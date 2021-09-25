@@ -1,0 +1,29 @@
+p = struct( 'rho_w',    1000,...
+            'd_shore',  1000,...
+            'sigma_y',  1e9,...
+            'g',        9.8,...
+            'Hs',       1,...
+            'T',        5,...
+            'tfinal',   10,...
+            's0',       [0; 0],...
+            'dt',       0.01);
+X = ones(1,8);
+
+[LCOE, D_env, Lt, B, FOS] = simulation(X,p);
+
+function [LCOE, D_env, Lt, B, FOS] = simulation(X, p)
+
+% capital X is design variables in vector format (necessary for optimization)
+% lowercase x is design variables in struct format (more readable)
+
+x = struct('L',X(1),'W',X(2),'M',X(3),'d_WEC',X(4),'d_farm',X(5),...
+            'N_WEC',X(6),'i_PT',X(7),'D_int',X(8));
+
+[F_max, D_env, P_elec] = dynamicSimulation(x,p);
+
+[B,FOS] = structures(F_max, x.L, x.W, x.M, p.sigma_y);
+
+[LCOE, Lt] = econ(x.L, x.W, x.M, x.N_WEC, x.i_PT, p.d_shore, FOS, P_elec);
+
+
+end
