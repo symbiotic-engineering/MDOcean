@@ -5,17 +5,18 @@ function [F_max, D_env, P_elec] = dynamicSimulation(x,p)
 sol = ode45(@(t,s)dynamics(t,s,x,p), [0 p.tfinal], p.s0);
 time = 0:p.dt:p.tfinal;
 state = deval(sol,time);
-%[~, P_elec, D_env, F] = dynamics(0, state, x, p);
+[~, P_elec, D_env, F] = dynamics(time, state, x, p);
 
 % plot results
 figure
-plot(time,state)%time,P_elec,time,D_env,time,F)
-legend({'position','velocity'})%'P elec','D env','F')
+plot(time,state*1e4,time,P_elec*1e7,time,D_env,time,F)
+legend({'position*1e4','velocity*1e4','P elec*1e7','D env','net force'})
+xlabel('time')
 
 % covert time series to scalar outputs
-D_env = 0;%mean(D_env); 
-F_max = 0;%max(F);
-P_elec = 0;%mean(P_elec);
+D_env = mean(D_env); 
+F_max = max(F);
+P_elec = -mean(P_elec);
 
 end
 
@@ -30,9 +31,9 @@ u = controls(s, x.D_int);
 
 F = F_hydro + F_ptrain;
 
-sdot = [0; 0];
-sdot(1) = s(2);
-sdot(2) = F/m;
+sdot = zeros(2,size(s,2));
+sdot(1,:) = s(2,:);
+sdot(2,:) = F./m;
 
 end
 
