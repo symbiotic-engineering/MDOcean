@@ -1,21 +1,24 @@
-function [F_hydro, m, D_env] = hydro(t, s, L, W, M, d_WEC, N_WEC, d_farm, d_shore, rho_w, g, Hs, T)
+function [F_hydro, m, D_env] = hydro(t, s, m_float, D_sft, d_WEC, N_WEC, d_farm, d_shore, rho_w, g, Hs, T)
+
+w = 2*pi/T;     % frequency
+r = D_sft / 2;  % radius
+A_w = pi * r^2; % waterplane area
+k = w^2 / g;    % wave number
+V_g = g /(2*w); % group velocity
 
 % hydrodynamic coefficients (in reality, these are functions of s, L, W, d_WEC, N_WEC)
-B       = 1 * ones(1,size(s,2)); % radiation damping
-A       = 1 * ones(1,size(s,2)); % added mass
-gamma   = 1 * ones(1,size(s,2)); % diffraction
+A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63 * ones(1,size(s,2)); % added mass
+gamma   = rho_w * g * A_w * ones(1,size(s,2)); % Froude Krylov / diffraction
+B       = k / (4 * rho_w * g * V_g) * gamma.^2; % radiation damping
 
-wave = Hs * sin(2*pi/T * t); % in reality this is a function of d_shore
+wave = Hs * sin(w * t); % in reality this is a function of d_shore
 
-F_hydrostatic = -rho_w * g * L * W * s(1,:);
+F_hydrostatic = -rho_w * g * A_w * s(1,:);
 F_radiation = -B .* s(2,:);
 F_excitation = gamma .* wave;
 F_hydro = F_hydrostatic + F_radiation + F_excitation;
 
-rho = 1000; % in reality this is a function of material M
-H = 1;
-mass = L * W * H * rho;
-m = mass + A;
+m = m_float + A;
 
 D_env = 0.5 * ones(1,size(s,2)); % in reality this is a function of d_farm and forces
 
