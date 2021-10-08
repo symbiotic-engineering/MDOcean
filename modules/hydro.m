@@ -6,7 +6,7 @@ A_w = pi * r^2; % waterplane area
 k = w^2 / g;    % wave number
 V_g = g /(2*w); % group velocity
 
-% hydrodynamic coefficients (in reality, these are functions of s, L, W, d_WEC, N_WEC)
+% hydrodynamic coefficients
 A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63 * ones(1,size(s,2)); % added mass
 gamma   = rho_w * g * A_w * ones(1,size(s,2)); % Froude Krylov / diffraction
 B       = k / (4 * rho_w * g * V_g) * gamma.^2; % radiation damping

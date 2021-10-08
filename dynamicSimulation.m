@@ -8,10 +8,10 @@ state = deval(sol,time);
 [~, P_elec, D_env, F] = dynamics(time, state, x, p, m_float);
 
 % plot results
-figure
-plot(time,state*1e4,time,P_elec/100,time,D_env,time,F)
-legend({'position*1e4','velocity*1e4','P elec/100','D env','net force'})
-xlabel('time')
+% figure
+% plot(time,state*1e4,time,P_elec/100,time,D_env,time,F)
+% legend({'position*1e4','velocity*1e4','P elec/100','D env','net force'})
+% xlabel('time')
 
 % covert time series to scalar outputs
 D_env = mean(D_env); 
