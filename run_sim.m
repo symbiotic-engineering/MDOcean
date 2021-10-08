@@ -31,24 +31,81 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             't_vc',     1.00 * in2m,...         % vertical column thickness (m)
             'd_WEC',    10,...                  % distance between WECs (m)
             'd_farm',   1000,...                % distance to farm (m)
-            'i_PT',     1);                     % powertrain index (-)
+            'i_PT',     1,...                   % powertrain index (-)
+            'P_min',    70e3,...                % minimum power (W)
+            'B_min',    1,...                   % minimum buoyancy ratio (-)
+            'FOS_min',  3);                     % minimum FOS (-)
 
-X = [5 1 1*in2m 5 1 1 1000];
+X = [ 10 20 30;     % outer diameter of float
+      .1 .3 .5;     % inner diameter ratio of float
+      40 62.8 70;   % radial material thickness
+      15 30 45;     % outer diameter of reaction plate
+      2 1 3;        % material
+      1 10 20;      % Number of WECs in array
+      5e6 1e7 5e7   % D_int
+        ];
+    
+X_nom = X(:,2);
+design_size = size(X);
+var_num = design_size(1);
+var_depth = design_size(2);
+LCOE = X*inf;
+opt_idx = zeros(var_num,1);
+recommended = zeros(var_num,2);
 
-[LCOE, D_env, Lt, B, FOS] = simulation(X,p)
+failed = cell(var_num*var_depth,1);
+power = zeros(var_num*var_depth,1);
+X_ins = zeros(var_num*var_depth, var_num);
 
-function [LCOE, D_env, Lt, B, FOS] = simulation(X, p)
+design = 0;
+for i = 1:var_num
+    X_in = X_nom;
+    for j = 1:var_depth
+        changed_entry = X(i,j);
+        if ~isnan(changed_entry)
+            design = design+1;
+            X_in(i) = changed_entry;
+            X_ins(design,:) = X_in;
+            [LCOE_temp, ~, ~, B, FOS, power(design)] = simulation(X_in,p);
+            [feasible, failed{design}] = is_feasible(power(design), B, FOS, p);
+            if feasible
+                LCOE(i,j) = LCOE_temp;
+            else
+                LCOE(i,j) = NaN;
+            end
+        end
+    end
+    [~, opt_idx(i)] = min(LCOE(i,:));
+    recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];
+end
+
+% create table for display
+var_names = {'D_sft',...    % outer diameter of float (m)
+            'D_i/D_sft',... % inner diameter ratio of float (m)
+            'L_sf',...      % radial material thickness of float (m) 
+            'D_or',...      % outer diameter of reaction plate (m)
+            'M',...         % material (-)
+            'N_WEC',...     % number of WECs in array (-)
+            'D_int'};       % internal damping of controller (Ns/m)
+results = array2table(X_ins, 'VariableNames', var_names);
+LCOE = LCOE';
+results = addvars(results, round(LCOE(:),1), round(power/1e3), failed, ...
+    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','ConstraintsFailed'});
+
+disp(results)
+
+function [LCOE, D_env, Lt, B, FOS, P_elec] = simulation(X, p)
 
 % capital X is design variables in vector format (necessary for optimization)
 % lowercase x is design variables in struct format (more readable)
 
-x = struct( 'D_sft',X(1),...	% outer diameter of float (m)
-            'D_i',  X(2),...    % inner diameter of float (m)
-            'L_sf', X(3),...    % radial material thickness of float (m) 
-            'D_or', X(4),...    % outer diameter of reaction plate (m)
-            'M',    X(5),...    % material (-)
-            'N_WEC',X(6),...    % number of WECs in array (-)
-            'D_int',X(7));      % internal damping of controller (Ns/m)
+x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
+            'D_i',  X(2)*X(1),...   % inner diameter of float (m)
+            'L_sf', X(3),...        % radial material thickness of float (m) 
+            'D_or', X(4),...        % outer diameter of reaction plate (m)
+            'M',    X(5),...        % material (-)
+            'N_WEC',X(6),...        % number of WECs in array (-)
+            'D_int',X(7));          % internal damping of controller (Ns/m)
 
 [V_d, V_m, m_tot, m_float, h] = geometry(x.D_i, x.D_sft, p.t_sft, x.L_sf, ...
                          p.t_sf, p.t_sfb, p.t_vc, x.D_or, p.t_r, p.rho_m, x.M);
