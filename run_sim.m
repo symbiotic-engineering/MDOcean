@@ -13,12 +13,15 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'd_shore',  1000,...                % distance from shore (m)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'Hs',       1,...                   % wave height (m)
-            'T',        5,...                   % wave period (s)
+            'T',        6,...                   % wave period (s)
             'tfinal',   30,...                  % simulation duration (s)
             's0',       [0; 0],...              % initial state [m m/s]
             'dt',       0.01,...                % timestep (s)
             'sigma_y',  [36,4.5,30]* ksi2pa,... % yield strength (Pa)
             'rho_m',    [8000 2400 8000],...    % material density (kg/m3)
+            'E',        [200e6, ...             % young's modulus (Pa)
+                        5000*sqrt(4.5*ksi2pa),...
+                        200e6],...              
             'cost_m',   [0.86/lb2kg, ...        % material cost
                         125/yd2m^3, ...         % [$/kg $/m3 $/kg] 
                         1.84/lb2kg],...  
@@ -34,7 +37,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'i_PT',     1,...                   % powertrain index (-)
             'P_min',    70e3,...                % minimum power (W)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
-            'FOS_min',  3);                     % minimum FOS (-)
+            'FOS_min',  1.5);                   % minimum FOS (-)
 
 X = [ 10 20 30;     % outer diameter of float
       .1 .3 .5;     % inner diameter ratio of float
@@ -55,6 +58,7 @@ recommended = zeros(var_num,2);
 
 failed = cell(var_num*var_depth,1);
 power = zeros(var_num*var_depth,1);
+FOS = zeros(var_num*var_depth,1);
 X_ins = zeros(var_num*var_depth, var_num);
 
 design = 0;
@@ -66,8 +70,8 @@ for i = 1:var_num
             design = design+1;
             X_in(i) = changed_entry;
             X_ins(design,:) = X_in;
-            [LCOE_temp, ~, ~, B, FOS, power(design)] = simulation(X_in,p);
-            [feasible, failed{design}] = is_feasible(power(design), B, FOS, p);
+            [LCOE_temp, ~, ~, B, FOS(design), power(design)] = simulation(X_in,p);
+            [feasible, failed{design}] = is_feasible(power(design), B, FOS(design), p);
             if feasible
                 LCOE(i,j) = LCOE_temp;
             else
@@ -89,8 +93,8 @@ var_names = {'D_sft',...    % outer diameter of float (m)
             'D_int'};       % internal damping of controller (Ns/m)
 results = array2table(X_ins, 'VariableNames', var_names);
 LCOE = LCOE';
-results = addvars(results, round(LCOE(:),1), round(power/1e3), failed, ...
-    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','ConstraintsFailed'});
+results = addvars(results, round(LCOE(:),1), round(power/1e3), FOS, failed, ...
+    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','FOS (-)','ConstraintsFailed'});
 
 disp(results)
 
@@ -107,12 +111,12 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'N_WEC',X(6),...        % number of WECs in array (-)
             'D_int',X(7));          % internal damping of controller (Ns/m)
 
-[V_d, V_m, m_tot, m_float, h] = geometry(x.D_i, x.D_sft, p.t_sft, x.L_sf, ...
+[V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(x.D_i, x.D_sft, p.t_sft, x.L_sf, ...
                          p.t_sf, p.t_sfb, p.t_vc, x.D_or, p.t_r, p.rho_m, x.M);
         
-[F_max, D_env, P_elec] = dynamicSimulation(x, p, m_float);
+[F_hydro_heave, F_hydro_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
 
-[B,FOS] = structures(V_d, m_tot, F_max, x.M, x.D_i, x.D_sft, h, x.D_or, p.rho_w, p.g, p.sigma_y);
+[B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
 
 [LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, p.i_PT, p.d_shore, FOS, P_elec);
 

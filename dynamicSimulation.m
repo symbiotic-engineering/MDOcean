@@ -1,11 +1,11 @@
 
-function [F_max, D_env, P_elec] = dynamicSimulation(x,p,m_float)
+function [F_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x,p,m_float,t_f)
 
 % run simulation
-sol = ode45(@(t,s)dynamics(t,s,x,p,m_float), [0 p.tfinal], p.s0);
+sol = ode45(@(t,s)dynamics(t,s,x,p,m_float,t_f), [0 p.tfinal], p.s0);
 time = 0:p.dt:p.tfinal;
 state = deval(sol,time);
-[~, P_elec, D_env, F] = dynamics(time, state, x, p, m_float);
+[~, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, m_float, t_f);
 
 % plot results
 % figure
@@ -15,25 +15,26 @@ state = deval(sol,time);
 
 % covert time series to scalar outputs
 D_env = mean(D_env); 
-F_max = max(F);
+F_heave = max(F_heave);
+F_surge = max(F_surge);
+F_ptrain = max(F_ptrain);
 P_elec = -mean(P_elec);
 
 end
 
-function [sdot, P_elec, D_env, F] = dynamics(t, s, x, p, m_float)
+function [sdot, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(t, s, x, p, m_float, t_f)
 % s    = [position velocity]
 % sdot = [velocity acceleration]
 
 u = controls(s, x.D_int);
 [F_ptrain, P_elec] = ptrain(s, u, p.i_PT);
-[F_hydro, m, D_env] = hydro(t, s, m_float, x.D_sft, p.d_WEC, x.N_WEC, ...
-                            p.d_farm, p.d_shore, p.rho_w, p.g, p.Hs, p.T);
-
-F = F_hydro + F_ptrain;
+[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.d_WEC, x.N_WEC, ...
+                            p.d_farm, p.d_shore, p.rho_w, p.g, p.Hs, p.T, t_f);
+F_net = F_heave + F_ptrain;
 
 sdot = zeros(2,size(s,2));
 sdot(1,:) = s(2,:);
-sdot(2,:) = F./m;
+sdot(2,:) = F_net./m;
 
 end
 
