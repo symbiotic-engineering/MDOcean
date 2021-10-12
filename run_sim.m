@@ -37,7 +37,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'i_PT',     1,...                   % powertrain index (-)
             'P_min',    70e3,...                % minimum power (W)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
-            'FOS_min',  1.5);                   % minimum FOS (-)
+            'FOS_min',  3);                     % minimum FOS (-)
 
 X = [ 10 20 30;     % outer diameter of float
       .1 .3 .5;     % inner diameter ratio of float

@@ -46,7 +46,7 @@ A_c = [A_c_sf, A_c_vc, A_c_rp];
 A_lat_sub = [A_l_sf A_l_vc A_l_rp];
 r_over_t = [0,... % D_sft/(2*t_sf) 
             D_i/(2*t_vc),...
-            D_or/(2*t_r)];
+            0];%D_or/(2*t_r)];
 
 end
 

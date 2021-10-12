@@ -13,12 +13,19 @@ F_axial = max([F_hydro_heave, F_ptrain]);
 P_hydrostatic = rho_w * g * depth;
 sigma_surge = F_hydro_surge ./ A_lat_sub;
 
-sigma_rr = P_hydrostatic + sigma_surge;     % radial compression
+sigma_rr = P_hydrostatic + abs(sigma_surge);% radial compression
 sigma_tt = P_hydrostatic * r_over_t;        % hoop stress
 sigma_zz = F_axial ./ A_c;                  % axial compression
 sigma_rt = sigma_surge;                     % shear
-sigma_tz = 0;
-sigma_zr = 0;
+sigma_tz = [0 0 0];
+sigma_zr = [0 0 0];
+
+sigma = zeros(3,3,3);
+for i=1:3
+sigma(:,:,i) = [sigma_rr(i) sigma_rt(i) sigma_zr(i);
+                sigma_rt(i) sigma_tt(i) sigma_tz(i);
+                sigma_zr(i) sigma_tz(i) sigma_zz(i)];
+end
 
 % assume ductile material for now - need to use mohr's circle for concrete
 sigma_vm = von_mises(sigma_rr, sigma_tt, sigma_zz, sigma_rt, sigma_tz, sigma_zr);
