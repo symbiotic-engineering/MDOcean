@@ -39,16 +39,15 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  3);                     % minimum FOS (-)
 
-X = [ 10 20 30;     % outer diameter of float
-      .1 .3 .5;     % inner diameter ratio of float
-      40 62.8 70;   % radial material thickness
-      15 30 45;     % outer diameter of reaction plate
-      2 1 3;        % material
-      1 10 20;      % Number of WECs in array
-      5e6 1e7 5e7   % D_int
+X = [ 20 10 30;     % outer diameter of float
+      .3 .1 .5;     % inner diameter ratio of float
+      30 15 45;     % outer diameter of reaction plate
+      1 2 3;        % material
+      10 1 20;      % Number of WECs in array
+      1e7 5e6 5e7   % D_int
         ];
     
-X_nom = X(:,2);
+X_nom = X(:,1);
 design_size = size(X);
 var_num = design_size(1);
 var_depth = design_size(2);
@@ -56,46 +55,48 @@ LCOE = X*inf;
 opt_idx = zeros(var_num,1);
 recommended = zeros(var_num,2);
 
-failed = cell(var_num*var_depth,1);
-power = zeros(var_num*var_depth,1);
-FOS = zeros(var_num*var_depth,1);
-X_ins = zeros(var_num*var_depth, var_num);
+number_runs = var_depth + (var_num-1)*(var_depth-1);
+failed = cell(number_runs,1);
+power = zeros(number_runs,1);
+FOS = zeros(number_runs,1);
+X_ins = zeros(number_runs, var_num);
 
 design = 0;
 for i = 1:var_num
     X_in = X_nom;
     for j = 1:var_depth
-        changed_entry = X(i,j);
-        if ~isnan(changed_entry)
-            design = design+1;
-            X_in(i) = changed_entry;
-            X_ins(design,:) = X_in;
-            [LCOE_temp, ~, ~, B, FOS(design), power(design)] = simulation(X_in,p);
-            [feasible, failed{design}] = is_feasible(power(design), B, FOS(design), p);
-            if feasible
-                LCOE(i,j) = LCOE_temp;
-            else
-                LCOE(i,j) = NaN;
+        if i == 1 || j~=1
+            changed_entry = X(i,j);
+            if ~isnan(changed_entry)
+                design = design+1;
+                X_in(i) = changed_entry;
+                X_ins(design,:) = X_in;
+                [LCOE_temp, ~, ~, B, FOS(design), power(design)] = simulation(X_in,p);
+                [feasible, failed{design}] = is_feasible(power(design), B, FOS(design), p);
+                if feasible
+                    LCOE(i,j) = LCOE_temp;
+                else
+                    LCOE(i,j) = NaN;
+                end
             end
         end
     end
     [~, opt_idx(i)] = min(LCOE(i,:));
     recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];
 end
-
+[LCOE_op, ~, ~, B_op, FOS_op, power_op] = simulation(recommended(:,1),p);
+[op_feasible, CC] = is_feasible(power_op, B_op, FOS_op, p);
 % create table for display
 var_names = {'D_sft',...    % outer diameter of float (m)
             'D_i/D_sft',... % inner diameter ratio of float (m)
-            'L_sf',...      % radial material thickness of float (m) 
             'D_or',...      % outer diameter of reaction plate (m)
             'M',...         % material (-)
             'N_WEC',...     % number of WECs in array (-)
             'D_int'};       % internal damping of controller (Ns/m)
 results = array2table(X_ins, 'VariableNames', var_names);
 LCOE = LCOE';
-results = addvars(results, round(LCOE(:),1), round(power/1e3), FOS, failed, ...
+results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), FOS, failed, ...
     'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','FOS (-)','ConstraintsFailed'});
-
 disp(results)
 
 function [LCOE, D_env, Lt, B, FOS, P_elec] = simulation(X, p)
@@ -105,11 +106,11 @@ function [LCOE, D_env, Lt, B, FOS, P_elec] = simulation(X, p)
 
 x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'D_i',  X(2)*X(1),...   % inner diameter of float (m)
-            'L_sf', X(3),...        % radial material thickness of float (m) 
-            'D_or', X(4),...        % outer diameter of reaction plate (m)
-            'M',    X(5),...        % material (-)
-            'N_WEC',X(6),...        % number of WECs in array (-)
-            'D_int',X(7));          % internal damping of controller (Ns/m)
+            'L_sf', pi*X(1),...        % radial material thickness of float (m) 
+            'D_or', X(3),...        % outer diameter of reaction plate (m)
+            'M',    X(4),...        % material (-)
+            'N_WEC',X(5),...        % number of WECs in array (-)
+            'D_int',X(6));          % internal damping of controller (Ns/m)
 
 [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(x.D_i, x.D_sft, p.t_sft, x.L_sf, ...
                          p.t_sf, p.t_sfb, p.t_vc, x.D_or, p.t_r, p.rho_m, x.M);
