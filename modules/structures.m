@@ -36,8 +36,8 @@ L = h;
 F_buckling = pi^2 * E(M) * I / (K*L)^2;
 
 %% Factor of Safety (FOS) Calculations
-FOS_yield = sigma_y(M) ./ sigma_vm
-FOS_buckling = F_buckling / F_axial
+FOS_yield = sigma_y(M) ./ sigma_vm;
+FOS_buckling = F_buckling / F_axial;
 FOS = min([FOS_yield, FOS_buckling]);
 
 end
