@@ -12,7 +12,7 @@ lb2kg = 1/2.2;  % pound to kilogram
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'd_shore',  1000,...                % distance from shore (m)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
-            'Hs',       1,...                   % wave height (m)
+            'Hs',       2,...                   % wave height (m)
             'T',        6,...                   % wave period (s)
             'tfinal',   30,...                  % simulation duration (s)
             's0',       [0; 0],...              % initial state [m m/s]
