@@ -9,11 +9,15 @@ lb2kg = 1/2.2;  % pound to kilogram
 %               Concrete (Brittle)
 %               Stainless Steel 304 (Ductile) ]
 
+file = 'C:\SAM\2020.11.29\wave_resource\Humboldt_California_Wave Resource _SAM CSV.csv';
+jpd = readmatrix(file,'Range','A3');
+
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'd_shore',  1000,...                % distance from shore (m)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
-            'Hs',       2,...                   % wave height (m)
-            'T',        6,...                   % wave period (s)
+            'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
+            'Hs',       jpd(2:end,1),...        % wave height (m)
+            'T',        jpd(1,2:end),...        % wave period (s)
             'tfinal',   30,...                  % simulation duration (s)
             's0',       [0; 0],...              % initial state [m m/s]
             'dt',       0.01,...                % timestep (s)
