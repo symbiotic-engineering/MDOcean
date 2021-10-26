@@ -1,5 +1,5 @@
 
-function [B,FOS,GM] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E,t_r,t_f)
+function [B,FOS,GM] = structures(V_d, V_s,m_tot, F_hydro_heave, F_surge, F_ptrain, M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E,t_r,t_f)
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
@@ -15,8 +15,7 @@ B = Fb / Fg;
 KB=((t_f/2)+h+t_r)/2;%center of buoyancy above the keel
 KG=((t_f/2)+h+t_r);%center of gravity above the keel
 I_m=(pi/64)*D_sft^4;%second moment of area of the water plane area
-V_s=(pi/4)*((D_sft^2*(t_f/2))+(D_i^2*h)+(D_or^2*t_r));%submerged volume
-BM=I_m/V_s;
+BM=I_m/V_s;%V_s is the submerged volume
 GM=KB+BM-KG;%Metacentric Height
 
 %% Stress calculations
