@@ -25,9 +25,9 @@ capex = development + infrastructure + mooring + devicestructure + pto ...
         + profitmargin + installation + contingency; 
 opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
+FCR=10.8;% 
 
-
-LCOE = (capex + opex)/aep; % temporarily removed fcr
+LCOE = (capex*FCR + opex)/aep; % temporarily removed fcr
 
 Lt = 20; % lifetime (years) RM3 ref
 
