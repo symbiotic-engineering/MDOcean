@@ -7,23 +7,24 @@ num_Hs = length(p.Hs);
 num_T = length(p.T);
 P_elec = zeros(num_Hs,num_T);
 
-for H_idx = 1 %1:num_Hs
+for H_idx = 1:num_Hs
     for T_idx = 1:num_T
-        Hs = p.Hs(H_idx);
-        T = p.T(T_idx);
-        
-        % run simulation
-        sol = ode45(@(t,s)dynamics(t,s,x,p,Hs,T,m_float,t_f), [0 p.tfinal], p.s0);
-        state = deval(sol,time);
-        [~, P_elec_vs_time, D_env, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, Hs, T, m_float, t_f);
-        P_elec(H_idx,T_idx) = -mean(P_elec_vs_time);
-        
-        % plot results
-        % figure
-        % plot(time,state*1e4,time,P_elec/100,time,D_env,time,F_heave,F_ptrain)
-        % legend({'position*1e4','velocity*1e4','P elec/100','D env','net force'})
-        % xlabel('time')
+        if p.JPD(H_idx,T_idx) ~= 0
+            Hs = p.Hs(H_idx);
+            T = p.T(T_idx);
 
+            % run simulation
+            sol = ode45(@(t,s)dynamics(t,s,x,p,Hs,T,m_float,t_f), [0 p.tfinal], p.s0);
+            state = deval(sol,time);
+            [~, P_elec_vs_time, D_env, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, Hs, T, m_float, t_f);
+            P_elec(H_idx,T_idx) = -mean(P_elec_vs_time);
+
+            % plot results
+            % figure
+            % plot(time,state*1e4,time,P_elec/100,time,D_env,time,F_heave,F_ptrain)
+            % legend({'position*1e4','velocity*1e4','P elec/100','D env','net force'})
+            % xlabel('time')
+        end
     end 
 end
 
@@ -45,8 +46,7 @@ function [sdot, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(t, s, x, p
 
 u = controls(s, x.D_int);
 [F_ptrain, P_elec] = ptrain(s, u, p.i_PT);
-[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.d_WEC, x.N_WEC, ...
-                            p.d_farm, p.d_shore, p.rho_w, p.g, Hs, T, t_f);
+[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.rho_w, p.g, Hs, T, t_f);
 F_net = F_heave + F_ptrain;
 
 sdot = zeros(2,size(s,2));
