@@ -13,7 +13,6 @@ file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = readmatrix(file,'Range','A3');
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
-            'd_shore',  1000,...                % distance from shore (m)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
             'Hs',       jpd(2:end,1),...        % wave height (m)
@@ -36,9 +35,6 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             't_sfb',    0.56 * in2m,...         % float bottom thickness (m)
             't_r',      1.00 * in2m,...         % reaction plate thickness (m)
             't_vc',     1.00 * in2m,...         % vertical column thickness (m)
-            'd_WEC',    10,...                  % distance between WECs (m)
-            'd_farm',   1000,...                % distance to farm (m)
-            'i_PT',     1,...                   % powertrain index (-)
             'P_min',    70e3,...                % minimum power (W)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  3);                     % minimum FOS (-)

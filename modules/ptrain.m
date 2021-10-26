@@ -1,4 +1,4 @@
-function [F_ptrain,P_elec] = ptrain(s, u, i_PT)
+function [F_ptrain,P_elec] = ptrain(s, u)
 
 GR = 10; % gear ratio
 r = 0.1;

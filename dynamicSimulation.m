@@ -45,7 +45,7 @@ function [sdot, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(t, s, x, p
 % sdot = [velocity acceleration]
 
 u = controls(s, x.D_int);
-[F_ptrain, P_elec] = ptrain(s, u, p.i_PT);
+[F_ptrain, P_elec] = ptrain(s, u);
 [F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.rho_w, p.g, Hs, T, t_f);
 F_net = F_heave + F_ptrain;
 
