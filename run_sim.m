@@ -115,9 +115,9 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
 [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(x.D_i, x.D_sft, p.t_sft, x.L_sf, ...
                          p.t_sf, p.t_sfb, p.t_vc, x.D_or, p.t_r, p.rho_m, x.M);
         
-[F_hydro_heave, F_hydro_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
+[F_hydro_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
 
-[B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
+[B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
 
 [LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, p.i_PT, p.d_shore, FOS, P_elec);
 
