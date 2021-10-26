@@ -1,4 +1,3 @@
-
 function [F_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x,p,m_float,t_f)
 
 time = 0:p.dt:p.tfinal;
@@ -19,6 +18,10 @@ for H_idx = 1:num_Hs
             [~, P_elec_vs_time, D_env, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, Hs, T, m_float, t_f);
             P_elec(H_idx,T_idx) = -mean(P_elec_vs_time);
 
+            sol = ode45(@(t,s)dynamics(t,s,x,p,Hs,T,m_float,t_f), [0 p.tfinal], p.s0);
+            state = deval(sol,time);
+            [~, ~, ~, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, p.Hs_struct, p.T_struct, m_float, t_f);
+            
             % plot results
             % figure
             % plot(time,state*1e4,time,P_elec/100,time,D_env,time,F_heave,F_ptrain)

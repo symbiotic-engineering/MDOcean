@@ -5,7 +5,7 @@ r = 0.1;
 
 T_max = 100; % max motor torque (in reality this is a function of i_PT)
 F_max = T_max / r * GR;
-F_ptrain = min(u,F_max);
+F_ptrain = sign(u)*min(abs(u), F_max);
 
 T = F_ptrain * r / GR;      % motor torque Nm
 w = s(2,:)/r * GR;          % motor speed rad/s
