@@ -26,7 +26,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
                         125/yd2m^3, ...         % [$/kg $/m3 $/kg] 
                         1.84/lb2kg],...  
             ...% https://agmetalminer.com/metal-prices/
-            ...% https://www.concretenetwork.com/concrete-prices.html
+            ...% https://www.concretenetwork.com/concrete-prices.html...
             't_sft',    0.50 * in2m,...         % float top thickness (m)
             't_sf',     0.44 * in2m,...         % float column thickness (m)
             't_sfb',    0.56 * in2m,...         % float bottom thickness (m)
@@ -37,7 +37,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'i_PT',     1,...                   % powertrain index (-)
             'P_min',    70e3,...                % minimum power (W)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
-            'FOS_min',  3);                     % minimum FOS (-)
+            'FOS_min',  3,...                   % minimum FOS (-)
+            'FCR',      0.108);                 % fixed charge rate (%)
 
 X = [ 20 10 30;     % outer diameter of float
       .3 .1 .5;     % inner diameter ratio of float
@@ -117,7 +118,7 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
         
 [F_hydro_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
 
-[B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
+[B,FOS] = structures(V_d,V_s, m_tot, F_hydro_heave, F_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
 
 [LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, p.i_PT, p.d_shore, FOS, P_elec);
 
