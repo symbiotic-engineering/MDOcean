@@ -1,5 +1,5 @@
 
-function [LCOE, Lt] = econ(m_tot, V_m, M, cost_m, N_WEC, i_PT, d_shore, FOS, P_elec)
+function [LCOE, Lt] = econ(m_tot, V_m, M, cost_m, N_WEC, P_elec)
 
 structural_cost = [m_tot V_m m_tot] .* cost_m;
 devicestructure =  N_WEC * structural_cost(M);

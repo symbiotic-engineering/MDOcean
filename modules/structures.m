@@ -7,7 +7,7 @@ Fg = m_tot * g;
 B = Fb / Fg;
 
 %% Stress calculations
-depth = h; % estimate for now
+depth = h/2; % average depth
 
 F_axial = max([F_hydro_heave, F_ptrain]);
 P_hydrostatic = rho_w * g * depth;
