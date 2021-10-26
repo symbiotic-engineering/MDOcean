@@ -8,7 +8,7 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'D_i',  X(2)*X(1),...   % inner diameter of float (m)
             'L_sf', pi*X(1),...        % radial material thickness of float (m) 
             'D_or', X(3),...        % outer diameter of reaction plate (m)
-            'M',    X(4),...        % material (-)
+            'M',    p.M,...         % material (-)
             'N_WEC',X(5),...        % number of WECs in array (-)
             'D_int',X(6));          % internal damping of controller (Ns/m)
 
