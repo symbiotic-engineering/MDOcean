@@ -1,5 +1,5 @@
 
-function [LCOE, Lt] = econ(m_tot, V_m, M, cost_m, N_WEC, i_PT, d_shore, FOS, P_elec)
+function [LCOE, Lt] = econ(m_tot, V_m, M, cost_m, N_WEC, i_PT, d_shore, FOS,FCR, P_elec)
 
 structural_cost = [m_tot V_m m_tot] .* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
@@ -25,9 +25,8 @@ capex = development + infrastructure + mooring + devicestructure + pto ...
         + profitmargin + installation + contingency; 
 opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
-FCR=10.8;% 
 
-LCOE = (capex*FCR + opex)/aep; % temporarily removed fcr
+LCOE = ((capex*FCR) + opex)/aep;%Levelized Cost of Energy
 
 Lt = 20; % lifetime (years) RM3 ref
 
