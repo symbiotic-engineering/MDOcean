@@ -3,7 +3,7 @@ function [feasible, failed] = is_feasible(power, B, FOS, GM, p)
 B_ok = B > p.B_min;
 FOS_ok = FOS > p.FOS_min;
 power_ok = power > p.P_min;
-GM_ok=GM > 0;
+GM_ok = GM > 0;
 
 feasible = B_ok & FOS_ok & power_ok & GM_ok;
 

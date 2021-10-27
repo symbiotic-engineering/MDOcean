@@ -28,8 +28,7 @@ function [sdot, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(t, s, x, p
 
 u = controls(s, x.D_int);
 [F_ptrain, P_elec] = ptrain(s, u, p.i_PT);
-[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.d_WEC, x.N_WEC, ...
-                            p.d_farm, p.d_shore, p.rho_w, p.g, p.Hs, p.T, t_f);
+[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.rho_w, p.g, p.Hs, p.T, t_f);
 F_net = F_heave + F_ptrain;
 
 sdot = zeros(2,size(s,2));
