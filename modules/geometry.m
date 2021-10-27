@@ -30,7 +30,7 @@ D_ivc = D_i - 2*t_vc;                   % inner diameter
 A_c_vc = pi * ((D_i/2)^2-(D_ivc/2)^2);  % cross sectional area
 V_vc_m = A_c_vc * h;                    % volume for material purposes
 I = pi * (D_i^4 - D_ivc^4) / 64;        % area moment of inertia
-A_l_vc =D_i * h;                  % lateral area
+A_l_vc = D_i * h;                       % lateral area
 
 %% Reaction plate
 A_c_rp = pi * ((D_or/2)^2 - (D_i/2)^2); % cross sectional area

@@ -1,22 +1,18 @@
 
-function [B,FOS,GM] = structures(V_d, V_s,m_tot, F_hydro_heave, F_surge, F_ptrain, M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E,t_r,t_f)
+function [B,FOS,GM] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, ...
+                        M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f)
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
 Fg = m_tot * g;
 B = Fb / Fg;
+
 %% Metacentric Height Calculatons
-%Metacentric Height (GM)
-%GM=KB+BM-KG
-%KB-the center of buoyancy above the keel
-%BM-I/V_cross~second moment of area of the water plane area/ displaced
-%volume
-%KG-center of gravity above the keel
-KB=((t_f/2)+h+t_r)/2;%center of buoyancy above the keel
-KG=((t_f/2)+h+t_r);%center of gravity above the keel
-I_m=(pi/64)*D_sft^4;%second moment of area of the water plane area
-BM=I_m/V_s;%V_s is the submerged volume
-GM=KB+BM-KG;%Metacentric Height
+KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
+KG =  t_f/2 + h + t_r;  	% center of gravity above the keel
+I_m = pi/64 * D_sft^4;      % second moment of area of the water plane area
+BM = I_m / V_d;             % V_d is the submerged/displaced volume
+GM = KB + BM - KG;          % Metacentric Height
 
 %% Stress calculations
 depth = h; % estimate for now
