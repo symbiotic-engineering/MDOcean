@@ -12,7 +12,7 @@ vol_sf = A_wsf * draft_sf;  % surface float submerged volume
 
 %Vertical Column Surge Geometry Calculations
 r_vc=D_i/2;% vertical column radius
-A_wvc=pi*r_vc^2;%verical column waterplane area
+A_wvc=pi*r_vc^2;%vertical column waterplane area
 draft_vc=D_i*7;%vertical column depth
 vol_vc=A_wvc*draft_vc;%vertical column submerged volume
 

@@ -5,6 +5,7 @@ function [B,FOS,GM] = structures(V_d, V_s,m_tot, F_hydro_heave, F_surge, F_ptrai
 Fb = rho_w * V_d * g;
 Fg = m_tot * g;
 B = Fb / Fg;
+
 %% Metacentric Height Calculatons
 %Metacentric Height (GM)
 %GM=KB+BM-KG
