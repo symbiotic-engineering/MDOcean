@@ -9,7 +9,7 @@ lb2kg = 1/2.2;  % pound to kilogram
 %               Concrete (Brittle)
 %               Stainless Steel 304 (Ductile) ]
 
-file = 'C:\SAM\2020.11.29\wave_resource\Humboldt_California_Wave Resource _SAM CSV.csv';
+file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = readmatrix(file,'Range','A3');
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
