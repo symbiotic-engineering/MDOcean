@@ -1,5 +1,5 @@
 
-function [B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E)
+function [B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E)
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
@@ -37,8 +37,11 @@ F_buckling = pi^2 * E(M) * I / (K*L)^2;
 
 %% Factor of Safety (FOS) Calculations
 FOS_yield = sigma_y(M) ./ sigma_vm;
+FOS1Y=FOS_yield(1);
+FOS2Y=FOS_yield(2);
+FOS3Y=FOS_yield(3);
 FOS_buckling = F_buckling / F_axial;
-FOS = min([FOS_yield, FOS_buckling]);
+%FOS = min([FOS_yield, FOS_buckling]);
 
 end
 

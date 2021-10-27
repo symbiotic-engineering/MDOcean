@@ -14,6 +14,12 @@ prob = optimproblem('Objective',simulation(X, p));
 prob.x0 = [20 .3 30 10 1e7];
 prob.options = optimoptions('fmincon',	'Display','iter',...
                                         'Algorithm','sqp');
+[~,~,~,B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling]=simulation(X,p);
+prob.Constraints.B=B > p.B_min;
+prob.Constraints.FOS1Y=FOS1Y > p.FOS_min;
+prob.constraints.FOS2Y=FOS2Y > p.FOS_min;
+prob.constriants.FOS3Y=FOS3Y > p.FOS_min;
+prob.constraints.F_b=FOS_buckling > p.FOS_min;
 
 prob.Constraints.c1 = D_sft > 1; % fixme with real constraints
 

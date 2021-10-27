@@ -1,5 +1,5 @@
 
-function [LCOE, D_env, Lt, B, FOS, P_elec] = simulation(X, p)
+function [LCOE, D_env, Lt, B, FOS1Y,FOS2Y,FOS3Y,FOS_buckling, P_elec] = simulation(X, p)
 
 % capital X is design variables in vector format (necessary for optimization)
 % lowercase x is design variables in struct format (more readable)
@@ -20,7 +20,7 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
 [F_hydro_heave, F_hydro_surge, ...
         F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
 
-[B,FOS] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, ...
+[B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(V_d, m_tot, F_hydro_heave, F_hydro_surge, F_ptrain, ...
         x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
 
 [LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec);
