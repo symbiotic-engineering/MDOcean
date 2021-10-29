@@ -21,7 +21,7 @@ F_axial = max([F_hydro_heave, F_ptrain]);
 P_hydrostatic = rho_w * g * depth;
 sigma_surge = F_surge ./ A_lat_sub;
 
-sigma_rr = P_hydrostatic + abs(sigma_surge);% radial compression
+sigma_rr = P_hydrostatic + sigma_surge;% radial compression
 sigma_tt = P_hydrostatic * r_over_t;        % hoop stress
 sigma_zz = F_axial ./ A_c;                  % axial compression
 sigma_rt = sigma_surge;                     % shear
