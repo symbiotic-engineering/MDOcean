@@ -72,8 +72,8 @@ for i = 1:var_num
                 design = design+1;
                 X_in(i) = changed_entry;
                 X_ins(design,:) = X_in;
-                [LCOE_temp, ~, ~, B, FOS(design), power(design)] = simulation(X_in,p);
-                [feasible, failed{design}] = is_feasible(power(design), B, FOS(design), p);
+                [LCOE_temp, ~, ~, B, FOS(design), power(design),GM(design)] = simulation(X_in,p);
+                [feasible, failed{design}] = is_feasible(power(design), B, FOS(design),GM(design), p);
                 if feasible
                     LCOE(i,j) = LCOE_temp;
                 else
@@ -85,8 +85,8 @@ for i = 1:var_num
     [~, opt_idx(i)] = min(LCOE(i,:));
     recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];
 end
-[LCOE_op, ~, ~, B_op, FOS_op, power_op] = simulation(recommended(:,1),p);
-[op_feasible, CC] = is_feasible(power_op, B_op, FOS_op, p);
+[LCOE_op, ~, ~, B_op, FOS_op, power_op,GM_op] = simulation(recommended(:,1),p);
+[op_feasible, CC] = is_feasible(power_op, B_op, FOS_op, GM_op,p);
 % create table for display
 var_names = {'D_sft',...    % outer diameter of float (m)
             'D_i/D_sft',... % inner diameter ratio of float (m)
@@ -100,7 +100,7 @@ results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), FOS, fail
     'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','FOS (-)','ConstraintsFailed'});
 disp(results)
 
-function [LCOE, D_env, Lt, B, FOS, P_elec] = simulation(X, p)
+function [LCOE, D_env, Lt, B, FOS, P_elec,GM] = simulation(X, p)
 
 % capital X is design variables in vector format (necessary for optimization)
 % lowercase x is design variables in struct format (more readable)
@@ -118,8 +118,8 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
         
 [F_hydro_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x, p, m_float, t_f);
 
-[B,FOS] = structures(V_d,V_s, m_tot, F_hydro_heave, F_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E);
+[B,FOS,GM] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, x.M, h, p.rho_w, p.g, p.sigma_y, A_c, A_lat_sub, r_over_t, I, p.E, t_f, p.t_r,x.D_sft);
 
-[LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, p.i_PT, p.d_shore, FOS, P_elec);
+[LCOE, Lt] = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, p.i_PT, p.d_shore, FOS,p.FCR, P_elec);
 
 end

@@ -1,6 +1,6 @@
 
 function [B,FOS,GM] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, ...
-                        M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f)
+                        M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f,D_sft)
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
