@@ -9,7 +9,15 @@ B = Fb / Fg;
 %% Stress calculations
 depth = h/2; % average depth
 
-F_axial = max([F_hydro_heave, F_ptrain]);
+Axial=[F_hydro_heave, F_ptrain];
+fax=Axial(1);
+for i=1:length(Axial)
+    if (Axial(i)>fax)
+        fax=Axial(i);
+    end
+end
+% The variable 'fax' stores the final maximum value
+F_axial=fax;
 P_hydrostatic = rho_w * g * depth;
 sigma_surge = F_hydro_surge ./ A_lat_sub;
 
