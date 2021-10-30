@@ -1,6 +1,6 @@
 
 function [B,FOS,GM] = structures(V_d, m_tot, F_hydro_heave, F_surge, F_ptrain, ...
-                        M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f,D_sft)
+                        M, h, rho_w, g, sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f,D_sft,D_i,D_or)
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
@@ -8,9 +8,10 @@ Fg = m_tot * g;
 B = Fb / Fg;
 
 %% Metacentric Height Calculatons
+
 KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
 KG =  t_f/2 + h + t_r;  	% center of gravity above the keel
-I_m = pi/64 * D_sft^4;      % second moment of area of the water plane area
+I_m = ((pi/64)* D_sft^4)+((pi/64)*D_i^4)+((pi/64)*D_or^4);% second moment of area of the water plane area
 BM = I_m / V_d;             % V_d is the submerged/displaced volume
 GM = KB + BM - KG;          % Metacentric Height
 
