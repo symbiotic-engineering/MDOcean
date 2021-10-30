@@ -7,7 +7,7 @@ Fb = rho_w * V_d * g;
 Fg = m_tot * g;
 B = Fb / Fg;
 
-%% Metacentric Height Calculatons
+%% Metacentric Height Calculations
 
 KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
 KG =  t_f/2 + h + t_r;  	% center of gravity above the keel
