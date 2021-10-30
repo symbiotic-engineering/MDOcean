@@ -1,57 +1,55 @@
 
-function [F_heave, F_surge, F_ptrain, D_env, P_elec] = dynamicSimulation(x,p,m_float,t_f)
+function [F_heave, F_surge, F_ptrain, D_env, P_elec, P_matrix, F_ptrain_unsat] = dynamicSimulation(x,p,m_float,t_f)
+   
+[Hs,T] = meshgrid(p.T,p.Hs);
 
-time = 0:p.dt:p.tfinal;
+% get unsaturated response
+[w,A,B,K,Fd] = dynamics_simple(Hs, T, x.D_sft,  p.rho_w, p.g);       
+m = m_float + A;
+b = B + x.D_int;
+k = K + x.K_int;
+[~,F_ptrain_unsat] = get_response(w,m,b,k,Fd);
 
-num_Hs = length(p.Hs);
-num_T = length(p.T);
-P_elec = zeros(num_Hs,num_T);
+% get saturated response
+% fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
+b_sat = B + x.mult * x.D_int;
+k_sat = K + x.mult * x.K_int;
+[X_sat,F_ptrain] = get_response(w,m,b_sat,k_sat,Fd);
 
-for H_idx = 1:num_Hs
-    for T_idx = 1:num_T
-        if p.JPD(H_idx,T_idx) ~= 0
-            Hs = p.Hs(H_idx);
-            T = p.T(T_idx);
-
-            % run simulation
-            sol = ode45(@(t,s)dynamics(t,s,x,p,Hs,T,m_float,t_f), [0 p.tfinal], p.s0);
-            state = deval(sol,time);
-            [~, P_elec_vs_time, D_env, F_heave, F_surge, F_ptrain] = dynamics(time, state, x, p, Hs, T, m_float, t_f);
-            P_elec(H_idx,T_idx) = -mean(P_elec_vs_time);
-
-            % plot results
-            % figure
-            % plot(time,state*1e4,time,P_elec/100,time,D_env,time,F_heave,F_ptrain)
-            % legend({'position*1e4','velocity*1e4','P elec/100','D env','net force'})
-            % xlabel('time')
-        end
-    end 
-end
+P_matrix = 1/2 * (x.mult * x.D_int) .* w.^2 .* X_sat.^2;
 
 % weight power across all sea states
-P_weighted = P_elec .* p.JPD;
-P_elec = mean(P_weighted,'all');
+P_weighted = P_matrix .* p.JPD;
+P_elec = mean(P_weighted(:));
 
 % covert time series to scalar outputs
-D_env = mean(D_env); 
-F_heave = max(F_heave);
-F_surge = max(F_surge);
-F_ptrain = max(F_ptrain);
+D_env = 0; 
+F_heave = 0;%max(F_heave);
+F_surge = 0;% fixme this should use structural sea state
+F_ptrain = mean(F_ptrain(:)); % fixme this should use structural sea state
 
 end
 
-function [sdot, P_elec, D_env, F_heave, F_surge, F_ptrain] = dynamics(t, s, x, p, Hs, T, m_float, t_f)
-% s    = [position velocity]
-% sdot = [velocity acceleration]
+function [w,A,B,K,Fd] = dynamics_simple(Hs,T,D_sft, rho_w, g)
+    w = 2*pi./T;         % frequency
+    k = w.^2 / g;        % wave number
+    V_g = g ./(2*w);     % group velocity
 
-u = controls(s, x.D_int);
-[F_ptrain, P_elec] = ptrain(s, u);
-[F_heave, F_surge, m, D_env] = hydro(t, s, m_float, x.D_sft, p.rho_w, p.g, Hs, T, t_f);
-F_net = F_heave + F_ptrain;
-
-sdot = zeros(2,size(s,2));
-sdot(1,:) = s(2,:);
-sdot(2,:) = F_net./m;
-
+    r = D_sft / 2;      % radius
+    A_w = pi * r^2;     % waterplane area
+    
+    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
+    gamma   = rho_w * g * A_w; % Froude Krylov / diffraction
+    B       = k ./ (4 * rho_w * g * V_g) * gamma.^2; % radiation damping
+    K       = rho_w * g * A_w;  % hydrostatic stiffness
+    Fd      = gamma * Hs;       % excitation force of wave
 end
 
+function [X,F_ptrain] = get_response(w,m,b,k,Fd)
+    real_term = b.*w/m;
+    imag_term = k/m - w.^2;
+    X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
+    %X_over_F_phase = atan2(imag_term,real_term);
+    X = X_over_F_mag .* Fd;
+    F_ptrain = (b.*w+k).*X;
+end
