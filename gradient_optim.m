@@ -14,6 +14,7 @@ prob = optimproblem('Objective',simulation(X, p));
 prob.x0 = [20 .3 30 10 1e7];
 prob.options = optimoptions('fmincon',	'Display','iter',...
                                         'Algorithm','sqp');
+ %Structures Constraints                                   
 [~,~,~,B,FOS1YH,FOS1YP,FOS2YH,FOS2YP,FOS3YH,FOS3YP,FOS_bucklingH,FOS_bucklingP]=simulation(X,p);
 prob.Constraints.B=B > p.B_min;
 prob.Constraints.FOS1YH=FOS1Y(1) > p.FOS_min;
