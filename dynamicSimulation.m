@@ -10,13 +10,14 @@ b = B + x.D_int;
 k = K + x.K_int;
 [~,F_ptrain_unsat] = get_response(w,m,b,k,Fd);
 
+mult = min(p.F_max ./ F_ptrain_unsat, 1); % override
 % get saturated response
 % fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
-b_sat = B + x.mult * x.D_int;
-k_sat = K + x.mult * x.K_int;
+b_sat = B + mult * x.D_int;
+k_sat = K + mult * x.K_int;
 [X_sat,F_ptrain] = get_response(w,m,b_sat,k_sat,Fd);
 
-P_matrix = 1/2 * (x.mult * x.D_int) .* w.^2 .* X_sat.^2;
+P_matrix = 1/2 * (mult * x.D_int) .* w.^2 .* X_sat.^2;
 
 % weight power across all sea states
 P_weighted = P_matrix .* p.JPD;

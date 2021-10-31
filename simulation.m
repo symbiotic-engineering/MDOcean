@@ -1,5 +1,5 @@
 
-function [LCOE, D_env, Lt, B, FOS, P_elec, P_matrix, F_pt_unsat] = simulation(X, mult, p)
+function [LCOE, D_env, Lt, B, FOS, P_elec, P_matrix, F_pt_unsat] = simulation(X, p)
 
 % capital X is design variables in vector format (necessary for optimization)
 % lowercase x is design variables in struct format (more readable)
@@ -9,7 +9,6 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'L_sf', pi*X(1),...     % radial material thickness of float (m) 
             'D_or', X(3),...        % outer diameter of reaction plate (m)
             'M',    p.M,...         % material (-)
-            'mult', mult,...        % force saturation multiplier (-)
             'N_WEC',X(5),...        % number of WECs in array (-)
             'D_int',X(6),...        % internal damping of controller (Ns/m)
             'K_int',0 );            % internal spring of controller (N/m)
