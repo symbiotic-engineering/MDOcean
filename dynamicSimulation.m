@@ -24,8 +24,8 @@ P_elec = mean(P_weighted(:));
 
 % covert time series to scalar outputs
 D_env = 0; 
-F_heave = 0;%max(F_heave);
-F_surge = 0;% fixme this should use structural sea state
+F_heave = 10;%max(F_heave);
+F_surge = 10;% fixme this should use structural sea state
 F_ptrain = mean(F_ptrain(:)); % fixme this should use structural sea state
 
 end
