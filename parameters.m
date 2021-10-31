@@ -39,6 +39,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             't_vc',     1.00 * in2m,...         % vertical column thickness (m)
             'P_min',    70e3,...                % minimum power (W)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
-            'FOS_min',  3);                     % minimum FOS (-)
+            'FOS_min',  3,...                   % minimum FOS (-)	
+            'FCR',      0.108);                 % fixed charge rate (%)	
         
 end
