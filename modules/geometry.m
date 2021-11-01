@@ -1,9 +1,8 @@
-function [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(D_i, D_sft, t_sft,L_sf, ...
+function [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(D_i, D_sft, t_sft, ...
                                 t_sf, t_sfb, t_vc, D_or, t_r, rho_m, M)
 
 %D_sft-diameter of the top surface float plate
 %t_sft-thickness of the top surface float plate
-%L_sf- length of the surface float column (rectangle)
 %W_sf-width of the surface float column (rectangle)
 %t_sf-thickness of the surface float column
 %t_sfb-thickness of the bottom surface float plate
