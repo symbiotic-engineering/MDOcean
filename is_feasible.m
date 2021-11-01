@@ -1,10 +1,11 @@
-function [feasible, failed] = is_feasible(power, B, FOS, p)
+function [feasible, failed] = is_feasible(power, B, FOS, GM, p)
 
 B_ok = B > p.B_min;
 FOS_ok = FOS > p.FOS_min;
 power_ok = power > p.P_min;
+GM_ok = GM > 0;
 
-feasible = B_ok & FOS_ok & power_ok;
+feasible = B_ok & FOS_ok & power_ok & GM_ok;
 
 if nargout > 1
     failed = ' ';
@@ -16,7 +17,10 @@ if nargout > 1
     end
     if ~power_ok
         failed = [failed 'Power'];
-    end  
+    end
+    if ~GM_ok
+        failed= [failed 'Metacentric Height'];
+    end
 end
 
 end

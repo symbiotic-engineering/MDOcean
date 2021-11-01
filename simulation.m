@@ -1,6 +1,7 @@
 function [LCOE, D_env, B, FOS1Y, FOS2Y, ...
             FOS3Y, FOS_buckling, ...
             P_elec, P_matrix, F_pt_unsat] = simulation(X, mult, p)	
+        
 % capital X is design variables in vector format (necessary for optimization)	
 % lowercase x is design variables in struct format (more readable)	
 x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
@@ -25,7 +26,7 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
 [B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(V_d, m_tot, ...
                                     F_hydro_heave, F_hydro_surge, F_ptrain,...
                                     x.M, h, p.rho_w, p.g, p.sigma_y, A_c, ...
-                                    A_lat_sub, r_over_t, I, p.E);
+                                    A_lat_sub, r_over_t, I, p.E, t_f, p.t_r);
 
 LCOE = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec, p.FCR);
 
