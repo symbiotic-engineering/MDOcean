@@ -15,8 +15,7 @@ intcon = 4;
 function [c,ceq] = mycon(X)
 p=parameters();
 [~, ~, B, FOS1Y, FOS2Y, ...
-            FOS3Y, FOS_buckling,GM, ...
-            ~, ~] = simulation (X,p);
+            FOS3Y, FOS_buckling,GM, P_elec, ~] = simulation (X,p);
 
 c(1)=FOS1Y(1)-p.FOS_min; %<=0;
 c(2)=FOS1Y(2)-p.FOS_min;%<=0;
@@ -28,5 +27,6 @@ c(7)=FOS_buckling(1)-p.FOS_min; %<=0;
 c(8)=FOS_buckling(2)-p.FOS_min; %<=0;
 c(9)=B-p.B_min; %<=0;
 c(10)= -GM;
+c(11) = -P_elec;
 ceq=[];
 end
