@@ -35,21 +35,21 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     prob = optimproblem('Objective',LCOE);
 
     % Structures Constraints
-    prob.Constraints.B              = B >= p.B_min;
-    prob.Constraints.FOS1YH         = FOS1Y(1) >= p.FOS_min;
-    prob.Constraints.FOS1YP         = FOS1Y(2) >= p.FOS_min;
-    prob.Constraints.FOS2YH         = FOS2Y(1) >= p.FOS_min;
-    prob.Constraints.FOS2YP         = FOS2Y(2) >= p.FOS_min;
-    prob.Constraints.FOS3YH         = FOS3Y(1) >= p.FOS_min;
-    prob.Constraints.FOS3YP         = FOS3Y(2) >= p.FOS_min;
-    prob.Constraints.FOS_bucklingH  = FOS_buckling(1) >= p.FOS_min;
-    prob.Constraints.FOS_bucklingP  = FOS_buckling(2) >= p.FOS_min;
+    prob.Constraints.Buoyancy               = B/p.B_min >= 1;
+    prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
     prob.Constraints.GM             = GM >= 0;
     prob.Constraints.P_positive     = P_elec >= 0;
 
     %show(prob)
     %% Run optimization
-    [opt_x, opt_LCOE, flag] = solve(prob,x0,'Options',opts);
+    [opt_x, opt_LCOE, flag,~,lambda] = solve(prob,x0,'Options',opts);
 
     %% Post process
     X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
