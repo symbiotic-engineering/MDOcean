@@ -14,7 +14,8 @@ x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
     b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
 
 opts = optimoptions('fmincon',	'Display','iter',...
-                                'Algorithm','sqp');
+                                'Algorithm','sqp',...
+                                'PlotFcn',@optimplotfval);
     
 for matl = 1:2:3 %b.M_min : b.M_max
     X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
@@ -41,6 +42,6 @@ for matl = 1:2:3 %b.M_min : b.M_max
     [opt_x, opt_LCOE, ~,~,lambda] = solve(prob,x0,'Options',opts);
     
     %% Post process
-    X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
+    X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n]
     plot_power_matrix(X_opt,p)
 end
