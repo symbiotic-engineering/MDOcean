@@ -7,7 +7,7 @@ X = [ 20 10 30;     % outer diameter of float
       30 15 45;     % outer diameter of reaction plate	
       1 2 3;        % material	
       10 1 20;      % Number of WECs in array	
-      1e7 5e6 5e7   % D_int	
+      10 5 50       % D_int	
       2*pi/7 2*pi/8 2*pi/9
         ];	
     	
