@@ -36,7 +36,7 @@ A_l_vc = D_i * h;                       % lateral area
 A_c_rp = pi * ((D_or/2)^2 - (D_i/2)^2); % cross sectional area
 A_l_rp = pi * D_or * t_r;               % lateral area
 V_rp = A_c_rp * t_r;                    % Volume (for displacement and material purposes)
-
+I_rp=pi* ((D_or^4)/64);
 %% Totals
 V_d = V_sf_d + V_vc_d + V_rp; % Total Volume displaced
 V_m = V_sf_m + V_vc_m + V_rp; % Total Volume of material
@@ -47,7 +47,7 @@ A_lat_sub = [A_l_sf A_l_vc A_l_rp];
 r_over_t = [0,... % D_sft/(2*t_sf) 
             D_i/(2*t_vc),...
             0];%D_or/(2*t_r)];
-I = [I_sf, I_vc, 0];
+I = [I_sf, I_vc, I_rp];
 
 end
 
