@@ -1,6 +1,6 @@
 function plot_power_matrix(X,p)
 
-[~,~,~,~,~,~,~,~,P_matrix,~] = simulation(X, p);
+[~,~,~,~,~,~,~,~,~,P_matrix] = simulation(X, p);
 
 [T,Hs] = meshgrid(p.T,p.Hs);
 figure

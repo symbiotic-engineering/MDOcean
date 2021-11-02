@@ -1,4 +1,4 @@
-function [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geometry(D_i, D_sft, t_sft, ...
+function [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I, draft] = geometry(D_i, D_sft, t_sft, ...
                                 t_sf, t_sfb, t_vc, D_or, t_r, rho_m, M)
 
 %D_sft-diameter of the top surface float plate
@@ -10,12 +10,13 @@ function [V_d, V_m, m_tot, m_float, h, t_f, A_c, A_lat_sub, r_over_t, I] = geome
 %% Surface float
 float_pct_submerged = 1/2; % guess for now
 t_f = D_sft / 4; % scaling law to keep same proportions as RM3
+draft_sf = float_pct_submerged * t_f;
 
 A_c_sf = pi*((D_sft/2)^2-(D_i/2)^2) + 24 * t_sf * (D_sft-D_i)/2;
-A_l_sf = 24 * t_sf * t_f * float_pct_submerged;
+A_l_sf = 24 * t_sf * t_f;
 
 %Volume of the surface float: (for displacement purposes)
-V_sf_d = float_pct_submerged * pi*((D_sft/2)^2-(D_i/2)^2) * t_f;
+V_sf_d = pi*((D_sft/2)^2 - (D_i/2)^2) * draft_sf;
 %Volume of the surface float: (for material purposes)
 W_sf = pi * (D_sft + D_i); % circumference of inner + outer circle
 V_sf_m = (pi * (D_sft/2)^2 * t_sft) + t_f * W_sf * t_sf + (pi * (D_sft/2)^2 * t_sfb) + + 24 * t_sf * (D_sft-D_i)/2 * t_f;
@@ -24,6 +25,7 @@ I_sf = pi/64 * D_sft^4;
 
 %% Vertical column
 h = D_i * 7; % scaling law to keep same proportions as RM3
+draft_vc = h;
 
 V_vc_d = pi * (D_i/2)^2 * h;            % volume for displacement purposes
 D_ivc = D_i - 2*t_vc;                   % inner diameter
@@ -33,6 +35,7 @@ I_vc = pi * (D_i^4 - D_ivc^4) / 64;        % area moment of inertia
 A_l_vc = D_i * h;                       % lateral area
 
 %% Reaction plate
+draft_rp = t_r;
 A_c_rp = pi * ((D_or/2)^2 - (D_i/2)^2); % cross sectional area
 A_l_rp = pi * D_or * t_r;               % lateral area
 V_rp = A_c_rp * t_r;                    % Volume (for displacement and material purposes)
@@ -48,6 +51,7 @@ r_over_t = [0,... % D_sft/(2*t_sf)
             D_i/(2*t_vc),...
             0];%D_or/(2*t_r)];
 I = [I_sf, I_vc, 0];
+draft = [draft_sf,draft_vc,draft_rp];
 
 end
 
