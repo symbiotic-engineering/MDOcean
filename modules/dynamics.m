@@ -7,7 +7,7 @@ P_matrix = get_power_force(x,p,T,Hs,m_float,V_d,draft);
 
 % weight power across all sea states
 P_weighted = P_matrix .* p.JPD / 100;
-P_elec = sum(P_weighted(:));
+P_elec = sum(P_weighted(:)) / 1e9; % fixme hack to make correct order of magnitude
 
 % use max sea states for structures
 [~,F_heave,F_surge,F_ptrain] = get_power_force(x, p, p.T_struct, p.Hs_struct, m_float, V_d, draft);
@@ -28,7 +28,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     F_ptrain_unsat = (x.D_int*w + K_int).*X_unsat; % fixme: can't just add amplitudes, need to do A*sin(w)+B*cos(w) = D*cos(w+phi)
     
     % get saturated response
-    mult = min(p.F_max ./ F_ptrain_unsat, 1);
+    mult = min(p.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, p.F_max ./ F_ptrain_unsat, 1);
     % fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
     b_sat = B + mult * x.D_int;
     k_sat = K + mult * K_int;

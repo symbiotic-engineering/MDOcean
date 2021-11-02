@@ -16,11 +16,11 @@ x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
 opts = optimoptions('fmincon',	'Display','iter',...
                                 'Algorithm','sqp');
     
-for matl = b.M_min : b.M_max
+for matl = 1:2:3 %b.M_min : b.M_max
     X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
 
     [LCOE, D_env, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, ~, ~] = fcn2optimexpr(@simulation, X, p);
+            FOS_buckling, GM, ~, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
 
     prob = optimproblem('Objective',LCOE);
     
