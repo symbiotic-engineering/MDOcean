@@ -10,7 +10,7 @@ B = Fb / Fg;
 %% Metacentric Height Calculatons
 KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
 KG =  t_f/2 + h + t_r;  	% center of gravity above the keel
-I_m = sum(I)      % second moment of area of the water plane area
+I_m = sum(I);               % second moment of area of the water plane area
 BM = I_m / V_d;             % V_d is the submerged/displaced volume
 GM = KB + BM - KG;          % Metacentric Height
 
