@@ -8,6 +8,7 @@ X = [ 20 10 30;     % outer diameter of float
       1 2 3;        % material	
       10 1 20;      % Number of WECs in array	
       1e7 5e6 5e7   % D_int	
+      2*pi/7 2*pi/8 2*pi/9
         ];	
     	
 X_nom = X(:,1);	
@@ -32,8 +33,10 @@ for i = 1:var_num
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, ~, ~, B, FOS(design), power(design)] = simulation(X_in,p);	
-                [feasible, failed{design}] = is_feasible(power(design), B, FOS(design), p);	
+                [LCOE_temp, ~, B, FOS1Y, FOS2Y, FOS3Y, ...
+            FOS_buckling, GM, power(design)] = simulation(X_in,p);	
+                FOS(design) = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
+                [feasible, failed{design}] = is_feasible(B, FOS(design), GM, p);	
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                 else	
@@ -53,7 +56,8 @@ var_names = {'D_sft',...    % outer diameter of float (m)
             'D_or',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'N_WEC',...     % number of WECs in array (-)	
-            'D_int'};       % internal damping of controller (Ns/m)	
+            'D_int',...     % internal damping of controller (Ns/m)	
+            'w_n'};         % natural frequency (rad/s)
 results = array2table(X_ins, 'VariableNames', var_names);	
 LCOE = LCOE';	
 results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), FOS, failed, ...	
