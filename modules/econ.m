@@ -1,5 +1,5 @@
 
-function [LCOE, Lt] = econ(m_tot, V_m, M, cost_m, N_WEC, P_elec)
+function LCOE = econ(m_tot, V_m, M, cost_m, N_WEC, P_elec, FCR)
 
 structural_cost = [m_tot V_m m_tot] .* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
@@ -27,8 +27,6 @@ opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
 
 
-LCOE = (capex + opex)/aep; % temporarily removed fcr
-
-Lt = 20; % lifetime (years) RM3 ref
+LCOE = (FCR*capex + opex)/aep;
 
 end
