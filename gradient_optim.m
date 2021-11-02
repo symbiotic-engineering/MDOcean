@@ -15,7 +15,7 @@ w_n         = optimvar('w_n',       [1 1],'LowerBound',w_min,'UpperBound',w_max)
 X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
 
 [LCOE, D_env, B, FOS1Y, FOS2Y, ...
-            FOS3Y, FOS_buckling, ...
+            FOS3Y, FOS_buckling,GM...
             ~, ~, F_pt_unsat] = fcn2optimexpr(@simulation, X, p);
 
 prob = optimproblem('Objective',LCOE);
@@ -32,7 +32,7 @@ prob.Constraints.FOS3YH         = FOS3Y(1) >= p.FOS_min;
 prob.Constraints.FOS3YP         = FOS3Y(2) >= p.FOS_min;
 prob.Constraints.FOS_bucklingH  = FOS_buckling(1) >= p.FOS_min;
 prob.Constraints.FOS_bucklingP  = FOS_buckling(2) >= p.FOS_min; 
-
+prob.Constraints.GM             = GM <=0;
 % these constraints, along with the upper bounds on slack1 and slack2 above,
 % implement the constraint mult = min(p.F_max / F_pt, 1).
 % prob.Constraints.forceMultEquality      = mult + slack1 <= slack2;
