@@ -38,7 +38,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     
     if nargout > 1
         F_ptrain = mult .* (x.D_int*w + K_int)* X_sat; % todo: check that this doesn't exceed F_max
-        F_heave = (B.*w + K) * X_sat;
+        F_heave = Fd/10;% fixme hack %(B.*w + K) * X_sat;
         F_surge = Hs * p.rho_w * p.g * V_d * (1 - exp(-k_wvn*draft));
     end
 end
