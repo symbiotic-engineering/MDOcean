@@ -17,7 +17,7 @@ D_env = 0;
 
 end
 
-function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_float,V_d, draft)
+function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_float,V_d,draft)
     % get unsaturated response
     [w,A,B,K,Fd,k_wvn] = dynamics_simple(Hs, T, x.D_sft, p.rho_w, p.g);       
     m = m_float + A;
@@ -38,20 +38,19 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     
     if nargout > 1
         F_ptrain = mult .* (x.D_int*w + K_int)* X_sat; % todo: check that this doesn't exceed F_max
-        F_heave = Fd/10;% fixme hack %(B.*w + K) * X_sat;
-        F_surge = Hs * p.rho_w * p.g * V_d * (1 - exp(-k_wvn*draft));
+        F_heave = ((p.rho_w*p.g*(p.Hs/2)*pi)/4)*(((x.D_or^2*exp(-k_wvn*(draft(1)+draft(2)+p.t_r))))-((x.D_or^2-x.D_i^2)*exp(-k_wvn*(draft(1)+draft(2))))+((x.D_sft^2-x.D_i^2)*exp(-k_wvn*draft(1))));
+        F_surge = (p.Hs/2) * p.rho_w * p.g * V_d * (1 - exp(-k_wvn*draft));
     end
 end
-
-function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_sft, rho_w, g)
+function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_sft,D_i,D_or,rho_w,g)
     w = 2*pi./T;         % frequency
     k = w.^2 / g;        % wave number
     V_g = g ./(2*w);     % group velocity
 
-    r = D_sft / 2;      % radius
+    r =[ D_sft / 2, D_i/2, D_or/2];      % radius of three major components
     A_w = pi * r^2;     % waterplane area
     
-    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
+    A       = 1/2 * rho_w * 4/3 * pi .* r.^3 * 0.63; % added mass
     gamma   = rho_w * g * A_w; % Froude Krylov / diffraction
     B       = k ./ (4 * rho_w * g * V_g) * gamma.^2; % radiation damping
     K       = rho_w * g * A_w;  % hydrostatic stiffness
