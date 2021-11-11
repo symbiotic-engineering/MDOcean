@@ -24,6 +24,6 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
                                     x.M, h, p.rho_w, p.g, p.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, p.E, t_f, p.t_r);
 
-LCOE = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec, p.FCR);
+LCOE = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec, p.FCR, p.development, p.infrastructure,p.profitmargin, p.contingency,p.postinstall,p.shoreoperations);
 
 end
