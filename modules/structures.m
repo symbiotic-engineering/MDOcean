@@ -14,20 +14,20 @@ rho_m=1150; %(kg/m^3)mooring line material density (nylon)
 Fb_m=((g*pi*D_m^2*L_m)/4)*(rho_w-rho_m); %mooring line buoyancy
 Fb_mtot=3*Fb_m; %total buoyancy force of the 3 mooring lines
 W_m=Fb_mtot/L_m; %total effective weight of the mooring lines per unit length
-%Wave Drag Force on the Mooring Lines
-T=17.1; % (s) 100 Year wave period
-v_w=(g*T)/(2*pi); %wave speed for deep waters
-%Normal Force
-C_dn=0.024; %normal drag coefficient
-F_wn=-1*0.5*C_dn*D_m*rho_w*(v_w)^2; %normal wave drag force on the mooring lines
-%Tangential Force
-C_dt=1.2; %tangent drag coefficient
-F_wt=-1*0.5*C_dt*D_m*rho_w*(v_w*sin(70))^2; %tangential wave drag force on the mooring lines
-%Current Drag Force on the Mooring Lines
-v_c=0.59; %(m/s) 100 year current speed 
-F_cn=-1*0.5*C_dn*D_m*rho_w*(v_c)^2; %normal current drag force on the mooring lines
-F_ct=-1*0.5*C_dt*D_m*rho_w*(v_c*sin(70))^2; %tangential wave drag force on the mooring lines
-%Wind Drag force?
+% %Wave Drag Force on the Mooring Lines
+% T=17.1; % (s) 100 Year wave period
+% v_w=(g*T)/(2*pi); %wave speed for deep waters
+% %Normal Force
+% C_dn=0.024; %normal drag coefficient
+% F_wn=-1*0.5*C_dn*D_m*rho_w*(v_w)^2; %normal wave drag force on the mooring lines
+% %Tangential Force
+% C_dt=1.2; %tangent drag coefficient
+% F_wt=-1*0.5*C_dt*D_m*rho_w*(v_w*sin(70))^2; %tangential wave drag force on the mooring lines
+% %Current Drag Force on the Mooring Lines
+% v_c=0.59; %(m/s) 100 year current speed 
+% F_cn=-1*0.5*C_dn*D_m*rho_w*(v_c)^2; %normal current drag force on the mooring lines
+% F_ct=-1*0.5*C_dt*D_m*rho_w*(v_c*sin(70))^2; %tangential wave drag force on the mooring lines
+% %Wind Drag force?
 
 %% Metacentric Height Calculatons
 KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
@@ -46,9 +46,10 @@ for i = 1:length(Axial)
 
     P_hydrostatic = rho_w * g * depth;
     sigma_surge = F_hydro_surge ./ A_lat_sub;
+    sigma_heave=
 
-    sigma_rr = P_hydrostatic + sigma_surge;     % radial compression
-    sigma_tt = P_hydrostatic * r_over_t;        % hoop stress
+    sigma_rr = P_hydrostatic%Mooring + sigma_surge;     % radial compression
+    sigma_tt = sigma_rr * r_over_t;        % hoop stress
     sigma_zz = F_axial ./ A_c;                  % axial compression
     sigma_rt = sigma_surge;                     % shear
     sigma_tz = [0 0 0];
