@@ -12,6 +12,13 @@ lb2kg = 1/2.2;  % pound to kilogram
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = readmatrix(file,'Range','A3');
 
+cost = struct( 'development', 4455300,...          % development cost ($)
+            'infrastructure',990000,...         % infrastructure cost ($)
+            'profitmargin', 356000,...          % profit margins ($)
+            'contingency', 1590000,...          % contingency cost ($)
+            'postinstall', 710000,...           % post installation cost ($)
+            'shoreoperations', 142000);         % shore operations cost ($)
+
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
@@ -38,11 +45,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'FOS_min',  3,...                   % minimum FOS (-)	
             'FCR',      0.108,...               % fixed charge rate (%)	
             'F_max',    1e6,...                 % max powertrain force (N)
-            'development', 4455300,...          % development cost ($)
-            'infrastructure',990000,...         % infrastructure cost ($)
-            'profitmargin', 356000,...          % profit margins ($)
-            'contingency', 1590000,...          % contingency cost ($)
-            'postinstall', 710000,...           % post installation cost ($)
-            'shoreoperations', 142000);         % shore operations cost ($)
+            'cost',     cost);
+            
             
 end
