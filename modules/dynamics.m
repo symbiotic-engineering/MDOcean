@@ -1,5 +1,5 @@
 
-function [F_heave, F_surge, F_ptrain, D_env, P_elec, P_matrix] = dynamics(x,p,m_float,V_d,draft)
+function [F_heave, F_surge, F_ptrain, P_var, P_elec, P_matrix] = dynamics(x,p,m_float,V_d,draft)
 
 % use probabilistic sea states for power
 [Hs,T] = meshgrid(p.T,p.Hs);
@@ -12,8 +12,8 @@ P_elec = sum(P_weighted(:)) / 1e9; % fixme hack to make correct order of magnitu
 % use max sea states for structures
 [~,F_heave,F_surge,F_ptrain] = get_power_force(x, p, p.T_struct, p.Hs_struct, m_float, V_d, draft);
 
-% environmental damping
-D_env = 0; 
+% variance in power
+P_var = var(P_matrix(:), p.JPD(:)); 
 
 end
 
@@ -25,7 +25,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     k = x.w_n^2 * m;
     K_int = k - K;
     X_unsat = get_response(w,m,b,k,Fd);
-    F_ptrain_unsat = (x.D_int*w + K_int).*X_unsat; % fixme: can't just add amplitudes, need to do A*sin(w)+B*cos(w) = D*cos(w+phi)
+    F_ptrain_unsat = sqrt( (x.D_int * w).^2 + (K_int).^2 ).* X_unsat;
     
     % get saturated response
     mult = min(p.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, p.F_max ./ F_ptrain_unsat, 1);
@@ -37,8 +37,8 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     P_matrix = 1/2 * (mult * x.D_int) .* w.^2 .* X_sat.^2;
     
     if nargout > 1
-        F_ptrain = mult .* (x.D_int*w + K_int)* X_sat; % todo: check that this doesn't exceed F_max
-        F_heave = Fd/10;% fixme hack %(B.*w + K) * X_sat;
+        F_ptrain = mult .* sqrt( (x.D_int*w).^2 + K_int^2 )* X_sat; % todo: check that this doesn't exceed F_max
+        F_heave = sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
         F_surge = Hs * p.rho_w * p.g * V_d * (1 - exp(-k_wvn*draft));
     end
 end
