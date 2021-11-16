@@ -29,7 +29,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
 
-    [LCOE, D_env, B, FOS1Y, FOS2Y, FOS3Y, ...
+    [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
 
     prob = optimproblem('Objective',LCOE);
@@ -48,11 +48,22 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     prob.Constraints.P_positive     = P_elec >= 0;
 
     %show(prob)
+    
+    solver_based = true;
     %% Run optimization
-    [opt_x, opt_LCOE, flag,~,lambda] = solve(prob,x0,'Options',opts);
-
+    if solver_based
+        % Convert to solver-based
+        problem = prob2struct(prob,x0);
+        problem.options = opts;
+        [X_opt,opt_LCOE,flag,output,lambda,grad,hess] = fmincon(problem);
+        X_opt = [X_opt(1:3); matl; X_opt(4:end)];
+        cond(hess)
+    else
+    	[opt_x, opt_LCOE, flag,output,lambda] = solve(prob,x0,'Options',opts);
+        X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
+    end
+    
     %% Post process
-    X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
     if ploton
         plot_power_matrix(X_opt,p)
     end
