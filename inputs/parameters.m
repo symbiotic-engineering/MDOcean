@@ -17,8 +17,14 @@ cost = struct( 'development', 4455300,...          % development cost ($)
             'profitmargin', 356000,...          % profit margins ($)
             'contingency', 1590000,...          % contingency cost ($)
             'postinstall', 710000,...           % post installation cost ($)
-            'shoreoperations', 142000);         % shore operations cost ($)
-
+            'shoreoperations', 142000,...       % shore operations cost ($)
+            'mooring', 525000,...               % mooring costs
+            'pto', 623000,...                   % power takeoff cost
+            'installation', 5909000,...         % installation cost
+            'operations', 27000,...             % operations costs
+            'replacement', 54000,...            % replacement costs
+            'consumables', 8000,...             % consumables costs
+            'insurance', 227000);               % cost of insurance
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
