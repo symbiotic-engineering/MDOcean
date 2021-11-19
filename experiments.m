@@ -64,6 +64,6 @@ var_names = {'D_sft',...    % outer diameter of float (m)
 results = array2table(X_ins, 'VariableNames', var_names);	
 LCOE = LCOE';
 P_var = P_var';
-results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)./power/1e20), FOS, failed, ...	
+results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)/1e11), FOS, failed, ...	
     'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','Power Variance (%)','FOS (-)','ConstraintsFailed'});	
 disp(results)
