@@ -46,16 +46,45 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
     prob.Constraints.GM             = GM >= 0;
     prob.Constraints.P_positive     = P_elec >= 0;
-
-    %show(prob)
-    %% Run optimization
-    [opt_x, opt_LCOE, flag,~,lambda] = solve(prob,x0,'Options',opts);
-
+    
+        if solver_based
+            solver_based=true
+                % Convert to solver-based
+                problem = prob2struct(prob,x0);
+                problem.options = opts;
+                [X_opt,opt_LCOE,flag,output,lambda,grad,hess] = fmincon(problem)
+                X_opt = [X_opt(1) X_opt(2) X_opt(3) matl X_opt(4) X_opt(5) X_opt(6)]
+                Diag=diag(hess)
+                cond(hess)
+                %% Scaled Optimization
+                Scale=1./sqrt(diag(hess)) %Scale Factor Calculation
+                X_scale=[Scale(1) Scale(2) Scale(3) 1 Scale(4) Scale(5) Scale(6)] %Scale Factor Array
+                X_opts=X_scale.*X_opt %Scaled design vaqriables
+                [X_opts,opt_LCOE,flag,output,lambda,grad,hess] = fmincon(problem)
+            else
+                [opt_x, opt_LCOE, flag,output,lambda] = solve(prob,x0,'Options',opts);
+                X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n]
+          end
+    
     %% Post process
-    X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
     if ploton
         plot_power_matrix(X_opt,p)
     end
+    %% Scaled Optimization
+    
 end
 
 end
+%     %show(prob)
+%     %% Run optimization
+%     
+%     [opt_x, opt_LCOE, flag,~,lambda] = solve(prob,x0,'Options',opts);
+% 
+%     %% Post process
+%     X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
+%     if ploton
+%         plot_power_matrix(X_opt,p)
+%     end
+% end
+% 
+% end
