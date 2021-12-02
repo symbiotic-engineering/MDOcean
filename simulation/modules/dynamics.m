@@ -12,10 +12,8 @@ P_elec = sum(P_weighted(:));
 % use max sea states for structures
 [~,F_heave,F_surge,F_ptrain] = get_power_force(x, p, p.T_struct, p.Hs_struct, m_float, V_d, draft);
 
-% normalized variance in power
-P_var = var(P_matrix(:), p.JPD(:)) / P_elec;
-
-P_var = P_var/1e11;
+% coefficient of variance (normalized standard deviation) of power
+P_var = std(P_matrix(:), p.JPD(:)) / P_elec;
 
 end
 
