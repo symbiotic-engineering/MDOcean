@@ -61,13 +61,13 @@ LCOE_balanced = overallLCOE(idx_balanced);
 P_var_balanced = overallPvar(idx_balanced);
 
 % RM3 nominal reference
-x_nom = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom];
+x_nom = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom]
 [LCOE_nom,P_var_nom] = simulation(x_nom,p);
 plot(LCOE_nom,P_var_nom,'rd')
 
 % axis labels
 xlabel('LCOE ($/kWh)')
-ylabel('Normalized Power Variance (%)')
+ylabel('Power Variation (%)')
 title('Pareto Front')
 xlim([0 LCOE_max])
 ylim([50 275])
