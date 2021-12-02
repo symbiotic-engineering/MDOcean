@@ -14,6 +14,7 @@ P_elec = sum(P_weighted(:));
 
 % coefficient of variance (normalized standard deviation) of power
 P_var = std(P_matrix(:), p.JPD(:)) / P_elec;
+P_var = P_var * 100; % convert to percentage
 
 end
 
