@@ -15,7 +15,6 @@ P_elec = sum(P_weighted(:));
 % normalized variance in power
 P_var = var(P_matrix(:), p.JPD(:)) / P_elec;
 
-P_elec = P_elec / 1e7; % fixme hack to make correct order of magnitude
 P_var = P_var/1e11;
 
 end
@@ -62,8 +61,8 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_sft, rho_w, g)
 end
 
 function X = get_response(w,m,b,k,Fd)
-    real_term = b.*w/m;
-    imag_term = k/m - w.^2;
+    real_term = b.*w;
+    imag_term = k - m*w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;
