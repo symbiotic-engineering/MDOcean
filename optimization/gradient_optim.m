@@ -64,7 +64,8 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
             problem.options = opts;
             %problem.objective = [
             [X_opt,opt_LCOE,flag,output,lambda,grad,hess] = fmincon(problem);
-            X_opt = [X_opt(1:3); matl; X_opt(4:end)];
+            X_opt = [X_opt(4); X_opt(1); X_opt(3); matl; X_opt(5); X_opt(2); X_opt(6)];
+            assert(simulation(X_opt,p) == opt_LCOE) % check that reordering of X_opt elements is correct
             cond(hess)
         else
             [opt_x, opt_LCOE, flag,output,lambda] = solve(prob,x0,'Options',opts);
