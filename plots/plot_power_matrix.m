@@ -7,23 +7,25 @@ figure
 
 subplot(1,3,1)
 contourf(T,Hs,P_matrix);
-xlabel('T')
-ylabel('Hs')
-title('Power Matrix')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Power (kW)')
 colorbar
 
 subplot(1,3,2)
 contourf(T,Hs,p.JPD)
-xlabel('T')
-ylabel('Hs')
-title('Joint Probability Distribution')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Probability (%)')
 colorbar
 
 subplot(1,3,3)
 contourf(T,Hs,P_matrix .* p.JPD/100)
-xlabel('T')
-ylabel('Hs')
-title('Probability Weighted Power Matrix')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Weighted Power (kW)')
 colorbar
+
+improvePlot
 
 end
