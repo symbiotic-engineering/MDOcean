@@ -38,7 +38,7 @@ else
     set(gcf, 'Color', 'white');
 end
 grid on
-ylim([-60 10])
+ylim([-80 10])
 xlim([-30 30])
 
 end
