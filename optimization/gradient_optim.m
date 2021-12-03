@@ -1,4 +1,4 @@
-function [X_opt, opt_LCOE, flag] = gradient_optim(x0,p,b)
+function [X_opt, opt_obj, flag, problem] = gradient_optim(x0,p,b)
 
 if nargin == 0
     clc;close all
@@ -29,32 +29,54 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
 
-    [LCOE, D_env, B, FOS1Y, FOS2Y, FOS3Y, ...
+    [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
+    
+    prob1 = optimproblem('Objective',LCOE);
+    prob2 = optimproblem('Objective',P_var);
+    objs = {'LCOE','P_var'};
+    probs = {prob1 prob2};
 
-    prob = optimproblem('Objective',LCOE);
+    for i=1:2
+        prob = probs{i};
+        % Structures Constraints
+        prob.Constraints.Buoyancy               = B/p.B_min >= 1;
+        prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
+        prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
+        prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
+        prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
+        prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
+        prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
+        prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
+        prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
+        prob.Constraints.GM             = GM >= 0;
+        prob.Constraints.P_positive     = P_elec >= 0;
 
-    % Structures Constraints
-    prob.Constraints.Buoyancy               = B/p.B_min >= 1;
-    prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
-    prob.Constraints.GM             = GM >= 0;
-    prob.Constraints.P_positive     = P_elec >= 0;
+        %show(prob)
 
-    %show(prob)
-    %% Run optimization
-    [opt_x, opt_LCOE, flag,~,lambda] = solve(prob,x0,'Options',opts);
+        solver_based = true;
+        %% Run optimization
+        if solver_based
+            % Convert to solver-based
+            problem = prob2struct(prob,x0,...
+                'ObjectiveFunctionName',['generatedObjective' objs{i}],...
+                'FileLocation','optimization/generated');
+            problem.options = opts;
+            %problem.objective = [
+            [X_opt,opt_obj,flag,output,lambda,grad,hess] = fmincon(problem);
+            X_opt = [X_opt(4); X_opt(1); X_opt(3); matl; X_opt(5); X_opt(2); X_opt(6)]
+            [out(1),out(2)] = simulation(X_opt,p);
+            assert(out(i) == opt_obj) % check that reordering of X_opt elements is correct
+            hess_condition = cond(hess)
+        else
+            [opt_x, opt_obj, flag,output,lambda] = solve(prob,x0,'Options',opts);
+            X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
+        end
 
-    %% Post process
-    X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
-    if ploton
-        plot_power_matrix(X_opt,p)
+        %% Post process
+        if ploton
+            plot_power_matrix(X_opt,p)
+        end
     end
 end
 

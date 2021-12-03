@@ -15,7 +15,8 @@ X_nom = X(:,1);
 design_size = size(X);	
 var_num = design_size(1);	
 var_depth = design_size(2);	
-LCOE = X*inf;	
+LCOE = X*inf;
+P_var = X*inf;
 opt_idx = zeros(var_num,1);	
 recommended = zeros(var_num,2);	
 number_runs = var_depth + (var_num-1)*(var_depth-1);	
@@ -33,14 +34,16 @@ for i = 1:var_num
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, ~, B, FOS1Y, FOS2Y, FOS3Y, ...
+                [LCOE_temp, P_var_temp, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, power(design)] = simulation(X_in,p);	
                 FOS(design) = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
                 [feasible, failed{design}] = is_feasible(B, FOS(design), GM, p);	
-                if feasible	
+                if true%feasible	
                     LCOE(i,j) = LCOE_temp;	
+                    P_var(i,j) = P_var_temp;
                 else	
-                    LCOE(i,j) = NaN;	
+                    LCOE(i,j) = NaN;
+                    P_var(i,j) = NaN;
                 end	
             end	
         end	
@@ -59,7 +62,8 @@ var_names = {'D_sft',...    % outer diameter of float (m)
             'D_int',...     % internal damping of controller (Ns/m)	
             'w_n'};         % natural frequency (rad/s)
 results = array2table(X_ins, 'VariableNames', var_names);	
-LCOE = LCOE';	
-results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), FOS, failed, ...	
-    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','FOS (-)','ConstraintsFailed'});	
+LCOE = LCOE';
+P_var = P_var';
+results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)/1e11), FOS, failed, ...	
+    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','Power Variance (%)','FOS (-)','ConstraintsFailed'});	
 disp(results)
