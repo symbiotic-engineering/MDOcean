@@ -1,4 +1,4 @@
-function [X_opt, opt_LCOE, flag, problem] = gradient_optim(x0,p,b)
+function [X_opt, opt_obj, flag, problem] = gradient_optim(x0,p,b)
 
 if nargin == 0
     clc;close all
@@ -37,7 +37,7 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     objs = {'LCOE','P_var'};
     probs = {prob1 prob2};
 
-    for i=1:1
+    for i=1:2
         prob = probs{i};
         % Structures Constraints
         prob.Constraints.Buoyancy               = B/p.B_min >= 1;
@@ -63,12 +63,13 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
                 'FileLocation','optimization');
             problem.options = opts;
             %problem.objective = [
-            [X_opt,opt_LCOE,flag,output,lambda,grad,hess] = fmincon(problem);
-            X_opt = [X_opt(4); X_opt(1); X_opt(3); matl; X_opt(5); X_opt(2); X_opt(6)];
-            assert(simulation(X_opt,p) == opt_LCOE) % check that reordering of X_opt elements is correct
-            cond(hess)
+            [X_opt,opt_obj,flag,output,lambda,grad,hess] = fmincon(problem);
+            X_opt = [X_opt(4); X_opt(1); X_opt(3); matl; X_opt(5); X_opt(2); X_opt(6)]
+            [out(1),out(2)] = simulation(X_opt,p);
+            assert(out(i) == opt_obj) % check that reordering of X_opt elements is correct
+            hess_condition = cond(hess)
         else
-            [opt_x, opt_LCOE, flag,output,lambda] = solve(prob,x0,'Options',opts);
+            [opt_x, opt_obj, flag,output,lambda] = solve(prob,x0,'Options',opts);
             X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
         end
 
