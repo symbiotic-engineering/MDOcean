@@ -37,8 +37,8 @@ for i = 1:var_num
                 [LCOE_temp, P_var_temp, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, power(design)] = simulation(X_in,p);	
                 FOS(design) = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
-                [feasible, failed{design}] = is_feasible(B, FOS(design), GM, p);	
-                if true%feasible	
+                [feasible, failed{design}] = is_feasible(B, FOS(design), GM, P_var_temp, p);	
+                if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     P_var(i,j) = P_var_temp;
                 else	
@@ -52,7 +52,7 @@ for i = 1:var_num
     recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];	
 end	
 [LCOE_op, ~, ~, B_op, FOS1Y_op,FOS2Y_op,FOS3Y_op,FOS_buckling_op,power_op] = simulation(recommended(:,1),p);	
-[op_feasible, CC] = is_feasible(power_op, B_op, FOS1Y_op, p);	
+[op_feasible, CC] = is_feasible(power_op, B_op, FOS1Y_op, power_op, p);	
 % create table for display	
 var_names = {'D_sft',...    % outer diameter of float (m)	
             'D_i/D_sft',... % inner diameter ratio of float (m)	
@@ -64,6 +64,6 @@ var_names = {'D_sft',...    % outer diameter of float (m)
 results = array2table(X_ins, 'VariableNames', var_names);	
 LCOE = LCOE';
 P_var = P_var';
-results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)/1e11), FOS, failed, ...	
+results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)), FOS, failed, ...	
     'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','Power Variance (%)','FOS (-)','ConstraintsFailed'});	
 disp(results)
