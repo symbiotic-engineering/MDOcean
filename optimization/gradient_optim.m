@@ -1,6 +1,7 @@
 function [X_opt, opt_obj, flag, problem] = gradient_optim(x0,p,b)
 
 if nargin == 0
+    % set default parameters if function is run without input
     clc;close all
     p = parameters();
     b = var_bounds(p);
@@ -15,6 +16,7 @@ else
     ploton = false;
 end
 
+% create optimization variables for each of the design variables
 D_sft       = optimvar('D_sft',     [1 1],'LowerBound',b.D_sft_min,    'UpperBound',b.D_sft_max);
 D_i_ratio   = optimvar('D_i_ratio', [1 1],'LowerBound',b.D_i_ratio_min,'UpperBound',b.D_i_ratio_max);
 D_or        = optimvar('D_or',      [1 1],'LowerBound',b.D_or_min,     'UpperBound',b.D_or_max);
@@ -27,6 +29,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'PlotFcn',plotfn,...
                                 'MaxIterations',10);
                             
+% iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
 
@@ -38,9 +41,10 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     objs = {'LCOE','P_var'};
     probs = {prob1 prob2};
 
+    % iterate through the two objectives: LCOE and P_var
     for i=1:2
         prob = probs{i};
-        % Structures Constraints
+        % add constraints
         prob.Constraints.Buoyancy               = B/p.B_min >= 1;
         prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
         prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
@@ -57,6 +61,7 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
 
         solver_based = true;
         %% Run optimization
+        % create folder for generated objectives if it doesn't already exist
         generated_folder = 'optimization/generated';
         if ~exist(generated_folder,'dir')
             mkdir(generated_folder)
@@ -69,13 +74,14 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
                 'FileLocation',generated_folder);
             problem.options = opts;
             
-            % Run unscaled optimization to determine scale factor
+            % Run unscaled optimization
             [X_opt,opt_obj,flag,~,~,~,hess_unscaled] = fmincon(problem);
             
             if flag <= 0 % if the unscaled optimization did not arrive at an optimal
+                % use the unscaled optimization hessian to find scale factor
                 scale = 1./sqrt(diag(hess_unscaled));
 
-                % Reformulate scaled optimization problem     
+                % Formulate a new scaled optimization problem     
                 problem_s = problem;
                 problem_s.options.MaxIterations = 100;
                 problem_s.objective = @(x) problem.objective(x .* scale);  
@@ -104,6 +110,7 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
         %% Post process
         if ploton
             plot_power_matrix(X_opt,p)
+            visualize_geometry(X_opt,p)
         end
     end
 
