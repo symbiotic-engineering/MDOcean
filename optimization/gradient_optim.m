@@ -57,11 +57,16 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
 
         solver_based = true;
         %% Run optimization
+        generated_folder = 'optimization/generated';
+        if ~exist(generated_folder,'dir')
+            mkdir(generated_folder)
+            addpath(generated_folder)
+        end
         if solver_based
             % Convert to solver-based
             problem = prob2struct(prob,x0,...
                 'ObjectiveFunctionName',['generatedObjective' objs{i}],...
-                'FileLocation','optimization/generated');
+                'FileLocation',generated_folder);
             problem.options = opts;
             
             % Run unscaled optimization to determine scale factor
