@@ -4,7 +4,7 @@ p = parameters();
 
 X = [ 20 10 30;     % outer diameter of float	
       .3 .1 .5;     % inner diameter ratio of float	
-      30 15 45;     % outer diameter of reaction plate	
+      1.5 1.4 1.6;     % outer diameter of reaction plate	
       1 2 3;        % material	
       10 1 20;      % Number of WECs in array	
       10 5 50       % D_int	
@@ -56,7 +56,7 @@ end
 % create table for display	
 var_names = {'D_sft',...    % outer diameter of float (m)	
             'D_i/D_sft',... % inner diameter ratio of float (m)	
-            'D_or',...      % outer diameter of reaction plate (m)	
+            'D_or/D_sft',...      % outer diameter ratio of reaction plate (m)	
             'M',...         % material (-)	
             'N_WEC',...     % number of WECs in array (-)	
             'D_int',...     % internal damping of controller (Ns/m)	

@@ -4,8 +4,8 @@ if nargin == 0
     clc;close all
     p = parameters();
     b = var_bounds(p);
-    x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
-        b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+    x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
+        b.D_or_ratio_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
     display = 'iter';
     plotfn = @optimplotfval;
     ploton = true;
@@ -17,7 +17,7 @@ end
 
 D_sft       = optimvar('D_sft',     [1 1],'LowerBound',b.D_sft_min,    'UpperBound',b.D_sft_max);
 D_i_ratio   = optimvar('D_i_ratio', [1 1],'LowerBound',b.D_i_ratio_min,'UpperBound',b.D_i_ratio_max);
-D_or        = optimvar('D_or',      [1 1],'LowerBound',b.D_or_min,     'UpperBound',b.D_or_max);
+D_or_ratio        = optimvar('D_or_ratio',      [1 1],'LowerBound',b.D_or_ratio_min,     'UpperBound',b.D_or_ratio_max);
 N_WEC       = optimvar('N_WEC',     [1 1],'LowerBound',b.N_WEC_min,    'UpperBound',b.N_WEC_max);
 D_int       = optimvar('D_int',     [1 1],'LowerBound',b.D_int_min,    'UpperBound',b.D_int_max);
 w_n         = optimvar('w_n',       [1 1],'LowerBound',b.w_n_min,      'UpperBound',b.w_n_max);
@@ -27,7 +27,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'PlotFcn',plotfn);
                             
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [D_sft D_i_ratio D_or matl N_WEC D_int w_n];
+    X = [D_sft D_i_ratio D_or_ratio matl N_WEC D_int w_n];
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
@@ -94,7 +94,7 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
             
         else
             [opt_x, opt_obj, flag,output,lambda] = solve(prob,x0,'Options',opts);
-            X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
+            X_opt = [opt_x.D_sft opt_x.D_i_ratio opt_x.D_or_ratio matl opt_x.N_WEC opt_x.D_int opt_x.w_n];
         end
 
         %% Post process

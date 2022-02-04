@@ -3,8 +3,8 @@ clear;clc;close all
 vars = {'F_max','FCR','t_sft'};
 ratios = .5 : .1 : 1.5;
 b = var_bounds(parameters());
-x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
-        b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
+        b.D_or_ratio_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
    
 LCOE = zeros(length(vars),length(ratios));
 for i=1:length(vars)

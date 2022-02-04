@@ -8,9 +8,9 @@ b.D_i_ratio_min = 0;
 b.D_i_ratio_max = 1;
 b.D_i_ratio_nom = .3;
 
-b.D_or_min = 0;
-b.D_or_max = 50;
-b.D_or_nom = 30;
+b.D_or_ratio_min = 1.4;
+b.D_or_ratio_max = 1.6;
+b.D_or_ratio_nom = 1.5;
 
 b.M_min = 1;
 b.M_max = length(p.sigma_y);

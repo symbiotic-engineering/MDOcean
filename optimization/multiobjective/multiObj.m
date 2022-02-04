@@ -1,8 +1,8 @@
 clc
 p = parameters();
 b = var_bounds(p);
-x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
-        b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
+        b.D_or_ratio_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
 
 [x_opt,LCOE_min,~, prob] = gradient_optim(x0,p,b);
 %idxswap = [2 6 3 1 5 7];

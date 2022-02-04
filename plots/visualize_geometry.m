@@ -1,7 +1,7 @@
 % close all
 % p = parameters();
 % b = var_bounds(p);
-% x = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom];
+% x = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom];
 % visualize_geometry(x,p)
 
 function visualize_geometry(x,p,mini,color)
@@ -18,7 +18,7 @@ else
     color = {color,color,color};
 end
 
-[D_sft,D_i_ratio,D_or,~,N_WEC,D_int,w_n] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7));
+[D_sft,D_i_ratio,D_or_ratio,~,N_WEC,D_int,w_n] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7));
 
 if ~mini && ~compare
     figure
