@@ -1,11 +1,11 @@
-function [Xs_opt, objs_opt, flag, problem] = gradient_optim(x0,p,b)
+function [Xs_opt, objs_opt, flag, problem] = gradient_optim(x0_input,p,b)
 
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all
     p = parameters();
     b = var_bounds(p);
-    x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
+    x0_input = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
         b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
     display = 'iter';
     plotfn = @optimplotfval;
@@ -63,15 +63,23 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
 
         %show(prob)
 
+        if length(x0_input)==1
+            x0 = x0_input;
+        elseif length(x0_input)==num_objectives
+            x0 = x0_input(i);
+        else
+            error('x0 input struct has wrong size')
+        end
+        
         solver_based = true;
         %% Run optimization
-        % create folder for generated objectives if it doesn't already exist
-        generated_folder = 'optimization/generated';
-        if ~exist(generated_folder,'dir')
-            mkdir(generated_folder)
-            addpath(generated_folder)
-        end
+        % create folder for generated objectives if it doesn't already exist        
         if solver_based
+            generated_folder = 'optimization/generated';
+            if ~exist(generated_folder,'dir')
+                mkdir(generated_folder)
+                addpath(generated_folder)
+            end
             % Convert to solver-based
             problem = prob2struct(prob,x0,...
                 'ObjectiveFunctionName',['generatedObjective' objs{i}],...
