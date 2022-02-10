@@ -12,3 +12,4 @@ num_outputs = 9;
 runtime = timeit(@()simulation(X,p),num_outputs);
 
 plot_power_matrix(X,p)
+power_PDF(X,p)

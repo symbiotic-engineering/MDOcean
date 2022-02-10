@@ -19,3 +19,14 @@ for i=1:4
     visualize_geometry(x,p,false,col{i})
 end
 legend('Nominal','Min LCOE','Min Variation','Balanced')
+
+figure
+t = tiledlayout(2,1);
+t.TileSpacing = 'compact';
+ylabel(t,'Probability (-)','FontWeight','bold')
+for i=1:4
+    x = X(i,:);
+    hold on
+    t = power_PDF(x,p,col{i},t);
+end
+legend('Nominal','Min LCOE','Min Variation','Balanced','location','best')
