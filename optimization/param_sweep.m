@@ -10,6 +10,8 @@ vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashe
 ratios = .8 : .1 : 1.2;
 p = parameters();
 b = var_bounds(p);
+
+% use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
         b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
 x0_vec = gradient_optim(x0,p,b);
