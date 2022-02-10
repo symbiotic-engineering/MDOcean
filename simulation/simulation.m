@@ -5,7 +5,7 @@ function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
 % lowercase x is design variables in struct format (more readable)	
 x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'D_i',  X(2)*X(1),...   % inner diameter of float (m)
-            'D_or', X(3),...        % outer diameter of reaction plate (m)
+            'D_or', X(3)*X(1),...        % outer diameter of reaction plate (m)
             'M',    X(4),...        % material (-)
             'N_WEC',X(5),...        % number of WECs in array (-)
             'D_int',X(6)*1e6,...    % internal damping of controller (Ns/m)

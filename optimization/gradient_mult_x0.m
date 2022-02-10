@@ -7,7 +7,7 @@ num_runs = 20;
 LCOE = Inf(num_runs,1);
 X_opt = zeros(num_runs,7);
 flag = zeros(num_runs,1);	
-x0s = struct('D_sft',[],'D_i_ratio',[],'D_or',[],'N_WEC',[],'D_int',[],'w_n',[]);
+x0s = struct('D_sft',[],'D_i_ratio',[],'D_or_ratio',[],'N_WEC',[],'D_int',[],'w_n',[]);
 
 for i = 1:num_runs
     [~,x0] = random_x0(b);
@@ -18,7 +18,7 @@ end
 % create table for display	
 var_names = {'D_sft',...    % outer diameter of float (m)	
             'D_i/D_sft',... % inner diameter ratio of float (m)	
-            'D_or',...      % outer diameter of reaction plate (m)	
+            'D_or/D_sft',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'N_WEC',...     % number of WECs in array (-)	
             'D_int',...     % internal damping of controller (Ns/m)	
@@ -30,7 +30,7 @@ results = addvars(results, round(LCOE,1), flag,  ...
 
 var_names = {'D_sft',...    % outer diameter of float (m)	
             'D_i_ratio',... % inner diameter ratio of float (m)	
-            'D_or',...      % outer diameter of reaction plate (m)	
+            'D_or_ratio',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'N_WEC',...     % number of WECs in array (-)	
             'D_int',...     % internal damping of controller (Ns/m)	

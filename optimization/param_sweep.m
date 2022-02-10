@@ -12,10 +12,10 @@ p = parameters();
 b = var_bounds(p);
 
 % use the optimal x as x0 to speed up the sweeps
-x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or',...
-        b.D_or_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
+        b.D_or_ratio_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
 x0_vec = gradient_optim(x0,p,b);
-x0 = struct('D_sft',x0_vec(1),'D_i_ratio',x0_vec(2),'D_or',x0_vec(3),...
+x0 = struct('D_sft',x0_vec(1),'D_i_ratio',x0_vec(2),'D_or_ratio',x0_vec(3),...
     'M',x0_vec(4),'N_WEC',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
    
 LCOE  = zeros(length(vars),length(ratios));

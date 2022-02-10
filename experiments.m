@@ -1,11 +1,11 @@
-clear;clc;%close all
+clear;clc;close all
 
 p = parameters();
 b = var_bounds(p);
 
 % X = [ 20 10 30;     % outer diameter of float	
 %       .3 .1 .5;     % inner diameter ratio of float	
-%       30 15 45;     % outer diameter of reaction plate	
+%       1.5 1.2 2;     % outer diameter of reaction plate	
 %       1 2 3;        % material	
 %       10 1 20;      % Number of WECs in array	
 %       10 5 50       % D_int	
@@ -15,7 +15,7 @@ b = var_bounds(p);
 n = 10;
 % X = [ b.D_sft_nom, linspace(b.D_sft_min, b.D_sft_max, n);
 %       b.D_i_ratio_nom, linspace(b.D_i_ratio_min, b.D_i_ratio_max, n);
-%       b.D_or_nom, linspace(b.D_or_min, b.D_or_max, n);
+%       b.D_or_ratio_nom, linspace(b.D_or_ratio_min, b.D_or_ratio_max, n);
 %       1, ones([1 n]);
 %       b.N_WEC_nom, linspace(b.N_WEC_min, b.N_WEC_max, n);
 %       b.D_int_nom, linspace(b.D_int_min, b.D_int_max, n);
@@ -23,7 +23,7 @@ n = 10;
 
 ratios = logspace(-1,1,n);
 ratios = [1, ratios(ratios~=1)];
-X =  [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_nom, 1, b.N_WEC_nom, b.D_int_nom, b.w_n_nom]' * ratios;
+X =  [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, 1, b.N_WEC_nom, b.D_int_nom, b.w_n_nom]' * ratios;
 X(4,:) = ones(1,n+1);
 
 X_nom = X(:,1);	
@@ -72,7 +72,7 @@ end
 % create table for display	
 var_names = {'D_sft',...    % outer diameter of float (m)	
             'D_i/D_sft',... % inner diameter ratio of float (m)	
-            'D_or',...      % outer diameter of reaction plate (m)	
+            'D_or/D_sft',...      % outer diameter ratio of reaction plate (m)	
             'M',...         % material (-)	
             'N_WEC',...     % number of WECs in array (-)	
             'D_int',...     % internal damping of controller (Ns/m)	
