@@ -29,7 +29,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     F_ptrain_unsat = sqrt( (x.D_int * w).^2 + (K_int).^2 ).* X_unsat;
     
     % get saturated response
-    mult = min(p.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, p.F_max ./ F_ptrain_unsat, 1);
+    mult = min(x.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, x.F_max ./ F_ptrain_unsat, 1);
     % fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
     b_sat = B + mult * x.D_int;
     k_sat = K + mult * K_int;

@@ -37,6 +37,6 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  3,...                   % minimum FOS (-)	
             'FCR',      0.108,...               % fixed charge rate (%)	
-            'F_max',    1e6);                   % max powertrain force (N)
+            'N_WEC',    10);                  % number of WECs in array (-)                 
         
 end
