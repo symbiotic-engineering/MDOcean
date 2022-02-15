@@ -12,7 +12,7 @@ b = var_bounds(p);
 %       2*pi/7 2*pi/8 2*pi/9
 %         ];	
 
-n = 10;
+n = 4;
 % X = [ b.D_sft_nom, linspace(b.D_sft_min, b.D_sft_max, n);
 %       b.D_i_ratio_nom, linspace(b.D_i_ratio_min, b.D_i_ratio_max, n);
 %       b.D_or_ratio_nom, linspace(b.D_or_ratio_min, b.D_or_ratio_max, n);
@@ -79,7 +79,7 @@ var_names = {'D_sft',...    % outer diameter of float (m)
             'w_n'};         % natural frequency (rad/s)
 var_names_pretty = {'D_{sft}',...    % outer diameter of float (m)	
             'D_i/D_{sft}',... % inner diameter ratio of float (m)	
-            'D_{or}',...      % outer diameter of reaction plate (m)	
+            'D_{or}/D_{sft}',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'N_{WEC}',...     % number of WECs in array (-)	
             'D_{int}',...     % internal damping of controller (Ns/m)	
@@ -87,8 +87,8 @@ var_names_pretty = {'D_{sft}',...    % outer diameter of float (m)
 results = array2table(X_ins, 'VariableNames', var_names);	
 LCOE = LCOE';
 P_var = P_var';
-results = addvars(results, round(LCOE(LCOE~=Inf),1), round(power/1e3), round(P_var(P_var~=Inf)), FOS, failed, ...	
-    'NewVariableNames', {'LCOE ($/kWh)','Power (kW)','Power Variance (%)','FOS (-)','ConstraintsFailed'});	
+results = addvars(results, round(LCOE(LCOE~=Inf),1), round(P_var(P_var~=Inf)), failed, ...	
+    'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','ConstraintsFailed'});	
 disp(results)
 
 % create pareto front
