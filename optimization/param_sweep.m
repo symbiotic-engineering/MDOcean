@@ -4,7 +4,7 @@ clear;clc;close all
 
 var_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
             'cost_m','t_{sft}','t_{sf}','t_{sfb}','t_r', 't_{vc}','B_{min}',...
-            'FOS_{min}','FCR','F_{max}'};   % list of parameters to sweep
+            'FOS_{min}','FCR','N_{WEC}'};   % list of parameters to sweep
 vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashes
 
 ratios = .8 : .1 : 1.2;
@@ -13,10 +13,10 @@ b = var_bounds(p);
 
 % use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
-        b.D_or_ratio_nom,'N_WEC',b.N_WEC_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+        b.D_or_ratio_nom,'F_max',b.F_max_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
 x0_vec = gradient_optim(x0,p,b);
 x0 = struct('D_sft',x0_vec(1),'D_i_ratio',x0_vec(2),'D_or_ratio',x0_vec(3),...
-    'M',x0_vec(4),'N_WEC',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
+    'M',x0_vec(4),'F_max',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
    
 LCOE  = zeros(length(vars),length(ratios));
 P_var = zeros(length(vars),length(ratios));
@@ -68,8 +68,9 @@ barh(categorical(var_names),slope_LCOE)
 title('LCOE')
 subplot 122
 barh(categorical(var_names),slope_Pvar)
-title('P_{var}')
+title('c_v')
 sgtitle('Normalized Sensitivities')
+improvePlot
 
 % both objectives on the same chart
 figure
