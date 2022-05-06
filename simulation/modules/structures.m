@@ -1,6 +1,7 @@
 function [B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling,GM] = structures(V_d, m_tot, ...
           	F_hydro_heave, F_hydro_surge, F_ptrain, M, h, rho_w, g, ...
-            sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f)
+            sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f, D_sft, I_sf)
+
 
 %% Buoyancy Calculations
 Fb = rho_w * V_d * g;
@@ -27,7 +28,7 @@ for i = 1:length(Axial)
 
     sigma_rr = P_hydrostatic + sigma_surge;     % radial compression
     sigma_tt = P_hydrostatic * r_over_t;        % hoop stress
-    sigma_zz = F_axial ./ A_c;                  % axial compression
+   	sigma_zz = ((F_axial(1)/A_c(4))-(F_axial(1)/A_c(3))+(F_axial(1)/A_c(1)))-((F_axial(2)/6)/A_c(1))-(((F_axial(2)/6)*(D_sft)^2)/I_sf); % axial compression
     sigma_rt = sigma_surge;                     % shear
     sigma_tz = [0 0 0];
     sigma_zr = [0 0 0];
