@@ -36,16 +36,17 @@ A_l_vc = D_i * h;                       % lateral area
 
 %% Reaction plate
 draft_rp = t_r;
-A_c_rp = pi * ((D_or/2)^2 - (D_i/2)^2); % cross sectional area
+A_c_rp_bottom=pi*(D_or/2)^2;
+A_c_rp_top = pi * ((D_or/2)^2 - (D_i/2)^2); % cross sectional area
 A_l_rp = pi * D_or * t_r;               % lateral area
-V_rp = A_c_rp * t_r;                    % Volume (for displacement and material purposes)
+V_rp = A_c_rp_top * t_r;                % Volume (for displacement and material purposes)
 I_rp=pi* ((D_or^4)/64);
 %% Totals
 V_d = V_sf_d + V_vc_d + V_rp; % Total Volume displaced
 V_m = V_sf_m + V_vc_m + V_rp; % Total Volume of material
 m_tot = V_m * rho_m(M);       % Total mass of material
 
-A_c = [A_c_sf, A_c_vc, A_c_rp];
+A_c = [A_c_sf, A_c_vc, A_c_rp_top,A_c_rp_bottom];
 A_lat_sub = [A_l_sf A_l_vc A_l_rp];
 r_over_t = [0,... % D_sft/(2*t_sf) 
             D_i/(2*t_vc),...
