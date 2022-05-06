@@ -7,10 +7,10 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'D_i',  X(2)*X(1),...   % inner diameter of float (m)
             't_f',  X(3)*X(1),...   % vertical thickness of float (m)
             'd_f',  X(4)*X(3)*X(1),... % float draft below waterline (m)
-            'N_WEC',X(5),...        % number of WECs in array (-)
+            'F_max',X(5)*1e6,...    % max powertrain force (N)
             'D_int',X(6)*1e6,...    % internal damping of controller (Ns/m)
-            'w_n',  X(7) );         % internal spring of controller (N/m)
-            'M',    X(4),...        % material (-)
+            'w_n',  X(7),...        % internal spring of controller (N/m)
+            'M',    X(8) );         % material (-)
         
 [V_d, V_m, m_tot, m_float, h,...
     A_c, A_lat_sub, r_over_t, I, draft] = geometry(x.D_i, x.D_sft, p.t_sft, ...
@@ -25,6 +25,6 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
                                     x.M, h, p.rho_w, p.g, p.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, p.E);
 
-LCOE = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec, p.FCR);
+LCOE = econ(m_tot, V_m, x.M, p.cost_m, p.N_WEC, P_elec, p.FCR);
 
 end
