@@ -1,7 +1,7 @@
 p = parameters();
 b = var_bounds(p);
 
-num_runs = 1e5;
+num_runs = 1e6;
 [LCOE,P_var,feasible] = deal(zeros(1,num_runs));
 
 X = zeros(num_runs,7);
@@ -61,7 +61,7 @@ LCOE_balanced = overallLCOE(idx_balanced);
 P_var_balanced = overallPvar(idx_balanced);
 
 % RM3 nominal reference
-x_nom = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom]
+x_nom = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, b.M_nom, b.F_max_nom, b.D_int_nom, b.w_n_nom]
 [LCOE_nom,P_var_nom] = simulation(x_nom,p);
 plot(LCOE_nom,P_var_nom,'rd')
 
@@ -119,3 +119,51 @@ axes('Position',[.55 .63 .15 .2])
 box on
 visualize_geometry(x_nom,p,true);
 set(gca,'XTickLabel',[],'YTickLabel',[])
+%% plots for DVs as a fn of percent along the pareto
+LCOE_pareto = overallLCOE(idxo);
+Pvar_pareto = overallPvar(idxo);
+[LCOE_pareto_sorted,idx_sort] = sort(LCOE_pareto(LCOE_pareto<LCOE_max));
+Pvar_pareto_sorted = Pvar_pareto(LCOE_pareto<LCOE_max);
+Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
+
+pct = linspace(0,100,length(idx_sort));
+
+X_pareto = X(idxo,:);
+X_pareto = X_pareto(LCOE_pareto<LCOE_max,:);
+X_pareto_sorted = X_pareto(idx_sort,:);
+
+X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
+
+windowSize = round(length(idx_sort) * 10/100);
+b = (1/windowSize)*ones(1,windowSize);
+a = 1;
+y = zeros(size(X_pareto_sorted_scaled));
+for i=1:7
+    x = X_pareto_sorted_scaled(:,i); 
+    x_padded = [ones(windowSize,1); x];
+    yy = filter(b,a,x_padded); % moving average filter
+    y(:,i) = yy((windowSize+1):end);
+end
+
+var_names_pretty = {'D_{sft}',...    % outer diameter of float (m)	
+            'D_i/D_{sft}',... % inner diameter ratio of float (m)	
+            'D_{or}/D_{sft}',...      % outer diameter of reaction plate (m)	
+            'M',...         % material (-)	
+            'F_{max}',...     % max force (N)
+            'D_{int}',...     % internal damping of controller (Ns/m)	
+            'w_n'};         % natural frequency (rad/s)
+
+figure
+plot(pct,LCOE_pareto_sorted,pct,Pvar_pareto_sorted)
+xlabel('Percent along the Pareto Curve')
+legend('LCOE','Power Variation')
+figure
+plot(pct,y)
+title('Design Heuristics')
+xlabel('Percent along the Pareto Curve')
+ylabel('Normalized Optimal Design Value')
+legend(var_names_pretty)
+ylim([0 15])
+improvePlot
+grid on
+set(gca,'YMinorGrid','on')

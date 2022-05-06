@@ -5,9 +5,9 @@ function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
 % lowercase x is design variables in struct format (more readable)	
 x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
             'D_i',  X(2)*X(1),...   % inner diameter of float (m)
-            'D_or', X(3)*X(1),...        % outer diameter of reaction plate (m)
+            'D_or', X(3)*X(1),...   % outer diameter of reaction plate (m)
             'M',    X(4),...        % material (-)
-            'N_WEC',X(5),...        % number of WECs in array (-)
+            'F_max',X(5)*1e6,...    % max powertrain force (N)
             'D_int',X(6)*1e6,...    % internal damping of controller (Ns/m)
             'w_n',  X(7) );         % internal spring of controller (N/m)
         
@@ -24,6 +24,6 @@ x = struct( 'D_sft',X(1),...        % outer diameter of float (m)
                                     x.M, h, p.rho_w, p.g, p.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, p.E, t_f, p.t_r);
 
-LCOE = econ(m_tot, V_m, x.M, p.cost_m, x.N_WEC, P_elec, p.FCR);
+LCOE = econ(m_tot, V_m, x.M, p.cost_m, p.N_WEC, P_elec, p.FCR);
 
 end

@@ -16,9 +16,9 @@ b.M_min = 1;
 b.M_max = length(p.sigma_y);
 b.M_nom = 1;
 
-b.N_WEC_min = 1;
-b.N_WEC_max = 100;
-b.N_WEC_nom = 10;
+b.F_max_min = 0;
+b.F_max_max = 100;
+b.F_max_nom = 1;
 
 b.D_int_min = 1;
 b.D_int_max = 100;
