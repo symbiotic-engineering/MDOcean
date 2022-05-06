@@ -39,7 +39,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(x,p,T,Hs, m_fl
     
     if nargout > 1
         F_ptrain = mult .* sqrt( (x.D_int*w).^2 + K_int^2 )* X_sat; % todo: check that this doesn't exceed F_max
-        F_heave = Fd/10;%sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
+        F_heave = ((p.rho_w*p.g*(p.Hs/2)*pi)/4)*(((x.D_or^2*exp(-k_wvn*(draft(1)+draft(2)+p.t_r))))-((x.D_or^2-x.D_i^2)*exp(-k_wvn*(draft(1)+draft(2))))+((x.D_sft^2-x.D_i^2)*exp(-k_wvn*draft(1)))); added mass and excitation
         F_surge = Hs * p.rho_w * p.g * V_d * (1 - exp(-k_wvn*draft));
     end
 end
