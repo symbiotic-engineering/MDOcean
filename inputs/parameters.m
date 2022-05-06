@@ -1,17 +1,27 @@
 function p = parameters()
-
 ksi2pa = 6894757; % 1000 pounds/in2 to Pascal
 in2m = 0.0254;  % inch to meter
 yd2m = 0.9144;  % yard to meter
 lb2kg = 1/2.2;  % pound to kilogram
-
 % Materials: [  Structural Steel ASTM-A36 (Ductile)
 %               Concrete (Brittle)
 %               Stainless Steel 304 (Ductile) ]
-
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = readmatrix(file,'Range','A3');
 
+cost = struct( 'development', 4455300,...          % development cost ($)
+            'infrastructure',990000,...         % infrastructure cost ($)
+            'profitmargin', 356000,...          % profit margins ($)
+            'contingency', 1590000,...          % contingency cost ($)
+            'postinstall', 710000,...           % post installation cost ($)
+            'shoreoperations', 142000,...       % shore operations cost ($)
+            'mooring', 525000,...               % mooring costs
+            'pto', 623000,...                   % power takeoff cost
+            'installation', 5909000,...         % installation cost
+            'operations', 27000,...             % operations costs
+            'replacement', 54000,...            % replacement costs
+            'consumables', 8000,...             % consumables costs
+            'insurance', 227000);               % cost of insurance
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
@@ -37,6 +47,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  3,...                   % minimum FOS (-)	
             'FCR',      0.108,...               % fixed charge rate (%)	
-            'N_WEC',    100);                  % number of WECs in array (-)                 
-        
+            'F_max',    1e6,...                 % max powertrain force (N)
+            'cost',     cost);
+
+
 end
