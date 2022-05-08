@@ -45,12 +45,13 @@ for i = 1:length(Axial)
 
 end
 end 
+
 function s_vm = von_mises(s_11, s_22, s_33, s_12, s_23, s_31)
 
-principal_term = 1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 );
-shear_term = 3 * (s_12.^2 + s_23.^2 + s_31.^2);
-
-s_vm = sqrt( principal_term + shear_term );
+    principal_term = 1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 );
+    shear_term = 3 * (s_12.^2 + s_23.^2 + s_31.^2);
+    
+    s_vm = sqrt( principal_term + shear_term );
 
 end
 
