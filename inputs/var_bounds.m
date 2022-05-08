@@ -1,14 +1,10 @@
 function b = var_bounds(p)
 
-b.D_sft_min = 0;
-b.D_sft_max = 50;
-b.D_sft_nom = 20;
+b.D_f_min = 6;    % because D_s_nom = 6, a consequence of the natural frequency constraint
+b.D_f_max = 50;
+b.D_f_nom = 20;
 
-b.D_i_ratio_min = 0;
-b.D_i_ratio_max = 1;
-b.D_i_ratio_nom = .3;
-
-b.D_s_ratio_min = .1; % fixme add damping constraint here
+b.D_s_ratio_min = 0;
 b.D_s_ratio_max = 1;
 b.D_s_ratio_nom = 6/20;
 

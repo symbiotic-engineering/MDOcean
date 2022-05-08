@@ -2,15 +2,17 @@ clear;close all;clc
 p = parameters();
 b = var_bounds(p);
 
-X = [b.D_sft_nom, b.D_i_ratio_nom, b.h_f_ratio_nom, b.T_f_ratio_nom, b.T_s_ratio_nom, ...
+X = [b.D_f_nom, b.D_s_ratio_nom, b.h_f_ratio_nom, b.T_f_ratio_nom, b.T_s_ratio_nom, ...
     b.F_max_nom, b.D_int_nom, b.w_n_nom, b.M_nom];
 
-[LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, GM, P_elec] = simulation(X,p)
+[LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, GM, P_elec, D_d] = simulation(X,p)
 
-[feasible,failed] = is_feasible(B,min([FOS1Y FOS2Y FOS3Y FOS_buckling]),GM,P_elec,p)
+FOS = min([FOS1Y FOS2Y FOS3Y FOS_buckling]);
+[feasible,failed] = is_feasible(B,FOS,GM,P_elec,D_d,p)
 
 num_outputs = 9;
 runtime = timeit(@()simulation(X,p),num_outputs);
 
 plot_power_matrix(X,p)
+figure
 power_PDF(X,p)

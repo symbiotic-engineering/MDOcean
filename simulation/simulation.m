@@ -1,5 +1,5 @@
 function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, P_matrix] = simulation(X, p)	
+            FOS_buckling, GM, P_elec, D_d, P_matrix] = simulation(X, p)	
 
 %% Assemble inputs
 in = p;
@@ -20,7 +20,7 @@ in.h_f = h_f_over_D_f * in.D_f;
 in.T_f = T_f_over_h_f * in.h_f;
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
-in.D_d = p.D_d_over_D_s * in.D_s;
+D_d = p.D_d_over_D_s * in.D_s;
 in.T_s = p.T_s_over_D_s * in.D_s;
 in.h_d = p.h_d_over_D_s * in.D_s;
 % Another ratio defined by design variable
@@ -32,7 +32,7 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
     A_c, A_lat_sub, r_over_t, ...
     I, T, V_f_pct, V_s_pct, GM] = geometry(in.D_s, in.D_f, in.T_f, in.h_f, in.h_s, ...
                                             in.t_ft, in.t_fr, in.t_fc, in.t_fb, in.t_sr, ...
-                                            in.D_d, in.T_s, in.h_d, ...
+                                            D_d, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
         	
@@ -62,5 +62,6 @@ g(11) = FOS_buckling(2) - p.FOS_min;    % spar survives powertrain force in buck
 g(12) = FOS3Y(1) - p.FOS_min;           % damping plate survives hydro force
 g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain force
 g(14) = P_elec;                         % positive power
+g(15) = D_d - p.D_d_min;             % damping plate diameter (spar natural freq)
 
 end
