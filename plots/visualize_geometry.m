@@ -18,15 +18,21 @@ else
     color = {color,color,color};
 end
 
-[D_sft,D_i_ratio,D_or_ratio,~,N_WEC,D_int,w_n] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7));
+[D_f,D_s_ratio,h_f_ratio,T_f_ratio,T_s_ratio,~,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8),x(9));
 
 if ~mini && ~compare
     figure
 end
-t_f = D_sft / 4;
-D_i = D_i_ratio * D_sft;
-D_or = D_or_ratio * D_sft;
-h = D_i * 7;
+D_s = D_s_ratio * D_f;
+h_f = h_f_ratio * D_f;
+T_f = T_f_ratio * h_f;
+% Geometric similarity to maintain constant damping ratio
+% D_s sets D_d, T_s, h_d
+D_d = p.D_d_over_D_s * D_s;
+T_s = p.T_s_over_D_s * D_s;
+h_d = p.h_d_over_D_s * D_s;
+% Another ratio defined by design variable
+h_s = 1/T_s_ratio * T_s;
 
 % waves
 x = linspace(-30,30,100);
@@ -36,9 +42,9 @@ hold on
 waves = plot(x,Hs*cos(x*2*pi/T),'c');
 
 % WEC
-center_rect([0 (t_f-h)/2+5 D_i h],color{1})      % vert col
-center_rect([0 -h+5+t_f/2 D_or p.t_r],color{2})  % reaction plate
-center_rect([0 0 D_sft t_f],color{3})            % float
+center_rect([0 (h_s/2-T_s) D_s h_s],color{1})       % vert col
+center_rect([0 -T_s D_d h_d],color{2})              % reaction plate
+center_rect([0 (h_f/2-T_f) D_f h_f],color{3})       % float
 
 % for legend
 plot(NaN,NaN,color{1})
