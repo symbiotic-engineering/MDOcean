@@ -1,6 +1,6 @@
 function [feasible, failed] = is_feasible(B, FOS, GM, P_elec, p)
 
-B_ok = B > p.B_min;
+B_ok = all(B < p.B_min) & all(B > 0);
 FOS_ok = FOS > p.FOS_min;
 GM_ok = GM > 0;
 P_ok = P_elec > 0;

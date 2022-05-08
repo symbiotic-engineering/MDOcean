@@ -1,34 +1,66 @@
 function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, P_matrix] = simulation(X, p)	
-        
-% capital X is design variables in vector format (necessary for optimization)	
-% lowercase x is design variables in struct format (more readable)	
-x = struct( 'D_sft',X(1),...            % outer diameter of float (m)
-            'D_i',  X(2)*X(1),...       % inner diameter of float (m)
-            't_f',  X(3)*X(1),...       % vertical thickness of float (m)
-            'd_f',  X(4)*X(3)*X(1),...  % float draft below waterline (m)
-            'F_max',X(5)*1e6,...        % max powertrain force (N)
-            'D_int',X(6)*1e6,...        % internal damping of controller (Ns/m)
-            'w_n',  X(7),...            % internal spring of controller (N/m)
-            'M',    X(8) );             % material (-)
 
-% merge design variables and parameters to single input struct
-mergestructs = @(x,y) cell2struct([struct2cell(x);struct2cell(y)],[fieldnames(x);fieldnames(y)]);
-in = mergestructs(x,p);
+%% Assemble inputs
+in = p;
 
-[V_d, V_m, m_tot, m_float, h,...
-    A_c, A_lat_sub, r_over_t, I, draft] = geometry(in.D_i, in.D_sft, in.t_sft, ...
-                                            in.t_sf, in.t_sfb, in.t_vc, ...
-                                            in.rho_m, in.M, in.rho_w);
+in.D_f              = X(1);     % outer diameter of float (m)
+D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
+h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
+T_f_over_h_f        = X(4);     % normalized float draft below waterline (-)
+T_s_over_h_s        = X(5);     % normalized spar draft below waterline (-)
+in.F_max            = X(6)*1e6; % max powertrain force (N)
+in.D_int            = X(7)*1e6; % internal damping of controller (Ns/m)
+in.w_n              = X(8);     % internal spring of controller (N/m)
+in.M                = X(9);     % material (-)
+
+% Variable ratios defined by design variables
+in.D_s = D_s_over_D_f * in.D_f;
+in.h_f = h_f_over_D_f * in.D_f;
+in.T_f = T_f_over_h_f * in.h_f;
+% Geometric similarity to maintain constant damping ratio
+% D_s sets D_d, T_s, h_d
+in.D_d = p.D_d_over_D_s * in.D_s;
+in.T_s = p.T_s_over_D_s * in.D_s;
+in.h_d = p.h_d_over_D_s * in.D_s;
+% Another ratio defined by design variable
+in.h_s = 1/T_s_over_h_s * in.T_s;
+
+
+%% Run modules
+[V_d, m_m, m_f_tot, ...
+    A_c, A_lat_sub, r_over_t, ...
+    I, T, V_f_pct, V_s_pct, GM] = geometry(in.D_s, in.D_f, in.T_f, in.h_f, in.h_s, ...
+                                            in.t_ft, in.t_fr, in.t_fc, in.t_fb, in.t_sr, ...
+                                            in.D_d, in.T_s, in.h_d, ...
+                                            in.M, in.rho_m, in.rho_w);
+B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
         	
 [F_hydro_heave, F_hydro_surge, ...
-	F_ptrain, P_var, P_elec, P_matrix] = dynamics(in, m_float, V_d, draft);
+	F_ptrain, P_var, P_elec, P_matrix] = dynamics(in, m_f_tot, V_d, T);
 
-[B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling,GM] = structures(...
+[FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
                                     F_hydro_heave, F_hydro_surge, F_ptrain,...
-                                    in.M, h, in.rho_w, in.g, in.sigma_y, A_c, ...
+                                    in.M, in.h_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_tot, V_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
+
+%% Assemble constraints g(x) >= 0
+g = zeros(1,14);
+g(1) = V_f_pct;                         % float too heavy
+g(2) = 1 - V_f_pct;                     % float too light
+g(3) = V_s_pct;                         % spar too heavy
+g(4) = 1 - V_s_pct;                     % spar too light
+g(5) = GM;                              % stability
+g(6) = FOS1Y(1) - p.FOS_min;            % float survives hydro force
+g(7) = FOS1Y(2) - p.FOS_min;            % float survives powertrain force
+g(8) = FOS2Y(1) - p.FOS_min;            % spar survives hydro force
+g(9) = FOS2Y(2) - p.FOS_min;            % spar survives powertrain force
+g(10) = FOS_buckling(1) - p.FOS_min;    % spar survives hydro force in buckling
+g(11) = FOS_buckling(2) - p.FOS_min;    % spar survives powertrain force in buckling
+g(12) = FOS3Y(1) - p.FOS_min;           % damping plate survives hydro force
+g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain force
+g(14) = P_elec;                         % positive power
 
 end

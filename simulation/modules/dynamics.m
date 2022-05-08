@@ -20,7 +20,7 @@ end
 
 function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
-    [w,A,B,K,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_sft, in.rho_w, in.g);       
+    [w,A,B,K,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.rho_w, in.g);       
     m = m_float + A;
     b = B + in.D_int;
     k = in.w_n^2 * m;
@@ -38,18 +38,19 @@ function [P_matrix, F_heave, F_surge, F_ptrain] = get_power_force(in,T,Hs, m_flo
     P_matrix = 1/2 * (mult * in.D_int) .* w.^2 .* X_sat.^2;
     
     if nargout > 1
-        F_ptrain = mult .* sqrt( (in.D_int*w).^2 + K_int^2 )* X_sat; % todo: check that this doesn't exceed F_max
+        F_ptrain = mult .* sqrt( (in.D_int*w).^2 + K_int^2 )* X_sat;
+        %assert(F_ptrain <= in.F_max);
         F_heave = Fd/10;%sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
-        F_surge = Hs * in.rho_w * in.g * V_d * (1 - exp(-k_wvn*draft));
+        F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
     end
 end
 
-function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_sft, rho_w, g)
+function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     w = 2*pi./T;         % frequency
     k = w.^2 / g;        % wave number
     V_g = g ./(2*w);     % group velocity
 
-    r = D_sft / 2;      % radius
+    r = D_f / 2;      % radius
     A_w = pi * r^2;     % waterplane area
     
     A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
