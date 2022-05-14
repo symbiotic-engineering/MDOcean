@@ -101,8 +101,8 @@ I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
 A_vc_l = 1/2 * pi * D_s * T_s;          % lateral area
 
 % Reaction plate
-A_d_c = pi/4 * (D_d^2 - D_s^2);        % cross sectional area
-A_d_l = 1/2 * pi * D_d * h_d;          % lateral area
+A_d_c = pi/4 * (D_d^2 - D_s^2);         % cross sectional area
+A_d_l = 1/2 * pi * D_d * h_d;           % lateral area
 I_rp = pi * D_d^4 / 64;
 
 %% Totals
