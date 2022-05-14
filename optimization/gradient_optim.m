@@ -53,7 +53,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
     objs = {'LCOE','P_var'};
     probs = {prob1 prob2};
     
-    num_objectives = 1;%2;
+    num_objectives = 2;
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);

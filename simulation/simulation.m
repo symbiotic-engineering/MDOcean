@@ -1,5 +1,5 @@
 function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, P_matrix] = simulation(X, p)	
+            FOS_buckling, GM, P_elec, D_d, P_matrix, g] = simulation(X, p)	
 
 %% Assemble inputs
 in = p;
