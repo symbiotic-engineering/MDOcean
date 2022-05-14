@@ -1,7 +1,7 @@
 
-function LCOE = econ(m_tot, V_m, M, cost_m, N_WEC, P_elec, FCR)
+function LCOE = econ(m_m, M, cost_m, N_WEC, P_elec, FCR)
 
-structural_cost = [m_tot V_m m_tot] .* cost_m;
+structural_cost = m_m.* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
 
 development     = 4553000;
