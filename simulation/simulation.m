@@ -7,17 +7,17 @@ in = p;
 in.D_f              = X(1);     % outer diameter of float (m)
 D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
 h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
-T_f_over_h_f        = X(4);     % normalized float draft below waterline (-)
-T_s_over_h_s        = X(5);     % normalized spar draft below waterline (-)
-in.F_max            = X(6)*1e6; % max powertrain force (N)
-in.D_int            = X(7)*1e6; % internal damping of controller (Ns/m)
-in.w_n              = X(8);     % internal spring of controller (N/m)
-in.M                = X(9);     % material (-)
+T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
+in.F_max            = X(5)*1e6; % max powertrain force (N)
+in.D_int            = X(6)*1e6; % internal damping of controller (Ns/m)
+in.w_n              = X(7);     % internal spring of controller (N/m)
+in.M                = X(8);     % material (-)
 
 % Variable ratios defined by design variables
 in.D_s = D_s_over_D_f * in.D_f;
 in.h_f = h_f_over_D_f * in.D_f;
-in.T_f = T_f_over_h_f * in.h_f;
+% Geometric similarity to float submergence parameter
+in.T_f = p.T_f_over_h_f * in.h_f;
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
 D_d = p.D_d_over_D_s * in.D_s;

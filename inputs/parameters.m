@@ -41,6 +41,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'N_WEC',    100,...                 % number of WECs in array (-)   
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
             'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
-            'h_d_over_D_s', 1*in2m/6);          % normalized damping plate thickness (-)                           
+            'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
+            'T_f_over_h_f', 2/4);               % normalized float draft (-)
         
 end

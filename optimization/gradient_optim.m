@@ -5,8 +5,8 @@ if nargin == 0
     clc;close all
     p = parameters();
     b = var_bounds(p);
-    x0_input = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
-        b.h_f_ratio_nom,'T_f_ratio',b.T_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,...
+    x0_input = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,...
+        'h_f_ratio',b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,...
         'F_max',b.F_max_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
     display = 'iter';
     plotfn = @optimplotfval;
@@ -22,7 +22,6 @@ sz = [1 1]; % create scalar variables
 D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
 D_s_ratio   = optimvar('D_s_ratio', sz,'LowerBound',b.D_s_ratio_min, 'UpperBound',b.D_s_ratio_max);
 h_f_ratio   = optimvar('h_f_ratio', sz,'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
-T_f_ratio   = optimvar('T_f_ratio', sz,'LowerBound',b.T_f_ratio_min, 'UpperBound',b.T_f_ratio_max);
 T_s_ratio   = optimvar('T_s_ratio', sz,'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
 F_max       = optimvar('F_max',     sz,'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
 D_int       = optimvar('D_int',     sz,'LowerBound',b.D_int_min,     'UpperBound',b.D_int_max);
@@ -35,7 +34,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [D_f D_s_ratio h_f_ratio T_f_ratio T_s_ratio F_max D_int w_n matl];
+    X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
 
     [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton);
 
@@ -91,7 +90,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
         
         [X_opt_raw,obj_opt,flag,output,lambda,grad,hess] = run_solver(prob, objs{i}, x0, opts);
         
-        X_opt = [X_opt_raw; evaluate(X(9),struct())];   % add material back onto design vector
+        X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
         assert(out(i) == obj_opt)                       % check correct reordering of X_opt elements
         
