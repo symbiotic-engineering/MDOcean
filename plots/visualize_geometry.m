@@ -8,7 +8,6 @@ function visualize_geometry(x,p,mini,color)
 
 if nargin<3
     mini = false; % whether to adjust formatting for a mini plot inset
-    compare = false;
 end
 if nargin<4
     color = {'b','k','r'};
