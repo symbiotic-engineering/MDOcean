@@ -46,7 +46,7 @@ end
 function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
+            FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
     
     prob1 = optimproblem('Objective',LCOE);
     prob2 = optimproblem('Objective',P_var);
@@ -77,6 +77,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
         prob.Constraints.GM                     = GM >= 0;
         prob.Constraints.P_positive             = P_elec >= 0;
         prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
+        prob.Constraints.Spar_height            = g(16) >= 0;
 
         %show(prob)
 
