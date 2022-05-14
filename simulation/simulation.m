@@ -64,4 +64,6 @@ g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain forc
 g(14) = P_elec;                         % positive power
 g(15) = D_d - p.D_d_min;             % damping plate diameter (spar natural freq)
 
+assert( all(~isinf(g)) && all(~isnan(g)) )
+
 end
