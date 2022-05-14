@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flag, problem] = gradient_optim(x0_input,p,b)
+function [Xs_opt, objs_opt, flags] = gradient_optim(x0_input,p,b)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -18,14 +18,15 @@ else
 end
 
 % create optimization variables for each of the design variables
-D_f         = optimvar('D_f',       [1 1],'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
-D_s_ratio   = optimvar('D_s_ratio', [1 1],'LowerBound',b.D_s_ratio_min, 'UpperBound',b.D_s_ratio_max);
-h_f_ratio   = optimvar('h_f_ratio', [1 1],'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
-T_f_ratio   = optimvar('T_f_ratio', [1 1],'LowerBound',b.T_f_ratio_min, 'UpperBound',b.T_f_ratio_max);
-T_s_ratio   = optimvar('T_s_ratio', [1 1],'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
-F_max       = optimvar('F_max',     [1 1],'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
-D_int       = optimvar('D_int',     [1 1],'LowerBound',b.D_int_min,     'UpperBound',b.D_int_max);
-w_n         = optimvar('w_n',       [1 1],'LowerBound',b.w_n_min,       'UpperBound',b.w_n_max);
+sz = [1 1]; % create scalar variables
+D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
+D_s_ratio   = optimvar('D_s_ratio', sz,'LowerBound',b.D_s_ratio_min, 'UpperBound',b.D_s_ratio_max);
+h_f_ratio   = optimvar('h_f_ratio', sz,'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
+T_f_ratio   = optimvar('T_f_ratio', sz,'LowerBound',b.T_f_ratio_min, 'UpperBound',b.T_f_ratio_max);
+T_s_ratio   = optimvar('T_s_ratio', sz,'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
+F_max       = optimvar('F_max',     sz,'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
+D_int       = optimvar('D_int',     sz,'LowerBound',b.D_int_min,     'UpperBound',b.D_int_max);
+w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound',b.w_n_max);
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...
@@ -36,6 +37,15 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_f_ratio T_s_ratio F_max D_int w_n matl];
 
+    [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton);
+
+end
+
+end
+
+%%
+function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton)
+
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, ~] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
     
@@ -44,9 +54,10 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
     objs = {'LCOE','P_var'};
     probs = {prob1 prob2};
     
-    num_objectives = 2;
+    num_objectives = 1;%2;
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
+    flags = zeros(1,num_objectives);
 
     % iterate through the two objectives: LCOE and P_var
     for i=1:num_objectives
@@ -78,65 +89,20 @@ for matl = 1%1:2:3 %b.M_min : b.M_max
             error('x0 input struct has wrong size')
         end
         
-        solver_based = true;
-        %% Run optimization
-        % create folder for generated objectives if it doesn't already exist        
-        if solver_based
-            generated_folder = 'optimization/generated';
-            if ~exist(generated_folder,'dir')
-                mkdir(generated_folder)
-                addpath(generated_folder)
-            end
-            % Convert to solver-based
-            problem = prob2struct(prob,x0,...
-                'ObjectiveFunctionName',['generatedObjective' objs{i}],...
-                'FileLocation',generated_folder);
-            problem.options = opts;
-            
-            % Run unscaled optimization
-            [X_opt,obj_opt,flag,~,~,~,hess_unscaled] = fmincon(problem);
-            
-            if flag <= 0 % if the unscaled optimization did not arrive at an optimal
-                % use the unscaled optimization hessian to find scale factor
-                scale = 1./sqrt(diag(hess_unscaled));
-
-                % Formulate a new scaled optimization problem     
-                problem_s = problem;
-                problem_s.options.MaxIterations = 100;
-                problem_s.objective = @(x) problem.objective(x .* scale);  
-                problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
-
-                inv_scale = 1./(scale);
-                problem_s.x0 = inv_scale .* X_opt;
-                problem_s.lb = inv_scale .* problem.lb;
-                problem_s.ub = inv_scale .* problem.ub;
-
-                % Run scaled optimization problem
-                [X_opt,obj_opt,flag,output,lambda,grad,hess] = fmincon(problem_s);
-                X_opt = scale .* X_opt;
-            end
-            
-            % Rearrange and check outputs
-            X_opt = [X_opt(1); X_opt(3); X_opt(7); X_opt(5); ...
-                X_opt(6); X_opt(4); X_opt(2); X_opt(8); matl]; % reorder elements based on order in autogenerated objective files
-            [out(1),out(2)] = simulation(X_opt,p);
-            assert(out(i) == obj_opt) % check that reordering of X_opt elements is correct
-            
-        else
-            [opt_x, obj_opt, flag,output,lambda] = solve(prob,x0,'Options',opts);
-            X_opt = [opt_x.D_sft opt_x.D_s_ratio opt_x.h_f_ratio ...
-                    opt_x.T_f_ratio opt_x.T_s_ratio opt_x.F_max ...
-                    opt_x.D_int opt_x.w_n matl];
-        end
+        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess] = run_solver(prob, objs{i}, x0, opts);
+        
+        X_opt = [X_opt_raw; evaluate(X(9),struct())];   % add material back onto design vector
+        [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
+        assert(out(i) == obj_opt)                       % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
+        flags(i) = flag;
 
-        %% Post process
+        % Post process
         if ploton
             plot_power_matrix(X_opt,p)
             visualize_geometry(X_opt,p)
         end
     end
-
 end
