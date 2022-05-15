@@ -1,10 +1,10 @@
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;close all
-dvar_names={'D_{sft}', 'D_{i_{ratio}}', 'D_{or_{ratio}}', 'M', 'F_{max}', 'D_{int}','w_{n}'};
+dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
 var_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_{sft}','t_{sf}','t_{sfb}','t_r', 't_{vc}','B_{min}',...
-            'FOS_{min}','FCR','N_{WEC}'};   % list of parameters to sweep
+            'cost_m','t_fr','t_fc', 't_fb','t_sr','B_min','FOS_min','D_d_min',...
+            'FCR','N_WEC','D_d_over_D_s','T_s_over_D_s','h_d_over_D_s','T_f_over_h_f'};  % list of parameters to sweep
 vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashes
 
 ratios = .8 : .1 : 1.2;
@@ -12,15 +12,17 @@ p = parameters();
 b = var_bounds(p);
 
 % use the optimal x as x0 to speed up the sweeps
-x0 = struct('D_sft',b.D_sft_nom,'D_i_ratio',b.D_i_ratio_nom,'D_or_ratio',...
-        b.D_or_ratio_nom,'F_max',b.F_max_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
+        b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,'F_max',b.F_max_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom,'M',b.M_nom);
 x0_vec = gradient_optim(x0,p,b);
-x0 = struct('D_sft',x0_vec(1),'D_i_ratio',x0_vec(2),'D_or_ratio',x0_vec(3),...
-    'M',x0_vec(4),'F_max',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
+x0 = struct('D_f',x0_vec(1),'D_s_ratio',x0_vec(2),'h_f_ratio',x0_vec(3),...
+    'T_s_ratio',x0_vec(4),'F_max',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
    
 LCOE  = zeros(length(vars),length(ratios));
 P_var = zeros(length(vars),length(ratios));
-X = zeros(length(vars), length(ratios), 9);
+X = zeros(length(vars), length(ratios), 8);
+X_LCOE= zeros(length(vars), length(ratios), 8);
+X_Pvar= zeros(length(vars), length(ratios), 8);
 %% Run optimization
 for i=1:length(vars)
     p = parameters();
@@ -60,7 +62,7 @@ ylabel('Power Variation ratio from nominal')
 legend(var_names)
 improvePlot
 grid on
-for i= 1:7
+for i= 1:8
 figure
 plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
 xlabel ('Parameter ratio from nominal')
@@ -97,7 +99,7 @@ sgtitle('Normalized Sensitivities')
 improvePlot
  
 %Assuming we want X* sensitivity plotted separately
-for i=1:7
+for i=1:8
 figure
 barh(categorical(var_names),[slope_X_LCOE(:,i),slope_X_Pvar(:,i)])
 title(dvar_names{i})
