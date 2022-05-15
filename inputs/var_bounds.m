@@ -5,7 +5,7 @@ b.D_f_max = 40;
 b.D_f_nom = 20;
 b.D_f_start = 20;
 
-b.D_s_ratio_min = 0;
+b.D_s_ratio_min = 0.01;
 b.D_s_ratio_max = 0.99;
 b.D_s_ratio_nom = 6/20;
 b.D_s_ratio_start = 6/20;
