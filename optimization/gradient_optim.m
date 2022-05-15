@@ -30,20 +30,20 @@ w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...
                                 'PlotFcn',plotfn,...
-                                'MaxIterations',10);
+                                'MaxIterations',8);
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
 
-    [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton);
+    [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,ploton)
+function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
@@ -59,7 +59,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
     flags = zeros(1,num_objectives);
 
     % iterate through the two objectives: LCOE and P_var
-    for i=1:num_objectives
+    for i = 1:num_objectives
         prob = probs{i};
         % add constraints
         prob.Constraints.Buoyancy_float_min     = B(1) >= 0;
@@ -78,6 +78,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
         prob.Constraints.P_positive             = P_elec >= 0;
         prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
         prob.Constraints.Spar_height            = g(16) >= 0;
+        prob.Constraints.LCOE_max               = g(17) >= 0;
 
         %show(prob)
 
@@ -90,7 +91,16 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,x0_input,opts,
         end
         
         [X_opt_raw,obj_opt,flag,output,lambda,grad,hess] = run_solver(prob, objs{i}, x0, opts);
-        
+
+                       % D_f  D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n]
+        mins_flexible = [true false     false     false     true  true  true]';
+        maxs_flexible = [true false     true      false     true  true  true]';
+        tol = eps(2);
+        if any(abs(X_opt_raw(mins_flexible) - b.X_mins(mins_flexible)) < tol) ...
+                || any(abs(X_opt_raw(maxs_flexible) - b.X_maxs(maxs_flexible)) < tol)
+            warning('Optimization is up against a flexible variable bound, consider changing bounds')
+        end
+
         X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
         assert(out(i) == obj_opt)                       % check correct reordering of X_opt elements
