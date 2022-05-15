@@ -64,6 +64,7 @@ g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain forc
 g(14) = P_elec;                         % positive power
 g(15) = D_d - p.D_d_min;                % damping plate diameter (spar natural freq)
 g(16) = h_s_extra;                      % prevent float rising above top of spar
+g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than nominal
 
 assert( all(~isinf(g)) && all(~isnan(g)) )
 
