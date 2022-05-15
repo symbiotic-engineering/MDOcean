@@ -25,18 +25,24 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
                         5000*sqrt(4.5*ksi2pa),...
                         200e6],...              
             'cost_m',   [0.86/lb2kg, ...        % material cost
-                        125/yd2m^3, ...         % [$/kg $/m3 $/kg] 
+                        125/yd2m^3/2400, ...    % $/kg 
                         1.84/lb2kg],...  
             ...% https://agmetalminer.com/metal-prices/
             ...% https://www.concretenetwork.com/concrete-prices.html
-            't_sft',    0.50 * in2m,...         % float top thickness (m)
-            't_sf',     0.44 * in2m,...         % float column thickness (m)
-            't_sfb',    0.56 * in2m,...         % float bottom thickness (m)
-            't_r',      1.00 * in2m,...         % reaction plate thickness (m)
-            't_vc',     1.00 * in2m,...         % vertical column thickness (m)
+            't_ft',     0.50 * in2m,...         % float top thickness (m)
+            't_fr',     0.44 * in2m,...         % float radial wall thickness (m)
+            't_fc',     0.44 * in2m,...         % float circumferential gusset thickness (m)
+            't_fb',     0.56 * in2m,...         % float bottom thickness (m)
+            't_sr',     1.00 * in2m,...         % vertical column thickness (m)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
-            'FOS_min',  3,...                   % minimum FOS (-)	
-            'FCR',      0.108,...               % fixed charge rate (%)	
-            'N_WEC',    100);                  % number of WECs in array (-)                 
+            'FOS_min',  1.5,...                 % minimum FOS (-)	
+            'D_d_min',  30,...                  % minimum damping plate diameter
+            'FCR',      0.108,...               % fixed charge rate (-)	
+            'N_WEC',    100,...                 % number of WECs in array (-)   
+            'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
+            'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
+            'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
+            'T_f_over_h_f', 2/4,...             % normalized float draft (-)
+            'LCOE_max', 2 );                    % maximum LCOE ($/kWh)
         
 end
