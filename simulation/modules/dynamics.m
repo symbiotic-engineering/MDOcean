@@ -43,7 +43,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain, h_s_extra] = get_power_force(in,
         F_heave = Fd/10;%sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
         X_max = max(X_sat,[],'all');
-        h_s_extra = (in.h_s - in.T_s - X_max) / in.h_s; % extra height on spar after accommodating float displacement
+        h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
     end
 end
 
