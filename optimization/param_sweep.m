@@ -1,10 +1,10 @@
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;close all
-
-var_names = {'Hs'};%'Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-          %  'cost_m','t_{sft}','t_{sf}','t_{sfb}','t_r', 't_{vc}','B_{min}',...
-           % 'FOS_{min}','FCR','N_{WEC}'};   % list of parameters to sweep
+dvar_names={'D_{sft}', 'D_{i_{ratio}}', 'D_{or_{ratio}}', 'M', 'F_{max}', 'D_{int}','w_{n}'};
+var_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
+            'cost_m','t_{sft}','t_{sf}','t_{sfb}','t_r', 't_{vc}','B_{min}',...
+            'FOS_{min}','FCR','N_{WEC}'};   % list of parameters to sweep
 vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashes
 
 ratios = .8 : .1 : 1.2;
@@ -60,9 +60,9 @@ ylabel('Power Variation ratio from nominal')
 legend(var_names)
 improvePlot
 grid on
-
+for i= 1:7
 figure
-plot(ratios, X_LCOE./X_LCOE_nom)
+plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
 xlabel ('Parameter ratio from nominal')
 ylabel ('X* ratio from nominal')
 legend(var_names)
@@ -70,19 +70,20 @@ improvePlot
 grid on
 
 figure
-plot(ratios, X_Pvar/X_Pvar_nom)
+plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
 xlabel ('Parameter ratio from nominal')
 ylabel ('X* ratio from nominal')
 legend(var_names)
 improvePlot
 grid on
+end
 
 %% Plot overall slope as tornado chart
 
-slope_LCOE = (LCOE(:,end) - LCOE(:,1))/LCOE_nom;
-slope_Pvar = (P_var(:,end) - P_var(:,1))/Pvar_nom;
-slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))/X_LCOE_nom;
-slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))/X_Pvar_nom;
+slope_LCOE = (LCOE(:,end) - LCOE(:,1))./LCOE_nom;
+slope_Pvar = (P_var(:,end) - P_var(:,1))./Pvar_nom;
+slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
+slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
 
 % separate charts for each objective
 figure
@@ -96,14 +97,20 @@ sgtitle('Normalized Sensitivities')
 improvePlot
  
 %Assuming we want X* sensitivity plotted separately
-
+for i=1:7
 figure
-barh(categorical(var_names),slope_X)
-title('X*, LCOE')
-sgtitle('Normalized Sensitivities')
+barh(categorical(var_names),[slope_X_LCOE(:,i),slope_X_Pvar(:,i)])
+title(dvar_names{i})
+legend('LCOE','c_{v}')
 improvePlot
 
+% figure
+% barh(categorical(var_names),slope_X_Pvar(:,i))
+% title('X*, C_v Normalized Parameter Sensitivities')
+% improvePlot
 
+
+end
 % both objectives on the same chart
 figure
 barh(categorical(var_names),[slope_LCOE slope_Pvar])
