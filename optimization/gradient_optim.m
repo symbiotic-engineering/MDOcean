@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags] = gradient_optim(x0_input,p,b)
+function [Xs_opt, objs_opt, flags, prob] = gradient_optim(x0_input,p,b)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -34,14 +34,14 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
 
-    [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
+    [Xs_opt, objs_opt, flags, prob] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
+function [Xs_opt, objs_opt, flags, prob] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
