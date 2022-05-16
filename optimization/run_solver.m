@@ -22,8 +22,8 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
 
             % Formulate a new scaled optimization problem     
             problem_s = problem;
-            problem_s.options.MaxIterations = 100;
-            problem_s.options.MaxFunctionEvaluations = 1000;
+            problem_s.options.MaxIterations = 150;
+            problem_s.options.MaxFunctionEvaluations = 1500;
             problem_s.objective = @(x) problem.objective(x .* scale);  
             problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
 

@@ -1,18 +1,20 @@
+clear;clc
 p = parameters();
 b = var_bounds(p);
 
 num_runs = 1e6;
 [LCOE,P_var,feasible] = deal(zeros(1,num_runs));
 
-X = zeros(num_runs,7);
+X = zeros(num_runs,8);
 for i=1:num_runs
-    x = random_x0(b);
-    X(i,:) = x;
-    [LCOE(i), P_var(i), B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, GM, P_elec] = simulation(x,p);	
+    xx = random_x0(b);
+    X(i,:) = xx;
+    [LCOE(i), P_var(i), B, FOS1Y, FOS2Y, FOS3Y, ...
+            FOS_buckling, GM, P_elec, D_d, P_matrix, g] = simulation(xx, p);	
     FOS = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
-    feasible(i) = is_feasible(B, FOS, GM, P_elec, p);
+    feasible(i) = is_feasible(B, FOS, GM, P_elec, D_d, g(16), g(17), g(18), p);
 end
-%%
+
 feasible = logical(feasible);
 LCOE(~feasible) = Inf;
 P_var(~feasible) = Inf;
@@ -26,17 +28,22 @@ title('Pareto Front')
 
 [~,idxs] = paretoFront(-1*[LCOE' P_var']);
 plot(LCOE(idxs),P_var(idxs),'r*')
-LCOE_max = 1;
+LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
-fval = [11 150]; % this is a dummy value, use fval in workspace from running multiObj.m
+%[x,fval] = pareto_search();
+load("pareto_search_results.mat")
+cols = [1 3 6 5 4 2 7];
+X_ps = x(:,cols); % swap indices based on solver generated function
+X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
+
 plot(fval(:,1),fval(:,2),'ks','MarkerFaceColor','k','HandleVisibility','off')
 
 utopia_LCOE = min(LCOE);
 utopia_P_var = min(P_var(LCOE<LCOE_max));
 plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
 
-legend('Dominated Points','Non-Dominated Points',...'Gradient-Based Pareto Front',
+legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
     'Utopia Point')
 %%
 close all
@@ -44,15 +51,14 @@ figure
 % overall pareto front
 overallLCOE = [LCOE'; fval(:,1)];
 overallPvar = [P_var'; fval(:,2)];
+overallX = [X; X_ps];
 [~,idxo] = paretoFront(-1*[overallLCOE overallPvar]);
 plot(overallLCOE(idxo),overallPvar(idxo),'bs','MarkerFaceColor','b')
 hold on
 
 % utopia point
 [minLCOE,idx_best_LCOE] = min(overallLCOE);
-filteredOverallPvar = overallPvar(overallLCOE<LCOE_max);
-filteredOverallLCOE = overallLCOE(overallLCOE<LCOE_max);
-[minPvar,idx_best_Pvar] = min(filteredOverallPvar);
+[minPvar,idx_best_Pvar] = min(overallPvar);
 plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
 
 % balanced design
@@ -61,7 +67,8 @@ LCOE_balanced = overallLCOE(idx_balanced);
 P_var_balanced = overallPvar(idx_balanced);
 
 % RM3 nominal reference
-x_nom = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, b.M_nom, b.F_max_nom, b.D_int_nom, b.w_n_nom]
+x_nom = b.X_noms;
+x_nom(8) = 1;
 [LCOE_nom,P_var_nom] = simulation(x_nom,p);
 plot(LCOE_nom,P_var_nom,'rd')
 
@@ -87,13 +94,13 @@ text(minLCOE+.03,minPvar,'Utopia Point')
 % text(6,15, 'Microgrids without Storage')
 text(LCOE_solar+.03,P_var_solar,'Solar')
 text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
-text(filteredOverallLCOE(idx_best_Pvar)-.2,filteredOverallPvar(idx_best_Pvar),'Least Variable')
+text(overallLCOE(idx_best_Pvar)-.2,overallPvar(idx_best_Pvar),'Least Variable')
 text(LCOE_balanced+.04,P_var_balanced+5,'Balanced Design')
 
 % idenitfy design variables for best designs
-x_best_LCOE = X(idx_best_LCOE,:)
-x_best_Pvar = X(idx_best_Pvar,:)
-x_balanced = X(idx_balanced,:)
+x_best_LCOE = overallX(idx_best_LCOE,:)
+x_best_Pvar = overallX(idx_best_Pvar,:)
+x_balanced = overallX(idx_balanced,:)
 
 % small corner pictures of best geometries
 % upper left
@@ -128,13 +135,15 @@ Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
 
 pct = linspace(0,100,length(idx_sort));
 
-X_pareto = X(idxo,:);
+X_pareto = overallX(idxo,:);
 X_pareto = X_pareto(LCOE_pareto<LCOE_max,:);
 X_pareto_sorted = X_pareto(idx_sort,:);
 
 X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
 
-windowSize = round(length(idx_sort) * 10/100);
+X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
+
+windowSize = round(length(idx_sort) * 5/100);
 b = (1/windowSize)*ones(1,windowSize);
 a = 1;
 y = zeros(size(X_pareto_sorted_scaled));
@@ -145,25 +154,48 @@ for i=1:7
     y(:,i) = yy((windowSize+1):end);
 end
 
-var_names_pretty = {'D_{sft}',...    % outer diameter of float (m)	
-            'D_i/D_{sft}',... % inner diameter ratio of float (m)	
-            'D_{or}/D_{sft}',...      % outer diameter of reaction plate (m)	
-            'M',...         % material (-)	
+var_names_pretty = {'D_f',...    % outer diameter of float (m)	
+            'D_s/D_f',...
+            'h_f/D_f',...      	
+            'T_s/h_s',...      	
             'F_{max}',...     % max force (N)
             'D_{int}',...     % internal damping of controller (Ns/m)	
             'w_n'};         % natural frequency (rad/s)
 
+
+% unfiltered
 figure
-plot(pct,LCOE_pareto_sorted,pct,Pvar_pareto_sorted)
-xlabel('Percent along the Pareto Curve')
-legend('LCOE','Power Variation')
-figure
-plot(pct,y)
-title('Design Heuristics')
+semilogy(pct,X_pareto_sorted_scaled)
+title('Unfiltered Design Heuristics')
 xlabel('Percent along the Pareto Curve')
 ylabel('Normalized Optimal Design Value')
-legend(var_names_pretty)
+legend(var_names_pretty,'Location','eastoutside')
 ylim([0 15])
 improvePlot
 grid on
 set(gca,'YMinorGrid','on')
+
+% filtered
+figure
+semilogy(pct,y)
+hold on
+lines = plot([3 97],[1 1],[3 97],[10 10],'Color',[.85 .85 .85]); % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+title('Design Heuristics')
+%xlabel('Percent along the Pareto Curve')
+ylabel('Normalized Optimal Design Value')
+ylim([.2 15])
+set(gca,'YTick',[.2 .5 1 2 5 10])
+improvePlot
+legend(var_names_pretty,'Location','eastoutside')
+set(gca,'YMinorGrid','on')
+set(gca,'XGrid','on')
+set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
+
+figure
+plot(pct,LCOE_pareto_sorted*100,pct,Pvar_pareto_sorted)
+grid on
+xlabel('Percent along the Pareto Curve')
+ylabel('Objective Value')
+improvePlot
+cent = char(0162);
+legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='eastoutside')

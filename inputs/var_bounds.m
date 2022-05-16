@@ -31,7 +31,7 @@ b.D_int_nom = 10;
 b.D_int_start = 30;
 
 b.w_n_min = .01;%2*pi/p.T(find(any(p.JPD > 0),1,'last'));  % min wave frequency that has any energy
-b.w_n_max = 20;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency that has any energy
+b.w_n_max = 40;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency that has any energy
 b.w_n_nom = 2*pi/8;
 b.w_n_start = 5;
 
