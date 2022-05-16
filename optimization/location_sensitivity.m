@@ -11,21 +11,20 @@ for i=1:n
   p.Hs = jpd(2:end,1);
   p.T = jpd(1,2:end);
   
-X = [b.D_f_nom, b.D_s_ratio_nom, b.h_f_ratio_nom, b.T_s_ratio_nom, ...
-    b.F_max_nom, b.D_int_nom, b.w_n_nom, b.M_nom];
+X = b.X_start_struct;
 
 
-[LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, GM, P_elec, D_d, ~, g] = simulation(X,p)
+[Xs_opt, objs_opt, flags]  = gradient_optim(X,p,b)
 
-FOS = min([FOS1Y FOS2Y FOS3Y FOS_buckling]);
-[feasible,failed] = is_feasible(B,FOS,GM,P_elec,D_d,g(16),p)
+% FOS = min([FOS1Y FOS2Y FOS3Y FOS_buckling]);
+% [feasible,failed] = is_feasible(B,FOS,GM,P_elec,D_d,g(16),p)
+% 
+% num_outputs = 9;
+% runtime = timeit(@()simulation(X,p),num_outputs);
 
-num_outputs = 9;
-runtime = timeit(@()simulation(X,p),num_outputs);
-
-plot_power_matrix(X,p)
-
-power_PDF(X,p)
+plot_power_matrix(Xs_opt(:,1),p)
+figure
+power_PDF(Xs_opt(:,1),p)
 
 end 
 
