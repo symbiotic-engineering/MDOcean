@@ -1,19 +1,6 @@
-function [B,FOS1Y,FOS2Y,FOS3Y,FOS_buckling,GM] = structures(V_d, m_tot, ...
+function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
           	F_hydro_heave, F_hydro_surge, F_ptrain, M, h, rho_w, g, ...
-            sigma_y, A_c, A_lat_sub, r_over_t, I, E, t_r, t_f, D_sft, I_sf)
-
-
-%% Buoyancy Calculations
-Fb = rho_w * V_d * g;
-Fg = m_tot * g;
-B = Fb / Fg;
-
-%% Metacentric Height Calculatons
-KB = (t_f/2 + h + t_r)/2;	% center of buoyancy above the keel
-KG =  t_f/2 + h + t_r;  	% center of gravity above the keel
-I_m = sum(I);               % second moment of area of the water plane area
-BM = I_m / V_d;             % V_d is the submerged/displaced volume
-GM = KB + BM - KG;          % Metacentric Height
+            sigma_y, A_c, A_lat_sub, r_over_t, I, E, D_s)
 
 %% Stress calculations
 depth = h/2; % average depth
@@ -28,7 +15,7 @@ for i = 1:length(Axial)
 
     sigma_rr = P_hydrostatic + sigma_surge;     % radial compression
     sigma_tt = P_hydrostatic * r_over_t;        % hoop stress
-   	sigma_zz = ((F_axial(1)/A_c(4))-(F_axial(1)/A_c(3))+(F_axial(1)/A_c(1)))-((F_axial(2)/6)/A_c(1))-(((F_axial(2)/6)*(D_sft)^2)/I_sf); % axial compression
+   	sigma_zz = [((-F_axial(1)/A_c(3))+(F_axial(1)/A_c(1))),-((F_axial(2)/6)/A_c(1)),-(((F_axial(2)/6)*(D_s)^2)/I(1))]; % axial compression
     sigma_rt = sigma_surge;                     % shear
     sigma_tz = [0 0 0];
     sigma_zr = [0 0 0];
@@ -58,12 +45,13 @@ for i = 1:length(Axial)
 
 end
 end 
+
 function s_vm = von_mises(s_11, s_22, s_33, s_12, s_23, s_31)
 
-principal_term = 1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 );
-shear_term = 3 * (s_12.^2 + s_23.^2 + s_31.^2);
-
-s_vm = sqrt( principal_term + shear_term );
+    principal_term = 1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 );
+    shear_term = 3 * (s_12.^2 + s_23.^2 + s_31.^2);
+    
+    s_vm = sqrt( principal_term + shear_term );
 
 end
 
