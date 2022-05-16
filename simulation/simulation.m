@@ -36,7 +36,7 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             in.M, in.rho_m, in.rho_w);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
         	
-[F_hydro_heave, F_hydro_surge, F_ptrain, ...
+[F_hydro_heave, F_hydro_surge, F_ptrain, F_ptrain_max,...
 	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
@@ -65,6 +65,7 @@ g(14) = P_elec;                         % positive power
 g(15) = D_d - p.D_d_min;                % damping plate diameter (spar natural freq)
 g(16) = h_s_extra;                      % prevent float rising above top of spar
 g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than nominal
+g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
 assert( all(~isinf(g)) && all(~isnan(g)) )
 

@@ -1,5 +1,5 @@
 
-function [F_heave, F_surge, F_ptrain, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,draft)
+function [F_heave, F_surge, F_ptrain, F_ptrain_max, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,draft)
 
 % use probabilistic sea states for power
 [Hs,T] = meshgrid(in.T,in.Hs);
@@ -10,7 +10,9 @@ P_weighted = P_matrix .* in.JPD / 100;
 P_elec = sum(P_weighted(:)); 
 
 % use max sea states for structures and max amplitude
-[~,F_heave,F_surge,F_ptrain,h_s_extra] = get_power_force(in, in.T_struct, in.Hs_struct, m_float, V_d, draft);
+[~,F_heave,F_surge,F_ptrain,...
+    F_ptrain_max,h_s_extra] = get_power_force(in, ...
+                            in.T_struct, in.Hs_struct, m_float, V_d, draft);
 
 % coefficient of variance (normalized standard deviation) of power
 P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
@@ -18,7 +20,7 @@ P_var = P_var * 100; % convert to percentage
 
 end
 
-function [P_matrix, F_heave, F_surge, F_ptrain, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
     [w,A,B,K,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.rho_w, in.g);       
     m = m_float + A;
@@ -39,6 +41,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain, h_s_extra] = get_power_force(in,
     
     if nargout > 1
         F_ptrain = mult .* sqrt( (in.D_int*w).^2 + K_int^2 )* X_sat;
+        F_ptrain_max = max(F_ptrain,[],'all');
         %assert(F_ptrain <= in.F_max);
         F_heave = Fd/10;%sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
