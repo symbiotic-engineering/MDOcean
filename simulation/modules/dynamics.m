@@ -1,5 +1,5 @@
 
-function [F_heave, F_surge, F_ptrain, F_ptrain_max, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,draft)
+function [F_heave, F_surge, F_ptrain, F_ptrain_max, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,)
 
 % use probabilistic sea states for power
 [Hs,T] = meshgrid(in.T,in.Hs);
@@ -40,13 +40,17 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     P_matrix = 1/2 * (mult * in.D_int) .* w.^2 .* X_sat.^2;
     
     if nargout > 1
+
         F_ptrain = mult .* sqrt( (in.D_int*w).^2 + K_int^2 )* X_sat;
         F_ptrain_max = max(F_ptrain,[],'all');
         %assert(F_ptrain <= in.F_max);
-        F_heave = Fd/10;%sqrt( (B.*w).^2 + K.^2 ) * X_sat; % todo: add added mass and excitation
+        F_heave = [(in.rho_w*in.g*(p.Hs/2)*pi)/4)*(((in.D_d^2*exp(-k_wvn*(in.T_f+in.T_s+in.h_d)))),...
+        -((in.D_d^2-x.D_s^2)*exp(-k_wvn*(in.T_f+in.T_s))),...
+        ((in.D_f^2-in.D_s^2)*exp(-k_wvn*in.T_f))]; added mass and excitation
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
         X_max = max(X_sat,[],'all');
         h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
+
     end
 end
 

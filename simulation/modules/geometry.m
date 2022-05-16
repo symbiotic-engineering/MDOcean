@@ -109,6 +109,7 @@ I_rp = pi * D_d^4 / 64;
 
 A_c = [A_f_c, A_vc_c, A_d_c];
 A_lat_sub = [A_f_l A_vc_l A_d_l];
+
 r_over_t = [0,... % D_sft/(2*t_sf) 
             D_s/(2*t_sr),...
             0];%D_or/(2*t_r)];
