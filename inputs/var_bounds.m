@@ -21,12 +21,12 @@ b.T_s_ratio_nom = 35/44;
 b.T_s_ratio_start = 35/44;
 
 b.F_max_min = 1e-4;
-b.F_max_max = 10;
+b.F_max_max = 15;
 b.F_max_nom = 5;
 b.F_max_start = 5;
 
 b.D_int_min = .1;
-b.D_int_max = 100;
+b.D_int_max = 200;
 b.D_int_nom = 10;
 b.D_int_start = 30;
 

@@ -32,7 +32,7 @@ LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
 %[x,fval] = pareto_search();
-load("pareto_search_results.mat")
+load("pareto_search_results2.mat")
 cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
@@ -70,14 +70,21 @@ P_var_balanced = overallPvar(idx_balanced);
 x_nom = b.X_noms;
 x_nom(8) = 1;
 [LCOE_nom,P_var_nom] = simulation(x_nom,p);
+LCOE_nom = 0.75; % from RM3 report p175 fig 5-33
 plot(LCOE_nom,P_var_nom,'rd')
+
+% black squares for 3 ref points
+plot(minLCOE,overallPvar(idx_best_LCOE),'ks')
+plot(overallLCOE(idx_best_Pvar),minPvar,'ks')
+%plot(LCOE_balanced,P_var_balanced,'ks')     
+plot(0.18,100,'ks') % hardcode solution from running gradient_optim with maxLCOE set to 0.18
 
 % axis labels
 xlabel('LCOE ($/kWh)')
 ylabel('Power Variation (%)')
 title('Pareto Front')
 xlim([0 LCOE_max])
-ylim([50 275])
+ylim([50 290])
 improvePlot
 
 % solar reference
@@ -92,31 +99,33 @@ text(minLCOE+.03,minPvar,'Utopia Point')
 % text(2,130, 'Grid-Connected')
 % text(3,40,  'Microgrids with Storage')
 % text(6,15, 'Microgrids without Storage')
-text(LCOE_solar+.03,P_var_solar,'Solar')
+text(LCOE_solar,P_var_solar-10,'Solar')
 text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
 text(overallLCOE(idx_best_Pvar)-.2,overallPvar(idx_best_Pvar),'Least Variable')
-text(LCOE_balanced+.04,P_var_balanced+5,'Balanced Design')
+text(LCOE_balanced-.04,P_var_balanced+5,'Balanced Design')
 
 % idenitfy design variables for best designs
 x_best_LCOE = overallX(idx_best_LCOE,:)
 x_best_Pvar = overallX(idx_best_Pvar,:)
 x_balanced = overallX(idx_balanced,:)
 
+x_balanced = [13.0468, 0.4599, 0.1000, 0.9738, 12.7445, 30.6899, 10.1115, 1.0000]; % hardcode from gradient optim
+
 % small corner pictures of best geometries
 % upper left
-axes('Position',[.15 .65 .15 .2])
+axes('Position',[.15 .7 .15 .2])
 box on
 visualize_geometry(x_best_LCOE,p,true);
 set(gca,'XTickLabel',[],'YTickLabel',[])
 
 % lower right
-axes('Position',[.7 .25 .15 .2])
+axes('Position',[.7 .2 .15 .2])
 box on
 visualize_geometry(x_best_Pvar,p,true);
 set(gca,'XTickLabel',[],'YTickLabel',[])
 
 % balanced
-axes('Position',[.38 .33 .15 .2])
+axes('Position',[.33 .33 .15 .2])
 box on
 visualize_geometry(x_balanced,p,true);
 set(gca,'XTickLabel',[],'YTickLabel',[])
