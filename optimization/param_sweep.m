@@ -3,8 +3,8 @@
 clear;clc;close all
 dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
 var_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_fr','t_fc', 't_fb','t_sr','B_min','FOS_min','D_d_min',...
-            'FCR','N_WEC','D_d_over_D_s','T_s_over_D_s','h_d_over_D_s','T_f_over_h_f'};  % list of parameters to sweep
+            'cost_m','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','B_{min}','FOS_{min}','D_d_{min}',...
+            'FCR','N_{WEC}','D_d_{over}_D_s','T_s_{over}_D_s','h_d_{over}_D_s','T_f_{over}_h_f'};  % list of parameters to sweep
 vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashes
 
 ratios = .8 : .1 : 1.2;
