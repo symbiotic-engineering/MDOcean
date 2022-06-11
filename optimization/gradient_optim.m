@@ -1,11 +1,11 @@
-function [Xs_opt, objs_opt, flags] = gradient_optim(x0_input,p,b)
+function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b)
 
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all
     p = parameters();
     b = var_bounds(p);
-    x0_input = b.X_nom_struct;
+    x0_input = b.X_start_struct;
     display = 'iter';
     plotfn = @optimplotfval;
     ploton = true;
@@ -34,50 +34,52 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
 
-    [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
+    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
+function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
     
-    prob1 = optimproblem('Objective',LCOE);
-    prob2 = optimproblem('Objective',P_var);
-    objs = {'LCOE','P_var'};
-    probs = {prob1 prob2};
+    objs = [LCOE P_var];
+    obj_names = {'LCOE','P_var'};
+    probs = cell([1 2]);
     
     num_objectives = 2;
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
 
+    % add constraints
+    prob = optimproblem();
+    prob.Constraints.Buoyancy_float_min     = B(1) >= 0;
+    prob.Constraints.Buoyancy_float_max     = B(1) <= 1;
+    prob.Constraints.Buoyancy_spar_min      = B(2) >= 0;
+    prob.Constraints.Buoyancy_spar_max      = B(2) <= 1;
+    prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
+    prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
+    prob.Constraints.GM                     = GM >= 0;
+    prob.Constraints.P_positive             = P_elec >= 0;
+    prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
+    prob.Constraints.Spar_height            = g(16) >= 0;
+    prob.Constraints.LCOE_max               = g(17) >= 0;
+    prob.Constraints.F_max_limit            = g(18) >= 0;
+
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
-        prob = probs{i};
-        % add constraints
-        prob.Constraints.Buoyancy_float_min     = B(1) >= 0;
-        prob.Constraints.Buoyancy_float_max     = B(1) <= 1;
-        prob.Constraints.Buoyancy_spar_min      = B(2) >= 0;
-        prob.Constraints.Buoyancy_spar_max      = B(2) <= 1;
-        prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
-        prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
-        prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
-        prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
-        prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
-        prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
-        prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
-        prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
-        prob.Constraints.GM                     = GM >= 0;
-        prob.Constraints.P_positive             = P_elec >= 0;
-        prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
-        prob.Constraints.Spar_height            = g(16) >= 0;
-        prob.Constraints.LCOE_max               = g(17) >= 0;
-        prob.Constraints.F_max                  = g(18) >= 0;
+        prob.Objective = objs(i);
+        
 
         %show(prob)
 
@@ -89,7 +91,8 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opt
             error('x0 input struct has wrong size')
         end
         
-        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess] = run_solver(prob, objs{i}, x0, opts);
+        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{i}, x0, opts);
+        probs{i} = problem;
 
                        % D_f   D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n]
         mins_flexible = [false false     false     false     false true  true]';
