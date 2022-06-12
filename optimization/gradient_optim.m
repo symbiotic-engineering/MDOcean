@@ -5,9 +5,7 @@ if nargin == 0
     clc;close all
     p = parameters();
     b = var_bounds(p);
-    x0_input = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,...
-        'h_f_ratio',b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,...
-        'F_max',b.F_max_nom,'D_int',b.D_int_nom,'w_n',b.w_n_nom);
+    x0_input = b.X_nom_struct;
     display = 'iter';
     plotfn = @optimplotfval;
     ploton = true;
@@ -79,6 +77,7 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opt
         prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
         prob.Constraints.Spar_height            = g(16) >= 0;
         prob.Constraints.LCOE_max               = g(17) >= 0;
+        prob.Constraints.F_max                  = g(18) >= 0;
 
         %show(prob)
 
@@ -92,9 +91,9 @@ function [Xs_opt, objs_opt, flags] = optimize_both_objectives(X,p,b,x0_input,opt
         
         [X_opt_raw,obj_opt,flag,output,lambda,grad,hess] = run_solver(prob, objs{i}, x0, opts);
 
-                       % D_f  D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n]
-        mins_flexible = [true false     false     false     true  true  true]';
-        maxs_flexible = [true false     true      false     true  true  true]';
+                       % D_f   D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n]
+        mins_flexible = [false false     false     false     false true  true]';
+        maxs_flexible = [true  false     false     false     true  true  true]';
         tol = eps(2);
         if any(abs(X_opt_raw(mins_flexible) - b.X_mins(mins_flexible)) < tol) ...
                 || any(abs(X_opt_raw(maxs_flexible) - b.X_maxs(maxs_flexible)) < tol)
