@@ -28,12 +28,29 @@ function [x,fval] = pareto_search()
     probMO.solver = 'paretosearch';
     probMO.nvars = 7;
     %%
-    [x,fval,flag,output] = paretosearch(probMO);
+    [x,fval,flag,output,residuals] = paretosearch(probMO);
     utopia = min(fval);
     hold on
     
     plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
 
     fval = fval ./ repmat(scale,length(fval),1);
-    save('optimization/multiobjective/pareto_search_results5',"fval","x")
+
+    tol = probMO.options.ConstraintTolerance;
+    lb_active = abs(residuals.lower) < tol;
+    ub_active = abs(residuals.upper) < tol;
+    con_active = abs(residuals.ineqnonlin) < tol;
+
+    [~,idx] = sort(fval(:,1)); % order by increasing LCOE
+
+    figure
+    subplot 311
+    spy(lb_active(idx,:)');
+    subplot 312
+    spy(ub_active(idx,:)')
+    subplot 313
+    spy(con_active(idx,:)')
+
+
+    save('optimization/multiobjective/pareto_search_results6',"fval","x","residuals")
 end
