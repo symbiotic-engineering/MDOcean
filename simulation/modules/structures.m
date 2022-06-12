@@ -1,9 +1,9 @@
 function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
-          	F_hydro_heave, F_hydro_surge, F_ptrain, M, h, rho_w, g, ...
+          	F_hydro_heave, F_hydro_surge, F_ptrain, M, h_s, T_s, rho_w, g, ...
             sigma_y, A_c, A_lat_sub, r_over_t, I, E)
 
 %% Stress calculations
-depth = h/2; % average depth
+depth = T_s; % max depth
 
 Axial = [F_hydro_heave, F_ptrain];
 
@@ -33,7 +33,7 @@ for i = 1:length(Axial)
 
     %% Buckling calculation
     K = 1; % free-free - is this correct?
-    L = h;
+    L = h_s;
     F_buckling = pi^2 * E(M) * I(2) / (K*L)^2;
 
     %% Factor of Safety (FOS) Calculations
@@ -41,7 +41,7 @@ for i = 1:length(Axial)
     FOS1Y(i)=FOS_yield(1);
     FOS2Y(i)=FOS_yield(2);
     FOS3Y(i)=FOS_yield(3);
-    FOS_buckling(i) = F_buckling * F_axial.^-1;
+    FOS_buckling(i) = F_buckling ./ F_axial;
 
 end
 end 
