@@ -222,4 +222,4 @@ xlabel('Percent along the Pareto Curve')
 ylabel('Objective Value')
 improvePlot
 cent = char(0162);
-legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='eastoutside')
+legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='northeast')
