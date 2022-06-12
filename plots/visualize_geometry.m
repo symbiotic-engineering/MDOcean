@@ -56,8 +56,8 @@ else
     set(gcf, 'Color', 'white');
 end
 grid on
-ylim([-80 10])
-xlim([-30 30])
+ylim([-50 10])
+xlim([-20 20])
 set(waves,'HandleVisibility','off')
 
 end
