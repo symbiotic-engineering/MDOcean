@@ -32,7 +32,7 @@ for i = 1:length(Axial)
     sigma_vm = von_mises(sigma_rr, sigma_tt, sigma_zz, sigma_rt, sigma_tz, sigma_zr);
 
     %% Buckling calculation
-    K = .5; % fixed-fixed - is this correct?
+    K = 1; % free-free - is this correct?
     L = h;
     F_buckling = pi^2 * E(M) * I(2) / (K*L)^2;
 
