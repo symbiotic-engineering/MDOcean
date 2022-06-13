@@ -32,7 +32,7 @@ LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
 %[x,fval] = pareto_search();
-load("pareto_search_results2.mat")
+load("pareto_search_results5.mat")
 cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
@@ -149,6 +149,11 @@ Pvar_pareto_sorted = Pvar_pareto(LCOE_pareto<LCOE_max);
 Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
 
 pct = linspace(0,100,length(idx_sort));
+%pct_angle = 100/(pi/2) * atan((LCOE_pareto_sorted - minLCOE) ./ (Pvar_pareto_sorted - minPvar));
+num = (overallPvar(idx_best_LCOE) - Pvar_pareto_sorted) / (overallPvar(idx_best_LCOE) - minPvar);
+den = (overallLCOE(idx_best_Pvar) - LCOE_pareto_sorted) / (overallLCOE(idx_best_Pvar) - minLCOE);
+pct_angle = 100/(pi/2) * atan( num ./ den);
+pct_angle(pct_angle==-100) = 100;
 
 X_pareto = overallX(idxo,:);
 X_pareto = X_pareto(LCOE_pareto<LCOE_max,:);
@@ -180,7 +185,7 @@ var_names_pretty = {'D_f',...    % outer diameter of float (m)
 
 % unfiltered
 figure
-semilogy(pct,X_pareto_sorted_scaled)
+semilogy(pct_angle,X_pareto_sorted_scaled)
 title('Unfiltered Design Heuristics')
 xlabel('Percent along the Pareto Curve')
 ylabel('Normalized Optimal Design Value')
@@ -194,15 +199,16 @@ set(gca,'YMinorGrid','on')
 cols = {'r:','r--','r-','r-.','b:','b--','b-'};
 figure
 for i=1:7
-semilogy(pct,y(:,i),cols{i})
-hold on
+    semilogy(pct_angle,y(:,i),cols{i})
+    hold on
 end
-plot([3 97],[1 1],[3 97],[10 10],'Color',[.85 .85 .85]); % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+plot([3 97],[1 1],[3 97],[10 10],[3 97],[100 100],...
+    'Color',[.85 .85 .85]); % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
 title('Design Heuristics')
 %xlabel('Percent along the Pareto Curve')
 ylabel('Normalized Optimal Design Value')
-ylim([.2 15])
-set(gca,'YTick',[.2 .5 1 2 5 10])
+ylim([.2 50])
+set(gca,'YTick',[.2 .5 1 2 5 10 20 50])
 improvePlot
 legend(var_names_pretty,'Location','eastoutside')
 set(gca,'YMinorGrid','on')
@@ -210,10 +216,10 @@ set(gca,'XGrid','on')
 set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
 
 figure
-plot(pct,LCOE_pareto_sorted*100,pct,Pvar_pareto_sorted)
+plot(pct_angle,LCOE_pareto_sorted*100,pct_angle,Pvar_pareto_sorted)
 grid on
 xlabel('Percent along the Pareto Curve')
 ylabel('Objective Value')
 improvePlot
 cent = char(0162);
-legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='eastoutside')
+legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='northeast')

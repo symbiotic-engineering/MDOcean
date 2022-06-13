@@ -2,20 +2,14 @@
 %% Setup
 clear;clc;close all
 dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
-<<<<<<< HEAD
-var_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','B_{min}','FOS_{min}','D_d_{min}',...
-            'FCR','N_{WEC}','D_d_{over}_D_s','T_s_{over}_D_s','h_d_{over}_D_s','T_f_{over}_h_f'};  % list of parameters to sweep
-vars = regexprep(var_names,'[{}\\]','');    % remove the curly braces and slashes
 
-=======
 param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
             'cost_m','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','B_{min}','FOS_{min}','D_{d_{min}}',...
             'FCR','N_{WEC}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
 params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
 params = regexprep(params,'/','_over_');
 %%
->>>>>>> 018ec5d859dee72dd9d2107d591b61acbb89aa2c
+
 ratios = .8 : .1 : 1.2;
 p = parameters();
 b = var_bounds(p);
