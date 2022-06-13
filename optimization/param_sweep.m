@@ -8,7 +8,6 @@ param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
             'FCR','N_{WEC}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
 params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
 params = regexprep(params,'/','_over_');
-%%
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
@@ -21,12 +20,13 @@ x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
 x0_vec = gradient_optim(x0,p,b);
 x0 = struct('D_f',x0_vec(1),'D_s_ratio',x0_vec(2),'h_f_ratio',x0_vec(3),...
     'T_s_ratio',x0_vec(4),'F_max',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
-   
+
 LCOE  = zeros(length(params),length(ratios));
 P_var = zeros(length(params),length(ratios));
 X = zeros(length(params), length(ratios), 8);
 X_LCOE= zeros(length(params), length(ratios), 8);
 X_Pvar= zeros(length(params), length(ratios), 8);
+
 %% Run optimization
 for i=1:length(params)
     p = parameters();
@@ -45,6 +45,7 @@ for i=1:length(params)
         end
     end   
 end
+
 %% Plot each sensitivity
 col_nom = find(ratios==1);
 LCOE_nom = LCOE(1,col_nom);
@@ -67,32 +68,31 @@ ylabel('Power Variation ratio from nominal')
 legend(param_names)
 improvePlot
 grid on
-for i= 1:8
-figure
-plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
-xlabel ('Parameter ratio from nominal')
-ylabel ('X* ratio from nominal')
-title([dvar_names{i} ' - min LCOE'])
-legend(param_names)
-improvePlot
-grid on
 
-figure
-plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
-xlabel ('Parameter ratio from nominal')
-ylabel ('X* ratio from nominal')
-title([dvar_names{i} ' - min c_v'])
-legend(param_names)
-improvePlot
-grid on
+for i = 1:8
+    figure
+    plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
+    xlabel ('Parameter ratio from nominal')
+    ylabel ('X* ratio from nominal')
+    title([dvar_names{i} ' - min LCOE'])
+    legend(param_names)
+    improvePlot
+    grid on
+    
+    figure
+    plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
+    xlabel ('Parameter ratio from nominal')
+    ylabel ('X* ratio from nominal')
+    title([dvar_names{i} ' - min c_v'])
+    legend(param_names)
+    improvePlot
+    grid on
 end
 
-%% Plot overall slope as tornado chart
+%% Tornado chart for overall slope - objective sensitivities
 
 slope_LCOE = (LCOE(:,end) - LCOE(:,1))./LCOE_nom;
 slope_Pvar = (P_var(:,end) - P_var(:,1))./Pvar_nom;
-slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
-slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
 
 % separate charts for each objective
 figure
@@ -104,24 +104,23 @@ barh(categorical(param_names),slope_Pvar)
 title('c_v')
 sgtitle('Normalized Sensitivities')
 improvePlot
- 
-%Assuming we want X* sensitivity plotted separately
-for i=1:8
-figure
-barh(categorical(param_names),[slope_X_LCOE(:,i),slope_X_Pvar(:,i)])
-title(dvar_names{i})
-legend('LCOE','c_{v}')
-improvePlot
 
-% figure
-% barh(categorical(var_names),slope_X_Pvar(:,i))
-% title('X*, C_v Normalized Parameter Sensitivities')
-% improvePlot
-
-
-end
 % both objectives on the same chart
 figure
 barh(categorical(param_names),[slope_LCOE slope_Pvar])
 legend('LCOE','P_{var}')
 title('Sensitivities')
+
+%% Tornado chart for overall slope - X* sensitivities
+
+slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
+slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
+
+% separate charts for each objective
+for i=1:8
+    figure
+    barh(categorical(param_names),[slope_X_LCOE(:,i),slope_X_Pvar(:,i)])
+    title(dvar_names{i})
+    legend('LCOE','c_{v}')
+    improvePlot
+end
