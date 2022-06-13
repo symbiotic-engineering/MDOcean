@@ -36,7 +36,7 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             in.M, in.rho_m, in.rho_w);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
         	
-[F_hydro_heave, F_hydro_surge, F_ptrain, ...
+[F_hydro_heave, F_hydro_surge, F_ptrain, F_ptrain_max,...
 	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
@@ -47,7 +47,7 @@ B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
 LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
 
 %% Assemble constraints g(x) >= 0
-g = zeros(1,14);
+g = zeros(1,18);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
 g(3) = V_s_pct;                         % prevent spar too heavy
@@ -64,7 +64,8 @@ g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain forc
 g(14) = P_elec;                         % positive power
 g(15) = D_d - p.D_d_min;                % damping plate diameter (spar natural freq)
 g(16) = h_s_extra;                      % prevent float rising above top of spar
-g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than nominal
+g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
+g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
 assert( all(~isinf(g)) && all(~isnan(g)) )
 
