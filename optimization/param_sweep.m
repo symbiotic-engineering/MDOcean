@@ -109,9 +109,11 @@ slope_Pvar = get_slope(P_var, ratios, Pvar_nom);
 figure
 subplot 121
 barh(categorical(param_names),slope_LCOE)
+set(gca,'YGrid','on')
 title('LCOE')
 subplot 122
 barh(categorical(param_names),slope_Pvar)
+set(gca,'YGrid','on')
 title('c_v')
 sgtitle('Normalized Sensitivities')
 improvePlot
