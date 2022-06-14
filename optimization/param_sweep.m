@@ -18,8 +18,10 @@ x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
         b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,'F_max',b.F_max_nom,...
         'D_int',b.D_int_nom,'w_n',b.w_n_nom,'M',b.M_nom);
 x0_vec = gradient_optim(x0,p,b);
-x0 = struct('D_f',x0_vec(1),'D_s_ratio',x0_vec(2),'h_f_ratio',x0_vec(3),...
-    'T_s_ratio',x0_vec(4),'F_max',x0_vec(5),'D_int',x0_vec(6),'w_n',x0_vec(7));
+x0 = struct('D_f',x0_vec(1,1),'D_s_ratio',x0_vec(2,1),'h_f_ratio',x0_vec(3,1),...
+    'T_s_ratio',x0_vec(4,1),'F_max',x0_vec(5,1),'D_int',x0_vec(6,1),'w_n',x0_vec(7,1));
+x0(2) = struct('D_f',x0_vec(1,2),'D_s_ratio',x0_vec(2,2),'h_f_ratio',x0_vec(3,2),...
+    'T_s_ratio',x0_vec(4,2),'F_max',x0_vec(5,2),'D_int',x0_vec(6,2),'w_n',x0_vec(7,2));
 
 LCOE  = zeros(length(params),length(ratios));
 P_var = zeros(length(params),length(ratios));
@@ -35,13 +37,17 @@ for i=1:length(params)
         p.(params{i}) = ratios(j) * var_nom;
         [Xs_opt, obj_opt, flag] = gradient_optim(x0,p,b);
         % [Xs_opt, obj_opt, flag] = deal(rand(8,2),rand(2,1),[1 1]); %dry run
-        if flag >= 1
+        if flag(1) >= 1
             LCOE(i,j) = obj_opt(1);
-            P_var(i,j) = obj_opt(2);
             X_LCOE(i,j,:) = Xs_opt(:,1);
+        else
+            [X_LCOE(i,j,:),LCOE(i,j)] = deal(NaN);
+        end
+        if flag(2) >= 1
+            P_var(i,j) = obj_opt(2);
             X_Pvar(i,j,:)= Xs_opt(:,2); 
         else
-            [X_LCOE(i,j,:),X_Pvar(i,j,:),LCOE(i,j), P_var(i,j)] = deal(NaN);
+            [X_Pvar(i,j,:), P_var(i,j)] = deal(NaN);
         end
     end   
 end
@@ -52,8 +58,11 @@ LCOE_nom = LCOE(1,col_nom);
 Pvar_nom = P_var(1,col_nom);
 X_LCOE_nom = X_LCOE(1,col_nom,:);
 X_Pvar_nom = X_Pvar(1,col_nom,:);
+X_LCOE_nom = X_LCOE_nom(:);
+X_Pvar_nom = X_Pvar_nom(:);
 
-figure
+figure(1)
+subplot 121
 plot(ratios,LCOE/LCOE_nom)
 xlabel('Parameter Ratio from nominal')
 ylabel('LCOE ratio from nominal')
@@ -61,7 +70,7 @@ legend(param_names)
 improvePlot
 grid on
 
-figure
+subplot 122
 plot(ratios,P_var/Pvar_nom)
 xlabel('Parameter ratio from nominal')
 ylabel('Power Variation ratio from nominal')
@@ -69,30 +78,32 @@ legend(param_names)
 improvePlot
 grid on
 
+
 for i = 1:8
-    figure
+    figure(2)
+    subplot(2,4,i)
     plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min LCOE'])
-    legend(param_names)
     improvePlot
     grid on
     
-    figure
+    figure(3)
+    subplot(2,4,i)
     plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min c_v'])
-    legend(param_names)
     improvePlot
     grid on
 end
+legend(param_names)
 
 %% Tornado chart for overall slope - objective sensitivities
 
-slope_LCOE = (LCOE(:,end) - LCOE(:,1))./LCOE_nom;
-slope_Pvar = (P_var(:,end) - P_var(:,1))./Pvar_nom;
+slope_LCOE = get_slope(LCOE, ratios, LCOE_nom);
+slope_Pvar = get_slope(P_var, ratios, Pvar_nom);
 
 % separate charts for each objective
 figure
@@ -107,20 +118,46 @@ improvePlot
 
 % both objectives on the same chart
 figure
-barh(categorical(param_names),[slope_LCOE slope_Pvar])
+barh(categorical(param_names),[slope_LCOE; slope_Pvar])
 legend('LCOE','P_{var}')
 title('Sensitivities')
 
 %% Tornado chart for overall slope - X* sensitivities
 
-slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
-slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
+% fixme: these slopes are incorrect, the dimensions are off!
+% slope_X_LCOE = get_slope(X_LCOE, ratios, X_LCOE_nom);
+% slope_X_Pvar = get_slope(X_Pvar, ratios, X_Pvar_nom);
+% 
+% %slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
+% %slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
+% 
+% % separate charts for each design variable, both objectives on same chart
+% figure
+% for i=1:8
+%     subplot(2,4,i)
+%     barh(categorical(param_names),[slope_X_LCOE(i,:);slope_X_Pvar(i,:)])
+%     title(dvar_names{i})
+%     improvePlot
+% end
+% legend('LCOE','c_v')
 
-% separate charts for each objective
-for i=1:8
-    figure
-    barh(categorical(param_names),[slope_X_LCOE(:,i),slope_X_Pvar(:,i)])
-    title(dvar_names{i})
-    legend('LCOE','c_{v}')
-    improvePlot
+function slope = get_slope(y_result, x, y_nominal)
+    result_for_nans = y_result(:,:,1); % deal with case where ndims(result) > 2
+
+    % if there are no NaNs, idx_first will be all ones and idx_last will be
+    % all size(result,2). Below calculates correct indices when there are NaNs.
+    [~,col_first] = max( ~isnan(result_for_nans), [], 2);
+    flipped = flip(result_for_nans,2);
+    [~,col_last_flipped] = max( ~isnan(flipped), [], 2);
+    col_last = size(y_result,2) + 1 - col_last_flipped;
+
+    idx_first = sub2ind(size(y_result), 1:size(y_result,1), col_first');
+    idx_last  = sub2ind(size(y_result), 1:size(y_result,1), col_last');
+
+    y_first = y_result(idx_first);
+    y_last = y_result(idx_last);
+    x_first = x(col_first);
+    x_last = x(col_last);
+    slope = (y_last - y_first) ./ (x_last - x_first);
+    slope = slope / y_nominal; % normalize
 end
