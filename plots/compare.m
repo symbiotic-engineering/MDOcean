@@ -1,14 +1,20 @@
 close all
 
-nominal	= [20	0.3	.2	.8 5	10	0.79 1];
-cheapest = [13.7	0.44	.1 .79 4.5 14 .85 1];
-minVariation = [12 .5 .1 .98 11 160 36.6 1];
-balanced = [13.0468, 0.4599, 0.1000, 0.9738, 12.7445, 30.6899, 10.1115, 1.0000];
-
-
 p = parameters();
+b = var_bounds(p);
+x0_input = b.X_start_struct;
 
-X = [nominal;cheapest;minVariation;balanced];
+Xs_opt = gradient_optim(x0_input,p,b);
+cheapest = Xs_opt(:,1);
+minVariation = Xs_opt(:,2);
+
+p.LCOE_max = 0.2;
+Xs_opt = gradient_optim(x0_input,p,b);
+balanced = Xs_opt(:,2);
+
+nominal	= [b.X_noms' 1];
+%%
+X = [nominal;cheapest';minVariation';balanced'];
 
 col = {'k','b','r','g'};
 
@@ -38,7 +44,7 @@ titles = {'Nominal','Min LCOE','Min Variation','Balanced'};
 figure
 for i=1:4
     x = X(i,:);   
-    [~,~,~,~,~,~,~,~,~,P_matrix] = simulation(x, p);
+    [~,~,~,~,~,~,~,~,~,~,P_matrix] = simulation(x, p);
     P_matrix = P_matrix / 1e3; % convert W to kW
     [T,Hs] = meshgrid(p.T,p.Hs); 
     
