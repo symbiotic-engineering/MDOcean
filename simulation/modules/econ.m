@@ -1,5 +1,5 @@
 
-function LCOE = econ(m_m, M, cost_m, N_WEC, P_elec, FCR)
+function [LCOE, capex, opex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR)
 
 structural_cost = m_m.* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
