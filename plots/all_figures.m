@@ -6,7 +6,7 @@
 % table 1 - design variables table
 p = parameters();
 b = var_bounds(p);
-DV_table = array2table([b.X_mins b.X_noms b.X_maxs], 'VariableNames',{'Mins','Noms','Maxs'})
+DV_table = array2table([b.X_mins b.X_noms b.X_maxs], 'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', {b.var_names{1:end-1}})
 
 % table 2 - constraints table
 
@@ -22,6 +22,9 @@ sin_saturation_demo()
 % figure 5 - JPD multiplication
 
 % table 4 - validation
+
+% paragraph 4.2 - convergence for different x0s
+gradient_mult_x0()
 
 % table 5 - optimal DVs for 4 designs
 compare()

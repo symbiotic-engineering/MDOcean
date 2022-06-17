@@ -6,6 +6,10 @@ files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...
     'PacWave-South_Oregon_Wave-Resource.csv','WETS_Hawaii_Wave-Resource.csv'};
 
+X_opts = zeros(8,length(files));
+obj_opts = zeros(1,length(files));
+flags = zeros(1,length(files));
+
 for i=1:length(files)
     
     jpd=readmatrix(files{i}, 'Range', 'A3');
@@ -14,14 +18,17 @@ for i=1:length(files)
     p.T = jpd(1,2:end);
   
     X = b.X_start_struct;
-
-    which_obj = 1; % only optimize LCOE
-    [X_opts, obj_opts, flags]  = gradient_optim(X,p,b,which_obj);
     
-    plot_power_matrix(X_opts,p)
+    which_obj = 1; % only optimize LCOE
+    [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,p,b,which_obj);
+    
+    plot_power_matrix(X_opts(:,i),p)
     figure(2)
-    power_PDF(X_opts,p)
+    power_PDF(X_opts(:,i),p)
     hold on
 end
 figure(2)
-legend('Humboldt, CA','PacWave North, OR', 'PacWave South, OR','WETS, Hawaii')
+locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','WETS, Hawaii'};
+legend(locs)
+array2table([X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',[b.var_names,{'LCOE','flag'}])
+assert(all(flags>0))

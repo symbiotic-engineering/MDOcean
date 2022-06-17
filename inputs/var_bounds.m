@@ -49,4 +49,6 @@ b.X_start_struct = struct('D_f',b.D_f_start,'D_s_ratio',b.D_s_ratio_start,...
         'h_f_ratio',b.h_f_ratio_start,'T_s_ratio',b.T_s_ratio_start,...
         'F_max',b.F_max_start,'D_int',b.D_int_start,'w_n',b.w_n_start);
 
+b.var_names = {'D_f','D_s_ratio','h_f_ratio','T_s_ratio','F_max','D_int','w_n','M'};
+
 end
