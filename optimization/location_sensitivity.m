@@ -13,16 +13,15 @@ for i=1:length(files)
     p.Hs = jpd(2:end,1);
     p.T = jpd(1,2:end);
   
-X = b.X_start_struct;
+    X = b.X_start_struct;
 
-
-[Xs_opt, objs_opt, flags]  = gradient_optim(X,p,b)
-
-plot_power_matrix(Xs_opt(:,1),p)
-figure(2)
-power_PDF(Xs_opt(:,1),p)
-hold on
+    which_obj = 1; % only optimize LCOE
+    [X_opts, obj_opts, flags]  = gradient_optim(X,p,b,which_obj);
+    
+    plot_power_matrix(X_opts,p)
+    figure(2)
+    power_PDF(X_opts,p)
+    hold on
 end
 figure(2)
 legend('Humboldt, CA','PacWave North, OR', 'PacWave South, OR','WETS, Hawaii')
-

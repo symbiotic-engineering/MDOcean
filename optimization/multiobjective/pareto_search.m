@@ -10,9 +10,10 @@ function [x,fval] = pareto_search()
     X_seeds = zeros(length(LCOE_seeds),7);
     for i = 1:length(LCOE_seeds)
         p.LCOE_max = LCOE_seeds(i);
-        [X_opt_tmp,~,~,~] = gradient_optim(x0,p,b);
+        which_obj = 2;
+        [X_opt_tmp,~,~,~] = gradient_optim(x0,p,b,which_obj);
         idxs = [1 6 2 5 4 3 7];
-        X_seeds(i,:) = X_opt_tmp(idxs,2)';
+        X_seeds(i,:) = X_opt_tmp(idxs)';
     end
     p.LCOE_max = LCOE;
     
