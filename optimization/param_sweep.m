@@ -1,6 +1,6 @@
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
-clear;clc;close all
+clear;clc;%close all
 dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
 
 param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
@@ -79,7 +79,7 @@ improvePlot
 grid on
 
 
-for i = 1:8
+for i = 1:7
     figure(2)
     subplot(2,4,i)
     plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
@@ -135,7 +135,7 @@ title('Sensitivities')
 % 
 % % separate charts for each design variable, both objectives on same chart
 % figure
-% for i=1:8
+% for i=1:7
 %     subplot(2,4,i)
 %     barh(categorical(param_names),[slope_X_LCOE(i,:);slope_X_Pvar(i,:)])
 %     title(dvar_names{i})

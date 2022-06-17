@@ -1,4 +1,4 @@
-close all
+%close all
 
 p = parameters();
 b = var_bounds(p);

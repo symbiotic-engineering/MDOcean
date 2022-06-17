@@ -1,4 +1,4 @@
-clear;close all;clc
+clear;%close all;clc
 p = parameters();
 b = var_bounds(p);
 

@@ -49,7 +49,7 @@ legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
 simplePareto = true; % toggle between a simple pareto front and one that's 
 % annotated with the three recommended designs
 
-close all
+%close all
 figure
 % overall pareto front
 overallLCOE = [LCOE'; fval(:,1)];
