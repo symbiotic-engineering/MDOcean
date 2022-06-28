@@ -9,8 +9,8 @@ D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
 h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
 T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
 in.F_max            = X(5)*1e6; % max powertrain force (N)
-in.D_int            = X(6)*1e6; % internal damping of controller (Ns/m)
-in.w_n              = X(7);     % internal spring of controller (N/m)
+in.B_p              = X(6)*1e6; % controller (powertrain) damping (Ns/m)
+in.w_n              = X(7);     % controller (powertrain) natural frequency (rad/s)
 in.M                = X(8);     % material (-)
 
 % Variable ratios defined by design variables
@@ -35,12 +35,12 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             D_d, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
-        	
-[F_hydro_heave, F_hydro_surge, F_ptrain, F_ptrain_max,...
+
+[F_heave_max, F_surge_max, F_ptrain_max, ...
 	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
-                                    F_hydro_heave, F_hydro_surge, F_ptrain,...
+                                    F_heave_max, F_surge_max,...
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
@@ -54,13 +54,13 @@ g(3) = V_s_pct;                         % prevent spar too heavy
 g(4) = 1 - V_s_pct;                     % prevent spar too light
 g(5) = GM;                              % stability
 g(6) = FOS1Y(1) - p.FOS_min;            % float survives hydro force
-g(7) = FOS1Y(2) - p.FOS_min;            % float survives powertrain force
+%g(7) = FOS1Y(2) - p.FOS_min;            % float survives powertrain force
 g(8) = FOS2Y(1) - p.FOS_min;            % spar survives hydro force
-g(9) = FOS2Y(2) - p.FOS_min;            % spar survives powertrain force
+%g(9) = FOS2Y(2) - p.FOS_min;            % spar survives powertrain force
 g(10) = FOS_buckling(1) - p.FOS_min;    % spar survives hydro force in buckling
-g(11) = FOS_buckling(2) - p.FOS_min;    % spar survives powertrain force in buckling
+%g(11) = FOS_buckling(2) - p.FOS_min;    % spar survives powertrain force in buckling
 g(12) = FOS3Y(1) - p.FOS_min;           % damping plate survives hydro force
-g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain force
+%g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain force
 g(14) = P_elec;                         % positive power
 g(15) = D_d - p.D_d_min;                % damping plate diameter (spar natural freq)
 g(16) = h_s_extra;                      % prevent float rising above top of spar
@@ -79,8 +79,7 @@ if nargout > 12 % if returning extra outputs for validation
     val(4) = capex;
     val(5) = opex;
     val(6) = P_elec;
-    val(7) = F_hydro_heave;
-    val(8) = F_ptrain;
+    val(7) = F_heave_max;
 end
 
 end
