@@ -69,17 +69,23 @@ g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
 assert( all(~isinf(g)) && all(~isnan(g)) )
 
-if nargout > 12 % if returning extra outputs for validation
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, in.h_f, in.h_s, ...
-                                            in.t_ft, in.t_fr, in.t_fc, in.t_fb, in.t_sr, ...
+if nargout > 12 % if returning extra struct output for validation
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, ...
+                                            in.h_f, in.h_s, in.t_ft, in.t_fr, ...
+                                            in.t_fc, in.t_fb, in.t_sr, ...
                                             D_d, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w);
     [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
-    val(1:3) = mass;
-    val(4) = capex;
-    val(5) = opex;
-    val(6) = P_elec;
-    val(7) = F_heave_max;
+    val.mass_f  = mass(1);
+    val.mass_vc = mass(2);
+    val.mass_rp = mass(3);
+    val.capex = capex;
+    val.opex = opex;
+    val.LCOE = LCOE;
+    val.power_avg = P_elec;
+    val.power_max = max(P_matrix,[],'all');
+    val.force_heave = F_heave_max;
+    val.FOS_b = FOS_buckling;
 end
 
 end
