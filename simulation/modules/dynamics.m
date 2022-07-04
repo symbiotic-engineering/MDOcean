@@ -32,8 +32,10 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
     
     % get saturated response
-    mult = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
-    % fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
+    r = in.F_max ./ F_ptrain_unsat;
+    alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
+    f_sat = min(alpha .* r, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
+    mult = get_multiplier(f_sat,m,b,k,w);
     b_sat = B_h + mult * in.B_p;
     k_sat = K_h + mult * K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
@@ -43,8 +45,13 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     if nargout > 1
         F_ptrain = mult .* F_ptrain_over_x .* X_sat;
         F_ptrain_max = max(F_ptrain,[],'all');
-        %assert(F_ptrain_max <= in.F_max);
-        F_heave = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        assert(F_ptrain == in.F_max * alpha);
+        assert(F_ptrain == f_sat * F_ptrain_unsat);
+
+        F_heave_fund = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
+        assert(F_heave <= in.F_max);
+
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
         X_max = max(X_sat,[],'all');
         h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
@@ -72,4 +79,37 @@ function X = get_response(w,m,b,k,Fd)
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;
+end
+
+function mult = get_multiplier(f_sat,m,b,k,w)
+    % all inputs are 2D arrays, the dimension of the sea state matrix
+    
+    % quadratic formula coeffs: 0 = a_quad * mult^2 + b_quad * mult + c_quad
+    % this algebra is written out on p196 of my notebook
+    m2_w4 = m.^2 .* w.^4;
+    two_k_m_w2 = 2 * k .* m .* w.^2;
+    f_sat2 = f_sat.^2;
+    a_quad = (f_sat2 - 1) .* ((b.*w).^2 + k.^2) + two_k_m_w2 - m2_w4;
+    b_quad = f_sat2 .* -two_k_m_w2;
+    c_quad = f_sat2 .* m2_w4;
+
+    % solve the quadratic formula
+    determinant = sqrt(b_quad .^ 2 - 4 * a_quad .* c_quad);
+    num = -b_quad + determinant;
+    num(:,:,2) = -b_quad - determinant;
+    den = 2 * a_quad;
+    roots = num ./ den;
+
+    % choose which of the two roots to use
+    which_soln = roots == real(roots) & roots > 0 & roots <= 1.0001; % real solns on (0, 1]
+    %both_ok = sum(which_soln,3) == 2;
+    %which_soln(both_ok,2) = false; % if both are ok, choose the first one arbitrarily for now
+    assert(all( sum(which_soln,3) == 1,'all') ); % confirm that 1 soln per sea state meets criteria
+    
+    mult = roots(which_soln);
+    mult = reshape(mult,size(f_sat));
+
+    % sanity check for the no saturation case
+    err_no_sat = abs(mult(f_sat == 1) - 1);
+    assert( all(err_no_sat < 1e-4,'all') ); 
 end

@@ -18,6 +18,16 @@ set(h,'HandleVisibility','off')
 
 legend('Saturated Signal','Fundamental Amplitude')
 
+% see what happens when added to phase shifted signal
+shift_on = false;
+if shift_on
+    shift = 33;
+    y_shift = .5/1.5 * [y(shift:end) y(1:(shift-1))];
+    plot(x,y_shift,x,ysat+y_shift,x,yfund+y_shift)
+end
+
+% alpha plot
+
 figure
 r = linspace(1,8,50); % r = Fp / Fmax
 alpha = 2/pi * ( r.*asin(1./r) + sqrt(1 - 1./r.^2) );
