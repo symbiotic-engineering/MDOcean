@@ -139,57 +139,13 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
 
     if any(both_ok,'all')
         warning('Using outliers to determine relevant quadratic formula solution')
-        [row,col]=find(both_ok);
-
-        % if both are ok, choose the first one arbitrarily for now
-        which_soln(row,col,2) = false; 
-        mult_1 = get_relevant_soln(which_soln,roots,idx_no_sat);   
-
-        % now choose the second one arbitrarily
-        which_soln(row,col,2) = true;
-        which_soln(row,col,1) = false;
-        mult_2 = get_relevant_soln(which_soln,roots,idx_no_sat);   
-
-        % compare outliers to figure out if first or second is better
-        window = 6;
-        outliers_1 = isoutlier(mult_1,'movmedian',window);
-        outliers_2 = isoutlier(mult_2,'movmedian',window);
         
-        outliers_1_relevant = outliers_1(both_ok);
-        outliers_2_relevant = outliers_2(both_ok);
-
-        one_all_outliers = all(outliers_1_relevant);
-        two_all_outliers = all(outliers_2_relevant);
-        one_all_ok = all(~outliers_1_relevant);
-        two_all_ok = all(~outliers_2_relevant);
-        
-        use_1 = (two_all_outliers && ~one_all_outliers) || (one_all_ok && ~two_all_ok);
-        use_2 = (one_all_outliers && ~two_all_outliers) || (two_all_ok && ~one_all_ok);
-%         use_1 = sum(outliers_1_relevant,'all') < sum(outliers_2_relevant,'all');
-%         use_2 = sum(outliers_1_relevant,'all') > sum(outliers_2_relevant,'all');
-
-        if use_1
-            mult = mult_1;
-        elseif use_2
-            mult = mult_2;
-        else
-            figure
-            subplot 121
-            contourf(mult_1)
-            subplot 122
-            contourf(mult_2)
-
-            error(['Failed to figure out which solution to the quadratic' ...
-                'equation is relevant, try manual inspection.'])
-        end
-        
-    else
-        
+        mult = handle_two_solns(both_ok,which_soln,roots,idx_no_sat);
+    else    
         num_solns = sum(which_soln,3);
         assert(all( num_solns == 1,'all') ); % confirm that 1 soln per sea state meets criteria
 
         mult = get_relevant_soln(which_soln,roots,idx_no_sat);   
-
     end
 
     assert(all(~isnan(mult),'all'))
@@ -211,4 +167,50 @@ function mult = get_relevant_soln(which_soln, roots, idx_no_sat)
     mult(idx_2d_first_sol) = roots(idx_3d_first_sol);
     mult(idx_2d_second_sol) = roots(idx_3d_second_sol);
     mult(idx_no_sat) = 1;
+end
+
+function mult = handle_two_solns(both_ok, which_soln, roots, idx_no_sat)
+    [row,col] = find(both_ok);
+
+    % if both are ok, choose the first one arbitrarily for now
+    which_soln(row,col,2) = false; 
+    mult_1 = get_relevant_soln(which_soln,roots,idx_no_sat);   
+
+    % now choose the second one arbitrarily
+    which_soln(row,col,2) = true;
+    which_soln(row,col,1) = false;
+    mult_2 = get_relevant_soln(which_soln,roots,idx_no_sat);   
+
+    % compare outliers to figure out if first or second is better
+    window = 6;
+    outliers_1 = isoutlier(mult_1,'movmedian',window);
+    outliers_2 = isoutlier(mult_2,'movmedian',window);
+    
+    outliers_1_relevant = outliers_1(both_ok);
+    outliers_2_relevant = outliers_2(both_ok);
+
+    one_all_outliers = all(outliers_1_relevant);
+    two_all_outliers = all(outliers_2_relevant);
+    one_all_ok = all(~outliers_1_relevant);
+    two_all_ok = all(~outliers_2_relevant);
+    
+    use_1 = (two_all_outliers && ~one_all_outliers) || (one_all_ok && ~two_all_ok);
+    use_2 = (one_all_outliers && ~two_all_outliers) || (two_all_ok && ~one_all_ok);
+%     use_1 = sum(outliers_1_relevant,'all') < sum(outliers_2_relevant,'all');
+%     use_2 = sum(outliers_1_relevant,'all') > sum(outliers_2_relevant,'all');
+
+    if use_1
+        mult = mult_1;
+    elseif use_2
+        mult = mult_2;
+    else
+        figure
+        subplot 121
+        contourf(mult_1)
+        subplot 122
+        contourf(mult_2)
+
+        error(['Failed to figure out which solution to the quadratic' ...
+            'equation is relevant, try manual inspection.'])
+    end
 end
