@@ -66,11 +66,11 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
 end
 
 function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
-    w = 2*pi./T;         % frequency
-    k = w.^2 / g;        % wave number
-    V_g = g ./(2*w);     % group velocity
+    w = 2*pi./T;        % frequency
+    k = w.^2 / g;       % wave number
+    V_g = g ./(2*w);    % group velocity
 
-    r = D_f / 2;      % radius
+    r = D_f / 2;        % radius
     A_w = pi * r^2;     % waterplane area
     
     A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
@@ -100,27 +100,8 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     w(idx_no_sat) = NaN;
     r_b(idx_no_sat) = NaN;
     
-    % coefficients defined for convenience
-    alpha_b = 1./(r_b + 1);
-    alpha_k = 1./(r_k + 1);
-    beta_b = r_b./(r_b + 1);
-    beta_k = r_k./(r_k + 1);
-    
-    m2_w4 = m.^2 .* w.^4;
-    two_k_m_w2 = 2 * k .* m .* w.^2;
-    inv_f_sat2 = f_sat.^(-2);
-    bw2 = (b.*w).^2;
-    k2 = k.^2;
-
-    % quadratic formula coeffs: 0 = a_quad * mult^2 + b_quad * mult + c_quad
-    a_quad = (alpha_b.^2 - inv_f_sat2) .* bw2 ...
-           + (alpha_k.^2 - inv_f_sat2) .* k2 ...
-           +  two_k_m_w2 - m2_w4;
-    b_quad = 2 * (alpha_b .* beta_b .* bw2 ...
-                +  alpha_k .* beta_k .* k2) ...
-                -  alpha_k .* two_k_m_w2;
-    c_quad = beta_b.^2 .* bw2 + beta_k.^2 .* k2 ...
-           - beta_k .* two_k_m_w2 + m2_w4;
+    %[a_quad, b_quad, c_quad] = get_a_b_c(f_sat,m,b,k,w,r_b,r_k)
+    [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
 
     % solve the quadratic formula
     determinant = sqrt(b_quad .^ 2 - 4 * a_quad .* c_quad);
@@ -149,6 +130,30 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     end
 
     assert(all(~isnan(mult),'all'))
+end
+
+function [a_quad,b_quad,c_quad] = get_a_b_c(f_sat,m,b,k,w,r_b,r_k)
+    % coefficients defined for convenience
+    alpha_b = 1./(r_b + 1);
+    alpha_k = 1./(r_k + 1);
+    beta_b = r_b./(r_b + 1);
+    beta_k = r_k./(r_k + 1);
+    
+    m2_w4 = m.^2 .* w.^4;
+    two_k_m_w2 = 2 * k .* m .* w.^2;
+    inv_f_sat2 = f_sat.^(-2);
+    bw2 = (b.*w).^2;
+    k2 = k.^2;
+
+    % quadratic formula coeffs: 0 = a_quad * mult^2 + b_quad * mult + c_quad
+    a_quad = (alpha_b.^2 - inv_f_sat2) .* bw2 ...
+           + (alpha_k.^2 - inv_f_sat2) .* k2 ...
+           +  two_k_m_w2 - m2_w4;
+    b_quad = 2 * (alpha_b .* beta_b .* bw2 ...
+                +  alpha_k .* beta_k .* k2) ...
+                -  alpha_k .* two_k_m_w2;
+    c_quad = beta_b.^2 .* bw2 + beta_k.^2 .* k2 ...
+           - beta_k .* two_k_m_w2 + m2_w4;
 end
 
 function mult = get_relevant_soln(which_soln, roots, idx_no_sat)
