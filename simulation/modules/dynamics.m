@@ -49,11 +49,11 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
         F_ptrain_max = max(F_ptrain,[],'all');
         F_err_1 = abs(F_ptrain ./ (in.F_max * alpha) - 1);
         F_err_2 = abs(F_ptrain ./ (f_sat * F_ptrain_unsat) - 1);
-        % 20 percent error acceptable for now
+        % 0.1 percent error
         if any(f_sat<1,'all')
-            assert(F_err_1(f_sat < 1) < 0.20);
+            assert(F_err_1(f_sat < 1) < 1e-3);
         end
-        assert(F_err_2 < 0.20);
+        assert(F_err_2 < 1e-3);
 
         F_heave_fund = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
         F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
@@ -100,7 +100,6 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     w(idx_no_sat) = NaN;
     r_b(idx_no_sat) = NaN;
     
-    %[a_quad, b_quad, c_quad] = get_a_b_c(f_sat,m,b,k,w,r_b,r_k)
     [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
 
     % solve the quadratic formula
@@ -130,30 +129,6 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     end
 
     assert(all(~isnan(mult),'all'))
-end
-
-function [a_quad,b_quad,c_quad] = get_a_b_c(f_sat,m,b,k,w,r_b,r_k)
-    % coefficients defined for convenience
-    alpha_b = 1./(r_b + 1);
-    alpha_k = 1./(r_k + 1);
-    beta_b = r_b./(r_b + 1);
-    beta_k = r_k./(r_k + 1);
-    
-    m2_w4 = m.^2 .* w.^4;
-    two_k_m_w2 = 2 * k .* m .* w.^2;
-    inv_f_sat2 = f_sat.^(-2);
-    bw2 = (b.*w).^2;
-    k2 = k.^2;
-
-    % quadratic formula coeffs: 0 = a_quad * mult^2 + b_quad * mult + c_quad
-    a_quad = (alpha_b.^2 - inv_f_sat2) .* bw2 ...
-           + (alpha_k.^2 - inv_f_sat2) .* k2 ...
-           +  two_k_m_w2 - m2_w4;
-    b_quad = 2 * (alpha_b .* beta_b .* bw2 ...
-                +  alpha_k .* beta_k .* k2) ...
-                -  alpha_k .* two_k_m_w2;
-    c_quad = beta_b.^2 .* bw2 + beta_k.^2 .* k2 ...
-           - beta_k .* two_k_m_w2 + m2_w4;
 end
 
 function mult = get_relevant_soln(which_soln, roots, idx_no_sat)
