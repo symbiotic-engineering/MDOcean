@@ -46,10 +46,13 @@ function [x,fval] = pareto_search()
 
     figure
     subplot 311
+    title('Lower Bound Active')
     spy(lb_active(idx,:)');
     subplot 312
+    title('Upper Bound Active')
     spy(ub_active(idx,:)')
     subplot 313
+    title('Constraint Active')
     spy(con_active(idx,:)')
 
 
