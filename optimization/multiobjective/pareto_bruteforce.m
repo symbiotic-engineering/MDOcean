@@ -32,7 +32,7 @@ LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
 %[x,fval] = pareto_search();
-load("pareto_search_results5.mat")
+load("pareto_search_results6.mat")
 cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
@@ -202,13 +202,19 @@ for i=1:7
     semilogy(pct_angle,y(:,i),cols{i})
     hold on
 end
-plot([3 97],[1 1],[3 97],[10 10],[3 97],[100 100],...
-    'Color',[.85 .85 .85]); % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+
+% make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+x_grid = [3 97];
+y_grid = [.1 1 10 100 1000];
+for i=1:length(y_grid)
+    plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
+end
+
 title('Design Heuristics')
 %xlabel('Percent along the Pareto Curve')
 ylabel('Normalized Optimal Design Value')
-ylim([.2 50])
-set(gca,'YTick',[.2 .5 1 2 5 10 20 50])
+ylim([.03 5000])
+set(gca,'YTick',y_grid)
 improvePlot
 legend(var_names_pretty,'Location','eastoutside')
 set(gca,'YMinorGrid','on')
