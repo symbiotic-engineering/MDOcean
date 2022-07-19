@@ -1,4 +1,4 @@
-close all
+%close all
 
 p = parameters();
 b = var_bounds(p);
@@ -9,8 +9,7 @@ cheapest = Xs_opt(:,1);
 minVariation = Xs_opt(:,2);
 
 p.LCOE_max = 0.2;
-Xs_opt = gradient_optim(x0_input,p,b);
-balanced = Xs_opt(:,2);
+balanced = gradient_optim(x0_input,p,b,2);
 
 nominal	= [b.X_noms' 1];
 %%

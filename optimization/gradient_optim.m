@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b)
+function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -13,6 +13,10 @@ else
     display = 'off';
     plotfn = [];
     ploton = false;
+end
+
+if nargin<4
+    which_objs = [1 2]; % run both objectives by default
 end
 
 % create optimization variables for each of the design variables
@@ -34,14 +38,14 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
 
-    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton);
+    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton)
+function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
@@ -50,7 +54,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     obj_names = {'LCOE','P_var'};
     probs = cell([1 2]);
     
-    num_objectives = 2;
+    num_objectives = length(which_objs);
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
@@ -78,9 +82,9 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
-        prob.Objective = objs(i);
+        which_obj = which_objs(i);
+        prob.Objective = objs(which_obj);
         
-
         %show(prob)
 
         if length(x0_input)==1
@@ -105,7 +109,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
 
         X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
-        assert(out(i) == obj_opt)                       % check correct reordering of X_opt elements
+        assert(out(which_obj) == obj_opt)                       % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;

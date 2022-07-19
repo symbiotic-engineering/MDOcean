@@ -26,19 +26,11 @@ scale = repmat([100 1],num_runs,1);
 results = addvars(results, objs.*scale, flags,  ...	
     'NewVariableNames', {'Objs','Flag'});
 
-var_names = {'D_f',...    % outer diameter of float (m)	
-            'D_s_ratio',...
-            'h_f_ratio',...
-            'T_s_ratio',...         
-            'F_max',...    
-            'D_int',...     % internal damping of controller (Ns/m)	
-            'w_n',...       % natural frequency (rad/s)
-            'M'};         % material (-)
-for i=1:length(var_names)
+for i=1:length(b.var_names)
     if i~= 8
         X = X_opt(:,i,:);
     results = addvars(results, X(:,:), 'NewVariableNames', ...
-                    [var_names{i} '_opt'], 'After', var_names{i});
+                    [b.var_names{i} '_opt'], 'After', b.var_names{i});
     end
 end
 
