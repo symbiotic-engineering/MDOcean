@@ -48,7 +48,11 @@ end
 function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p);%simulation(X, p);
+       FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p,...
+                                            'OutputSize',{[1,1],[1,1],[1,2],...
+                                            [1,1],[1,1],[1,1],[1,1],[1,1],....
+                                            [1,1],[1,1],size(p.JPD),[1, 18]},...
+                                            'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     objs = [LCOE P_var];
     obj_names = {'LCOE','P_var'};
@@ -91,7 +95,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
             error('x0 input struct has wrong size')
         end
         
-        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{i}, x0, opts);
+        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts);
         probs{i} = problem;
 
                        % D_f   D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n]
@@ -105,7 +109,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
 
         X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
-        assert(out(which_obj) == obj_opt)                       % check correct reordering of X_opt elements
+        assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;

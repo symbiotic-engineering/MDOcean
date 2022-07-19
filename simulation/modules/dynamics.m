@@ -22,7 +22,7 @@ end
 
 function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
-    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.rho_w, in.g);       
+    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.rho_w, in.g);
     m = m_float + A;
     b = B_h + in.B_p;
     k = in.w_n^2 * m;
@@ -32,19 +32,33 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
     
     % get saturated response
-    mult = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
-    % fixme: should multiply mult (saturation multiplier) by a fourier multiplier to get total mult
+    r = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
+    alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
+    f_sat = alpha .* r;
+    mult = get_multiplier(f_sat,m,b,k,w, B_h/in.B_p, K_h/K_p);
     b_sat = B_h + mult * in.B_p;
     k_sat = K_h + mult * K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
+    % calculate power
     P_matrix = 1/2 * (mult * in.B_p) .* w.^2 .* X_sat.^2;
     
+    % calculate forces
     if nargout > 1
         F_ptrain = mult .* F_ptrain_over_x .* X_sat;
         F_ptrain_max = max(F_ptrain,[],'all');
-        %assert(F_ptrain_max <= in.F_max);
-        F_heave = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        F_err_1 = abs(F_ptrain ./ (in.F_max * alpha) - 1);
+        F_err_2 = abs(F_ptrain ./ (f_sat * F_ptrain_unsat) - 1);
+        % 0.1 percent error
+        if any(f_sat<1,'all')
+            assert(F_err_1(f_sat < 1) < 1e-3);
+        end
+        assert(F_err_2 < 1e-3);
+
+        F_heave_fund = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
+        %assert(F_heave <= in.F_max);
+
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
         X_max = max(X_sat,[],'all');
         h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
@@ -52,11 +66,11 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
 end
 
 function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
-    w = 2*pi./T;         % frequency
-    k = w.^2 / g;        % wave number
-    V_g = g ./(2*w);     % group velocity
+    w = 2*pi./T;        % frequency
+    k = w.^2 / g;       % wave number
+    V_g = g ./(2*w);    % group velocity
 
-    r = D_f / 2;      % radius
+    r = D_f / 2;        % radius
     A_w = pi * r^2;     % waterplane area
     
     A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
@@ -72,4 +86,111 @@ function X = get_response(w,m,b,k,Fd)
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;
+end
+
+function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
+    % m, k, and r_k are scalars.
+    % All other inputs are 2D arrays, the dimension of the sea state matrix.
+    % This algebra is written out on p198 of my notebook.
+
+    % speedup: only do math for saturated sea states, since unsat will = 1
+    idx_no_sat = f_sat == 1;
+    f_sat(idx_no_sat) = NaN;
+    b(idx_no_sat) = NaN;
+    w(idx_no_sat) = NaN;
+    r_b(idx_no_sat) = NaN;
+    
+    [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
+
+    % solve the quadratic formula
+    determinant = sqrt(b_quad .^ 2 - 4 * a_quad .* c_quad);
+    num = -b_quad + determinant;
+    num(:,:,2) = -b_quad - determinant;
+    den = 2 * a_quad;
+    roots = num ./ den;
+
+    % choose which of the two roots to use
+    which_soln = roots == real(roots) & roots > 0 & roots <= 1; % real solns on (0, 1]
+    both_ok = sum(which_soln,3) == 2;
+    
+    which_soln(idx_no_sat) = 1; % temporarily mark the non-saturated solutions
+                                % as having one solution, to ensure the 
+                                % logic below works correctly
+
+    if any(both_ok,'all')
+        warning('Using outliers to determine relevant quadratic formula solution')
+        
+        mult = handle_two_solns(both_ok,which_soln,roots,idx_no_sat);
+    else    
+        num_solns = sum(which_soln,3);
+        assert(all( num_solns == 1,'all') ); % confirm that 1 soln per sea state meets criteria
+
+        mult = get_relevant_soln(which_soln,roots,idx_no_sat);   
+    end
+
+    assert(all(~isnan(mult),'all'))
+end
+
+function mult = get_relevant_soln(which_soln, roots, idx_no_sat)
+% pick the specified roots using multidimensional logical indexing
+
+    mult = NaN(size(idx_no_sat));
+
+    % figure out 3d and 2d indices
+    idx_3d_first_sol = which_soln;
+    idx_3d_first_sol(:,:,2) = false;
+    idx_3d_second_sol = which_soln;
+    idx_3d_second_sol(:,:,1) = false;
+    idx_2d_first_sol = which_soln(:,:,1);
+    idx_2d_second_sol = which_soln(:,:,2);
+    
+    mult(idx_2d_first_sol) = roots(idx_3d_first_sol);
+    mult(idx_2d_second_sol) = roots(idx_3d_second_sol);
+    mult(idx_no_sat) = 1;
+end
+
+function mult = handle_two_solns(both_ok, which_soln, roots, idx_no_sat)
+    [row,col] = find(both_ok);
+
+    % if both are ok, choose the first one arbitrarily for now
+    which_soln(row,col,2) = false; 
+    mult_1 = get_relevant_soln(which_soln,roots,idx_no_sat);   
+
+    % now choose the second one arbitrarily
+    which_soln(row,col,2) = true;
+    which_soln(row,col,1) = false;
+    mult_2 = get_relevant_soln(which_soln,roots,idx_no_sat);   
+
+    % compare outliers to figure out if first or second is better
+    window = 6;
+    outliers_1 = isoutlier(mult_1,'movmedian',window);
+    outliers_2 = isoutlier(mult_2,'movmedian',window);
+    
+    outliers_1_relevant = outliers_1(both_ok);
+    outliers_2_relevant = outliers_2(both_ok);
+
+    one_all_outliers = all(outliers_1_relevant);
+    two_all_outliers = all(outliers_2_relevant);
+    one_all_ok = all(~outliers_1_relevant);
+    two_all_ok = all(~outliers_2_relevant);
+    
+    use_1 = (two_all_outliers && ~one_all_outliers) || (one_all_ok && ~two_all_ok);
+    use_2 = (one_all_outliers && ~two_all_outliers) || (two_all_ok && ~one_all_ok);
+%     use_1 = sum(outliers_1_relevant,'all') < sum(outliers_2_relevant,'all');
+%     use_2 = sum(outliers_1_relevant,'all') > sum(outliers_2_relevant,'all');
+
+    if use_1
+        mult = mult_1;
+    elseif use_2
+        mult = mult_2;
+    else
+        figure
+        subplot 121
+        contourf(mult_1)
+        subplot 122
+        contourf(mult_2)
+
+        error(['Failed to figure out which solution to the quadratic' ...
+            'equation is relevant, try manual inspection.'])
+    end
 end
