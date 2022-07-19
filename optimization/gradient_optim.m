@@ -95,7 +95,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
             error('x0 input struct has wrong size')
         end
         
-        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{i}, x0, opts);
+        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts);
         probs{i} = problem;
 
                        % D_f   D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n]
