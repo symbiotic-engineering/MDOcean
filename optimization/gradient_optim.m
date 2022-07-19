@@ -26,7 +26,7 @@ D_s_ratio   = optimvar('D_s_ratio', sz,'LowerBound',b.D_s_ratio_min, 'UpperBound
 h_f_ratio   = optimvar('h_f_ratio', sz,'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
 T_s_ratio   = optimvar('T_s_ratio', sz,'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
 F_max       = optimvar('F_max',     sz,'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
-D_int       = optimvar('D_int',     sz,'LowerBound',b.D_int_min,     'UpperBound',b.D_int_max);
+B_p         = optimvar('D_int',     sz,'LowerBound',b.B_p_min,       'UpperBound',b.B_p_max);
 w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound',b.w_n_max);
 
 opts = optimoptions('fmincon',	'Display',display,...
@@ -36,7 +36,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n matl];
+    X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
 
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
@@ -65,17 +65,13 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     prob.Constraints.Buoyancy_float_max     = B(1) <= 1;
     prob.Constraints.Buoyancy_spar_min      = B(2) >= 0;
     prob.Constraints.Buoyancy_spar_max      = B(2) <= 1;
-    prob.Constraints.FOS_float_hydro        = FOS1Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_float_ptrain       = FOS1Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_column_hydro       = FOS2Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_column_ptrain      = FOS2Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_plate_hydro        = FOS3Y(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_plate_ptrain       = FOS3Y(2)/p.FOS_min >= 1;
-    prob.Constraints.FOS_buckling_hydro     = FOS_buckling(1)/p.FOS_min >= 1;
-    prob.Constraints.FOS_buckling_ptrain    = FOS_buckling(2)/p.FOS_min >= 1;
+    prob.Constraints.FOS_float_hydro        = FOS1Y / p.FOS_min >= 1;
+    prob.Constraints.FOS_column_hydro       = FOS2Y / p.FOS_min >= 1;
+    prob.Constraints.FOS_plate_hydro        = FOS3Y / p.FOS_min >= 1;
+    prob.Constraints.FOS_buckling_hydro     = FOS_buckling / p.FOS_min >= 1;
     prob.Constraints.GM                     = GM >= 0;
     prob.Constraints.P_positive             = P_elec >= 0;
-    prob.Constraints.Damping                = D_d/p.D_d_min >= 1;
+    prob.Constraints.Damping                = D_d / p.D_d_min >= 1;
     prob.Constraints.Spar_height            = g(16) >= 0;
     prob.Constraints.LCOE_max               = g(17) >= 0;
     prob.Constraints.F_max_limit            = g(18) >= 0;
@@ -98,7 +94,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{i}, x0, opts);
         probs{i} = problem;
 
-                       % D_f   D_s_ratio h_f_ratio T_s_ratio F_max D_int w_n]
+                       % D_f   D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n]
         mins_flexible = [false false     false     false     false true  true]';
         maxs_flexible = [true  false     false     false     true  true  true]';
         tol = eps(2);
