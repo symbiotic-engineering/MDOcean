@@ -109,7 +109,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
 
         X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
-        assert(out(which_obj) == obj_opt)                       % check correct reordering of X_opt elements
+        assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
