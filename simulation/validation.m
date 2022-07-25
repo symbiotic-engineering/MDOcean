@@ -17,7 +17,7 @@ assert( all(err < 0.01) )
 %% Cost within 5 percent
 [~,~,pct_error] = validate_nominal_RM3();
 disp('Cost percent error:')
-err = [pct_err.capex pct_error.opex];
+err = [pct_error.capex pct_error.opex];
 assert( all(err < 0.05) )
 
 %% Power within 10 percent
