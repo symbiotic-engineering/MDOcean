@@ -7,6 +7,8 @@ p = parameters();
 b = var_bounds(p);
 v = validation_inputs();
 
+p.power_max = v.power_max;
+
 y_desired = [v.power_avg, v.power_max, v.force_heave];
 
 % x = [F_max_nom, B_p_nom, w_n_nom]
@@ -37,7 +39,7 @@ function [err,y] = errFunc(x,y_desired,p,b)
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, val] = simulation(X, p);
     y = [val.power_avg, val.power_max, val.force_heave];
     err = abs(y - y_desired) ./ y_desired;
-    err(1:2) = 0; % override max power
+    %err(1:2) = 0; % override max power
     err = norm(err);
 end
     

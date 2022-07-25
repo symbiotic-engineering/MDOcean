@@ -5,6 +5,9 @@ function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_e
 [Hs,T] = meshgrid(in.T,in.Hs);
 P_matrix = get_power_force(in,T,Hs,m_float,V_d,draft);
 
+% saturate maximum power
+P_matrix = min(P_matrix,in.power_max);
+
 % weight power across all sea states
 P_weighted = P_matrix .* in.JPD / 100;
 P_elec = sum(P_weighted(:)); 

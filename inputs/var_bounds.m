@@ -22,17 +22,17 @@ b.T_s_ratio_start = 35/44;
 
 b.F_max_min = 1e-4;
 b.F_max_max = 15;
-b.F_max_nom = 5;
+b.F_max_nom =7.28;
 b.F_max_start = 5;
 
 b.B_p_min = .1;
 b.B_p_max = 200;
-b.B_p_nom = 10;
+b.B_p_nom = 1.58;
 b.B_p_start = 30;
 
 b.w_n_min = .01;%2*pi/p.T(find(any(p.JPD > 0),1,'last'));  % min wave frequency that has any energy
 b.w_n_max = 40;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency that has any energy
-b.w_n_nom = 2*pi/8;
+b.w_n_nom = 0.97;
 b.w_n_start = 5;
 
 b.M_min = 1;
