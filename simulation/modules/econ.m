@@ -1,5 +1,5 @@
 
-function [LCOE, capex, opex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR)
+function [LCOE, capex, opex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR, efficiency)
 
 structural_cost = m_m.* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
@@ -22,7 +22,8 @@ consumables     = N_WEC * 8000;
 insurance       = 227000;
 
 hr_per_yr = 8766;
-aep = N_WEC * P_elec*hr_per_yr/1000; % annual energy production: W to kWh per year
+P_avg = N_WEC * P_elec * efficiency;
+aep = P_avg * hr_per_yr / 1000; % annual energy production: W to kWh per year
 
 capex = development + infrastructure + mooring + devicestructure + pto ...
         + profitmargin + installation + contingency; 

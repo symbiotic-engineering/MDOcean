@@ -44,6 +44,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
             'T_f_over_h_f', 2/4,...             % normalized float draft (-)
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
-            'power_max', Inf);                  % maximum power (W)   
+            'power_max', Inf,...                % maximum power (W)
+            'pto_eff',   0.80,...               % PTO efficiency (-)
+            'array_eff', 0.95*0.98 );           % array availability and transmission efficiency (-)
         
 end

@@ -44,7 +44,7 @@ B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.array_eff);
 
 %% Assemble constraints g(x) >= 0
 g = zeros(1,18);
@@ -75,7 +75,7 @@ if nargout > 12 % if returning extra struct output for validation
                                             in.t_fc, in.t_fb, in.t_sr, ...
                                             D_d, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.array_eff);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
