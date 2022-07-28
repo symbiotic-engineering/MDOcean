@@ -43,6 +43,7 @@ assert( err < 0.1 )
 function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     p = parameters();
     p.N_WEC = 1;
+    p.power_max = 286000;
     b = var_bounds(p);
     
     
