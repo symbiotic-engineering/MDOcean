@@ -33,11 +33,11 @@ err = [pct_error.force_heave pct_error.FOS_b];
 assert( all(err < 0.1) )
 
 %% LCOE within 10 percent
-[~,~,pct_error] = validate_nominal_RM3();
-disp('LCOE percent error:')
-err = pct_error.LCOE;
-assert( err < 0.1 )
-
+% [~,~,pct_error] = validate_nominal_RM3();
+% disp('LCOE percent error:')
+% err = pct_error.LCOE;
+% assert( err < 0.1 )
+validate_econ_scaling()
 
 %%%%%% function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
@@ -73,4 +73,44 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
             tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});
         end
     end
+end
+
+function [] = validate_econ_scaling()
+    p = parameters();
+    p.power_max = 286000;
+    b = var_bounds(p);
+    X = [b.X_noms; 1];
+    
+    N_WEC = [1 10 50 100];
+    for i = 1:length(N_WEC)
+        p.N_WEC = N_WEC(i); 
+        [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, out_struct] = simulation(X,p);
+        if i==1
+            simulated = out_struct;
+        else
+            simulated(i) = out_struct;
+        end
+    end
+
+    actual = validation_inputs();
+
+    figure
+    subplot 131
+    semilogx(N_WEC,[simulated.LCOE],N_WEC,actual.LCOE)
+    xlabel('N_{WEC}')
+    title('LCOE')
+    legend('Simulated','Actual')
+
+    subplot 132
+    semilogx(N_WEC,[simulated.capex],N_WEC,actual.capex)
+    xlabel('N_{WEC}')
+    title('Capex')
+    legend('Simulated','Actual')
+
+    subplot 133
+    semilogx(N_WEC,[simulated.opex],N_WEC,actual.opex)
+    xlabel('N_{WEC}')
+    title('Opex')
+    legend('Simulated','Actual')
+    improvePlot
 end
