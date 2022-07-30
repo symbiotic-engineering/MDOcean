@@ -1,9 +1,9 @@
 function [V_d, m_m, m_f_tot, ...
          A_c, A_lat_sub, r_over_t, ...
          I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, T_f, h_f, h_s, ...
-                                            t_ft, t_fr, t_fc, t_fb, t_sr, ...
-                                            D_d, T_s, h_d, ...
-                                            M, rho_m, rho_w)
+                                            t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
+                                            D_d, D_dt, theta_dt, T_s, h_d, ...
+                                            M, rho_m, rho_w, m_scale)
 
 %% Variable Definitions
 % D: diameter
@@ -13,6 +13,7 @@ function [V_d, m_m, m_f_tot, ...
 % _f: float
 % _s: spar
 % _d: damping plate
+% _dt: damping plate tubular support
 
 %               _____                               -
 %               |   |                               |
@@ -26,9 +27,9 @@ function [V_d, m_m, m_f_tot, ...
 %               |   |                   |           hs
 %               |Ds |                   Ts          |
 %               |   |                   |           |
-%               |   |                   |           |
-%               |   |                   |           |
-%               |   |                   |           |
+%             / |   | \                 |           |
+%        Ldt/   |   |   \               |           |
+%         /     |   |     \             |           |
 %       _________Dd__________           -   -       -
 %       |                   |               hd
 %       _____________________               -
@@ -40,6 +41,7 @@ function [V_d, m_m, m_f_tot, ...
 % t_fc - circumferential thickness of the float gussets
 % t_fr - radial thickness of the float walls
 % t_sr - radial thickness of the spar walls
+% t_dt - radial thickness of damping plate support tube walls
 
 %% Float
 num_gussets = 24;
@@ -55,7 +57,7 @@ V_bot_plate = pi * (D_f/2)^2 * t_fb;
 V_rims_gussets = A_f_c * h_f;
 V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets;
 
-m_f_m = V_sf_m * rho_m(M);      % mass of float material without ballast
+m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
 % float hydrostatic calculations
 A_f = pi/4 * (D_f^2 - D_s^2);
@@ -83,12 +85,16 @@ A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);      % spar column cross sectional area
 V_vc_m = A_vc_c * h_s;                   % volume of column material
 
 % damping plate material use
-A_d = pi/4 * D_d^2;
-V_d_m = A_d * h_d;
+A_d = pi/4 * D_d^2; % damping plate itself
+num_supports = 4;
+L_dt = D_d / (2*cos(theta_dt));
+D_dt_i = D_dt - 2 * t_dt;
+A_dt = pi/4 * (D_dt^2 - D_dt_i^2); % support tube area
+V_d_m = A_d * h_d + num_supports * A_dt * L_dt;
 
 % total spar material use and mass
-m_vc_m = V_vc_m * rho_m(M);
-m_d_m = V_d_m * rho_m(M);
+m_vc_m = V_vc_m * rho_m(M) * m_scale;
+m_d_m = V_d_m * rho_m(M) * m_scale;
 m_s_m = m_vc_m + m_d_m;                 % mass of spar material
 
 % spar ballast
@@ -117,7 +123,7 @@ T = [T_f, T_s, h_d];
 m_m = m_f_m + m_s_m;                    % total mass of material
 
 V_d = [V_f_d, V_vc_d, V_d_d];
-mass = [m_f_tot, m_vc_m + m_s_b, m_d_m];
+mass = [m_f_m, m_vc_m, m_d_m]; % material mass of each structure
 
 %% Metacentric Height Calculation
 % centers of buoyancy, measured from keel (bottom of damping plate)
