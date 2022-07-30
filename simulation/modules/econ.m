@@ -22,7 +22,7 @@ postinstall     = 710000;
 shoreoperations = 142000;
 replacement     = N_WEC * 54000;
 consumables     = N_WEC * 8000;
-insurance       = 227000;
+insurance       = (.8 + .2*N_WEC) * 227000;
 
 opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
