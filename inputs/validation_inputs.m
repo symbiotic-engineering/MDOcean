@@ -9,6 +9,7 @@ RM3 = struct(   'mass_f',       208e3, ...  % p159 RM3 report
                 ...                         % B58:E58 in CBS Report Tables
                 'LCOE',         [4.48, 1.45, 0.85, 0.76], ... 
                 ...                         % B98:F98 in CBS Report Tables
+                ...                         % 4.48 is estimated from Fig 5-33 p175 RM3 report
                 'power_avg',    85.9e3, ... % S14 in CBS Performance & Economics
                 'power_max',    286e3, ...  % S15 in CBS Performance & Economics
                 'force_heave',  8500e3,...  % p156 RM3 report

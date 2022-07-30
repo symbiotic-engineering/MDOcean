@@ -38,7 +38,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  1.5,...                 % minimum FOS (-)	
             'D_d_min',  30,...                  % minimum damping plate diameter
-            'FCR',      0.108,...               % fixed charge rate (-)	
+            'FCR',      0.113,...               % fixed charge rate (-), see RM3 report p63
             'N_WEC',    100,...                 % number of WECs in array (-)   
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
             'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
