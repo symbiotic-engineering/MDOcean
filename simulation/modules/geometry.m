@@ -117,7 +117,7 @@ T = [T_f, T_s, h_d];
 m_m = m_f_m + m_s_m;                    % total mass of material
 
 V_d = [V_f_d, V_vc_d, V_d_d];
-mass = [m_f_tot, m_vc_m + m_s_b, m_d_m];
+mass = [m_f_m, m_vc_m, m_d_m]; % material mass of each structure
 
 %% Metacentric Height Calculation
 % centers of buoyancy, measured from keel (bottom of damping plate)
