@@ -3,6 +3,7 @@ function RM3 = validation_inputs()
 RM3 = struct(   'mass_f',       208e3, ...  % p159 RM3 report
                 'mass_vc',      224e3, ...  % p159 RM3 report
                 'mass_rp',      245e3, ...  % p159 RM3 report
+                'mass_tot',     680e3, ...  % p159 RM3 report
                 'capex',        [17e6 61e6, 207e6, 390e6],  ... 
                 ...                         % B15:E15 in CBS Report Tables
                 'opex',         [1.2e6, 3.3e6, 6.6e6, 9.4e6],... 
