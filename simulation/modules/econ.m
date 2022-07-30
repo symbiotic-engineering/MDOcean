@@ -14,6 +14,9 @@ profitmargin    = 356000;
 installation    = 5909000;
 contingency     = 1590000;
 
+capex = development + infrastructure + mooring + devicestructure + pto ...
+        + profitmargin + installation + contingency; 
+
 operations      = N_WEC * 27000;
 postinstall     = 710000;
 shoreoperations = 142000;
@@ -21,15 +24,12 @@ replacement     = N_WEC * 54000;
 consumables     = N_WEC * 8000;
 insurance       = 227000;
 
-hr_per_yr = 8766;
-P_avg = N_WEC * P_elec * efficiency;
-aep = P_avg * hr_per_yr / 1000; % annual energy production: W to kWh per year
-
-capex = development + infrastructure + mooring + devicestructure + pto ...
-        + profitmargin + installation + contingency; 
 opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
 
+hr_per_yr = 8766;
+P_avg = N_WEC * P_elec * efficiency;
+aep = P_avg * hr_per_yr / 1000; % annual energy production: W to kWh per year
 
 LCOE = (FCR*capex + opex)/aep;
 
