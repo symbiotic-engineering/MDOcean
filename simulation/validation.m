@@ -8,44 +8,38 @@ clc
 failed
 assert( feasible )
 
-%% Mass within 1 percent
+%% Mass within 10 percent
 [~,~,pct_error] = validate_nominal_RM3();
-disp('Mass percent error:')
-err = [pct_error.mass_f pct_error.mass_vc pct_error.mass_rp];
-assert( all(err < 0.01) )
+err = [pct_error.mass_f pct_error.mass_vc pct_error.mass_rp pct_error.mass_tot];
+assert( all(err < 0.1) )
 
 %% Cost within 5 percent
-% [~,~,pct_error] = validate_nominal_RM3();
-% disp('Cost percent error:')
-% err = [pct_error.capex pct_error.opex];
-% assert( all(err < 0.05) )
+[~,~,pct_error] = validate_nominal_RM3();
+err = [pct_error.capex pct_error.opex];
+assert( all(err < 0.05) )
 
 %% Power within 10 percent
 [~,~,pct_error] = validate_nominal_RM3();
-disp('Power percent error:')
 err = [pct_error.power_avg pct_error.power_max];
 assert( all(err < 0.1) )
 
 %% Force within 10 percent
 [~,~,pct_error] = validate_nominal_RM3();
-disp('Force percent error:')
 err = [pct_error.force_heave pct_error.FOS_b];
 assert( all(err < 0.1) )
 
 %% LCOE within 10 percent
-% [~,~,pct_error] = validate_nominal_RM3();
-% disp('LCOE percent error:')
-% err = pct_error.LCOE;
-% assert( err < 0.1 )
-validate_econ_scaling()
+[~,~,pct_error] = validate_nominal_RM3();
+err = pct_error.LCOE;
+assert( all(err < 0.1) )
 
 %%%%%% function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     p = parameters();
     p.N_WEC = 1;
     p.power_max = 286000;
-    b = var_bounds(p);
-    
+    p.LCOE_max = 10; % set large max LCOE to avoid failing feasibility check
+    b = var_bounds(p); 
     
     X = [b.X_noms; 1];
     
@@ -57,14 +51,31 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     
     if nargout > 2
         actual = validation_inputs();
-        
+        tiledlayout(1,3)
         fields = fieldnames(actual);
         for i = 1:length(fields)
-            sim = simulated.(fields{i});
+            if any(strcmp(fields{i},{'capex','opex','LCOE'}))
+                % for economic validation, sweep N_WEC
+                N_WEC = [1 10 50 100];
+                tmp = simulated;
+                for j = 2:length(N_WEC)
+                    p.N_WEC = N_WEC(j); 
+                    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, tmp(j)] = simulation(X,p);
+                end
+                simulated.(fields{i}) = [tmp.(fields{i})];  
+                
+                nexttile
+                semilogx(N_WEC,simulated.(fields{i}),N_WEC,actual.(fields{i}))
+                xlabel('N_{WEC}')
+                title((fields{i}))
+                legend('Simulated','Actual')
+            end
+            sim = simulated.(fields{i}); 
             act = actual.(fields{i});
             pct_error.(fields{i}) = abs(sim-act) ./ act;
         end
-        
+        improvePlot
+
         if nargout > 3
             % create combined struct
             results = simulated;
@@ -73,44 +84,4 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
             tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});
         end
     end
-end
-
-function [] = validate_econ_scaling()
-    p = parameters();
-    p.power_max = 286000;
-    b = var_bounds(p);
-    X = [b.X_noms; 1];
-    
-    N_WEC = [1 10 50 100];
-    for i = 1:length(N_WEC)
-        p.N_WEC = N_WEC(i); 
-        [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, out_struct] = simulation(X,p);
-        if i==1
-            simulated = out_struct;
-        else
-            simulated(i) = out_struct;
-        end
-    end
-
-    actual = validation_inputs();
-
-    figure
-    subplot 131
-    semilogx(N_WEC,[simulated.LCOE],N_WEC,actual.LCOE)
-    xlabel('N_{WEC}')
-    title('LCOE ($/kWh)')
-    legend('Simulated','Actual')
-
-    subplot 132
-    semilogx(N_WEC,[simulated.capex],N_WEC,actual.capex)
-    xlabel('N_{WEC}')
-    title('Capex ($)')
-    legend('Simulated','Actual')
-
-    subplot 133
-    semilogx(N_WEC,[simulated.opex],N_WEC,actual.opex)
-    xlabel('N_{WEC}')
-    title('Opex ($)')
-    legend('Simulated','Actual')
-    improvePlot
 end
