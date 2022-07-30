@@ -3,7 +3,7 @@ function [V_d, m_m, m_f_tot, ...
          I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, T_f, h_f, h_s, ...
                                             t_ft, t_fr, t_fc, t_fb, t_sr, ...
                                             D_d, T_s, h_d, ...
-                                            M, rho_m, rho_w)
+                                            M, rho_m, rho_w, m_scale)
 
 %% Variable Definitions
 % D: diameter
@@ -55,7 +55,7 @@ V_bot_plate = pi * (D_f/2)^2 * t_fb;
 V_rims_gussets = A_f_c * h_f;
 V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets;
 
-m_f_m = V_sf_m * rho_m(M);      % mass of float material without ballast
+m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
 % float hydrostatic calculations
 A_f = pi/4 * (D_f^2 - D_s^2);
@@ -87,8 +87,8 @@ A_d = pi/4 * D_d^2;
 V_d_m = A_d * h_d;
 
 % total spar material use and mass
-m_vc_m = V_vc_m * rho_m(M);
-m_d_m = V_d_m * rho_m(M);
+m_vc_m = V_vc_m * rho_m(M) * m_scale;
+m_d_m = V_d_m * rho_m(M) * m_scale;
 m_s_m = m_vc_m + m_d_m;                 % mass of spar material
 
 % spar ballast

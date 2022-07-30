@@ -30,6 +30,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             ...% RM3 CBS sheet 1.4 average of cells I21, I34, I46, I56
             ...% https://www.concretenetwork.com/concrete-prices.html
             ...% https://agmetalminer.com/metal-prices/
+            'm_scale',  1.38,...                % factor to account for mass of neglected stiffeners (-)
             't_ft',     0.50 * in2m,...         % float top thickness (m)
             't_fr',     0.44 * in2m,...         % float radial wall thickness (m)
             't_fc',     0.44 * in2m,...         % float circumferential gusset thickness (m)
