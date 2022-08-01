@@ -72,14 +72,16 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
 end
 
 function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
-    w = 2*pi./T;        % frequency
-    k = w.^2 / g;       % wave number
-    V_g = g ./(2*w);    % group velocity
+    w = 2*pi./T;        % angular frequency
+    k = w.^2 / g;       % wave number (dispersion relation for deep water)
+    V_g = g ./(2*w);    % group velocity (Newman equation 6.63)
 
     r = D_f / 2;        % radius
     A_w = pi * r^2;     % waterplane area
     
-    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63; % added mass
+    A       = 0.4 * rho_w * D_f^2;  % added mass, from Newman figure 6.23
+                                    % 0.4 from B/T = 8 curve for x-axis .2 to .5 
+                                    % which corresponds to periods 5 to 13s with T=2
     gamma   = rho_w * g * A_w; % Froude Krylov / diffraction
     B       = k ./ (4 * rho_w * g * V_g) * gamma.^2; % radiation damping
     K       = rho_w * g * A_w;  % hydrostatic stiffness
@@ -97,7 +99,6 @@ end
 function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     % m, k, and r_k are scalars.
     % All other inputs are 2D arrays, the dimension of the sea state matrix.
-    % This algebra is written out on p198 of my notebook.
 
     % speedup: only do math for saturated sea states, since unsat will = 1
     idx_no_sat = f_sat == 1;
