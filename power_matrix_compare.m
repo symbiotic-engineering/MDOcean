@@ -38,16 +38,23 @@ pre_JPD_power(:,:,4) = sim_elec_sat;
 
 post_JPD_power = pre_JPD_power .* JPD / 100;
 
-CWR_unweighted = pre_JPD_power ./ wave_resource_raw;
-CWR_weighted = post_JPD_power ./ wave_resource_raw;
+diameter = X(1);
+CW = pre_JPD_power ./ wave_resource_raw;    % capture width
+CW_max = 9.8 * T.^2 / (4*pi^2);             % max CW for linear hydrodynamics, axisymmetric body
+CWR = CW / diameter;                        % capture width ratio
+CW_to_CW_max = CW ./ CW_max;
+CW_to_CW_max_zeroed = CW_to_CW_max;
+JPD_rep = repmat(JPD,[1 1 4]);
+CW_to_CW_max_zeroed(JPD_rep == 0) = NaN;
 
 vars = pre_JPD_power;
 vars(:,:,:,2) = post_JPD_power;
-vars(:,:,:,3) = CWR_unweighted;
-vars(:,:,:,4) = CWR_weighted;
+vars(:,:,:,3) = CWR;
+vars(:,:,:,4) = CW_to_CW_max;
+vars(:,:,:,5) = CW_to_CW_max_zeroed;
 
 var_names = {'Unweighted Device Power Matrix (kW)','JPD-Weighted Power Matrix (kW)',...
-    'Unweighted Capture Width Ratio (-)','JPD-Weighted Capture Width Ratio (-)'};
+    'Capture Width Ratio (-)','Capture Width / Max Capture Width (-)','Capture Width / Max Capture Width (-)'};
 
 % four figures showing weigted and unweighted power and CWR
 for fig = 1:size(vars,4)
