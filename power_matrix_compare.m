@@ -8,26 +8,27 @@ b = var_bounds(p);
 X = [b.X_noms; 1];
 
 % unsaturated power
-actual_mech_unsat = readmatrix(filename,'Range','E73:T87','Sheet','Performance & Economics');
+actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance & Economics');
 actual_elec_unsat = actual_mech_unsat * p.pto_eff;
 [~, P_var, ~, ~, ~, ~, ~, ~, P_elec, ~, P_matrix] = simulation(X,p);
-sim_elec_unsat = P_matrix(:,5:end)/1000;
+sim_elec_unsat = P_matrix/1000;
 
 % saturated power
 v = validation_inputs();
 p.power_max = v.power_max;
-actual_elec_sat = readmatrix(filename,'Range','E97:T111','Sheet','Performance & Economics');
+actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & Economics');
 [~, P_var, ~, ~, ~, ~, ~, ~, P_elec, ~, P_matrix] = simulation(X,p);
-sim_elec_sat = P_matrix(:,5:end)/1000;
+sim_elec_sat = P_matrix/1000;
 
 % wave resources
-[T,H] = meshgrid(p.T(5:end), p.Hs);
-JPD = p.JPD(:,5:end);
-JPD_actual = readmatrix(filename,'Range','E24:T38','Sheet','Performance & Economics');
+[T,H] = meshgrid(p.T, p.Hs);
+JPD = p.JPD;
+JPD_actual = readmatrix(filename,'Range','E24:S37','Sheet','Performance & Economics');
 wave_resource_raw = 1030 * 9.8^2 / (64*pi) * T .* H.^2 / 1000;
-wave_resource_sheet = readmatrix(filename,'Range','E49:T63','Sheet','Performance & Economics');
+wave_resource_sheet = readmatrix(filename,'Range','E49:S62','Sheet','Performance & Economics');
+wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 wave_resource_sim = wave_resource_raw;
-wave_resource_sim(JPD == 0) = 0;
+wave_resource_sim(JPD == 0) = NaN;
 
 % variable manipulation before plotting
 power_titles = {'Actual: Unsaturated','Simulated: Unsaturated','Actual: Saturated','Simulated: Saturated'};
