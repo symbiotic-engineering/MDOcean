@@ -34,6 +34,14 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     k = in.w_n^2 * m;
     K_p = k - K_h;
     X_unsat = get_response(w,m,b,k,Fd);
+
+    % confirm unsaturated response doesn't exceed maximum capture width
+    P_unsat = 1/2 * in.B_p * w.^2 .* X_unsat.^2;
+    P_wave = in.rho_w * in.g^2 / (64*pi) * T .* Hs.^2;
+    CW = P_unsat ./ P_wave;
+    CW_max = in.g * T.^2 / (4*pi^2);
+    assert( all(CW <= CW_max, 'all') ); % check hydro coeffs if this fails
+
     F_ptrain_over_x = sqrt( (in.B_p * w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
     
@@ -80,10 +88,10 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     A_w = pi * r^2;     % waterplane area
     
     % Froude Krylov force coefficient (diffraction is neglected)
-    fudge_factor =  1;
+    tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
     draft = 2;
     r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
-    gamma   = rho_w * g * pi * exp(-k * draft * fudge_factor) .* r_k_term; 
+    gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
 
     % other hydrodynamic force coefficients
     A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63;  % added mass
