@@ -49,9 +49,9 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     r = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
     f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m,b,k,w, B_h/in.B_p, K_h/K_p);
+    mult = get_multiplier(f_sat,m,b,k,w, B_h/in.B_p, K_h./K_p);
     b_sat = B_h + mult * in.B_p;
-    k_sat = K_h + mult * K_p;
+    k_sat = K_h + mult .* K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
@@ -88,13 +88,26 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     A_w = pi * r^2;     % waterplane area
     
     % Froude Krylov force coefficient (diffraction is neglected)
-    tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
-    draft = 2;
-    r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
-    gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
+%     tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
+%     draft = 2;
+%     r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
+%     gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
 
     % other hydrodynamic force coefficients
-    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63;  % added mass
+%     A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63;  % added mass
+
+    hydro = readWAMIT(struct(),'rm3.out',[]); % function from WECSim
+    w_wamit = hydro.w;
+    A_wamit = hydro.A(3,3,:);
+    A_wamit = A_wamit(:);
+    gamma_wamit = hydro.ex_ma(3,1,:);
+    gamma_wamit = gamma_wamit(:);
+
+    gamma_interp = interp1(w_wamit,gamma_wamit,w);
+    A_interp = interp1(w_wamit,A_wamit,w);
+    gamma = rho_w * g * gamma_interp;
+    A = rho_w * A_interp;
+
     B       = k ./ (4 * rho_w * g * V_g) .* gamma.^2; % radiation damping
     K       = rho_w * g * A_w;  % hydrostatic stiffness
     Fd      = gamma .* Hs;       % excitation force of wave
@@ -102,7 +115,7 @@ end
 
 function X = get_response(w,m,b,k,Fd)
     real_term = b.*w;
-    imag_term = k - m*w.^2;
+    imag_term = k - m.*w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;
