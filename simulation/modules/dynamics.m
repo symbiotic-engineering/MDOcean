@@ -2,7 +2,7 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,draft)
 
 % use probabilistic sea states for power
-[Hs,T] = meshgrid(in.T,in.Hs);
+[T,Hs] = meshgrid(in.T,in.Hs);
 P_matrix = get_power_force(in,T,Hs,m_float,V_d,draft);
 
 % account for powertrain electrical losses
@@ -79,13 +79,17 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     r = D_f / 2;        % radius
     A_w = pi * r^2;     % waterplane area
     
-    A       = 0.4 * rho_w * D_f^2;  % added mass, from Newman figure 6.23
-                                    % 0.4 from B/T = 8 curve for x-axis .2 to .5 
-                                    % which corresponds to periods 5 to 13s with T=2
-    gamma   = rho_w * g * A_w; % Froude Krylov / diffraction
-    B       = k ./ (4 * rho_w * g * V_g) * gamma.^2; % radiation damping
+    % Froude Krylov force coefficient (diffraction is neglected)
+    fudge_factor =  1;
+    draft = 2;
+    r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
+    gamma   = rho_w * g * pi * exp(-k * draft * fudge_factor) .* r_k_term; 
+
+    % other hydrodynamic force coefficients
+    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63;  % added mass
+    B       = k ./ (4 * rho_w * g * V_g) .* gamma.^2; % radiation damping
     K       = rho_w * g * A_w;  % hydrostatic stiffness
-    Fd      = gamma * Hs;       % excitation force of wave
+    Fd      = gamma .* Hs;       % excitation force of wave
 end
 
 function X = get_response(w,m,b,k,Fd)
