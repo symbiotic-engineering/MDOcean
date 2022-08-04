@@ -36,11 +36,11 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     X_unsat = get_response(w,m,b,k,Fd);
 
     % confirm unsaturated response doesn't exceed maximum capture width
-    P_unsat = 1/2 * in.B_p * w.^2 .* X_unsat.^2;
-    P_wave = in.rho_w * in.g^2 / (64*pi) * T .* Hs.^2;
-    CW = P_unsat ./ P_wave;
-    CW_max = in.g * T.^2 / (4*pi^2);
-    assert( all(CW <= CW_max, 'all') ); % check hydro coeffs if this fails
+%     P_unsat = 1/2 * in.B_p * w.^2 .* X_unsat.^2;
+%     P_wave = in.rho_w * in.g^2 / (64*pi) * T .* Hs.^2;
+%     CW = P_unsat ./ P_wave;
+%     CW_max = in.g * T.^2 / (4*pi^2);
+%     assert( all(CW <= CW_max, 'all') ); % check hydro coeffs if this fails
 
     F_ptrain_over_x = sqrt( (in.B_p * w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
