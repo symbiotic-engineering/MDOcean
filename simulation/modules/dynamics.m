@@ -90,10 +90,9 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     % Froude Krylov force coefficient (diffraction is neglected)
     tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
     draft = 2;
-    r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
-    if(~all(r_k_term > 0,'all'))
-        error('r_k_term negative: approximation failing because w too large')
-    end
+    r_k_term = r^2 - (k.^2 * r^4)/8 + (k.^4 * r^6)/192 - (k.^6 * r^8)/9216 ...
+                + (k.^8 * r^10)/737280 - (k.^10 * r^12)/88473600;
+    r_k_term = max(r_k_term, 0); % zero any negatives that result at high frequencies
     gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
 
     % other hydrodynamic force coefficients
@@ -145,7 +144,11 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
         mult = handle_two_solns(both_ok,which_soln,roots,idx_no_sat);
     else    
         num_solns = sum(which_soln,3);
-        assert(all( num_solns == 1,'all') ); % confirm that 1 soln per sea state meets criteria
+        if ~(all( num_solns == 1,'all') )
+            num_solns(num_solns==0) = roots(num_solns==0) > 0 & roots(num_solns==0) <= 1.001; % wider tolerance
+            assert(all( num_solns == 1,'all'))
+            % confirm that 1 soln per sea state meets criteria
+        end
 
         mult = get_relevant_soln(which_soln,roots,idx_no_sat);   
     end

@@ -17,12 +17,12 @@ gamma_without_coeffs = int(inner_int_without_coeffs,y,y_min,y_max);
 gamma_without_coeffs = simplify(rewrite(gamma_without_coeffs,'sin'));
 coeffs = subs(coeffs,k^2,k*w^2/g);
 gamma = abs(gamma_without_coeffs * coeffs)
-taylor(gamma_without_coeffs/k,k,'Order',10)
+taylor(gamma_without_coeffs/k,k,'Order',11)
 
 derivative = diff(gamma_without_coeffs,'k')
 
 %% approximation error
-i = 0:2:10; % last term included
+i = 8:2:14; % last term included
 exc = i+2;  % first term excluded
 w = 1.4;
 k = w^2/9.8;
