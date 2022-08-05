@@ -91,6 +91,9 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
     draft = 2;
     r_k_term = r^2 - 1/8 * k.^2 * r^4 + 1/192 * k.^4 * r^6 - 1/9216 * k.^6 * r^8;
+    if(~all(r_k_term > 0,'all'))
+        error('r_k_term negative: approximation failing because w too large')
+    end
     gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
 
     % other hydrodynamic force coefficients
@@ -209,7 +212,7 @@ function mult = handle_two_solns(both_ok, which_soln, roots, idx_no_sat)
         subplot 122
         contourf(mult_2)
 
-        error(['Failed to figure out which solution to the quadratic' ...
+        error(['Failed to figure out which solution to the quadratic ' ...
             'equation is relevant, try manual inspection.'])
     end
 end

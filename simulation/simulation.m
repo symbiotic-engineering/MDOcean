@@ -67,7 +67,7 @@ g(16) = h_s_extra;                      % prevent float rising above top of spar
 g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
-assert( all(~isinf(g)) && all(~isnan(g)) )
+assert( all(~isinf(g)) && all(~isnan(g)) && all(isreal(g)))
 
 if nargout > 12 % if returning extra struct output for validation
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, ...
