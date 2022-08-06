@@ -1,6 +1,8 @@
 function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, P_matrix, g, val] = simulation(X, p)	
 
+X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
+
 %% Assemble inputs
 in = p;
 
@@ -36,6 +38,8 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
 
+m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
+
 [F_heave_max, F_surge_max, F_ptrain_max, ...
 	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
 
@@ -67,7 +71,11 @@ g(16) = h_s_extra;                      % prevent float rising above top of spar
 g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
-assert( all(~isinf(g)) && all(~isnan(g)) && all(isreal(g)))
+criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
+%assert( criteria )
+if ~criteria
+    disp('ohno')
+end
 
 if nargout > 12 % if returning extra struct output for validation
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, ...
