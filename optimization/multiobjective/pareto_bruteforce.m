@@ -67,9 +67,13 @@ plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
 % RM3 nominal reference
 x_nom = b.X_noms;
 x_nom(8) = 1;
-[LCOE_nom,P_var_nom] = simulation(x_nom,p);
-LCOE_nom = 0.75; % from RM3 report p175 fig 5-33
+[LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p);
+
+RM3 = validation_inputs();
+LCOE_nom = RM3.LCOE(4);
+P_var_nom = RM3.c_v;
 plot(LCOE_nom,P_var_nom,'rd')
+plot(LCOE_nom_sim,P_var_nom_sim,'rs')
 
 if ~simplePareto
     % balanced design
@@ -99,7 +103,8 @@ plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],
 % for the yellow color to work, do not use improvePlot below here
 
 % text labels
-text(LCOE_nom+.03,P_var_nom,'RM3 Nominal')
+text(LCOE_nom+.03,P_var_nom,'Nominal Actual [10]')
+text(LCOE_nom_sim+.03,P_var_nom_sim,'Nominal Simulation')
 text(minLCOE+.03,minPvar,'Utopia Point')
 text(LCOE_solar,P_var_solar-10,'Solar')
 if ~simplePareto
