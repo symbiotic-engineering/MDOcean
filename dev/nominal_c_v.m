@@ -9,7 +9,7 @@ function c_v = nominal_c_v()
 	P_elec = sum(P_weighted(:));
 
 	% coefficient of variance (normalized standard deviation) of power
-	P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
-	P_var = P_var * 100; % convert to percentage
+	P_var = std(P_matrix(:), JPD(:)) / P_elec;
+	c_v = P_var * 100; % convert to percentage
 
 end

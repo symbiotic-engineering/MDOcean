@@ -39,7 +39,6 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             't_dt',     1.00 * in2m,...         % damping plate support tube radial wall thickness (m)
             'D_dt',     48.00 * in2m,...        % damping plate support tube diameter (m)
             'theta_dt', atan(17.5/15),...       % angle from horizontal of damping plate support tubes (rad)
-            'B_min',    1,...                   % minimum buoyancy ratio (-)
             'FOS_min',  1.5,...                 % minimum FOS (-)	
             'D_d_min',  30,...                  % minimum damping plate diameter
             'FCR',      0.113,...               % fixed charge rate (-), see RM3 report p63
@@ -50,7 +49,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'T_f_over_h_f', 2/4,...             % normalized float draft (-)
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
-            'pto_eff',   0.80,...               % PTO efficiency (-)
-            'array_eff', 0.95*0.98 );           % array availability and transmission efficiency (-)
+            'eff_pto',   0.80,...               % PTO efficiency (-)
+            'eff_array', 0.95*0.98 );           % array availability and transmission efficiency (-)
         
 end
