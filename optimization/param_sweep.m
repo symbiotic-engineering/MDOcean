@@ -4,10 +4,18 @@ clear;clc;%close all
 dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
 
 param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','B_{min}','FOS_{min}','D_{d_{min}}',...
-            'FCR','N_{WEC}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
+            'cost_m','m_scale','t_{ft}','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','t_{dt}','D_{dt}','theta_{dt}','B_{min}','FOS_{min}','D_{d_{min}}',...
+            'FCR','N_{WEC}','pto_eff','array_eff','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
 params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
 params = regexprep(params,'/','_over_');
+
+% 1 = environment
+% 2 = material
+% 3 = structural thicknesses
+% 4 = constraints
+% 5 = economic and efficiency
+% 6 = external geometric ratios
+param_groupings = [1 1 1 1 2 2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 5 5 5 5 6 6 6 6];
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
