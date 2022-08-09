@@ -95,6 +95,7 @@ if nargout > 12 % if returning extra struct output for validation
     val.power_max = max(P_matrix,[],'all');
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
+	val.c_v = P_var;
 end
 
 end
