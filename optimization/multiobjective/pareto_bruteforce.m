@@ -96,7 +96,7 @@ xlabel('LCOE ($/kWh)')
 ylabel('Power Variation (%)')
 title('Pareto Front')
 xlim([0 .9])
-ylim([30 130])
+ylim([25 165])
 improvePlot
 
 % solar reference
@@ -125,25 +125,25 @@ x_balanced = [13.0468, 0.4599, 0.1000, 0.9738, 12.7445, 30.6899, 10.1115, 1.0000
 if ~simplePareto
     % small corner pictures of best geometries
     % upper left
-    axes('Position',[.15 .7 .15 .2])
+    axes('Position',[.28 .7 .15 .2])
     box on
     visualize_geometry(x_best_LCOE,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % lower right
-    axes('Position',[.7 .2 .15 .2])
+    axes('Position',[.53 .16 .15 .2])
     box on
     visualize_geometry(x_best_Pvar,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % balanced
-    axes('Position',[.33 .33 .15 .2])
+    axes('Position',[.25 .25 .15 .2])
     box on
     visualize_geometry(x_balanced,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % RM3
-    axes('Position',[.55 .63 .15 .2])
+    axes('Position',[.7 .45 .15 .2])
     box on
     visualize_geometry(x_nom,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
