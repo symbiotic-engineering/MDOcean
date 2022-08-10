@@ -46,7 +46,7 @@ plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
 legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
     'Utopia Point')
 %%
-simplePareto = false; % toggle between a simple pareto front and one that's 
+simplePareto = true; % toggle between a simple pareto front and one that's 
 % annotated with the three recommended designs
 
 %close all
@@ -80,15 +80,14 @@ plot(LCOE_nom_sim,P_var_nom_sim,'rs')
 
 if ~simplePareto
     % balanced design
-    [~,idx_balanced] = min(abs(overallPvar-100));
+    [~,idx_balanced] = min(abs(overallPvar-40));
     LCOE_balanced = overallLCOE(idx_balanced);
     P_var_balanced = overallPvar(idx_balanced);
     
     % black squares for 3 ref points
     plot(minLCOE,overallPvar(idx_best_LCOE),'ks')
     plot(overallLCOE(idx_best_Pvar),minPvar,'ks')
-    %plot(LCOE_balanced,P_var_balanced,'ks')     
-    plot(0.18,100,'ks') % hardcode solution from running gradient_optim with maxLCOE set to 0.18
+    plot(LCOE_balanced,P_var_balanced,'ks')
 end
 
 % axis labels
@@ -107,20 +106,18 @@ plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],
 
 % text labels
 text(LCOE_nom-.26,P_var_nom,'Nominal Actual [10]')
-text(LCOE_nom_sim-.25,P_var_nom_sim,'Nominal Simulation')
+text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
 text(minLCOE+.03,minPvar,'Utopia Point')
 text(LCOE_solar+.03,P_var_solar,'Solar')
 if ~simplePareto
     text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
     text(overallLCOE(idx_best_Pvar)+.03,overallPvar(idx_best_Pvar),'Least Variable')
-    text(LCOE_balanced-.04,P_var_balanced+5,'Balanced Design')
+    text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
 end
 % idenitfy design variables for best designs
 x_best_LCOE = overallX(idx_best_LCOE,:)
 x_best_Pvar = overallX(idx_best_Pvar,:)
-%x_balanced = overallX(idx_balanced,:)
-
-x_balanced = [13.0468, 0.4599, 0.1000, 0.9738, 12.7445, 30.6899, 10.1115, 1.0000]; % hardcode from gradient optim
+x_balanced = overallX(idx_balanced,:)
 
 if ~simplePareto
     % small corner pictures of best geometries
