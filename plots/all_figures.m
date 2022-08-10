@@ -33,7 +33,7 @@ plot_power_matrix(X,p)
 runtests('validation')
 
 %% paragraph 4.2 - convergence for different x0s
-%gradient_mult_x0()
+gradient_mult_x0()
 
 %% table 5 - optimal DVs for 4 designs
 compare()
@@ -43,6 +43,7 @@ location_sensitivity()
 
 %% figure 6 - pareto front
 % figure 7 - design heuristics
+pareto_search()
 pareto_bruteforce()
 
 %% figure 8 - parameter sensitivities
