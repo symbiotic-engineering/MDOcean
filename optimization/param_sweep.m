@@ -9,19 +9,17 @@ param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
 params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
 params = regexprep(params,'/','_over_');
 
-% 1 = environment
-% 2 = material
-% 3 = structural thicknesses
-% 4 = economic and efficiency
-% 5 = external geometric ratios
-param_groupings = [1 1 1 1 2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 5 5 5 5];
+groups = {'Dynamics','Structures',...
+    'Economics','Geometry'};
+param_groupings = [1 2 1 2 2 2 2 3 2 2 2 2 2 2 4 4 3 3 1 4 4 4 4];
 color_groupings = {'r','b','g','y','m'};
 colors = color_groupings(param_groupings);
+cell2table([params',groups(param_groupings)'])
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
 b = var_bounds(p);
-
+%%
 % use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
         b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,'F_max',b.F_max_nom,...
@@ -95,7 +93,7 @@ for i = 1:7
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min LCOE'])
-    improvePlot
+    %improvePlot
     grid on
     
     figure(3)
@@ -104,7 +102,7 @@ for i = 1:7
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min c_v'])
-    improvePlot
+    %improvePlot
     grid on
 end
 legend(param_names)
@@ -127,7 +125,9 @@ for i=1:length(LCOE_params)
     barh(LCOE_params(i),slope_LCOE(i),colors{i})
     hold on
 end
-set(gca,'YGrid','on')
+xlim([-2.5 1])
+ax = gca;
+set(ax,'YGrid','on')
 title('LCOE')
 
 subplot 122
@@ -143,10 +143,12 @@ for i=1:max(param_groupings)
     legend_idx(i) = find(param_groupings==i,1);
 end
 labels = repmat({''},size(param_groupings));
-labels(legend_idx) = {'Environment','Material','Structural Thickness',...
-    'Economic and efficiency','External geometric ratios'};
+labels(legend_idx) = groups;
 legend(labels)
 improvePlot
+xlim([-2.5 1])
+set(gca, 'FontSize', 14)
+set(ax,'FontSize',14)
 
 % both objectives on the same chart
 figure
