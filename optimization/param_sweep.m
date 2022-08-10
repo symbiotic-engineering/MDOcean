@@ -12,7 +12,7 @@ params = regexprep(params,'/','_over_');
 groups = {'Dynamics','Structures',...
     'Economics','Geometry'};
 param_groupings = [1 2 1 2 2 2 2 3 2 2 2 2 2 2 4 4 3 3 1 4 4 4 4];
-color_groupings = {'r','b','g','y','m'};
+color_groupings = {'b','y','g','r'};
 colors = color_groupings(param_groupings);
 cell2table([params',groups(param_groupings)'])
 
