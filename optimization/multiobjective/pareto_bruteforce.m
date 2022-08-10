@@ -2,7 +2,7 @@ clear;clc
 p = parameters();
 b = var_bounds(p);
 
-num_runs = 1e4;
+num_runs = 5e4;
 [LCOE,P_var,feasible] = deal(zeros(1,num_runs));
 
 X = zeros(num_runs,8);
@@ -32,7 +32,7 @@ LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
 %[x,fval] = pareto_search();
-load("pareto_search_results6.mat")
+load("pareto_search_results7.mat")
 cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
@@ -196,7 +196,7 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
                 'h_f/D_f',...      	
                 'T_s/h_s',...      	
                 'F_{max}',...     % max force (N)
-                'D_{int}',...     % internal damping of controller (Ns/m)	
+                'B_p',...     % internal damping of controller (Ns/m)	
                 'w_n'};         % natural frequency (rad/s)
     
     
@@ -222,7 +222,8 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     
     % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
     x_grid = [3 97];
-    y_grid = [.1 1 10 100 1000];
+    y_grid = [.1 1];
+    y_tick = [.01 .02 .05 .1 .2 .5 1 2 5];
     for i=1:length(y_grid)
         plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
     end
@@ -230,8 +231,8 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     title('Design Heuristics')
     %xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
-    ylim([.03 5000])
-    set(gca,'YTick',y_grid)
+    ylim([.01 5])
+    set(gca,'YTick',y_tick)
     improvePlot
     legend(var_names_pretty,'Location','eastoutside')
     set(gca,'YMinorGrid','on')
@@ -239,7 +240,7 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
     
     figure
-    plot(pct_angle,LCOE_pareto_sorted*100,pct_angle,Pvar_pareto_sorted)
+    plot(pct_angle,LCOE_pareto_sorted*100,'m',pct_angle,Pvar_pareto_sorted,'c')
     grid on
     xlabel('Percent along the Pareto Curve')
     ylabel('Objective Value')

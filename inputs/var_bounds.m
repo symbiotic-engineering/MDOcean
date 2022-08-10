@@ -21,19 +21,19 @@ b.T_s_ratio_nom = 35/44;
 b.T_s_ratio_start = 35/44;
 
 b.F_max_min = 0.01;
-b.F_max_max = 15;
+b.F_max_max = 100;
 b.F_max_nom = 9.12;
 b.F_max_start = 5;
 
 b.B_p_min = .1;
 b.B_p_max = 50;
 b.B_p_nom = 0.311;
-b.B_p_start = 30;
+b.B_p_start = 0.5;
 
 b.w_n_min = .01;%2*pi/p.T(find(any(p.JPD > 0),1,'last'));  % min wave frequency that has any energy
 b.w_n_max = 40;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency that has any energy
 b.w_n_nom = 1.49;
-b.w_n_start = 5;
+b.w_n_start = 0.8;
 
 b.M_min = 1;
 b.M_max = length(p.sigma_y);
