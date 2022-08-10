@@ -20,7 +20,7 @@ function [x,fval] = pareto_search()
         X_seeds(i,:) = X_opt_tmp(idxs)';
 
         % debugging checks on optimization convergence and objective values
-        assert(flag_tmp==1);
+        %assert(flag_tmp==1);
         obj_check = generatedObjectiveP_var(X_opt_tmp(idxs)',{p});
         assert(obj_tmp == obj_check)
         [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);

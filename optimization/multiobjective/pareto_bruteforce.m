@@ -46,7 +46,7 @@ plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
 legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
     'Utopia Point')
 %%
-simplePareto = true; % toggle between a simple pareto front and one that's 
+simplePareto = false; % toggle between a simple pareto front and one that's 
 % annotated with the three recommended designs
 
 %close all
@@ -65,13 +65,16 @@ hold on
 plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
 
 % RM3 nominal reference
-x_nom = b.X_noms;
-x_nom(8) = 1;
-[LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p);
-
 RM3 = validation_inputs();
 LCOE_nom = RM3.LCOE(4);
 P_var_nom = RM3.c_v;
+
+x_nom = b.X_noms;
+x_nom(8) = 1;
+p_nom = p;
+p_nom.power_max = RM3.power_max;
+[LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
+
 plot(LCOE_nom,P_var_nom,'rd')
 plot(LCOE_nom_sim,P_var_nom_sim,'rs')
 
@@ -92,8 +95,8 @@ end
 xlabel('LCOE ($/kWh)')
 ylabel('Power Variation (%)')
 title('Pareto Front')
-xlim([0 LCOE_max])
-ylim([50 290])
+xlim([0 .9])
+ylim([30 130])
 improvePlot
 
 % solar reference
@@ -103,13 +106,13 @@ plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],
 % for the yellow color to work, do not use improvePlot below here
 
 % text labels
-text(LCOE_nom+.03,P_var_nom,'Nominal Actual [10]')
-text(LCOE_nom_sim+.03,P_var_nom_sim,'Nominal Simulation')
+text(LCOE_nom-.26,P_var_nom,'Nominal Actual [10]')
+text(LCOE_nom_sim-.25,P_var_nom_sim,'Nominal Simulation')
 text(minLCOE+.03,minPvar,'Utopia Point')
-text(LCOE_solar,P_var_solar-10,'Solar')
+text(LCOE_solar+.03,P_var_solar,'Solar')
 if ~simplePareto
     text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
-    text(overallLCOE(idx_best_Pvar)-.2,overallPvar(idx_best_Pvar),'Least Variable')
+    text(overallLCOE(idx_best_Pvar)+.03,overallPvar(idx_best_Pvar),'Least Variable')
     text(LCOE_balanced-.04,P_var_balanced+5,'Balanced Design')
 end
 % idenitfy design variables for best designs
@@ -147,90 +150,100 @@ if ~simplePareto
 end
 
 %% plots for DVs as a fn of percent along the pareto
-LCOE_pareto = overallLCOE(idxo);
-Pvar_pareto = overallPvar(idxo);
-[LCOE_pareto_sorted,idx_sort] = sort(LCOE_pareto(LCOE_pareto<LCOE_max));
-Pvar_pareto_sorted = Pvar_pareto(LCOE_pareto<LCOE_max);
-Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
 
-pct = linspace(0,100,length(idx_sort));
-%pct_angle = 100/(pi/2) * atan((LCOE_pareto_sorted - minLCOE) ./ (Pvar_pareto_sorted - minPvar));
-num = (overallPvar(idx_best_LCOE) - Pvar_pareto_sorted) / (overallPvar(idx_best_LCOE) - minPvar);
-den = (overallLCOE(idx_best_Pvar) - LCOE_pareto_sorted) / (overallLCOE(idx_best_Pvar) - minLCOE);
-pct_angle = 100/(pi/2) * atan( num ./ den);
-pct_angle(pct_angle==-100) = 100;
+design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
+              overallPvar, minPvar, idx_best_Pvar, overallX, idxo, LCOE_max)
 
-X_pareto = overallX(idxo,:);
-X_pareto = X_pareto(LCOE_pareto<LCOE_max,:);
-X_pareto_sorted = X_pareto(idx_sort,:);
+%%
+function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
+                                     overallPvar, minPvar, idx_best_Pvar, ...
+                                     overallX, idxo, LCOE_max)
 
-X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
-
-X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
-
-windowSize = round(length(idx_sort) * 5/100);
-b = (1/windowSize)*ones(1,windowSize);
-a = 1;
-y = zeros(size(X_pareto_sorted_scaled));
-for i=1:7
-    x = X_pareto_sorted_scaled(:,i); 
-    x_padded = [ones(windowSize,1); x];
-    yy = filter(b,a,x_padded); % moving average filter
-    y(:,i) = yy((windowSize+1):end);
+    LCOE_pareto = overallLCOE(idxo);
+    Pvar_pareto = overallPvar(idxo);
+    [LCOE_pareto_sorted,idx_sort] = sort(LCOE_pareto(LCOE_pareto<LCOE_max));
+    Pvar_pareto_sorted = Pvar_pareto(LCOE_pareto<LCOE_max);
+    Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
+    
+    pct = linspace(0,100,length(idx_sort));
+    %pct_angle = 100/(pi/2) * atan((LCOE_pareto_sorted - minLCOE) ./ (Pvar_pareto_sorted - minPvar));
+    num = (overallPvar(idx_best_LCOE) - Pvar_pareto_sorted) / (overallPvar(idx_best_LCOE) - minPvar);
+    den = (overallLCOE(idx_best_Pvar) - LCOE_pareto_sorted) / (overallLCOE(idx_best_Pvar) - minLCOE);
+    pct_angle = 100/(pi/2) * atan( num ./ den);
+    pct_angle(pct_angle==-100) = 100;
+    
+    X_pareto = overallX(idxo,:);
+    X_pareto = X_pareto(LCOE_pareto<LCOE_max,:);
+    X_pareto_sorted = X_pareto(idx_sort,:);
+    
+    X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
+    
+    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
+    
+    windowSize = round(length(idx_sort) * 5/100);
+    b = (1/windowSize)*ones(1,windowSize);
+    a = 1;
+    y = zeros(size(X_pareto_sorted_scaled));
+    for i=1:7
+        x = X_pareto_sorted_scaled(:,i); 
+        x_padded = [ones(windowSize,1); x];
+        yy = filter(b,a,x_padded); % moving average filter
+        y(:,i) = yy((windowSize+1):end);
+    end
+    
+    var_names_pretty = {'D_f',...    % outer diameter of float (m)	
+                'D_s/D_f',...
+                'h_f/D_f',...      	
+                'T_s/h_s',...      	
+                'F_{max}',...     % max force (N)
+                'D_{int}',...     % internal damping of controller (Ns/m)	
+                'w_n'};         % natural frequency (rad/s)
+    
+    
+    % unfiltered
+    figure
+    semilogy(pct_angle,X_pareto_sorted_scaled)
+    title('Unfiltered Design Heuristics')
+    xlabel('Percent along the Pareto Curve')
+    ylabel('Normalized Optimal Design Value')
+    legend(var_names_pretty,'Location','eastoutside')
+    ylim([0 15])
+    improvePlot
+    grid on
+    set(gca,'YMinorGrid','on')
+    
+    % filtered
+    cols = {'r:','r--','r-','r-.','b:','b--','b-'};
+    figure
+    for i=1:7
+        semilogy(pct_angle,y(:,i),cols{i})
+        hold on
+    end
+    
+    % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+    x_grid = [3 97];
+    y_grid = [.1 1 10 100 1000];
+    for i=1:length(y_grid)
+        plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
+    end
+    
+    title('Design Heuristics')
+    %xlabel('Percent along the Pareto Curve')
+    ylabel('Normalized Optimal Design Value')
+    ylim([.03 5000])
+    set(gca,'YTick',y_grid)
+    improvePlot
+    legend(var_names_pretty,'Location','eastoutside')
+    set(gca,'YMinorGrid','on')
+    set(gca,'XGrid','on')
+    set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
+    
+    figure
+    plot(pct_angle,LCOE_pareto_sorted*100,pct_angle,Pvar_pareto_sorted)
+    grid on
+    xlabel('Percent along the Pareto Curve')
+    ylabel('Objective Value')
+    improvePlot
+    cent = char(0162);
+    legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='northeast')
 end
-
-var_names_pretty = {'D_f',...    % outer diameter of float (m)	
-            'D_s/D_f',...
-            'h_f/D_f',...      	
-            'T_s/h_s',...      	
-            'F_{max}',...     % max force (N)
-            'D_{int}',...     % internal damping of controller (Ns/m)	
-            'w_n'};         % natural frequency (rad/s)
-
-
-% unfiltered
-figure
-semilogy(pct_angle,X_pareto_sorted_scaled)
-title('Unfiltered Design Heuristics')
-xlabel('Percent along the Pareto Curve')
-ylabel('Normalized Optimal Design Value')
-legend(var_names_pretty,'Location','eastoutside')
-ylim([0 15])
-improvePlot
-grid on
-set(gca,'YMinorGrid','on')
-
-% filtered
-cols = {'r:','r--','r-','r-.','b:','b--','b-'};
-figure
-for i=1:7
-    semilogy(pct_angle,y(:,i),cols{i})
-    hold on
-end
-
-% make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
-x_grid = [3 97];
-y_grid = [.1 1 10 100 1000];
-for i=1:length(y_grid)
-    plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
-end
-
-title('Design Heuristics')
-%xlabel('Percent along the Pareto Curve')
-ylabel('Normalized Optimal Design Value')
-ylim([.03 5000])
-set(gca,'YTick',y_grid)
-improvePlot
-legend(var_names_pretty,'Location','eastoutside')
-set(gca,'YMinorGrid','on')
-set(gca,'XGrid','on')
-set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
-
-figure
-plot(pct_angle,LCOE_pareto_sorted*100,pct_angle,Pvar_pareto_sorted)
-grid on
-xlabel('Percent along the Pareto Curve')
-ylabel('Objective Value')
-improvePlot
-cent = char(0162);
-legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='northeast')
