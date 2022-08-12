@@ -20,22 +20,48 @@ Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimizati
 
 **Disclaimer**
 
-The version of the simulation used in the conference proceedings paper and in the conference video was later found to have a number of errors. 
-These errors have since been corrected and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
+The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
+These errors have since been corrected, and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
 Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
+
+Errors that have since been fixed include:
+- Incorrect value for young's modulus of steel
+- Incorrect implementation of force saturation multiplier
+- Wave period and wave height were swapped
+- Froude Krylov force coefficient too high
+- Incorrect nominal controller design variables and objective values
+- Incorrect buckling end condition
+- Nominal simulation did not use power saturation
+- Incorrect scaling of cost with number of WECs
+- Powertrain and transmission loss not accounted for
+- Mass of damping plate support tubes not accounted for
+
+*Because the results in the official conference proceedings contain these errors, an updated unofficial version 
+of the paper will be posted here in early September 2022, containing corrections.*
 
 **License**
 
 This project is released open-source under the MIT License. The validation folder contains code taken from NREL's BEMIO module, which is part of WEC-Sim. 
-The license for this open source WEC-Sim code is included.
+The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **File Structure**
 
 - `inputs`: numerical inputs needed to run the optimiztion, simulation, and validation, including wave data, parameters, design variable bounds, and validation values.
+- `simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
+The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
 - `optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
 if you want to run single objective optimization for each of the two objectives.
 - `plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to try out the entire pipeline by running all relevant 
 optimizations to generate every figure in the paper.
-- `simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
-The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
+
+**Dependencies**
+
+The following packages are used in this code:
+- MATLAB
+- Optimization Toolbox
+- Global Optimization Toolbox
+- Statistics and Machine Learning Toolbox
+- Symbolic Math Toolbox
+
+All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
