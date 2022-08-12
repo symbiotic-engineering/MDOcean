@@ -1,5 +1,5 @@
-function LCOE = econ(m_m, M, cost_m, N_WEC, P_elec, FCR)
 
+function [LCOE, scaledcapex, scaledopex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR, efficiency)
 
 structural_cost = m_m.* cost_m;
 devicestructure = structural_cost(M);
@@ -23,11 +23,12 @@ insurconstruct  = 110203;
 reserves        = 330608;
 
 %O&M Costs
-operations      = 888220;
-maintenance     = 351125;
+% operations      = 888220;
+% maintenance     = 351125;
 
 hr_per_yr = 8766;
-aep = .269*(N_WEC * P_elec*hr_per_yr/1000); % annual energy production: W to kWh per year
+P_avg = N_WEC * P_elec * efficiency;
+aep = P_avg * hr_per_yr / 1000; % annual energy production: W to kWh per year
 
 capex = .32*(devicestructure + struc_assembly + pto + mooring + development + engimgmt...
         + elecinfrastruct + plantcomiss + siteaccess + asseminstall...
@@ -40,7 +41,5 @@ scaledcapex = N_WEC*capex+ 15935544.80;
 
 scaledopex= N_WEC*42343.16 + 1197001; 
 
-%LCOE = (FCR*capex + opex)/aep;
-
-LCOE= (FCR*scaledcapex + scaledopex)/aep;
+LCOE = (FCR*scaledcapex + scaledopex)/aep;
 end

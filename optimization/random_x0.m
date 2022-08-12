@@ -3,7 +3,7 @@ function [x0,x0_struct] = random_x0(b)
 mins = b.X_mins;
 maxs = b.X_maxs;
 
-r = rand(1,7);
+r = rand(7,1);
 
 x0 = (maxs-mins).*r + mins;
 x0(8) = randi(b.M_max);

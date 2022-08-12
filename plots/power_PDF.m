@@ -7,7 +7,7 @@ P_counts = repelem(P_matrix(:), round(p.JPD(:)*100));
 logscale = true; % toggle whether power is logscale
 if logscale
     P_min = 0.1;
-    P_max = 1000;
+    P_max = 10000;
     prob_min = 1e-4;
     prob_max = 1;
     prob_label_pos = [10^-(1.5),1e-5];
