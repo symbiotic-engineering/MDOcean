@@ -15,9 +15,7 @@ P_matrix = min(P_matrix,in.power_max);
 P_weighted = P_matrix .* in.JPD / 100;
 P_elec = sum(P_weighted(:)); 
 
-if ~isreal(P_elec)
-    disp('ohno')
-end
+assert(isreal(P_elec))
 
 % use max sea states for structural forces and max amplitude
 [~,F_heave_max,F_surge_max,...
@@ -30,9 +28,9 @@ P_var = P_var * 100; % convert to percentage
 
 end
 
-function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, F_heave, F_surge, F_ptrain_max, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
-    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.rho_w, in.g);
+    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
     m = m_float + A;
     b = B_h + in.B_p;
     k = in.w_n^2 * m;
@@ -69,11 +67,9 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
         F_err_2 = abs(F_ptrain ./ (f_sat * F_ptrain_unsat) - 1);
         % 0.1 percent error
         if any(f_sat<1,'all')
-            if ~(F_err_1(f_sat < 1) < 1e-3)
-                disp('ohno')
-            end
+            assert(F_err_1(f_sat < 1) < 1e-3);
         end
-        %assert(F_err_2 < 1e-3);
+        assert(F_err_2 < 1e-3);
 
         F_heave_fund = sqrt( (mult * in.B_p * w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
         F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
@@ -85,7 +81,7 @@ function [P_matrix, F_heave, F_surge, F_ptrain, F_ptrain_max, h_s_extra] = get_p
     end
 end
 
-function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
+function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, rho_w, g)
     w = 2*pi./T;        % angular frequency
     k = w.^2 / g;       % wave number (dispersion relation for deep water)
     V_g = g ./(2*w);    % group velocity (Newman equation 6.63)
@@ -95,7 +91,7 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, rho_w, g)
     
     % Froude Krylov force coefficient (diffraction is neglected)
     tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
-    draft = 2;
+    draft = T_f;
     r_k_term = r^2 - (k.^2 * r^4)/8 + (k.^4 * r^6)/192 - (k.^6 * r^8)/9216 ...
                 + (k.^8 * r^10)/737280 - (k.^10 * r^12)/88473600;
     r_k_term = max(r_k_term, 0); % zero any negatives that result at high frequencies
