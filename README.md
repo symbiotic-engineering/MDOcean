@@ -20,8 +20,8 @@ Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimizati
 
 **Disclaimer**
 
-The version of the simulation used in the conference proceedings paper and in the conference video was later found to have a number of errors. 
-These errors have since been corrected and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
+The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
+These errors have since been corrected, and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
 Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
 
 Errors that have since been fixed include:
@@ -54,3 +54,12 @@ if you want to run single objective optimization for each of the two objectives.
 - `plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to try out the entire pipeline by running all relevant 
 optimizations to generate every figure in the paper.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
+
+**Dependencies**
+The following packages are used in this code:
+- MATLAB
+- Optimization Toolbox
+- Global Optimization Toolbox
+- Statistics and Machine Learning Toolbox
+- Symbolic Math Toolbox
+All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
