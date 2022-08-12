@@ -65,3 +65,12 @@ The following packages are used in this code:
 - Symbolic Math Toolbox
 
 All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
+
+**Funding Acknowledgement**
+
+This material is based upon work supported by the 
+National Science Foundation Graduate Research Fellowship under 
+Grant No. DGE–2139899, and the Cornell Engineering Fellowship.
+Any opinion, findings, and conclusions or recommendations 
+expressed in this material are those of the authors(s) and do not 
+necessarily reflect the views of the National Science Foundation.
