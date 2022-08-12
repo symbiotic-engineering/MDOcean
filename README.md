@@ -1,5 +1,6 @@
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
+
 More specifically, it uses the SQP and pattern search algorithms to find the geometry and controller design which minimizes the energy cost and power variation 
 of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
 
@@ -9,6 +10,8 @@ The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab
 in the [2022 ASME IDETC-CIE](https://event.asme.org/IDETC-CIE).
 At this conference, the work was presented at the [DAC-6](https://www.designautomationconference.org/dac-6) session and is publication number 90227.
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
+
+Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” International Design Engineering Technical Conferences & Computers and Information in Engineering Conference, St. Louis, MO, August 14-17, 2022.`
 
 **Authors**
 - Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact) @rebeccamccabe
