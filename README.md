@@ -11,7 +11,7 @@ in the [2022 ASME IDETC-CIE](https://event.asme.org/IDETC-CIE).
 At this conference, the work was presented at the [DAC-6](https://www.designautomationconference.org/dac-6) session and is publication number 90227.
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
 
-Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” International Design Engineering Technical Conferences & Computers and Information in Engineering Conference, St. Louis, MO, August 14-17, 2022.`
+Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” *International Design Engineering Technical Conferences & Computers and Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
 
 **Authors**
 - Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact) @rebeccamccabe
