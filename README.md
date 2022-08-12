@@ -42,7 +42,7 @@ of the paper will be posted here in early September 2022, containing corrections
 **License**
 
 This project is released open-source under the MIT License. The validation folder contains code taken from NREL's BEMIO module, which is part of WEC-Sim. 
-The license for this open source WEC-Sim code is included.
+The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **File Structure**
 
@@ -56,10 +56,12 @@ optimizations to generate every figure in the paper.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
 
 **Dependencies**
+
 The following packages are used in this code:
 - MATLAB
 - Optimization Toolbox
 - Global Optimization Toolbox
 - Statistics and Machine Learning Toolbox
 - Symbolic Math Toolbox
+
 All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
