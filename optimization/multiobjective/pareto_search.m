@@ -57,13 +57,16 @@ function [x,fval] = pareto_search()
 
     % show which constaints are active along the pareto front
     tol = probMO.options.ConstraintTolerance;
-    constraint_active_plot(residuals,fval,tol)
+    idx = constraint_active_plot(residuals,fval,tol);
+
+    cols = [1 3 6 5 4 2 7];
+    x_sorted = x(idx,cols)
 
     % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results7',"fval","x","residuals")
+    save('optimization/multiobjective/pareto_search_results8',"fval","x","residuals")
 end
 
-function [] = constraint_active_plot(residuals,fval,tol)
+function [idx] = constraint_active_plot(residuals,fval,tol)
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
     con_active = abs(residuals.ineqnonlin) < tol;

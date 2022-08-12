@@ -32,7 +32,7 @@ LCOE_max = p.LCOE_max;
 xlim([0 LCOE_max])
 
 %[x,fval] = pareto_search();
-load("pareto_search_results7.mat")
+load("pareto_search_results8.mat")
 cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
@@ -41,12 +41,12 @@ plot(fval(:,1),fval(:,2),'ks','MarkerFaceColor','k','HandleVisibility','off')
 
 utopia_LCOE = min(LCOE);
 utopia_P_var = min(P_var(LCOE<LCOE_max));
-plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
+%plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
 
 legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
     'Utopia Point')
 %%
-simplePareto = true; % toggle between a simple pareto front and one that's 
+simplePareto = false; % toggle between a simple pareto front and one that's 
 % annotated with the three recommended designs
 
 %close all
@@ -116,10 +116,11 @@ if ~simplePareto
 end
 % idenitfy design variables for best designs
 x_best_LCOE = overallX(idx_best_LCOE,:)
-x_best_Pvar = overallX(idx_best_Pvar,:)
-x_balanced = overallX(idx_balanced,:)
 
 if ~simplePareto
+    x_best_Pvar = overallX(idx_best_Pvar,:)
+    x_balanced = overallX(idx_balanced,:)
+
     % small corner pictures of best geometries
     % upper left
     axes('Position',[.28 .7 .15 .2])
