@@ -1,4 +1,4 @@
-clear;clc;%close all
+clear;clc;close all
 p = parameters();
 b = var_bounds(p);
 
@@ -8,112 +8,126 @@ simplePareto = false; % toggle between a simple pareto front and one that's
 %[x,fval] = pareto_search();
 load("pareto_search_results8.mat")
 cols = [1 3 6 5 4 2 7];
-X_ps = x(:,cols); % swap indices based on solver generated function
-X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
+X = x(:,cols); % swap indices based on solver generated function
+X = [X ones(length(X),1)]; % add eigth column for material 
+LCOE = fval(:,1);
+Pvar = fval(:,2);
 
-figure
-% overall pareto front
-overallLCOE = fval(:,1);
-overallPvar = fval(:,2);
-overallX = X_ps;
-[~,idxo] = paretoFront(-1*[overallLCOE overallPvar]);
-plot(overallLCOE(idxo),overallPvar(idxo),'bs','MarkerFaceColor','b')
-hold on
+% find basic pareto front
+[~,idxo] = paretoFront(-1*[LCOE Pvar]);
+[minLCOE,idx_best_LCOE] = min(LCOE);
+[minPvar,idx_best_Pvar] = min(Pvar);
 
-% utopia point
-[minLCOE,idx_best_LCOE] = min(overallLCOE);
-[minPvar,idx_best_Pvar] = min(overallPvar);
-plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
-
-% RM3 nominal reference
+% RM3 nominal - actual
 RM3 = validation_inputs();
 LCOE_nom = RM3.LCOE(4);
 P_var_nom = RM3.c_v;
 
+% RM3 nominal - simulated
 x_nom = b.X_noms;
 x_nom(8) = 1;
 p_nom = p;
 p_nom.power_max = RM3.power_max;
 [LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
 
-plot(LCOE_nom,P_var_nom,'rd')
-plot(LCOE_nom_sim,P_var_nom_sim,'rs')
-
-if ~simplePareto
-    % balanced design
-    [~,idx_balanced] = min(abs(overallPvar-40));
-    LCOE_balanced = overallLCOE(idx_balanced);
-    P_var_balanced = overallPvar(idx_balanced);
-    
-    % black squares for 3 ref points
-    plot(minLCOE,overallPvar(idx_best_LCOE),'ks')
-    plot(overallLCOE(idx_best_Pvar),minPvar,'ks')
-    plot(LCOE_balanced,P_var_balanced,'ks')
-end
-
-% axis labels
-xlabel('LCOE ($/kWh)')
-ylabel('Power Variation (%)')
-title('Pareto Front')
-xlim([0 .9])
-ylim([25 165])
-improvePlot
-
-% solar reference
+% solar
 LCOE_solar = 0.03;
 P_var_solar = 125;
-plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2])
-% for the yellow color to work, do not use improvePlot below here
 
-% text labels
-text(LCOE_nom+.03,P_var_nom,'Nominal')
-text(LCOE_nom+.01,P_var_nom-5,'Actual [10]')
-text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
-text(minLCOE+.03,minPvar,'Utopia Point')
-text(LCOE_solar+.03,P_var_solar,'Solar')
-if ~simplePareto
-    text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
-    text(overallLCOE(idx_best_Pvar)+.03,overallPvar(idx_best_Pvar)-3,'Least Variable')
-    text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
-end
+% balanced design
+[~,idx_balanced] = min(abs(Pvar-40));
+LCOE_balanced = LCOE(idx_balanced);
+P_var_balanced = Pvar(idx_balanced);
+
 % idenitfy design variables for best designs
-x_best_LCOE = overallX(idx_best_LCOE,:)
+x_best_LCOE = X(idx_best_LCOE,:)
+x_best_Pvar = X(idx_best_Pvar,:)
+x_balanced = X(idx_balanced,:)
 
-if ~simplePareto
-    x_best_Pvar = overallX(idx_best_Pvar,:)
-    x_balanced = overallX(idx_balanced,:)
-
-    mini_plot_size = [.2 .22];
-    % small corner pictures of best geometries
-    % upper left
-    axes('Position',[.25 .7 mini_plot_size])
-    box on
-    visualize_geometry(x_best_LCOE,p,true);
-    set(gca,'XTickLabel',[],'YTickLabel',[])
-    
-    % lower right
-    axes('Position',[.53 .14 mini_plot_size])
-    box on
-    visualize_geometry(x_best_Pvar,p,true);
-    set(gca,'XTickLabel',[],'YTickLabel',[])
-    
-    % balanced
-    axes('Position',[.22 .25 mini_plot_size])
-    box on
-    visualize_geometry(x_balanced,p,true);
-    set(gca,'XTickLabel',[],'YTickLabel',[])
-    
-    % RM3
-    axes('Position',[.7 .45 mini_plot_size])
-    box on
-    visualize_geometry(x_nom,p,true);
-    set(gca,'XTickLabel',[],'YTickLabel',[])
-end
+%% plot pareto front with annotations and embedded images
+pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, simplePareto, p)
 
 %% plots for DVs as a fn of percent along the pareto
+design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
+                       Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
 
-design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-              overallPvar, minPvar, idx_best_Pvar, overallX, idxo, p.LCOE_max)
+%%
+function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCOE_solar, LCOE_balanced,...
+                          Pvar,minPvar,idx_best_Pvar,P_var_nom,P_var_nom_sim,P_var_solar,P_var_balanced,...
+                          x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,simplePareto,p)
+    figure
+    % overall pareto front
+    plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
+    hold on
+    
+    % utopia point
+    plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
+    
+    % RM3 nominal reference
+    plot(LCOE_nom,P_var_nom,'rd')
+    plot(LCOE_nom_sim,P_var_nom_sim,'rs')
+    
+    if ~simplePareto    
+        % black squares for 3 ref points
+        plot(minLCOE,Pvar(idx_best_LCOE),'ks')
+        plot(LCOE(idx_best_Pvar),minPvar,'ks')
+        plot(LCOE_balanced,P_var_balanced,'ks')
+    end
+    
+    % axis labels
+    xlabel('LCOE ($/kWh)')
+    ylabel('Power Variation (%)')
+    title('Pareto Front')
+    xlim([0 .9])
+    ylim([25 165])
+    improvePlot
+    
+    % solar reference
+    plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2])
+    % for the yellow color to work, do not use improvePlot below here
+    
+    % text labels
+    text(LCOE_nom+.03,P_var_nom,'Nominal')
+    text(LCOE_nom+.01,P_var_nom-5,'Actual [10]')
+    text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
+    text(minLCOE+.03,minPvar,'Utopia Point')
+    text(LCOE_solar+.03,P_var_solar,'Solar')
+    if ~simplePareto
+        text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest')
+        text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable')
+        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
+    end
+    
+    if ~simplePareto
+        mini_plot_size = [.2 .22];
+        % small corner pictures of best geometries
+        % upper left
+        axes('Position',[.25 .7 mini_plot_size])
+        box on
+        visualize_geometry(x_best_LCOE,p,true);
+        set(gca,'XTickLabel',[],'YTickLabel',[])
+        
+        % lower right
+        axes('Position',[.53 .14 mini_plot_size])
+        box on
+        visualize_geometry(x_best_Pvar,p,true);
+        set(gca,'XTickLabel',[],'YTickLabel',[])
+        
+        % balanced
+        axes('Position',[.22 .25 mini_plot_size])
+        box on
+        visualize_geometry(x_balanced,p,true);
+        set(gca,'XTickLabel',[],'YTickLabel',[])
+        
+        % RM3
+        axes('Position',[.7 .45 mini_plot_size])
+        box on
+        visualize_geometry(x_nom,p,true);
+        set(gca,'XTickLabel',[],'YTickLabel',[])
+    end
+end
 
 %%
 function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
