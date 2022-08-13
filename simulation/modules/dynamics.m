@@ -3,7 +3,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_e
 
 % use probabilistic sea states for power
 [T,Hs] = meshgrid(in.T,in.Hs);
-P_matrix = get_power_force(in,T,Hs,m_float,V_d,draft);
+[P_matrix,h_s_extra] = get_power_force(in,T,Hs,m_float,V_d,draft);
 
 % account for powertrain electrical losses
 P_matrix = P_matrix * in.eff_pto;
@@ -18,8 +18,8 @@ P_elec = sum(P_weighted(:));
 assert(isreal(P_elec))
 
 % use max sea states for structural forces and max amplitude
-[~,F_heave_max,F_surge_max,...
-    F_ptrain_max,h_s_extra] = get_power_force(in, ...
+[~,~,F_heave_max,F_surge_max,...
+    F_ptrain_max] = get_power_force(in, ...
                             in.T_struct, in.Hs_struct, m_float, V_d, draft);
 
 % coefficient of variance (normalized standard deviation) of power
@@ -28,7 +28,7 @@ P_var = P_var * 100; % convert to percentage
 
 end
 
-function [P_matrix, F_heave, F_surge, F_ptrain_max, h_s_extra] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
     [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
     m = m_float + A;
@@ -59,8 +59,11 @@ function [P_matrix, F_heave, F_surge, F_ptrain_max, h_s_extra] = get_power_force
     % calculate power
     P_matrix = 1/2 * (mult * in.B_p) .* w.^2 .* X_sat.^2;
     
+    X_max = max(X_sat,[],'all');
+    h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
+
     % calculate forces
-    if nargout > 1
+    if nargout > 2
         F_ptrain = mult .* F_ptrain_over_x .* X_sat;
         F_ptrain_max = max(F_ptrain,[],'all');
         F_err_1 = abs(F_ptrain ./ (in.F_max * alpha) - 1);
@@ -76,8 +79,6 @@ function [P_matrix, F_heave, F_surge, F_ptrain_max, h_s_extra] = get_power_force
         %assert(F_heave <= in.F_max);
 
         F_surge = Hs * in.rho_w * in.g * V_d .* (1 - exp(-k_wvn*draft));
-        X_max = max(X_sat,[],'all');
-        h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
     end
 end
 
