@@ -1,35 +1,9 @@
-clear;clc
+clear;clc;%close all
 p = parameters();
 b = var_bounds(p);
 
-num_runs = 10;
-[LCOE,P_var,feasible] = deal(zeros(1,num_runs));
-
-X = zeros(num_runs,8);
-for i=1:num_runs
-    xx = random_x0(b);
-    X(i,:) = xx;
-    [LCOE(i), P_var(i), B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, P_matrix, g] = simulation(xx, p);	
-    FOS = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
-    feasible(i) = is_feasible(B, FOS, GM, P_elec, D_d, g(16), g(17), g(18), p);
-end
-
-feasible = logical(feasible);
-LCOE(~feasible) = Inf;
-P_var(~feasible) = Inf;
-%%
-figure
-plot(LCOE,P_var,'*')
-hold on
-xlabel('LCOE ($/kWh)')
-ylabel('Normalized Power Variance (%)')
-title('Pareto Front')
-
-[~,idxs] = paretoFront(-1*[LCOE' P_var']);
-plot(LCOE(idxs),P_var(idxs),'r*')
-LCOE_max = p.LCOE_max;
-xlim([0 LCOE_max])
+simplePareto = false; % toggle between a simple pareto front and one that's 
+% annotated with the three recommended designs
 
 %[x,fval] = pareto_search();
 load("pareto_search_results8.mat")
@@ -37,24 +11,11 @@ cols = [1 3 6 5 4 2 7];
 X_ps = x(:,cols); % swap indices based on solver generated function
 X_ps = [X_ps ones(length(X_ps),1)]; % add eigth column for material 
 
-plot(fval(:,1),fval(:,2),'ks','MarkerFaceColor','k','HandleVisibility','off')
-
-utopia_LCOE = min(LCOE);
-utopia_P_var = min(P_var(LCOE<LCOE_max));
-%plot(utopia_LCOE,utopia_P_var,'gp','MarkerFaceColor','g','MarkerSize',20)
-
-legend('Dominated Points','Non-Dominated Points','Pareto Search Results',...
-    'Utopia Point')
-%%
-simplePareto = false; % toggle between a simple pareto front and one that's 
-% annotated with the three recommended designs
-
-%close all
 figure
 % overall pareto front
-overallLCOE = [LCOE'; fval(:,1)];
-overallPvar = [P_var'; fval(:,2)];
-overallX = [X; X_ps];
+overallLCOE = fval(:,1);
+overallPvar = fval(:,2);
+overallX = X_ps;
 [~,idxo] = paretoFront(-1*[overallLCOE overallPvar]);
 plot(overallLCOE(idxo),overallPvar(idxo),'bs','MarkerFaceColor','b')
 hold on
@@ -152,7 +113,7 @@ end
 %% plots for DVs as a fn of percent along the pareto
 
 design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-              overallPvar, minPvar, idx_best_Pvar, overallX, idxo, LCOE_max)
+              overallPvar, minPvar, idx_best_Pvar, overallX, idxo, p.LCOE_max)
 
 %%
 function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
