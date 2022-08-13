@@ -2,7 +2,7 @@ clear;clc
 p = parameters();
 b = var_bounds(p);
 
-num_runs = 5e4;
+num_runs = 10;
 [LCOE,P_var,feasible] = deal(zeros(1,num_runs));
 
 X = zeros(num_runs,8);
@@ -105,13 +105,14 @@ plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],
 % for the yellow color to work, do not use improvePlot below here
 
 % text labels
-text(LCOE_nom-.26,P_var_nom,'Nominal Actual [10]')
+text(LCOE_nom+.03,P_var_nom,'Nominal')
+text(LCOE_nom+.01,P_var_nom-5,'Actual [10]')
 text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
 text(minLCOE+.03,minPvar,'Utopia Point')
 text(LCOE_solar+.03,P_var_solar,'Solar')
 if ~simplePareto
     text(overallLCOE(idx_best_LCOE)+.03,overallPvar(idx_best_LCOE),'Cheapest')
-    text(overallLCOE(idx_best_Pvar)+.03,overallPvar(idx_best_Pvar),'Least Variable')
+    text(overallLCOE(idx_best_Pvar)+.03,overallPvar(idx_best_Pvar)-3,'Least Variable')
     text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
 end
 % idenitfy design variables for best designs
@@ -121,27 +122,28 @@ if ~simplePareto
     x_best_Pvar = overallX(idx_best_Pvar,:)
     x_balanced = overallX(idx_balanced,:)
 
+    mini_plot_size = [.2 .22];
     % small corner pictures of best geometries
     % upper left
-    axes('Position',[.28 .7 .15 .2])
+    axes('Position',[.25 .7 mini_plot_size])
     box on
     visualize_geometry(x_best_LCOE,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % lower right
-    axes('Position',[.53 .16 .15 .2])
+    axes('Position',[.53 .14 mini_plot_size])
     box on
     visualize_geometry(x_best_Pvar,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % balanced
-    axes('Position',[.25 .25 .15 .2])
+    axes('Position',[.22 .25 mini_plot_size])
     box on
     visualize_geometry(x_balanced,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])
     
     % RM3
-    axes('Position',[.7 .45 .15 .2])
+    axes('Position',[.7 .45 mini_plot_size])
     box on
     visualize_geometry(x_nom,p,true);
     set(gca,'XTickLabel',[],'YTickLabel',[])

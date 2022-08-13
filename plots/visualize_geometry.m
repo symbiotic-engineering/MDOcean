@@ -36,7 +36,7 @@ h_s = 1/T_s_ratio * T_s;
 
 % waves
 x = linspace(-30,30,100);
-Hs = 1.5;
+Hs = 3;
 T = 7.5;
 hold on
 waves = plot(x,Hs*cos(x*2*pi/T),'c');
@@ -56,7 +56,7 @@ else
     set(gcf, 'Color', 'white');
 end
 grid on
-ylim([-50 10])
+ylim([-40 35])
 xlim([-20 20])
 set(waves,'HandleVisibility','off')
 
