@@ -61,7 +61,7 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
     x_nom = b.X_noms;
     x_nom(8) = 1;
     p_nom = p;
-    p_nom.power_max = RM3.power_max;
+    %p_nom.power_max = RM3.power_max;
     [LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
     
     % solar
@@ -106,7 +106,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     xlabel('LCOE ($/kWh)')
     ylabel('Power Variation (%)')
     title('Pareto Front')
-    xlim([0 .9])
+    xlim([0 1])
     ylim([25 165])
     improvePlot
     
@@ -115,28 +115,30 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     % for the yellow color to work, do not use improvePlot below here
     
     % text labels
-    text(LCOE_nom+.03,P_var_nom,'Nominal')
-    text(LCOE_nom+.01,P_var_nom-5,'Actual [10]')
-    text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
-    text(minLCOE+.03,minPvar,'Utopia Point')
-    text(LCOE_solar+.03,P_var_solar,'Solar')
+    sz = 14;
+    text(LCOE_nom+.03,P_var_nom,'Nominal','FontSize',sz)
+    text(LCOE_nom+.01,P_var_nom-5,'Actual [10]','FontSize',sz)
+    text(LCOE_nom_sim-.02,P_var_nom_sim+5,'Nominal','FontSize',sz)
+    text(LCOE_nom_sim+.03,P_var_nom_sim,'Sim','FontSize',sz)
+    text(minLCOE+.03,minPvar-2,'Utopia Point','FontSize',sz)
+    text(LCOE_solar+.03,P_var_solar,'Solar','FontSize',sz)
     if showSingleObj
-        text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest')
-        text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable')
-        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
+        text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest','FontSize',sz)
+        text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
+        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design','FontSize',sz)
     end
     
     if showImages
         mini_plot_size = [.2 .22];
         % small corner pictures of best geometries
         % upper left
-        axes('Position',[.25 .7 mini_plot_size])
+        axes('Position',[.28 .7 mini_plot_size])
         box on
         visualize_geometry(x_best_LCOE,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % lower right
-        axes('Position',[.53 .14 mini_plot_size])
+        axes('Position',[.52 .15 mini_plot_size])
         box on
         visualize_geometry(x_best_Pvar,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
@@ -148,7 +150,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % RM3
-        axes('Position',[.7 .45 mini_plot_size])
+        axes('Position',[.7 .5 mini_plot_size])
         box on
         visualize_geometry(x_nom,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
