@@ -241,7 +241,9 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
     
     figure
-    plot(pct_angle,LCOE_pareto_sorted*100,'m',pct_angle,Pvar_pareto_sorted,'c')
+    plot(pct_angle,LCOE_pareto_sorted*100,'Color',[0.4940 0.1840 0.5560]) % purple
+    hold on
+    plot(pct_angle,Pvar_pareto_sorted,'Color',[0.4660 0.6740 0.1880]) % green
     grid on
     xlabel('Percent along the Pareto Curve')
     ylabel('Objective Value')
