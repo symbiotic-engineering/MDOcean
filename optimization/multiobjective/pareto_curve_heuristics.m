@@ -2,9 +2,6 @@ clear;clc;close all
 p = parameters();
 b = var_bounds(p);
 
-simplePareto = false; % toggle between a simple pareto front and one that's 
-% annotated with the three recommended designs
-
 %[x,fval] = pareto_search();
 load("pareto_search_results8.mat")
 cols = [1 3 6 5 4 2 7];
@@ -13,50 +10,79 @@ X = [X ones(length(X),1)]; % add eigth column for material
 LCOE = fval(:,1);
 Pvar = fval(:,2);
 
-% find basic pareto front
-[~,idxo] = paretoFront(-1*[LCOE Pvar]);
-[minLCOE,idx_best_LCOE] = min(LCOE);
-[minPvar,idx_best_Pvar] = min(Pvar);
+[LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+ Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+ x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
 
-% RM3 nominal - actual
-RM3 = validation_inputs();
-LCOE_nom = RM3.LCOE(4);
-P_var_nom = RM3.c_v;
+%% super simple "pareto" plot of just single objective optimizations
+showSingleObj = true;
+showImages = false;
+pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
+            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
+            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
 
-% RM3 nominal - simulated
-x_nom = b.X_noms;
-x_nom(8) = 1;
-p_nom = p;
-p_nom.power_max = RM3.power_max;
-[LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
-
-% solar
-LCOE_solar = 0.03;
-P_var_solar = 125;
-
-% balanced design
-[~,idx_balanced] = min(abs(Pvar-40));
-LCOE_balanced = LCOE(idx_balanced);
-P_var_balanced = Pvar(idx_balanced);
-
-% idenitfy design variables for best designs
-x_best_LCOE = X(idx_best_LCOE,:)
-x_best_Pvar = X(idx_best_Pvar,:)
-x_balanced = X(idx_balanced,:)
-
-%% plot pareto front with annotations and embedded images
+%% simple pareto plot
+showSingleObj = false;
+showImages = false;
 pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
             Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, simplePareto, p)
+            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
+
+%% plot pareto front with annotations and embedded images of three recommended designs
+showSingleObj = true;
+showImages = true;
+pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
 
 %% plots for DVs as a fn of percent along the pareto
 design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
                        Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
 
 %%
+function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
+         LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+         Pvar, minPvar, idx_best_Pvar, P_var_nom, ...
+         P_var_nom_sim, P_var_solar, P_var_balanced,...
+         x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] ...
+                                        = process_pareto_front(LCOE,Pvar,X,p,b)
+
+    % find basic pareto front
+    [~,idxo] = paretoFront(-1*[LCOE Pvar]);
+    [minLCOE,idx_best_LCOE] = min(LCOE);
+    [minPvar,idx_best_Pvar] = min(Pvar);
+    
+    % RM3 nominal - actual
+    RM3 = validation_inputs();
+    LCOE_nom = RM3.LCOE(4);
+    P_var_nom = RM3.c_v;
+    
+    % RM3 nominal - simulated
+    x_nom = b.X_noms;
+    x_nom(8) = 1;
+    p_nom = p;
+    p_nom.power_max = RM3.power_max;
+    [LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
+    
+    % solar
+    LCOE_solar = 0.03;
+    P_var_solar = 125;
+    
+    % balanced design
+    [~,idx_balanced] = min(abs(Pvar-40));
+    LCOE_balanced = LCOE(idx_balanced);
+    P_var_balanced = Pvar(idx_balanced);
+    
+    % idenitfy design variables for best designs
+    x_best_LCOE = X(idx_best_LCOE,:)
+    x_best_Pvar = X(idx_best_Pvar,:)
+    x_balanced = X(idx_balanced,:)
+end
+
+%%
 function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCOE_solar, LCOE_balanced,...
                           Pvar,minPvar,idx_best_Pvar,P_var_nom,P_var_nom_sim,P_var_solar,P_var_balanced,...
-                          x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,simplePareto,p)
+                          x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,showSingleObj,showImages,p)
     figure
     % overall pareto front
     plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
@@ -69,7 +95,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     plot(LCOE_nom,P_var_nom,'rd')
     plot(LCOE_nom_sim,P_var_nom_sim,'rs')
     
-    if ~simplePareto    
+    if showSingleObj  
         % black squares for 3 ref points
         plot(minLCOE,Pvar(idx_best_LCOE),'ks')
         plot(LCOE(idx_best_Pvar),minPvar,'ks')
@@ -94,13 +120,13 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     text(LCOE_nom_sim-.25,P_var_nom_sim+1,'Nominal Simulation')
     text(minLCOE+.03,minPvar,'Utopia Point')
     text(LCOE_solar+.03,P_var_solar,'Solar')
-    if ~simplePareto
+    if showSingleObj
         text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest')
         text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable')
         text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design')
     end
     
-    if ~simplePareto
+    if showImages
         mini_plot_size = [.2 .22];
         % small corner pictures of best geometries
         % upper left
