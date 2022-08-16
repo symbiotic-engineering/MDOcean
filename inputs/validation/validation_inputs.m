@@ -14,6 +14,7 @@ RM3 = struct(   'mass_f',       208e3, ...  % p159 RM3 report
                 'power_avg',    85.9e3, ... % S14 in CBS Performance & Economics
                 'power_max',    286e3, ...  % S15 in CBS Performance & Economics
                 'force_heave',  8500e3,...  % p156 RM3 report
-                'FOS_b',        3 );        % p158 RM3 report
+                'FOS_b',        3,...       % p158 RM3 report
+				'c_v',			nominal_c_v()); % calculated from data in CBS Performance & Economics
 
 end

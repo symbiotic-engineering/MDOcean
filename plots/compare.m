@@ -8,7 +8,7 @@ Xs_opt = gradient_optim(x0_input,p,b);
 cheapest = Xs_opt(:,1);
 minVariation = Xs_opt(:,2);
 
-p.LCOE_max = 0.2;
+p.LCOE_max = 0.1;
 balanced = gradient_optim(x0_input,p,b,2);
 
 nominal	= [b.X_noms' 1];

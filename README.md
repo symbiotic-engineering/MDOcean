@@ -11,7 +11,7 @@ in the [2022 ASME IDETC-CIE](https://event.asme.org/IDETC-CIE).
 At this conference, the work was presented at the [DAC-6](https://www.designautomationconference.org/dac-6) session and is publication number 90227.
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
 
-Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” International Design Engineering Technical Conferences & Computers and Information in Engineering Conference, St. Louis, MO, August 14-17, 2022.`
+Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” *International Design Engineering Technical Conferences & Computers and Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
 
 **Authors**
 - Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact) @rebeccamccabe
@@ -21,7 +21,7 @@ Citation: `R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimizati
 **Disclaimer**
 
 The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
-These errors have since been corrected, and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
+These errors have since been corrected, and the current code ([v1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4)) is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
 Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
 
 Errors that have since been fixed include:
@@ -35,6 +35,7 @@ Errors that have since been fixed include:
 - Incorrect scaling of cost with number of WECs
 - Powertrain and transmission loss not accounted for
 - Mass of damping plate support tubes not accounted for
+- Float maximum displacement constraint not being enforced
 
 *Because the results in the official conference proceedings contain these errors, an updated unofficial version 
 of the paper will be posted here in early September 2022, containing corrections.*
@@ -65,3 +66,12 @@ The following packages are used in this code:
 - Symbolic Math Toolbox
 
 All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
+
+**Funding Acknowledgement**
+
+This material is based upon work supported by the 
+National Science Foundation Graduate Research Fellowship under 
+Grant No. DGE–2139899, and the Cornell Engineering Fellowship.
+Any opinion, findings, and conclusions or recommendations 
+expressed in this material are those of the authors(s) and do not 
+necessarily reflect the views of the National Science Foundation.

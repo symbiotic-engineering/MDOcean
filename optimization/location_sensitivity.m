@@ -32,3 +32,9 @@ locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','WETS, Hawaii'};
 legend(locs)
 array2table([X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',[b.var_names,{'LCOE','flag'}])
 assert(all(flags>0))
+
+%% try Hawaii with California design
+X_cali = X_opts(:,1);
+
+LCOE_hawaii_with_cali_design = simulation(X_cali,p)
+pct_diff = (LCOE_hawaii_with_cali_design - obj_opts(4)) / obj_opts(4)

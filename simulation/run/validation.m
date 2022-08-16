@@ -33,6 +33,11 @@ assert( all(err < 0.1) )
 err = pct_error.LCOE;
 assert( all(err < 0.1) )
 
+%% cv within 10 percent
+[~,~,pct_error] = validate_nominal_RM3();
+err = pct_error.c_v;
+assert( err < 0.1 )
+
 %%%%%% function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     p = parameters();

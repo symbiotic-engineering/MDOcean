@@ -1,22 +1,29 @@
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;%close all
-dvar_names={'D_{f}','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','D_{int}','w_{n}','M'};
+dvar_names={'D_f','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','B_p','w_n','M'};
 
 param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','B_{min}','FOS_{min}','D_{d_{min}}',...
-            'FCR','N_{WEC}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
+            'cost_m','t_{ft}','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','t_{dt}','D_{dt}','\theta_{dt}',...
+            'FCR','N_{WEC}','eff_{pto}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
 params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
 params = regexprep(params,'/','_over_');
+
+groups = {'Dynamics','Structures',...
+    'Economics','Geometry'};
+param_groupings = [1 2 1 2 2 2 2 3 2 2 2 2 2 2 4 4 3 3 1 4 4 4 4];
+color_groupings = {'b','y','g','r'};
+colors = color_groupings(param_groupings);
+cell2table([params',groups(param_groupings)'])
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
 b = var_bounds(p);
-
+%%
 % use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
         b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,'F_max',b.F_max_nom,...
-        'D_int',b.D_int_nom,'w_n',b.w_n_nom,'M',b.M_nom);
+        'D_int',b.B_p_nom,'w_n',b.w_n_nom,'M',b.M_nom);
 x0_vec = gradient_optim(x0,p,b);
 x0 = struct('D_f',x0_vec(1,1),'D_s_ratio',x0_vec(2,1),'h_f_ratio',x0_vec(3,1),...
     'T_s_ratio',x0_vec(4,1),'F_max',x0_vec(5,1),'D_int',x0_vec(6,1),'w_n',x0_vec(7,1));
@@ -86,7 +93,7 @@ for i = 1:7
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min LCOE'])
-    improvePlot
+    %improvePlot
     grid on
     
     figure(3)
@@ -95,7 +102,7 @@ for i = 1:7
     xlabel ('Parameter ratio from nominal')
     ylabel ('X* ratio from nominal')
     title([dvar_names{i} ' - min c_v'])
-    improvePlot
+    %improvePlot
     grid on
 end
 legend(param_names)
@@ -105,18 +112,43 @@ legend(param_names)
 slope_LCOE = get_slope(LCOE, ratios, LCOE_nom);
 slope_Pvar = get_slope(P_var, ratios, Pvar_nom);
 
+[~,LCOE_sort_idx] = sort(abs(slope_LCOE),'MissingPlacement','first');
+[~,Pvar_sort_idx] = sort(abs(slope_Pvar),'MissingPlacement','first');
+
+LCOE_params = categorical(param_names, param_names(LCOE_sort_idx));
+Pvar_params = categorical(param_names, param_names(Pvar_sort_idx));
+
 % separate charts for each objective
 figure
 subplot 121
-barh(categorical(param_names),slope_LCOE)
-set(gca,'YGrid','on')
+for i=1:length(LCOE_params)
+    barh(LCOE_params(i),slope_LCOE(i),colors{i})
+    hold on
+end
+xlim([-2.5 1])
+ax = gca;
+set(ax,'YGrid','on')
 title('LCOE')
+
 subplot 122
-barh(categorical(param_names),slope_Pvar)
+for i=1:length(LCOE_params)
+    barh(Pvar_params(i),slope_Pvar(i),colors{i})
+    hold on 
+end
 set(gca,'YGrid','on')
 title('c_v')
 sgtitle('Normalized Sensitivities')
+legend_idx = zeros(1,max(param_groupings));
+for i=1:max(param_groupings)
+    legend_idx(i) = find(param_groupings==i,1);
+end
+labels = repmat({''},size(param_groupings));
+labels(legend_idx) = groups;
+legend(labels)
 improvePlot
+xlim([-2.5 1])
+set(gca, 'FontSize', 14)
+set(ax,'FontSize',14)
 
 % both objectives on the same chart
 figure

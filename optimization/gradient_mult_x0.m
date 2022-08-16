@@ -21,6 +21,7 @@ for i = 2:num_runs
 end
 
 %% create table for display	
+[x0s(1:num_runs).B_p] = deal(x0s.D_int);
 results = struct2table(x0s);
 scale = repmat([100 1],num_runs,1);
 results = addvars(results, objs.*scale, flags,  ...	

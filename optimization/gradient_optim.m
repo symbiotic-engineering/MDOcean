@@ -32,7 +32,9 @@ w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...
                                 'PlotFcn',plotfn,...
-                                'MaxIterations',8);
+                                'MaxIterations',8,...
+                                'FunValCheck','on',...
+                                'ConstraintTolerance',1e-5);
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
@@ -121,4 +123,12 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
             visualize_geometry(X_opt,p)
         end
     end
+    if ploton
+        table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs];
+        objs_opt
+        flags
+        array2table(table_data,'RowNames',b.var_names(1:end-1),...
+                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound'})
+    end
+
 end

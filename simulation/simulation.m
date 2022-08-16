@@ -1,6 +1,8 @@
 function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
             FOS_buckling, GM, P_elec, D_d, P_matrix, g, val] = simulation(X, p)	
 
+X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
+
 %% Assemble inputs
 in = p;
 
@@ -36,6 +38,8 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
 B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
 
+m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
+
 [F_heave_max, F_surge_max, F_ptrain_max, ...
 	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
 
@@ -44,7 +48,7 @@ B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.array_eff);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
 g = zeros(1,18);
@@ -67,7 +71,11 @@ g(16) = h_s_extra;                      % prevent float rising above top of spar
 g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
-assert( all(~isinf(g)) && all(~isnan(g)) )
+criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
+%assert( criteria )
+if ~criteria
+    disp('ohno')
+end
 
 if nargout > 12 % if returning extra struct output for validation
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, ...
@@ -75,7 +83,7 @@ if nargout > 12 % if returning extra struct output for validation
                                             in.t_fc, in.t_fb, in.t_sr, in.t_dt,...
                                             D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.array_eff);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -87,6 +95,7 @@ if nargout > 12 % if returning extra struct output for validation
     val.power_max = max(P_matrix,[],'all');
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
+	val.c_v = P_var;
 end
 
 end
