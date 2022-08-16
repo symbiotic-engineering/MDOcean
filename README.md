@@ -21,7 +21,7 @@ Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimizatio
 **Disclaimer**
 
 The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
-These errors have since been corrected, and the current code is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
+These errors have since been corrected, and the current code ([v1.4](link)) is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
 Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
 
 Errors that have since been fixed include:
@@ -35,6 +35,7 @@ Errors that have since been fixed include:
 - Incorrect scaling of cost with number of WECs
 - Powertrain and transmission loss not accounted for
 - Mass of damping plate support tubes not accounted for
+- Float maximum displacement constraint not being enforced
 
 *Because the results in the official conference proceedings contain these errors, an updated unofficial version 
 of the paper will be posted here in early September 2022, containing corrections.*
