@@ -63,7 +63,7 @@ function [x,fval] = pareto_search()
     x_sorted = x(idx,cols)
 
     % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results8',"fval","x","residuals")
+    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals")
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)

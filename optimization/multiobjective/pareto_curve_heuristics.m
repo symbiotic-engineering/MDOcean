@@ -3,7 +3,7 @@ p = parameters();
 b = var_bounds(p);
 
 %[x,fval] = pareto_search();
-load("pareto_search_results8.mat")
+load("pareto_search_results.mat")
 cols = [1 3 6 5 4 2 7];
 X = x(:,cols); % swap indices based on solver generated function
 X = [X ones(length(X),1)]; % add eigth column for material 
