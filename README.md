@@ -9,6 +9,7 @@ of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/) and has been accepted for publication/presentation 
 in the [2022 ASME IDETC-CIE](https://event.asme.org/IDETC-CIE).
 At this conference, the work was presented at the [DAC-6](https://www.designautomationconference.org/dac-6) session and is publication number 90227.
+A recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
 
 Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” *International Design Engineering Technical Conferences & Computers and Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
