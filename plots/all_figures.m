@@ -43,8 +43,8 @@ location_sensitivity()
 
 %% figure 6 - pareto front
 % figure 7 - design heuristics
-pareto_search()
-pareto_bruteforce()
+pareto_search();
+pareto_curve_heuristics()
 
 %% figure 8 - parameter sensitivities
 param_sweep()

@@ -43,7 +43,7 @@ titles = {'Nominal','Min LCOE','Min Variation','Balanced'};
 figure
 for i=1:4
     x = X(i,:);   
-    [~,~,~,~,~,~,~,~,~,~,P_matrix] = simulation(x, p);
+    [~,~,P_matrix] = simulation(x, p);
     P_matrix = P_matrix / 1e3; % convert W to kW
     [T,Hs] = meshgrid(p.T,p.Hs); 
     

@@ -1,5 +1,4 @@
-function [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, P_matrix, g, val] = simulation(X, p)	
+function [LCOE, P_var, P_matrix, g, val] = simulation(X, p)	
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
@@ -36,7 +35,6 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
                                             in.t_ft, in.t_fr, in.t_fc, in.t_fb, in.t_sr, ...
                                             in.t_dt, D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
-B = [V_f_pct, V_s_pct]; % temporary to avoid changing output of simulation
 
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
@@ -51,25 +49,21 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
-g = zeros(1,18);
+g = zeros(1,14);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
 g(3) = V_s_pct;                         % prevent spar too heavy
 g(4) = 1 - V_s_pct;                     % prevent spar too light
 g(5) = GM;                              % stability
-g(6) = FOS1Y(1) - p.FOS_min;            % float survives hydro force
-%g(7) = FOS1Y(2) - p.FOS_min;            % float survives powertrain force
-g(8) = FOS2Y(1) - p.FOS_min;            % spar survives hydro force
-%g(9) = FOS2Y(2) - p.FOS_min;            % spar survives powertrain force
-g(10) = FOS_buckling(1) - p.FOS_min;    % spar survives hydro force in buckling
-%g(11) = FOS_buckling(2) - p.FOS_min;    % spar survives powertrain force in buckling
-g(12) = FOS3Y(1) - p.FOS_min;           % damping plate survives hydro force
-%g(13) = FOS3Y(2) - p.FOS_min;           % damping plate survives powertrain force
-g(14) = P_elec;                         % positive power
-g(15) = D_d - p.D_d_min;                % damping plate diameter (spar natural freq)
-g(16) = h_s_extra;                      % prevent float rising above top of spar
-g(17) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-g(18) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
+g(6) = FOS1Y / p.FOS_min - 1;           % float survives max force
+g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
+g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
+g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
+g(10) = P_elec;                         % positive power
+g(11) = D_d / p.D_d_min - 1;            % damping plate diameter (spar natural freq)
+g(12) = h_s_extra;                      % prevent float rising above top of spar
+g(13) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
+g(14) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
@@ -77,7 +71,7 @@ if ~criteria
     disp('ohno')
 end
 
-if nargout > 12 % if returning extra struct output for validation
+if nargout > 4 % if returning extra struct output for validation
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, mass] = geometry(in.D_s, in.D_f, in.T_f, ...
                                             in.h_f, in.h_s, in.t_ft, in.t_fr, ...
                                             in.t_fc, in.t_fb, in.t_sr, in.t_dt,...

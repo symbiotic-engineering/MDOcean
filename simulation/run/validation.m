@@ -25,7 +25,7 @@ assert( all(err < 0.1) )
 
 %% Force within 10 percent
 [~,~,pct_error] = validate_nominal_RM3();
-err = [pct_error.force_heave pct_error.FOS_b];
+err = [pct_error.force_heave];
 assert( all(err < 0.1) )
 
 %% LCOE within 10 percent
@@ -48,11 +48,9 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     
     X = [b.X_noms; 1];
     
-    [~, ~, B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, ...
-                                GM, P_elec, D_d, ~, g, simulated] = simulation(X,p);
+    [~, ~, ~, g, simulated] = simulation(X,p);
     
-    FOS = min([FOS1Y FOS2Y FOS3Y FOS_buckling]);
-    [feasible,failed] = is_feasible(B,FOS,GM,P_elec,D_d,g(16),g(17),g(18),p);
+    [feasible,failed] = is_feasible(g, b);
     
     if nargout > 2
         actual = validation_inputs();
@@ -65,7 +63,7 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
                 tmp = simulated;
                 for j = 2:length(N_WEC)
                     p.N_WEC = N_WEC(j); 
-                    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, tmp(j)] = simulation(X,p);
+                    [~, ~, ~, ~, tmp(j)] = simulation(X,p);
                 end
                 simulated.(fields{i}) = [tmp.(fields{i})];  
                 

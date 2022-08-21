@@ -49,11 +49,8 @@ end
 %%
 function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
-    [LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, ...
-       FOS_buckling, GM, P_elec, D_d, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,1],[1,1],[1,2],...
-                                            [1,1],[1,1],[1,1],[1,1],[1,1],....
-                                            [1,1],[1,1],size(p.JPD),[1, 18]},...
+    [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
+                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, 14]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     objs = [LCOE P_var];
@@ -61,26 +58,17 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     probs = cell([1 2]);
     
     num_objectives = length(which_objs);
+    num_constraints = length(b.constraint_names);
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
 
     % add constraints
     prob = optimproblem();
-    prob.Constraints.Buoyancy_float_min     = B(1) >= 0;
-    prob.Constraints.Buoyancy_float_max     = B(1) <= 1;
-    prob.Constraints.Buoyancy_spar_min      = B(2) >= 0;
-    prob.Constraints.Buoyancy_spar_max      = B(2) <= 1;
-    prob.Constraints.FOS_float_hydro        = FOS1Y / p.FOS_min >= 1;
-    prob.Constraints.FOS_column_hydro       = FOS2Y / p.FOS_min >= 1;
-    prob.Constraints.FOS_plate_hydro        = FOS3Y / p.FOS_min >= 1;
-    prob.Constraints.FOS_buckling_hydro     = FOS_buckling / p.FOS_min >= 1;
-    prob.Constraints.GM                     = GM >= 0;
-    prob.Constraints.P_positive             = P_elec >= 0;
-    prob.Constraints.Damping                = D_d / p.D_d_min >= 1;
-    prob.Constraints.Spar_height            = g(16) >= 0;
-    prob.Constraints.LCOE_max               = g(17) >= 0;
-    prob.Constraints.F_max_limit            = g(18) >= 0;
+    for i = 1:num_constraints
+        name = b.constraint_names{i};
+        prob.Constraints.(name) = g(i) >= 0;
+    end
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives

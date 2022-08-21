@@ -24,9 +24,8 @@ x = fmincon(fcn, x0,[],[],[],[],x_min,x_max);
 % check feasibility
 X = [b.X_noms; 1];
 X(5:7) = x;
-[LCOE, P_var, B, FOS1Y, FOS2Y, FOS3Y, FOS_buckling, GM, P_elec, D_d, ~, g] = simulation(X,p);
-FOS = min([FOS1Y FOS2Y FOS3Y FOS_buckling]);
-[feasible,failed] = is_feasible(B,FOS,GM,P_elec,D_d,g(16),g(17),g(18),p)
+[LCOE, P_var, ~, g] = simulation(X,p);
+[feasible,failed] = is_feasible(g, b)
 
 % display x output
 array2table(x,'VariableNames',{'F_max (1e6 N)','B_p (1e6 Ns/m)','w_n (rad/s)'})
@@ -40,8 +39,8 @@ array2table(results,'RowNames',{'Sim Output','RM3 Actual'},...
 function [err,y] = errFunc(x,y_desired,p,b)
     X = [b.X_noms; 1];
     X(5:7) = x;
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, g, val] = simulation(X, p);
-    y = [val.power_avg, val.force_heave, g(18)+1];
+    [~, ~, ~, g, val] = simulation(X, p);
+    y = [val.power_avg, val.force_heave, g(14)+1];
     err = abs(y - y_desired) ./ y_desired;
     err = norm(err);
 end

@@ -8,10 +8,8 @@ X = zeros(num_runs,8);
 for i=1:num_runs
     xx = random_x0(b);
     X(i,:) = xx;
-    [LCOE(i), P_var(i), B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, P_elec, D_d, P_matrix, g] = simulation(xx, p);	
-    FOS = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
-    feasible(i) = is_feasible(B, FOS, GM, P_elec, D_d, g(16), g(17), g(18), p);
+    [LCOE(i), P_var(i), P_matrix, g] = simulation(xx, p);
+    feasible(i) = is_feasible(g, b);
 end
 
 feasible = logical(feasible);
