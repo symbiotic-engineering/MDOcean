@@ -125,7 +125,7 @@ for i=1:length(LCOE_params)
     barh(LCOE_params(i),slope_LCOE(i),colors{i})
     hold on
 end
-xlim([-2.5 1])
+xlim([-3 1])
 ax = gca;
 set(ax,'YGrid','on')
 title('LCOE')
@@ -146,7 +146,7 @@ labels = repmat({''},size(param_groupings));
 labels(legend_idx) = groups;
 legend(labels)
 improvePlot
-xlim([-2.5 1])
+xlim([-.5 .5])
 set(gca, 'FontSize', 14)
 set(ax,'FontSize',14)
 
