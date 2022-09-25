@@ -1,5 +1,5 @@
 % Generate all figures used in the report
-close all
+function ran = all_figures()
 
 %% figure 1 - RM3 image
 % Created in powerpoint
@@ -33,7 +33,7 @@ plot_power_matrix(X,p)
 runtests('validation')
 
 %% paragraph 4.2 - convergence for different x0s
-gradient_mult_x0()
+%gradient_mult_x0()
 
 %% table 5 - optimal DVs for 4 designs
 compare()
@@ -54,3 +54,7 @@ param_sweep()
 
 % figure 10 - probability CDF
 %compare()
+
+ran = true;
+
+end
