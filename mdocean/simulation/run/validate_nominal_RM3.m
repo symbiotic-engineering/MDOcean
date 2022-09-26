@@ -1,4 +1,4 @@
-function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
+function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
     p = parameters();
     p.N_WEC = 1;
     p.power_max = 286000;
@@ -10,7 +10,7 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
     [~, ~, ~, g, simulated] = simulation(X,p);
     
     [feasible,failed] = is_feasible(g, b);
-    
+
     if nargout > 2
         actual = validation_inputs();
         tiledlayout(1,3)
@@ -38,12 +38,12 @@ function [feasible,failed,pct_error,tab] = validate_nominal_RM3()
         end
         improvePlot
 
-        if nargout > 3
+        if nargout > 4
             % create combined struct
             results = simulated;
             results(2) = actual;
             results(3) = pct_error;
             tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});
         end
-    end
+   end
 end

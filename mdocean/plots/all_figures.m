@@ -31,7 +31,7 @@ X = [b.X_noms; 1];
 plot_power_matrix(X,p)
 
 %% table 4 - validation table
-[~,~,~,tab] = validate_nominal_RM3();
+[~,~,~,~,tab] = validate_nominal_RM3();
 display(tab)
 
 %% paragraph 4.2 - convergence for different x0s
