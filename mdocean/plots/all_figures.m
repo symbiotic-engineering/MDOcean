@@ -8,7 +8,8 @@ function ran = all_figures()
 p = parameters();
 b = var_bounds(p);
 DV_table = array2table([b.X_mins b.X_noms b.X_maxs], ...
-    'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', b.var_names(1:end-1))
+    'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', b.var_names(1:end-1));
+display(DV_table)
 
 %% table 2 - constraints table
 
@@ -29,8 +30,9 @@ b = var_bounds(p);
 X = [b.X_noms; 1];
 plot_power_matrix(X,p)
 
-%% table 4 - validation
-runtests('validation')
+%% table 4 - validation table
+[~,~,~,tab] = validate_nominal_RM3();
+display(tab)
 
 %% paragraph 4.2 - convergence for different x0s
 %gradient_mult_x0()
