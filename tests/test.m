@@ -31,7 +31,7 @@ classdef test < matlab.unittest.TestCase
         % Test methods
         
         function allFiguresRun(testCase)
-            %testCase.verifyReturnsTrue( @all_figures )
+            testCase.verifyReturnsTrue( @all_figures )
         end
 
         function validateNominalFeasible(testCase)
