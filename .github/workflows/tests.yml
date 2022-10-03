@@ -34,6 +34,7 @@ jobs:
         with:
           source-folder: mdocean
           test-results-junit: test-results/results.xml
+          test-results-pdf: test-results/testreport.pdf
           code-coverage-cobertura: code-coverage/coverage.xml
 
       - name: Publish code coverage
@@ -48,3 +49,9 @@ jobs:
         with:
           report_paths: 'test-results/results.xml'
           include_passed: true
+
+      - name: Upload test report PDF
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test-results/testreport.pdf
