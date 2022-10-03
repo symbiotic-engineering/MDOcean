@@ -36,8 +36,14 @@ jobs:
           test-results-junit: test-results/results.xml
           code-coverage-cobertura: code-coverage/coverage.xml
 
-      - name: Run code coverage
+      - name: Publish code coverage
         if: always()
         uses: codecov/codecov-action@v1
         with:
           file: code-coverage/coverage.xml
+
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          report_paths: 'test-results/results.xml'
