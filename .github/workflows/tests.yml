@@ -45,12 +45,13 @@ jobs:
 
       - name: Publish test report
         uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
+        if: always()
         with:
           report_paths: 'test-results/results.xml'
           include_passed: true
 
       - name: Upload test report PDF
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-report
