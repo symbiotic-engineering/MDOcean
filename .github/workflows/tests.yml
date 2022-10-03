@@ -23,7 +23,8 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout branch
+        uses: actions/checkout@v3
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1
@@ -34,3 +35,8 @@ jobs:
           source-folder: mdocean
           test-results-junit: test-results/results.xml
           code-coverage-cobertura: code-coverage/coverage.xml
+
+      - name: Run code coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: code-coverage/coverage.xml
