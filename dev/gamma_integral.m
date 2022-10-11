@@ -21,6 +21,33 @@ taylor(gamma_without_coeffs/k,k,'Order',11)
 
 derivative = diff(gamma_without_coeffs,'k')
 
+%% try hilbert transform
+clear all
+syms rho g k T R w real positive
+bessel_approx = taylor(besselj(1,k*R),k,'Order',7);
+gamma_bessel = 2*rho*g/k * exp(-k*T) * R * pi * bessel_approx;
+b_over_rho_w = k/2 * (gamma_bessel/(rho*g))^2;
+b = b_over_rho_w * rho * w;
+
+b = subs(b,k,w^2/g);
+pretty(b)
+
+
+a = 1/w^2 * htrans(-w*b,w,w);
+pretty(a)
+
+fudge = 5;
+b_over_rho_w_eval = vpa(subs(b_over_rho_w,{R,T,k},{10,2*fudge,w^2/9.8}));
+a_over_rho_eval = vpa(subs(a/rho,{g,T,R,rho},{9.8,2*fudge,10,1000}));
+pretty(a_over_rho_eval)
+
+figure
+fplot(a_over_rho_eval,[.1 2])
+title('a/rho')
+figure
+fplot(b_over_rho_w_eval,[.1 1.5])
+title('b/rho w')
+
 %% approximation error
 i = 8:2:14; % last term included
 exc = i+2;  % first term excluded
