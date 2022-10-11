@@ -1,30 +1,30 @@
 
 function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_extra] = dynamics(in,m_float,V_d,draft)
 
-% use probabilistic sea states for power
-[T,Hs] = meshgrid(in.T,in.Hs);
-[P_matrix,h_s_extra] = get_power_force(in,T,Hs,m_float,V_d,draft);
-
-% account for powertrain electrical losses
-P_matrix = P_matrix * in.eff_pto;
-
-% saturate maximum power
-P_matrix = min(P_matrix,in.power_max);
-
-% weight power across all sea states
-P_weighted = P_matrix .* in.JPD / 100;
-P_elec = sum(P_weighted(:)); 
-
-assert(isreal(P_elec))
-
-% use max sea states for structural forces and max amplitude
-[~,~,F_heave_max,F_surge_max,...
-    F_ptrain_max] = get_power_force(in, ...
-                            in.T_struct, in.Hs_struct, m_float, V_d, draft);
-
-% coefficient of variance (normalized standard deviation) of power
-P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
-P_var = P_var * 100; % convert to percentage
+    % use probabilistic sea states for power
+    [T,Hs] = meshgrid(in.T,in.Hs);
+    [P_matrix,h_s_extra] = get_power_force(in,T,Hs,m_float,V_d,draft);
+    
+    % account for powertrain electrical losses
+    P_matrix = P_matrix * in.eff_pto;
+    
+    % saturate maximum power
+    P_matrix = min(P_matrix,in.power_max);
+    
+    % weight power across all sea states
+    P_weighted = P_matrix .* in.JPD / 100;
+    P_elec = sum(P_weighted(:)); 
+    
+    assert(isreal(P_elec))
+    
+    % use max sea states for structural forces and max amplitude
+    [~,~,F_heave_max,F_surge_max,...
+        F_ptrain_max] = get_power_force(in, ...
+                                in.T_struct, in.Hs_struct, m_float, V_d, draft);
+    
+    % coefficient of variance (normalized standard deviation) of power
+    P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
+    P_var = P_var * 100; % convert to percentage
 
 end
 
@@ -85,24 +85,18 @@ end
 function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, rho_w, g)
     w = 2*pi./T;        % angular frequency
     k = w.^2 / g;       % wave number (dispersion relation for deep water)
-    V_g = g ./(2*w);    % group velocity (Newman equation 6.63)
 
     r = D_f / 2;        % radius
+    draft = T_f;        % draft below waterline
     A_w = pi * r^2;     % waterplane area
     
-    % Froude Krylov force coefficient (diffraction is neglected)
-    tuning_factor =  5; % tune to more closely match WAMIT results which include diffraction
-    draft = T_f;
-    r_k_term = r^2 - (k.^2 * r^4)/8 + (k.^4 * r^6)/192 - (k.^6 * r^8)/9216 ...
-                + (k.^8 * r^10)/737280 - (k.^10 * r^12)/88473600;
-    r_k_term = max(r_k_term, 0); % zero any negatives that result at high frequencies
-    gamma   = rho_w * g * pi * exp(-k * draft * tuning_factor) .* r_k_term; 
-
-    % other hydrodynamic force coefficients
-    A       = 1/2 * rho_w * 4/3 * pi * r^3 * 0.63;  % added mass
-    B       = k ./ (4 * rho_w * g * V_g) .* gamma.^2; % radiation damping
-    K       = rho_w * g * A_w;  % hydrostatic stiffness
-    Fd      = gamma .* Hs;       % excitation force of wave
+    [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(r, k, draft);  
+    
+    A = rho_w * A_over_rho;                 % added mass
+    B = rho_w * w .* B_over_rho_w;          % radiation damping
+    gamma   = rho_w * g * gamma_over_rho_g; % froude krylov coefficient
+    K       = rho_w * g * A_w;              % hydrostatic stiffness
+    Fd      = gamma .* Hs;                  % excitation force of wave
 end
 
 function X = get_response(w,m,b,k,Fd)
