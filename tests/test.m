@@ -46,7 +46,8 @@ classdef test < matlab.unittest.TestCase
         end
 
         function validateNominalHydroCoeffs(testCase)
-            % see dev/wamit_coeff_plot
+            mean_sq_err = wamit_coeff_plot(false);
+            testCase.verifyLessThanOrEqual(mean_sq_err, 0.15)
         end
 
         function hydrodynamicLimitObeyed(testCase)
