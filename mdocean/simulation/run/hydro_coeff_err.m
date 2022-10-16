@@ -1,4 +1,4 @@
-function [mean_sq_err, R2] = wamit_coeff_plot(plot_on)
+function [mean_sq_err, R2] = hydro_coeff_err(plot_on)
 
 if nargin==0
     plot_on = true;

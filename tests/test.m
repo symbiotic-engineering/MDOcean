@@ -46,7 +46,7 @@ classdef test < matlab.unittest.TestCase
         end
 
         function validateNominalHydroCoeffs(testCase)
-            mean_sq_err = wamit_coeff_plot(false);
+            mean_sq_err = hydro_coeff_err(false);
             testCase.verifyLessThanOrEqual(mean_sq_err, 0.15)
         end
 
