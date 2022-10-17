@@ -5,8 +5,24 @@ classdef test < matlab.unittest.TestCase
         simulated
         actual
     end
+
     properties (TestParameter)
         field = fieldnames(validation_inputs());
+        which_figs = test.enumerateFigs()
+        which_tabs = test.enumerateTabs()
+    end
+
+    methods (Static)
+        function which_figs = enumerateFigs()
+            [num_figs, num_tabs] = all_figures( [],[] );
+            which_figs = [1:num_figs zeros(1, num_tabs)];
+            which_figs = num2cell(which_figs);
+        end
+        function which_tabs = enumerateTabs()
+            [num_figs, num_tabs] = all_figures( [],[] );
+            which_tabs = [zeros(1,num_figs), 1:num_tabs];
+            which_tabs = num2cell(which_tabs);
+        end
     end
 
     methods(TestClassSetup)
@@ -24,16 +40,17 @@ classdef test < matlab.unittest.TestCase
             testCase.failed    = fail;
             testCase.simulated = sim;
             testCase.actual    = act;
-        end      
+        end
     end
     
-    methods(Test)
-        % Test methods
-        
-        function allFiguresRun(testCase)
-            testCase.verifyReturnsTrue( @all_figures )
+    % Test methods
+    methods(Test, ParameterCombination='sequential')   
+        function allFiguresRun(~, which_figs, which_tabs)
+            all_figures(which_figs,which_tabs);
         end
+    end
 
+    methods(Test)
         function validateNominalFeasible(testCase)
             testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed] );
             testCase.verifyTrue(testCase.feasible);
