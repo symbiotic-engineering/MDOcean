@@ -1,4 +1,5 @@
-clear;%close all;clc
+function [] = location_sensitivity()
+
 p = parameters();
 b = var_bounds(p);
 
@@ -38,3 +39,5 @@ X_cali = X_opts(:,1);
 
 LCOE_hawaii_with_cali_design = simulation(X_cali,p)
 pct_diff = (LCOE_hawaii_with_cali_design - obj_opts(4)) / obj_opts(4)
+
+end

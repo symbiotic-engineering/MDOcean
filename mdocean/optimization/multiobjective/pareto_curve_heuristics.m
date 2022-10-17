@@ -1,44 +1,45 @@
-clear;clc;close all
-p = parameters();
-b = var_bounds(p);
+function pareto_curve_heuristics()
+    p = parameters();
+    b = var_bounds(p);
+    
+    %[x,fval] = pareto_search();
+    load("pareto_search_results.mat")
+    cols = [1 3 6 5 4 2 7];
+    X = x(:,cols); % swap indices based on solver generated function
+    X = [X ones(length(X),1)]; % add eigth column for material 
+    LCOE = fval(:,1);
+    Pvar = fval(:,2);
+    
+    [LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+     Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+     x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
+    
+    %% super simple "pareto" plot of just single objective optimizations
+    showSingleObj = true;
+    showImages = false;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
+    
+    %% simple pareto plot
+    showSingleObj = false;
+    showImages = false;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
+    
+    %% plot pareto front with annotations and embedded images of three recommended designs
+    showSingleObj = true;
+    showImages = true;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
+    
+    %% plots for DVs as a fn of percent along the pareto
+    design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
+                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
 
-%[x,fval] = pareto_search();
-load("pareto_search_results.mat")
-cols = [1 3 6 5 4 2 7];
-X = x(:,cols); % swap indices based on solver generated function
-X = [X ones(length(X),1)]; % add eigth column for material 
-LCOE = fval(:,1);
-Pvar = fval(:,2);
-
-[LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
- Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
- x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
-
-%% super simple "pareto" plot of just single objective optimizations
-showSingleObj = true;
-showImages = false;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
-
-%% simple pareto plot
-showSingleObj = false;
-showImages = false;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
-
-%% plot pareto front with annotations and embedded images of three recommended designs
-showSingleObj = true;
-showImages = true;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
-
-%% plots for DVs as a fn of percent along the pareto
-design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-                       Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
-
+end
 %%
 function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
          LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...

@@ -1,4 +1,4 @@
-%close all
+function [] = compare()
 
 p = parameters();
 b = var_bounds(p);
@@ -75,3 +75,5 @@ cb = colorbar('Position',[.8 .175 .08 .685]);
 sgtitle('Weighted Power (kW)','FontWeight','bold','FontSize',20)
 text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
+
+end
