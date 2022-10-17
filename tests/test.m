@@ -8,6 +8,7 @@ classdef test < matlab.unittest.TestCase
 
     properties (TestParameter)
         field = fieldnames(validation_inputs());
+        rel_tol = {.1,.1,.1,.1,.25,.25,.25,.1,.1,.1,.1,.1};
         which_figs = test.enumerateFigs()
         which_tabs = test.enumerateTabs()
     end
@@ -48,18 +49,18 @@ classdef test < matlab.unittest.TestCase
         function allFiguresRun(~, which_figs, which_tabs)
             all_figures(which_figs,which_tabs);
         end
+
+        function validateNominal(testCase, field, rel_tol)
+            sim = testCase.simulated.(field);
+            act = testCase.actual.(field);
+            testCase.verifyEqual(sim, act, 'RelTol',rel_tol)
+        end
     end
 
     methods(Test)
         function validateNominalFeasible(testCase)
             testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed] );
             testCase.verifyTrue(testCase.feasible);
-        end
-
-        function validateNominal(testCase, field)
-            sim = testCase.simulated.(field);
-            act = testCase.actual.(field);
-            testCase.verifyEqual(sim, act, 'RelTol',.1)
         end
 
         function validateNominalHydroCoeffs(testCase)
