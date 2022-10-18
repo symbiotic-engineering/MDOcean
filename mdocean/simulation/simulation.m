@@ -90,6 +90,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
+    val.
 end
 
 end

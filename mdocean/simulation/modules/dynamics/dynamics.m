@@ -3,7 +3,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_e
 
     % use probabilistic sea states for power
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix,h_s_extra] = get_power_force(in,T,Hs,m_float,V_d,draft);
+    [P_matrix,h_s_extra,P_unsat] = get_power_force(in,T,Hs,m_float,V_d,draft);
     
     % account for powertrain electrical losses
     P_matrix = P_matrix * in.eff_pto;
@@ -18,7 +18,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_e
     assert(isreal(P_elec))
     
     % use max sea states for structural forces and max amplitude
-    [~,~,F_heave_max,F_surge_max,...
+    [~,~,~,F_heave_max,F_surge_max,...
         F_ptrain_max] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, V_d, draft);
     
@@ -28,7 +28,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, P_var, P_elec, P_matrix, h_s_e
 
 end
 
-function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
     [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
     m = m_float + A;
@@ -38,11 +38,7 @@ function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force
     X_unsat = get_response(w,m,b,k,Fd);
 
     % confirm unsaturated response doesn't exceed maximum capture width
-%     P_unsat = 1/2 * in.B_p * w.^2 .* X_unsat.^2;
-%     P_wave = in.rho_w * in.g^2 / (64*pi) * T .* Hs.^2;
-%     CW = P_unsat ./ P_wave;
-%     CW_max = in.g * T.^2 / (4*pi^2);
-%     assert( all(CW <= CW_max, 'all') ); % check hydro coeffs if this fails
+    P_unsat = 1/2 * in.B_p * w.^2 .* X_unsat.^2;
 
     F_ptrain_over_x = sqrt( (in.B_p * w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;

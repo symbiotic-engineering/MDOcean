@@ -69,7 +69,13 @@ classdef test < matlab.unittest.TestCase
         end
 
         function hydrodynamicLimitObeyed(testCase)
-            % see lines 41-45 in dynamics.m
+            p = parameters();
+            P_unsat = simulation(X,p);
+            [T,Hs] = meshgrid(in.T,in.Hs);
+            P_wave = p.rho_w * p.g^2 / (64*pi) * T .* Hs.^2;
+            CW = P_unsat ./ P_wave;
+            CW_max = p.g * T.^2 / (4*pi^2);
+            testCase.verifyLessThanOrEqual( CW, CW_max );
         end
     end
     
