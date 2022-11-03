@@ -68,7 +68,7 @@ g(14) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
 if ~criteria
-    disp('ohno')
+    warning('Inf, NaN, or imaginary constraint detected')
 end
 
 if nargout > 4 % if returning extra struct output for validation
@@ -78,6 +78,7 @@ if nargout > 4 % if returning extra struct output for validation
                                             D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
+    [~, ~, ~, ~, ~, ~, ~, P_unsat] = dynamics(in, m_f_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -90,7 +91,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
-    val.
+    val.power_unsat = P_unsat;
 end
 
 end

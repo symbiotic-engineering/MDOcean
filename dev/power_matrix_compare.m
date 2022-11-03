@@ -9,7 +9,7 @@ X = [b.X_noms; 1];
 
 % unsaturated power
 actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance & Economics');
-actual_elec_unsat = actual_mech_unsat * p.pto_eff;
+actual_elec_unsat = actual_mech_unsat * p.eff_pto;
 [~, ~, P_matrix] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
 
@@ -87,7 +87,7 @@ for i = 1:3
     title(resource_titles{i})
     colorbar
 end
-sgtitle('Wave Resource')
+sgtitle('Wave Resource (kW/m)')
 
 % JPD figure
 JPDs = JPD;

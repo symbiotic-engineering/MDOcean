@@ -1,4 +1,4 @@
-function [mean_sq_err, R2] = hydro_coeff_err(plot_on)
+function [mean_abs_err, R2] = hydro_coeff_err(plot_on)
 
 if nargin==0
     plot_on = true;
@@ -30,11 +30,11 @@ A_MDOcean = ones(size(w))* A_MDOcean;
 err_A = abs(A - A_MDOcean') ./ A;
 err_B = abs(B - B_MDOcean') ./ B;
 err_G = abs(gamma - gamma_MDOcean') ./ gamma;
-mA = mean(err_A.^2);
-mB = mean(err_B.^2);
-mG = mean(err_G.^2);
+mA = mean(err_A);
+mB = mean(err_B);
+mG = mean(err_G);
 
-mean_sq_err = [mA mB mG];
+mean_abs_err = [mA mB mG];
 
 %% R^2
 R_A = corrcoef(A, A_MDOcean);

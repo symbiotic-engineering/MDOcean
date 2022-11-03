@@ -64,18 +64,13 @@ classdef test < matlab.unittest.TestCase
         end
 
         function validateNominalHydroCoeffs(testCase)
-            mean_sq_err = hydro_coeff_err(false);
-            testCase.verifyLessThanOrEqual(mean_sq_err, 0.15)
+            mean_err = hydro_coeff_err(false);
+            testCase.verifyLessThanOrEqual(mean_err, 0.10)
         end
 
         function hydrodynamicLimitObeyed(testCase)
-            p = parameters();
-            P_unsat = simulation(X,p);
-            [T,Hs] = meshgrid(in.T,in.Hs);
-            P_wave = p.rho_w * p.g^2 / (64*pi) * T .* Hs.^2;
-            CW = P_unsat ./ P_wave;
-            CW_max = p.g * T.^2 / (4*pi^2);
-            testCase.verifyLessThanOrEqual( CW, CW_max );
+            ratio = check_max_CW();
+            testCase.verifyLessThanOrEqual( ratio, 1 );
         end
     end
     

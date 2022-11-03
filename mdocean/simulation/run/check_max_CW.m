@@ -1,0 +1,33 @@
+function [ratio] = check_max_CW()
+    p = parameters();
+    p.cost_m = [0 0 0]; % hack that makes cost constant, so minimizing LCOE is actually maximizing power
+    p.power_max = Inf;
+    b = var_bounds(p);
+    x0 = b.X_start_struct;
+
+    % run LCOE minimization (effectively power maximization)
+    X_opt = gradient_optim(x0,p,b,1); 
+
+    % plug back into simulation to get unsaturated power
+    [~, ~, ~, ~, val] = simulation(X_opt,p);
+    P_unsat = val.power_unsat;
+
+    % calculate capture width
+    [T,Hs] = meshgrid(p.T,p.Hs);
+    P_wave = p.rho_w * p.g^2 / (64*pi) * T .* Hs.^2;
+    CW = P_unsat ./ P_wave;
+
+    % compare to maximum capture width
+    CW_max = p.g * T.^2 / (4*pi^2);
+
+    ratio = CW ./ CW_max;
+
+    figure
+    contourf(T,Hs,ratio)
+    xlabel('Wave Period T (s)')
+    ylabel('Wave Height Hs (m)')
+    colorbar
+    grid on
+    title('CW / CW_{max}')
+end
+
