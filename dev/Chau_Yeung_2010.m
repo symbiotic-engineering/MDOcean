@@ -1,7 +1,7 @@
-N = 50;
+N = 1;
 syms r theta z real
 syms R_1n_1(n) R_1n_2(n) R_2n_2(n) Z_n_i1(n) Z_n_i2(n) Lambda_k(k) N_k(k) Z_k_e(k)
-syms h g A omega m_k a1 a2 d1 d2 m0 real positive
+syms h m_k a1 a2 d1 d2 m0 real positive
 syms n k real
 syms C_1n_1(n) C_1n_2(n) C_2n_1(n) C_2n_2(n) B_k(k) %[N+1 1]
 
@@ -26,21 +26,15 @@ Z_n_i1(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n1*(z+h)));
 Z_n_i2(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n2*(z+h)));
 
 % eq 6
-% R_1n_1 = subs(R_1n_1,n,(0:N).');
-% R_1n_2 = subs(R_1n_2,n,(0:N).');
-% R_2n_2 = subs(R_2n_2,n,(0:N).');
-% Z_n_i1 = subs(Z_n_i1,n,(0:N).');
-% Z_n_i2 = subs(Z_n_i2,n,(0:N).');
+phi_h_n_i1 = (C_1n_1 * R_1n_1 + C_2n_1 * R_2n_1) * Z_n_i1;
+phi_h_n_i2 = (C_1n_2 * R_1n_2 + C_2n_2 * R_2n_2) * Z_n_i2;
+%phi_h_i1 = symsum(phi_h_n_i1, n, 0, N);
+%phi_h_i2 = symsum(phi_h_n_i2, n, 0, N);
+% phi_h_i1 = sum(phi_h_n_i1);
+% phi_h_i2 = sum(phi_h_n_i2);
 
-sum_arg_1 = (C_1n_1 * R_1n_1 + C_2n_1 * R_2n_1) * Z_n_i1;
-sum_arg_2 = (C_1n_2 * R_1n_2 + C_2n_2 * R_2n_2) * Z_n_i2;
-phi_h_i1 = symsum(sum_arg_1, n, 0, N);
-phi_h_i2 = symsum(sum_arg_2, n, 0, N);
-% phi_h_i1 = sum(sum_arg_1);
-% phi_h_i2 = sum(sum_arg_2);
-
-phi_1 = phi_h_i1 + phi_p_i1;
-phi_2 = phi_h_i2 + phi_p_i2;
+%phi_1 = phi_h_i1 + phi_p_i1;
+%phi_2 = phi_h_i2 + phi_p_i2;
 
 % pretty(phi_1)
 % pretty(phi_2)
@@ -56,50 +50,67 @@ Z_k_e(k) = piecewise(k==0, 1/sqrt(N_k) * cosh(m0 * (z+h)), k>=1, 1/sqrt(N_k) * c
 
 % eq 12
 % sym_arg_e = B_k .* subs(Lambda_k * Z_k_e,k,(0:N).');
-sym_arg_e = B_k * Lambda_k * Z_k_e;
-phi_e = symsum(sym_arg_e,k,0,N);
-%phi_e = sum(sym_arg_e);
+%phi_e_k = B_k * Lambda_k * Z_k_e;
+%phi_e = symsum(phi_e_k,k,0,N);
+%phi_e = sum(phi_e_k);
 
 % potential matching (total)
-phi_1_a1 = subs(phi_1, r, a1);
-phi_2_a1 = subs(phi_2, r, a1);
-match_12_potential = phi_1_a1 == phi_2_a1;
-
-phi_2_a2 = subs(phi_2, r, a2);
-phi_e_a2 = subs(phi_e, r, a2);
-match_2e_potential = phi_2_a2 == phi_e_a2;
-
-% velocity matching (total)
-dphi_1_dr = diff(phi_1, r);
-dphi_2_dr = diff(phi_2, r);
-dphi_e_dr = diff(phi_e, r);
-
-dphi_1_dr_a1 = subs(dphi_1_dr,r,a1);
-dphi_2_dr_a1 = subs(dphi_2_dr,r,a1);
-match_12_velocity = dphi_1_dr_a1 == dphi_2_dr_a1;
-
-dphi_2_dr_a2 = subs(dphi_2_dr, r, a2);
-dphi_e_dr_a2 = subs(dphi_e_dr, r, a2);
-match_2e_velocity = dphi_2_dr_a2 == dphi_e_dr_a2;
-
-% body boundary condition (particular only)
-dphi_p_1_dz = diff(phi_p_i1, z);
-dphi_p_2_dz = diff(phi_p_i2, z);
-dphi_p_1_dz_d1 = subs(dphi_p_1_dz, z, -d1);
-dphi_p_2_dz_d2 = subs(dphi_p_2_dz, z, -d2);
-
-body_1_velocity = dphi_p_1_dz_d1 == 1;
-body_2_velocity = dphi_p_2_dz_d2 == 1;
-
-eqns = [match_12_potential, match_2e_potential ...
-        match_12_velocity,  match_2e_velocity ...
-        body_1_velocity,    body_2_velocity];
+% phi_1_a1 = subs(phi_1, r, a1);
+% phi_2_a1 = subs(phi_2, r, a1);
+%match_12_potential = phi_1_a1 == phi_2_a1;
 
 B_n(n) = subs(B_k, k, n);
+Lambda_n(n) = subs(Lambda_k, k, n);
+Z_n_e(n) = subs(Z_k_e, k, n);
+
+% equation 22 in old 1981 paper, applied to boundary 2-e
+dz_2 = 1 - d2/h;
+match_2e_potential = C_1n_2(n) * subs(R_1n_2,r,a2) + C_2n_2(n) * subs(R_2n_2,r,a2) == ...
+    B_n(n) * Lambda_n(n) * dz_2 - int(subs(phi_p_i2,r,a2) * Z_n_i2, z, 0, dz_2);
+
+% equation 22 in old 1981 paper, applied to boundary 1-2
+dz_1 = 1 - d1/h;
+match_12_potential = C_1n_1(n) * subs(R_1n_1,r,a1) == ...
+    ( C_1n_2 * subs(R_1n_2,r,a1) + C_2n_2 * subs(R_2n_2,r,a1) ) * dz_1 + ...
+    int(subs(phi_p_i2 - phi_p_i1,r,a1) * Z_n_i1, z, 0, dz_1);
+
+%phi_2_a2 = subs(phi_2, r, a2);
+%phi_e_a2 = subs(phi_e, r, a2);
+%match_2e_potential = phi_2_a2 == phi_e_a2;
+
+% velocity matching (total)
+
+% equation 23 in old 1981 paper, applied to boundary 2-e
+match_2e_velocity = B_n(n) * subs(diff(Lambda_n(n), r), r, a2) == ...
+    (C_1n_2 * subs(diff(R_1n_2, r), r, a2) + C_2n_2 * subs(diff(R_2n_2, r), r, a2) ) * dz_2 + ...
+    int( subs(diff(phi_p_i2,r),r,a2) * Z_n_e, z, 0, dz_2 );
+
+% equation 23 in old 1981 paper, applied to boundary 1-2
+match_12_velocity = C_1n_2 * subs(R_1n_2, r, a1) + C_2n_2 * subs(R_2n_2, r, a1) == ...
+    C_1n_1 * subs( diff(R_1n_1,r), r,a1) * dz_1 + int( subs(diff(phi_p_i1 - phi_p_i2,r),r,a1) * Z_n_i2, z, 0, dz_1 );
+
+% dphi_1_dr = diff(phi_1, r);
+% dphi_2_dr = diff(phi_2, r);
+% dphi_e_dr = diff(phi_e, r);
+% 
+% dphi_1_dr_a1 = subs(dphi_1_dr,r,a1);
+% dphi_2_dr_a1 = subs(dphi_2_dr,r,a1);
+% match_12_velocity = dphi_1_dr_a1 == dphi_2_dr_a1;
+% 
+% dphi_2_dr_a2 = subs(dphi_2_dr, r, a2);
+% dphi_e_dr_a2 = subs(dphi_e_dr, r, a2);
+% match_2e_velocity = dphi_2_dr_a2 == dphi_e_dr_a2;
+
+eqns = [subs(match_12_potential,n,0:N), subs(match_2e_potential,n,0:N) ...
+        subs(match_12_velocity,n,0:N),  subs(match_2e_velocity,n,0:N)];
+
+%eqns = subs(eqns, n, 0:N);
 unknowns = [C_1n_1(0:N) C_1n_2(0:N) C_2n_1(0:N) C_2n_2(0:N) B_n(0:N)];
 
 syms C_1n_1_const C_1n_2_const C_2n_1_const C_2n_2_const B_k_const [N+1 1]
 unknowns_const = [C_1n_1_const; C_1n_2_const; C_2n_1_const; C_2n_2_const; B_k_const];
 eqns = subs(eqns, unknowns, unknowns_const');
+
+eqns = subs(eqns,{h m_k a1 a2 d1 d2 m0},{20 1 1 2 1 2 1});
 
 solve(eqns, unknowns_const)
