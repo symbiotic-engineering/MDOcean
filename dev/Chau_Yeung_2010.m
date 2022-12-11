@@ -66,7 +66,7 @@ Z_n_e(n) = subs(Z_k_e, k, n);
 % equation 22 in old 1981 paper, applied to boundary 2-e
 dz_2 = 1 - d2/h;
 match_2e_potential = C_1n_2(n) * subs(R_1n_2,r,a2) + C_2n_2(n) * subs(R_2n_2,r,a2) == ...
-    B_n(n) * Lambda_n(n) * dz_2 - int(subs(phi_p_i2,r,a2) * Z_n_i2, z, 0, dz_2);
+    B_n(n) * subs(Lambda_n(n),r,a2) * dz_2 - int(subs(phi_p_i2,r,a2) * Z_n_i2, z, 0, dz_2);
 
 % equation 22 in old 1981 paper, applied to boundary 1-2
 dz_1 = 1 - d1/h;
@@ -113,4 +113,4 @@ eqns = subs(eqns, unknowns, unknowns_const');
 
 eqns = subs(eqns,{h m_k a1 a2 d1 d2 m0},{20 1 1 2 1 2 1});
 
-solve(eqns, unknowns_const)
+solns = solve(eqns, unknowns_const)
