@@ -1,3 +1,6 @@
+clear all
+close all
+
 N = 20;
 syms r theta z real
 syms R_1n_1(n) R_1n_2(n) R_2n_2(n) Z_n_i1(n) Z_n_i2(n) Lambda_k(k) N_k(k) Z_k_e(k)
@@ -87,7 +90,7 @@ match_2e_velocity = B_n(n) * subs(diff(Lambda_n(n), r), r, a2) == ...
     int(subs(diff(phi_p_i2,r),r,a2) * Z_n_e(n), z, 0, dz_2 );
 
 % equation 23 in old 1981 paper, applied to boundary 1-2
-match_12_velocity = C_1n_2(n) * subs(R_1n_2(n), r, a1) + C_2n_2(n) * subs(R_2n_2(n), r, a1) == ...
+match_12_velocity = C_1n_2(n) * subs(diff(R_1n_2(n),r), r, a1) + C_2n_2(n) * subs(diff(R_2n_2(n),r), r, a1) == ...
     C_1n_1(n) * subs( diff(R_1n_1(n),r), r,a1) * dz_1 + int( subs(diff(phi_p_i1 - phi_p_i2,r),r,a1) * Z_n_i2(n), z, 0, dz_1 );
 
 % dphi_1_dr = diff(phi_1, r);
@@ -172,8 +175,6 @@ for k = 1:length(fns)
 
 end
 
-
-
 phi_h_n_i1_solns_all = (C_1n_1s' .* R_1n_1(0:N) + C_2n_1s' .* R_2n_1(0:N)) .* Z_n_i1(0:N); 
 phi_h_n_i2_solns_all = (C_1n_2s' .* R_1n_2(0:N) + C_2n_2s' .* R_2n_2(0:N)) .* Z_n_i2(0:N);
 
@@ -184,16 +185,15 @@ phi_e_k = B_ks' .* Lambda_k(0:N) .* Z_k_e(0:N);
 phi_h_i1 = sum(phi_h_n_i1_solns_all,2);
 phi_h_i2 = sum(phi_h_n_i2_solns_all,2);
 
-phi_e = sum(phi_e_k);
+phi_e_sym = sum(phi_e_k);
 
 % 36 and 37
-phi_1 = phi_h_i1 + phi_p_i1;
-phi_2 = phi_h_i2 + phi_p_i2;
+phi_1_sym = phi_h_i1 + phi_p_i1;
+phi_2_sym = phi_h_i2 + phi_p_i2;
 
-phi_1 = subs(phi_1,params,params_num);
-phi_2 = subs(phi_2,params,params_num);
-phi_e = subs(phi_e,params,params_num);
-
+phi_1 = subs(phi_1_sym,params,params_num);
+phi_2 = subs(phi_2_sym,params,params_num);
+phi_e = subs(phi_e_sym,params,params_num);
 
 %pretty(phi_1)
 %pretty(phi_2)
@@ -219,8 +219,8 @@ phi(regione) = phie(regione);
 figure
 levels = [linspace(0,2,5) 3:9];
 subplot 121
-[c,h] = contourf(R,Z,real(phi),levels);
-clabel(c,h)
+[c,h_fig] = contourf(R,Z,real(phi),levels);
+clabel(c,h_fig)
 xlabel('R')
 ylabel('Z')
 title('Velocity Potential - Real')
@@ -230,10 +230,46 @@ imag_phi = imag(phi);
 imag_phi(~region1 & ~region2 & ~regione) = NaN;
 
 subplot 122
-[c,h] = contourf(R,Z,imag_phi);
-clabel(c,h)
+[c,h_fig] = contourf(R,Z,imag_phi);
+clabel(c,h_fig)
 xlabel('R')
 ylabel('Z')
 title('Velocity Potential - Imaginary')
 colorbar
 
+%% force
+force_2_over_rho_w_eiwt = 1i * int( int(r*phi_2_sym,a1,a2), 0, 2*pi );
+
+syms a1_over_a2 real positive
+force_2_over_rho_w_eiwt = subs(force_2_over_rho_w_eiwt, {h, a1},{1, a1_over_a2 * a2});
+symvar(force_2_over_rho_w_eiwt)
+
+res=10;
+a2_vec = linspace(.1,2,res);
+d2_vec = linspace(.1,.5,res);
+a1_over_a2_vec = [.25 .5 .75 .9];
+
+[a2_mat,d2_mat,a1_over_a2_mat] = meshgrid(a2_vec,d2_vec,a1_over_a2_vec);
+%%
+force = real(double(vpa(subs(force_2_over_rho_w_eiwt,{a2,d2,a1_over_a2},{a2_mat,d2_mat,a1_over_a2_mat}))));
+
+figure
+for plot_num = 1:length(a1_over_a2_vec)
+    subplot(2,2,plot_num)
+    contourf(a2_mat(:,:,plot_num),d2_mat(:,:,plot_num),force(:,:,plot_num))
+    title(["a_1/a_2 = " num2str(a1_over_a2_vec(plot_num))])
+    xlabel('a_2')
+    ylabel('d_2')
+    colorbar
+end
+sgtitle('Heave Exciting Force')
+
+% force2 = NaN(size(R));
+% force2(region2) = force_2_over_rho_w_eiwt(region2);
+% 
+% figure
+% contourf(R,Z,real(force2))
+% xlabel('R')
+% ylabel('Z')
+% title('Heave Force on float')
+% colorbar
