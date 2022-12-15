@@ -129,29 +129,36 @@ a2_vec = 1; % linspace(.5, 1, sweep_res);
 d2_vec = .25;
 a1_vec = .5;
 d1_vec = 2;
-m0_vec = 1;
+m0_vec = [.5 1];
 
-[a2_mat,d2_mat,a1_mat,d1_mat,m0_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec, m0_vec);
+[a2_mat,d2_mat,a1_mat,d1_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec);
 
-m_k_mat = m0_mat; % todo implement dispersion relation here
+m_k_vec = m0_vec; % todo implement dispersion relation here
 
 phi = zeros(spatial_res,spatial_res,numel(a2_mat));
-[force, A, B] = deal(zeros(size(a2_mat)));
+[force, A, B, sigma_force, sigma_position] = deal(zeros(numel(a2_mat), length(m0_vec)));
 
 plot_phi = true;
+plot_omega = true;
 
 for i=1:numel(a2_mat)
-    disp(['running ' num2str(i) ' out of ' num2str(length(a2_mat))]);
-    [phi(:,:,i), force(i), A(i), B(i)] = get_phi_force(eqns, unknowns_const, N, ...
-        R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
-        phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
-        h_mat, m_k_mat, a1_mat, a2_mat, d1_mat, d2_mat, m0_mat);
+    for j=1:length(m0_vec)
+        disp(['running ' num2str(i) ' out of ' num2str(numel(a2_mat)*length(m0_vec))]);
+        [phi(:,:,i,j), force(i,j) ] = get_phi_force(...
+            eqns, unknowns_const, N, ...
+            R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
+            phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
+            h_mat, m_k_vec(i), a1_mat, a2_mat, d1_mat, d2_mat, m0_vec(i));
+    end
+    [A(i,:), B(i,:), sigma_force(i,:), sigma_position(i,:)] = get_frequency_stuff(force(i,:),m0_vec,plot_omega);
 
 end
 
+
+
 %% multidim plot over geometry
 % figure
-% for plot_num = 1:length(a1_over_a2_vec)
+% for plot_num = 1:length(a2_vec)
 %     subplot(2,2,plot_num)
 %     contourf(a2_mat(:,:,plot_num),d2_mat(:,:,plot_num),force(:,:,plot_num))
 %     title(["a_1/a_2 = " num2str(a1_over_a2_vec(plot_num))])
@@ -162,7 +169,7 @@ end
 % sgtitle('Heave Exciting Force')
 
 %%
-function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
+function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
                 R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
                 phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
                 h_num, m_k_num, a1_num, a2_num, d1_num, d2_num, m0_num)
@@ -282,13 +289,52 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
 
     force = real(double(vpa(subs(force_2_over_rho_w_eiwt,{h,a1,a2,d2},{h_num,a1_num,a2_num,d2_num}))));
 
-    k = m0_num;
+    force = force / 1e180; % normalize because force is very large (probably a bug somewhere)
+end
+function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,plot_omega)
     g = 9.8;
     rho = 1025;
     omega = sqrt(k*g);
-    X = force * rho * omega;
-    Vg = g/(2*omega);
-    B = k/ (4*rho*g*Vg) * X.^2;
+    X3 = force * rho .* omega;
+    Vg = g./(2*omega);
+    B = k./ (4*rho*g*Vg) .* X3.^2;
 
-    A = B; % todo implement kramers kronig relationship
+    A = zeros(size(B));
+    for i=1:length(omega)
+        A(i) = 1/omega(i)^2 * hilbert(-omega(i)*B(i)); % kramers kronig relationship
+    end
+
+    Hm0 = 2;
+    Tp = 1;
+    amplitude = Hm0 / 2;
+    H_force = X3/amplitude;
+
+    % transfer function
+    m = 1; % mass
+    A = 1;
+    C = rho * g * A;
+    H_position = X3 / (-omega.^2*(m+A) + C + 1i*omega.*B);
+    if plot_omega
+        figure
+        plot(omega,abs(H_position))
+        title('Heave RAO')
+        xlabel('\omega (rad/s)')
+        ylabel('|\Xi/A| - Magnitude of Position Transfer Function')
+    end
+
+    % spectrum and standard deviations
+    S = pierson(omega, Hm0, Tp);                    % spectrum
+    sigma_force = wkinchin(S,omega,H_force);        % standard deviation force
+    sigma_position = wkinchin(S,omega,H_position);  % standard deviation pos
+end
+
+function E_pm = pierson(omega,Hm0, Tp)
+    gamma = 3.3;
+    alpha  = 1. / (.23 + .03 * gamma - .185 / (1.9 + gamma)) / 16. ; 
+    E_pm = alpha .* Hm0^2 * Tp^-4 .* omega.^-5 .* exp(-1.25 * (Tp .* omega).^-4);
+end
+
+function std = wkinchin(S, omega, H)
+    var = trapz( omega, S .* abs(H).^2 );
+    std = sqrt(var);
 end
