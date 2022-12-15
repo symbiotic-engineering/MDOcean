@@ -156,7 +156,7 @@ end
 
 %% multidim plot over geometry
 figure
-contourf(a2_mat,d2_mat,force)
+contourf(a2_mat,d2_mat,reshape(force,2,2))
 xlabel('a_2')
 ylabel('d_2')
 colorbar
