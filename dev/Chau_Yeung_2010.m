@@ -125,11 +125,11 @@ h_mat = 1;
 
 spatial_res = 30;
 sweep_res = 10;
-a2_vec = 1; % linspace(.5, 1, sweep_res);
-d2_vec = .25;
+a2_vec = [1 1.5]; % linspace(.5, 1, sweep_res);
+d2_vec = [.5 .6];
 a1_vec = .5;
 d1_vec = 2;
-m0_vec = [.5 1];
+m0_vec = 1;
 
 [a2_mat,d2_mat,a1_mat,d1_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec);
 
@@ -148,25 +148,19 @@ for i=1:numel(a2_mat)
             eqns, unknowns_const, N, ...
             R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
             phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
-            h_mat, m_k_vec(i), a1_mat, a2_mat, d1_mat, d2_mat, m0_vec(i));
+            h_mat, m_k_vec(j), a1_mat(i), a2_mat(i), d1_mat(i), d2_mat(i), m0_vec(j));
     end
     [A(i,:), B(i,:), sigma_force(i,:), sigma_position(i,:)] = get_frequency_stuff(force(i,:),m0_vec,plot_omega);
 
 end
 
-
-
 %% multidim plot over geometry
-% figure
-% for plot_num = 1:length(a2_vec)
-%     subplot(2,2,plot_num)
-%     contourf(a2_mat(:,:,plot_num),d2_mat(:,:,plot_num),force(:,:,plot_num))
-%     title(["a_1/a_2 = " num2str(a1_over_a2_vec(plot_num))])
-%     xlabel('a_2')
-%     ylabel('d_2')
-%     colorbar
-% end
-% sgtitle('Heave Exciting Force')
+figure
+contourf(a2_mat,d2_mat,force)
+xlabel('a_2')
+ylabel('d_2')
+colorbar
+title('Heave Exciting Force: X/\rho \omega e^{i\omega t}')
 
 %%
 function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
@@ -304,28 +298,33 @@ function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,plot_ome
         A(i) = 1/omega(i)^2 * hilbert(-omega(i)*B(i)); % kramers kronig relationship
     end
 
-    Hm0 = 2;
-    Tp = 1;
-    amplitude = Hm0 / 2;
-    H_force = X3/amplitude;
-
-    % transfer function
-    m = 1; % mass
-    A = 1;
-    C = rho * g * A;
-    H_position = X3 / (-omega.^2*(m+A) + C + 1i*omega.*B);
-    if plot_omega
-        figure
-        plot(omega,abs(H_position))
-        title('Heave RAO')
-        xlabel('\omega (rad/s)')
-        ylabel('|\Xi/A| - Magnitude of Position Transfer Function')
+    if length(omega) > 1
+        Hm0 = 2;
+        Tp = 1;
+        amplitude = Hm0 / 2;
+        H_force = X3/amplitude;
+    
+        % transfer function
+        m = 1; % mass
+        A = 1;
+        C = rho * g * A;
+        H_position = X3 ./ (-omega.^2*(m+A) + C + 1i*omega.*B);
+        if plot_omega
+            figure
+            plot(omega,abs(H_position))
+            title('Heave RAO')
+            xlabel('\omega (rad/s)')
+            ylabel('|\Xi/A| - Magnitude of Position Transfer Function')
+        end
+    
+        % spectrum and standard deviations
+        S = pierson(omega, Hm0, Tp);                    % spectrum
+        sigma_force = wkinchin(S,omega,H_force);        % standard deviation force
+        sigma_position = wkinchin(S,omega,H_position);  % standard deviation pos
+    else
+        sigma_force = 0;
+        sigma_position = 0;
     end
-
-    % spectrum and standard deviations
-    S = pierson(omega, Hm0, Tp);                    % spectrum
-    sigma_force = wkinchin(S,omega,H_force);        % standard deviation force
-    sigma_position = wkinchin(S,omega,H_position);  % standard deviation pos
 end
 
 function E_pm = pierson(omega,Hm0, Tp)
