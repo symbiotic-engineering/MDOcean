@@ -84,6 +84,9 @@ syms C_1n_1_const C_1n_2_const C_2n_2_const B_k_const [N+1 1] real
 unknowns_const = [C_1n_1_const; C_1n_2_const; C_2n_2_const; B_k_const];
 eqns = subs(eqns, unknowns, unknowns_const');
 
+syms m_k_const [N 1]
+eqns = subs(eqns,m_k(1:N),m_k_const');
+
 symvar(eqns)
 
 %% prepare geometries to numerical sweep
@@ -128,9 +131,12 @@ for i = 1:length(m0_vec)
     m_k_mat(m_k_idx,:) = repmat(m_k_vec,length(m_k_idx),1);
 end
 
+% override for now
+m_k_mat = 1;%ones(size(m_k_mat));
+
 %% numerically solve equations for geometry sweep
 for i=1:numel(a2_mat)
-    disp(['running ' num2str(i) ' out of ' num2str(length(a2_mat))]);
+    disp(['running ' num2str(i) ' out of ' num2str(numel(a2_mat))]);
     [phi(:,:,i), force(i), A(i), B(i)] = get_phi_force(eqns, unknowns_const, N, ...
         R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
         phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
@@ -155,8 +161,8 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
                 phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
                 h_num, m_k_num, a1_num, a2_num, d1_num, d2_num, m0_num)
 
-    syms h m_k a1 a2 d1 d2 m0 real positive 
-    params = {h m_k a1 a2 d1 d2 m0};
+    syms h m_k_const a1 a2 d1 d2 m0 real positive 
+    params = {h m_k_const a1 a2 d1 d2 m0};
     params_num = {h_num m_k_num a1_num a2_num d1_num d2_num m0_num};
     eqns = subs(eqns,params,params_num);
     
