@@ -96,7 +96,7 @@ a2_vec = 1; % linspace(.5, 1, sweep_res);
 d2_vec = .25;
 a1_vec = .5;
 d1_vec = [1 2];
-m0_vec = [10 10];
+m0_vec = [1 1];
 
 [a2_mat,d2_mat,a1_mat,d1_mat,m0_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec, m0_vec);
 
@@ -172,21 +172,25 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     index = 1;
     
     for k = 1:length(fns)
+        
         if index > N+1
             index = 1;
         end
-       
-        if (k<=N+1)
-            C_1n_1s(index) = solns.(fns{k});
-        end
-        if (N+1<k) && (k<=2*(N + 1))
-            C_1n_2s(index) = solns.(fns{k});   
-        end
-        if (k>2*(N+1)) && (k<=3*(N+1))
-             C_2n_2s(index) = solns.(fns{k});      
-        end
-        if (k>3*(N+1)) 
-             B_ks(index) = solns.(fns{k});
+        if isempty(solns.(fns{k}))
+            error('Linear solver could not find a solution')
+        else
+            if (k<=N+1)
+                C_1n_1s(index) = solns.(fns{k});
+            end
+            if (N+1<k) && (k<=2*(N + 1))
+                C_1n_2s(index) = solns.(fns{k});   
+            end
+            if (k>2*(N+1)) && (k<=3*(N+1))
+                 C_2n_2s(index) = solns.(fns{k});      
+            end
+            if (k>3*(N+1)) 
+                 B_ks(index) = solns.(fns{k});
+            end
         end
         index = index + 1;   
     end
