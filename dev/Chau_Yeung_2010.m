@@ -36,9 +36,6 @@ Z_n_i2(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n2(n)*(z+h)));
 phi_h_n_i1(n) = (C_1n_1(n) * R_1n_1(n) + C_2n_1(n) * R_2n_1(n)) * Z_n_i1(n);
 phi_h_n_i2(n) = (C_1n_2(n) * R_1n_2(n) + C_2n_2(n) * R_2n_2(n)) * Z_n_i2(n);
 
-% pretty(phi_1)
-% pretty(phi_2)
-
 % eq 13
 Lambda_k(k) = piecewise(k==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), k>=1, besselk(0,m_k(k)*r)/besselk(0,m_k(k)*a2));
 
@@ -95,15 +92,15 @@ Z_k_e = subs(Z_k_e,m_k(1:N),m_k_const);
 symvar(eqns)
 
 %% prepare geometries to numerical sweep
-h_mat = 1;
+h_mat = 10;
 
 spatial_res = 30;
 sweep_res = 10;
 
-a2_vec = 1; % linspace(.5, 1, sweep_res);
-d2_vec = .25;
-a1_vec = .5;
-d1_vec = [.5 .75];
+a2_vec = h_mat*1; % linspace(.5, 1, sweep_res);
+d2_vec = h_mat*.25;
+a1_vec = h_mat*.5;
+d1_vec = h_mat*[.5 .75];
 m0_vec = [1 1];
 
 % check valid geometry
@@ -133,7 +130,7 @@ for i = 1:length(m0_vec)
         m_k_vec(k_idx) = fminbnd(m_k_sq_err,m_k_lower,m_k_upper);
     end
     %plot(1:N,m_k_vec,'*-')
-    xlabel('k'); ylabel('m_k')
+    %xlabel('k'); ylabel('m_k')
     shouldnt_be_int = round(m0_i * m_k_vec/pi - .5, 4); % check in case it found an asymptote instead of a solution
     not_repeated = numel(unique(m_k_vec)) == numel(m_k_vec);
     assert(all(shouldnt_be_int ~= floor(shouldnt_be_int)) && not_repeated)
@@ -141,9 +138,6 @@ for i = 1:length(m0_vec)
     m_k_idx = find(m0_i==m0_mat);
     m_k_mat(m_k_idx,:) = repmat(m_k_vec,length(m_k_idx),1);
 end
-
-% override for now
-m_k_mat = ones(size(m_k_mat));
 
 %% numerically solve equations for geometry sweep
 for i=1:numel(a2_mat)
