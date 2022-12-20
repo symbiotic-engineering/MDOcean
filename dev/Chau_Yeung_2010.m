@@ -75,17 +75,22 @@ match_2e_velocity = B_n(n) * subs(diff(Lambda_n(n), r), r, a2) == ...
 match_12_velocity = C_1n_2(n) * subs(diff(R_1n_2(n),r), r, a1) + C_2n_2(n) * subs(diff(R_2n_2(n),r), r, a1) == ...
     C_1n_1(n) * subs( diff(R_1n_1(n),r), r,a1) * dz_1 + int( subs(diff(phi_p_i1 - phi_p_i2,r),r,a1) * Z_n_i2(n), z, 0, dz_1 );
 
+% substitute in 0:N for count variables
 eqns = [subs(match_12_potential,n,0:N), subs(match_2e_potential,n,0:N) ...
         subs(match_12_velocity,n,0:N),  subs(match_2e_velocity,n,0:N)];
-
+Lambda_k = subs(Lambda_k,k,0:N);
+Z_k_e = subs(Z_k_e,k,0:N);
 unknowns = [C_1n_1(0:N) C_1n_2(0:N) C_2n_2(0:N) B_n(0:N)];
 
+% substitute symbolic constant vectors for symbolic functions
 syms C_1n_1_const C_1n_2_const C_2n_2_const B_k_const [N+1 1] real
 unknowns_const = [C_1n_1_const; C_1n_2_const; C_2n_2_const; B_k_const];
 eqns = subs(eqns, unknowns, unknowns_const');
 
-syms m_k_const [N 1]
-eqns = subs(eqns,m_k(1:N),m_k_const');
+syms m_k_const [1 N]
+eqns = subs(eqns,m_k(1:N),m_k_const);
+Lambda_k = subs(Lambda_k,m_k(1:N),m_k_const);
+Z_k_e = subs(Z_k_e,m_k(1:N),m_k_const);
 
 symvar(eqns)
 
@@ -98,8 +103,14 @@ sweep_res = 10;
 a2_vec = 1; % linspace(.5, 1, sweep_res);
 d2_vec = .25;
 a1_vec = .5;
-d1_vec = [1 2];
+d1_vec = [.5 .75];
 m0_vec = [1 1];
+
+% check valid geometry
+assert(max(d1_vec) < min(h_mat) && ...
+       max(d2_vec) < min(h_mat) && ...
+       max(a1_vec) < min(a2_vec) && ...
+       max(d2_vec) < min(d1_vec) )
 
 [a2_mat,d2_mat,a1_mat,d1_mat,m0_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec, m0_vec);
 
@@ -132,7 +143,7 @@ for i = 1:length(m0_vec)
 end
 
 % override for now
-m_k_mat = 1;%ones(size(m_k_mat));
+m_k_mat = ones(size(m_k_mat));
 
 %% numerically solve equations for geometry sweep
 for i=1:numel(a2_mat)
@@ -161,9 +172,12 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
                 phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
                 h_num, m_k_num, a1_num, a2_num, d1_num, d2_num, m0_num)
 
-    syms h m_k_const a1 a2 d1 d2 m0 real positive 
-    params = {h m_k_const a1 a2 d1 d2 m0};
-    params_num = {h_num m_k_num a1_num a2_num d1_num d2_num m0_num};
+    syms m_k_const [1 N]
+    eqns = subs(eqns,m_k_const,m_k_num);
+
+    syms h a1 a2 d1 d2 m0 real positive 
+    params = {h a1 a2 d1 d2 m0};
+    params_num = {h_num a1_num a2_num d1_num d2_num m0_num};
     eqns = subs(eqns,params,params_num);
     
     solns = vpasolve(eqns, unknowns_const);
@@ -204,7 +218,7 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     phi_h_n_i1_solns_all = (C_1n_1s' .* R_1n_1(0:N) + C_2n_1s' .* R_2n_1(0:N)) .* Z_n_i1(0:N); 
     phi_h_n_i2_solns_all = (C_1n_2s' .* R_1n_2(0:N) + C_2n_2s' .* R_2n_2(0:N)) .* Z_n_i2(0:N);
     
-    phi_e_k = B_ks' .* Lambda_k(0:N) .* Z_k_e(0:N);
+    phi_e_k = B_ks' .* Lambda_k .* Z_k_e;
         
     % summing all to get the potential 
     phi_h_i1 = sum(phi_h_n_i1_solns_all,2);
@@ -219,6 +233,7 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     phi_1 = subs(phi_1_sym,params,params_num);
     phi_2 = subs(phi_2_sym,params,params_num);
     phi_e = subs(phi_e_sym,params,params_num);
+    phi_e = subs(phi_e,m_k_const,m_k_num);
     
     r_vec = linspace(0,2*a2_num,spatial_res);
     z_vec = linspace(0,h_num,spatial_res);
