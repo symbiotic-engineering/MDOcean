@@ -21,12 +21,15 @@ phi_p_i1 = 1/(2*(h-d1)) * ((z+h)^2 - r^2/2);
 phi_p_i2 = 1/(2*(h-d2)) * ((z+h)^2 - r^2/2);
 
 % eq 7
-R_1n_1(n) = piecewise(n==0, 1/2, n>=1, besseli(0,lambda_n1(n)*r)/besseli(0,lambda_n1(n)*a2));
-R_1n_2(n) = piecewise(n==0, 1/2, n>=1, besseli(0,lambda_n2(n)*r)/besseli(0,lambda_n2(n)*a2));
+R_1n_1(n) = piecewise(n==0, 1/2, n>=1, ...
+                    besseli(0,lambda_n1(n)*r)/besseli(0,lambda_n1(n)*a2));
+R_1n_2(n) = piecewise(n==0, 1/2, n>=1, ...
+                    besseli(0,lambda_n2(n)*r)/besseli(0,lambda_n2(n)*a2));
 
 % eq 8
 R_2n_1(n) = sym(0);
-R_2n_2(n) = piecewise(n==0, 1/2*log(r/a2), n>=1, besselk(0,lambda_n2(n)*r)/besselk(0,lambda_n2(n)*a2));
+R_2n_2(n) = piecewise(n==0, 1/2*log(r/a2), ...
+    n>=1, besselk(0,lambda_n2(n)*r)/besselk(0,lambda_n2(n)*a2));
 
 % eq 9
 Z_n_i1(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n1(n)*(z+h)));
@@ -37,13 +40,16 @@ phi_h_n_i1(n) = (C_1n_1(n) * R_1n_1(n) + C_2n_1(n) * R_2n_1(n)) * Z_n_i1(n);
 phi_h_n_i2(n) = (C_1n_2(n) * R_1n_2(n) + C_2n_2(n) * R_2n_2(n)) * Z_n_i2(n);
 
 % eq 13
-Lambda_k(k) = piecewise(k==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), k>=1, besselk(0,m_k(k)*r)/besselk(0,m_k(k)*a2));
+Lambda_k(k) = piecewise(k==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), ...
+    k>=1, besselk(0,m_k(k)*r)/besselk(0,m_k(k)*a2));
 
 % eq 2.34 in analytical methods book
-N_k(k) = piecewise(k==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), k>=1, 1/2*(1+sinh(2*m_k(k)*h))/(2*m_k(k)*h));
+N_k(k) = piecewise(k==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
+    k>=1, 1/2*(1+sinh(2*m_k(k)*h))/(2*m_k(k)*h));
 
 % eq 14
-Z_k_e(k) = piecewise(k==0, 1/sqrt(N_k(k)) * cosh(m0 * (z+h)), k>=1, 1/sqrt(N_k(k)) * cosh(m_k(k) * (z+h)));
+Z_k_e(k) = piecewise(k==0, 1/sqrt(N_k(k)) * cosh(m0 * (z+h)), ...
+    k>=1, 1/sqrt(N_k(k)) * cosh(m_k(k) * (z+h)));
 
 % eq 12
 B_n(n) = subs(B_k, k, n);
@@ -53,28 +59,35 @@ Z_n_e(n) = subs(Z_k_e, k, n);
 % potential matching
 % equation 22 in old 1981 paper, applied to boundary 2-e
 dz_2 = h - d2;
-match_2e_potential = C_1n_2(n) * subs(R_1n_2(n),r,a2) + C_2n_2(n) * subs(R_2n_2(n),r,a2) == ...
-    B_n(n) * subs(Lambda_n(n),r,a2) * dz_2 - int(subs(phi_p_i2,r,a2) * Z_n_i2(n), z, -h, -d2);
+match_2e_potential = C_1n_2(n) * subs(R_1n_2(n),r,a2) + ...
+                     C_2n_2(n) * subs(R_2n_2(n),r,a2) == ...
+    B_n(n) * subs(Lambda_n(n),r,a2) * dz_2 - ...
+    int(subs(phi_p_i2,r,a2) * Z_n_i2(n), z, -h, -d2);
 
 % equation 22 in old 1981 paper, applied to boundary 1-2
 dz_1 = h - d1;
 match_12_potential = C_1n_1(n) * subs(R_1n_1(n),r,a1) == ...
-    ( C_1n_2(n) * subs(R_1n_2(n),r,a1) + C_2n_2(n) * subs(R_2n_2(n),r,a1) ) * dz_1 + ...
+    ( C_1n_2(n) * subs(R_1n_2(n),r,a1) + ...
+      C_2n_2(n) * subs(R_2n_2(n),r,a1) ) * dz_1 + ...
     int(subs(phi_p_i2 - phi_p_i1,r,a1) * Z_n_i1(n), z, -h, -d1);
 
 % velocity matching
 % equation 23 in old 1981 paper, applied to boundary 2-e
 match_2e_velocity = B_n(n) * subs(diff(Lambda_n(n), r), r, a2) == ...
-    (C_1n_2(n) * subs(diff(R_1n_2(n), r), r, a2) + C_2n_2(n) * subs(diff(R_2n_2(n), r), r, a2) ) * dz_2 + ...
+    (C_1n_2(n) * subs(diff(R_1n_2(n), r), r, a2) + ...
+     C_2n_2(n) * subs(diff(R_2n_2(n), r), r, a2) ) * dz_2 + ...
     int(subs(diff(phi_p_i2,r),r,a2) * Z_n_e(n), z, 0, dz_2 );
 
 % equation 23 in old 1981 paper, applied to boundary 1-2
-match_12_velocity = C_1n_2(n) * subs(diff(R_1n_2(n),r), r, a1) + C_2n_2(n) * subs(diff(R_2n_2(n),r), r, a1) == ...
-    C_1n_1(n) * subs( diff(R_1n_1(n),r), r,a1) * dz_1 + int( subs(diff(phi_p_i1 - phi_p_i2,r),r,a1) * Z_n_i2(n), z, 0, dz_1 );
+match_12_velocity = C_1n_2(n) * subs(diff(R_1n_2(n),r), r, a1) + ...
+    C_2n_2(n) * subs(diff(R_2n_2(n),r), r, a1) == ...
+    C_1n_1(n) * subs( diff(R_1n_1(n),r), r,a1) * dz_1 + ...
+    int( subs(diff(phi_p_i1 - phi_p_i2,r),r,a1) * Z_n_i2(n), z, 0, dz_1 );
 
 % substitute in 0:N for count variables
 eqns = [subs(match_12_potential,n,0:N), subs(match_2e_potential,n,0:N) ...
         subs(match_12_velocity,n,0:N),  subs(match_2e_velocity,n,0:N)];
+
 Lambda_k = subs(Lambda_k,k,0:N);
 Z_k_e = subs(Z_k_e,k,0:N);
 unknowns = [C_1n_1(0:N) C_1n_2(0:N) C_2n_2(0:N) B_n(0:N)];
@@ -89,7 +102,7 @@ eqns = subs(eqns,m_k(1:N),m_k_const);
 Lambda_k = subs(Lambda_k,m_k(1:N),m_k_const);
 Z_k_e = subs(Z_k_e,m_k(1:N),m_k_const);
 
-symvar(eqns)
+%symvar(eqns)
 
 %% prepare geometries to numerical sweep
 h_mat = 10;
@@ -98,10 +111,10 @@ spatial_res = 30;
 sweep_res = 10;
 
 a2_vec = h_mat*1; % linspace(.5, 1, sweep_res);
-d2_vec = h_mat*.25;
+d2_vec = h_mat*[.25 .4];
 a1_vec = h_mat*.5;
 d1_vec = h_mat*[.5 .75];
-m0_vec = [1 1];
+m0_vec = [1 2];
 
 % check valid geometry
 assert(max(d1_vec) < min(h_mat) && ...
@@ -109,20 +122,22 @@ assert(max(d1_vec) < min(h_mat) && ...
        max(a1_vec) < min(a2_vec) && ...
        max(d2_vec) < min(d1_vec) )
 
-[a2_mat,d2_mat,a1_mat,d1_mat,m0_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec, m0_vec);
+[a2_mat,d2_mat,a1_mat,d1_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec);
 
-phi = zeros(spatial_res,spatial_res,numel(a2_mat));
-[force, A, B] = deal(zeros(size(a2_mat)));
+phi = zeros(spatial_res,spatial_res,numel(a2_mat),length(m0_vec));
+[force, A, B, sigma_force, sigma_position] = deal(zeros(numel(a2_mat), length(m0_vec)));
 
 plot_phi = true;
+plot_omega = true;
 
 % eq 11 - numerical root-finding to solve the imaginary dispersion relation
 %figure
 %hold on
-m_k_vec = zeros(1,N);
-m_k_mat = NaN(numel(m0_mat),N);
-for i = 1:length(m0_vec)
-    m0_i = m0_vec(i);
+m_k_mat = zeros(length(m0_vec),N);
+
+for freq_idx = 1:length(m0_vec)
+    m_k_vec = zeros(1,N);
+    m0_i = m0_vec(freq_idx);
     m_k_sq_err = @(m_k) (m_k * tan(m_k * h_mat) + m0_i * tanh(m0_i*h_mat))^2;
     for k_idx=1:N
         m_k_lower = (pi*(k_idx-1) + pi/2) / m0_i + eps;
@@ -135,33 +150,39 @@ for i = 1:length(m0_vec)
     not_repeated = numel(unique(m_k_vec)) == numel(m_k_vec);
     assert(all(shouldnt_be_int ~= floor(shouldnt_be_int)) && not_repeated)
 
-    m_k_idx = find(m0_i==m0_mat);
-    m_k_mat(m_k_idx,:) = repmat(m_k_vec,length(m_k_idx),1);
+    m_k_mat(freq_idx,:) = m_k_vec;
 end
 
 %% numerically solve equations for geometry sweep
-for i=1:numel(a2_mat)
-    disp(['running ' num2str(i) ' out of ' num2str(numel(a2_mat))]);
-    [phi(:,:,i), force(i), A(i), B(i)] = get_phi_force(eqns, unknowns_const, N, ...
-        R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
-        phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
-        h_mat, m_k_mat(i,:), a1_mat(i), a2_mat(i), d1_mat(i), d2_mat(i), m0_mat(i));
+for geom_idx = 1:numel(a2_mat)
+    disp(['running geometry ' num2str(geom_idx) ' out of ' num2str(numel(a2_mat))]);
+    
+    for freq_idx = 1:length(m0_vec)
+        disp(['    running frequency ' num2str(freq_idx) ' out of ' num2str(length(m0_vec))]);
+
+        [phi(:,:,geom_idx,freq_idx), force(geom_idx,freq_idx) ] = get_phi_force(...
+                                                    eqns, unknowns_const, N, ...
+            R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
+            phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
+            h_mat, m_k_mat(freq_idx,:), a1_mat(geom_idx), a2_mat(geom_idx), ...
+            d1_mat(geom_idx), d2_mat(geom_idx), m0_vec(freq_idx));
+    end
+
+    [A(geom_idx,:), B(geom_idx,:), sigma_force(geom_idx,:), sigma_position(geom_idx,:)] = ...
+        get_frequency_stuff(force(geom_idx,:), m0_vec, h_mat, plot_omega);
+
 end
 
 %% multidim plot over geometry
-% figure
-% for plot_num = 1:length(a1_over_a2_vec)
-%     subplot(2,2,plot_num)
-%     contourf(a2_mat(:,:,plot_num),d2_mat(:,:,plot_num),force(:,:,plot_num))
-%     title(["a_1/a_2 = " num2str(a1_over_a2_vec(plot_num))])
-%     xlabel('a_2')
-%     ylabel('d_2')
-%     colorbar
-% end
-% sgtitle('Heave Exciting Force')
+figure
+contourf(reshape(d1_mat,2,2),reshape(d2_mat,2,2),reshape(force(:,1),2,2))
+xlabel('d_1')
+ylabel('d_2')
+colorbar
+title('Heave Exciting Force: X/\rho \omega e^{i\omega t}')
 
 %%
-function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
+function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
                 R_1n_1, R_1n_2, R_2n_1, R_2n_2, Z_n_i1, Z_n_i2, Lambda_k, Z_k_e, ...
                 phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
                 h_num, m_k_num, a1_num, a2_num, d1_num, d2_num, m0_num)
@@ -186,7 +207,6 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     index = 1;
     
     for k = 1:length(fns)
-        
         if index > N+1
             index = 1;
         end
@@ -213,7 +233,7 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     phi_h_n_i2_solns_all = (C_1n_2s' .* R_1n_2(0:N) + C_2n_2s' .* R_2n_2(0:N)) .* Z_n_i2(0:N);
     
     phi_e_k = B_ks' .* Lambda_k .* Z_k_e;
-        
+    
     % summing all to get the potential 
     phi_h_i1 = sum(phi_h_n_i1_solns_all,2);
     phi_h_i2 = sum(phi_h_n_i2_solns_all,2);
@@ -224,11 +244,13 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     phi_1_sym = phi_h_i1 + phi_p_i1;
     phi_2_sym = phi_h_i2 + phi_p_i2;
     
+    % sub in geometry
     phi_1 = subs(phi_1_sym,params,params_num);
     phi_2 = subs(phi_2_sym,params,params_num);
     phi_e = subs(phi_e_sym,params,params_num);
     phi_e = subs(phi_e,m_k_const,m_k_num);
     
+    % sub in spatial coordinates
     r_vec = linspace(0,2*a2_num,spatial_res);
     z_vec = linspace(0,h_num,spatial_res);
     [R,Z] = meshgrid(r_vec,z_vec);
@@ -237,6 +259,7 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
     phi2 = double(subs(phi_2,{r,z},{R,Z}));
     phie = double(subs(phi_e,{r,z},{R,Z}));
     
+    % assemble total phi based on phi in each region
     regione = R > a2_num;
     region1 = R < a1_num & Z < (h_num - d1_num);
     region2 = R > a1_num & R <= a2_num & Z < (h_num - d2_num);
@@ -251,21 +274,12 @@ function [phi, force, A, B] = get_phi_force(eqns, unknowns_const, N, ...
         plot_potential(phi,R,Z,region_body);
     end
 
+    % force
     force_2_over_rho_w_eiwt = 1i * int( int(r*phi_2_sym,a1,a2), 0, 2*pi );
     
-    symvar(force_2_over_rho_w_eiwt)
+    %symvar(force_2_over_rho_w_eiwt)
 
     force = real(double(vpa(subs(force_2_over_rho_w_eiwt,{h,a1,a2,d2},{h_num,a1_num,a2_num,d2_num}))));
-
-    k = m0_num;
-    g = 9.8;
-    rho = 1025;
-    omega = sqrt(k*g*tanh(k*h_num));
-    X = force * rho * omega;
-    Vg = g/(2*omega) * (k^2 + tanh(k*h_num) - k^2*tanh(k*h_num)^2);
-    B = k/(4*rho*g*Vg) * X.^2;
-
-    A = B; % todo implement kramers kronig relationship
 end
 
 function [] = plot_potential(phi,R,Z,region_body)
@@ -289,4 +303,56 @@ function [] = plot_potential(phi,R,Z,region_body)
     ylabel('Z')
     title('Velocity Potential - Imaginary')
     colorbar
+end
+function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_omega)
+    g = 9.8;
+    rho = 1025;
+    omega = sqrt(k*g.*tanh(k*h));
+    X3 = force * rho .* omega;
+    Vg = g./(2*omega) .* (k.^2 + tanh(k*h) - k.^2.*tanh(k*h).^2);
+    B = k./ (4*rho*g*Vg) .* X3.^2;
+
+    A = zeros(size(B));
+    for i=1:length(omega)
+        A(i) = 1/omega(i)^2 * hilbert(-omega(i)*B(i)); % kramers kronig relationship
+    end
+
+    if length(omega) > 1
+        Hm0 = 2;
+        Tp = 1;
+        amplitude = Hm0 / 2;
+        H_force = X3 / amplitude;
+    
+        % transfer function
+        m = 1; % mass
+        A = 1;
+        C = rho * g * A;
+        H_position = X3 ./ (-omega.^2.*(m+A) + C + 1i*omega.*B);
+        if plot_omega
+            figure
+            plot(omega,abs(H_position))
+            title('Heave RAO')
+            xlabel('\omega (rad/s)')
+            ylabel('|\Xi/A| - Magnitude of Position Transfer Function')
+        end
+    
+        % spectrum and standard deviations
+        S = pierson(omega, Hm0, Tp);                    % spectrum
+        sigma_force = wkinchin(S,omega,H_force);        % standard deviation force
+        sigma_position = wkinchin(S,omega,H_position);  % standard deviation pos
+    else
+        sigma_force = 0;
+        sigma_position = 0;
+    end
+end
+
+function E_pm = pierson(omega,Hm0, Tp)
+    gamma = 3.3;
+    alpha  = 1. / (.23 + .03 * gamma - .185 / (1.9 + gamma)) / 16. ; 
+    E_pm = alpha .* Hm0^2 * Tp^-4 .* omega.^-5 .* exp(-1.25 * (Tp .* omega).^-4);
+end
+
+function std = wkinchin(S, omega, H)
+    var = trapz( omega, S .* abs(H).^2 );
+    std = sqrt(var);
 end
