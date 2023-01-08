@@ -40,7 +40,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
 
         if nargout > 4
             % create combined struct
-            results = simulated;
+            results = rmfield(simulated, 'power_unsat');
             results(2) = actual;
             results(3) = pct_error;
             tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});
