@@ -20,7 +20,7 @@ cell2table([params',groups(param_groupings)'])
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 %%
 % use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...

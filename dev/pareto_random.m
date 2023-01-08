@@ -1,6 +1,6 @@
 clear;clc
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 num_runs = 1e5;
 [LCOE,P_var,feasible] = deal(zeros(1,num_runs));
 

@@ -1,7 +1,7 @@
 function [] = compare()
 
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 x0_input = b.X_start_struct;
 
 Xs_opt = gradient_optim(x0_input,p,b);

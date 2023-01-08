@@ -1,6 +1,6 @@
 clear;close all;clc
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 
 
 X = [b.X_noms; 1];

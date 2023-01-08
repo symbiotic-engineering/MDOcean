@@ -2,7 +2,7 @@ function [ratio] = check_max_CW()
     p = parameters();
     p.cost_m = [0 0 0]; % hack that makes cost constant, so minimizing LCOE is actually maximizing power
     p.power_max = Inf;
-    b = var_bounds(p);
+    b = var_bounds();
     x0 = b.X_start_struct;
 
     % run LCOE minimization (effectively power maximization)

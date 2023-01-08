@@ -1,6 +1,6 @@
 function [x,fval] = pareto_search()
     p = parameters();
-    b = var_bounds(p);
+    b = var_bounds();
     x0 = b.X_start_struct;
     
     %% Calculate seed points for the pareto front

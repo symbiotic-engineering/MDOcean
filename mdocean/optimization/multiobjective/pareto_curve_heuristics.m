@@ -1,6 +1,6 @@
 function pareto_curve_heuristics()
     p = parameters();
-    b = var_bounds(p);
+    b = var_bounds();
     
     %[x,fval] = pareto_search();
     load("pareto_search_results.mat")

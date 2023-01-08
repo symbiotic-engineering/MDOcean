@@ -1,7 +1,7 @@
 function [] = location_sensitivity()
 
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 
 files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...

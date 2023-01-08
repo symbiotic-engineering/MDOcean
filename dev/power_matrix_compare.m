@@ -4,7 +4,7 @@ filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
 
 % inputs
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 X = [b.X_noms; 1];
 
 % unsaturated power

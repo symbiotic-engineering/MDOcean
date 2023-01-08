@@ -1,7 +1,7 @@
 clear;clc;close all
 
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 
 % X = [ 20 10 30;     % outer diameter of float	
 %       .3 .1 .5;     % inner diameter ratio of float	

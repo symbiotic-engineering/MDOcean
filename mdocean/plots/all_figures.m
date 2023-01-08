@@ -26,7 +26,7 @@ end
 %% figure 5 - JPD multiplication
 if any(which_figs == 5)
     p = parameters();
-    b = var_bounds(p);
+    b = var_bounds();
     X = [b.X_noms; 1];
     plot_power_matrix(X,p)
 end
@@ -52,7 +52,7 @@ end
 %% table 1 - design variables table
 if any(which_tabs == 1)
     p = parameters();
-    b = var_bounds(p);
+    b = var_bounds();
     DV_table = array2table([b.X_mins b.X_noms b.X_maxs], ...
         'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', b.var_names(1:end-1));
     display(DV_table)
