@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/main/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/code-cleanup/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
 ![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)
 
 # MDOcean
