@@ -1,5 +1,7 @@
 [![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/code-cleanup/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
+[![DOI](https://zenodo.org/badge/410160635.svg)](https://zenodo.org/badge/latestdoi/410160635)
 
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
