@@ -94,6 +94,10 @@ m_minus = subs(m_minus,r_k, r_k_zeta/zeta);
 pretty(m_plus)
 pretty(m_minus)
 
+latex(m_plus)
+
+m_plus_rkz_inf = simplify(limit(m_plus,r_k_zeta,Inf));
+
 %% sub in numerical
 % relationship between m, f_sat, and w for the ideal case (max power control)
 % see notebook p115-118
@@ -132,7 +136,7 @@ title('Energy scale for m_-')
 colorbar
 caxis([0 1])
 
-r_k_z_selected = r_k_z([1 4 7 11 17 34 100]); % corresponds to values [.01 .1 .2 .3 .5 1 3]
+r_k_z_selected = r_k_z([1 4 7 11 17 34]); % corresponds to values [.01 .1 .2 .3 .5 1]
 figure;
 hold on
 
@@ -146,18 +150,91 @@ for i=1:length(r_k_z_selected)
     m_i = m_tmp(idx);
     e_i = energy(idx);
 
+%     subplot 131
+%     plot(f_i,m_i,colors{i})
+%     hold on
+%     xlabel('Force Saturation Factor f_{sat}')
+%     ylabel('Powertrain Control Multiplier m_{sat}')
+
+    if i==1 % number of decimals to round r_k_zeta in legend
+        round_num = 2;
+    else
+        round_num = 1;
+    end
     subplot 121
-    plot(f_i,m_i,colors{i},'DisplayName',['|r_k \zeta| = ' num2str(rkzi)])
+    plot(f_i,e_i,colors{i})
     hold on
-    xlabel('force saturation factor f_{sat}')
-    ylabel('powertrain control multiplier m')
+    xlabel('Force Saturation Factor f_{sat}')
+    ylabel('Energy Multiplier e')
 
     subplot 122
-    plot(f_i,e_i,colors{i},'DisplayName',['|r_k \zeta| = ' num2str(round(rkzi,1))])
+    plot(m_i,e_i,colors{i},'DisplayName',['|r_k \zeta| = ' num2str(round(rkzi,round_num))])
     hold on
-    xlabel('force saturation factor f_{sat}')
-    ylabel('energy multiplier e')
+    xlabel('Powertrain Control Multiplier m_{sat}')
+    ylabel('Energy Multiplier e')
 end
-legend
-sgtitle('Effect of Hydrodynamics on Force Saturation Behavior')
+
+m_inf = subs(m_plus_rkz_inf, f, f_sat);
+e_inf = f_sat.^2 ./ m_inf;
+% subplot 131
+% plot(f_sat,m_inf,'k')
+subplot 121
+plot(f_sat,e_inf,'k')
+grid on
+subplot 122
+plot(m_inf,e_inf,'k','DisplayName','|r_k \zeta| \rightarrow \infty')
+grid on
+
+leg = legend;
+sgtitle('Effect of Controller Non-Idealities on Energy')
+title(leg,'Robustness Metric')
 improvePlot
+
+%% now calculate required fsat based on r_k zeta
+syms F_max_over_F_d
+% what I called F_unsat above is technically F_unsat_over_Fd
+alpha = 2/sym('pi') * (F_unsat / F_max_over_F_d * asin(F_max_over_F_d / F_unsat)) + sqrt(1 - (F_max_over_F_d/F_unsat)^2);
+f_sat_new = alpha * F_max_over_F_d / F_unsat;
+
+% do the same nondimensionalizing that I did to quad above
+f_sat_new = subs(expand(f_sat_new), m^2, k^2/wn^4);
+
+% zeta^2 = b^2 / (4 k m) so km = b^2 / (4 zeta^2)
+f_sat_new = subs(f_sat_new, k*m, b^2 / (4*zeta^2));
+
+% b/m = 2*zeta*wn and m=k/wn^2 so b=2 zeta k / wn
+f_sat_new = subs(f_sat_new, b, 2*zeta*k / wn);
+
+f_sat_new = subs(f_sat_new, w/wn, w_ratio);
+
+% ideal powertrain case
+f_sat_new = subs(f_sat_new,{w_ratio,r_b},{1,2});
+f_sat_new = subs(f_sat_new,r_k, r_k_zeta/zeta);
+
+f_sat_new = simplify(f_sat_new);
+
+% doesnt work - solver unable to find explicit solution. so redo numerical
+% syms f_sat_var
+% eqn = f_sat_var - f_sat_new == 0;
+% F_max_over_F_d_soln = solve(eqn,F_max_over_F_d);
+% F_max_over_F_d_num = subs(F_max_over_F_d_soln, {r_k_zeta,f_sat_var},{RKZ,F});
+% 
+% figure
+% contourf(F,F_max_over_F_d_soln,energy)
+
+% now use F to refer to F_max/F_d instead of f_sat
+m_plus_new = subs(m_plus,f,f_sat_new);
+
+mult_new_num = vpa(subs(m_plus_new,{F_max_over_F_d,r_k_zeta},{F,RKZ}));
+FS = vpa(subs(f_sat_new,{F_max_over_F_d,r_k_zeta},{F,RKZ}));
+energy = FS.^2 ./ mult_new_num;
+
+figure
+contourf(F, RKZ, mult_new_num)
+title('Mult')
+figure
+contourf(F, RKZ, energy)
+title('Energy')
+figure 
+contourf(F,RKZ,FS)
+title('f sat')
