@@ -225,7 +225,7 @@ f_sat_new = simplify(f_sat_new);
 % now use F to refer to F_max/F_d instead of f_sat
 m_plus_new = subs(m_plus,f,f_sat_new);
 
-mult_new_num = vpa(subs(m_plus_new,{F_max_over_F_d,r_k_zeta},{F,RKZ}));
+mult_new_num = vpa(subs(m_plus_new,{F_max_over_F_d,r_k_zeta,pi},{F,RKZ,3.14}));
 FS = vpa(subs(f_sat_new,{F_max_over_F_d,r_k_zeta},{F,RKZ}));
 energy = FS.^2 ./ mult_new_num;
 
