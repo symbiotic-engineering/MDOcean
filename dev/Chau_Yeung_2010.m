@@ -43,15 +43,14 @@ phi_h_n_i2(n) = (C_1n_2(n) * R_1n_2(n) + C_2n_2(n) * R_2n_2(n)) * Z_n_i2(n);
 Lambda_k(k) = piecewise(k==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), ...
     k>=1, besselk(0,m_k(k)*r)/besselk(0,m_k(k)*a2));
 
-% eq 2.34 in analytical methods book
+% eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006 
 N_k(k) = piecewise(k==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
-    k>=1, 1/2*(1+sinh(2*m_k(k)*h))/(2*m_k(k)*h));
+                   k>=1, 1/2*(1+sinh(2*m_k(k)*h)/(2*m_k(k)*h)) );
 
 % eq 14
 Z_k_e(k) = piecewise(k==0, 1/sqrt(N_k(k)) * cosh(m0 * (z+h)), ...
-    k>=1, 1/sqrt(N_k(k)) * cosh(m_k(k) * (z+h)));
+                     k>=1, 1/sqrt(N_k(k)) * cos(m_k(k) * (z+h)));
 
-% eq 12
 B_n(n) = subs(B_k, k, n);
 Lambda_n(n) = subs(Lambda_k, k, n);
 Z_n_e(n) = subs(Z_k_e, k, n);
@@ -111,10 +110,10 @@ spatial_res = 30;
 sweep_res = 10;
 
 a2_vec = h_mat*1; % linspace(.5, 1, sweep_res);
-d2_vec = h_mat*[.25 .4];
+d2_vec = h_mat*[.25];% .4];
 a1_vec = h_mat*.5;
-d1_vec = h_mat*[.5 .75];
-m0_vec = [1 2];
+d1_vec = h_mat*[.5];% .75];
+m0_vec = [1];% 2];
 
 % check valid geometry
 assert(max(d1_vec) < min(h_mat) && ...
@@ -174,12 +173,16 @@ for geom_idx = 1:numel(a2_mat)
 end
 
 %% multidim plot over geometry
-figure
-contourf(reshape(d1_mat,2,2),reshape(d2_mat,2,2),reshape(force(:,1),2,2))
-xlabel('d_1')
-ylabel('d_2')
-colorbar
-title('Heave Exciting Force: X/\rho \omega e^{i\omega t}')
+if length(d2_vec)>1 && length(d1_vec)>1
+    figure
+    contourf(reshape(d1_mat,length(d2_vec),length(d1_vec)),...
+             reshape(d2_mat,length(d2_vec),length(d1_vec)),...
+             reshape(force(:,1),length(d2_vec),length(d1_vec)))
+    xlabel('d_1')
+    ylabel('d_2')
+    colorbar
+    title('Heave Exciting Force: X/\rho \omega e^{i\omega t}')
+end
 
 %%
 function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
