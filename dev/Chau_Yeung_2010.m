@@ -243,15 +243,17 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     
     phi_e_sym = sum(phi_e_k);
     
-    % 36 and 37
-    phi_1_sym = phi_h_i1 + phi_p_i1;
-    phi_2_sym = phi_h_i2 + phi_p_i2;
-    
     % sub in geometry
-    phi_1 = subs(phi_1_sym,params,params_num);
-    phi_2 = subs(phi_2_sym,params,params_num);
+    phi_h1 = subs(phi_h_i1,params,params_num);
+    phi_h2 = subs(phi_h_i2,params,params_num);
+    phi_p1 = subs(phi_p_i1,params,params_num);
+    phi_p2 = subs(phi_p_i2,params,params_num);
     phi_e = subs(phi_e_sym,params,params_num);
     phi_e = subs(phi_e,m_k_const,m_k_num);
+
+    % 36 and 37
+    phi_1 = phi_h1 + phi_p1;
+    phi_2 = phi_h2 + phi_p2;
     
     % sub in spatial coordinates
     r_vec = linspace(0,2*a2_num,spatial_res);
@@ -260,6 +262,10 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     
     phi1 = double(subs(phi_1,{r,z},{R,Z}));
     phi2 = double(subs(phi_2,{r,z},{R,Z}));
+    phi1h = double(subs(phi_h1,{r,z},{R,Z}));
+    phi1p = double(subs(phi_p1,{r,z},{R,Z}));
+    phi2h = double(subs(phi_h2,{r,z},{R,Z}));
+    phi2p = double(subs(phi_p2,{r,z},{R,Z}));
     phie = double(subs(phi_e,{r,z},{R,Z}));
     
     % assemble total phi based on phi in each region
@@ -272,44 +278,61 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     phi(region2) = phi2(region2);
     phi(regione) = phie(regione);
 
+    phiH = NaN(size(R));
+    phiH(region1) = phi1h(region1);
+    phiH(region2) = phi2h(region2);
+
+    phiP = NaN(size(R));
+    phiP(region1) = phi1p(region1);
+    phiP(region2) = phi2p(region2);
+
     if plot_phi
         region_body = ~region1 & ~region2 & ~regione;
-        plot_potential(phi,R,Z,region_body);
+        plot_potential(phi,R,Z,region_body,'Total');
+        plot_potential(phiH,R,Z,region_body,'Homogeneous');
+        plot_potential(phiP,R,Z,region_body,'Particular');
     end
 
     % force
-    force_2_over_rho_w_eiwt = 1i * int( int(r*phi_2_sym,a1,a2), 0, 2*pi );
+    force_2_over_rho_w_eiwt = 1i * int( int(r*(phi_h_i2+phi_p_i2),a1,a2), 0, 2*pi );
     
     %symvar(force_2_over_rho_w_eiwt)
 
     force = real(double(vpa(subs(force_2_over_rho_w_eiwt,{h,a1,a2,d2},{h_num,a1_num,a2_num,d2_num}))));
 end
 
-function [] = plot_potential(phi,R,Z,region_body)
+function [] = plot_potential(phi,R,Z,region_body,name)
     figure
     minphi = min(real(phi),[],'all');
     maxphi = max(real(phi),[],'all');
-    levels = [-logspace(log10(-minphi),0,15), logspace(0,log10(maxphi),15)];
-    levels = sort([levels, 100:5:180]);
+
+    num_levels = 30;
+    if minphi<0
+        levels = [-logspace(log10(-minphi),0,num_levels/2), logspace(0,log10(maxphi),num_levels/2)];
+        levels = sort([levels, 100:5:180]);
+    else
+        levels = linspace(minphi,maxphi,num_levels);%[logspace(log10(minphi),log10(maxphi),num_levels)];
+    end
     subplot 121
     [c,h_fig] = contourf(R,Z,real(phi),levels);
     clabel(c,h_fig)
     xlabel('R')
     ylabel('Z')
-    title('Velocity Potential - Real')
+    title([name ' Velocity Potential - Real'])
     colorbar;
     set(gca,'ColorScale','log')
     
     imag_phi = imag(phi);
-    imag_phi(region_body) = NaN;
-    
-    subplot 122
-    [c,h_fig] = contourf(R,Z,imag_phi);
-    clabel(c,h_fig)
-    xlabel('R')
-    ylabel('Z')
-    title('Velocity Potential - Imaginary')
-    colorbar
+    if numel(unique(imag_phi)) > 1
+        imag_phi(region_body) = NaN;
+        subplot 122
+        [c,h_fig] = contourf(R,Z,imag_phi);
+        clabel(c,h_fig)
+        xlabel('R')
+        ylabel('Z')
+        title([name ' Velocity Potential - Imaginary'])
+        colorbar
+    end
 end
 function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_omega)
     g = 9.8;
