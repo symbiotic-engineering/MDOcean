@@ -313,11 +313,12 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
 
     if plot_phi
         region_body = ~region1 & ~region2 & ~regione;
-        plot_potential(phi,R,Z,region_body,'Total');
-        plot_potential(phiH,R,Z,region_body,'Homogeneous');
-        plot_potential(phiP,R,Z,region_body,'Particular');
+        plot_potential(phi,R,Z,region_body,'Total Potential');
+        plot_potential(phiH,R,Z,region_body,'Homogeneous Potential');
+        plot_potential(phiP,R,Z,region_body,'Particular Potential');
         plot_potential(v_r,R,Z,region_body,'Radial Velocity')
         plot_potential(v_z,R,Z,region_body,'Vertical Velocity')
+        plot_velocity(real(v_r),real(v_z),R,Z);
     end
 
     % force
@@ -345,7 +346,7 @@ function [] = plot_potential(phi,R,Z,region_body,name)
     clabel(c,h_fig)
     xlabel('R')
     ylabel('Z')
-    title([name ' Velocity Potential - Real'])
+    title([name ' - Real'])
     colorbar;
     set(gca,'ColorScale','log')
     
@@ -357,10 +358,29 @@ function [] = plot_potential(phi,R,Z,region_body,name)
         clabel(c,h_fig)
         xlabel('R')
         ylabel('Z')
-        title([name ' Velocity Potential - Imaginary'])
+        title([name ' - Imaginary'])
         colorbar
     end
 end
+function plot_velocity(v_r,v_z,R,Z)
+    v_tot = sqrt(v_r.^2 + v_z.^2);
+
+    num_levels = 10;
+    levels = logspace(1,6,num_levels);%logspace(log10(min(v_tot,[],'all')),log10(max(v_tot,[],'all')),num_levels);
+    levels = sort([levels, 0:10, 12:2:20]);
+
+    figure
+    [c,h_fig] = contourf(R,Z,v_tot,levels);
+    clabel(c,h_fig)
+    xlabel('R')
+    ylabel('Z')
+    title('Velocity')
+    colorbar
+    hold on
+    quiver(R,Z,v_r./v_tot,v_z./v_tot)
+    set(gca,'ColorScale','log')
+end
+
 function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_omega)
     g = 9.8;
     rho = 1025;
