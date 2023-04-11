@@ -255,8 +255,16 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     phi_1 = phi_h1 + phi_p1;
     phi_2 = phi_h2 + phi_p2;
     
+    % velocity
+    v_1r = diff(phi_1,r);
+    v_1z = diff(phi_1,z);
+    v_2r = diff(phi_2,r);
+    v_2z = diff(phi_2,z);
+    v_er = diff(phi_e,r);
+    v_ez = diff(phi_e,z);
+
     % sub in spatial coordinates
-    r_vec = linspace(0,2*a2_num,spatial_res);
+    r_vec = linspace(2*a2_num/spatial_res,2*a2_num,spatial_res);
     z_vec = linspace(0,h_num,spatial_res);
     [R,Z] = meshgrid(r_vec,z_vec);
     
@@ -267,6 +275,13 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     phi2h = double(subs(phi_h2,{r,z},{R,Z}));
     phi2p = double(subs(phi_p2,{r,z},{R,Z}));
     phie = double(subs(phi_e,{r,z},{R,Z}));
+
+    v1r = double(subs(v_1r,{r,z},{R,Z}));
+    v1z = double(subs(v_1z,{r,z},{R,Z}));
+    v2r = double(subs(v_2r,{r,z},{R,Z}));
+    v2z = double(subs(v_2z,{r,z},{R,Z}));
+    ver = double(subs(v_er,{r,z},{R,Z}));
+    vez = double(subs(v_ez,{r,z},{R,Z}));
     
     % assemble total phi based on phi in each region
     regione = R > a2_num;
@@ -286,11 +301,23 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     phiP(region1) = phi1p(region1);
     phiP(region2) = phi2p(region2);
 
+    v_r = NaN(size(R));
+    v_r(region1) = v1r(region1);
+    v_r(region2) = v2r(region2);
+    v_r(regione) = ver(regione);
+
+    v_z = NaN(size(R));
+    v_z(region1) = v1z(region1);
+    v_z(region2) = v2z(region2);
+    v_z(regione) = vez(regione);
+
     if plot_phi
         region_body = ~region1 & ~region2 & ~regione;
         plot_potential(phi,R,Z,region_body,'Total');
         plot_potential(phiH,R,Z,region_body,'Homogeneous');
         plot_potential(phiP,R,Z,region_body,'Particular');
+        plot_potential(v_r,R,Z,region_body,'Radial Velocity')
+        plot_potential(v_z,R,Z,region_body,'Vertical Velocity')
     end
 
     % force
