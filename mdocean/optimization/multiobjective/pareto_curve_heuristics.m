@@ -169,7 +169,7 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     Pvar_pareto_sorted = Pvar_pareto(LCOE_pareto<LCOE_max);
     Pvar_pareto_sorted = Pvar_pareto_sorted(idx_sort);
     
-    pct = linspace(0,100,length(idx_sort));
+    %pct = linspace(0,100,length(idx_sort));
     %pct_angle = 100/(pi/2) * atan((LCOE_pareto_sorted - minLCOE) ./ (Pvar_pareto_sorted - minPvar));
     num = (overallPvar(idx_best_LCOE) - Pvar_pareto_sorted) / (overallPvar(idx_best_LCOE) - minPvar);
     den = (overallLCOE(idx_best_Pvar) - LCOE_pareto_sorted) / (overallLCOE(idx_best_Pvar) - minLCOE);
