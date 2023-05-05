@@ -2,6 +2,7 @@ clear
 close all
 
 durations = 1;
+C = 2;
 DP = 1;
 E = 1:10;
 
@@ -22,17 +23,21 @@ for i_tau = 1:length(durations)
         figure
         plot(E,cv)
         DP_star = DP(i_DP) : DP(end);
+        c = zeros(1,length(DP_star));
         for i_DPstar = 1:length(DP_star)
             E_DPstar = 1;
-            c = 1;
+            c(i_DPstar) = 1;
         end
     end
-    c_min = 1;
+    c_min = min(c);
+    C_tau = C(i_tau);
+    figure
+    plot(DP_star,c_min,[min(DP_star) max(DP_star)],[C_tau C_tau])
 end
 
 % get power PDF for min LCOE design
 
 % plot pareto front
 pareto_curve_heuristics()
-figure(2)
+figure(4)
 
