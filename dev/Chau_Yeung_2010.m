@@ -265,7 +265,7 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
 
     % sub in spatial coordinates
     r_vec = linspace(2*a2_num/spatial_res,2*a2_num,spatial_res);
-    z_vec = linspace(0,h_num,spatial_res);
+    z_vec = linspace(-h_num,0,spatial_res);
     [R,Z] = meshgrid(r_vec,z_vec);
     
     phi1 = double(subs(phi_1,{r,z},{R,Z}));
@@ -285,8 +285,8 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     
     % assemble total phi based on phi in each region
     regione = R > a2_num;
-    region1 = R < a1_num & Z < (h_num - d1_num);
-    region2 = R > a1_num & R <= a2_num & Z < (h_num - d2_num);
+    region1 = R < a1_num & Z < -d1_num;
+    region2 = R > a1_num & R <= a2_num & Z < -d2_num;
     
     phi = NaN(size(R));
     phi(region1) = phi1(region1);
