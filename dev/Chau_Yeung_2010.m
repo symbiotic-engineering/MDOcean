@@ -113,7 +113,7 @@ a2_vec = h_mat*1; % linspace(.5, 1, sweep_res);
 d2_vec = h_mat*[.25];% .4];
 a1_vec = h_mat*.5;
 d1_vec = h_mat*[.5];% .75];
-m0_vec = [1];% 2];
+m0_vec = [.1];% 2];
 
 % check valid geometry
 assert(max(d1_vec) < min(h_mat) && ...
@@ -123,7 +123,7 @@ assert(max(d1_vec) < min(h_mat) && ...
 
 [a2_mat,d2_mat,a1_mat,d1_mat] = ndgrid(a2_vec,d2_vec,a1_vec, d1_vec);
 
-phi = zeros(spatial_res,spatial_res,numel(a2_mat),length(m0_vec));
+phi = zeros(spatial_res,spatial_res+2,numel(a2_mat),length(m0_vec));
 [force, A, B, sigma_force, sigma_position] = deal(zeros(numel(a2_mat), length(m0_vec)));
 
 plot_phi = true;
@@ -265,6 +265,7 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
 
     % sub in spatial coordinates
     r_vec = linspace(2*a2_num/spatial_res,2*a2_num,spatial_res);
+    r_vec = sort([r_vec a1_num a2_num]);
     z_vec = linspace(-h_num,0,spatial_res);
     [R,Z] = meshgrid(r_vec,z_vec);
     
@@ -285,7 +286,7 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
     
     % assemble total phi based on phi in each region
     regione = R > a2_num;
-    region1 = R < a1_num & Z < -d1_num;
+    region1 = R <= a1_num & Z < -d1_num;
     region2 = R > a1_num & R <= a2_num & Z < -d2_num;
     
     phi = NaN(size(R));
@@ -319,6 +320,9 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
         plot_potential(v_r,R,Z,region_body,'Radial Velocity')
         plot_potential(v_z,R,Z,region_body,'Vertical Velocity')
         plot_velocity(real(v_r),real(v_z),R,Z);
+
+        plot_matching(phi1,phi2,phie,a1_num,a2_num,R,Z,'\phi')
+        plot_matching(v1r,v2r,ver,a1_num,a2_num,R,Z,'v_r')
     end
 
     % force
@@ -379,6 +383,28 @@ function plot_velocity(v_r,v_z,R,Z)
     hold on
     quiver(R,Z,v_r./v_tot,v_z./v_tot)
     set(gca,'ColorScale','log')
+end
+
+function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name)
+    % at R = a1
+    [~,idx_a1] = min(abs(R - a1),[],2,'linear');
+    phi1_a1 = abs(phi1(idx_a1));
+    phi2_a1 = abs(phi2(idx_a1));
+
+    % at R = a2
+    [~,idx_a2] = min(abs(R - a2),[],2,'linear');
+    phi2_a2 = abs(phi2(idx_a2));
+    phie_a2 = abs(phie(idx_a2));
+
+    % plot
+    figure
+    plot(Z(idx_a1),phi1_a1,'r--',Z(idx_a1),phi2_a1,'m-')
+    hold on
+    plot(Z(idx_a2),phi2_a2,'b-',Z(idx_a2),phie_a2,'c--')
+    legend('phi_1,a1','phi_2,a1','phi_2,a2','phi_e,a2')
+    xlabel('Z')
+    ylabel(['|' name '|'])
+    title([name ' Matching'])
 end
 
 function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_omega)
