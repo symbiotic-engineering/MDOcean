@@ -401,7 +401,7 @@ function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name)
     plot(Z(idx_a1),phi1_a1,'r--',Z(idx_a1),phi2_a1,'m-')
     hold on
     plot(Z(idx_a2),phi2_a2,'b-',Z(idx_a2),phie_a2,'c--')
-    legend('phi_1,a1','phi_2,a1','phi_2,a2','phi_e,a2')
+    legend([name '_1 at a_1'],[name '_2 at a_1'],[name '_2 at a_2'],[name '_e at a_2'])
     xlabel('Z')
     ylabel(['|' name '|'])
     title([name ' Matching'])
