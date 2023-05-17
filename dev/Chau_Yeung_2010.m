@@ -343,7 +343,8 @@ function [] = plot_potential(phi,R,Z,region_body,name)
         levels = [-logspace(log10(-minphi),0,num_levels/2), logspace(0,log10(maxphi),num_levels/2)];
         levels = sort([levels, 100:5:180]);
     else
-        levels = linspace(minphi,maxphi,num_levels);%[logspace(log10(minphi),log10(maxphi),num_levels)];
+        %levels = linspace(minphi,maxphi,num_levels);%[logspace(log10(minphi),log10(maxphi),num_levels)];
+        levels = 10 * ( floor(minphi/10) : ceil(maxphi/10) ); % count by 10s
     end
     subplot 121
     [c,h_fig] = contourf(R,Z,real(phi),levels);
@@ -352,7 +353,7 @@ function [] = plot_potential(phi,R,Z,region_body,name)
     ylabel('Z')
     title([name ' - Real'])
     colorbar;
-    set(gca,'ColorScale','log')
+    %set(gca,'ColorScale','log')
     
     imag_phi = imag(phi);
     if numel(unique(imag_phi)) > 1
@@ -382,7 +383,7 @@ function plot_velocity(v_r,v_z,R,Z)
     colorbar
     hold on
     quiver(R,Z,v_r./v_tot,v_z./v_tot)
-    set(gca,'ColorScale','log')
+    %set(gca,'ColorScale','log')
 end
 
 function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name)
