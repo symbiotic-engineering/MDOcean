@@ -29,5 +29,13 @@ function [ratio] = check_max_CW()
     colorbar
     grid on
     title('CW / CW_{max}')
+
+    figure
+    plot(p.T,ratio(1,:))
+    xlabel('Wave Period T (s)')
+    ylabel('CW / CW_{max}')
+    hold on
+    plot([min(p.T) max(p.T)], [1 1], 'k--')
+    improvePlot
 end
 
