@@ -26,6 +26,7 @@ insurance       = (.8 + .2*N_WEC) * 227000;
 
 opex = operations + postinstall + shoreoperations + replacement ...
         + consumables + insurance;
+opex=1193447.03 * N_WEC^.443321491;
 
 hr_per_yr = 8766;
 P_avg = N_WEC * P_elec * efficiency;
