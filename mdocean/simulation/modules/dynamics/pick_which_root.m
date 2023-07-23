@@ -3,6 +3,7 @@ function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
     which_soln = roots == real(roots) & roots > 0 & roots <= 1; % real solns on (0, 1]
     both_ok = sum(which_soln,3) == 2;
     
+    temp=which_soln;
     which_soln(idx_no_sat) = 1; % temporarily mark the non-saturated solutions
                                 % as having one solution, to ensure the 
                                 % logic below works correctly
@@ -24,14 +25,13 @@ function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
             end
             % confirm that 1 soln per sea state meets criteria
         end
-
+        which_soln=temp;
         mult = get_relevant_soln(which_soln,roots,idx_no_sat);   
     end
 end
 
 function mult = get_relevant_soln(which_soln, roots, idx_no_sat)
 % pick the specified roots using multidimensional logical indexing
-
     mult = zeros(size(idx_no_sat));
 
     % figure out 3d and 2d indices
