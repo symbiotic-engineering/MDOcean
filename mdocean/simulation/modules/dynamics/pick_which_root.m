@@ -3,7 +3,6 @@ function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
     which_soln = roots == real(roots) & roots > 0 & roots <= 1; % real solns on (0, 1]
     both_ok = sum(which_soln,3) == 2;
     
-    temp=which_soln;
     which_soln(idx_no_sat) = 1; % temporarily mark the non-saturated solutions
                                 % as having one solution, to ensure the 
                                 % logic below works correctly
@@ -15,17 +14,12 @@ function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
     
     else                        % one or zero solutions
         num_solns = sum(which_soln,3);
-        if ~(all( num_solns == 1,'all') ) % if there are some with no solns
-            which_soln(num_solns==0) = roots(num_solns==0) > 0 & roots(num_solns==0) <= 1.001; % try wider tolerance
-            num_solns(num_solns==0) = sum(which_soln(num_solns==0),3);
-            if ~(all( num_solns == 1,'all'))
-                % if still a problem, proceed with which_soln set to zero
-                % for the problem sea states, which will set mult = 0
-                warning('Some sea states have no valid quadratic solution, so their energy is zeroed.')
-            end
-            % confirm that 1 soln per sea state meets criteria
+        if ~(all( num_solns == 1,'all') ) % confirm that 1 soln per sea state meets criteria
+            % if there are some with no solns, proceed with which_soln set to zero
+            % for the problem sea states, which will set mult = 0
+            warning('Some sea states have no valid quadratic solution, so their energy is zeroed.')        
         end
-        which_soln=temp;
+
         mult = get_relevant_soln(which_soln,roots,idx_no_sat);   
     end
 end

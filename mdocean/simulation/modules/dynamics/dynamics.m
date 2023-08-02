@@ -76,9 +76,13 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
         F_err_2 = abs(F_ptrain ./ (f_sat .* F_ptrain_unsat) - 1);
         % 0.1 percent error
         if any(f_sat<1,'all')
-%            assert(all(F_err_1(f_sat < 1) < 1e-3),'all');
+            stuff = all(F_err_1(f_sat < 1) < 1e-3, 'all');
+            if ~stuff
+                stuff
+            end
+            %assert(stuff);
         end
-%        assert(all(F_err_2 < 1e-3,'all'));
+        assert(all(F_err_2 < 1e-3,'all'));
 
         F_heave_fund = sqrt( (mult .* in.B_p .* w).^2 + (mult .* K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
         F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
