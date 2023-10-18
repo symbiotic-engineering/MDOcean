@@ -24,10 +24,10 @@ p.Bp = p.Bh; % this should techncially depend on rb
 % maximum force
 wn = p.w / w_star;
 w_u_star = p.w / w_n_u;
-zeta = rb / (rb - 1) * w_star / w_u_star * zeta_u;
+zeta = r_b / (r_b - 1) * w_star / w_u_star * zeta_u;
 X = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
-F_p = (p.Bp * p.w + p.Kp) * X;
-p.F_max = F_max_over_Fp * Fp;
+F_p = ((p.Bp * p.w)^2 + p.Kp^2) * X;
+p.F_max = F_max_over_Fp * F_p;
 
 % ode inputs
 T = 2*pi/p.w;
