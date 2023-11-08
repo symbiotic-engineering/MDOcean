@@ -1,6 +1,7 @@
 function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
 
     which_soln = roots == real(roots) & roots > 0 & roots <= 1; % real solns on (0, 1]
+
     both_ok = sum(which_soln,3) == 2;
     
     which_soln(idx_no_sat) = 1; % temporarily mark the non-saturated solutions
@@ -8,8 +9,11 @@ function mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad)
                                 % logic below works correctly
 
     if any(both_ok,'all')       % two solutions
-        warning('Using outliers to determine relevant quadratic formula solution')
-        
+        roots_equal = roots(:,:,1) == roots(:,:,2);
+        if ~all(roots_equal(both_ok),'all')
+            warning('Two valid non-equal solutions, choosing 1st arbitrarily')
+        end
+
         mult = handle_two_solns(both_ok,which_soln,roots,idx_no_sat,a_quad,b_quad,c_quad);
     
     else                        % one or zero solutions
