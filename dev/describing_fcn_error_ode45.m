@@ -24,6 +24,9 @@ results_sim = cat(dim_cat, avg_pwr,  max_x,  max_xdot,  pwr_ratio,  x_ratio,  xd
 results_act = cat(dim_cat, avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2);
 results_str = {'Average Power','Max X','Max Xdot','Power Ratio','X Ratio','Xdot Ratio'};
 
+results_unsat_sim = results_sim(F_MAX_FP >= 1);
+results_unsat_act = results_act(F_MAX_FP >= 1);
+
 for j = 1:size(results_sim,dim_cat)
     figure
     res_sim = results_sim(:,:,:,j);
