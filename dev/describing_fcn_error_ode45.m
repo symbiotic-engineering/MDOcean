@@ -2,9 +2,9 @@ clear
 close all
 
 % sweep variables
-zeta_u = [.2 .5 .8 1]; % sets level of damping of uncontrolled system
-w_u_star = 0.5 : 0.1 : 0.9; % sets frequency ratio of uncontrolled system
-F_max_over_Fp = 0.5 : 0.1 : 1.2; % sets level of saturation
+zeta_u = .01 : .02 : .15; % sets level of damping of uncontrolled system
+w_u_star = 0.1 : 0.2 : 1.5; % sets frequency ratio of uncontrolled system
+F_max_over_Fp = 0.1 : 0.2 : 1.1; % sets level of saturation
 
 % generate sweep grid
 [ZETA_U,W_U_STAR,F_MAX_FP] = meshgrid(zeta_u, w_u_star, F_max_over_Fp);
@@ -79,7 +79,8 @@ F_max_over_Fp = min(F_max_over_Fp, 1);
 f_sat = 2/pi * (F_max_over_Fp .* sqrt(1 - F_max_over_Fp.^2) + asin(F_max_over_Fp));
 rkz = abs(w_u_star / w_star * r_b .* zeta_u ./ ( ((w_u_star / w_star).^2 - 1) * (r_b-1)));
 % m_sat equation assumes r_b = 2 and w_star = 1
-m_sat = -f_sat .* (f_sat .* rkz.^2 - f_sat + 2*rkz .* sqrt(-f_sat.^2 + rkz.^2 + 1)) ./ (f_sat.^2 .* rkz.^2 + f_sat.^2 - 4*rkz.^2);
+m_sat = -f_sat .* (f_sat .* rkz.^2 - f_sat + 2*rkz .* sqrt(-f_sat.^2 + rkz.^2 + 1)) ...
+    ./ (f_sat.^2 .* rkz.^2 + f_sat.^2 - 4*rkz.^2);
 e = f_sat.^2 ./ m_sat;
 
 % P_unsat equation assumes r_b = 2 and w_star = 1
@@ -99,7 +100,8 @@ xdot_ratio = f_sat ./ m_sat;
 
 end
 
-function [avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = ground_truth(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h)
+function [avg_pwr, max_x, max_xdot, ...
+    pwr_ratio, x_ratio, xdot_ratio] = ground_truth(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h)
 
 [avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = deal(zeros(size(ZETA_U)));
 
@@ -138,7 +140,7 @@ wn = p.w / w_star;
 w_u_star = p.w / w_n_u;
 zeta = r_b / (r_b - 1) * w_star / w_u_star * zeta_u;
 X = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
-F_p = ((p.Bp * p.w)^2 + p.Kp^2) * X;
+F_p = sqrt((p.Bp * p.w)^2 + p.Kp^2) * X;
 p.F_max = F_max_over_Fp * F_p;
 
 % ode inputs
