@@ -68,7 +68,9 @@ for j = 1:size(results_sim,dim_cat)
     sgtitle(results_str{j})
 end
 
-function [avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h)
+function [avg_pwr, max_x, max_xdot, ...
+    pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(zeta_u, w_u_star, ...
+                                                    F_max_over_Fp, m, w, F_h)
 
 r_b = 2;
 w_star = 1;
@@ -106,8 +108,8 @@ for i = 1:numel(ZETA_U)
     w_u_star = W_U_STAR(i);
     F_max_over_Fp = F_MAX_FP(i);
 
-    [avg_pwr(i), max_x(i), max_xdot(i)] = run_ode(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h);
-    [avg_pwr_unsat, max_x_unsat, max_xdot_unsat] = run_ode(zeta_u, w_u_star, 1e8, m, w, F_h);
+    [avg_pwr(i), max_x(i), max_xdot(i)] = run_ode(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h, false);
+    [avg_pwr_unsat, max_x_unsat, max_xdot_unsat] = run_ode(zeta_u, w_u_star, 1e8, m, w, F_h, false);
     
     pwr_ratio(i) = avg_pwr(i) / avg_pwr_unsat;
     x_ratio(i) = max_x(i) / max_x_unsat;
@@ -116,7 +118,7 @@ end
 
 end
 
-function [avg_pwr, max_x, max_xdot] = run_ode(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h)
+function [avg_pwr, max_x, max_xdot] = run_ode(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h, plotOn)
 
 % dependent variables
 w_n_u = w ./ w_u_star;
@@ -142,18 +144,20 @@ p.F_max = F_max_over_Fp * F_p;
 % ode inputs
 T = 2*pi/p.w;
 y0 = [0,0];
-tspan = [0 5*T];
+tspan = linspace(0,5*T,501);
 
 % ode solve
 [t,y] = ode45(@(t,y)dynamics(t,y,p),tspan,y0);
 [~,Fp,P] = dynamics(t',y',p);
 
 % plot
-% figure
-% plot(t,y)
-% hold on
-% plot(t,Fp,t,P)
-% legend('x','xdot','Fp','P')
+if plotOn
+    figure
+    plot(t,y)
+    hold on
+    plot(t,Fp,t,P)
+    legend('x','xdot','Fp','P')
+end
 
 avg_pwr = mean(P(t>=4*T));
 max_x = max(abs(y(t>=4*T,1)));
