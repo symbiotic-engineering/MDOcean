@@ -55,6 +55,7 @@ function newmap = bluewhitered(m)
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 
+shading('interp');
 
 if nargin < 1
    m = size(get(gcf,'colormap'),1);
@@ -132,6 +133,9 @@ else
     end
     
 end
+
+shading('faceted');
+
 % 
 % m = 64;
 % new = [bottom; botmiddle; middle; topmiddle; top];
