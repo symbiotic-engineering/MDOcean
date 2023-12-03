@@ -88,7 +88,7 @@ P_unsat = 1/16 * F_h^2 / (m*w) * w_u_star ./ zeta_u;
 P_sat = P_unsat .* e;
 
 zeta = r_b/(r_b - 1) * w_star ./ w_u_star .* zeta_u;
-X_unsat = F_h^2 / (m*w^2) * w_star.^2 ./ sqrt( (1 - w_star^2)^2 + (2*zeta*w_star).^2);
+X_unsat = F_h / (m*w^2) * w_star.^2 ./ sqrt( (1 - w_star^2)^2 + (2*zeta*w_star).^2);
 X_sat = X_unsat .* f_sat ./ m_sat;
 
 avg_pwr = P_sat;
@@ -139,13 +139,17 @@ p.Bp = p.Bh; % fixme: this should techncially depend on rb
 wn = p.w / w_star;
 w_u_star = p.w / w_n_u;
 zeta = r_b / (r_b - 1) * w_star / w_u_star * zeta_u;
-X = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
-F_p = sqrt((p.Bp * p.w)^2 + p.Kp^2) * X;
+X_unsat = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
+
+[~, ~, ~, ~, x_ratio, ~] = describing_fcn(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h);
+X_sat = X_unsat .* x_ratio;
+
+F_p = sqrt((p.Bp * p.w)^2 + p.Kp^2) * X_unsat;
 p.F_max = F_max_over_Fp * F_p;
 
 % ode inputs
 T = 2*pi/p.w;
-y0 = [0,0];
+y0 = [-X_sat,0];
 tspan = linspace(0,5*T,501);
 
 % ode solve
@@ -161,9 +165,18 @@ if plotOn
     legend('x','xdot','Fp','P')
 end
 
+% use 5th period
 avg_pwr = mean(P(t>=4*T));
 max_x = max(abs(y(t>=4*T,1)));
 max_xdot = max(abs(y(t>=4*T,2)));
+
+% compare against 4th period to ensure convergance
+avg_pwr_4th = mean(P(t>=3*T & t<=4*T));
+if ~ismembertol(avg_pwr,avg_pwr_4th,0.05) % 1% error allowed
+    avg_pwr = NaN;
+    max_x = NaN;
+    max_xdot = NaN;
+end
 
 end 
 
