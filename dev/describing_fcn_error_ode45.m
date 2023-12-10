@@ -4,7 +4,7 @@ close all
 % sweep variables
 zeta_u = .01 : .02 : .15; % sets level of damping of uncontrolled system
 w_u_star = 0.1 : 0.2 : 1.5; % sets frequency ratio of uncontrolled system
-F_max_over_Fp = 0.1 : 0.2 : 1.1; % sets level of saturation
+F_max_over_Fp = 0.7 : 0.2 : 1.1; % sets level of saturation
 
 % generate sweep grid
 [ZETA_U,W_U_STAR,F_MAX_FP] = meshgrid(zeta_u, w_u_star, F_max_over_Fp);
@@ -15,8 +15,12 @@ w = 1;  % dimensional term for frequency
 F_h = 1; % dimensional term for exciting force
 
 % get results
-[avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
+tic
+[avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h, 7);
+toc
+tic
 [avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
+toc
 
 % combine results
 dim_cat = ndims(ZETA_U)+1;
@@ -68,35 +72,63 @@ for j = 1:size(results_sim,dim_cat)
     sgtitle(results_str{j})
 end
 
+function [f_sat_i] = get_f_sat(F_max_over_Fp, i)
+    assert(all(F_max_over_Fp <= 1 & F_max_over_Fp >= 0,'all'))
+    if i == 1
+        f_sat_i = 2/pi * (F_max_over_Fp .* sqrt(1 - F_max_over_Fp.^2) + asin(F_max_over_Fp));
+
+    elseif rem(i,2)==1 && i>0 % odd positive numbers
+        theta = i * asin(F_max_over_Fp);
+        f_sat_i = 4/pi * 1/(i*(i^2-1)) * (i * sqrt(1 - F_max_over_Fp.^2) .* sin(theta) ...
+            - F_max_over_Fp .* cos(theta));
+
+    else % nonpositive numbers and even positive numbers
+        f_sat_i = 0;
+    end
+
+end
+
 function [avg_pwr, max_x, max_xdot, ...
     pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(zeta_u, w_u_star, ...
-                                                    F_max_over_Fp, m, w, F_h)
+                                                    F_max_over_Fp, m, w, F_h, order)
 
 r_b = 2;
 w_star = 1;
 
 F_max_over_Fp = min(F_max_over_Fp, 1);
-f_sat = 2/pi * (F_max_over_Fp .* sqrt(1 - F_max_over_Fp.^2) + asin(F_max_over_Fp));
 rkz = abs(w_u_star / w_star * r_b .* zeta_u ./ ( ((w_u_star / w_star).^2 - 1) * (r_b-1)));
-% m_sat equation assumes r_b = 2 and w_star = 1
-m_sat = -f_sat .* (f_sat .* rkz.^2 - f_sat + 2*rkz .* sqrt(-f_sat.^2 + rkz.^2 + 1)) ...
-    ./ (f_sat.^2 .* rkz.^2 + f_sat.^2 - 4*rkz.^2);
-e = f_sat.^2 ./ m_sat;
 
 % P_unsat equation assumes r_b = 2 and w_star = 1
 P_unsat = 1/16 * F_h^2 / (m*w) * w_u_star ./ zeta_u;
-P_sat = P_unsat .* e;
 
 zeta = r_b/(r_b - 1) * w_star ./ w_u_star .* zeta_u;
 X_unsat = F_h / (m*w^2) * w_star.^2 ./ sqrt( (1 - w_star^2)^2 + (2*zeta*w_star).^2);
-X_sat = X_unsat .* f_sat ./ m_sat;
 
-avg_pwr = P_sat;
-max_x = X_sat;
-max_xdot = max_x * w;
-pwr_ratio = e;
-x_ratio = f_sat ./ m_sat;
-xdot_ratio = f_sat ./ m_sat;
+orders = 1 : 2 : order;
+[P_sat, X_sat, e, f_sat, m_sat] = deal(zeros([length(orders),size(F_max_over_Fp)]));
+for n = 1:length(orders)
+    i = orders(n);
+    f_sat_i = get_f_sat(F_max_over_Fp, i);
+    
+    % m_sat equation assumes r_b = 2 and w_star = 1
+    m_sat_i = -f_sat_i .* (f_sat_i .* rkz.^2 - f_sat_i + 2*rkz .* sqrt(-f_sat_i.^2 + rkz.^2 + 1)) ...
+        ./ (f_sat_i.^2 .* rkz.^2 + f_sat_i.^2 - 4*rkz.^2);
+    e_i = f_sat_i.^2 ./ m_sat_i;
+
+    colons = repmat({':'},ndims(f_sat_i),1); % to allow indexing when we don't know dimensions ahead of time
+    P_sat(n,colons{:}) = P_unsat .* e_i;
+    X_sat(n,colons{:}) = X_unsat .* f_sat_i ./ m_sat_i;
+    f_sat(n,colons{:}) = f_sat_i;
+    m_sat(n,colons{:}) = m_sat_i;
+    e(n,colons{:}) = e_i;
+end
+
+avg_pwr = squeeze(sum(P_sat));
+max_x = squeeze(sum(X_sat));
+max_xdot = squeeze(sum(X_sat * w * i));
+pwr_ratio = squeeze(sum(e));
+x_ratio = squeeze(sum(f_sat ./ m_sat));
+xdot_ratio = squeeze(sum(f_sat ./ m_sat)); % fixme this isn't true for i>1
 
 end
 
@@ -141,7 +173,7 @@ w_u_star = p.w / w_n_u;
 zeta = r_b / (r_b - 1) * w_star / w_u_star * zeta_u;
 X_unsat = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
 
-[~, ~, ~, ~, x_ratio, ~] = describing_fcn(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h);
+[~, ~, ~, ~, x_ratio, ~] = describing_fcn(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h, 1);
 X_sat = X_unsat .* x_ratio;
 
 F_p = sqrt((p.Bp * p.w)^2 + p.Kp^2) * X_unsat;
