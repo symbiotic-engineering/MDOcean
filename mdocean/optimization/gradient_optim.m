@@ -4,7 +4,7 @@ if nargin == 0
     % set default parameters if function is run without input
     clc;close all
     p = parameters();
-    b = var_bounds();
+    b = var_bounds(p);
     x0_input = b.X_start_struct;
     display = 'iter';
     plotfn = @optimplotfval;
