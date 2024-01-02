@@ -125,11 +125,11 @@ for n = 1:length(orders)
 end
 
 avg_pwr = squeeze(sum(P_sat));
-max_x = squeeze(sum(X_sat));
-max_xdot = squeeze(sum(X_sat * w * i));
+max_x    = squeeze(X_sat(1,colons{:}));
+max_xdot = squeeze(X_sat(1,colons{:}) * w);
 pwr_ratio = squeeze(sum(e));
-x_ratio = squeeze(sum(f_sat ./ m_sat));
-xdot_ratio = squeeze(sum(f_sat ./ m_sat)); % fixme this isn't true for i>1
+x_ratio    = squeeze(f_sat(1,colons{:}) ./ m_sat(1,colons{:}));
+xdot_ratio = squeeze(f_sat(1,colons{:}) ./ m_sat(1,colons{:}));
 
 end
 
