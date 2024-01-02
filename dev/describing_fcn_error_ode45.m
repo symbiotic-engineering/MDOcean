@@ -2,9 +2,9 @@ clear
 close all
 
 % sweep variables
-zeta_u = [.05,.10,.15];%.01 : .02 : .15; % sets level of damping of uncontrolled system
-w_u_star = [0.1,0.6,1.1];%0.1 : 0.2 : 1.5; % sets frequency ratio of uncontrolled system
-F_max_over_Fp = 0.7 : 0.2 : 1.1; % sets level of saturation
+zeta_u = .01 : .03 : .13; % sets level of damping of uncontrolled system
+w_u_star = 0.1 : 0.3 : 1.3; % sets frequency ratio of uncontrolled system
+F_max_over_Fp = 0.3 : 0.2 : 1.1; % sets level of saturation
 
 % generate sweep grid
 [ZETA_U,W_U_STAR,F_MAX_FP] = meshgrid(zeta_u, w_u_star, F_max_over_Fp);
@@ -63,6 +63,7 @@ for j = 1:size(results_sim,dim_cat)
     error_h = subplot(1,3,3);
     slice(ZETA_U,W_U_STAR,F_MAX_FP, (res_sim-res_act)./res_act,...
         zeta_u(2:end),w_u_star(end),F_max_over_Fp,'nearest');
+    caxis([-1,1])
     colormap(error_h,bluewhitered)
     colorbar
     xlabel('\zeta_u')
@@ -159,12 +160,12 @@ function [avg_pwr, max_x, max_xdot, ...
     % load WOT python results from mat file 
     vars = {'avg_pwr', 'max_x', 'max_xdot', 'pwr_ratio', 'x_ratio', ...
         'xdot_ratio','zeta_u', 'w_u_star', 'f_max_Fp', 'm', 'w', 'F_h'};
-    load('wot_sweep_results_20240101_234222_N=11.mat',vars{:})
+    load('wot_sweep_results_20240102_023554_N=11.mat',vars{:})
 
     % confirm that WOT was run with same inputs as matlab
-    assert(all(ZETA_U == zeta_u,'all'))
-    assert(all(W_U_STAR == w_u_star,'all'))
-    assert(all(F_MAX_FP == f_max_Fp,'all'))
+    assert(all(ismembertol(ZETA_U, zeta_u),'all'))
+    assert(all(ismembertol(W_U_STAR, w_u_star),'all'))
+    assert(all(ismembertol(F_MAX_FP, f_max_Fp),'all'))
     assert(m == m_)
     assert(w == w_)
     assert(F_h == F_h_)
