@@ -2,8 +2,8 @@ clear
 close all
 
 % sweep variables
-zeta_u = .01 : .02 : .15; % sets level of damping of uncontrolled system
-w_u_star = 0.1 : 0.2 : 1.5; % sets frequency ratio of uncontrolled system
+zeta_u = [.05,.10,.15];%.01 : .02 : .15; % sets level of damping of uncontrolled system
+w_u_star = [0.1,0.6,1.1];%0.1 : 0.2 : 1.5; % sets frequency ratio of uncontrolled system
 F_max_over_Fp = 0.7 : 0.2 : 1.1; % sets level of saturation
 
 % generate sweep grid
@@ -19,7 +19,8 @@ tic
 [avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h, 7);
 toc
 tic
-[avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
+[avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth_wot(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
+%[avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
 toc
 
 % combine results
@@ -149,6 +150,24 @@ for i = 1:numel(ZETA_U)
     x_ratio(i) = max_x(i) / max_x_unsat;
     xdot_ratio(i) = max_xdot(i) / max_xdot_unsat;
 end
+
+end
+
+function [avg_pwr, max_x, max_xdot, ...
+    pwr_ratio, x_ratio, xdot_ratio] = ground_truth_wot(ZETA_U, W_U_STAR, F_MAX_FP, m_, w_, F_h_) %#ok<STOUT> 
+
+    % load WOT python results from mat file 
+    vars = {'avg_pwr', 'max_x', 'max_xdot', 'pwr_ratio', 'x_ratio', ...
+        'xdot_ratio','zeta_u', 'w_u_star', 'f_max_Fp', 'm', 'w', 'F_h'};
+    load('wot_sweep_results_20240101_234222_N=11.mat',vars{:})
+
+    % confirm that WOT was run with same inputs as matlab
+    assert(all(ZETA_U == zeta_u,'all'))
+    assert(all(W_U_STAR == w_u_star,'all'))
+    assert(all(F_MAX_FP == f_max_Fp,'all'))
+    assert(m == m_)
+    assert(w == w_)
+    assert(F_h == F_h_)
 
 end
 
