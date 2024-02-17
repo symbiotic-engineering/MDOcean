@@ -48,7 +48,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
 g = zeros(1,18);
@@ -83,7 +83,7 @@ if nargout > 12 % if returning extra struct output for validation
                                             in.t_fc, in.t_fb, in.t_sr, in.t_dt,...
                                             D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
