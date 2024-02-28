@@ -96,6 +96,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
     hold on
     
+
     % utopia point
     plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
     
@@ -115,7 +116,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     ylabel('Power Variation (%)')
     title('Pareto Front')
     xlim([0 1])
-    ylim([25 350])
+    ylim([25 400])
     improvePlot
     
     % solar reference
@@ -123,21 +124,26 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     % for the yellow color to work, do not use improvePlot below here
     
     % wind reference
-    plot(LCOE_wind, P_var_wind,'-o','MarkerSize',12,'MarkerEdgeColor',[.2, .2, .8],'MarkerFaceColor',[.2, .2, .8])
-    
+    uniCha = char(hex2dec('1F7C0'))
+    %markersize = 10;
+    %markerSymbol = [0, -1; 0.5, 0; 0, 1; -0.5, 0; 0, -1] * markersize;
+
+    %plot(LCOE_wind, P_var_wind,Marker=uniCha, MarkerSize=100, Color='blue')
+    plot(LCOE_wind, P_var_wind,'o','MarkerSize',12,'MarkerFaceColor', [0.3010 0.7450 0.9330])
+    text(LCOE_wind, P_var_wind, uniCha, 'FontSize', 20, 'Color', 'black', 'HorizontalAlignment', 'center')
 
     % Define the coordinates for the 3-blade marker
-    markerX = [0, -0.1, 0.1];
-    markerY = [0, 0.1, 0.1];
+    %markerX = [0, -0.1, 0.1];
+    %markerY = [0, 0.1, 0.1];
 
     % Repeat the marker at specific indices (adjust as needed)
-    markerIndices = [2, 1];
+    %markerIndices = [2, 1];
 
     % Plot the 3-blade marker at specified indices
     % plot(LCOE_wind, P_var_wind, 'Marker', 'none');  % Plot without markers initially
-    plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r');
-    plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g');
-    plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b');
+    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r');
+    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g');
+    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b');
     % for idx = markerIndices
     %     plot(LCOE_wind(idx) + markerX, P_var_wind(idx) + markerY, 'r-', 'LineWidth', 1);
     % end
@@ -148,7 +154,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     
 
     % text labels
-    sz = 14;
+    sz = 12;
     text(LCOE_nom+.03,P_var_nom,'Nominal','FontSize',sz)
     text(LCOE_nom+.01,P_var_nom-5,'Actual [10]','FontSize',sz)
     text(LCOE_nom_sim-.02,P_var_nom_sim+5,'Nominal','FontSize',sz)
