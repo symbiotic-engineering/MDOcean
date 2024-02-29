@@ -13,8 +13,8 @@ b = var_bounds();
 %         ];	
 
 n = 20;
-% X = [ b.D_sft_nom, linspace(b.D_sft_min, b.D_sft_max, n);
-%       b.D_i_ratio_nom, linspace(b.D_i_ratio_min, b.D_i_ratio_max, n);
+% X = [ b.D_f_nom, linspace(b.D_f_min, b.D_f_max, n);
+%       b.D_s_ratio_nom, linspace(b.D_s_ratio_min, b.D_s_ratio_max, n);
 %       b.D_or_ratio_nom, linspace(b.D_or_ratio_min, b.D_or_ratio_max, n);
 %       1, ones([1 n]);
 %       b.F_max_nom, linspace(b.F_max_min, b.F_max_max, n);
@@ -24,7 +24,8 @@ n = 20;
 
 ratios = logspace(log10(1/3),log10(3),n);
 ratios = [1, ratios(ratios~=1)];
-X =  [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, 1, b.F_max_nom, b.D_int_nom, b.w_n_nom]' * ratios;
+%X =  [b.D_f_nom, b.D_s_ratio_nom, b.D_or_ratio_nom, 1, b.F_max_nom, b.B_p_nom, b.w_n_nom]' * ratios;
+X =  [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom]' * ratios;
 X(4,:) = ones(1,n+1);
 
 X_nom = X(:,1);	
@@ -71,16 +72,16 @@ end
 [op_feasible, CC] = is_feasible(power_op, B_op, FOS1Y_op, power_op, p);	
 
 % create table for display	
-var_names = {'D_sft',...    % outer diameter of float (m)	
-            'D_i/D_sft',... % inner diameter ratio of float (m)	
-            'D_or/D_sft',...      % outer diameter ratio of reaction plate (m)	
+var_names = {'D_f',...    % outer diameter of float (m)	
+            'D_s/D_f',... % inner diameter ratio of float (m)	
+            'D_or/D_f',...      % outer diameter ratio of reaction plate (m)	
             'M',...         % material (-)	
             'F_max',...     % number of WECs in array (-)	
-            'D_int',...     % internal damping of controller (Ns/m)	
+            'B_p',...     % internal damping of controller (Ns/m)	
             'w_n'};         % natural frequency (rad/s)
-var_names_pretty = {'D_{sft}',...    % outer diameter of float (m)	
-            'D_i/D_{sft}',... % inner diameter ratio of float (m)	
-            'D_{or}/D_{sft}',...      % outer diameter of reaction plate (m)	
+var_names_pretty = {'D_{f}',...    % outer diameter of float (m)	
+            'D_s/D_{f}',... % inner diameter ratio of float (m)	
+            'D_{or}/D_{f}',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'F_{max}',...     % number of WECs in array (-)	
             'D_{int}',...     % internal damping of controller (Ns/m)	
