@@ -103,7 +103,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     % RM3 nominal reference
     plot(LCOE_nom,P_var_nom,'rd')
     plot(LCOE_nom_sim,P_var_nom_sim,'rs')
-    
+     
     if showSingleObj  
         % black squares for 3 ref points
         plot(minLCOE,Pvar(idx_best_LCOE),'ks')
@@ -115,7 +115,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     xlabel('LCOE ($/kWh)')
     ylabel('Power Variation (%)')
     title('Pareto Front')
-    xlim([0 1])
+    xlim([0 1.2])
     ylim([25 400])
     improvePlot
     
@@ -124,30 +124,11 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     % for the yellow color to work, do not use improvePlot below here
     
     % wind reference
-    uniCha = char(hex2dec('1F7C0'))
-    %markersize = 10;
-    %markerSymbol = [0, -1; 0.5, 0; 0, 1; -0.5, 0; 0, -1] * markersize;
-
-    %plot(LCOE_wind, P_var_wind,Marker=uniCha, MarkerSize=100, Color='blue')
-    plot(LCOE_wind, P_var_wind,'o','MarkerSize',12,'MarkerFaceColor', [0.3010 0.7450 0.9330])
-    text(LCOE_wind, P_var_wind, uniCha, 'FontSize', 20, 'Color', 'black', 'HorizontalAlignment', 'center')
-
-    % Define the coordinates for the 3-blade marker
-    %markerX = [0, -0.1, 0.1];
-    %markerY = [0, 0.1, 0.1];
-
-    % Repeat the marker at specific indices (adjust as needed)
-    %markerIndices = [2, 1];
-
-    % Plot the 3-blade marker at specified indices
-    % plot(LCOE_wind, P_var_wind, 'Marker', 'none');  % Plot without markers initially
-    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r');
-    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g');
-    %plot(LCOE_wind, P_var_wind, 'Marker', 'none', 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b');
-    % for idx = markerIndices
-    %     plot(LCOE_wind(idx) + markerX, P_var_wind(idx) + markerY, 'r-', 'LineWidth', 1);
-    % end
-    
+    plot(LCOE_wind+.01, P_var_wind,'o','MarkerSize',1,'MarkerFaceColor', [0.3010 0.7450 0.9330])
+    triangle = native2unicode([0xF0 0x9F 0x9F 0x80],'utf8');
+    %figure
+    text(LCOE_wind-.0243, P_var_wind,triangle,'FontSize', 25,'Color', [0.3010 0.7450 0.9330])
+    %text(LCOE_wind, P_var_wind, uniCha, 'FontSize', 20, 'Color', 'black', 'HorizontalAlignment', 'center')
 
     % hydro reference
     plot(LCOE_hydro, P_var_hydro,'o','MarkerSize',12,'MarkerEdgeColor',[.5, .0, .1],'MarkerFaceColor',[.5, .0, .1])
@@ -155,18 +136,18 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
 
     % text labels
     sz = 12;
-    text(LCOE_nom+.03,P_var_nom,'Nominal','FontSize',sz)
-    text(LCOE_nom+.01,P_var_nom-5,'Actual [10]','FontSize',sz)
-    text(LCOE_nom_sim-.02,P_var_nom_sim+5,'Nominal','FontSize',sz)
-    text(LCOE_nom_sim+.03,P_var_nom_sim,'Sim','FontSize',sz)
-    text(minLCOE+.03,minPvar-2,'Utopia Point','FontSize',sz)
+    text(LCOE_nom+.03,P_var_nom+2,'Nominal','FontSize',sz)
+    text(LCOE_nom+.03,P_var_nom-9,'Actual [10]','FontSize',sz)
+    text(LCOE_nom_sim-.02,P_var_nom_sim+12,'Nominal','FontSize',sz)
+    text(LCOE_nom_sim+.02,P_var_nom_sim+1,'Sim','FontSize',sz)
+    text(minLCOE-.06,minPvar-11,'Utopia Point','FontSize',sz)
     text(LCOE_solar+.03,P_var_solar,'Solar','FontSize',sz)
-    text(LCOE_wind+.03,P_var_wind,'Wind','FontSize',sz)
+    text(LCOE_wind+.01,P_var_wind-3,'Wind','FontSize',sz)
     text(LCOE_hydro+.03,P_var_hydro,'Hydro','FontSize',sz)
     if showSingleObj
         text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest','FontSize',sz)
-        text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
-        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design','FontSize',sz)
+        text(LCOE(idx_best_Pvar)-.03,Pvar(idx_best_Pvar)-7,'Least Variable','FontSize',sz)
+        text(LCOE_balanced+.01,P_var_balanced+7,'Balanced Design','FontSize',sz)
     end
     
     if showImages
