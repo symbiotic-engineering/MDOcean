@@ -1,7 +1,3 @@
-syms m a_1 a_2
-N = 4;
-BC_a1 = generate_BC(0,0,1,1,0,m,a_1,N)
-BC_a2 = generate_BC(0,0,1,1,0,m,a_2,N)
 
 function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_region, both_Z_region, m, a, N)
 
@@ -21,12 +17,14 @@ function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_re
         (h - LHS_d_region) * get_C(LHS_phi_region, m, a) .* get_dR_dr(LHS_phi_region, m, a);
     
     % RHS
-    syms n % summation index
+    j = sym('j'); % summation index
     integrand_RHS = get_dphi_p_dr(RHS_phi_region, a) * Z_m;
-    Z_n = get_Z(RHS_phi_region, n, a);
-    coupling_integral(n,m) = int(Z_n(n) * Z_m(m), z, -h, RHS_d_region);
-    sum_RHS(n,m) = get_C(RHS_phi_region,n, a) .* get_dR_dr(RHS_phi_region,n, a) * coupling_integral(n,m);
-    RHS = int(integrand_RHS, z, -h, RHS_d_region) + symsum(sum_RHS, n, 0, N);
+    Z_n = get_Z(RHS_phi_region, j, a);
+    coupling_integral(j,m) = int(Z_n(j) * Z_m(m), z, -h, RHS_d_region);
+    C(j) = get_C(RHS_phi_region,j, a);
+    dR_dr(j) = get_dR_dr(RHS_phi_region,j, a);
+    sum_RHS(j,m) = C(j) .* dR_dr(j) * coupling_integral(j,m);
+    RHS = int(integrand_RHS, z, -h, RHS_d_region) + symsum(sum_RHS, j, 0, N);
     
     % equation
     BC = LHS == RHS;
@@ -51,7 +49,7 @@ function d_phi_p_dr = get_dphi_p_dr(in_out, radius)
 
 end
 
-function lambda = lambda(n,region)
+function lambda = lambda(j,region)
     syms d1 d2 h
     % eq 4
     if strcmp(region,'i1')
@@ -59,85 +57,90 @@ function lambda = lambda(n,region)
     else
         di = d2;
     end
-    lambda(n) = n*pi/(h-di);
+    lambda(j) = j*pi/(h-di);
 end
 
-function Z = get_Z(in_out, n, radius)
+function Z = get_Z(in_out, j, radius)
     syms z h
     region = get_region_from_in_out_radius(in_out,radius);
 
     if strcmp(region,'i1') || strcmp(region,'i2')
         % equation 9
-        Z = piecewise(n==0, 1, ...
-                      n>=1, sqrt(2)*cos(lambda(n,region)*(z+h)) ...
+        Z = piecewise(j==0, 1, ...
+                      j>=1, sqrt(2)*cos(lambda(j,region)*(z+h)) ...
                       );
     elseif strcmp(region,'e')
         syms m0 m_k
+        m_k = symfun(m_k,j);
         % eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006 
-        N_k(n) = piecewise(n==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
-                                  n>=1, 1/2*(1+sin(2*m_k(n)*h)/(2*m_k(n)*h)) ...
-                                  );
+        N_k(j) = piecewise(j==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
+                           j>=1, 1/2*(1+sin(2*m_k(j)*h)/(2*m_k(j)*h)) ...
+                           );
         % equation 14
-        Z = piecewise(n==0, 1/sqrt(N_k(n)) * cosh(m0 * (z+h)), ...
-                      n>=1, 1/sqrt(N_k(n)) * cos(m_k(n) * (z+h)) ...
-                      );
+        Z(j) = piecewise(j==0, 1/sqrt(N_k(j)) * cosh(m0 * (z+h)), ...
+                         j>=1, 1/sqrt(N_k(j)) * cos(m_k(j) * (z+h)) ...
+                         );
     end
 end
 
-function C = get_C(in_out, n, radius)
+function C = get_C(in_out, j, radius)
     region = get_region_from_in_out_radius(in_out,radius);
     syms C_1n_1 C_1n_2 C_2n_1 B_k
-    symfun(C_1n_1,n); symfun(C_1n_2,n); symfun(C_2n_1,n); symfun(B_k,n);
+    C_1n_1 = symfun(C_1n_1,j);
+    C_1n_2 = symfun(C_1n_2,j);
+    C_2n_1 = symfun(C_2n_1,j); 
+    B_k = symfun(B_k,j);
+
     if strcmp(region,'i1')
-        C = [C_1n_1, C_2n_1];
+        C = [C_1n_1(j), C_2n_1(j)];
     elseif strcmp(region,'i2')
-        C = [C_1n_2, 0];
+        C = [C_1n_2(j), 0];
     elseif strcmp(region,'e')
-        C = B_k;
+        C = B_k(j);
     end
 
 end
 
-function dR_dr = get_dR_dr(in_out, n, radius)
+function dR_dr = get_dR_dr(in_out, j, radius)
     region = get_region_from_in_out_radius(in_out,radius);
 
     syms r
-    R = get_R(region, n);
+    R = get_R(region, j);
     dR_dr = subs( diff(R,r), r, radius);
 
 end
 
-function R = get_R(region, n)
+function R = get_R(region, j)
     syms r a2 m0 R m_k
-    symfun(R,n); symfun(m_k,n);
+    R = symfun(R,j); m_k = symfun(m_k,j);
     if strcmp(region,'i1') || strcmp(region,'i2')
         % eq 7
-        R_1n(n) = piecewise(n==0, 1/2, n>=1, ...
-                            besseli(0,lambda(n,region)*r)/besseli(0,lambda(n,region)*a2));
+        R_1n(j) = piecewise(j==0, 1/2, j>=1, ...
+                            besseli(0,lambda(j,region)*r)/besseli(0,lambda(j,region)*a2));
         if strcmp(region,'i1')
             % eq 8
-            R_2n(n) = sym(0);
+            R_2n(j) = sym(0);
         else
-            R_2n(n) = piecewise(n==0, 1/2*log(r/a2), ...
-                                n>=1, besselk(0,lambda(n,region)*r)/besselk(0,lambda(n,region)*a2));
+            R_2n(j) = piecewise(j==0, 1/2*log(r/a2), ...
+                                j>=1, besselk(0,lambda(j,region)*r)/besselk(0,lambda(j,region)*a2));
         end
         R = [R_1n, R_2n];
 
     elseif strcmp(region,'e')
         % eq 13
-        Lambda_k(n) = piecewise(n==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), ...
-                                n>=1, besselk(0,m_k(n)*r)/besselk(0,m_k(n)*a2));
+        Lambda_k(j) = piecewise(j==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), ...
+                                j>=1, besselk(0,m_k(j)*r)/besselk(0,m_k(j)*a2));
         R = Lambda_k;
     end
 end
 
 function region = get_region_from_in_out_radius(in_out,radius)
-    syms a_1 a_2
-    if radius==a_1 && in_out==1
+    syms a1 a2
+    if radius==a1 && in_out==1
         region = 'i1';
-    elseif (radius==a_1 && in_out==0) || (radius==a_2 && in_out==1)
+    elseif (radius==a1 && in_out==0) || (radius==a2 && in_out==1)
         region = 'i2';
-    elseif radius==a_2 && in_out==0
+    elseif radius==a2 && in_out==0
         region = 'e';
     else
         error('invalid radius or in/out value')
