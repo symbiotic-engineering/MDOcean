@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambda, gs] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -40,14 +40,14 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
 
-    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs,lambda,g,gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs,lambda,g,gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
                                             'OutputSize',{[1,1],[1,1],size(p.JPD),[1, 14]},...
@@ -98,9 +98,10 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
 
         X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
-        [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
+        [out(1),out(2),~,g] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
+        gs(:,i) = g;
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;
@@ -118,5 +119,4 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
                 'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound'})
     end
-
 end

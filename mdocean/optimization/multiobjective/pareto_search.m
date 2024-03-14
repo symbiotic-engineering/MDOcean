@@ -60,10 +60,41 @@ function [x,fval] = pareto_search()
     idx = constraint_active_plot(residuals,fval,tol);
 
     cols = [1 3 6 5 4 2 7];
-    x_sorted = x(idx,cols)
+    x_sorted = x(idx,cols);
+
+    % solve for lambda values
+    [rows,~] = size(x);
+    for i = 1:length(LCOE_seeds)
+        p.LCOE_max = LCOE_seeds(i);
+        which_objs = 2;
+    end
+
+    for i = 1:rows
+        input = x(i,:);
+        x_0_new.D_f = input(1);
+        x_0_new.D_s_ratio = input(2);
+        x_0_new.h_f_ratio = input(3);
+        x_0_new.T_s_ratio = input(4);
+        x_0_new.F_max = input(5);
+        x_0_new.D_int = input(6);
+        x_0_new.w_n = input(7);
+        [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
+        g(:,i) = gs;
+        Xs_opt_original(8,:) = [];
+        Xs_opt(:,i) = Xs_opt_original;
+        lambda.active(:,i) = lambda_original.ineqnonlin;
+        lambda.lower(:,i) = lambda_original.lower;
+        lambda.upper(:,i) = lambda_original.upper;
+    end
+    residuals2.ineqnonlin = g';
+    residuals2.lower = Xs_opt'-b.X_mins';
+    residuals2.upper = Xs_opt'-b.X_maxs';
+    [~]=constraint_active_plot(residuals2,fval,tol);
 
     % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals")
+    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals",...
+    "lambda")
+
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)
