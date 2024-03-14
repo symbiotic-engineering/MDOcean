@@ -6,9 +6,13 @@ X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, t
 in = p;
 
 in.D_f              = X(1);     % outer diameter of float (m)
+%in.D_f              = 20.8418;
 D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
+%D_s_over_D_f        = 0.2879;
 h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
+%h_f_over_D_f        = 0.1;
 T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
+%T_s_over_h_s        = 0.4604;
 in.F_max            = X(5)*1e6; % max powertrain force (N)
 in.B_p              = X(6)*1e6; % controller (powertrain) damping (Ns/m)
 in.w_n              = X(7);     % controller (powertrain) natural frequency (rad/s)
@@ -39,7 +43,8 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
 [F_heave_max, F_surge_max, F_ptrain_max, ...
-	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, V_d, T);
+	    P_var, P_elec, P_matrix, h_s_extra, P_unsat, X_below_wave, X_below_linear] = ...
+        dynamics(in, m_f_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
                                     F_heave_max, F_surge_max,...
@@ -64,6 +69,24 @@ g(11) = D_d / p.D_d_min - 1;            % damping plate diameter (spar natural f
 g(12) = h_s_extra;                      % prevent float rising above top of spar
 g(13) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(14) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
+% prevent rising out of water/slamming
+count = length(g)+1;
+[m,n] = size(X_below_wave);
+for i = 1:m
+    for j = 1:n
+        g(count) = X_below_wave(i,j);
+        count = count+1;
+    end
+end
+% obey linear theory
+count = length(g)+1;
+[q,r] = size(X_below_linear);
+for i = 1:m
+    for j = 1:n
+        g(count) = X_below_linear(q,r);
+        count = count+1;
+    end
+end
 
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
