@@ -43,7 +43,7 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
 [F_heave_max, F_surge_max, F_ptrain_max, ...
-	    P_var, P_elec, P_matrix, h_s_extra, P_unsat, X_below_wave, X_below_linear] = ...
+	    P_var, P_elec, P_matrix, h_s_extra, power_unsat, X_below_wave, X_below_linear] = ...
         dynamics(in, m_f_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
@@ -113,6 +113,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
+    val.power_unsat = power_unsat;
 end
 
 end
