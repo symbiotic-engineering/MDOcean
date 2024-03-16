@@ -8,7 +8,7 @@ if nargout > 1
 
     % delete once I find where b.constraint_names is defined and add more
     % names
-    const_names_temp = const_names
+    const_names_temp = const_names;
     if length(const_names) < length(g)
         for i = length(const_names)+1:length(g)
             const_names_temp{i} = 'prevent slamming';
