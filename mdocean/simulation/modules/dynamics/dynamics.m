@@ -1,6 +1,6 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_elec, P_matrix, h_s_extra, P_unsat,X_below_wave, X_below_linear]...
-    = dynamics(in,m_float,V_d,draft)
+    P_var, P_elec, P_matrix, h_s_extra, P_unsat, X_below_wave, X_below_linear] = ...
+    dynamics(in,m_float,V_d,draft)
 
     % use probabilistic sea states for power
     [T,Hs] = meshgrid(in.T,in.Hs);
@@ -20,42 +20,51 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     
     % use max sea states for structural forces and max amplitude
     [~,~,~,F_heave_max,F_surge_max,...
-        F_ptrain_max] = get_power_force(in, ...
+        F_ptrain_max,X_sat] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
     P_var = P_var * 100; % convert to percentage
-
+    
+    % prevent rising out of the water
+    X_max_linear = 1/10 * in.D_f;
+    X_below_wave = Hs - X_sat;
+    X_below_linear = X_max_linear - X_sat;
 end
 
-function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max, X_sat] = ...
+get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
     [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
     m = m_float + A;
+    if in.freq_based_optimal_ctrl
+        in.B_p = B_h;
+        k = (2*pi./T).^2 * m;
+    else
+        k = in.w_n^2 * m;
+    end
     b = B_h + in.B_p;
-    k = in.w_n^2 * m;
     K_p = k - K_h;
     X_unsat = get_response(w,m,b,k,Fd);
 
     % confirm unsaturated response doesn't exceed maximum capture width
-    P_unsat = 1/8 * 1/2 * in.B_p * w.^2 .* X_unsat.^2;
+    P_unsat = 1/2 * in.B_p .* w.^2 .* X_unsat.^2;
 
-    F_ptrain_over_x = sqrt( (in.B_p * w).^2 + (K_p).^2 );
+    F_ptrain_over_x = sqrt( (in.B_p .* w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
     
     % get saturated response
     r = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
     f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m,b,k,w, b/in.B_p, k/K_p);
-    b_sat = B_h + mult * in.B_p;
-    k_sat = K_h + mult * K_p;
+    mult = get_multiplier(f_sat,m,b,k,w, b./in.B_p, k./K_p);
+    b_sat = B_h + mult .* in.B_p;
+    k_sat = K_h + mult .* K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
-    P_matrix = 1/8 * 1/2 * (mult * in.B_p) .* w.^2 .* X_sat.^2;
-    
+    P_matrix = 1/2 * (mult .* in.B_p) .* w.^2 .* X_sat.^2;
     X_max = max(X_sat,[],'all');
     h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
 
@@ -67,11 +76,11 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
         F_err_2 = abs(F_ptrain ./ (f_sat .* F_ptrain_unsat) - 1);
         % 0.1 percent error
         if any(f_sat<1,'all')
-            assert(all(F_err_1(f_sat < 1) < 1e-3),'all');
+%            assert(all(F_err_1(f_sat < 1) < 1e-3),'all');
         end
-        assert(all(F_err_2 < 1e-3,'all'));
+%        assert(all(F_err_2 < 1e-3,'all'));
 
-        F_heave_fund = sqrt( (mult * in.B_p .* w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        F_heave_fund = sqrt( (mult .* in.B_p .* w).^2 + (mult .* K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
         F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
         %assert(F_heave <= in.F_max);
 

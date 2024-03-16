@@ -11,7 +11,7 @@ if nargout > 1
     const_names_temp = const_names
     if length(const_names) < length(g)
         for i = length(const_names)+1:length(g)
-            const_names_temp{i} = 'max amplitude';
+            const_names_temp{i} = 'prevent slamming';
         end
     end
     const_names = const_names_temp;
