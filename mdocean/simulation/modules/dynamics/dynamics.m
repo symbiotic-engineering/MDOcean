@@ -1,6 +1,6 @@
-
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_elec, P_matrix, h_s_extra, P_unsat] = dynamics(in,m_float,V_d,draft)
+    P_var, P_elec, P_matrix, h_s_extra, P_unsat,X_below_wave, X_below_linear]...
+    = dynamics(in,m_float,V_d,draft)
 
     % use probabilistic sea states for power
     [T,Hs] = meshgrid(in.T,in.Hs);
