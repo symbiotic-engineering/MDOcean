@@ -60,10 +60,41 @@ function [x,fval] = pareto_search()
     idx = constraint_active_plot(residuals,fval,tol);
 
     cols = [1 3 6 5 4 2 7];
-    x_sorted = x(idx,cols)
+    x_sorted = x(idx,cols);
+
+    % solve for lambda values
+    [rows,~] = size(x);
+    for i = 1:length(LCOE_seeds)
+        p.LCOE_max = LCOE_seeds(i);
+        which_objs = 2;
+    end
+
+    for i = 1:rows
+        input = x(i,:);
+        x_0_new.D_f = input(1);
+        x_0_new.D_s_ratio = input(2);
+        x_0_new.h_f_ratio = input(3);
+        x_0_new.T_s_ratio = input(4);
+        x_0_new.F_max = input(5);
+        x_0_new.D_int = input(6);
+        x_0_new.w_n = input(7);
+        [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
+        g(:,i) = gs;
+        Xs_opt_original(8,:) = [];
+        Xs_opt(:,i) = Xs_opt_original;
+        lambda.active(:,i) = lambda_original.ineqnonlin;
+        lambda.lower(:,i) = lambda_original.lower;
+        lambda.upper(:,i) = lambda_original.upper;
+    end
+    residuals2.ineqnonlin = g';
+    residuals2.lower = Xs_opt'-b.X_mins';
+    residuals2.upper = Xs_opt'-b.X_maxs';
+    [~]=constraint_active_plot(residuals2,fval,tol);
 
     % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals")
+    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals",...
+    "lambda")
+
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)
@@ -74,15 +105,58 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 
     figure
-    subplot 311
+
+    %subplot 311
+    H=subplot(3,1,1, 'Position', [0.195 0.787 0.86 0.16]);
     spy(lb_active(idx,:)');
-    title('Lower Bound Active')
+    yticks(linspace(1,8,8));
+    yticklabels({'WEC Surface Float Outer Diameter', ...
+        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+        'Ratio of WEC Surface Float Height to Outer Diameter', ...
+        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+        'Powertrain/Controller Damping','Controller Natural Frequency', ...
+        'Material'});
+    xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
+    grid on
 
-    subplot 312
+    %subplot 312
+    I=subplot(3,1,2, 'Position', [0.195 0.505 0.86 0.16]);
     spy(ub_active(idx,:)')
-    title('Upper Bound Active')
+    yticks(linspace(1,8,8))
+    yticklabels({'WEC Surface Float Outer Diameter', ...
+        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+        'Ratio of WEC Surface Float Height to Outer Diameter', ...
+        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+        'Powertrain/Controller Damping','Controller Natural Frequency', ...
+        'Material'});
+    xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
+    grid on
 
-    subplot 313
+    %subplot 313
+    J=subplot(3,1,3, 'Position', [0.2 0.08 0.85 0.3]);
     spy(con_active(idx,:)')
-    title('Constraint Active')
+    xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
+    yticks(linspace(1,14,14));
+    yticklabels({'Prevent Float Too Heavy', 'Prevent Float Too Light', ...
+        'Prevent Spar Too Heavy','Prevent Spar Too Light', ...
+        'Metacentric Height','Float Yield','Column Yield','Reaction Plate Yield' ...
+        'Column Buckling','Net Generated Power','Minimum Damping Plate Diameter', ...
+        'Prevent Float Above Top of the Spar','Prevent LCOE Greater Than Nominal', ...
+        'Prevent Irrelevant Max Force'});
+    grid on
+
+    improvePlot
+
+    %subplot 311
+    set(H, "FontSize",10)
+    title(H,'Lower Bound Active', "FontSize", 16)
+
+    %subplot 312
+    set(I, "FontSize",10)
+    title(I,'Upper Bound Active', "FontSize", 16)
+
+    %subplot 313
+    set(J, "FontSize",9.5)
+    title(J,'Constraint Active', "FontSize", 16)
+
 end
