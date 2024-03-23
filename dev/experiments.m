@@ -25,8 +25,8 @@ n = 20;
 ratios = logspace(log10(1/3),log10(3),n);
 ratios = [1, ratios(ratios~=1)];
 %X =  [b.D_f_nom, b.D_s_ratio_nom, b.D_or_ratio_nom, 1, b.F_max_nom, b.B_p_nom, b.w_n_nom]' * ratios;
-X =  [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom]' * ratios;
-X(4,:) = ones(1,n+1);
+X =  [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom 1]' * ratios;
+X(8,:) = ones(1,n+1);
 
 X_nom = X(:,1);	
 design_size = size(X);	
@@ -42,19 +42,21 @@ power = zeros(number_runs,1);
 FOS = zeros(number_runs,1);	
 X_ins = zeros(number_runs, var_num);	
 design = 0;	
-for i = 1:var_num	
+for i = 1:var_num-1	
     X_in = X_nom;	
-    for j = 1:var_depth	
+    for j = 1:var_depth-1	
         if i == 1 || j~=1	
             changed_entry = X(i,j);	
             if ~isnan(changed_entry)	
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, P_var_temp, B, FOS1Y, FOS2Y, FOS3Y, ...
-            FOS_buckling, GM, power(design)] = simulation(X_in,p);	
-                FOS(design) = min([FOS1Y,FOS2Y,FOS3Y,FOS_buckling]);
-                [feasible, failed{design}] = is_feasible(B, FOS(design), GM, P_var_temp, p);	
+                [LCOE_temp, P_var_temp, P_matrix, g, val] = simulation(X_in,p);	
+                disp(g)
+                FOS(design) = min([(g(6)+1)*p.FOS_min,(g(7)+1)*p.FOS_min,(g(8)+1)*p.FOS_min,(g(9)+1)*p.FOS_min]);
+                g(13) = 0;
+                g(14) = 0;
+                [feasible, failed] = is_feasible(g, b);
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     P_var(i,j) = P_var_temp;
@@ -68,8 +70,8 @@ for i = 1:var_num
     [~, opt_idx(i)] = min(LCOE(i,:));	
     recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];	
 end	
-[LCOE_op, ~, ~, B_op, FOS1Y_op,FOS2Y_op,FOS3Y_op,FOS_buckling_op,power_op] = simulation(recommended(:,1),p);	
-[op_feasible, CC] = is_feasible(power_op, B_op, FOS1Y_op, power_op, p);	
+%[LCOE, P_var, P_matrix, g, val] = simulation(X,p);	
+%[feasible, failed] = is_feasible(g, b);	
 
 % create table for display	
 var_names = {'D_f',...    % outer diameter of float (m)	
@@ -79,23 +81,25 @@ var_names = {'D_f',...    % outer diameter of float (m)
             'F_max',...     % number of WECs in array (-)	
             'B_p',...     % internal damping of controller (Ns/m)	
             'w_n'};         % natural frequency (rad/s)
-var_names_pretty = {'D_{f}',...    % outer diameter of float (m)	
+var_names_pretty = {
+            'D_{f}',...    % outer diameter of float (m)	
             'D_s/D_{f}',... % inner diameter ratio of float (m)	
             'D_{or}/D_{f}',...      % outer diameter of reaction plate (m)	
             'M',...         % material (-)	
             'F_{max}',...     % number of WECs in array (-)	
             'D_{int}',...     % internal damping of controller (Ns/m)	
             '\omega_n'};         % natural frequency (rad/s)
-results = array2table(X_ins, 'VariableNames', var_names);	
+%results = array2table(X_ins, 'VariableNames', var_names);	
 LCOE = LCOE';
 P_var = P_var';
-results = addvars(results, round(LCOE(LCOE~=Inf),1), round(P_var(P_var~=Inf)), failed, ...	
-    'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','ConstraintsFailed'});	
-disp(results)
+%results = addvars(results, round(LCOE(LCOE~=Inf),1), round(P_var(P_var~=Inf)), failed, ...	
+    %'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','ConstraintsFailed'});	
+%disp(results)
 
-%% create pareto front
-figure
-plot(LCOE, P_var, '*')
+
+pareto_curve_heuristics()
+figure(2)
+plot(LCOE, P_var, '*--')
 xlabel('LCOE')
 ylabel('P_{var}')
 title('Design of Experiments Pareto Front')
@@ -130,3 +134,6 @@ xlabel('Design Variable Ratio (-)')
 xticklabels(ax1,{})
 xticks(ax2,xticks(ax1))
 improvePlot
+
+%pareto_curve_heuristics(figure(5))
+
