@@ -262,42 +262,14 @@ end
 
 %%
 function [] = lagrange_multiplier_plot(lambdaActive, ...
-                                 lambdaUpper,lambdaLower);
+                                 lambdaUpper,lambdaLower)
     figure
     hold on
-    [m,n]=size(lambdaActive)
-    % I'll change these later
+    [m,n]=size(lambdaActive);
+    color_cell = {'.r','or','+r','*r','xr','-r','|r','+b','ob','+b','*b','xb','-b','|b'};
     for i=1:m
         for j = 1:n
-            if rem(j,14)==1
-                color = '.r';
-            elseif rem(j,14)==2
-                color = 'or';
-            elseif rem(j,14)==3
-                color = '+r';
-            elseif rem(j,14)==4
-                color = '*r';
-            elseif rem(j,14)==5
-                color = 'xr';
-            elseif rem(j,14)==6
-                color = '-r';
-            elseif rem(j,14)==7
-                color = '|r';
-            elseif rem(j,14)==8
-                color = '+b';
-            elseif rem(j,14)==9
-                color = 'ob';
-            elseif rem(j,14)==10
-                color = '+b';
-            elseif rem(j,14)==11
-                color = '*b';
-            elseif rem(j,14)==12
-                color = 'xb';
-            elseif rem(j,14)==13
-                color = '-b';
-            else
-                color = '|b';
-            end
+            color = color_cell{rem(j,15)};
             plot(i*100/60,lambdaActive(i,j),color,'MarkerSize',12);
         end
     end
@@ -321,21 +293,7 @@ function [] = lagrange_multiplier_plot(lambdaActive, ...
     % I'll change these later
     for i=1:m
         for j = 1:n
-            if rem(j,7)==1
-                color = '.r';
-            elseif rem(j,7)==2
-                color = 'or';
-            elseif rem(j,7)==3
-                color = '+r';
-            elseif rem(j,7)==4
-                color = '*r';
-            elseif rem(j,7)==5
-                color = 'xr';
-            elseif rem(j,7)==6
-                color = '-r';
-            else
-                color = '|r';
-            end
+            color = color_cell{rem(j,15)};
             plot(i*100/60,lambdaLower(i,j),color,'MarkerSize',12);
         end
     end
@@ -358,21 +316,7 @@ function [] = lagrange_multiplier_plot(lambdaActive, ...
     % I'll change these later
     for i=1:m
         for j = 1:n
-            if rem(j,7)==1
-                color = '.r';
-            elseif rem(j,7)==2
-                color = 'or';
-            elseif rem(j,7)==3
-                color = '+r';
-            elseif rem(j,7)==4
-                color = '*r';
-            elseif rem(j,7)==5
-                color = 'xr';
-            elseif rem(j,7)==6
-                color = '-r';
-            else
-                color = '|r';
-            end
+            color = color_cell{rem(j,15)};
             plot(i*100/60,lambdaUpper(i,j),color,'MarkerSize',12);
         end
     end
