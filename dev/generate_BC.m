@@ -1,14 +1,19 @@
 
+%syms a1 n
+%get_C(0, n, a1)
+%generate_BC_asdf(0,0,1,1,0,n,a1,4)
+
 function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_region, both_Z_region, m, a, N)
 
-    % pass in five binary bits here
+    % pass in five binary bits here for which region (outer/inner) is used
+    % for which pieces of the matching condition
     % false = 0 = out, true = 1 = in
     % expected correct answer: 0, 0, 1, 1, 0
     
     % LHS (left hand side)  is defined as the side where orthogonality happens
     % RHS (right hand side) is defined as the side where coupling integral happens
     
-    Z_m = get_Z(both_Z_region, m, a);
+    Z_m(m) = get_Z(both_Z_region, m, a);
     
     syms z h
     % LHS
@@ -19,10 +24,10 @@ function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_re
     % RHS
     j = sym('j'); % summation index
     integrand_RHS = get_dphi_p_dr(RHS_phi_region, a) * Z_m;
-    Z_n = get_Z(RHS_phi_region, j, a);
+    Z_n(j) = get_Z(RHS_phi_region, j, a);
     coupling_integral(j,m) = int(Z_n(j) * Z_m(m), z, -h, RHS_d_region);
-    C(j) = get_C(RHS_phi_region,j, a);
-    dR_dr(j) = get_dR_dr(RHS_phi_region,j, a);
+    C(j) = get_C(RHS_phi_region, j, a);
+    dR_dr(j) = get_dR_dr(RHS_phi_region, j, a);
     sum_RHS(j,m) = C(j) .* dR_dr(j) * coupling_integral(j,m);
     RHS = int(integrand_RHS, z, -h, RHS_d_region) + symsum(sum_RHS, j, 0, N);
     
@@ -70,8 +75,12 @@ function Z = get_Z(in_out, j, radius)
                       j>=1, sqrt(2)*cos(lambda(j,region)*(z+h)) ...
                       );
     elseif strcmp(region,'e')
-        syms m0 m_k
-        m_k = symfun(m_k,j);
+        syms m0 m_k(dv)
+        % dv means dummy variable: due to weird symbolic syntax it's necessary
+        % to create the symfun as a function of the dummy and then replace it with j, 
+        % instead of directly creating it as a function of j
+        m_k(j) = subs(m_k,dv,j);
+        
         % eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006 
         N_k(j) = piecewise(j==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
                            j>=1, 1/2*(1+sin(2*m_k(j)*h)/(2*m_k(j)*h)) ...
@@ -85,18 +94,22 @@ end
 
 function C = get_C(in_out, j, radius)
     region = get_region_from_in_out_radius(in_out,radius);
-    syms C_1n_1 C_1n_2 C_2n_1 B_k
-    C_1n_1 = symfun(C_1n_1,j);
-    C_1n_2 = symfun(C_1n_2,j);
-    C_2n_1 = symfun(C_2n_1,j); 
-    B_k = symfun(B_k,j);
+
+    % dv means dummy variable: due to weird symbolic syntax it's necessary
+    % to create the symfun as a function of the dummy and then replace it with j, 
+    % instead of directly creating it as a function of j
+    syms C_1n_1(dv) C_1n_2(dv) C_2n_1(dv) B_k(dv)
+    C_1n_1(j) = subs(C_1n_1,dv,j);
+    C_1n_2(j) = subs(C_1n_2,dv,j);
+    C_2n_1(j) = subs(C_2n_1,dv,j); 
+    B_k(j)    = subs(B_k,   dv,j);
 
     if strcmp(region,'i1')
-        C = [C_1n_1(j), C_2n_1(j)];
+        C(j) = [C_1n_1(j), C_2n_1(j)];
     elseif strcmp(region,'i2')
-        C = [C_1n_2(j), 0];
+        C(j) = [C_1n_2(j), 0];
     elseif strcmp(region,'e')
-        C = B_k(j);
+        C(j) = B_k(j);
     end
 
 end
@@ -111,8 +124,15 @@ function dR_dr = get_dR_dr(in_out, j, radius)
 end
 
 function R = get_R(region, j)
-    syms r a2 m0 R m_k
-    R = symfun(R,j); m_k = symfun(m_k,j);
+    syms r a2 m0
+   
+    % dv means dummy variable: due to weird symbolic syntax it's necessary
+    % to create the symfun as a function of the dummy and then replace it with j, 
+    % instead of directly creating it as a function of j
+    syms R(dv) m_k(dv)
+    R(j) = subs(R,dv,j);
+    m_k(j) = subs(m_k,dv,j);
+
     if strcmp(region,'i1') || strcmp(region,'i2')
         % eq 7
         R_1n(j) = piecewise(j==0, 1/2, j>=1, ...
