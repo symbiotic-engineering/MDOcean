@@ -266,10 +266,15 @@ function [] = lagrange_multiplier_plot(lambdaActive, ...
     figure
     hold on
     [m,n]=size(lambdaActive);
+    count = 0;
     color_cell = {'.r','or','+r','*r','xr','-r','|r','+b','ob','+b','*b','xb','-b','|b'};
     for i=1:m
         for j = 1:n
             color = color_cell{rem(j,15)};
+            if rem(j,15)==11 && lambdaActive(i,j) ~= 0
+                count = count+1;
+                tdlksajf(count) = lambdaActive(i,j)
+            end
             plot(i*100/60,lambdaActive(i,j),color,'MarkerSize',12);
         end
     end
