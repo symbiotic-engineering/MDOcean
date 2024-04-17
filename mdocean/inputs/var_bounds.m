@@ -55,10 +55,10 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
     'pos_power','spar_damping','spar_height','LCOE_max','irrelevant_max_force'};
 
 % modify nominal control inputs to so power and force matches actual
-[F_max_nom, B_p_nom, w_n_nom] = find_nominal_inputs(b, false);
-b.F_max_nom = F_max_nom;
-b.B_p_nom = B_p_nom;
-b.w_n_nom = w_n_nom;
+%[F_max_nom, B_p_nom, w_n_nom] = find_nominal_inputs(b, false);
+b.F_max_nom = 1e6%F_max_nom;
+b.B_p_nom = 1e6%B_p_nom;
+b.w_n_nom = 1%w_n_nom;
 
 b.X_noms = [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
 
