@@ -18,17 +18,19 @@ function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_re
     syms z h
     % LHS
     integrand_LHS = get_dphi_p_dr(LHS_phi_region, a) * Z_m;
+    C_LHS(m) = get_C(LHS_phi_region, m, a);
+    dR_dr_LHS(m) = get_dR_dr(LHS_phi_region, m, a);
     LHS = int(integrand_LHS, z, -h, LHS_d_region) + ...
-        (h - LHS_d_region) * get_C(LHS_phi_region, m, a) .* get_dR_dr(LHS_phi_region, m, a);
+        (h - LHS_d_region) * C_LHS * dR_dr_LHS.';
     
     % RHS
     j = sym('j'); % summation index
     integrand_RHS = get_dphi_p_dr(RHS_phi_region, a) * Z_m;
     Z_n(j) = get_Z(RHS_phi_region, j, a);
     coupling_integral(j,m) = int(Z_n(j) * Z_m(m), z, -h, RHS_d_region);
-    C(j) = get_C(RHS_phi_region, j, a);
-    dR_dr(j) = get_dR_dr(RHS_phi_region, j, a);
-    sum_RHS(j,m) = C(j) .* dR_dr(j) * coupling_integral(j,m);
+    C_RHS(j) = get_C(RHS_phi_region, j, a);
+    dR_dr_RHS(j) = get_dR_dr(RHS_phi_region, j, a);
+    sum_RHS(j,m) = C_RHS(j) * dR_dr_RHS(j).' * coupling_integral(j,m);
     RHS = int(integrand_RHS, z, -h, RHS_d_region) + symsum(sum_RHS, j, 0, N);
     
     % equation
@@ -80,7 +82,7 @@ function Z = get_Z(in_out, j, radius)
         % to create the symfun as a function of the dummy and then replace it with j, 
         % instead of directly creating it as a function of j
         m_k(j) = subs(m_k,dv,j);
-        
+
         % eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006 
         N_k(j) = piecewise(j==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
                            j>=1, 1/2*(1+sin(2*m_k(j)*h)/(2*m_k(j)*h)) ...
