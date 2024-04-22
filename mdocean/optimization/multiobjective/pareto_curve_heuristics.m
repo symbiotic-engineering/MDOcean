@@ -266,16 +266,12 @@ function [] = lagrange_multiplier_plot(lambdaActive, ...
     figure
     hold on
     [m,n]=size(lambdaActive);
-    count = 0;
-    color_cell = {'.r','or','+r','*r','xr','-r','|r','+b','ob','+b','*b','xb','-b','|b'};
+    color_cell = {'.r','.g','.b','.c','.m','.y','.k',"#FF0000",'ob','+b','*b','xb','-b','|b'};
+    %color_cell = {'r','g','b','c','m','y','k',[0 0.4470 0.7410],[0.8500 0.3250 0.0980],[0.9290 0.6940 0.1250],[0.4940 0.1840 0.5560],[0.4660 0.6740 0.1880],[0.3010 0.7450 0.9330],[0.6350 0.0780 0.1840]};
     for i=1:m
         for j = 1:n
-            color = color_cell{rem(j,15)};
-            if rem(j,15)==11 && lambdaActive(i,j) ~= 0
-                count = count+1;
-                tdlksajf(count) = lambdaActive(i,j)
-            end
-            plot(i*100/60,lambdaActive(i,j),color,'MarkerSize',12);
+            %color = color_cell{rem(j,15)};
+            plot(i*100/60,lambdaActive(i,j),'.','MarkerSize',12);
         end
     end
     %plot(pct_angle,lambda_active_sorted)
