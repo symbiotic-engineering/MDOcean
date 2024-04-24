@@ -1,14 +1,16 @@
 
-%syms a1 n
-%get_C(0, n, a1)
-%generate_BC_asdf(0,0,1,1,0,n,a1,4)
+% syms a1 n
+% get_C(0, n, a1)
+% tic
+% generate_BC_asdf(0,0,1,1,0,n,a1,4)
+% toc
 
 function BC = generate_BC(LHS_d_region, LHS_phi_region, RHS_d_region, RHS_phi_region, both_Z_region, m, a, N)
 
     % pass in five binary bits here for which region (outer/inner) is used
     % for which pieces of the matching condition
     % false = 0 = out, true = 1 = in
-    % expected correct answer: 0, 0, 1, 1, 0
+    % expected correct answer: 0, 0, 1, 1, 0 for velocity matching
     
     % LHS (left hand side)  is defined as the side where orthogonality happens
     % RHS (right hand side) is defined as the side where coupling integral happens
@@ -100,16 +102,16 @@ function C = get_C(in_out, j, radius)
     % dv means dummy variable: due to weird symbolic syntax it's necessary
     % to create the symfun as a function of the dummy and then replace it with j, 
     % instead of directly creating it as a function of j
-    syms C_1n_1(dv) C_1n_2(dv) C_2n_1(dv) B_k(dv)
+    syms C_1n_1(dv) C_1n_2(dv) C_2n_2(dv) B_k(dv)
     C_1n_1(j) = subs(C_1n_1,dv,j);
     C_1n_2(j) = subs(C_1n_2,dv,j);
-    C_2n_1(j) = subs(C_2n_1,dv,j); 
+    C_2n_2(j) = subs(C_2n_2,dv,j); 
     B_k(j)    = subs(B_k,   dv,j);
 
     if strcmp(region,'i1')
-        C(j) = [C_1n_1(j), C_2n_1(j)];
+        C(j) = [C_1n_1(j), 0];
     elseif strcmp(region,'i2')
-        C(j) = [C_1n_2(j), 0];
+        C(j) = [C_1n_2(j), C_2n_2(j)];
     elseif strcmp(region,'e')
         C(j) = B_k(j);
     end
