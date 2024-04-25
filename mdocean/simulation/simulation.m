@@ -5,10 +5,14 @@ X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, t
 %% Assemble inputs
 in = p;
 
-in.D_f              = X(1);     % outer diameter of float (m)
-D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
-h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
-T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
+%in.D_f              = X(1);     % outer diameter of float (m)
+in.D_f              = 20.8418;
+%D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
+D_s_over_D_f        = 0.2879;
+%h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
+h_f_over_D_f        = 0.1;
+%T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
+T_s_over_h_s        = 0.4604;
 in.F_max            = X(5)*1e6; % max powertrain force (N)
 in.B_p              = X(6)*1e6; % controller (powertrain) damping (Ns/m)
 in.w_n              = X(7);     % controller (powertrain) natural frequency (rad/s)
