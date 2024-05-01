@@ -89,7 +89,7 @@ function [x,fval] = pareto_search()
     residuals2.ineqnonlin = g';
     residuals2.lower = Xs_opt'-b.X_mins';
     residuals2.upper = Xs_opt'-b.X_maxs';
-    [~]=constraint_active_plot(residuals2,fval,tol);
+    %[~]=constraint_active_plot(residuals2,fval,tol);
 
     % save mat file to be read by pareto_bruteforce.m
     save('optimization/multiobjective/pareto_search_results',"fval","x","residuals",...
@@ -100,7 +100,7 @@ end
 function [idx] = constraint_active_plot(residuals,fval,tol)
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
-    con_active = abs(residuals.ineqnonlin) < tol;
+    con_active = abs(residuals.ineqnonlin) < tol
 
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 

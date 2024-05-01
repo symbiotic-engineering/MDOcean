@@ -4,7 +4,7 @@ if nargin == 0
     % set default parameters if function is run without input
     clc;close all
     p = parameters();
-    b = var_bounds(p);
+    b = var_bounds();
     x0_input = b.X_start_struct;
     display = 'iter';
     plotfn = @optimplotfval;
@@ -50,7 +50,7 @@ end
 function [Xs_opt, objs_opt, flags, probs,lambda,g,gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, 14]},...
+                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, length(b.constraint_names)]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     objs = [LCOE P_var];
