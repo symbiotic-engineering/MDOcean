@@ -31,12 +31,6 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             ...% https://www.concretenetwork.com/concrete-prices.html
             ...% https://agmetalminer.com/metal-prices/
             'm_scale',  1.25,...                % factor to account for mass of neglected stiffeners (-)
-            't_ft',     0.50 * in2m,...         % float top thickness (m)
-            't_fr',     0.44 * in2m,...         % float radial wall thickness (m)
-            't_fc',     0.44 * in2m,...         % float circumferential gusset thickness (m)
-            't_fb',     0.56 * in2m,...         % float bottom thickness (m)
-            't_sr',     1.00 * in2m,...         % vertical column thickness (m)
-            't_dt',     1.00 * in2m,...         % damping plate support tube radial wall thickness (m)
             'D_dt',     48.00 * in2m,...        % damping plate support tube diameter (m)
             'theta_dt', atan(17.5/15),...       % angle from horizontal of damping plate support tubes (rad)
             'FOS_min',  1.5,...                 % minimum FOS (-)	

@@ -13,7 +13,14 @@ in.F_max            = X(5)*1e6; % max powertrain force (N)
 in.B_p              = X(6)*1e6; % controller (powertrain) damping (Ns/m)
 in.w_n              = X(7);     % controller (powertrain) natural frequency (rad/s)
 in.M                = X(8);     % material (-)
-
+in.t_ft             = X(9);     % float top thickness (m)
+in.t_fr             = X(10);    % float radial wall thickness (m)
+in.t_fc             = X(11);    % float circumferential gusset thickness (m)
+in.t_fb             = X(12);    % float bottom thickness (m)
+in.t_sr             = X(13);    % vertical column thickness (m)
+in.t_dt             = X(14);    % damping plate support tube radial wall thickness (m)      
+in.power_max         = X(15);    % maximum power (W)
+          
 % Variable ratios defined by design variables
 in.D_s = D_s_over_D_f * in.D_f;
 in.h_f = h_f_over_D_f * in.D_f;

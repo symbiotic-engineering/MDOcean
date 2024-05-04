@@ -22,12 +22,19 @@ end
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
 D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
-D_s_ratio   = optimvar('D_s_ratio', sz,'LowerBound',b.D_s_ratio_min, 'UpperBound',b.D_s_ratio_max);
-h_f_ratio   = optimvar('h_f_ratio', sz,'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
-T_s_ratio   = optimvar('T_s_ratio', sz,'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
+D_s_over_D_f   = optimvar('D_s_over_D_f', sz,'LowerBound',b.D_s_over_D_f_min, 'UpperBound',b.D_s_over_D_f_max);
+h_f_over_D_f   = optimvar('h_f_over_D_f', sz,'LowerBound',b.h_f_over_D_f_min, 'UpperBound',b.h_f_over_D_f_max);
+T_s_over_h_s   = optimvar('T_s_over_h_s', sz,'LowerBound',b.T_s_over_h_s_min, 'UpperBound',b.T_s_over_h_s_max);
 F_max       = optimvar('F_max',     sz,'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
-B_p         = optimvar('D_int',     sz,'LowerBound',b.B_p_min,       'UpperBound',b.B_p_max);
+B_p         = optimvar('B_p',     sz,'LowerBound',b.B_p_min,       'UpperBound',b.B_p_max);
 w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound',b.w_n_max);
+t_ft        = optimvar('t_ft',      sz,'LowerBound',b.t_ft_min,      'UpperBound',b.t_ft_max);
+t_fr        = optimvar('t_fr',      sz,'LowerBound',b.t_fr_min,      'UpperBound',b.t_fr_max);
+t_fc        = optimvar('t_fc',      sz,'LowerBound',b.t_fc_min,      'UpperBound',b.t_fc_max);
+t_fb        = optimvar('t_fb',      sz,'LowerBound',b.t_fb_min,      'UpperBound',b.t_fb_max);
+t_sr        = optimvar('t_sr',      sz,'LowerBound',b.t_sr_min,      'UpperBound',b.t_sr_max);
+t_dt        = optimvar('t_dt',      sz,'LowerBound',b.t_dt_min,      'UpperBound',b.t_dt_max);
+power_max   = optimvar('power_max', sz,'LowerBound',b.power_max_min, 'UpperBound',b.power_max_max);
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...
@@ -38,7 +45,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
+    X = [D_f D_s_over_D_f h_f_over_D_f T_s_over_h_s F_max B_p w_n matl t_ft t_fr t_fc t_fb t_sr t_dt power_max];
 
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
@@ -97,7 +104,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
             warning('Optimization is up against a flexible variable bound, consider changing bounds')
         end
 
-        X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
+        X_opt = [X_opt_raw(1:7); evaluate(X(8),struct()); X_opt_raw(8:end)];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
@@ -112,10 +119,10 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
     end
     if ploton
-        table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs];
+        table_data = [Xs_opt, b.X_mins, b.X_maxs];
         objs_opt
         flags
-        array2table(table_data,'RowNames',b.var_names(1:end-1),...
+        array2table(table_data,'RowNames',b.var_names,...
                 'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound'})
     end
 
