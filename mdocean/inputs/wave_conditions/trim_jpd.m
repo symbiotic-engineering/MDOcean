@@ -1,4 +1,4 @@
-function trimmed = trim_jpd(jpd)
+function trimmed = trim_jpd(jpd, g)
 
 jpd_entries = jpd(2:end,2:end);
 rows_all_zeros = all(jpd_entries==0,2);
@@ -14,5 +14,10 @@ if min_T < 3.5
         'If pushing up against this limit, it is recommended to plot ' ...
         'gamma vs omega to confirm smooth behavior at high frequencies. '])
 end
+
+max_T = trimmed(1,end);
+min_w = 2*pi/max_T;
+if min_w^2 * depth / g < 2
+    error('The JPD contains frequencies too large, the deep water condition is not satisfied.')
 
 end

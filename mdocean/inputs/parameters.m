@@ -4,16 +4,17 @@ ksi2pa = 6894757; % 1000 pounds/in2 to Pascal
 in2m = 0.0254;  % inch to meter
 yd2m = 0.9144;  % yard to meter
 lb2kg = 1/2.2;  % pound to kilogram
+g = 9.8;        % m/s^2
 
 % Materials: [  Structural Steel ASTM-A36 (Ductile)
 %               Concrete (Brittle)
 %               Stainless Steel 304 (Ductile) ]
 
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
-jpd = trim_jpd(readmatrix(file,'Range','A3'));
+jpd = trim_jpd(readmatrix(file,'Range','A3'), g);
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
-            'g',        9.8,...                 % acceleration of gravity (m/s2)
+            'g',        g,...                   % acceleration of gravity (m/s2)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
             'Hs',       jpd(2:end,1),...        % wave height (m)
             'Hs_struct',11.9,...                % 100 year wave height (m)
