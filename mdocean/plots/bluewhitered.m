@@ -1,4 +1,4 @@
-function newmap = bluewhitered(m)
+function newmap = bluewhitered(m, white_number)
 %BLUEWHITERED   Blue, white, and red color map.
 %   BLUEWHITERED(M) returns an M-by-3 matrix containing a blue to white
 %   to red colormap, with white corresponding to the CAXIS value closest
@@ -32,55 +32,57 @@ function newmap = bluewhitered(m)
 if nargin < 1
    m = size(get(gcf,'colormap'),1);
 end
+if nargin < 2
+    white_number = 0;
+end
 
-
-bottom = [0 0 0.5];
-botmiddle = [0 0.5 1];
-middle = [1 1 1];
-topmiddle = [1 0 0];
-top = [0.5 0 0];
+bottom_blue = [0 0 0.5];
+botmiddle_blue = [0 0.5 1];
+middle_white = [1 1 1];
+topmiddle_red = [1 0 0];
+top_red = [0.5 0 0];
 
 % Find middle
 lims = get(gca, 'CLim');
 
 % Find ratio of negative to positive
-if (lims(1) < 0) & (lims(2) > 0)
+if (lims(1) < white_number) && (lims(2) > white_number)
     % It has both negative and positive
     % Find ratio of negative to positive
-    ratio = abs(lims(1)) / (abs(lims(1)) + lims(2));
+    ratio = (white_number - lims(1)) / (lims(2) - lims(1)); %abs(lims(1)) / (abs(lims(1)) + lims(2));
     neglen = round(m*ratio);
     poslen = m - neglen;
     
     % Just negative
-    new = [bottom; botmiddle; middle];
+    new = [bottom_blue; botmiddle_blue; middle_white];
     len = length(new);
     oldsteps = linspace(0, 1, len);
     newsteps = linspace(0, 1, neglen);
-    newmap1 = zeros(neglen, 3);
+    bluemap = zeros(neglen, 3);
     
     for i=1:3
         % Interpolate over RGB spaces of colormap
-        newmap1(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
+        bluemap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
     end
     
     % Just positive
-    new = [middle; topmiddle; top];
+    new = [middle_white; topmiddle_red; top_red];
     len = length(new);
     oldsteps = linspace(0, 1, len);
     newsteps = linspace(0, 1, poslen);
-    newmap = zeros(poslen, 3);
+    redmap = zeros(poslen, 3);
     
     for i=1:3
         % Interpolate over RGB spaces of colormap
-        newmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
+        redmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
     end
     
     % And put 'em together
-    newmap = [newmap1; newmap];
+    newmap = [bluemap; redmap];
     
-elseif lims(1) >= 0
+elseif lims(1) >= white_number
     % Just positive
-    new = [middle; topmiddle; top];
+    new = [middle_white; topmiddle_red; top_red];
     len = length(new);
     oldsteps = linspace(0, 1, len);
     newsteps = linspace(0, 1, m);
@@ -93,7 +95,7 @@ elseif lims(1) >= 0
     
 else
     % Just negative
-    new = [bottom; botmiddle; middle];
+    new = [bottom_blue; botmiddle_blue; middle_white];
     len = length(new);
     oldsteps = linspace(0, 1, len);
     newsteps = linspace(0, 1, m);
