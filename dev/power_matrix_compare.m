@@ -4,20 +4,20 @@ filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
 
 % inputs
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 X = [b.X_noms; 1];
 
 % unsaturated power
 actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance & Economics');
-actual_elec_unsat = actual_mech_unsat * p.pto_eff;
-[~, P_var, ~, ~, ~, ~, ~, ~, P_elec, ~, P_matrix] = simulation(X,p);
+actual_elec_unsat = actual_mech_unsat * p.eff_pto;
+[~, ~, P_matrix] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
 
 % saturated power
 v = validation_inputs();
 p.power_max = v.power_max;
 actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & Economics');
-[~, P_var, ~, ~, ~, ~, ~, ~, P_elec, ~, P_matrix] = simulation(X,p);
+[~, ~, P_matrix] = simulation(X,p);
 sim_elec_sat = P_matrix/1000;
 
 % wave resources
@@ -87,7 +87,7 @@ for i = 1:3
     title(resource_titles{i})
     colorbar
 end
-sgtitle('Wave Resource')
+sgtitle('Wave Resource (kW/m)')
 
 % JPD figure
 JPDs = JPD;
