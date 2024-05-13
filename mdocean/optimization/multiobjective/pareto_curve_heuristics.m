@@ -1,7 +1,7 @@
 function pareto_curve_heuristics()
     p = parameters();
     b = var_bounds();
-    
+
     %[x,fval] = pareto_search();
     load("pareto_search_results.mat")
     cols = [1 3 6 5 4 2 7];
@@ -10,29 +10,29 @@ function pareto_curve_heuristics()
     LCOE = fval(:,1);
     Pvar = fval(:,2);
     
-    [LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-     Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+    [LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar, LCOE_wind, LCOE_hydro, LCOE_balanced,...
+     Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_wind, P_var_hydro, P_var_balanced,...
      x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
     showImages = false;
-    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
-                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_wind,  LCOE_hydro, NaN*LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_wind, P_var_hydro, NaN*P_var_balanced,...
                 x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
     
     %% simple pareto plot
     showSingleObj = false;
     showImages = false;
-    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_wind,  LCOE_hydro, LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_wind, P_var_hydro, P_var_balanced,...
                 x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
     showImages = true;
-    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar, LCOE_wind,  LCOE_hydro, LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_wind, P_var_hydro, P_var_balanced,...
                 x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
     
     %% plots for DVs as a fn of percent along the pareto
@@ -42,9 +42,9 @@ function pareto_curve_heuristics()
 end
 %%
 function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
-         LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+         LCOE_nom_sim,  LCOE_solar, LCOE_wind,  LCOE_hydro, LCOE_balanced,...
          Pvar, minPvar, idx_best_Pvar, P_var_nom, ...
-         P_var_nom_sim, P_var_solar, P_var_balanced,...
+         P_var_nom_sim, P_var_solar, P_var_wind, P_var_hydro, P_var_balanced,...
          x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] ...
                                         = process_pareto_front(LCOE,Pvar,X,p,b)
 
@@ -69,6 +69,14 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
     LCOE_solar = 0.03;
     P_var_solar = 125;
     
+    % wind
+    LCOE_wind = 0.07;
+    P_var_wind = 34.49;
+
+    % hydro 
+    LCOE_hydro = 0.095;
+    P_var_hydro = 346.67;
+
     % balanced design
     [~,idx_balanced] = min(abs(Pvar-100));
     LCOE_balanced = LCOE(idx_balanced);
@@ -81,21 +89,22 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
 end
 
 %%
-function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCOE_solar, LCOE_balanced,...
-                          Pvar,minPvar,idx_best_Pvar,P_var_nom,P_var_nom_sim,P_var_solar,P_var_balanced,...
+function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCOE_solar, LCOE_wind, LCOE_hydro, LCOE_balanced,...
+                          Pvar,minPvar,idx_best_Pvar,P_var_nom,P_var_nom_sim,P_var_solar,P_var_wind, P_var_hydro,P_var_balanced,...
                           x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,showSingleObj,showImages,p)
     figure
     % overall pareto front
     plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
     hold on
     
+
     % utopia point
     plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
     
     % RM3 nominal reference
     plot(LCOE_nom,P_var_nom,'rd')
     plot(LCOE_nom_sim,P_var_nom_sim,'rs')
-    
+     
     if showSingleObj  
         % black squares for 3 ref points
         plot(minLCOE,Pvar(idx_best_LCOE),'ks')
@@ -107,26 +116,39 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     xlabel('LCOE ($/kWh)')
     ylabel('Power Variation (%)')
     title('Pareto Front')
-    xlim([0 1])
-    ylim([25 165])
+    xlim([0 1.2])
+    ylim([25 400])
     improvePlot
     
     % solar reference
     plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2])
     % for the yellow color to work, do not use improvePlot below here
     
+    % wind reference
+    plot(LCOE_wind+.01, P_var_wind,'o','MarkerSize',1,'MarkerFaceColor', [0.3010 0.7450 0.9330])
+    triangle = native2unicode([0xF0 0x9F 0x9F 0x80],'utf8');
+    %figure
+    text(LCOE_wind-.0243, P_var_wind,triangle,'FontSize', 25,'Color', [0.3010 0.7450 0.9330])
+    %text(LCOE_wind, P_var_wind, uniCha, 'FontSize', 20, 'Color', 'black', 'HorizontalAlignment', 'center')
+
+    % hydro reference
+    plot(LCOE_hydro, P_var_hydro,'o','MarkerSize',12,'MarkerEdgeColor',[.5, .0, .1],'MarkerFaceColor',[.5, .0, .1])
+    
+
     % text labels
-    sz = 14;
-    text(LCOE_nom+.03,P_var_nom,'Nominal','FontSize',sz)
-    text(LCOE_nom+.01,P_var_nom-5,'Actual [10]','FontSize',sz)
-    text(LCOE_nom_sim-.02,P_var_nom_sim+5,'Nominal','FontSize',sz)
-    text(LCOE_nom_sim+.03,P_var_nom_sim,'Sim','FontSize',sz)
-    text(minLCOE+.03,minPvar-2,'Utopia Point','FontSize',sz)
+    sz = 12;
+    text(LCOE_nom+.03,P_var_nom+2,'Nominal','FontSize',sz)
+    text(LCOE_nom+.03,P_var_nom-9,'Actual [10]','FontSize',sz)
+    text(LCOE_nom_sim-.02,P_var_nom_sim+12,'Nominal','FontSize',sz)
+    text(LCOE_nom_sim+.02,P_var_nom_sim+1,'Sim','FontSize',sz)
+    text(minLCOE-.06,minPvar-11,'Utopia Point','FontSize',sz)
     text(LCOE_solar+.03,P_var_solar,'Solar','FontSize',sz)
+    text(LCOE_wind+.01,P_var_wind-3,'Wind','FontSize',sz)
+    text(LCOE_hydro+.03,P_var_hydro,'Hydro','FontSize',sz)
     if showSingleObj
         text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest','FontSize',sz)
-        text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
-        text(LCOE_balanced-.15,P_var_balanced+5,'Balanced Design','FontSize',sz)
+        text(LCOE(idx_best_Pvar)-.03,Pvar(idx_best_Pvar)-7,'Least Variable','FontSize',sz)
+        text(LCOE_balanced+.01,P_var_balanced+7,'Balanced Design','FontSize',sz)
     end
     
     if showImages
