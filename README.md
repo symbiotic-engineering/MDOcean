@@ -1,3 +1,8 @@
+[![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/code-cleanup/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
+[![DOI](https://zenodo.org/badge/410160635.svg)](https://zenodo.org/badge/latestdoi/410160635)
+
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
 
@@ -6,13 +11,17 @@ of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC
 
 **Context**
 
-The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/) and has been accepted for publication/presentation 
-in the [2022 ASME IDETC-CIE](https://event.asme.org/IDETC-CIE).
-At this conference, the work was presented at the [DAC-6](https://www.designautomationconference.org/dac-6) session and is publication number 90227.
+The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/) 
+and has been accepted for publication/presentation in the 2022 ASME IDETC-CIE.
+At this conference, the work was presented at the DAC-6 session and is publication number 90227.
 A recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
 
-Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” *International Design Engineering Technical Conferences & Computers and Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
+Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
+to Reduce Cost and Power Variation of a Wave Energy Converter,” 
+*International Design Engineering Technical Conferences & Computers and 
+Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
+https://doi.org/10.1115/DETC2022-90227.
 
 **Authors**
 - Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact) @rebeccamccabe
@@ -21,7 +30,8 @@ Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimizatio
 
 **Disclaimer**
 
-The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
+The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) 
+and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
 These errors have since been corrected, and the current code ([v1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4)) is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
 Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
 
