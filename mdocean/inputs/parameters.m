@@ -50,6 +50,6 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)
-            'eff_array', 0.95*0.98 );           % array availability and transmission efficiency (-)
-        
+            'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
+            'cost_perN', 0.1 );                 % cost per Newton   
 end
