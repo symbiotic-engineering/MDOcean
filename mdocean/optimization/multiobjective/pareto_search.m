@@ -9,7 +9,7 @@ function [x,fval] = pareto_search()
 
     % get extra seed values in the middle by optimizing at fixed LCOEs
     LCOE_max = p.LCOE_max;
-    LCOE_seeds = [0.1 0.2 0.3 0.4];
+    LCOE_seeds = linspace(0.1,0.4,16);
     X_seeds = zeros(length(LCOE_seeds),7);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     for i = 1:length(LCOE_seeds)
