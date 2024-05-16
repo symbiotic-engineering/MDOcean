@@ -43,7 +43,7 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
     X_unsat = get_response(w,m,b,k,Fd);
 
     % confirm unsaturated response doesn't exceed maximum capture width
-    P_unsat = 1/2 * in.B_p .* w.^2 .* X_unsat.^2;
+    P_unsat = 1/8 * 1/2 * in.B_p .* w.^2 .* X_unsat.^2;
 
     F_ptrain_over_x = sqrt( (in.B_p .* w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
@@ -58,8 +58,8 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
-    P_matrix = 1/2 * (mult .* in.B_p) .* w.^2 .* X_sat.^2;
-
+    P_matrix = 1/8 * 1/2 * (mult .* in.B_p) .* w.^2 .* X_sat.^2;
+    
     X_max = max(X_sat,[],'all');
     h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
 
