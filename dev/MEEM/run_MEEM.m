@@ -106,13 +106,22 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
 end
 
 function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
-    syms m_k_h
+
     m_k_num = zeros(1,K_num);
-    eqn = m_k_h * tan(m_k_h) == -m0_num * h_num * tanh(m0_num * h_num);
-    
+    % using tand instead of tan because finite precision of pi means
+    % inconsistent behaviour around tan(pi/2)
+    eqn = @(m_k_h_deg) (m_k_h_deg * pi/180) .* tand(m_k_h_deg) + m0_num * h_num * tanh(m0_num * h_num);
+
     for k_num = 1:K_num
-        bounds = sym(pi) * [k_num-1/2, k_num];    
-        m_k_num(k_num) = double(vpasolve(eqn, m_k_h, bounds))/h_num;
+        bounds = 180 * [k_num-1/2, k_num];
+        % apply tweak determined experimentally to be the smallest tweak
+        % that doesn't return +-Inf - see p17 of notebook
+        expo = floor( log(bounds(1)) / log(2) );
+        bound_tweak = eps * (2^(expo - 1) + 1);
+        bounds(1) = bounds(1) + bound_tweak;
+
+        m_k_h_deg = fzero(eqn, bounds);
+        m_k_num(k_num) = m_k_h_deg * pi/180 / h_num;
     end    
 
     m_k_cell = num2cell(m_k_num);
