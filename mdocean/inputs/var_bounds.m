@@ -53,8 +53,8 @@ b.var_names = {'D_f','D_s_ratio','h_f_ratio','T_s_ratio','F_max','B_p','w_n','M'
 b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar_too_light',...
     'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
     'pos_power','spar_damping','spar_height','LCOE_max','irrelevant_max_force'};
-for i = 15:434
-    b.constraint_names{i} = strcat('prevent_slamming',num2str(i-14));
+for i = 15:42
+   b.constraint_names{i} = strcat('prevent_slamming',num2str(i-14));
 end
 
 % modify nominal control inputs to so power and force matches actual
