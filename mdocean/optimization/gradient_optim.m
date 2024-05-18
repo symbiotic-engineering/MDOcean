@@ -37,7 +37,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'ConstraintTolerance',1e-5);
                             
 % iterate through material choices                            
-for matl = 1%1:2:3 %b.M_min : b.M_max
+for matl = 1:2:3 %b.M_min : b.M_max
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
 
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
