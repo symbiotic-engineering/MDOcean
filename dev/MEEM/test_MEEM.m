@@ -4,13 +4,15 @@
 % - write symbolic to file so it runs the solve fast (check)
 % - check that the same dimensions scaled by some constant give the same
 % nondim hydro coeffs (checked, doesn't match, must resolve)
-% - compare hydro coeffs against Yeung and WAMIT
+% - do convergence study on hydro coeff vs N (check)
+% - compare hydro coeffs against Yeung (check) and WAMIT (unofficially
+% checked, A is ~2x too big and B is reasonable)
 % - get excitation force
-% - do convergence study on hydro coeff and matching quality vs N
-% - integrate into mdocean
+% - do convergence study on matching quality vs N
+% - integrate into mdocean (check)
 
 % extensions for later:
-% - time profiling and speedup
+% - time profiling and speedup (check)
 % - h = 1 gives divide by zero error, investigate
 % - update auto BCs to work with different N,M,K
 % - find the difference between auto BCs and regular BCs
