@@ -24,19 +24,18 @@ h_num = 1.001;
 m0_num = 1;
 spatial_res = 30;
 
-%% run
+%% run validation of potential for single frequency
 run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi);
 figure(7)
 plot_potential_validation()
 
-
+%% run validation of hydro coeffs for various frequencies
 m0_nums = linspace(0.1,5,100);
 plot_phi = false;
 [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 
-%% plot hydro coeffs vs wavenumber
 figure
 plot(m0_nums,mu_nondim, m0_nums,lambda_nondim)
 xlabel('Wavenumber m_0')
@@ -46,6 +45,7 @@ grid on
 hold on
 plot_hydro_coeff_validation()
 
+%% validation functions
 function plot_potential_validation()
     a1_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a1.csv");
     a2_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a2.csv");
@@ -59,7 +59,10 @@ function plot_hydro_coeff_validation()
     excitation_nondim = readmatrix("dev/MEEM/MEEM_validation/excitation.csv");
     excitation_phase_nondim = readmatrix("dev/MEEM/MEEM_validation/excitation_phase.csv");
 
-    plot(mu_nondim(:,1), mu_nondim(:,2))
-    plot(lambda_nondim(:,1), lambda_nondim(:,2))
-
+    fudge_mu = 1/(2*pi);
+    fudge_lambda = 1./(6*pi*lambda_nondim(:,1));
+    
+    plot(mu_nondim(:,1), fudge_mu * mu_nondim(:,2),'c--','DisplayName','Added Mass Yeung 2012')
+    plot(lambda_nondim(:,1), fudge_lambda .* lambda_nondim(:,2),'m--','DisplayName','Damping Yeung 2012')
+    improvePlot
 end
