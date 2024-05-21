@@ -17,11 +17,15 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
            all( d2_mat < d1_mat, 'all'), 'Invalid geometry')
 
     % check input dimensions
-    numel_numeric_inputs = [numel(a1_mat), numel(a2_mat), numel(d1_mat), numel(d2_mat), ...
-                     numel(h_mat), numel(m0_mat)];
-    numel_nonscalar = numel_numeric_inputs(numel_numeric_inputs ~= 1);
+    size_numeric_inputs = [size(a1_mat); size(a2_mat); size(d1_mat); size(d2_mat); ...
+                     size(h_mat); size(m0_mat)];
+    numel_numeric_inputs = prod(size_numeric_inputs,2);
+    idx_nonscalar = any(size_numeric_inputs ~= 1, 2);
+    size_nonscalar = size_numeric_inputs(idx_nonscalar,:);
+    numel_nonscalar = prod(size_nonscalar);
 
-    if isempty(numel_nonscalar) % all scalars
+    all_scalars = isempty(size_nonscalar);
+    if all_scalars
         num_runs = 1;
     else                        % some vectors/matrices
         num_runs = unique(numel_nonscalar);
@@ -65,6 +69,12 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
                                                                 h_num, m0_num, spatial_res, ...
                                                                 K_num, show_A, plot_phi, fname);
     end
+
+    if ~all_scalars
+        mu_nondim     = reshape(mu_nondim,    size_nonscalar);
+        lambda_nondim = reshape(lambda_nondim,size_nonscalar);
+    end
+
 end
 
 function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)

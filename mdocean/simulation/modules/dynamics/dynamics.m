@@ -30,7 +30,7 @@ end
 
 function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
-    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
+    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, in.T_s, in.h, in.rho_w, in.g, in.use_MEEM);
     m = m_float + A;
     b = B_h + in.B_p;
     k = in.w_n^2 * m;
@@ -51,9 +51,9 @@ function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force
     r = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
     f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m,b,k,w, B_h/in.B_p, K_h/K_p);
+    mult = get_multiplier(f_sat,m,b,k,w, B_h/in.B_p, K_h./K_p);
     b_sat = B_h + mult * in.B_p;
-    k_sat = K_h + mult * K_p;
+    k_sat = K_h + mult .* K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
@@ -82,16 +82,22 @@ function [P_matrix, h_s_extra, F_heave, F_surge, F_ptrain_max] = get_power_force
     end
 end
 
-function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, rho_w, g)
+function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, D_s, T_s, h, rho_w, g, use_MEEM)
     w = 2*pi./T;        % angular frequency
     k = w.^2 / g;       % wave number (dispersion relation for deep water)
 
-    r = D_f / 2;        % radius
-    draft = T_f;        % draft below waterline
-    A_w = pi * r^2;     % waterplane area
+    a2 = D_f / 2;        % radius
+    a1 = D_s / 2;
+    d2 = T_f;        % draft below waterline
+    d1 = T_s;
+    A_w = pi * a2^2;     % waterplane area
     
-    [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(r, k, draft);  
-    
+    if use_MEEM
+        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h); 
+    else
+        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(a2, k, d2);  
+    end
+
     A = rho_w * A_over_rho;                 % added mass
     B = rho_w * w .* B_over_rho_w;          % radiation damping
     gamma   = rho_w * g * gamma_over_rho_g; % froude krylov coefficient
@@ -101,7 +107,7 @@ end
 
 function X = get_response(w,m,b,k,Fd)
     real_term = b.*w;
-    imag_term = k - m*w.^2;
+    imag_term = k - m.*w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;

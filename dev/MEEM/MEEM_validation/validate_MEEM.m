@@ -39,6 +39,7 @@ plot_phi = false;
 figure
 plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
 ylabel('Nondimensional Hydro Coeff')
+xlabel('Wavenumber m0')
 legend('Added Mass','Damping')
 grid on
 hold on
