@@ -47,17 +47,17 @@ plot_hydro_coeff_validation()
 
 %% validation functions
 function plot_potential_validation()
-    a1_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a1.csv");
-    a2_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a2.csv");
+    a1_potential = readmatrix("inputs/validation/MEEM_validation/potential_a1.csv");
+    a2_potential = readmatrix("inputs/validation/MEEM_validation/potential_a2.csv");
     plot(a1_potential(:,1),a1_potential(:,2),'m-*','DisplayName','Yeung 2012 at a_1')
     plot(a2_potential(:,1),a2_potential(:,2),'b-*','DisplayName','Yeung 2012 at a_2')
 end
 
 function plot_hydro_coeff_validation()
-    mu_nondim = readmatrix("dev/MEEM/MEEM_validation/added_mass.csv");
-    lambda_nondim = readmatrix("dev/MEEM/MEEM_validation/damping.csv");
-    excitation_nondim = readmatrix("dev/MEEM/MEEM_validation/excitation.csv");
-    excitation_phase_nondim = readmatrix("dev/MEEM/MEEM_validation/excitation_phase.csv");
+    mu_nondim = readmatrix("inputs/validation/MEEM_validation/added_mass.csv");
+    lambda_nondim = readmatrix("inputs/validation/MEEM_validation/damping.csv");
+    excitation_nondim = readmatrix("inputs/validation/MEEM_validation/excitation.csv");
+    excitation_phase_nondim = readmatrix("inputs/validation/MEEM_validation/excitation_phase.csv");
 
     plot(mu_nondim(:,1),     mu_nondim(:,2),    'c--','DisplayName','Added Mass Yeung 2012')
     plot(lambda_nondim(:,1), lambda_nondim(:,2),'m--','DisplayName','Damping Yeung 2012')

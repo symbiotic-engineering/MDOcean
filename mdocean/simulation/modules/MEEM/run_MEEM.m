@@ -44,8 +44,8 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     fname = ['N' num2str(N_num) '_M' num2str(M_num) '_K' num2str(K_num) '_heaving_' heaving];
 
     % generate matlab functions from symbolic equations if needed
-    if ~exist(['dev/MEEM/generated/A_b_matrix_' fname],'file') || ...
-       ~exist(['dev/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
+    if ~exist(['simulation/modules/MEEM/generated/A_b_matrix_' fname],'file') || ...
+       ~exist(['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
     end  
 
@@ -402,11 +402,11 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(full_line, bars(2)*[1,1], 'k') % first horizontal
 %     plot(full_line, bars(3)*[1,1], 'k') % first horizontal
     
-    matlabFunction(A,b,'File',['dev/MEEM/generated/A_b_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
+    matlabFunction(A,b,'File',['simulation/modules/MEEM/generated/A_b_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
-                    'File',['dev/MEEM/generated/hydro_potential_velocity_fields_' fname],...
+                    'File',['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
 end
