@@ -89,6 +89,7 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
         v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,...
         v_e_z_num] = feval(hydro_fname, a1_num,a2_num,d1_num,d2_num,h_num,...
                                                     m0_num,m_k_cell{:},x_cell{:},R,Z);
+        [phi_p_i1_num,phi_p_i2_num] = fix_scalars(size(R),phi_p_i1_num,phi_p_i2_num);
         assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,phi_i1_num,phi_i2_num,phi_e_num,...
                                      phi_p_i1_num,phi_p_i2_num,phi_h_i1_num,phi_h_i2_num,...
                                      v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num,fname);
@@ -103,6 +104,16 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
     mu_nondim = real(hydro_nondim_num);
     lambda_nondim = imag(hydro_nondim_num) / omega;
 
+end
+
+function [varargout] = fix_scalars(desired_size, varargin)
+% ensures that all arguments passed have desired_size. If they are scalar,
+% converts them to the desired size by multiplying by appropriate one matrix.
+
+    varargout = cell(1,numel(varargin));
+    for i = 1:numel(varargin)
+        varargout{i} = ones(desired_size) .* varargin{i};
+    end
 end
 
 function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
@@ -441,7 +452,6 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     z_cutoffs_velocity = [-d1_num -d2_num -d2_num 0];
 
     plot_matching(phi_i1_num,phi_i2_num,phi_e_num,a1_num,a2_num,R,Z,'potential',z_cutoffs_potential)
-    plot_validation()
 
     plot_matching(v_1_r_num,v_2_r_num,v_e_r_num,a1_num,a2_num,R,Z,'Radial Velocity',z_cutoffs_velocity)
     plot([-d1_num -d2_num],[0 0],'m','DisplayName','No flux BC at a1')
@@ -519,11 +529,4 @@ function plot_velocity(v_r,v_z,R,Z)
     colorbar
     hold on
     quiver(R,Z,v_r./v_tot,v_z./v_tot)
-end
-
-function plot_validation()
-    a1_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a1.csv");
-    a2_potential = readmatrix("dev/MEEM/MEEM_validation/potential_a2.csv");
-    plot(a1_potential(:,1),a1_potential(:,2),'m-*','DisplayName','Yeung 2012 at a_1')
-    plot(a2_potential(:,1),a2_potential(:,2),'b-*','DisplayName','Yeung 2012 at a_2')
 end
