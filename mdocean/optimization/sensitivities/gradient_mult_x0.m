@@ -1,7 +1,7 @@
 clear;clc;close all
 
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 
 num_runs = 100;
 objs = Inf(num_runs,2);

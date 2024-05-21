@@ -1,7 +1,7 @@
-%close all
+function [] = compare()
 
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 x0_input = b.X_start_struct;
 
 Xs_opt = gradient_optim(x0_input,p,b);
@@ -75,3 +75,5 @@ cb = colorbar('Position',[.8 .175 .08 .685]);
 sgtitle('Weighted Power (kW)','FontWeight','bold','FontSize',20)
 text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
+
+end

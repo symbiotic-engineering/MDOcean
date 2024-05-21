@@ -3,7 +3,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
     p.N_WEC = 1;
     p.power_max = 286000;
     p.LCOE_max = 10; % set large max LCOE to avoid failing feasibility check
-    b = var_bounds(p); 
+    b = var_bounds(); 
     
     X = [b.X_noms; 1];
     
@@ -40,7 +40,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
 
         if nargout > 4
             % create combined struct
-            results = simulated;
+            results = rmfield(simulated, 'power_unsat');
             results(2) = actual;
             results(3) = pct_error;
             tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});

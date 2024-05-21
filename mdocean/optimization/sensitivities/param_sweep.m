@@ -1,3 +1,5 @@
+function [] = param_sweep()
+
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;%close all
@@ -18,7 +20,7 @@ cell2table([params',groups(param_groupings)'])
 
 ratios = .8 : .1 : 1.2;
 p = parameters();
-b = var_bounds(p);
+b = var_bounds();
 %%
 % use the optimal x as x0 to speed up the sweeps
 x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
@@ -174,6 +176,7 @@ title('Sensitivities')
 %     improvePlot
 % end
 % legend('LCOE','c_v')
+end
 
 function slope = get_slope(y_result, x, y_nominal)
     result_for_nans = y_result(:,:,1); % deal with case where ndims(result) > 2

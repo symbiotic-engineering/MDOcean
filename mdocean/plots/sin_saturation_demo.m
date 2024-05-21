@@ -1,3 +1,4 @@
+function [] = sin_saturation_demo()
 
 x = linspace(0,1,100);
 y = 1.5*sin(x*2*pi);
@@ -41,3 +42,5 @@ yticks(1:.1:1.3)
 xlabel('Force Ratio F_p/F_{max}')
 ylabel('Fundamental Ratio \alpha')
 improvePlot
+
+end

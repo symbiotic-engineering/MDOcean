@@ -1,44 +1,45 @@
-clear;clc;close all
-p = parameters();
-b = var_bounds(p);
+function pareto_curve_heuristics()
+    p = parameters();
+    b = var_bounds();
+    
+    %[x,fval] = pareto_search();
+    load("pareto_search_results.mat")
+    cols = [1 3 6 5 4 2 7];
+    X = x(:,cols); % swap indices based on solver generated function
+    X = [X ones(length(X),1)]; % add eigth column for material 
+    LCOE = fval(:,1);
+    Pvar = fval(:,2);
+    
+    [LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+     Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+     x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
+    
+    %% super simple "pareto" plot of just single objective optimizations
+    showSingleObj = true;
+    showImages = false;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
+    
+    %% simple pareto plot
+    showSingleObj = false;
+    showImages = false;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
+    
+    %% plot pareto front with annotations and embedded images of three recommended designs
+    showSingleObj = true;
+    showImages = true;
+    pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
+                Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
+                x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
+    
+    %% plots for DVs as a fn of percent along the pareto
+    design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
+                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
 
-%[x,fval] = pareto_search();
-load("pareto_search_results.mat")
-cols = [1 3 6 5 4 2 7];
-X = x(:,cols); % swap indices based on solver generated function
-X = [X ones(length(X),1)]; % add eigth column for material 
-LCOE = fval(:,1);
-Pvar = fval(:,2);
-
-[LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
- Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
- x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,b);
-
-%% super simple "pareto" plot of just single objective optimizations
-showSingleObj = true;
-showImages = false;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  NaN*LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, NaN*P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, [], showSingleObj, showImages, p)
-
-%% simple pareto plot
-showSingleObj = false;
-showImages = false;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
-
-%% plot pareto front with annotations and embedded images of three recommended designs
-showSingleObj = true;
-showImages = true;
-pareto_plot(LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
-            Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
-            x_best_LCOE, x_best_Pvar, x_nom, x_balanced, idxo, showSingleObj, showImages, p)
-
-%% plots for DVs as a fn of percent along the pareto
-design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-                       Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
-
+end
 %%
 function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
          LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
@@ -69,7 +70,7 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
     P_var_solar = 125;
     
     % balanced design
-    [~,idx_balanced] = min(abs(Pvar-40));
+    [~,idx_balanced] = min(abs(Pvar-100));
     LCOE_balanced = LCOE(idx_balanced);
     P_var_balanced = Pvar(idx_balanced);
     
@@ -85,21 +86,21 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
                           x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,showSingleObj,showImages,p)
     figure
     % overall pareto front
-    plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
+    plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
     hold on
     
     % utopia point
-    plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
+    plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20,'HandleVisibility','off')
     
     % RM3 nominal reference
-    plot(LCOE_nom,P_var_nom,'rd')
-    plot(LCOE_nom_sim,P_var_nom_sim,'rs')
+    plot(LCOE_nom,P_var_nom,'rd','HandleVisibility','off')
+    plot(LCOE_nom_sim,P_var_nom_sim,'rs','HandleVisibility','off')
     
     if showSingleObj  
         % black squares for 3 ref points
-        plot(minLCOE,Pvar(idx_best_LCOE),'ks')
-        plot(LCOE(idx_best_Pvar),minPvar,'ks')
-        plot(LCOE_balanced,P_var_balanced,'ks')
+        plot(minLCOE,Pvar(idx_best_LCOE),'ks','HandleVisibility','off')
+        plot(LCOE(idx_best_Pvar),minPvar,'ks','HandleVisibility','off')
+        plot(LCOE_balanced,P_var_balanced,'ks','HandleVisibility','off')
     end
     
     % axis labels
@@ -111,7 +112,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     improvePlot
     
     % solar reference
-    plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2])
+    plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2],'HandleVisibility','off')
     % for the yellow color to work, do not use improvePlot below here
     
     % text labels
@@ -125,32 +126,32 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     if showSingleObj
         text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest','FontSize',sz)
         text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
-        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design','FontSize',sz)
+        text(LCOE_balanced-.15,P_var_balanced+5,'Balanced Design','FontSize',sz)
     end
-    
+
     if showImages
         mini_plot_size = [.2 .22];
         % small corner pictures of best geometries
         % upper left
-        axes('Position',[.28 .7 mini_plot_size])
+        axes('Position',[.28 .6 mini_plot_size])
         box on
         visualize_geometry(x_best_LCOE,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % lower right
-        axes('Position',[.52 .15 mini_plot_size])
+        axes('Position',[.51 .23 mini_plot_size])
         box on
         visualize_geometry(x_best_Pvar,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % balanced
-        axes('Position',[.22 .25 mini_plot_size])
+        axes('Position',[.10 .28 mini_plot_size])
         box on
         visualize_geometry(x_balanced,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % RM3
-        axes('Position',[.7 .5 mini_plot_size])
+        axes('Position',[.7 .53 mini_plot_size])
         box on
         visualize_geometry(x_nom,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])

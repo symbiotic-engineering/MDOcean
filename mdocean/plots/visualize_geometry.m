@@ -1,6 +1,6 @@
 % close all
 % p = parameters();
-% b = var_bounds(p);
+% b = var_bounds();
 % x = [b.D_sft_nom, b.D_i_ratio_nom, b.D_or_ratio_nom, b.M_nom, b.N_WEC_nom, b.D_int_nom, b.w_n_nom];
 % visualize_geometry(x,p)
 
