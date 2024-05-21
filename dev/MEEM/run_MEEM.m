@@ -99,10 +99,8 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
                                                     m0_num,m_k_cell{:},x_cell{:},0,0);
     end
 
-    g = 9.806;
-    omega = sqrt(g * m0_num * tanh(m0_num*h_num));
     mu_nondim = real(hydro_nondim_num);
-    lambda_nondim = imag(hydro_nondim_num) / omega;
+    lambda_nondim = imag(hydro_nondim_num);
 
 end
 
@@ -317,8 +315,8 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % IC = heaving inner cylinder
     integrand_OC = subs(r * phi_i2 * v_2z, z, -d2);
     integrand_IC = subs(r * phi_i1 * v_1z, z, -d1);
-    hydro_OC = h^3 * int(integrand_OC,r,a1,a2);
-    hydro_IC = h^3 * int(integrand_IC,r,0,a1);
+    hydro_OC = h^3 * 2*pi* int(integrand_OC,r,a1,a2);
+    hydro_IC = h^3 * 2*pi* int(integrand_IC,r,0,a1);
     
     if heaving_OC && heaving_IC
         hydro_over_rho = hydro_OC + hydro_IC;
@@ -379,20 +377,20 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     [A,b] = equationsToMatrix(eqns_NMK,unknowns_const);
     
     % visualize sparsity pattern of A
-    clf
-    spy(A)
-    hold on
-    widths = [N_num+1, M_num+1, M_num+1, K_num+1];
-    bars = .5 + [widths(1), sum(widths(1:2)), sum(widths(1:3))];
-    full_line = [0,1+sum(widths)];
-    
-    plot(bars(1)*[1,1], full_line, 'k') % first vertical
-    plot(bars(2)*[1,1], full_line, 'k') % second vertical
-    plot(bars(3)*[1,1], full_line, 'k') % third vertical
-    
-    plot(full_line, bars(1)*[1,1], 'k') % first horizontal
-    plot(full_line, bars(2)*[1,1], 'k') % first horizontal
-    plot(full_line, bars(3)*[1,1], 'k') % first horizontal
+%     clf
+%     spy(A)
+%     hold on
+%     widths = [N_num+1, M_num+1, M_num+1, K_num+1];
+%     bars = .5 + [widths(1), sum(widths(1:2)), sum(widths(1:3))];
+%     full_line = [0,1+sum(widths)];
+%     
+%     plot(bars(1)*[1,1], full_line, 'k') % first vertical
+%     plot(bars(2)*[1,1], full_line, 'k') % second vertical
+%     plot(bars(3)*[1,1], full_line, 'k') % third vertical
+%     
+%     plot(full_line, bars(1)*[1,1], 'k') % first horizontal
+%     plot(full_line, bars(2)*[1,1], 'k') % first horizontal
+%     plot(full_line, bars(3)*[1,1], 'k') % first horizontal
     
     matlabFunction(A,b,'File',['dev/MEEM/generated/A_b_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     

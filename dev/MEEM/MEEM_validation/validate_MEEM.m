@@ -36,12 +36,8 @@ plot_phi = false;
 [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 
-fudge_mu = 2*pi;
-fudge_lambda = 5*pi*m0_nums;
-
 figure
-plot(m0_nums, fudge_mu * mu_nondim, m0_nums, fudge_lambda .* lambda_nondim)
-xlabel('Wavenumber m_0')
+plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
 ylabel('Nondimensional Hydro Coeff')
 legend('Added Mass','Damping')
 grid on
