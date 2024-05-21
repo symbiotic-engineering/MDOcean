@@ -20,7 +20,7 @@ h_num = 1.001;
 m0_nums = linspace(0.1,5,100);
 spatial_res = 30;
 
-num_harmonics = [3 5 10];
+num_harmonics = [1 3 5 10];
 run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 
@@ -51,5 +51,12 @@ function run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs,
     grid on
     hold on
     legend(cellstr(num2str([num_harmonics(:); num_harmonics(:)])))
+    improvePlot
+
+    figure
+    plot(num_harmonics, mu_nondim(:,1), '*-', num_harmonics, lambda_nondim(:,1),'*-')
+    xlabel('Number of Harmonics')
+    ylabel('Nondimensional Hydro Coefficient')
+    legend('Added Mass','Damping')
     improvePlot
 end
