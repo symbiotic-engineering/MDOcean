@@ -51,5 +51,5 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)
             'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
-            'cost_perN', 0.1 );                 % cost per Newton   
+            'cost_perN', 0.1656 );              % cost per Newton ($/N), from https://doi.org/10.1016/j.ifacol.2022.10.531
 end
