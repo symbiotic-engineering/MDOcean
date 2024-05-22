@@ -6,7 +6,7 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, D_s, T_s, h, rho_w, g
     a1 = D_s / 2;
     d2 = T_f;        % draft below waterline
     d1 = T_s;
-    A_w = pi * a2^2;     % waterplane area
+    A_w = pi * (a2^2 - a1^2);     % waterplane area
     
     if use_MEEM
         [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h); 
