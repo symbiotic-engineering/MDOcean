@@ -5,6 +5,8 @@ function newmap = bluewhitered(m, white_number)
 %   to zero.  This colormap is most useful for images and surface plots
 %   with positive and negative values.  BLUEWHITERED, by itself, is the
 %   same length as the current colormap.
+
+% Adapted from https://www.mathworks.com/matlabcentral/fileexchange/4058-bluewhitered
 %
 %   Examples:
 %   ------------------------------
