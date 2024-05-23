@@ -10,12 +10,6 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     % does not find the combinations of all possible inputs. If you want this, 
     % pre-generate the combinations (ie with meshgrid) and pass the meshes in here).
 
-    % check valid geometry
-    assert(all( d1_mat < h_mat,  'all') && ...
-           all( d2_mat < h_mat,  'all') && ...
-           all( a1_mat < a2_mat, 'all') && ...
-           all( d2_mat < d1_mat, 'all'), 'Invalid geometry')
-
     % check input dimensions
     size_numeric_inputs = [size(a1_mat); size(a2_mat); size(d1_mat); size(d2_mat); ...
                      size(h_mat); size(m0_mat)];
@@ -65,9 +59,21 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
         h_num  =  h_mat(idxs(5));
         m0_num = m0_mat(idxs(6));
 
-        [mu_nondim(i), lambda_nondim(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
+        % check valid geometry
+        valid_geometry = d1_num < h_num  && ...
+                         d2_num < h_num  && ...
+                         a1_num < a2_num && ...
+                         d2_num < d1_num;
+        
+        if valid_geometry
+            [mu_nondim(i), lambda_nondim(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, ...
                                                                 K_num, show_A, plot_phi, fname);
+        else
+            mu_nondim(i) = 1e-9;
+            lambda_nondim(i) = 1e-9;
+            warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
+        end
     end
 
     if ~all_scalars
@@ -75,6 +81,9 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
         lambda_nondim = reshape(lambda_nondim,size_nonscalar);
     end
 
+    if any(isnan(mu_nondim),'all')
+        error('MEEM got NaN as result')
+    end
 end
 
 function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
@@ -149,7 +158,11 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
     Ab_fname = ['A_b_matrix_' fname];
     [A_num, b_num] = feval(Ab_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
-    
+    if any(~isfinite(A_num),'all')
+        A_num(~isfinite(A_num)) = 0;
+        warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
+            'perhaps due to too large argument in besseli. Elements will be zeroed.'])
+    end
     % show A matrix values
     if show_A
         cond(A_num)

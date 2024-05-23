@@ -3,8 +3,7 @@
 % nondim hydro coeffs (checked, doesn't match, must resolve)
 % - compare hydro coeffs against WAMIT (unofficially
 % checked, A is ~2x too big and B is reasonable)
-% - get excitation force
-% - only run for every freq not wave height
+% - get excitation force (done for deep water, todo for non-deep)
 % - make validation an official part of the testcases
 
 % extensions for later:

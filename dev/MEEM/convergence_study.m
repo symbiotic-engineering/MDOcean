@@ -6,21 +6,31 @@ close all
 auto_BCs = false;
 
 heaving_OC = true;
-heaving_IC = true;
+heaving_IC = false;
 
 plot_phi = false;
 show_A = false;
 
+geometry = 'RM3'; % RM3 or default
+
 %% set numerical values
-a1_num = .5;
-a2_num = 1;
-d1_num = .5;
-d2_num = .25;
-h_num = 1.001;
+if strcmp(geometry,'default')
+    a1_num = .5;
+    a2_num = 1;
+    d1_num = .5;
+    d2_num = .25;
+    h_num = 1.001;
+elseif strcmp(geometry,'RM3')
+    a1_num = 3/100;
+    a2_num = 10/100;
+    d1_num = 35/100;
+    d2_num = 2/100;
+    h_num = 1;
+end
 m0_nums = linspace(0.1,5,100);
 spatial_res = 30;
 
-num_harmonics = [1 3 5 10];
+num_harmonics = [3 5 10 20 30];
 run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 

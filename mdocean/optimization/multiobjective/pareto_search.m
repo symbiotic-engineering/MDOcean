@@ -9,23 +9,39 @@ function [x,fval] = pareto_search()
 
     % get extra seed values in the middle by optimizing at fixed LCOEs
     LCOE_max = p.LCOE_max;
-    LCOE_seeds = linspace(0.1,0.4,16);
+    LCOE_min = objs_opt(1);
+    P_var_min = objs_opt(2);
+
+    num_seeds = 8;
+    LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
+    LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
     X_seeds = zeros(length(LCOE_seeds),7);
     P_var_seeds = zeros(1,length(LCOE_seeds));
+    init_failed = false(1,length(LCOE_seeds));
     for i = 1:length(LCOE_seeds)
         p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
         [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,p,b,which_obj);
-        idxs = [1 6 2 5 4 3 7];
-        X_seeds(i,:) = X_opt_tmp(idxs)';
-
-        % debugging checks on optimization convergence and objective values
-        %assert(flag_tmp==1);
-        obj_check = generatedObjectiveP_var(X_opt_tmp(idxs)',{p});
-        assert(obj_tmp == obj_check)
-        [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
-        assert(obj_tmp == P_var_seeds(i))
+        if flag_tmp == -2 % Initial pareto point is not feasible - this prevents a LPalg error in paretosearch
+            init_failed(i) = true;
+            warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
+        else
+            idxs = [1 6 2 5 4 3 7];
+            X_seeds(i,:) = X_opt_tmp(idxs)';
+    
+            % debugging checks on optimization convergence and objective values
+            obj_check = generatedObjectiveP_var(X_opt_tmp(idxs)',{p});
+            assert(obj_tmp == obj_check)
+            [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
+            assert(obj_tmp == P_var_seeds(i))
+        end
     end
+
+    % remove failed seeds
+    X_seeds(init_failed,:) = [];
+    P_var_seeds(init_failed) = [];
+    LCOE_seeds(init_failed) = [];
+
     p.LCOE_max = LCOE_max;
 
     %% Set up pareto search algorithm
@@ -36,7 +52,7 @@ function [x,fval] = pareto_search()
     [LCOE_x0,P_var_x0] = simulation([b.X_starts; 1],p);
     [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
     X0 = [probMO.x0'; X_opt(idxs,:)'; X_seeds];
-    fvals = [LCOE_x0,P_var_x0; objs_opt(1) P_var_min_LCOE; LCOE_max objs_opt(2); LCOE_seeds' P_var_seeds'];
+    fvals = [LCOE_x0,P_var_x0; LCOE_min P_var_min_LCOE; LCOE_max P_var_min; LCOE_seeds' P_var_seeds'];
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
