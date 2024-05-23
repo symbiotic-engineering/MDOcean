@@ -31,7 +31,9 @@ end
 
 function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
     % get unsaturated response
-    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, in.T_s, in.h, in.rho_w, in.g, in.use_MEEM);
+    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, ...
+                                            in.T_s, in.h, in.rho_w, in.g, ...
+                                            in.use_MEEM, in.harmonics);
     m = m_float + A;
     b = B_h + in.B_p;
     k = in.w_n^2 * m;

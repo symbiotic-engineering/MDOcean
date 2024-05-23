@@ -1,4 +1,4 @@
-function [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, m0, d2, a1, d1, h)
+function [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, m0, d2, a1, d1, h, harmonics)
 
 heaving_IC = false;
 heaving_OC = true;
@@ -6,7 +6,10 @@ auto_BCs = false;
 spatial_res = 0;
 show_A = false;
 plot_phi = false;
-N_num = 3; M_num = 3; K_num = 3;
+
+N_num = harmonics;
+M_num = harmonics;
+K_num = harmonics;
 
 [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
                                                N_num, M_num, K_num, ...
