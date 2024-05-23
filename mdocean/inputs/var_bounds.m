@@ -61,7 +61,8 @@ b.var_names = {'D_f','D_s_ratio','h_f_ratio','T_s_ratio','F_max','B_p','w_n','M'
 b.var_names_pretty = {'D_f','D_s/D_f','h_f/D_f','T_s/h_s','F_{max}','B_p','\omega_n','M'};
 b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar_too_light',...
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
-                      'pos_power','spar_damping','spar_height','LCOE_max','irrelevant_max_force'};
+                      'pos_power','spar_damping','spar_height_up','spar_height_down','LCOE_max',...
+                      'irrelevant_max_force','water_deep_enough'};
 
 % modify nominal control inputs to so power and force matches actual
 [F_max_nom, B_p_nom, w_n_nom] = find_nominal_inputs(b, false);

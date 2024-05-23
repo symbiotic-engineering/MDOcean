@@ -49,16 +49,17 @@ end
 %%
 function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
+    num_constraints = length(b.constraint_names);
+    num_objectives = length(which_objs);
+
     [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, 14]},...
+                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     objs = [LCOE P_var];
     obj_names = {'LCOE','P_var'};
-    probs = cell([1 2]);
+    probs = cell([1 2]); 
     
-    num_objectives = length(which_objs);
-    num_constraints = length(b.constraint_names);
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
