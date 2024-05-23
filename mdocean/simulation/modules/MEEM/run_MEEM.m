@@ -75,6 +75,9 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
         lambda_nondim = reshape(lambda_nondim,size_nonscalar);
     end
 
+    if any(isnan(mu_nondim),'all')
+        error('MEEM got NaN as result')
+    end
 end
 
 function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
@@ -149,7 +152,11 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
     Ab_fname = ['A_b_matrix_' fname];
     [A_num, b_num] = feval(Ab_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
-    
+    if any(~isfinite(A_num),'all')
+        A_num(~isfinite(A_num)) = 0;
+        warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
+            'perhaps due to too large argument in besseli. Elements will be zeroed.'])
+    end
     % show A matrix values
     if show_A
         cond(A_num)
