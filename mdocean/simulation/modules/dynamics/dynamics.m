@@ -29,9 +29,13 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
 
 end
 
-function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+function [P_matrix, h_s_extra, P_unsat, ...
+          F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+
     % get unsaturated response
-    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.rho_w, in.g);
+    [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, ...
+                                            in.T_s, in.h, in.rho_w, in.g, ...
+                                            in.use_MEEM, in.harmonics);
     m = m_float + A;
     b = B_h + in.B_p;
     k = in.w_n^2 * m;
@@ -48,16 +52,19 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
     r = min(in.F_max ./ F_ptrain_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
     f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m,b,k,w, b/in.B_p, k/K_p);
+    mult = get_multiplier(f_sat,m,b,k,w, b/in.B_p, k./K_p);
     b_sat = B_h + mult * in.B_p;
-    k_sat = K_h + mult * K_p;
+    k_sat = K_h + mult .* K_p;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
     P_matrix = 1/8 * 1/2 * (mult * in.B_p) .* w.^2 .* X_sat.^2;
     
     X_max = max(X_sat,[],'all');
-    h_s_extra = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s; % extra height on spar after accommodating float displacement
+    % extra height on spar after accommodating float displacement
+    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s;
+    h_s_extra_down = (in.T_s - in.T_f - X_max) / in.h_s;
+    h_s_extra = [h_s_extra_up, h_s_extra_down];
 
     % calculate forces
     if nargout > 2
@@ -71,7 +78,8 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
         end
         assert(all(F_err_2 < 1e-3,'all'));
 
-        F_heave_fund = sqrt( (mult * in.B_p .* w).^2 + (mult * K_p - m_float * w.^2).^2 ) .* X_sat; % includes powertrain force and D'Alembert force
+        % heave force: includes powertrain force and D'Alembert force
+        F_heave_fund = sqrt( (mult * in.B_p .* w).^2 + (mult .* K_p - m_float .* w.^2).^2 ) .* X_sat;
         F_heave = min(F_heave_fund, in.F_max + m_float * w.^2 .* X_sat);
         %assert(F_heave <= in.F_max);
 
@@ -81,7 +89,7 @@ end
 
 function X = get_response(w,m,b,k,Fd)
     imag_term = b.*w;
-    real_term = k - m*w.^2;
+    real_term = k - m.*w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     %X_over_F_phase = atan2(imag_term,real_term);
     X = X_over_F_mag .* Fd;

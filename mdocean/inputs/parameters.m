@@ -14,6 +14,7 @@ jpd = trim_jpd(readmatrix(file,'Range','A3'));
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
+            'h',        100,...                 % water depth (m)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
             'Hs',       jpd(2:end,1),...        % wave height (m)
             'Hs_struct',11.9,...                % 100 year wave height (m)
@@ -50,6 +51,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)
-            'eff_array', 0.95*0.98 );           % array availability and transmission efficiency (-)
+            'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
+            'use_MEEM',  true,...               % whether to use MEEM for hydro coeffs (boolean)
+            'harmonics', 10 );                  % number of harmonics to use for MEEM (int)
         
 end

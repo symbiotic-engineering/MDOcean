@@ -100,7 +100,8 @@ m_s_m = m_vc_m + m_d_m;                 % mass of spar material
 % spar ballast
 m_s_b = m_s_tot - m_s_m;                % mass of spar ballast
 V_s_b = m_s_b / rho_w;                  % volume of spar ballast
-V_s_tot = pi/4 * D_s^2 * h_s;           % total volume available on spar for ballast
+V_powertrain = .75 * pi * 3^2 * 12;
+V_s_tot = pi/4 * D_s^2 * h_s - V_powertrain;      % total volume available on spar for ballast
 V_s_pct = V_s_b / V_s_tot;              % percent of available volume used by ballast on spar            
 
 I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
