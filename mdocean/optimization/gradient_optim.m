@@ -68,7 +68,7 @@ num_successful_matls_each_obj = sum(success, 2);
 one_success = num_successful_matls_each_obj == 1;
 no_success = num_successful_matls_each_obj == 0;
 multiple_success = ~one_success & ~no_success;
-opt_matl_idx(one_success) = find(success(one_success,:));
+[~,opt_matl_idx(one_success)] = find(success(one_success,:));
 % if the optimization did not succeed for any material, use the material with the lowest objectives
 [~,opt_matl_idx(no_success)] = min(objs_opt_tmp(no_success,:));
 % if the optimization succeeded for multiple materials, choose from among the
@@ -102,7 +102,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     
     objs = [LCOE P_var];
     obj_names = {'LCOE','P_var'};
-    probs = cell([1 2]); 
+    probs = cell([1 num_objectives]); 
     
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
