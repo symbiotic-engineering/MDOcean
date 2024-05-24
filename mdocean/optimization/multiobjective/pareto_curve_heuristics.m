@@ -4,9 +4,7 @@ function pareto_curve_heuristics()
     
     %[x,fval] = pareto_search();
     load("pareto_search_results.mat")
-    cols = [1 3 6 5 4 2 7];
-    X = x(:,cols); % swap indices based on solver generated function
-    X = [X ones(length(X),1)]; % add eigth column for material 
+     
     LCOE = fval(:,1);
     Pvar = fval(:,2);
     
@@ -182,8 +180,6 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     
     X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
     
-    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
-    
     windowSize = round(length(idx_sort) * 5/100);
     b = (1/windowSize)*ones(1,windowSize);
     a = 1;
@@ -194,14 +190,16 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
         yy = filter(b,a,x_padded); % moving average filter
         y(:,i) = yy((windowSize+1):end);
     end
-    
+    y(:,8) = X_pareto_sorted_scaled(:,8); % don't filter material (integer)
+
     var_names_pretty = {'D_f',...    % outer diameter of float (m)	
                 'D_s/D_f',...
                 'h_f/D_f',...      	
                 'T_s/h_s',...      	
                 'F_{max}',...     % max force (N)
                 'B_p',...     % internal damping of controller (Ns/m)	
-                'w_n'};         % natural frequency (rad/s)
+                'w_n',...         % natural frequency (rad/s)
+                'M' };
     
     
     % unfiltered
@@ -217,9 +215,9 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca,'YMinorGrid','on')
     
     % filtered
-    cols = {'r:','r--','r-','r-.','b:','b--','b-'};
+    cols = {'r:','r--','r-','r-.','b:','b--','b-','r-*'};
     figure
-    for i=1:7
+    for i=1:size(y,2)
         semilogy(pct_angle,y(:,i),cols{i})
         hold on
     end
