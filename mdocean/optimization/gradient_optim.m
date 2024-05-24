@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs,materials)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -19,6 +19,11 @@ if nargin<4
     which_objs = [1 2]; % run both objectives by default
 end
 
+if nargin<5
+    materials = [1 3]; % run both steels by default
+    % materials = b.M_min : b.M_max
+end
+
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
 D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
@@ -36,7 +41,6 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'FunValCheck','on',...
                                 'ConstraintTolerance',1e-5);
 
-materials = [1,3]; %b.M_min : b.M_max
 num_matls = length(materials);
 num_objs = length(which_objs);
 num_DVs = length(b.var_names);
