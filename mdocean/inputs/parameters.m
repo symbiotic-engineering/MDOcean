@@ -12,7 +12,7 @@ lb2kg = 1/2.2;  % pound to kilogram
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = trim_jpd(readmatrix(file,'Range','A3'));
 
-p = struct( 'rho_w',    1000,...                % water density (kg/m3)
+p = struct( 'rho_w',    1030,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'h',        100,...                 % water depth (m)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
