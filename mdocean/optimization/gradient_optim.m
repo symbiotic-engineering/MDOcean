@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs,materials)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -19,6 +19,11 @@ if nargin<4
     which_objs = [1 2]; % run both objectives by default
 end
 
+if nargin<5
+    materials = [1 3]; % run both steels by default
+    % materials = b.M_min : b.M_max
+end
+
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
 D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
@@ -35,14 +40,57 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'MaxIterations',8,...
                                 'FunValCheck','on',...
                                 'ConstraintTolerance',1e-5);
-                            
-% iterate through material choices                            
-for matl = 1%1:2:3 %b.M_min : b.M_max
+
+num_matls = length(materials);
+num_objs = length(which_objs);
+num_DVs = length(b.var_names);
+
+% initialize loop outputs
+Xs_opt_tmp = zeros(num_DVs,num_objs,num_matls);
+objs_opt_tmp = zeros(num_objs,num_matls);
+flags_tmp = zeros(num_objs,num_matls);
+probs_tmp = cell(num_objs,num_matls);
+
+% iterate through material choices
+for matl_idx = 1 : num_matls
+    matl = materials(matl_idx);
     X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
 
-    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt_tmp(:,:,matl_idx), ...
+     objs_opt_tmp(:,matl_idx), ...
+     flags_tmp(:,matl_idx), ...
+     probs_tmp(:,matl_idx)] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
+
+% post process to find the optimal material for each objective
+opt_matl_idx = zeros(1, num_objs);
+
+% if the optimization only succeeded for one material, use that material
+success = flags_tmp >= 0;
+num_successful_matls_each_obj = sum(success, 2);
+one_success = num_successful_matls_each_obj == 1;
+no_success = num_successful_matls_each_obj == 0;
+multiple_success = ~one_success & ~no_success;
+[~,opt_matl_idx(one_success)] = find(success(one_success,:));
+% if the optimization did not succeed for any material, use the material with the lowest objectives
+[~,opt_matl_idx(no_success)] = min(objs_opt_tmp(no_success,:));
+% if the optimization succeeded for multiple materials, choose from among the
+% successful materials and select the material with the lower objective
+multiple_success_objs = objs_opt_tmp(multiple_success,:);
+multiple_success_objs(~success(multiple_success,:)) = NaN;
+[~,opt_matl_idx(multiple_success)] = min(multiple_success_objs,[],2);
+
+% collect outputs at the optimal material - requires strange indexing
+row_idx = repmat((1:num_DVs)', [1 num_objs]);
+col_idx = repmat(1:num_objs, [num_DVs 1]);
+page_idx = repmat(opt_matl_idx, [num_DVs 1]);
+X_opt_idx = sub2ind(size(Xs_opt_tmp), row_idx, col_idx, page_idx);
+Xs_opt   = Xs_opt_tmp(X_opt_idx);
+two_dim_idx = sub2ind(size(objs_opt_tmp), 1:num_objs, opt_matl_idx);
+objs_opt = objs_opt_tmp(two_dim_idx);
+flags    = flags_tmp(two_dim_idx);
+probs    = probs_tmp(two_dim_idx);
 
 end
 
@@ -58,7 +106,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     
     objs = [LCOE P_var];
     obj_names = {'LCOE','P_var'};
-    probs = cell([1 2]); 
+    probs = cell([1 num_objectives]); 
     
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
