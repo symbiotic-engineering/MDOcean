@@ -1,10 +1,10 @@
 
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_elec, P_matrix, h_s_extra, P_unsat] = dynamics(in,m_float,V_d,draft)
+    P_var, P_elec, P_matrix, h_s_extra, P_unsat] = dynamics(in,m_float,m_spar,V_d,draft)
 
     % use probabilistic sea states for power
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix,h_s_extra,P_unsat] = get_power_force(in,T,Hs,m_float,V_d,draft);
+    [P_matrix,h_s_extra,P_unsat] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
     
     % account for powertrain electrical losses
     P_matrix = P_matrix * in.eff_pto;
@@ -21,7 +21,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     % use max sea states for structural forces and max amplitude
     [~,~,~,F_heave_max,F_surge_max,...
         F_ptrain_max] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, V_d, draft);
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
@@ -30,7 +30,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
 end
 
 function [P_matrix, h_s_extra, P_unsat, ...
-          F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+          F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft)
 
     % get unsaturated response
     [w,A,B_h,K_h,Fd,k_wvn] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, ...
@@ -53,12 +53,18 @@ function [P_matrix, h_s_extra, P_unsat, ...
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
     f_sat = alpha .* r;
     mult = get_multiplier(f_sat,m,b,k,w, b/in.B_p, k./K_p);
-    b_sat = B_h + mult * in.B_p;
-    k_sat = K_h + mult .* K_p;
+    B_p_sat = mult * in.B_p;
+    K_p_sat = mult .* K_p;
+    b_sat = B_h + B_p_sat;
+    k_sat = K_h + K_p_sat;
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
+    % get spar response
+    spar_float_amplitude_ratio = spar_dynamics(1/in.D_d_over_D_s, in.D_d, in.rho_w, in.mu, in.C_d_s, in.T_s, ...
+                                                in.spar_excitation_coeffs, K_p_sat, B_p_sat, m_spar, Hs, w, X_sat, in.g );
+
     % calculate power
-    P_matrix = 1/8 * 1/2 * (mult * in.B_p) .* w.^2 .* X_sat.^2;
+    P_matrix = 1/8 * 1/2 * B_p_sat .* w.^2 .* X_sat.^2;
     
     X_max = max(X_sat,[],'all');
     % extra height on spar after accommodating float displacement
