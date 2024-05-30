@@ -7,6 +7,7 @@
 % - make validation an official part of the testcases
 
 % extensions for later:
+% - don't remake A matrix when heaving OC vs IC changes, only B matrix
 % - do convergence study on matching quality vs N
 % - more speedup
 % - h = 1 gives divide by zero error, investigate
