@@ -9,6 +9,9 @@ function pareto_curve_heuristics()
     X = [X ones(length(X),1)]; % add eigth column for material 
     LCOE = fval(:,1);
     Pvar = fval(:,2);
+    lambdaActive = lambda.active';
+    lambdaLower = lambda.lower';
+    lambdaUpper = lambda.upper';
     
     [LCOE, minLCOE, idx_best_LCOE, LCOE_nom,  LCOE_nom_sim,  LCOE_solar,  LCOE_balanced,...
      Pvar, minPvar, idx_best_Pvar, P_var_nom, P_var_nom_sim, P_var_solar, P_var_balanced,...
@@ -39,6 +42,8 @@ function pareto_curve_heuristics()
     design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
                            Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
 
+    %% plots Lagrange multipliers as a fn of percent along the pareto
+    lagrange_multiplier_plot(lambdaActive,lambdaUpper,lambdaLower)
 end
 %%
 function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
@@ -70,7 +75,7 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
     P_var_solar = 125;
     
     % balanced design
-    [~,idx_balanced] = min(abs(Pvar-100));
+    [~,idx_balanced] = min(abs(Pvar-40));
     LCOE_balanced = LCOE(idx_balanced);
     P_var_balanced = Pvar(idx_balanced);
     
@@ -126,32 +131,32 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     if showSingleObj
         text(LCOE(idx_best_LCOE)+.03,Pvar(idx_best_LCOE),'Cheapest','FontSize',sz)
         text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
-        text(LCOE_balanced-.15,P_var_balanced+5,'Balanced Design','FontSize',sz)
+        text(LCOE_balanced+.02,P_var_balanced+5,'Balanced Design','FontSize',sz)
     end
 
     if showImages
         mini_plot_size = [.2 .22];
         % small corner pictures of best geometries
         % upper left
-        axes('Position',[.28 .6 mini_plot_size])
+        axes('Position',[.28 .7 mini_plot_size])
         box on
         visualize_geometry(x_best_LCOE,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % lower right
-        axes('Position',[.51 .23 mini_plot_size])
+        axes('Position',[.52 .15 mini_plot_size])
         box on
         visualize_geometry(x_best_Pvar,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % balanced
-        axes('Position',[.10 .28 mini_plot_size])
+        axes('Position',[.22 .25 mini_plot_size])
         box on
         visualize_geometry(x_balanced,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
         
         % RM3
-        axes('Position',[.7 .53 mini_plot_size])
+        axes('Position',[.7 .5 mini_plot_size])
         box on
         visualize_geometry(x_nom,p,true);
         set(gca,'XTickLabel',[],'YTickLabel',[])
@@ -253,4 +258,78 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     improvePlot
     cent = char(0162);
     legend(['LCOE (' cent '/kWh)'],'c_v (%)',Location='northeast')
+end
+
+%%
+function [] = lagrange_multiplier_plot(lambdaActive, ...
+                                 lambdaUpper,lambdaLower)
+    figure
+    hold on
+    [m,n]=size(lambdaActive);
+    color_cell = {'.r','.g','.b','.c','.m','.y','.k',"#FF0000",'ob','+b','*b','xb','-b','|b'};
+    %color_cell = {'r','g','b','c','m','y','k',[0 0.4470 0.7410],[0.8500 0.3250 0.0980],[0.9290 0.6940 0.1250],[0.4940 0.1840 0.5560],[0.4660 0.6740 0.1880],[0.3010 0.7450 0.9330],[0.6350 0.0780 0.1840]};
+    for i=1:m
+        for j = 1:n
+            %color = color_cell{rem(j,15)};
+            plot(i*100/60,lambdaActive(i,j),'.','MarkerSize',12);
+        end
+    end
+    %plot(pct_angle,lambda_active_sorted)
+    title("Lagrange Multipliers",'FontSize',20)
+    xlabel("Percent Along the Pareto Front",'FontSize',15)
+    ylabel("Lagrange Multiplier",'FontSize',15)
+    legend("prevent float too heavy","prevent float too light", ...
+                     "prevent spar too heavy","prevent spar too light","stability",...
+                     "float survives max force","spar survives max force",...
+                     "damping plate survives max force","spar doesn't buckle", ...
+                     'positive power','damping plate diameter','prevent float rising above top of spar',...
+                     'prevent too expensive','prevent irrelevant max force')
+    hold off
+
+    % lower bound plot
+    figure
+    hold on
+    [m,n]=size(lambdaLower);
+    % I'll change these later
+    for i=1:m
+        for j = 1:n
+            color = color_cell{rem(j,15)};
+            plot(i*100/60,lambdaLower(i,j),color,'MarkerSize',12);
+        end
+    end
+        title('Lower Bound Active Lagrange Multipliers')
+        xlabel('Percent Along the Pareto Curve')
+        ylabel('Lagrange Multiplier')
+        xlim([-1,101]);
+        ylim([-.05,.2])
+        legend('WEC Surface Float Outer Diameter', ...
+        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+        'Ratio of WEC Surface Float Height to Outer Diameter', ...
+        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+        'Powertrain/Controller Damping','Controller Natural Frequency')
+        hold off
+
+    % upper bound plot
+    figure
+    hold on
+    [m,n]=size(lambdaUpper)
+    % I'll change these later
+    for i=1:m
+        for j = 1:n
+            color = color_cell{rem(j,15)};
+            plot(i*100/60,lambdaUpper(i,j),color,'MarkerSize',12);
+        end
+    end
+        title('Upper Bound Active Lagrange Multipliers')
+        xlabel('Percent Along the Pareto Curve')
+        ylabel('Lagrange Multiplier')
+        %xlim([-1,61]);
+        ylim([-.02,.04])
+        legend('WEC Surface Float Outer Diameter', ...
+        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+        'Ratio of WEC Surface Float Height to Outer Diameter', ...
+        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+        'Powertrain/Controller Damping','Controller Natural Frequency')
+    improvePlot
+    hold off
 end
