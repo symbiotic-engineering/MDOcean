@@ -66,4 +66,11 @@ function [x_s, x_s_error] = calculate_x_s(x_s_guess, D_d, C_d, K_s, K_p, m_s, B_
 
     x_s_error = x_s_guess - x_s;
 
+    zeta_with_coupling = (B_p+B_s)./(2*sqrt((K_p+K_s).*m_s))
+
+    if any( ~isreal(zeta_with_coupling),'all')
+        disp('ohno')
+    end
+    zeta_no_coupling = B_s./(2*sqrt(K_s.*m_s))
+
 end
