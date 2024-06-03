@@ -18,5 +18,6 @@ function [w,A,B,K,Fd,k] = dynamics_simple(Hs, T, D_f, T_f, D_s, T_s, h, rho_w, g
     B = rho_w * w .* B_over_rho_w;          % radiation damping
     gamma   = rho_w * g * gamma_over_rho_g; % froude krylov coefficient
     K       = rho_w * g * A_w;              % hydrostatic stiffness
-    Fd      = gamma .* Hs / 2;                  % excitation force of wave
+    H       = Hs / sqrt(2);                 % equivalent regular wave height
+    Fd      = gamma .* H / 2;               % excitation force of wave
 end

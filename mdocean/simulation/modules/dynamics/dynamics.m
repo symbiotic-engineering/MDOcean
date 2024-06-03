@@ -62,7 +62,7 @@ function [P_matrix, h_s_extra, P_unsat, ...
     X_sat = get_response(w,m,b_sat,k_sat,Fd);
     
     % calculate power
-    P_matrix = 1/8 * 1/2 * (mult .* in.B_p) .* w.^2 .* X_sat.^2;
+    P_matrix = 1/2 * (mult .* in.B_p) .* w.^2 .* X_sat.^2;
     
     X_max = max(X_sat,[],'all');
     % extra height on spar after accommodating float displacement

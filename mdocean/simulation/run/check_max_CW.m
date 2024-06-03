@@ -14,7 +14,7 @@ function [ratio] = check_max_CW()
 
     % calculate capture width
     [T,Hs] = meshgrid(p.T,p.Hs);
-    P_wave = p.rho_w * p.g^2 / (32*pi) * T .* Hs.^2;
+    P_wave = p.rho_w * p.g^2 / (64*pi) * T .* Hs.^2;
     CW = P_unsat ./ P_wave;
 
     % compare to maximum capture width
