@@ -43,7 +43,7 @@ function [P_matrix, h_s_extra, P_unsat, F_heave, F_surge, F_ptrain_max] = get_po
     X_unsat = get_response(w,m,b,k,Fd);
 
     % confirm unsaturated response doesn't exceed maximum capture width
-    P_unsat = 1/8 * 1/2 * in.B_p .* w.^2 .* X_unsat.^2;
+    P_unsat = 1/2 * in.B_p .* w.^2 .* X_unsat.^2;
 
     F_ptrain_over_x = sqrt( (in.B_p .* w).^2 + (K_p).^2 );
     F_ptrain_unsat = F_ptrain_over_x .* X_unsat;
