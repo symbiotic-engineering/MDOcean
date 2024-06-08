@@ -99,7 +99,10 @@ function [X, X_unsat, mult, F_ptrain] = get_response_drag(w,m,B_h,B_p,K_h,K_p,F_
         X_err = max( abs(X_guess - X), [], 'all');
         X_guess = X;
         iters = iters + 1;
-        disp(iters);
+        if iters > 20
+            warning(['Float drag has not converged after 20 iterations. X_err = ' num2str(X_err)])
+            break
+        end
     end
 end
 
