@@ -14,7 +14,8 @@ x0s = struct('D_f',[],'D_s_ratio',[],'h_f_ratio',[],'T_s_ratio',[],'F_max',[],'D
 x0s(1) = b.X_start_struct;
 
 % 20 random ICs
-for i = 2:num_runs
+parpool
+parfor i = 2:num_runs
     [~,x0] = random_x0(b);
     x0s(i) = x0;
     [X_opt(i,:,:), objs(i,:), flags(i,:)] = gradient_optim(x0,p,b);	
@@ -44,7 +45,7 @@ converged = flags > 0;
 kkt = flags == 1;
 tol = 0.001;
 optimal = abs(objs - min(objs)) < tol; % this assumes that solutions converging 
-% to the same objective have the same optimal DVs, which is not guaranteed 
+% to the same objective value have the same optimal DVs, which is not guaranteed 
 % but seems correct in this case by inspection of the table above
 
 optimal_and_converged = converged & optimal;

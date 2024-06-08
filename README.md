@@ -75,8 +75,10 @@ The following packages are used in this code:
 - Global Optimization Toolbox
 - Statistics and Machine Learning Toolbox
 - Symbolic Math Toolbox
+- Parallel Computing Toolbox
 
-All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
+All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality, 
+and the Parallel Computing Toolbox, which is used to speed up computations.
 
 **Funding Acknowledgement**
 
