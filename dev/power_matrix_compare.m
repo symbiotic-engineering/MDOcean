@@ -104,3 +104,14 @@ for i = 1:2
     title(JPD_titles{i})
 end
 sgtitle('JPD (-)')
+
+% power error plot
+figure
+pre_JPD_pct_error = 100 * (pre_JPD_power(:,:,4) - pre_JPD_power(:,:,3)) ./ pre_JPD_power(:,:,3);
+pre_JPD_pct_error(JPD==0) = NaN;
+contourf(T,H,pre_JPD_pct_error)
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Power Percent Error (%)')
+colorbar
+grid on

@@ -17,14 +17,23 @@ B = B(:);
 gamma = hydro.ex_ma(3,1,w<w_max);
 gamma = gamma(:);
 
-r = 10;
-draft = 2;
+a2 = 10;
+a1 = 3;
+d2 = 2;
+d1 = 35;
 g = 9.8;
+h = 100;
 
 k = w.^2 / g;
 
-[A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs(r,k,draft);
-A_MDOcean = ones(size(w))* A_MDOcean;
+use_MEEM = true;
+if use_MEEM
+    [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h); 
+else
+    [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs(a2, k, d2);
+    A_MDOcean = ones(size(w))* A_MDOcean;
+end
+
 
 %% mean error
 err_A = abs(A - A_MDOcean') ./ A;
@@ -54,7 +63,7 @@ if plot_on
     hold on
     set(gca,"ColorOrderIndex",1)
     plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean)
-    ylim([0 2500])
+    ylim([0 3500])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
     legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force \gamma/(\rhog)','Simulation (Analytical)','Actual (WAMIT BEM)')
     title('Normalized Hydrodynamic Coefficients')
