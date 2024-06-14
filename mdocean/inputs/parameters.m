@@ -48,7 +48,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
             'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
             'T_f_over_h_f', 2/4,...             % normalized float draft (-)
-            'C_d_float',1.5,...                 % coefficient of drag for float
+            'C_d_float',0,...                 % coefficient of drag for float
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)

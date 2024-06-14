@@ -10,7 +10,7 @@ X = [b.X_noms; 1];
 % unsaturated power
 actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance & Economics');
 actual_elec_unsat = actual_mech_unsat * p.eff_pto;
-[~, ~, P_matrix] = simulation(X,p);
+[~, ~, P_matrix, ~, val] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
 
 % saturated power
@@ -19,6 +19,15 @@ p.power_max = v.power_max;
 actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & Economics');
 [~, ~, P_matrix] = simulation(X,p);
 sim_elec_sat = P_matrix/1000;
+
+% wecSim spar stationary
+spar_fixed = load('wecsim_power_sparfixedcd5_floatcd0','P');
+spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
+
+% wecSim spar moving
+spar_moving = load('wecsim_power_sparfloatingcd5_floatcd15_irreg','P');
+spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
+spar_moving_power(spar_moving_power>1e6) = NaN;
 
 % wave resources
 [T,H] = meshgrid(p.T, p.Hs);
@@ -31,11 +40,15 @@ wave_resource_sim = wave_resource_raw;
 wave_resource_sim(JPD == 0) = NaN;
 
 % variable manipulation before plotting
-power_titles = {'Actual: Unsaturated','Simulated: Unsaturated','Actual: Saturated','Simulated: Saturated'};
+power_titles = {'RM3 Report','MDOcean',...
+        'WecSim spar moving','WecSim spar fixed'};
+    %'Actual: Saturated','Simulated: Saturated'};
 pre_JPD_power        = actual_elec_unsat;
 pre_JPD_power(:,:,2) = sim_elec_unsat;
-pre_JPD_power(:,:,3) = actual_elec_sat;
-pre_JPD_power(:,:,4) = sim_elec_sat;
+%pre_JPD_power(:,:,3) = actual_elec_sat;
+%pre_JPD_power(:,:,4) = sim_elec_sat;
+pre_JPD_power(:,:,3) = spar_moving_power;
+pre_JPD_power(:,:,4) = spar_fixed_power;
 
 post_JPD_power = pre_JPD_power .* JPD / 100;
 
@@ -49,13 +62,20 @@ JPD_rep = repmat(JPD,[1 1 4]);
 CW_to_CW_max_zeroed(JPD_rep == 0) = NaN;
 
 vars = pre_JPD_power;
-vars(:,:,:,2) = post_JPD_power;
-vars(:,:,:,3) = CWR;
-vars(:,:,:,4) = CW_to_CW_max;
-vars(:,:,:,5) = CW_to_CW_max_zeroed;
+%vars(:,:,:,2) = post_JPD_power;
+vars(:,:,:,2) = CW;
+% vars(:,:,:,4) = CWR;
+vars(:,:,:,3) = CW_to_CW_max;
+% vars(:,:,:,6) = CW_to_CW_max_zeroed;
+vars(:,:,:,4) = pre_JPD_power ./ H.^2;
 
-var_names = {'Unweighted Device Power Matrix (kW)','JPD-Weighted Power Matrix (kW)',...
-    'Capture Width Ratio (-)','Capture Width / Max Capture Width (-)','Capture Width / Max Capture Width (-)'};
+var_names = {'Unweighted Device Power Matrix (kW)',...
+...%     'JPD-Weighted Power Matrix (kW)',...
+     'Capture With (m)'...
+...%     'Capture Width Ratio (-)',...
+     'Capture Width / Max Capture Width (-)',...
+...%     'Capture Width / Max Capture Width (-)',...
+    'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
 
 % four figures showing weigted and unweighted power and CWR
 for fig = 1:size(vars,4)
@@ -106,12 +126,42 @@ end
 sgtitle('JPD (-)')
 
 % power error plot
-figure
-pre_JPD_pct_error = 100 * (pre_JPD_power(:,:,4) - pre_JPD_power(:,:,3)) ./ pre_JPD_power(:,:,3);
-pre_JPD_pct_error(JPD==0) = NaN;
-contourf(T,H,pre_JPD_pct_error)
+figure                      % (sim - actual) / actual
+pre_JPD_pct_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,1)) ./ pre_JPD_power(:,:,1);
+%pre_JPD_pct_error(JPD==0) = NaN;
+pre_JPD_pct_error(pre_JPD_pct_error==0) = NaN;
+contourf(T,H,pre_JPD_pct_error,-10:10:100)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('Power Percent Error (%)')
+title('Unsaturated Power Percent Error to RM Report (%)')
+colorbar
+grid on
+
+figure
+MDOcean_Wecsim_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
+contourf(T,H,MDOcean_Wecsim_error)
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Unsaturated Power Percent Error to WecSim (%)')
+colorbar
+grid on
+
+
+% Bp and X (without power saturation)
+if length(unique(val.B_p)) > 1
+    figure
+    contourf(T,H,val.B_p/1e6)
+    xlabel('Wave Period T (s)')
+    ylabel('Wave Height Hs (m)')
+    title('B_p [MN/(m/s)]')
+    colorbar
+    grid on
+end
+
+figure
+contourf(T,H,val.X)
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Float Amplitude (m)')
 colorbar
 grid on
