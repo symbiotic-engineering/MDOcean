@@ -39,13 +39,13 @@ function [P_matrix, h_s_extra, P_unsat, ...
 
     % control - set powertrain coefficients
     if strcmp(in.control_type,'reactive')
-        K_p = w.^2 .* m - K_h;
+        K_p = w.^2 .* m - K_h; % fixme check if this is true with drag
         B_p = B_h;
     elseif strcmp (in.control_type, 'constant impedance')
         K_p = in.w_n^2 * m - K_h; % fixme this is not actually constant since m varies
         B_p = in.B_p;
     elseif strcmp (in.control_type, 'damping')
-        B_p = sqrt(B_h.^2 + ( (w.^2 .* m - K_h) ./ w).^2);
+        B_p = []; % empty means it will be calculated in get_response_drag
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
 
@@ -101,6 +101,14 @@ function [X, X_unsat, mult, F_ptrain, B_p] = get_response_drag(w,m,B_h,B_p_in,K_
 
         B_not_p = B_h + B_drag;
         K_not_p = K_h + K_drag;
+
+        if isempty(B_p_in)
+            K_p_ideal = w.^2 .* m - K_not_p;
+            B_p = sqrt( B_not_p.^2 + (K_p_ideal ./ w).^2 );
+        else
+            B_p = B_p_in;
+        end
+
         [X, angle_X, X_unsat, ...
             mult, F_ptrain] = get_response_saturated(w,m,B_not_p,B_p,K_not_p,K_p,F_d,F_max);
         X_err = max( abs(X_guess - X), [], 'all');
