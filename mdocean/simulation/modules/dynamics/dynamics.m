@@ -1,9 +1,9 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_elec, P_matrix, h_s_extra, P_unsat] = dynamics(in,m_float,V_d,draft)
+    P_var, P_elec, P_matrix, h_s_extra, Kp_over_Ks, P_unsat] = dynamics(in,m_float,m_spar,V_d,draft)
 
     % use probabilistic sea states for power
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix,h_s_extra,P_unsat] = get_power_force(in,T,Hs,m_float,V_d,draft);
+    [P_matrix,h_s_extra,P_unsat, Kp_over_Ks] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
     
     % account for powertrain electrical losses
     P_matrix = P_matrix * in.eff_pto;
@@ -20,7 +20,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     % use max sea states for structural forces and max amplitude
     [~,~,~,F_heave_max,F_surge_max,...
         F_ptrain_max] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, V_d, draft);
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
@@ -29,7 +29,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
 end
 
 function [P_matrix, h_s_extra, P_unsat, ...
-          F_heave, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float,V_d, draft)
+          F_heave, F_surge, F_ptrain_max, Kp_over_Ks] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft)
 
     % get dynamic coefficients
     [w,A,B_h,K_h,F_d,k_wvn,drag_const,mag_v0] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, ...
@@ -50,11 +50,15 @@ function [P_matrix, h_s_extra, P_unsat, ...
     end
 
     % get response: includes drag and force saturation
-    [X, X_unsat, mult, F_ptrain] = get_response_drag(w,m,B_h,B_p,K_h,K_p,F_d,in.F_max,drag_const,mag_v0);
+    [X, X_unsat, mult, F_ptrain, B_p] = get_response_drag(w,m,B_h,B_p,K_h,K_p,F_d,in.F_max,drag_const,mag_v0);
 
     % confirm unsaturated response doesn't exceed maximum capture width
     P_unsat = 1/2 * B_p .* w.^2 .* X_unsat.^2;
     
+    % get spar response
+    [spar_float_amplitude_ratio,Kp_over_Ks] = spar_dynamics(1/in.D_d_over_D_s, in.D_d, in.rho_w, in.mu, in.C_d_s, in.T_s, ...
+                                                in.spar_excitation_coeffs, mult .* K_p, mult .* B_p, m_spar, Hs, w, X, in.g );
+
     % calculate power
     P_matrix = 1/2 * (mult .* B_p) .* w.^2 .* X.^2;
     
@@ -79,7 +83,7 @@ function [P_matrix, h_s_extra, P_unsat, ...
     end
 end
 
-function [X, X_unsat, mult, F_ptrain] = get_response_drag(w,m,B_h,B_p,K_h,K_p,F_d,F_max,drag_const,mag_v0)
+function [X, X_unsat, mult, F_ptrain, B_p] = get_response_drag(w,m,B_h,B_p_in,K_h,K_p,F_d,F_max,drag_const,mag_v0)
     % initial guess: 1m amplitude
     X_guess = 1;
     angle_X_guess = 0;
