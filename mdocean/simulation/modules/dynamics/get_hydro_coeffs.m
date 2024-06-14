@@ -1,4 +1,4 @@
-function [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(r, k, draft)
+function [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(r, k, draft, hydro)
     
     % Froude Krylov force coefficient (diffraction is neglected)
 
@@ -17,7 +17,7 @@ function [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(r, k, d
     g = 9.8;
     w = sqrt(g * k);
 
-    hydro = readWAMIT(struct(),'rm3.out',[]); % function from WECSim
+    
     w_wamit = hydro.w;
     A_wamit = hydro.A(3,3,:);
     A_wamit = A_wamit(:);

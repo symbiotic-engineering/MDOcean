@@ -65,7 +65,7 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'irrelevant_max_force','water_deep_enough'};
 
 % modify nominal control inputs to so power and force matches actual
-[F_max_nom, B_p_nom, w_n_nom] = find_nominal_inputs(b, false);
+[F_max_nom, B_p_nom, w_n_nom] = deal(1e6);%find_nominal_inputs(b, false);
 b.F_max_nom = F_max_nom;
 b.B_p_nom = B_p_nom;
 b.w_n_nom = w_n_nom;

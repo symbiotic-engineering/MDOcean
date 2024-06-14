@@ -54,7 +54,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'eff_pto',   0.80,...               % PTO efficiency (-)
             'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
             'control_type', 'damping',...       % 'reactive' or 'constant impedance' or 'damping'
-            'use_MEEM',  true,...               % whether to use MEEM for hydro coeffs (boolean)
-            'harmonics', 10 );                  % number of harmonics to use for MEEM (int)
+            'use_MEEM',  false,...               % whether to use MEEM for hydro coeffs (boolean)
+            'harmonics', 10,...                  % number of harmonics to use for MEEM (int)
+            'hydro',readWAMIT(struct(),'rm3.out',[]) ); % function from WECSim
         
 end
