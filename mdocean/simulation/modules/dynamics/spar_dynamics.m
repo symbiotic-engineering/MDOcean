@@ -2,7 +2,8 @@
 function [x_s_x_f_ratio, Kp_over_Ks] = spar_dynamics(Ds_over_Dd, D_d, rho_w, mu, C_d, T_s, ...
    spar_excitation_coeffs, K_p, B_p, mass_spar, Hs, w, x_f, g)
 
-    wave_amplitude = Hs / 2; % fixme is this right?
+    H = Hs / sqrt(2);
+    wave_amplitude = H / 2;
     
     % mass
     r = Ds_over_Dd;
