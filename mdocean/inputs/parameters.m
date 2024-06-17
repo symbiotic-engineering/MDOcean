@@ -11,9 +11,12 @@ lb2kg = 1/2.2;  % pound to kilogram
 
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = trim_jpd(readmatrix(file,'Range','A3'));
+g = 9.8;
+spar_exc = get_spar_exc(g);
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
-            'g',        9.8,...                 % acceleration of gravity (m/s2)
+            'mu',       1e-3,...                % dynamic viscosity of water (Pa s)
+            'g',        g,...                   % acceleration of gravity (m/s2)
             'h',        100,...                 % water depth (m)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
             'Hs',       jpd(2:end,1),...        % wave height (m)
@@ -41,21 +44,24 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'D_dt',     48.00 * in2m,...        % damping plate support tube diameter (m)
             'theta_dt', atan(17.5/15),...       % angle from horizontal of damping plate support tubes (rad)
             'FOS_min',  1.5,...                 % minimum FOS (-)	
-            'D_d_min',  30,...                  % minimum damping plate diameter
             'FCR',      0.113,...               % fixed charge rate (-), see RM3 report p63
             'N_WEC',    100,...                 % number of WECs in array (-)   
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
             'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
             'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
             'T_f_over_h_f', 2/4,...             % normalized float draft (-)
-            'C_d_float',0,...                 % coefficient of drag for float
+            'C_d_float',0,...                   % coefficient of drag for float
+            'C_d_spar', 5,...                   % spar coefficient of drag
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)
             'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
             'control_type', 'damping',...       % 'reactive' or 'constant impedance' or 'damping'
-            'use_MEEM',  false,...               % whether to use MEEM for hydro coeffs (boolean)
-            'harmonics', 10,...                  % number of harmonics to use for MEEM (int)
+            'X_tol',     1e-2,...               % max allowable iteration error on magnitude of amplitude (m)
+            'phase_X_tol',5e-2,...              % max allowable iteration error on phase angle of amplitude (rad)
+            'max_drag_iters',20,...             % max number of iterations for drag convergence (-)
+            'use_MEEM',  false,...              % whether to use MEEM for hydro coeffs (boolean)
+            'harmonics', 10,...                 % number of harmonics to use for MEEM (int)
+            'spar_excitation_coeffs',spar_exc,...% spar excitation hydro coeffs from WAMIT for nominal RM3
             'hydro',readWAMIT(struct(),'rm3.out',[]) ); % function from WECSim
-        
 end
