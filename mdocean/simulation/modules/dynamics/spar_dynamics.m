@@ -1,6 +1,6 @@
 
-function [x_s_x_f_ratio, Kp_over_Ks] = spar_dynamics(Ds_over_Dd, D_d, rho_w, mu, C_d, T_s, ...
-   spar_excitation_coeffs, K_p, B_p, mass_spar, Hs, w, x_f, g)
+function [m_s,K_s,F_s,B_33_rad_spar] = spar_dynamics(Ds_over_Dd, D_d, rho_w, mu, C_d, T_s, ...
+                                                    spar_excitation_coeffs, mass_spar, Hs, w, g)
 
     H = Hs / sqrt(2);
     wave_amplitude = H / 2;
@@ -33,20 +33,20 @@ function [x_s_x_f_ratio, Kp_over_Ks] = spar_dynamics(Ds_over_Dd, D_d, rho_w, mu,
     nu = mu / rho_w; % kinematic viscosity of water
     beta = D_d^2 * f / nu; % nondimensional frequency parameter
 
-    x_s_error = ones(size(w));
-    x_s_guess = ones(size(w));
-    tol = 0.01;
-    num_iter = 0;
-    while any( abs(x_s_error) > tol, 'all')
-        [x_s, x_s_error] = calculate_x_s(x_s_guess, D_d, C_d, K_s, K_p, m_s, ...
-                                        B_p, B_33_rad_spar, w, x_f, F_s, mu, beta);
-        x_s_guess = x_s;
-        num_iter = num_iter + 1;
-    end
-    fprintf('Took %d iterations to converge \n',num_iter)
+%     x_s_error = ones(size(w));
+%     x_s_guess = ones(size(w));
+%     tol = 0.01;
+%     num_iter = 0;
+%     while any( abs(x_s_error) > tol, 'all')
+%         [x_s, x_s_error] = calculate_x_s(x_s_guess, D_d, C_d, K_s, K_p, m_s, ...
+%                                         B_p, B_33_rad_spar, w, x_f, F_s, mu, beta);
+%         x_s_guess = x_s;
+%         num_iter = num_iter + 1;
+%     end
+%     fprintf('Took %d iterations to converge \n',num_iter)
     
-    x_s_x_f_ratio = x_s ./ x_f
-    Kp_over_Ks = K_p ./ K_s;
+    %x_s_x_f_ratio = x_s ./ x_f
+    %Kp_over_Ks = K_p ./ K_s;
 end
 
 % todo: test spar equations, make figure of wamit results, latex equations
@@ -68,11 +68,11 @@ function [x_s, x_s_error] = calculate_x_s(x_s_guess, D_d, C_d, K_s, K_p, m_s, B_
 
     x_s_error = x_s_guess - x_s;
 
-    zeta_with_coupling = (B_p+B_s)./(2*sqrt((K_p+K_s).*m_s))
+    %zeta_with_coupling = (B_p+B_s)./(2*sqrt((K_p+K_s).*m_s))
 
-    if any( ~isreal(zeta_with_coupling),'all')
-        disp('ohno')
-    end
-    zeta_no_coupling = B_s./(2*sqrt(K_s.*m_s))
+    %if any( ~isreal(zeta_with_coupling),'all')
+    %    disp('ohno')
+    %end
+    %zeta_no_coupling = B_s./(2*sqrt(K_s.*m_s))
 
 end

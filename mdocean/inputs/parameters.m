@@ -51,14 +51,17 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
             'T_f_over_h_f', 2/4,...             % normalized float draft (-)
             'C_d_float',1.5,...                 % coefficient of drag for float
+            'C_d_spar', 5,...                   % spar coefficient of drag
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)
             'eff_pto',   0.80,...               % PTO efficiency (-)
             'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
             'control_type', 'damping',...       % 'reactive' or 'constant impedance' or 'damping'
+            'X_tol',     1e-2,...               % max allowable iteration error on magnitude of amplitude (m)
+            'phase_X_tol',5e-2,...              % max allowable iteration error on phase angle of amplitude (rad)
+            'max_drag_iters',20,...             % max number of iterations for drag convergence (-)
             'use_MEEM',  true,...               % whether to use MEEM for hydro coeffs (boolean)
             'harmonics', 10,...                 % number of harmonics to use for MEEM (int)
-            'C_d_s',     5,...                  % spar coefficient of drag
             'spar_excitation_coeffs',spar_exc );% spar excitation hydro coeffs from WAMIT for nominal RM3
         
 end

@@ -39,7 +39,7 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
 [F_heave_max, F_surge_max, F_ptrain_max, ...
-	    P_var, P_elec, P_matrix, h_s_extra, Kp_over_Ks] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
                                     F_heave_max, F_surge_max,...
@@ -60,7 +60,7 @@ g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
 g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
 g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_elec;                         % positive power
-g(11) = 1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
+g(11) = 0; %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(12) = h_s_extra(1);                   % prevent float rising above top of spar
 g(13) = h_s_extra(2);                   % prevent float going below bottom of spar
 g(14) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
@@ -80,7 +80,7 @@ if nargout > 4 % if returning extra struct output for validation
                                             in.D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, ...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, P_unsat] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    %[~, ~, ~, ~, ~, ~, ~, ~, P_unsat] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -93,7 +93,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.force_heave = F_heave_max;
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
-    val.power_unsat = P_unsat;
+    %val.power_unsat = P_unsat;
 end
 
 end
