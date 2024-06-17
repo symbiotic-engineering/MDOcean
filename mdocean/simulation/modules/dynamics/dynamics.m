@@ -102,9 +102,9 @@ function [mag_U,phase_U,...
                                                 drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,control_type,...
                                                 X_tol,phase_X_tol,max_drag_iters)
     % initial guess: 1m float amplitude, stationary spar
-    X_f_guess = 1;
+    X_f_guess = 2;
     phase_X_f_guess = 0;
-    X_s_guess = 0;
+    X_s_guess = 1;
     phase_X_s_guess = 0;
 
     [X_err,phase_X_err] = deal(1);
@@ -112,8 +112,8 @@ function [mag_U,phase_U,...
 
     % loop until converged
     while X_err > X_tol || phase_X_err > phase_X_tol
-        [B_drag_f, K_drag_f] = get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f);
-        [B_drag_s, K_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s);
+        [B_drag_f, K_drag_f] = deal(0);%get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f);
+        [B_drag_s, K_drag_s] = deal(0);%get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s);
 
         B_f = B_h_f + B_drag_f;
         B_s = B_h_s + B_drag_s;
