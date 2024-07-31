@@ -5,6 +5,9 @@
 % checked, A is ~2x too big and B is reasonable)
 % - get excitation force (done for deep water, todo for non-deep)
 % - make validation an official part of the testcases
+% - investigate the possible error where 0 is passed for R,Z if the
+% potential field isn't being plotted, which might mess up numerical
+% integration!!
 
 % extensions for later:
 % - don't remake A matrix when heaving OC vs IC changes, only B matrix
@@ -20,6 +23,8 @@
 % - take the limit in deep water
 % - get coupling hydro coeffs for when moving at diff velocities
 % - extend to many regions
+% - use the analytical form of the radial coupling integrals instead of
+% numerical integration, to speed up. (equation 53-55 of 2012 paper)
 
 clear all
 close all
@@ -27,7 +32,7 @@ close all
 %% settings 
 auto_BCs = false;
 
-num_harmonics = 3;
+num_harmonics = 10;
 N_num = num_harmonics;
 M_num = num_harmonics;
 K_num = num_harmonics;
