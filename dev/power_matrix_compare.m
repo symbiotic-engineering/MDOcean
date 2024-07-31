@@ -25,7 +25,7 @@ spar_fixed = load('wecsim_power_sparfixedcd5_floatcd0','P');
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 
 % wecSim spar moving
-spar_moving = load('wecsim_power_sparfloatingcd5_floatcd15_irreg','P');
+spar_moving = load('wecsim_power_sparfloatingcd5_floatcd0','P');
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 
