@@ -15,7 +15,7 @@ g = 9.8;
 spar_exc = get_spar_exc(g);
 
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
-            'mu',       1e-3,...                % dynamic viscosity of water (Pa s)
+            ...%'mu',       1e-3,...                % dynamic viscosity of water (Pa s)
             'g',        g,...                   % acceleration of gravity (m/s2)
             'h',        100,...                 % water depth (m)
             'JPD',      jpd(2:end,2:end),...    % joint probability distribution of wave (%)
@@ -58,8 +58,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'eff_array', 0.95*0.98,...          % array availability and transmission efficiency (-)
             'control_type', 'damping',...       % 'reactive' or 'constant impedance' or 'damping'
             'X_tol',     1e-2,...               % max allowable iteration error on magnitude of amplitude (m)
-            'phase_X_tol',5e-2,...              % max allowable iteration error on phase angle of amplitude (rad)
-            'max_drag_iters',20,...             % max number of iterations for drag convergence (-)
+            'phase_X_tol',deg2rad(3),...        % max allowable iteration error on phase angle of amplitude (rad)
+            'max_drag_iters',100,...             % max number of iterations for drag convergence (-)
             'use_MEEM',  false,...              % whether to use MEEM for hydro coeffs (boolean)
             'harmonics', 10,...                 % number of harmonics to use for MEEM (int)
             'spar_excitation_coeffs',spar_exc,...% spar excitation hydro coeffs from WAMIT for nominal RM3

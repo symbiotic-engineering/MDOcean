@@ -1,38 +1,26 @@
 
-function [m_s,K_s,F_s,B_33_rad_spar] = spar_dynamics(Ds_over_Dd, D_d, rho_w, mu, C_d, T_s, ...
-                                                    spar_excitation_coeffs, mass_spar, Hs, w, g)
-
-    H = Hs / sqrt(2);
-    wave_amplitude = H / 2;
+function [A_s_over_rho,gamma_s_over_rho_g,B_s_over_rho_w] = spar_dynamics(Ds_over_Dd, D_d, T_s, ...
+                                                    spar_excitation_coeffs, k)
     
-    % mass
+    % added mass
     r = Ds_over_Dd;
     root_r = sqrt(1-r^2);
     ratio_term = 1/3 - 1/4 * r^2 * root_r - 1/12 * (1 - root_r)^2 * (2 + root_r);
-    A_33_spar = rho_w * D_d^3 * ratio_term;
-    m_s = mass_spar + A_33_spar; % effective spar mass = mass + added mass
-    
-    % stiffness
-    D_s = Ds_over_Dd * D_d;
-    K_s = rho_w * g * pi/4 * D_s^2; % stiffness of spar
+    A_s_over_rho = D_d^3 * ratio_term; % added mass
     
     % excitation - interpolate WAMIT results
-    k = w.^2 / g; % deepwater wave number
     depth_multiplier = exp(-k * (T_s - spar_excitation_coeffs.T_s));
-    gamma_over_rho_g = interp1(spar_excitation_coeffs.k * D_d, ...
+    gamma_s_over_rho_g = interp1(spar_excitation_coeffs.k * D_d, ...
         spar_excitation_coeffs.gamma_over_rho_g, k * D_d) .* depth_multiplier;
-    gamma_3 = rho_w * g * gamma_over_rho_g;
-    F_s = gamma_3 .* wave_amplitude; 
     
     % radiation damping
-    B_over_rho_w = k/2 .* gamma_over_rho_g.^2; % haskind relation
-    B_33_rad_spar = B_over_rho_w * rho_w .* w;
+    B_s_over_rho_w = k/2 .* gamma_s_over_rho_g.^2; % haskind relation
     
-    % frequency parameter
-    f = w / (2 * pi); % frequency Hz
-    nu = mu / rho_w; % kinematic viscosity of water
-    beta = D_d^2 * f / nu; % nondimensional frequency parameter
-
+%     % frequency parameter
+%     f = w / (2 * pi); % frequency Hz
+%     nu = mu / rho_w; % kinematic viscosity of water
+%     beta = D_d^2 * f / nu; % nondimensional frequency parameter
+%
 %     x_s_error = ones(size(w));
 %     x_s_guess = ones(size(w));
 %     tol = 0.01;
