@@ -24,7 +24,10 @@
 % - get coupling hydro coeffs for when moving at diff velocities
 % - extend to many regions
 % - use the analytical form of the radial coupling integrals instead of
-% numerical integration, to speed up. (equation 53-55 of 2012 paper)
+% numerical integration, to speed up. (equation 53-55 of 2012 paper). Based
+% on integral_testing_r.mlx, I might need to add assumeAlso(m_k>0) before 
+% generating sym functions? Once this is true, hydro coeffs are a linear
+% matrix multiply based on eigencoeffs, so implement in this form.
 
 clear all
 close all
