@@ -25,9 +25,11 @@ spar_fixed = load('wecsim_power_sparfixedcd5_floatcd0','P');
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 
 % wecSim spar moving
-spar_moving = load('wecsim_power_sparfloatingcd5_floatcd0','P');
+vars = {'P','float_amplitude','spar_amplitude'};
+spar_moving = load('wecsim_power_sparfloatingcd5_floatcd0_multibody',vars{:});
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
+spar_moving_float_amplitude = reshape(spar_moving.float_amplitude,size(P_matrix));
 
 % wave resources
 [T,H] = meshgrid(p.T, p.Hs);
@@ -150,7 +152,7 @@ grid on
 % Bp and X (without power saturation)
 if length(unique(val.B_p)) > 1
     figure
-    contourf(T,H,val.B_p/1e6)
+    contourf(T,H,val.B_p/1e6,0:2:20)
     xlabel('Wave Period T (s)')
     ylabel('Wave Height Hs (m)')
     title('B_p [MN/(m/s)]')
@@ -159,9 +161,18 @@ if length(unique(val.B_p)) > 1
 end
 
 figure
+subplot 121
 contourf(T,H,val.X)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('Float Amplitude (m)')
+title('MDOcean Float Amplitude (m)')
+colorbar
+grid on
+
+subplot 122
+contourf(T,H,spar_moving_float_amplitude)
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('WecSim Float Amplitude (m)')
 colorbar
 grid on
