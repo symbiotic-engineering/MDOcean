@@ -63,6 +63,8 @@ m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without balla
 A_f = pi/4 * (D_f^2 - D_s^2);
 V_f_d = A_f * T_f;
 m_f_tot = V_f_d * rho_w;
+m_f_tot = 725833;
+warning('Overriding mass properties')
 
 % ballast
 m_f_b = m_f_tot - m_f_m;        % mass of ballast on float
@@ -78,6 +80,7 @@ V_vc_d = pi/4 * D_s^2 * T_s;    % vertical column volume displaced
 V_d_d = pi/4 * D_d^2 * h_d;     % damping plate volume displaced
 V_s_d = V_vc_d + V_d_d;         % spar volume displaced (both column and damping plate)
 m_s_tot = rho_w * V_s_d;        % total spar mass
+m_s_tot = 886687;
 
 % vertical column material use
 D_vc_i = D_s - 2 * t_sr;                 % spar column inner diameter
