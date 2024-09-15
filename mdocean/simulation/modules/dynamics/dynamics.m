@@ -183,17 +183,30 @@ function [mag_U,phase_U,...
 end
 
 function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type)
-    
+    multibody = false;
+
     % intrinsic admittance of the controlled DOF
-    [real_G_u,imag_G_u] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w);
+    if multibody
+        [real_G_u,imag_G_u] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w);
+        mag_G_u_squared = real_G_u.^2 + imag_G_u.^2;
+    end
 
     % control - set powertrain coefficients
-    mag_G_u_squared = real_G_u.^2 + imag_G_u.^2;
     if strcmp(control_type,'reactive')
-        K_p = -w .* imag_G_u ./ mag_G_u_squared;
-        B_p = real_G_u ./ mag_G_u_squared;
+        if multibody
+            K_p = -w .* imag_G_u ./ mag_G_u_squared;
+            B_p = real_G_u ./ mag_G_u_squared;
+        else
+            K_p = w.^2 .* m_f - K_f;
+            B_p = B_f;
+        end
     elseif strcmp (control_type, 'damping')
-        B_p = 1 ./ sqrt(mag_G_u_squared);
+        if multibody
+            B_p = 1 ./ sqrt(mag_G_u_squared);
+        else
+            K_p_ideal = w.^2 .* m_f - K_f;
+            B_p = sqrt( B_f.^2 + (K_p_ideal ./ w).^2 );
+        end
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
 end
@@ -220,11 +233,19 @@ function [mag_U,phase_U,...
                                                 m_c,m_f,m_s,w,K_p,B_p,...
                                                 F_f_mag,F_f_phase,...
                                                 F_s_mag,F_s_phase,F_max,X_max)
-    
-    mag_U_unsat = multibody_response(B_c, B_f, B_s, K_f, K_s,...
-                                     m_c, m_f, m_s, w, K_p, B_p,...
-                                     F_f_mag, F_f_phase,...
-                                     F_s_mag, F_s_phase);
+    multibody = false;
+    if multibody
+        mag_U_unsat = multibody_response(B_c, B_f, B_s, K_f, K_s,...
+                                         m_c, m_f, m_s, w, K_p, B_p,...
+                                         F_f_mag, F_f_phase,...
+                                         F_s_mag, F_s_phase);
+    else
+        b = B_f + B_p;
+        k = K_f + K_p;
+        X_unsat = second_order_transfer_fcn(w, m_f, b, k, F_f_mag);
+        F_ptrain_over_x = sqrt( (B_p .* w).^2 + (K_p).^2 );
+        mag_U_unsat = F_ptrain_over_x .* X_unsat;
+    end
 
     % get force-saturated response
     r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
@@ -232,16 +253,28 @@ function [mag_U,phase_U,...
     f_sat = alpha .* r;
     mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
-    [mag_U,phase_U,...
-     real_P,reactive_P,...
-     mag_X_u,phase_X_u,...
-     mag_X_f,phase_X_f,...
-     mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
-                                             m_c, m_f, m_s, w, ...
-                                             mult.*K_p, mult.*B_p, ...
-                                             F_f_mag, F_f_phase, ...
-                                             F_s_mag, F_s_phase);
-    
+    if multibody
+        [mag_U,phase_U,...
+         real_P,reactive_P,...
+         mag_X_u,phase_X_u,...
+         mag_X_f,phase_X_f,...
+         mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
+                                                 m_c, m_f, m_s, w, ...
+                                                 mult.*K_p, mult.*B_p, ...
+                                                 F_f_mag, F_f_phase, ...
+                                                 F_s_mag, F_s_phase);
+    else
+        b_sat = B_f + mult .* B_p;
+        k_sat = K_f + mult .* K_p;
+        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag);
+        mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
+        mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
+        mag_U = mult .* F_ptrain_over_x .* mag_X_f;
+        phase_U = 0; % fixme this is incorrect and affects combine_ptrain_dalembert_forces
+        real_P = 1/2 * b_sat .* w.^2 .* mag_X_u.^2;
+        reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+    end
+
     F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
     F_err_2 = abs(mag_U ./ (f_sat .* mag_U_unsat) - 1);
     % 0.1 percent error
@@ -261,6 +294,18 @@ function [mag_U,phase_U,...
     mag_X_s = mag_X_s .* r_x;
     mag_U   = mag_U   .* r_x;
     real_P  = real_P  .* r_x.^2;
+end
+
+function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F)
+    imag_term = b .* w;
+    real_term = k - m .* w.^2;
+    X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
+    X = X_over_F_mag .* F;
+    if nargout > 1
+        angle_F = 0; % fixme fill in actual excitation angle
+        X_over_F_phase = atan2(imag_term,real_term);
+        angle_X = X_over_F_phase + angle_F;
+    end
 end
 
 function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
