@@ -7,7 +7,9 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
                                                 C_d_float, C_d_spar, ...
                                                 rho_w, g, ...
                                                 use_MEEM, harmonics, hydro)
-    w = 2*pi./T;        % angular frequency
+    Tp = T; % assume input is peak period
+    Te = 0.857 * Tp; % Pierson Moskowitz
+    w = 2*pi./Te;        % angular frequency
     k = w.^2 / g;       % wave number (dispersion relation for deep water)
 
     a2 = D_f / 2;        % radius
