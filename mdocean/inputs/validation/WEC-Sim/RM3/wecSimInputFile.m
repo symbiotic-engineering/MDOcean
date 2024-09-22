@@ -15,7 +15,9 @@ else
 end
 
 mcr.header = {'waves.height','waves.period','pto(1).damping'};
-mcr.cases = [H(:),T(:),val.B_p(:)];
+%control = val.B_p(:);
+control = load('ctrl_47b518e');
+mcr.cases = [H(:),T(:),control];
 save('mcrMDOcean.mat','mcr')
 
 %% Simulation Data
