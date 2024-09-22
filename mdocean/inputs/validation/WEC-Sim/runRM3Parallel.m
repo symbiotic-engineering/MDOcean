@@ -32,7 +32,8 @@ totalNumOfWorkers=p.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
-parpool(p); % open the pool
+%parpool(p); % open the pool
+gcp;
 
 fprintf('Opening the parallel pool took %g seconds.\n', toc)
 
@@ -128,7 +129,8 @@ parfor imcr=1:length(mcr.cases(:,1))
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
 
-    rmdir(pctDir, 's')    
+    rmdir(pctDir, 's')  
+
 end
 
 % filename to save
