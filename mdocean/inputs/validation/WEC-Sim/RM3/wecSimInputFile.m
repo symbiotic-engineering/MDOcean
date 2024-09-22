@@ -1,5 +1,5 @@
-% add the desired outputs to wecSimPCT.m and then run wecSimPCT while in
-% the tutorials/RM3 folder
+% add the desired outputs to runRM3Parallel.m and then run runRM3Parallel while in
+% the mdocean/inputs/validation/WEC-Sim/RM3 folder
 
 regular = true;
 
@@ -17,7 +17,7 @@ end
 mcr.header = {'waves.height','waves.period','pto(1).damping'};
 %control = val.B_p(:);
 control = load('ctrl_47b518e');
-mcr.cases = [H(:),T(:),control];
+mcr.cases = [H(:),T(:),control.ctrl];
 save('mcrMDOcean.mat','mcr')
 
 %% Simulation Data
