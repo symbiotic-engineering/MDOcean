@@ -17,6 +17,9 @@
 % limitations under the License.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% this is a revised version of WEC-Sim/source/wecSimPCT.m that saves
+% specific output variables with a given filename
+
 %% wecSimPCT
 % WEC-Sim parallel computing toolbox executable
 clear mcr imcr i j k l1 l2 m n name nseed kkk len numConditions
@@ -99,6 +102,8 @@ end
 %% Execute wecSimPCT
 pause(1)
 delete savedLog*
+
+% variables to save
 start_idx = simu.rampTime * simu.dt;
 P = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
@@ -115,13 +120,23 @@ parfor imcr=1:length(mcr.cases(:,1))
     % Run WEC-Sim
     output = wecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers);   
     fclose(fileID);
+
+    % save specific output variables
     P(imcr) = mean(output.ptos.powerInternalMechanics(start_idx:end,3));
-    float_amplitude(imcr) = max(output.bodies(1).position(start_idx:end,3));
-    spar_amplitude(imcr)  = max(output.bodies(2).position(start_idx:end,3));
+    float_pos = output.bodies(1).position(start_idx:end,3);
+    spar_pos  = output.bodies(2).position(start_idx:end,3);
+    float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
+    spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
+
     rmdir(pctDir, 's')    
 end
 
-save("wecsim_power_sparfloatingcd5_floatcd0_multibody",'P','float_amplitude','spar_amplitude')
+% filename to save
+[~, git_output] = system('git rev-parse --short HEAD');
+git_hash = git_output(1:end-1);
+output_filename = ['wecsim_sparfloatingcd5_floatcd0_' git_hash];
+
+save(output_filename, 'P','float_amplitude','spar_amplitude')
 
 clear imcr totalNumOfWorkers
 delete(gcp); % close the parallel pool
