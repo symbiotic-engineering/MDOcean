@@ -119,7 +119,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     fileID = fopen(filename,'a');
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = wecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers);   
+    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers);   
     fclose(fileID);
 
     % save specific output variables
