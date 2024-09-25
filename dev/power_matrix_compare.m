@@ -12,6 +12,7 @@ actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance &
 actual_elec_unsat = actual_mech_unsat * p.eff_pto;
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
+sim_mech_unsat = sim_elec_unsat / p.eff_pto;
 
 % saturated power
 v = validation_inputs();
@@ -21,11 +22,13 @@ actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & 
 sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
-spar_fixed = load('wecsim_power_sparfixedcd5_floatcd0','P');
+vars = {'P','float_amplitude','spar_amplitude'};
+spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-47b518e_254cbdd',vars{:});
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
+spar_fixed_float_amplitude = -reshape(spar_fixed.float_amplitude, size(P_matrix));
 
 % wecSim spar moving
-spar_moving = load('wecsim_power_sparfloatingcd5_floatcd15_irreg','P');
+spar_moving = load('wecsim_power_sparfloatingcd5_floatcd15','P');
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 
@@ -43,8 +46,8 @@ wave_resource_sim(JPD == 0) = NaN;
 power_titles = {'RM3 Report','MDOcean',...
         'WecSim spar moving','WecSim spar fixed'};
     %'Actual: Saturated','Simulated: Saturated'};
-pre_JPD_power        = actual_elec_unsat;
-pre_JPD_power(:,:,2) = sim_elec_unsat;
+pre_JPD_power        = actual_mech_unsat;
+pre_JPD_power(:,:,2) = sim_mech_unsat;
 %pre_JPD_power(:,:,3) = actual_elec_sat;
 %pre_JPD_power(:,:,4) = sim_elec_sat;
 pre_JPD_power(:,:,3) = spar_moving_power;
@@ -159,9 +162,16 @@ if length(unique(val.B_p)) > 1
 end
 
 figure
+subplot 121
 contourf(T,H,val.X)
+colorbar
+grid on
+title('MDOcean')
+subplot 122
+contourf(T,H,abs(spar_fixed_float_amplitude))
+title('WEC-Sim spar fixed')
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('Float Amplitude (m)')
+sgtitle('Float Amplitude (m)')
 colorbar
 grid on
