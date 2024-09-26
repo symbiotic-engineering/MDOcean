@@ -15,8 +15,8 @@ b.D_s_ratio_start = 6/20;
 % height of float to outer diameter of float ratio (-)
 b.h_f_ratio_min = .1;
 b.h_f_ratio_max = 10;
-b.h_f_ratio_nom = 4/20;
-b.h_f_ratio_start = 4/20;
+b.h_f_ratio_nom = 5.2/20;
+b.h_f_ratio_start = 5.2/20;
 
 % draft of spar to height of spar ratio (-)
 b.T_s_ratio_min = 0.01;

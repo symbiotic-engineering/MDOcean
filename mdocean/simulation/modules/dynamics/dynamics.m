@@ -32,7 +32,7 @@ function [P_matrix, h_s_extra, P_unsat, ...
           F_heave, F_surge, F_ptrain_max, B_p, X] = get_power_force(in,T,Hs, m_float,V_d, draft)
 
     % get dynamic coefficients
-    [w,A,B_h,K_h,F_d,k_wvn,drag_const,mag_v0] = dynamics_simple(Hs, T, in.D_f, in.T_f, in.D_s, ...
+    [w,A,B_h,K_h,F_d,k_wvn,drag_const,mag_v0] = dynamics_simple(Hs, T, in.D_f, in.T_f_2, in.D_s, ...
                                             in.T_s, in.h, in.C_d_float, in.rho_w, in.g, ...
                                             in.use_MEEM, in.harmonics, in.hydro);
     m = m_float + A;
@@ -60,8 +60,8 @@ function [P_matrix, h_s_extra, P_unsat, ...
     
     X_max = max(X,[],'all');
     % extra height on spar after accommodating float displacement
-    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f) - X_max) / in.h_s;
-    h_s_extra_down = (in.T_s - in.T_f - X_max) / in.h_s;
+    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
+    h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
     h_s_extra = [h_s_extra_up, h_s_extra_down];
 
     % calculate forces
