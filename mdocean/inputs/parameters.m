@@ -12,6 +12,8 @@ lb2kg = 1/2.2;  % pound to kilogram
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = trim_jpd(readmatrix(file,'Range','A3'));
 
+above = 2; % top of float above still water line
+
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'g',        9.8,...                 % acceleration of gravity (m/s2)
             'h',        100,...                 % water depth (m)
@@ -47,8 +49,9 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
             'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
             'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
-            'T_f_2_over_h_f', (5.2-2)/5.2,...   % normalized float draft (-)
-            'T_f_1_over_T_f_2',(4-2)/(5.2-2),...% normalized float draft slant (-)
+            'T_f_2_over_h_f', (5-above)/5,...   % normalized float draft (-)
+            'T_f_1_over_T_f_2',(4-above)/(5-above),...% normalized float draft slant (-)
+            'D_f_b_over_D_f',10/20,...          % normalized diameter of float bottom (-)
             'C_d_float',0,...                 % coefficient of drag for float
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)
             'power_max', Inf,...                % maximum power (W)

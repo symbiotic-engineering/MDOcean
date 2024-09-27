@@ -1,6 +1,6 @@
 function [V_d, m_m, m_f_tot, ...
          A_c, A_lat_sub, r_over_t, ...
-         I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, T_f_1, T_f_2, h_f, h_s, ...
+         I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
                                             t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
                                             D_d, D_dt, theta_dt, T_s, h_d, ...
                                             M, rho_m, rho_w, m_scale)
@@ -23,7 +23,7 @@ function [V_d, m_m, m_f_tot, ...
 % ----------|           |---------  -   -       hf  |
 %           |           |    Tf1    |   |       |   |
 %            \         /      -    Tf2  |       |   |
-%             \_______/             _   |       _   |
+%             \__Dfb__/             _   |       _   |
 %               |   |                   |           |
 %               |   |                   |           hs
 %               |Ds |                   Ts          |
@@ -64,12 +64,11 @@ m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without balla
 A_f = pi/4 * (D_f^2 - D_s^2);
 V_f_cyl = A_f * T_f_1;                      % displaced volume of float: hollow cylinder portion
 V_f_fr = pi/12 * (T_f_2 - T_f_1) ...
-    * (D_f^2 + D_s^2 + D_f*D_s);            % displaced volume of float: non-hollow frustum portion
+    * (D_f^2 + D_f_b^2 + D_f*D_f_b);            % displaced volume of float: non-hollow frustum portion
 V_f_fr_mid = pi/4 * D_s^2 * (T_f_2 - T_f_1);% displaced volume of float: center cylinder to subtract from frustum
 V_f_fru_hol = V_f_fr - V_f_fr_mid;          % displaced volume of float: hollow frustum portion
 V_f_d = V_f_cyl + V_f_fru_hol;              % total displaced volume of float
 m_f_tot = V_f_d * rho_w;
-m_f_tot = 725833;
 warning('Overriding mass properties')
 
 % ballast
