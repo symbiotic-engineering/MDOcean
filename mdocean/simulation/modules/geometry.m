@@ -79,7 +79,7 @@ V_f_b = m_f_b / rho_w;                  % volume of ballast on float
 V_f_tot = V_f_d + A_f * (h_f - T_f_2);  % total volume available on float
 V_f_pct = V_f_b / V_f_tot;              % percent of available volume used by ballast on float
 
-I_f = pi/64 * D_f^4;            % area moment of inertia of float
+I_f = pi/64 * D_f^4;                    % area moment of inertia of float
 
 %% Spar (vertical column and damping plate)
 
@@ -98,7 +98,7 @@ A_d = pi/4 * D_d^2; % damping plate itself
 num_supports = 4;
 L_dt = D_d / (2*cos(theta_dt));
 D_dt_i = D_dt - 2 * t_dt;
-A_dt = pi/4 * (D_dt^2 - D_dt_i^2); % support tube area
+A_dt = pi/4 * (D_dt^2 - D_dt_i^2);      % support tube area
 V_d_m = A_d * h_d + num_supports * A_dt * L_dt;
 
 % total spar material use and mass
@@ -109,8 +109,8 @@ m_s_m = m_vc_m + m_d_m;                 % mass of spar material
 % spar ballast
 m_s_b = m_s_tot - m_s_m;                % mass of spar ballast
 V_s_b = m_s_b / rho_w;                  % volume of spar ballast
-V_powertrain = .75 * pi * 3^2 * 12;
-V_s_tot = pi/4 * D_s^2 * h_s - V_powertrain;      % total volume available on spar for ballast
+V_pto = .75 * pi * 3^2 * 12;            % volume of PTO (assume constant)
+V_s_tot = pi/4 * D_s^2 * h_s - V_pto;   % total volume available on spar for ballast
 V_s_pct = V_s_b / V_s_tot;              % percent of available volume used by ballast on spar            
 
 I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
