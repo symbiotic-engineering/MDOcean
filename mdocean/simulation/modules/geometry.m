@@ -48,15 +48,18 @@ function [V_d, m_m, m_f_tot, ...
 num_gussets = 24;
 num_gussets_loaded_lateral = 2;
 
-% float cross sectional and lateral area
-A_f_c = pi * (D_f + D_s) * t_fr + num_gussets * t_fc * (D_f - D_s)/2;
+% float cross sectional and lateral area for structural purposes
+D_f_mean = (D_f + D_f_b)/2;
+A_f_cross_top = pi * (D_f + D_s) * t_fr + num_gussets * t_fc * (D_f - D_s)/2; % a ring with diameter D_f, a ring with diameter D_s, and gussets
+A_f_cross_bot = pi * (D_s)       * t_fr + num_gussets * t_fc * (D_f_mean - D_s)/2; % a ring with diameter D_s, and bottom part of gussets
 A_f_l = num_gussets_loaded_lateral * t_fc * T_f_2;
 
 % float material volume and mass
 V_top_plate = pi * (D_f/2)^2 * t_ft;
-V_bot_plate = pi * (D_f/2)^2 * t_fb; % FIXME
-V_rims_gussets = A_f_c * h_f;
-V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets;
+V_bot_plate = pi * (D_f_b/2)^2 * t_fb;
+V_bot_slant = pi/2 * (D_f + D_f_b) * (T_f_2 - T_f_1) * t_fb; 
+V_rims_gussets = A_f_cross_top * (h_f - (T_f_2 - T_f_1)) + A_f_cross_bot * (T_f_2 - T_f_1);
+V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets + V_bot_slant; % FIXME I'm neglecting the mass of the extra stiffeners
 
 m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
@@ -64,18 +67,17 @@ m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without balla
 A_f = pi/4 * (D_f^2 - D_s^2);
 V_f_cyl = A_f * T_f_1;                      % displaced volume of float: hollow cylinder portion
 V_f_fr = pi/12 * (T_f_2 - T_f_1) ...
-    * (D_f^2 + D_f_b^2 + D_f*D_f_b);            % displaced volume of float: non-hollow frustum portion
+    * (D_f^2 + D_f_b^2 + D_f*D_f_b);        % displaced volume of float: non-hollow frustum portion
 V_f_fr_mid = pi/4 * D_s^2 * (T_f_2 - T_f_1);% displaced volume of float: center cylinder to subtract from frustum
 V_f_fru_hol = V_f_fr - V_f_fr_mid;          % displaced volume of float: hollow frustum portion
 V_f_d = V_f_cyl + V_f_fru_hol;              % total displaced volume of float
 m_f_tot = V_f_d * rho_w;
-warning('Overriding mass properties')
 
 % ballast
-m_f_b = m_f_tot - m_f_m;        % mass of ballast on float
-V_f_b = m_f_b / rho_w;          % volume of ballast on float
-V_f_tot = A_f * h_f;            % total volume available on float -- FIXME
-V_f_pct = V_f_b / V_f_tot;      % percent of available volume used by ballast on float
+m_f_b = m_f_tot - m_f_m;                % mass of ballast on float
+V_f_b = m_f_b / rho_w;                  % volume of ballast on float
+V_f_tot = V_f_d + A_f * (h_f - T_f_2);  % total volume available on float
+V_f_pct = V_f_b / V_f_tot;              % percent of available volume used by ballast on float
 
 I_f = pi/64 * D_f^4;            % area moment of inertia of float
 
@@ -122,7 +124,7 @@ I_rp = pi * D_d^4 / 64;
 
 %% Totals
 
-A_c = [A_f_c, A_vc_c, A_d_c];
+A_c = [A_f_cross_top, A_vc_c, A_d_c];
 A_lat_sub = [A_f_l A_vc_l A_d_l];
 r_over_t = [0,... % D_sft/(2*t_sf) 
             D_s/(2*t_sr),...
