@@ -31,9 +31,9 @@ function [V_d, m_m, m_f_tot, ...
 %             / |   | \                 |           |
 %        Ldt/   |   |   \               |           |
 %         /     |   |     \             |           |
-%       _________Dd__________           -   -       -
-%       |                   |               hd
-%       _____________________               -
+%       _________Dd__________           |   -       |
+%       |                   |           |   hd      |
+%       _____________________           -   -       -
 
 
 % Not shown in diagram:
@@ -83,16 +83,15 @@ I_f = pi/64 * D_f^4;            % area moment of inertia of float
 
 %% Spar (vertical column and damping plate)
 
-V_vc_d = pi/4 * D_s^2 * T_s;    % vertical column volume displaced
-V_d_d = pi/4 * D_d^2 * h_d;     % damping plate volume displaced
-V_s_d = V_vc_d + V_d_d;         % spar volume displaced (both column and damping plate)
-m_s_tot = rho_w * V_s_d;        % total spar mass
-m_s_tot = 886687;
+V_vc_d = pi/4 * D_s^2 * (T_s-h_d);      % vertical column volume displaced
+V_d_d = pi/4 * D_d^2 * h_d;             % damping plate volume displaced
+V_s_d = V_vc_d + V_d_d;                 % spar volume displaced (both column and damping plate)
+m_s_tot = rho_w * V_s_d;                % total spar mass
 
 % vertical column material use
-D_vc_i = D_s - 2 * t_sr;                 % spar column inner diameter
-A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);      % spar column cross sectional area
-V_vc_m = A_vc_c * h_s;                   % volume of column material
+D_vc_i = D_s - 2 * t_sr;                % spar column inner diameter
+A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
+V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
 
 % damping plate material use
 A_d = pi/4 * D_d^2; % damping plate itself
@@ -115,7 +114,7 @@ V_s_tot = pi/4 * D_s^2 * h_s - V_powertrain;      % total volume available on sp
 V_s_pct = V_s_b / V_s_tot;              % percent of available volume used by ballast on spar            
 
 I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
-A_vc_l = 1/2 * pi * D_s * T_s;          % lateral area
+A_vc_l = 1/2 * pi * D_s * (T_s-h_d);    % lateral area
 
 % Reaction plate
 A_d_c = pi/4 * (D_d^2 - D_s^2);         % cross sectional area
@@ -159,14 +158,14 @@ CM_f_from_waterline = CM_f_num / CM_f_den;
 %CM_f_from_waterline = T_f_2 - h_f/2; % cylinder case
 
 % centers of buoyancy, measured from keel (bottom of damping plate)
-CB_f = h_d + T_s - CB_f_from_waterline;
-CB_vc = h_d + T_s/2;
+CB_f = T_s - CB_f_from_waterline;
+CB_vc = h_d + (T_s-h_d)/2;
 CB_d = h_d/2;
 CBs = [CB_f, CB_vc, CB_d];
 
-% centers of gravity, measured from keel (assume even mass distribution)
-CG_f = h_d + T_s - CM_f_from_waterline;
-CG_vc = h_d + h_s/2;
+% centers of gravity, measured from keel - assume even mass distribution
+CG_f = T_s - CM_f_from_waterline;
+CG_vc = h_d + (h_s-h_d)/2;
 CG_d = h_d/2;
 CGs = [CG_f, CG_vc, CG_d];
 
