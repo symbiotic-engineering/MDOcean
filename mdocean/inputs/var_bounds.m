@@ -21,8 +21,8 @@ b.h_f_ratio_start = 5/20;
 % draft of spar to height of spar ratio (-)
 b.T_s_ratio_min = 0.01;
 b.T_s_ratio_max = 0.99;
-b.T_s_ratio_nom = 35/44;
-b.T_s_ratio_start = 35/44;
+b.T_s_ratio_nom = 29/37.9;%35/44;
+b.T_s_ratio_start = 29/37.9;%35/44;
 
 % maximum powertrain force (MN)
 b.F_max_min = 0.01;
