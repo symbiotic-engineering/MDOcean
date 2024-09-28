@@ -137,19 +137,22 @@ mass = [m_f_m, m_vc_m, m_d_m]; % material mass of each structure
 %% Metacentric Height Calculation
 
 % see dev/cob_com_frustum.mlx for derivation of float COB and COM
-D_term_1 = -D_s^2 - 2*D_s*D_f + 3*D_f^2;
-D_term_2 = 2*D_f^2 - 2*D_s^2;
-D_term_3 = -3*D_s^2 + 2*D_s*D_f + D_f^2;
+D_term_1 = -D_f_b^2 - 2*D_f_b*D_f + 3*D_f^2;
+D_term_2 = 2*D_f^2 - 2*D_f_b^2;
+D_term_3 = -6*D_s^2 + 3*D_f_b^2 + 2*D_f_b*D_f + D_f^2;
 CB_f_integral = D_term_1*T_f_1^2 + D_term_2*T_f_1*T_f_2 * D_term_3*T_f_2^2;
 CB_f_from_waterline = 1/V_f_d * pi/48 * CB_f_integral;
 %CB_f_from_waterline = T_f_2 / 2; % cylinder case
 
-T_term_1 =   T_f_1^2 + 4*T_f_1*T_f_2 - 2*T_f_1*h_f + 6*T_f_2^2 - 3*h_f^2;
-T_term_2 = 3*T_f_1^2 + 4*T_f_1*T_f_2 - 2*T_f_1*h_f - 2*T_f_2^2 - 5*h_f^2 + 8*T_f_2*h_f;
-T_term_3 = 4*(  T_f_1 + T_f_2 +   h_f);
-T_term_4 = 4*(2*T_f_1 - T_f_2 + 2*h_f);
-CM_f_num = T_term_1*D_s + T_term_2*D_f;
-CM_f_den = T_term_3*D_s + T_term_4*D_f;
+T_term_1 =    T_f_1^2 + 4*T_f_1*T_f_2 - 2*T_f_1*h_f - 12*T_f_2^2 + 12*T_f_2*h_f - 3*h_f^2;
+T_term_2 =  2*T_f_1^2                               - 8 *T_f_2^2 + 8 *T_f_2*h_f - 2*h_f^2;
+T_term_3 = -3*T_f_1^2 - 4*T_f_1*T_f_2 + 2*T_f_1*h_f + 2 *T_f_2^2 - 8 *T_f_2*h_f + 5*h_f^2;
+T_term_4 = 18*T_f_2^2                                            - 12*T_f_2*h_f;
+T_term_5 = 4*(   T_f_1 - 2*T_f_2 +   h_f);
+T_term_6 = 4*(-2*T_f_1 +   T_f_2 - 2*h_f);
+T_term_7 = 12*T_f_2;
+CM_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_s^2;
+CM_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_s^2;
 CM_f_from_waterline = CM_f_num / CM_f_den;
 %CM_f_from_waterline = T_f_2 - h_f/2; % cylinder case
 
