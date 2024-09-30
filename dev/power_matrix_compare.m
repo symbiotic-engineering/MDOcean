@@ -23,7 +23,7 @@ sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
 vars = {'P','float_amplitude','spar_amplitude'};
-spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-47b518e_254cbdd',vars{:});
+spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 spar_fixed_float_amplitude = -reshape(spar_fixed.float_amplitude, size(P_matrix));
 
