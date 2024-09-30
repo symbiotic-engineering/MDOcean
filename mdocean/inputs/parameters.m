@@ -14,6 +14,8 @@ jpd = trim_jpd(readmatrix(file,'Range','A3'));
 g = 9.8;
 spar_exc = get_spar_exc(g);
 
+above = 2; % top of float above still water line
+
 p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             ...%'mu',       1e-3,...                % dynamic viscosity of water (Pa s)
             'g',        g,...                   % acceleration of gravity (m/s2)
@@ -40,6 +42,7 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             't_fc',     0.44 * in2m,...         % float circumferential gusset thickness (m)
             't_fb',     0.56 * in2m,...         % float bottom thickness (m)
             't_sr',     1.00 * in2m,...         % vertical column thickness (m)
+            't_d_max',  1.00 * in2m,...         % max thickness of damping plate before making it hollow (m)
             't_dt',     1.00 * in2m,...         % damping plate support tube radial wall thickness (m)
             'D_dt',     48.00 * in2m,...        % damping plate support tube diameter (m)
             'theta_dt', atan(17.5/15),...       % angle from horizontal of damping plate support tubes (rad)
@@ -47,9 +50,11 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'FCR',      0.113,...               % fixed charge rate (-), see RM3 report p63
             'N_WEC',    100,...                 % number of WECs in array (-)   
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
-            'T_s_over_D_s', 35/6,...            % normalized spar draft (-)
-            'h_d_over_D_s', 1*in2m/6,...        % normalized damping plate thickness (-)     
-            'T_f_over_h_f', 2/4,...             % normalized float draft (-)
+            'T_s_over_D_s', 29/6,... %35/6      % normalized spar draft (-)
+            'h_d_over_D_s', 0.1/6,...%in2m/6    % normalized damping plate thickness (-)     
+            'T_f_2_over_h_f', (5-above)/5,...   % normalized float draft (-)
+            'T_f_1_over_T_f_2',(4-above)/(5-above),...% normalized float draft slant (-)
+            'D_f_b_over_D_f', 10/20,...         % normalized diameter of float bottom (-)
             'C_d_float',0,...                   % coefficient of drag for float
             'C_d_spar', 5,...                   % spar coefficient of drag
             'LCOE_max', .5,...                  % maximum LCOE ($/kWh)

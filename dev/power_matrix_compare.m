@@ -12,6 +12,7 @@ actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance &
 actual_elec_unsat = actual_mech_unsat * p.eff_pto;
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
+sim_mech_unsat = sim_elec_unsat / p.eff_pto;
 
 % saturated power
 v = validation_inputs();
@@ -21,11 +22,12 @@ actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & 
 sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
-spar_fixed = load('wecsim_power_sparfixedcd5_floatcd0','P');
+vars = {'P','float_amplitude','spar_amplitude'};
+spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
+spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix));
 
 % wecSim spar moving
-vars = {'P','float_amplitude','spar_amplitude'};
 spar_moving = load('wecsim_power_sparfloatingcd5_floatcd0_multibody',vars{:});
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
@@ -45,8 +47,8 @@ wave_resource_sim(JPD == 0) = NaN;
 power_titles = {'RM3 Report','MDOcean',...
         'WecSim spar moving','WecSim spar fixed'};
     %'Actual: Saturated','Simulated: Saturated'};
-pre_JPD_power        = actual_elec_unsat;
-pre_JPD_power(:,:,2) = sim_elec_unsat;
+pre_JPD_power        = actual_mech_unsat;
+pre_JPD_power(:,:,2) = sim_mech_unsat;
 %pre_JPD_power(:,:,3) = actual_elec_sat;
 %pre_JPD_power(:,:,4) = sim_elec_sat;
 pre_JPD_power(:,:,3) = spar_moving_power;
@@ -152,7 +154,7 @@ grid on
 % Bp and X (without power saturation)
 if length(unique(val.B_p)) > 1
     figure
-    contourf(T,H,val.B_p/1e6,0:2:20)
+    contourf(T,H,val.B_p/1e6)
     xlabel('Wave Period T (s)')
     ylabel('Wave Height Hs (m)')
     title('B_p [MN/(m/s)]')
@@ -161,18 +163,28 @@ if length(unique(val.B_p)) > 1
 end
 
 figure
-subplot 121
+subplot 131
 contourf(T,H,val.X)
+title('MDOcean')
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('MDOcean Float Amplitude (m)')
 colorbar
 grid on
 
-subplot 122
+subplot 132
+contourf(T,H,spar_fixed_float_amplitude)
+title('WEC-Sim spar fixed')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+colorbar
+grid on
+
+subplot 133
 contourf(T,H,spar_moving_float_amplitude)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('WecSim Float Amplitude (m)')
+title('WEC-Sim spar moving')
 colorbar
 grid on
+
+sgtitle('Float Amplitude (m)')
