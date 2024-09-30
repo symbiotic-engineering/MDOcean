@@ -136,7 +136,7 @@ end
 % filename to save
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparfixed_floatcd0_ctrl-47b518e_' git_hash];
+output_filename = ['wecsim_sparfixed_floatcd0_ctrl-49aa381_' git_hash];
 
 save(output_filename, 'P','float_amplitude','spar_amplitude')
 
