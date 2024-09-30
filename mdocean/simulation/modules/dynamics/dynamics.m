@@ -277,7 +277,7 @@ function [mag_U,phase_U,...
         mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
         mag_U = mult .* F_ptrain_over_x .* mag_X_f;
         phase_U = 0; % fixme this is incorrect and affects combine_ptrain_dalembert_forces
-        real_P = 1/2 * b_sat .* w.^2 .* mag_X_u.^2;
+        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2;
         reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
     end
 
