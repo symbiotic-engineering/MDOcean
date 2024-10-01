@@ -53,7 +53,8 @@ function [P_matrix, h_s_extra, B_p, mag_X_u,...
      B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                             F_f_mag,F_f_phase,F_s_mag,F_s_phase,in.F_max,...
                                             drag_const_f,drag_const_s,mag_v0_f,mag_v0_s, ...
-                                            X_max,in.control_type,in.X_tol,in.phase_X_tol,in.max_drag_iters);
+                                            X_max,in.control_type,in.use_multibody,...
+                                            in.X_tol,in.phase_X_tol,in.max_drag_iters);
 
 % FIXME: check stability of closed loop multibody system
     
@@ -104,7 +105,8 @@ function [mag_U,phase_U,...
          B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                         F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
                                         drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
-                                        X_max,control_type,X_tol,phase_X_tol,max_drag_iters)
+                                        X_max,control_type,multibody,...
+                                        X_tol,phase_X_tol,max_drag_iters)
     % initial guess: 2m float amplitude, 0.5m spar amplitude
     X_f_guess = 2;
     phase_X_f_guess = 0;
@@ -125,7 +127,7 @@ function [mag_U,phase_U,...
                                         X_s_guess, phase_X_s_guess, mag_v0_s, drag_const_s, ...
                                         B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,w,...
                                         F_f_mag,F_f_phase,F_s_mag,F_s_phase,...
-                                        control_type,F_max,X_max); % closed loop dynamics
+                                        control_type,multibody,F_max,X_max); % closed loop dynamics
         % error
         X_f_err = X_f_guess - mag_X_f;
         X_s_err = X_s_guess - mag_X_s;
@@ -159,7 +161,7 @@ function [mag_U,phase_U,...
                                         X_s_guess, phase_X_s_guess, mag_v0_s, drag_const_s, ...
                                         B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,w,...
                                         F_f_mag,F_f_phase,F_s_mag,F_s_phase,...
-                                        control_type,F_max,X_max)
+                                        control_type,multibody,F_max,X_max)
     [B_drag_f, K_drag_f] = get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f);
     [B_drag_s, K_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s);
 
@@ -169,7 +171,7 @@ function [mag_U,phase_U,...
     K_s = K_h_s + K_drag_s;
 
     % unsaturated control gains
-    [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w,control_type);
+    [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w,control_type,multibody);
 
     % amplitude and power output for chosen controller
     [mag_U,phase_U,...
@@ -181,34 +183,30 @@ function [mag_U,phase_U,...
                                                 m_c,m_f,m_s,w,K_p,B_p,...
                                                 F_f_mag,F_f_phase,...
                                                 F_s_mag,F_s_phase,...
-                                                F_max,X_max);
+                                                F_max,X_max,multibody);
 end
 
-function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type)
-    multibody = false;
+function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type, multibody)
 
     % intrinsic admittance of the controlled DOF
     if multibody
         [real_G_u,imag_G_u] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w);
         mag_G_u_squared = real_G_u.^2 + imag_G_u.^2;
+    else
+        % derived on page 58 of notebook
+        resistance = B_f;
+        reactance = m_f.*w - K_f./w;
+        mag_G_u_squared = 1 ./ (resistance.^2 + reactance.^2);
+        real_G_u = resistance .* mag_G_u_squared;
+        imag_G_u = -reactance .* mag_G_u_squared;
     end
 
     % control - set powertrain coefficients
     if strcmp(control_type,'reactive')
-        if multibody
-            K_p = -w .* imag_G_u ./ mag_G_u_squared;
-            B_p = real_G_u ./ mag_G_u_squared;
-        else
-            K_p = w.^2 .* m_f - K_f;
-            B_p = B_f;
-        end
+        K_p = -w .* imag_G_u ./ mag_G_u_squared;
+        B_p = real_G_u ./ mag_G_u_squared;
     elseif strcmp (control_type, 'damping')
-        if multibody
-            B_p = 1 ./ sqrt(mag_G_u_squared);
-        else
-            K_p_ideal = w.^2 .* m_f - K_f;
-            B_p = sqrt( B_f.^2 + (K_p_ideal ./ w).^2 );
-        end
+        B_p = 1 ./ sqrt(mag_G_u_squared);
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
 end
@@ -235,8 +233,8 @@ function [mag_U,phase_U,...
      B_p_sat,K_p_sat] = get_response_saturated(B_c,B_f,B_s,K_f,K_s,...
                                                 m_c,m_f,m_s,w,K_p,B_p,...
                                                 F_f_mag,F_f_phase,...
-                                                F_s_mag,F_s_phase,F_max,X_max)
-    multibody = false;
+                                                F_s_mag,F_s_phase,...
+                                                F_max,X_max,multibody)
     if multibody
         mag_U_unsat = multibody_response(B_c, B_f, B_s, K_f, K_s,...
                                          m_c, m_f, m_s, w, K_p, B_p,...

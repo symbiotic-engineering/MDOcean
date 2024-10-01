@@ -64,8 +64,9 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'control_type', 'damping',...       % 'reactive' or 'constant impedance' or 'damping'
             'X_tol',     1e-2,...               % max allowable iteration error on magnitude of amplitude (m)
             'phase_X_tol',deg2rad(3),...        % max allowable iteration error on phase angle of amplitude (rad)
-            'max_drag_iters',100,...             % max number of iterations for drag convergence (-)
+            'max_drag_iters',100,...            % max number of iterations for drag convergence (-)
             'use_MEEM',  false,...              % whether to use MEEM for hydro coeffs (boolean)
+            'use_multibody', false,...          % whether to use multibody dynamics (boolean)
             'harmonics', 10,...                 % number of harmonics to use for MEEM (int)
             'spar_excitation_coeffs',spar_exc,...% spar excitation hydro coeffs from WAMIT for nominal RM3
             'hydro',readWAMIT(struct(),'rm3.out',[]) ); % function from WECSim
