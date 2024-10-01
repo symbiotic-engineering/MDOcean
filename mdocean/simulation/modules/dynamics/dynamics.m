@@ -202,10 +202,10 @@ function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type,
     end
 
     % control - set powertrain coefficients
-    if strcmp(control_type,'reactive')
+    if strcmpi(control_type,'reactive')
         K_p = -w .* imag_G_u ./ mag_G_u_squared;
         B_p = real_G_u ./ mag_G_u_squared;
-    elseif strcmp (control_type, 'damping')
+    elseif strcmpi(control_type, 'damping')
         B_p = 1 ./ sqrt(mag_G_u_squared);
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
