@@ -1,9 +1,9 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
     P_var, P_elec, P_matrix, h_s_extra, B_p, X_u] = dynamics(in,m_float,m_spar,V_d,draft)
 
-    % use probabilistic sea states for power
+    % use probabilistic sea states for power and PTO force
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix,h_s_extra,B_p,X_u] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
+    [P_matrix,h_s_extra,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
     
     % account for powertrain electrical losses
     P_matrix = P_matrix * in.eff_pto;
@@ -18,8 +18,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     assert(isreal(P_elec))
     
     % use max sea states for structural forces and max amplitude
-    [~,~,~,~,F_heave_max,F_surge_max,...
-        F_ptrain_max] = get_power_force(in, ...
+    [~,~,~,~,F_heave_max,F_surge_max,~] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
