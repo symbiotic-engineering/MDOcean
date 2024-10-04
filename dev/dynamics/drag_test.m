@@ -10,7 +10,8 @@ Cd = 0:1:5;
 
 sweep_drag(true,false,Cd)
 sweep_drag(false,false,Cd)
-sweep_drag(true,true,0)
+%sweep_drag(true,true,0)
+%sweep_drag(false,true,0)
 
 function sweep_drag(reactive,multibody,Cd)
     p = parameters();
@@ -32,10 +33,11 @@ function sweep_drag(reactive,multibody,Cd)
     end
 
     b = var_bounds();
-    X = [b.X_noms; 1];
+    X = [b.X_noms; 1];    
     
-    
-    
+    %p.T = 6.5;
+    %p.Hs = 2.25;
+    %p.JPD = 1;
     [~,H] = meshgrid(p.T, p.Hs);
 
     
@@ -46,12 +48,16 @@ function sweep_drag(reactive,multibody,Cd)
         disp(Cd(i))
         [~, ~, P_matrix, ~, val] = simulation(X,p);
         P_over_H2 = P_matrix ./ H.^2;
-        P_over_H2_2pt5 = .5 * (P_over_H2(H==2.25) + P_over_H2(H==2.75));
+        P_over_H2_2pt5 = P_over_H2(H==2.25);
+        %P_over_H2_2pt5 = .5 * (P_over_H2(H==2.25) + P_over_H2(H==2.75));
         plot(p.T, P_over_H2_2pt5/1000,linestyle,'DisplayName',['Cd=' num2str(Cd(i))])
+
+        disp(val.X(H==2.25))
+        disp(val.force_ptrain)
     end
     legend
     xlabel('T (s)')
-    ylabel('P / H^2 (kW/m^2)')
+    ylabel('P / H^2 (kW/m^2) at H=2.5m')
     
     T_new = [4 4.5 p.T]; % extend to lower periods
     w = 2*pi./T_new;
