@@ -47,7 +47,7 @@ function [P_matrix, h_s_extra, B_p, mag_X_u,...
     % get response: includes drag and force saturation
     [mag_U,phase_U,...
      real_P,reactive_P,...
-     mag_X_u,~,...
+     mag_X_u,phase_X_u,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
@@ -213,7 +213,7 @@ end
 
 function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const)
     mag_v = w .* X_guess;
-    phase_v = phase_X_guess + pi;
+    phase_v = phase_X_guess - pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
     phase_v_prime = atan( tan(phase_X_guess) ./ (1 - mag_v0_v_ratio ./ cos(phase_X_guess)) ); % derived on p48 of my notebook
     
@@ -270,12 +270,18 @@ function [mag_U,phase_U,...
     else
         b_sat = B_f + B_p_sat;
         k_sat = K_f + K_p_sat;
-        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag);
+
+        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
         mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
         mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
         mag_U = mult .* F_ptrain_over_x .* mag_X_f;
-        phase_U = 0; % fixme this is incorrect and affects combine_ptrain_dalembert_forces
-        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2;
+        
+        phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
+        phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
+        phase_U = phase_V_u + phase_Z_u;            % phase of control force
+
+        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+        check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
         reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
     end
 
@@ -300,15 +306,14 @@ function [mag_U,phase_U,...
     real_P  = real_P  .* r_x.^2;
 end
 
-function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F)
+function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
     imag_term = b .* w;
     real_term = k - m .* w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     X = X_over_F_mag .* F;
     if nargout > 1
-        angle_F = 0; % fixme fill in actual excitation angle
         X_over_F_phase = atan2(imag_term,real_term);
-        angle_X = X_over_F_phase + angle_F;
+        angle_X = X_over_F_phase + F_phase;
     end
 end
 
