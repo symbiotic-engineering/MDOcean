@@ -32,8 +32,7 @@ totalNumOfWorkers=p.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
-%parpool(p); % open the pool
-gcp;
+gcp; % open the pool
 
 fprintf('Opening the parallel pool took %g seconds.\n', toc)
 
@@ -132,11 +131,6 @@ parfor imcr=1:length(mcr.cases(:,1))
     rmdir(pctDir, 's')  
 
 end
-
-% filename to save
-[~, git_output] = system('git rev-parse --short HEAD');
-git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparfixed_floatcd0_ctrl-49aa381_' git_hash];
 
 save(output_filename, 'P','float_amplitude','spar_amplitude')
 

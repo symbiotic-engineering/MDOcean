@@ -4,7 +4,7 @@
 regular = true;
 
 p = parameters();
-p.C_d_float = 0;
+p.C_d_float = 1;
 b = var_bounds();
 X = [b.X_noms; 1];
 [~, ~, P_matrix, ~, val] = simulation(X,p);
@@ -15,10 +15,14 @@ else
 end
 
 mcr.header = {'waves.height','waves.period','pto(1).damping'};
-%control = val.B_p(:);
-control = load('ctrl_49aa381');
-mcr.cases = [H(:),T(:),control.ctrl(:)];
+control = val.B_p(:);
+mcr.cases = [H(:),T(:),control];
 save('mcrMDOcean.mat','mcr')
+
+% filename to save
+[~, git_output] = system('git rev-parse --short HEAD');
+git_hash = git_output(1:end-1);
+output_filename = ['wecsim_sparfixed_floatcd' num2str(p.C_d_float) '_' git_hash];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
