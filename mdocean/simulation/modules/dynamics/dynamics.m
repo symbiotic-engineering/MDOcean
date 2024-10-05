@@ -212,9 +212,9 @@ end
 
 function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const)
     mag_v = w .* X_guess;
-    phase_v = phase_X_guess - pi/2;
+    phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
-    phase_v_prime = atan( tan(phase_X_guess) ./ (1 - mag_v0_v_ratio ./ cos(phase_X_guess)) ); % derived on p48 of my notebook
+    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of my notebook
     
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of my notebook
     phi_alpha = phase_v_prime - phase_v;
