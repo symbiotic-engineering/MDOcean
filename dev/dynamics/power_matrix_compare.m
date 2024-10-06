@@ -23,7 +23,8 @@ sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
 vars = {'P','float_amplitude','spar_amplitude'};
-spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
+%spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
+spar_fixed = load('wecsim_sparfixed_floatcd1_92fac3d',vars{:});
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix));
 
@@ -129,7 +130,7 @@ for i = 1:2
 end
 sgtitle('JPD (-)')
 
-% power error plot
+% power error plot: vs RM3 report
 figure                      % (sim - actual) / actual
 pre_JPD_pct_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,1)) ./ pre_JPD_power(:,:,1);
 %pre_JPD_pct_error(JPD==0) = NaN;
@@ -141,14 +142,27 @@ title('Unsaturated Power Percent Error to RM Report (%)')
 colorbar
 grid on
 
+% power and amplitude error plot: vs WecSim
+MDOcean_Wecsim_power_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
+MDOcean_Wecsim_amplitude_error = 100 * (val.X - spar_fixed_float_amplitude) ./ spar_fixed_float_amplitude;
 figure
-MDOcean_Wecsim_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
-contourf(T,H,MDOcean_Wecsim_error)
+subplot 121
+[c,h_fig] = contourf(T,H,MDOcean_Wecsim_power_error,[0:5 7 10 20 50]);
+clabel(c,h_fig);
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
-title('Unsaturated Power Percent Error to WecSim (%)')
+title('Unsaturated Power')
 colorbar
 grid on
+subplot 122
+[c,h_fig] = contourf(T,H,MDOcean_Wecsim_amplitude_error,[-3 -1 0 5 20 50]);
+clabel(c,h_fig);
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('Unsaturated Amplitude')
+colorbar
+grid on
+sgtitle('Percent Error to WecSim (%)')
 
 
 % Bp and X (without power saturation)
@@ -188,3 +202,10 @@ colorbar
 grid on
 
 sgtitle('Float Amplitude (m)')
+
+%% compare average power over all sea states in JPD
+P_weighted_sim = sim_mech_unsat .* p.JPD / 100;
+P_avg_sim = sum(P_weighted_sim(:))
+P_weighted_actual = spar_fixed_power .* p.JPD / 100;
+P_avg_actual = sum(P_weighted_actual(:))
+pct_error_P_avg = 100 * (P_avg_sim - P_avg_actual) / P_avg_actual
