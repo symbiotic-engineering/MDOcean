@@ -6,14 +6,17 @@ close all; clear
 
 reactive = true;
 
-Cd = 0:1:5;
+Cd = 5;%0:1:5;
 
-sweep_drag(true,false,Cd)
-sweep_drag(false,false,Cd)
+P_reactive = sweep_drag(true,false,Cd);
+P_damping = sweep_drag(false,false,Cd);
+
+pct_diff = 100*(P_damping - P_reactive) ./ P_reactive
+
 %sweep_drag(true,true,0)
 %sweep_drag(false,true,0)
 
-function sweep_drag(reactive,multibody,Cd)
+function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     p = parameters();
     p.eff_pto = 1;
     p.use_multibody = multibody;
