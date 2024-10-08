@@ -5,9 +5,6 @@
 % checked, A is ~2x too big and B is reasonable)
 % - get excitation force (done for deep water, todo for non-deep)
 % - make validation an official part of the testcases
-% - investigate the possible error where 0 is passed for R,Z if the
-% potential field isn't being plotted, which might mess up numerical
-% integration!!
 
 % extensions for later:
 % - don't remake A matrix when heaving OC vs IC changes, only B matrix
@@ -21,13 +18,9 @@
 % - get surge coeffs
 % - do low-frequency approximations for cummins equation
 % - take the limit in deep water
-% - get coupling hydro coeffs for when moving at diff velocities
+% - get coupling hydro coeffs for when moving at diff velocities (=0 for 
+%   flat-bottom geometries, nvm, only relevant for multi-region slant approx)
 % - extend to many regions
-% - use the analytical form of the radial coupling integrals instead of
-% numerical integration, to speed up. (equation 53-55 of 2012 paper). Based
-% on integral_testing_r.mlx, I might need to add assumeAlso(m_k>0) before 
-% generating sym functions? Once this is true, hydro coeffs are a linear
-% matrix multiply based on eigencoeffs, so implement in this form.
 
 clear all
 close all
