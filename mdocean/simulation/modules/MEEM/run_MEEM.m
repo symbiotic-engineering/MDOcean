@@ -171,6 +171,11 @@ function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_nu
 
     % solve for x
     x = full(A_num\b_num);
+
+    % sometimes (ie for geometries very close to the seafloor) A_num will
+    % be singular and thus x will be inf/nan. Zero these.
+    x(~isfinite(x)) = 0;
+
     x_cell = num2cell(x);
     % solve for hydro
     hydro_nondim_num = c_num * x + c_0_num;
