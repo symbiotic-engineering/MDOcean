@@ -25,7 +25,9 @@ end
 D_s = D_s_ratio * D_f;
 h_f = h_f_ratio * D_f;
 % Geometric similarity float submergence
-T_f = p.T_f_over_h_f * h_f;
+T_f_2 = p.T_f_2_over_h_f * h_f;
+T_f_1 = p.T_f_1_over_T_f_2 * T_f_2;
+D_f_b = p.D_f_b_over_D_f * D_f;
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
 D_d = p.D_d_over_D_s * D_s;
@@ -42,9 +44,15 @@ hold on
 waves = plot(x,Hs*cos(x*2*pi/T),'c');
 
 % WEC
+float_rect_bottom = -T_f_1;
+float_rect_height = h_f - (T_f_2-T_f_1);
+float_rect_middle = float_rect_bottom + float_rect_height/2;
+
 center_rect([0 (h_s/2-T_s) D_s h_s],color{1})       % vert col
 center_rect([0 -T_s D_d h_d],color{2})              % reaction plate
-center_rect([0 (h_f/2-T_f) D_f h_f],color{3})       % float
+center_rect([0 float_rect_middle D_f float_rect_height],color{3})       % float straight part
+
+trapezoid(D_f_b,D_f,-T_f_2,-T_f_1,color{3}) % float slanted part
 
 % for legend
 plot(NaN,NaN,color{1})
@@ -73,4 +81,8 @@ rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
 
 end
 
-
+function trapezoid(base_1,base_2,y_1,y_2,color)
+    x = [-base_1/2, base_1/2, base_2/2, -base_2/2, -base_1/2];
+    y = [y_1 y_1 y_2 y_2 y_1];
+    plot(x,y,'LineWidth',3,'Color',color)
+end

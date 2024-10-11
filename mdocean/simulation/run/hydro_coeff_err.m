@@ -22,13 +22,14 @@ a1 = 3;
 d2 = 2;
 d1 = 35;
 g = 9.8;
-h = 100;
+h = 300;
 
 k = w.^2 / g;
+harmonics = 50;
 
 use_MEEM = true;
 if use_MEEM
-    [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h); 
+    [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h, harmonics); 
 else
     [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs(a2, k, d2);
     A_MDOcean = ones(size(w))* A_MDOcean;
@@ -63,7 +64,7 @@ if plot_on
     hold on
     set(gca,"ColorOrderIndex",1)
     plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean)
-    ylim([0 3500])
+    ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
     legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force \gamma/(\rhog)','Simulation (Analytical)','Actual (WAMIT BEM)')
     title('Normalized Hydrodynamic Coefficients')
@@ -71,7 +72,7 @@ if plot_on
     improvePlot
     
     %% check B formula
-    figure
-    plot(w,B./gamma.^2*10000, w,w.^2/(2*9.8)*10000,'--')
-    legend('B/\gamma^2*\rho g^2/\omega', '\omega^2/2g')
+%     figure
+%     plot(w,B./gamma.^2*10000, w,w.^2/(2*9.8)*10000,'--')
+%     legend('B/\gamma^2*\rho g^2/\omega', '\omega^2/2g')
 end
