@@ -1,6 +1,6 @@
 function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
           	F_heave, F_surge, M, h_s, T_s, rho_w, g, ...
-            sigma_y, A_c, A_lat_sub, r_over_t, I, E)
+            sigma_y, A_c, A_lat_sub, r_over_t, I, E, D_d, A_dt, theta_dt, L_dt, h_d, D_s, t_d)
 
     %% Stress calculations
     depth = [0 T_s T_s]; % max depth
@@ -15,6 +15,35 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     sigma_tz = [0 0 0];
     sigma_zr = [0 0 0];
     
+    %check this area
+    F_water = P_hydrostatic(2) * A_c(3)/2;
+    r = D_d/2;
+    I_d = (1/12) * r * h_d^3;
+    F_support = 3*F_water*r^3*A_dt/(8*sin(theta_dt)*(3*L_dt*I_d - (r^3*A_dt)));
+
+    %this area is wrong
+    x1 = linspace(0,r-t_d,1500);
+    A = 2*sqrt(r^2-x1.^2) * h_d - (2*sqrt(r^2-x1.^2) * t_d^3);
+    sigma_axial = -F_support * cos(theta_dt) ./ A;
+    %count = 1;
+    % for x = 0:0.01:r-0.01 %avoid infinite moment of inertia
+    %     i = count;
+    %     M_x(i) = -(F_water+F_support*sin(theta_dt))*x + (F_water*x^2/(2*r)) + ...
+    %     (F_water*r/2) + (F_support*r*sin(theta_dt));
+    %     I_x(i) = (1/12) * 2*sqrt(r^2-x^2) * h_d^3;
+    %     count = count+1;
+    % end
+
+    r_bending = r-D_s/2;
+    x = linspace(0,r_bending-0.01,1500);
+    M_x = -(F_water+F_support*sin(theta_dt))*x + (F_water.*x.^2/(2*r_bending)) + ...
+        (F_water*r_bending/2) + (F_support*r_bending*sin(theta_dt));
+    I_x = (1/12) * 2*sqrt(r_bending^2-x.^2) * h_d^3% - ((1/12) * 2*sqrt(r_bending^2-x.^2) * t_d^3);
+
+    sigma_bending = abs(M_x .* h_d./(2.*I_x));
+    max_sigma_bending = max(sigma_bending);
+    sigma_x = sigma_axial + max_sigma_bending;
+
     % uncomment for debugging
     %     sigma = zeros(3,3,3);
     %     for j=1:3
@@ -48,4 +77,3 @@ function s_vm = von_mises(s_11, s_22, s_33, s_12, s_23, s_31)
     s_vm = sqrt( principal_term + shear_term );
 
 end
-

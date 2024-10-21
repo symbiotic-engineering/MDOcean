@@ -1,6 +1,6 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
          A_c, A_lat_sub, r_over_t, ...
-         I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
+         I, T, V_f_pct, V_s_pct, GM, mass, A_dt, L_dt, t_d] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
                                             t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
                                             D_d, D_dt, theta_dt, T_s, h_d, t_d_max, ...
                                             M, rho_m, rho_w, m_scale)
@@ -118,7 +118,7 @@ I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
 A_vc_l = 1/2 * pi * D_s * (T_s-h_d);    % lateral area
 
 % Reaction plate
-A_d_c = pi/4 * (D_d^2 - D_s^2);         % cross sectional area
+A_d_c = pi/4 * (D_d^2);         % cross sectional area
 A_d_l = 1/2 * pi * D_d * h_d;           % lateral area
 I_rp = pi * D_d^4 / 64;
 
@@ -177,4 +177,3 @@ BM = I_f / sum(V_d);            % moment due to buoyant rotational stiffness
 GM = KB + BM - KG;              % metacentric height
 
 end
-
