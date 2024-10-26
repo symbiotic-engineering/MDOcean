@@ -23,8 +23,13 @@ sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
 vars = {'P','float_amplitude','spar_amplitude'};
-%spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
-spar_fixed = load('wecsim_sparfixed_floatcd1_92fac3d',vars{:});
+if p.C_d_float == 0
+    spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
+elseif p.C_d_float == 1
+    spar_fixed = load('wecsim_sparfixed_floatcd1_92fac3d',vars{:});
+else
+    error('cant find wecsim data for this Cd')
+end
 spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix));
 
@@ -145,9 +150,17 @@ grid on
 % power and amplitude error plot: vs WecSim
 MDOcean_Wecsim_power_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
 MDOcean_Wecsim_amplitude_error = 100 * (val.X - spar_fixed_float_amplitude) ./ spar_fixed_float_amplitude;
+% set contour lines to make plot more readable
+if p.C_d_float==0
+    power_error_vals = [0:5 7 10 20 50];
+    X_error_vals = [-3 -1 0 5 20 50];
+elseif p.C_d_float==1
+    power_error_vals = [-20:5:20 300];
+    X_error_vals = [-10:5:10 600];
+end
 figure
 subplot 121
-[c,h_fig] = contourf(T,H,MDOcean_Wecsim_power_error,[0:5 7 10 20 50]);
+[c,h_fig] = contourf(T,H,MDOcean_Wecsim_power_error,power_error_vals);
 clabel(c,h_fig);
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
@@ -155,7 +168,7 @@ title('Unsaturated Power')
 colorbar
 grid on
 subplot 122
-[c,h_fig] = contourf(T,H,MDOcean_Wecsim_amplitude_error,[-3 -1 0 5 20 50]);
+[c,h_fig] = contourf(T,H,MDOcean_Wecsim_amplitude_error,X_error_vals);
 clabel(c,h_fig);
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
