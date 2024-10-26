@@ -6,6 +6,7 @@ classdef test < matlab.unittest.TestCase
         actual
     end
 
+    % inputs for tests, including passing tolerances
     properties (TestParameter)
         field = fieldnames(validation_inputs());
         rel_tol = {.1,.1,.1,.1,.25,.25,.25,.1,.1,.1,.1,.1};
@@ -13,6 +14,7 @@ classdef test < matlab.unittest.TestCase
         which_tabs = test.enumerateTabs()
     end
 
+    % helper methods to enumerate all figures and tables
     methods (Static)
         function which_figs = enumerateFigs()
             [num_figs, num_tabs] = all_figures( [],[] );

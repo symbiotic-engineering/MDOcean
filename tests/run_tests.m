@@ -10,8 +10,12 @@ addpath(genpath(sourceCodeFolder))
 suite = testsuite('tests');
 runner = testrunner('textoutput');
 
-mkdir('code-coverage');
-mkdir('test-results');
+if ~exist('code-coverage', 'dir')
+    mkdir('code-coverage');
+end
+if ~exist('test-results', 'dir')
+    mkdir('test-results');
+end
 
 reportFormat = [CoverageReport('code-coverage/coverageReport') CoberturaFormat('code-coverage/coverage.xml')];
 
