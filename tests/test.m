@@ -1,4 +1,5 @@
 classdef test < matlab.unittest.TestCase
+    % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     properties
         feasible
         failed
