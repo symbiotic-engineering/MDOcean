@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main", "ci"]
+    branches: [ "main"]
   pull_request:
-    branches: [ "main", "ci"]
+    branches: [ "main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,16 +26,28 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3
 
+      - name: Check validity of citation.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "-f zenodo --validate --show-trace"
+
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2
+        with:
+            products: >
+                Parallel_Computing_Toolbox
+                Global_Optimization_Toolbox
+                Optimization_Toolbox
+                Statistics_and_Machine_Learning_Toolbox
       
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v1
+        uses: matlab-actions/run-tests@v2
         with:
           source-folder: mdocean
           test-results-junit: test-results/results.xml
           test-results-pdf: test-results/testreport.pdf
           code-coverage-cobertura: code-coverage/coverage.xml
+          use-parallel: true
 
       - name: Publish code coverage
         if: always()
@@ -55,3 +67,4 @@ jobs:
         with:
           name: test-report
           path: test-results/testreport.pdf
+    
