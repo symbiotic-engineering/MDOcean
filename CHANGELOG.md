@@ -3,7 +3,9 @@
 
 ## [v2.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v2.1) - 2024-10-26 - Zenodo fix
 ### Fixed
-- Citation.cff works in Zenodo
+- Citation.cff file valid
+### Changed
+- Upgraded to matlab actions tests v2
 
 ## [v2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v2.0) - 2024-05-23 - first stable version using MEEM hydrodynamics
 ### Added
