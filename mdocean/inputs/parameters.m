@@ -48,7 +48,8 @@ p = struct( 'rho_w',    1000,...                % water density (kg/m3)
             'theta_dt', atan(17.5/15),...       % angle from horizontal of damping plate support tubes (rad)
             'FOS_min',  1.5,...                 % minimum FOS (-)	
             'FCR',      0.113,...               % fixed charge rate (-), see RM3 report p63
-            'N_WEC',    100,...                 % number of WECs in array (-)   
+            'N_WEC',    100,...                 % number of WECs in array (-)
+            'D_d_min',  30,...                  % minimum damping plate diameter
             'D_d_over_D_s', 30/6,...            % normalized damping plate diameter (-)
             'T_s_over_D_s', 29/6,... %35/6      % normalized spar draft (-)
             'h_d_over_D_s', 0.1/6,...%in2m/6    % normalized damping plate thickness (-)     

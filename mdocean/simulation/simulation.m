@@ -63,7 +63,8 @@ g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
 g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
 g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_elec;                         % positive power
-g(11) = 0; %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
+g(11) = in.D_d / p.D_d_min - 1;         % damping plate diameter (spar natural freq)
+%1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(12) = h_s_extra(1);                   % prevent float rising above top of spar
 g(13) = h_s_extra(2);                   % prevent float going below bottom of spar
 g(14) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
