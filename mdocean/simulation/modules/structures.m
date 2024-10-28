@@ -14,17 +14,18 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     sigma_rt = sigma_surge;                     % shear
     sigma_tz = [0 0 0];
     sigma_zr = [0 0 0];
-    
-    %check this area
+
     F_water = P_hydrostatic(2) * A_c(3)/2;
     r = D_d/2;
     I_d = (1/12) * r * h_d^3;
     F_support = 3*F_water*r^3*A_dt/(8*sin(theta_dt)*(3*L_dt*I_d - (r^3*A_dt)));
 
-    %this area is wrong
     x1 = linspace(0,r-t_d,1500);
     A = 2*sqrt(r^2-x1.^2) * h_d - (2*sqrt(r^2-x1.^2) * t_d^3);
     sigma_axial = -F_support * cos(theta_dt) ./ A;
+    v = abs(-F_water - (F_support*(sin(theta_dt))) + (F_water*x1/r));
+    shear = max(v./A);
+
     %count = 1;
     % for x = 0:0.01:r-0.01 %avoid infinite moment of inertia
     %     i = count;
@@ -38,11 +39,10 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     x = linspace(0,r_bending-0.01,1500);
     M_x = -(F_water+F_support*sin(theta_dt))*x + (F_water.*x.^2/(2*r_bending)) + ...
         (F_water*r_bending/2) + (F_support*r_bending*sin(theta_dt));
-    I_x = (1/12) * 2*sqrt(r_bending^2-x.^2) * h_d^3% - ((1/12) * 2*sqrt(r_bending^2-x.^2) * t_d^3);
+    I_x = (1/12) * 2*sqrt(r_bending^2-x.^2) * h_d^3 - ((1/12) * 2*sqrt(r_bending^2-x.^2) * t_d^3);
 
     sigma_bending = abs(M_x .* h_d./(2.*I_x));
-    max_sigma_bending = max(sigma_bending);
-    sigma_x = sigma_axial + max_sigma_bending;
+    sigma_xx = max(sigma_axial) + max(sigma_bending);
 
     % uncomment for debugging
     %     sigma = zeros(3,3,3);
@@ -53,7 +53,13 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     %     end
     
     % assume ductile material for now - need to use mohr's circle for concrete
+    sigma_rr(3) = sigma_xx;
+    sigma_tt(3) = 0;
+    sigma_zz(3) = sigma_zz(3)+P_hydrostatic(3);
+    sigma_rt(3) = shear;
+
     sigma_vm = von_mises(sigma_rr, sigma_tt, sigma_zz, sigma_rt, sigma_tz, sigma_zr);
+    %sigma_vm = von_mises(sigma_xx, [0 0 0], sigma_zz+P_hydrostatic, shear, [0 0 0], [0 0 0]);
     
     %% Buckling calculation
     K = 2; % fixed-free - top is fixed by float angular stiffness, bottom is free
