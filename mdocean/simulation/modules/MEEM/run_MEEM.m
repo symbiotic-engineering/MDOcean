@@ -439,11 +439,16 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
 %     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
     
-    matlabFunction(A,b,c,c_0,'File',['simulation/modules/MEEM/generated/A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
+    folder = 'simulation/modules/MEEM/generated/';
+    if ~isfolder(folder)
+        folder = '';
+        warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
+    end
+    matlabFunction(A,b,c,c_0,'File',[folder 'A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
-                    'File',['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],...
+                    'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
 end
