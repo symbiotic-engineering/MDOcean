@@ -151,13 +151,22 @@ grid on
 MDOcean_Wecsim_power_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
 MDOcean_Wecsim_amplitude_error = 100 * (val.X - spar_fixed_float_amplitude) ./ spar_fixed_float_amplitude;
 % set contour lines to make plot more readable
-if p.C_d_float==0
-    power_error_vals = [0:5 7 10 20 50];
-    X_error_vals = [-3 -1 0 5 20 50];
-elseif p.C_d_float==1
-    power_error_vals = [-20:5:20 300];
-    X_error_vals = [-10:5:10 600];
+if p.C_d_float==0 && p.use_MEEM==false
+    power_error_vals = 3;
+    X_error_vals = 3;
+elseif p.C_d_float==1 && p.use_MEEM==false
+    power_error_vals = [-80 -50 -20 0 2:5 7 10 20];
+    X_error_vals = [-50 -40 -20 -10 0:5 10];
+elseif p.C_d_float==0 && p.use_MEEM==true
+    power_error_vals = [-25:5:0 2 5];
+    X_error_vals = -20:5:10;
+elseif p.C_d_float==1 && p.use_MEEM==true
+    power_error_vals = [-85 -50 -20 -14 -12 -10:5:20];
+    X_error_vals = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
 end
+min_colorbar = min(min([MDOcean_Wecsim_power_error,MDOcean_Wecsim_amplitude_error],[],'all'),-5);
+max_colorbar = max(max([MDOcean_Wecsim_power_error,MDOcean_Wecsim_amplitude_error],[],'all'),5);
+
 figure
 subplot 121
 [c,h_fig] = contourf(T,H,MDOcean_Wecsim_power_error,power_error_vals);
@@ -166,6 +175,8 @@ xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Unsaturated Power')
 colorbar
+clim([min_colorbar max_colorbar])
+colormap(bluewhitered)
 grid on
 subplot 122
 [c,h_fig] = contourf(T,H,MDOcean_Wecsim_amplitude_error,X_error_vals);
@@ -174,6 +185,8 @@ xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Unsaturated Amplitude')
 colorbar
+clim([min_colorbar max_colorbar])
+colormap(bluewhitered)
 grid on
 sgtitle('Percent Error to WecSim (%)')
 
