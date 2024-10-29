@@ -1,4 +1,4 @@
-function [LCOE, P_var, P_matrix, g, val] = simulation(X, p)	
+function [LCOE, P_var, P_matrix_elec, g, val] = simulation(X, p)	
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
@@ -42,14 +42,14 @@ in.h_s = 1/T_s_over_h_s * in.T_s;
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
 [F_heave_max, F_surge_max, F_ptrain_max, ...
-	    P_var, P_elec, P_matrix, h_s_extra] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+	    P_var, P_avg_elec, P_matrix_elec, h_s_extra] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
                                     F_heave_max, F_surge_max,...
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
 g = zeros(1,16);
@@ -62,7 +62,7 @@ g(6) = FOS1Y / p.FOS_min - 1;           % float survives max force
 g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
 g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
 g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
-g(10) = P_elec;                         % positive power
+g(10) = P_avg_elec;                         % positive power
 g(11) = in.D_d / p.D_d_min - 1;         % damping plate diameter (spar natural freq)
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(12) = h_s_extra(1);                   % prevent float rising above top of spar
@@ -83,8 +83,8 @@ if nargout > 4 % if returning extra struct output for validation
                                             in.t_fc, in.t_fb, in.t_sr, in.t_dt,...
                                             in.D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, in.t_d_max,...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_elec, in.FCR, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, B_p,X] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.eff_array);
+    [~, ~, ~, ~, ~, ~, ~, B_p,X,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -92,14 +92,15 @@ if nargout > 4 % if returning extra struct output for validation
     val.capex = capex;
     val.opex = opex;
     val.LCOE = LCOE;
-    val.power_avg = P_elec;
-    val.power_max = max(P_matrix,[],'all');
+    val.power_avg = P_avg_elec;
+    val.power_max = max(P_matrix_elec,[],'all');
     val.force_heave = F_heave_max;
     val.force_ptrain = F_ptrain_max;
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
     val.B_p = B_p;
     val.X = X;
+    val.P_mech = P_matrix_mech;
 end
 
 end
