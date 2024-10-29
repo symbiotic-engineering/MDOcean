@@ -64,6 +64,12 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'pos_power','spar_damping','spar_height_up','spar_height_down','LCOE_max',...
                       'irrelevant_max_force','water_deep_enough'};
 
+[~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
+idxs_recover = zeros(size(idxs_sort));
+idxs_recover(idxs_sort) = 1:length(idxs_sort); % indices to recover unsorted variabes from sorted ones
+b.idxs_sort    = idxs_sort;
+b.idxs_recover = idxs_recover;
+
 % modify nominal control inputs to so power and force matches actual
 [F_max_nom, B_p_nom, w_n_nom] = deal(1e6);%find_nominal_inputs(b, false);
 b.F_max_nom = F_max_nom;

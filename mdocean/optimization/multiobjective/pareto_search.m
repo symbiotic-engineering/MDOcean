@@ -26,7 +26,7 @@ function [x,fval] = pareto_search()
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
         else
-            idxs = [1 6 2 5 4 3 7];
+            idxs = b.idxs_sort;
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values

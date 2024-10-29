@@ -70,10 +70,6 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
-    idxs_recover = zeros(size(idxs_sort));
-    idxs_recover(idxs_sort) = 1:length(idxs_sort); % indices to recover unsorted variabes from sorted ones
-
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
         which_obj = which_objs(i);
@@ -90,7 +86,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
             
         [X_opt_raw,obj_opt,flag,...
-            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, idxs_recover);
+            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover);
         probs{i} = problem;
 
                        % D_f   D_s_over_D_f T_f_over_T_s T_s_over_h_s F_max B_p w_n]
