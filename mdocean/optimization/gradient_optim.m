@@ -21,13 +21,13 @@ end
 
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
-D_f         = optimvar('D_f',       sz,'LowerBound',b.D_f_min,       'UpperBound',b.D_f_max);
-D_s_ratio   = optimvar('D_s_ratio', sz,'LowerBound',b.D_s_ratio_min, 'UpperBound',b.D_s_ratio_max);
-h_f_ratio   = optimvar('h_f_ratio', sz,'LowerBound',b.h_f_ratio_min, 'UpperBound',b.h_f_ratio_max);
-T_s_ratio   = optimvar('T_s_ratio', sz,'LowerBound',b.T_s_ratio_min, 'UpperBound',b.T_s_ratio_max);
-F_max       = optimvar('F_max',     sz,'LowerBound',b.F_max_min,     'UpperBound',b.F_max_max);
-B_p         = optimvar('D_int',     sz,'LowerBound',b.B_p_min,       'UpperBound',b.B_p_max);
-w_n         = optimvar('w_n',       sz,'LowerBound',b.w_n_min,       'UpperBound',b.w_n_max);
+x1 = optimvar(b.var_names{1}, sz,'LowerBound',b.X_mins(1), 'UpperBound',b.X_maxs(1));
+x2 = optimvar(b.var_names{2}, sz,'LowerBound',b.X_mins(2), 'UpperBound',b.X_maxs(2));
+x3 = optimvar(b.var_names{3}, sz,'LowerBound',b.X_mins(3), 'UpperBound',b.X_maxs(3));
+x4 = optimvar(b.var_names{4}, sz,'LowerBound',b.X_mins(4), 'UpperBound',b.X_maxs(4));
+x5 = optimvar(b.var_names{5}, sz,'LowerBound',b.X_mins(5), 'UpperBound',b.X_maxs(5));
+x6 = optimvar(b.var_names{6}, sz,'LowerBound',b.X_mins(6), 'UpperBound',b.X_maxs(6));
+x7 = optimvar(b.var_names{7}, sz,'LowerBound',b.X_mins(7), 'UpperBound',b.X_maxs(7));
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...
@@ -38,8 +38,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                             
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [D_f D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n matl];
-
+    X = [x1 x2 x3 x4 x5 x6 x7 matl];
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
@@ -71,6 +70,10 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
+    [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
+    idxs_recover = zeros(size(idxs_sort));
+    idxs_recover(idxs_sort) = 1:length(idxs_sort); % indices to recover unsorted variabes from sorted ones
+
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
         which_obj = which_objs(i);
@@ -85,13 +88,14 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         else
             error('x0 input struct has wrong size')
         end
-        
-        [X_opt_raw,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts);
+            
+        [X_opt_raw,obj_opt,flag,...
+            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, idxs_recover);
         probs{i} = problem;
 
-                       % D_f   D_s_ratio h_f_ratio T_s_ratio F_max B_p w_n]
-        mins_flexible = [false false     false     false     false true  true]';
-        maxs_flexible = [true  false     false     false     true  true  true]';
+                       % D_f   D_s_over_D_f T_f_over_T_s T_s_over_h_s F_max B_p w_n]
+        mins_flexible = [false false        false        false        false true true]';
+        maxs_flexible = [true  false        false        false        true  true true]';
         tol = eps(2);
         if any(abs(X_opt_raw(mins_flexible) - b.X_mins(mins_flexible)) < tol) ...
                 || any(abs(X_opt_raw(maxs_flexible) - b.X_maxs(maxs_flexible)) < tol)

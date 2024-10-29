@@ -7,28 +7,31 @@ in = p;
 
 in.D_f              = X(1);     % outer diameter of float (m)
 D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
-h_f_over_D_f        = X(3);     % normalized vertical thickness of float (-)
-T_s_over_h_s        = X(4);     % normalized spar draft below waterline (-)
+T_f_2_over_T_s      = X(3);     % normalized draft of float (-)
+T_s_over_h_s        = X(4);     % normalized draft of spar (-)
 in.F_max            = X(5)*1e6; % max powertrain force (N)
 in.B_p              = X(6)*1e6; % controller (powertrain) damping (Ns/m)
 in.w_n              = X(7);     % controller (powertrain) natural frequency (rad/s)
 in.M                = X(8);     % material (-)
 
-% Variable ratios defined by design variables
+% Variable ratio defined by design variable
 in.D_s = D_s_over_D_f * in.D_f;
-in.h_f = h_f_over_D_f * in.D_f;
-% Geometric similarity to float submergence parameter
-in.T_f_2 = p.T_f_2_over_h_f * in.h_f;
-% Geometric similarity to float angle paramter
-in.T_f_1 = p.T_f_1_over_T_f_2 * in.T_f_2;
-in.D_f_b = p.D_f_b_over_D_f * in.D_f;
+
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
 in.D_d = p.D_d_over_D_s * in.D_s;
 in.T_s = p.T_s_over_D_s * in.D_s;
 in.h_d = p.h_d_over_D_s * in.D_s;
-% Another ratio defined by design variable
+
+% Two more ratios defined by design variables
 in.h_s = 1/T_s_over_h_s * in.T_s;
+in.T_f_2 = T_f_2_over_T_s * in.T_s;
+
+% Geometric similarity to float submergence parameter
+in.h_f = in.T_f_2 / p.T_f_2_over_h_f;
+% Geometric similarity to float angle paramter
+in.T_f_1 = p.T_f_1_over_T_f_2 * in.T_f_2;
+in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 
 
 %% Run modules
