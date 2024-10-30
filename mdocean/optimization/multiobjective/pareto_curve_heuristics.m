@@ -4,7 +4,7 @@ function pareto_curve_heuristics()
     
     %[x,fval] = pareto_search();
     load("pareto_search_results.mat")
-    cols = [1 3 6 5 4 2 7];
+    cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add eigth column for material 
     LCOE = fval(:,1);
