@@ -61,10 +61,10 @@ b.var_names = {'D_f','D_s_over_D_f','T_f_over_T_s','T_s_over_h_s','F_max','B_p',
 b.var_names_pretty = {'D_f','D_s/D_f','T_f/T_s','T_s/h_s','F_{max}','B_p','\omega_n','M'};
 b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar_too_light',...
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
-                      'pos_power','spar_damping','spar_height_up','spar_height_down','LCOE_max',...
-                      'irrelevant_max_force','water_deep_enough'};
-for i = 17:44
-    b.constraint_names{i} = strcat('prevent_slamming',num2str(i-16));
+                      'pos_power','spar_damping','LCOE_max','irrelevant_max_force','water_deep_enough',...
+                      'spar_height_up','spar_height_down','linear_theory'};
+for i = 18:32
+    b.constraint_names{i} = strcat('prevent_slamming',num2str(i-17));
 end
 
 [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices

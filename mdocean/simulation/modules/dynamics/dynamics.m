@@ -1,9 +1,9 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_avg_elec, P_matrix_elec, h_s_extra, X_below_wave, X_below_linear, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
+    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
 
-    % use probabilistic sea states for power and PTO force
+    % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix_mech,h_s_extra,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
+    [P_matrix_mech,X_constraints,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
@@ -17,7 +17,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     
     assert(isreal(P_avg_elec))
     
-    % use max sea states for structural forces and max amplitude
+    % use max sea states for structural forces
     [~,~,~,~,F_heave_max,F_surge_max,~] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
@@ -25,13 +25,10 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
     
-    % prevent rising out of the water
-    X_max_linear = 1/10 * in.D_f;
-    X_below_wave = Hs(:,15) - X_u(:,15);
-    X_below_linear = X_max_linear - X_u(:,15);
+
 end
 
-function [P_matrix, h_s_extra, B_p, mag_X_u,...
+function [P_matrix, X_constraints, B_p, mag_X_u,...
           F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft)
 
     % get dynamic coefficients for float and spar
@@ -68,7 +65,14 @@ function [P_matrix, h_s_extra, B_p, mag_X_u,...
     % extra height on spar after accommodating float displacement
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
-    h_s_extra = [h_s_extra_up, h_s_extra_down];
+
+    % prevent rising out of the water
+    X_max_linear = 1/10 * in.D_f;
+    wave_amp = Hs(end,:)/(2*sqrt(2));
+    X_below_wave = wave_amp ./ mag_X_u(end,:) - 1;
+    X_below_linear = X_max_linear / X_max - 1;
+
+    X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave];
 
     % calculate forces
     if nargout > 3
