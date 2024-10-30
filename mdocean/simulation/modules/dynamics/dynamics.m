@@ -66,11 +66,19 @@ function [P_matrix, X_constraints, B_p, mag_X_u,...
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
 
-    % prevent rising out of the water
+    % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
-    wave_amp = Hs(end,:)/(2*sqrt(2));
-    X_below_wave = wave_amp ./ mag_X_u(end,:) - 1;
+    
     X_below_linear = X_max_linear / X_max - 1;
+
+    % prevent rising out of the water
+    wave_amp = Hs(end,:)/(2*sqrt(2));
+    X_over_A = mag_X_u(end,:) ./ wave_amp;
+    T_over_A = in.T_f_2 ./ wave_amp;
+    R = T_over_A ./ sqrt(1 + X_over_A.^2 - 2 * X_over_A .* cos(phase_X_u(end,:))); % ratio derived on p88-89 of notebook
+    long_draft = R-1;
+    small_diameter = 2*pi - 2*real(acos(R)) - k_wvn(end,:) * in.D_f;
+    X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
 
     X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave];
 
