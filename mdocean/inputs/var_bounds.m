@@ -63,7 +63,7 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
                       'pos_power','spar_damping','LCOE_max','irrelevant_max_force','water_deep_enough',...
                       'spar_height_up','spar_height_down','linear_theory'};
-for i = 18:32
+for i = 18:(17+14*15)
     b.constraint_names{i} = strcat('prevent_slamming',num2str(i-17));
 end
 
