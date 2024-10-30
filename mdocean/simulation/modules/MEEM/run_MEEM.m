@@ -38,7 +38,7 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     fname = ['N' num2str(N_num) '_M' num2str(M_num) '_K' num2str(K_num) '_heaving_' heaving];
 
     % generate matlab functions from symbolic equations if needed
-    if ~exist(['simulation/modules/MEEM/generated/A_b_matrix_' fname],'file') || ...
+    if ~exist(['simulation/modules/MEEM/generated/A_b_c_matrix_' fname],'file') || ...
        ~exist(['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
     end  
@@ -89,7 +89,7 @@ end
 function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -102,7 +102,7 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
         [R,Z] = meshgrid(r_vec,z_vec);
         
         % get hydro coeffs and potential velocity fields
-        [hydro_nondim_num,phi_i1_num,phi_i2_num,...
+        [~,phi_i1_num,phi_i2_num,...
         phi_e_num,phi_p_i1_num,phi_p_i2_num,...
         phi_h_i1_num,phi_h_i2_num,v_1_r_num,...
         v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,...
@@ -112,10 +112,6 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
         assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,phi_i1_num,phi_i2_num,phi_e_num,...
                                      phi_p_i1_num,phi_p_i2_num,phi_h_i1_num,phi_h_i2_num,...
                                      v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num,fname);
-    else
-        % just get hydro coeffs
-        hydro_nondim_num = feval(hydro_fname,a1_num,a2_num,d1_num,d2_num,h_num,...
-                                                    m0_num,m_k_cell{:},x_cell{:},0,0);
     end
 
     mu_nondim = real(hydro_nondim_num);
@@ -133,7 +129,7 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
 
     m_k_num = zeros(1,K_num);
     % using tand instead of tan because finite precision of pi means
@@ -155,8 +151,8 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
     m_k_cell = num2cell(m_k_num);
 
     % get A and b matrices
-    Ab_fname = ['A_b_matrix_' fname];
-    [A_num, b_num] = feval(Ab_fname, a1_num, a2_num, d1_num, d2_num,...
+    Abc_fname = ['A_b_c_matrix_' fname];
+    [A_num, b_num, c_num, c_0_num] = feval(Abc_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
     if any(~isfinite(A_num),'all')
         A_num(~isfinite(A_num)) = 0;
@@ -175,7 +171,14 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
 
     % solve for x
     x = full(A_num\b_num);
+
+    % sometimes (ie for geometries very close to the seafloor) A_num will
+    % be singular and thus x will be inf/nan. Zero these.
+    x(~isfinite(x)) = 0;
+
     x_cell = num2cell(x);
+    % solve for hydro
+    hydro_nondim_num = c_num * x + c_0_num;
 end
 
 function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
@@ -189,6 +192,10 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     assumeAlso(n >= 0)
     assumeAlso(m >= 0)
     assumeAlso(k >= 0)
+    assumeAlso(h > d2)
+    assumeAlso(h > d1)
+    assumeAlso(r > 0)
+    assumeAlso(m_k(k) > 0)
     
     % equation numbers refer to Chau & Yeung 2010 unless otherwise noted
     
@@ -307,11 +314,11 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     
     % sum all N terms
     syms N M K real positive integer
-    phi_h_i1 = symsum(phi_h_n_i1, n, 0, N);
-    phi_h_i2 = symsum(phi_h_m_i2, m, 0, M);
+    phi_h_i1 = phi_h_n_i1(0) + symsum(phi_h_n_i1, n, 1, N);
+    phi_h_i2 = phi_h_m_i2(0) + symsum(phi_h_m_i2, m, 1, M);
     phi_i1 = phi_p_i1 + phi_h_i1;
     phi_i2 = phi_p_i2 + phi_h_i2;
-    phi_e  = symsum(phi_e_k, k, 0, K);
+    phi_e  = phi_e_k(0) + symsum(phi_e_k, k, 1, K);
     
     % derivatives to geometric variables
     % hndInfDepth = limit(hnd,h,inf)
@@ -338,8 +345,16 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % IC = heaving inner cylinder
     integrand_OC = subs(r * phi_i2 * v_2z, z, -d2);
     integrand_IC = subs(r * phi_i1 * v_1z, z, -d1);
-    hydro_OC = h^3 * 2*pi* int(integrand_OC,r,a1,a2);
-    hydro_IC = h^3 * 2*pi* int(integrand_IC,r,0,a1);
+    integral_OC = int(integrand_OC,r,a1,a2);
+    integral_IC = int(integrand_IC,r,0,a1);
+
+    % uncomment these to display the c-vector for general NMK
+    %vars = [C_1m_2(0) C_2m_2(0)];
+    %pretty(collect(simplify(integral_OC,'Steps',100), vars))
+    %pretty(collect(simplify(integral_IC,'Steps',100), vars))
+
+    hydro_OC = h^3 * 2*pi* integral_OC;
+    hydro_IC = h^3 * 2*pi* integral_IC;
     
     if heaving_OC && heaving_IC
         hydro_over_rho = hydro_OC + hydro_IC;
@@ -396,6 +411,15 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     hydro_nondim_NMK = var{14};
     eqns_NMK = var{15};
     
+    % generate c-vector
+    c = jacobian(hydro_nondim_NMK,unknowns_const);
+    c_0 = simplify(subs(hydro_nondim_NMK,unknowns_const,0*unknowns_const));
+
+    % uncomment these lines to show the hydro integral for specific NMK
+    %pretty(c.')
+    %pretty(c_0)
+    %isAlways(hydro_nondim_NMK == c_0 + c * unknowns_const.') % check, should return true
+
     % generate linear system
     [A,b] = equationsToMatrix(eqns_NMK,unknowns_const);
     
@@ -412,14 +436,19 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(bars(3)*[1,1], full_line, 'k') % third vertical
 %     
 %     plot(full_line, bars(1)*[1,1], 'k') % first horizontal
-%     plot(full_line, bars(2)*[1,1], 'k') % first horizontal
-%     plot(full_line, bars(3)*[1,1], 'k') % first horizontal
+%     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
+%     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
     
-    matlabFunction(A,b,'File',['simulation/modules/MEEM/generated/A_b_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
+    folder = 'simulation/modules/MEEM/generated/';
+    if ~isfolder(folder)
+        folder = '';
+        warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
+    end
+    matlabFunction(A,b,c,c_0,'File',[folder 'A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
-                    'File',['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],...
+                    'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
 end
@@ -461,7 +490,7 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     plot_potential(phi,R,Z,region_body,'Total Potential');
 
     date_string = [char(datetime('now','Format','yyyy-MM-dd__h-mma')) '_'];
-    folder = ['dev' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
+    folder = ['dev' filesep 'hydro_coeffs' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
     savefig(folder)
     plot_potential(phiH,R,Z,region_body,'Homogeneous Potential');
     plot_potential(phiP,R,Z,region_body,'Particular Potential');
