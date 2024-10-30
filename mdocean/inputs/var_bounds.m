@@ -63,6 +63,9 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
                       'pos_power','spar_damping','spar_height_up','spar_height_down','LCOE_max',...
                       'irrelevant_max_force','water_deep_enough'};
+for i = 17:436
+    b.constraint_names{i} = strcat('prevent_slamming',num2str(i-16));
+end
 
 [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
 idxs_recover = zeros(size(idxs_sort));
