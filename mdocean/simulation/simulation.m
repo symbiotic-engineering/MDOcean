@@ -45,7 +45,8 @@ in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inputs
 
 [F_heave_max, F_surge_max, F_ptrain_max, ...
-	    P_var, P_avg_elec, P_matrix_elec, h_s_extra] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+	    P_var, P_avg_elec, P_matrix_elec, ...
+        h_s_extra, X_below_wave, X_below_linear] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
                                     F_heave_max, F_surge_max,...
@@ -74,6 +75,25 @@ g(14) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(15) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 g(16) = in.h / in.T_s - 1;              % water deep enough
 
+% prevent rising out of water/slamming
+count = length(g)+1;
+[m,n] = size(X_below_wave);
+for i = 1:m
+    for j = 1:n
+        g(count) = X_below_wave(i,j);
+        count = count+1;
+    end
+end
+% obey linear theory
+count = length(g)+1;
+[q,r] = size(X_below_linear);
+for i = 1:m
+    for j = 1:n
+        g(count) = X_below_linear(q,r);
+        count = count+1;
+    end
+end
+
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
 if ~criteria
@@ -87,7 +107,7 @@ if nargout > 4 % if returning extra struct output for validation
                                             in.D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, in.t_d_max,...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, B_p,X,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);

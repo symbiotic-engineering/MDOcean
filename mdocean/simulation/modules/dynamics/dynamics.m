@@ -1,5 +1,5 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_avg_elec, P_matrix_elec, h_s_extra, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
+    P_var, P_avg_elec, P_matrix_elec, h_s_extra, X_below_wave, X_below_linear, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
 
     % use probabilistic sea states for power and PTO force
     [T,Hs] = meshgrid(in.T,in.Hs);
