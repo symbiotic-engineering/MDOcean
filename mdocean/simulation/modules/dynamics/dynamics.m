@@ -18,7 +18,7 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces and max amplitude
-    [~,~,~,X_sat,F_heave_max,F_surge_max,~] = get_power_force(in, ...
+    [~,~,~,~,F_heave_max,F_surge_max,~] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
@@ -27,8 +27,8 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     
     % prevent rising out of the water
     X_max_linear = 1/10 * in.D_f;
-    X_below_wave = Hs - X_sat;
-    X_below_linear = X_max_linear - X_sat;
+    X_below_wave = Hs(:,15) - X_u(:,15);
+    X_below_linear = X_max_linear - X_u(:,15);
 end
 
 function [P_matrix, h_s_extra, B_p, mag_X_u,...

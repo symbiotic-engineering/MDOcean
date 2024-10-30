@@ -75,24 +75,9 @@ g(14) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(15) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
 g(16) = in.h / in.T_s - 1;              % water deep enough
 
-% prevent rising out of water/slamming
-count = length(g)+1;
-[m,n] = size(X_below_wave);
-for i = 1:m
-    for j = 1:n
-        g(count) = X_below_wave(i,j);
-        count = count+1;
-    end
-end
-% obey linear theory
-count = length(g)+1;
-[q,r] = size(X_below_linear);
-for i = 1:m
-    for j = 1:n
-        g(count) = X_below_linear(q,r);
-        count = count+1;
-    end
-end
+g(17:16+size(X_below_wave(:))) = X_below_wave(:); % prevent rising out of water/slamming
+sizeg = length(g);
+g(sizeg+1:sizeg+size(X_below_linear(:))) = X_below_linear(:); % obey linear theory
 
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
