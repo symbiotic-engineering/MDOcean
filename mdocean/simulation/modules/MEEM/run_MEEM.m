@@ -247,11 +247,36 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % coupling integrals
     C_nm(n,m) = simplify(int(Z_m_i2(m) * Z_n_i1(n), z, -h, -d1));
     C_mk(m,k) = simplify(int(Z_m_i2(m) * Z_k_e(k),  z, -h, -d2));
-    
-    
+
     dz_1 = h - d1;
     dz_2 = h - d2;
+
+    % coupling integral approximation for large m0h
+    C_mk_00_approx = sqrt(2*h/m0) * exp(-d2*m0);
+    C_mk_m0_approx = sqrt(2) * C_mk_00_approx * (-1)^m / ( 1 + (lambda_m2/m0)^2 );
+
+    plot_error = true;
+    if plot_error
+        ch = children(C_mk); % different m,k cases (split the piecewise)
+        syms d2_over_h m0h
+        % normalized error = error / h
+        C_mk_00_error = expand(simplify(subs(1/h*(C_mk_00_approx - ch{1,1}), {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_0m_error = expand(simplify(subs(1/h*(C_mk_m0_approx - ch{3,1}), {d2,m0}, {d2_over_h*h,m0h/h})));
     
+        term = expand(simplify(subs(1/h*ch{3,1}, {d2,m0}, {d2_over_h*h,m0h/h})));
+        denom = sqrt(2 * m0h + 2 * cosh(m0h) * sinh(m0h)) * (d2_over_h^2 * m0h^2  - 2 * d2_over_h * m0h^2  + sym(pi)^2*m^2  + m0h^2 );
+        factor = 2*sqrt(2) * (-1)^m * m0h^(3/2) * (1-d2_over_h)^2 / denom;
+        pretty(expand(simplify(term / factor))*factor);
+        
+        % plots
+        str = 'Percent error in C_{mk} for k=0, m=';
+        levels = 10.^(-6:2:-2);%[10.^(-120 : 30 : -10) 10^-5];
+        plot_large_freq_approx_error(C_mk_00_error,levels,-8,[str '0'])
+        for mm = [1:4 10 11]
+            plot_large_freq_approx_error(C_mk_0m_error(mm),levels,-8,[str num2str(mm)])
+        end
+    end
+
     % potential matching
     % equation 22 in old 1981 paper, applied to boundary 2-e
     match_2e_potential = dz_2 * ( C_1m_2(m)*subs(R_1m_2(m),r,a2) ...
@@ -451,6 +476,51 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
                     'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
+end
+
+function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str)
+    
+    levels_2 = [0 levels];
+
+    % attempt 1: symbolic plot - doesn't allow you to have contour labels
+    fig = figure;
+    hdl = fcontour(sym_error,[0 1 pi acosh(realmax)],'LevelList',levels_2,'Fill','on');
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    colorbar
+    set(gca, 'ColorScale', 'log');
+    
+    % attempt 2: numeric plot - allows contor labels, but log scale can't
+    % show negatives, so plot the absolute value
+    fig2 = figure;
+    [C,hdl2] = contourf(hdl.XData,hdl.YData, abs(hdl.ZData),'LevelList',levels_2);
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title([title_str ' Absolute Value']);
+    clabel(C,hdl2);
+    set(gca, 'ColorScale', 'log');
+    clim([0 max(hdl2.ZData,[],'all')])
+    colorbar;
+    hold on
+
+    % attempt 3: numeric signedlog plot - allows negatives
+    figure
+    signed_log(hdl.ZData,smallest_exp,levels,hdl.XData,hdl.YData)
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    hold on
+    clabel(C); % use contour label from attempt 2 since it is without log
+    [~,h_nan] = contourf(hdl.XData,hdl.YData, isnan(hdl.ZData), [1 1], 'LineColor', 'none','FaceColor','none');
+    hatchfill2(h_nan,'cross','LineColor','k');
+    x = (logspace(0,1)-1)/9; % 0 to 1 with more points close to zero
+    plot(x,20./x,'k--','LineWidth',2)
+    ylim([pi acosh(realmax)])
+
+    % close first two figures since just the third one is final
+    close(fig)
+    close(fig2)
 end
 
 function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
