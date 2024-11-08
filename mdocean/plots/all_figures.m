@@ -75,6 +75,7 @@ end
 %% table 2 - constraints table
 tab_names{2} = 'Tab. 2: constraints';
 if any(which_tabs == 2)
+    b = var_bounds();
     display(b.constraint_names')
 end
 
