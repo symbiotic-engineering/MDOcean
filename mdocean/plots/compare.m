@@ -77,7 +77,7 @@ text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% design variable table
-DV_table = array2table(X, ...
-        'VariableNames',titles, 'RowNames', b.var_names(1:end-1));
+DV_table = array2table(X.', ...
+        'VariableNames',titles, 'RowNames', b.var_names);
 
 end
