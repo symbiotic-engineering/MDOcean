@@ -18,7 +18,7 @@ classdef test < matlab.unittest.TestCase
     % helper methods to enumerate all figures and tables
     methods (Static)
         function which_fig_struct = enumerateFigs()
-            [num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+            [~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
             which_figs = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
             fig_names = matlab.lang.makeValidName([fig_names, none]);
@@ -26,7 +26,7 @@ classdef test < matlab.unittest.TestCase
             which_fig_struct = cell2struct(which_figs,fig_names,2);
         end
         function which_tab_struct = enumerateTabs()
-            [num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+            [~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
             which_tabs = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
             tab_names = matlab.lang.makeValidName([none, tab_names]);
@@ -44,7 +44,7 @@ classdef test < matlab.unittest.TestCase
             testCase.applyFixture(CurrentFolderFixture(desiredFolder))
         end
 
-        function runValidation(testCase)
+        function runNominalValidation(testCase)
             [feas, fail, sim, act] = validate_nominal_RM3();
             testCase.feasible  = feas;
             testCase.failed    = fail;
@@ -55,8 +55,13 @@ classdef test < matlab.unittest.TestCase
     
     % Test methods
     methods(Test, ParameterCombination='sequential')   
-        function allFiguresRun(~, which_figs, which_tabs)
-            all_figures(which_figs,which_tabs);
+        function allFiguresRun(testCase, which_figs, which_tabs)
+            success_criterion = all_figures(which_figs,which_tabs);
+            if ~isempty(success_criterion)
+                for i=1:length(success_criterion)
+                    testCase.verifyGreaterThan(success_criterion(i),0);
+                end
+            end
         end
 
         function validateNominal(testCase, field, rel_tol)

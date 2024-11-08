@@ -1,10 +1,11 @@
 % Generate all figures used in the paper
-function [num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs )
+function [success_criterion,num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs )
 
 num_figs = 10;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
+success_criterion = {};
 
 if nargin==0
     % if run without arguments, show all figures and tables
@@ -101,7 +102,10 @@ end
 %% table 6 - optimal DVs for 4 locations
 tab_names{6} = 'Tab. 6: optimal DVs for 4 locations';
 if any(which_tabs == 6)
-    location_sensitivity()
+    tab = location_sensitivity();
+    display(tab);
+    location_flags = tab(strcmp(tab.Row,'flag'),:).Variables;
+    success_criterion(end+1) = {location_flags};
 end
 
 %% paragraph 4.2 - convergence for different x0s
