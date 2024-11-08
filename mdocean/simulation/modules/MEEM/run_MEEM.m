@@ -154,10 +154,29 @@ function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_nu
     Abc_fname = ['A_b_c_matrix_' fname];
     [A_num, b_num, c_num, c_0_num] = feval(Abc_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
+
+    % get rid of expected NaNs
+    m0h_max = acosh(realmax) / 2;
+    if m0_num*h_num > m0h_max
+        len = length(A_num);
+        [col,row] = meshgrid(1:len);
+        bottom_left = (row == len - K_num) & (col < len - K_num);
+        top_right = row < len - K_num & (col == len - K_num);
+        idx_C_m0 = bottom_left | top_right;
+        A_num(idx_C_m0) = 0; % this is shown to converge to zero
+        b_high_freq = -a2_num / (h_num - d2_num) * sqrt(h_num / (2 * m0_num)) * exp(-d2_num * m0_num);
+        b_num(end-K_num) = b_high_freq;
+    end
+
+    % throw warning for unexpected NaNs
     if any(~isfinite(A_num),'all')
         A_num(~isfinite(A_num)) = 0;
         warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
             'perhaps due to too large argument in besseli. Elements will be zeroed.'])
+    end
+    if any(~isfinite(b_num),'all')
+        b_num(~isfinite(b_num)) = 0;
+        warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
     % show A matrix values
     if show_A
