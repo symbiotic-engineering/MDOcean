@@ -1,5 +1,8 @@
 function b = var_bounds()
 
+b.var_names = {'D_f','D_s_ratio','h_f_ratio','T_s_ratio','F_max','D_int','w_n','M'};
+b.var_names_pretty = {'D_f','D_s/D_f','h_f/D_f','T_s/h_s','F_{max}','B_p','\omega_n','M'};
+
 % outer diameter of float (m)	
 b.D_f_min = 6;    % because D_s_nom = 6, a consequence of the spar natural frequency constraint
 b.D_f_max = 40;
@@ -53,12 +56,11 @@ b.X_maxs = [b.D_f_max b.D_s_ratio_max b.h_f_ratio_max b.T_s_ratio_max b.F_max_ma
 b.X_noms = [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
 b.X_starts = [b.D_f_start b.D_s_ratio_start b.h_f_ratio_start b.T_s_ratio_start b.F_max_start b.B_p_start b.w_n_start]';
 
-b.X_start_struct = struct('D_f',b.D_f_start,'D_s_ratio',b.D_s_ratio_start,...
-        'h_f_ratio',b.h_f_ratio_start,'T_s_ratio',b.T_s_ratio_start,...
-        'F_max',b.F_max_start,'D_int',b.B_p_start,'w_n',b.w_n_start);
+b.X_start_struct = cell2struct(num2cell(b.X_starts),b.var_names(1:end-1)',1);
+% struct('D_f',b.D_f_start,'D_s_ratio',b.D_s_ratio_start,...
+%         'h_f_ratio',b.h_f_ratio_start,'T_s_ratio',b.T_s_ratio_start,...
+%         'F_max',b.F_max_start,'D_int',b.B_p_start,'w_n',b.w_n_start);
 
-b.var_names = {'D_f','D_s_ratio','h_f_ratio','T_s_ratio','F_max','B_p','w_n','M'};
-b.var_names_pretty = {'D_f','D_s/D_f','h_f/D_f','T_s/h_s','F_{max}','B_p','\omega_n','M'};
 b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar_too_light',...
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
                       'pos_power','spar_damping','spar_height_up','spar_height_down','LCOE_max',...

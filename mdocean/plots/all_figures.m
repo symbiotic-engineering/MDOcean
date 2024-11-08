@@ -81,8 +81,8 @@ end
 %% table 3 - parameters table
 tab_names{3} = 'Tab. 3: parameters';
 if any(which_tabs == 3)
-    p = parameters();
-    struct2table(p, 'AsArray',true)
+    [~,tab] = parameters();
+    display(tab)
 end
 
 %% table 4 - validation table

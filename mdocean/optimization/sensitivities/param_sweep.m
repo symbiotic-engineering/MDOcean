@@ -3,40 +3,29 @@ function [] = param_sweep()
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;%close all
-dvar_names={'D_f','D_{s_{ratio}}', 'h_{f_{ratio}}','T_{s_{ratio}}', 'F_{max}','B_p','w_n','M'};
+b = var_bounds();
+[p,T] = parameters();
 
-param_names = {'Hs','Hs_{struct}','T','T_{struct}','\sigma_y','\rho_m','E',...
-            'cost_m','t_{ft}','t_{fr}','t_{fc}', 't_{fb}','t_{sr}','t_{dt}','D_{dt}','\theta_{dt}',...
-            'FCR','N_{WEC}','eff_{pto}','D_d/D_s','T_s/D_s','h_d/D_s','T_f/h_f'};  % list of parameters to sweep
-params = regexprep(param_names,'[{}\\]','');    % remove the curly braces and slashes
-params = regexprep(params,'/','_over_');
+param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
+params = T.name(T.sweep);
+dvar_names = b.var_names_pretty;
 
-groups = {'Dynamics','Structures',...
-    'Economics','Geometry'};
-param_groupings = [1 2 1 2 2 2 2 3 2 2 2 2 2 2 4 4 3 3 1 4 4 4 4];
-color_groupings = {'b','y','g','r'};
-colors = color_groupings(param_groupings);
-cell2table([params',groups(param_groupings)'])
+groups = categorical(T.subsystem(T.sweep));
+color_groupings = {'b','g','r','k','y'};
+colors = color_groupings(groups);
 
 ratios = .8 : .1 : 1.2;
-p = parameters();
-b = var_bounds();
 %%
 % use the optimal x as x0 to speed up the sweeps
-x0 = struct('D_f',b.D_f_nom,'D_s_ratio',b.D_s_ratio_nom,'h_f_ratio',...
-        b.h_f_ratio_nom,'T_s_ratio',b.T_s_ratio_nom,'F_max',b.F_max_nom,...
-        'D_int',b.B_p_nom,'w_n',b.w_n_nom,'M',b.M_nom);
+x0 = b.X_start_struct;
 x0_vec = gradient_optim(x0,p,b);
-x0 = struct('D_f',x0_vec(1,1),'D_s_ratio',x0_vec(2,1),'h_f_ratio',x0_vec(3,1),...
-    'T_s_ratio',x0_vec(4,1),'F_max',x0_vec(5,1),'D_int',x0_vec(6,1),'w_n',x0_vec(7,1));
-x0(2) = struct('D_f',x0_vec(1,2),'D_s_ratio',x0_vec(2,2),'h_f_ratio',x0_vec(3,2),...
-    'T_s_ratio',x0_vec(4,2),'F_max',x0_vec(5,2),'D_int',x0_vec(6,2),'w_n',x0_vec(7,2));
+x0 = cell2struct(num2cell(x0_vec),b.var_names',1);
 
-LCOE  = zeros(length(params),length(ratios));
-P_var = zeros(length(params),length(ratios));
-X = zeros(length(params), length(ratios), 8);
-X_LCOE= zeros(length(params), length(ratios), 8);
-X_Pvar= zeros(length(params), length(ratios), 8);
+num_DVs = length(dvar_names);
+LCOE  = zeros(length(params), length(ratios));
+P_var = zeros(length(params), length(ratios));
+X_LCOE= zeros(length(params), length(ratios), num_DVs);
+X_Pvar= zeros(length(params), length(ratios), num_DVs);
 
 %% Run optimization
 for i=1:length(params)
@@ -45,7 +34,7 @@ for i=1:length(params)
     for j=1:length(ratios)
         p.(params{i}) = ratios(j) * var_nom;
         [Xs_opt, obj_opt, flag] = gradient_optim(x0,p,b);
-        % [Xs_opt, obj_opt, flag] = deal(rand(8,2),rand(2,1),[1 1]); %dry run
+        %[Xs_opt, obj_opt, flag] = deal(rand(num_DVs,2),rand(2,1),[1 1]); %dry run
         if flag(1) >= 1
             LCOE(i,j) = obj_opt(1);
             X_LCOE(i,j,:) = Xs_opt(:,1);
@@ -87,7 +76,6 @@ legend(param_names)
 improvePlot
 grid on
 
-
 for i = 1:7
     figure(2)
     subplot(2,4,i)
@@ -127,9 +115,9 @@ for i=1:length(LCOE_params)
     barh(LCOE_params(i),slope_LCOE(i),colors{i})
     hold on
 end
-xlim([-3 1])
+xlim([-1 1] + fix(imrange(slope_LCOE)))
 ax = gca;
-set(ax,'YGrid','on')
+set(ax,'YGrid','on','XGrid','on')
 title('LCOE')
 
 subplot 122
@@ -137,18 +125,18 @@ for i=1:length(LCOE_params)
     barh(Pvar_params(i),slope_Pvar(i),colors{i})
     hold on 
 end
-set(gca,'YGrid','on')
+xlim([-1 1] + fix(imrange(slope_Pvar)))
+set(gca,'YGrid','on','XGrid','on')
 title('c_v')
 sgtitle('Normalized Sensitivities')
-legend_idx = zeros(1,max(param_groupings));
-for i=1:max(param_groupings)
-    legend_idx(i) = find(param_groupings==i,1);
-end
-labels = repmat({''},size(param_groupings));
-labels(legend_idx) = groups;
+
+% legend
+[~,first_idx] = ismember(categories(groups),groups);
+labels = repmat({''},size(groups));         % create blank labels
+labels(first_idx) = categories(groups);     % leave most labels blank, except the first of each category
 legend(labels)
+
 improvePlot
-xlim([-.5 .5])
 set(gca, 'FontSize', 14)
 set(ax,'FontSize',14)
 
@@ -157,6 +145,10 @@ figure
 barh(categorical(param_names),[slope_LCOE; slope_Pvar])
 legend('LCOE','P_{var}')
 title('Sensitivities')
+improvePlot
+set(gca, 'FontSize', 12)
+set(ax,'FontSize',12)
+set(gca,'YGrid','on','XGrid','on')
 
 %% Tornado chart for overall slope - X* sensitivities
 
