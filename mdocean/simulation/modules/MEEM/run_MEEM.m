@@ -252,28 +252,29 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     dz_2 = h - d2;
 
     % coupling integral approximation for large m0h
-    C_mk_00_approx = sqrt(2*h/m0) * exp(-d2*m0);
-    C_mk_m0_approx = sqrt(2) * C_mk_00_approx * (-1)^m / ( 1 + (lambda_m2/m0)^2 );
+    const = piecewise(m==0,1, m>=1,2);
+    C_m0_approx = sqrt(2*h/m0*const) * exp(-d2*m0) * (-1)^m / ( 1 + (lambda_m2/m0)^2 );
+    C_mk_optional_approx(m,k) = piecewise(m0*d2 > 20 & k==0, C_m0_approx, C_mk(m,k));
 
-    plot_error = true;
+    plot_error = false;
     if plot_error
-        ch = children(C_mk); % different m,k cases (split the piecewise)
         syms d2_over_h m0h
-        % normalized error = error / h
-        C_mk_00_error = expand(simplify(subs(1/h*(C_mk_00_approx - ch{1,1}), {d2,m0}, {d2_over_h*h,m0h/h})));
-        C_mk_0m_error = expand(simplify(subs(1/h*(C_mk_m0_approx - ch{3,1}), {d2,m0}, {d2_over_h*h,m0h/h})));
-    
-        term = expand(simplify(subs(1/h*ch{3,1}, {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_h_approx_plot(m) = expand(simplify(subs( C_m0_approx/h , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_h_actual_plot(m) = expand(simplify(subs( C_mk(m,0)/h   , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_error = expand(simplify(C_mk_h_approx_plot - C_mk_h_actual_plot));
+        
+        % checking derivation of approximation
         denom = sqrt(2 * m0h + 2 * cosh(m0h) * sinh(m0h)) * (d2_over_h^2 * m0h^2  - 2 * d2_over_h * m0h^2  + sym(pi)^2*m^2  + m0h^2 );
         factor = 2*sqrt(2) * (-1)^m * m0h^(3/2) * (1-d2_over_h)^2 / denom;
-        pretty(expand(simplify(term / factor))*factor);
+        pretty(expand(simplify(C_mk_h_actual_plot / factor))*factor);
         
         % plots
-        str = 'Percent error in C_{mk} for k=0, m=';
-        levels = 10.^(-6:2:-2);%[10.^(-120 : 30 : -10) 10^-5];
-        plot_large_freq_approx_error(C_mk_00_error,levels,-8,[str '0'])
-        for mm = [1:4 10 11]
-            plot_large_freq_approx_error(C_mk_0m_error(mm),levels,-8,[str num2str(mm)])
+        str = 'C_{mk} for k=0, m=';
+        levels = 10.^(-6:2:-2);
+        for mm = 0:2
+            plot_large_freq_approx_error(C_mk_h_actual_plot(mm),levels,-8,['Actual ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_h_approx_plot(mm),levels,-8,['Approximate ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_error(mm),levels,-8,['Absolute error in ' str num2str(mm)]);
         end
     end
 
@@ -512,8 +513,10 @@ function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str
     title(title_str);
     hold on
     clabel(C); % use contour label from attempt 2 since it is without log
-    [~,h_nan] = contourf(hdl.XData,hdl.YData, isnan(hdl.ZData), [1 1], 'LineColor', 'none','FaceColor','none');
-    hatchfill2(h_nan,'cross','LineColor','k');
+    if any(isnan(hdl.ZData),'all')
+        [~,h_nan] = contourf(hdl.XData,hdl.YData, isnan(hdl.ZData), [1 1], 'LineColor', 'none','FaceColor','none');
+        hatchfill2(h_nan,'cross','LineColor','k');
+    end
     x = (logspace(0,1)-1)/9; % 0 to 1 with more points close to zero
     plot(x,20./x,'k--','LineWidth',2)
     ylim([pi acosh(realmax)])
