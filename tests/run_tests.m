@@ -24,7 +24,7 @@ filePathsToExclude = contains(codeFilePaths, 'generated');
 codeFilePaths(filePathsToExclude) = [];
 
 p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
-p2 = XMLPlugin.producingJUnitFormat([test_dir '/results.xml']);
+p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
 p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
 
 runner.addPlugin(p1);
