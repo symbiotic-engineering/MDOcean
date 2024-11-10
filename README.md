@@ -1,5 +1,5 @@
 [![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/code-cleanup/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
 ![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13997244.svg)](https://doi.org/10.5281/zenodo.13997244)
 
