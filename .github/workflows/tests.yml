@@ -50,13 +50,21 @@ jobs:
           use-parallel: true
           select-by-folder: tests
 
-      - name: Publish code coverage
-        if: always()
-        uses: codecov/codecov-action@v1
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v4
         with:
-          file: code-coverage/coverage.xml
+          fail_ci_if_error: true
+          files: code-coverage/coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Publish test report
+      - name: Publish test report to codecov
+        uses: codecov/test-results-action@v0
+        with:
+          fail_ci_if_error: true
+          files: test-results/results.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to GitHub UI
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
