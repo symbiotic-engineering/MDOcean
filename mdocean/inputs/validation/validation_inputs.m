@@ -1,6 +1,7 @@
-function RM3 = validation_inputs()
+function RM3_report = validation_inputs()
 
-RM3 = struct(   'mass_f',       208e3, ...  % p159 RM3 report
+RM3_report = struct(...
+                'mass_f',       208e3, ...  % p159 RM3 report
                 'mass_vc',      224e3, ...  % p159 RM3 report
                 'mass_rp',      245e3, ...  % p159 RM3 report
                 'mass_tot',     680e3, ...  % p159 RM3 report
@@ -16,5 +17,9 @@ RM3 = struct(   'mass_f',       208e3, ...  % p159 RM3 report
                 'force_heave',  8500e3,...  % p156 RM3 report
                 'FOS_b',        3,...       % p158 RM3 report
 				'c_v',			nominal_c_v()); % calculated from data in CBS Performance & Economics
+
+RM3_wecsim = struct(...
+                'vol_float',    1, ...
+                'vol_spar',     1);
 
 end
