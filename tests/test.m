@@ -45,6 +45,8 @@ classdef test < matlab.unittest.TestCase
         end
 
         function runNominalValidation(testCase)
+            % this is a shared setup because the results are used by both
+            % validateNominal and validateNominalFeasible
             [feas, fail, sim, act] = validate_nominal_RM3();
             testCase.feasible  = feas;
             testCase.failed    = fail;
@@ -59,7 +61,7 @@ classdef test < matlab.unittest.TestCase
             success_criterion = all_figures(which_figs,which_tabs);
             if ~isempty(success_criterion)
                 for i=1:length(success_criterion)
-                    testCase.verifyGreaterThan(success_criterion(i),0);
+                    testCase.verifyGreaterThan(success_criterion{i},0);
                 end
             end
         end
