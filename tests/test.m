@@ -74,6 +74,7 @@ classdef test < matlab.unittest.TestCase
 
             % Delete matching folders
             for d = 1:length(foldersToDelete)
+                rmpath(foldersToDelete{d})
                 rmdir(foldersToDelete{d},'s');
             end
 
