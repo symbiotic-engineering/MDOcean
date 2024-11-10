@@ -1,5 +1,4 @@
 function [] = gradient_mult_x0(filename_uuid)
-clear;clc;close all
 
 p = parameters();
 b = var_bounds();

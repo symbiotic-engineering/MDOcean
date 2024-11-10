@@ -2,7 +2,6 @@ function [] = param_sweep(filename_uuid)
 
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
-clear;clc;%close all
 b = var_bounds();
 [p,T] = parameters();
 b.filename_uuid = filename_uuid;
