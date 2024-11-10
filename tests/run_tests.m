@@ -17,18 +17,23 @@ mkdir(cov_dir)
 mkdir(test_dir)
 
 reportFormat = [CoverageReport([cov_dir '/coverageReport']) CoberturaFormat([cov_dir '/coverage.xml'])];
+dirOut = dir(fullfile(sourceCodeFolder, '**', '*.m'));
+codeFilePaths = string({dirOut.folder}) + filesep + string({dirOut.name});
+% don't test coverage of generated files
+filePathsToExclude = contains(codeFilePaths, 'generated');
+codeFilePaths(filePathsToExclude) = [];
 
-p1 = CodeCoveragePlugin.forFolder({sourceCodeFolder}, 'IncludingSubfolders', true, 'Producing', reportFormat);
+p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/results.xml']);
 p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
 
-%runner.addPlugin(p1);
+runner.addPlugin(p1);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
 
 results = runner.runInParallel(suite);
 
-%open([cov_dir '/coverageReport/index.html'])
+open([cov_dir '/coverageReport/index.html'])
 open([test_dir '/testreport.pdf'])
 
 display(results);
