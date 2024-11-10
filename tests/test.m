@@ -61,6 +61,24 @@ classdef test < matlab.unittest.TestCase
             testCase.uuid = parallel.pool.Constant(@() char(matlab.lang.internal.uuid()));
         end
     end
+
+    methods(TestClassTeardown)
+        function deleteGeneratedFiles(testCase)
+            % Create a wildcard pattern
+            pattern = fullfile('**',['*' testCase.uuid.Value '*']);
+            
+            % Get a list of folders that match the pattern
+            matchingFiles = dir(pattern);
+            foldersToDelete = matchingFiles([matchingFiles.isdir]);
+            foldersToDelete = fullfile({foldersToDelete.folder},{foldersToDelete.name});
+
+            % Delete matching folders
+            for d = 1:length(foldersToDelete)
+                rmdir(foldersToDelete{d},'s');
+            end
+
+        end
+    end
     
     % Test methods
     methods(Test, ParameterCombination='sequential')   
