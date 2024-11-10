@@ -33,8 +33,10 @@ runner.addPlugin(p3);
 
 results = runner.runInParallel(suite);
 
-open([cov_dir '/coverageReport/index.html'])
-open([test_dir '/testreport.pdf'])
+if ~batchStartupOptionUsed % don't open reports when running on CI server 
+    open([cov_dir '/coverageReport/index.html'])
+    open([test_dir '/testreport.pdf'])
+end
 
 display(results);
 assertSuccess(results);
