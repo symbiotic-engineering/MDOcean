@@ -60,14 +60,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to GitHub UI
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: 'test-results/**/results.xml'
 
       - name: Upload test report PDF
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: test-results/**/testreport.pdf
