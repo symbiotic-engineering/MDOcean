@@ -110,7 +110,7 @@ classdef test < matlab.unittest.TestCase
         end
 
         function hydrodynamicLimitObeyed(testCase)
-            ratio = check_max_CW();
+            ratio = check_max_CW(testCase.uuid.Value);
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
     end
