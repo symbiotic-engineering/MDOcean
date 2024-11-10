@@ -51,14 +51,14 @@ end
 fig_names{6} = 'Fig. 6: pareto front';
 fig_names{7} = 'Fig. 7: design heuristics';
 if any(which_figs == 6 | which_figs == 7)  
-    %pareto_search(filename_uuid);
+    pareto_search(filename_uuid);
     pareto_curve_heuristics()
 end
 
 %% figure 8 - parameter sensitivities
 fig_names{8} = 'Fig. 8: parameter sensitivities';
 if any(which_figs == 8)
-    %param_sweep(filename_uuid)
+    param_sweep(filename_uuid)
 end
 
 %% figure 9, 10 - overlaid geometry, probability CDF
@@ -117,7 +117,7 @@ end
 %% paragraph 4.2 - convergence for different x0s
 tab_names{7} = 'Tab. 7: convergence for different x0s';
 if any(which_tabs == 7)
-    %gradient_mult_x0(filename_uuid)
+    gradient_mult_x0(filename_uuid)
 end
 
 end
