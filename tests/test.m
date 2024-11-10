@@ -1,11 +1,18 @@
 classdef test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
+    
+    properties (Constant)
+        run_slow_tests = false;
+        slow_figs = [6 7 8];
+        slow_tabs = 7;
+    end
+
     properties
         feasible
         failed
         simulated
         actual
-        uuid
+        uuid   
     end
 
     % inputs for tests, including passing tolerances
@@ -20,19 +27,43 @@ classdef test < matlab.unittest.TestCase
     methods (Static)
         function which_fig_struct = enumerateFigs()
             [~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
-            which_figs = [1:num_figs zeros(1, num_tabs)];
+
+            if ~test.run_slow_tests
+                num_tabs = num_tabs - length(test.slow_tabs);
+            end
+
+            which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
             fig_names = matlab.lang.makeValidName([fig_names, none]);
-            which_figs = num2cell(which_figs);
-            which_fig_struct = cell2struct(which_figs,fig_names,2);
+
+            if ~test.run_slow_tests
+                idx_slow = ismember(which_figs_vec, test.slow_figs);
+                which_figs_vec(idx_slow) = [];
+                fig_names(idx_slow) = [];
+            end
+
+            which_figs_cell = num2cell(which_figs_vec);
+            which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
         end
         function which_tab_struct = enumerateTabs()
             [~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
-            which_tabs = [zeros(1,num_figs), 1:num_tabs];
+
+            if ~test.run_slow_tests
+                num_figs = num_figs - length(test.slow_figs);
+            end
+
+            which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
             tab_names = matlab.lang.makeValidName([none, tab_names]);
-            which_tabs = num2cell(which_tabs);
-            which_tab_struct = cell2struct(which_tabs,tab_names,2);
+
+            if ~test.run_slow_tests
+                idx_slow = ismember(which_tabs_vec, test.slow_tabs);
+                which_tabs_vec(idx_slow) = [];
+                tab_names(idx_slow) = [];
+            end
+
+            which_tabs_cell = num2cell(which_tabs_vec);
+            which_tab_struct = cell2struct(which_tabs_cell,tab_names,2);
         end
     end
 
