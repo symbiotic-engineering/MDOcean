@@ -51,6 +51,7 @@ jobs:
           fail_ci_if_error: true
           directory: code-coverage
           token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
 
       - name: Publish test report to codecov
         uses: codecov/test-results-action@v1
@@ -58,6 +59,7 @@ jobs:
           fail_ci_if_error: true
           directory: code-coverage
           token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
 
       - name: Publish test report to GitHub UI
         uses: mikepenz/action-junit-report@v5
@@ -70,5 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: test-results/**/testreport.pdf
+          path: |
+            test-results/**/testreport.pdf
+            code-coverage/**/coverage.xml
     
