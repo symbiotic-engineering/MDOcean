@@ -24,7 +24,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
@@ -41,14 +41,9 @@ jobs:
                 Statistics_and_Machine_Learning_Toolbox
       
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-command@v2
         with:
-          source-folder: mdocean
-          test-results-junit: test-results/results.xml
-          test-results-pdf: test-results/testreport.pdf
-          code-coverage-cobertura: code-coverage/coverage.xml
-          use-parallel: true
-          select-by-folder: tests
+          command: addpath("tests"), run_tests
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v4
