@@ -100,7 +100,7 @@ for n = 1:N
         if isempty(strfind(raw{n},'Wave period (sec)'))==0
             T = 2;
             hydro(F).Nf = hydro(F).Nf+1;
-            tmp = textscan(raw{n}(find(raw{n}=='=')+1:end),'%f');
+            tmp = textscan(raw{n}(find(raw{n}=='=',1)+1:end),'%f');
             hydro(F).T(hydro(F).Nf) = tmp{1};  % Wave periods
             hydro(F).w(hydro(F).Nf) = 2*pi/tmp{1};  % Wave frequencies
         end
