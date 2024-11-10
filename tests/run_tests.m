@@ -22,13 +22,13 @@ p1 = CodeCoveragePlugin.forFolder({sourceCodeFolder}, 'IncludingSubfolders', tru
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/results.xml']);
 p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
 
-runner.addPlugin(p1);
+%runner.addPlugin(p1);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
 
 results = runner.run(suite);
 
-open([cov_dir '/coverageReport/index.html'])
+%open([cov_dir '/coverageReport/index.html'])
 open([test_dir '/testreport.pdf'])
 
 display(results);
