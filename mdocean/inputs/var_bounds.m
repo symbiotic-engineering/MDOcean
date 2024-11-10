@@ -1,5 +1,8 @@
 function b = var_bounds()
 
+b.var_names = {'D_f','D_s_over_D_f','T_f_over_T_s','T_s_over_h_s','F_max','B_p','w_n','M'};
+b.var_names_pretty = {'D_f','D_s/D_f','T_f/T_s','T_s/h_s','F_{max}','B_p','\omega_n','M'};
+
 % outer diameter of float (m)	
 b.D_f_min = 6;    % because D_s_nom = 6, a consequence of the spar natural frequency constraint
 b.D_f_max = 40;
@@ -53,12 +56,8 @@ b.X_maxs = [b.D_f_max b.D_s_over_D_f_max b.T_f_over_T_s_max b.T_s_over_h_s_max b
 b.X_noms = [b.D_f_nom b.D_s_over_D_f_nom b.T_f_over_T_s_nom b.T_s_over_h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
 b.X_starts = [b.D_f_start b.D_s_over_D_f_start b.T_f_over_T_s_start b.T_s_over_h_s_start b.F_max_start b.B_p_start b.w_n_start]';
 
-b.X_start_struct = struct('D_f',b.D_f_start,'D_s_over_D_f',b.D_s_over_D_f_start,...
-        'T_f_over_T_s',b.T_f_over_T_s_start,'T_s_over_h_s',b.T_s_over_h_s_start,...
-        'F_max',b.F_max_start,'B_p',b.B_p_start,'w_n',b.w_n_start);
+b.X_start_struct = cell2struct(num2cell(b.X_starts),b.var_names(1:end-1)',1);
 
-b.var_names = {'D_f','D_s_over_D_f','T_f_over_T_s','T_s_over_h_s','F_max','B_p','w_n','M'};
-b.var_names_pretty = {'D_f','D_s/D_f','T_f/T_s','T_s/h_s','F_{max}','B_p','\omega_n','M'};
 b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar_too_light',...
                       'stability','FOS_float_yield','FOS_col_yield','FOS_plate','FOS_col_buckling',...
                       'pos_power','spar_damping','LCOE_max','irrelevant_max_force','water_deep_enough',...
@@ -73,12 +72,6 @@ idxs_recover(idxs_sort) = 1:length(idxs_sort); % indices to recover unsorted var
 b.idxs_sort    = idxs_sort;
 b.idxs_recover = idxs_recover;
 
-% modify nominal control inputs to so power and force matches actual
-[F_max_nom, B_p_nom, w_n_nom] = deal(1e6);%find_nominal_inputs(b, false);
-b.F_max_nom = F_max_nom;
-b.B_p_nom = B_p_nom;
-b.w_n_nom = w_n_nom;
-
-b.X_noms = [b.D_f_nom b.D_s_over_D_f_nom b.T_f_over_T_s_nom b.T_s_over_h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
+b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
 
 end

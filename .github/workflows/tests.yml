@@ -24,7 +24,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
@@ -41,31 +41,38 @@ jobs:
                 Statistics_and_Machine_Learning_Toolbox
       
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-command@v2
         with:
-          source-folder: mdocean
-          test-results-junit: test-results/results.xml
-          test-results-pdf: test-results/testreport.pdf
-          code-coverage-cobertura: code-coverage/coverage.xml
-          use-parallel: true
-          select-by-folder: tests
+          command: addpath("tests"), run_tests
 
-      - name: Publish code coverage
-        if: always()
-        uses: codecov/codecov-action@v1
-        with:
-          file: code-coverage/coverage.xml
-
-      - name: Publish test report
-        uses: mikepenz/action-junit-report@v3
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v4
         if: always()
         with:
-          report_paths: 'test-results/results.xml'
+          fail_ci_if_error: true
+          directory: code-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to codecov
+        uses: codecov/test-results-action@v1
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: test-results
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to GitHub UI
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: 'test-results/**/junit.xml'
 
       - name: Upload test report PDF
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: test-results/testreport.pdf
+          path: |
+            test-results/**/testreport.pdf
+            code-coverage/**/coverage.xml
     

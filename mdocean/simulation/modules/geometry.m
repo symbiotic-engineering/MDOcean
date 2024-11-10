@@ -94,7 +94,7 @@ A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
 V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
 
 % damping plate material use
-A_d = pi/4 * D_d^2; % damping plate itself
+A_d = pi/4 * D_d^2;                     % damping plate itself
 num_supports = 4;
 L_dt = D_d / (2*cos(theta_dt));
 D_dt_i = D_dt - 2 * t_dt;
@@ -130,11 +130,11 @@ r_over_t = [0,... % D_sft/(2*t_sf)
             D_s/(2*t_sr),...
             0];%D_or/(2*t_r)];
 I = [I_f, I_vc, I_rp];
-T = [T_f_2, T_s, h_d];     % drafts: used to calculated F_surge in dynamics.m
-m_m = m_f_m + m_s_m;                    % total mass of material
+T = [T_f_2, T_s, h_d];          % drafts: used to calculated F_surge in dynamics.m
+m_m = m_f_m + m_s_m;            % total mass of material
 
-V_d = [V_f_d, V_vc_d, V_d_d]; % volume displaced
-mass = [m_f_m, m_vc_m, m_d_m]; % material mass of each structure
+V_d = [V_f_d, V_vc_d, V_d_d];   % volume displaced
+mass = [m_f_m, m_vc_m, m_d_m];  % material mass of each structure
 
 %% Metacentric Height Calculation
 
@@ -144,7 +144,6 @@ D_term_2 = 2*D_f^2 - 2*D_f_b^2;
 D_term_3 = -6*D_s^2 + 3*D_f_b^2 + 2*D_f_b*D_f + D_f^2;
 CB_f_integral = D_term_1*T_f_1^2 + D_term_2*T_f_1*T_f_2 + D_term_3*T_f_2^2;
 CB_f_from_waterline = 1/V_f_d * pi/48 * CB_f_integral;
-%CB_f_from_waterline = T_f_2 / 2; % cylinder case
 
 T_term_1 =    T_f_1^2 + 2*T_f_1*T_f_2 - 3*T_f_2^2;
 T_term_2 =  2*T_f_1^2                 - 2 *T_f_2^2;
@@ -156,7 +155,6 @@ T_term_7 = 12*h_f;
 CM_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_s^2;
 CM_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_s^2;
 CM_f_from_waterline = CM_f_num / CM_f_den;
-%CM_f_from_waterline = T_f_2 - h_f/2; % cylinder case
 
 % centers of buoyancy, measured from keel (bottom of damping plate)
 CB_f = T_s - CB_f_from_waterline;

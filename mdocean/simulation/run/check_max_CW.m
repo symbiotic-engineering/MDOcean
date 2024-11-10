@@ -1,9 +1,10 @@
-function [ratio] = check_max_CW()
+function [ratio] = check_max_CW(filename_uuid)
     p = parameters();
     p.cost_m = [0 0 0]; % hack that makes cost constant, so minimizing LCOE is actually maximizing power
     p.power_max = Inf;
     
     b = var_bounds();
+    b.filename_uuid = filename_uuid;
     x0 = b.X_start_struct;
 
     % run LCOE minimization (effectively power maximization due to hack above)

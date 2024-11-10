@@ -86,7 +86,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
             
         [X_opt_raw,obj_opt,flag,...
-            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover);
+            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
 
                        % D_f   D_s_over_D_f T_f_over_T_s T_s_over_h_s F_max B_p w_n]

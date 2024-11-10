@@ -44,83 +44,48 @@ middle_white = [1 1 1];
 topmiddle_red = [1 0 0];
 top_red = [0.5 0 0];
 
-% Find middle
+% Find limits
 lims = get(gca, 'CLim');
 
-% Find ratio of negative to positive
-if (lims(1) < white_number) && (lims(2) > white_number)
-    % It has both negative and positive
-    % Find ratio of negative to positive
-    ratio = (white_number - lims(1)) / (lims(2) - lims(1)); %abs(lims(1)) / (abs(lims(1)) + lims(2));
-    neglen = round(m*ratio);
-    poslen = m - neglen;
+bluemap_basic = [bottom_blue; botmiddle_blue; middle_white];
+redmap_basic = [middle_white; topmiddle_red; top_red];
+
+bluepart = white_number - lims(1);
+redpart = lims(2) - white_number;
+
+if bluepart > 0 && redpart > 0
+    % It has both blue and red
+    ratio_blue = bluepart / (bluepart + redpart);
+    bluelen = round(m*ratio_blue);
+    redlen = m - bluelen;
     
-    % Just negative
-    new = [bottom_blue; botmiddle_blue; middle_white];
-    len = length(new);
-    oldsteps = linspace(0, 1, len);
-    newsteps = linspace(0, 1, neglen);
-    bluemap = zeros(neglen, 3);
-    
-    for i=1:3
-        % Interpolate over RGB spaces of colormap
-        bluemap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
-    end
-    
-    % Just positive
-    new = [middle_white; topmiddle_red; top_red];
-    len = length(new);
-    oldsteps = linspace(0, 1, len);
-    newsteps = linspace(0, 1, poslen);
-    redmap = zeros(poslen, 3);
-    
-    for i=1:3
-        % Interpolate over RGB spaces of colormap
-        redmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
-    end
-    
-    % And put 'em together
+    bluemap = resize_cmap(bluemap_basic,bluelen);
+    redmap = resize_cmap(redmap_basic,redlen);
     newmap = [bluemap; redmap];
     
-elseif lims(1) >= white_number
-    % Just positive
-    new = [middle_white; topmiddle_red; top_red];
-    len = length(new);
-    oldsteps = linspace(0, 1, len);
-    newsteps = linspace(0, 1, m);
-    newmap = zeros(m, 3);
-    
-    for i=1:3
-        % Interpolate over RGB spaces of colormap
-        newmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
-    end
+elseif bluepart <= 0
+    % Just red (positive)
+    redmap_basic = [middle_white; topmiddle_red; top_red];
+    newmap = resize_cmap(redmap_basic,m);
     
 else
-    % Just negative
-    new = [bottom_blue; botmiddle_blue; middle_white];
-    len = length(new);
-    oldsteps = linspace(0, 1, len);
-    newsteps = linspace(0, 1, m);
-    newmap = zeros(m, 3);
+    % Just blue (negative)
+    bluemap_basic = [bottom_blue; botmiddle_blue; middle_white];
+    newmap = resize_cmap(bluemap_basic,m);
+    
+end
+end
+
+function newmap = resize_cmap(oldmap,newlen)
+
+    oldlen = length(oldmap);
+    oldsteps = linspace(0, 1, oldlen);
+    newsteps = linspace(0, 1, newlen);
+    newmap = zeros(newlen, 3);
     
     for i=1:3
         % Interpolate over RGB spaces of colormap
-        newmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
+        temp = interp1(oldsteps, oldmap(:,i), newsteps);
+        newmap(:,i) = min(max(temp', 0), 1);
     end
-    
 end
-% 
-% m = 64;
-% new = [bottom; botmiddle; middle; topmiddle; top];
-% % x = 1:m;
-% 
-% oldsteps = linspace(0, 1, 5);
-% newsteps = linspace(0, 1, m);
-% newmap = zeros(m, 3);
-% 
-% for i=1:3
-%     % Interpolate over RGB spaces of colormap
-%     newmap(:,i) = min(max(interp1(oldsteps, new(:,i), newsteps)', 0), 1);
-% end
-% 
-% % set(gcf, 'colormap', newmap), colorbar

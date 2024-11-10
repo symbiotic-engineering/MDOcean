@@ -1,10 +1,18 @@
 classdef test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
+    
+    properties (Constant)
+        run_slow_tests = true;
+        slow_figs = [6 7 8];
+        slow_tabs = 7;
+    end
+
     properties
         feasible
         failed
         simulated
         actual
+        uuid   
     end
 
     % inputs for tests, including passing tolerances
@@ -17,15 +25,45 @@ classdef test < matlab.unittest.TestCase
 
     % helper methods to enumerate all figures and tables
     methods (Static)
-        function which_figs = enumerateFigs()
-            [num_figs, num_tabs] = all_figures( [],[] );
-            which_figs = [1:num_figs zeros(1, num_tabs)];
-            which_figs = num2cell(which_figs);
+        function which_fig_struct = enumerateFigs()
+            [~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+
+            if ~test.run_slow_tests
+                num_tabs = num_tabs - length(test.slow_tabs);
+            end
+
+            which_figs_vec = [1:num_figs zeros(1, num_tabs)];
+            none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
+            fig_names = matlab.lang.makeValidName([fig_names, none]);
+
+            if ~test.run_slow_tests
+                idx_slow = ismember(which_figs_vec, test.slow_figs);
+                which_figs_vec(idx_slow) = [];
+                fig_names(idx_slow) = [];
+            end
+
+            which_figs_cell = num2cell(which_figs_vec);
+            which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
         end
-        function which_tabs = enumerateTabs()
-            [num_figs, num_tabs] = all_figures( [],[] );
-            which_tabs = [zeros(1,num_figs), 1:num_tabs];
-            which_tabs = num2cell(which_tabs);
+        function which_tab_struct = enumerateTabs()
+            [~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+
+            if ~test.run_slow_tests
+                num_figs = num_figs - length(test.slow_figs);
+            end
+
+            which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
+            none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
+            tab_names = matlab.lang.makeValidName([none, tab_names]);
+
+            if ~test.run_slow_tests
+                idx_slow = ismember(which_tabs_vec, test.slow_tabs);
+                which_tabs_vec(idx_slow) = [];
+                tab_names(idx_slow) = [];
+            end
+
+            which_tabs_cell = num2cell(which_tabs_vec);
+            which_tab_struct = cell2struct(which_tabs_cell,tab_names,2);
         end
     end
 
@@ -38,19 +76,51 @@ classdef test < matlab.unittest.TestCase
             testCase.applyFixture(CurrentFolderFixture(desiredFolder))
         end
 
-        function runValidation(testCase)
+        function runNominalValidation(testCase)
+            % this is a shared setup because the results are used by both
+            % validateNominal and validateNominalFeasible
             [feas, fail, sim, act] = validate_nominal_RM3();
             testCase.feasible  = feas;
             testCase.failed    = fail;
             testCase.simulated = sim;
             testCase.actual    = act;
         end
+
+        function generateUUID(testCase)
+            % generate unique identifier for each parallel worker
+            % required to prevent file overalps for generated code
+            testCase.uuid = parallel.pool.Constant(@() char(matlab.lang.internal.uuid()));
+        end
+    end
+
+    methods(TestClassTeardown)
+        function deleteGeneratedFiles(testCase)
+            % Create a wildcard pattern
+            pattern = fullfile('**',['*' testCase.uuid.Value '*']);
+            
+            % Get a list of folders that match the pattern
+            matchingFiles = dir(pattern);
+            foldersToDelete = matchingFiles([matchingFiles.isdir]);
+            foldersToDelete = fullfile({foldersToDelete.folder},{foldersToDelete.name});
+
+            % Delete matching folders
+            for d = 1:length(foldersToDelete)
+                rmpath(foldersToDelete{d})
+                rmdir(foldersToDelete{d},'s');
+            end
+
+        end
     end
     
     % Test methods
     methods(Test, ParameterCombination='sequential')   
-        function allFiguresRun(~, which_figs, which_tabs)
-            all_figures(which_figs,which_tabs);
+        function allFiguresRun(testCase, which_figs, which_tabs)
+            success_criterion = all_figures(which_figs,which_tabs,testCase.uuid.Value);
+            if ~isempty(success_criterion)
+                for i=1:length(success_criterion)
+                    testCase.verifyGreaterThan(success_criterion{i},0);
+                end
+            end
         end
 
         function validateNominal(testCase, field, rel_tol)
@@ -72,7 +142,7 @@ classdef test < matlab.unittest.TestCase
         end
 
         function hydrodynamicLimitObeyed(testCase)
-            ratio = check_max_CW();
+            ratio = check_max_CW(testCase.uuid.Value);
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
     end

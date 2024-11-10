@@ -154,10 +154,29 @@ function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_nu
     Abc_fname = ['A_b_c_matrix_' fname];
     [A_num, b_num, c_num, c_0_num] = feval(Abc_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
+
+    % get rid of expected NaNs
+    m0h_max = acosh(realmax) / 2;
+    if m0_num*h_num > m0h_max
+        len = length(A_num);
+        [col,row] = meshgrid(1:len);
+        bottom_left = (row == len - K_num) & (col < len - K_num);
+        top_right = row < len - K_num & (col == len - K_num);
+        idx_C_m0 = bottom_left | top_right;
+        A_num(idx_C_m0) = 0; % this is shown to converge to zero
+        b_high_freq = -a2_num / (h_num - d2_num) * sqrt(h_num / (2 * m0_num)) * exp(-d2_num * m0_num);
+        b_num(end-K_num) = b_high_freq;
+    end
+
+    % throw warning for unexpected NaNs
     if any(~isfinite(A_num),'all')
         A_num(~isfinite(A_num)) = 0;
         warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
             'perhaps due to too large argument in besseli. Elements will be zeroed.'])
+    end
+    if any(~isfinite(b_num),'all')
+        b_num(~isfinite(b_num)) = 0;
+        warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
     % show A matrix values
     if show_A
@@ -247,11 +266,37 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % coupling integrals
     C_nm(n,m) = simplify(int(Z_m_i2(m) * Z_n_i1(n), z, -h, -d1));
     C_mk(m,k) = simplify(int(Z_m_i2(m) * Z_k_e(k),  z, -h, -d2));
-    
-    
+
     dz_1 = h - d1;
     dz_2 = h - d2;
-    
+
+    % coupling integral approximation for large m0h
+    const = piecewise(m==0,1, m>=1,2);
+    C_m0_approx = sqrt(2*h/m0*const) * exp(-d2*m0) * (-1)^m / ( 1 + (lambda_m2/m0)^2 );
+    C_mk_optional_approx(m,k) = piecewise(m0*d2 > 20 & k==0, C_m0_approx, C_mk(m,k));
+
+    plot_error = false;
+    if plot_error
+        syms d2_over_h m0h
+        C_mk_h_approx_plot(m) = expand(simplify(subs( C_m0_approx/h , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_h_actual_plot(m) = expand(simplify(subs( C_mk(m,0)/h   , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_error = expand(simplify(C_mk_h_approx_plot - C_mk_h_actual_plot));
+        
+        % checking derivation of approximation
+        denom = sqrt(2 * m0h + 2 * cosh(m0h) * sinh(m0h)) * (d2_over_h^2 * m0h^2  - 2 * d2_over_h * m0h^2  + sym(pi)^2*m^2  + m0h^2 );
+        factor = 2*sqrt(2) * (-1)^m * m0h^(3/2) * (1-d2_over_h)^2 / denom;
+        pretty(expand(simplify(C_mk_h_actual_plot / factor))*factor);
+        
+        % plots
+        str = 'C_{mk} for k=0, m=';
+        levels = 10.^(-6:2:-2);
+        for mm = 0:2
+            plot_large_freq_approx_error(C_mk_h_actual_plot(mm),levels,-8,['Actual ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_h_approx_plot(mm),levels,-8,['Approximate ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_error(mm),levels,-8,['Absolute error in ' str num2str(mm)]);
+        end
+    end
+
     % potential matching
     % equation 22 in old 1981 paper, applied to boundary 2-e
     match_2e_potential = dz_2 * ( C_1m_2(m)*subs(R_1m_2(m),r,a2) ...
@@ -451,6 +496,53 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
                     'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
+end
+
+function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str)
+    
+    levels_2 = [0 levels];
+
+    % attempt 1: symbolic plot - doesn't allow you to have contour labels
+    fig = figure;
+    hdl = fcontour(sym_error,[0 1 pi acosh(realmax)],'LevelList',levels_2,'Fill','on');
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    colorbar
+    set(gca, 'ColorScale', 'log');
+    
+    % attempt 2: numeric plot - allows contor labels, but log scale can't
+    % show negatives, so plot the absolute value
+    fig2 = figure;
+    [C,hdl2] = contourf(hdl.XData,hdl.YData, abs(hdl.ZData),'LevelList',levels_2);
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title([title_str ' Absolute Value']);
+    clabel(C,hdl2);
+    set(gca, 'ColorScale', 'log');
+    clim([0 max(hdl2.ZData,[],'all')])
+    colorbar;
+    hold on
+
+    % attempt 3: numeric signedlog plot - allows negatives
+    figure
+    signed_log(hdl.ZData,smallest_exp,levels,hdl.XData,hdl.YData)
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    hold on
+    clabel(C); % use contour label from attempt 2 since it is without log
+    if any(isnan(hdl.ZData),'all')
+        [~,h_nan] = contourf(hdl.XData,hdl.YData, isnan(hdl.ZData), [1 1], 'LineColor', 'none','FaceColor','none');
+        hatchfill2(h_nan,'cross','LineColor','k');
+    end
+    x = (logspace(0,1)-1)/9; % 0 to 1 with more points close to zero
+    plot(x,20./x,'k--','LineWidth',2)
+    ylim([pi acosh(realmax)])
+
+    % close first two figures since just the third one is final
+    close(fig)
+    close(fig2)
 end
 
 function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
