@@ -1,7 +1,8 @@
-function [DV_table] = compare()
+function [DV_table] = compare(filename_uuid)
 
 p = parameters();
 b = var_bounds();
+b.filename_uuid = filename_uuid;
 x0_input = b.X_start_struct;
 
 Xs_opt = gradient_optim(x0_input,p,b);

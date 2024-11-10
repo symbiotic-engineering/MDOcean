@@ -26,7 +26,7 @@ p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
 
-results = runner.run(suite);
+results = runner.runInParallel(suite);
 
 %open([cov_dir '/coverageReport/index.html'])
 open([test_dir '/testreport.pdf'])

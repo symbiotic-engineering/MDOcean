@@ -1,8 +1,8 @@
-function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj, x0, opts)
+function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj, x0, opts, filename_uuid)
     solver_based = true;
     % create folder for generated objectives if it doesn't already exist        
     if solver_based
-        generated_folder = 'optimization/generated';
+        generated_folder = ['optimization/generated' filename_uuid];
         if ~exist(generated_folder,'dir')
             mkdir(generated_folder)
             addpath(generated_folder)

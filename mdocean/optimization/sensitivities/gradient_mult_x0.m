@@ -1,7 +1,9 @@
+function [] = gradient_mult_x0(filename_uuid)
 clear;clc;close all
 
 p = parameters();
 b = var_bounds();
+b.filename_uuid = filename_uuid;
 
 num_runs = 100;
 objs = Inf(num_runs,2);
@@ -55,3 +57,5 @@ percent_kkt = sum(kkt) / num_runs
 percent_optimal = sum(optimal) / num_runs
 percent_optimal_given_converged = sum(optimal_and_converged) ./ sum(converged)
 percent_optimal_given_kkt = sum(optimal_and_kkt) ./ sum(kkt)
+
+end

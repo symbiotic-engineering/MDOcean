@@ -1,6 +1,7 @@
-function [x,fval] = pareto_search()
+function [x,fval] = pareto_search(filename_uuid)
     p = parameters();
     b = var_bounds();
+    b.filename_uuid = filename_uuid;
     x0 = b.X_start_struct;
     
     %% Calculate seed points for the pareto front

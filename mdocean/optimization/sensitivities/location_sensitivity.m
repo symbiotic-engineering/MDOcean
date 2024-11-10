@@ -1,7 +1,8 @@
-function [tab] = location_sensitivity()
+function [tab] = location_sensitivity(filename_uuid)
 
 p = parameters();
 b = var_bounds();
+b.filename_uuid = filename_uuid;
 
 files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...

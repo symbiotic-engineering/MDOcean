@@ -1,10 +1,11 @@
-function [] = param_sweep()
+function [] = param_sweep(filename_uuid)
 
 % Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 clear;clc;%close all
 b = var_bounds();
 [p,T] = parameters();
+b.filename_uuid = filename_uuid;
 
 param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
 params = T.name(T.sweep);
@@ -30,6 +31,7 @@ X_Pvar= zeros(length(params), length(ratios), num_DVs);
 %% Run optimization
 for i=1:length(params)
     p = parameters();
+    p.filename_uuid = filename_uuid;
     var_nom = p.(params{i});
     for j=1:length(ratios)
         p.(params{i}) = ratios(j) * var_nom;

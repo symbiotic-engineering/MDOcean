@@ -5,6 +5,7 @@ classdef test < matlab.unittest.TestCase
         failed
         simulated
         actual
+        uuid
     end
 
     % inputs for tests, including passing tolerances
@@ -53,12 +54,18 @@ classdef test < matlab.unittest.TestCase
             testCase.simulated = sim;
             testCase.actual    = act;
         end
+
+        function generateUUID(testCase)
+            % generate unique identifier for each parallel worker
+            % required to prevent file overalps for generated code
+            testCase.uuid = parallel.pool.Constant(@() char(matlab.lang.internal.uuid()));
+        end
     end
     
     % Test methods
     methods(Test, ParameterCombination='sequential')   
         function allFiguresRun(testCase, which_figs, which_tabs)
-            success_criterion = all_figures(which_figs,which_tabs);
+            success_criterion = all_figures(which_figs,which_tabs,testCase.uuid.Value);
             if ~isempty(success_criterion)
                 for i=1:length(success_criterion)
                     testCase.verifyGreaterThan(success_criterion{i},0);
