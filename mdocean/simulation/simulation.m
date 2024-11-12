@@ -78,6 +78,15 @@ g(16) = X_constraints(2);               % prevent float going below bottom of sp
 g(17) = X_constraints(3);               % float amplitude obeys linear theory
 g(18:end) = X_constraints(4:end);       % prevent rising out of water/slamming
 
+% if violating any constraints which cause a sim error, make sure they are
+% the worst violations, since fmincon minimizes the largest violation
+sim_error = logical(size(g));
+sim_error(14) = true;
+g_worst_sim_error = min(g(sim_error));
+if g_worst_sim_error<0
+    g(g < g_worst_sim_error) = g_worst_sim_error * 0.9;
+end
+
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )
 if ~criteria
