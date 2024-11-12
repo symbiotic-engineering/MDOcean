@@ -1,4 +1,6 @@
 function [x,fval] = pareto_search(filename_uuid)
+    if nargin==0; filename_uuid=''; end
+    
     p = parameters();
     b = var_bounds();
     b.filename_uuid = filename_uuid;
@@ -79,8 +81,9 @@ function [x,fval] = pareto_search(filename_uuid)
     cols = [1 3 6 5 4 2 7];
     x_sorted = x(idx,cols)
 
-    % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals")
+    % save mat file to be read by pareto_heuristics.m
+    date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals")
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)

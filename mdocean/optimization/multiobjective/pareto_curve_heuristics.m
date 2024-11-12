@@ -3,7 +3,8 @@ function pareto_curve_heuristics()
     b = var_bounds();
     
     %[x,fval] = pareto_search();
-    load("pareto_search_results.mat")
+    d=dir("**/pareto_search_results*");
+    load(d(end).name)
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add eigth column for material 
