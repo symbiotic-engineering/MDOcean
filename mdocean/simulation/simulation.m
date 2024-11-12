@@ -4,8 +4,8 @@ X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, t
 
 %% Assemble inputs
 in = p;
-
-in.D_f              = X(1);     % outer diameter of float (m)
+  
+in.D_s              = X(1);     % inner diameter of float (m)
 D_s_over_D_f        = X(2);     % normalized diameter of spar column (-)
 T_f_2_over_T_s      = X(3);     % normalized draft of float (-)
 T_s_over_h_s        = X(4);     % normalized draft of spar (-)
@@ -15,7 +15,7 @@ in.w_n              = X(7);     % controller (powertrain) natural frequency (rad
 in.M                = X(8);     % material (-)
 
 % Variable ratio defined by design variable
-in.D_s = D_s_over_D_f * in.D_f;
+in.D_f = in.D_s / D_s_over_D_f;
 
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
@@ -68,11 +68,11 @@ g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
 g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
 g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_avg_elec;                     % positive power
-g(11) = in.D_d / p.D_d_min - 1;         % damping plate diameter (spar natural freq)
+%g(11) = in.D_d / p.D_d_min - 1;         % damping plate diameter (spar natural freq)
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(12) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(13) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
-g(14) = in.h / in.T_s - 1;              % water deep enough
+%g(14) = 1 - in.T_s / in.h;              % water deep enough
 g(15) = X_constraints(1);               % prevent float rising above top of spar
 g(16) = X_constraints(2);               % prevent float going below bottom of spar
 g(17) = X_constraints(3);               % float amplitude obeys linear theory

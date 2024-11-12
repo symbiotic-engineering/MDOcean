@@ -70,6 +70,10 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
+    A_ineq = [p.T_s_over_D_s/(.9*p.h); -p.D_d_over_D_s/p.D_d_min];
+    b_ineq = [1; -1];
+    prob.Constraints.linear = A_ineq*X(1) <= b_ineq;
+
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
         which_obj = which_objs(i);

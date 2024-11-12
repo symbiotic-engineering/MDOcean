@@ -26,6 +26,7 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
             problem_s.options.MaxFunctionEvaluations = 2000;
             problem_s.objective = @(x) problem.objective(x .* scale);  
             problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
+            problem_s.Aineq = problem.Aineq .* scale';
 
             inv_scale = 1./(scale);
             if ~isempty(output.bestfeasible)

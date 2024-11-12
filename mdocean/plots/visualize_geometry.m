@@ -17,12 +17,12 @@ else
     color = {color,color,color};
 end
 
-[D_f,D_s_ratio,h_f_ratio,T_s_ratio,~,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8));
+[D_s,D_s_ratio,h_f_ratio,T_s_ratio,~,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8));
 
 if ~mini && ~compare
     figure
 end
-D_s = D_s_ratio * D_f;
+D_f = D_s / D_s_ratio;
 h_f = h_f_ratio * D_f;
 % Geometric similarity float submergence
 T_f_2 = p.T_f_2_over_h_f * h_f;
