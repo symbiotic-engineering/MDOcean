@@ -73,8 +73,8 @@ function signed_log(Z,C,levels,X,Y)
     end
 
     % add colorbar with tick labels
-    cb = colorbar('Ticks',tick_z_values);
-    cb.TickLabels = arrayfun(@(x) sprintf('%.1e', x), tick_labels, 'UniformOutput', false);
+    cb = colorbar('Ticks',unique(tick_z_values));
+    cb.TickLabels = arrayfun(@(x) sprintf('%.1e', x), unique(tick_labels), 'UniformOutput', false);
     % set limits for the caxis 
     caxis(crange_z); % represented in signed log10
 
