@@ -19,7 +19,11 @@ function signed_log(Z,C,levels,X,Y)
     
     if isempty(C)
         % controls smallest order of magnitude near zero
-        C = log10(min(nonzeros(abs(Z)),[],'all')); 
+        if all(Z==0,'all') 
+            C = 1;
+        else
+            C = log10(min(nonzeros(abs(Z)),[],'all')); 
+        end
     end
 
     % capital Z is the data, lowercase z is the signed-log-transformed data
@@ -27,6 +31,9 @@ function signed_log(Z,C,levels,X,Y)
 
     % get the maximum value of abs(Z)
     Z_range = max(abs(imrange(Z)));
+    if Z_range==0
+        Z_range = 1;
+    end
 
     % get color range. this needs to be symmetric unless you also make a 
     % custom asymmetric divergent colormap
