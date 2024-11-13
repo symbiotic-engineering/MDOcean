@@ -72,9 +72,20 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    A_ineq = [p.T_s_over_D_s/(.9*p.h); -p.D_d_over_D_s/p.D_d_min];
-    b_ineq = [1; -1];
-    prob.Constraints.linear = A_ineq*X(1) <= b_ineq;
+    if p.use_MEEM
+        MEEM_buffer_spar = p.harmonics * pi / (2 * 700.5 * p.h);
+    else
+        MEEM_buffer_spar = 0;
+    end
+
+    % fixme this should be more robust, rn if order of X changes it breaks
+    A_spar = [p.T_s_over_D_s/p.h + MEEM_buffer_spar;
+             -p.D_d_over_D_s/p.D_d_min];
+    b_spar = [1; -1];
+    prob.Constraints.spar_linear = A_spar*X(1) <= b_spar;
+
+    % notebook page 118-119 on 11/13/24
+    %prob.Constraints.float_linear = A_float*[]
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
