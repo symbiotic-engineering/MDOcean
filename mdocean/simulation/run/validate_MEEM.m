@@ -12,8 +12,8 @@ K_num = num_harmonics;
 heaving_OC = true;
 heaving_IC = false;
 
-plot_phi = true;
-show_A = false;
+plot_phi = false;
+show_A = true;
 
 %% set numerical values
 a1_num = .5;

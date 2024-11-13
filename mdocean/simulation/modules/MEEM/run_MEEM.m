@@ -38,7 +38,7 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     fname = ['N' num2str(N_num) '_M' num2str(M_num) '_K' num2str(K_num) '_heaving_' heaving];
 
     % generate matlab functions from symbolic equations if needed
-    if ~exist(['simulation/modules/MEEM/generated/A_b_c_matrix_' fname],'file') || ...
+    if ~exist(['simulation/modules/MEEM/generated/A_b_c_matrix_' fname '_scaled'],'file') || ...
        ~exist(['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
     end  
@@ -91,7 +91,7 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
     
     [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
 
-    hydro_fname = ['hydro_potential_velocity_fields_' fname];
+    hydro_fname = ['hydro_potential_velocity_fields_' fname];% '_scaled'];
     if plot_phi
         % generate R Z mesh
         r_vec = linspace(2*a2_num/spatial_res,2*a2_num,spatial_res);
@@ -151,7 +151,7 @@ function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_nu
     m_k_cell = num2cell(m_k_num);
 
     % get A and b matrices
-    Abc_fname = ['A_b_c_matrix_' fname];
+    Abc_fname = ['A_b_c_matrix_' fname '_scaled'];
     [A_num, b_num, c_num, c_0_num] = feval(Abc_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
 
@@ -235,16 +235,18 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
         phi_p_i2 = 0;
     end
     
+    a12 = (a1+a2)/2;
+
     % eq 7
     R_1n_1(n) = piecewise(n==0, 1/2, n>=1, ...
-                        besseli(0,lambda_n1(n)*r)/besseli(0,lambda_n1(n)*a2));
+                        besseli(0,lambda_n1(n)*r)/besseli(0,lambda_n1(n)*a1));
     R_1m_2(m) = piecewise(m==0, 1/2, m>=1, ...
-                        besseli(0,lambda_m2(m)*r)/besseli(0,lambda_m2(m)*a2));
+                        besseli(0,lambda_m2(m)*r)/besseli(0,lambda_m2(m)*a12));
     
     % eq 8
     R_2n_1(n) = sym(0);
     R_2m_2(m) = piecewise(m==0, 1/2*log(r/a2), ...
-        m>=1, besselk(0,lambda_m2(m)*r)/besselk(0,lambda_m2(m)*a2));
+        m>=1, besselk(0,lambda_m2(m)*r)/besselk(0,lambda_m2(m)*a12));
     
     % eq 9
     Z_n_i1(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n1(n)*(z+h)));
@@ -484,19 +486,29 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
 %     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
     
+    % convert besselj and besseli to their scaled counterparts
+    [A_scaled,c_scaled] = scale_bessels_symbolic(A,c);
+    
+    % combine and expand to get the exps in the numerator and denominator to subtract
+    A_scaled = combine(A_scaled,'exp');
+    c_scaled = combine(expand(c_scaled,'ArithmeticOnly', true),'exp'); 
+       
     folder = 'simulation/modules/MEEM/generated/';
     if ~isfolder(folder)
         folder = '';
         warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
     end
-    matlabFunction(A,b,c,c_0,'File',[folder 'A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
+    matlabFunction(A_scaled,b,c_scaled,c_0,'File',[folder 'A_b_c_matrix_' fname '_scaling'], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     
+    scale_bessels_file(['A_b_c_matrix_' fname '_scaling'],folder)
+
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
                     'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
 end
+
 
 function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str)
     

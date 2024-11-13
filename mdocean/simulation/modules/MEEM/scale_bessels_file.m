@@ -1,9 +1,9 @@
-function scale_besseli(filename)
+function scale_bessels_file(filename,folder)
 
-    new_filename = strcat(filename, '_scaled');
+    new_filename = strcat(filename(1:end-3), 'ed'); % change scaling to scaled
     
     % Open the file for reading
-    fid = fopen([filename '.m'], 'r');
+    fid = fopen([folder filename '.m'], 'r');
     if fid == -1
         error('Cannot open the file.');
     end
@@ -12,8 +12,11 @@ function scale_besseli(filename)
     file_content = fread(fid, '*char')';
     fclose(fid);
     
-    % Replace occurrences of besseli(nu,Z) with besseli(nu,Z,1)*exp(abs(real(Z)))
-    modified_content = regexprep(file_content, 'besseli\((\w+),\s*(\w+)\)', 'besseli($1,$2,1)*exp(abs(real($2)))');
+    % Replace occurrences of besseli(nu,Z) with besseli(nu,Z,1)
+    modified_content = regexprep(file_content,     'besseli\((\w+),\s*(\w+)\)', 'besseli($1,$2,1)');
+
+    % Replace occurrences of besselj(nu,Z) with besselj(nu,Z,1)
+    modified_content = regexprep(modified_content, 'besselj\((\w+),\s*(\w+)\)', 'besselj($1,$2,1)');
     
     % Replace function header
     modified_content = regexprep(modified_content, filename, new_filename);
