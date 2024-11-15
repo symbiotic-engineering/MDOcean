@@ -36,8 +36,10 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'PlotFcn',plotfn,...
                                 'MaxIterations',8,...
                                 'FunValCheck','on',...
-                                'ConstraintTolerance',1e-5);
-                            
+                                'ConstraintTolerance',1e-5);%,...
+                                %'SpecifyObjectiveGradient',true,...
+                                %'SpecifyConstraintGradient',true); % would require ALL constraints to be AD-supported
+
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 matl];
@@ -72,9 +74,15 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    A_ineq = [p.T_s_over_D_s/(.9*p.h); -p.D_d_over_D_s/p.D_d_min];
-    b_ineq = [1; -1];
-    prob.Constraints.linear = A_ineq*X(1) <= b_ineq;
+    A_spar = [p.T_s_over_D_s/(.9*p.h); -p.D_d_over_D_s/p.D_d_min];
+    b_spar = [1; -1];
+    prob.Constraints.linear_spar = A_spar*X(1) <= b_spar;
+
+    % notebook p122
+    p0 = (1/p.T_f_2_over_h_f - 1);
+    A_top = [1+p0, 0; 1 p0];
+    b_top = [1; 1];
+    prob.Constraints.linear_float_spar_top = A_top*[X(4); X(3)] <= b_top;
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
