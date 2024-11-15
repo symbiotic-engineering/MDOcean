@@ -64,6 +64,7 @@ function [x,fval] = pareto_search(filename_uuid)
     probMO.solver = 'paretosearch';
     probMO.nvars = 7;
     %% Execute pareto search
+    disp('Finished finding pareto seed points. Now starting paretosearch.')
     [x,fval,flag,output,residuals] = paretosearch(probMO);
 
     %% Process and save results

@@ -38,7 +38,7 @@ function pareto_curve_heuristics()
     
     %% plots for DVs as a fn of percent along the pareto
     design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
+                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max, b.var_names_pretty(1:end-1))
 
 end
 %%
@@ -162,7 +162,7 @@ end
 %%
 function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
                                      overallPvar, minPvar, idx_best_Pvar, ...
-                                     overallX, idxo, LCOE_max)
+                                     overallX, idxo, LCOE_max, var_names)
 
     LCOE_pareto = overallLCOE(idxo);
     Pvar_pareto = overallPvar(idxo);
@@ -196,22 +196,13 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
         y(:,i) = yy((windowSize+1):end);
     end
     
-    var_names_pretty = {'D_f',...    % outer diameter of float (m)	
-                'D_s/D_f',...
-                'h_f/D_f',...      	
-                'T_s/h_s',...      	
-                'F_{max}',...     % max force (N)
-                'B_p',...     % internal damping of controller (Ns/m)	
-                'w_n'};         % natural frequency (rad/s)
-    
-    
     % unfiltered
     figure
     semilogy(pct_angle,X_pareto_sorted_scaled)
     title('Unfiltered Design Heuristics')
     xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
-    legend(var_names_pretty,'Location','eastoutside')
+    legend(var_names,'Location','eastoutside')
     ylim([0 15])
     improvePlot
     grid on
@@ -239,7 +230,7 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     ylim([.01 5])
     set(gca,'YTick',y_tick)
     improvePlot
-    legend(var_names_pretty,'Location','eastoutside')
+    legend(var_names,'Location','eastoutside')
     set(gca,'YMinorGrid','on')
     set(gca,'XGrid','on')
     set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
