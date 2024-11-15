@@ -13,6 +13,10 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
             'FileLocation',generated_folder);
         problem.options = opts;
         
+        if strcmp(opts.Algorithm,'sqp')
+            problem.Aineq = full(problem.Aineq); % avoid warning that SQP can't have sparse matrices
+        end
+        
         % Run unscaled optimization
         [X_opt,obj_opt,flag,output,lambda,grad,hess] = fmincon(problem);
         
