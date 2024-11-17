@@ -74,15 +74,21 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    A_spar = [p.T_s_over_D_s/(.9*p.h); -p.D_d_over_D_s/p.D_d_min];
-    b_spar = [1; -1];
-    prob.Constraints.linear_spar = A_spar*X(1) <= b_spar;
+    D_s   = X(1);     % inner diameter of float (m)
+    D_f   = X(2);     % normalized diameter of spar column (-)
+    T_f_2 = X(3);     % normalized draft of float (-)
+    h_s   = X(4);     % normalized draft of spar (-)
 
-    % notebook p122
-    p0 = (1/p.T_f_2_over_h_f - 1);
-    A_top = [1+p0, 0; 1 p0];
-    b_top = [1; 1];
-    prob.Constraints.linear_float_spar_top = A_top*[X(4); X(3)] <= b_top;
+    T_s = D_s * p.T_s_over_D_s;
+    h_f = T_f_2 / p.T_f_2_over_h_f;
+    D_d = p.D_d_over_D_s * D_s;
+
+    prob.Constraints.linear_spar_natural_freq = D_d >= p.D_d_min;
+    prob.Constraints.linear_float_spar_diam = D_s <= D_f - .01;
+    prob.Constraints.linear_float_spar_draft = T_f_2 <= T_s - .01;
+    prob.Constraints.linear_float_spar_tops = h_s - T_s >= h_f - T_f_2 + .01;
+    prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= p.harmonics * D_f / (2*223); % M
+    prob.Constraints.linear_spar_seafloor = p.h - T_s >= p.harmonics * D_s / (2*223); % N
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
