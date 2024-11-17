@@ -10,7 +10,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
     [~, ~, ~, g, simulated] = simulation(X,p);
     
     % whether nominal violates constraints
-    [feasible,failed] = is_feasible(g, b);
+    [feasible,failed] = is_feasible(g, X, p, b);
 
     % comparison of simulated and actual values
     if nargout > 2

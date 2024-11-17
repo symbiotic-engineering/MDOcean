@@ -1,4 +1,6 @@
 function [x,fval] = pareto_search(filename_uuid)
+    if nargin==0; filename_uuid=''; end
+    
     p = parameters();
     b = var_bounds();
     b.filename_uuid = filename_uuid;
@@ -27,7 +29,7 @@ function [x,fval] = pareto_search(filename_uuid)
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
         else
-            idxs = [1 6 2 5 4 3 7];
+            idxs = b.idxs_sort;
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
@@ -62,6 +64,7 @@ function [x,fval] = pareto_search(filename_uuid)
     probMO.solver = 'paretosearch';
     probMO.nvars = 7;
     %% Execute pareto search
+    disp('Finished finding pareto seed points. Now starting paretosearch.')
     [x,fval,flag,output,residuals] = paretosearch(probMO);
 
     %% Process and save results
@@ -79,27 +82,37 @@ function [x,fval] = pareto_search(filename_uuid)
     cols = [1 3 6 5 4 2 7];
     x_sorted = x(idx,cols)
 
-    % save mat file to be read by pareto_bruteforce.m
-    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals")
+    % save mat file to be read by pareto_heuristics.m
+    date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals")
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
-    con_active = abs(residuals.ineqnonlin) < tol;
+    nlcon_active = abs(residuals.ineqnonlin) < tol;
+    lincon_active = abs(residuals.ineqlin) < tol;
+
+    % merge sea state slamming constraints
+    nlcon_active(:,16) = any(nlcon_active(:,16:end),2);
+    nlcon_active(:,17:end) = [];
 
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 
     figure
-    subplot 311
+    subplot 221
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
 
-    subplot 312
+    subplot 222
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
 
-    subplot 313
-    spy(con_active(idx,:)')
-    title('Constraint Active')
+    subplot 223
+    spy(nlcon_active(idx,:)')
+    title('Nonlinear Constraint Active')
+
+    subplot 224
+    spy(lincon_active(idx,:)')
+    title('Linear Constraint Active')
 end

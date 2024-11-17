@@ -84,6 +84,11 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     if any(isnan(mu_nondim),'all')
         error('MEEM got NaN as result')
     end
+
+    if any(lambda_nondim<0,'all')
+        lambda_nondim(lambda_nondim<0) = 1e-9;
+        warning('MEEM calculated negative damping. Setting damping to very small positive value.')
+    end
 end
 
 function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
