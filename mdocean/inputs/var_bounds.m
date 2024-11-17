@@ -51,6 +51,12 @@ b.M_max = 3;
 b.M_nom = 1;
 b.M_start = 1;
 
+                 % D_s    D_f   T_f_2  h_s    F_max  B_p   w_n]
+b.mins_flexible = [false  true  true   true   true   true  true]';
+b.maxs_flexible = [true   true  false  false  true   true  true]';
+% if a bound is marked flexible and the bound is active after optimization, 
+% a warning in gradient_optim will remind you to adjust the bound.
+
 b.X_mins = [b.D_s_min b.D_f_min b.T_f_2_min b.h_s_min b.F_max_min b.B_p_min b.w_n_min]';
 b.X_maxs = [b.D_s_max b.D_f_max b.T_f_2_max b.h_s_max b.F_max_max b.B_p_max b.w_n_max]';
 b.X_noms = [b.D_s_nom b.D_f_nom b.T_f_2_nom b.h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';

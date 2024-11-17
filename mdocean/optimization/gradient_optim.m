@@ -110,12 +110,9 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
             output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
 
-                       % D_f   D_s_over_D_f T_f_over_T_s T_s_over_h_s F_max B_p w_n]
-        mins_flexible = [false false        false        false        false true true]';
-        maxs_flexible = [true  false        false        false        true  true true]';
         tol = eps(2);
-        if any(abs(X_opt_raw(mins_flexible) - b.X_mins(mins_flexible)) < tol) ...
-                || any(abs(X_opt_raw(maxs_flexible) - b.X_maxs(maxs_flexible)) < tol)
+        if any(abs(X_opt_raw(b.mins_flexible) - b.X_mins(b.mins_flexible)) < tol) ...
+                || any(abs(X_opt_raw(b.maxs_flexible) - b.X_maxs(b.maxs_flexible)) < tol)
             warning('Optimization is up against a flexible variable bound, consider changing bounds')
         end
 
