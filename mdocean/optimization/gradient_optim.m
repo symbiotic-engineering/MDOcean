@@ -7,7 +7,7 @@ if nargin == 0
     b = var_bounds();
     x0_input = b.X_start_struct;
     display = 'iter';
-    plotfn = {@optimplotfval, @(x,~,~)viz(x,p,b)};
+    plotfn = {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)};
     ploton = true;
 else
     display = 'off';
@@ -83,12 +83,13 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     h_f = T_f_2 / p.T_f_2_over_h_f;
     D_d = p.D_d_over_D_s * D_s;
 
+    besseli_argmax = 700.5;
     prob.Constraints.linear_spar_natural_freq = D_d >= p.D_d_min;
     prob.Constraints.linear_float_spar_diam = D_s <= D_f - .01;
     prob.Constraints.linear_float_spar_draft = T_f_2 <= T_s - .01;
     prob.Constraints.linear_float_spar_tops = h_s - T_s >= h_f - T_f_2 + .01;
-    prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= p.harmonics * D_f / (2*223); % M
-    prob.Constraints.linear_spar_seafloor = p.h - T_s >= p.harmonics * D_s / (2*223); % N
+    prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= p.harmonics * D_f * pi/(2*besseli_argmax); % M
+    prob.Constraints.linear_spar_seafloor = p.h - T_s >= p.harmonics * D_s * pi/(2*besseli_argmax); % N
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
@@ -139,30 +140,5 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
                 'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound'})
     end
-
-end
-
-function flag = viz(x,p,b)
-
-    X =[x(b.idxs_recover); 1]; % reorder indices
-
-    grey = [0.8, 0.8, 0.8]; % RGB for light grey
-
-    % Get all line and rectangle objects from previous iterations
-    lines = findobj(gca, 'Type', 'line');
-    rectangles = findobj(gca, 'Type', 'rectangle');
-    
-    % Change their color to light grey
-    for i = 1:length(lines)
-        lines(i).Color = grey;
-    end
-    for i = 1:length(rectangles)
-        rectangles(i).EdgeColor = grey;
-    end
-
-    % plot geomtry of current iteration
-    visualize_geometry(X,p,true)
-
-    flag = false; % don't stop optimization
 
 end
