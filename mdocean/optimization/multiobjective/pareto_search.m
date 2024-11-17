@@ -90,20 +90,29 @@ end
 function [idx] = constraint_active_plot(residuals,fval,tol)
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
-    con_active = abs(residuals.ineqnonlin) < tol;
+    nlcon_active = abs(residuals.ineqnonlin) < tol;
+    lincon_active = abs(residuals.ineqlin) < tol;
+
+    % merge sea state slamming constraints
+    nlcon_active(:,16) = any(nlcon_active(:,16:end),2);
+    nlcon_active(:,17:end) = [];
 
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 
     figure
-    subplot 311
+    subplot 221
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
 
-    subplot 312
+    subplot 222
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
 
-    subplot 313
-    spy(con_active(idx,:)')
-    title('Constraint Active')
+    subplot 223
+    spy(nlcon_active(idx,:)')
+    title('Nonlinear Constraint Active')
+
+    subplot 224
+    spy(lincon_active(idx,:)')
+    title('Linear Constraint Active')
 end
