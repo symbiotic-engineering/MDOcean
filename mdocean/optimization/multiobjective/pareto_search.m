@@ -10,13 +10,34 @@ function [x,fval] = pareto_search(filename_uuid)
     
     %% Calculate seed points for the pareto front
     % get pareto front endpoints by running optimization
-    [X_opt,objs_opt,~,probs] = gradient_optim(x0,p,b);
-
-    % get extra seed values in the middle by optimizing at fixed LCOEs
+    [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
+    [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
+    
     LCOE_max = p.LCOE_max;
     LCOE_min = objs_opt(1);
     P_var_min = objs_opt(2);
 
+    % remove infeasible single-objective optima
+    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
+    single_obj_failed = flag_opt == -2;
+    X_opt(:,single_obj_failed) = [];
+    fvals_opt(single_obj_failed,:) = [];
+
+    % use x0 start as seed, if x0 is feasible
+    [LCOE_x0,P_var_x0,~,g_0] = simulation([b.X_starts; 1],p);
+    x0_feasible = is_feasible(g_0, [b.X_starts; 1], p, b);
+    if x0_feasible
+        fvals_0 = [LCOE_x0,P_var_x0];
+        X_0 = b.X_starts(idxs);
+    else
+        fvals_0 = [];
+        X_0 = [];
+    end
+
+    % get extra seed values in the middle by optimizing at fixed LCOEs
+    if LCOE_max < LCOE_min
+        LCOE_max = 2*LCOE_min;
+    end
     num_seeds = 8;
     LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
     LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
@@ -54,15 +75,16 @@ function [x,fval] = pareto_search(filename_uuid)
     scale = [10 0.1];
     probMO.objective = @(x)[generatedObjectiveLCOE(x,{p})*scale(1), generatedObjectiveP_var(x,{p})*scale(2)];
     
-    [LCOE_x0,P_var_x0] = simulation([b.X_starts; 1],p);
-    [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
-    X0 = [probMO.x0'; X_opt(idxs,:)'; X_seeds];
-    fvals = [LCOE_x0,P_var_x0; LCOE_min P_var_min_LCOE; LCOE_max P_var_min; LCOE_seeds' P_var_seeds'];
+    X0 = [X_0; X_opt(idxs,:)'; X_seeds];
+    fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
-        'PlotFcn','psplotparetof','InitialPoints',X0_struct,'MinPollFraction',1,...
+        'PlotFcn','psplotparetof','MinPollFraction',1,...
         'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
+    if ~isempty(X0)
+        probMO.options.InitialPoints = X0_struct;
+    end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
     %% Execute pareto search
