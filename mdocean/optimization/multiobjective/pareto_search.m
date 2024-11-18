@@ -5,6 +5,8 @@ function [x,fval] = pareto_search(filename_uuid)
     b = var_bounds();
     b.filename_uuid = filename_uuid;
     x0 = b.X_start_struct;
+    idxs = b.idxs_sort;
+    num_DVs = length(b.X_starts);
     
     %% Calculate seed points for the pareto front
     % get pareto front endpoints by running optimization
@@ -18,9 +20,10 @@ function [x,fval] = pareto_search(filename_uuid)
     num_seeds = 8;
     LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
     LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
-    X_seeds = zeros(length(LCOE_seeds),7);
+    X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
+    
     for i = 1:length(LCOE_seeds)
         p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
@@ -29,7 +32,6 @@ function [x,fval] = pareto_search(filename_uuid)
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
         else
-            idxs = b.idxs_sort;
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
@@ -62,7 +64,7 @@ function [x,fval] = pareto_search(filename_uuid)
         'PlotFcn','psplotparetof','InitialPoints',X0_struct,'MinPollFraction',1,...
         'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
     probMO.solver = 'paretosearch';
-    probMO.nvars = 7;
+    probMO.nvars = num_DVs;
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
     [x,fval,flag,output,residuals] = paretosearch(probMO);
@@ -79,8 +81,7 @@ function [x,fval] = pareto_search(filename_uuid)
     tol = probMO.options.ConstraintTolerance;
     idx = constraint_active_plot(residuals,fval,tol);
 
-    cols = [1 3 6 5 4 2 7];
-    x_sorted = x(idx,cols)
+    x_sorted = x(idx,b.idxs_recover);
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');

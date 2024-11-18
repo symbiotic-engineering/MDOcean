@@ -61,7 +61,7 @@ function [LCOE, minLCOE, idx_best_LCOE, LCOE_nom, ...
     
     % RM3 nominal - simulated
     x_nom = b.X_noms;
-    x_nom(8) = 1;
+    x_nom(length(b.var_names)) = 1;
     p_nom = p;
     %p_nom.power_max = RM3.power_max;
     [LCOE_nom_sim,P_var_nom_sim] = simulation(x_nom,p_nom);
@@ -183,13 +183,13 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     
     X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
     
-    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
+    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:end-1); % get rid of material
     
     windowSize = round(length(idx_sort) * 5/100);
     b = (1/windowSize)*ones(1,windowSize);
     a = 1;
     y = zeros(size(X_pareto_sorted_scaled));
-    for i=1:7
+    for i=1:size(X_pareto_sorted_scaled,2)
         x = X_pareto_sorted_scaled(:,i); 
         x_padded = [ones(windowSize,1); x];
         yy = filter(b,a,x_padded); % moving average filter
@@ -209,9 +209,9 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca,'YMinorGrid','on')
     
     % filtered
-    cols = {'r:','r--','r-','r-.','b:','b--','b-'};
+    cols = {'r:','r--','r-','r-.','b:','b--','b-','g:','g--','g-','g-.','g.','g*','b.'};
     figure
-    for i=1:7
+    for i=1:size(X_pareto_sorted_scaled,2)
         semilogy(pct_angle,y(:,i),cols{i})
         hold on
     end
