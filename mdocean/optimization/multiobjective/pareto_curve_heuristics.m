@@ -3,8 +3,9 @@ function pareto_curve_heuristics()
     b = var_bounds();
     
     %[x,fval] = pareto_search();
-    load("pareto_search_results.mat")
-    cols = [1 3 6 5 4 2 7];
+    d=dir("**/pareto_search_results*");
+    load(d(end).name)
+    cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add eigth column for material 
     LCOE = fval(:,1);
@@ -37,7 +38,7 @@ function pareto_curve_heuristics()
     
     %% plots for DVs as a fn of percent along the pareto
     design_heuristics_plot(LCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
-                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max)
+                           Pvar, minPvar, idx_best_Pvar, X, idxo, p.LCOE_max, b.var_names_pretty(1:end-1))
 
 end
 %%
@@ -86,21 +87,21 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
                           x_best_LCOE,x_best_Pvar,x_nom,x_balanced,idxo,showSingleObj,showImages,p)
     figure
     % overall pareto front
-    plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b')
+    plot(LCOE(idxo),Pvar(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
     hold on
     
     % utopia point
-    plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20)
+    plot(minLCOE,minPvar,'gp','MarkerFaceColor','g','MarkerSize',20,'HandleVisibility','off')
     
     % RM3 nominal reference
-    plot(LCOE_nom,P_var_nom,'rd')
-    plot(LCOE_nom_sim,P_var_nom_sim,'rs')
+    plot(LCOE_nom,P_var_nom,'rd','HandleVisibility','off')
+    plot(LCOE_nom_sim,P_var_nom_sim,'rs','HandleVisibility','off')
     
     if showSingleObj  
         % black squares for 3 ref points
-        plot(minLCOE,Pvar(idx_best_LCOE),'ks')
-        plot(LCOE(idx_best_Pvar),minPvar,'ks')
-        plot(LCOE_balanced,P_var_balanced,'ks')
+        plot(minLCOE,Pvar(idx_best_LCOE),'ks','HandleVisibility','off')
+        plot(LCOE(idx_best_Pvar),minPvar,'ks','HandleVisibility','off')
+        plot(LCOE_balanced,P_var_balanced,'ks','HandleVisibility','off')
     end
     
     % axis labels
@@ -112,7 +113,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
     improvePlot
     
     % solar reference
-    plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2])
+    plot(LCOE_solar, P_var_solar,'o','MarkerSize',12,'MarkerEdgeColor',[1, .87, .2],'MarkerFaceColor',[1, .87, .2],'HandleVisibility','off')
     % for the yellow color to work, do not use improvePlot below here
     
     % text labels
@@ -128,7 +129,7 @@ function [] = pareto_plot(LCOE,minLCOE,idx_best_LCOE,LCOE_nom, LCOE_nom_sim, LCO
         text(LCOE(idx_best_Pvar)+.03,Pvar(idx_best_Pvar)-3,'Least Variable','FontSize',sz)
         text(LCOE_balanced-.15,P_var_balanced+5,'Balanced Design','FontSize',sz)
     end
-    
+
     if showImages
         mini_plot_size = [.2 .22];
         % small corner pictures of best geometries
@@ -161,7 +162,7 @@ end
 %%
 function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best_LCOE, ...
                                      overallPvar, minPvar, idx_best_Pvar, ...
-                                     overallX, idxo, LCOE_max)
+                                     overallX, idxo, LCOE_max, var_names)
 
     LCOE_pareto = overallLCOE(idxo);
     Pvar_pareto = overallPvar(idxo);
@@ -195,22 +196,13 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
         y(:,i) = yy((windowSize+1):end);
     end
     
-    var_names_pretty = {'D_f',...    % outer diameter of float (m)	
-                'D_s/D_f',...
-                'h_f/D_f',...      	
-                'T_s/h_s',...      	
-                'F_{max}',...     % max force (N)
-                'B_p',...     % internal damping of controller (Ns/m)	
-                'w_n'};         % natural frequency (rad/s)
-    
-    
     % unfiltered
     figure
     semilogy(pct_angle,X_pareto_sorted_scaled)
     title('Unfiltered Design Heuristics')
     xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
-    legend(var_names_pretty,'Location','eastoutside')
+    legend(var_names,'Location','eastoutside')
     ylim([0 15])
     improvePlot
     grid on
@@ -238,7 +230,7 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     ylim([.01 5])
     set(gca,'YTick',y_tick)
     improvePlot
-    legend(var_names_pretty,'Location','eastoutside')
+    legend(var_names,'Location','eastoutside')
     set(gca,'YMinorGrid','on')
     set(gca,'XGrid','on')
     set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines

@@ -1,7 +1,7 @@
 [![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/branch/code-cleanup/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
 ![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
-[![DOI](https://zenodo.org/badge/410160635.svg)](https://zenodo.org/badge/latestdoi/410160635)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13997244.svg)](https://doi.org/10.5281/zenodo.13997244)
 
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
@@ -16,6 +16,7 @@ and has been accepted for publication/presentation in the 2022 ASME IDETC-CIE.
 At this conference, the work was presented at the DAC-6 session and is publication number 90227.
 A recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
 The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
+Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
 
 Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
@@ -28,32 +29,9 @@ https://doi.org/10.1115/DETC2022-90227.
 - Olivia Murphy, om66@cornell.edu (Project contributor) @ommurphy
 - Maha Haji, maha@cornell.edu (Advisor) @maha-haji
 
-**Disclaimer**
-
-The versions of the simulation used in the conference proceedings paper ([v1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2)) 
-and in the conference video ([v1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3)) were later found to have a number of errors. 
-These errors have since been corrected, and the current code ([v1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4)) is correct to the best of the authors' knowledge, within the limitations of the stated assumptions. 
-Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
-
-Errors that have since been fixed include:
-- Incorrect value for young's modulus of steel
-- Incorrect implementation of force saturation multiplier
-- Wave period and wave height were swapped
-- Froude Krylov force coefficient too high
-- Incorrect nominal controller design variables and objective values
-- Incorrect buckling end condition
-- Nominal simulation did not use power saturation
-- Incorrect scaling of cost with number of WECs
-- Powertrain and transmission loss not accounted for
-- Mass of damping plate support tubes not accounted for
-- Float maximum displacement constraint not being enforced
-
-*Because the results in the official conference proceedings contain these errors, an updated unofficial version 
-of the paper will be posted here in early September 2022, containing corrections.*
-
 **License**
 
-This project is released open-source under the MIT License. The validation folder contains code taken from NREL's BEMIO module, which is part of WEC-Sim. 
+This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim. 
 The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **File Structure**

@@ -9,7 +9,7 @@ for i=1:num_runs
     xx = random_x0(b);
     X(i,:) = xx;
     [LCOE(i), P_var(i), P_matrix, g] = simulation(xx, p);
-    feasible(i) = is_feasible(g, b);
+    feasible(i) = is_feasible(g, xx, p, b);
 end
 
 feasible = logical(feasible);

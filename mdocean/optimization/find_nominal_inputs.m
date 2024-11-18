@@ -31,7 +31,7 @@ if display_on
     X = [b.X_noms; 1];
     X(5:7) = x;
     [LCOE, P_var, ~, g] = simulation(X,p)
-    [feasible,failed] = is_feasible(g, b)
+    [feasible,failed] = is_feasible(g, X, p, b)
 
     % display x output
     array2table(x,'VariableNames',{'F_max (1e6 N)','B_p (1e6 Ns/m)','w_n (rad/s)'})
