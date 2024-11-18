@@ -47,47 +47,48 @@ b.w_n_max = 40;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency t
 b.w_n_nom = 0.8;
 b.w_n_start = 0.8;
 
+in2m = 0.0254;
 % material thickness of float top (m)
-b.t_ft_min = 0.3;
-b.t_ft_max = 0.5;
-b.t_ft_nom = 0.5;
-b.t_ft_start = 0.4;
+b.t_ft_min = 0.1 * in2m;
+b.t_ft_max = 1.0 * in2m;
+b.t_ft_nom = 0.5 * in2m;
+b.t_ft_start = 0.5 * in2m;
 
 % material thickness of float bottom (m)
-b.t_fr_min = 0.1; 
-b.t_fr_max = 0.6;
-b.t_fr_nom = 0.44;
-b.t_fr_start = 0.2;
+b.t_fr_min = 0.1 * in2m; 
+b.t_fr_max = 1.0 * in2m;
+b.t_fr_nom = 0.44 * in2m;
+b.t_fr_start = 0.44 * in2m;
 
 % materal thickness of float circumferential gussets (m)
-b.t_fc_min = 0.1; 
-b.t_fc_max = 0.6; 
-b.t_fc_nom = 0.44; 
-b.t_fc_start = 0.2; 
+b.t_fc_min = 0.1 * in2m; 
+b.t_fc_max = 1.0 * in2m; 
+b.t_fc_nom = 0.44 * in2m; 
+b.t_fc_start = 0.44 * in2m; 
 
 % material thickness of float bottom (m)
-b.t_fb_min = 0.1;
-b.t_fb_max = 0.9;
-b.t_fb_nom = 0.56;
-b.t_fb_start = 0.2;
+b.t_fb_min = 0.1 * in2m;
+b.t_fb_max = 1.0 * in2m;
+b.t_fb_nom = 0.56 * in2m;
+b.t_fb_start = 0.56 * in2m;
 
 % material thickness of spar radial (m)
-b.t_sr_min = 0.2;
-b.t_sr_max = 2.0;
-b.t_sr_nom = 1.00;
-b.t_sr_start = 0.3;
+b.t_sr_min = 0.2 * in2m;
+b.t_sr_max = 2.0 * in2m;
+b.t_sr_nom = 1.0 * in2m;
+b.t_sr_start = 1.0 * in2m;
 
-% material thickness of damping plate (m)
-b.t_dt_min = 0.2;
-b.t_dt_max = 2.0;
-b.t_dt_nom = 1.00;
-b.t_dt_start = 0.3;
+% material thickness of damping plate support tube radial walls (m)
+b.t_dt_min = 0.2 * in2m;
+b.t_dt_max = 2.0 * in2m;
+b.t_dt_nom = 1.0 * in2m;
+b.t_dt_start = 1.0 * in2m;
 
 % maximum generator power (W)
-b.P_max_min = 3;
-b.P_max_max = 40;
-b.P_max_nom = 20;
-b.P_max_start = 5;
+b.P_max_min = 50;
+b.P_max_max = 1000;
+b.P_max_nom = 286;
+b.P_max_start = 286;
 
 % material index (-)
 b.M_min = 1;
@@ -96,8 +97,8 @@ b.M_nom = 1;
 b.M_start = 1;
 
                  % D_s    D_f   T_f_2  h_s    F_max  B_p   w_n  thicknesses P_max]
-b.mins_flexible = [false  true  true   true   true   true  true true(6,1)   true]';
-b.maxs_flexible = [true   true  false  false  true   true  true true(6,1)   true]';
+b.mins_flexible = [false  true  true   true   true   true  true true(1,6)   true]';
+b.maxs_flexible = [true   true  false  false  true   true  true true(1,6)   true]';
 % if a bound is marked flexible and the bound is active after optimization, 
 % a warning in gradient_optim will remind you to adjust the bound.
 
