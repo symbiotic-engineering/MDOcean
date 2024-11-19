@@ -64,7 +64,9 @@ g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(11) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-g(12) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
+g(12) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
+                                        % this constraint should always be active
+                                        % and is only required when p.cost_perN = 0.
 g(13) = X_constraints(1);               % prevent float rising above top of spar
 g(14) = X_constraints(2);               % prevent float going below bottom of spar
 g(15) = X_constraints(3);               % float amplitude obeys linear theory
