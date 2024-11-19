@@ -47,7 +47,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, r_over_t, I, in.E);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.eff_array);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
 num_g = 15+numel(p.JPD);
@@ -64,7 +64,9 @@ g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(11) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-g(12) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force
+g(12) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
+                                        % this constraint should always be active
+                                        % and is only required when p.cost_perN = 0.
 g(13) = X_constraints(1);               % prevent float rising above top of spar
 g(14) = X_constraints(2);               % prevent float going below bottom of spar
 g(15) = X_constraints(3);               % float amplitude obeys linear theory
@@ -82,7 +84,7 @@ if nargout > 4 % if returning extra struct output for validation
                                             in.t_fc, in.t_fb, in.t_sr, in.t_dt,...
                                             in.D_d, in.D_dt, in.theta_dt, in.T_s, in.h_d, in.t_d_max,...
                                             in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.eff_array);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
     [~, ~, ~, ~, ~, ~, ~, B_p,X,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);

@@ -79,8 +79,7 @@ function [x,fval] = pareto_search(filename_uuid)
     tol = probMO.options.ConstraintTolerance;
     idx = constraint_active_plot(residuals,fval,tol);
 
-    cols = [1 3 6 5 4 2 7];
-    x_sorted = x(idx,cols)
+    x_sorted = x(idx,b.idxs_recover)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
