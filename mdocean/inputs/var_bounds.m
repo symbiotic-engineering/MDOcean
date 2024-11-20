@@ -40,7 +40,7 @@ b.h_s_start = 37.9;
 % maximum powertrain force (MN)
 b.F_max_min = 0.01;
 b.F_max_max = 100;
-b.F_max_wecsim = 1e6;
+b.F_max_wecsim = 100;
 b.F_max_nom = 100;
 b.F_max_start = 5;
 
