@@ -15,7 +15,8 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
     % comparison of simulated and actual values
     if nargout > 2
         actual = validation_inputs(mode);
-        tiledlayout(1,3)
+        f = figure;
+        t = tiledlayout(f,1,3);
         fields = fieldnames(actual);
 
         % for economic validation, sweep N_WEC
@@ -34,11 +35,11 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
             if any(strcmp(field,{'capex','opex','LCOE'}))
                 simulated.(field) = [simulated_diff_N_WEC.(field)];  
                 
-                nexttile
-                semilogx(N_WEC,simulated.(field),N_WEC,actual.(field))
-                xlabel('N_{WEC}')
-                title((field))
-                legend('Simulated','Actual')
+                ax = nexttile(t);
+                semilogx(ax, N_WEC,simulated.(field),N_WEC,actual.(field))
+                xlabel(ax,'N_{WEC}')
+                title(ax,(field))
+                legend(ax,'Simulated','Actual')
             end
 
             % if the field is dynamic, plot vs sea state matrix
