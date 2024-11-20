@@ -8,17 +8,25 @@ classdef test < matlab.unittest.TestCase
     end
 
     properties
-        feasible
-        failed
-        simulated
-        actual
+        feasible_report
+        failed_report
+        simulated_report
+        actual_report
+
+        feasible_wecsim
+        failed_wecsim
+        simulated_wecsim
+        actual_wecsim
+
         uuid   
     end
 
     % inputs for tests, including passing tolerances
     properties (TestParameter)
-        field = fieldnames(validation_inputs());
-        rel_tol = {.1,.1,.1,.1,.25,.25,.25,.1,.1,.1,.1,.1};
+        field_report = fieldnames(validation_inputs('report'));
+        field_wecsim = fieldnames(validation_inputs('wecsim'));
+        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1};
+        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1};
         which_figs = test.enumerateFigs()
         which_tabs = test.enumerateTabs()
     end
@@ -79,11 +87,18 @@ classdef test < matlab.unittest.TestCase
         function runNominalValidation(testCase)
             % this is a shared setup because the results are used by both
             % validateNominal and validateNominalFeasible
-            [feas, fail, sim, act] = validate_nominal_RM3();
-            testCase.feasible  = feas;
-            testCase.failed    = fail;
-            testCase.simulated = sim;
-            testCase.actual    = act;
+            [feas_r, fail_r, sim_r, act_r] = validate_nominal_RM3('report'); % report
+            [feas_w, fail_w, sim_w, act_w] = validate_nominal_RM3('wecsim'); % wecsim
+            
+            testCase.feasible_report  = feas_r;
+            testCase.failed_report    = fail_r;
+            testCase.simulated_report = sim_r;
+            testCase.actual_report    = act_r;
+
+            testCase.feasible_wecsim  = feas_w;
+            testCase.failed_wecsim    = fail_w;
+            testCase.simulated_wecsim = sim_w;
+            testCase.actual_wecsim    = act_w;
         end
 
         function generateUUID(testCase)
@@ -123,17 +138,29 @@ classdef test < matlab.unittest.TestCase
             end
         end
 
-        function validateNominal(testCase, field, rel_tol)
-            sim = testCase.simulated.(field);
-            act = testCase.actual.(field);
-            testCase.verifyEqual(sim, act, 'RelTol',rel_tol)
+        function validateNominalReport(testCase, field_report, rel_tol_report)
+            sim = testCase.simulated_report.(field_report);
+            act = testCase.actual_report.(field_report);
+            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_report)
         end
+
+        function validateNominalWecsim(testCase, field_wecsim, rel_tol_wecsim)
+            sim = testCase.simulated_wecsim.(field_wecsim);
+            act = testCase.actual_wecsim.(field_wecsim);
+            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_wecsim)
+        end
+
     end
 
     methods(Test)
-        function validateNominalFeasible(testCase)
-            testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed] );
-            testCase.verifyTrue(testCase.feasible);
+        function validateNominalReportFeasible(testCase)
+            testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_report] );
+            testCase.verifyTrue(testCase.feasible_report);
+        end
+
+        function validateNominalWecsimFeasible(testCase)
+            testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_wecsim] );
+            testCase.verifyTrue(testCase.feasible_wecsim);
         end
 
         function validateNominalHydroCoeffs(testCase)

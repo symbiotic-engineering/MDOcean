@@ -1,9 +1,9 @@
-function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
-    p = parameters();
+function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
+    p = parameters(mode);
     p.N_WEC = 1;
     p.power_max = 286000;
     p.LCOE_max = 10; % set large max LCOE to avoid failing feasibility check
-    b = var_bounds(); 
+    b = var_bounds(mode); 
     
     X = [b.X_noms; 1];
     
@@ -14,8 +14,9 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
 
     % comparison of simulated and actual values
     if nargout > 2
-        actual = validation_inputs();
-        tiledlayout(1,3)
+        actual = validation_inputs(mode);
+        f = figure;
+        t = tiledlayout(f,1,3);
         fields = fieldnames(actual);
 
         % for economic validation, sweep N_WEC
@@ -34,11 +35,11 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
             if any(strcmp(field,{'capex','opex','LCOE'}))
                 simulated.(field) = [simulated_diff_N_WEC.(field)];  
                 
-                nexttile
-                semilogx(N_WEC,simulated.(field),N_WEC,actual.(field))
-                xlabel('N_{WEC}')
-                title((field))
-                legend('Simulated','Actual')
+                ax = nexttile(t);
+                semilogx(ax, N_WEC,simulated.(field),N_WEC,actual.(field))
+                xlabel(ax,'N_{WEC}')
+                title(ax,(field))
+                legend(ax,'Simulated','Actual')
             end
 
             % if the field is dynamic, plot vs sea state matrix
