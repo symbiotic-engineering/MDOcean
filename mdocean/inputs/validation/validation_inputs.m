@@ -22,7 +22,7 @@ RM3_report = struct(...
 
 RM3_wecsim = struct(...
                 'vol_f',        725.833, ...% submerged volume from WAMIT RM3.out
-                'vol_s',        726.755, ...% submerged volume from WAMIT RM3.out
+                'vol_s',        886.687,   ...% submerged volume from WAMIT RM3.out
                 'CB_f',         1.2929, ... % center of buoyancy below waterline (MDOcean F24 debugging slide 25)
                 'CG_f',         0.2833 ...  % center of gravity below waterline (MDOcean F24 debugging slide 25)
               );
