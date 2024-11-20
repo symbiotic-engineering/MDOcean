@@ -19,7 +19,8 @@ RM3_report = struct(...
 				'c_v',			nominal_c_v()); % calculated from data in CBS Performance & Economics
 
 RM3_wecsim = struct(...
-                'vol_float',    1, ...
-                'vol_spar',     1);
+                'vol_f',        725.833, ...% submerged volume from WAMIT RM3.out
+                'vol_s',        726.755 ...% submerged volume from WAMIT RM3.out
+              );
 
 end
