@@ -12,7 +12,7 @@ b.var_names_pretty = {'D_s','D_f','T_{f,2}','h_s','F_{max}','B_p','\omega_n','M'
 % inner diameter of float (m)	
 b.D_s_min = 0;
 b.D_s_max = 30;
-b.D_s_nom = 6.5;
+b.D_s_nom = 6;
 b.D_s_wecsim = 6;
 b.D_s_start = 6;
 

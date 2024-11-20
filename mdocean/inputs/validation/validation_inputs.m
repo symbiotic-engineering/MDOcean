@@ -5,7 +5,7 @@ RM3_report = struct(...
                 'mass_vc',      224e3, ...  % p159 RM3 report
                 'mass_rp',      245e3, ...  % p159 RM3 report
                 'mass_tot',     680e3, ...  % p159 RM3 report
-                'vol_f',        742.044,... % calculated (MDOcean F24 debugging slide 23)
+                'vol_f',        701.9, ...  % calculated (MDOcean F24 debugging slide 23)
                 'vol_s',        1008, ...   % calculated (MDOcean F24 debugging slide 27)
                 'capex',        [17e6 61e6, 207e6, 390e6],  ... 
                 ...                         % B15:E15 in CBS Report Tables
