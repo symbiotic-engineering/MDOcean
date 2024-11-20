@@ -1,16 +1,37 @@
-function [p,T] = parameters()
+function [p,T] = parameters(mode)
+
+% mode = 'wecsim': use parameters corresponding to RM3.out in WEC-Sim
+% mode = anything else or not provided: use parmaters corresponding to RM3 report (default)
+
+if nargin<1
+    mode = '';
+end
 
 ksi2pa = 6894757; % 1000 pounds/in2 to Pascal
 in2m = 0.0254;  % inch to meter
 yd2m = 0.9144;  % yard to meter
 lb2kg = 1/2.2;  % pound to kilogram
 
+if strcmpi(mode,'wecsim')
+    T_s_over_D_s = 29/6;
+    h_d_over_D_s = 0.1/6;
+    T_f_2_over_h_f = 3/5;
+    D_f_b_over_D_f = 10/20;
+    T_f_1_over_T_f_2 = 2/3;
+    D_f_in_over_D_s = 6/6;
+else
+    T_s_over_D_s = 35/6;
+    h_d_over_D_s = 1*in2m/6;
+    T_f_2_over_h_f = 3.2/5.2;
+    D_f_b_over_D_f = 6.5/20;
+    T_f_1_over_T_f_2 = 2/3.2;
+    D_f_in_over_D_s = 6.5/6;
+end
+
 file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 jpd = trim_jpd(readmatrix(file,'Range','A3'));
 g = 9.8;
 spar_exc = get_spar_exc(g);
-
-above = 2; % top of float above still water line (m)
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description'};
 types = {'string','string',     'cell', 'string',   'logical','string'};
@@ -75,16 +96,18 @@ T = [T;
         "minimum damping plate diameter");
     table("D_d_over_D_s","D_d/D_s",{30/6},"geometry",true,...
         "normalized damping plate diameter (-)");
-    table("T_s_over_D_s","T_s/D_s",{29/6},"geometry",true,...
+    table("T_s_over_D_s","T_s/D_s",{T_s_over_D_s},"geometry",true,...
         "normalized spar draft (-)");
-    table("h_d_over_D_s","h_d/D_s",{0.1/6},"geometry",true,...
+    table("h_d_over_D_s","h_d/D_s",{h_d_over_D_s},"geometry",true,...
         "normalized damping plate thickness (-)");
-    table("T_f_2_over_h_f","T_{f,2}/h_f",{(5-above)/5},"geometry",true,...
+    table("T_f_2_over_h_f","T_{f,2}/h_f",{T_f_2_over_h_f},"geometry",true,...
         "normalized float draft (-)");
-    table("T_f_1_over_T_f_2","T_{f,1}/T_{f,2}",{(4-above)/(5-above)},...
+    table("T_f_1_over_T_f_2","T_{f,1}/T_{f,2}",{T_f_1_over_T_f_2},...
         "geometry",true,"normalized float draft slant (-)");
-    table("D_f_b_over_D_f","D_{f,b}/D_f",{10/20},"geometry",true,...
+    table("D_f_b_over_D_f","D_{f,b}/D_f",{D_f_b_over_D_f},"geometry",true,...
         "normalized diameter of float bottom (-)");
+    table("D_f_in_over_D_s","D_{f,in}/D_s",{D_f_in_over_D_s},"geometry",...
+        true,"ratio of float inner diameter to spar diameter (-)")
     ...
     ...% Dynamics: device parameters
     table("C_d_float","C_{d,float}",{0},"dynamics",true,"coefficient of drag for float");

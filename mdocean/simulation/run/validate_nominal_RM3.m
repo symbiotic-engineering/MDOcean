@@ -1,9 +1,9 @@
-function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
-    p = parameters();
+function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
+    p = parameters(mode);
     p.N_WEC = 1;
     p.power_max = 286000;
     p.LCOE_max = 10; % set large max LCOE to avoid failing feasibility check
-    b = var_bounds(); 
+    b = var_bounds(mode); 
     
     X = [b.X_noms; 1];
     
@@ -14,7 +14,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3()
 
     % comparison of simulated and actual values
     if nargout > 2
-        actual = validation_inputs();
+        actual = validation_inputs(mode);
         tiledlayout(1,3)
         fields = fieldnames(actual);
 

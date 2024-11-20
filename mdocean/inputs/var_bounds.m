@@ -1,4 +1,10 @@
-function b = var_bounds()
+function b = var_bounds(mode)
+% mode = 'wecsim': use parameters corresponding to RM3.out in WEC-Sim
+% mode = anything else or not provided: use parmaters corresponding to RM3 report (default)
+
+if nargin<1
+    mode = '';
+end
 
 b.var_names = {'D_s','D_f','T_f_2','h_s','F_max','B_p','w_n','M'};
 b.var_names_pretty = {'D_s','D_f','T_{f,2}','h_s','F_{max}','B_p','\omega_n','M'};
@@ -67,7 +73,11 @@ b.maxs_flexible = [true   true  false  false  true   true  true]';
 
 b.X_mins = [b.D_s_min b.D_f_min b.T_f_2_min b.h_s_min b.F_max_min b.B_p_min b.w_n_min]';
 b.X_maxs = [b.D_s_max b.D_f_max b.T_f_2_max b.h_s_max b.F_max_max b.B_p_max b.w_n_max]';
-b.X_noms = [b.D_s_nom b.D_f_nom b.T_f_2_nom b.h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
+if strcmpi(mode,'wecsim')
+    b.X_noms = [b.D_s_wecsim b.D_f_wecsim b.T_f_2_wecsim b.h_s_wecsim b.F_max_wecsim b.B_p_wecsim b.w_n_wecsim]';
+else
+    b.X_noms = [b.D_s_nom b.D_f_nom b.T_f_2_nom b.h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
+end
 b.X_starts = [b.D_s_start b.D_f_start b.T_f_2_start b.h_s_start b.F_max_start b.B_p_start b.w_n_start]';
 
 b.X_start_struct = cell2struct(num2cell(b.X_starts),b.var_names(1:end-1)',1);

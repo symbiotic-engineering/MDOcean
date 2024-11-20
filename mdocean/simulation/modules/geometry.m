@@ -1,6 +1,7 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
          A_c, A_lat_sub, r_over_t, ...
-         I, T, V_f_pct, V_s_pct, GM, mass] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
+         I, T, V_f_pct, V_s_pct, GM, mass,...
+         CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
                                             t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
                                             D_d, D_dt, theta_dt, T_s, h_d, t_d_max, ...
                                             M, rho_m, rho_w, m_scale)
@@ -152,9 +153,9 @@ T_term_4 =                                           12*T_f_2*h_f - 6*h_f^2;
 T_term_5 = 4*(   T_f_1 -   T_f_2);
 T_term_6 = 4*(-2*T_f_1 + 2*T_f_2 - 3*h_f);
 T_term_7 = 12*h_f;
-CM_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_s^2;
-CM_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_s^2;
-CM_f_from_waterline = CM_f_num / CM_f_den;
+CG_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_s^2;
+CG_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_s^2;
+CG_f_from_waterline = CG_f_num / CG_f_den;
 
 % centers of buoyancy, measured from keel (bottom of damping plate)
 CB_f = T_s - CB_f_from_waterline;
@@ -163,7 +164,7 @@ CB_d = h_d/2;
 CBs = [CB_f, CB_vc, CB_d];
 
 % centers of gravity, measured from keel - assume even mass distribution
-CG_f = T_s - CM_f_from_waterline;
+CG_f = T_s - CG_f_from_waterline;
 CG_vc = h_d + (h_s-h_d)/2;
 CG_d = h_d/2;
 CGs = [CG_f, CG_vc, CG_d];

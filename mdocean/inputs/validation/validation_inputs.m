@@ -1,10 +1,12 @@
-function RM3_report = validation_inputs()
+function [RM3_actual] = validation_inputs(mode)
 
 RM3_report = struct(...
                 'mass_f',       208e3, ...  % p159 RM3 report
                 'mass_vc',      224e3, ...  % p159 RM3 report
                 'mass_rp',      245e3, ...  % p159 RM3 report
                 'mass_tot',     680e3, ...  % p159 RM3 report
+                'vol_f',        742.044,... % calculated (MDOcean F24 debugging slide 23)
+                'vol_s',        1008, ...   % calculated (MDOcean F24 debugging slide 27)
                 'capex',        [17e6 61e6, 207e6, 390e6],  ... 
                 ...                         % B15:E15 in CBS Report Tables
                 'opex',         [1.2e6, 3.3e6, 6.6e6, 9.4e6],... 
@@ -20,7 +22,17 @@ RM3_report = struct(...
 
 RM3_wecsim = struct(...
                 'vol_f',        725.833, ...% submerged volume from WAMIT RM3.out
-                'vol_s',        726.755 ...% submerged volume from WAMIT RM3.out
+                'vol_s',        726.755, ...% submerged volume from WAMIT RM3.out
+                'CB_f',         1.2929, ... % center of buoyancy below waterline (MDOcean F24 debugging slide 25)
+                'CG_f',         0.2833 ...  % center of gravity below waterline (MDOcean F24 debugging slide 25)
               );
+
+if strcmpi(mode,'wecsim')
+    RM3_actual = RM3_wecsim;
+elseif strcmpi(mode,'report')
+    RM3_actual = RM3_report;
+else
+    error("Invalid validation mode: use 'wecsim' or 'report.'")
+end
 
 end
