@@ -127,6 +127,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     spar_pos  = output.bodies(2).position(start_idx:end,3);
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
+    relative_amplitude(imcr) = 1/2 * (max(float_pos - spar_pos) - min(float_pos - spar_pos));
 
     rmdir(pctDir, 's')  
 

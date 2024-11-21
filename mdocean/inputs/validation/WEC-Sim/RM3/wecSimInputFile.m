@@ -22,7 +22,7 @@ save('mcrMDOcean.mat','mcr')
 % filename to save
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparfixed_floatcd' num2str(p.C_d_float) '_' git_hash];
+output_filename = ['wecsim_sparcd5_floatcd' num2str(p.C_d_float) '_' git_hash];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
