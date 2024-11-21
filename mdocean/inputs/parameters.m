@@ -110,7 +110,7 @@ T = [T;
         true,"ratio of float inner diameter to spar diameter (-)")
     ...
     ...% Dynamics: device parameters
-    table("C_d_float","C_{d,float}",{0},"dynamics",true,"coefficient of drag for float");
+    table("C_d_float","C_{d,float}",{1},"dynamics",true,"coefficient of drag for float");
     table("C_d_spar","C_{d,spar}",{5},"dynamics",true,"spar coefficient of drag");
     table("power_max","power_{max}",{Inf},"dynamics",true,"maximum power (W)");
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)");
@@ -118,7 +118,7 @@ T = [T;
     ...% Dynamics: simulation type
     table("control_type","control type",{'damping'},"dynamics",false,...
         "reactive or constant impedance or damping");
-    table("use_MEEM","use_MEEM",{true},"dynamics",false,...
+    table("use_MEEM","use_MEEM",{false},"dynamics",false,...
         "whether to use MEEM for hydro coeffs (boolean)");
     table("use_multibody","use_multibody",{true},"dynamics",false,...
         "whether to use multibody dynamics (boolean)");

@@ -133,7 +133,7 @@ parfor imcr=1:length(mcr.cases(:,1))
 
 end
 
-save(output_filename, 'P','float_amplitude','spar_amplitude')
+save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude')
 
 clear imcr totalNumOfWorkers
 delete(gcp); % close the parallel pool
