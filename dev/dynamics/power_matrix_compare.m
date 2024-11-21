@@ -15,7 +15,7 @@ sim_elec_unsat = P_matrix/1000;
 sim_mech_unsat = sim_elec_unsat / p.eff_pto;
 
 % saturated power
-v = validation_inputs();
+v = validation_inputs('report');
 p.power_max = v.power_max;
 actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & Economics');
 [~, ~, P_matrix] = simulation(X,p);
