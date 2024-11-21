@@ -34,7 +34,8 @@ spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
 spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix));
 
 % wecSim spar moving
-spar_moving = load('wecsim_power_sparfloatingcd5_floatcd0_multibody',vars{:});
+% 'wecsim_power_sparfloatingcd5_floatcd0_multibody'
+spar_moving = load('wecsim_sparcd5_floatcd1_6769f0f',vars{:});
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 spar_moving_float_amplitude = reshape(spar_moving.float_amplitude,size(P_matrix));
@@ -149,7 +150,7 @@ grid on
 
 % power and amplitude error plot: vs WecSim
 MDOcean_Wecsim_power_error = 100 * (pre_JPD_power(:,:,2) - pre_JPD_power(:,:,4)) ./ pre_JPD_power(:,:,4);
-MDOcean_Wecsim_amplitude_error = 100 * (val.X - spar_fixed_float_amplitude) ./ spar_fixed_float_amplitude;
+MDOcean_Wecsim_amplitude_error = 100 * (val.X_f - spar_fixed_float_amplitude) ./ spar_fixed_float_amplitude;
 % set contour lines to make plot more readable
 if p.C_d_float==0 && p.use_MEEM==false
     power_error_vals = 3;
@@ -204,7 +205,7 @@ end
 
 figure
 subplot 131
-contourf(T,H,val.X)
+contourf(T,H,val.X_f)
 title('MDOcean')
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')

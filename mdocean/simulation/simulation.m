@@ -88,7 +88,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.theta_dt, in.T_s, in.h_d, in.t_d_max,...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, B_p,X,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -103,7 +103,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.FOS_b = FOS_buckling;
 	val.c_v = P_var;
     val.B_p = B_p;
-    val.X = X;
+    val.X_u = X_u;
+    val.X_f = X_f;
     val.P_mech = P_matrix_mech;
     val.CB_f = CB_f;
     val.CG_f = CG_f;
