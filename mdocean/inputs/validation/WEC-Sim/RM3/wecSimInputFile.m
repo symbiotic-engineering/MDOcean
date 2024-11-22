@@ -20,6 +20,10 @@ mcr.cases = [H(:),T(:),control];
 save('mcrMDOcean.mat','mcr')
 
 % filename to save
+[~, status] = system('git status');
+if ~contains(status,'working tree clean')
+    error('you have  uncommitted changes, please commit so the wecsim settings can be referenced to the commit')
+end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
 output_filename = ['wecsim_sparcd5_floatcd' num2str(p.C_d_float) '_' git_hash];
