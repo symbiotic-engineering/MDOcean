@@ -110,8 +110,8 @@ T = [T;
         true,"ratio of float inner diameter to spar diameter (-)")
     ...
     ...% Dynamics: device parameters
-    table("C_d_float","C_{d,float}",{1},"dynamics",true,"coefficient of drag for float");
-    table("C_d_spar","C_{d,spar}",{5},"dynamics",true,"spar coefficient of drag");
+    table("C_d_float","C_{d,float}",{0},"dynamics",true,"coefficient of drag for float");
+    table("C_d_spar","C_{d,spar}",{0},"dynamics",true,"spar coefficient of drag");
     table("power_max","power_{max}",{Inf},"dynamics",true,"maximum power (W)");
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)");
     ...

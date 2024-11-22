@@ -4,7 +4,6 @@
 regular = true;
 
 p = parameters();
-p.C_d_float = 1;
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
 b = var_bounds();
 X = [b.X_noms; 1];
