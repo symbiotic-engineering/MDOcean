@@ -22,7 +22,7 @@ actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & 
 sim_elec_sat = P_matrix/1000;
 
 % wecSim spar stationary
-vars = {'P','float_amplitude','spar_amplitude'};
+vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
 if p.C_d_float == 0
     spar_fixed = load('wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe',vars{:});
 elseif p.C_d_float == 1
@@ -35,10 +35,11 @@ spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix))
 
 % wecSim spar moving
 % 'wecsim_power_sparfloatingcd5_floatcd0_multibody'
-spar_moving = load('wecsim_sparcd5_floatcd1_6769f0f',vars{:});
+spar_moving = load('wecsim_sparcd5_floatcd1_c3d8bad',vars{:});
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 spar_moving_float_amplitude = reshape(spar_moving.float_amplitude,size(P_matrix));
+spar_moving_relative_amplitude = reshape(spar_moving.relative_amplitude,size(P_matrix));
 
 % wave resources
 [T,H] = meshgrid(p.T, p.Hs);
@@ -192,7 +193,7 @@ grid on
 sgtitle('Percent Error to WecSim (%)')
 
 
-% Bp and X (without power saturation)
+% Bp (without power saturation)
 if length(unique(val.B_p)) > 1
     figure
     contourf(T,H,val.B_p/1e6)
@@ -203,6 +204,7 @@ if length(unique(val.B_p)) > 1
     grid on
 end
 
+% X_f float amplitude
 figure
 subplot 131
 contourf(T,H,val.X_f)
@@ -229,6 +231,34 @@ colorbar
 grid on
 
 sgtitle('Float Amplitude (m)')
+
+% X_u relative (PTO) amplitude
+figure
+subplot 131
+contourf(T,H,val.X_u)
+title('MDOcean')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+colorbar
+grid on
+
+subplot 132
+contourf(T,H,spar_fixed_float_amplitude) % X_f = X_u when spar fixed
+title('WEC-Sim spar fixed')
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+colorbar
+grid on
+
+subplot 133
+contourf(T,H,spar_moving_relative_amplitude)
+xlabel('Wave Period T (s)')
+ylabel('Wave Height Hs (m)')
+title('WEC-Sim spar moving')
+colorbar
+grid on
+
+sgtitle('Relative Amplitude (m)')
 
 %% compare average power over all sea states in JPD
 P_weighted_sim = sim_mech_unsat .* p.JPD / 100;
