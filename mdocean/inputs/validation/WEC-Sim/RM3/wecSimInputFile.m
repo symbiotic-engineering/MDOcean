@@ -3,7 +3,10 @@
 
 regular = true;
 
-p = parameters();
+if ~exist('p','var')
+    warning('parameters were loaded from scratch')
+    p = parameters();
+end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
 b = var_bounds();
 X = [b.X_noms; 1];
@@ -26,7 +29,7 @@ if ~contains(status,'working tree clean')
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparcd5_floatcd' num2str(p.C_d_float) '_' git_hash];
+output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class

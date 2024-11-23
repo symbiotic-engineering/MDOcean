@@ -1,14 +1,18 @@
+function pct_error_P_avg = power_matrix_compare(X, p, wecsim_filename)
 clear;close all;clc
 
-filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
+report_filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
 
-% inputs
-p = parameters();
-b = var_bounds();
-X = [b.X_noms; 1];
+if nargin==0
+    % inputs
+    p = parameters();
+    b = var_bounds();
+    X = [b.X_noms; 1];
+    wecsim_filename = 'wecsim_sparcd0_floatcd0_55e8584';
+end
 
 % unsaturated power
-actual_mech_unsat = readmatrix(filename,'Range','E73:S86','Sheet','Performance & Economics');
+actual_mech_unsat = readmatrix(report_filename,'Range','E73:S86','Sheet','Performance & Economics');
 actual_elec_unsat = actual_mech_unsat * p.eff_pto;
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
@@ -17,7 +21,7 @@ sim_mech_unsat = sim_elec_unsat / p.eff_pto;
 % saturated power
 v = validation_inputs('report');
 p.power_max = v.power_max;
-actual_elec_sat = readmatrix(filename,'Range','E97:S110','Sheet','Performance & Economics');
+actual_elec_sat = readmatrix(report_filename,'Range','E97:S110','Sheet','Performance & Economics');
 [~, ~, P_matrix] = simulation(X,p);
 sim_elec_sat = P_matrix/1000;
 
@@ -35,7 +39,7 @@ spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix))
 
 % wecSim spar moving
 % 'wecsim_power_sparfloatingcd5_floatcd0_multibody'
-spar_moving = load('wecsim_sparcd5_floatcd1_c3d8bad',vars{:});
+spar_moving = load(wecsim_filename,vars{:});
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 spar_moving_float_amplitude = reshape(spar_moving.float_amplitude,size(P_matrix));
@@ -44,9 +48,9 @@ spar_moving_relative_amplitude = reshape(spar_moving.relative_amplitude,size(P_m
 % wave resources
 [T,H] = meshgrid(p.T, p.Hs);
 JPD = p.JPD;
-JPD_actual = readmatrix(filename,'Range','E24:S37','Sheet','Performance & Economics');
+JPD_actual = readmatrix(report_filename,'Range','E24:S37','Sheet','Performance & Economics');
 wave_resource_raw = 1030 * 9.8^2 / (64*pi) * T .* H.^2 / 1000;
-wave_resource_sheet = readmatrix(filename,'Range','E49:S62','Sheet','Performance & Economics');
+wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet','Performance & Economics');
 wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 wave_resource_sim = wave_resource_raw;
 wave_resource_sim(JPD == 0) = NaN;
@@ -251,7 +255,7 @@ colorbar
 grid on
 
 subplot 133
-contourf(T,H,spar_moving_relative_amplitude)
+contourf(T,H,spar_moving_relative_amplitude,0:.2:1.6)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('WEC-Sim spar moving')
@@ -266,3 +270,5 @@ P_avg_sim = sum(P_weighted_sim(:))
 P_weighted_actual = spar_fixed_power .* p.JPD / 100;
 P_avg_actual = sum(P_weighted_actual(:))
 pct_error_P_avg = 100 * (P_avg_sim - P_avg_actual) / P_avg_actual
+
+end

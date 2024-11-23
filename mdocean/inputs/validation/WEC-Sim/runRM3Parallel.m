@@ -27,8 +27,8 @@ clear body waves simu output pto constraint ptoSim
 global mcr
 
 % open the local cluster profile
-p = parcluster('local');
-totalNumOfWorkers=p.NumWorkers;
+pool = parcluster('local');
+totalNumOfWorkers=pool.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
@@ -136,6 +136,6 @@ end
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude')
 
 clear imcr totalNumOfWorkers
-delete(gcp); % close the parallel pool
+%delete(gcp); % close the parallel pool
 
 
