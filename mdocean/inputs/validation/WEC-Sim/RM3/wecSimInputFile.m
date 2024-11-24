@@ -29,11 +29,16 @@ if ~contains(status,'working tree clean')
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash];
+uuid = char(matlab.lang.internal.uuid());
+output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash '_' uuid];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
-simu.simMechanicsFile = 'RM3.slx';      % Specify Simulink Model File
+if p.use_multibody
+    simu.simMechanicsFile = 'RM3_translation.slx';      % Specify Simulink Model File
+else
+    simu.simMechanicsFile = 'RM3_fixed.slx';
+end
 simu.mode = 'normal';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
