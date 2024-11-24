@@ -327,7 +327,7 @@ function results = load_RM3_report_results(eff_pto)
     
     [T,H] = meshgrid(Te,Hs);
 
-    %power_mech_unsat = power_mech_unsat(1:2,1:2);
+    power_mech_unsat = power_mech_unsat(1:2,1:2);
     power_elec_unsat = power_mech_unsat * eff_pto;
 
     %v = validation_inputs('report');
@@ -336,10 +336,10 @@ function results = load_RM3_report_results(eff_pto)
                                     'Sheet',sheet);
 
     JPD = readmatrix(report_filename,'Range','E24:S37','Sheet',sheet)/100;
-    %JPD_actual = JPD_actual(1:2,1:2);
+    JPD_actual = JPD_actual(1:2,1:2);
 
     wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet',sheet);
-    %wave_resource_sheet = wave_resource_sheet(1:2,1:2);
+    wave_resource_sheet = wave_resource_sheet(1:2,1:2);
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 
     results = assemble_results_struct(size(power_mech_unsat),...
