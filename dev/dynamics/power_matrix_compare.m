@@ -24,7 +24,7 @@ if nargin<4
     report = false;
 end
 
-results_wecsim = load_wecsim_results(wecsim_filename, size(p.JPD));
+results_wecsim = load_wecsim_results(wecsim_filename, p);
 
 results_mdocean = compute_mdocean_results(X,p);
 
@@ -44,13 +44,16 @@ end
 
 %var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
 %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-%                 'relative_amplitude', 'PTO_damping'};
-vars_to_plot = {'power_mech_unsat','JPD','float_amplitude','relative_amplitude'};
+%                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max'};
+vars_to_plot = {'power_mech_unsat','JPD','CW_to_CW_max','float_amplitude','relative_amplitude'};
 comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
 
 % compare average power over all sea states in JPD
-weighted_power_error = compute_weighted_percent_error(results_sim.power_mech_unsat, ...
+weighted_power_error = zeros([1,length(results_sim)]);
+for i=1:length(results_sim)
+weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
                                                       results_actual.power_mech_unsat, p.JPD);
+end
 
 end
 
@@ -315,21 +318,27 @@ end
 function results = load_RM3_report_results(eff_pto)
 
     report_filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
+    sheet = 'Performance & Economics';
 
     power_mech_unsat = readmatrix(report_filename,'Range','E73:S86',...
-                                    'Sheet','Performance & Economics');
+                                    'Sheet',sheet);
+    Hs = readmatrix(report_filename,'Range','D73:D86','Sheet',sheet);
+    Te = readmatrix(report_filename,'Range','E72:S72','Sheet',sheet);
+    
+    [T,H] = meshgrid(Te,Hs);
+
     %power_mech_unsat = power_mech_unsat(1:2,1:2);
     power_elec_unsat = power_mech_unsat * eff_pto;
 
-    v = validation_inputs('report');
-    p.power_max = v.power_max;
+    %v = validation_inputs('report');
+    %p.power_max = v.power_max;
     power_elec_sat = readmatrix(report_filename,'Range','E97:S110',...
-                                    'Sheet','Performance & Economics');
+                                    'Sheet',sheet);
 
-    JPD_actual = readmatrix(report_filename,'Range','E24:S37','Sheet','Performance & Economics');
+    JPD = readmatrix(report_filename,'Range','E24:S37','Sheet',sheet)/100;
     %JPD_actual = JPD_actual(1:2,1:2);
 
-    wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet','Performance & Economics');
+    wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet',sheet);
     %wave_resource_sheet = wave_resource_sheet(1:2,1:2);
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 
@@ -364,8 +373,9 @@ function results = compute_mdocean_results(X,p)
                                       'PTO_damping',val.B_p);
 end
 
-function results = load_wecsim_results(wecsim_filename, sz)
+function results = load_wecsim_results(wecsim_filename, p)
 
+    sz = size(p.JPD);
     % wecSim spar stationary
     vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
 
@@ -376,11 +386,12 @@ function results = load_wecsim_results(wecsim_filename, sz)
     spar_amplitude = reshape(wecsim_raw.spar_amplitude,sz);
     relative_amplitude = reshape(wecsim_raw.relative_amplitude,sz);
 
-    % todo: add T, H, JPD, PTO damping
+    % todo: add damping
+
 
     results = assemble_results_struct(size(power_mech_unsat),...
                                          'power_mech_unsat',power_mech_unsat, ...
-                                          ... % T, H, JPD, PTO_damping
+                                          'T', p.T, 'H', p.Hs, 'JPD', p.JPD, ...%PTO_damping
                                          'float_amplitude', float_amplitude,...
                                          'spar_amplitude',spar_amplitude, ...
                                          'relative_amplitude',relative_amplitude);
