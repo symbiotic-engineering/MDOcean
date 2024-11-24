@@ -17,7 +17,7 @@
 % limitations under the License.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function output = wecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers)
+function output = wecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p)
 %% wecSimFcn
 % WEC-Sim from function executable+
     wecSim

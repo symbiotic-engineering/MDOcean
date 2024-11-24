@@ -1,5 +1,4 @@
 function pct_error_P_avg = power_matrix_compare(X, p, wecsim_filename)
-clear;close all;clc
 
 report_filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
 
@@ -13,6 +12,7 @@ end
 
 % unsaturated power
 actual_mech_unsat = readmatrix(report_filename,'Range','E73:S86','Sheet','Performance & Economics');
+actual_mech_unsat = actual_mech_unsat(1:2,1:2);
 actual_elec_unsat = actual_mech_unsat * p.eff_pto;
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 sim_elec_unsat = P_matrix/1000;
@@ -34,12 +34,14 @@ elseif p.C_d_float == 1
 else
     error('cant find wecsim data for this Cd')
 end
-spar_fixed_power = -reshape(spar_fixed.P, size(P_matrix)) / 1000;
-spar_fixed_float_amplitude = reshape(spar_fixed.float_amplitude, size(P_matrix));
+spar_fixed_power = zeros(size(P_matrix));%-reshape(spar_fixed.P, size(P_matrix)) / 1000;
+spar_fixed_float_amplitude = zeros(size(P_matrix));%reshape(spar_fixed.float_amplitude, size(P_matrix));
 
 % wecSim spar moving
 % 'wecsim_power_sparfloatingcd5_floatcd0_multibody'
 spar_moving = load(wecsim_filename,vars{:});
+disp('p matrix is '); disp(size(P_matrix))
+disp('spar_moving.P is '); disp(size(spar_moving.P));
 spar_moving_power = -reshape(spar_moving.P, size(P_matrix)) / 1000;
 spar_moving_power(spar_moving_power>1e6) = NaN;
 spar_moving_float_amplitude = reshape(spar_moving.float_amplitude,size(P_matrix));
@@ -49,8 +51,10 @@ spar_moving_relative_amplitude = reshape(spar_moving.relative_amplitude,size(P_m
 [T,H] = meshgrid(p.T, p.Hs);
 JPD = p.JPD;
 JPD_actual = readmatrix(report_filename,'Range','E24:S37','Sheet','Performance & Economics');
+JPD_actual = JPD_actual(1:2,1:2);
 wave_resource_raw = 1030 * 9.8^2 / (64*pi) * T .* H.^2 / 1000;
 wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet','Performance & Economics');
+wave_resource_sheet = wave_resource_sheet(1:2,1:2);
 wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 wave_resource_sim = wave_resource_raw;
 wave_resource_sim(JPD == 0) = NaN;

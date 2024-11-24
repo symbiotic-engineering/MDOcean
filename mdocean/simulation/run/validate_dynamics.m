@@ -1,4 +1,4 @@
-
+clear;close all;clc
 
 %% Round 1: singlebody
 b = var_bounds('wecsim');
@@ -55,16 +55,16 @@ X = [b.X_noms; 1];
 
 
 function pct_error = run_dynamic_validation(X,p)
-    wecsim_filename = run_wecsim_validation(p);
-    pct_error = power_matrix_compare(X,p,wecsim_filename);
-end
-
-function output_filename = run_wecsim_validation(p)
     % override to have fewer sea states for the sake of fast debugging
     p.Hs = [1 2];
     p.T = [5 6];
     p.JPD = [.25 .25; .25 25];
 
+    wecsim_filename = run_wecsim_validation(p);
+    pct_error = power_matrix_compare(X,p,wecsim_filename);
+end
+
+function output_filename = run_wecsim_validation(p)
     % p needs to be in the workspace for runRM3Parallel script to work right
     runRM3Parallel % this script uses p and modifies it, and saves output_filename to workspace
 

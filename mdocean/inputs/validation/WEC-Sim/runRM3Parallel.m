@@ -108,6 +108,7 @@ start_idx = simu.rampTime * simu.dt;
 P = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
+relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -118,7 +119,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     fileID = fopen(filename,'a');
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers);   
+    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
     fclose(fileID);
 
     % save specific output variables
