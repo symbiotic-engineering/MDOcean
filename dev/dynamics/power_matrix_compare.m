@@ -5,7 +5,6 @@ if nargin==0
     p = parameters();
     b = var_bounds();
     X = [b.X_noms; 1];
-    report = false;
 
     if p.use_multibody
         wecsim_filename = 'wecsim_sparcd0_floatcd0_55e8584';
@@ -19,6 +18,10 @@ if nargin==0
             error('cant find wecsim data for this Cd')
         end
     end
+end
+
+if nargin<4
+    report = false;
 end
 
 results_wecsim = load_wecsim_results(wecsim_filename, size(p.JPD));
