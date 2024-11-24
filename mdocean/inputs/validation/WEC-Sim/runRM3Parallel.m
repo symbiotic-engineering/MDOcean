@@ -117,11 +117,10 @@ parfor imcr=1:length(mcr.cases(:,1))
     pctDir = sprintf('pctDir_%g', t.ID);
     getAttachedFilesFolder(pctDir);
     fileID = fopen(filename,'a');
-    cleanup = onCleanup(cleanup_fcn(fileID,pctDir));
+    cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
     output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
-    fclose(fileID);
 
     % save specific output variables
     P(imcr) = mean(output.ptos.powerInternalMechanics(start_idx:end,3));
