@@ -33,10 +33,20 @@ if report
     results_actual = results_RM3_report;
     results_sim = results_wecsim;
     results_sim(2) = results_mdocean;
+    actual_str = 'Actual: RM3 Report';
+    sim_str = {'Sim: WecSim','Sim: MDOcean'};
 else
     results_actual = results_wecsim;
     results_sim = results_mdocean;
+    actual_str = 'Actual: WecSim';
+    sim_str = {'Sim: MDOcean'};
 end
+
+%var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
+%                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
+%                 'relative_amplitude', 'PTO_damping'};
+vars_to_plot = {'power_mech_unsat','JPD','float_amplitude','relative_amplitude'};
+comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
 
 % compare average power over all sea states in JPD
 weighted_power_error = compute_weighted_percent_error(results_sim.power_mech_unsat, ...
@@ -255,38 +265,46 @@ function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     weighted_error = compute_percent_error_matrix(actual_avg, sim_avg);
 end
 
-function comparison_plot(T, H, actual, sim, vars_to_plot)
+function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
     num_subplots = 2*length(sim)+1;
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
         figure
         % actual
         subplot(1,num_subplots,1)
-        contour_plot(T,H, actual.(var_name), 'Actual')
+        contour_plot(T,H, actual.(var_name), actual_str);
 
         for i=1:length(sim)
             % sim
             subplot(1,num_subplots,1+i)
-            contour_plot(T,H,sim(i).(var_name), 'Simulated')
+            contour_plot(T,H,sim(i).(var_name), sim_str(i));
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
-            subplot(1,num_subplots,3+i)
-            error_plot(T,H,error,'Percent Error',error_values);
+            subplot(1,num_subplots,1+length(sim)+i)
+            error_levels = 10;
+            error_plot(T,H,error,'Percent Error',error_levels);
         end
         
-        sgtitle(var_name)
+        title_split = strsplit(var_name,'_');
+        title_str = cellfun(@mlreportgen.utils.capitalizeFirstChar,title_split,'UniformOutput',false);
+        title_str_spaces = strcat(title_str," ");
+        sgtitle(horzcat(title_str_spaces{:}))
     end
 end
 
 function error_plot(T, H, error, error_title, error_values)
     [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
     clabel(c,h_fig);
-    clim([min_colorbar max_colorbar])
-    colormap(bluewhitered)
+    %clim([min_colorbar max_colorbar])
+    colormap(h_fig.Parent,bluewhitered)
 end
 
-function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_vals)
-    [c,h_fig] = contourf(T,H,Z,Z_vals);
+function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
+    if nargin<5
+        Z_levels = 10;
+    end
+
+    [c,h_fig] = contourf(T,H,Z,Z_levels);
     title(Z_title)
     xlabel('Wave Period T (s)')
     ylabel('Wave Height Hs (m)')
@@ -315,7 +333,8 @@ function results = load_RM3_report_results(eff_pto)
     %wave_resource_sheet = wave_resource_sheet(1:2,1:2);
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 
-    results = assemble_results_struct('power_mech_unsat',power_mech_unsat, ...
+    results = assemble_results_struct(size(power_mech_unsat),...
+                                        'power_mech_unsat',power_mech_unsat, ...
                                         'power_elec_unsat',power_elec_unsat, ...
                                         'power_elec_sat',power_elec_sat, ...
                                         'T',T, 'H',H, 'JPD',JPD);
@@ -334,7 +353,8 @@ function results = compute_mdocean_results(X,p)
 
     spar_amplitude = 0*P_matrix; % fixme add val.X_s as an output
 
-    results = assemble_results_struct('power_mech_unsat', power_mech_unsat, ...
+    results = assemble_results_struct(size(power_mech_unsat),...
+                                      'power_mech_unsat', power_mech_unsat, ...
                                       'power_elec_unsat',power_elec_unsat, ...
                                       'power_elec_sat', power_elec_sat, ...
                                       'T',p.T, 'H',p.Hs, 'JPD',p.JPD, ...
@@ -358,7 +378,8 @@ function results = load_wecsim_results(wecsim_filename, sz)
 
     % todo: add T, H, JPD, PTO damping
 
-    results = assemble_results_struct('power_mech_unsat',power_mech_unsat, ...
+    results = assemble_results_struct(size(power_mech_unsat),...
+                                         'power_mech_unsat',power_mech_unsat, ...
                                           ... % T, H, JPD, PTO_damping
                                          'float_amplitude', float_amplitude,...
                                          'spar_amplitude',spar_amplitude, ...
@@ -366,7 +387,7 @@ function results = load_wecsim_results(wecsim_filename, sz)
 
 end
 
-function results = assemble_results_struct(varargin)
+function results = assemble_results_struct(sz,varargin)
 
     var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
                  'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
@@ -374,7 +395,7 @@ function results = assemble_results_struct(varargin)
 
     p = inputParser;
     for var_idx = 1:length(var_names)
-        addParameter(p,var_names{var_idx},NaN,@isnumeric)
+        addParameter(p,var_names{var_idx},NaN(sz),@isnumeric);
     end
     parse(p,varargin{:})
     results = p.Results;
