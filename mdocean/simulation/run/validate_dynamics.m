@@ -56,9 +56,9 @@ X = [b.X_noms; 1];
 
 function pct_error = run_dynamic_validation(X,p)
     % override to have fewer sea states for the sake of fast debugging
-    p.Hs = [1 2];
-    p.T = [5 6];
-    p.JPD = [.25 .25; .25 25];
+%     p.Hs = [1 2];
+%     p.T = [5 6];
+%     p.JPD = [.25 .25; .25 25];
 
     wecsim_filename = run_wecsim_validation(p);
     pct_error = power_matrix_compare(X,p,wecsim_filename);
