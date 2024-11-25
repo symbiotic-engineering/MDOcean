@@ -2,77 +2,78 @@ clear
 close all
 
 % sweep variables
-zeta_u = .01 : .03 : .13; % sets level of damping of uncontrolled system
-w_u_star = 0.1 : 0.3 : 1.3; % sets frequency ratio of uncontrolled system
+R = 0.1 : 0.02 : 10; % normalized resistance ratio
+D = 0 : 0.2 : 1; % ratio of hydrodynamic damping to total damping
+alpha_m = -10 : 0.1 : 10; % reactive to real impedance ratio
 F_max_over_Fp = 0.3 : 0.2 : 1.1; % sets level of saturation
 
 % generate sweep grid
-[ZETA_U,W_U_STAR,F_MAX_FP] = meshgrid(zeta_u, w_u_star, F_max_over_Fp);
+[R_grid, D_grid, ALPHA_M_grid,F_MAX_FP] = meshgrid(R, D, alpha_m, F_max_over_Fp);
 
 % constant variables - changing these should have no effect on the nondimensional outputs
 m = 1;  % dimensional term for mass
 w = 1;  % dimensional term for frequency
 F_h = 1; % dimensional term for exciting force
 
-% get results
+% Get results
 tic
-[avg_pwr, max_x, max_xdot, pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h, 7);
+[avg_pwr, max_voltage_ratio, max_xdot, pwr_ratio, voltage_ratio, xdot_ratio] = describing_fcn(R_grid, D_grid, ALPHA_M_grid, F_MAX_FP, m, w, F_h, 7);
 toc
-tic
-[avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth_wot(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
-%[avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2] = ground_truth(  ZETA_U, W_U_STAR, F_MAX_FP, m, w, F_h);
-toc
+%tic
+%[avg_pwr2, max_voltage_ratio2, max_xdot2, pwr_ratio2, voltage_ratio2, xdot_ratio2] = ground_truth_wot(R_grid, D_grid, ALPHA_M_grid, F_MAX_FP, m, w, F_h);
+%toc
 
-% combine results
-dim_cat = ndims(ZETA_U)+1;
-results_sim = cat(dim_cat, avg_pwr,  max_x,  max_xdot,  pwr_ratio,  x_ratio,  xdot_ratio);
-results_act = cat(dim_cat, avg_pwr2, max_x2, max_xdot2, pwr_ratio2, x_ratio2, xdot_ratio2);
-results_str = {'Average Power','Max X','Max Xdot','Power Ratio','X Ratio','Xdot Ratio'};
+% Combine results
+dim_cat = ndims(R_grid) + 1;
+results_sim = cat(dim_cat, avg_pwr, max_voltage_ratio, max_xdot, pwr_ratio, voltage_ratio, xdot_ratio);
+%results_act = cat(dim_cat, avg_pwr2, max_voltage_ratio2, max_xdot2, pwr_ratio2, voltage_ratio2, xdot_ratio2);
+results_str = {'Average Power', 'Max Voltage Ratio', 'Max Xdot', 'Power Ratio', 'Voltage Ratio', 'Xdot Ratio'};
 
+% Only unsaturated results
 results_unsat_sim = results_sim(F_MAX_FP >= 1);
-results_unsat_act = results_act(F_MAX_FP >= 1);
+%results_unsat_act = results_act(F_MAX_FP >= 1);
 
-for j = 1:size(results_sim,dim_cat)
-    figure
+% Plot each result
+for j = 1:size(results_sim, dim_cat)
+    figure;
     res_sim = results_sim(:,:,:,j);
     res_act = results_act(:,:,:,j);
-    color_lims = [min([res_sim,res_act],[],'all') max([res_sim,res_act],[],'all')];
+    color_lims = [min([res_sim, res_act], [], 'all'), max([res_sim, res_act], [], 'all')];
 
-    % plot simulated results
-    subplot 131
-    slice(ZETA_U,W_U_STAR,F_MAX_FP, res_sim,...
-        zeta_u(2:end),w_u_star(end),F_max_over_Fp,'nearest');
-    caxis(color_lims)
-    colorbar
-    xlabel('\zeta_u')
-    ylabel('\omega_u^*')
-    zlabel('F_{max}/F_p')
-    title('Describing Function')
+    % Simulated results plot
+    subplot(1, 3, 1);
+    slice(R_grid, D_grid, F_MAX_FP, res_sim, R(2:end), D(end), F_max_over_Fp, 'nearest');
+    caxis(color_lims);
+    colorbar;
+    xlabel('R');
+    ylabel('D');
+    zlabel('F_{max}/F_p');
+    title('Describing Function');
 
-    % plot actual results
-    subplot 132
-    slice(ZETA_U,W_U_STAR,F_MAX_FP, res_act,...
-        zeta_u(2:end),w_u_star(end),F_max_over_Fp,'nearest');
-    caxis(color_lims)
-    colorbar
-    xlabel('\zeta_u')
-    ylabel('\omega_u^*')
-    zlabel('F_{max}/F_p')
-    title('Numerical Integration')
+    % Actual results plot
+    %subplot(1, 3, 2);
+    %slice(R_grid, D_grid, F_MAX_FP, res_act, R(2:end), D(end), F_max_over_Fp, 'nearest');
+    %caxis(color_lims);
+    %colorbar;
+    %xlabel('R');
+    %ylabel('D');
+    %zlabel('F_{max}/F_p');
+    %title('Numerical Integration');
 
-    error_h = subplot(1,3,3);
-    slice(ZETA_U,W_U_STAR,F_MAX_FP, (res_sim-res_act)./res_act,...
-        zeta_u(2:end),w_u_star(end),F_max_over_Fp,'nearest');
-    caxis([-1,1])
-    colormap(error_h,bluewhitered)
-    colorbar
-    xlabel('\zeta_u')
-    ylabel('\omega_u^*')
-    zlabel('F_{max}/F_p')
-    title('Fractional Error')
+    % Error plot
+    %error_h = subplot(1, 3, 3);
+    %slice(R_grid, D_grid, F_MAX_FP, (res_sim - res_act) ./ res_act, R(2:end), D(end), F_max_over_Fp, 'nearest');
+    %caxis([-1, 1]);
+    %colormap(error_h, bluewhitered);
+    %colorbar;
+    %xlabel('R');
+    %ylabel('D');
+    %zlabel('F_{max}/F_p');
+    %title('Fractional Error');
 
-    sgtitle(results_str{j})
+    sgtitle(results_str{j});
 end
+
 
 function [f_sat_i] = get_f_sat(F_max_over_Fp, i)
     assert(all(F_max_over_Fp <= 1 & F_max_over_Fp >= 0,'all'))
@@ -90,48 +91,65 @@ function [f_sat_i] = get_f_sat(F_max_over_Fp, i)
 
 end
 
-function [avg_pwr, max_x, max_xdot, ...
-    pwr_ratio, x_ratio, xdot_ratio] = describing_fcn(zeta_u, w_u_star, ...
-                                                    F_max_over_Fp, m, w, F_h, order)
+function [avg_pwr, max_voltage_ratio, max_xdot, ...
+    pwr_ratio, voltage_ratio, xdot_ratio] = describing_fcn(R, D, ...
+                                                alpha_m, F_max_over_Fp, m, w, F_h, order)
 
-r_b = 2;
-w_star = 1;
+    % Compute unsaturated power and voltage ratio based on Force_saturation_conference equations
+    G_0 = 1; % constant from the paper
+    J = 1;  % placeholder for incident energy density
+    k = 1;  % placeholder for wavenumber
+    L=0;
+    F_e=0;
+    G=1;
+    Kt=1;
 
-F_max_over_Fp = min(F_max_over_Fp, 1);
-rkz = abs(w_u_star / w_star * r_b .* zeta_u ./ ( ((w_u_star / w_star).^2 - 1) * (r_b-1)));
+    Z_th = R*(1+L*1i+D/(R*(1+alpha_m*1i)));
+    V_th = sqrt(F_e*R/(Kt*G))*(D/(R*sqrt(1 + alpha_m^2)));
 
-% P_unsat equation assumes r_b = 2 and w_star = 1
-P_unsat = 1/16 * F_h^2 / (m*w) * w_u_star ./ zeta_u;
+    z=Z_th;
 
-zeta = r_b/(r_b - 1) * w_star ./ w_u_star .* zeta_u;
-X_unsat = F_h / (m*w^2) * w_star.^2 ./ sqrt( (1 - w_star^2)^2 + (2*zeta*w_star).^2);
-
-orders = 1 : 2 : order;
-[P_sat, X_sat, e, f_sat, m_sat] = deal(zeros([length(orders),size(F_max_over_Fp)]));
-for n = 1:length(orders)
-    i = orders(n);
-    f_sat_i = get_f_sat(F_max_over_Fp, i);
+    Gamma = (z+1)/(z-1); % Define or compute Gamma as needed
     
-    % m_sat equation assumes r_b = 2 and w_star = 1
-    m_sat_i = -f_sat_i .* (f_sat_i .* rkz.^2 - f_sat_i + 2*rkz .* sqrt(-f_sat_i.^2 + rkz.^2 + 1)) ...
-        ./ (f_sat_i.^2 .* rkz.^2 + f_sat_i.^2 - 4*rkz.^2);
-    e_i = f_sat_i.^2 ./ m_sat_i;
 
-    colons = repmat({':'},ndims(f_sat_i),1); % to allow indexing when we don't know dimensions ahead of time
-    P_sat(n,colons{:}) = P_unsat .* e_i;
-    X_sat(n,colons{:}) = X_unsat .* f_sat_i ./ m_sat_i;
-    f_sat(n,colons{:}) = f_sat_i;
-    m_sat(n,colons{:}) = m_sat_i;
-    e(n,colons{:}) = e_i;
-end
+    % Calculate Re(Gamma) and Im(Gamma)
+    Re_Gamma = real(Gamma);
+    Im_Gamma = imag(Gamma);
 
-avg_pwr = squeeze(sum(P_sat));
-max_x    = squeeze(X_sat(1,colons{:}));
-max_xdot = squeeze(X_sat(1,colons{:}) * w);
-pwr_ratio = squeeze(sum(e));
-x_ratio    = squeeze(f_sat(1,colons{:}) ./ m_sat(1,colons{:}));
-xdot_ratio = squeeze(f_sat(1,colons{:}) ./ m_sat(1,colons{:}));
+    epsilon = 1; % Define epsilon
+    % Calculate voltage_ratio_unsat based on the given formula
+    voltage_ratio = sqrt((abs(Gamma).^2 + 2 * epsilon * Re_Gamma + 1) ./ ...
+                           (alpha^2 * abs(Gamma).^2 + 2 * alpha * Im_Gamma + 1));
 
+    % P_unsat corresponds to P_L^m in matched case (Equation 7)
+    P_unsat = (G_0 * J / k) * (D ./ (1 + (R ./ D) .* (1 + alpha_m.^2)));
+    
+
+    orders = 1 : 2 : order;
+    [P_sat, Voltage_ratio_sat, e, f_sat, z] = deal(zeros([length(orders), size(F_max_over_Fp)]));
+
+    for n = 1:length(orders)
+        i = orders(n);
+        f_sat_i = get_f_sat(F_max_over_Fp, i);
+
+        % Update m_sat to z in the saturation equation
+        %z_i = -f_sat_i .* (f_sat_i .* (D .* R).^2 - f_sat_i + 2 * D .* sqrt(-f_sat_i.^2 + (D .* R).^2 + 1)) ...
+            %./ (f_sat_i.^2 .* (D .* R).^2 + f_sat_i.^2 - 4 * (D .* R).^2);
+        e_i = f_sat_i.^2 ./ z_i;
+
+        P_sat(n, :) = P_unsat .* (1-abs(Gamma).^2);
+        Voltage_ratio_sat(n, :) = voltage_ratio_unsat .* f_sat_i ./ z_i;
+        f_sat(n, :) = f_sat_i;
+        z(n, :) = z_i;
+        e(n, :) = e_i;
+    end
+
+    avg_pwr = squeeze(sum(P_sat));
+    max_voltage_ratio = squeeze(Voltage_ratio_sat(1, :));
+    max_xdot = squeeze(Voltage_ratio_sat(1, :) * w);
+    pwr_ratio = squeeze(sum(e));
+    voltage_ratio = squeeze(f_sat(1, :) ./ z(1, :));
+    xdot_ratio = squeeze(f_sat(1, :) ./ z(1, :));
 end
 
 function [avg_pwr, max_x, max_xdot, ...
@@ -172,85 +190,3 @@ function [avg_pwr, max_x, max_xdot, ...
 
 end
 
-function [avg_pwr, max_x, max_xdot] = run_ode(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h, plotOn)
-
-% dependent variables
-w_n_u = w ./ w_u_star;
-
-% parameters
-p = struct('Kh',w_n_u^2*m, 'Bh',2*zeta_u*w_n_u*m, 'm',m, 'w',w, ...
-           'Fh',F_h);
-
-% impedance matching
-w_star = 1;
-r_b = 2;
-p.Kp = p.m * p.w^2 - p.Kh; % fixme: this should techncially depend on w*
-p.Bp = p.Bh; % fixme: this should techncially depend on rb
-
-% maximum force
-wn = p.w / w_star;
-w_u_star = p.w / w_n_u;
-zeta = r_b / (r_b - 1) * w_star / w_u_star * zeta_u;
-X_unsat = p.Fh / (p.m * wn^2) / sqrt( (1 - w_star^2)^2 + (2*zeta*w_star)^2 );
-
-[~, ~, ~, ~, x_ratio, ~] = describing_fcn(zeta_u, w_u_star, F_max_over_Fp, m, w, F_h, 1);
-X_sat = X_unsat .* x_ratio;
-
-F_p = sqrt((p.Bp * p.w)^2 + p.Kp^2) * X_unsat;
-p.F_max = F_max_over_Fp * F_p;
-
-% ode inputs
-T = 2*pi/p.w;
-y0 = [-X_sat,0];
-tspan = linspace(0,5*T,501);
-
-% ode solve
-[t,y] = ode45(@(t,y)dynamics(t,y,p),tspan,y0);
-[~,Fp,P] = dynamics(t',y',p);
-
-% plot
-if plotOn
-    figure
-    plot(t,y)
-    hold on
-    plot(t,Fp,t,P)
-    legend('x','xdot','Fp','P')
-end
-
-% use 5th period
-avg_pwr = mean(P(t>=4*T));
-max_x = max(abs(y(t>=4*T,1)));
-max_xdot = max(abs(y(t>=4*T,2)));
-
-% compare against 4th period to ensure convergance
-avg_pwr_4th = mean(P(t>=3*T & t<=4*T));
-if ~ismembertol(avg_pwr,avg_pwr_4th,0.05) % 1% error allowed
-    avg_pwr = NaN;
-    max_x = NaN;
-    max_xdot = NaN;
-end
-
-end 
-
-% equation of motion
-function [ydot,Fp,P] = dynamics(t,y,p)
-
-% states
-x = y(1,:);
-xdot = y(2,:);
-
-% forces
-Fh = p.Fh * sin(p.w * t);
-Fhyd = p.Kh * x + p.Bh * xdot;
-Fp = p.Kp * x + p.Bp * xdot;
-Fp = min(max(Fp/p.F_max, -1), 1) * p.F_max;
-F = Fh - Fp - Fhyd;
-
-% state derivatives
-xddot = F / p.m;
-ydot = [xdot; xddot];
-
-% power
-P = Fp .* xdot;
-
-end
