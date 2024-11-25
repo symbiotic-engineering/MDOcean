@@ -1,6 +1,6 @@
 function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
           	F_heave, F_surge, M, h_s, T_s, rho_w, g, ...
-            sigma_y, A_c, A_lat_sub, r_over_t, I, E, D_d, A_dt, theta_dt, L_dt, h_d, D_s, t_d)
+            sigma_y, A_c, A_lat_sub, r_over_t, I, E, D_d, A_dt, theta_dt, L_dt, h_d, D_s, t_d, v)
 
     %% Stress calculations
     depth = [0 T_s T_s]; % max depth
@@ -34,8 +34,12 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     x = linspace(0,r_bending-1,1500);
     x1 = linspace(0,r-t_d,1500);
 
-    [sigma_xx, shear, sigma_bending, sigma_axial, M_x, I_x, F_water, F_support,y] = damping_plate_func(E, D_d, A_dt, theta_dt, L_dt, h_d, D_s, h_d - t_d, A_c(1),A_c(2),A_c(3), P_hydrostatic(1),P_hydrostatic(2),P_hydrostatic(3),x,x1,F_heave);
-    %[y_tip] = damping_plate_check(r, D_s/2, F_support*sin(theta_dt), h_d-t_d, E, F_water/r_bending, D_s, v);
+    [sigma_xx,shear,sigma_bending,sigma_axial,M_x,I_x,F_water,F_support,y] = ...
+    damping_plate_func(E,D_d,A_dt,theta_dt,L_dt,h_d,D_s,h_d - t_d,A_c(1), ...
+    A_c(2),A_c(3),P_hydrostatic(1),P_hydrostatic(2),P_hydrostatic(3),x,x1,F_heave);
+    y_tip_Roark = damping_plate_check(r,D_s/2,F_support*sin(theta_dt),h_d-t_d,E,F_water/r_bending,D_s,v(1));
+    
+    %plots for debugging
     hold on
     %plot(x,M_x)
     %plot(x,I_x)
