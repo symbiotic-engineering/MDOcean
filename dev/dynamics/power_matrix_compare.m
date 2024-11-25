@@ -299,7 +299,9 @@ function error_plot(T, H, error, error_title, error_values)
     [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
     clabel(c,h_fig);
     %clim([min_colorbar max_colorbar])
-    colormap(h_fig.Parent,bluewhitered)
+    if ~isempty(h_fig)
+        colormap(h_fig.Parent,bluewhitered)
+    end
 end
 
 function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
@@ -307,7 +309,11 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
         Z_levels = 10;
     end
 
-    [c,h_fig] = contourf(T,H,Z,Z_levels);
+    if any(isfinite(Z),'all')
+        [c,h_fig] = contourf(T,H,Z,Z_levels);
+    else
+        c = []; h_fig = [];
+    end
     title(Z_title)
     xlabel('Wave Period T (s)')
     ylabel('Wave Height Hs (m)')
