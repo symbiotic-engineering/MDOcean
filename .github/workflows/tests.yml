@@ -26,7 +26,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
-          path: main
+          path: MDOcean
 
       - name: Checkout WEC-Sim
         uses: actions/checkout@v4
@@ -34,16 +34,10 @@ jobs:
           repository: WEC-Sim/WEC-Sim
           path: WEC-Sim
 
-      - name: cd to MDOcean directory
-        run: |
-            pwd
-            cd main
-            pwd
-
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
         with:
-          args: "-f zenodo --validate --show-trace"
+          args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
@@ -60,14 +54,14 @@ jobs:
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-command@v2
         with:
-          command: addpath("tests"), run_tests
+          command: addpath("MDOcean/tests"), run_tests
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v4
         if: always()
         with:
           fail_ci_if_error: true
-          directory: code-coverage
+          directory: MDOcean/code-coverage
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to codecov
@@ -75,14 +69,14 @@ jobs:
         if: always()
         with:
           fail_ci_if_error: true
-          directory: test-results
+          directory: MDOcean/test-results
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to GitHub UI
         uses: mikepenz/action-junit-report@v5
         if: always()
         with:
-          report_paths: 'test-results/**/junit.xml'
+          report_paths: 'MDOcean/test-results/**/junit.xml'
 
       - name: Upload test report PDF
         if: always()
@@ -90,7 +84,7 @@ jobs:
         with:
           name: test-report
           path: |
-            test-results/**/testreport.pdf
-            code-coverage/**/coverage.xml
-            **/DynamicValidation_*.pdf
+            MDOcean/test-results/**/testreport.pdf
+            MDOcean/code-coverage/**/coverage.xml
+            MDOcean/**/DynamicValidation_*.pdf
     
