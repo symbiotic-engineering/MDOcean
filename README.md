@@ -56,6 +56,7 @@ The following packages are used in this code:
 | Global Optimization Toolbox | Required for optimization |
 | Symbolic Math Toolbox | Optional for simulation code generation |
 | Parallel Computing Toolbox | Optional for speedup |
+| MATLAB Report Generator | Optional for WEC-Sim validation |
 | Simulink | Optional for WEC-Sim validation | 
 | Simscape | Optional for WEC-Sim validation | 
 | Simscape Multibody | Optional for WEC-Sim validation |
