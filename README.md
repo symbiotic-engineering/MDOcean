@@ -60,6 +60,7 @@ The following packages are used in this code:
 | Simscape | Optional for WEC-Sim validation | 
 | Simscape Multibody | Optional for WEC-Sim validation |
 | [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
+
 The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
 
 **Funding Acknowledgement**
