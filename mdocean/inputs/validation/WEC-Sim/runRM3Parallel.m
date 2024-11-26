@@ -111,6 +111,8 @@ float_amplitude = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
 
+%rtp = Simulink.BlockDiagram.buildRapidAcceleratorTarget(load_system(simu.simMechanicsFile));
+
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
     t = getCurrentTask();
@@ -130,6 +132,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
     relative_amplitude(imcr) = 1/2 * (max(float_pos - spar_pos) - min(float_pos - spar_pos));
+    close_system(simu.simMechanicsFile,0);
     Simulink.sdi.clear
 end
 

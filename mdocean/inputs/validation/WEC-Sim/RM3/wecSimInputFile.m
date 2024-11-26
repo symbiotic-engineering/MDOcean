@@ -39,7 +39,7 @@ if p.use_multibody
 else
     simu.simMechanicsFile = 'inputs/validation/WEC-Sim/RM3/RM3_fixed.slx';
 end
-simu.mode = 'accelerator';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
+simu.mode = 'rapid-accelerator';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
 simu.rampTime = 100;                    % Wave Ramp Time [s]
