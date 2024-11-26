@@ -18,7 +18,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % this is a revised version of WEC-Sim/source/wecSimPCT.m that saves
-% specific output variables with a given filename
+% specific output variables with a given filename.
+% fixme: this perhaps belongs better in userDefinedFunctions.m?
 
 %% wecSimPCT
 % WEC-Sim parallel computing toolbox executable

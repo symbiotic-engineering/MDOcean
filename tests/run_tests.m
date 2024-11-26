@@ -7,6 +7,13 @@ import matlab.unittest.plugins.TestReportPlugin
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
+
+if exist('../WEC-Sim','dir')
+    wecSimFolder = '../WEC-Sim/source';
+    set_param(0, 'ErrorIfLoadNewModel', 'off')
+    addpath(genpath(wecSimFolder))
+end
+
 suite = testsuite('tests');
 runner = testrunner('textoutput');
 

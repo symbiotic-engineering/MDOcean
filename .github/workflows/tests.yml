@@ -25,6 +25,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
         uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: Checkout WEC-Sim
+        uses: actions/checkout@v4
+        with:
+          repository: WEC-Sim/WEC-Sim
+          path: WEC-Sim
 
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
@@ -39,6 +47,9 @@ jobs:
                 Global_Optimization_Toolbox
                 Optimization_Toolbox
                 Statistics_and_Machine_Learning_Toolbox
+                Simulink # for WEC-Sim validation
+                Simscape
+                Simscape_Multibody
       
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-command@v2
@@ -75,4 +86,5 @@ jobs:
           path: |
             test-results/**/testreport.pdf
             code-coverage/**/coverage.xml
+            **/DynamicValidation_*.pdf
     

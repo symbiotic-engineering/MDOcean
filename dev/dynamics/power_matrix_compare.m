@@ -1,4 +1,4 @@
-function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report)
+function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report, override)
 
 if nargin==0
     % inputs
@@ -29,7 +29,7 @@ results_wecsim = load_wecsim_results(wecsim_filename, p);
 results_mdocean = compute_mdocean_results(X,p);
 
 if report
-    results_RM3_report = load_RM3_report_results(p.eff_pto);
+    results_RM3_report = load_RM3_report_results(p.eff_pto, override);
     results_actual = results_RM3_report;
     results_sim = results_wecsim;
     results_sim(2) = results_mdocean;
@@ -321,33 +321,35 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     grid on
 end
 
-function results = load_RM3_report_results(eff_pto)
+function results = load_RM3_report_results(eff_pto, override)
 
     report_filename = 'RM3-CBS.xlsx'; % spreadsheet containing RM3 "actual" power data
     sheet = 'Performance & Economics';
 
     power_mech_unsat = readmatrix(report_filename,'Range','E73:S86',...
                                     'Sheet',sheet);
-    %power_mech_unsat = power_mech_unsat(1:2,1:2);
+    
     
     Hs = readmatrix(report_filename,'Range','D73:D86','Sheet',sheet);
     Te = readmatrix(report_filename,'Range','E72:S72','Sheet',sheet);
-    %Hs = Hs(1:2); Te = Te(1:2);
-    
-    [T,H] = meshgrid(Te,Hs);
-
-
-    power_elec_unsat = power_mech_unsat * eff_pto;
 
     power_elec_sat = readmatrix(report_filename,'Range','E97:S110',...
                                     'Sheet',sheet);
 
     JPD = readmatrix(report_filename,'Range','E24:S37','Sheet',sheet)/100;
-    %JPD = JPD(1:2,1:2);
 
     wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet',sheet);
-    %wave_resource_sheet = wave_resource_sheet(1:2,1:2);
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
+
+    if override
+        power_mech_unsat = power_mech_unsat(1:2,1:2);
+        Hs = Hs(1:2); Te = Te(1:2);
+        JPD = JPD(1:2,1:2);
+        wave_resource_sheet = wave_resource_sheet(1:2,1:2);
+    end
+
+    power_elec_unsat = power_mech_unsat * eff_pto;
+    [T,H] = meshgrid(Te,Hs);
 
     results = assemble_results_struct(size(power_mech_unsat),...
                                         'power_mech_unsat',power_mech_unsat, ...

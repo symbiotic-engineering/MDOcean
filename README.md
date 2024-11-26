@@ -48,13 +48,16 @@ optimizations to generate every figure in the paper.
 **Dependencies**
 
 The following packages are used in this code:
-- MATLAB
-- Optimization Toolbox
-- Global Optimization Toolbox
-- Statistics and Machine Learning Toolbox
-- Symbolic Math Toolbox
-
-All are required except the symbolic math toolbox, which is used only for code generation and exploratory scripting, not core functionality.
+| ---    | ---      |
+| MATLAB | Required for simulation |
+| Statistics and Machine Learning Toolbox | Required for simulation |
+| Optimization Toolbox | Required for optimization |
+| Global Optimization Toolbox | Required for optimization |
+| Symbolic Math Toolbox | Optional for simulation code generation |
+| Parallel Computing Toolbox | Optional for speedup |
+| Simulink | Optional for WEC-Sim validation | 
+| Simscape | Optional for WEC-Sim validation | 
+| Simscape Multibody | Optional for WEC-Sim validation |
 
 **Funding Acknowledgement**
 
