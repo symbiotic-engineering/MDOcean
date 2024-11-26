@@ -140,5 +140,7 @@ clear imcr totalNumOfWorkers
 
 function cleanup_fcn(fileID,pctDir)
     fclose(fileID);
-    %rmdir(pctDir, 's');
+    try
+        rmdir(pctDir, 's');
+    end
 end
