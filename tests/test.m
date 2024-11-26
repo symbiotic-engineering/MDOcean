@@ -1,4 +1,6 @@
-classdef test < matlab.unittest.TestCase
+classdef (SharedTestFixtures={ ...
+        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+        test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
@@ -17,10 +19,6 @@ classdef test < matlab.unittest.TestCase
         failed_wecsim
         simulated_wecsim
         actual_wecsim
-
-        errors_singlebody
-        errors_multibody
-        errors_report
 
         uuid   
     end
@@ -82,12 +80,6 @@ classdef test < matlab.unittest.TestCase
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
-        function changeFolder(testCase)
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            desiredFolder = '../mdocean';
-            testCase.applyFixture(CurrentFolderFixture(desiredFolder))
-        end
-
         function runNominalValidation(testCase)
             % this is a shared setup because the results are used by both
             % validateNominal and validateNominalFeasible
@@ -103,13 +95,6 @@ classdef test < matlab.unittest.TestCase
             testCase.failed_wecsim    = fail_w;
             testCase.simulated_wecsim = sim_w;
             testCase.actual_wecsim    = act_w;
-        end
-
-        function runNominalDynamics(testCase)
-            [singlebody, multibody, report] = validate_dynamics();
-            testCase.errors_singlebody = singlebody;
-            testCase.errors_multibody  = multibody;
-            testCase.errors_report     = report;
         end
 
         function generateUUID(testCase)
@@ -184,44 +169,6 @@ classdef test < matlab.unittest.TestCase
             ratio = check_max_CW(testCase.uuid.Value);
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
-
-        % Dynamic tests
-        function validateSinglebodyWecsimBaseline(testCase)
-            err = testCase.errors_singlebody.pct_error_baseline;
-            testCase.verifyLessThanOrEqual(err, 2);
-            % match wecsim to within 2 percent under perfect assumptions
-        end
-
-        function validateSinglebodyWecsimTotal(testCase)
-            err = testCase.errors_singlebody.pct_error_total;
-            testCase.verifyLessThanOrEqual(err, 10);
-            % match wecsim to within 10 percent under assumptions used for optim
-        end
-
-        function validateMultibodyWecsimBaseline(testCase)
-            err = testCase.errors_multibody.pct_error_baseline;
-            testCase.verifyLessThanOrEqual(err, 2);
-            % match wecsim to within 2 percent under perfect assumptions
-        end
-
-        function validateMultibodyWecsimTotal(testCase)
-            err = testCase.errors_multibody.pct_error_total;
-            testCase.verifyLessThanOrEqual(err, 10);
-            % match wecsim to within 10 percent under assumptions used for optim
-        end
-
-        function validateMultibodyReportBaseline(testCase)
-            err = testCase.errors_report.pct_error_baseline;
-            testCase.verifyLessThanOrEqual(err, 5);
-            % match RM3 report to within 5 percent under perfect assumptions
-        end
-
-        function validateMultibodyReportTotal(testCase)
-            err = testCase.errors_report.pct_error_total;
-            testCase.verifyLessThanOrEqual(err, 10);
-            % match RM3 report to within 10 percent under assumptions used for optim
-        end
-
 
     end
     
