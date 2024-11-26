@@ -130,7 +130,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
     relative_amplitude(imcr) = 1/2 * (max(float_pos - spar_pos) - min(float_pos - spar_pos));
-
+    Simulink.sdi.clear
 end
 
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude')
