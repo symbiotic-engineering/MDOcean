@@ -102,4 +102,7 @@ b.idxs_recover = idxs_recover;
 
 b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
 
+b.F_max_nom = find_nominal_inputs(b, mode, false);
+b.X_noms(5) = b.F_max_nom;
+
 end
