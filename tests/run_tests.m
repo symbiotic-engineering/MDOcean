@@ -14,7 +14,9 @@ if exist('../WEC-Sim','dir')
     addpath(genpath(wecSimFolder))
 end
 
-suite = testsuite('tests');
+% pass the folder "tests" to run both regular tests and wecsim tests.
+% pass just the regular test class "test" to only run regular tests.
+suite = testsuite('test');
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
