@@ -17,6 +17,10 @@ end
 % pass the folder "tests" to run both regular tests and wecsim tests.
 % pass just the regular test class "test" to only run regular tests.
 suite = testsuite('test');
+
+pwd
+disp({suite.BaseFolder}.')
+disp(path)
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
