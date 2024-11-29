@@ -18,10 +18,6 @@ end
 
 suite = testsuite('tests');
 suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
-
-pwd
-disp({suite.BaseFolder}.')
-disp(path)
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');

@@ -133,10 +133,9 @@ parfor imcr=1:length(mcr.cases(:,1))
     Simulink.sdi.clear
 end
 
-save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude')
+save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude','p')
 
 clear imcr totalNumOfWorkers
-%delete(gcp); % close the parallel pool
 
 function cleanup_fcn(fileID,pctDir)
     fclose(fileID);
