@@ -18,7 +18,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % this is a revised version of WEC-Sim/source/wecSimPCT.m that saves
-% specific output variables with a given filename
+% specific output variables with a given filename.
+% fixme: this perhaps belongs better in userDefinedFunctions.m?
 
 %% wecSimPCT
 % WEC-Sim parallel computing toolbox executable
@@ -27,8 +28,8 @@ clear body waves simu output pto constraint ptoSim
 global mcr
 
 % open the local cluster profile
-p = parcluster('local');
-totalNumOfWorkers=p.NumWorkers;
+pool = parcluster('local');
+totalNumOfWorkers=pool.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
@@ -108,6 +109,7 @@ start_idx = simu.rampTime * simu.dt;
 P = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
+relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -116,10 +118,10 @@ parfor imcr=1:length(mcr.cases(:,1))
     pctDir = sprintf('pctDir_%g', t.ID);
     getAttachedFilesFolder(pctDir);
     fileID = fopen(filename,'a');
+    cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers);   
-    fclose(fileID);
+    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
 
     % save specific output variables
     P(imcr) = mean(output.ptos.powerInternalMechanics(start_idx:end,3));
@@ -127,14 +129,17 @@ parfor imcr=1:length(mcr.cases(:,1))
     spar_pos  = output.bodies(2).position(start_idx:end,3);
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
-
-    rmdir(pctDir, 's')  
-
+    relative_amplitude(imcr) = 1/2 * (max(float_pos - spar_pos) - min(float_pos - spar_pos));
+    Simulink.sdi.clear
 end
 
-save(output_filename, 'P','float_amplitude','spar_amplitude')
+save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude','p')
 
 clear imcr totalNumOfWorkers
-delete(gcp); % close the parallel pool
 
-
+function cleanup_fcn(fileID,pctDir)
+    fclose(fileID);
+    try
+        rmdir(pctDir, 's');
+    end
+end

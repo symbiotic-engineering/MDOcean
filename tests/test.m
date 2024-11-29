@@ -1,4 +1,6 @@
-classdef test < matlab.unittest.TestCase
+classdef (SharedTestFixtures={ ...
+        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+        test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
@@ -78,12 +80,6 @@ classdef test < matlab.unittest.TestCase
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
-        function changeFolder(testCase)
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            desiredFolder = '../mdocean';
-            testCase.applyFixture(CurrentFolderFixture(desiredFolder))
-        end
-
         function runNominalValidation(testCase)
             % this is a shared setup because the results are used by both
             % validateNominal and validateNominalFeasible
@@ -153,6 +149,7 @@ classdef test < matlab.unittest.TestCase
     end
 
     methods(Test)
+        % Static tests
         function validateNominalReportFeasible(testCase)
             testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_report] );
             testCase.verifyTrue(testCase.feasible_report);
@@ -172,6 +169,7 @@ classdef test < matlab.unittest.TestCase
             ratio = check_max_CW(testCase.uuid.Value);
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
+
     end
     
 end

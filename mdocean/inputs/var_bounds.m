@@ -6,8 +6,8 @@ if nargin<1
     mode = '';
 end
 
-b.var_names = {'D_s','D_f','T_f_2','h_s','F_max','B_p','w_n','M'};
-b.var_names_pretty = {'D_s','D_f','T_{f,2}','h_s','F_{max}','B_p','\omega_n','M'};
+b.var_names = {'D_s','D_f','T_f_2','h_s','F_max','B_p','h_fs_clear','M'};
+b.var_names_pretty = {'D_s','D_f','T_{f,2}','h_s','F_{max}','B_p','h_{fs,clear}','M'};
 
 % inner diameter of float (m)	
 b.D_s_min = 0;
@@ -51,12 +51,12 @@ b.B_p_wecsim = 10;
 b.B_p_nom = 10;
 b.B_p_start = 0.5;
 
-% natural frequency (rad/s)
-b.w_n_min = .01;%2*pi/p.T(find(any(p.JPD > 0),1,'last'));  % min wave frequency that has any energy
-b.w_n_max = 40;%2*pi/p.T(find(any(p.JPD > 0),1,'first')); % max wave frequency that has any energy
-b.w_n_wecsim = 0.8;
-b.w_n_nom = 0.8;
-b.w_n_start = 0.8;
+% vertical clearance between float tube support and spar (m)
+b.h_fs_clear_min = .01;
+b.h_fs_clear_max = 10;
+b.h_fs_clear_wecsim = 4;
+b.h_fs_clear_nom = 4; % p169 11/26/24
+b.h_fs_clear_start = 4;
 
 % material index (-)
 b.M_min = 1;
@@ -65,20 +65,20 @@ b.M_wecsim = 1;
 b.M_nom = 1;
 b.M_start = 1;
 
-                 % D_s    D_f   T_f_2  h_s    F_max  B_p   w_n]
+                 % D_s    D_f   T_f_2  h_s    F_max  B_p   h_fs_clear]
 b.mins_flexible = [false  true  true   true   true   true  true]';
 b.maxs_flexible = [true   true  false  false  true   true  true]';
 % if a bound is marked flexible and the bound is active after optimization, 
 % a warning in gradient_optim will remind you to adjust the bound.
 
-b.X_mins = [b.D_s_min b.D_f_min b.T_f_2_min b.h_s_min b.F_max_min b.B_p_min b.w_n_min]';
-b.X_maxs = [b.D_s_max b.D_f_max b.T_f_2_max b.h_s_max b.F_max_max b.B_p_max b.w_n_max]';
+b.X_mins = [b.D_s_min b.D_f_min b.T_f_2_min b.h_s_min b.F_max_min b.B_p_min b.h_fs_clear_min]';
+b.X_maxs = [b.D_s_max b.D_f_max b.T_f_2_max b.h_s_max b.F_max_max b.B_p_max b.h_fs_clear_max]';
 if strcmpi(mode,'wecsim')
-    b.X_noms = [b.D_s_wecsim b.D_f_wecsim b.T_f_2_wecsim b.h_s_wecsim b.F_max_wecsim b.B_p_wecsim b.w_n_wecsim]';
+    b.X_noms = [b.D_s_wecsim b.D_f_wecsim b.T_f_2_wecsim b.h_s_wecsim b.F_max_wecsim b.B_p_wecsim b.h_fs_clear_wecsim]';
 else
-    b.X_noms = [b.D_s_nom b.D_f_nom b.T_f_2_nom b.h_s_nom b.F_max_nom b.B_p_nom b.w_n_nom]';
+    b.X_noms = [b.D_s_nom b.D_f_nom b.T_f_2_nom b.h_s_nom b.F_max_nom b.B_p_nom b.h_fs_clear_nom]';
 end
-b.X_starts = [b.D_s_start b.D_f_start b.T_f_2_start b.h_s_start b.F_max_start b.B_p_start b.w_n_start]';
+b.X_starts = [b.D_s_start b.D_f_start b.T_f_2_start b.h_s_start b.F_max_start b.B_p_start b.h_fs_clear_start]';
 
 b.X_start_struct = cell2struct(num2cell(b.X_starts),b.var_names(1:end-1)',1);
 
@@ -101,5 +101,8 @@ b.idxs_sort    = idxs_sort;
 b.idxs_recover = idxs_recover;
 
 b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
+
+b.F_max_nom = find_nominal_inputs(b, mode, false);
+b.X_noms(5) = b.F_max_nom;
 
 end
