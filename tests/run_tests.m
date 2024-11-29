@@ -4,6 +4,8 @@ import matlab.unittest.TestRunner;
 import matlab.unittest.plugins.XMLPlugin;
 import matlab.unittest.plugins.codecoverage.CoberturaFormat;
 import matlab.unittest.plugins.TestReportPlugin
+import matlab.unittest.selectors.HasName
+import matlab.unittest.constraints.ContainsSubstring
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
