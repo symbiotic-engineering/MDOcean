@@ -33,20 +33,29 @@ if report
     results_actual = results_RM3_report;
     results_sim = results_wecsim;
     results_sim(2) = results_mdocean;
-    actual_str = 'Actual: RM3 Report';
-    sim_str = {'Sim: WecSim','Sim: MDOcean'};
+    actual_str = 'RM3 Report';
+    sim_str = {'WecSim','MDOcean'};
 else
     results_actual = results_wecsim;
     results_sim = results_mdocean;
-    actual_str = 'Actual: WecSim';
-    sim_str = {'Sim: MDOcean'};
+    actual_str = 'WecSim';
+    sim_str = {'MDOcean'};
 end
 
-%var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
+% options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
 %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-%                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max'};
+%                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
 vars_to_plot = {'power_mech_unsat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
 comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
+
+% todo: use actual pretty variables titles with units
+% var_names = {'Unweighted Device Power Matrix (kW)',...
+%      'JPD-Weighted Power Matrix (kW)',...
+%      'Capture With (m)'...
+%      'Capture Width Ratio (-)',...
+%      'Capture Width / Max Capture Width (-)',...
+%      'Capture Width / Max Capture Width (-)',...
+%     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
 
 % compare average power over all sea states in JPD
 weighted_power_error = zeros([1,length(results_sim)]);
@@ -56,48 +65,7 @@ weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_me
 end
 
 end
-
 %%
-function old_stuff()
-
-var_names = {'Unweighted Device Power Matrix (kW)',...
-...%     'JPD-Weighted Power Matrix (kW)',...
-     'Capture With (m)'...
-...%     'Capture Width Ratio (-)',...
-     'Capture Width / Max Capture Width (-)',...
-...%     'Capture Width / Max Capture Width (-)',...
-    'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-
-% set contour lines to make plot more readable
-if p.C_d_float==0 && p.use_MEEM==false
-    power_error_vals = 3;
-    X_error_vals = 3;
-elseif p.C_d_float==1 && p.use_MEEM==false
-    power_error_vals = [-80 -50 -20 0 2:5 7 10 20];
-    X_error_vals = [-50 -40 -20 -10 0:5 10];
-elseif p.C_d_float==0 && p.use_MEEM==true
-    power_error_vals = [-25:5:0 2 5];
-    X_error_vals = -20:5:10;
-elseif p.C_d_float==1 && p.use_MEEM==true
-    power_error_vals = [-85 -50 -20 -14 -12 -10:5:20];
-    X_error_vals = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
-end
-min_colorbar = min(min([MDOcean_Wecsim_power_error,MDOcean_Wecsim_amplitude_error],[],'all'),-5);
-max_colorbar = max(max([MDOcean_Wecsim_power_error,MDOcean_Wecsim_amplitude_error],[],'all'),5);
-
-
-% % Bp (without power saturation)
-% if length(unique(val.B_p)) > 1
-%     figure
-%     contourf(T,H,val.B_p/1e6)
-%     xlabel('Wave Period T (s)')
-%     ylabel('Wave Height Hs (m)')
-%     title('B_p [MN/(m/s)]')
-%     colorbar
-%     grid on
-% end
-
-end
 
 function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     sim_weighted = sim .* weights / 100;
@@ -115,17 +83,31 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
         figure
         % actual
         subplot(1,num_subplots,1)
-        contour_plot(T,H, actual.(var_name), actual_str);
+        contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
 
         for i=1:length(sim)
             % sim
             subplot(1,num_subplots,1+i)
-            contour_plot(T,H,sim(i).(var_name), sim_str(i));
+            contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
             subplot(1,num_subplots,1+length(sim)+i)
             error_levels = 10;
-            error_plot(T,H,error,'Percent Error',error_levels);
+            % set contour lines to make plot more readable
+%             if p.C_d_float==0 && p.use_MEEM==false
+%                 power_error_vals = 3;
+%                 X_error_vals = 3;
+%             elseif p.C_d_float==1 && p.use_MEEM==false
+%                 power_error_vals = [-80 -50 -20 0 2:5 7 10 20];
+%                 X_error_vals = [-50 -40 -20 -10 0:5 10];
+%             elseif p.C_d_float==0 && p.use_MEEM==true
+%                 power_error_vals = [-25:5:0 2 5];
+%                 X_error_vals = -20:5:10;
+%             elseif p.C_d_float==1 && p.use_MEEM==true
+%                 power_error_vals = [-85 -50 -20 -14 -12 -10:5:20];
+%                 X_error_vals = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
+%             end
+            error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
         
         title_split = strsplit(var_name,'_');
@@ -138,7 +120,6 @@ end
 function error_plot(T, H, error, error_title, error_values)
     [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
     clabel(c,h_fig);
-    %clim([min_colorbar max_colorbar])
     if ~isempty(h_fig)
         colormap(h_fig.Parent,bluewhitered)
     end
@@ -228,7 +209,7 @@ function results = load_wecsim_results(wecsim_filename, p)
 
     wecsim_raw = load(wecsim_filename,vars{:});
     power_mech_unsat = -reshape(wecsim_raw.P, sz) / 1000;
-    %power(power>1e6) = NaN;
+    %power_mech_unsat(power_mech_unsat>1e6) = NaN;
     float_amplitude = reshape(wecsim_raw.float_amplitude,sz);
     spar_amplitude = reshape(wecsim_raw.spar_amplitude,sz);
     relative_amplitude = reshape(wecsim_raw.relative_amplitude,sz);
@@ -260,23 +241,17 @@ function results = assemble_results_struct(sz,varargin)
 
     % calculated variables
     wave_resource_raw = 1030 * 9.8^2 / (64*pi) * results.T .* results.H.^2 / 1000;
-    %wave_resource_sim = wave_resource_raw;
-    %wave_resource_sim(results.JPD == 0) = NaN;
     
     %diameter = X(2);
     results.CW = results.power_mech_unsat ./ wave_resource_raw;    % capture width
     CW_max = 9.8 * results.T.^2 / (4*pi^2);             % max CW for linear hydrodynamics, axisymmetric body
     %results.CWR = CW / diameter;                        % capture width ratio
     results.CW_to_CW_max = results.CW ./ CW_max;
-    %CW_to_CW_max_zeroed = CW_to_CW_max;
-    %JPD_rep = repmat(JPD,[1 1 4]);
-    %CW_to_CW_max_zeroed(JPD_rep == 0) = NaN;
 
 end
 
 function pct_error = compute_percent_error_matrix(actual, sim)
     pct_error = 100 * (sim - actual) ./ actual;
-    %pre_JPD_pct_error(JPD==0) = NaN;
     pct_error(pct_error==0) = NaN;
 
 end
