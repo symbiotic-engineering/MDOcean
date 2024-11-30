@@ -61,6 +61,7 @@ T = [T;
         ...% RM3 CBS sheet 1.4 average of cells F21, F34, F46, F56
         ...% https://www.concretenetwork.com/concrete-prices.html
         ...% https://agmetalminer.com/metal-prices/
+    table("nu","\nu",0.3,"structures",true,"Poisson's ratio (-)");
     ...
     ...% Thicknesses and structures
     table("t_f_t","t_{f,t}",{0.50 * in2m},"structures",true,"float top thickness (m)");
