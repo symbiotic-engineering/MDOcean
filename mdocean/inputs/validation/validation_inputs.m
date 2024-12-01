@@ -17,7 +17,9 @@ RM3_report = struct(...
                 'power_avg',    85.9e3, ... % S14 in CBS Performance & Economics
                 'power_max',    286e3, ...  % S15 in CBS Performance & Economics
                 'force_heave',  8500e3,...  % p156 RM3 report
-                'FOS_b',        3,...       % p158 RM3 report
+                'FOS_spar',     11.1,...    % p158 RM3 report, but modified 
+                ...                         % assuming that RM3 report used r 
+                ...                         % instead of D when calculating I
 				'c_v',			nominal_c_v()); % calculated from data in CBS Performance & Economics
 
 RM3_wecsim = struct(...

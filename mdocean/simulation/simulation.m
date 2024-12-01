@@ -47,7 +47,8 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 	    P_var, P_avg_elec, P_matrix_elec, ...
         X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
-[FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
+[FOS_float,FOS_spar,FOS_damping_plate,...
+    FOS_spar_local_buckling] = structures(...
                                     F_heave_max, F_surge_max,...
                                     in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, A_c, ...
                                     A_lat_sub, in.D_s, in.t_s_r, I, in.E, in.nu);
@@ -62,10 +63,10 @@ g(2) = 1 - V_f_pct;                     % prevent float too light
 g(3) = V_s_pct;                         % prevent spar too heavy
 g(4) = 1 - V_s_pct;                     % prevent spar too light
 g(5) = GM;                              % pitch stability of float-spar system
-g(6) = FOS1Y / p.FOS_min - 1;           % float survives max force
-g(7) = FOS2Y / p.FOS_min - 1;           % spar survives max force
-g(8) = FOS3Y / p.FOS_min - 1;           % damping plate survives max force
-g(9) = FOS_buckling / p.FOS_min - 1;    % spar survives max force in buckling
+g(6) = FOS_float / p.FOS_min - 1;           % float survives max force
+g(7) = FOS_spar / p.FOS_min - 1;           % spar survives max force
+g(8) = FOS_damping_plate / p.FOS_min - 1;           % damping plate survives max force
+g(9) = FOS_spar_local_buckling / p.FOS_min - 1;    % spar survives max force in buckling
 g(10) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(11) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
@@ -85,7 +86,7 @@ if ~criteria
 end
 
 if nargout > 4 % if returning extra struct output for validation
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ...
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ...
      mass, CB_f,CG_f] = geometry(in.D_s, in.D_f, in.D_f_in, in.D_f_b, ...
                                  in.T_f_1, in.T_f_2, in.h_f, in.h_s, ...
                                  in.h_fs_clear, in.D_f_tu, in.t_f_t, ...
@@ -106,7 +107,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.power_max = max(P_matrix_elec,[],'all');
     val.force_heave = F_heave_max;
     val.force_ptrain = F_ptrain_max;
-    val.FOS_b = FOS_buckling;
+    val.FOS_spar = FOS_spar;
 	val.c_v = P_var;
     val.B_p = B_p;
     val.X_u = X_u;
