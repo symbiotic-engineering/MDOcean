@@ -94,8 +94,10 @@ end
 %% table 4 - validation table
 tab_names{4} = 'Tab. 4: validation against nominal';
 if any(which_tabs == 4)
-    [~,~,~,~,tab] = validate_nominal_RM3();
+    [~,~,~,~,tab] = validate_nominal_RM3('report');
     display(tab)
+    [~,~,~,~,tab2] = validate_nominal_RM3('wecsim');
+    display(tab2)
 end
 
 %% table 5 - optimal DVs for 4 designs
