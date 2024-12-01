@@ -22,7 +22,8 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     
     % use max sea states for structural forces
     [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, in.F_max);
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0);
+    F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
