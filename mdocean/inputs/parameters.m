@@ -52,8 +52,9 @@ T = [T;
     ...
     ...% Materials: [  Structural Steel ASTM-A36 (Ductile)
     ...%               Concrete (Brittle)
-    ...%               Stainless Steel 304 (Ductile) ]
+    ...%               Stainless Steel 316 (Ductile) ASTM-A240 ]
     table("sigma_y","\sigma_y",{[36,4.5,30]* ksi2pa},"structures",true,"yield strength (Pa)");
+    table("sigma_e","\sigma_e",{[58*.45, 0, 75*.45]*ksi2pa},"structures",true,"endurance limit (Pa)")
     table("rho_m","\rho_m",{[7850 2400 7900]},"structures",true,"material density (kg/m3)");
     table("E","E",{[200e9, 5000*sqrt(4.5*ksi2pa), 200e9]},"structures",true,...
         "young's modulus (Pa)");
@@ -61,7 +62,7 @@ T = [T;
         ...% RM3 CBS sheet 1.4 average of cells F21, F34, F46, F56
         ...% https://www.concretenetwork.com/concrete-prices.html
         ...% https://agmetalminer.com/metal-prices/
-    table("nu","\nu",0.3,"structures",true,"Poisson's ratio (-)");
+    table("nu","\nu",{[0.36 0 0.29]},"structures",true,"Poisson's ratio (-)");
     ...
     ...% Thicknesses and structures
     table("t_f_t","t_{f,t}",{0.50 * in2m},"structures",true,"float top thickness (m)");
