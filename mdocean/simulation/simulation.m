@@ -111,7 +111,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.power_max = max(P_matrix_elec,[],'all');
     val.force_heave = F_heave_storm;
     val.force_ptrain = F_ptrain_max;
-    val.FOS_spar = FOS_spar;
+    val.FOS_spar = FOS_spar(1);
 	val.c_v = P_var;
     val.B_p = B_p;
     val.X_u = X_u;
