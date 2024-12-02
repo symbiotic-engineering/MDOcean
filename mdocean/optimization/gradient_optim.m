@@ -118,9 +118,17 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         probs{i} = problem;
 
         tol = eps(2);
-        if any(abs(X_opt_raw(b.mins_flexible) - b.X_mins(b.mins_flexible)) < tol) ...
-                || any(abs(X_opt_raw(b.maxs_flexible) - b.X_maxs(b.maxs_flexible)) < tol)
-            warning('Optimization is up against a flexible variable bound, consider changing bounds')
+        min_active = abs(X_opt_raw - b.X_mins) < tol;
+        max_active = abs(X_opt_raw - b.X_maxs) < tol;
+        flexible_min_active = b.mins_flexible & min_active;
+        flexible_max_active = b.maxs_flexible & max_active;
+        if  any(flexible_min_active) || any(flexible_max_active)
+            var_opt = b.var_names(1:end-1);
+            max_string = strcat(var_opt(flexible_max_active)," ");
+            min_string = strcat(var_opt(flexible_min_active)," ");
+            msg = ['Optimization is up against a flexible variable bound, consider changing bounds. ',...
+                   'At max: ' horzcat(max_string{:}) ', at min: ' horzcat(min_string{:})];
+            warning(msg)
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector

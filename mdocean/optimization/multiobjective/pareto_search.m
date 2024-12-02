@@ -84,12 +84,30 @@ function [x,fval] = pareto_search(filename_uuid)
         'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
     if ~isempty(X0)
         probMO.options.InitialPoints = X0_struct;
+    else
+        probMO.x0 = [];
+        warning('All starting points are infeasible')
     end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
-    [x,fval,flag,output,residuals] = paretosearch(probMO);
+    try
+        [x,fval,flag,output,residuals] = paretosearch(probMO);
+    catch ME
+        if (strcmp(ME.identifier,'MATLAB:emptyObjectDotAssignment'))
+            msg = ['Pareto search could not find any feasible starting points, ' ...
+                   'so plot errored. Retrying without plot.'];
+            warning(msg)
+            probMO.options.PlotFcn = [];
+            [x,fval,flag,output,residuals] = paretosearch(probMO);
+            if flag==-2
+                error(output.message)
+            end
+        else
+            rethrow(ME)
+        end
+    end
 
     %% Process and save results
     utopia = min(fval);
