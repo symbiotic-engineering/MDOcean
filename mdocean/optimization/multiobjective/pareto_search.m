@@ -102,12 +102,12 @@ function [x,fval] = pareto_search(filename_uuid)
             warning(msg)
             probMO.options.PlotFcn = [];
             [x,fval,flag,output,residuals] = paretosearch(probMO);
-            if flag==-2
-                error(output.message)
-            end
         else
             rethrow(ME)
         end
+    end
+    if flag==-2
+        error(output.message)
     end
 
     %% Process and save results
