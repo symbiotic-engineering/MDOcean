@@ -3,6 +3,7 @@ function [x,fval] = pareto_search(filename_uuid)
     
     p = parameters();
     b = var_bounds();
+    
     b.filename_uuid = filename_uuid;
     x0 = b.X_start_struct;
     idxs = b.idxs_sort;
@@ -119,7 +120,7 @@ function [x,fval] = pareto_search(filename_uuid)
 
     % show which constaints are active along the pareto front
     tol = probMO.options.ConstraintTolerance;
-    idx = constraint_active_plot(residuals,fval,tol);
+    idx = constraint_active_plot(residuals,fval,tol,b);
 
     x_sorted = x(idx,b.idxs_recover)
 
@@ -128,36 +129,49 @@ function [x,fval] = pareto_search(filename_uuid)
     save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals")
 end
 
-function [idx] = constraint_active_plot(residuals,fval,tol)
+function [idx] = constraint_active_plot(residuals,fval,tol,b)
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
     nlcon_active = abs(residuals.ineqnonlin) < tol;
     lincon_active = abs(residuals.ineqlin) < tol;
 
     % merge sea state slamming constraints
-    nlcon_active(:,16) = any(nlcon_active(:,16:end),2);
-    nlcon_active(:,17:end) = [];
+    idx_slamming = contains(b.constraint_names,'slamming');
+    idx_slamming_first = strcmp(b.constraint_names,'prevent_slamming1');
+    idx_slamming_after = idx_slamming & ~idx_slamming_first;
+    nlcon_active(:,idx_slamming_first) = any(nlcon_active(:,idx_slamming),2);
+    nlcon_active(:,idx_slamming_after) = [];
 
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 
     figure
-    subplot 221
+    tiledlayout(2,2); 
+    
+    nexttile
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
-    grid minor
+    grid on
+    set(gca,'ytick',1:size(lb_active,2),'yticklabel',b.var_names_pretty(1:end-1))
+    set(gca, 'PlotBoxAspectRatio', [2 1 1])
 
-    subplot 222
+    nexttile
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
-    grid minor
+    grid on
+    set(gca,'ytick',1:size(ub_active,2),'yticklabel',b.var_names_pretty(1:end-1))
+    set(gca, 'PlotBoxAspectRatio', [2 1 1])
 
-    subplot 223
+    nexttile
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active')
-    grid minor
+    grid on
+    set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',b.constraint_names_pretty(~idx_slamming_after))
+    set(gca, 'PlotBoxAspectRatio', [2 1 1])
 
-    subplot 224
+    nexttile
     spy(lincon_active(idx,:)')
     title('Linear Constraint Active')
-    grid minor
+    set(gca,'ytick',1:size(lincon_active,2),'yticklabel',b.lin_constraint_names_pretty)
+    set(gca, 'PlotBoxAspectRatio', [2 1 1])
+    grid on
 end

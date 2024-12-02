@@ -109,11 +109,8 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
 %             end
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
-        
-        title_split = strsplit(var_name,'_');
-        title_str = cellfun(@mlreportgen.utils.capitalizeFirstChar,title_split,'UniformOutput',false);
-        title_str_spaces = strcat(title_str," ");
-        sgtitle(horzcat(title_str_spaces{:}))
+
+        sgtitle(remove_underscores(var_name))
     end
 end
 

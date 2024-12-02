@@ -152,9 +152,11 @@ i1 = length(b.constraint_names);
 for i = (i1+1):(i1+14*15)
     b.constraint_names{i} = strcat('prevent_slamming',num2str(i-i1));
 end
+b.constraint_names_pretty = remove_underscores(b.constraint_names);
 
 b.lin_constraint_names = {'spar_natural_freq','float_spar_diam','float_spar_draft',...
                           'float_spar_tops','float_seafloor','spar_seafloor'};
+b.lin_constraint_names_pretty = remove_underscores(b.lin_constraint_names);
 
 [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
 idxs_recover = zeros(size(idxs_sort));
