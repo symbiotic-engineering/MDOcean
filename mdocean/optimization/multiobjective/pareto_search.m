@@ -144,16 +144,20 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
     subplot 221
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
+    grid minor
 
     subplot 222
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
+    grid minor
 
     subplot 223
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active')
+    grid minor
 
     subplot 224
     spy(lincon_active(idx,:)')
     title('Linear Constraint Active')
+    grid minor
 end
