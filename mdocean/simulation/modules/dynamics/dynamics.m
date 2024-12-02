@@ -21,6 +21,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces
+    % fixme: for storms, should return excitation force, not all hydro force
     [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
@@ -71,6 +72,9 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
 
+    % sufficient length of float support tube
+    h_fs_extra = in.h_fs_clear / X_max - 1;
+
     % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
     
@@ -85,7 +89,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
     X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave(:).'];
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
