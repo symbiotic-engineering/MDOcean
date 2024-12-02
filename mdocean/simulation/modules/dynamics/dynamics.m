@@ -273,6 +273,7 @@ function [mag_U,phase_U,...
     % get force-saturated response
     r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
+    alpha(r==0) = 4/pi; % prevent 0/0 when r=0
     f_sat = alpha .* r;
     mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
@@ -344,12 +345,15 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     % All other inputs are 2D arrays, the dimension of the sea state matrix.
 
     % speedup: only do math for saturated sea states, since unsat will = 1
+    % likewise, don't do math for uncontrolled sea states (f_sat=0)
     idx_no_sat = f_sat == 1;
-    f_sat(idx_no_sat) = NaN;
-    b(idx_no_sat) = NaN;
-    w(idx_no_sat) = NaN;
-    r_b(idx_no_sat) = NaN;
-    
+    idx_zero = f_sat == 0;
+    idx_nan = idx_no_sat | idx_zero;
+    f_sat(idx_nan) = NaN;
+    b(idx_nan) = NaN;
+    w(idx_nan) = NaN;
+    r_b(idx_nan) = NaN;
+
     [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
 
     % solve the quadratic formula
@@ -360,6 +364,6 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     roots = num ./ den;
 
     % choose which of the two roots to use
-    mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad);
+    mult = pick_which_root(roots, idx_no_sat, idx_zero, a_quad, b_quad, c_quad);
     assert(all(~isnan(mult),'all'))
 end
