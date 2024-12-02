@@ -1,13 +1,16 @@
-clear;clc;close all
+function [] = gradient_mult_x0(filename_uuid)
 
 p = parameters();
 b = var_bounds();
 
-num_runs = 100;
+if nargin>0
+    b.filename_uuid = filename_uuid;
+end
+
+num_runs = 3;
 objs = Inf(num_runs,2);
 X_opt = zeros(num_runs,8,2);
 flags = zeros(num_runs,2);	
-x0s = struct('D_f',[],'D_s_ratio',[],'h_f_ratio',[],'T_s_ratio',[],'F_max',[],'D_int',[],'w_n',[]);
 
 % nominal ICs
 [X_opt(1,:,:), objs(1,:), flags(1,:)] = gradient_optim(b.X_start_struct,p,b);	
@@ -21,9 +24,10 @@ for i = 2:num_runs
 end
 
 %% create table for display	
-[x0s(1:num_runs).B_p] = deal(x0s.D_int);
+
 results = struct2table(x0s);
-scale = repmat([100 1],num_runs,1);
+cents_per_dollar = 100;
+scale = repmat([cents_per_dollar 1],num_runs,1); % scale LCOE units
 results = addvars(results, objs.*scale, flags,  ...	
     'NewVariableNames', {'Objs','Flag'});
 
@@ -55,3 +59,5 @@ percent_kkt = sum(kkt) / num_runs
 percent_optimal = sum(optimal) / num_runs
 percent_optimal_given_converged = sum(optimal_and_converged) ./ sum(converged)
 percent_optimal_given_kkt = sum(optimal_and_kkt) ./ sum(kkt)
+
+end

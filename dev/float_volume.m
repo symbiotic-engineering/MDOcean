@@ -35,7 +35,7 @@ D_f = 20;
 D_s = 6.5;
 A_f = pi/4 * (D_f^2 - D_s^2);
 V_f_cyl = A_f * T_f_1;                      % displaced volume of float: hollow cylinder portion
-D_flat = 10;
+D_flat = 6.5;
 V_f_fr = pi/12 * (T_f_2 - T_f_1) ...
     * (D_f^2 + D_flat^2 + D_f*D_flat);            % displaced volume of float: non-hollow frustum portion
 V_f_fr_mid = pi/4 * D_s^2 * (T_f_2 - T_f_1);% displaced volume of float: center cylinder to subtract from frustum

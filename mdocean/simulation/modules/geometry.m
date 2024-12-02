@@ -1,6 +1,6 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
          A_c, A_lat_sub, r_over_t, ...
-         I, T, V_f_pct, V_s_pct, GM, mass, A_dt, L_dt, t_d] = geometry(D_s, D_f, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
+         I, T, V_f_pct, V_s_pct, GM, mass, A_dt, L_dt, t_d,CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f,D_f_in, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
                                             t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
                                             D_d, D_dt, theta_dt, T_s, h_d, t_d_max, ...
                                             M, rho_m, rho_w, m_scale)
@@ -37,6 +37,7 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 
 
 % Not shown in diagram:
+% D_f_in - inner diameter of float
 % t_ft - axial thickness of the float top plate
 % t_fb - axial thickness of the float bottom plate
 % t_fc - circumferential thickness of the float gussets
@@ -50,8 +51,8 @@ num_gussets_loaded_lateral = 2;
 
 % float cross sectional and lateral area for structural purposes
 D_f_mean = (D_f + D_f_b)/2;
-A_f_cross_top = pi * (D_f + D_s) * t_fr + num_gussets * t_fc * (D_f - D_s)/2; % a ring with diameter D_f, a ring with diameter D_s, and gussets
-A_f_cross_bot = pi * (D_s)       * t_fr + num_gussets * t_fc * (D_f_mean - D_s)/2; % a ring with diameter D_s, and bottom part of gussets
+A_f_cross_top = pi * (D_f + D_f_in) * t_fr + num_gussets * t_fc * (D_f - D_f_in)/2; % a ring with diameter D_f, a ring with diameter D_s, and gussets
+A_f_cross_bot = pi * (D_f_in)       * t_fr + num_gussets * t_fc * (D_f_mean - D_f_in)/2; % a ring with diameter D_s, and bottom part of gussets
 A_f_l = num_gussets_loaded_lateral * t_fc * T_f_2;
 
 % float material volume and mass
@@ -64,11 +65,11 @@ V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets + V_bot_slant; % FIXME I'm n
 m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
 % float hydrostatic calculations
-A_f = pi/4 * (D_f^2 - D_s^2);
+A_f = pi/4 * (D_f^2 - D_f_in^2);
 V_f_cyl = A_f * T_f_1;                      % displaced volume of float: hollow cylinder portion
 V_f_fr = pi/12 * (T_f_2 - T_f_1) ...
     * (D_f^2 + D_f_b^2 + D_f*D_f_b);        % displaced volume of float: non-hollow frustum portion
-V_f_fr_mid = pi/4 * D_s^2 * (T_f_2 - T_f_1);% displaced volume of float: center cylinder to subtract from frustum
+V_f_fr_mid = pi/4 * D_f_in^2 * (T_f_2 - T_f_1);% displaced volume of float: center cylinder to subtract from frustum
 V_f_fru_hol = V_f_fr - V_f_fr_mid;          % displaced volume of float: hollow frustum portion
 V_f_d = V_f_cyl + V_f_fru_hol;              % total displaced volume of float
 m_f_tot = V_f_d * rho_w;
@@ -94,7 +95,7 @@ A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
 V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
 
 % damping plate material use
-A_d = pi/4 * D_d^2; % damping plate itself
+A_d = pi/4 * D_d^2;                     % damping plate itself
 num_supports = 4;
 L_dt = D_d / (2*cos(theta_dt));
 D_dt_i = D_dt - 2 * t_dt;
@@ -130,21 +131,20 @@ r_over_t = [0,... % D_sft/(2*t_sf)
             D_s/(2*t_sr),...
             0];%D_or/(2*t_r)];
 I = [I_f, I_vc, I_rp];
-T = [T_f_2, T_s, h_d];     % drafts: used to calculated F_surge in dynamics.m
-m_m = m_f_m + m_s_m;                    % total mass of material
+T = [T_f_2, T_s, h_d];          % drafts: used to calculated F_surge in dynamics.m
+m_m = m_f_m + m_s_m;            % total mass of material
 
-V_d = [V_f_d, V_vc_d, V_d_d]; % volume displaced
-mass = [m_f_m, m_vc_m, m_d_m]; % material mass of each structure
+V_d = [V_f_d, V_vc_d, V_d_d];   % volume displaced
+mass = [m_f_m, m_vc_m, m_d_m];  % material mass of each structure
 
 %% Metacentric Height Calculation
 
 % see dev/cob_com_frustum.mlx for derivation of float COB and COM
 D_term_1 = -D_f_b^2 - 2*D_f_b*D_f + 3*D_f^2;
 D_term_2 = 2*D_f^2 - 2*D_f_b^2;
-D_term_3 = -6*D_s^2 + 3*D_f_b^2 + 2*D_f_b*D_f + D_f^2;
+D_term_3 = -6*D_f_in^2 + 3*D_f_b^2 + 2*D_f_b*D_f + D_f^2;
 CB_f_integral = D_term_1*T_f_1^2 + D_term_2*T_f_1*T_f_2 + D_term_3*T_f_2^2;
 CB_f_from_waterline = 1/V_f_d * pi/48 * CB_f_integral;
-%CB_f_from_waterline = T_f_2 / 2; % cylinder case
 
 T_term_1 =    T_f_1^2 + 2*T_f_1*T_f_2 - 3*T_f_2^2;
 T_term_2 =  2*T_f_1^2                 - 2 *T_f_2^2;
@@ -153,10 +153,9 @@ T_term_4 =                                           12*T_f_2*h_f - 6*h_f^2;
 T_term_5 = 4*(   T_f_1 -   T_f_2);
 T_term_6 = 4*(-2*T_f_1 + 2*T_f_2 - 3*h_f);
 T_term_7 = 12*h_f;
-CM_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_s^2;
-CM_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_s^2;
-CM_f_from_waterline = CM_f_num / CM_f_den;
-%CM_f_from_waterline = T_f_2 - h_f/2; % cylinder case
+CG_f_num = T_term_1*D_f_b^2 + T_term_2*D_f_b*D_f + T_term_3*D_f^2 + T_term_4*D_f_in^2;
+CG_f_den = T_term_5*D_f_b^2 + T_term_5*D_f_b*D_f + T_term_6*D_f^2 + T_term_7*D_f_in^2;
+CG_f_from_waterline = CG_f_num / CG_f_den;
 
 % centers of buoyancy, measured from keel (bottom of damping plate)
 CB_f = T_s - CB_f_from_waterline;
@@ -165,7 +164,7 @@ CB_d = h_d/2;
 CBs = [CB_f, CB_vc, CB_d];
 
 % centers of gravity, measured from keel - assume even mass distribution
-CG_f = T_s - CM_f_from_waterline;
+CG_f = T_s - CG_f_from_waterline;
 CG_vc = h_d + (h_s-h_d)/2;
 CG_d = h_d/2;
 CGs = [CG_f, CG_vc, CG_d];

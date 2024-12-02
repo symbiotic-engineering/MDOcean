@@ -1,36 +1,38 @@
 function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_elec, P_matrix, h_s_extra, B_p, X_u] = dynamics(in,m_float,m_spar,V_d,draft)
+    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
 
-    % use probabilistic sea states for power and PTO force
+    % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix,h_s_extra,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
+    [P_matrix_mech,X_constraints,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
     
     % account for powertrain electrical losses
-    P_matrix = P_matrix * in.eff_pto;
+    P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix = min(P_matrix,in.power_max);
+    P_matrix_elec = min(P_matrix_elec,in.power_max);
     
     % weight power across all sea states
-    P_weighted = P_matrix .* in.JPD / 100;
-    P_elec = sum(P_weighted(:)); 
+    P_weighted = P_matrix_elec .* in.JPD / 100;
+    P_avg_elec = sum(P_weighted(:)); 
     
-    assert(isreal(P_elec))
+    assert(isreal(P_avg_elec))
     
-    % use max sea states for structural forces and max amplitude
+    % use max sea states for structural forces
     [~,~,~,~,F_heave_max,F_surge_max,~] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
     
     % coefficient of variance (normalized standard deviation) of power
-    P_var = std(P_matrix(:), in.JPD(:)) / P_elec;
+    P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
+    
 
 end
 
-function [P_matrix, h_s_extra, B_p, mag_X_u,...
+function [P_matrix, X_constraints, B_p, mag_X_u,...
           F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft)
 
     % get dynamic coefficients for float and spar
+    % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
     [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
      m_s,B_h_s,K_h_s,F_s_mag,F_s_phase,...
      m_c,B_c,drag_const_f,drag_const_s,...
@@ -64,7 +66,22 @@ function [P_matrix, h_s_extra, B_p, mag_X_u,...
     % extra height on spar after accommodating float displacement
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
-    h_s_extra = [h_s_extra_up, h_s_extra_down];
+
+    % prevent violation of linear wave theory
+    X_max_linear = 1/10 * in.D_f;
+    
+    X_below_linear = X_max_linear / X_max - 1;
+
+    % prevent rising out of the water
+    wave_amp = Hs/(2*sqrt(2));
+    X_over_A = mag_X_u ./ wave_amp;
+    T_over_A = in.T_f_2 ./ wave_amp;
+    R = T_over_A ./ sqrt(1 + X_over_A.^2 - 2 * X_over_A .* cos(phase_X_u)); % ratio derived on p88-89 of notebook
+    long_draft = R-1;
+    small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
+    X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
+
+    X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
@@ -214,6 +231,7 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     mag_v = w .* X_guess;
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
+    mag_v0_v_ratio(mag_v==0) = 0; % prevent divide by zero
     phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of my notebook
     
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of my notebook

@@ -1,11 +1,13 @@
-function [] = location_sensitivity()
+function [tab] = location_sensitivity(filename_uuid)
 
 p = parameters();
 b = var_bounds();
+b.filename_uuid = filename_uuid;
 
 files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...
-    'PacWave-South_Oregon_Wave-Resource.csv','WETS_Hawaii_Wave-Resource.csv'};
+    'PacWave-South_Oregon_Wave-Resource.csv',...
+    'WETS_Hawaii_Wave-Resource.csv'};
 
 X_opts = zeros(8,length(files));
 obj_opts = zeros(1,length(files));
@@ -31,8 +33,7 @@ end
 figure(2)
 locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','WETS, Hawaii'};
 legend(locs)
-array2table([X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',[b.var_names,{'LCOE','flag'}])
-assert(all(flags>0))
+tab = array2table([X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',[b.var_names,{'LCOE','flag'}]);
 
 %% try Hawaii with California design
 X_cali = X_opts(:,1);

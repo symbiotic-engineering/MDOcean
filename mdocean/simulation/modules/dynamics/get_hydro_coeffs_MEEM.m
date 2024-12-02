@@ -41,7 +41,7 @@ gamma_f_over_rho_g = sqrt(2 * B_f_over_rho_w ./ m0); % Haskind relationship, usi
 % set the remaining coeffs to zero since not sure how to approximate them
 A_c_over_rho = 0;
 B_c_over_rho_w = 0;
-gamma_phase_f = 0; % I would maybe be able to get this from Haskind of MEEM results?
+gamma_phase_f = zeros(size(mu_nondim)); % I would maybe be able to get this from Haskind of MEEM results?
 gamma_phase_s = 0;
 
 end
