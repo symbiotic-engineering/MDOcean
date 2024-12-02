@@ -60,50 +60,50 @@ b.h_fs_clear_wecsim = 4;
 b.h_fs_clear_nom = 4; % p169 11/26/24
 b.h_fs_clear_start = 4;
 
-in2m = 0.0254;
-% material thickness of float top (m)
-b.t_ft_min = 0.1 * in2m;
-b.t_ft_max = 1.0 * in2m;
-b.t_ft_nom = 0.5 * in2m;
-b.t_ft_wecsim = 0.5 * in2m;
-b.t_ft_start = 0.5 * in2m;
+in2mm = 25.4;
+% material thickness of float top (mm)
+b.t_ft_min = 0.1 * in2mm;
+b.t_ft_max = 1.0 * in2mm;
+b.t_ft_nom = 0.5 * in2mm;
+b.t_ft_wecsim = 0.5 * in2mm;
+b.t_ft_start = 0.5 * in2mm;
 
-% material thickness of float bottom (m)
-b.t_fr_min = 0.1 * in2m; 
-b.t_fr_max = 1.0 * in2m;
-b.t_fr_nom = 0.44 * in2m;
-b.t_fr_wecsim = 0.44 * in2m;
-b.t_fr_start = 0.44 * in2m;
+% material thickness of float bottom (mm)
+b.t_fr_min = 0.1 * in2mm; 
+b.t_fr_max = 1.0 * in2mm;
+b.t_fr_nom = 0.44 * in2mm;
+b.t_fr_wecsim = 0.44 * in2mm;
+b.t_fr_start = 0.44 * in2mm;
 
-% materal thickness of float circumferential gussets (m)
-b.t_fc_min = 0.1 * in2m; 
-b.t_fc_max = 1.0 * in2m; 
-b.t_fc_nom = 0.44 * in2m; 
-b.t_fc_wecsim = 0.44 * in2m; 
-b.t_fc_start = 0.44 * in2m; 
+% materal thickness of float circumferential gussets (mm)
+b.t_fc_min = 0.1 * in2mm; 
+b.t_fc_max = 1.0 * in2mm; 
+b.t_fc_nom = 0.44 * in2mm; 
+b.t_fc_wecsim = 0.44 * in2mm; 
+b.t_fc_start = 0.44 * in2mm; 
 
-% material thickness of float bottom (m)
-b.t_fb_min = 0.1 * in2m;
-b.t_fb_max = 1.0 * in2m;
-b.t_fb_nom = 0.56 * in2m;
-b.t_fb_wecsim = 0.56 * in2m;
-b.t_fb_start = 0.56 * in2m;
+% material thickness of float bottom (mm)
+b.t_fb_min = 0.1 * in2mm;
+b.t_fb_max = 1.0 * in2mm;
+b.t_fb_nom = 0.56 * in2mm;
+b.t_fb_wecsim = 0.56 * in2mm;
+b.t_fb_start = 0.56 * in2mm;
 
-% material thickness of spar radial (m)
-b.t_sr_min = 0.2 * in2m;
-b.t_sr_max = 2.0 * in2m;
-b.t_sr_nom = 1.0 * in2m;
-b.t_sr_wecsim = 1.0 * in2m;
-b.t_sr_start = 1.0 * in2m;
+% material thickness of spar radial (mm)
+b.t_sr_min = 0.2 * in2mm;
+b.t_sr_max = 2.0 * in2mm;
+b.t_sr_nom = 1.0 * in2mm;
+b.t_sr_wecsim = 1.0 * in2mm;
+b.t_sr_start = 1.0 * in2mm;
 
-% material thickness of damping plate support tube radial walls (m)
-b.t_dt_min = 0.2 * in2m;
-b.t_dt_max = 2.0 * in2m;
-b.t_dt_nom = 1.0 * in2m;
-b.t_dt_wecsim = 1.0 * in2m;
-b.t_dt_start = 1.0 * in2m;
+% material thickness of damping plate support tube radial walls (mm)
+b.t_dt_min = 0.2 * in2mm;
+b.t_dt_max = 2.0 * in2mm;
+b.t_dt_nom = 1.0 * in2mm;
+b.t_dt_wecsim = 1.0 * in2mm;
+b.t_dt_start = 1.0 * in2mm;
 
-% maximum generator power (W)
+% maximum generator power (kW)
 b.P_max_min = 50;
 b.P_max_max = 1000;
 b.P_max_nom = 286;
