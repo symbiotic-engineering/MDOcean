@@ -8,9 +8,11 @@ if nargin>0
 end
 
 num_runs = 3;
-objs = Inf(num_runs,2);
-X_opt = zeros(num_runs,8,2);
-flags = zeros(num_runs,2);	
+num_DVs = length(b.var_names);
+num_objs = 2;
+objs = Inf(num_runs,num_objs);
+X_opt = zeros(num_runs,num_DVs,num_objs);
+flags = zeros(num_runs,num_objs);	
 
 % nominal ICs
 [X_opt(1,:,:), objs(1,:), flags(1,:)] = gradient_optim(b.X_start_struct,p,b);	
@@ -31,12 +33,10 @@ scale = repmat([cents_per_dollar 1],num_runs,1); % scale LCOE units
 results = addvars(results, objs.*scale, flags,  ...	
     'NewVariableNames', {'Objs','Flag'});
 
-for i=1:length(b.var_names)
-    if i~= 8
-        X = X_opt(:,i,:);
+for i=1:length(b.var_names)-1
+    X = X_opt(:,i,:);
     results = addvars(results, X(:,:), 'NewVariableNames', ...
                     [b.var_names{i} '_opt'], 'After', b.var_names{i});
-    end
 end
 
 results = sortrows(results,{'Flag','Objs'},'descend');

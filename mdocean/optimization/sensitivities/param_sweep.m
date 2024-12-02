@@ -103,6 +103,13 @@ legend(param_names)
 slope_LCOE = get_slope(LCOE, ratios, LCOE_nom);
 slope_Pvar = get_slope(P_var, ratios, Pvar_nom);
 
+if all(~isfinite(slope_LCOE),'all') || all(~isfinite(slope_Pvar),'all')
+    msg = ['All slopes are NaN, meaning all optimizations failed. ' ...
+        'This might be because no feasible solution can be found. ' ...
+        'slope_LCOE = ', num2str(slope_LCOE), ' and slope_Pvar = ', num2str(slope_Pvar)];
+    error(msg)
+end
+
 [~,LCOE_sort_idx] = sort(abs(slope_LCOE),'MissingPlacement','first');
 [~,Pvar_sort_idx] = sort(abs(slope_Pvar),'MissingPlacement','first');
 

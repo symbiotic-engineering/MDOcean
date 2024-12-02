@@ -12,7 +12,14 @@ in.h_s   = X(4);      % total height of spar (m)
 in.F_max = X(5)*1e6;  % max powertrain force (N)
 in.B_p   = X(6)*1e6;  % controller (powertrain) damping (Ns/m)
 in.h_fs_clear = X(7); % vertical clearance between float tubes and spar when at rest (m)
-in.M     = X(8);      % material (-)
+in.t_f_t  = X(8)*1e-3;     % float top thickness (m)
+in.t_f_r  = X(9)*1e-3;     % float radial wall thickness (m)
+in.t_f_c  = X(10)*1e-3;    % float circumferential gusset thickness (m)
+in.t_f_b  = X(11)*1e-3;    % float bottom thickness (m)
+in.t_s_r  = X(12)*1e-3;    % vertical column thickness (m)
+in.t_d_tu  = X(13)*1e-3;    % damping plate support tube radial wall thickness (m)      
+in.P_max = X(14)*1e3;    % maximum power (W)
+in.M     = X(15);    % material (-)
 
 % Geometric similarity to maintain constant damping ratio
 % D_s sets D_d, T_s, h_d
@@ -56,7 +63,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
-num_g = 19+numel(p.JPD);
+num_g = 20+numel(p.JPD);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -79,9 +86,9 @@ g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % and is only required when p.cost_perN = 0.
 g(17) = X_constraints(1);               % prevent float rising above top of spar
 g(18) = X_constraints(2);               % prevent float going below bottom of spar
-g(19) = X_constraints(3);               % float amplitude obeys linear theory
-g(20:end) = X_constraints(4:end);       % prevent rising out of water/slamming
-% fixme: add another X_constraint that h_fs_clear is greater than X_u
+g(19) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
+g(20) = X_constraints(4);               % float amplitude obeys linear theory
+g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
 %assert( criteria )

@@ -21,8 +21,10 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces
+    % fixme: for storms, should return excitation force, not all hydro force
     [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, in.F_max);
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0);
+    F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
@@ -70,6 +72,9 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
 
+    % sufficient length of float support tube
+    h_fs_extra = in.h_fs_clear / X_max - 1;
+
     % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
     
@@ -84,7 +89,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
     X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave(:).'];
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
@@ -272,6 +277,7 @@ function [mag_U,phase_U,...
     % get force-saturated response
     r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
+    alpha(r==0) = 4/pi; % prevent 0/0 when r=0
     f_sat = alpha .* r;
     mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
@@ -343,12 +349,15 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     % All other inputs are 2D arrays, the dimension of the sea state matrix.
 
     % speedup: only do math for saturated sea states, since unsat will = 1
+    % likewise, don't do math for uncontrolled sea states (f_sat=0)
     idx_no_sat = f_sat == 1;
-    f_sat(idx_no_sat) = NaN;
-    b(idx_no_sat) = NaN;
-    w(idx_no_sat) = NaN;
-    r_b(idx_no_sat) = NaN;
-    
+    idx_zero = f_sat == 0;
+    idx_nan = idx_no_sat | idx_zero;
+    f_sat(idx_nan) = NaN;
+    b(idx_nan) = NaN;
+    w(idx_nan) = NaN;
+    r_b(idx_nan) = NaN;
+
     [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
 
     % solve the quadratic formula
@@ -359,6 +368,6 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     roots = num ./ den;
 
     % choose which of the two roots to use
-    mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad);
+    mult = pick_which_root(roots, idx_no_sat, idx_zero, a_quad, b_quad, c_quad);
     assert(all(~isnan(mult),'all'))
 end

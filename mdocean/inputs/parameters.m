@@ -45,10 +45,13 @@ T = [T;
     table("h","h",{100},"site",true,"water depth (m)");
     table("JPD","JPD",{jpd(2:end,2:end)},"site",false,...
         "joint probability distribution of wave (%)");
-    table("Hs","H_s",{jpd(2:end,1)},"site",true,"wave height (m)");
-    table("Hs_struct","H_{s,struct}",{11.9},"site",true,"100 year wave height (m)");
-    table("T","T",{jpd(1,2:end)},"site",true,"wave period (s)");
-    table("T_struct","T_{struct}",{17.1},"site",true,"100 year wave period (s)");
+    table("Hs","H_s",{jpd(2:end,1)},"site",true,"significant wave height (m)");
+    table("T","T",{jpd(1,2:end)},"site",true,"wave energy period (s)");
+    table("Hs_struct","H_{s,struct}",{[5 7 9 11.22 9 7 5]*1.9*sqrt(2)},...
+        "site",true,"100 year significant individual wave height (m)");
+    table("T_struct","T_{struct}",{[5.57 8.76 12.18 17.26 21.09 24.92 31.70]},...
+        "site",true,"100 year wave peak period (s)");
+    ...% 100 year extreme heights and periods from Berg 2011 
     ...
     ...% Materials: [  Structural Steel ASTM-A36 (Ductile)
     ...%               Concrete (Brittle)
@@ -65,16 +68,16 @@ T = [T;
     table("nu","\nu",{[0.36 0 0.29]},"structures",true,"Poisson's ratio (-)");
     ...
     ...% Thicknesses and structures
-    table("t_f_t","t_{f,t}",{0.50 * in2m},"structures",true,"float top thickness (m)");
-    table("t_f_r","t_{f,r}",{0.44 * in2m},"structures",true,"float radial wall thickness (m)");
-    table("t_f_c","t_{f,c}",{0.44 * in2m},"structures",true,...
-        "float circumferential gusset thickness (m)");
-    table("t_f_b","t_{f,b}",{0.56 * in2m},"structures",true,"float bottom thickness (m)");
-    table("t_s_r","t_{s,r}",{1.00 * in2m},"structures",true,"vertical column thickness (m)");
+...%     table("t_f_t","t_{f,t}",{0.50 * in2m},"structures",true,"float top thickness (m)");
+...%     table("t_f_r","t_{f,r}",{0.44 * in2m},"structures",true,"float radial wall thickness (m)");
+...%     table("t_f_c","t_{f,c}",{0.44 * in2m},"structures",true,...
+...%         "float circumferential gusset thickness (m)");
+...%     table("t_f_b","t_{f,b}",{0.56 * in2m},"structures",true,"float bottom thickness (m)");
+...%     table("t_s_r","t_{s,r}",{1.00 * in2m},"structures",true,"vertical column thickness (m)");
     table("t_d_max","t_{d,max}",{1.00 * in2m},"structures",true,...
         "max thickness of damping plate before making it hollow (m)");
-    table("t_d_tu","t_{d,tu}",{1.00 * in2m},"structures",true,...
-        "damping plate support tube radial wall thickness (m)");
+...%     table("t_d_tu","t_{d,tu}",{1.00 * in2m},"structures",true,...
+...%         "damping plate support tube radial wall thickness (m)");
     table("D_d_tu","D_{d,tu}",{48.00 * in2m},"structures",true,...
         "damping plate support tube diameter (m)");
     table("theta_d_tu","\theta_{d,tu}",{atan(17.5/15)},"structures",true,...
@@ -143,7 +146,11 @@ T = [T;
     table("spar_excitation_coeffs","spar excitation coeffs",{spar_exc},...
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3");
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
-        false,"function from WECSim")];
+        false,"function from WECSim");
+    table("F_heave_mult","F_{heave,mult}",{1.925*0.857},"dynamics",true,...
+        "multiplier to make heave force match with validation (-)")];
+    % 1.925 is required to make WAMIT match tank test, and 0.857 is
+    % required to make MEEM match WAMIT
 
 T.Properties.VariableNames = cols;
 

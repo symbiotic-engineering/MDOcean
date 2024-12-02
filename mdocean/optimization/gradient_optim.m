@@ -21,13 +21,20 @@ end
 
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
-x1 = optimvar(b.var_names{1}, sz,'LowerBound',b.X_mins(1), 'UpperBound',b.X_maxs(1));
-x2 = optimvar(b.var_names{2}, sz,'LowerBound',b.X_mins(2), 'UpperBound',b.X_maxs(2));
-x3 = optimvar(b.var_names{3}, sz,'LowerBound',b.X_mins(3), 'UpperBound',b.X_maxs(3));
-x4 = optimvar(b.var_names{4}, sz,'LowerBound',b.X_mins(4), 'UpperBound',b.X_maxs(4));
-x5 = optimvar(b.var_names{5}, sz,'LowerBound',b.X_mins(5), 'UpperBound',b.X_maxs(5));
-x6 = optimvar(b.var_names{6}, sz,'LowerBound',b.X_mins(6), 'UpperBound',b.X_maxs(6));
-x7 = optimvar(b.var_names{7}, sz,'LowerBound',b.X_mins(7), 'UpperBound',b.X_maxs(7));
+x1  = optimvar(b.var_names{1},  sz,'LowerBound',b.X_mins(1),  'UpperBound',b.X_maxs(1));
+x2  = optimvar(b.var_names{2},  sz,'LowerBound',b.X_mins(2),  'UpperBound',b.X_maxs(2));
+x3  = optimvar(b.var_names{3},  sz,'LowerBound',b.X_mins(3),  'UpperBound',b.X_maxs(3));
+x4  = optimvar(b.var_names{4},  sz,'LowerBound',b.X_mins(4),  'UpperBound',b.X_maxs(4));
+x5  = optimvar(b.var_names{5},  sz,'LowerBound',b.X_mins(5),  'UpperBound',b.X_maxs(5));
+x6  = optimvar(b.var_names{6},  sz,'LowerBound',b.X_mins(6),  'UpperBound',b.X_maxs(6));
+x7  = optimvar(b.var_names{7},  sz,'LowerBound',b.X_mins(7),  'UpperBound',b.X_maxs(7));
+x8  = optimvar(b.var_names{8},  sz,'LowerBound',b.X_mins(8),  'UpperBound',b.X_maxs(8));
+x9  = optimvar(b.var_names{9},  sz,'LowerBound',b.X_mins(9),  'UpperBound',b.X_maxs(9));
+x10 = optimvar(b.var_names{10}, sz,'LowerBound',b.X_mins(10), 'UpperBound',b.X_maxs(10));
+x11 = optimvar(b.var_names{11}, sz,'LowerBound',b.X_mins(11), 'UpperBound',b.X_maxs(11));
+x12 = optimvar(b.var_names{12}, sz,'LowerBound',b.X_mins(12), 'UpperBound',b.X_maxs(12));
+x13 = optimvar(b.var_names{13}, sz,'LowerBound',b.X_mins(13), 'UpperBound',b.X_maxs(13));
+x14 = optimvar(b.var_names{14}, sz,'LowerBound',b.X_mins(14), 'UpperBound',b.X_maxs(14));
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...%'interior-point',...
@@ -42,7 +49,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [x1 x2 x3 x4 x5 x6 x7 matl];
+    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
@@ -111,12 +118,20 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         probs{i} = problem;
 
         tol = eps(2);
-        if any(abs(X_opt_raw(b.mins_flexible) - b.X_mins(b.mins_flexible)) < tol) ...
-                || any(abs(X_opt_raw(b.maxs_flexible) - b.X_maxs(b.maxs_flexible)) < tol)
-            warning('Optimization is up against a flexible variable bound, consider changing bounds')
+        min_active = abs(X_opt_raw - b.X_mins) < tol;
+        max_active = abs(X_opt_raw - b.X_maxs) < tol;
+        flexible_min_active = b.mins_flexible & min_active;
+        flexible_max_active = b.maxs_flexible & max_active;
+        if  any(flexible_min_active) || any(flexible_max_active)
+            var_opt = b.var_names(1:end-1);
+            max_string = strcat(var_opt(flexible_max_active)," ");
+            min_string = strcat(var_opt(flexible_min_active)," ");
+            msg = ['Optimization is up against a flexible variable bound, consider changing bounds. ',...
+                   'At max: ' horzcat(max_string{:}) ', at min: ' horzcat(min_string{:})];
+            warning(msg)
         end
 
-        X_opt = [X_opt_raw; evaluate(X(8),struct())];   % add material back onto design vector
+        X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
         [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
@@ -131,11 +146,11 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
     end
     if ploton
-        table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs];
+        table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs b.X_noms];
         objs_opt
         flags
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
-                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound'})
+                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound','Nom'})
     end
 
 end

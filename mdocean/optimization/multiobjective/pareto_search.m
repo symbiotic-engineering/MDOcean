@@ -3,24 +3,49 @@ function [x,fval] = pareto_search(filename_uuid)
     
     p = parameters();
     b = var_bounds();
+    
     b.filename_uuid = filename_uuid;
     x0 = b.X_start_struct;
+    idxs = b.idxs_sort;
+    num_DVs = length(b.X_starts);
     
     %% Calculate seed points for the pareto front
     % get pareto front endpoints by running optimization
-    [X_opt,objs_opt,~,probs] = gradient_optim(x0,p,b);
-
-    % get extra seed values in the middle by optimizing at fixed LCOEs
+    [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
+    [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
+    
     LCOE_max = p.LCOE_max;
     LCOE_min = objs_opt(1);
     P_var_min = objs_opt(2);
 
+    % remove infeasible single-objective optima
+    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
+    single_obj_failed = flag_opt == -2;
+    X_opt(:,single_obj_failed) = [];
+    fvals_opt(single_obj_failed,:) = [];
+
+    % use x0 start as seed, if x0 is feasible
+    [LCOE_x0,P_var_x0,~,g_0] = simulation([b.X_starts; 1],p);
+    x0_feasible = is_feasible(g_0, [b.X_starts; 1], p, b);
+    if x0_feasible
+        fvals_0 = [LCOE_x0,P_var_x0];
+        X_0 = b.X_starts(idxs);
+    else
+        fvals_0 = [];
+        X_0 = [];
+    end
+
+    % get extra seed values in the middle by optimizing at fixed LCOEs
+    if LCOE_max < LCOE_min
+        LCOE_max = 2*LCOE_min;
+    end
     num_seeds = 8;
     LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
     LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
-    X_seeds = zeros(length(LCOE_seeds),7);
+    X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
+    
     for i = 1:length(LCOE_seeds)
         p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
@@ -29,7 +54,6 @@ function [x,fval] = pareto_search(filename_uuid)
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
         else
-            idxs = b.idxs_sort;
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
@@ -52,20 +76,39 @@ function [x,fval] = pareto_search(filename_uuid)
     scale = [10 0.1];
     probMO.objective = @(x)[generatedObjectiveLCOE(x,{p})*scale(1), generatedObjectiveP_var(x,{p})*scale(2)];
     
-    [LCOE_x0,P_var_x0] = simulation([b.X_starts; 1],p);
-    [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
-    X0 = [probMO.x0'; X_opt(idxs,:)'; X_seeds];
-    fvals = [LCOE_x0,P_var_x0; LCOE_min P_var_min_LCOE; LCOE_max P_var_min; LCOE_seeds' P_var_seeds'];
+    X0 = [X_0; X_opt(idxs,:)'; X_seeds];
+    fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
-        'PlotFcn','psplotparetof','InitialPoints',X0_struct,'MinPollFraction',1,...
+        'PlotFcn','psplotparetof','MinPollFraction',1,...
         'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
+    if ~isempty(X0)
+        probMO.options.InitialPoints = X0_struct;
+    else
+        probMO.x0 = [];
+        warning('All starting points are infeasible')
+    end
     probMO.solver = 'paretosearch';
-    probMO.nvars = 7;
+    probMO.nvars = num_DVs;
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
-    [x,fval,flag,output,residuals] = paretosearch(probMO);
+    try
+        [x,fval,flag,output,residuals] = paretosearch(probMO);
+    catch ME
+        if (strcmp(ME.identifier,'MATLAB:emptyObjectDotAssignment'))
+            msg = ['Pareto search could not find any feasible starting points, ' ...
+                   'so plot errored. Retrying without plot.'];
+            warning(msg)
+            probMO.options.PlotFcn = [];
+            [x,fval,flag,output,residuals] = paretosearch(probMO);
+        else
+            rethrow(ME)
+        end
+    end
+    if flag==-2
+        error(output.message)
+    end
 
     %% Process and save results
     utopia = min(fval);
@@ -77,41 +120,11 @@ function [x,fval] = pareto_search(filename_uuid)
 
     % show which constaints are active along the pareto front
     tol = probMO.options.ConstraintTolerance;
-    idx = constraint_active_plot(residuals,fval,tol);
+    idx = constraint_active_plot(residuals,fval,tol,b);
 
     x_sorted = x(idx,b.idxs_recover)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals")
-end
-
-function [idx] = constraint_active_plot(residuals,fval,tol)
-    lb_active = abs(residuals.lower) < tol;
-    ub_active = abs(residuals.upper) < tol;
-    nlcon_active = abs(residuals.ineqnonlin) < tol;
-    lincon_active = abs(residuals.ineqlin) < tol;
-
-    % merge sea state slamming constraints
-    nlcon_active(:,16) = any(nlcon_active(:,16:end),2);
-    nlcon_active(:,17:end) = [];
-
-    [~,idx] = sort(fval(:,1)); % order by increasing LCOE
-
-    figure
-    subplot 221
-    spy(lb_active(idx,:)');
-    title('Lower Bound Active')
-
-    subplot 222
-    spy(ub_active(idx,:)')
-    title('Upper Bound Active')
-
-    subplot 223
-    spy(nlcon_active(idx,:)')
-    title('Nonlinear Constraint Active')
-
-    subplot 224
-    spy(lincon_active(idx,:)')
-    title('Linear Constraint Active')
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol")
 end
