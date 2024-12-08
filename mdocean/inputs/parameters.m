@@ -83,7 +83,7 @@ T = [T;
     table("theta_d_tu","\theta_{d,tu}",{atan(17.5/15)},"structures",true,...
         "angle from horizontal of damping plate support tubes (rad)");
     table("FOS_min","FOS_{min}",{1.5},"structures",true,"minimum FOS (-)");
-    table("D_f_tu","D_{f,tu}",{20 * in2m},"structures",true,"float support tube diameter (m)");
+    table("D_f_tu","D_{f,tu}",{20 * in2m},"structures",true,"float support tube diameter (m)"); % 24 in p156 report, 20 in cad
     table("t_f_tu","t_{f,tu}",{.5 * in2m},"structures",true,"float support tube thickness (m)");
     ...
     ...% Economics
