@@ -56,9 +56,11 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
                     X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
-    FOS_spar_local] = structures(F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ...
-                                 in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, in.sigma_e, ...
-                                 A_c, A_lat_sub, in.D_s, in.t_s_r, I, in.E, in.nu);
+    FOS_spar_local] = structures(...
+          	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ... % forces
+            in.h_s, in.T_s, in.D_s, in.D_f, in.D_f_in, in.num_sections, in.D_f_tu, ... % bulk dimensions
+            in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, in.h_stiff, in.w_stiff, ... % structural dimensions
+            in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu);
 
 LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
 

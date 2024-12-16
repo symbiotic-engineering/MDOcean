@@ -1,21 +1,32 @@
 function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
-          	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ...
-            M, h_s, T_s, rho_w, g, sigma_y, sigma_e, A_c, A_lat_sub, D_s, t_s_r, I, E, nu)
+          	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ... % forces
+            h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, ... % bulk dimensions
+            t_s_r, I, A_c, A_lat_sub, t_bot, t_top, h_stiff, w_stiff, ... % structural dimensions
+            M, rho_w, g, sigma_y, sigma_e, E, nu) % constants
 
     F_heave_peak = max(F_heave_storm,F_heave_op);
     F_surge_peak = max(F_surge_storm,F_surge_op);
 
     % peak
-    [FOS1Y, FOS2Y, FOS3Y, FOS_buckling] = structures_one_case(F_heave_peak, F_surge_peak, ...
-            M, h_s, T_s, rho_w, g, sigma_y(M), A_c, A_lat_sub, D_s, t_s_r, I, E, nu);
-
+    [FOS1Y, FOS2Y, FOS3Y, FOS_buckling] = structures_one_case(...
+            F_heave_peak, F_surge_peak, sigma_y(M), ...
+            h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, ...
+            t_s_r, I, A_c, A_lat_sub, t_bot, t_top, h_stiff, w_stiff, ...
+            M, rho_w, g, E, nu);
+    
     % endurance limit (fatigue)
-    [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(F_heave_op, F_surge_op, ...
-            M, h_s, T_s, rho_w, g, sigma_e(M), A_c, A_lat_sub, D_s, t_s_r, I, E, nu);
+    [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(...
+            F_heave_op, F_surge_op, sigma_e(M), ...
+            h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, ...
+            t_s_r, I, A_c, A_lat_sub, t_bot, t_top, h_stiff, w_stiff, ...
+            M, rho_w, g, E, nu);
 end
 
-function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(F_heave, F_surge, ...
-            M, h_s, T_s, rho_w, g, sigma_max, A_c, A_lat_sub, D_s, t_s_r, I, E, nu)
+function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
+            F_heave, F_surge, sigma_max, ...
+            h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, ...
+            t_s_r, I, A_c, A_lat_sub, t_bot, t_top, h_stiff, w_stiff, ...
+            M, rho_w, g, E, nu)
 
     %% Stress calculations
     depth = [0 T_s T_s]; % max depth
@@ -41,15 +52,18 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(F_heave, F_
     % assume ductile material for now - need to use mohr's circle for concrete
     sigma_vm = von_mises(sigma_rr, sigma_tt, sigma_zz, sigma_rt, sigma_tz, sigma_zr);
     
+    %% Float plate stress
+    [sigma_float_bot,sigma_float_top] = float_plate_stress(D_f, D_f_in, F_heave, num_sections, t_bot, t_top, h_stiff, w_stiff, D_f_tu, nu);
+    % ignoring top and side plates for now
+
     %% Buckling calculation
     [FOS_spar,FOS_spar_local] = spar_combined_buckling(F_heave, E(M), I(2), h_s, D_s, A_c(2), t_s_r, ...
                                         P_hydrostatic(2), sigma_max, nu(M));
 
     %% Factor of Safety (FOS) Calculations
-    FOS_yield = sigma_max ./ sigma_vm;
-    FOS1Y = FOS_yield(1);
+    FOS1Y = sigma_max / sigma_float_bot;
     FOS2Y = FOS_spar;
-    FOS3Y = FOS_yield(3);
+    FOS3Y = sigma_vm(3);
 
 end 
 
