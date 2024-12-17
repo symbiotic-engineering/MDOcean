@@ -124,13 +124,26 @@ classdef (SharedTestFixtures={ ...
     end
     
     % Test methods
-    methods(Test, ParameterCombination='sequential')   
+    methods(Test, ParameterCombination='sequential')
+
+        % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
             success_criterion = all_figures(which_figs,which_tabs,testCase.uuid.Value);
             if ~isempty(success_criterion)
                 for i=1:length(success_criterion)
                     testCase.verifyGreaterThan(success_criterion{i},0);
                 end
+            end
+
+            if which_figs ~= 0
+                fig_name = ['LoggedFigure_' num2str(which_figs)];
+                fig = gcf;
+    
+                set(fig,'Units','Inches');
+                pos = get(fig,'Position');
+                set(fig,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+                print(fig,['../test-results/' fig_name],'-dpdf','-r0')
+                testCase.log(matlab.unittest.diagnostics.FigureDiagnostic(fig,'Formats','png','Prefix',fig_name))
             end
         end
 
