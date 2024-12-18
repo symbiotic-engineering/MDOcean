@@ -35,7 +35,8 @@ in.T_f_1 = p.T_f_1_over_T_f_2 * in.T_f_2;
 in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 
 % Space between float and spar
-in.D_f_in = p.D_f_in_over_D_s * in.D_s;
+D_f_in = p.D_f_in_over_D_s * in.D_s;
+in.D_f_in = min(D_f_in, D_f - 1e-6); % ensure positive area to avoid sim breaking for infeasible inputs
 
 %% Run modules
 [V_d, m_m, m_f_tot, m_s_tot, ...
