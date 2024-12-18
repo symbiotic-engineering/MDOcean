@@ -95,8 +95,7 @@ g(22) = X_constraints(3);               % prevent float support tube (PTO attach
 g(23) = X_constraints(4);               % float amplitude obeys linear theory
 g(24:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
-criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
-%assert( criteria )
+criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
     warning('Inf, NaN, or imaginary constraint detected')
 end
