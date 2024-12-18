@@ -141,13 +141,13 @@ classdef (SharedTestFixtures={ ...
             end
 
             if which_figs ~= 0 % figure
-                fig_name = ['Figure_' num2str(which_figs) '_'];
+                fig_name = ['Figure_' num2str(which_figs)];
     
                 set(fig_out,'Units','Inches');
                 pos = get(fig_out,'Position');
                 set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
                 print(fig_out,['../test-results/' fig_name],'-dpdf','-r0')
-                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',fig_name);
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
             else % table
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
