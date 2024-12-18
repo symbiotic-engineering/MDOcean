@@ -34,7 +34,7 @@ end
 fig_names{3} = 'Fig. 3: saturation time signal';
 fig_names{4} = 'Fig. 4: saturation alpha';
 if any(which_figs == 3 | which_figs == 4)
-    sin_saturation_demo()
+    sin_desc_fcn_demo()
 end
 
 %% figure 5 - JPD multiplication
