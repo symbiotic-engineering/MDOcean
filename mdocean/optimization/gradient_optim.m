@@ -89,10 +89,11 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     T_s = D_s * p.T_s_over_D_s;
     h_f = T_f_2 / p.T_f_2_over_h_f;
     D_d = p.D_d_over_D_s * D_s;
+    D_f_in = D_s * p.D_f_in_over_D_s;
 
     MEEM = pi*p.harmonics / (p.besseli_argmax*2);
     prob.Constraints.linear_spar_natural_freq = D_d >= p.D_d_min;
-    prob.Constraints.linear_float_spar_diam = D_s <= D_f - .01;
+    prob.Constraints.linear_float_spar_diam = D_f_in <= D_f - .01;
     prob.Constraints.linear_float_spar_draft = T_f_2 <= T_s - .01;
     prob.Constraints.linear_float_spar_tops = h_s - T_s >= h_f - T_f_2 + .01;
     prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= MEEM * D_f; % M
