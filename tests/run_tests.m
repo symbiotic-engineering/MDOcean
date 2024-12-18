@@ -36,8 +36,8 @@ codeFilePaths(filePathsToExclude) = [];
 
 p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
-p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
-p4 = DiagnosticsRecordingPlugin();
+p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true);
+p4 = DiagnosticsRecordingPlugin('IncludingPassingDiagnostics',true);
 
 runner.addPlugin(p1);
 runner.addPlugin(p2);
