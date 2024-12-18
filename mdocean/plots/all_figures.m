@@ -85,10 +85,13 @@ fig_names{7} = 'Fig. 7: design heuristics';
 if any(which_figs == 6 | which_figs == 7)  
     pareto_search(filename_uuid);
     pareto_curve_heuristics()
-    fig7 = gcf;
-    fig6 = figure(fig7.Number - 1);
-    fig_output(which_figs==6) = fig6;
-    fig_output(which_figs==5) = fig5;
+    fig7b = gcf;
+    fig7a = figure(fig7b.Number - 1);
+    fig6 = figure(fig7b.Number - 3);
+    figTBD = figure(fig7b.Number - 6); % constraint activity
+    figTBD.Position = [1 41 1536 844.8000];
+    fig_output(which_figs==6) = [fig6 figTBD]; % combine for now until I renumber everything
+    fig_output(which_figs==7) = [fig7a fig7b];
 end
 
 %% figure 8 - parameter sensitivities
