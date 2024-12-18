@@ -90,8 +90,8 @@ if any(which_figs == 6 | which_figs == 7)
     fig6 = figure(fig7b.Number - 3);
     figTBD = figure(fig7b.Number - 6); % constraint activity
     figTBD.Position = [1 41 1536 844.8000];
-    fig_output(which_figs==6) = [fig6 figTBD]; % combine for now until I renumber everything
-    fig_output(which_figs==7) = [fig7a fig7b];
+    fig_output(which_figs==6) = fig6;
+    fig_output(which_figs==7) = fig7a;% fig7b];
 end
 
 %% figure 8 - parameter sensitivities
