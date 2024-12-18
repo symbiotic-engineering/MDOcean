@@ -1,4 +1,4 @@
-function [] = gradient_mult_x0(filename_uuid)
+function [results] = gradient_mult_x0(filename_uuid)
 
 p = parameters();
 b = var_bounds();
