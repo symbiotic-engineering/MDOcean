@@ -17,7 +17,7 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
     d2 = T_f;        % draft below waterline
     d1 = T_s;
     A_w_f = pi * (a2^2 - a1^2);     % waterplane area
-    A_w_s = pi/4 * D_s^2;
+    A_w_s = pi/4 * D_s^2; % fixme: for drag, should the area be the damping plate area, not the waterplane area?
     
     if use_MEEM
         [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...

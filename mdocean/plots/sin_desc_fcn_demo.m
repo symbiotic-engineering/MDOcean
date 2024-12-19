@@ -1,5 +1,6 @@
-function [] = sin_saturation_demo()
+function [] = sin_desc_fcn_demo()
 
+%% force saturation
 x = linspace(0,1,100);
 y = 1.5*sin(x*2*pi);
 idx_sat = abs(y)>1;
@@ -41,6 +42,18 @@ xticks(1:8)
 yticks(1:.1:1.3)
 xlabel('Force Ratio F_p/F_{max}')
 ylabel('Fundamental Ratio \alpha')
+improvePlot
+
+%% drag
+drag_DF = 8/(3*pi)*sin(x*2*pi);
+drag_actual = sin(x*2*pi) .* abs(sin(x*2*pi));
+
+figure
+plot(x,drag_actual,x,drag_DF)
+xlabel('Normalized Time')
+ylabel('Normalized Drag Force')
+legend('Squared Signal $\sin(\omega t)|\sin(\omega t)|$',...
+    'Fundamental Amplitude $\frac{8}{3\pi}\sin(\omega t)$','Interpreter','latex')
 improvePlot
 
 end
