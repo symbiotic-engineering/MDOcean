@@ -35,7 +35,8 @@ in.T_f_1 = p.T_f_1_over_T_f_2 * in.T_f_2;
 in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 
 % Space between float and spar
-in.D_f_in = p.D_f_in_over_D_s * in.D_s;
+D_f_in = p.D_f_in_over_D_s * in.D_s;
+in.D_f_in = min(D_f_in, in.D_f - 1e-6); % ensure positive area to avoid sim breaking for infeasible inputs
 
 %% Run modules
 [V_d, m_m, m_f_tot, m_s_tot, ...
@@ -56,14 +57,16 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
                     X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
-    FOS_spar_local] = structures(F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ...
-                                 in.M, in.h_s, in.T_s, in.rho_w, in.g, in.sigma_y, in.sigma_e, ...
-                                 A_c, A_lat_sub, in.D_s, in.t_s_r, I, in.E, in.nu);
+    FOS_spar_local] = structures(...
+          	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ... % forces
+            in.h_s, in.T_s, in.D_s, in.D_f, in.D_f_in, in.num_sections, in.D_f_tu, ... % bulk dimensions
+            in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, in.h_stiff, in.w_stiff, ... % structural dimensions
+            in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu);
 
 LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
-num_g = 20+numel(p.JPD);
+num_g = 23+numel(p.JPD);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -72,26 +75,28 @@ g(4) = 1 - V_s_pct;                     % prevent spar too light
 g(5) = GM;                              % pitch stability of float-spar system
 g(6) = FOS_float(1) / p.FOS_min - 1;    % float survives max force
 g(7) = FOS_float(2) / p.FOS_min - 1;    % float survives fatigue
-g(8) = FOS_spar(1) / p.FOS_min - 1;           % spar survives max force
-g(9) = FOS_spar(2) / p.FOS_min - 1;           % spar survives fatigue
-g(10) = FOS_damping_plate(1) / p.FOS_min - 1; % damping plate survives max force
-g(11) = FOS_damping_plate(2) / p.FOS_min - 1; % damping plate survives fatigue
-g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
-g(13) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-g(14) = P_avg_elec;                     % positive power
+g(8) = in.t_f_t / in.t_f_b - 0.5 / 0.56;      % float top thickness ratio placeholder
+g(9) = in.t_f_r / in.t_f_b - 0.44 / 0.56;     % float radial thickness ratio placeholder
+g(10) = in.t_f_c / in.t_f_b - 0.44 / 0.56;    % float circumferential thickness ratio placeholder
+g(11) = FOS_spar(1) / p.FOS_min - 1;           % spar survives max force
+g(12) = FOS_spar(2) / p.FOS_min - 1;           % spar survives fatigue
+g(13) = FOS_damping_plate(1) / p.FOS_min - 1; % damping plate survives max force
+g(14) = FOS_damping_plate(2) / p.FOS_min - 1; % damping plate survives fatigue
+g(15) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
+g(16) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
+g(17) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
-g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
+g(18) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
+g(19) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be active
                                         % and is only required when p.cost_perN = 0.
-g(17) = X_constraints(1);               % prevent float rising above top of spar
-g(18) = X_constraints(2);               % prevent float going below bottom of spar
-g(19) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
-g(20) = X_constraints(4);               % float amplitude obeys linear theory
-g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
+g(20) = X_constraints(1);               % prevent float rising above top of spar
+g(21) = X_constraints(2);               % prevent float going below bottom of spar
+g(22) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
+g(23) = X_constraints(4);               % float amplitude obeys linear theory
+g(24:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
-criteria = all(~isinf(g)) && all(~isnan(g)) && all(isreal(g));
-%assert( criteria )
+criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
     warning('Inf, NaN, or imaginary constraint detected')
 end
