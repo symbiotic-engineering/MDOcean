@@ -1,4 +1,4 @@
-function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
+function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     p = parameters(mode);
     p.N_WEC = 1;
     p.power_max = 286000;
@@ -15,8 +15,8 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
     % comparison of simulated and actual values
     if nargout > 2
         actual = validation_inputs(mode);
-        f = figure;
-        t = tiledlayout(f,1,3);
+        fig = figure;
+        t = tiledlayout(fig,1,3);
         fields = fieldnames(actual);
 
         % for economic validation, sweep N_WEC
@@ -60,7 +60,7 @@ function [feasible,failed,simulated,actual,tab] = validate_nominal_RM3(mode)
             results = rmfield(simulated, extra_fields); % remove fields where there is no actual data
             results(2) = actual;
             results(3) = pct_error;
-            tab = struct2table(results, 'RowNames',{'Simulation','RM3 actual','Error'});
+            tab = struct2table(results, 'RowNames',strcat({'Simulation','RM3 actual','Error'},{[' ' mode]}));
         end
    end
 end
