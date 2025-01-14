@@ -111,7 +111,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
         F_surge_coeff = 2 * in.rho_w * w_max^2 * max(wave_amp,[],'all') ./ k_max;
         F_surge_f = F_surge_coeff * pi * in.D_f^2/4 .* (       1             - exp(-k_max*in.T_f_2));
         F_surge_s = F_surge_coeff * pi * in.D_s^2/4 .* (exp(-k_max*in.T_f_2) - exp(-k_max*in.T_s));
-        F_surge = [F_surge_f F_surge_s 0]
+        F_surge = [F_surge_f F_surge_s 0];
     end
 end
 
