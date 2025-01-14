@@ -1,10 +1,11 @@
 function [] = param_sweep(filename_uuid)
 
-% Brute force parameter sensitivity sweep (reoptimize for each param value)
 %% Setup
 b = var_bounds();
+if nargin>0
+    b.filename_uuid = filename_uuid;
+end
 [p,T] = parameters();
-b.filename_uuid = filename_uuid;
 
 param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
 params = T.name(T.sweep);
@@ -14,42 +15,41 @@ groups = categorical(T.subsystem(T.sweep));
 color_groupings = {'b','g','r','k','y'};
 colors = color_groupings(groups);
 
-ratios = .8 : .1 : 1.2;
+
 %%
 % use the optimal x as x0 to speed up the sweeps
+% and obtain gradients
 x0 = b.X_start_struct;
-x0_vec = gradient_optim(x0,p,b);
+[x0_vec, J0, ~, ~, lambda, grad, hess] = gradient_optim(x0,p,b);
 x0 = cell2struct(num2cell(x0_vec),b.var_names',1);
 
 num_DVs = length(dvar_names);
-LCOE  = zeros(length(params), length(ratios));
-P_var = zeros(length(params), length(ratios));
-X_LCOE= zeros(length(params), length(ratios), num_DVs);
-X_Pvar= zeros(length(params), length(ratios), num_DVs);
+num_constr = length(b.constraint_names);
 
-%% Run optimization
+
+%% Obtain local sensitivity 
+%[LCOE_L, X_LCOE_L, ...
+% P_var_L, X_Pvar_L] = local_sens_both_obj_all_param(x0_vec, p, params, lambdas, grads, hesses, num_constr);
+
+
+%% Rerun optimization for global sensitivities
+ratios = .8 : .1 : 1.2;
+
+[LCOE, P_var]    = deal(zeros(length(params), length(ratios)));
+[X_LCOE, X_Pvar] = deal(zeros(length(params), length(ratios), num_DVs));
+
 for i=1:length(params)
-    p = parameters();
-    p.filename_uuid = filename_uuid;
-    var_nom = p.(params{i});
-    for j=1:length(ratios)
-        p.(params{i}) = ratios(j) * var_nom;
-        [Xs_opt, obj_opt, flag] = gradient_optim(x0,p,b);
-        %[Xs_opt, obj_opt, flag] = deal(rand(num_DVs,2),rand(2,1),[1 1]); %dry run
-        if flag(1) >= 1
-            LCOE(i,j) = obj_opt(1);
-            X_LCOE(i,j,:) = Xs_opt(:,1);
-        else
-            [X_LCOE(i,j,:),LCOE(i,j)] = deal(NaN);
-        end
-        if flag(2) >= 1
-            P_var(i,j) = obj_opt(2);
-            X_Pvar(i,j,:)= Xs_opt(:,2); 
-        else
-            [X_Pvar(i,j,:), P_var(i,j)] = deal(NaN);
-        end
-    end   
+    param_name = params{i};
+
+    [LCOE(i,:),  X_LCOE(i,:,:), ...
+     P_var(i,:), X_Pvar(i,:,:)] = global_sens_repotimize(x0, p, b, param_name, ratios, num_DVs);
 end
+
+% fill in ratios == 1 (left blank since same as initial)
+LCOE(:,ratios==1) = J0(1);
+P_var(:,ratios==1) = J0(2);
+X_LCOE(:,ratios==1,:) = x0_vec(:,1);
+X_Pvar(:,ratios==1,:) = x0_vec(:,2);
 
 %% Plot each sensitivity
 col_nom = find(ratios==1);
@@ -178,6 +178,8 @@ set(gca,'YGrid','on','XGrid','on')
 % legend('LCOE','c_v')
 end
 
+
+
 function slope = get_slope(y_result, x, y_nominal)
     result_for_nans = y_result(:,:,1); % deal with case where ndims(result) > 2
 
@@ -198,3 +200,34 @@ function slope = get_slope(y_result, x, y_nominal)
     slope = (y_last - y_first) ./ (x_last - x_first);
     slope = slope / y_nominal; % normalize
 end
+
+function [LCOE, X_LCOE, P_var, X_Pvar] = global_sens_repotimize(x0, p, b, param_name, ratios, num_DVs)
+% Brute force parameter sensitivity sweep (reoptimize for each param value)
+
+    [LCOE,P_var] = deal(zeros(1,length(ratios)));
+    [X_LCOE,X_Pvar] = deal(zeros(length(ratios),num_DVs));
+
+    var_nom = p.(param_name);
+
+    for j=1:length(ratios)
+        if ratios(j) ~=1   
+            p.(param_name) = ratios(j) * var_nom;
+            [Xs_opt, obj_opt, flag] = gradient_optim(x0,p,b);
+            %[Xs_opt, obj_opt, flag] = deal(rand(num_DVs,2),rand(2,1),[1 1]); %dry run
+            if flag(1) >= 1
+                LCOE(j) = obj_opt(1);
+                X_LCOE(j,:) = Xs_opt(:,1);
+            else
+                [X_LCOE(j,:),LCOE(j)] = deal(NaN);
+            end
+            if flag(2) >= 1
+                P_var(j) = obj_opt(2);
+                X_Pvar(j,:)= Xs_opt(:,2); 
+            else
+                [X_Pvar(j,:), P_var(j)] = deal(NaN);
+            end
+        end
+    end   
+
+end
+
