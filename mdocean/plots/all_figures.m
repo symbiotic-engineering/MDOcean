@@ -7,7 +7,7 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
-num_figs = 10;
+num_figs = 14;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -59,13 +59,49 @@ if any(which_figs == 2)
     fig_output{which_figs==2} = fig2;
 end
 
-%% figure 2 - N2 diagram
-fig_names{2} = 'Fig. 2: N2 diagram';
-if any(which_figs == 2)
+%% figure 3 - N2 diagram
+fig_names{3} = 'Fig. 3: N2 diagram';
+if any(which_figs == 3)
     % Created in powerpoint
-    fig2 = figure;
-    imshow(imread("n2final2.png"),'Parent',axes(fig2));
-    fig_output(which_figs==2) = fig2;
+    fig3 = figure;
+    imshow(imread("simple_N2.jpg"),'Parent',axes(fig3));
+    fig_output{which_figs==3} = fig3;
+end
+
+%% figure 4 - Dimensions
+fig_names{4} = 'Fig. 4: Dimensions';
+if any(which_figs == 4)
+    % Created in powerpoint
+    fig4 = figure;
+    imshow(imread("dimensions.jpg"),'Parent',axes(fig4));
+    fig_output{which_figs==4} = fig4;
+end
+
+%% figure 5 - MEEM geometry
+fig_names{5} = 'Fig. 5: MEEM geometry';
+if any(which_figs == 5)
+    % Created in powerpoint
+    fig5 = figure;
+    imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
+    fig_output{which_figs==5} = fig5;
+end
+
+%% figure 11 - MEEM geometry
+fig_names{11} = 'Fig. 11: FBD';
+if any(which_figs == 11)
+    % Created in powerpoint
+    fig11 = figure;
+    imshow(imread("FBD.jpg"),'Parent',axes(fig11));
+    fig_output{which_figs==11} = fig11;
+end
+
+%% figure 14 - Optimization process flowchart
+fig_names{14} = 'Fig. 14: Optimization flowchart';
+if any(which_figs == 14)
+    % Created in powerpoint
+    fig14 = figure;
+    imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
+    fig_output{which_figs==14} = fig14;
 end
 
 %% figure 3, 4 - saturation time signal, saturation alpha
