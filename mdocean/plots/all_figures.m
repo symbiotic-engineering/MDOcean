@@ -59,18 +59,6 @@ if any(which_figs == 2)
     fig_output{which_figs==2} = fig2;
 end
 
-
-
-
-% 
-% fig_names{2} = 'Fig. 2: Methodology overview';
-% if any(which_figs == 2)
-%     % Created in powerpoint
-%     fig2 = '../plots/non_matlab_figs/methods_flowchart_2_cropped.pdf';
-%     fig_output{which_figs==2} = fig2;
-%     print(fig2,'-bestfit')
-% end
-
 %% figure 2 - N2 diagram
 fig_names{2} = 'Fig. 2: N2 diagram';
 if any(which_figs == 2)
