@@ -20,6 +20,9 @@ if nargin==0
 end
 
 fig_output = gobjects(1, length(which_figs));
+
+fig_output = cell(1, length(which_figs));
+
 tab_output(1, 1:length(which_tabs)) = {table()};
 
 %% Define mapping from figures/tables to scripts
@@ -44,8 +47,29 @@ if any(which_figs == 1)
     % Created in powerpoint
     fig1 = figure;
     imshow(imread("geometry.png"),'Parent',axes(fig1));
-    fig_output(which_figs==1) = fig1;
+    fig_output{which_figs==1} = fig1;
 end
+
+%% figure 2 - Methodology overview
+fig_names{2} = 'Fig. 2: Methodology overview';
+if any(which_figs == 2)
+    % Created in powerpoint
+    fig2 = figure;
+    imshow(imread("methods_flowchart_2_cropped.jpg"),'Parent',axes(fig2));
+    fig_output{which_figs==2} = fig2;
+end
+
+
+
+
+% 
+% fig_names{2} = 'Fig. 2: Methodology overview';
+% if any(which_figs == 2)
+%     % Created in powerpoint
+%     fig2 = '../plots/non_matlab_figs/methods_flowchart_2_cropped.pdf';
+%     fig_output{which_figs==2} = fig2;
+%     print(fig2,'-bestfit')
+% end
 
 %% figure 2 - N2 diagram
 fig_names{2} = 'Fig. 2: N2 diagram';
