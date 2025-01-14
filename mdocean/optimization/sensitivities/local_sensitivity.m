@@ -1,0 +1,217 @@
+
+b = var_bounds();
+[p,T] = parameters();
+
+%param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
+%params = T.name(T.sweep);
+params = {'h'};
+
+dvar_names = b.var_names_pretty;
+
+%%
+% use the optimal x as x0 to speed up the sweeps
+% and obtain gradients
+x0 = b.X_start_struct;
+[x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
+
+num_constr = length(b.constraint_names);
+
+disp('done optimizing, starting param sensitivity')
+tic
+local_sens_both_obj_all_param(x0_vec, p, params, lambdas, grads, hesses, num_constr)
+toc
+
+function [LCOE_L,  X_LCOE_L, ...
+          P_var_L, X_Pvar_L] = local_sens_deltas(x0, p, param_name, ratios, matrix, lambdas, J0)
+
+    delta_p = p0 * (ratios - 1);
+
+    [par_x_star_par_p, dJdp, dJstar_dp] = get_local_sens();
+
+    % deltas based on specific ratios
+    delta_x_star = par_x_star_par_p * delta_p;
+    delta_J = dJdp * delta_p; 
+    delta_Jstar = dJstar_dp * delta_p;
+
+    dxs(:,obj) = delta_x_star;
+    dJs(obj)   = delta_Jstar;
+
+    x_new = x0s + dxs;
+    J_new = J0 + dJs;
+end
+
+function local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
+    for obj = 1:2
+        x0 = x0s(:,obj);
+        lambda = lambdas(obj);
+        grad = grads(:,obj);
+        hess = hesses(:,:,obj);
+
+        [par_x_star_par_p, dJstar_dp, ...
+            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj)
+    end
+end
+
+function [par_x_star_par_p, dJstar_dp, ...
+            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj)
+% construct matrix equation for a single J - slide 47 of lec 10 of MDO
+
+    % lagrange multpliers
+    lambda_nl  = lambda.ineqnonlin;
+    lambda_lin = lambda.ineqlin;
+    lambda_lb = lambda.lower;
+    lambda_ub = lambda.upper;
+
+    % active constraints
+    active     = lambda_nl ~= 0;
+    active_lin = lambda_lin ~= 0;
+    active_lb  = lambda_lb ~= 0;
+    active_ub  = lambda_ub ~= 0;
+    % fixme: need to actually use these bounds
+
+    % left hand side matrix - independent of parameter
+    matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin);
+    
+    % sweep parameters
+    for i = 1:length(params)
+        param_name = params{i};
+        % right hand side vector - depends on parameter
+        [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
+                                                        lambda_nl, lambda_lin, active, active_lin);
+    
+        % matrix solution
+        sol = matrix \ vector;
+        par_x_star_par_p = sol(1:length(x0)-1);
+        par_lam_par_p = sol(length(x0):end);
+    
+        % total derivative
+        par_J_par_x = grad;
+        dJstar_dp = par_J_par_p + par_J_par_x.' * par_x_star_par_p;
+
+        %delta_p_nl_becomes_inactive = -lambda_nl(active) ./ par_lam_par_p
+        %delta_p_becomes_active
+    end
+end
+
+function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
+                                                        lambda_nl, lambda_lin, active, active_lin)
+
+
+
+    p0 = p.(param_name);
+    [par_J_par_p, par_g_par_p, ...
+        par_par_J_par_x_par_p, ...
+        par_par_g_par_x_par_p,...
+        par_g_lin_par_p,...
+        par_par_g_lin_par_x_par_p] = get_partials(obj, p, param_name, x0, p0,num_constr);
+
+    % use all constraints for J sensitivity - MDO book - just J, not J*
+    dJdp = par_J_par_p - lambda_nl.' * par_g_par_p - lambda_lin.' * par_g_lin_par_p.';
+
+    % only use active constraints for J* and x* sensitivity
+    % d vector
+    d = [par_g_par_p(active); par_g_lin_par_p(active_lin)];
+
+    % c vector
+    c_obj_term = par_par_J_par_x_par_p;
+    c_nl_constraint_term = par_par_g_par_x_par_p * lambda_nl;
+    c_lin_constraint_term = par_par_g_lin_par_x_par_p * lambda_lin;
+    c = c_obj_term + c_nl_constraint_term + c_lin_constraint_term;
+    vector = -[c; d];
+end
+
+function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin)
+
+    % A is just the Hessian of the Lagrangian, which we already have from the optimization
+    A = hess;
+
+    % obtain B = dg/dx with finite difference
+    active_constraint_handle = @(X) get_constraints([X;1],p,active);
+    num_constr_active = sum(active);
+    num_constr_active_lin = sum(active_lin);
+    B_nl = finite_difference_vector_x(active_constraint_handle,x0(1:end-1),num_constr_active);
+    [~, A_ineq_lin_part] = is_feasible(0, x0, p);
+    A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
+    A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
+    B_lin = A_ineq_lin(active_lin,:).';
+    B= [B_nl B_lin];
+
+    % make matrix
+    matrix = [A B; B.' zeros(num_constr_active+num_constr_active_lin)];
+end
+
+function [par_J_par_p, par_g_par_p, ...
+            par_par_J_par_x_par_p, ...
+            par_par_g_par_x_par_p,...
+            par_g_lin_par_p,...
+            par_par_g_lin_par_x_par_p] = get_partials(obj, p, param_name, x0, p0,num_constr)
+
+        %  compute par_y_par_p using finite difference
+        y_fcn_handle = @(param_value) get_sim_outputs_and_derivs(obj,p,param_name,param_value,x0);
+        par_y_par_p = finite_difference_scalar_x(y_fcn_handle,p0);
+    
+        % decompose par_y_par_p into its sections
+        par_J_par_p = par_y_par_p(1,1);
+        par_g_par_p = par_y_par_p(1,2 : 1+num_constr).';
+        par_par_J_par_x_par_p = par_y_par_p(2:end, 1);
+        par_par_g_par_x_par_p = par_y_par_p(2:end, 2 : 1+num_constr);
+
+        % fixme these are just placeholder zeros
+        num_constr_lin = 6;
+        par_g_lin_par_p = zeros(1,num_constr_lin);
+        par_par_g_lin_par_x_par_p = zeros(length(x0)-1,num_constr_lin);
+end
+
+function y = get_sim_outputs_and_derivs(obj,p,param_name,param_value,x0)
+    p.(param_name) = param_value;
+
+    % F = [J(obj),g]
+    F_handle = @(X)get_sim_outputs([X;1],p,obj);
+
+    % get F directly from simulation
+    F = F_handle(x0);
+
+    % get parF_parX from finite difference
+    parF_parx = finite_difference_vector_x(F_handle,x0(1:end-1),length(F));
+
+    % assemble y from F and parF_parX
+    y = [F;parF_parx];
+end
+
+% wrappers to get the right outputs to make function handles
+function F = get_sim_outputs(X,p,obj)
+    [J1, J2, ~, g] = simulation(X, p);
+    J = [J1,J2];
+    F = [J(obj),g];
+end
+function g_active = get_constraints(X,p,active)
+    [~, ~, ~, g] = simulation(X, p);
+    g_active = g(active);
+end
+
+function deriv = finite_difference_vector_x(fcn_handle,x_1_vec,ny)
+% fcn handle: a function expecting input vector x and returning output matrix y (size ny)
+    
+    nx = length(x_1_vec);
+    deriv = zeros([nx ny]);
+    for i=1:nx
+        x_before = x_1_vec(1:i-1);
+        x_after  = x_1_vec(i+1:end);
+        scalar_handle = @(x_i) fcn_handle([x_before; x_i; x_after]);
+        deriv(i,:) = finite_difference_scalar_x(scalar_handle,x_1_vec(i));
+    end
+end
+
+function deriv = finite_difference_scalar_x(fcn_handle,x_1)
+% fcn handle: a function expecting input scalar x and returning output matrix y
+    assert(isscalar(x_1))
+    y_1 = fcn_handle(x_1);
+    delta_x = 1e-10;
+    x_2 = x_1 + delta_x;
+    y_2 = fcn_handle(x_2);
+
+    delta_y = y_2 - y_1;
+    deriv = delta_y / delta_x;
+    % deriv is size(y)
+end
+
