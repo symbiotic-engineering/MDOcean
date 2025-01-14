@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -50,14 +50,14 @@ opts = optimoptions('fmincon',	'Display',display,...
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
-    [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
@@ -73,6 +73,8 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
+    grads = zeros(length(X)-1,num_objectives);
+    hesses = zeros(length(X)-1,length(X)-1,num_objectives);
 
     % add constraints
     prob = optimproblem();
@@ -139,6 +141,13 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;
+        if i==1
+            lambdas = lambda;
+        else
+            lambdas(i) = lambda;
+        end
+        grads(:,i) = grad;
+        hesses(:,:,i) = hess;
 
         % Post process
         if ploton
