@@ -7,8 +7,16 @@ function sigma = get_stiffener_equivalent_stress(t_plate, h_stiff, width_plate, 
     b = width_stiff;
     M = moment_per_length;
     
-    eta_over_h = 1/2 * (1 - b/a * (H/h)^2) / (1 + b/a * (H/h)); % eq 7.67 MIT 2.080
-    h_eq_over_h_3 = 4 * ( (1-3*eta_over_h+3*eta_over_h^2) + b/(2*a) * ( (H/h)^2 + 3*(H/h)^2*eta_over_h + 3*H/h*eta_over_h^2 )  ); % eq 7.69
+    % eq 7.67 from MIT 2.080
+    num = 1 - b/a * (H/h)^2;
+    den = 1 + b/a * (H/h);
+    eta_over_h = 1/2 * num / den; 
+
+    % eq 7.69 from MIT 2.080
+    term1 = 1 - 3 * eta_over_h + 3 * eta_over_h^2;
+    term2 = (H/h)^2 + 3*(H/h)^2 * eta_over_h + 3 * H/h * eta_over_h^2;
+    h_eq_over_h_3 = 4 * ( term1 + b/(2*a) * term2 ); 
+    
     if h_eq_over_h_3 < 0
         warning('stiffener equivalence broke')
         h_eq_over_h_3 = 1;
