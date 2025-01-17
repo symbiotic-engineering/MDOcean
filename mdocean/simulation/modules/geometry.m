@@ -115,7 +115,7 @@ V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
 % damping plate material use
 A_d = pi/4 * D_d^2;                     % damping plate itself
 num_supports = 4;
-L_dt = D_d / (2*cos(theta_d_tu));
+L_dt = (D_d - D_s) / (2*cos(theta_d_tu));
 D_dt_i = D_d_tu - 2 * t_d_tu;
 A_dt = pi/4 * (D_d_tu^2 - D_dt_i^2);      % support tube area
 t_d = min(h_d, t_d_max);                % material thickenss of damping plate
