@@ -166,11 +166,9 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     hold on
     plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
     plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
-    plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
-    plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
-    plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
     legend
     xlabel('r')
+    ylabel('Moment')
     improvePlot
 
     figure
@@ -181,7 +179,17 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
     legend
     xlabel('r')
-    ylabel('deflection')
+    ylabel('Deflection')
+    improvePlot
+
+    figure
+    plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
+    hold on
+    plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
+    plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
+    legend
+    xlabel('r')
+    ylabel('Normalized Quantity')
     improvePlot
 
 end
