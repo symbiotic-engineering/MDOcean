@@ -1,8 +1,11 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
-         A_c, A_lat_sub, r_over_t, ...
-         I, T, V_f_pct, V_s_pct, GM, mass, A_dt, L_dt, t_d,CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f,D_f_in, D_f_b, T_f_1, T_f_2, h_f, h_s, ...
-                                            t_ft, t_fr, t_fc, t_fb, t_sr, t_dt, ...
-                                            D_d, D_dt, theta_dt, T_s, h_d, t_d_max, ...
+         A_c, A_lat_sub, ...
+         I, T, V_f_pct, V_s_pct, GM,...
+         mass, A_dt, L_dt, t_d,...
+         CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f, D_f_in, D_f_b, ...
+                                            T_f_1, T_f_2, h_f, h_s, h_fs_clear, D_f_tu, ...
+                                            t_f_t, t_f_r, t_f_c, t_f_b, t_f_tu, t_s_r, t_d_tu, ...
+                                            D_d, D_d_tu, theta_d_tu, T_s, h_d, t_d_max, ...
                                             M, rho_m, rho_w, m_scale)
 
 %% Variable Definitions
@@ -13,12 +16,13 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 % _f: float
 % _s: spar
 % _d: damping plate
-% _dt: damping plate tubular support
+% _d_tu: damping plate tubular support
+% _f_tu: float tubular support
 
 %               _____                               -
-%               |   |                               |
-%               |   |                               |
-%            _____Df_____                       -   |
+%              /|   |\                              |
+%             / |   | \Lft                          |
+%            /____Df___\_                       -   |
 %           |           |                       |   |
 % ----------|           |---------  -   -       hf  |
 %           |           |    Tf1    |   |       |   |
@@ -38,12 +42,13 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 
 % Not shown in diagram:
 % D_f_in - inner diameter of float
-% t_ft - axial thickness of the float top plate
-% t_fb - axial thickness of the float bottom plate
-% t_fc - circumferential thickness of the float gussets
-% t_fr - radial thickness of the float walls
-% t_sr - radial thickness of the spar walls
-% t_dt - radial thickness of damping plate support tube walls
+% t_f_t - axial thickness of the float top plate
+% t_f_b - axial thickness of the float bottom plate
+% t_f_c - circumferential thickness of the float gussets
+% t_f_r - radial thickness of the float walls
+% t_s_r - radial thickness of the spar walls
+% t_d_tu - radial thickness of damping plate support tube walls
+% t_f_tu - radial thicknss of float support tube walls
 
 %% Float
 num_gussets = 24;
@@ -51,16 +56,29 @@ num_gussets_loaded_lateral = 2;
 
 % float cross sectional and lateral area for structural purposes
 D_f_mean = (D_f + D_f_b)/2;
-A_f_cross_top = pi * (D_f + D_f_in) * t_fr + num_gussets * t_fc * (D_f - D_f_in)/2; % a ring with diameter D_f, a ring with diameter D_s, and gussets
-A_f_cross_bot = pi * (D_f_in)       * t_fr + num_gussets * t_fc * (D_f_mean - D_f_in)/2; % a ring with diameter D_s, and bottom part of gussets
-A_f_l = num_gussets_loaded_lateral * t_fc * T_f_2;
+A_f_cross_top = pi * (D_f + D_f_in) * t_f_r + num_gussets * t_f_c * (D_f - D_f_in)/2; % a ring with diameter D_f, a ring with diameter D_f_in, and gussets
+A_f_cross_bot = pi * (D_f_in)       * t_f_r + num_gussets * t_f_c * (D_f_mean - D_f_in)/2; % a ring with diameter D_s, and bottom part of gussets
+A_f_l = num_gussets_loaded_lateral * t_f_c * T_f_2;
 
-% float material volume and mass
-V_top_plate = pi * (D_f/2)^2 * t_ft;
-V_bot_plate = pi * (D_f_b/2)^2 * t_fb;
-V_bot_slant = pi/2 * (D_f + D_f_b) * (T_f_2 - T_f_1) * t_fb; 
-V_rims_gussets = A_f_cross_top * (h_f - (T_f_2 - T_f_1)) + A_f_cross_bot * (T_f_2 - T_f_1);
-V_sf_m = V_top_plate + V_bot_plate + V_rims_gussets + V_bot_slant; % FIXME I'm neglecting the mass of the extra stiffeners
+% float material volume and mass - see drawings on p168-169 of notebook 11/26/24
+V_top_plate = pi * ( (D_f/2)^2 - (D_f_in/2)^2 ) * t_f_t;
+V_bot_plate = pi * (D_f_b/2)^2 * t_f_b;
+slant_height = sqrt((D_f/2 - D_f_b/2)^2 + (T_f_2 - T_f_1)^2); 
+V_bot_slant = pi/2 * (D_f + D_f_b) * slant_height * t_f_b;       % lateral area of frustum
+V_outer_rim = pi * D_f * t_f_r * (h_f - (T_f_2 - T_f_1));
+V_inner_rim = pi * D_f_in * t_f_t * h_f;
+A_gusset = (h_f - (T_f_2 - T_f_1)) * (D_f - D_f_in)/2 + (T_f_2 - T_f_1) * (D_f_mean - D_f_in)/2;
+V_gussets = num_gussets * A_gusset * t_f_c;
+
+% float support tubes for attaching PTO
+num_float_tubes = 6;
+horiz_leg_tube = D_f/2;
+vert_leg_tube = (1 + D_f/(D_f-D_s)) * (h_fs_clear + h_s - h_f + T_f_2 - T_f_1 - T_s); % h_fs_clear is vertical clearance between float tubes and spar when at rest
+L_ft = sqrt(horiz_leg_tube^2 + vert_leg_tube^2); % length of float tube
+V_f_tubes = num_float_tubes * (D_f_tu^2 - (D_f_tu - 2*t_f_tu)^2) * pi/4 * L_ft;
+
+V_sf_m = V_top_plate + V_bot_plate + V_outer_rim ...
+        + V_inner_rim + V_bot_slant  + V_gussets + V_f_tubes;
 
 m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
@@ -90,16 +108,16 @@ V_s_d = V_vc_d + V_d_d;                 % spar volume displaced (both column and
 m_s_tot = rho_w * V_s_d;                % total spar mass
 
 % vertical column material use
-D_vc_i = D_s - 2 * t_sr;                % spar column inner diameter
+D_vc_i = D_s - 2 * t_s_r;                % spar column inner diameter
 A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
 V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
 
 % damping plate material use
 A_d = pi/4 * D_d^2;                     % damping plate itself
 num_supports = 4;
-L_dt = D_d / (2*cos(theta_dt));
-D_dt_i = D_dt - 2 * t_dt;
-A_dt = pi/4 * (D_dt^2 - D_dt_i^2);      % support tube area
+L_dt = D_d / (2*cos(theta_d_tu));
+D_dt_i = D_d_tu - 2 * t_d_tu;
+A_dt = pi/4 * (D_d_tu^2 - D_dt_i^2);      % support tube area
 t_d = min(h_d, t_d_max);                % material thickenss of damping plate
 V_d_m = A_d * t_d + num_supports * A_dt * L_dt;
 
@@ -127,9 +145,6 @@ I_rp = pi * D_d^4 / 64;
 
 A_c = [A_f_cross_top, A_vc_c, A_d_c];
 A_lat_sub = [A_f_l A_vc_l A_d_l];
-r_over_t = [0,... % D_sft/(2*t_sf) 
-            D_s/(2*t_sr),...
-            0];%D_or/(2*t_r)];
 I = [I_f, I_vc, I_rp];
 T = [T_f_2, T_s, h_d];          % drafts: used to calculated F_surge in dynamics.m
 m_m = m_f_m + m_s_m;            % total mass of material

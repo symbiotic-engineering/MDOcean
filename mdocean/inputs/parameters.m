@@ -45,42 +45,52 @@ T = [T;
     table("h","h",{100},"site",true,"water depth (m)");
     table("JPD","JPD",{jpd(2:end,2:end)},"site",false,...
         "joint probability distribution of wave (%)");
-    table("Hs","H_s",{jpd(2:end,1)},"site",true,"wave height (m)");
-    table("Hs_struct","H_{s,struct}",{11.9},"site",true,"100 year wave height (m)");
-    table("T","T",{jpd(1,2:end)},"site",true,"wave period (s)");
-    table("T_struct","T_{struct}",{17.1},"site",true,"100 year wave period (s)");
+    table("Hs","H_s",{jpd(2:end,1)},"site",true,"significant wave height (m)");
+    table("T","T",{jpd(1,2:end)},"site",true,"wave energy period (s)");
+    table("Hs_struct","H_{s,struct}",{[5 7 9 11.22 9 7 5]*1.9*sqrt(2)},...
+        "site",true,"100 year significant individual wave height (m)");
+    table("T_struct","T_{struct}",{[5.57 8.76 12.18 17.26 21.09 24.92 31.70]},...
+        "site",true,"100 year wave peak period (s)");
+    ...% 100 year extreme heights and periods from Berg 2011 
     ...
     ...% Materials: [  Structural Steel ASTM-A36 (Ductile)
     ...%               Concrete (Brittle)
-    ...%               Stainless Steel 304 (Ductile) ]
+    ...%               Stainless Steel 316 (Ductile) ASTM-A240 ]
     table("sigma_y","\sigma_y",{[36,4.5,30]* ksi2pa},"structures",true,"yield strength (Pa)");
-    table("rho_m","\rho_m",{[8000 2400 8000]},"structures",true,"material density (kg/m3)");
+    table("sigma_e","\sigma_e",{[58*.45, 0, 75*.45]*ksi2pa},"structures",true,"endurance limit (Pa)")
+    table("rho_m","\rho_m",{[7850 2400 7900]},"structures",true,"material density (kg/m3)");
     table("E","E",{[200e9, 5000*sqrt(4.5*ksi2pa), 200e9]},"structures",true,...
         "young's modulus (Pa)");
     table("cost_m","cost_m",{[4.28, 125/yd2m^3/2400, 1.84/lb2kg]},"economics",true,"material cost ($/kg)");
         ...% RM3 CBS sheet 1.4 average of cells F21, F34, F46, F56
         ...% https://www.concretenetwork.com/concrete-prices.html
         ...% https://agmetalminer.com/metal-prices/
+    table("nu","\nu",{[0.36 0 0.29]},"structures",true,"Poisson's ratio (-)");
     ...
     ...% Thicknesses and structures
-    table("t_ft","t_{ft}",{0.50 * in2m},"structures",true,"float top thickness (m)");
-    table("t_fr","t_{fr}",{0.44 * in2m},"structures",true,"float radial wall thickness (m)");
-    table("t_fc","t_{fc}",{0.44 * in2m},"structures",true,...
-        "float circumferential gusset thickness (m)");
-    table("t_fb","t_{fb}",{0.56 * in2m},"structures",true,"float bottom thickness (m)");
-    table("t_sr","t_{sr}",{1.00 * in2m},"structures",true,"vertical column thickness (m)");
+...%     table("t_f_t","t_{f,t}",{0.50 * in2m},"structures",true,"float top thickness (m)");
+...%     table("t_f_r","t_{f,r}",{0.44 * in2m},"structures",true,"float radial wall thickness (m)");
+...%     table("t_f_c","t_{f,c}",{0.44 * in2m},"structures",true,...
+...%         "float circumferential gusset thickness (m)");
+...%     table("t_f_b","t_{f,b}",{0.56 * in2m},"structures",true,"float bottom thickness (m)");
+...%     table("t_s_r","t_{s,r}",{1.00 * in2m},"structures",true,"vertical column thickness (m)");
     table("t_d_max","t_{d,max}",{1.00 * in2m},"structures",true,...
         "max thickness of damping plate before making it hollow (m)");
-    table("t_dt","t_{dt}",{1.00 * in2m},"structures",true,...
-        "damping plate support tube radial wall thickness (m)");
-    table("D_dt","D_{dt}",{48.00 * in2m},"structures",true,...
+...%     table("t_d_tu","t_{d,tu}",{1.00 * in2m},"structures",true,...
+...%         "damping plate support tube radial wall thickness (m)");
+    table("D_d_tu","D_{d,tu}",{48.00 * in2m},"structures",true,...
         "damping plate support tube diameter (m)");
-    table("theta_dt","\theta_{dt}",{atan(17.5/15)},"structures",true,...
+    table("theta_d_tu","\theta_{d,tu}",{atan(17.5/15)},"structures",true,...
         "angle from horizontal of damping plate support tubes (rad)");
     table("FOS_min","FOS_{min}",{1.5},"structures",true,"minimum FOS (-)");
+    table("D_f_tu","D_{f,tu}",{20 * in2m},"structures",true,"float support tube diameter (m)"); % 24 in p156 report, 20 in cad
+    table("t_f_tu","t_{f,tu}",{.5 * in2m},"structures",true,"float support tube thickness (m)");
+    table("h_stiff","h_{stiff}",{16 * in2m},"structures",true,"float stiffener height (m)");
+    table("w_stiff","w_{stiff}",{1  * in2m},"structures",true,"float stiffener width (m)");
+    table("num_sections","N_{sect}",{12},"structures",false,"number of float sections (-)");
     ...
     ...% Economics
-    table("m_scale","m_{scale}",{1.25},"economics",false,...
+    table("m_scale","m_{scale}",{1.1},"economics",false,...
         "factor to account for mass of neglected stiffeners (-)");
     table("FCR","FCR",{0.113},"economics",true,...
         "fixed charge rate (-), see RM3 report p63");
@@ -111,7 +121,7 @@ T = [T;
     ...
     ...% Dynamics: device parameters
     table("C_d_float","C_{d,float}",{0},"dynamics",true,"coefficient of drag for float");
-    table("C_d_spar","C_{d,spar}",{5},"dynamics",true,"spar coefficient of drag");
+    table("C_d_spar","C_{d,spar}",{0},"dynamics",true,"spar coefficient of drag");
     table("power_max","power_{max}",{Inf},"dynamics",true,"maximum power (W)");
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)");
     ...
@@ -139,7 +149,11 @@ T = [T;
     table("spar_excitation_coeffs","spar excitation coeffs",{spar_exc},...
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3");
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
-        false,"function from WECSim")];
+        false,"function from WECSim");
+    table("F_heave_mult","F_{heave,mult}",{1.925*0.857},"dynamics",true,...
+        "multiplier to make heave force match with validation (-)")];
+    % 1.925 is required to make WAMIT match tank test, and 0.857 is
+    % required to make MEEM match WAMIT
 
 T.Properties.VariableNames = cols;
 

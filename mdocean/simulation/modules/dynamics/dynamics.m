@@ -1,9 +1,12 @@
-function [F_heave_max, F_surge_max, F_ptrain_max, ...
-    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, X_u, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
+function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ...
+    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, X_u, X_f, X_s, P_matrix_mech] = dynamics(in,m_float,m_spar,V_d,draft)
 
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix_mech,X_constraints,B_p,X_u,~,~,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,V_d,draft);
+    [P_matrix_mech,X_constraints,B_p,...
+        X_u,X_f,X_s,F_heave_op,...
+        F_surge_op,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,...
+                                                        V_d,draft,in.F_max);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
@@ -18,8 +21,10 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces
-    [~,~,~,~,F_heave_max,F_surge_max,~] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft);
+    % fixme: for storms, should return excitation force, not all hydro force
+    [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0);
+    F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
@@ -28,8 +33,8 @@ function [F_heave_max, F_surge_max, F_ptrain_max, ...
 
 end
 
-function [P_matrix, X_constraints, B_p, mag_X_u,...
-          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft)
+function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
+          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, F_max)
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -52,7 +57,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
-                                            F_f_mag,F_f_phase,F_s_mag,F_s_phase,in.F_max,...
+                                            F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
                                             drag_const_f,drag_const_s,mag_v0_f,mag_v0_s, ...
                                             X_max,in.control_type,in.use_multibody,...
                                             in.X_tol,in.phase_X_tol,in.max_drag_iters);
@@ -66,6 +71,9 @@ function [P_matrix, X_constraints, B_p, mag_X_u,...
     % extra height on spar after accommodating float displacement
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
+
+    % sufficient length of float support tube
+    h_fs_extra = in.h_fs_clear / X_max - 1;
 
     % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
@@ -81,19 +89,20 @@ function [P_matrix, X_constraints, B_p, mag_X_u,...
     small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
     X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, X_below_linear, X_below_wave(:).'];
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
         % powertrain force
         F_ptrain_max = max(mag_U,[],'all');
-        F_ptrain_max = min(F_ptrain_max, in.F_max);
+        F_ptrain_max = min(F_ptrain_max, F_max);
 
-        % heave force: includes powertrain force and D'Alembert force
-        %F_heave_fund = sqrt( (mult .* B_p .* w).^2 + (mult .* K_p - m_float .* w.^2).^2 ) .* X;
-        
-        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f, phase_X_f, mag_U, phase_U, in.F_max);
-        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s, phase_X_s, mag_U, phase_U, in.F_max);
+        % heave force: includes powertrain force and D'Alembert force        
+        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f, phase_X_f, mag_U, phase_U, F_max);
+        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s, phase_X_s, mag_U, phase_U, F_max);
+
+        F_heave_f = max(F_heave_f,[],'all');
+        F_heave_s = max(F_heave_s,[],'all');
 
         % surge force
         F_surge = max(Hs,[],'all') * in.rho_w * in.g * V_d .* (1 - exp(-max(k_wvn,[],'all')*draft));
@@ -266,8 +275,9 @@ function [mag_U,phase_U,...
     end
 
     % get force-saturated response
-    r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, in.F_max ./ F_ptrain_unsat, 1);
+    r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, F_max ./ F_ptrain_unsat, 1);
     alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
+    alpha(r==0) = 4/pi; % prevent 0/0 when r=0
     f_sat = alpha .* r;
     mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
@@ -339,12 +349,15 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     % All other inputs are 2D arrays, the dimension of the sea state matrix.
 
     % speedup: only do math for saturated sea states, since unsat will = 1
+    % likewise, don't do math for uncontrolled sea states (f_sat=0)
     idx_no_sat = f_sat == 1;
-    f_sat(idx_no_sat) = NaN;
-    b(idx_no_sat) = NaN;
-    w(idx_no_sat) = NaN;
-    r_b(idx_no_sat) = NaN;
-    
+    idx_zero = f_sat == 0;
+    idx_nan = idx_no_sat | idx_zero;
+    f_sat(idx_nan) = NaN;
+    b(idx_nan) = NaN;
+    w(idx_nan) = NaN;
+    r_b(idx_nan) = NaN;
+
     [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
 
     % solve the quadratic formula
@@ -355,6 +368,6 @@ function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
     roots = num ./ den;
 
     % choose which of the two roots to use
-    mult = pick_which_root(roots, idx_no_sat, a_quad, b_quad, c_quad);
+    mult = pick_which_root(roots, idx_no_sat, idx_zero, a_quad, b_quad, c_quad);
     assert(all(~isnan(mult),'all'))
 end

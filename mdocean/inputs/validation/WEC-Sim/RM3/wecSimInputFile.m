@@ -3,8 +3,11 @@
 
 regular = true;
 
-p = parameters();
-p.C_d_float = 1;
+if ~exist('p','var')
+    warning('parameters were loaded from scratch')
+    p = parameters();
+end
+p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
 b = var_bounds();
 X = [b.X_noms; 1];
 [~, ~, P_matrix, ~, val] = simulation(X,p);
@@ -20,14 +23,23 @@ mcr.cases = [H(:),T(:),control];
 save('mcrMDOcean.mat','mcr')
 
 % filename to save
+[~, status] = system('git status');
+if ~contains(status,'working tree clean')
+    error('you have  uncommitted changes, please commit so the wecsim settings can be referenced to the commit')
+end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-output_filename = ['wecsim_sparfixed_floatcd' num2str(p.C_d_float) '_' git_hash];
+uuid = char(matlab.lang.internal.uuid());
+output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash '_' uuid];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
-simu.simMechanicsFile = 'RM3.slx';      % Specify Simulink Model File
-simu.mode = 'normal';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
+if p.use_multibody
+    simu.simMechanicsFile = 'inputs/validation/WEC-Sim/RM3/RM3_translation.slx';      % Specify Simulink Model File
+else
+    simu.simMechanicsFile = 'inputs/validation/WEC-Sim/RM3/RM3_fixed.slx';
+end
+simu.mode = 'accelerator';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
 simu.rampTime = 100;                    % Wave Ramp Time [s]
@@ -35,6 +47,7 @@ simu.endTime = 3100;                     % Simulation End Time [s]
 simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & simu.solver = 'ode45' for variable step 
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';
+simu.saveWorkspace = false;
 
 %% Wave Information 
 % % noWaveCIC, no waves with radiation CIC  
@@ -87,18 +100,18 @@ simu.stateSpace = 1;                      % Turn on State Space
 
 %% Body Data
 % Float
-body(1) = bodyClass('hydroData/rm3.h5');      
+body(1) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5');      
     % Create the body(1) Variable, Set Location of Hydrodynamic Data File 
     % and Body Number Within this File.   
-body(1).geometryFile = 'geometry/float.stl';    % Location of Geomtry File
+body(1).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/float.stl';    % Location of Geomtry File
 body(1).mass = 'equilibrium';                   
     % Body Mass. The 'equilibrium' Option Sets it to the Displaced Water 
     % Weight.
 body(1).inertia = [20907301 21306090.66 37085481.11];  % Moment of Inertia [kg*m^2]     
 
 % Spar/Plate
-body(2) = bodyClass('hydroData/rm3.h5'); 
-body(2).geometryFile = 'geometry/plate.stl'; 
+body(2) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5'); 
+body(2).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/plate.stl'; 
 body(2).mass = 'equilibrium';                   
 body(2).inertia = [94419614.57 94407091.24 28542224.82];
 

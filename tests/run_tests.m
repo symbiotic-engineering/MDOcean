@@ -4,10 +4,21 @@ import matlab.unittest.TestRunner;
 import matlab.unittest.plugins.XMLPlugin;
 import matlab.unittest.plugins.codecoverage.CoberturaFormat;
 import matlab.unittest.plugins.TestReportPlugin
+import matlab.unittest.plugins.DiagnosticsRecordingPlugin
+import matlab.unittest.selectors.HasName
+import matlab.unittest.constraints.ContainsSubstring
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
+
+if exist('../WEC-Sim','dir')
+    wecSimFolder = '../WEC-Sim/source';
+    set_param(0, 'ErrorIfLoadNewModel', 'off')
+    addpath(genpath(wecSimFolder))
+end
+
 suite = testsuite('tests');
+suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
@@ -25,11 +36,15 @@ codeFilePaths(filePathsToExclude) = [];
 
 p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
-p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf']);
+p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true);
+p4 = DiagnosticsRecordingPlugin('IncludingPassingDiagnostics',true);
 
 runner.addPlugin(p1);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
+runner.addPlugin(p4);
+
+runner.ArtifactsRootFolder = test_dir;
 
 results = runner.runInParallel(suite);
 

@@ -7,6 +7,12 @@ function pareto_curve_heuristics()
     %[x,fval] = pareto_search();
     d=dir("**/pareto_search_results*");
     load(d(end).name)
+
+    if ~exist('tol','var')
+        tol = 1e-6;
+    end
+    constraint_active_plot(residuals,fval,tol,b)
+
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add extra column for material 
@@ -207,13 +213,13 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     
     X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_LCOE,length(idx_sort),1);
     
-    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:7); % get rid of material
+    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:end-1); % get rid of material
     
     windowSize = round(length(idx_sort) * 5/100);
     b = (1/windowSize)*ones(1,windowSize);
     a = 1;
     y = zeros(size(X_pareto_sorted_scaled));
-    for i=1:7
+    for i=1:size(X_pareto_sorted_scaled,2)
         x = X_pareto_sorted_scaled(:,i); 
         x_padded = [ones(windowSize,1); x];
         yy = filter(b,a,x_padded); % moving average filter
@@ -233,9 +239,9 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca,'YMinorGrid','on')
     
     % filtered
-    cols = {'r:','r--','r-','r-.','b:','b--','b-'};
+    cols = {'r:','r--','r-','r-.','b:','b--','b-','g:','g--','g-','g-.','g.','g*','b.'};
     figure
-    for i=1:7
+    for i=1:size(X_pareto_sorted_scaled,2)
         semilogy(pct_angle,y(:,i),cols{i})
         hold on
     end

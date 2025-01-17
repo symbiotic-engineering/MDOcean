@@ -1,4 +1,6 @@
-classdef test < matlab.unittest.TestCase
+classdef (SharedTestFixtures={ ...
+        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+        test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
@@ -12,11 +14,13 @@ classdef test < matlab.unittest.TestCase
         failed_report
         simulated_report
         actual_report
+        econ_fig_report
 
         feasible_wecsim
         failed_wecsim
         simulated_wecsim
         actual_wecsim
+        econ_fig_wecsim
 
         uuid   
     end
@@ -34,7 +38,7 @@ classdef test < matlab.unittest.TestCase
     % helper methods to enumerate all figures and tables
     methods (Static)
         function which_fig_struct = enumerateFigs()
-            [~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+            [~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
 
             if ~test.run_slow_tests
                 num_tabs = num_tabs - length(test.slow_tabs);
@@ -54,7 +58,7 @@ classdef test < matlab.unittest.TestCase
             which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
         end
         function which_tab_struct = enumerateTabs()
-            [~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+            [~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
 
             if ~test.run_slow_tests
                 num_figs = num_figs - length(test.slow_figs);
@@ -78,27 +82,23 @@ classdef test < matlab.unittest.TestCase
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
-        function changeFolder(testCase)
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            desiredFolder = '../mdocean';
-            testCase.applyFixture(CurrentFolderFixture(desiredFolder))
-        end
-
         function runNominalValidation(testCase)
             % this is a shared setup because the results are used by both
             % validateNominal and validateNominalFeasible
-            [feas_r, fail_r, sim_r, act_r] = validate_nominal_RM3('report'); % report
-            [feas_w, fail_w, sim_w, act_w] = validate_nominal_RM3('wecsim'); % wecsim
+            [feas_r, fail_r, sim_r, act_r, ~, fig_r] = validate_nominal_RM3('report'); % report
+            [feas_w, fail_w, sim_w, act_w, ~, fig_w] = validate_nominal_RM3('wecsim'); % wecsim
             
             testCase.feasible_report  = feas_r;
             testCase.failed_report    = fail_r;
             testCase.simulated_report = sim_r;
             testCase.actual_report    = act_r;
+            testCase.econ_fig_report  = fig_r;
 
             testCase.feasible_wecsim  = feas_w;
             testCase.failed_wecsim    = fail_w;
             testCase.simulated_wecsim = sim_w;
             testCase.actual_wecsim    = act_w;
+            testCase.econ_fig_wecsim  = fig_w;
         end
 
         function generateUUID(testCase)
@@ -128,31 +128,60 @@ classdef test < matlab.unittest.TestCase
     end
     
     % Test methods
-    methods(Test, ParameterCombination='sequential')   
+    methods(Test, ParameterCombination='sequential')
+
+        % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
-            success_criterion = all_figures(which_figs,which_tabs,testCase.uuid.Value);
-            if ~isempty(success_criterion)
-                for i=1:length(success_criterion)
-                    testCase.verifyGreaterThan(success_criterion{i},0);
-                end
+            [success_criterion,fig_out,tab_out] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
+
+            if isempty(success_criterion)
+                success_criterion = 1;
+            else
+                success_criterion = success_criterion{:};
             end
+
+            if which_figs ~= 0 % figure
+                fig_name = ['Figure_' num2str(which_figs)];
+    
+                set(fig_out,'Units','Inches');
+                pos = get(fig_out,'Position');
+                set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+                print(fig_out,['../test-results/' fig_name],'-dpdf','-r0')
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+            else % table
+                diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
+            end
+
+            testCase.verifyGreaterThan(success_criterion, 0, diagnostic);
+
         end
 
         function validateNominalReport(testCase, field_report, rel_tol_report)
             sim = testCase.simulated_report.(field_report);
             act = testCase.actual_report.(field_report);
-            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_report)
+            if strcmp(field_report,'LCOE')
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_report,'Prefix','econ_validation_report');
+            else
+                diagnostic = '';
+            end
+            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_report,diagnostic)
         end
 
         function validateNominalWecsim(testCase, field_wecsim, rel_tol_wecsim)
             sim = testCase.simulated_wecsim.(field_wecsim);
             act = testCase.actual_wecsim.(field_wecsim);
-            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_wecsim)
+            if strcmp(field_wecsim,'LCOE')
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_wecsim,'Prefix','econ_validation_wecsim');
+            else
+                diagnostic = '';
+            end
+            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_wecsim,diagnostic)
         end
 
     end
 
     methods(Test)
+        % Static tests
         function validateNominalReportFeasible(testCase)
             testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_report] );
             testCase.verifyTrue(testCase.feasible_report);
@@ -172,6 +201,7 @@ classdef test < matlab.unittest.TestCase
             ratio = check_max_CW(testCase.uuid.Value);
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
+
     end
     
 end
