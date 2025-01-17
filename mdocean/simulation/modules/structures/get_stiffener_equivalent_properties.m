@@ -8,16 +8,17 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
     a = width_plate/2;
     b = width_stiff;
     
-    % eq 7.67 from MIT 2.080
+    % eq 7.67 from MIT 2.080, but  fixing typo: b/a should be b/2a
     % finding neutral axis
-    num = 1 - b./a * (H/h)^2;
-    den = 1 + b./a * (H/h);
+    num = 1 - b./(2*a) * (H/h)^2;
+    den = 1 + b./(2*a) * (H/h);
     eta_over_h = 1/2 * num ./ den; 
 
-    % eq 7.69 from MIT 2.080
+    % eq 7.69 from MIT 2.080, but fixing typo: ^2 should be ^3 in term2, 
+    % and eta should be eta over h in term1
     % finding equivalent height that creates equal area moment of inertia
     term1 = 1 - 3 * eta_over_h + 3 * eta_over_h.^2;
-    term2 = (H/h)^2 + 3*(H/h)^2 * eta_over_h + 3 * H/h * eta_over_h.^2;
+    term2 = (H/h)^3 + 3*(H/h)^2 * eta_over_h + 3 * H/h * eta_over_h.^2;
     h_eq_over_h_3 = 4 * ( term1 + b./(2*a) .* term2 ); 
     
     if any(h_eq_over_h_3 < 1) % if equivalent stiffened height is less than unstiffened height
@@ -28,8 +29,10 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
     h_eq = h_eq_over_h * h;
     
     if nargout > 1
-        eta = eta_over_h * h; % location of neutral axis, from unstiffened face of plate
-        y_max = h - eta; % max distance from neutral axis
+        eta = eta_over_h * h; % location of neutral axis, from stiffened face of plate
+        y_plate = h - eta; % neutral axis from unstiffened face of plate
+        y_stiff = H + eta; % neutral axis from free face of stiffener
+        y_max = max(y_plate, y_stiff); % max distance from neutral axis
 
         if nargout > 2   
             I = 1/12 * width_plate * h_eq.^3; % moment of inertia, of both the 
