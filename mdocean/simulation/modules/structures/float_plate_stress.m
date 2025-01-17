@@ -12,6 +12,8 @@ function [sigma_vm_bot,sigma_vm_top] = float_plate_stress(D_f, D_f_in, F_heave, 
     b_avg = sqrt(b_out * b_in);
     
     h = (D_f-D_f_in)/2;
+
+    % trapezoid interpolation
     if h >= b_avg
         m = (b_out-b_in)/(2*h);
         shorter_length = b_in*(m+sqrt(1+m^2));
@@ -51,7 +53,7 @@ function sigma_vm_top = top_plate_stress(length_ratio, shorter_length, W, t_top,
     M_cent = sigma_cent_no_stiff * t_top^2 / 6;
     
     M_max = max(abs([M_edge,M_cent]));
-    sigma_max = get_stiffener_equivalent_stress(t_top, h_stiff, width_plate, w_stiff, M_max);
+    sigma_max = stiffened_plate_stress(t_top, h_stiff, width_plate, w_stiff, M_max);
     sigma_vm_top = sigma_max;
 
 end
@@ -68,14 +70,20 @@ function sigma_vm = bottom_plate_stress(length_ratio, shorter_length, P_hydrodyn
     M_shorter = alpha_shorter_fcn(length_ratio) * P_hydrodynamic * shorter_length^2;
     M_longer  = alpha_longer_fcn(length_ratio)  * P_hydrodynamic * shorter_length^2;
     
-    sigma_shorter = get_stiffener_equivalent_stress(t_bot, h_stiff, width_plate, w_stiff, M_shorter);
-    sigma_longer  = get_stiffener_equivalent_stress(t_bot, h_stiff, width_plate, w_stiff, M_longer);
+    sigma_shorter = stiffened_plate_stress(t_bot, h_stiff, width_plate, w_stiff, M_shorter);
+    sigma_longer  = stiffened_plate_stress(t_bot, h_stiff, width_plate, w_stiff, M_longer);
     
     sigma_zz = P_hydrodynamic;
     
-    s_11 = sigma_shorter; s_22 = 0; s_33 = sigma_zz;
+    % von mises
+    s_11 = sigma_shorter;
+    s_22 = 0;
+    s_33 = sigma_zz;
     sigma_vm = sqrt(1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 ));
 
 end
 
-
+function sigma = stiffened_plate_stress(t_plate, h_stiff, width_plate, width_stiff, moment_per_length)
+    [h_eq,y_max] = get_stiffener_equivalent_properties(t_plate, h_stiff, width_plate, width_stiff);
+    sigma = get_plate_stress(moment_per_length, y_max, h_eq);
+end
