@@ -143,18 +143,23 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     K_tube = 6*E*I_tube / (L_dt^2 * (D_d - D_s));
 
     % compatbility (derived from equating plate and tube deflection)
-    F_tube = F_heave * delta_plate_dis_nondim / (D_eq/(a^2*K_tube) - delta_plate_con_nondim);
+    F_tube = -F_heave * delta_plate_dis_nondim / (D_eq/(a^2*K_tube) - delta_plate_con_nondim);
 
     % moment superposition
     Mr_con = Mr_con_nondim.' * F_tube;
     Mr_dis = Mr_dis_nondim_vec * F_heave;
-    Mr = Mr_con + Mr_dis;
+    Mr = Mr_dis - Mr_con;
 
     % stress
     sigma_r_vec = get_plate_stress(Mr, y_max_vec, h_eq_vec);
     sigma_r  = max(abs(sigma_r_vec));
 
     sigma_vm  = sigma_r; % ignore Mt for now
+
+    % uncomment for debugging
+    % just for plot purposes
+    delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
+                            + F_tube * sum(delta_plate_con_nondim_vec.',1));
 
     figure
     plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
@@ -167,6 +172,18 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     legend
     xlabel('r')
     improvePlot
+
+    figure
+    plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
+    hold on
+    plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
+    plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
+    plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
+    legend
+    xlabel('r')
+    ylabel('deflection')
+    improvePlot
+
 end
 
 function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,nu,rho)
