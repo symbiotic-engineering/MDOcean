@@ -107,7 +107,7 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     b = D_s/2;
     N = 100;
 
-     % nondimensional annular plate solutions
+    % nondimensional annular plate solutions
     rho = linspace(b/a,1,20); % evaluate at these radial points
     theta = [0 pi/2 pi 3*pi/2];
     [delta_plate_dis_nondim_vec, Mr_dis_nondim_vec, ...
@@ -155,6 +155,18 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     sigma_r  = max(abs(sigma_r_vec));
 
     sigma_vm  = sigma_r; % ignore Mt for now
+
+    figure
+    plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
+    hold on
+    plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
+    plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
+    plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
+    plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
+    plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
+    legend
+    xlabel('r')
+    improvePlot
 end
 
 function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,nu,rho)
