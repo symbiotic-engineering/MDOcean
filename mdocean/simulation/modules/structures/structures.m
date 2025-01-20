@@ -131,6 +131,11 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     circumf = 2*pi*r;
     width_plate = circumf / num_stiffeners;
 
+    % fixme hardcode
+    in2m = 0.0254;
+    h_stiff = [12.5 .5 22  1]*in2m;
+    width_stiff = [.5 10 1 12]*in2m;
+
     % fixme should this be t_d or t_d*2? Technically should account for gap
     [h_eq_vec,y_max_vec] = get_stiffener_equivalent_properties(t_d, h_stiff, width_plate, width_stiff);
     h_eq = mean(h_eq_vec); % approximation to avoid dealing with radially varying equivalent thickness
