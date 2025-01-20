@@ -115,8 +115,8 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     [delta_plate_con_nondim_vec, Mr_con_nondim_vec] = concentrated_plate_nondim(b/a,nu,theta,rho,N);
 
     % max deflection at outer edge, 
-    delta_plate_dis_nondim = abs(delta_plate_dis_nondim_vec(end));
-    delta_plate_con_nondim = abs(delta_plate_con_nondim_vec(end,:));
+    delta_plate_dis_nondim = delta_plate_dis_nondim_vec(end);
+    delta_plate_con_nondim = delta_plate_con_nondim_vec(end,:);
     % max moment at inner edge
     %Mr_dis_nondim = abs(Mr_dis_nondim_vec(1));
     %Mr_con_nondim = abs(Mr_con_nondim_vec(1,:));
@@ -148,12 +148,12 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     K_tube = 6*E*I_tube / (L_dt^2 * (D_d - D_s));
 
     % compatbility (derived from equating plate and tube deflection)
-    F_tube = -F_heave * delta_plate_dis_nondim / (D_eq/(a^2*K_tube) - delta_plate_con_nondim);
+    F_tube = F_heave * delta_plate_dis_nondim / (D_eq/(a^2*K_tube) - delta_plate_con_nondim);
 
     % moment superposition
     Mr_con = Mr_con_nondim.' * F_tube;
     Mr_dis = Mr_dis_nondim_vec * F_heave;
-    Mr = Mr_dis - Mr_con;
+    Mr = Mr_dis + Mr_con;
 
     % stress
     sigma_r_vec = get_plate_stress(Mr, y_max_vec, h_eq_vec);
@@ -202,7 +202,7 @@ end
 function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,nu,rho)
     A = pi*a^2;
     q = F_heave/A;
-    P = F_heave/4;
+    P = F_heave;
     v = nu;
     r = rho*a;
     r0 = b;
@@ -243,6 +243,12 @@ function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,n
 
     Mr_nondim = Mr * 2*pi/P;
     Mt_nondim = Mt * 2*pi/P;
+
+    % use sign convention that positive F_heave results in positive
+    % deflection at outer end and positive moment at inner end
+    w_nondim = -w_nondim;
+    Mr_nondim = -Mr_nondim;
+    Mt_nondim = -Mt_nondim;
 end
 
 function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,N)
@@ -305,7 +311,12 @@ function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,
     en_c_term = cn .* RHO.^(-n-2) .* n .* (n+1) * (1-nu);
     en_d_term = dn .* RHO.^-n .* (n-1) .* (n-2 - nu*(n+2));
     en = en_a_term + en_b_term + en_c_term + en_d_term;
-    Mr_nondim = -1 * (e0' + e1'*cos(theta) + en'*cos(n(:,1)*theta));
+    Mr_nondim = e0' + e1'*cos(theta) + en'*cos(n(:,1)*theta);
+
+    % use sign convention that positive input force results in negative
+    % deflection at outer end and negative moment at inner end
+    w_nondim = -w_nondim;
+    Mr_nondim = -Mr_nondim;
 end
 
 function sigma_vm = damping_plate_structures_old(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
