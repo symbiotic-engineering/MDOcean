@@ -47,7 +47,8 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
     FOS2Y = FOS_spar;
-    FOS3Y = sigma_max / radial_stress_damping_plate;
+    damping_fudge = 7.5;
+    FOS3Y = sigma_max / radial_stress_damping_plate * damping_fudge;
 
 end 
 
@@ -109,27 +110,24 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
 
     % nondimensional annular plate solutions
     rho = linspace(b/a,1,20); % evaluate at these radial points
-    theta = [0 pi/2 pi 3*pi/2];
+    theta = [0 pi/2 pi 3*pi/2]; % evaluate at these angles
     [delta_plate_dis_nondim_vec, Mr_dis_nondim_vec, ...
                                  Mt_dis_nondim_vec] = distributed_plate_nondim(a,b,F_heave,nu,rho);
     [delta_plate_con_nondim_vec, Mr_con_nondim_vec] = concentrated_plate_nondim(b/a,nu,theta,rho,N);
 
-    % max deflection at outer edge, 
+    % use deflection at outer edge for compatibility
     delta_plate_dis_nondim = delta_plate_dis_nondim_vec(end);
     delta_plate_con_nondim = delta_plate_con_nondim_vec(end,:);
-    % max moment at inner edge
-    %Mr_dis_nondim = abs(Mr_dis_nondim_vec(1));
-    %Mr_con_nondim = abs(Mr_con_nondim_vec(1,:));
     
     % sum the four angles for concentrated solution
     delta_plate_con_nondim = sum(delta_plate_con_nondim);
     Mr_con_nondim = sum(Mr_con_nondim_vec,2);
 
     % stiffeners
-    num_stiffeners = 24;
+    num_stiffener_repeats = 12;
     r = rho * a;
     circumf = 2*pi*r;
-    width_plate = circumf / num_stiffeners;
+    width_plate = circumf / num_stiffener_repeats;
 
     % fixme hardcode
     in2m = 0.0254;
@@ -163,39 +161,39 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
 
     % uncomment for debugging
     % just for plot purposes
-    delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
-                            + F_tube * sum(delta_plate_con_nondim_vec.',1));
-
-    figure
-    plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
-    hold on
-    plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
-    plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
-    legend
-    xlabel('r')
-    ylabel('Moment')
-    improvePlot
-
-    figure
-    plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
-    hold on
-    plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
-    plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
-    plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
-    legend
-    xlabel('r')
-    ylabel('Deflection')
-    improvePlot
-
-    figure
-    plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
-    hold on
-    plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
-    plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
-    legend
-    xlabel('r')
-    ylabel('Normalized Quantity')
-    improvePlot
+%     delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
+%                             + F_tube * sum(delta_plate_con_nondim_vec.',1));
+% 
+%     figure
+%     plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
+%     hold on
+%     plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
+%     plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
+%     legend
+%     xlabel('r')
+%     ylabel('Moment')
+%     improvePlot
+% 
+%     figure
+%     plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
+%     hold on
+%     plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
+%     plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
+%     plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
+%     legend
+%     xlabel('r')
+%     ylabel('Deflection')
+%     improvePlot
+% 
+%     figure
+%     plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
+%     hold on
+%     plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
+%     plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
+%     legend
+%     xlabel('r')
+%     ylabel('Normalized Quantity')
+%     improvePlot
 
 end
 
@@ -229,8 +227,8 @@ function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,n
 
     Mrb = -q*a^2/C8 * (C9*(a^2-r0^2)/(2*a*b) - L17);
     Qb = q/2/b * (a^2 - r0^2);
-    E = 0;% fixme 
-    D = 0; % fixme E*h^3/12/(1-v^2);
+    E = 0;% fixme - only needed for Mt
+    D = 0; % fixme E*h^3/12/(1-v^2); - only needed for Mt
 
     y_over_D = Mrb * r.^2 .* F2 ...
               + Qb * r.^3 .* F3 ...
