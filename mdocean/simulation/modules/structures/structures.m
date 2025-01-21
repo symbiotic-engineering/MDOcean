@@ -13,8 +13,10 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
             rho_w, g, E(M), nu(M)};
 
     % DLC 1: peak
+    sigma_buckle = sigma_y(M);     % fixme: to find ultimate, need to implement the ABS buckling formulas.
+    sigma_u = sqrt(sigma_y(M) * sigma_buckle);
     [FOS1Y, FOS2Y, FOS3Y, FOS_buckling] = structures_one_case(...
-            F_heave_peak, F_surge_peak, sigma_y(M), shared_inputs{:});
+            F_heave_peak, F_surge_peak, sigma_u, shared_inputs{:});
     
     % DLC 2: endurance limit (long cycle fatigue)
     [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(...

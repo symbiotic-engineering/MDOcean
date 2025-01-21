@@ -10,6 +10,7 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
         error('invalid input length')
     end
     
+    % fixme if the stiffeners are spaced far apart, the effective width will be reduced due to shear lag
     if strcmp(shape,'tee')
         [centroid, h_eq_over_h_3, height_max] = T_beam_properties(t_plate, h_stiff, width_plate, width_stiff);
 
@@ -118,7 +119,7 @@ function [centroid, h_eq_over_h_3, height_max] = T_beam_properties(t_plate, h_st
     % renaming inputs to match MIT 2.080 equations
     h = t_plate;
     H = h_stiff;
-    a = width_plate/2; % fixme if the stiffeners are spaced far apart, the effective width will be reduced due to shear lag
+    a = width_plate/2;
     b = width_stiff;
     
     % eq 7.67 from MIT 2.080, but  fixing typo: b/a should be b/2a
