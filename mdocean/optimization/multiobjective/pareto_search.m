@@ -9,6 +9,10 @@ function [x,fval] = pareto_search(filename_uuid)
     idxs = b.idxs_sort;
     num_DVs = length(b.X_starts);
     
+    objFcnName = 'generatedObjective';
+    objFcn1 = str2func([objFcnName b.obj_names{1}]);
+    objFcn2 = str2func([objFcnName b.obj_names{2}]);
+
     %% Calculate seed points for the pareto front
     % get pareto front endpoints by running optimization
     [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
@@ -57,7 +61,7 @@ function [x,fval] = pareto_search(filename_uuid)
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
-            obj_check = generatedObjectiveP_var(X_opt_tmp(idxs)',{p});
+            obj_check = objFcn2(X_opt_tmp(idxs)',{p});
             assert(obj_tmp == obj_check)
             [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
             assert(obj_tmp == P_var_seeds(i))
@@ -74,7 +78,8 @@ function [x,fval] = pareto_search(filename_uuid)
     %% Set up pareto search algorithm
     probMO = probs{1};
     scale = [10 0.1];
-    probMO.objective = @(x)[generatedObjectiveLCOE(x,{p})*scale(1), generatedObjectiveP_var(x,{p})*scale(2)];
+    
+    probMO.objective = @(x)[objFcn1(x,{p})*scale(1), objFcn2(x,{p})*scale(2)];
     
     X0 = [X_0; X_opt(idxs,:)'; X_seeds];
     fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
