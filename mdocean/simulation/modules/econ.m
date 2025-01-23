@@ -1,5 +1,5 @@
 
-function [LCOE, capex, opex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR, cost_perN, F_max, efficiency)
+function [LCOE, capex, opex] = econ(m_m, M, cost_m, N_WEC, P_elec, FCR, cost_perN, cost_perW, F_max, P_max, efficiency)
 
 structural_cost = m_m.* cost_m;
 devicestructure =  N_WEC * structural_cost(M);
@@ -9,7 +9,7 @@ devicestructure =  N_WEC * structural_cost(M);
 development     = 4553000;
 infrastructure  = 990000;
 mooring         = N_WEC * 525000;
-pto             = N_WEC * (623000 + F_max * cost_perN);
+pto             = N_WEC * (623000 + F_max * cost_perN  + P_max * cost_perW);
 profitmargin    = 356000;
 installation    = 5909000;
 contingency     = 1590000;

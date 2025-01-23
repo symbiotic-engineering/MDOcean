@@ -63,7 +63,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
             in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, in.h_stiff, in.w_stiff, ... % structural dimensions
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
+LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD);
@@ -110,7 +110,8 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.t_s_r, in.t_d_tu, in.D_d, in.D_d_tu, ...
                                  in.theta_d_tu, in.T_s, in.h_d, in.t_d_max,...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.F_max, in.eff_array);
+    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
+                        in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
     [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
