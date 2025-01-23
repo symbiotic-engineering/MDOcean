@@ -7,7 +7,7 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
-num_figs = 14;
+num_figs = 29;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -86,13 +86,75 @@ if any(which_figs == 5)
     fig_output{which_figs==5} = fig5;
 end
 
-%% figure 11 - MEEM geometry
+%% figure 6 - hydro coeffs vs freq
+fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
+if any(which_figs == 6)
+    fig6 = figure;
+    % fixme - not implemented
+    fig_output{which_figs==6} = fig6;
+end
+
+%% figure 7 - drag DF
+fig_names{7} = 'Fig. 7: drag describing function';
+if any(which_figs == 7)
+    fig7 = figure;
+    % fixme - not implemented
+    fig_output{which_figs==7} = fig7;
+end
+
+%% figure 8, XX - saturation time signal, saturation alpha
+fig_names{8} = 'Fig. 8: force saturation time signal';
+%fig_names{4} = 'Fig. XX: saturation alpha';
+if any(which_figs == 8) % | which_figs == 4)
+    sin_desc_fcn_demo()
+    figX = gcf;
+    fig8 = figure(figX.Number-1);
+    fig_output(which_figs==8) = fig8;
+    %fig_output(which_figs==4) = figX;
+end
+
+%% figure 9 - JPD multiplication
+fig_names{9} = 'Fig. 9: JPD multiplication';
+if any(which_figs == 9)
+    p = parameters();
+    b = var_bounds();
+    X = [b.X_noms; 1];
+    plot_power_matrix(X,p)
+    fig9 = gcf;
+    fig_output(which_figs==9) = fig9;
+end
+
+%% figure 10 - WecSim error breakdown
+fig_names{10} = 'Fig. 10: WECSim error breakdown';
+if any(which_figs == 10)
+    % fixme - not implemented
+    fig10 = figure;
+    fig_output(which_figs==10) = fig10;
+end
+
+%% figure 11 - FBD
 fig_names{11} = 'Fig. 11: FBD';
 if any(which_figs == 11)
     % Created in powerpoint
     fig11 = figure;
     imshow(imread("FBD.jpg"),'Parent',axes(fig11));
     fig_output{which_figs==11} = fig11;
+end
+
+%% figure 12 - cost vs N WEC
+fig_names{12} = 'Fig. 12: cost vs N WEC';
+if any(which_figs == 12)
+    % fixme - not implemented
+    fig12 = figure;
+    fig_output(which_figs==12) = fig12;
+end
+
+%% figure 13 - sim runtime
+fig_names{13} = 'Fig. 13: sim runtime';
+if any(which_figs == 13)
+    % fixme - not implemented
+    fig13 = figure;
+    fig_output(which_figs==13) = fig13;
 end
 
 %% figure 14 - Optimization process flowchart
@@ -104,63 +166,64 @@ if any(which_figs == 14)
     fig_output{which_figs==14} = fig14;
 end
 
-%% figure 3, 4 - saturation time signal, saturation alpha
-fig_names{3} = 'Fig. 3: saturation time signal';
-fig_names{4} = 'Fig. 4: saturation alpha';
-if any(which_figs == 3 | which_figs == 4)
-    sin_desc_fcn_demo()
-    fig4 = gcf;
-    fig3 = figure(fig4.Number-1);
-    fig_output(which_figs==3) = fig3;
-    fig_output(which_figs==4) = fig4;
+%% figure 15 - design space exploration
+fig_names{15} = 'Fig. 15: design space exploration';
+if any(which_figs == 15)
+    % fixme - not implemented
+    fig15 = figure;
+    fig_output(which_figs==15) = fig15;
 end
 
-%% figure 5 - JPD multiplication
-fig_names{5} = 'Fig. 5: JPD multiplication';
-if any(which_figs == 5)
-    p = parameters();
-    b = var_bounds();
-    X = [b.X_noms; 1];
-    plot_power_matrix(X,p)
-    fig5 = gcf;
-    fig_output(which_figs==5) = fig5;
+%% figure 16, 17, 18, 19, 20, 21 - parameter sensitivities
+fig_names{16} = 'Fig. 16: local objective parameter sensitivities';
+fig_names{17} = 'Fig. 17: local optimal objective parameter sensitivities';
+fig_names{18} = 'Fig. 18: local optimal design variable parameter sensitivities';
+fig_names{19} = 'Fig. 19: constraint activity thresholds';
+fig_names{20} = 'Fig. 20: global optimal objective parameter sensitivities';
+fig_names{21} = 'Fig. 21: global optimal design variable parameter sensitivities';
+if any(which_figs == 16)
+    param_sweep(filename_uuid)
+    fig16 = gcf;
+    fig_output(which_figs==16) = fig16;
+    % fixme: 17 through 21 not implemented
 end
 
-
-%% figure 6, 7 - pareto front, design heuristics
-fig_names{6} = 'Fig. 6: pareto front';
-fig_names{7} = 'Fig. 7: design heuristics';
-if any(which_figs == 6 | which_figs == 7)  
+%% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
+fig_names{22} = 'Fig. 22: pareto front';
+fig_names{23} = 'Fig. 23: design heuristics';
+fig_names{24} = 'Fig. 24: objective heuristics';
+fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
+fig_names{26} = 'Fig. 26: constraint activity';
+if any(which_figs == 22 | which_figs == 23 | which_figs == 24)  
     pareto_search(filename_uuid);
     pareto_curve_heuristics()
-    fig7b = gcf;
-    fig7a = figure(fig7b.Number - 1);
-    fig6 = figure(fig7b.Number - 3);
-    figTBD = figure(fig7b.Number - 6); % constraint activity
-    figTBD.Position = [1 41 1536 844.8000];
-    fig_output(which_figs==6) = fig6;
-    fig_output(which_figs==7) = fig7a;% fig7b];
+    fig24 = gcf;
+    fig23 = figure(fig24.Number - 1);
+    fig22 = figure(fig24.Number - 3);
+    fig26 = figure(fig24.Number - 6); % constraint activity
+    fig26.Position = [1 41 1536 844.8000];
+    fig_output(which_figs==22) = fig22;
+    fig_output(which_figs==23) = fig23;
+    fig_output(which_figs==24) = fig24;
+    % fixme: 25 not implemented
+    fig_output(which_figs==26) = fig26;
 end
 
-%% figure 8 - parameter sensitivities
-fig_names{8} = 'Fig. 8: parameter sensitivities';
-if any(which_figs == 8)
-    param_sweep(filename_uuid)
-    fig8 = gcf;
-    fig_output(which_figs==8) = fig8;
-end
-
-%% figure 9, 10 - overlaid geometry, probability CDF
-fig_names{9} = 'Fig. 9: overlaid geometry';
-fig_names{10} = 'Fig. 10: probability CDF';
-if any(which_figs == 9 | which_figs == 10 | which_tabs == 5)
+%% figure 27, 28, 29 - overlaid geometry, hydro coeffs, probability CDF
+fig_names{27} = 'Fig. 27: overlaid geometry';
+fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
+fig_names{29} = 'Fig. 29: probability CDF';
+if any(which_figs == 27 | which_figs == 28 | which_tabs == 29)
     tab5 = compare(filename_uuid);
     n = gcf().Number;
-    fig10 = figure(n-1);
-    fig9 = figure(n-2);
-    fig_output(which_figs==9) = fig9;
-    fig_output(which_figs==10) = fig10;
+    fig29 = figure(n-1);
+    fig27 = figure(n-2);
+    fig_output(which_figs==9) = fig27;
+    fig_output(which_figs==10) = fig29;
+    % fixme: 28 not implemented
 end
+
+% fixme: 30 to 46 not implemented
 
 %% table 1 - design variables table
 tab_names{1} = 'Tab. 1: design variables';
