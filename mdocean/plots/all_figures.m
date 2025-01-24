@@ -21,7 +21,7 @@ end
 
 fig_output = gobjects(1, length(which_figs));
 
-fig_output = cell(1, length(which_figs));
+%fig_output = cell(1, length(which_figs));
 
 tab_output(1, 1:length(which_tabs)) = {table()};
 
@@ -47,7 +47,7 @@ if any(which_figs == 1)
     % Created in powerpoint
     fig1 = figure;
     imshow(imread("geometry.png"),'Parent',axes(fig1));
-    fig_output{which_figs==1} = fig1;
+    fig_output(which_figs==1) = fig1;
 end
 
 %% figure 2 - Methodology overview
@@ -56,7 +56,7 @@ if any(which_figs == 2)
     % Created in powerpoint
     fig2 = figure;
     imshow(imread("methods_flowchart_2_cropped.jpg"),'Parent',axes(fig2));
-    fig_output{which_figs==2} = fig2;
+    fig_output(which_figs==2) = fig2;
 end
 
 %% figure 3 - N2 diagram
@@ -65,7 +65,7 @@ if any(which_figs == 3)
     % Created in powerpoint
     fig3 = figure;
     imshow(imread("simple_N2.jpg"),'Parent',axes(fig3));
-    fig_output{which_figs==3} = fig3;
+    fig_output(which_figs==3) = fig3;
 end
 
 %% figure 4 - Dimensions
@@ -74,7 +74,7 @@ if any(which_figs == 4)
     % Created in powerpoint
     fig4 = figure;
     imshow(imread("dimensions.jpg"),'Parent',axes(fig4));
-    fig_output{which_figs==4} = fig4;
+    fig_output(which_figs==4) = fig4;
 end
 
 %% figure 5 - MEEM geometry
@@ -83,7 +83,7 @@ if any(which_figs == 5)
     % Created in powerpoint
     fig5 = figure;
     imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
-    fig_output{which_figs==5} = fig5;
+    fig_output(which_figs==5) = fig5;
 end
 
 %% figure 6 - hydro coeffs vs freq
@@ -91,7 +91,7 @@ fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
 if any(which_figs == 6)
     fig6 = figure;
     % fixme - not implemented
-    fig_output{which_figs==6} = fig6;
+    fig_output(which_figs==6) = fig6;
 end
 
 %% figure 7 - drag DF
@@ -99,7 +99,7 @@ fig_names{7} = 'Fig. 7: drag describing function';
 if any(which_figs == 7)
     fig7 = figure;
     % fixme - not implemented
-    fig_output{which_figs==7} = fig7;
+    fig_output(which_figs==7) = fig7;
 end
 
 %% figure 8, XX - saturation time signal, saturation alpha
@@ -138,7 +138,7 @@ if any(which_figs == 11)
     % Created in powerpoint
     fig11 = figure;
     imshow(imread("FBD.jpg"),'Parent',axes(fig11));
-    fig_output{which_figs==11} = fig11;
+    fig_output(which_figs==11) = fig11;
 end
 
 %% figure 12 - cost vs N WEC
@@ -163,7 +163,7 @@ if any(which_figs == 14)
     % Created in powerpoint
     fig14 = figure;
     imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
-    fig_output{which_figs==14} = fig14;
+    fig_output(which_figs==14) = fig14;
 end
 
 %% figure 15 - design space exploration
