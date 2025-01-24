@@ -88,7 +88,7 @@ g(16) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local b
 g(17) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(18) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
+%g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
 g(19) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be active
                                         % and is only required when p.cost_perN = 0.
