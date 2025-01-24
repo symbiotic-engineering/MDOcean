@@ -1,4 +1,4 @@
-function [LCOE, P_var, P_matrix_elec, g, val] = simulation(X, p)	
+function [LCOE, J_capex_design, P_matrix_elec, g, val] = simulation(X, p)	
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
@@ -63,7 +63,8 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
             in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, in.h_stiff, in.w_stiff, ... % structural dimensions
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu);
 
-LCOE = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
+[LCOE,capex_design] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
+J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD);
@@ -87,6 +88,7 @@ g(16) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local b
 g(17) = P_avg_elec;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(18) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
+%g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
 g(19) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be active
                                         % and is only required when p.cost_perN = 0.
@@ -110,7 +112,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.t_s_r, in.t_d_tu, in.D_d, in.D_d_tu, ...
                                  in.theta_d_tu, in.T_s, in.h_d, in.t_d_max,...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
+    [~,~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
     [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
