@@ -213,13 +213,14 @@ end
 fig_names{27} = 'Fig. 27: overlaid geometry';
 fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
 fig_names{29} = 'Fig. 29: probability CDF';
-if any(which_figs == 27 | which_figs == 28 | which_tabs == 29)
+if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5)
     tab5 = compare(filename_uuid);
     n = gcf().Number;
     fig29 = figure(n-1);
     fig27 = figure(n-2);
-    fig_output(which_figs==9) = fig27;
-    fig_output(which_figs==10) = fig29;
+    fig_output(which_figs==27) = fig27;
+    fig_output(which_figs==28) = figure;
+    fig_output(which_figs==29) = fig29;
     % fixme: 28 not implemented
 end
 
