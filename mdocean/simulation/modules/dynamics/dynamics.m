@@ -116,8 +116,16 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
         F_heave_f = max(F_heave_f,[],'all');
         F_heave_s = max(F_heave_s,[],'all');
 
-        % surge force
-        F_surge = max(Hs(~idx_constraint),[],'all') * in.rho_w * in.g * V_d .* (1 - exp(-max(k_wvn(~idx_constraint),[],'all')*draft));
+        % surge force - from Eq 25 Newman 1963 - assumes slender kR << 1
+        % https://apps.dtic.mil/sti/tr/pdf/AD0406333.pdf  
+        F_surge_coeff = 2 * in.rho_w * w.^2 .* wave_amp ./ k_wvn;
+        F_surge_f = F_surge_coeff * pi * in.D_f^2/4 .* (       1             - exp(-k_wvn*in.T_f_2));
+        F_surge_s = F_surge_coeff * pi * in.D_s^2/4 .* (exp(-k_wvn*in.T_f_2) - exp(-k_wvn*in.T_s));
+
+        F_surge_f_max = max(F_surge_f(~idx_constraint),[],'all');
+        F_surge_s_max = max(F_surge_s(~idx_constraint),[],'all');
+
+        F_surge = [F_surge_f_max F_surge_s_max 0];
     end
 end
 

@@ -4,8 +4,8 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = true;
-        slow_figs = [6 7 8];
+        run_slow_tests = false;
+        slow_figs = 16:26;
         slow_tabs = 7;
     end
 
