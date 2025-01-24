@@ -2,7 +2,7 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
           	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ...              % forces
             h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt,D_d_tu,...        % bulk dimensions
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff,...% structural dimensions
-            M, rho_w, g, sigma_y, sigma_e, E, nu, num_terms_plate)                              % constants
+            M, rho_w, g, sigma_y, sigma_e, E, nu, num_terms_plate, radial_mesh_plate, num_stiff_d)           % constants
 
     F_heave_peak = max(F_heave_storm,F_heave_op);
     F_surge_peak = max(F_surge_storm,F_surge_op);
@@ -10,7 +10,7 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     % inputs for both DLCs
     shared_inputs = {h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt, D_d_tu,...
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff, ...
-            rho_w, g, E(M), nu(M), num_terms_plate};
+            rho_w, g, E(M), nu(M), num_terms_plate, radial_mesh_plate, num_stiff_d};
 
     % DLC 1: peak
     sigma_buckle = sigma_y(M);     % fixme: to find ultimate, need to implement the ABS buckling formulas.
@@ -27,7 +27,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
             F_heave, F_surge, sigma_max, ...
             h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt, D_d_tu,...
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff, ...
-            rho_w, g, E, nu, num_terms_plate)
+            rho_w, g, E, nu, num_terms_plate, radial_mesh_plate, num_stiff_d)
     
     depth = T_s; % max depth
     P_hydrostatic = rho_w * g * depth;
@@ -45,7 +45,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
     %% Damping plate
     radial_stress_damping_plate = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,w_stiff, ...
-                                            D_d_tu, t_d_tu, num_terms_plate);
+                                            D_d_tu, t_d_tu, num_terms_plate, radial_mesh_plate, num_stiff_d);
 
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
@@ -104,13 +104,13 @@ end
 
 function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,width_stiff,...
-                                            D_d_tu, t_d_tu, N)
+                                            D_d_tu, t_d_tu, N, radial_mesh_plate, num_stiffeners)
     
     a = D_d/2;
     b = D_s/2;
 
     % nondimensional annular plate solutions
-    rho = linspace(b/a,1,20); % evaluate at these radial points
+    rho = linspace(b/a, 1, radial_mesh_plate); % evaluate at these radial points
     theta = [0 pi/2 pi 3*pi/2]; % evaluate at these angles
     [delta_plate_dis_nondim_vec, Mr_dis_nondim_vec, ...
                                  Mt_dis_nondim_vec] = distributed_plate_nondim(a,b,F_heave,nu,rho);
@@ -124,16 +124,17 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     delta_plate_con_nondim = sum(delta_plate_con_nondim);
     Mr_con_nondim = sum(Mr_con_nondim_vec,2);
 
-    % stiffeners
-    num_stiffener_repeats = 12;
-    r = rho * a;
-    circumf = 2*pi*r;
-    width_plate = circumf / num_stiffener_repeats;
-
     % fixme hardcode
     in2m = 0.0254;
     h_stiff = [12.5 .5 22  1]*in2m;
     width_stiff = [.5 10 1 12]*in2m;
+
+    % stiffeners
+    num_unique_stiffeners = length(h_stiff)/2;
+    num_stiffener_repeats = num_stiffeners / num_unique_stiffeners;
+    r = rho * a;
+    circumf = 2*pi*r;
+    width_plate = circumf / num_stiffener_repeats;
 
     % fixme should this be t_d or t_d*2? Technically should account for gap
     [h_eq_vec,y_max_vec] = get_stiffener_equivalent_properties(t_d, h_stiff, width_plate, width_stiff);
