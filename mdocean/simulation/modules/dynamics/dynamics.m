@@ -70,6 +70,10 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
     mag_X_u_const(idx_constraint) = 0;
+    mag_X_f_const = mag_X_f;
+    mag_X_f_const(idx_constraint) = 0;
+    mag_X_s_const = mag_X_s;
+    mag_X_s_const(idx_constraint) = 0;
 
     X_max = max(mag_X_u_const,[],'all');
     % extra height on spar after accommodating float displacement
@@ -106,8 +110,8 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
         F_ptrain_max = min(F_ptrain_max, F_max);
 
         % heave force: includes powertrain force and D'Alembert force        
-        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f, phase_X_f, mag_U_const, phase_U, F_max);
-        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s, phase_X_s, mag_U_const, phase_U, F_max);
+        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f_const, phase_X_f, mag_U_const, phase_U, F_max);
+        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s_const, phase_X_s, mag_U_const, phase_U, F_max);
 
         F_heave_f = max(F_heave_f,[],'all');
         F_heave_s = max(F_heave_s,[],'all');
