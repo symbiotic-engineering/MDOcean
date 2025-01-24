@@ -85,8 +85,10 @@ T = [T;
     table("FOS_min","FOS_{min}",{1.5},"structures",true,"minimum FOS (-)");
     table("D_f_tu","D_{f,tu}",{20 * in2m},"structures",true,"float support tube diameter (m)"); % 24 in p156 report, 20 in cad
     table("t_f_tu","t_{f,tu}",{.5 * in2m},"structures",true,"float support tube thickness (m)");
-    table("h_stiff","h_{stiff}",{16 * in2m},"structures",true,"float stiffener height (m)");
-    table("w_stiff","w_{stiff}",{1  * in2m},"structures",true,"float stiffener width (m)");
+    table("h_stiff_f","h_{stiff,f}",{16 * in2m},"structures",true,"float stiffener height (m)");
+    table("w_stiff_f","w_{stiff,f}",{1  * in2m},"structures",true,"float stiffener width (m)");
+    table("h_stiff_d","h_{stiff,d}",{[12.5 .5 22  1]*in2m},"structures",true,"damping plate stiffener height (m)");
+    table("w_stiff_d","w_{stiff,d}",{[.5 10 1 12]  * in2m},"structures",true,"damping plate stiffener width (m)");
     table("num_sections","N_{sect}",{12},"structures",false,"number of float sections (-)");
     table("FOS_mult_d","FOS_{mult,d}",{7.5},"structures",true,"damping plate factor of safety multiplier (-)");
     table("num_terms_plate","N_{plate}",{100},"structures",false,...

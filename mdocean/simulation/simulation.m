@@ -61,7 +61,8 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
     FOS_spar_local] = structures(...
           	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ... % forces
             in.h_s, in.T_s, in.D_s, in.D_f, in.D_f_in, in.num_sections, in.D_f_tu, in.D_d, L_dt, in.theta_d_tu,in.D_d_tu,... % bulk dimensions
-            in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, t_d, in.t_d_tu, in.h_d, A_dt, in.h_stiff, in.w_stiff, ... % structural dimensions
+            in.t_s_r, I, A_c, A_lat_sub, in.t_f_b, in.t_f_t, t_d, in.t_d_tu, in.h_d, A_dt,  ... % structural dimensions
+            in.h_stiff_f, in.w_stiff_f, in.h_stiff_d, in.w_stiff_d,... % stiffener thicknesses
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu, ...
             in.num_terms_plate, in.radial_mesh_plate, in.num_stiff_d);
 
