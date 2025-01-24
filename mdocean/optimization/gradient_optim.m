@@ -17,6 +17,9 @@ end
 
 if nargin<4
     which_objs = [1 2]; % run both objectives by default
+    % 1 = min LCOE
+    % 2 = min design-dependent capex cost, subject to power above threshold
+    % 3 = max average power
 end
 
 % create optimization variables for each of the design variables
@@ -62,12 +65,11 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
 
-    [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
+    [J1, J2, ~, g] = fcn2optimexpr(@simulation,X,p,...
                                             'OutputSize',{[1,1],[1,1],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
-    objs = [LCOE P_var];
-    obj_names = {'LCOE','P_var'};
+    objs = [J1 J2];
     probs = cell([1 2]); 
     
     Xs_opt = zeros(length(X),num_objectives);
@@ -115,7 +117,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
             
         [X_opt_raw,obj_opt,flag,...
-            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
+            output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
 
         tol = eps(2);
