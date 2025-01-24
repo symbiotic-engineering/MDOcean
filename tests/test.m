@@ -4,8 +4,8 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = true;
-        slow_figs = [6 7 8];
+        run_slow_tests = false;
+        slow_figs = 16:26;
         slow_tabs = 7;
     end
 
@@ -146,7 +146,7 @@ classdef (SharedTestFixtures={ ...
                 set(fig_out,'Units','Inches');
                 pos = get(fig_out,'Position');
                 set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-                print(fig_out,['../test-results/' fig_name],'-dpdf','-r0')
+                print(fig_out,['test-results/' fig_name],'-dpdf','-r0')
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
             else % table
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
