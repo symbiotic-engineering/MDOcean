@@ -2,7 +2,7 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
           	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ...              % forces
             h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt,D_d_tu,...        % bulk dimensions
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff,...% structural dimensions
-            M, rho_w, g, sigma_y, sigma_e, E, nu)                                  % constants
+            M, rho_w, g, sigma_y, sigma_e, E, nu, num_terms_plate)                              % constants
 
     F_heave_peak = max(F_heave_storm,F_heave_op);
     F_surge_peak = max(F_surge_storm,F_surge_op);
@@ -10,7 +10,7 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     % inputs for both DLCs
     shared_inputs = {h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt, D_d_tu,...
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff, ...
-            rho_w, g, E(M), nu(M)};
+            rho_w, g, E(M), nu(M), num_terms_plate};
 
     % DLC 1: peak
     sigma_buckle = sigma_y(M);     % fixme: to find ultimate, need to implement the ABS buckling formulas.
@@ -27,7 +27,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
             F_heave, F_surge, sigma_max, ...
             h_s, T_s, D_s, D_f, D_f_in, num_sections, D_f_tu, D_d, L_dt, theta_dt, D_d_tu,...
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, h_stiff, w_stiff, ...
-            rho_w, g, E, nu)
+            rho_w, g, E, nu, num_terms_plate)
     
     depth = T_s; % max depth
     P_hydrostatic = rho_w * g * depth;
@@ -44,7 +44,8 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
 
     %% Damping plate
     radial_stress_damping_plate = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
-                                            theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,w_stiff, D_d_tu, t_d_tu);
+                                            theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,w_stiff, ...
+                                            D_d_tu, t_d_tu, num_terms_plate);
 
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
@@ -103,11 +104,10 @@ end
 
 function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,width_stiff,...
-                                            D_d_tu, t_d_tu)
+                                            D_d_tu, t_d_tu, N)
     
     a = D_d/2;
     b = D_s/2;
-    N = 100;
 
     % nondimensional annular plate solutions
     rho = linspace(b/a,1,20); % evaluate at these radial points
@@ -251,6 +251,9 @@ function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,n
 end
 
 function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,N)
+% Boedo and Prantil 1998: corrected solution of clamped ring plate with edge point load
+% https://ascelibrary.org/doi/epdf/10.1061/%28ASCE%290733-9399%281998%29124%3A6%28696%29
+
     % lam: aspect ratio: b/a = inner radius/outer radius
     % nu: poisson ratio
     % theta: angular coordinate
