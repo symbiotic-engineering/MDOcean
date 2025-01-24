@@ -49,8 +49,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
     FOS2Y = FOS_spar;
-    damping_fudge = 7.5;
-    FOS3Y = sigma_max / radial_stress_damping_plate * damping_fudge;
+    FOS3Y = sigma_max / radial_stress_damping_plate;
 
 end 
 

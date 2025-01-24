@@ -88,6 +88,7 @@ T = [T;
     table("h_stiff","h_{stiff}",{16 * in2m},"structures",true,"float stiffener height (m)");
     table("w_stiff","w_{stiff}",{1  * in2m},"structures",true,"float stiffener width (m)");
     table("num_sections","N_{sect}",{12},"structures",false,"number of float sections (-)");
+    table("FOS_mult_d","FOS_{mult,d}",{7.5},"structures",true,"damping plate factor of safety multiplier (-)");
     ...
     ...% Economics
     table("m_scale","m_{scale}",{1.1},"economics",false,...
