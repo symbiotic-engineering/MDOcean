@@ -19,7 +19,7 @@ function pareto_curve_heuristics()
     LCOE = fval(:,1);
     Pvar = fval(:,2);
 
-    new_objs = false; % switch between LCOE-Pvar and capex-Pavg
+    new_objs = true; % switch between LCOE-Pvar and capex-Pavg
     
     [J1, minJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, minJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
