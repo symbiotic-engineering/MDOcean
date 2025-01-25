@@ -194,7 +194,7 @@ fig_names{23} = 'Fig. 23: design heuristics';
 fig_names{24} = 'Fig. 24: objective heuristics';
 fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
 fig_names{26} = 'Fig. 26: constraint activity';
-if any(which_figs == 22 | which_figs == 23 | which_figs == 24)  
+if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25 | which_figs == 26)  
     pareto_search(filename_uuid);
     pareto_curve_heuristics()
     fig24 = gcf;
