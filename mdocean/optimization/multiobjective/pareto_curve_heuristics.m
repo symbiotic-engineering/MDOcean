@@ -320,7 +320,9 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     set(gca,'YMinorGrid','on')
     
     % filtered
-    cols = {'r:','r--','r-','r-.','b:','b--','b-','g:','g--','g-','g-.','g.','g*','b.'};
+    cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
+            'b:','b--',...                       % PTO
+            'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
     figure
     for i=1:size(X_pareto_sorted_scaled,2)
         semilogy(pct_angle,y(:,i),cols{i})
