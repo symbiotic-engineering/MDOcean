@@ -6,6 +6,7 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
                                             T_f_1, T_f_2, h_f, h_s, h_fs_clear, D_f_tu, ...
                                             t_f_t, t_f_r, t_f_c, t_f_b, t_f_tu, t_s_r, t_d_tu, ...
                                             D_d, D_d_tu, theta_d_tu, T_s, h_d, t_d_max, ...
+                                            h_stiff_d, w_stiff_d, num_stiff_d, ...
                                             M, rho_m, rho_w, m_scale)
 
 %% Variable Definitions
@@ -119,7 +120,10 @@ L_dt = (D_d - D_s) / (2*cos(theta_d_tu));
 D_dt_i = D_d_tu - 2 * t_d_tu;
 A_dt = pi/4 * (D_d_tu^2 - D_dt_i^2);      % support tube area
 t_d = min(h_d, t_d_max);                % material thickenss of damping plate
-V_d_m = A_d * t_d + num_supports * A_dt * L_dt;
+num_unique_stiffeners = length(h_stiff_d)/2;
+num_stiff_repeats = num_stiff_d / num_unique_stiffeners;
+A_stiff_d = num_stiff_repeats * sum(h_stiff_d .* w_stiff_d);
+V_d_m = A_d * t_d + num_supports * A_dt * L_dt + A_stiff_d * (D_d - D_s)/2;
 
 % total spar material use and mass
 m_vc_m = V_vc_m * rho_m(M) * m_scale;
