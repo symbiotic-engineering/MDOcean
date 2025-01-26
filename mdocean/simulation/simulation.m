@@ -134,6 +134,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.mass_tot = sum(mass);
     val.capex = capex;
     val.capex_design = J_capex_design;
+    val.capex_struct = [0 0 0 0]; % fixme
+    val.capex_PTO = [0 0 0 0]; % fixme
     val.opex = opex;
     val.LCOE = LCOE;
     val.power_avg = P_avg_elec;
