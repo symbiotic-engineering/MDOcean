@@ -19,6 +19,13 @@ if nargin==0
     which_tabs = 1:num_tabs;
 end
 
+if isempty(which_figs)
+    which_figs = 0;
+end
+if isempty(which_tabs)
+    which_tabs = 0;
+end
+
 fig_output = gobjects(1, length(which_figs));
 
 %fig_output = cell(1, length(which_figs));

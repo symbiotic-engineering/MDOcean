@@ -74,7 +74,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
 
         capex_design = Pvar; % second sim output means something different
         J2 = capex_design;
-        J2_fieldname = 'capex_design';
+        J2_fieldname = 'J_capex_design';
         J2_fieldidx = 4;
         J2_mult = 1; % $M
 
@@ -419,7 +419,7 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
     grey = [.85 .85 .85];
     [c,h] = contour(P_ELEC/1000,C_DESIGN/1e6,LCOE,levs,'Color',grey);
     clabel(c,h,'manual');
-    legend('LCOE')
+    legend('LCOE ($/kWh)')
 
 end
 

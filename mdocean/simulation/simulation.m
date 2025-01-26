@@ -125,7 +125,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.h_stiff_f, in.w_stiff_f, in.num_sections_f, ...
                                  in.h_stiff_d, in.w_stiff_d, in.num_stiff_d, ...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,~,capex,opex] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
+    [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
     [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
@@ -133,9 +133,10 @@ if nargout > 4 % if returning extra struct output for validation
     val.mass_rp = mass(3);
     val.mass_tot = sum(mass);
     val.capex = capex;
-    val.capex_design = J_capex_design;
-    val.capex_struct = [0 0 0 0]; % fixme
-    val.capex_PTO = [0 0 0 0]; % fixme
+    val.capex_design = capex_design;
+    val.J_capex_design = J_capex_design;
+    val.capex_struct = devicestructure;
+    val.capex_PTO = pto;
     val.opex = opex;
     val.LCOE = LCOE;
     val.power_avg = P_avg_elec;
