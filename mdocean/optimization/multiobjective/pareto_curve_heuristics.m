@@ -312,13 +312,17 @@ function [] = design_heuristics_plot(overallJ1, bestJ1, idx_best_J1, x_best_J1, 
     windowSize = round(length(idx_sort) * 5/100);
     b = (1/windowSize)*ones(1,windowSize);
     a = 1;
-    y = zeros(size(X_pareto_sorted_scaled));
+    n_points_interp = 51;
+    pct_angle_even = linspace(0,100,n_points_interp);
+    y = zeros(n_points_interp, size(X_pareto_sorted_scaled,2));
+    
     for i=1:size(X_pareto_sorted_scaled,2)
         x = X_pareto_sorted_scaled(:,i);
+        x_even_spread = interp1(pct_angle,x,pct_angle_even).';
         if strcmp(dir(1),'max')
-            x = flipud(x); % apply filter backwards
+            x_even_spread = flipud(x_even_spread); % apply filter backwards
         end
-        x_padded = [ones(windowSize,1); x];
+        x_padded = [ones(windowSize,1); x_even_spread];
         yy = filter(b,a,x_padded); % moving average filter
         yy_crop = yy((windowSize+1):end);
         if strcmp(dir(1),'max')
@@ -345,7 +349,7 @@ function [] = design_heuristics_plot(overallJ1, bestJ1, idx_best_J1, x_best_J1, 
             'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
     figure
     for i=1:size(X_pareto_sorted_scaled,2)
-        semilogy(pct_angle,y(:,i),cols{i})
+        semilogy(pct_angle_even,y(:,i),cols{i})
         hold on
     end
     
