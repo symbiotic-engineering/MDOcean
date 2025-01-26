@@ -94,23 +94,15 @@ if any(which_figs == 6)
     fig_output(which_figs==6) = fig6;
 end
 
-%% figure 7 - drag DF
+%% figure 7, 8 - drag DF, saturation time signal
 fig_names{7} = 'Fig. 7: drag describing function';
-if any(which_figs == 7)
-    fig7 = figure;
-    % fixme - not implemented
-    fig_output(which_figs==7) = fig7;
-end
-
-%% figure 8, XX - saturation time signal, saturation alpha
 fig_names{8} = 'Fig. 8: force saturation time signal';
-%fig_names{4} = 'Fig. XX: saturation alpha';
-if any(which_figs == 8) % | which_figs == 4)
+if any(which_figs == 7 | which_figs == 8)
     sin_desc_fcn_demo()
-    figX = gcf;
-    fig8 = figure(figX.Number-1);
+    fig7 = gcf;
+    fig8 = figure(fig7.Number-2);
+    fig_output(which_figs==7) = fig7;
     fig_output(which_figs==8) = fig8;
-    %fig_output(which_figs==4) = figX;
 end
 
 %% figure 9 - JPD multiplication
