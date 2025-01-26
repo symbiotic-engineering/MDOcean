@@ -47,8 +47,9 @@ function [x,fval] = pareto_search(filename_uuid)
     LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
     LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
     num_seeds_gap = 8;
-    LCOE_seeds_gap = linspace(LCOE_min, LCOE_seeds(1), num_seeds_gap+2); % add extra seeds between min and first seed to fill gap there
-    LCOE_seeds = [LCOE_seeds_gap(2:end-1) LCOE_seeds];
+    LCOE_upper_gap = mean([LCOE_min LCOE_seeds(1)]);
+    LCOE_seeds_gap = logspace(log10(LCOE_min), log10(LCOE_upper_gap), num_seeds_gap+1); % add extra seeds between min and first seed to fill gap there
+    LCOE_seeds = [LCOE_seeds_gap(2:end) LCOE_seeds];
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
@@ -80,7 +81,7 @@ function [x,fval] = pareto_search(filename_uuid)
 
     %% Set up pareto search algorithm
     probMO = probs{1};
-    scale = [10 0.1];
+    scale = [10 1];
     
     probMO.objective = @(x)[objFcn1(x,{p})*scale(1), objFcn2(x,{p})*scale(2)];
     
