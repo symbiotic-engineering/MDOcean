@@ -44,7 +44,7 @@ The Apache 2.0 license for this open source WEC-Sim code is included.
 - `mdocean/simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
 The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
 - `mdocean/optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
-if you want to run single objective optimization for each of the two objectives.
+if you want to run single objective optimization for each of the two objectives. For multi-objective, run `pareto_search.m` followed by `pareto_curve_heuristics.m`.
 - `mdocean/plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to try out the entire pipeline by running all relevant 
 optimizations to generate every figure in the paper.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
@@ -69,6 +69,7 @@ The following packages are used in this code:
 The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
 
 **Contributing**
+
 Suggestions, questions, bug reports, and contributions are welcome. Open an issue or pull request. To discuss the possibility of broader collaborations, please email rgm222@cornell.edu.
 
 **Funding Acknowledgement**
