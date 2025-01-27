@@ -6,28 +6,31 @@
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
 
-More specifically, it uses the SQP and pattern search algorithms to find the geometry and controller design which minimizes the energy cost and power variation 
+More specifically, it uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power   
 of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
+
+For 210 sea states, the model takes 39 ms to run, which is around a 5 order of magnitude improvement compared to the equivalent ~1 hour set of parallel WEC-Sim MCR simulations.
 
 **Context**
 
-The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/) 
-and has been accepted for publication/presentation in the 2022 ASME IDETC-CIE.
-At this conference, the work was presented at the DAC-6 session and is publication number 90227.
-A recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
-The project began as an effort in Cornell course [MAE 5350](https://classes.cornell.edu/browse/roster/FA21/class/MAE/5350).
-Known areas for improvement are listed as GitHub issues. If you find any additional errors, please let us know.
+The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
+Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025.
+
+Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
 *International Design Engineering Technical Conferences & Computers and 
 Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
-https://doi.org/10.1115/DETC2022-90227.
+[https://doi.org/10.1115/DETC2022-90227](https://doi.org/10.1115/DETC2022-90227).
 
-**Authors**
-- Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact) @rebeccamccabe
-- Olivia Murphy, om66@cornell.edu (Project contributor) @ommurphy
-- Maha Haji, maha@cornell.edu (Advisor) @maha-haji
+A video recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
+
+**Software Authors**
+- Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact, 2021-present) @rebeccamccabe
+- Madison Dietrich, mjd429@cornell.edu (Project contributor, 2023-present) @MadisonDietrich
+- Olivia Murphy, om66@cornell.edu (Project contributor, 2021-22) @ommurphy
+- Iris Ren, zr92@cornell.edu (Project contributor, 2024)
+- Maha Haji, maha@cornell.edu (Advisor, 2021-present) @maha-haji
 
 **License**
 
@@ -36,12 +39,13 @@ The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **File Structure**
 
-- `inputs`: numerical inputs needed to run the optimiztion, simulation, and validation, including wave data, parameters, design variable bounds, and validation values.
-- `simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
+- `tests`: continuous integration tests for validation as well as generating a report with all figures.
+- `mdocean/inputs`: numerical inputs needed to run the optimiztion, simulation, and validation, including wave data, parameters, design variable bounds, and validation values.
+- `mdocean/simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
 The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
-- `optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
+- `mdocean/optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
 if you want to run single objective optimization for each of the two objectives.
-- `plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to try out the entire pipeline by running all relevant 
+- `mdocean/plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to try out the entire pipeline by running all relevant 
 optimizations to generate every figure in the paper.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
 
@@ -63,6 +67,9 @@ The following packages are used in this code:
 | [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
 
 The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
+
+**Contributing**
+Suggestions, questions, bug reports, and contributions are welcome. Open an issue or pull request. To discuss the possibility of broader collaborations, please email rgm222@cornell.edu.
 
 **Funding Acknowledgement**
 
