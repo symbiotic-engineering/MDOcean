@@ -28,7 +28,9 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
             problem_s = problem;
             problem_s.options.MaxIterations = 150;
             problem_s.options.MaxFunctionEvaluations = 2000;
-            problem_s.options.PlotFcn{2} = @(x,in1,in2) problem.options.PlotFcn{2}(x .* scale,in1,in2);  
+            if ~isempty(problem.options.PlotFcn)
+                problem_s.options.PlotFcn{2} = @(x,in1,in2) problem.options.PlotFcn{2}(x .* scale,in1,in2);  
+            end
             problem_s.objective = @(x) problem.objective(x .* scale);  
             problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
             problem_s.Aineq = problem.Aineq .* scale';
