@@ -12,7 +12,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix_elec = min(P_matrix_elec,in.power_max);
+    P_matrix_elec = min(P_matrix_elec,in.P_max);
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
