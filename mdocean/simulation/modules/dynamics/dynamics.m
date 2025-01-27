@@ -30,6 +30,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     
     % use all X constraints operationally, only use slamming in storm
     X_constraints_storm = X_constraints_storm(5:end);
+    X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
     X_constraints = [X_constraints_op X_constraints_storm];
 
     % coefficient of variance (normalized standard deviation) of power
