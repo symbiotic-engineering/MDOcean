@@ -56,7 +56,7 @@ b.F_max_start = 5;
 
 % maximum generator power (kW)
 b.P_max_min = 1;
-b.P_max_max = 1000;
+b.P_max_max = 2000;
 b.P_max_nom = 286;
 b.P_max_wecsim = 286;
 b.P_max_start = 286;
