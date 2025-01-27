@@ -1,7 +1,11 @@
-function [feasible, failed] = is_feasible(g_nonlin, x, p, b)
+function [feasible, failed] = is_feasible(g_nonlin, x, p, b, idx_ignore)
+
+if nargin<5
+    idx_ignore = false(size(g_nonlin));
+end
 
 tol = -.01;
-feasible_nonlin = all(g_nonlin >= tol);
+feasible_nonlin = all(g_nonlin(~idx_ignore) >= tol);
 
 % The linear constraint currently assume a certain design variable order.
 % If you change the order, this assert reminds you to update A_ineq & b_ineq.

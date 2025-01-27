@@ -199,6 +199,8 @@ function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1
     if new_objs
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
+        xlim([80 350])
+        ylim([.8 2.3])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
@@ -235,9 +237,9 @@ function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1
         text(J1_balanced-.15,J2_balanced+5,'Balanced Design','FontSize',sz)
     end
 
-    showLCOEContours = true;
+    showLCOEContours = false;
     if showLCOEContours
-        LCOE_min = 0.083;
+        LCOE_min = 0.103;
         LCOE_nom = 0.76; % fixme hardcoded
         overlay_LCOE(p, LCOE_nom, LCOE_min)
     end
@@ -412,9 +414,8 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
     LCOE = LCOE_fcn(P_ELEC, C_DESIGN, p);
 
     hold on
-    levs = [.06;
-            LCOE_min;
-            .1; .15; .2; .3; .5; .8];
+    levs = [LCOE_min;
+            .12; .15; .2; .3; .5; .8];
             %LCOE_nom];
     grey = [.85 .85 .85];
     [c,h] = contour(P_ELEC/1000,C_DESIGN/1e6,LCOE,levs,'Color',grey);

@@ -1,8 +1,8 @@
 function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     p = parameters(mode);
     p.N_WEC = 1;
-    p.power_max = 286000;
     p.LCOE_max = 10; % set large max LCOE to avoid failing feasibility check
+    p.control_type = 'damping';
     b = var_bounds(mode); 
     
     X = [b.X_noms; 1];
@@ -10,13 +10,14 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     [~, ~, ~, g, simulated] = simulation(X,p);
     
     % whether nominal violates constraints
-    [feasible,failed] = is_feasible(g, X, p, b);
+    idx_ignore = strcmp(b.constraint_names,'irrelevant_max_force');
+    [feasible,failed] = is_feasible(g, X, p, b, idx_ignore);
 
     % comparison of simulated and actual values
     if nargout > 2
         actual = validation_inputs(mode);
         fig = figure;
-        econ_fields = {'capex','opex','LCOE','capex_design','capex_struct','capex_PTO'};
+        econ_fields = {'capex','opex','LCOE','capex_design','capex_struct','capex_PTO','J_capex_design'};
         t = tiledlayout(fig,1,length(econ_fields));
         fields = fieldnames(actual);
 

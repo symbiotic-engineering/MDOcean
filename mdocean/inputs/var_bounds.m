@@ -63,7 +63,7 @@ b.P_max_start = 286;
 
 in2mm = 25.4;
 % material thickness of float bottom (mm)
-b.t_fb_min = 0.1 * in2mm;
+b.t_fb_min = 0.05 * in2mm;
 b.t_fb_max = 1.0 * in2mm;
 b.t_fb_nom = 0.56 * in2mm;
 b.t_fb_wecsim = 0.56 * in2mm;
@@ -77,7 +77,7 @@ b.t_sr_wecsim = 1.0 * in2mm;
 b.t_sr_start = 1.0 * in2mm;
 
 % material thickness of damping plate (mm)
-b.t_d_min = 0.2 * in2mm;
+b.t_d_min = 0.05 * in2mm;
 b.t_d_max = 2.0 * in2mm;
 b.t_d_nom = 1.0 * in2mm;
 b.t_d_wecsim = 1.0 * in2mm;
