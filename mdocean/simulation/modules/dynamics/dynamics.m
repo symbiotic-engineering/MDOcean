@@ -72,8 +72,9 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
 
 % FIXME: check stability of closed loop multibody system
     
-    % calculate power
-    P_matrix = real_P;
+    % apply empirical fitted "fudge factor" to adjust power from singlebody to multibody
+    fudge_factor = 23.5 ./ (T.^2 - 14*T + 83) * in.power_scale;
+    P_matrix = real_P .* fudge_factor;
     
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
