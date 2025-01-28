@@ -118,7 +118,15 @@ m_s_tot = rho_w * V_s_d;                % total spar mass
 % vertical column material use
 D_vc_i = D_s - 2 * t_s_r;                % spar column inner diameter
 A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
-V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
+V_vc_m_body = A_vc_c * (h_s - h_d);
+A_vc_caps = pi/4 * D_vc_i^2;
+t_vc_caps = (1/2 + 2.5) * 0.0254; % middle is 2.5", top is 0.5"
+V_vc_caps = A_vc_caps * t_vc_caps;
+num_stiff_vc = 12;
+A_vc_stiff = 0.658 + 2*0.652 + 0.350; % triangles
+t_vc_stiff = 0.0254;
+V_vc_m_stiff = num_stiff_vc * A_vc_stiff * t_vc_stiff;
+V_vc_m = V_vc_m_body + V_vc_m_stiff + V_vc_caps;          % volume of column material
 
 % damping plate material use
 A_d = pi/4 * D_d^2;                     % damping plate itself
