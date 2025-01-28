@@ -11,7 +11,7 @@ function pareto_curve_heuristics()
     if ~exist('tol','var')
         tol = 1e-6;
     end
-    constraint_active_plot(residuals,fval,tol,b)
+    constraint_active_plot(residuals,fval,tol,b);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
@@ -28,23 +28,29 @@ function pareto_curve_heuristics()
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
     showImages = false;
+    showLCOEContours = false;
     pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, NaN*J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, NaN*J2_balanced,...
-                x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, showImages, p, new_objs)
+                x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, ...
+                showImages, showLCOEContours, p, new_objs)
     
     %% simple pareto plot
     showSingleObj = false;
     showImages = false;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim*NaN, J1_solar, J1_balanced,...
-                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim*NaN, J2_solar, J2_balanced,...
-                x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, showImages, p, new_objs)
+    showLCOEContours = true;
+    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
+                x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
+                showImages, showLCOEContours, p, new_objs)
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
     showImages = true;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
-                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-                x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, showImages, p, new_objs)
+    showLCOEContours = false;
+    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
+                x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
+                showImages, showLCOEContours, p, new_objs)
     
     %% plots for DVs as a fn of percent along the pareto
     J1_max = Inf;%p.LCOE_max;
@@ -171,7 +177,8 @@ end
 %%
 function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2,bestJ2,idx_best_J2,J2_nom,J2_nom_sim,J2_solar,J2_balanced,...
-                          x_best_J1,x_best_J2,x_nom,x_balanced,idxo,showSingleObj,showImages,p,new_objs)
+                          x_best_J1,x_best_J2,x_nom,x_balanced,idxo,showSingleObj,...
+                          showImages,showLCOEContours,p,new_objs)
     figure
     % overall pareto front
     plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
@@ -199,8 +206,8 @@ function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1
     if new_objs
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
-        xlim([80 350])
-        ylim([.8 2.3])
+        xlim([80 300])
+        ylim([.8 3])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
@@ -237,9 +244,8 @@ function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1
         text(J1_balanced-.15,J2_balanced+5,'Balanced Design','FontSize',sz)
     end
 
-    showLCOEContours = false;
     if showLCOEContours
-        LCOE_min = 0.103;
+        LCOE_min = 0.272;
         LCOE_nom = 0.76; % fixme hardcoded
         overlay_LCOE(p, LCOE_nom, LCOE_min)
     end
