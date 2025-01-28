@@ -77,7 +77,9 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu, ... % constants
             in.num_terms_plate, in.radial_mesh_plate, in.num_stiff_d);
 
-[LCOE,capex_design] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
+[LCOE,capex_design] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, ...
+                            in.FCR, in.cost_perN_mult, in.cost_perW_mult, ...
+                            in.F_max, in.P_max, in.eff_array);
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
@@ -90,8 +92,8 @@ g(4) = 1 - V_s_pct;                     % prevent spar too light
 g(5) = GM;                              % pitch stability of float-spar system
 g(6) = FOS_float(1) / p.FOS_min - 1;    % float survives max force
 g(7) = FOS_float(2) / p.FOS_min - 1;    % float survives fatigue
-g(8) = FOS_spar(1) / p.FOS_min - 1;           % spar survives max force
-g(9) = FOS_spar(2) / p.FOS_min - 1;           % spar survives fatigue
+g(8) = FOS_spar(1) / p.FOS_min - 1;     % spar survives max force
+g(9) = FOS_spar(2) / p.FOS_min - 1;     % spar survives fatigue
 g(10) = FOS_damping_plate(1) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives max force
 g(11) = FOS_damping_plate(2) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives fatigue
 g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
@@ -125,8 +127,8 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.h_stiff_f, in.w_stiff_f, in.num_sections_f, ...
                                  in.h_stiff_d, in.w_stiff_d, in.num_stiff_d, ...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
-    [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_m, in.N_WEC, P_avg_elec, in.FCR, ...
-                        in.cost_perN, in.cost_perW, in.F_max, in.P_max, in.eff_array);
+    [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
+                        in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
     [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
