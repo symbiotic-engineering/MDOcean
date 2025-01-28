@@ -129,7 +129,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
