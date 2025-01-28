@@ -181,10 +181,10 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
 end
 
 %%
-function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
-                          J2,bestJ2,idx_best_J2,J2_nom,J2_nom_sim,J2_solar,J2_balanced,...
-                          x_best_J1,x_best_J2,x_nom,x_balanced,idxo,showSingleObj,...
-                          showImages,showLCOEContours,p,new_objs)
+function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+                          J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
+                          x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
+                          showImages, showLCOEContours, p, new_objs)
     figure
     % overall pareto front
     plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
@@ -194,11 +194,11 @@ function [] = pareto_plot(J1,bestJ1,idx_best_J1,J1_nom, J1_nom_sim, J1_solar, J1
     plot(bestJ1,bestJ2,'gp','MarkerFaceColor','g','MarkerSize',20,'HandleVisibility','off')
     
     % RM3 nominal reference - report
-    plot(J1_nom(1),J2_nom(1),'rd','HandleVisibility','off')
+    plot(J1_nom(1),    J2_nom(1),    'rd','HandleVisibility','off')
     plot(J1_nom_sim(1),J2_nom_sim(1),'rs','HandleVisibility','off')
 
     % RM3 nominal reference - wecsim
-    plot(J1_nom(2),J2_nom(2),'md','HandleVisibility','off')
+    plot(J1_nom(2),    J2_nom(2),    'md','HandleVisibility','off')
     plot(J1_nom_sim(2),J2_nom_sim(2),'ms','HandleVisibility','off')
     
     if showSingleObj  
@@ -285,77 +285,45 @@ function mini_plot(pos, x, p)
 end
 
 %%
-function [] = design_heuristics_plot(overallJ1, bestJ1, idx_best_J1, x_best_J1, ...
-                                     overallJ2, bestJ2, idx_best_J2, ...
+function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
+                                     overallJ2, J2_best, idx_best_J2, ...
                                      overallX, idxo, J1_max, var_names, new_objs)
 
+    % filter out pareto nonoptimal points
     J1_pareto = overallJ1(idxo);
     J2_pareto = overallJ2(idxo);
-    [J1_pareto_sorted,idx_sort] = sort(J1_pareto(J1_pareto<J1_max));
-    J2_pareto_sorted = J2_pareto(J1_pareto<J1_max);
-    J2_pareto_sorted = J2_pareto_sorted(idx_sort);
-    
-    pct = linspace(0,100,length(idx_sort));
+    X_pareto  = overallX(idxo,1:end-1); % get rid of material
+
+    % filter out J1 above thresh
+    idx_keep = J1_pareto < J1_max;
 
     J1_worst = overallJ1(idx_best_J2);
     J2_worst = overallJ2(idx_best_J1);
-    J1_range = bestJ1 - J1_worst;
-    J2_range = bestJ2 - J2_worst;
-    frac_J1 = abs( (J1_worst - J1_pareto_sorted) / J1_range );
-    frac_J2 = abs( (J2_worst - J2_pareto_sorted) / J2_range );
 
-    % this keeps 0% corresponding to left (min J1) and 100% corresponding to right (max J1)
+    % desired direction
     if new_objs
         dir = {'max','min'};
     else
         dir = {'min','min'};
     end
-    if strcmp(dir(1),'max')
-        num = frac_J1;
-        den = frac_J2;
-    elseif strcmp( dir(1),'min')
-        num = frac_J2;
-        den = frac_J1;
-    else
-        error('invalid direction string')
-    end
 
-    pct_angle = 100/(pi/2) * atan( num ./ den);
-    pct_angle(pct_angle==-100) = 100;
+    % order from left to right on pareto front appearance, 
+    % and normalize by optimal J1 values
+    [X_pareto_ordered_normed,...
+     J1_pareto_ordered_normed, ...
+     J2_pareto_ordered_normed,...
+     pct_angle] = pareto_order_normalize(J1_pareto(idx_keep), J2_pareto(idx_keep), ...
+                                         X_pareto(idx_keep,:), dir,...
+                                         J1_best, J1_worst, ...
+                                         J2_best, J2_worst, x_best_J1(1:end-1));
     
-    X_pareto = overallX(idxo,:);
-    X_pareto = X_pareto(J1_pareto<J1_max,:);
-    X_pareto_sorted = X_pareto(idx_sort,:);
+    % apply filter
+    backwards = strcmp(dir(1),'max');
+    [X_filtered,pct_angle_even] = low_pass_filter(pct_angle, X_pareto_ordered_normed, backwards);
     
-    X_pareto_sorted_scaled = X_pareto_sorted ./ repmat(x_best_J1,length(idx_sort),1);
-    
-    X_pareto_sorted_scaled = X_pareto_sorted_scaled(:,1:end-1); % get rid of material
-    
-    windowSize = round(length(idx_sort) * 5/100);
-    b = (1/windowSize)*ones(1,windowSize);
-    a = 1;
-    n_points_interp = 51;
-    pct_angle_even = linspace(0,100,n_points_interp);
-    y = zeros(n_points_interp, size(X_pareto_sorted_scaled,2));
-    
-    for i=1:size(X_pareto_sorted_scaled,2)
-        x = X_pareto_sorted_scaled(:,i);
-        x_even_spread = interp1(pct_angle,x,pct_angle_even).';
-        if strcmp(dir(1),'max')
-            x_even_spread = flipud(x_even_spread); % apply filter backwards
-        end
-        x_padded = [ones(windowSize,1); x_even_spread];
-        yy = filter(b,a,x_padded); % moving average filter
-        yy_crop = yy((windowSize+1):end);
-        if strcmp(dir(1),'max')
-            yy_crop = flipud(yy_crop); % apply filter backwards
-        end
-        y(:,i) = yy_crop;
-    end
-    
-    % unfiltered
+    % plot unfiltered
     figure
-    semilogy(pct_angle,X_pareto_sorted_scaled)
+    semilogy(pct_angle,X_pareto_ordered_normed)
     title('Unfiltered Design Heuristics')
     xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
@@ -365,17 +333,17 @@ function [] = design_heuristics_plot(overallJ1, bestJ1, idx_best_J1, x_best_J1, 
     grid on
     set(gca,'YMinorGrid','on')
     
-    % filtered
+    % plot filtered
     cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
             'b:','b--',...                       % PTO
             'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
     figure
-    for i=1:size(X_pareto_sorted_scaled,2)
-        semilogy(pct_angle_even,y(:,i),cols{i})
+    for i=1:size(X_pareto_ordered_normed,2)
+        semilogy(pct_angle_even,X_filtered(:,i),cols{i})
         hold on
     end
     
-    % make fake major grid lines (didn't do grid on because then major lines show up for .2 .5 2 5 too)
+    % make fake major grid lines (didn't do "grid on" because then major lines show up for .2 .5 2 5 too)
     x_grid = [3 97];
     y_grid = [.1 1];
     y_tick = [.01 .02 .05 .1 .2 .5 1 2 5];
@@ -404,15 +372,54 @@ function [] = design_heuristics_plot(overallJ1, bestJ1, idx_best_J1, x_best_J1, 
         cent = char(0162);
         legend_text = {['LCOE (' cent '/kWh)'],'c_v (%)'};
     end
+
+    % objective heuristics
     figure
-    plot(pct_angle,scale_1*J1_pareto_sorted/bestJ1,'Color',[0.4940 0.1840 0.5560]) % purple
+    plot(pct_angle, scale_1 * J1_pareto_ordered_normed,'Color',[0.4940 0.1840 0.5560]) % purple
     hold on
-    plot(pct_angle,scale_2*J2_pareto_sorted/J2_worst,'Color',[0.4660 0.6740 0.1880]) % green
+    plot(pct_angle, scale_2 * J2_pareto_ordered_normed,'Color',[0.4660 0.6740 0.1880]) % green
     grid on
     xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Objective Value')
     improvePlot
     legend(legend_text,Location='northeast')
+end
+
+function [filtered, t_even_spread] = low_pass_filter(time, signals, backwards)
+
+    num_sigs = size(signals,2);
+
+    windowSize = round(length(time) * 5/100);
+    b = (1/windowSize) * ones(1,windowSize);
+    a = 1;
+
+    n_points_interp = 51;
+    t_even_spread = linspace(min(time),max(time),n_points_interp);
+
+    filtered = zeros(n_points_interp, num_sigs);
+    
+    for i=1:num_sigs
+        % interpolate signal onto uniform time grid
+        sig = signals(:,i);
+        sig_even_spread = interp1(time,sig,t_even_spread).';
+
+        % flip if filtering backwards in time
+        if backwards
+            sig_even_spread = flipud(sig_even_spread);
+        end
+
+        % pad, apply moving average filter, and crop away padding
+        sig_padded = [ones(windowSize,1); sig_even_spread];
+        yy = filter(b,a,sig_padded); 
+        yy_crop = yy((windowSize+1):end);
+
+        % flip if filtering backwards in time
+        if backwards
+            yy_crop = flipud(yy_crop); % apply filter backwards
+        end
+
+        filtered(:,i) = yy_crop;
+    end
 end
 
 function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
@@ -434,4 +441,50 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
     clabel(c,h,'LabelSpacing',400);
     legend('LCOE ($/kWh)','Location','northwest')
 
+end
+
+function [X_pareto_ordered_normed,...
+          J1_pareto_ordered_normed, ...
+          J2_pareto_ordered_normed, pct_angle] = pareto_order_normalize(J1_pareto, J2_pareto, X_pareto, dir,  ...
+                                                                        J1_best, J1_worst, J2_best, J2_worst,...
+                                                                        X_best_J1)
+
+    % sort from min J1 to max J1 (left to right)
+    [J1_pareto_ordered,idx_order] = sort(J1_pareto);
+    J2_pareto_ordered = J2_pareto(idx_order);
+    X_pareto_ordered = X_pareto(idx_order,:);
+    
+    % normalize by best J1
+    X_pareto_ordered_normed = X_pareto_ordered ./ repmat(X_best_J1,length(idx_order),1);
+    J1_pareto_ordered_normed = J1_pareto_ordered / J1_best;
+    J2_pareto_ordered_normed = J2_pareto_ordered / J2_worst;
+
+    % ranges
+    J1_range = J1_best - J1_worst;
+    J2_range = J2_best - J2_worst;
+
+    % fraction along each objective
+    frac_J1 = abs( (J1_worst - J1_pareto_ordered) / J1_range );
+    frac_J2 = abs( (J2_worst - J2_pareto_ordered) / J2_range );
+
+    % choose num and den to keep 0% corresponding to left (min J1) and 
+    % 100% corresponding to right (max J1). See notebook p83 1/25/25
+    if strcmp(dir(1),'max')
+        num = frac_J1;
+        den = frac_J2;
+    elseif strcmp( dir(1),'min')
+        num = frac_J2;
+        den = frac_J1;
+    else
+        error('invalid direction string')
+    end
+
+    % find angle along circle with origin at nadir point - useful because 
+    % diminishing returns often makes pareto look like a quarter circle
+    angle = atan( num ./ den);
+
+    % express angle as percentage: 0 to pi/2 maps 0 to 100
+    pct_angle = 100/(pi/2) * angle;
+    pct_angle(pct_angle==-100) = 100;
+    
 end
