@@ -23,7 +23,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     else
         dir = 'ascend';
     end
-    [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE
+    [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
     figure
     tiledlayout(2,2); 
