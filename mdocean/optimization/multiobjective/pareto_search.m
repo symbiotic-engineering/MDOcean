@@ -135,5 +135,5 @@ function [x,fval] = pareto_search(filename_uuid)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol")
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end

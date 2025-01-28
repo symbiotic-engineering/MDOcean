@@ -1,5 +1,6 @@
 function pareto_curve_heuristics()
-    p = parameters();
+    close all
+    p0 = parameters();
     b = var_bounds();
     p_w = parameters('wecsim');
     b_w = var_bounds('wecsim');
@@ -7,6 +8,11 @@ function pareto_curve_heuristics()
     %[x,fval] = pareto_search();
     d=dir("**/pareto_search_results*");
     load(d(end).name)
+
+    if ~isequaln(p,p0)
+        warning(['You are loading results with different parameters than your ' ...
+            'local machine right now. WecSim validation results (p_w) may be incorrect.'])
+    end
 
     if ~exist('tol','var')
         tol = 1e-6;
