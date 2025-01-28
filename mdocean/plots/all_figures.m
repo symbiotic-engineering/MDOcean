@@ -188,7 +188,7 @@ if any(which_figs == 16)
 end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
-fig_names{22} = 'Fig. 22: pareto front';
+fig_names{22} = 'Fig. 22: pareto front with design images';
 fig_names{23} = 'Fig. 23: design heuristics';
 fig_names{24} = 'Fig. 24: objective heuristics';
 fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
@@ -199,12 +199,13 @@ if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25
     fig24 = gcf;
     fig23 = figure(fig24.Number - 1);
     fig22 = figure(fig24.Number - 3);
+    fig25 = figure(fig24.Number - 4);
     fig26 = figure(fig24.Number - 6); % constraint activity
     fig26.Position = [1 41 1536 844.8000];
     fig_output(which_figs==22) = fig22;
     fig_output(which_figs==23) = fig23;
     fig_output(which_figs==24) = fig24;
-    % fixme: 25 not implemented
+    fig_output(which_figs==25) = fig25;
     fig_output(which_figs==26) = fig26;
 end
 
