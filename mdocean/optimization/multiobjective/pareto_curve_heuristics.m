@@ -17,15 +17,16 @@ function pareto_curve_heuristics()
     if ~exist('tol','var')
         tol = 1e-6;
     end
-    constraint_active_plot(residuals,fval,tol,b);
+
+    new_objs = true; % switch between LCOE-Pvar and capex-Pavg
+
+    constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add extra column for material 
     LCOE = fval(:,1);
     Pvar = fval(:,2);
-
-    new_objs = true; % switch between LCOE-Pvar and capex-Pavg
     
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...

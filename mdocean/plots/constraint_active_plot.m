@@ -1,4 +1,9 @@
-function [idx] = constraint_active_plot(residuals,fval,tol,b)
+function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
+
+    if nargin<5
+        reversed = false;
+    end
+
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
     nlcon_active = abs(residuals.ineqnonlin) < tol;
@@ -10,11 +15,15 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b)
     idx_slamming_after = idx_slamming & ~idx_slamming_first;
     nlcon_active(:,idx_slamming_first) = any(nlcon_active(:,idx_slamming),2);
     nlcon_active(:,idx_slamming_after) = [];
-
     constraint_names_mod = b.constraint_names_pretty(~idx_slamming_after);
     constraint_names_mod(idx_slamming_first) = {'Prevent Slamming'};
 
-    [~,idx] = sort(fval(:,1)); % order by increasing LCOE
+    if reversed
+        dir = 'descend';
+    else
+        dir = 'ascend';
+    end
+    [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE
 
     figure
     tiledlayout(2,2); 
