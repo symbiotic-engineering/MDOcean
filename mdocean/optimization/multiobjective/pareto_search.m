@@ -43,13 +43,10 @@ function [x,fval] = pareto_search(filename_uuid)
     if LCOE_max < LCOE_min
         LCOE_max = 2*LCOE_min;
     end
-    num_seeds = 8;
-    LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
-    LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
-    num_seeds_gap = 8;
-    LCOE_upper_gap = mean([LCOE_min LCOE_seeds(1)]);
-    LCOE_seeds_gap = logspace(log10(LCOE_min), log10(LCOE_upper_gap), num_seeds_gap+1); % add extra seeds between min and first seed to fill gap there
-    LCOE_seeds = [LCOE_seeds_gap(2:end) LCOE_seeds];
+    num_seeds = 20;
+    theta = linspace(0,pi/2,num_seeds+2);
+    theta = theta(2:end-1);
+    LCOE_seeds = LCOE_min + (1-sin(theta))*(LCOE_max-LCOE_min);
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
