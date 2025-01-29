@@ -5,7 +5,7 @@ classdef (SharedTestFixtures={ ...
     
     properties (Constant)
         run_slow_tests = false;
-        slow_figs = [16:21 24 25];
+        slow_figs = [16:21];
         slow_tabs = 7;
     end
 
@@ -29,8 +29,8 @@ classdef (SharedTestFixtures={ ...
     properties (TestParameter)
         field_report = fieldnames(validation_inputs('report'));
         field_wecsim = fieldnames(validation_inputs('wecsim'));
-        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1};
-        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1};
+        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1,.1,.1,.1,.1};
+        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1,.1,.1};
         which_figs = test.enumerateFigs()
         which_tabs = test.enumerateTabs()
     end

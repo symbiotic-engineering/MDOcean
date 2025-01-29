@@ -19,6 +19,13 @@ if nargin==0
     which_tabs = 1:num_tabs;
 end
 
+if isempty(which_figs)
+    which_figs = 0;
+end
+if isempty(which_tabs)
+    which_tabs = 0;
+end
+
 fig_output = gobjects(1, length(which_figs));
 
 %fig_output = cell(1, length(which_figs));
@@ -94,23 +101,15 @@ if any(which_figs == 6)
     fig_output(which_figs==6) = fig6;
 end
 
-%% figure 7 - drag DF
+%% figure 7, 8 - drag DF, saturation time signal
 fig_names{7} = 'Fig. 7: drag describing function';
-if any(which_figs == 7)
-    fig7 = figure;
-    % fixme - not implemented
-    fig_output(which_figs==7) = fig7;
-end
-
-%% figure 8, XX - saturation time signal, saturation alpha
 fig_names{8} = 'Fig. 8: force saturation time signal';
-%fig_names{4} = 'Fig. XX: saturation alpha';
-if any(which_figs == 8) % | which_figs == 4)
+if any(which_figs == 7 | which_figs == 8)
     sin_desc_fcn_demo()
-    figX = gcf;
-    fig8 = figure(figX.Number-1);
+    fig7 = gcf;
+    fig8 = figure(fig7.Number-2);
+    fig_output(which_figs==7) = fig7;
     fig_output(which_figs==8) = fig8;
-    %fig_output(which_figs==4) = figX;
 end
 
 %% figure 9 - JPD multiplication
@@ -189,23 +188,24 @@ if any(which_figs == 16)
 end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
-fig_names{22} = 'Fig. 22: pareto front';
+fig_names{22} = 'Fig. 22: pareto front with design images';
 fig_names{23} = 'Fig. 23: design heuristics';
 fig_names{24} = 'Fig. 24: objective heuristics';
 fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
 fig_names{26} = 'Fig. 26: constraint activity';
-if any(which_figs == 22 | which_figs == 23 | which_figs == 24)  
+if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25 | which_figs == 26)  
     pareto_search(filename_uuid);
     pareto_curve_heuristics()
     fig24 = gcf;
     fig23 = figure(fig24.Number - 1);
     fig22 = figure(fig24.Number - 3);
+    fig25 = figure(fig24.Number - 4);
     fig26 = figure(fig24.Number - 6); % constraint activity
     fig26.Position = [1 41 1536 844.8000];
     fig_output(which_figs==22) = fig22;
     fig_output(which_figs==23) = fig23;
     fig_output(which_figs==24) = fig24;
-    % fixme: 25 not implemented
+    fig_output(which_figs==25) = fig25;
     fig_output(which_figs==26) = fig26;
 end
 
