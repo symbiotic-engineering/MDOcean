@@ -11,7 +11,7 @@ in.T_f_2 = X(3);        % draft of float (m)
 in.h_s   = X(4);        % total height of spar (m)
 in.h_fs_clear = X(5);   % vertical clearance between float tubes and spar when at rest (m)
 in.F_max = X(6) * 1e6;  % max powertrain force (N)
-in.P_max = X(7) * 1e3;  % maximum power (W)
+in.P_max = X(7) * 1e3;  % maximum electrical power (W)
 in.t_f_b = X(8) * 1e-3; % float bottom thickness (m)
 in.t_s_r = X(9) * 1e-3; % vertical column thickness (m)
 in.t_d   = X(10)* 1e-3; % damping plate support tube radial wall thickness (m)
@@ -64,7 +64,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
- P_var, P_avg_elec, P_matrix_elec, ...
+ P_var, P_avg_elec, P_pk_elec, P_matrix_elec, ...
                     X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
@@ -83,7 +83,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
-num_g = 20+numel(p.JPD)+length(p.T_struct);
+num_g = 21+numel(p.JPD)+length(p.T_struct);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -105,11 +105,12 @@ g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be active
                                         % and is only required when p.cost_perN = 0.
-g(17) = X_constraints(1);               % prevent float rising above top of spar
-g(18) = X_constraints(2);               % prevent float going below bottom of spar
-g(19) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
-g(20) = X_constraints(4);               % float amplitude obeys linear theory
-g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
+g(17) = P_pk_elec/in.P_max - 1;            % prevent irrelevant max power
+g(18) = X_constraints(1);               % prevent float rising above top of spar
+g(19) = X_constraints(2);               % prevent float going below bottom of spar
+g(20) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
+g(21) = X_constraints(4);               % float amplitude obeys linear theory
+g(22:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
@@ -129,7 +130,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
