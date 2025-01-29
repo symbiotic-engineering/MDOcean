@@ -1,4 +1,4 @@
-function P_avg_sat_over_P_avg_unsat = power_saturation_ratio(P_max_ratio,phi)
+function P_avg_sat_over_P_avg_unsat = power_saturation_ratio(P_max_ratio, phase_delta_PTO_force_to_velocity)
 %POWER_SATURATION_RATIO
 %    P_avg_sat_over_P_avg_unsat = POWER_SATURATION_RATIO(P_max_ratio,PHI)
 
@@ -6,9 +6,8 @@ function P_avg_sat_over_P_avg_unsat = power_saturation_ratio(P_max_ratio,phi)
 %    29-Jan-2025 01:17:12
 
 t2 = acos(P_max_ratio);
-t3 = cos(phi);
+t3 = cos(phase_delta_PTO_force_to_velocity);
 t4 = P_max_ratio.^2;
-t8 = 1.0./pi;
 t5 = t3.*2.0;
 t6 = P_max_ratio.*t2;
 t7 = t3.*pi;
@@ -19,8 +18,11 @@ t13 = t10+1.0;
 t12 = acos(t11);
 t14 = sqrt(t13);
 t15 = -t14;
-if (t11 < 1.0)
-    P_avg_sat_over_P_avg_unsat = (t6+t7+t15-P_max_ratio.*t12-t3.*t12.*2.0+sqrt(t13-P_max_ratio.*t3.*4.0-1.0./t9.^2.*4.0))./t7;
-else
-    P_avg_sat_over_P_avg_unsat = (t6+t7+t15)./t7;
-end
+
+idx_use_1 = t11 < 1.0;
+
+result1 = (t6+t7+t15-P_max_ratio.*t12-t3.*t12.*2.0+sqrt(t13-P_max_ratio.*t3.*4.0-1.0./t9.^2.*4.0))./t7;
+result2 = (t6+t7+t15)./t7;
+
+P_avg_sat_over_P_avg_unsat = result2;
+P_avg_sat_over_P_avg_unsat(idx_use_1) = result1(idx_use_1);
