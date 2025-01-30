@@ -8,7 +8,6 @@ if nargin<3
 end
 
 
-
 num_figs = 29;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
@@ -93,7 +92,6 @@ if any(which_figs == 5)
     fig5 = figure;
     imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
     fig_output(which_figs==5) = fig5;
-<<<<<<< HEAD
 end
 
 % %% figure 11 - MEEM geometry
@@ -171,8 +169,7 @@ end
 %     fig_output(which_figs==9) = fig9;
 %     fig_output(which_figs==10) = fig10;
 % end
-=======
-end
+%end ??
 
 %% figure 6 - hydro coeffs vs freq
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
@@ -304,7 +301,6 @@ if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5)
     fig_output(which_figs==29) = fig29;
     % fixme: 28 not implemented
 end
->>>>>>> 7c30b170cef0d69f75e6d47b376d972ab4fdf5d0
 
 % fixme: 30 to 46 not implemented
 
