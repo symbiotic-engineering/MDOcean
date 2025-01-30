@@ -110,52 +110,6 @@ if any(which_figs == 14)
     fig_output(which_figs==14) = fig14;
 end
 
-%% figure 3, 4 - saturation time signal, saturation alpha
-% fig_names{3} = 'Fig. 3: saturation time signal';
-% fig_names{4} = 'Fig. 4: saturation alpha';
-% if any(which_figs == 3 | which_figs == 4)
-%     sin_desc_fcn_demo()
-%     fig4 = gcf;
-%     fig3 = figure(fig4.Number-1);
-%     fig_output(which_figs==3) = fig3;
-%     fig_output(which_figs==4) = fig4;
-% end
-
-%% figure 5 - JPD multiplication
-% fig_names{5} = 'Fig. 5: JPD multiplication';
-% if any(which_figs == 5)
-%     p = parameters();
-%     b = var_bounds();
-%     X = [b.X_noms; 1];
-%     plot_power_matrix(X,p)
-%     fig5 = gcf;
-%     fig_output(which_figs==5) = fig5;
-% end
-
-
-%% figure 6, 7 - pareto front, design heuristics
-% fig_names{6} = 'Fig. 6: pareto front';
-% fig_names{7} = 'Fig. 7: design heuristics';
-% if any(which_figs == 6 | which_figs == 7)  
-%     pareto_search(filename_uuid);
-%     pareto_curve_heuristics()
-%     fig7b = gcf;
-%     fig7a = figure(fig7b.Number - 1);
-%     fig6 = figure(fig7b.Number - 3);
-%     figTBD = figure(fig7b.Number - 6); % constraint activity
-%     figTBD.Position = [1 41 1536 844.8000];
-%     fig_output(which_figs==6) = fig6;
-%     fig_output(which_figs==7) = fig7a;% fig7b];
-% end
-
-%% figure 8 - parameter sensitivities
-% fig_names{8} = 'Fig. 8: parameter sensitivities';
-% if any(which_figs == 8)
-%     param_sweep(filename_uuid)
-%     fig8 = gcf;
-%     fig_output(which_figs==8) = fig8;
-% end
-
 %% figure 9, 10 - overlaid geometry, probability CDF
 % fig_names{9} = 'Fig. 9: overlaid geometry';
 % fig_names{10} = 'Fig. 10: probability CDF';
