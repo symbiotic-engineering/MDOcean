@@ -3,16 +3,17 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
 
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix_mech,X_constraints,B_p,...
+    [P_matrix_mech,X_constraints_op,B_p,...
         X_u,X_f,X_s,F_heave_op,...
         F_surge_op,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,...
-                                                        V_d,draft,in.F_max);
+                                                        V_d,draft,in.F_max, ...
+                                                        in.JPD==0, in.T_f_1);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix_elec = min(P_matrix_elec,in.power_max);
+    P_matrix_elec = min(P_matrix_elec,in.P_max);
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
@@ -22,10 +23,16 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     
     % use max sea states for structural forces
     % fixme: for storms, should return excitation force, not all hydro force
-    [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0);
+    [~,X_constraints_storm,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, ...
+                                0, false(size(in.T_struct)), in.T_f_2);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
+    % use all X constraints operationally, only use slamming in storm
+    X_constraints_storm = X_constraints_storm(5:end);
+    X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
+    X_constraints = [X_constraints_op X_constraints_storm];
+
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
@@ -34,7 +41,8 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
 end
 
 function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
-          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, F_max)
+          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, ...
+                                                            F_max, idx_constraint, T_f_slam)
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -48,7 +56,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
                                             in.rho_w, in.g, ...
                                             in.use_MEEM, in.harmonics, in.hydro);
 
-    X_max = 1e6;%min(Hs / (2*sqrt(2)), in.T_f);
+    X_u_max = 1e6;%min(Hs / (2*sqrt(2)), in.T_f);
 
     % get response: includes drag and force saturation
     [mag_U,phase_U,...
@@ -59,59 +67,75 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
      B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                             F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
                                             drag_const_f,drag_const_s,mag_v0_f,mag_v0_s, ...
-                                            X_max,in.control_type,in.use_multibody,...
+                                            X_u_max,in.control_type,in.use_multibody,...
                                             in.X_tol,in.phase_X_tol,in.max_drag_iters);
 
 % FIXME: check stability of closed loop multibody system
     
-    % calculate power
-    P_matrix = real_P;
+    % apply empirical fitted "fudge factor" to adjust power from singlebody to multibody
+    fudge_factor = 23.5 ./ (T.^2 - 14*T + 83) * in.power_scale;
+    P_matrix = real_P .* fudge_factor;
     
-    X_max = max(mag_X_u,[],'all');
+    % set values where JPD=0 to 0 to not include them in constraint
+    mag_X_u_const = mag_X_u;
+    mag_X_u_const(idx_constraint) = 0;
+    mag_X_f_const = mag_X_f;
+    mag_X_f_const(idx_constraint) = 0;
+    mag_X_s_const = mag_X_s;
+    mag_X_s_const(idx_constraint) = 0;
+
+    X_u_max = max(mag_X_u_const,[],'all');
+    X_f_max = max(mag_X_f_const,[],'all');
+
     % extra height on spar after accommodating float displacement
-    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
-    h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
+    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_u_max) / in.h_s;
+    h_s_extra_down = (in.T_s - in.T_f_2 - X_u_max) / in.h_s;
 
     % sufficient length of float support tube
-    h_fs_extra = in.h_fs_clear / X_max - 1;
+    h_fs_extra = in.h_fs_clear / X_u_max - 1;
 
     % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
     
-    X_below_linear = X_max_linear / X_max - 1;
+    X_below_linear = X_max_linear / X_f_max - 1;
 
     % prevent rising out of the water
     wave_amp = Hs/(2*sqrt(2));
-    X_over_A = mag_X_u ./ wave_amp;
-    T_over_A = in.T_f_2 ./ wave_amp;
-    R = T_over_A ./ sqrt(1 + X_over_A.^2 - 2 * X_over_A .* cos(phase_X_u)); % ratio derived on p88-89 of notebook
-    long_draft = R-1;
-    small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
-    X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
+    theta_slam = max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
+    X_slam = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 ) - wave_amp .* cos(theta_slam);
+    X_slam( imag(X_slam)~=0 ) = 0; % slamming occurs even for stationary body
+    X_below_wave = X_slam ./ mag_X_u_const - 1;
+    X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
 
     X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
+        % set values where JPD=0 to 0 to not include them in constraint
+        mag_U_const = mag_U;
+        mag_U_const(idx_constraint) = 0;
+            
         % powertrain force
-        F_ptrain_max = max(mag_U,[],'all');
+        F_ptrain_max = max(mag_U_const,[],'all');
         F_ptrain_max = min(F_ptrain_max, F_max);
 
         % heave force: includes powertrain force and D'Alembert force        
-        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f, phase_X_f, mag_U, phase_U, F_max);
-        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s, phase_X_s, mag_U, phase_U, F_max);
+        F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f_const, phase_X_f, mag_U_const, phase_U, F_max);
+        F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s_const, phase_X_s, mag_U_const, phase_U, F_max);
 
         F_heave_f = max(F_heave_f,[],'all');
         F_heave_s = max(F_heave_s,[],'all');
 
         % surge force - from Eq 25 Newman 1963 - assumes slender kR << 1
         % https://apps.dtic.mil/sti/tr/pdf/AD0406333.pdf  
-        k_max = max(k_wvn,[],'all');
-        w_max = max(w,[],'all');
-        F_surge_coeff = 2 * in.rho_w * w_max^2 * max(wave_amp,[],'all') ./ k_max;
-        F_surge_f = F_surge_coeff * pi * in.D_f^2/4 .* (       1             - exp(-k_max*in.T_f_2));
-        F_surge_s = F_surge_coeff * pi * in.D_s^2/4 .* (exp(-k_max*in.T_f_2) - exp(-k_max*in.T_s));
-        F_surge = [F_surge_f F_surge_s 0];
+        F_surge_coeff = 2 * in.rho_w * w.^2 .* wave_amp ./ k_wvn;
+        F_surge_f = F_surge_coeff * pi * in.D_f^2/4 .* (       1             - exp(-k_wvn*in.T_f_2));
+        F_surge_s = F_surge_coeff * pi * in.D_s^2/4 .* (exp(-k_wvn*in.T_f_2) - exp(-k_wvn*in.T_s));
+
+        F_surge_f_max = max(F_surge_f(~idx_constraint),[],'all');
+        F_surge_s_max = max(F_surge_s(~idx_constraint),[],'all');
+
+        F_surge = [F_surge_f_max F_surge_s_max 0];
     end
 end
 

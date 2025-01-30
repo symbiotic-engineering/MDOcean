@@ -9,6 +9,10 @@ function [x,fval] = pareto_search(filename_uuid)
     idxs = b.idxs_sort;
     num_DVs = length(b.X_starts);
     
+    objFcnName = 'generatedObjective';
+    objFcn1 = str2func([objFcnName b.obj_names{1}]);
+    objFcn2 = str2func([objFcnName b.obj_names{2}]);
+
     %% Calculate seed points for the pareto front
     % get pareto front endpoints by running optimization
     [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
@@ -39,9 +43,10 @@ function [x,fval] = pareto_search(filename_uuid)
     if LCOE_max < LCOE_min
         LCOE_max = 2*LCOE_min;
     end
-    num_seeds = 8;
-    LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
-    LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
+    num_seeds = 20;
+    theta = linspace(0,pi/2,num_seeds+2);
+    theta = theta(2:end-1);
+    LCOE_seeds = LCOE_min + (1-sin(theta))*(LCOE_max-LCOE_min);
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
@@ -57,7 +62,7 @@ function [x,fval] = pareto_search(filename_uuid)
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
-            obj_check = generatedObjectiveP_var(X_opt_tmp(idxs)',{p});
+            obj_check = objFcn2(X_opt_tmp(idxs)',{p});
             assert(obj_tmp == obj_check)
             [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
             assert(obj_tmp == P_var_seeds(i))
@@ -73,8 +78,9 @@ function [x,fval] = pareto_search(filename_uuid)
 
     %% Set up pareto search algorithm
     probMO = probs{1};
-    scale = [10 0.1];
-    probMO.objective = @(x)[generatedObjectiveLCOE(x,{p})*scale(1), generatedObjectiveP_var(x,{p})*scale(2)];
+    scale = [10 1];
+    
+    probMO.objective = @(x)[objFcn1(x,{p})*scale(1), objFcn2(x,{p})*scale(2)];
     
     X0 = [X_0; X_opt(idxs,:)'; X_seeds];
     fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
@@ -126,5 +132,5 @@ function [x,fval] = pareto_search(filename_uuid)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol")
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end

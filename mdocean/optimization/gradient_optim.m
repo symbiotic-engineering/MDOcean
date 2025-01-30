@@ -17,10 +17,15 @@ end
 
 if nargin<4
     which_objs = [1 2]; % run both objectives by default
+    % 1 = min LCOE
+    % 2 = min design-dependent capex cost, subject to power above threshold
+    % 3 = max average power
 end
 
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
+%
+assert(length(b.X_mins)==12) % this code currently assumes hardcoded number of design variables
 x1  = optimvar(b.var_names{1},  sz,'LowerBound',b.X_mins(1),  'UpperBound',b.X_maxs(1));
 x2  = optimvar(b.var_names{2},  sz,'LowerBound',b.X_mins(2),  'UpperBound',b.X_maxs(2));
 x3  = optimvar(b.var_names{3},  sz,'LowerBound',b.X_mins(3),  'UpperBound',b.X_maxs(3));
@@ -33,8 +38,6 @@ x9  = optimvar(b.var_names{9},  sz,'LowerBound',b.X_mins(9),  'UpperBound',b.X_m
 x10 = optimvar(b.var_names{10}, sz,'LowerBound',b.X_mins(10), 'UpperBound',b.X_maxs(10));
 x11 = optimvar(b.var_names{11}, sz,'LowerBound',b.X_mins(11), 'UpperBound',b.X_maxs(11));
 x12 = optimvar(b.var_names{12}, sz,'LowerBound',b.X_mins(12), 'UpperBound',b.X_maxs(12));
-x13 = optimvar(b.var_names{13}, sz,'LowerBound',b.X_mins(13), 'UpperBound',b.X_maxs(13));
-x14 = optimvar(b.var_names{14}, sz,'LowerBound',b.X_mins(14), 'UpperBound',b.X_maxs(14));
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...%'interior-point',...
@@ -49,7 +52,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
+    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
     [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
@@ -62,12 +65,11 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
 
-    [LCOE, P_var, ~, g] = fcn2optimexpr(@simulation,X,p,...
+    [J1, J2, ~, g] = fcn2optimexpr(@simulation,X,p,...
                                             'OutputSize',{[1,1],[1,1],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
-    objs = [LCOE P_var];
-    obj_names = {'LCOE','P_var'};
+    objs = [J1 J2];
     probs = cell([1 2]); 
     
     Xs_opt = zeros(length(X),num_objectives);
@@ -115,7 +117,7 @@ function [Xs_opt, objs_opt, flags, probs] = optimize_both_objectives(X,p,b,x0_in
         end
             
         [X_opt_raw,obj_opt,flag,...
-            output,lambda,grad,hess,problem] = run_solver(prob, obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
+            output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
 
         tol = eps(2);

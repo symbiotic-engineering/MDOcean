@@ -7,7 +7,9 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
-num_figs = 5;
+
+
+num_figs = 29;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -17,6 +19,13 @@ if nargin==0
     % if run without arguments, show all figures and tables
     which_figs = 1:num_figs;
     which_tabs = 1:num_tabs;
+end
+
+if isempty(which_figs)
+    which_figs = 0;
+end
+if isempty(which_tabs)
+    which_tabs = 0;
 end
 
 fig_output = gobjects(1, length(which_figs));
@@ -84,6 +93,7 @@ if any(which_figs == 5)
     fig5 = figure;
     imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
     fig_output(which_figs==5) = fig5;
+<<<<<<< HEAD
 end
 
 % %% figure 11 - MEEM geometry
@@ -161,6 +171,142 @@ end
 %     fig_output(which_figs==9) = fig9;
 %     fig_output(which_figs==10) = fig10;
 % end
+=======
+end
+
+%% figure 6 - hydro coeffs vs freq
+fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
+if any(which_figs == 6)
+    fig6 = figure;
+    % fixme - not implemented
+    fig_output(which_figs==6) = fig6;
+end
+
+%% figure 7, 8 - drag DF, saturation time signal
+fig_names{7} = 'Fig. 7: drag describing function';
+fig_names{8} = 'Fig. 8: force saturation time signal';
+if any(which_figs == 7 | which_figs == 8)
+    sin_desc_fcn_demo()
+    fig7 = gcf;
+    fig8 = figure(fig7.Number-2);
+    fig_output(which_figs==7) = fig7;
+    fig_output(which_figs==8) = fig8;
+end
+
+%% figure 9 - JPD multiplication
+fig_names{9} = 'Fig. 9: JPD multiplication';
+if any(which_figs == 9)
+    p = parameters();
+    b = var_bounds();
+    X = [b.X_noms; 1];
+    plot_power_matrix(X,p)
+    fig9 = gcf;
+    fig_output(which_figs==9) = fig9;
+end
+
+%% figure 10 - WecSim error breakdown
+fig_names{10} = 'Fig. 10: WECSim error breakdown';
+if any(which_figs == 10)
+    % fixme - not implemented
+    fig10 = figure;
+    fig_output(which_figs==10) = fig10;
+end
+
+%% figure 11 - FBD
+fig_names{11} = 'Fig. 11: FBD';
+if any(which_figs == 11)
+    % Created in powerpoint
+    fig11 = figure;
+    imshow(imread("FBD.jpg"),'Parent',axes(fig11));
+    fig_output(which_figs==11) = fig11;
+end
+
+%% figure 12 - cost vs N WEC
+fig_names{12} = 'Fig. 12: cost vs N WEC';
+if any(which_figs == 12)
+    % fixme - not implemented
+    fig12 = figure;
+    fig_output(which_figs==12) = fig12;
+end
+
+%% figure 13 - sim runtime
+fig_names{13} = 'Fig. 13: sim runtime';
+if any(which_figs == 13)
+    % fixme - not implemented
+    fig13 = figure;
+    fig_output(which_figs==13) = fig13;
+end
+
+%% figure 14 - Optimization process flowchart
+fig_names{14} = 'Fig. 14: Optimization flowchart';
+if any(which_figs == 14)
+    % Created in powerpoint
+    fig14 = figure;
+    imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
+    fig_output(which_figs==14) = fig14;
+end
+
+%% figure 15 - design space exploration
+fig_names{15} = 'Fig. 15: design space exploration';
+if any(which_figs == 15)
+    % fixme - not implemented
+    fig15 = figure;
+    fig_output(which_figs==15) = fig15;
+end
+
+%% figure 16, 17, 18, 19, 20, 21 - parameter sensitivities
+fig_names{16} = 'Fig. 16: local objective parameter sensitivities';
+fig_names{17} = 'Fig. 17: local optimal objective parameter sensitivities';
+fig_names{18} = 'Fig. 18: local optimal design variable parameter sensitivities';
+fig_names{19} = 'Fig. 19: constraint activity thresholds';
+fig_names{20} = 'Fig. 20: global optimal objective parameter sensitivities';
+fig_names{21} = 'Fig. 21: global optimal design variable parameter sensitivities';
+if any(which_figs == 16)
+    param_sweep(filename_uuid)
+    fig16 = gcf;
+    fig_output(which_figs==16) = fig16;
+    % fixme: 17 through 21 not implemented
+end
+
+%% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
+fig_names{22} = 'Fig. 22: pareto front with design images';
+fig_names{23} = 'Fig. 23: design heuristics';
+fig_names{24} = 'Fig. 24: objective heuristics';
+fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
+fig_names{26} = 'Fig. 26: constraint activity';
+if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25 | which_figs == 26)  
+    pareto_search(filename_uuid);
+    pareto_curve_heuristics()
+    fig24 = gcf;
+    fig23 = figure(fig24.Number - 1);
+    fig22 = figure(fig24.Number - 3);
+    fig25 = figure(fig24.Number - 4);
+    fig26 = figure(fig24.Number - 6); % constraint activity
+    fig26.Position = [1 41 1536 844.8000];
+    fig_output(which_figs==22) = fig22;
+    fig_output(which_figs==23) = fig23;
+    fig_output(which_figs==24) = fig24;
+    fig_output(which_figs==25) = fig25;
+    fig_output(which_figs==26) = fig26;
+end
+
+%% figure 27, 28, 29 - overlaid geometry, hydro coeffs, probability CDF
+fig_names{27} = 'Fig. 27: overlaid geometry';
+fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
+fig_names{29} = 'Fig. 29: probability CDF';
+if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5)
+    tab5 = compare(filename_uuid);
+    n = gcf().Number;
+    fig29 = figure(n-1);
+    fig27 = figure(n-2);
+    fig_output(which_figs==27) = fig27;
+    fig_output(which_figs==28) = figure;
+    fig_output(which_figs==29) = fig29;
+    % fixme: 28 not implemented
+end
+>>>>>>> 7c30b170cef0d69f75e6d47b376d972ab4fdf5d0
+
+% fixme: 30 to 46 not implemented
 
 %% table 1 - design variables table
 tab_names{1} = 'Tab. 1: design variables';
