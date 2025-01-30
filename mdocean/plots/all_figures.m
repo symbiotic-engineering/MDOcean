@@ -7,7 +7,7 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
-num_figs = 14;
+num_figs = 5;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -21,7 +21,7 @@ end
 
 fig_output = gobjects(1, length(which_figs));
 
-fig_output = cell(1, length(which_figs));
+%fig_output = cell(1, length(which_figs));
 
 tab_output(1, 1:length(which_tabs)) = {table()};
 
@@ -47,7 +47,7 @@ if any(which_figs == 1)
     % Created in powerpoint
     fig1 = figure;
     imshow(imread("geometry.png"),'Parent',axes(fig1));
-    fig_output{which_figs==1} = fig1;
+    fig_output(which_figs==1) = fig1;
 end
 
 %% figure 2 - Methodology overview
@@ -56,7 +56,7 @@ if any(which_figs == 2)
     % Created in powerpoint
     fig2 = figure;
     imshow(imread("methods_flowchart_2_cropped.jpg"),'Parent',axes(fig2));
-    fig_output{which_figs==2} = fig2;
+    fig_output(which_figs==2) = fig2;
 end
 
 %% figure 3 - N2 diagram
@@ -65,7 +65,7 @@ if any(which_figs == 3)
     % Created in powerpoint
     fig3 = figure;
     imshow(imread("simple_N2.jpg"),'Parent',axes(fig3));
-    fig_output{which_figs==3} = fig3;
+    fig_output(which_figs==3) = fig3;
 end
 
 %% figure 4 - Dimensions
@@ -74,7 +74,7 @@ if any(which_figs == 4)
     % Created in powerpoint
     fig4 = figure;
     imshow(imread("dimensions.jpg"),'Parent',axes(fig4));
-    fig_output{which_figs==4} = fig4;
+    fig_output(which_figs==4) = fig4;
 end
 
 %% figure 5 - MEEM geometry
@@ -83,84 +83,84 @@ if any(which_figs == 5)
     % Created in powerpoint
     fig5 = figure;
     imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
-    fig_output{which_figs==5} = fig5;
-end
-
-%% figure 11 - MEEM geometry
-fig_names{11} = 'Fig. 11: FBD';
-if any(which_figs == 11)
-    % Created in powerpoint
-    fig11 = figure;
-    imshow(imread("FBD.jpg"),'Parent',axes(fig11));
-    fig_output{which_figs==11} = fig11;
-end
-
-%% figure 14 - Optimization process flowchart
-fig_names{14} = 'Fig. 14: Optimization flowchart';
-if any(which_figs == 14)
-    % Created in powerpoint
-    fig14 = figure;
-    imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
-    fig_output{which_figs==14} = fig14;
-end
-
-%% figure 3, 4 - saturation time signal, saturation alpha
-fig_names{3} = 'Fig. 3: saturation time signal';
-fig_names{4} = 'Fig. 4: saturation alpha';
-if any(which_figs == 3 | which_figs == 4)
-    sin_desc_fcn_demo()
-    fig4 = gcf;
-    fig3 = figure(fig4.Number-1);
-    fig_output(which_figs==3) = fig3;
-    fig_output(which_figs==4) = fig4;
-end
-
-%% figure 5 - JPD multiplication
-fig_names{5} = 'Fig. 5: JPD multiplication';
-if any(which_figs == 5)
-    p = parameters();
-    b = var_bounds();
-    X = [b.X_noms; 1];
-    plot_power_matrix(X,p)
-    fig5 = gcf;
     fig_output(which_figs==5) = fig5;
 end
 
+% %% figure 11 - MEEM geometry
+% fig_names{11} = 'Fig. 11: FBD';
+% if any(which_figs == 11)
+%     % Created in powerpoint
+%     fig11 = figure;
+%     imshow(imread("FBD.jpg"),'Parent',axes(fig11));
+%     fig_output{which_figs==11} = fig11;
+% end
+% 
+% %% figure 14 - Optimization process flowchart
+% fig_names{14} = 'Fig. 14: Optimization flowchart';
+% if any(which_figs == 14)
+%     % Created in powerpoint
+%     fig14 = figure;
+%     imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
+%     fig_output{which_figs==14} = fig14;
+% end
+
+%% figure 3, 4 - saturation time signal, saturation alpha
+% fig_names{3} = 'Fig. 3: saturation time signal';
+% fig_names{4} = 'Fig. 4: saturation alpha';
+% if any(which_figs == 3 | which_figs == 4)
+%     sin_desc_fcn_demo()
+%     fig4 = gcf;
+%     fig3 = figure(fig4.Number-1);
+%     fig_output(which_figs==3) = fig3;
+%     fig_output(which_figs==4) = fig4;
+% end
+
+%% figure 5 - JPD multiplication
+% fig_names{5} = 'Fig. 5: JPD multiplication';
+% if any(which_figs == 5)
+%     p = parameters();
+%     b = var_bounds();
+%     X = [b.X_noms; 1];
+%     plot_power_matrix(X,p)
+%     fig5 = gcf;
+%     fig_output(which_figs==5) = fig5;
+% end
+
 
 %% figure 6, 7 - pareto front, design heuristics
-fig_names{6} = 'Fig. 6: pareto front';
-fig_names{7} = 'Fig. 7: design heuristics';
-if any(which_figs == 6 | which_figs == 7)  
-    pareto_search(filename_uuid);
-    pareto_curve_heuristics()
-    fig7b = gcf;
-    fig7a = figure(fig7b.Number - 1);
-    fig6 = figure(fig7b.Number - 3);
-    figTBD = figure(fig7b.Number - 6); % constraint activity
-    figTBD.Position = [1 41 1536 844.8000];
-    fig_output(which_figs==6) = fig6;
-    fig_output(which_figs==7) = fig7a;% fig7b];
-end
+% fig_names{6} = 'Fig. 6: pareto front';
+% fig_names{7} = 'Fig. 7: design heuristics';
+% if any(which_figs == 6 | which_figs == 7)  
+%     pareto_search(filename_uuid);
+%     pareto_curve_heuristics()
+%     fig7b = gcf;
+%     fig7a = figure(fig7b.Number - 1);
+%     fig6 = figure(fig7b.Number - 3);
+%     figTBD = figure(fig7b.Number - 6); % constraint activity
+%     figTBD.Position = [1 41 1536 844.8000];
+%     fig_output(which_figs==6) = fig6;
+%     fig_output(which_figs==7) = fig7a;% fig7b];
+% end
 
 %% figure 8 - parameter sensitivities
-fig_names{8} = 'Fig. 8: parameter sensitivities';
-if any(which_figs == 8)
-    param_sweep(filename_uuid)
-    fig8 = gcf;
-    fig_output(which_figs==8) = fig8;
-end
+% fig_names{8} = 'Fig. 8: parameter sensitivities';
+% if any(which_figs == 8)
+%     param_sweep(filename_uuid)
+%     fig8 = gcf;
+%     fig_output(which_figs==8) = fig8;
+% end
 
 %% figure 9, 10 - overlaid geometry, probability CDF
-fig_names{9} = 'Fig. 9: overlaid geometry';
-fig_names{10} = 'Fig. 10: probability CDF';
-if any(which_figs == 9 | which_figs == 10 | which_tabs == 5)
-    tab5 = compare(filename_uuid);
-    n = gcf().Number;
-    fig10 = figure(n-1);
-    fig9 = figure(n-2);
-    fig_output(which_figs==9) = fig9;
-    fig_output(which_figs==10) = fig10;
-end
+% fig_names{9} = 'Fig. 9: overlaid geometry';
+% fig_names{10} = 'Fig. 10: probability CDF';
+% if any(which_figs == 9 | which_figs == 10 | which_tabs == 5)
+%     tab5 = compare(filename_uuid);
+%     n = gcf().Number;
+%     fig10 = figure(n-1);
+%     fig9 = figure(n-2);
+%     fig_output(which_figs==9) = fig9;
+%     fig_output(which_figs==10) = fig10;
+% end
 
 %% table 1 - design variables table
 tab_names{1} = 'Tab. 1: design variables';

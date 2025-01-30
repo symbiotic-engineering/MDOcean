@@ -132,7 +132,7 @@ classdef (SharedTestFixtures={ ...
 
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
-            [success_criterion,fig_out,tab_out] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
+            [success_criterion,fig_out,tab_out, num_figs] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
 
             if isempty(success_criterion)
                 success_criterion = 1;
