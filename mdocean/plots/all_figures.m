@@ -7,6 +7,7 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
+
 num_figs = 29;
 num_tabs = 7;
 fig_names = cell([1,num_figs]);
@@ -27,8 +28,6 @@ if isempty(which_tabs)
 end
 
 fig_output = gobjects(1, length(which_figs));
-
-%fig_output = cell(1, length(which_figs));
 
 tab_output(1, 1:length(which_tabs)) = {table()};
 
@@ -93,11 +92,42 @@ if any(which_figs == 5)
     fig_output(which_figs==5) = fig5;
 end
 
+%% figure 12 - FBD
+fig_names{12} = 'Fig. 12: FBD';
+if any(which_figs == 12)
+    % Created in powerpoint
+    fig12 = figure;
+    imshow(imread("FBD.jpg"),'Parent',axes(fig12));
+    fig_output(which_figs==12) = fig12;
+end
+
+%% figure 14 - Optimization process flowchart
+fig_names{14} = 'Fig. 14: Optimization flowchart';
+if any(which_figs == 14)
+    % Created in powerpoint
+    fig14 = figure;
+    imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
+    fig_output(which_figs==14) = fig14;
+end
+
+%% figure 9, 10 - overlaid geometry, probability CDF
+% fig_names{9} = 'Fig. 9: overlaid geometry';
+% fig_names{10} = 'Fig. 10: probability CDF';
+% if any(which_figs == 9 | which_figs == 10 | which_tabs == 5)
+%     tab5 = compare(filename_uuid);
+%     n = gcf().Number;
+%     fig10 = figure(n-1);
+%     fig9 = figure(n-2);
+%     fig_output(which_figs==9) = fig9;
+%     fig_output(which_figs==10) = fig10;
+% end
+%end ??
+
 %% figure 6 - hydro coeffs vs freq
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
 if any(which_figs == 6)
     fig6 = figure;
-    % fixme - not implemented
+    hydro_coeff_err()
     fig_output(which_figs==6) = fig6;
 end
 
@@ -126,8 +156,8 @@ end
 %% figure 10 - WecSim error breakdown
 fig_names{10} = 'Fig. 10: WECSim error breakdown';
 if any(which_figs == 10)
-    % fixme - not implemented
     fig10 = figure;
+    imshow(imread("error_breakdown.png"),'Parent',axes(fig10));
     fig_output(which_figs==10) = fig10;
 end
 
@@ -151,8 +181,8 @@ end
 %% figure 13 - sim runtime
 fig_names{13} = 'Fig. 13: sim runtime';
 if any(which_figs == 13)
-    % fixme - not implemented
     fig13 = figure;
+    imshow(imread("tree_map.png"),'Parent',axes(fig13));
     fig_output(which_figs==13) = fig13;
 end
 
