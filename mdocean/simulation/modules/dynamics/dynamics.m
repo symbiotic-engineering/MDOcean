@@ -305,45 +305,58 @@ function [mag_U,phase_U,...
     end
 
     % get force-saturated response
-    r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, F_max ./ F_ptrain_unsat, 1);
-    alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
-    alpha(r==0) = 4/pi; % prevent 0/0 when r=0
-    f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
-    B_p_sat = mult.*B_p;
-    K_p_sat = mult.*K_p;
+    % notebook p106 2/2/25
+    f_sat = min(4/pi * F_max ./ mag_U_unsat, 1);
 
-    if multibody
-        [mag_U,phase_U,...
-         real_P,reactive_P,...
-         mag_X_u,phase_X_u,...
-         mag_X_f,phase_X_f,...
-         mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
-                                                 m_c, m_f, m_s, w, ...
-                                                 K_p_sat, B_p_sat, ...
-                                                 F_f_mag, F_f_phase, ...
-                                                 F_s_mag, F_s_phase);
-    else
-        b_sat = B_f + B_p_sat;
-        k_sat = K_f + K_p_sat;
+    % fixme: If reactive control, mult should be complex, based on eq4 of IFAC paper.
+    F_err = zeros(size(f_sat));
+    max_err = 1;
+    mult = f_sat;
+    iters = 0;
 
-        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
-        mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
-        mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
-        mag_U = mult .* F_ptrain_over_x .* mag_X_f;
-        
-        phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
-        phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
-        phase_U = phase_V_u + phase_Z_u;            % phase of control force
+    while max_err > 0.01
 
-        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
-        check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
-        reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+        iters = iters + 1;
+        mult = mult ./ (F_err+1);%get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
+    
+        B_p_sat = mult.*B_p;
+        K_p_sat = mult.*K_p;
+    
+        if multibody
+            [mag_U,phase_U,...
+             real_P,reactive_P,...
+             mag_X_u,phase_X_u,...
+             mag_X_f,phase_X_f,...
+             mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
+                                                     m_c, m_f, m_s, w, ...
+                                                     K_p_sat, B_p_sat, ...
+                                                     F_f_mag, F_f_phase, ...
+                                                     F_s_mag, F_s_phase);
+        else
+            b_sat = B_f + B_p_sat;
+            k_sat = K_f + K_p_sat;
+    
+            [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
+            mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
+            mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
+            mag_U = mult .* F_ptrain_over_x .* mag_X_f;
+            
+            phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
+            phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
+            phase_U = phase_V_u + phase_Z_u;            % phase of control force
+    
+            real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+            check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
+            reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+        end
+    
+    %     F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
+        F_err = abs(mag_U ./ (f_sat .* mag_U_unsat) - 1);
+        max_err = max(abs(F_err),[],'all');
+
     end
 
-    F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
-    F_err_2 = abs(mag_U ./ (f_sat .* mag_U_unsat) - 1);
     % 0.1 percent error
 %     if any(f_sat<1,'all')
 %         stuff = all(F_err_1(f_sat < 1) < 1e-3, 'all');
