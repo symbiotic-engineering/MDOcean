@@ -29,7 +29,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % use all X constraints operationally, only use slamming in storm
-    X_constraints_storm = X_constraints_storm(5:end);
+    X_constraints_storm = X_constraints_storm(5);
     X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
     X_constraints = [X_constraints_op X_constraints_storm];
 
@@ -106,8 +106,9 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     X_slam( imag(X_slam)~=0 ) = 0; % slamming occurs even for stationary body
     X_below_wave = X_slam ./ mag_X_u_const - 1;
     X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
+    X_below_wave_all = min(X_below_wave,[],'all'); % min across all sea states
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave_all];
 
     % calculate forces
     if nargout > 3
