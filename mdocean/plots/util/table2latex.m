@@ -58,27 +58,36 @@ function table2latex(T, filename)
     fprintf(fileID, '%s \\\\ \n', col_names);
     fprintf(fileID, '\\hline \n');
     
+    table_string = '';
     % Writing the data
     try
         for row = 1:size(T,1)
-            temp{1,n_col} = [];
+            row_data = cell(1,n_col);
+            row_data{1,n_col} = [];
             for col = 1:n_col
                 value = T{row,col};
                 if isstruct(value), error('Table must not contain structs.'); end
                 while iscell(value), value = value{1,1}; end
                 if isinf(value), value = '$\infty$'; end
-                temp{1,col} = num2str(value);
+
+                exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
+                mantissa = value / 10^exponent; % Calculate mantissa
+                % Format the output
+                row_data{1,col} = sprintf('$%.3f x 10^{%d}$', mantissa, exponent);
             end
             if ~isempty(row_names)
-                temp = [row_names{row}, temp];
+                row_data = [row_names{row}, row_data];
             end
-            fprintf(fileID, '%s \\\\ \n', strjoin(temp, ' & '));
-            clear temp;
+            row_string = append(strjoin(row_data, ' & '), ' \\\\ \n'); % need 4 \ in row_string and 2 \ in file
+            table_string = append(table_string, row_string);
+            clear row_data;
         end
-    catch
+    catch err
         error('Unknown error. Make sure that table only contains chars, strings or numeric values.');
     end
     
+    fprintf(fileID, table_string);
+
     % Closing the file
     fprintf(fileID, '\\hline \n');
     fprintf(fileID, '\\end{tabular}');

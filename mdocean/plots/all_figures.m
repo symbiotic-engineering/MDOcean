@@ -213,7 +213,7 @@ fig_names{27} = 'Fig. 27: overlaid geometry';
 fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
 fig_names{29} = 'Fig. 29: probability CDF';
 if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5)
-    tab5 = compare(filename_uuid);
+    [tab5,tab6] = compare(filename_uuid);
     n = gcf().Number;
     fig29 = figure(n-1);
     fig27 = figure(n-2);
@@ -273,28 +273,38 @@ if any(which_tabs == 4)
     tab_output{which_tabs==4} = tab4;
 end
 
-%% table 19 - optimal DVs for 4 designs
-tab_names{5} = 'Tab. 19: optimal DVs for 4 designs';
+%% table 19 - optimal DVs for various designs
+tab_names{5} = 'Tab. 19: optimal DVs for various designs';
 if any(which_tabs == 5)
     % computation above with figures 27-29
     display(tab5);
     tab_output{which_tabs==5} = tab5;
+    table2latex(tab5,'table_19.tex')
+end
+
+%% table 20 - optimal outputs for various designs
+tab_names{6} = 'Tab. 20: optimal outputs for various designs';
+if any(which_tabs == 6)
+    % computation above with figures 27-29
+    display(tab6);
+    tab_output{which_tabs==6} = tab6;
+    table2latex(tab6,'../test-results/table_20.tex')
 end
 
 %% table 21 - convergence for different x0s
-tab_names{6} = 'Tab. 21: convergence for different x0s';
-if any(which_tabs == 6)
-    tab6 = gradient_mult_x0(filename_uuid);
-    tab_output{which_tabs==6} = tab6;
+tab_names{7} = 'Tab. 21: convergence for different x0s';
+if any(which_tabs == 7)
+    tab7 = gradient_mult_x0(filename_uuid);
+    tab_output{which_tabs==7} = tab7;
 end
 
 %% table 22 - optimal DVs for 4 locations
-tab_names{7} = 'Tab. 22: optimal DVs for 4 locations';
-if any(which_tabs == 7)
-    tab7 = location_sensitivity(filename_uuid);
-    display(tab7);
-    tab_output{which_tabs==7} = tab7;
-    location_flags = tab7(strcmp(tab7.Row,'flag'),:).Variables;
+tab_names{8} = 'Tab. 22: optimal DVs for 4 locations';
+if any(which_tabs == 8)
+    tab8 = location_sensitivity(filename_uuid);
+    display(tab8);
+    tab_output{which_tabs==8} = tab8;
+    location_flags = tab8(strcmp(tab8.Row,'flag'),:).Variables;
     success_criterion(end+1) = {location_flags};
 end
 
