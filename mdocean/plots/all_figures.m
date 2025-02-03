@@ -7,6 +7,10 @@ if nargin<3
                         % since prob2struct needs unique filenames for code generation
 end
 
+date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
+save_folder = ['../test-results/' date '/'];
+mkdir(save_folder)
+
 num_figs = 29;
 num_tabs = 8;
 fig_names = cell([1,num_figs]);
@@ -279,7 +283,7 @@ if any(which_tabs == 5)
     % computation above with figures 27-29
     display(tab5);
     tab_output{which_tabs==5} = tab5;
-    table2latex(tab5,'../test-results/table_19.tex')
+    table2latex(tab5,[save_folder 'table_19.tex'])
 end
 
 %% table 20 - optimal outputs for various designs
@@ -288,7 +292,7 @@ if any(which_tabs == 6)
     % computation above with figures 27-29
     display(tab6);
     tab_output{which_tabs==6} = tab6;
-    table2latex(tab6,'../test-results/table_20.tex')
+    table2latex(tab6,[save_folder 'table_20.tex'])
 end
 
 %% table 21 - convergence for different x0s
@@ -296,7 +300,7 @@ tab_names{7} = 'Tab. 21: convergence for different x0s';
 if any(which_tabs == 7)
     tab7 = gradient_mult_x0(filename_uuid);
     tab_output{which_tabs==7} = tab7;
-    table2latex(tab7,'../test-results/table_21.tex')
+    table2latex(tab7,[save_folder 'table_21.tex'])
 end
 
 %% table 22 - optimal DVs for 4 locations
@@ -308,9 +312,11 @@ if any(which_tabs == 8)
     location_flags = tab8(strcmp(tab8.Row,'flag'),:).Variables;
     success_criterion(end+1) = {location_flags};
 
-    colspec = 'c>{\raggedright\arraybackslash}p{0.18\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
+    idx_remove = ismember(tab8.Row,{'flag','Optimal Material index'});
+    tab8latex = tab8(~idx_remove,:);
+    colspec = '>{\centering\arraybackslash}p{0.18\linewidth}>{\centering\arraybackslash}p{0.1\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
     firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
-    table2latex(tab8,'../test-results/table_22.tex',colspec,firstrow)
+    table2latex(tab8latex,[save_folder 'table_22.tex'],colspec,firstrow)
 end
 
 

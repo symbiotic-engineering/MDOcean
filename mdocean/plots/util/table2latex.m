@@ -88,17 +88,21 @@ function table2latex(T, filename, special_col_spec, special_first_row)
                 while iscell(value)
                     value = value{1,1};
                 end
-                if isinf(value)
-                    value = '$\infty$';
+                if ismissing(value)
+                    value = '';
                 end
+                
                 % Format the output
                 if isnumeric(value)
+                    if isinf(value)
+                        value = '$\infty$';
+                    end
                     exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
                     mantissa = value / 10^exponent; % Calculate mantissa
                     value = sprintf('$%.3f x 10^{%d}$', mantissa, exponent);
                 end
                 
-                row_data{1,col} = value;
+                row_data{1,col} = char(value);
             end
             if ~isempty(row_names)
                 row_data = [row_names{row}, row_data];
