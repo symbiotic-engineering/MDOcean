@@ -216,7 +216,7 @@ end
 fig_names{27} = 'Fig. 27: overlaid geometry';
 fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
 fig_names{29} = 'Fig. 29: probability CDF';
-if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5)
+if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5 | which_tabs == 6)
     [tab5,tab6] = compare(filename_uuid);
     n = gcf().Number;
     fig29 = figure(n-1);
