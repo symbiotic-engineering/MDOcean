@@ -222,7 +222,7 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
         xlim([80 300])
-        ylim([.8 3])
+        ylim([.5 3])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
