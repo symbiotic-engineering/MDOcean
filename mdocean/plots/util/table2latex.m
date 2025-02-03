@@ -91,6 +91,12 @@ function table2latex(T, filename, special_col_spec, special_first_row)
                 if ismissing(value)
                     value = '';
                 end
+                if ~isempty(value) && (ischar(value) || isstring(value))
+                    value = char(value);
+                    if isstrprop(value(1), 'digit')
+                        value = str2double(value);
+                    end
+                end
                 
                 % Format the output
                 if isnumeric(value)
@@ -99,7 +105,11 @@ function table2latex(T, filename, special_col_spec, special_first_row)
                     end
                     exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
                     mantissa = value / 10^exponent; % Calculate mantissa
-                    value = sprintf('$%.3f x 10^{%d}$', mantissa, exponent);
+                    if exponent==0
+                        value = sprintf('$%.3g $',mantissa);
+                    else
+                        value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
+                    end
                 end
                 
                 row_data{1,col} = char(value);

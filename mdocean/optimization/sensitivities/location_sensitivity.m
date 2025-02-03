@@ -59,7 +59,7 @@ design_var_descs = cellfun(@(x) ['Optimal ' x], b.var_descs, 'UniformOutput', fa
 symbols = [site_info_vars,  design_var_names,{'$LCOE^*$','flag'}];
 row_descs = [site_info_descs, design_var_descs,{'Optimal levelized cost of energy (\\$/kWh)','flag'}];
 
-first_row = array2table(string([{'-'},most_common_wave]),'VariableNames',[{'Symbol'},locs],'RowNames',{'Most frequent wave conditions'});
+first_row = array2table(string([{'-'},most_common_wave]),'VariableNames',[{'Symbol'},locs],'RowNames',{'Most frequent wave'});
 
 start_tab = array2table([site_info;X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',row_descs);
 symbol_col = array2table(string(symbols).','VariableNames',{'Symbol'},'RowNames',row_descs);

@@ -309,12 +309,12 @@ if any(which_tabs == 8)
     tab8 = location_sensitivity(filename_uuid);
     display(tab8);
     tab_output{which_tabs==8} = tab8;
-    location_flags = tab8(strcmp(tab8.Row,'flag'),:).Variables;
+    location_flags = str2double(tab8(strcmp(tab8.Row,'flag'),:).Variables);
     success_criterion(end+1) = {location_flags};
 
     idx_remove = ismember(tab8.Row,{'flag','Optimal Material index'});
     tab8latex = tab8(~idx_remove,:);
-    colspec = '>{\centering\arraybackslash}p{0.18\linewidth}>{\centering\arraybackslash}p{0.1\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
+    colspec = '>{\centering\arraybackslash}p{0.20\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
     firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
     table2latex(tab8latex,[save_folder 'table_22.tex'],colspec,firstrow)
 end
