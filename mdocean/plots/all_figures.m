@@ -8,7 +8,7 @@ if nargin<3
 end
 
 num_figs = 29;
-num_tabs = 7;
+num_tabs = 8;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
 success_criterion = {};
@@ -279,7 +279,7 @@ if any(which_tabs == 5)
     % computation above with figures 27-29
     display(tab5);
     tab_output{which_tabs==5} = tab5;
-    table2latex(tab5,'table_19.tex')
+    table2latex(tab5,'../test-results/table_19.tex')
 end
 
 %% table 20 - optimal outputs for various designs
@@ -296,6 +296,7 @@ tab_names{7} = 'Tab. 21: convergence for different x0s';
 if any(which_tabs == 7)
     tab7 = gradient_mult_x0(filename_uuid);
     tab_output{which_tabs==7} = tab7;
+    table2latex(tab7,'../test-results/table_21.tex')
 end
 
 %% table 22 - optimal DVs for 4 locations
@@ -306,6 +307,10 @@ if any(which_tabs == 8)
     tab_output{which_tabs==8} = tab8;
     location_flags = tab8(strcmp(tab8.Row,'flag'),:).Variables;
     success_criterion(end+1) = {location_flags};
+
+    colspec = 'c>{\raggedright\arraybackslash}p{0.18\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
+    firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
+    table2latex(tab8,'../test-results/table_22.tex',colspec,firstrow)
 end
 
 
