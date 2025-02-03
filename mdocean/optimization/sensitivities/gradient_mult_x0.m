@@ -12,7 +12,7 @@ num_DVs = length(b.var_names);
 num_objs = 2;
 objs = Inf(num_runs,num_objs);
 X_opt = zeros(num_runs,num_DVs,num_objs);
-flags = zeros(num_runs,num_objs);	
+flags = ones(num_runs,num_objs);	
 
 % nominal ICs
 [X_opt(1,:,:), objs(1,:), flags(1,:)] = gradient_optim(b.X_start_struct,p,b);	
