@@ -20,9 +20,12 @@ x0s(1) = b.X_start_struct;
 
 % 20 random ICs
 for i = 2:num_runs
-    [~,x0] = random_x0(b);
-    x0s(i) = x0;
-    [X_opt(i,:,:), objs(i,:), flags(i,:)] = gradient_optim(x0,p,b);	
+    [x0_vec,x0] = random_x0(b);
+    [~, ~, feasible_lin] = is_feasible(0, x0_vec, p, b);
+    if feasible_lin
+        x0s(i) = x0;
+        [X_opt(i,:,:), objs(i,:), flags(i,:)] = gradient_optim(x0,p,b);	
+    end
 end
 
 %% create table for display	
