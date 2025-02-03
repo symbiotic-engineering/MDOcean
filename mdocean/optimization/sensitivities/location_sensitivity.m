@@ -29,6 +29,8 @@ for i=1:length(files)
     p.T = jpd(1,2:end);
     p.h = depths(i);
 
+    b = fix_constraints(p,b);
+
     [~,idx_most_common] = max(p.JPD,[],'all');
     [row,col] = ind2sub(size(p.JPD),idx_most_common);
     most_common_wave(i) = {['$H_s = ' num2str(p.Hs(row)) '$m, $T_e=' num2str(p.T(col)) '$s']};
@@ -103,4 +105,16 @@ function delta_w = find_BW(Hs,Te,JPD)
 %     plot(w_half_below,P_half,'ro')
 %     plot(w_half_above,P_half,'go')
 
+end
+
+function b = fix_constraints(p,b)
+    desired_length = 20 + numel(p.JPD) + length(p.T_struct);
+    len = length(b.constraint_names);
+    if len < desired_length
+        b.constraint_names(end+1 : end+desired_length-len) = 'slamming';
+        b.constraint_names_pretty = remove_underscores(b.constraint_names);
+    elseif len > desired_length
+        b.constraint_names = b.constraint_names(1:desired_length);
+        b.constraint_names_pretty = remove_underscores(b.constraint_names);
+    end
 end
