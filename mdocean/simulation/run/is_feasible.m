@@ -1,4 +1,4 @@
-function [feasible, failed] = is_feasible(g_nonlin, x, p, b, idx_ignore)
+function [feasible, failed, feasible_lin] = is_feasible(g_nonlin, x, p, b, idx_ignore)
 
 if nargin<5
     idx_ignore = false(size(g_nonlin));
