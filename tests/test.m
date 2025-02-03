@@ -132,7 +132,7 @@ classdef (SharedTestFixtures={ ...
 
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
-            [success_criterion,fig_out,tab_out, num_figs] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
+            [success_criterion,fig_out,tab_out] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
 
             if isempty(success_criterion)
                 success_criterion = 1;
@@ -142,12 +142,21 @@ classdef (SharedTestFixtures={ ...
 
             if which_figs ~= 0 % figure
                 fig_name = ['Figure_' num2str(which_figs)];
-    
-                set(fig_out,'Units','Inches');
-                pos = get(fig_out,'Position');
-                set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-                print(fig_out,['../test-results/' fig_name],'-dpdf','-r0')
+                pdf_name = ['../test-results/' fig_name];
+                
+                if ~isempty(fig_out.UserData)
+                    % pdf already exists in files, just copy to folder
+                    copyfile(fig_out.UserData, pdf_name)
+                else
+                    % save pdf from matlab figure output
+                    set(fig_out,'Units','Inches');
+                    pos = get(fig_out,'Position');
+                    set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+                    print(fig_out,pdf_name,'-dpdf','-r0')
+                end
+                % in either case, use figure itself, not pdf, for printing the diagnostic
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+                
             else % table
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end

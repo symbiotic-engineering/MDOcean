@@ -50,56 +50,47 @@ tab_output(1, 1:length(which_tabs)) = {table()};
 % table_mapping(6) = 9; % location sensitivity
 % table_mapping(7) = 10; % convergence
 
-%% figure 1 - RM3 image
-fig_names{1} = 'Fig. 1: RM3 image';
-if any(which_figs == 1)
-    % Created in powerpoint
-    fig1 = figure;
-    imshow(imread("geometry.png"),'Parent',axes(fig1));
-    fig_output(which_figs==1) = fig1;
-end
 
-%% figure 2 - Methodology overview
-fig_names{2} = 'Fig. 2: Methodology overview';
-if any(which_figs == 2)
-    % Created in powerpoint
-    fig2 = figure;
-    imshow(imread("methods_flowchart_2_cropped.jpg"),'Parent',axes(fig2));
-    fig_output(which_figs==2) = fig2;
-end
+%% non matlab figures
+non_matlab_figs = [1:5 10:11 13:14];
+non_matlab_fig_names = {'Fig. 1: RM3 image',...
+                        'Fig. 2: Methodology overview',...
+                        'Fig. 3: N2 diagram',...
+                        'Fig. 4: Dimensions',...
+                        'Fig. 5: MEEM geometry',...
+                        'Fig. 10: WECSim error breakdown',...
+                        'Fig. 11: FBD',...
+                        'Fig. 13: sim runtime',...
+                        'Fig. 14: Optimization flowchart'};
+non_matlab_fig_files = {'geometry.png',...
+                        'methods_flowchart_2_cropped.jpg',...
+                        'simple_N2.jpg',...
+                        'dimensions.jpg',...
+                        'MEEM-dims-basic-2.jpg',...
+                        'error_breakdown.png',...
+                        'FBD.jpg',...
+                        'tree_map.png',...
+                        'optimization_process.jpg'};
 
-%% figure 3 - N2 diagram
-fig_names{3} = 'Fig. 3: N2 diagram';
-if any(which_figs == 3)
-    % Created in powerpoint
-    fig3 = figure;
-    imshow(imread("simple_N2.jpg"),'Parent',axes(fig3));
-    fig_output(which_figs==3) = fig3;
-end
+for i = 1:length(non_matlab_figs)
+    fig_num = non_matlab_figs(i);
+    fig_name = non_matlab_fig_names(i);
+    fig_file = non_matlab_fig_files(i);
 
-%% figure 4 - Dimensions
-fig_names{4} = 'Fig. 4: Dimensions';
-if any(which_figs == 4)
-    % Created in powerpoint
-    fig4 = figure;
-    imshow(imread("dimensions.jpg"),'Parent',axes(fig4));
-    fig_output(which_figs==4) = fig4;
-end
-
-%% figure 5 - MEEM geometry
-fig_names{5} = 'Fig. 5: MEEM geometry';
-if any(which_figs == 5)
-    % Created in powerpoint
-    fig5 = figure;
-    imshow(imread("MEEM-dims-basic-2.jpg"),'Parent',axes(fig5));
-    fig_output(which_figs==5) = fig5;
+    fig_names{fig_num} = fig_name;
+    if any(which_figs == fig_num)
+        tmp_fig = figure;
+        imshow(imread(fig_file),'Parent',axes(tmp_fig));
+        tmp_fig.UserData = fig_file(1:end-4);
+        fig_output(which_figs==fig_num) = tmp_fig;
+    end
 end
 
 %% figure 6 - hydro coeffs vs freq
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
 if any(which_figs == 6)
-    fig6 = figure;
     hydro_coeff_err()
+    fig6 = gcf;
     fig_output(which_figs==6) = fig6;
 end
 
@@ -125,47 +116,12 @@ if any(which_figs == 9)
     fig_output(which_figs==9) = fig9;
 end
 
-%% figure 10 - WecSim error breakdown
-fig_names{10} = 'Fig. 10: WECSim error breakdown';
-if any(which_figs == 10)
-    fig10 = figure;
-    imshow(imread("error_breakdown.png"),'Parent',axes(fig10));
-    fig_output(which_figs==10) = fig10;
-end
-
-%% figure 11 - FBD
-fig_names{11} = 'Fig. 11: FBD';
-if any(which_figs == 11)
-    % Created in powerpoint
-    fig11 = figure;
-    imshow(imread("FBD.jpg"),'Parent',axes(fig11));
-    fig_output(which_figs==11) = fig11;
-end
-
-
 %% figure 12 - cost vs N WEC
 fig_names{12} = 'Fig. 12: cost vs N WEC';
 if any(which_figs == 12)
     % fixme - not implemented
     fig12 = figure;
     fig_output(which_figs==12) = fig12;
-end
-
-%% figure 13 - sim runtime
-fig_names{13} = 'Fig. 13: sim runtime';
-if any(which_figs == 13)
-    fig13 = figure;
-    imshow(imread("tree_map.png"),'Parent',axes(fig13));
-    fig_output(which_figs==13) = fig13;
-end
-
-%% figure 14 - Optimization process flowchart
-fig_names{14} = 'Fig. 14: Optimization flowchart';
-if any(which_figs == 14)
-    % Created in powerpoint
-    fig14 = figure;
-    imshow(imread("optimization_process.jpg"),'Parent',axes(fig14));
-    fig_output(which_figs==14) = fig14;
 end
 
 %% figure 15 - design space exploration
