@@ -11,8 +11,12 @@ b.var_names = {'D_s','D_f','T_f_2','h_s','h_fs_clear','F_max','P_max',...
                 't_fb','t_sr','t_d','h_stiff_f','h1_stiff_d','M'};
 b.var_names_pretty = {'D_s','D_f','T_{f,2}','h_s','h_{fs,clear}','F_{max}','P_{max}',...
                 't_{fb}','t_{sr}','t_d','h_{stiff,f}','h_{1,stiff,d}','M'};
+b.var_descs = {'Spar diameter','Float diameter','Float draught','Spar height',...
+    'Float-spar clearance height','Maximum force','Maximum power',...
+    'Float bottom thickness','Spar radial thickness','Damping plate thickness',...
+    'Float stiffener height','Damping plate stiffener height','Material index'};
 
-% inner diameter of float (m)	
+% diameter of spar (m)	
 b.D_s_min = 0;
 b.D_s_max = 30;
 b.D_s_nom = 6;
@@ -51,7 +55,7 @@ b.h_fs_clear_start = 4;
 b.F_max_min = 0.01;
 b.F_max_max = 100;
 b.F_max_wecsim = 100;
-b.F_max_nom = 100;
+b.F_max_nom = 1;
 b.F_max_start = 5;
 
 % maximum generator power (kW)
@@ -139,7 +143,8 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'FOS_col_max','FOS_col_fatigue','FOS_plate_max','FOS_plate_fatigue',...
                       'FOS_col_local_max','FOS_col_local_fatigue',...
                       'pos_power','LCOE_max','irrelevant_max_force',...
-                      'spar_height_up','spar_height_down','linear_theory'};
+                      'spar_height_up','spar_height_down','float_spar_hit',...
+                      'linear_theory'};
 i1 = length(b.constraint_names);
 JPD_size = 14*15;
 storm_size = 7;
