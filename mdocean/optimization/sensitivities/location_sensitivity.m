@@ -111,7 +111,7 @@ function b = fix_constraints(p,b)
     desired_length = 20 + numel(p.JPD) + length(p.T_struct);
     len = length(b.constraint_names);
     if len < desired_length
-        b.constraint_names(end+1 : end+desired_length-len) = 'slamming';
+        b.constraint_names(end+1 : end+desired_length-len) = {'slamming'};
         b.constraint_names_pretty = remove_underscores(b.constraint_names);
     elseif len > desired_length
         b.constraint_names = b.constraint_names(1:desired_length);
