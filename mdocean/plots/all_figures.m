@@ -75,7 +75,7 @@ non_matlab_fig_files = {'geometry.png',...
 for i = 1:length(non_matlab_figs)
     fig_num = non_matlab_figs(i);
     fig_name = non_matlab_fig_names(i);
-    fig_file = non_matlab_fig_files(i);
+    fig_file = non_matlab_fig_files{i};
 
     fig_names{fig_num} = fig_name;
     if any(which_figs == fig_num)
