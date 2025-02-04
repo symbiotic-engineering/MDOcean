@@ -118,9 +118,8 @@ end
 
 %% figure 12 - cost vs N WEC
 fig_names{12} = 'Fig. 12: cost vs N WEC';
-if any(which_figs == 12)
-    % fixme - not implemented
-    fig12 = figure;
+if any(which_figs == 12) || any(which_tabs == 1)
+    [~,~,~,~,tab1a,fig12] = validate_nominal_RM3('report');
     fig_output(which_figs==12) = fig12;
 end
 
@@ -188,7 +187,7 @@ end
 %% table 12 - validation table
 tab_names{1} = 'Tab. 12: validation against nominal';
 if any(which_tabs == 1)
-    [~,~,~,~,tab1a] = validate_nominal_RM3('report');
+    % tab1a was generated with fig 12 above
     display(tab1a)
     [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
     display(tab1b)
