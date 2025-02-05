@@ -11,14 +11,18 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-if exist('../WEC-Sim','dir')
+run_wecsim_validation = false;
+
+if run_wecsim_validation && exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
 end
 
 suite = testsuite('tests');
-suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
+if ~run_wecsim_validation
+    suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
+end
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
@@ -53,5 +57,6 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
     open([test_dir '/testreport.pdf'])
 end
 
+optim_time_bar_chart(suite,results)
 display(results);
 assertSuccess(results);
