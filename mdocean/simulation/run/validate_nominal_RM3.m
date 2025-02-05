@@ -36,15 +36,17 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
             field = fields{i};
 
             % if the field is economic (execpt J_capex_design since it's a duplicate), plot vs N_WEC
-            if any(strcmp(field,econ_fields)) && ~strcmp(field,'J_capex_design')
+            if any(strcmp(field,econ_fields))
                 simulated.(field) = [simulated_diff_N_WEC.(field)];  
                 
-                ax = nexttile(t);
-                semilogx(ax, N_WEC,simulated.(field),N_WEC,actual.(field),'--')
-                xlabel(ax,'N_{WEC}')
-                title(ax,remove_underscores({field}))
-                if length(t.Children) == t.GridSize(2)
-                    legend(ax,'Simulated','Actual','Location','bestoutside') % only add legend to last plot
+                if ~strcmp(field,'J_capex_design')
+                    ax = nexttile(t);
+                    semilogx(ax, N_WEC,simulated.(field),N_WEC,actual.(field),'--')
+                    xlabel(ax,'N_{WEC}')
+                    title(ax,remove_underscores({field}))
+                    if length(t.Children) == t.GridSize(2)
+                        legend(ax,'Simulated','Actual','Location','bestoutside') % only add legend to last plot
+                    end
                 end
             end
 
