@@ -149,14 +149,11 @@ classdef (SharedTestFixtures={ ...
                     copyfile(fig_out.UserData, pdf_name)
                 else
                     % save pdf from matlab figure output
-                    set(fig_out,'Units','Inches');
-                    pos = get(fig_out,'Position');
-                    set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-                    print(fig_out,pdf_name,'-dpdf','-r0')
+                    save_pdf(fig_out,pdf_name)
                 end
                 % in either case, use figure itself, not pdf, for printing the diagnostic
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
-                
+
             else % table
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end

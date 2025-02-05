@@ -1,5 +1,5 @@
 
-function optim_time_bar_chart(suite,results)
+function fig = optim_time_bar_chart(suite,results)
 
 full_names = {results.Name};
 times = [results.Duration];
@@ -38,7 +38,7 @@ if ~isempty(sfp)
 end
 
 figure
-bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab))
+fig = bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab));
 title('Runtime (seconds)')
 improvePlot
 
