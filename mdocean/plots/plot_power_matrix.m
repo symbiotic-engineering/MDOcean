@@ -1,9 +1,9 @@
-function plot_power_matrix(X,p)
+function plot_power_matrix(X,p,filename_uuid)
 
 [~,~,P_matrix] = simulation(X, p);
 
 P_matrix = P_matrix / 1e3; % convert W to kW
-[CW_over_CW_max, P_wave, CW_max] = check_max_CW();%filename_uuid);
+[CW_over_CW_max, P_wave, CW_max] = check_max_CW(filename_uuid);
 
 [T,Hs] = meshgrid(p.T,p.Hs);
 figure

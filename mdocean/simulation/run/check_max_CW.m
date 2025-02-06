@@ -1,4 +1,4 @@
-function [ratio, P_wave, CW_max] = check_max_CW()%filename_uuid)
+function [ratio, P_wave, CW_max] = check_max_CW(filename_uuid)
     p = parameters();
     b = var_bounds();
     %b.filename_uuid = filename_uuid;
