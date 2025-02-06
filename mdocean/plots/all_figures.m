@@ -11,7 +11,7 @@ date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 
-num_figs = 29;
+num_figs = 31;
 num_tabs = 8;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -181,6 +181,16 @@ if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5 
     fig_output(which_figs==29) = fig29;
     % fixme: 28 not implemented
 end
+
+%% figure 31 - asymptotic b vector
+fig_names{31} = 'Fig. 31: asymptotic b vector';
+if any(which_figs == 31)
+    b_Inf
+    fig31 = gcf;
+    fig_output(which_figs==31) = fig31;
+end
+
+
 
 % fixme: 30 to 46 not implemented
 
