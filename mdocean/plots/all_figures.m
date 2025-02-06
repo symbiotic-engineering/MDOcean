@@ -11,7 +11,7 @@ date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 
-num_figs = 31;
+num_figs = 37;
 num_tabs = 8;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -190,6 +190,13 @@ if any(which_figs == 31)
     fig_output(which_figs==31) = fig31;
 end
 
+%% figure 37 - damping plate moment
+fig_names{37} = 'Fig. 37: damping plate moment';
+if any(which_figs == 37)
+    BoedoPrantilAnnularPlate()
+    fig37 = gcf;
+    fig_output(which_figs==37) = fig37;
+end
 
 
 % fixme: 30 to 46 not implemented
