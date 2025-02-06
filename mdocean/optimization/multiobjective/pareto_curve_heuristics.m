@@ -28,6 +28,14 @@ function pareto_curve_heuristics()
     LCOE = fval(:,1);
     Pvar = fval(:,2);
     
+%     if new_objs
+%         [X_max_pwr,val] = max_avg_power(p,b);
+%         [LCOE_max_pwr,P_var_max_pwr] = simulation(X_max_pwr,p); % fixme do I need a constraint to ensure P_max is tight, like I have for F_max?
+%         LCOE(end+1) = LCOE_max_pwr;
+%         Pvar(end+1) = P_var_max_pwr;
+%         X(end+1,:) = X_max_pwr;
+%     end
+
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
      x_best_J1, x_best_J2, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs);
@@ -214,7 +222,7 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
         xlim([80 300])
-        ylim([.8 3])
+        ylim([.5 3])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
