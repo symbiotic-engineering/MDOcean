@@ -40,7 +40,8 @@ function [LCOE_L,  X_LCOE_L, ...
     J_new = J0 + dJs;
 end
 
-function local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
+function [par_x_star_par_p, dJstar_dp, ...
+            dJdp, par_lam_par_p] = local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
     for obj = 1:2
         x0 = x0s(:,obj);
         lambda = lambdas(obj);
