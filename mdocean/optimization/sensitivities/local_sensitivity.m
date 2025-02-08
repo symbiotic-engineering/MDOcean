@@ -70,14 +70,15 @@ function [par_x_star_par_p, dJstar_dp, ...
     % fixme: need to actually use these bounds
 
     % left hand side matrix - independent of parameter
-    matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin);
+    matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,active_ub);
     
     % sweep parameters
     for i = 1:length(params)
         param_name = params{i};
         % right hand side vector - depends on parameter
         [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
-                                                        lambda_nl, lambda_lin, active, active_lin);
+                                                        lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
+                                                        active, active_lin, active_lb, active_ub);
     
         % matrix solution
         sol = matrix \ vector;
@@ -94,8 +95,8 @@ function [par_x_star_par_p, dJstar_dp, ...
 end
 
 function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
-                                                        lambda_nl, lambda_lin, active, active_lin)
-
+                                                        lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
+                                                        active, active_lin, active_lb, active_ub)
 
 
     p0 = p.(param_name);
@@ -105,39 +106,59 @@ function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, pa
         par_g_lin_par_p,...
         par_par_g_lin_par_x_par_p] = get_partials(obj, p, param_name, x0, p0,num_constr);
 
+    % assume that x bounds are parameter-independent
+    par_g_lb_par_p = zeros(size(active_lb)); par_g_ub_par_p = zeros(size(active_ub));
+
     % use all constraints for J sensitivity - MDO book - just J, not J*
-    dJdp = par_J_par_p - lambda_nl.' * par_g_par_p - lambda_lin.' * par_g_lin_par_p.';
+    dJdp = par_J_par_p ...
+    - lambda_nl.' * par_g_par_p ...
+    - lambda_lin.'* par_g_lin_par_p.' ...
+    - lambda_lb.' * par_g_lb_par_p ...
+    - lambda_ub.' * par_g_ub_par_p;
 
     % only use active constraints for J* and x* sensitivity
     % d vector
-    d = [par_g_par_p(active); par_g_lin_par_p(active_lin)];
+    d = [par_g_par_p(active);
+        par_g_lin_par_p(active_lin);
+        par_g_lb_par_p(active_lb);
+        par_g_ub_par_p(active_ub)];
 
     % c vector
     c_obj_term = par_par_J_par_x_par_p;
     c_nl_constraint_term = par_par_g_par_x_par_p * lambda_nl;
     c_lin_constraint_term = par_par_g_lin_par_x_par_p * lambda_lin;
-    c = c_obj_term + c_nl_constraint_term + c_lin_constraint_term;
+    c_lb_term = 0; %par_par_g_lb_par_x_par_p * lambda_lb;
+    c_ub_term = 0; %par_par_g_ub_par_x_par_p * lambda_ub;
+    c = c_obj_term + c_nl_constraint_term + c_lin_constraint_term + c_lb_term + c_ub_term;
     vector = -[c; d];
 end
 
-function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin)
+function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,active_ub)
 
     % A is just the Hessian of the Lagrangian, which we already have from the optimization
     A = hess;
 
-    % obtain B = dg/dx with finite difference
-    active_constraint_handle = @(X) get_constraints([X;1],p,active);
+    % number of active constraints
     num_constr_active = sum(active);
-    num_constr_active_lin = sum(active_lin);
+    num_constr_active_tot = sum([active; active_lin; active_lb; active_ub]);
+
+    % obtain B = dg/dx with finite difference for nonlinear constraints
+    active_constraint_handle = @(X) get_constraints([X;1],p,active);
     B_nl = finite_difference_vector_x(active_constraint_handle,x0(1:end-1),num_constr_active);
+
+    % obtain B from constraint A_ineq matrix for linear constraints and bounds
     [~, A_ineq_lin_part] = is_feasible(0, x0, p);
     A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
     A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
     B_lin = A_ineq_lin(active_lin,:).';
-    B= [B_nl B_lin];
+    A_ineq_lb = diag(-active_lb);
+    A_ineq_ub = diag(active_ub);
+    B_lb = -A_ineq_lb(:,active_lb);
+    B_ub = A_ineq_ub(:,active_ub);
+    B = [B_nl B_lin B_lb B_ub];
 
     % make matrix
-    matrix = [A B; B.' zeros(num_constr_active+num_constr_active_lin)];
+    matrix = [A B; B.' zeros(num_constr_active_tot)];
 end
 
 function [par_J_par_p, par_g_par_p, ...
