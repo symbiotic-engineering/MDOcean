@@ -223,13 +223,13 @@ function deriv = finite_difference_vector_x(fcn_handle,x_1_vec,ny)
     end
 end
 
-function deriv = finite_difference_scalar_x(fcn_handle,x_1)
+function deriv = finite_difference_scalar_x(f_handle,x_1)
 % fcn handle: a function expecting input scalar x and returning output matrix y
     assert(isscalar(x_1))
-    y_1 = fcn_handle(x_1);
-    delta_x = 1e-10;
+    y_1 = f_handle(x_1);
+    delta_x = max(1e-10, x_1*2e-4);
     x_2 = x_1 + delta_x;
-    y_2 = fcn_handle(x_2);
+    y_2 = f_handle(x_2);
 
     delta_y = y_2 - y_1;
     deriv = delta_y / delta_x;
