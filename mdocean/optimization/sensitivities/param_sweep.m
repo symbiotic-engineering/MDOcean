@@ -48,8 +48,8 @@ end
 % fill in ratios == 1 (left blank since same as initial)
 LCOE(:,ratios==1) = J0(1);
 P_var(:,ratios==1) = J0(2);
-X_LCOE(:,ratios==1,:) = x0_vec(:,1);
-X_Pvar(:,ratios==1,:) = x0_vec(:,2);
+X_LCOE(:,ratios==1,:) = repmat(x0_vec(:,1).',length(params),1);
+X_Pvar(:,ratios==1,:) = repmat(x0_vec(:,2).',length(params),1);
 
 %% Plot each sensitivity
 col_nom = find(ratios==1);
