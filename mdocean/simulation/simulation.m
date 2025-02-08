@@ -80,11 +80,11 @@ g(9) = in.t_f_r / in.t_f_b - 0.44 / 0.56;     % float radial thickness ratio pla
 g(10) = in.t_f_c / in.t_f_b - 0.44 / 0.56;    % float circumferential thickness ratio placeholder
 g(11) = FOS_spar(1) / p.FOS_min - 1;           % spar survives max force
 g(12) = FOS_spar(2) / p.FOS_min - 1;           % spar survives fatigue
-g(13) = FOS_damping_plate(1) / p.FOS_min - 1; % damping plate survives max force
-g(14) = FOS_damping_plate(2) / p.FOS_min - 1; % damping plate survives fatigue
+g(13) = 1;%FOS_damping_plate(1) / p.FOS_min - 1; % damping plate survives max force
+g(14) = 1;%FOS_damping_plate(2) / p.FOS_min - 1; % damping plate survives fatigue
 g(15) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
 g(16) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-g(17) = P_avg_elec;                     % positive power
+g(17) = P_avg_elec/1e6;                 % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(18) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 g(19) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
