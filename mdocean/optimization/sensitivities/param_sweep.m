@@ -46,10 +46,24 @@ for i=1:length(params)
 end
 
 % fill in ratios == 1 (left blank since same as initial)
+X_LCOE_0_3d = permute(repmat(x0_vec(:,1).',length(params),1,sum(ratios==1)),[1 3 2]);
+X_Pvar_0_3d = permute(repmat(x0_vec(:,2).',length(params),1,sum(ratios==1)),[1 3 2]);
 LCOE(:,ratios==1) = J0(1);
 P_var(:,ratios==1) = J0(2);
-X_LCOE(:,ratios==1,:) = repmat(x0_vec(:,1).',length(params),1);
-X_Pvar(:,ratios==1,:) = repmat(x0_vec(:,2).',length(params),1);
+X_LCOE(:,ratios==1,:) = X_LCOE_0_3d;
+X_Pvar(:,ratios==1,:) = X_Pvar_0_3d;
+
+% check if deltas too small, indicating potential finite precision error
+delta_x_LCOE = abs(X_LCOE - X_LCOE_0_3d(:,1,:));
+delta_x_Pvar = abs(X_Pvar - X_Pvar_0_3d(:,1,:));
+delta = [delta_x_LCOE delta_x_Pvar];
+delta_too_small = (delta < 1e-6) & (delta ~= 0);
+if any(delta_too_small,'all') 
+    warning(['The global sensitivity is potentially inaccurate ' ...
+        'due to finite precision effects. You must either decrease ' ...
+        'options.StepTolerance in gradient_optim, or increase ' ...
+        'abs(ratios-1) in param_sweep.'])
+end
 
 %% Plot each sensitivity
 col_nom = find(ratios==1);
