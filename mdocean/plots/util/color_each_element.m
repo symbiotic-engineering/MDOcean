@@ -3,7 +3,7 @@ function color_each_element(matrix)
 figure;
 imagesc(matrix);
 colormap(bluewhitered);
-colorbar;
+
 ax=gca;
 
 nx = size(matrix,2);
@@ -15,6 +15,8 @@ set(ax,'XTickLabel',1:nx)
 set(ax,'YTickLabel',1:ny)
 
 grid on;
-axis equal
+axis image
+
+colorbar;
 
 end

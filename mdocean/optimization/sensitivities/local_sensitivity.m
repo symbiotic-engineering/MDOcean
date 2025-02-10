@@ -90,6 +90,42 @@ function [par_x_star_par_p, dJstar_dp, ...
         par_J_par_x = grad;
         dJstar_dp = par_J_par_p + par_J_par_x.' * par_x_star_par_p;
 
+        debug = true;
+        if debug
+            % comparision against global
+            vars_global = load('global_sens.mat','X_LCOE','param_name','p','ratios');
+            assert(strcmp(vars_global.param_name, param_name))
+            dx = squeeze(vars_global.X_LCOE(1,4,:)  - vars_global.X_LCOE(1,3,:));
+            dp = (vars_global.ratios(4)-vars_global.ratios(3)) * vars_global.p.(param_name);
+            dxdp = dx(1:14) / dp;
+
+            color_each_element(par_x_star_par_p)
+            title('local dx*/dp')
+
+            color_each_element(dxdp)
+            title('global dx*/dp')
+
+            pct_err = (par_x_star_par_p - dxdp)./dxdp*100;
+            pct_err(abs(dxdp)<1e-4 & abs(par_x_star_par_p)<1e-4) = 0;
+            color_each_element(pct_err)
+            title('percent error')
+
+            % breakdown of local into two terms
+            M = inv(matrix);
+            M1 = M(1:14,1:14);
+            M2 = M(1:14,15:end);
+            neg_c = vector(1:14);
+            neg_d = vector(15:end);
+            dxdp_term1 = M1 * neg_c;
+            dxdp_term2 = M2 * neg_d;
+
+            color_each_element(dxdp_term1)
+            title('local dx*/dp term 1: -M_1 c')
+
+            color_each_element(dxdp_term2)
+            title('local dx*/dp term 2: -M_2 d')
+        end
+
         %delta_p_nl_becomes_inactive = -lambda_nl(active) ./ par_lam_par_p
         %delta_p_becomes_active
     end
