@@ -2,11 +2,11 @@
 b = var_bounds();
 [p,T] = parameters();
 
-%param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
-%params = T.name(T.sweep);
-params = {'h'};
+param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
+params = T.name(T.sweep);
+%params = {'h'};
 
-dvar_names = b.var_names_pretty;
+dvar_names = b.var_names_pretty(1:end-1);
 
 %%
 % use the optimal x as x0 to speed up the sweeps
@@ -18,43 +18,86 @@ num_constr = length(b.constraint_names);
 
 disp('done optimizing, starting param sensitivity')
 tic
-local_sens_both_obj_all_param(x0_vec, p, params, lambdas, grads, hesses, num_constr)
+[par_x_star_par_p, dJstar_dp, ...
+ dJdp, par_J_par_p, delta_p_change_activity] = local_sens_both_obj_all_param(x0_vec, p, params, ...
+                                                            lambdas, grads, hesses, num_constr);
 toc
 
-function [LCOE_L,  X_LCOE_L, ...
-          P_var_L, X_Pvar_L] = local_sens_deltas(x0, p, param_name, ratios, matrix, lambdas, J0)
+p_val = T.value{T.sweep};
+dJdp_normalized = [par_J_par_p dJdp dJstar_dp].' .* p_val ./ J0(1);
+dxdp_normalized = par_x_star_par_p.' .* p_val ./ x0_vec(1:end-1,1);
+delta_p_normalized = delta_p_change_activity ./ p_val;
 
-    delta_p = p0 * (ratios - 1);
+color_each_element(dJdp_normalized)
+title('dJ/dp normalized')
+set(gca,'XTickLabel',param_names)
+set(gca,'YTickLabel',{'partial','total linear','total quadratic'})
+clim([-10 10])
+colormap(bluewhitered)
+xlabel('Parameters p')
+ylabel('Type of Sensitivity')
 
-    [par_x_star_par_p, dJdp, dJstar_dp] = get_local_sens();
+color_each_element(dxdp_normalized)
+title('dx*/dp normalized')
+set(gca,'XTickLabel',param_names)
+set(gca,'YTickLabel',dvar_names)
+clim([-10 10])
+colormap(bluewhitered)
+xlabel('Parameters p')
+ylabel('Design Variables x')
 
-    % deltas based on specific ratios
-    delta_x_star = par_x_star_par_p * delta_p;
-    delta_J = dJdp * delta_p; 
-    delta_Jstar = dJstar_dp * delta_p;
+constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty dvar_names dvar_names];
+idx_slam = contains(constr_names,'Slamming');
+delta_p_norm_combine_slamming = delta_p_normalized(:,~idx_slam);
+delta_p_norm_slam = delta_p_normalized(:,idx_slam);
+[~,idx_delta_p_slam] = min(abs(delta_p_norm_slam),[],2);
+idx_delta_p_slam = sub2ind(size(delta_p_norm_slam),1:length(params),idx_delta_p_slam');
+delta_p_norm_combine_slamming(:,end+1) = delta_p_norm_slam(idx_delta_p_slam);
+color_each_element(delta_p_norm_combine_slamming)
+title('Normalized delta p to change constraint activity')
+set(gca,'YTickLabel',param_names)
+set(gca,'XTickLabel',[constr_names(~idx_slam),'Slamming'])
+clim([-10 10])
+colormap(bluewhitered)
+ylabel('Parameters')
+xlabel('Constraints')
 
-    dxs(:,obj) = delta_x_star;
-    dJs(obj)   = delta_Jstar;
-
-    x_new = x0s + dxs;
-    J_new = J0 + dJs;
-end
+% function [LCOE_L,  X_LCOE_L, ...
+%           P_var_L, X_Pvar_L] = local_sens_deltas(x0, p, param_name, ratios, matrix, lambdas, J0)
+% 
+%     delta_p = p0 * (ratios - 1);
+% 
+%     [par_x_star_par_p, dJdp, dJstar_dp] = get_local_sens();
+% 
+%     % deltas based on specific ratios
+%     delta_x_star = par_x_star_par_p * delta_p;
+%     delta_J = dJdp * delta_p; 
+%     delta_Jstar = dJstar_dp * delta_p;
+% 
+%     dxs(:,obj) = delta_x_star;
+%     dJs(obj)   = delta_Jstar;
+% 
+%     x_new = x0s + dxs;
+%     J_new = J0 + dJs;
+% end
 
 function [par_x_star_par_p, dJstar_dp, ...
-            dJdp, par_lam_par_p] = local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
-    for obj = 1:2
+            dJdp, par_J_par_p, delta_p_change_activity] = local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
+    for obj = 1%:2
         x0 = x0s(:,obj);
         lambda = lambdas(obj);
         grad = grads(:,obj);
         hess = hesses(:,:,obj);
 
         [par_x_star_par_p, dJstar_dp, ...
-            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj);
+            dJdp, par_J_par_p, ...
+            delta_p_change_activity] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj);
     end
 end
 
-function [par_x_star_par_p, dJstar_dp, ...
-            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj)
+function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
+            dJdp_all_params, par_J_par_p_all_params,...
+            delta_p_change_activity_all_params] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr_nl, obj)
 % construct matrix equation for a single J - slide 47 of lec 10 of MDO
 
     % lagrange multpliers
@@ -68,67 +111,127 @@ function [par_x_star_par_p, dJstar_dp, ...
     active_lin = lambda_lin ~= 0;
     active_lb  = lambda_lb ~= 0;
     active_ub  = lambda_ub ~= 0;
-    % fixme: need to actually use these bounds
 
     % left hand side matrix - independent of parameter
     matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,active_ub);
     
+    % allocate outputs
+    par_J_par_p_all_params = zeros(length(params),1);
+    dJdp_all_params = zeros(length(params),1);
+    dJstar_dp_all_params = zeros(length(params),1);
+    par_x_star_par_p_all_params = zeros(length(params),length(x0)-1);
+    num_constr_tot = length(lambda_nl) + length(lambda_lin) + length(lambda_lb) + length(lambda_ub);
+    delta_p_change_activity_all_params = zeros(length(params),num_constr_tot);
+
     % sweep parameters
     for i = 1:length(params)
         param_name = params{i};
-        % right hand side vector - depends on parameter
-        [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
+
+        [par_J_par_p, dJdp, dJstar_dp, ...
+         par_x_star_par_p, delta_p_change_activity] = local_sens_one_obj_one_param(matrix, ...
+                                                        grad, obj, p, param_name, x0, num_constr_nl, ...
                                                         lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
                                                         active, active_lin, active_lb, active_ub);
-    
-        % matrix solution
-        sol = matrix \ vector;
-        par_x_star_par_p = sol(1:length(x0)-1);
-        par_lam_par_p = sol(length(x0):end);
-    
-        % total derivative
-        par_J_par_x = grad;
-        dJstar_dp = par_J_par_p + par_J_par_x.' * par_x_star_par_p;
 
-        debug = true;
-        if debug
-            % comparision against global
-            vars_global = load('global_sens.mat','X_LCOE','param_name','p','ratios');
-            assert(strcmp(vars_global.param_name, param_name))
-            dx = squeeze(vars_global.X_LCOE(1,4,:)  - vars_global.X_LCOE(1,3,:));
-            dp = (vars_global.ratios(4)-vars_global.ratios(3)) * vars_global.p.(param_name);
-            dxdp = dx(1:14) / dp;
-
-            color_each_element(par_x_star_par_p)
-            title('local dx*/dp')
-
-            color_each_element(dxdp)
-            title('global dx*/dp')
-
-            pct_err = (par_x_star_par_p - dxdp)./dxdp*100;
-            pct_err(abs(dxdp)<1e-4 & abs(par_x_star_par_p)<1e-4) = 0;
-            color_each_element(pct_err)
-            title('percent error')
-
-            % breakdown of local into two terms
-            M = inv(matrix);
-            M1 = M(1:14,1:14);
-            M2 = M(1:14,15:end);
-            neg_c = vector(1:14);
-            neg_d = vector(15:end);
-            dxdp_term1 = M1 * neg_c;
-            dxdp_term2 = M2 * neg_d;
-
-            color_each_element(dxdp_term1)
-            title('local dx*/dp term 1: -M_1 c')
-
-            color_each_element(dxdp_term2)
-            title('local dx*/dp term 2: -M_2 d')
-        end
-
-        %delta_p_nl_becomes_inactive = -lambda_nl(active) ./ par_lam_par_p
-        %delta_p_becomes_active
+        % assign outputs
+        par_J_par_p_all_params(i) = par_J_par_p;
+        dJdp_all_params(i) = dJdp;
+        dJstar_dp_all_params(i) = dJstar_dp;
+        par_x_star_par_p_all_params(i,:) = par_x_star_par_p;
+        delta_p_change_activity_all_params(i,:) = delta_p_change_activity;
     end
+end
+
+function [par_J_par_p, dJdp, dJstar_dp, ...
+    par_x_star_par_p, delta_p_change_activity] = local_sens_one_obj_one_param(matrix, grad, obj, ...
+                                                        p, param_name, x0, num_constr, ...
+                                                        lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
+                                                        active, active_lin, active_lb, active_ub)
+        if ~isscalar(p.(param_name))
+            warning(['Setting sensitivity to zero for nonscalar param ' param_name])
+            [par_J_par_p, dJdp, dJstar_dp, par_x_star_par_p, delta_p_change_activity] = deal(0);
+        else
+            % right hand side vector - depends on parameter
+            [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
+                                                            lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
+                                                            active, active_lin, active_lb, active_ub);
+        
+            % matrix solution
+            sol = matrix \ vector;
+            par_x_star_par_p = sol(1:length(x0)-1);
+            par_lam_par_p = sol(length(x0):end);
+        
+            % total derivative
+            par_J_par_x = grad;
+            dJstar_dp = par_J_par_p + par_J_par_x.' * par_x_star_par_p;
+    
+            debug = false;
+            if debug
+                % comparision against global
+                vars_global = load('global_sens.mat','X_LCOE','param_name','p','ratios');
+                assert(strcmp(vars_global.param_name, param_name))
+                dx = squeeze(vars_global.X_LCOE(1,4,:)  - vars_global.X_LCOE(1,3,:));
+                dp = (vars_global.ratios(4)-vars_global.ratios(3)) * vars_global.p.(param_name);
+                dxdp = dx(1:14) / dp;
+    
+                color_each_element(par_x_star_par_p)
+                title('local dx*/dp')
+    
+                color_each_element(dxdp)
+                title('global dx*/dp')
+    
+                pct_err = (par_x_star_par_p - dxdp)./dxdp*100;
+                pct_err(abs(dxdp)<1e-4 & abs(par_x_star_par_p)<1e-4) = 0;
+                color_each_element(pct_err)
+                title('percent error')
+    
+                % breakdown of local into two terms
+                M = inv(matrix);
+                M1 = M(1:14,1:14);
+                M2 = M(1:14,15:end);
+                neg_c = vector(1:14);
+                neg_d = vector(15:end);
+                dxdp_term1 = M1 * neg_c;
+                dxdp_term2 = M2 * neg_d;
+    
+                color_each_element(dxdp_term1)
+                title('local dx*/dp term 1: -M_1 c')
+    
+                color_each_element(dxdp_term2)
+                title('local dx*/dp term 2: -M_2 d')
+            end
+    
+            % active constraints becoming inactive
+            idx_nl = 1:sum(active);
+            idx_lin = sum(active)+1 : sum(active)+sum(active_lin);
+            idx_lb = sum(active)+sum(active_lin)+1 : sum(active)+sum(active_lin)+sum(active_lb);
+            idx_ub = sum(active)+sum(active_lin)+sum(active_lb)+1 : sum(active)+sum(active_lin)+sum(active_lb)+sum(active_ub);
+            delta_p_nl_becomes_inactive  = -lambda_nl(active) ./ par_lam_par_p(idx_nl);
+            delta_p_lin_becomes_inactive = -lambda_lin(active_lin) ./ par_lam_par_p(idx_lin);
+            delta_p_lb_becomes_inactive  = -lambda_lb(active_lb) ./ par_lam_par_p(idx_lb);
+            delta_p_ub_becomes_inactive  = -lambda_ub(active_ub) ./ par_lam_par_p(idx_ub);
+    
+            % inactive constraints becoming active
+            % fixme - this is zeroed for now
+            delta_p_nl_becomes_active  = zeros(sum(~active),1);     %-g(~active) ./ (dg_dx(~active) * par_x_star_par_p)
+            delta_p_lin_becomes_active = zeros(sum(~active_lin),1); %-g_lin(~active_lin) ./ (dg_lin_dx(~active_lin) * par_x_star_par_p)
+            delta_p_lb_becomes_active  = zeros(sum(~active_lb),1);  %-g_lb(~active_lb) ./ (dg_lb_dx(~active_lb) * par_x_star_par_p)
+            delta_p_ub_becomes_active  = zeros(sum(~active_ub),1);  %-g_ub(~active_ub) ./ (dg_ub_dx(~active_ub) * par_x_star_par_p)
+    
+            % combine constraint activity change for both active and inactive
+            delta_p_nl_change_activity(active)  = delta_p_nl_becomes_inactive;
+            delta_p_nl_change_activity(~active) = delta_p_nl_becomes_active;
+            delta_p_lin_change_activity(active_lin)  = delta_p_lin_becomes_inactive;
+            delta_p_lin_change_activity(~active_lin) = delta_p_lin_becomes_active;
+            delta_p_lb_change_activity(active_lb)  = delta_p_lb_becomes_inactive;
+            delta_p_lb_change_activity(~active_lb) = delta_p_lb_becomes_active;
+            delta_p_ub_change_activity(active_ub)  = delta_p_ub_becomes_inactive;
+            delta_p_ub_change_activity(~active_ub) = delta_p_ub_becomes_active;
+    
+            % combine all constraints: nonlin, lin, lb, ub
+            delta_p_change_activity = [delta_p_nl_change_activity, delta_p_lin_change_activity, ...
+                                       delta_p_lb_change_activity, delta_p_ub_change_activity];
+        end
 end
 
 function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, x0, num_constr, ...
