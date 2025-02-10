@@ -267,7 +267,7 @@ function deriv = finite_difference_scalar_x(f_handle,x_1)
 % fcn handle: a function expecting input scalar x and returning output matrix y
     assert(isscalar(x_1))
     y_1 = f_handle(x_1);
-    delta_x = max(1e-10, x_1*2e-4);
+    delta_x = max(1e-10, x_1*1e-4);
     x_2 = x_1 + delta_x;
     y_2 = f_handle(x_2);
 
