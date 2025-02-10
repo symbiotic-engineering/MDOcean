@@ -49,7 +49,7 @@ function [par_x_star_par_p, dJstar_dp, ...
         hess = hesses(:,:,obj);
 
         [par_x_star_par_p, dJstar_dp, ...
-            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj)
+            dJdp, par_lam_par_p] = local_sens_one_obj_all_param(x0, p, params, lambda, grad, hess, num_constr, obj);
     end
 end
 
@@ -113,7 +113,7 @@ function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, pa
     % use all constraints for J sensitivity - MDO book - just J, not J*
     dJdp = par_J_par_p ...
     - lambda_nl.' * par_g_par_p ...
-    - lambda_lin.'* par_g_lin_par_p.' ...
+    - lambda_lin.'* par_g_lin_par_p ...
     - lambda_lb.' * par_g_lb_par_p ...
     - lambda_ub.' * par_g_ub_par_p;
 
@@ -178,10 +178,13 @@ function [par_J_par_p, par_g_par_p, ...
         par_par_J_par_x_par_p = par_y_par_p(2:end, 1);
         par_par_g_par_x_par_p = par_y_par_p(2:end, 2 : 1+num_constr);
 
-        % fixme these are just placeholder zeros
-        num_constr_lin = 6;
-        par_g_lin_par_p = zeros(1,num_constr_lin);
-        par_par_g_lin_par_x_par_p = zeros(length(x0)-1,num_constr_lin);
+        % linear sensitivities (analytical)
+        [~, ~, dAdp, dbdp] = lin_ineq_constraints(p, param_name);
+        num_constr_lin = size(dAdp,1);
+        num_DVs_constr_lin = size(dAdp,2);
+        par_g_lin_par_p = dAdp * x0(1:num_DVs_constr_lin) - dbdp; % zeros(1,num_constr_lin);
+        par_par_g_lin_par_x_par_p = zeros(length(x0)-1, num_constr_lin);
+        par_par_g_lin_par_x_par_p(1:num_DVs_constr_lin,:) = dAdp.';
 end
 
 function y = get_sim_outputs_and_derivs(obj,p,param_name,param_value,x0)

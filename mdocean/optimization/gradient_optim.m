@@ -71,36 +71,26 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_bot
     obj_names = {'LCOE','P_var'};
     probs = cell([1 2]); 
     
+    % allocate outputs
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
     grads = zeros(length(X)-1,num_objectives);
     hesses = zeros(length(X)-1,length(X)-1,num_objectives);
 
-    % add constraints
+    % add nonlinear constraints
     prob = optimproblem();
     for i = 1:num_constraints
         name = b.constraint_names{i};
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    D_s   = X(1);     % inner diameter of float (m)
-    D_f   = X(2);     % normalized diameter of spar column (-)
-    T_f_2 = X(3);     % normalized draft of float (-)
-    h_s   = X(4);     % normalized draft of spar (-)
-
-    T_s = D_s * p.T_s_over_D_s;
-    h_f = T_f_2 / p.T_f_2_over_h_f;
-    D_d = p.D_d_over_D_s * D_s;
-    D_f_in = D_s * p.D_f_in_over_D_s;
-
-    MEEM = pi*p.harmonics / (p.besseli_argmax*2);
-    prob.Constraints.linear_spar_natural_freq = D_d >= p.D_d_min;
-    prob.Constraints.linear_float_spar_diam = D_f_in <= D_f - .01;
-    prob.Constraints.linear_float_spar_draft = T_f_2 <= T_s - .01;
-    prob.Constraints.linear_float_spar_tops = h_s - T_s >= h_f - T_f_2 + .01;
-    prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= MEEM * D_f; % M
-    prob.Constraints.linear_spar_seafloor = p.h - T_s >= MEEM * D_s; % N
+    % add linear constraints
+    [A_lin,b_lin] = lin_ineq_constraints(p);
+    for i=1:length(b_lin)
+        name = b.lin_constraint_names{i};
+        prob.Constraints.(name) = A_lin(i,:)*X(1:4).' <= b_lin(i);
+    end
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
