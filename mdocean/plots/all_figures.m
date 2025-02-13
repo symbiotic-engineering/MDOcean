@@ -182,12 +182,23 @@ if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5 
     % fixme: 28 not implemented
 end
 
+%% figure 30 - fixme not implemented
+fig_names{30} = 'Fig. 30: XXX';
+if any(which_figs == 30)
+    fig_output(which_figs==30) = figure;
+end
+
 %% figure 31 - asymptotic b vector
 fig_names{31} = 'Fig. 31: asymptotic b vector';
 if any(which_figs == 31)
     b_Inf
     fig31 = gcf;
     fig_output(which_figs==31) = fig31;
+end
+
+%% figure 32-36 - fixme not implemented
+if any( ismember(which_figs, 32:36) )
+    fig_output(ismember(which_figs, 32:36)) = figure;
 end
 
 %% figure 37 - damping plate moment
@@ -198,8 +209,7 @@ if any(which_figs == 37)
     fig_output(which_figs==37) = fig37;
 end
 
-
-% fixme: 30 to 46 not implemented
+% fixme: 38 to 46 not implemented
 
 %% table 12 - validation table
 tab_names{1} = 'Tab. 12: validation against nominal';
