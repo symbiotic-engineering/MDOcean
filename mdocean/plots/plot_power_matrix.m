@@ -8,62 +8,75 @@ P_matrix = P_matrix / 1e3; % convert W to kW
 [T,Hs] = meshgrid(p.T,p.Hs);
 figure
 
-% subplot(1,3,1)
-% contourf(T,Hs,P_matrix);
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
-% title('Power (kW)')
-% colorbar
-% 
-% subplot(1,3,2)
-% contourf(T,Hs,p.JPD)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
-% title('Probability (%)')
-% colorbar
-% 
-% subplot(1,3,3)
-% contourf(T,Hs,P_matrix .* p.JPD/100)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
-% title('Weighted Power (kW)')
-% colorbar
-
-subplot(1,5,1)
+subplot(2,5,1)
+sub_one=subplot(251)
+sub_one.Position=[0.07, 0.6039, 0.2, 0.3068];
 contourf(T,Hs,P_wave);
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Raw Wave Power Density (W/m)','FontSize',12)
 colorbar
 
-subplot(1,5,2)
+subplot(2,5,2)
+sub_two=subplot(252);
+sub_two.Position=[0.2928, 0.5838, 0.05, 0.3412];
+text(0.5,0.5,'x','FontSize',24)
+axis off
+
+subplot(2,5,3)
+sub_three=subplot(253);
+sub_three.Position=[0.4156, 0.5838, 0.2, 0.3412];
 contourf(T,Hs,CW_over_CW_max)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Device Capture Efficiency','FontSize',12)
 colorbar
 
-subplot(1,5,3)
+subplot(2,5,4)
+sub_four=subplot(254);
+sub_four.Position=[0.6484, 0.5838, 0.05, 0.3412];
+text(0.5,0.5,'x','FontSize',24)
+axis off
+
+subplot(2,5,5)
+sub_five=subplot(255);
+sub_five.Position=[0.7713, 0.5838, 0.2, 0.3412];
 contourf(T,Hs,CW_max)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Radiation Capture Width Limit (m)','FontSize',12)
 colorbar
 
-subplot(1,5,4)
+subplot(2,5,6)
+sub_six=subplot(256);
+sub_six.Position=[0.12, 0.1100, 0.05, 0.3412];
+text(0.5,0.5,'x','FontSize',24)
+axis off
+
+subplot(2,5,7)
+sub_seven=subplot(257);
+sub_seven.Position=[0.2628, 0.1100, 0.2, 0.3412];
 contourf(T,Hs,p.JPD)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Probability at Site (%)','FontSize',12)
 colorbar
 
-subplot(1,5,5)
+subplot(2,5,8)
+sub_eight=subplot(258);
+sub_eight.Position=[0.5056, 0.1100, 0.05, 0.3412];
+text(0.5,0.5,'=','FontSize',24)
+axis off
+
+subplot(2,5,9)
+sub_nine=subplot(259);
+sub_nine.Position=[0.6684, 0.1100, 0.2, 0.3412];
 contourf(T,Hs,P_wave .* CW_over_CW_max .* CW_max .* p.JPD)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Weighted Power (W)','FontSize',12)
 colorbar
 
-%improvePlot
+improvePlot
 
 end
