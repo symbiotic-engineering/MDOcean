@@ -9,6 +9,9 @@ function pareto_curve_heuristics()
     d=dir("**/pareto_search_results*");
     load(d(end).name)
 
+    %delete later
+    p=p0;
+
     if ~isequaln(p,p0)
         warning(['You are loading results with different parameters than your ' ...
             'local machine right now. WecSim validation results (p_w) may be incorrect.'])
@@ -20,7 +23,7 @@ function pareto_curve_heuristics()
 
     new_objs = true; % switch between LCOE-Pvar and capex-Pavg
 
-    constraint_active_plot(residuals,fval,tol,b,new_objs);
+    %constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function

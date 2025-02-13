@@ -19,18 +19,25 @@ if strcmp(DOE_strategy,'sample')
           2*pi/7 2*pi/8 2*pi/9
         ];	
 elseif strcmp(DOE_strategy,'bounds')
-    X = [ b.D_f_nom, linspace(b.D_f_min, b.D_f_max, n);
-          b.D_s_ratio_nom, linspace(b.D_s_ratio_min, b.D_s_ratio_max, n);
-          b.h_f_ratio_nom, linspace(b.h_f_ratio_min, b.h_f_ratio_max, n);
-          b.T_s_ratio_nom, linspace(b.T_s_ratio_min, b.T_s_ratio_max, n);
-          b.F_max_nom, linspace(b.F_max_min, b.F_max_max, n);
-          b.B_p_nom, linspace(b.B_p_min, b.B_p_max, n);
-          b.w_n_nom, linspace(b.w_n_min, b.w_n_max, n) ];
+    %X = [ b.D_f_nom, linspace(b.D_f_min, b.D_f_max, n);
+    %      b.D_s_ratio_nom, linspace(b.D_s_ratio_min, b.D_s_ratio_max, n);
+    %      b.h_f_ratio_nom, linspace(b.h_f_ratio_min, b.h_f_ratio_max, n);
+    %      b.T_s_ratio_nom, linspace(b.T_s_ratio_min, b.T_s_ratio_max, n);
+    %      b.F_max_nom, linspace(b.F_max_min, b.F_max_max, n);
+    %      b.B_p_nom, linspace(b.B_p_min, b.B_p_max, n);
+    %      b.w_n_nom, linspace(b.w_n_min, b.w_n_max, n) ];
+    
+    X=zeros(length(b.X_noms),2);
+    for i = 1:length(b.X_mins)
+        X(i,1)=b.X_noms(i);
+        X(i,1)=linspace(b.X_mins(i),b.X_maxs(i),n);
+    end
+
     ratios = X./X(:,1);
 elseif strcmp(DOE_strategy,'ratios')
     ratios = logspace(log10(1/3),log10(3),n);
     ratios = [1, ratios(ratios~=1)];
-    X =  [b.D_f_nom b.D_s_ratio_nom b.h_f_ratio_nom b.T_s_ratio_nom b.F_max_nom b.B_p_nom b.w_n_nom b.M_nom]' * ratios;
+    X =  [b.X_noms; b.M_nom] * ratios;
 end
 
 X_nom = X(:,1);	
@@ -40,7 +47,7 @@ num_vals_per_var = design_size(2);
 num_vals_swept = num_vals_per_var - 1; % don't sweep 1st value of each variable (corresponding to ratio 1)
 
 % don't sweep material
-idx_material = 8;
+idx_material = 15;
 X(idx_material,:) = b.M_nom * ones(1,n+1);
 num_vars_swept = num_vars - 1;
 
@@ -69,8 +76,6 @@ for i = 1:num_vars_swept
                 [LCOE_temp, P_var_temp, P_matrix, g, val] = simulation(X_in,p);
 
                 % only add to results if first 12 constraints are feasible
-                g(13) = 0;
-                g(14) = 0;
                 [feasible, which_failed] = is_feasible(g, X_in, p, b);
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	

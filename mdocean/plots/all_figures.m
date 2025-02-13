@@ -205,7 +205,8 @@ end
 fig_names{37} = 'Fig. 37: damping plate moment';
 if any(which_figs == 37)
     BoedoPrantilAnnularPlate()
-    fig37 = gcf;
+    fig37_temp = gcf;
+    fig37=figure(fig37_temp.Number-2);
     fig_output(which_figs==37) = fig37;
 end
 
