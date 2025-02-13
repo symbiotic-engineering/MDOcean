@@ -37,7 +37,7 @@ elseif strcmp(DOE_strategy,'bounds')
 elseif strcmp(DOE_strategy,'ratios')
     ratios = logspace(log10(1/3),log10(3),n);
     ratios = [1, ratios(ratios~=1)];
-    X =  [b.X_noms; b.M_nom] * ratios;
+    X =  [b.X_noms] * ratios;
 end
 
 X_nom = X(:,1);	
@@ -73,7 +73,7 @@ for i = 1:num_vars_swept
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, P_var_temp, P_matrix, g, val] = simulation(X_in,p);
+                [LCOE_temp, P_var_temp, P_matrix, g, val] = simulation([X_in;b.M_nom],p);
 
                 % only add to results if first 12 constraints are feasible
                 [feasible, which_failed] = is_feasible(g, X_in, p, b);
@@ -93,7 +93,7 @@ for i = 1:num_vars_swept
 end	
 
 % create table for display	
-results = array2table(X_ins, 'VariableNames', b.var_names);	
+results = array2table(X_ins, 'VariableNames', b.var_names(1:end-1));	
 LCOE = LCOE';
 P_var = P_var';
 results = addvars(results, round(LCOE(LCOE~=Inf),2), round(P_var(P_var~=Inf),1), failed, ...
