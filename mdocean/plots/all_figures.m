@@ -210,7 +210,10 @@ if any(which_figs == 37)
     fig_output(which_figs==37) = fig37;
 end
 
-% fixme: 38 to 46 not implemented
+% fixme: 38 to 46 not implemented, but still name the figures
+empty_idx = cellfun(@isempty,fig_names);
+empty_str = strcat('Fig._', string(find(empty_idx)));
+[fig_names{empty_idx}] = deal(empty_str{:});
 
 %% table 12 - validation table
 tab_names{1} = 'Tab. 12: validation against nominal';
