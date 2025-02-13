@@ -61,8 +61,8 @@ else
     set(gcf, 'Color', 'white');
 end
 grid on
-ylim([-40 35])
-xlim([-20 20])
+ylim([-40 12])
+xlim([-27 27])
 set(waves,'HandleVisibility','off')
 
 end
@@ -81,5 +81,5 @@ end
 function trapezoid(base_1,base_2,y_1,y_2,color)
     x = [-base_1/2, base_1/2, base_2/2, -base_2/2, -base_1/2];
     y = [y_1 y_1 y_2 y_2 y_1];
-    plot(x,y,'LineWidth',3,'Color',color)
+    plot(x,y,'LineWidth',3,'Color',color,'HandleVisibility','off')
 end

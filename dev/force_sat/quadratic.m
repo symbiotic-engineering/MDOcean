@@ -68,7 +68,8 @@ matrix = matrix ./ bases;
 matrix = simplify(matrix,'IgnoreAnalyticConstraints',true)
 
 latex(matrix)
-bases_rk = bases .* [r_k^2, r_k^2*r_b, r_k^2*r_b^2, r_k*r_b^2, r_b^2];
+rkb = [r_k^2, r_k^2*r_b, r_k^2*r_b^2, r_k*r_b^2, r_b^2];
+bases_rk = bases .* rkb;
 pretty(bases_rk')
 latex(bases_rk)
 
@@ -76,6 +77,51 @@ latex(bases_rk)
 eqn_m_1 = sum(quad) == 0;
 soln_f = solve(eqn_m_1,f);
 assert(soln_f == 1)
+
+%% replace rk with other variables
+% notebook p97 2-1-25
+syms omega_u_star zeta_u star real positive
+
+rk_new = star^2/(star^2-1);
+rb_new = 1/(1-zeta_u/(zeta*star));
+w_rat_new = omega_u_star / star;
+
+rkb_new = subs(rkb,[r_k,r_b],[rk_new, rb_new]);
+pretty(rkb_new.')
+bases_new = subs(bases,w_ratio,w_rat_new);
+bases_rk_new = bases_new .* rkb_new;
+scale = (star^2-1)^2 * (star*zeta)^-2 * (zeta_u - star*zeta)^2;
+pretty(simplify(bases_rk_new.' * scale,'IgnoreAnalyticConstraints',true))
+
+%% check that parameterization used in paper equals "new" just above
+% notebook p99 2-1-25
+matrix_check = [-4  4/f^2 1/f^2 -1  0  0;
+                 8  0     0      2  8  2;
+                -4 -4    -1     -1 -8 -2];
+bases_unsquared_check = [omega_u_star * (zeta_u - star*zeta),...
+                         omega_u_star*star*zeta,...
+                         omega_u_star^2 - star^2,...
+                         star^2-1];
+bases_squared_check = [bases_unsquared_check(1)^2;...
+                       bases_unsquared_check(2)^2;...
+                       bases_unsquared_check(3)^2;...
+                       bases_unsquared_check(4)^2;...
+                       bases_unsquared_check(1)*bases_unsquared_check(2);...
+                       bases_unsquared_check(3)*bases_unsquared_check(4)];
+
+bases_should_match = [bases_unsquared_check(1)^2;... % a^2
+                     -bases_unsquared_check(1) * bases_unsquared_check(2);... % -ab
+                      bases_unsquared_check(3)^2 + 4*bases_unsquared_check(2)^2;... % c^2+4b^2
+                      bases_unsquared_check(3) * bases_unsquared_check(4);... % cd
+                      bases_unsquared_check(4)^2]; % d^2
+
+should_be_1 = simplify( bases_should_match ./ (bases_rk_new.' * scale) )
+assert(all(should_be_1 == 1))
+
+%% and check that it equals the original (r_k, r_b, quad)
+quad_new = subs(quad,[r_k,r_b,w_ratio],[rk_new,rb_new,w_rat_new]);
+should_be_1_also = simplify( quad_new.' ./ (matrix_check*bases_squared_check/scale) )
+assert(all(should_be_1_also == 1))
 
 %% optimal powertrain case
 bases_rk = subs(bases_rk,{w_ratio,r_b},{1,2}).';
