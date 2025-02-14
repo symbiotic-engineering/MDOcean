@@ -40,11 +40,15 @@ function [] = param_sweep(filename_uuid)
                                                                     lambdas, grads, hesses, num_constr);
     toc
     
-    disp('done local, startng global param sensitivity')
+    %% Obtain global sensitivity
+    disp('done local, starting global param sensitivity')
+    tic
     [par_x_star_par_p_global, dJstar_dp_global, ...
         delta_p_change_activity_global] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, p, b, colors, groups);
+    toc
 
-    dJdp_combined = [par_J_par_p_local dJdp_local dJstar_dp_local dJstar_dp_global.'];
+    %% Post processing
+    dJdp_combined = [par_J_par_p_local dJdp_local dJstar_dp_local dJstar_dp_global];
     dJdp_names = {'local partial','local total linear','local total quadratic','global'};
 
     % normalization
@@ -65,7 +69,6 @@ function [] = param_sweep(filename_uuid)
     delta_p_plot(delta_p_local_normalized,  b, dvar_names, param_names)
     delta_p_plot(delta_p_global_normalized, b, dvar_names, param_names)
 
-    % bar chart plots
 end
 
 function delta_p_plot(delta_p_norm,b,dvar_names,param_names)
@@ -109,7 +112,8 @@ end
 %% Rerun optimization for global sensitivities
 function [par_x_star_par_p_global, ...
           dJstar_dp_global, ...
-          delta_p_change_activity_global] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, p, b, colors, groups)
+          delta_p_change_activity_global,...
+          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
     ratios = [.9 .95 1 1.05 1.1];
     num_DVs = size(x0_vec,1)-1;
@@ -120,9 +124,10 @@ function [par_x_star_par_p_global, ...
 
     for i=1:length(params)
         param_name = params{i};
-    
         [LCOE(i,:),  X_LCOE(i,:,:), ...
-         P_var(i,:), X_Pvar(i,:,:)] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs);
+         g_LCOE(i,:,:),lambda_LCOE(i,:),...
+         P_var(i,:), X_Pvar(i,:,:),...
+         g_Pvar(i,:,:),lambda_Pvar(i,:)] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs);
     
     end
     
@@ -146,7 +151,6 @@ function [par_x_star_par_p_global, ...
             'abs(ratios-1) in param_sweep.'])
     end
     
-    %% Plot each sensitivity
     col_nom = find(ratios==1);
     LCOE_nom = LCOE(1,col_nom);
     Pvar_nom = P_var(1,col_nom);
@@ -155,6 +159,34 @@ function [par_x_star_par_p_global, ...
     X_LCOE_nom = X_LCOE_nom(:);
     X_Pvar_nom = X_Pvar_nom(:);
     
+    %% Calculate objective sensitivities
+    
+    slope_LCOE = get_slope(LCOE, ratios);
+    slope_Pvar = get_slope(P_var, ratios);
+    
+    slope_LCOE_norm = slope_LCOE / LCOE_nom; % normalize
+    slope_Pvar_norm = slope_Pvar / Pvar_nom;
+
+    if all(~isfinite(slope_LCOE),'all') || all(~isfinite(slope_Pvar),'all')
+        msg = ['All slopes are NaN, meaning all optimizations failed. ' ...
+            'This might be because no feasible solution can be found. ' ...
+            'slope_LCOE = ', num2str(slope_LCOE), ' and slope_Pvar = ', num2str(slope_Pvar)];
+        error(msg)
+    end
+    
+    %% Calculate design variable sensitivities
+    slope_X_LCOE = get_slope(X_LCOE, ratios);
+    slope_X_Pvar = get_slope(X_Pvar, ratios);
+    
+    slope_X_LCOE_norm  = slope_X_LCOE ./ X_LCOE_nom.'; % normalize
+    slope_X_Pvar_norm  = slope_X_Pvar ./ X_Pvar_nom.';
+    
+    %% assign outputs - fixme ignoring slope_Pvar for now
+    dJstar_dp_global = slope_LCOE;
+    par_x_star_par_p_global = slope_X_LCOE_norm; %zeros(length(params),num_DVs);
+    delta_p_change_activity_global = zeros(length(params),233+6+2*14); % fixme
+
+    %% Line plots showing nonlinearity
     figure(1)
     subplot 121
     plot(ratios,LCOE/LCOE_nom)
@@ -192,51 +224,20 @@ function [par_x_star_par_p_global, ...
         grid on
     end
     legend(param_names)
-    
-    %% Tornado chart for overall slope - objective sensitivities
-    
-    slope_LCOE = get_slope(LCOE, ratios);
-    slope_Pvar = get_slope(P_var, ratios);
-    
-    slope_LCOE_norm = slope_LCOE / LCOE_nom; % normalize
-    slope_Pvar_norm = slope_Pvar / Pvar_nom;
 
-    if all(~isfinite(slope_LCOE),'all') || all(~isfinite(slope_Pvar),'all')
-        msg = ['All slopes are NaN, meaning all optimizations failed. ' ...
-            'This might be because no feasible solution can be found. ' ...
-            'slope_LCOE = ', num2str(slope_LCOE), ' and slope_Pvar = ', num2str(slope_Pvar)];
-        error(msg)
+    %% Tornado chart for overall slope
+    sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
+    
+    % separate charts for each design variable
+    for i=1:num_DVs
+        sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
+                                param_names, colors, groups, ['dx*/dp - ' dvar_names{i}]);
     end
-    
-    sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups)
-    
-    %% assign outputs - fixme ignoring slope_Pvar for now
-    dJstar_dp_global = slope_LCOE;
-    par_x_star_par_p_global = zeros(length(params),num_DVs); % fixme zero
-    delta_p_change_activity_global = zeros(length(params),233+6+2*14);
 
-    %% Tornado chart for overall slope - X* sensitivities
-    
-    % fixme: these slopes are incorrect, the dimensions are off!
-    % slope_X_LCOE = get_slope(X_LCOE, ratios, X_LCOE_nom);
-    % slope_X_Pvar = get_slope(X_Pvar, ratios, X_Pvar_nom);
-    % 
-    % %slope_X_LCOE = (X_LCOE(:,end) - X_LCOE(:,1))./X_LCOE_nom;
-    % %slope_X_Pvar = (X_Pvar(:,end) - X_Pvar(:,1))./X_Pvar_nom;
-    % 
-    % % separate charts for each design variable, both objectives on same chart
-    % figure
-    % for i=1:num_DVs
-    %     subplot(2,4,i)
-    %     barh(categorical(param_names),[slope_X_LCOE(i,:);slope_X_Pvar(i,:)])
-    %     title(dvar_names{i})
-    %     improvePlot
-    % end
-    % legend('LCOE','c_v')
 end
 
 
-function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups)
+function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
 
     [~,LCOE_sort_idx] = sort(abs(slope_LCOE),'MissingPlacement','first');
     [~,Pvar_sort_idx] = sort(abs(slope_Pvar),'MissingPlacement','first');
@@ -264,7 +265,7 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     xlim([-1 1] + fix(imrange(slope_Pvar)))
     set(gca,'YGrid','on','XGrid','on')
     title('c_v')
-    sgtitle('Normalized Sensitivities')
+    sgtitle(['Normalized Sensitivities: ' extra_title])
     
     % legend
     [~,first_idx] = ismember(categories(groups),groups);
@@ -277,61 +278,109 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     set(ax,'FontSize',14)
     
     % both objectives on the same chart
-    figure
-    barh(categorical(param_names),[slope_LCOE; slope_Pvar])
-    legend('LCOE','P_{var}')
-    title('Sensitivities')
-    improvePlot
-    set(gca, 'FontSize', 12)
-    set(ax,'FontSize',12)
-    set(gca,'YGrid','on','XGrid','on')
+%     figure
+%     barh(categorical(param_names),[slope_LCOE, slope_Pvar])
+%     legend('LCOE','P_{var}')
+%     title(['Normalized Sensitivities' extra_title])
+%     improvePlot
+%     set(gca, 'FontSize', 12)
+%     set(ax,'FontSize',12)
+%     set(gca,'YGrid','on','XGrid','on')
 end
 
-function slope = get_slope(y_result, x)
-    result_for_nans = y_result(:,:,1); % deal with case where ndims(result) > 2
+function slope = get_slope(y, x)
+    % y is a 2D (ie J*) or 3D (ie X*) array, and x is a 1D vector (ie ratios), 
+    % then slope is similar to
+    % (y(:,end,:) - y(:,1,:) ./ (x(end) - x(1))
+    % but if y contains NaNs at those indices, then more inner indices are used.
+
+    assert(size(x,2) == size(y,2))
+    assert(ndims(y) <= 3)
+    assert(size(x,1) == 1)
+    x = x.'; % make row vector into col vector so indexing below works
+
+    y_for_nans = y(:,:,1); % deal with case where ndims(y) > 2 - this works
+    % because the presence of a NaN for 3D input (X*) is determined by the first two indices only
 
     % if there are no NaNs, idx_first will be all ones and idx_last will be
     % all size(result,2). Below calculates correct indices when there are NaNs.
-    [~,col_first] = max( ~isnan(result_for_nans), [], 2);
-    flipped = flip(result_for_nans,2);
-    [~,col_last_flipped] = max( ~isnan(flipped), [], 2);
-    col_last = size(y_result,2) + 1 - col_last_flipped;
+    [~,sub_dim2_first] = max( ~isnan(y_for_nans), [], 2);
+    flipped = flip(y_for_nans,2);
+    [~,sub_dim2_last_flipped] = max( ~isnan(flipped), [], 2);
+    sub_dim2_last = size(y,2) + 1 - sub_dim2_last_flipped;
+    [sub_dim1, sub_dim3] = meshgrid(1:size(y,1), 1:size(y,3));
+    sub_dim2_first = repmat(sub_dim2_first,[1 size(y,3)]);
+    sub_dim2_last  = repmat(sub_dim2_last, [1 size(y,3)]);
+    idx_first = sub2ind(size(y), sub_dim1.', sub_dim2_first, sub_dim3.');
+    idx_last  = sub2ind(size(y), sub_dim1.', sub_dim2_last,  sub_dim3.');
 
-    idx_first = sub2ind(size(y_result), 1:size(y_result,1), col_first');
-    idx_last  = sub2ind(size(y_result), 1:size(y_result,1), col_last');
-
-    y_first = y_result(idx_first);
-    y_last = y_result(idx_last);
-    x_first = x(col_first);
-    x_last = x(col_last);
+    % using idx_first and idx_last, calculate slope
+    y_first = y(idx_first);
+    y_last = y(idx_last);
+    x_first = x(sub_dim2_first);
+    x_last = x(sub_dim2_last);
     slope = (y_last - y_first) ./ (x_last - x_first);
     
 end
 
-function [LCOE, X_LCOE, P_var, X_Pvar] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs)
-% Brute force parameter sensitivity sweep (reoptimize for each param value)
+function [LCOE, X_LCOE, g_LCOE, lambda_LCOE, ...
+         P_var, X_Pvar, g_Pvar, lambda_Pvar] = global_sens_reoptimize(x0, p, b, ...
+                                                                    param_name, ratios, num_DVs)
+    % Brute force parameter sensitivity sweep (reoptimize for each param value)
+
+    num_constr = length(b.constraint_names);
 
     [LCOE,P_var] = deal(zeros(1,length(ratios)));
     [X_LCOE,X_Pvar] = deal(zeros(length(ratios),num_DVs));
+    [g_LCOE,g_Pvar] = deal(zeros(length(ratios),num_constr));
+    [lambda_LCOE,lambda_Pvar] = deal(struct());
+     
 
     var_nom = p.(param_name);
+
+    dry_run = true;
 
     for j=1:length(ratios)
         if ratios(j) ~=1   
             p.(param_name) = ratios(j) * var_nom;
-            %[Xs_opt, obj_opt, flag] = gradient_optim(x0,p,b);
-            [Xs_opt, obj_opt, flag] = deal(rand(num_DVs,2),rand(2,1),[1 1]); %dry run
+            if dry_run
+                [Xs_opt, obj_opt, flag] = deal(rand(num_DVs+1,2),rand(2,1),[1 1]); %dry run
+                lambdas = struct('ineqnonlin',rand(num_constr,1),...
+                   'ineqlin',rand(length(b.lin_constraint_names),1),...
+                   'lower',rand(num_DVs,1),...
+                   'upper',rand(num_DVs,1));
+                lambdas(2) = lambdas;
+                g_LCOE_tmp = rand(num_constr,1);
+                g_Pvar_tmp = rand(num_constr,1);
+            else
+                [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,p,b);
+                [~,~,~,g_LCOE_tmp] = simulation(Xs_opt(:,1),p);
+                [~,~,~,g_Pvar_tmp] = simulation(Xs_opt(:,2),p);
+            end
+            
             if flag(1) >= 1
                 LCOE(j) = obj_opt(1);
-                X_LCOE(j,:) = Xs_opt(:,1);
+                X_LCOE(j,:) = Xs_opt(1:end-1,1);
+                g_LCOE(j,:) = g_LCOE_tmp;
+                if j==1
+                    lambda_LCOE = lambdas(1);
+                else
+                    lambda_LCOE(j) = lambdas(1);
+                end
             else
-                [X_LCOE(j,:),LCOE(j)] = deal(NaN);
+                [X_LCOE(j,:),LCOE(j),g_LCOE(j,:)] = deal(NaN);
             end
             if flag(2) >= 1
                 P_var(j) = obj_opt(2);
-                X_Pvar(j,:)= Xs_opt(:,2); 
+                X_Pvar(j,:)= Xs_opt(1:end-1,2); 
+                g_Pvar(j,:) = g_Pvar_tmp;
+                if j==1
+                    lambda_Pvar = lambdas(2);
+                else
+                    lambda_Pvar(j) = lambdas(2);
+                end
             else
-                [X_Pvar(j,:), P_var(j)] = deal(NaN);
+                [X_Pvar(j,:), P_var(j),g_Pvar(j,:)] = deal(NaN);
             end
         end
     end   
