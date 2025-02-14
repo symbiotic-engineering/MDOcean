@@ -16,19 +16,12 @@ function [] = param_sweep(filename_uuid)
     color_groupings = {'b','g','r','k','y'};
     colors = color_groupings(groups);
     
-    
     %%
     % use the optimal x as x0 to speed up the sweeps
     % and obtain gradients
     x0 = b.X_start_struct;
-    bypass = true; % read single obj optim results from file to speed up debugging
-    if bypass
-        load('gradient_optim_021225.mat')
-    else
-        [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
-    end
+    [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
     
-    num_DVs = length(dvar_names);
     num_constr = length(b.constraint_names);
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
@@ -66,15 +59,15 @@ function [] = param_sweep(filename_uuid)
     sensitivity_plot(dJdp_normalized, 'dJ/dp normalized', param_names, dJdp_names, ...
         'Parameters p', 'Type of Sensitivity')
     
-    dxdp_plot(dxdp_local_normalized,  param_names, dvar_names)
-    dxdp_plot(dxdp_global_normalized, param_names, dvar_names)
+    dxdp_plot(dxdp_local_normalized,  param_names, dvar_names, 'local')
+    dxdp_plot(dxdp_global_normalized, param_names, dvar_names, 'global')
     
-    delta_p_plot(delta_p_local_normalized,  b, dvar_names, param_names)
-    delta_p_plot(delta_p_global_normalized, b, dvar_names, param_names)
+    delta_p_plot(delta_p_local_normalized,  b, dvar_names, param_names, 'local')
+    delta_p_plot(delta_p_global_normalized, b, dvar_names, param_names, 'global')
 
 end
 
-function delta_p_plot(delta_p_norm,b,dvar_names,param_names)
+function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
     constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty dvar_names dvar_names];
     idx_slam = contains(constr_names,'Slamming');
     delta_p_norm_combine_slamming = delta_p_norm(:,~idx_slam);
@@ -83,17 +76,16 @@ function delta_p_plot(delta_p_norm,b,dvar_names,param_names)
     idx_delta_p_slam = sub2ind(size(delta_p_norm_slam),1:length(param_names),idx_delta_p_slam');
     delta_p_norm_combine_slamming(:,end+1) = delta_p_norm_slam(idx_delta_p_slam);
     
-    titl = 'Normalized delta p to change constraint activity';
+    titl = ['Normalized delta p to change constraint activity: ' title_suffix];
     xticks = [constr_names(~idx_slam),'Slamming'];
     yticks = param_names;
     xlab = 'Constraints';
     ylab = 'Parameters';
     sensitivity_plot(delta_p_norm_combine_slamming, titl, xticks, yticks, xlab, ylab)
-    
 end
 
-function dxdp_plot(dxdp, param_names, dvar_names)
-    titl = 'dx*/dp normalized';
+function dxdp_plot(dxdp, param_names, dvar_names,title_suffix)
+    titl = ['dx*/dp normalized: ' title_suffix];
     xticks = param_names;
     yticks = dvar_names;
     xlab = 'Parameters p';
@@ -103,13 +95,18 @@ end
 
 function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
     color_each_element(matrix)
+    ax = gca;
     title(titl)
-    set(gca,'XTickLabel',xticks)
-    set(gca,'YTickLabel',yticks)
+    set(ax,'XTickLabel',xticks)
+    set(ax,'YTickLabel',yticks)
     clim([-10 10])
     colormap(bluewhitered)
     xlabel(xlab)
     ylabel(ylab)
+    improvePlot
+    set(ax,'XTickLabelRotation', 60)
+    ax.XAxis.FontSize = 14;
+    set(gcf,'Position',[1 41 1536 8448]) % full screen
 end
 
 %% Rerun optimization for global sensitivities
@@ -221,9 +218,10 @@ function [par_x_star_par_p_global, ...
     legend(param_names)
     improvePlot
     grid on
+    set(gcf,'Position',[1 41 1536 8448]) % full screen
     
     for i = 1:num_DVs
-        figure(2)
+        f2 = figure(2);
         subplot(3,5,i)
         plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
         xlabel ('Parameter ratio from nominal')
@@ -232,7 +230,7 @@ function [par_x_star_par_p_global, ...
         %improvePlot
         grid on
         
-        figure(3)
+        f3 = figure(3);
         subplot(3,5,i)
         plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
         xlabel ('Parameter ratio from nominal')
@@ -242,6 +240,8 @@ function [par_x_star_par_p_global, ...
         grid on
     end
     legend(param_names)
+    set(f2,'Position',[1 41 1536 8448]) % full screen
+    set(f3,'Position',[1 41 1536 8448]) % full screen
 
     %% Tornado chart for overall slope
     sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
@@ -294,6 +294,7 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     improvePlot
     set(gca, 'FontSize', 14)
     set(ax,'FontSize',14)
+    set(gcf,"Position",[1.8 41.8 698.2 836.8])
     
     % both objectives on the same chart
 %     figure
@@ -352,7 +353,7 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
 
     var_nom = p.(param_name);
 
-    dry_run = true; % true means use random numbers, false means actual optimization
+    dry_run = false; % true means use random numbers, false means actual optimization
 
     for j=1:length(ratios)
         if ratios(j) ~=1   
