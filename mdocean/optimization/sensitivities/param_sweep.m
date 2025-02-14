@@ -1,6 +1,7 @@
 function [] = param_sweep(filename_uuid)
 
     %% Setup
+    close all
     b = var_bounds();
     if nargin>0
         b.filename_uuid = filename_uuid;
@@ -29,6 +30,8 @@ function [] = param_sweep(filename_uuid)
     
     num_DVs = length(dvar_names);
     num_constr = length(b.constraint_names);
+    g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
+    g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
     
     %% Obtain local sensitivity 
     disp('done optimizing, starting local param sensitivity')
@@ -44,7 +47,7 @@ function [] = param_sweep(filename_uuid)
     disp('done local, starting global param sensitivity')
     tic
     [par_x_star_par_p_global, dJstar_dp_global, ...
-        delta_p_change_activity_global] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, p, b, colors, groups);
+        delta_p_change_activity_global] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, g_lambda_0, p, b, colors, groups);
     toc
 
     %% Post processing
@@ -113,31 +116,39 @@ end
 function [par_x_star_par_p_global, ...
           dJstar_dp_global, ...
           delta_p_change_activity_global,...
-          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, p, b, colors, groups)
+          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, ...
+                                                               x0_vec, dvar_names, J0, g_lambda_0, ...
+                                                               p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
     ratios = [.9 .95 1 1.05 1.1];
     num_DVs = size(x0_vec,1)-1;
+    num_constr = length(b.constraint_names) + length(b.lin_constraint_names) + 2*num_DVs;
     
     [LCOE, P_var]    = deal(zeros(length(params), length(ratios)));
     [X_LCOE, X_Pvar] = deal(zeros(length(params), length(ratios), num_DVs));
+    [g_lambda_LCOE, g_lambda_Pvar] = deal(zeros(length(params), length(ratios), num_constr));
     x0 = cell2struct(num2cell(x0_vec),b.var_names',1);
 
     for i=1:length(params)
         param_name = params{i};
         [LCOE(i,:),  X_LCOE(i,:,:), ...
-         g_LCOE(i,:,:),lambda_LCOE(i,:),...
+         g_lambda_LCOE(i,:,:),...
          P_var(i,:), X_Pvar(i,:,:),...
-         g_Pvar(i,:,:),lambda_Pvar(i,:)] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs);
+         g_lambda_Pvar(i,:,:)] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs, num_constr);
     
     end
     
     % fill in ratios == 1 (left blank since same as initial)
     X_LCOE_0_3d = permute(repmat(x0_vec(1:end-1,1).',length(params),1,sum(ratios==1)),[1 3 2]);
     X_Pvar_0_3d = permute(repmat(x0_vec(1:end-1,2).',length(params),1,sum(ratios==1)),[1 3 2]);
+    g_lambda_LCOE_0_3d = permute(repmat(g_lambda_0(:,1).',length(params),1,sum(ratios==1)),[1 3 2]);
+    g_lambda_Pvar_0_3d = permute(repmat(g_lambda_0(:,2).',length(params),1,sum(ratios==1)),[1 3 2]);
     LCOE(:, ratios==1) = J0(1);
     P_var(:,ratios==1) = J0(2);
     X_LCOE(:,ratios==1,:) = X_LCOE_0_3d;
     X_Pvar(:,ratios==1,:) = X_Pvar_0_3d;
+    g_lambda_LCOE(:,ratios==1,:) = g_lambda_LCOE_0_3d;
+    g_lambda_Pvar(:,ratios==1,:) = g_lambda_Pvar_0_3d;
     
     % check if deltas too small, indicating potential finite precision error
     delta_x_LCOE = abs(X_LCOE - X_LCOE_0_3d(:,1,:));
@@ -151,13 +162,14 @@ function [par_x_star_par_p_global, ...
             'abs(ratios-1) in param_sweep.'])
     end
     
+    % info for optimal design with nominal parameter values (not nominal design)
     col_nom = find(ratios==1);
     LCOE_nom = LCOE(1,col_nom);
     Pvar_nom = P_var(1,col_nom);
-    X_LCOE_nom = X_LCOE(1,col_nom,:);
-    X_Pvar_nom = X_Pvar(1,col_nom,:);
-    X_LCOE_nom = X_LCOE_nom(:);
-    X_Pvar_nom = X_Pvar_nom(:);
+    X_LCOE_nom = squeeze(X_LCOE(1,col_nom,:));
+    X_Pvar_nom = squeeze(X_Pvar(1,col_nom,:));
+    g_lambda_LCOE_nom = squeeze(g_lambda_LCOE(1,col_nom,:)).';
+    g_lambda_Pvar_nom = squeeze(g_lambda_Pvar(1,col_nom,:)).';
     
     %% Calculate objective sensitivities
     
@@ -181,10 +193,16 @@ function [par_x_star_par_p_global, ...
     slope_X_LCOE_norm  = slope_X_LCOE ./ X_LCOE_nom.'; % normalize
     slope_X_Pvar_norm  = slope_X_Pvar ./ X_Pvar_nom.';
     
+    %% calculate lagrange multiplier and constraint sensitivities
+    dlambda_g_dp_LCOE = get_slope(g_lambda_LCOE, ratios);
+    dlambda_g_dp_Pvar = get_slope(g_lambda_Pvar, ratios);
+    delta_p_LCOE = -g_lambda_LCOE_nom ./ dlambda_g_dp_LCOE;
+    delta_p_Pvar = -g_lambda_Pvar_nom ./ dlambda_g_dp_Pvar;
+
     %% assign outputs - fixme ignoring slope_Pvar for now
     dJstar_dp_global = slope_LCOE;
     par_x_star_par_p_global = slope_X_LCOE_norm; %zeros(length(params),num_DVs);
-    delta_p_change_activity_global = zeros(length(params),233+6+2*14); % fixme
+    delta_p_change_activity_global = delta_p_LCOE; %zeros(length(params),233+6+2*14);
 
     %% Line plots showing nonlinearity
     figure(1)
@@ -323,67 +341,68 @@ function slope = get_slope(y, x)
     
 end
 
-function [LCOE, X_LCOE, g_LCOE, lambda_LCOE, ...
-         P_var, X_Pvar, g_Pvar, lambda_Pvar] = global_sens_reoptimize(x0, p, b, ...
-                                                                    param_name, ratios, num_DVs)
+function [LCOE, X_LCOE, g_lambda_LCOE, ...
+         P_var, X_Pvar, g_lambda_Pvar] = global_sens_reoptimize(x0, p, b, ...
+                                                                    param_name, ratios, num_DVs, num_constr)
     % Brute force parameter sensitivity sweep (reoptimize for each param value)
-
-    num_constr = length(b.constraint_names);
 
     [LCOE,P_var] = deal(zeros(1,length(ratios)));
     [X_LCOE,X_Pvar] = deal(zeros(length(ratios),num_DVs));
-    [g_LCOE,g_Pvar] = deal(zeros(length(ratios),num_constr));
-    [lambda_LCOE,lambda_Pvar] = deal(struct());
-     
+    [g_lambda_LCOE,g_lambda_Pvar] = deal(zeros(length(ratios),num_constr));
 
     var_nom = p.(param_name);
 
-    dry_run = true;
+    dry_run = true; % true means use random numbers, false means actual optimization
 
     for j=1:length(ratios)
         if ratios(j) ~=1   
             p.(param_name) = ratios(j) * var_nom;
             if dry_run
-                [Xs_opt, obj_opt, flag] = deal(rand(num_DVs+1,2),rand(2,1),[1 1]); %dry run
-                lambdas = struct('ineqnonlin',rand(num_constr,1),...
-                   'ineqlin',rand(length(b.lin_constraint_names),1),...
-                   'lower',rand(num_DVs,1),...
-                   'upper',rand(num_DVs,1));
-                lambdas(2) = lambdas;
-                g_LCOE_tmp = rand(num_constr,1);
-                g_Pvar_tmp = rand(num_constr,1);
+                [Xs_opt, obj_opt, flag] = deal(rand(num_DVs+1,2),rand(2,1),[1 1]);
+                g_lambda_LCOE_tmp = rand(num_constr,1);
+                g_lambda_Pvar_tmp = rand(num_constr,1);
             else
                 [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,p,b);
-                [~,~,~,g_LCOE_tmp] = simulation(Xs_opt(:,1),p);
-                [~,~,~,g_Pvar_tmp] = simulation(Xs_opt(:,2),p);
+                g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),p,b);
+                g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),p,b);
             end
             
             if flag(1) >= 1
                 LCOE(j) = obj_opt(1);
                 X_LCOE(j,:) = Xs_opt(1:end-1,1);
-                g_LCOE(j,:) = g_LCOE_tmp;
-                if j==1
-                    lambda_LCOE = lambdas(1);
-                else
-                    lambda_LCOE(j) = lambdas(1);
-                end
+                g_lambda_LCOE(j,:) = g_lambda_LCOE_tmp;
             else
-                [X_LCOE(j,:),LCOE(j),g_LCOE(j,:)] = deal(NaN);
+                [X_LCOE(j,:),LCOE(j),g_lambda_LCOE(j,:)] = deal(NaN);
             end
             if flag(2) >= 1
                 P_var(j) = obj_opt(2);
                 X_Pvar(j,:)= Xs_opt(1:end-1,2); 
-                g_Pvar(j,:) = g_Pvar_tmp;
-                if j==1
-                    lambda_Pvar = lambdas(2);
-                else
-                    lambda_Pvar(j) = lambdas(2);
-                end
+                g_lambda_Pvar(j,:) = g_lambda_Pvar_tmp;
             else
-                [X_Pvar(j,:), P_var(j),g_Pvar(j,:)] = deal(NaN);
+                [X_Pvar(j,:), P_var(j),g_lambda_Pvar(j,:)] = deal(NaN);
             end
         end
     end   
+
+end
+
+function g_lambda = combine_g_lambda(lambda,X,p,b)
+% returns a vector containing lambda where constraints are active,
+% and g where constraints are inactive.
+
+    all_lambda = [lambda.ineqnonlin; lambda.ineqlin; lambda.lower; lambda.upper];
+    idx_g = all_lambda == 0;
+
+    % sensitivities use g<=0 convention
+    [~,~,~,g_nl] = simulation(X,p);
+    [A_lin, b_lin] = lin_ineq_constraints(p);
+    g_lin = A_lin*X(1:size(A_lin,2)) - b_lin;
+    g_lb = b.X_mins - X(1:end-1);
+    g_ub = X(1:end-1) - b.X_maxs;
+    all_g = [-g_nl.'; g_lin; g_lb; g_ub];
+
+    g_lambda = all_lambda;
+    g_lambda(idx_g) = all_g(idx_g);
 
 end
 

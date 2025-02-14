@@ -224,7 +224,7 @@ function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,ac
     B_nl = finite_difference_vector_x(active_constraint_handle,x0(1:end-1),num_constr_active);
 
     % obtain B from constraint A_ineq matrix for linear constraints and bounds
-    [~, A_ineq_lin_part] = is_feasible(0, x0, p);
+    A_ineq_lin_part = lin_ineq_constraints(p);
     A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
     A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
     B_lin = A_ineq_lin(active_lin,:).';
@@ -258,7 +258,7 @@ function [par_J_par_p, par_g_par_p, ...
         [~, ~, dAdp, dbdp] = lin_ineq_constraints(p, param_name);
         num_constr_lin = size(dAdp,1);
         num_DVs_constr_lin = size(dAdp,2);
-        par_g_lin_par_p = dAdp * x0(1:num_DVs_constr_lin) - dbdp; % zeros(1,num_constr_lin);
+        par_g_lin_par_p = dAdp * x0(1:num_DVs_constr_lin) - dbdp;
         par_par_g_lin_par_x_par_p = zeros(length(x0)-1, num_constr_lin);
         par_par_g_lin_par_x_par_p(1:num_DVs_constr_lin,:) = dAdp.';
 end
