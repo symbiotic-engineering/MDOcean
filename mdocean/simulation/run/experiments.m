@@ -71,7 +71,7 @@ for i = 1:num_vars_swept
                 % only add to results if first 12 constraints are feasible
                 g(13) = 0;
                 g(14) = 0;
-                [feasible, which_failed] = is_feasible(g, X_in, p, b);
+                [feasible, ~, which_failed] = is_feasible(g, X_in, p, b);
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     P_var(i,j) = P_var_temp;
