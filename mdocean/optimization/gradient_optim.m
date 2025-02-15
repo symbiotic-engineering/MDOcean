@@ -91,7 +91,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_bot
     [A_lin,b_lin] = lin_ineq_constraints(p);
     for i=1:length(b_lin)
         name = b.lin_constraint_names{i};
-        prob.Constraints.(name) = A_lin(i,:)*X(1:4).' <= b_lin(i);
+        prob.Constraints.(name) = A_lin(i,:)*X(1:size(A_lin,2)).' <= b_lin(i);
     end
 
     % iterate through the two objectives: LCOE and P_var

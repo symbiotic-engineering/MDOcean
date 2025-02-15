@@ -1,23 +1,3 @@
-
-% function [LCOE_L,  X_LCOE_L, ...
-%           P_var_L, X_Pvar_L] = local_sens_deltas(x0, p, param_name, ratios, matrix, lambdas, J0)
-% 
-%     delta_p = p0 * (ratios - 1);
-% 
-%     [par_x_star_par_p, dJdp, dJstar_dp] = get_local_sens();
-% 
-%     % deltas based on specific ratios
-%     delta_x_star = par_x_star_par_p * delta_p;
-%     delta_J = dJdp * delta_p; 
-%     delta_Jstar = dJstar_dp * delta_p;
-% 
-%     dxs(:,obj) = delta_x_star;
-%     dJs(obj)   = delta_Jstar;
-% 
-%     x_new = x0s + dxs;
-%     J_new = J0 + dJs;
-% end
-
 function [par_x_star_par_p, dJstar_dp, ...
             dJdp, par_J_par_p, delta_p_change_activity] = local_sens_both_obj_all_param(x0s, p, params, lambdas, grads, hesses, num_constr)
     for obj = 1%:2
@@ -184,7 +164,8 @@ function [vector, par_J_par_p, dJdp] = local_sens_RHS_vector_and_dJdp(obj, p, pa
         par_par_g_lin_par_x_par_p] = get_partials(obj, p, param_name, x0, p0,num_constr);
 
     % assume that x bounds are parameter-independent
-    par_g_lb_par_p = zeros(size(active_lb)); par_g_ub_par_p = zeros(size(active_ub));
+    par_g_lb_par_p = zeros(size(active_lb)); 
+    par_g_ub_par_p = zeros(size(active_ub));
 
     % use all constraints for J sensitivity - MDO book - just J, not J*
     dJdp = par_J_par_p ...
@@ -216,22 +197,25 @@ function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,ac
     A = hess;
 
     % number of active constraints
-    num_constr_active = sum(active);
+    num_constr_active_nl = sum(active);
     num_constr_active_tot = sum([active; active_lin; active_lb; active_ub]);
 
     % obtain B = dg/dx with finite difference for nonlinear constraints
     active_constraint_handle = @(X) get_constraints([X;1],p,active);
-    B_nl = finite_difference_vector_x(active_constraint_handle,x0(1:end-1),num_constr_active);
+    B_nl = finite_difference_vector_x(active_constraint_handle,x0(1:end-1),num_constr_active_nl);
 
-    % obtain B from constraint A_ineq matrix for linear constraints and bounds
+    % obtain B from constraint A_ineq matrix for linear constraints
     A_ineq_lin_part = lin_ineq_constraints(p);
     A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
     A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
     B_lin = A_ineq_lin(active_lin,:).';
+
+    % B is +- 1 at for the active bounds
     A_ineq_lb = diag(-active_lb);
     A_ineq_ub = diag(active_ub);
     B_lb = -A_ineq_lb(:,active_lb);
     B_ub = A_ineq_ub(:,active_ub);
+
     B = [B_nl B_lin B_lb B_ub];
 
     % make matrix
@@ -296,8 +280,8 @@ function deriv = finite_difference_vector_x(fcn_handle,x_1_vec,ny)
     nx = length(x_1_vec);
     deriv = zeros([nx ny]);
     for i=1:nx
-        x_before = x_1_vec(1:i-1);
-        x_after  = x_1_vec(i+1:end);
+        x_before = x_1_vec(1:i-1);   % elements of x vector before the element being finite differenced
+        x_after  = x_1_vec(i+1:end); % elements of x vector after  the element being finite differenced
         scalar_handle = @(x_i) fcn_handle([x_before; x_i; x_after]);
         deriv(i,:) = finite_difference_scalar_x(scalar_handle,x_1_vec(i));
     end

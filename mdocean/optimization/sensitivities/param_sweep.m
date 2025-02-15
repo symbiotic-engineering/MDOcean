@@ -22,7 +22,7 @@ function [] = param_sweep(filename_uuid)
     x0 = b.X_start_struct;
     [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
     
-    num_constr = length(b.constraint_names);
+    num_constr_nl = length(b.constraint_names);
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
     
@@ -33,7 +33,7 @@ function [] = param_sweep(filename_uuid)
      dJstar_dp_local, dJdp_local, ...
      par_J_par_p_local, ...
      delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, p, params, ...
-                                                                    lambdas, grads, hesses, num_constr);
+                                                                    lambdas, grads, hesses, num_constr_nl);
     toc
     
     %% Obtain global sensitivity
@@ -68,7 +68,8 @@ function [] = param_sweep(filename_uuid)
 end
 
 function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
-    constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty dvar_names dvar_names];
+    constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty ...
+        strcat(dvar_names," lower"), strcat(dvar_names," upper")];
     idx_slam = contains(constr_names,'Slamming');
     delta_p_norm_combine_slamming = delta_p_norm(:,~idx_slam);
     delta_p_norm_slam = delta_p_norm(:,idx_slam);
@@ -198,9 +199,9 @@ function [par_x_star_par_p_global, ...
 
     %% assign outputs - fixme ignoring slope_Pvar for now
     dJstar_dp_global = slope_LCOE;
-    par_x_star_par_p_global = slope_X_LCOE_norm; %zeros(length(params),num_DVs);
-    delta_p_change_activity_global = delta_p_LCOE; %zeros(length(params),233+6+2*14);
-
+    par_x_star_par_p_global = slope_X_LCOE_norm;
+    delta_p_change_activity_global = delta_p_LCOE;
+    
     %% Line plots showing nonlinearity
     figure(1)
     subplot 121
