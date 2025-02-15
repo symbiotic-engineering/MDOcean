@@ -9,9 +9,6 @@ function pareto_curve_heuristics()
     d=dir("**/pareto_search_results*");
     load(d(end).name)
 
-    %delete later
-    p=p0;
-
     if ~isequaln(p,p0)
         warning(['You are loading results with different parameters than your ' ...
             'local machine right now. WecSim validation results (p_w) may be incorrect.'])
@@ -23,7 +20,7 @@ function pareto_curve_heuristics()
 
     new_objs = true; % switch between LCOE-Pvar and capex-Pavg
 
-    %constraint_active_plot(residuals,fval,tol,b,new_objs);
+    constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
@@ -224,8 +221,8 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     if new_objs
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
-        xlim([80 300])
-        ylim([.5 3])
+        xlim([.9*min(J1) 1.1*max(J1)])
+        ylim([.9*min(J2) 1.1*max(J2)])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
