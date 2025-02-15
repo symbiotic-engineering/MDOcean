@@ -104,7 +104,7 @@ plot(m0h_max_asymptotic_zero/acosh(realmax)*[1 1],ylim,'k-.')
 
 legend('b','Asymptotic b','1/(1-d_2/h)','1/2','1/(d_2/h)')
 xlabel('m_0h/acosh(realmax)')
-ylabel('b_{34}')
+ylabel('b_{N+2M+1}')
 improvePlot
 
 % conclusion: it's not correct, but it goes to zero before it goes to nan,

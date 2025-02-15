@@ -1,4 +1,9 @@
-function [idx] = constraint_active_plot(residuals,fval,tol,b)
+function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
+
+    if nargin<5
+        reversed = false;
+    end
+
     lb_active = abs(residuals.lower) < tol;
     ub_active = abs(residuals.upper) < tol;
     nlcon_active = abs(residuals.ineqnonlin) < tol;
@@ -10,8 +15,15 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b)
     idx_slamming_after = idx_slamming & ~idx_slamming_first;
     nlcon_active(:,idx_slamming_first) = any(nlcon_active(:,idx_slamming),2);
     nlcon_active(:,idx_slamming_after) = [];
+    constraint_names_mod = b.constraint_names_pretty(~idx_slamming_after);
+    constraint_names_mod(idx_slamming_first) = {'Prevent Slamming'};
 
-    [~,idx] = sort(fval(:,1)); % order by increasing LCOE
+    if reversed
+        dir = 'descend';
+    else
+        dir = 'ascend';
+    end
+    [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
     figure
     tiledlayout(2,2); 
@@ -34,7 +46,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b)
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active')
     grid on
-    set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',b.constraint_names_pretty(~idx_slamming_after))
+    set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',constraint_names_mod)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
 
     nexttile
