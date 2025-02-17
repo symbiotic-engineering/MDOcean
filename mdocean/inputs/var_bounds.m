@@ -25,7 +25,7 @@ b.D_s_start = 6;
 
 % outer diameter of float (m)	
 b.D_f_min = 1;
-b.D_f_max = 50;
+b.D_f_max = 60;
 b.D_f_wecsim = 20;
 b.D_f_nom = 20;
 b.D_f_start = 20;
