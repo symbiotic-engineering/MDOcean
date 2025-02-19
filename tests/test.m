@@ -5,7 +5,7 @@ classdef (SharedTestFixtures={ ...
     
     properties (Constant)
         run_slow_tests = false;
-        slow_figs = [16:21 24 25];
+        slow_figs = [16:21];
         slow_tabs = 7;
     end
 
@@ -29,8 +29,8 @@ classdef (SharedTestFixtures={ ...
     properties (TestParameter)
         field_report = fieldnames(validation_inputs('report'));
         field_wecsim = fieldnames(validation_inputs('wecsim'));
-        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1};
-        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1};
+        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1,.1,.1,.1,.1};
+        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1,.1,.1};
         which_figs = test.enumerateFigs()
         which_tabs = test.enumerateTabs()
     end
@@ -142,12 +142,18 @@ classdef (SharedTestFixtures={ ...
 
             if which_figs ~= 0 % figure
                 fig_name = ['Figure_' num2str(which_figs)];
-    
-                set(fig_out,'Units','Inches');
-                pos = get(fig_out,'Position');
-                set(fig_out,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-                print(fig_out,['../test-results/' fig_name],'-dpdf','-r0')
+                pdf_name = ['../test-results/' fig_name];
+                
+                if ~isempty(fig_out.UserData)
+                    % pdf already exists in files, just copy to folder
+                    copyfile(fig_out.UserData, pdf_name)
+                else
+                    % save pdf from matlab figure output
+                    save_pdf(fig_out,pdf_name)
+                end
+                % in either case, use figure itself, not pdf, for printing the diagnostic
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+
             else % table
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end

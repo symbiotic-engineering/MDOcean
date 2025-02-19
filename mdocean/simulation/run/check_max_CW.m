@@ -1,17 +1,10 @@
 function [ratio] = check_max_CW(filename_uuid)
     p = parameters();
-    p.cost_m = [0 0 0]; % hack that makes cost constant, so minimizing LCOE is actually maximizing power
-    p.power_max = Inf;
-    
     b = var_bounds();
     b.filename_uuid = filename_uuid;
-    x0 = b.X_start_struct;
 
-    % run LCOE minimization (effectively power maximization due to hack above)
-    X_opt = gradient_optim(x0,p,b,1); 
+    [~,val] = max_avg_power(p,b);
 
-    % plug back into simulation to get unsaturated power
-    [~, ~, ~, ~, val] = simulation(X_opt,p);
     P_mech = val.P_mech;
 
     % calculate capture width

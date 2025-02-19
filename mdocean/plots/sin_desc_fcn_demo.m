@@ -18,7 +18,7 @@ ylabel('Normalized Powertrain Force')
 improvePlot
 set(h,'HandleVisibility','off')
 
-legend('Saturated Signal','Fundamental Amplitude')
+legend('Saturated Signal','Fundamental Amplitude','Interpreter','latex')
 
 % see what happens when added to phase shifted signal
 shift_on = false;
@@ -49,7 +49,7 @@ drag_DF = 8/(3*pi)*sin(x*2*pi);
 drag_actual = sin(x*2*pi) .* abs(sin(x*2*pi));
 
 figure
-plot(x,drag_actual,x,drag_DF)
+plot(x,drag_actual,'r',x,drag_DF,'b')
 xlabel('Normalized Time')
 ylabel('Normalized Drag Force')
 legend('Squared Signal $\sin(\omega t)|\sin(\omega t)|$',...
