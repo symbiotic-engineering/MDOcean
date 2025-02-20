@@ -10,6 +10,9 @@ function [] = param_sweep(filename_uuid)
     
     param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
     params = T.name(T.sweep);
+    p_val  = [T.value_normalize{T.sweep}];
+    p_idxs = T.index_normalize(T.sweep);
+
     dvar_names = b.var_names_pretty(1:end-1);
     
     groups = categorical(T.subsystem(T.sweep));
@@ -26,44 +29,38 @@ function [] = param_sweep(filename_uuid)
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
     
-    %% Obtain local sensitivity 
+    %% Obtain normalized local sensitivity 
     disp('done optimizing, starting local param sensitivity')
     tic
     [par_x_star_par_p_local, ...
      dJstar_dp_local, dJdp_local, ...
      par_J_par_p_local, ...
-     delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, p, params, ...
+     delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, J0, p, params, p_val, p_idxs, ...
                                                                     lambdas, grads, hesses, num_constr_nl);
     toc
-    
-    %% Obtain global sensitivity
+
+    %% Obtain normalized global sensitivity
     disp('done local, starting global param sensitivity')
     tic
     [par_x_star_par_p_global, dJstar_dp_global, ...
-        delta_p_change_activity_global] = global_sens_all_param(params, param_names, x0_vec, dvar_names, J0, g_lambda_0, p, b, colors, groups);
+        delta_p_change_activity_global] = global_sens_all_param(params, param_names, p_val, ...
+                                                                x0_vec, dvar_names, J0, g_lambda_0, ...
+                                                                p, b, colors, groups);
     toc
 
     %% Post processing
-    dJdp_combined = [par_J_par_p_local dJdp_local dJstar_dp_local dJstar_dp_global];
+    dJdp_combined = [par_J_par_p_local; dJdp_local; dJstar_dp_local; dJstar_dp_global];
     dJdp_names = {'local partial','local total linear','local total quadratic','global'};
-
-    % normalization
-    p_val = T.value{T.sweep};
-    dJdp_normalized = dJdp_combined.' .* p_val ./ J0(1);
-    dxdp_local_normalized  = par_x_star_par_p_local.'  .* p_val ./ x0_vec(1:end-1,1);
-    dxdp_global_normalized = par_x_star_par_p_global.' .* p_val ./ x0_vec(1:end-1,1);
-    delta_p_local_normalized  = delta_p_change_activity_local  ./ p_val;
-    delta_p_global_normalized = delta_p_change_activity_global ./ p_val;
     
     % color grid plots
-    sensitivity_plot(dJdp_normalized, 'dJ/dp normalized', param_names, dJdp_names, ...
+    sensitivity_plot(dJdp_combined, 'dJ/dp normalized', param_names, dJdp_names, ...
         'Parameters p', 'Type of Sensitivity')
     
-    dxdp_plot(dxdp_local_normalized,  param_names, dvar_names, 'local')
-    dxdp_plot(dxdp_global_normalized, param_names, dvar_names, 'global')
+    dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local')
+    dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global')
     
-    delta_p_plot(delta_p_local_normalized,  b, dvar_names, param_names, 'local')
-    delta_p_plot(delta_p_global_normalized, b, dvar_names, param_names, 'global')
+    delta_p_plot(delta_p_change_activity_local,  b, dvar_names, param_names, 'local')
+    delta_p_plot(delta_p_change_activity_global, b, dvar_names, param_names, 'global')
 
 end
 
@@ -106,15 +103,22 @@ function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
     ylabel(ylab)
     improvePlot
     set(ax,'XTickLabelRotation', 60)
-    ax.XAxis.FontSize = 14;
-    set(gcf,'Position',[1 41 1536 8448]) % full screen
+    if length(xticks) < 50
+        ax.XAxis.FontSize = 14;
+    else
+        ax.XAxis.FontSize = 10;
+    end
+    if length(yticks) > 40
+        ax.YAxis.FontSize = 10;
+    end
+    set(gcf,'Position',[1 41 1536 840]) % full screen
 end
 
 %% Rerun optimization for global sensitivities
 function [par_x_star_par_p_global, ...
           dJstar_dp_global, ...
           delta_p_change_activity_global,...
-          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, ...
+          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, p_val, ...
                                                                x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
@@ -174,8 +178,8 @@ function [par_x_star_par_p_global, ...
     slope_LCOE = get_slope(LCOE, ratios);
     slope_Pvar = get_slope(P_var, ratios);
     
-    slope_LCOE_norm = slope_LCOE / LCOE_nom; % normalize
-    slope_Pvar_norm = slope_Pvar / Pvar_nom;
+    slope_LCOE_norm = slope_LCOE.' / LCOE_nom; % normalize
+    slope_Pvar_norm = slope_Pvar.' / Pvar_nom;
 
     if all(~isfinite(slope_LCOE),'all') || all(~isfinite(slope_Pvar),'all')
         msg = ['All slopes are NaN, meaning all optimizations failed. ' ...
@@ -196,11 +200,13 @@ function [par_x_star_par_p_global, ...
     dlambda_g_dp_Pvar = get_slope(g_lambda_Pvar, ratios);
     delta_p_LCOE = -g_lambda_LCOE_nom ./ dlambda_g_dp_LCOE;
     delta_p_Pvar = -g_lambda_Pvar_nom ./ dlambda_g_dp_Pvar;
+    delta_p_LCOE_norm = delta_p_LCOE ./ p_val.';
+    delta_p_Pvar_norm = delta_p_Pvar ./ p_val.';
 
-    %% assign outputs - fixme ignoring slope_Pvar for now
-    dJstar_dp_global = slope_LCOE;
-    par_x_star_par_p_global = slope_X_LCOE_norm;
-    delta_p_change_activity_global = delta_p_LCOE;
+    %% assign normalized outputs - fixme ignoring slope_Pvar for now
+    dJstar_dp_global = slope_LCOE_norm;
+    par_x_star_par_p_global = slope_X_LCOE_norm.';
+    delta_p_change_activity_global = delta_p_LCOE_norm;
     
     %% Line plots showing nonlinearity
     figure(1)
@@ -219,7 +225,7 @@ function [par_x_star_par_p_global, ...
     legend(param_names)
     improvePlot
     grid on
-    set(gcf,'Position',[1 41 1536 8448]) % full screen
+    set(gcf,'Position',[1 41 1536 840]) % full screen
     
     for i = 1:num_DVs
         f2 = figure(2);
@@ -241,8 +247,8 @@ function [par_x_star_par_p_global, ...
         grid on
     end
     legend(param_names)
-    set(f2,'Position',[1 41 1536 8448]) % full screen
-    set(f3,'Position',[1 41 1536 8448]) % full screen
+    set(f2,'Position',[1 41 1536 840]) % full screen
+    set(f3,'Position',[1 41 1536 840]) % full screen
 
     %% Tornado chart for overall slope
     sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
@@ -290,7 +296,7 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     [~,first_idx] = ismember(categories(groups),groups);
     labels = repmat({''},size(groups));         % create blank labels
     labels(first_idx) = categories(groups);     % leave most labels blank, except the first of each category
-    legend(labels)
+    legend(labels,'location','south')
     
     improvePlot
     set(gca, 'FontSize', 14)
