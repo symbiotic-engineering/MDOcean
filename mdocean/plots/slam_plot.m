@@ -1,11 +1,14 @@
 function fig = slam_plot()
 
 theta = linspace(0,pi,200);
-T_f_over_H_span = linspace(0,1,120);
+y_axis_span = linspace(0,1,120);
 two_Tf_over_H_max = 3;
-[THETA,TWO_TF_OVER_H_SPAN] = meshgrid(theta,T_f_over_H_span);
+[THETA,Y_AXIS_SPAN] = meshgrid(theta,y_axis_span);
 
-TWO_TF_OVER_H = sin(THETA) + TWO_TF_OVER_H_SPAN .* (two_Tf_over_H_max - sin(THETA));
+% this makes it so y_axis_span=0 corresponds to y=sin(theta) and
+% y_axis_span=1 corresponds to y=two_Tf_over_H_max, to get a good sin shape
+TWO_TF_OVER_H = sin(THETA) + Y_AXIS_SPAN .* (two_Tf_over_H_max - sin(THETA));
+
 squared = sin(THETA)./(TWO_TF_OVER_H);
 X_map = TWO_TF_OVER_H .* (sqrt(1 - squared.^2) - 1) - cos(THETA);
 idx_imag = X_map~=real(X_map);
@@ -27,5 +30,6 @@ text(.19,.4,my_text,'Interpreter','latex','FontSize',24)
 improvePlot
 set(gcf,"Position",[100 100 750 600])
 title('$X_{slam}=T_f+\frac{H}{2} X^*$','Interpreter','latex','FontSize',24)
+colormap(bluewhitered)
 
 end
