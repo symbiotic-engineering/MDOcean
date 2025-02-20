@@ -33,7 +33,7 @@ function [] = param_sweep(filename_uuid)
     disp('done optimizing, starting local param sensitivity')
     tic
     [par_x_star_par_p_local, ...
-     dJstar_dp_local, dJdp_local, ...
+     dJ_star_dp_lin_local, dJ_star_dp_quad_local, ...
      par_J_par_p_local, ...
      delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, J0, p, params, p_val, p_idxs, ...
                                                                     lambdas, grads, hesses, num_constr_nl);
@@ -49,12 +49,14 @@ function [] = param_sweep(filename_uuid)
     toc
 
     %% Post processing
-    dJdp_combined = [par_J_par_p_local; dJdp_local; dJstar_dp_local; dJstar_dp_global];
+    dJdp_combined = [par_J_par_p_local; dJ_star_dp_quad_local; dJ_star_dp_lin_local; dJstar_dp_global];
     dJdp_names = {'local partial','local total linear','local total quadratic','global'};
     
     % color grid plots
-    sensitivity_plot(dJdp_combined, 'dJ/dp normalized', param_names, dJdp_names, ...
+    sensitivity_plot(dJdp_combined, 'dJ*/dp normalized', param_names, dJdp_names, ...
         'Parameters p', 'Type of Sensitivity')
+    sensitivity_plot(dJstar_dp_global, 'dJ*/dp normalized: global', param_names, '', ...
+        'Parameters p', '')
     
     dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local')
     dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global')
@@ -65,6 +67,7 @@ function [] = param_sweep(filename_uuid)
 end
 
 function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
+    % combine all the slamming constraints into one so it fits on plot
     constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty ...
         strcat(dvar_names," lower"), strcat(dvar_names," upper")];
     idx_slam = contains(constr_names,'Slamming');
@@ -74,7 +77,7 @@ function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
     idx_delta_p_slam = sub2ind(size(delta_p_norm_slam),1:length(param_names),idx_delta_p_slam');
     delta_p_norm_combine_slamming(:,end+1) = delta_p_norm_slam(idx_delta_p_slam);
     
-    titl = ['Normalized delta p to change constraint activity: ' title_suffix];
+    titl = ['Normalized \Deltap to change constraint activity: ' title_suffix];
     xticks = [constr_names(~idx_slam),'Slamming'];
     yticks = param_names;
     xlab = 'Constraints';
