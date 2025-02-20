@@ -83,6 +83,7 @@ function k = dispersion(w,h,g)
         k_deep_guess = w(idx_mid).^2 / g;
         k_guess = k_deep_guess;
         while err > 0.2 && iters < 50
+            % fixed point iteration, dividing by k_deep_guess for better stability
             k_new = w(idx_mid).^2 / g ./ tanh(k_guess*h);
             err = max(abs(k_new - k_guess)./k_deep_guess,[],'all');
             k_guess = k_new;
