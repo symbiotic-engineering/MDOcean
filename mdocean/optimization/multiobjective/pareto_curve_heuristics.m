@@ -9,9 +9,6 @@ function pareto_curve_heuristics()
     d=dir("**/pareto_search_results*");
     load(d(end).name)
 
-    %delete later
-    p=p0;
-
     if ~isequaln(p,p0)
         warning(['You are loading results with different parameters than your ' ...
             'local machine right now. WecSim validation results (p_w) may be incorrect.'])
@@ -23,7 +20,7 @@ function pareto_curve_heuristics()
 
     new_objs = true; % switch between LCOE-Pvar and capex-Pavg
 
-    %constraint_active_plot(residuals,fval,tol,b,new_objs);
+    constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
@@ -41,7 +38,7 @@ function pareto_curve_heuristics()
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-     x_best_J1, x_best_J2, x_nom, x_balanced, idxo] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs);
+     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
@@ -59,7 +56,7 @@ function pareto_curve_heuristics()
     pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs)
+                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE))
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
@@ -81,8 +78,8 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
          J1_nom_sim,  J1_solar,  J1_balanced,...
          J2, bestJ2, idx_best_J2, J2_nom, ...
          J2_nom_sim, J2_solar, J2_balanced,...
-         x_best_J1, x_best_J2, x_nom, x_balanced, idxo] ...
-                                        = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs)
+         x_best_J1, x_best_J2, x_nom, x_balanced, ...
+         idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs)
     
     if new_objs
         num_points = size(X,1);
@@ -142,6 +139,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
                   RM3_wecsim.(J1_fieldname)(J1_fieldidx)];
         J2_nom = [RM3_report.(J2_fieldname)(J2_fieldidx),...
                   RM3_wecsim.(J2_fieldname)(J2_fieldidx)];
+        LCOE_nom = RM3_report.LCOE(4);
     catch
         J1_nom = [NaN NaN]; % fixme
         J2_nom = [NaN NaN];
@@ -196,7 +194,7 @@ end
 function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                           x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
-                          showImages, showLCOEContours, p, new_objs)
+                          showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min)
     figure
     % overall pareto front
     plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
@@ -224,8 +222,8 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     if new_objs
         xlabel('Average Electrical Power (kW)')
         ylabel('Structural and PTO Cost ($M)')
-        xlim([80 300])
-        ylim([.5 3])
+        xlim([.9*min(J1) 1.1*max(J1)])
+        ylim([.9*min(J2) 1.05*max(J2)])
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
@@ -244,10 +242,10 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     
     % text labels
     sz = 14;
-    text(J1_nom(1)+10,J2_nom(1),'RM3 Report','FontSize',sz)
+    text(J1_nom(1)+7,J2_nom(1)+.02,'RM3 Report','FontSize',sz)
     text(J1_nom(1)+.01,J2_nom(1)-5,'Actual [10]','FontSize',sz)
     text(J1_nom_sim(1)-.02,J2_nom_sim(1)+5,'RM3 Report','FontSize',sz)
-    text(J1_nom_sim(1)+.03,J2_nom_sim(1),'Sim','FontSize',sz)
+    text(J1_nom_sim(1)+.03,J2_nom_sim(1)-.05,'Sim','FontSize',sz)
 
     text(J1_nom(2)+.03,J2_nom(2),'RM3 WecSim','FontSize',sz)
     text(J1_nom(2)+.01,J2_nom(2)-5,'Actual','FontSize',sz)
@@ -263,8 +261,6 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     end
 
     if showLCOEContours
-        LCOE_min = 0.272;
-        LCOE_nom = 0.76; % fixme hardcoded
         overlay_LCOE(p, LCOE_nom, LCOE_min)
     end
 
@@ -350,6 +346,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
             'b:','b--',...                       % PTO
             'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
     figure
+    s1 = subplot(2,1,1);
     for i=1:size(X_pareto_ordered_normed,2)
         semilogy(pct_angle_even,X_filtered(:,i),cols{i})
         hold on
@@ -363,16 +360,17 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
         plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
     end
     
-    title('Design Heuristics')
+    title('Design Trends')
     %xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
-    ylim([.03 2])
-    set(gca,'YTick',y_tick)
+    ylim([.9*min(X_filtered,[],'all'), 1.1*max(X_filtered,[],'all')])
+    set(s1,'YTick',y_tick)
     improvePlot
-    legend(var_names,'Location','eastoutside')
-    set(gca,'YMinorGrid','on')
-    set(gca,'XGrid','on')
-    set(gca, 'Children', flipud(get(gca, 'Children')) ) % put fake gridlines behind real lines
+    
+    l1 = legend(var_names,'Location','eastoutside');
+    set(s1,'YMinorGrid','on')
+    set(s1,'XGrid','on')
+    set(s1, 'Children', flipud(get(s1, 'Children')) ) % put fake gridlines behind real lines
     
     if new_objs
         legend_text = {'Average Electrical Power','Structural and PTO Cost'};
@@ -386,7 +384,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     end
 
     % objective heuristics
-    figure
+    s2 = subplot(2,1,2); %figure
     plot(pct_angle, scale_1 * J1_pareto_ordered_normed,'Color',[0.4940 0.1840 0.5560]) % purple
     hold on
     plot(pct_angle, scale_2 * J2_pareto_ordered_normed,'Color',[0.4660 0.6740 0.1880]) % green
@@ -394,7 +392,13 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Objective Value')
     improvePlot
-    legend(legend_text,Location='northeast')
+    l2 = legend(legend_text,Location='eastoutside');
+
+    set(gcf,"Position",[100 100 715 835]) % make wider so x major grid shows for every 20
+    l1.Position(1:2) = [.78 .43];
+    s1.Position(2:4) = [.5 .6 .4];
+    s2.Position(3:4) = [.6 .28];
+    l2.Position(1:2) = [.54 .16];
 end
 
 function [filtered, t_even_spread] = low_pass_filter(time, signals, backwards)
@@ -446,11 +450,24 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
 
     hold on
     levs = [LCOE_min;
-            .12; .15; .2; .3; .5; .8];
-            %LCOE_nom];
+            .12; .15; .2; .3; .5;
+            LCOE_nom];
     grey = [.85 .85 .85];
-    [c,h] = contour(P_ELEC/1000,C_DESIGN/1e6,LCOE,levs,'Color',grey);
-    clabel(c,h,'LabelSpacing',400);
+    [~,h] = contour(P_ELEC/1000,C_DESIGN/1e6,LCOE,levs,'Color',grey,'ShowText','on','LabelSpacing',400);
+    if isMATLABReleaseOlderThan("R2022b")
+        h.LevelList = round(h.LevelList,3); % for old versions, round the contours directly. Will be slightly off from scatter points.
+    else
+        h.LabelFormat = '%0.2f'; % for new versions, just round the text
+    end
+
+    %h.TextList = round(h.TextList,2);
+    %clabel(c,h,'LabelSpacing',400);
+%     for i=1:size(contour_text) % round labels to 2 decimals
+%         textstr = get(contour_text(i),'String');
+%         textnum = str2double(textstr); 
+%         textstrnew = sprintf('%0.2f', textnum);
+%         set(contour_text(i),'String',textstrnew);
+%     end
     legend('LCOE ($/kWh)','Location','northwest')
 
 end

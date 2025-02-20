@@ -11,7 +11,7 @@ date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 
-num_figs = 37;
+num_figs = 36;
 num_tabs = 8;
 fig_names = cell([1,num_figs]);
 tab_names = cell([1,num_tabs]);
@@ -147,70 +147,67 @@ end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
 fig_names{22} = 'Fig. 22: pareto front with design images';
-fig_names{23} = 'Fig. 23: design heuristics';
-fig_names{24} = 'Fig. 24: objective heuristics';
-fig_names{25} = 'Fig. 25: pareto front with LCOE contours';
-fig_names{26} = 'Fig. 26: constraint activity';
-if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25 | which_figs == 26)  
+fig_names{23} = 'Fig. 23: design and objective heuristics';
+fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
+fig_names{25} = 'Fig. 25: constraint activity';
+if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25)  
     pareto_search(filename_uuid);
     pareto_curve_heuristics()
-    fig24 = gcf;
-    fig23 = figure(fig24.Number - 1);
-    fig22 = figure(fig24.Number - 3);
-    fig25 = figure(fig24.Number - 4);
-    fig26 = figure(fig24.Number - 6); % constraint activity
-    fig26.Position = [1 41 1536 844.8000];
+    fig23 = gcf;
+    fig22 = figure(fig23.Number - 2);
+    fig24 = figure(fig23.Number - 3);
+    fig25 = figure(fig23.Number - 5); % constraint activity
+    fig25.Position = [1 41 1536 844.8000];
     fig_output(which_figs==22) = fig22;
     fig_output(which_figs==23) = fig23;
     fig_output(which_figs==24) = fig24;
     fig_output(which_figs==25) = fig25;
-    fig_output(which_figs==26) = fig26;
 end
 
-%% figure 27, 28, 29 - overlaid geometry, hydro coeffs, probability CDF
-fig_names{27} = 'Fig. 27: overlaid geometry';
-fig_names{28} = 'Fig. 28: overlaid hydro coeffs';
-fig_names{29} = 'Fig. 29: probability CDF';
-if any(which_figs == 27 | which_figs == 28 | which_figs == 29 | which_tabs == 5 | which_tabs == 6)
+%% figure 26, 27, 28 - overlaid geometry, hydro coeffs, probability CDF
+fig_names{26} = 'Fig. 26: overlaid geometry';
+fig_names{27} = 'Fig. 27: overlaid hydro coeffs';
+fig_names{28} = 'Fig. 28: probability CDF';
+if any(which_figs == 26 | which_figs == 27 | which_figs == 28 | which_tabs == 5 | which_tabs == 6)
     [tab5,tab6] = compare(filename_uuid);
     n = gcf().Number;
-    fig29 = figure(n-1);
-    fig27 = figure(n-2);
-    fig_output(which_figs==27) = fig27;
-    fig_output(which_figs==28) = figure;
-    fig_output(which_figs==29) = fig29;
-    % fixme: 28 not implemented
+    fig28 = figure(n-1);
+    fig26 = figure(n-2);
+    fig_output(which_figs==26) = fig26;
+    fig_output(which_figs==27) = figure;
+    fig_output(which_figs==28) = fig28;
+    % fixme: 27 not implemented
 end
 
-%% figure 30 - fixme not implemented
-fig_names{30} = 'Fig. 30: XXX';
+%% figure 29 - fixme not implemented
+fig_names{29} = 'Fig. 29: XXX';
+if any(which_figs == 29)
+    fig_output(which_figs==29) = figure;
+end
+
+%% figure 30 - asymptotic b vector
+fig_names{30} = 'Fig. 30: asymptotic b vector';
 if any(which_figs == 30)
-    fig_output(which_figs==30) = figure;
-end
-
-%% figure 31 - asymptotic b vector
-fig_names{31} = 'Fig. 31: asymptotic b vector';
-if any(which_figs == 31)
     b_Inf
     fig31 = gcf;
-    fig_output(which_figs==31) = fig31;
+    fig_output(which_figs==30) = fig30;
 end
 
-%% figure 32-36 - fixme not implemented
-if any( ismember(which_figs, 32:36) )
-    fig_output(ismember(which_figs, 32:36)) = figure;
+%% figure 31-35 - fixme not implemented
+if any( ismember(which_figs, 31:35) )
+    fig_output(ismember(which_figs, 31:35)) = figure;
 end
 
-%% figure 37 - damping plate moment
-fig_names{37} = 'Fig. 37: damping plate moment';
-if any(which_figs == 37)
+%% figure 36 - damping plate moment
+fig_names{36} = 'Fig. 36: damping plate moment';
+if any(which_figs == 36)
     BoedoPrantilAnnularPlate()
-    fig37_temp = gcf;
-    fig37=figure(fig37_temp.Number-2);
-    fig_output(which_figs==37) = fig37;
+    fig36_temp = gcf;
+    fig36 = figure(fig36_temp.Number-2);
+    fig_output(which_figs==36) = fig36;
 end
 
-% fixme: 38 to 46 not implemented, but still name the figures
+%% fixme: 37 to 45 not implemented, but still name the figures
 empty_idx = cellfun(@isempty,fig_names);
 empty_str = strcat('Fig._', string(find(empty_idx)));
 [fig_names{empty_idx}] = deal(empty_str{:});
