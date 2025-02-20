@@ -27,10 +27,10 @@ elseif strcmp(DOE_strategy,'bounds')
     %      b.B_p_nom, linspace(b.B_p_min, b.B_p_max, n);
     %      b.w_n_nom, linspace(b.w_n_min, b.w_n_max, n) ];
     
-    X=zeros(length(b.X_noms),2);
+    X = zeros(length(b.X_noms),2);
     for i = 1:length(b.X_mins)
-        X(i,1)=b.X_noms(i);
-        X(i,1)=linspace(b.X_mins(i),b.X_maxs(i),n);
+        X(i,1) = b.X_noms(i);
+        X(i,1) = linspace(b.X_mins(i),b.X_maxs(i),n);
     end
 
     ratios = X./X(:,1);
@@ -46,25 +46,19 @@ num_vars = design_size(1);
 num_vals_per_var = design_size(2);
 num_vals_swept = num_vals_per_var - 1; % don't sweep 1st value of each variable (corresponding to ratio 1)
 
-% don't sweep material
-idx_material = 15;
-X(idx_material,:) = b.M_nom * ones(1,n+1);
-num_vars_swept = num_vars - 1;
-
 % initialize variables
 LCOE = X*inf;
-P_var = X*inf;
+cost = X*inf;
+power = X*inf;
 opt_idx = zeros(num_vars,1);	
 recommended = zeros(num_vars,2);	
-number_runs = 1 + num_vars_swept * num_vals_swept; % nominal run plus all sweeps
+number_runs = 1 + num_vars * num_vals_swept; % nominal run plus all sweeps
 failed = cell(number_runs,1);	
-power = zeros(number_runs,1);	
-FOS = zeros(number_runs,1);	
 X_ins = zeros(number_runs, num_vars);	
 design = 0;
 
 % run design of experiments
-for i = 1:num_vars_swept
+for i = 1:num_vars
     X_in = X_nom;	
     for j = 1:num_vals_per_var
         if i == 1 || j~=1	% prevent rerunning nominal multiple times
@@ -73,16 +67,20 @@ for i = 1:num_vars_swept
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, P_var_temp, P_matrix, g, val] = simulation([X_in;b.M_nom],p);
+                [LCOE_temp, cost_temp, P_matrix, g, val] = simulation([X_in;b.M_nom],p);
 
                 % only add to results if first 12 constraints are feasible
-                [feasible, which_failed] = is_feasible(g, X_in, p, b);
+                idx_ignore = false(1,length(b.constraint_names));
+                ignore = {'irrelevant_max_force','LCOE_max','linear_theory'};
+                idx_ignore(ismember(b.constraint_names,ignore)) = true;
+                [feasible, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
-                    P_var(i,j) = P_var_temp;
+                    cost(i,j) = cost_temp;
+                    power(i,j) = val.power_avg;
                 else	
                     LCOE(i,j) = NaN;
-                    P_var(i,j) = NaN;
+                    cost(i,j) = NaN;
                 end	
                 failed{design} = which_failed;
             end	
@@ -95,17 +93,17 @@ end
 % create table for display	
 results = array2table(X_ins, 'VariableNames', b.var_names(1:end-1));	
 LCOE = LCOE';
-P_var = P_var';
-results = addvars(results, round(LCOE(LCOE~=Inf),2), round(P_var(P_var~=Inf),1), failed, ...
+cost = cost';
+power = power';
+results = addvars(results, round(LCOE(LCOE~=Inf),2), round(cost(cost~=Inf),1), failed, ...
                 'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','Failed Constraints'});	
 disp(results)
 
 % plot pareto curve for comparison
 pareto_curve_heuristics()
-figure(2)
-plot(LCOE, P_var, '*--')
-xlabel('LCOE')
-ylabel('P_{var}')
+figure(3)
+plot(power/1e3, cost, '*--')
+
 title('Design of Experiments Pareto Front')
 l = legend(b.var_names_pretty);
 improvePlot
@@ -114,7 +112,7 @@ l.Location = 'bestoutside';
 %% sensitivities plot
 [ratios_sorted,idx] = sort(ratios);
 LCOE(1,:) = LCOE(1,1); % fill in nominal LCOE results for each DV where it wasn't repeatedly tested
-P_var(1,:) = P_var(1,1);
+cost(1,:) = cost(1,1);
 
 figure
 t = tiledlayout(2,1);
@@ -125,8 +123,8 @@ plot(ratios_sorted,LCOE(idx,:).')
 ylabel('LCOE ($/kWh)')
 grid on
 ax2 = nexttile(2);
-plot(ratios_sorted,P_var(idx,:).')
-ylabel('Power c_v (%)')
+plot(ratios_sorted,cost(idx,:).')
+ylabel('Structural and PTO Cost ($M)')
 grid on
 
 title(t,'Design of Experiments Results','FontWeight','bold','FontSize',20)
