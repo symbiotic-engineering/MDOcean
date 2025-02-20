@@ -33,12 +33,13 @@ num_designs = length(titles);
 
 %% geometry comparison
 figure
+biggest_to_smallest = [5, 2, 4, 1, 3];
 for i=1:num_designs
-    x = X(i,:);
+    x = X(biggest_to_smallest(i),:);
     hold on
     visualize_geometry(x,p,false,color{i})
 end
-legend(titles)
+legend({'Balanced','Min LCOE','Max Power','Nominal','Min CAPEX'},'Location','east')
 
 %% power probability comparison
 figure

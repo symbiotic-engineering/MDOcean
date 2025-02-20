@@ -38,7 +38,7 @@ x = linspace(-30,30,100);
 Hs = 3;
 T = 7.5;
 hold on
-waves = plot(x,Hs*cos(x*2*pi/T),'c');
+waves = plot(x,Hs/2*cos(x*2*pi/T),'c');
 
 % WEC
 float_rect_bottom = -T_f_1;
