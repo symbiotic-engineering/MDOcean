@@ -21,10 +21,12 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 % _d_tu: damping plate tubular support
 % _f_tu: float tubular support
 
-%               _____                               -
-%              /|   |\                              |
-%             / |   | \Lft                          |
-%            /____Df___\_                       -   |
+%                /\
+%               /  \ Lft
+% h_fs_clear-  /    \                               -
+%           | /  ___ \                              |
+%           -/  |   | \                             |
+%           /____Df____\                        -   |
 %           |           |                       |   |
 % ----------|           |---------  -   -       hf  |
 %           |           |    Tf1    |   |       |   |
