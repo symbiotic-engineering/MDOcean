@@ -33,12 +33,22 @@ num_designs = length(titles);
 
 %% geometry comparison
 figure
+biggest_to_smallest = [5, 2, 4, 1, 3];
+
+x = linspace(-30,30,100);
+Hs = 3;
+T = 7.5;
+hold on
+waves = plot(x,Hs/2*cos(x*2*pi/T),'c','Linewidth',3);
+set(waves,'HandleVisibility','off')
+
 for i=1:num_designs
-    x = X(i,:);
+    x = X(biggest_to_smallest(i),:);
     hold on
     visualize_geometry(x,p,false,color{i})
 end
-legend(titles)
+xlim([-40,40])
+legend({'Balanced','Min LCOE','Max Power','Nominal','Min CAPEX'},'Location','east')
 
 %% power probability comparison
 figure

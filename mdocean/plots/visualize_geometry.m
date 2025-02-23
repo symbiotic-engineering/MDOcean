@@ -34,11 +34,11 @@ T_s = p.T_s_over_D_s * D_s;
 h_d = p.h_d_over_D_s * D_s;
 
 % waves
-x = linspace(-30,30,100);
-Hs = 3;
-T = 7.5;
-hold on
-waves = plot(x,Hs*cos(x*2*pi/T),'c');
+%x = linspace(-30,30,100);
+%Hs = 3;
+%T = 7.5;
+%hold on
+%waves = plot(x,Hs/2*cos(x*2*pi/T),'c');
 
 % WEC
 float_rect_bottom = -T_f_1;
@@ -70,7 +70,7 @@ end
 grid on
 ylim([-40 20])
 xlim([-27 27])
-set(waves,'HandleVisibility','off')
+%set(waves,'HandleVisibility','off')
 
 end
 
