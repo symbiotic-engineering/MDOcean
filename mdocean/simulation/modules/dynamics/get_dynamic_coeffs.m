@@ -8,7 +8,7 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
                                                 rho_w, g, ...
                                                 use_MEEM, harmonics, hydro)
     w = 2*pi./T;            % angular frequency
-    k = dispersion(w,g,h);  % wave number (dispersion relation for finite depth water)
+    k = dispersion(w,h,g);  % wave number (dispersion relation for finite depth water)
 
     a2 = D_f / 2;        % radius
     a1 = D_s / 2;
