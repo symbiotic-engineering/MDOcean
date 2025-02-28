@@ -266,19 +266,19 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
 
     if showImages   % small pictures of best geometries
 
-        upper_left = [.28 .6];
+        upper_left = [.2 .7]; %.28,.6
         mini_plot(upper_left,x_best_J1,p)
 
-        lower_right = [.51 .23];
+        lower_right = [.63 .16]; %.51,.23
         mini_plot(lower_right,x_best_J2,p)
         
-        balanced_pos = [.10 .28];
+        balanced_pos = [.17 .41]; %0.1,.35
         mini_plot(balanced_pos,x_balanced,p)
 
-        report_pos = [.7 .53];
+        report_pos = [.68 .43]; %.7,.53
         mini_plot(report_pos,x_nom(:,1),p)
         
-        wecsim_pos = [.8 .7];
+        wecsim_pos = [.78 .64]; %.8,.7
         mini_plot(wecsim_pos,x_nom(:,2),p)
     end
 
