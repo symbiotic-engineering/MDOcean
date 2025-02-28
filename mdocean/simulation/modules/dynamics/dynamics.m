@@ -89,7 +89,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
 
     % extra height on spar after accommodating float displacement
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_u_max) / in.h_s;
-    h_s_extra_down = (in.T_s - in.T_f_2 - X_u_max) / in.h_s;
+    h_s_extra_down = (in.T_s - in.T_f_2 - in.h_d - X_u_max) / in.h_s;
 
     % sufficient length of float support tube
     h_fs_extra = in.h_fs_clear / X_u_max - 1;

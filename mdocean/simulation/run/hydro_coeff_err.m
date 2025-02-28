@@ -34,7 +34,7 @@ harmonics = 20;
 
 use_MEEM = true;
 if use_MEEM
-    [A_MDOcean,~,~,B_MDOcean,~,~,gamma_MDOcean,~,gamma_ph_MDOcean,~] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, harmonics, spar_excitation_coeffs);
+    [A_MDOcean,~,~,B_MDOcean,~,~,gamma_MDOcean,~,gamma_ph_MDOcean,~] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, g, w, harmonics, spar_excitation_coeffs);
 else
     [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs(a2, k, d2);
     A_MDOcean = ones(size(w))* A_MDOcean;

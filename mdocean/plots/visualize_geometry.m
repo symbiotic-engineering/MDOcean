@@ -17,7 +17,7 @@ else
     color = {color,color,color};
 end
 
-[D_s,D_f,T_f_2,h_s,~,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8));
+[D_s,D_f,T_f_2,h_s,h_fs_clear,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8));
 
 if ~mini && ~compare
     figure
@@ -51,6 +51,13 @@ center_rect([0 float_rect_middle D_f float_rect_height],color{3})       % float 
 
 trapezoid(D_f_b,D_f,-T_f_2,-T_f_1,color{3}) % float slanted part
 
+% float tubes
+m_tubes = (h_fs_clear + (h_s-T_s) - (h_f - T_f_2)) / ( (D_f-D_s)/2 );
+x_tubes = [-D_f/2, 0, D_f/2];
+y_tube_1 = h_f - T_f_2;
+y_tubes = y_tube_1 + [0, m_tubes * D_f/2, 0];
+plot(x_tubes, y_tubes, color{3},'LineWidth',3)
+
 % for legend
 plot(NaN,NaN,color{1})
 
@@ -61,7 +68,7 @@ else
     set(gcf, 'Color', 'white');
 end
 grid on
-ylim([-40 12])
+ylim([-40 20])
 xlim([-27 27])
 %set(waves,'HandleVisibility','off')
 
