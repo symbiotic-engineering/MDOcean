@@ -1,7 +1,7 @@
 
 % Runs one-at-a-time design of experiments
 
-clear;clc;close all
+%clear;clc;close all
 
 p = parameters();
 b = var_bounds();

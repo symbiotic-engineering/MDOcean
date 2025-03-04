@@ -126,8 +126,8 @@ end
 %% figure 15 - design space exploration
 fig_names{15} = 'Fig. 15: design space exploration';
 if any(which_figs == 15)
-    % fixme - not implemented
-    fig15 = figure;
+    experiments()
+    fig15 = gcf;
     fig_output(which_figs==15) = fig15;
 end
 
@@ -189,21 +189,26 @@ end
 fig_names{30} = 'Fig. 30: asymptotic b vector';
 if any(which_figs == 30)
     b_Inf
-    fig31 = gcf;
+    fig30 = gcf;
     fig_output(which_figs==30) = fig30;
 end
 
-%% figure 31-35 - fixme not implemented
-if any( ismember(which_figs, 31:35) )
-    fig_output(ismember(which_figs, 31:35)) = figure;
+%% figure 31-33 - fixme not implemented
+if any( ismember(which_figs, 31:33) )
+    fig_output(ismember(which_figs, 31:33)) = figure;
 end
 
-%% figure 36 - damping plate moment
-fig_names{36} = 'Fig. 36: damping plate moment';
-if any(which_figs == 36)
+%% figure2 34 to 36 - damping plate moment and deflection
+fig_names{34} = 'Fig. 34: damping plate moment';
+fig_names{35} = 'Fig. 35: damping plate deflection';
+fig_names{36} = 'Fig. 36: damping plate plate aspect ratio';
+if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
     BoedoPrantilAnnularPlate()
-    fig36_temp = gcf;
-    fig36 = figure(fig36_temp.Number-2);
+    fig36 = gcf;
+    fig35 = figure(fig36.Number-1);
+    fig34 = figure(fig36.Number-7);
+    fig_output(which_figs==34) = fig34;
+    fig_output(which_figs==35) = fig35;
     fig_output(which_figs==36) = fig36;
 end
 
