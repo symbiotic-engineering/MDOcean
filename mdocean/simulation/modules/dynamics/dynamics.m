@@ -339,7 +339,33 @@ function [mag_U,phase_U,...
     
             [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
             mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
-            mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
+            
+            % force of float exciting spar, with PTO on
+            s = 1i * w;
+            F_fs = (m_c.*s.^2 + (B_p_sat+B_c).*s + K_p_sat) .* mag_X_f .* exp(1i * phase_X_f);
+            F_fs_mag = abs(F_fs);
+            F_fs_phase = angle(F_fs);
+
+            % force of float exciting spar, with PTO off
+            F_fs_pas = (m_c.*s.^2 + B_c.*s) .* mag_X_f .* exp(1i * phase_X_f);
+            F_fs_pas_mag = abs(F_fs_pas);
+            F_fs_pas_phase = angle(F_fs_pas);
+
+            [mag_X_s_pas_exc,phase_X_s_pas_exc] = second_order_transfer_fcn(w, m_s, B_s,         K_s,         F_s_mag,  F_s_phase); % force due to spar excitation, with PTO off
+            [mag_X_s_pas_flt,phase_X_s_pas_flt] = second_order_transfer_fcn(w, m_s, B_s,         K_s,         F_fs_pas_mag, F_fs_pas_phase); % force due to float excitation, with PTO off
+
+            X_s_pas = mag_X_s_pas_exc .* exp(1i * phase_X_s_pas_exc) + mag_X_s_pas_flt .* exp(1i * phase_X_s_pas_flt);
+            mag_X_s_pas = abs(X_s_pas);
+            phase_X_s_pas = angle(X_s_pas);
+
+            [mag_X_s_exc,phase_X_s_exc]         = second_order_transfer_fcn(w, m_s, B_s+B_p_sat, K_s+K_p_sat, F_s_mag,  F_s_phase); % force due to spar excitation, with PTO on
+            [mag_X_s_flt,phase_X_s_flt]         = second_order_transfer_fcn(w, m_s, B_s+B_p_sat, K_s+K_p_sat, F_fs_mag, F_fs_phase);% force due to float excitation, with PTO on
+
+            X_s = mag_X_s_exc .* exp(1i * phase_X_s_exc) + mag_X_s_flt .* exp(1i * phase_X_s_flt);
+            mag_X_s = abs(X_s);
+            phase_X_s = angle(X_s);
+
+            %mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
             mag_U = mult .* F_ptrain_over_x .* mag_X_f;
             
             phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
