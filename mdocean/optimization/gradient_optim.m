@@ -1,4 +1,4 @@
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, gs] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -54,14 +54,14 @@ opts = optimoptions('fmincon',	'Display',display,...
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
-    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
@@ -128,9 +128,10 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_bot
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-        [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
+        [out(1),out(2),~,g] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
+        gs(:,i)=g;
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;

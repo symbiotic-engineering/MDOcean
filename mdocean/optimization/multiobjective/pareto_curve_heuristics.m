@@ -18,6 +18,9 @@ function pareto_curve_heuristics()
     X = [X ones(length(X),1)]; % add extra column for material 
     LCOE = fval(:,1);
     Pvar = fval(:,2);
+    lambdaActive=lambda.active';
+    lambdaLower=lambda.lower';
+    lambdaUpper=lambda.upper';
 
     new_objs = true; % switch between LCOE-Pvar and capex-Pavg
     
@@ -50,6 +53,8 @@ function pareto_curve_heuristics()
     J1_max = Inf;%p.LCOE_max;
     design_heuristics_plot(J1, minJ1, idx_best_J1, x_best_J1, ...
                            J2, minJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs)
+
+    lagrange_multiplier_plot(lambdaActive,lambdaUpper,lambdaLower)
 
 end
 %%
@@ -363,4 +368,76 @@ function [] = design_heuristics_plot(overallLCOE, minLCOE, idx_best_LCOE, x_best
     ylabel('Objective Value')
     improvePlot
     legend(legend_text,Location='northeast')
+end
+
+%%
+function [] = lagrange_multiplier_plot(lambdaActive, ...
+    lambdaUpper,lambdaLower);
+figure
+hold on
+[m,n]=size(lambdaActive);
+color_cell = {'.r','or','+r','*r','xr','-r','|r','+b','ob','+b','*b','xb','-b','|b'};
+% I'll change these later
+for i=1:m
+    for j = 1:n
+        color=color_cell{rem(j,15)};
+        plot(i*100/60,lambdaActive(i,j),color,'MarkerSize',12);
+    end
+end
+%plot(pct_angle,lambda_active_sorted)
+title("Lagrange Multipliers")
+xlabel("Percent Along the Pareto Front")
+ylabel("Lagrange Multiplier")
+legend("prevent float too heavy","prevent float too light", ...
+    "prevent spar too heavy","prevent spar too light","stability",...
+    "float survives max force","spar survives max force",...
+    "damping plate survives max force","spar doesn't buckle", ...
+    'positive power','damping plate diameter','prevent float rising above top of spar',...
+    'prevent too expensive','prevent irrelevant max force')
+hold off
+%improvePlot
+
+% lower bound plot
+figure
+hold on
+[m,n]=size(lambdaLower);
+for i=1:m
+    for j = 1:n
+        color=color_cell{rem(j,15)};
+        plot(i*100/60,lambdaLower(i,j),color,'MarkerSize',12);
+    end
+end
+title('Lower Bound Active Lagrange Multipliers')
+xlabel('Percent Along the Pareto Curve')
+ylabel('Lagrange Multiplier')
+xlim([-1,101]);
+ylim([-.05,.2])
+legend('WEC Surface Float Outer Diameter', ...
+    'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+    'Ratio of WEC Surface Float Height to Outer Diameter', ...
+    'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+    'Powertrain/Controller Damping','Controller Natural Frequency')
+hold off
+
+% upper bound plot
+figure
+hold on
+[m,n]=size(lambdaUpper);
+for i=1:m
+    for j = 1:n
+        color=color_cell{rem(j,15)};
+        plot(i*100/60,lambdaUpper(i,j),color,'MarkerSize',12);
+    end
+end
+title('Upper Bound Active Lagrange Multipliers')
+xlabel('Percent Along the Pareto Curve')
+ylabel('Lagrange Multiplier')
+%xlim([-1,61]);
+ylim([-.02,.04])
+legend('WEC Surface Float Outer Diameter', ...
+    'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
+    'Ratio of WEC Surface Float Height to Outer Diameter', ...
+    'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
+    'Powertrain/Controller Damping','Controller Natural Frequency')
+hold off
 end
