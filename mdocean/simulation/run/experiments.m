@@ -119,21 +119,39 @@ t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 
 ax1 = nexttile(1);
-plot(ratios_sorted,LCOE(idx,:).')
-ylabel('LCOE ($/kWh)')
+cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
+        'b:','b--',...                       % PTO
+        'g:','g--','g-','g-.','g.'};  % structural
+for i=1:size(cols,2)
+    temp = LCOE(idx,:).';
+    plot(ratios_sorted,temp(i,:),cols{i})
+    hold on
+end
+%plot(ratios_sorted,LCOE(idx,:).')
+yline(1.43835,'LineWidth',2,'Color','k')
+ylab1=ylabel('LCOE ($/kWh)');
+axis(ax1,[0 3 1 2.5])
+l = legend(b.var_names_pretty{1:end-1});
+l.Location = 'northeastoutside';
 grid on
+
 ax2 = nexttile(2);
-plot(ratios_sorted,cost(idx,:).')
-ylabel('Structural and PTO Cost ($M)')
+for i=1:size(cols,2)
+    temp = cost(idx,:).';
+    plot(ratios_sorted,temp(i,:),cols{i})
+    hold on
+end
+%plot(ratios_sorted,cost(idx,:).')
+yline(2.16098,'LineWidth',2,'Color','k')
+ylab2=ylabel('Structural & PTO Cost ($M)');
 grid on
 
 title(t,'Design of Experiments Results','FontWeight','bold','FontSize',20)
-l = legend(b.var_names_pretty);
-l.Location = 'bestoutside';
 grid on
 linkaxes([ax1,ax2],'x');
 xlabel('Design Variable Ratio (-)')
 xticklabels(ax1,{})
 xticks(ax2,xticks(ax1))
 improvePlot
-
+ylab1.FontSize=16.5;
+ylab2.FontSize=16.5;
