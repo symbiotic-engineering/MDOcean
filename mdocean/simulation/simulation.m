@@ -22,7 +22,7 @@ in.M     = X(13);       % material index (-)
 % float thickness ratios
 in.t_f_r  = in.t_f_b * p.t_f_r_over_t_f_b;  % float radial wall thickness (m)
 in.t_f_c  = in.t_f_b * p.t_f_c_over_t_f_b;  % float circumferential gusset thickness (m)
-in.t_f_t  = in.t_f_b * p.t_f_t_over_t_f_b;  % float bottom thickness (m)
+in.t_f_t  = in.t_f_b * p.t_f_t_over_t_f_b;  % float top thickness (m)
 
 % stiffener thickness ratios
 in.w_stiff_f = p.w_over_h_stiff_f  * in.h_stiff_f;

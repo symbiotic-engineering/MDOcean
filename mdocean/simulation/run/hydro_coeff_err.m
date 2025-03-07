@@ -70,7 +70,7 @@ R2 = [R2_A R2_B R2_G R2_Gph];
 
 if plot_on
     %% coeff comparison validation figure
-    figure
+    fig = figure;
     plot(w,A,'--',w,B,'--',w,gamma,'--',w,gamma_ph*1e3,'--','LineWidth',3,'HandleVisibility','off')
     hold on
     set(gca,"ColorOrderIndex",1)
@@ -79,10 +79,14 @@ if plot_on
     plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean,w,gamma_ph_MDOcean*1e3)
     ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
-    legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force Magnitude |\gamma|/(\rhog)','1000*Excitation Phase \angle\gamma/(\rhog)','Simulation (Analytical)','Actual (WAMIT BEM)')
+    leg = legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force Magnitude |\gamma|/(\rhog)',...
+        '1000*Excitation Phase \angle\gamma/(\rhog)',...
+        'MDOcean Simulation (Semi-Analytical MEEM)','"Ground Truth" Simulation (WAMIT BEM)');
     title('Normalized Hydrodynamic Coefficients')
     xlabel('Wave frequency \omega (rad/s)')
     improvePlot
+    set(fig,'Position',[100 100 697.8 600])
+    set(leg,'Position',[0.1692 0.6372 0.7027 0.2615])
     
     %% check B formula
 %     figure

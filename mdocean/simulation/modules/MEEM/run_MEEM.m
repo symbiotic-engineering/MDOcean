@@ -1,4 +1,4 @@
-function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
+function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
                                                N_num, M_num, K_num, ...
                                                a1_mat, a2_mat, d1_mat, ...
                                                d2_mat, h_mat, m0_mat, ...
@@ -46,6 +46,7 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     % for loop for numeric inputs
     mu_nondim = zeros(1,num_runs);
     lambda_nondim = zeros(1,num_runs);
+    exc_phases = zeros(1,num_runs);
     
     for i = 1:num_runs
         % index into matrix inputs with i and into scalar inputs with 1
@@ -66,12 +67,13 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
                          d2_num < d1_num;
         
         if valid_geometry
-            [mu_nondim(i), lambda_nondim(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
+            [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, ...
                                                                 K_num, show_A, plot_phi, fname);
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
+            exc_phases(i) = 0;
             warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
         end
     end
@@ -91,10 +93,10 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     end
 end
 
-function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
+function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -134,7 +136,7 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
 
     m_k_num = zeros(1,K_num);
     % using tand instead of tan because finite precision of pi means
@@ -203,6 +205,13 @@ function [x_cell, m_k_cell, hydro_nondim_num] = compute_eigen_hydro_coeffs(a1_nu
     x_cell = num2cell(x);
     % solve for hydro
     hydro_nondim_num = c_num * x + c_0_num;
+
+    % see notebook p139 3/3/25 - from eq97 of Chau and Yung 2012
+    idx_B_0_e = length(A_num)-K_num;
+    B_0_e = x(idx_B_0_e);
+    exc_phase = -pi/2 + angle(B_0_e) - angle( besselh(0,m0_num*a2_num) );
+    exc_phase = -exc_phase; % I have to negate it to match WAMIT, not sure why
+
 end
 
 function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
