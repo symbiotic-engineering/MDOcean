@@ -108,7 +108,8 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs]
         else
             error('x0 input struct has wrong size')
         end
-            
+          
+        x0
         [X_opt_raw,obj_opt,flag,...
             output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;

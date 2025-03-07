@@ -1,4 +1,4 @@
-function [x,fval] = pareto_search(filename_uuid)
+function [x,fval,lambda] = pareto_search(filename_uuid)
     if nargin==0; filename_uuid=''; end
     
     p = parameters();
@@ -126,7 +126,7 @@ function [x,fval] = pareto_search(filename_uuid)
 
     % show which constaints are active along the pareto front
     tol = probMO.options.ConstraintTolerance;
-    idx = constraint_active_plot(residuals,fval,tol,b);
+    idx = constraint_active_plot(residuals,fval,tol);
 
     x_sorted = x(idx,b.idxs_recover)
 % solve for lambda values
@@ -145,6 +145,8 @@ function [x,fval] = pareto_search(filename_uuid)
         x_0_new.F_max = input(5);
         x_0_new.D_int = input(6);
         x_0_new.w_n = input(7);
+        x0new.(b.var_names(1))
+        %B_p
         [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
         g(:,i) = gs;
         Xs_opt_original(8,:) = [];

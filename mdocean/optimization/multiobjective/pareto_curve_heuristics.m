@@ -5,15 +5,18 @@ function pareto_curve_heuristics()
     b_w = var_bounds('wecsim');
     
     %[x,fval] = pareto_search();
-    d=dir("**/pareto_search_results*");
-    load(d(end).name)
+%    d=dir("**/pareto_search_results*");
+%    load(d(end).name)
+    load("pareto_search_results.mat")
 
     if ~exist('tol','var')
         tol = 1e-6;
     end
-    constraint_active_plot(residuals,fval,tol,b)
+    %constraint_active_plot(residuals,fval,tol,b)
 
     cols = b.idxs_recover;
+    %check this
+    cols=[1 3 6 5 4 2 7];
     X = x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add extra column for material 
     LCOE = fval(:,1);
