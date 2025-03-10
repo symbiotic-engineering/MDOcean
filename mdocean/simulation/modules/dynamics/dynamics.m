@@ -271,13 +271,14 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
     mag_v0_v_ratio(mag_v==0) = 0; % prevent divide by zero
-    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of my notebook
+    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
     
-    alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of my notebook
+    alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
     phi_alpha = phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
+    B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
     K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
 end
 
@@ -318,6 +319,13 @@ function [mag_U,phase_U,...
     while max_err > 0.01
 
         iters = iters + 1;
+        if iters > 100
+            warning('force saturation loop failed to converge. reversing search direction on problem sea states.')
+            F_err(abs(F_err) > max_err) = -F_err(abs(F_err) > max_err);
+        elseif iters > 1000
+            warning('force saturation loop failed to converge, and reversing search didnt help')
+            break
+        end
         mult = mult ./ (F_err+1);%get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
     
         B_p_sat = mult.*B_p;
@@ -352,7 +360,7 @@ function [mag_U,phase_U,...
         end
     
     %     F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
-        F_err = abs(mag_U ./ (f_sat .* mag_U_unsat) - 1);
+        F_err = mag_U ./ (f_sat .* mag_U_unsat) - 1;
         max_err = max(abs(F_err),[],'all');
 
     end
