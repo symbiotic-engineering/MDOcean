@@ -221,7 +221,17 @@ function [mag_U,phase_U,...
     [B_drag_s, K_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s);
 
     B_f = B_h_f + B_drag_f;
+    if any(B_f<0,'all')
+        warning('float damping is negative, zeroing!')
+    end
+    B_f = max(B_f,zeros(size(B_f))); % prevent negative damping
+
     B_s = B_h_s + B_drag_s;
+    if any(B_s<0,'all')
+        warning('spar damping is negative, zeroing!')
+    end
+    B_s = max(B_s,zeros(size(B_s))); % prevent negative damping
+
     K_f = K_h_f + K_drag_f;
     K_s = K_h_s + K_drag_s;
 
@@ -278,7 +288,7 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
-    B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
+    
     K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
 end
 
