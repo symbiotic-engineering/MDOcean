@@ -73,7 +73,7 @@ for i = 1:num_vars
                 idx_ignore = false(1,length(b.constraint_names));
                 ignore = {'irrelevant_max_force','LCOE_max','linear_theory'};
                 idx_ignore(ismember(b.constraint_names,ignore)) = true;
-                [feasible, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     cost(i,j) = cost_temp;

@@ -98,7 +98,7 @@ g(10) = FOS_damping_plate(1) * in.FOS_mult_d / p.FOS_min - 1; % damping plate su
 g(11) = FOS_damping_plate(2) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives fatigue
 g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
 g(13) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-g(14) = P_avg_elec;                     % positive power
+g(14) = P_avg_elec/1e6;                     % positive power
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 %g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold

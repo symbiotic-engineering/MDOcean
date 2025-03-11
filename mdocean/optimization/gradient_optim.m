@@ -1,4 +1,5 @@
-function [Xs_opt, objs_opt, flags, probs, vals] = gradient_optim(x0_input,p,b,which_objs)
+
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -46,21 +47,22 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'PlotFcn',plotfn,...
                                 'MaxIterations',8,...
                                 'FunValCheck','on',...
-                                'ConstraintTolerance',1e-5);%,...
+                                'ConstraintTolerance',1e-5,...
+                                'FiniteDifferenceStepSize',1e-4);%,...
                                 %'SpecifyObjectiveGradient',true,...
                                 %'SpecifyConstraintGradient',true); % would require ALL constraints to be AD-supported
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
-    [Xs_opt, objs_opt, flags, probs, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
@@ -72,34 +74,26 @@ function [Xs_opt, objs_opt, flags, probs, vals] = optimize_both_objectives(X,p,b
     objs = [J1 J2];
     probs = cell([1 2]); 
     
+    % allocate outputs
     Xs_opt = zeros(length(X),num_objectives);
     objs_opt = zeros(1,num_objectives);
     flags = zeros(1,num_objectives);
+    grads = zeros(length(X)-1,num_objectives);
+    hesses = zeros(length(X)-1,length(X)-1,num_objectives);
 
-    % add constraints
+    % add nonlinear constraints
     prob = optimproblem();
     for i = 1:num_constraints
         name = b.constraint_names{i};
         prob.Constraints.(name) = g(i) >= 0;
     end
 
-    D_s   = X(1);     % inner diameter of float (m)
-    D_f   = X(2);     % normalized diameter of spar column (-)
-    T_f_2 = X(3);     % normalized draft of float (-)
-    h_s   = X(4);     % normalized draft of spar (-)
-
-    T_s = D_s * p.T_s_over_D_s;
-    h_f = T_f_2 / p.T_f_2_over_h_f;
-    D_d = p.D_d_over_D_s * D_s;
-    D_f_in = D_s * p.D_f_in_over_D_s;
-
-    MEEM = pi*p.harmonics / (p.besseli_argmax*2);
-    prob.Constraints.linear_spar_natural_freq = D_d >= p.D_d_min;
-    prob.Constraints.linear_float_spar_diam = D_f_in <= D_f - .01;
-    prob.Constraints.linear_float_spar_draft = T_f_2 <= T_s - .01;
-    prob.Constraints.linear_float_spar_tops = h_s - T_s >= h_f - T_f_2 + .01;
-    prob.Constraints.linear_float_seafloor = p.h - T_f_2 >= MEEM * D_f; % M
-    prob.Constraints.linear_spar_seafloor = p.h - T_s >= MEEM * D_s; % N
+    % add linear constraints
+    [A_lin,b_lin] = lin_ineq_constraints(p);
+    for i=1:length(b_lin)
+        name = b.lin_constraint_names{i};
+        prob.Constraints.(name) = A_lin(i,:)*X(1:size(A_lin,2)).' <= b_lin(i);
+    end
 
     % iterate through the two objectives: LCOE and P_var
     for i = 1:num_objectives
@@ -143,9 +137,13 @@ function [Xs_opt, objs_opt, flags, probs, vals] = optimize_both_objectives(X,p,b
         flags(i) = flag;
         if i==1
             vals = val;
+            lambdas = lambda;
         else
             vals(i) = val;
+            lambdas(i) = lambda;
         end
+        grads(:,i) = grad;
+        hesses(:,:,i) = hess;
 
         % Post process
         if ploton

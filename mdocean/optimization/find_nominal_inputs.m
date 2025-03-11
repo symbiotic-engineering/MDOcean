@@ -16,7 +16,7 @@ function F_max_nom = find_nominal_inputs(b, mode, display_on)
         idx_F = strcmp(b.var_names,'F_max');
         X(idx_F) = F_max_nom;
         [LCOE, P_var, ~, g] = simulation(X,p)
-        [feasible,failed] = is_feasible(g, X, p, b)
+        [feasible,~,failed] = is_feasible(g, X, p, b)
 
         % display x output
         array2table(F_max_nom,'VariableNames',{'F_max (1e6 N)'})

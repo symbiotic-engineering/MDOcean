@@ -11,7 +11,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     
     % whether nominal violates constraints
     idx_ignore = strcmp(b.constraint_names,'irrelevant_max_force');
-    [feasible,failed] = is_feasible(g, X, p, b, idx_ignore);
+    [feasible,~,failed] = is_feasible(g, X, p, b, idx_ignore);
 
     % comparison of simulated and actual values
     if nargout > 2
