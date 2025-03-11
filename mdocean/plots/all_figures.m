@@ -131,18 +131,20 @@ if any(which_figs == 15)
     fig_output(which_figs==15) = fig15;
 end
 
-%% figure 16, 17, 18, 19, 20, 21 - parameter sensitivities
-fig_names{16} = 'Fig. 16: local objective parameter sensitivities';
-fig_names{17} = 'Fig. 17: local optimal objective parameter sensitivities';
-fig_names{18} = 'Fig. 18: local optimal design variable parameter sensitivities';
-fig_names{19} = 'Fig. 19: constraint activity thresholds';
-fig_names{20} = 'Fig. 20: global optimal objective parameter sensitivities';
-fig_names{21} = 'Fig. 21: global optimal design variable parameter sensitivities';
-if any(which_figs == 16)
+%% figure 16, 17, 18 - parameter sensitivities
+fig_names{16} = 'Fig. 16: local and global objective parameter sensitivities';
+fig_names{17} = 'Fig. 17: local optimal design variable parameter sensitivities';
+fig_names{18} = 'Fig. 18: global optimal design variable parameter sensitivities';
+if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     param_sweep(filename_uuid)
-    fig16 = gcf;
+    figTemp = gcf; % delta p global
+    fig18 = figure(figTemp.Number - 2); % dx*/dp global
+    fig17 = figure(figTemp.Number - 3); % dx*/dp local
+    fig16 = figure(figTemp.Number - 5); % dJ*/dp combined
     fig_output(which_figs==16) = fig16;
-    % fixme: 17 through 21 not implemented
+    fig_output(which_figs==17) = fig17;
+    fig_output(which_figs==18) = fig18;
+    % fixme: 19 through 21 not implemented
 end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
