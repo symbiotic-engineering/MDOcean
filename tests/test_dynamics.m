@@ -59,7 +59,21 @@ classdef (SharedTestFixtures={ ...
             % match RM3 report to within 10 percent under assumptions used for optim
         end
 
+        function dynamicValidationTable(testCase)
+            T_report = struct2table(testCase.errors_report);
+            T_singlebody = struct2table(testCase.errors_singlebody);
+            T_multibody = struct2table(testCase.errors_multibody);
+            T = [T_report;T_singlebody;T_multibody];
 
+            diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(T);
+            testCase.log(diagnostic);
+        end
     end
     
+
+
+
+
+
+
 end
