@@ -6,7 +6,7 @@ report = true;
 override = false;
 power_matrix_compare(X, p, wecsim_filename, report, override)
 
-% add breakpoint inside power_matrix_compare and do the following in
+% add breakpoint on line 115 of power_matrix_compare and do the following in
 % command window: (see 1/27/25 slides for screenshots)
 sp = sim.power_mech_unsat;
 ap = actual.power_mech_unsat;
