@@ -163,16 +163,27 @@ function [mag_U,phase_U,...
                                         X_max,control_type,multibody,...
                                         X_tol,phase_X_tol,max_drag_iters)
     % initial guess: 2m float amplitude, 0.5m spar amplitude
-    X_f_guess = 2;
-    phase_X_f_guess = 0;
-    X_s_guess = .5;
-    phase_X_s_guess = 0;
+    X_f_guess = 2 * ones(size(w));
+    phase_X_f_guess = zeros(size(w));
+    X_s_guess = .5 * ones(size(w));
+    phase_X_s_guess = zeros(size(w));
 
-    [X_err,phase_X_err] = deal(1);
+    converged = false;
     iters = 0;
 
+    drag_convergence_plot = false; %size(w) == [14,15]; % hack so it runs for operational not storm
+
     % loop until converged
-    while X_err > X_tol || phase_X_err > phase_X_tol
+    while ~converged
+        if drag_convergence_plot
+            % record guesses
+            % 10,1 was found manually to be the problem sea state
+            X_f_guesses(iters+1) = X_f_guess(10,1);
+            X_s_guesses(iters+1) = X_s_guess(10,1);
+            phase_X_f_guesses(iters+1) = phase_X_f_guess(10,1);
+            phase_X_s_guesses(iters+1) = phase_X_s_guess(10,1);
+        end
+
         [mag_U,phase_U,...
          real_P,reactive_P,...
          mag_X_u,phase_X_u,...
@@ -197,7 +208,12 @@ function [mag_U,phase_U,...
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
 
-        % check iterations
+        % check convergence
+        X_converged = X_err < X_tol;
+        phase_X_converged = phase_X_err < phase_X_tol || phase_X_err < 2*pi+phase_X_tol; % the 2pi allows for the solution to oscillate between +pi and -pi
+        converged = X_converged && phase_X_converged;
+
+        % increment iterations and check max iters
         iters = iters + 1;
         if iters > max_drag_iters
             warning(['Drag loop has not converged after ' num2str(max_drag_iters) ' iterations. ' ...
@@ -205,6 +221,25 @@ function [mag_U,phase_U,...
             break
         end
     end
+
+    if drag_convergence_plot
+        x_iter = 1:iters;
+        figure
+        plot(x_iter,X_f_guesses,x_iter,phase_X_f_guesses)
+        hold on
+        plot(x_iter,X_s_guesses,x_iter,phase_X_s_guesses)
+        legend('|X_f|','\angleX_f','|X_s|','\angleX_s')
+
+        x_iter_tol = x_iter(2:end)+1;
+        plot(x_iter_tol,X_f_guesses(2:end)+X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end)+phase_X_tol,'k--','HandleVisibility','off')
+        plot(x_iter_tol,X_s_guesses(2:end)+X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end)+phase_X_tol,'k--','HandleVisibility','off')
+        plot(x_iter_tol,X_f_guesses(2:end)-X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end)-phase_X_tol,'k--','HandleVisibility','off')
+        plot(x_iter_tol,X_s_guesses(2:end)-X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end)-phase_X_tol,'k--','HandleVisibility','off')
+        xlabel('Iterations')
+        title('Drag Nonlinearity Convergence')
+        improvePlot
+    end
+
 end
 
 function [mag_U,phase_U,...
