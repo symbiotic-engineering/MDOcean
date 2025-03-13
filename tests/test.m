@@ -40,19 +40,9 @@ classdef (SharedTestFixtures={ ...
         function which_fig_struct = enumerateFigs()
             [~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
 
-            if ~test.run_slow_tests
-                num_tabs = num_tabs - length(test.slow_tabs);
-            end
-
             which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
             fig_names = matlab.lang.makeValidName([fig_names, none]);
-
-            if ~test.run_slow_tests
-                idx_slow = ismember(which_figs_vec, test.slow_figs);
-                which_figs_vec(idx_slow) = [];
-                fig_names(idx_slow) = [];
-            end
 
             which_figs_cell = num2cell(which_figs_vec);
             which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
@@ -60,19 +50,9 @@ classdef (SharedTestFixtures={ ...
         function which_tab_struct = enumerateTabs()
             [~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
 
-            if ~test.run_slow_tests
-                num_figs = num_figs - length(test.slow_figs);
-            end
-
             which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
             tab_names = matlab.lang.makeValidName([none, tab_names]);
-
-            if ~test.run_slow_tests
-                idx_slow = ismember(which_tabs_vec, test.slow_tabs);
-                which_tabs_vec(idx_slow) = [];
-                tab_names(idx_slow) = [];
-            end
 
             which_tabs_cell = num2cell(which_tabs_vec);
             which_tab_struct = cell2struct(which_tabs_cell,tab_names,2);
@@ -132,6 +112,12 @@ classdef (SharedTestFixtures={ ...
 
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
+
+            if ~test.run_slow_tests % mark slow tests as filtered
+                testCase.assumeFalse( ismember(which_figs, test.slow_figs) );
+                testCase.assumeFalse( ismember(which_tabs, test.slow_tabs) );
+            end
+
             [success_criterion,fig_out,tab_out] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
 
             if isempty(success_criterion)
