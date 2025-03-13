@@ -11,7 +11,7 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-run_wecsim_validation = false;
+run_wecsim_validation = true;
 
 if run_wecsim_validation && exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
