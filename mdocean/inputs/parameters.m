@@ -65,7 +65,7 @@ T = [T;
     table("rho_m","\rho_m",{[7850 2400 7900]},"structures",true,"material density (kg/m3)",{1});
     table("E","E",{[200e9, 5000*sqrt(4.5*ksi2pa), 200e9]},"structures",true,...
             "young's modulus (Pa)",{1});
-    table("cost_perkg_mult","cost_m",{[4.28, 125/yd2m^3/2400, 1.84/lb2kg]},"economics",true,"material cost ($/kg)",{1});
+    table("cost_perkg_mult","cost_m",{[4.28, 125/yd2m^3/2400, 1.84/lb2kg]/4.28},"economics",true,"material cost ($/kg)",{1});
         ...% RM3 CBS sheet 1.4 average of cells F21, F34, F46, F56
         ...% https://www.concretenetwork.com/concrete-prices.html
         ...% https://agmetalminer.com/metal-prices/
