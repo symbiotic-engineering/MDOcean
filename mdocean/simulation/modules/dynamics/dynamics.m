@@ -225,16 +225,22 @@ function [mag_U,phase_U,...
     if drag_convergence_plot
         x_iter = 1:iters;
         figure
-        plot(x_iter,X_f_guesses,x_iter,phase_X_f_guesses)
+        plot(x_iter,X_f_guesses,'DisplayName','|X_f|')
         hold on
-        plot(x_iter,X_s_guesses,x_iter,phase_X_s_guesses)
-        legend('|X_f|','\angleX_f','|X_s|','\angleX_s')
+        plot(x_iter,phase_X_f_guesses,'DisplayName','\angleX_f')
+        if multibody
+            plot(x_iter,X_s_guesses,'DisplayName','|X_s|')
+            plot(x_iter,phase_X_s_guesses,'DisplayName','\angleX_s')
+        end
+        legend
 
-        x_iter_tol = x_iter(2:end)+1;
-        plot(x_iter_tol,X_f_guesses(2:end)+X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end)+phase_X_tol,'k--','HandleVisibility','off')
-        plot(x_iter_tol,X_s_guesses(2:end)+X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end)+phase_X_tol,'k--','HandleVisibility','off')
-        plot(x_iter_tol,X_f_guesses(2:end)-X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end)-phase_X_tol,'k--','HandleVisibility','off')
-        plot(x_iter_tol,X_s_guesses(2:end)-X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end)-phase_X_tol,'k--','HandleVisibility','off')
+        x_iter_tol = x_iter(2:end-1)+1;
+        plot(x_iter_tol,X_f_guesses(2:end-1)+X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end-1)+phase_X_tol,'k--','HandleVisibility','off')
+        plot(x_iter_tol,X_f_guesses(2:end-1)-X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end-1)-phase_X_tol,'k--','HandleVisibility','off')
+        if multibody
+            plot(x_iter_tol,X_s_guesses(2:end-1)+X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end-1)+phase_X_tol,'k--','HandleVisibility','off')
+            plot(x_iter_tol,X_s_guesses(2:end-1)-X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end-1)-phase_X_tol,'k--','HandleVisibility','off')
+        end
         xlabel('Iterations')
         title('Drag Nonlinearity Convergence')
         improvePlot
