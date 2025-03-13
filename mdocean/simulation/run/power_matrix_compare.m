@@ -1,68 +1,68 @@
 function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report, override)
 
-if nargin==0
-    % inputs
-    p = parameters();
-    b = var_bounds();
-    X = [b.X_noms; 1];
-
-    if p.use_multibody
-        wecsim_filename = 'wecsim_sparcd0_floatcd0_55e8584';
-        %'wecsim_power_sparfloatingcd5_floatcd0_multibody'
-    else % singlebody = spar fixed
-        if p.C_d_float == 0
-            wecsim_filename = 'wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe';
-        elseif p.C_d_float == 1
-            wecsim_filename = 'wecsim_sparfixed_floatcd1_92fac3d';
-        else
-            error('cant find wecsim data for this Cd')
+    if nargin==0
+        % inputs
+        p = parameters();
+        b = var_bounds();
+        X = [b.X_noms; 1];
+    
+        if p.use_multibody
+            wecsim_filename = 'wecsim_sparcd0_floatcd0_55e8584';
+            %'wecsim_power_sparfloatingcd5_floatcd0_multibody'
+        else % singlebody = spar fixed
+            if p.C_d_float == 0
+                wecsim_filename = 'wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe';
+            elseif p.C_d_float == 1
+                wecsim_filename = 'wecsim_sparfixed_floatcd1_92fac3d';
+            else
+                error('cant find wecsim data for this Cd')
+            end
         end
     end
-end
-
-if nargin<4
-    report = false;
-end
-
-results_wecsim = load_wecsim_results(wecsim_filename, p);
-
-results_mdocean = compute_mdocean_results(X,p);
-
-if report
-    results_RM3_report = load_RM3_report_results(p.eff_pto, override);
-    results_actual = results_RM3_report;
-    results_sim = results_wecsim;
-    results_sim(2) = results_mdocean;
-    actual_str = 'RM3 Report';
-    sim_str = {'WecSim','MDOcean'};
-else
-    results_actual = results_wecsim;
-    results_sim = results_mdocean;
-    actual_str = 'WecSim';
-    sim_str = {'MDOcean'};
-end
-
-% options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
-%                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-%                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
-vars_to_plot = {'power_mech_unsat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
-comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
-
-% todo: use actual pretty variables titles with units
-% var_names = {'Unweighted Device Power Matrix (kW)',...
-%      'JPD-Weighted Power Matrix (kW)',...
-%      'Capture With (m)'...
-%      'Capture Width Ratio (-)',...
-%      'Capture Width / Max Capture Width (-)',...
-%      'Capture Width / Max Capture Width (-)',...
-%     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-
-% compare average power over all sea states in JPD
-weighted_power_error = zeros([1,length(results_sim)]);
-for i=1:length(results_sim)
-weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
-                                                      results_actual.power_mech_unsat, p.JPD);
-end
+    
+    if nargin<4
+        report = false;
+    end
+    
+    results_wecsim = load_wecsim_results(wecsim_filename, p);
+    
+    results_mdocean = compute_mdocean_results(X,p);
+    
+    if report
+        results_RM3_report = load_RM3_report_results(p.eff_pto, override);
+        results_actual = results_RM3_report;
+        results_sim = results_wecsim;
+        results_sim(2) = results_mdocean;
+        actual_str = 'RM3 Report';
+        sim_str = {'WecSim','MDOcean'};
+    else
+        results_actual = results_wecsim;
+        results_sim = results_mdocean;
+        actual_str = 'WecSim';
+        sim_str = {'MDOcean'};
+    end
+    
+    % options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
+    %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
+    %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
+    vars_to_plot = {'power_mech_unsat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
+    comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
+    
+    % todo: use actual pretty variables titles with units
+    % var_names = {'Unweighted Device Power Matrix (kW)',...
+    %      'JPD-Weighted Power Matrix (kW)',...
+    %      'Capture With (m)'...
+    %      'Capture Width Ratio (-)',...
+    %      'Capture Width / Max Capture Width (-)',...
+    %      'Capture Width / Max Capture Width (-)',...
+    %     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
+    
+    % compare average power over all sea states in JPD
+    weighted_power_error = zeros([1,length(results_sim)]);
+    for i=1:length(results_sim)
+    weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
+                                                          results_actual.power_mech_unsat, p.JPD);
+    end
 
 end
 %%
