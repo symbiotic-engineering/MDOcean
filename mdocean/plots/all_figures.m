@@ -190,7 +190,7 @@ end
 %% figure 30 - asymptotic b vector
 fig_names{30} = 'Fig. 30: asymptotic b vector';
 if any(which_figs == 30)
-    b_Inf
+    b_inf_numeric()
     fig30 = gcf;
     fig_output(which_figs==30) = fig30;
 end
@@ -200,7 +200,7 @@ if any( ismember(which_figs, 31:33) )
     fig_output(ismember(which_figs, 31:33)) = figure;
 end
 
-%% figure2 34 to 36 - damping plate moment and deflection
+%% figure 34 to 36 - damping plate moment and deflection
 fig_names{34} = 'Fig. 34: damping plate moment';
 fig_names{35} = 'Fig. 35: damping plate deflection';
 fig_names{36} = 'Fig. 36: damping plate plate aspect ratio';
