@@ -7,16 +7,18 @@ classdef (SharedTestFixtures={ ...
         errors_singlebody
         errors_multibody
         errors_report
+        table
     end
 
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
         function runNominalDynamics(testCase)
-            [singlebody, multibody, report] = validate_dynamics();
+            [singlebody, multibody, report, tab] = validate_dynamics();
             testCase.errors_singlebody = singlebody;
             testCase.errors_multibody  = multibody;
             testCase.errors_report     = report;
+            testCase.table             = tab;
         end
     end
 
@@ -60,20 +62,9 @@ classdef (SharedTestFixtures={ ...
         end
 
         function dynamicValidationTable(testCase)
-            T_report = struct2table(testCase.errors_report);
-            T_singlebody = struct2table(testCase.errors_singlebody);
-            T_multibody = struct2table(testCase.errors_multibody);
-            T = [T_report;T_singlebody;T_multibody];
-
-            diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(T);
+            diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(testCase.table);
             testCase.log(diagnostic);
         end
     end
-    
-
-
-
-
-
 
 end
