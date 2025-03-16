@@ -242,7 +242,7 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     
     % text labels
     sz = 14;
-    text(J1_nom(1)+7,J2_nom(1)+.02,'RM3 Report','FontSize',sz)
+    text(J1_nom(1)+2,J2_nom(1)+.02,'RM3 Report','FontSize',sz)
     text(J1_nom(1)+.01,J2_nom(1)-5,'Actual [10]','FontSize',sz)
     text(J1_nom_sim(1)-.02,J2_nom_sim(1)+5,'RM3 Report','FontSize',sz)
     text(J1_nom_sim(1)+.03,J2_nom_sim(1)-.05,'Sim','FontSize',sz)
@@ -255,7 +255,7 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     text(bestJ1+.03,bestJ2-2,'Utopia Point','FontSize',sz)
     text(J1_solar+.03,J2_solar,'Solar','FontSize',sz)
     if showSingleObj
-        text(J1(idx_best_J1)+.03,J2(idx_best_J1),'Cheapest','FontSize',sz)
+        text(J1(idx_best_J1)+.03,J2(idx_best_J1),'Most Power','FontSize',sz)
         text(J1(idx_best_J2)+.03,J2(idx_best_J2)-3,'Least Variable','FontSize',sz)
         text(J1_balanced-.15,J2_balanced+5,'Balanced Design','FontSize',sz)
     end
@@ -265,20 +265,21 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     end
 
     if showImages   % small pictures of best geometries
+        ylim([0.64, 2.28])
 
-        upper_left = [.2 .7]; %.28,.6
+        upper_left = [.78 .45]; %.28,.6
         mini_plot(upper_left,x_best_J1,p)
 
-        lower_right = [.63 .16]; %.51,.23
+        lower_right = [.15 .2]; %.51,.23
         mini_plot(lower_right,x_best_J2,p)
         
-        balanced_pos = [.17 .41]; %0.1,.35
+        balanced_pos = [.415 .30]; %0.1,.35
         mini_plot(balanced_pos,x_balanced,p)
 
-        report_pos = [.68 .43]; %.7,.53
+        report_pos = [.15 .64]; %.7,.53
         mini_plot(report_pos,x_nom(:,1),p)
         
-        wecsim_pos = [.78 .64]; %.8,.7
+        wecsim_pos = [.38 .60]; %.8,.7
         mini_plot(wecsim_pos,x_nom(:,2),p)
     end
 

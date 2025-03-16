@@ -25,7 +25,7 @@ X_nom	= [b.X_noms' 1];
 
 %%
 X    = [X_nom;   X_minLCOE';  X_minCapex';  X_maxPower';  X_balanced'];
-vals = [val_nom, val_minLCOE, val_minCapex, val_maxPower, val_balanced];
+vals = {val_nom, val_minLCOE, val_minCapex, val_maxPower, val_balanced};
 
 titles = {'Nominal','Min LCOE','Min Capex','Max Power','Balanced'};
 color = {'k','b','r','g','m'};
@@ -104,6 +104,9 @@ cb = colorbar('Position',[.8 .175 .08 .685]);
 sgtitle('Weighted Power (kW)','FontWeight','bold','FontSize',20)
 text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
+
+%% hydro coeff comparison plot
+
 
 %% design variable table
 DV_table = array2table(X.', ...
