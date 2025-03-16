@@ -238,6 +238,14 @@ if any(which_tabs == 1)
     display(tab1)
 
     tab_output{which_tabs==1} = tab1;
+
+    vector_cols = {'capex','capex_design','J_capex_design','capex_struct','capex_PTO','opex','LCOE'};
+    idx_remove = ismember(tab1.Properties.VariableNames,vector_cols); 
+    %tab1latex = tab1(:,~idx_remove); % remove vector cols so rows2vars works
+    tab1latex = rows2vars(tab1,'VariableNamingRule','preserve','DataVariables',~idx_remove);
+    tab1latex.OriginalVariableNames = remove_underscores(tab1latex.OriginalVariableNames);
+    tab1latex = renamevars(tab1latex, 'OriginalVariableNames', 'Variable');
+    table2latex(tab1latex,[save_folder 'table_12.tex'])
 end
 
 %% table 15 - constraints table
