@@ -58,7 +58,7 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
 end
 
 fig = optim_time_bar_chart(suite,results);
-save_pdf(fig,[test_dir '/Figure_30.pdf'])
+save_pdf(fig,'test-results/Figure_30.pdf')
 
 display(results);
 assertSuccess(results);
