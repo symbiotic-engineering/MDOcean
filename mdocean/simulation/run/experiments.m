@@ -99,16 +99,18 @@ results = addvars(results, round(LCOE(LCOE~=Inf),2), round(cost(cost~=Inf),1), f
                 'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','Failed Constraints'});	
 disp(results)
 
-% plot pareto curve for comparison
-pareto_curve_heuristics()
-figure(3)
-plot(power/1e3, cost, '*--')
-
-title('Design of Experiments Pareto Front')
-l = legend(b.var_names_pretty);
-improvePlot
-l.Location = 'bestoutside';
-
+% plot pareto curve for comparison, if pareto results exist
+d=dir("**/pareto_search_results*");
+if ~isempty(d)
+    pareto_curve_heuristics()
+    figure(3)
+    plot(power/1e3, cost, '*--')
+    
+    title('Design of Experiments Pareto Front')
+    l = legend(b.var_names_pretty);
+    improvePlot
+    l.Location = 'bestoutside';
+end
 %% sensitivities plot
 [ratios_sorted,idx] = sort(ratios);
 LCOE(1,:) = LCOE(1,1); % fill in nominal LCOE results for each DV where it wasn't repeatedly tested
