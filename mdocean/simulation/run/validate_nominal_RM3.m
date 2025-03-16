@@ -64,7 +64,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
         set(ax.Legend,'Position',[0.2671 0.1913 0.0973 0.0902])
 
         % simulated and actual in table form 
-        if nargout > 5
+        if nargout > 4
             % create combined struct
             extra_fields = setdiff(fieldnames(simulated),fieldnames(actual));
             results = rmfield(simulated, extra_fields); % remove fields where there is no actual data
