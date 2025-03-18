@@ -363,7 +363,8 @@ function [mag_U,phase_U,...
         if iters > 100
             warning('force saturation loop failed to converge. reversing search direction on problem sea states.')
             F_err(abs(F_err) > max_err) = -F_err(abs(F_err) > max_err);
-        elseif iters > 1000
+        end
+        if iters > 1000
             warning('force saturation loop failed to converge, and reversing search didnt help')
             break
         end
