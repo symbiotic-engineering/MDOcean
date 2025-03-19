@@ -3,21 +3,25 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
 
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
+    zero_prob_idxs = in.JPD==0;
+    T(zero_prob_idxs) = NaN;
+    Hs(zero_prob_idxs) = NaN;
+
     [P_matrix_mech,X_constraints_op,B_p,...
         X_u,X_f,X_s,F_heave_op,...
         F_surge_op,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,...
                                                         V_d,draft,in.F_max, ...
-                                                        in.JPD==0, in.T_f_1);
+                                                        zero_prob_idxs, in.T_f_1);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix_elec = min(P_matrix_elec,in.P_max);
+    P_matrix_elec = min(P_matrix_elec,in.P_max,'includenan');
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
-    P_avg_elec = sum(P_weighted(:)); 
+    P_avg_elec = sum(P_weighted(:),'omitnan'); 
     
     assert(isreal(P_avg_elec))
     
@@ -34,7 +38,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     X_constraints = [X_constraints_op X_constraints_storm];
 
     % coefficient of variance (normalized standard deviation) of power
-    P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
+    P_var = std(P_matrix_elec(:), in.JPD(:),'omitnan') / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
     
 
