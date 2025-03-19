@@ -23,8 +23,9 @@ else
 end
 
 mcr.header = {'waves.height','waves.period','pto(1).damping'};
-control = val.B_p(:);
-mcr.cases = [H(:),T(:),control];
+idx = p.JPD ~= 0;
+control = val.B_p(idx);
+mcr.cases = [H(idx),T(idx),control];
 save('mcrMDOcean.mat','mcr')
 
 % filename to save

@@ -11,7 +11,7 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
             %'wecsim_power_sparfloatingcd5_floatcd0_multibody'
         else % singlebody = spar fixed
             if p.C_d_float == 0
-                wecsim_filename = 'wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe';
+                wecsim_filename = 'wecsim_sparcd0_floatcd0_multibody_0_meem_off_git_8f74f47_uuid_66255df6-2eec-463d-ae72-3178d01d3485';
             elseif p.C_d_float == 1
                 wecsim_filename = 'wecsim_sparfixed_floatcd1_92fac3d';
             else
@@ -203,13 +203,16 @@ function results = load_wecsim_results(wecsim_filename, p)
     sz = size(p.JPD);
     % wecSim spar stationary
     vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
+    idx = find(p.JPD ~= 0);
 
     wecsim_raw = load(wecsim_filename,vars{:});
-    power_mech_unsat = -reshape(wecsim_raw.P, sz) / 1000;
+    [power_mech_unsat,float_amplitude,spar_amplitude,relative_amplitude] = deal(nan(sz));
+    power_mech_unsat(idx) = -wecsim_raw.P / 1000;
+    float_amplitude(idx) = wecsim_raw.float_amplitude;
+    spar_amplitude(idx) = wecsim_raw.spar_amplitude;
+    relative_amplitude(idx) = wecsim_raw.relative_amplitude;
+
     %power_mech_unsat(power_mech_unsat>1e6) = NaN;
-    float_amplitude = reshape(wecsim_raw.float_amplitude,sz);
-    spar_amplitude = reshape(wecsim_raw.spar_amplitude,sz);
-    relative_amplitude = reshape(wecsim_raw.relative_amplitude,sz);
 
     % todo: add damping
 
