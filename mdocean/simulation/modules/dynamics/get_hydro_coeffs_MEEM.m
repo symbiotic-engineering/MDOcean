@@ -23,8 +23,9 @@ K_num = harmonics;
 
 % expand matrix for each Hs
 num_Hs = size(m0,1);
-mu_nondim = repmat(mu_nondim,[num_Hs 1]);
+mu_nondim     = repmat(mu_nondim,     [num_Hs 1]);
 lambda_nondim = repmat(lambda_nondim, [num_Hs 1]);
+gamma_phase_f = repmat(gamma_phase_f, [num_Hs 1]);
 
 normalize = pi * a2^3;
 A_f_over_rho   = mu_nondim     * normalize;
@@ -42,7 +43,6 @@ gamma_f_over_rho_g = sqrt(2 * mult .* B_f_over_rho_w ./ m0); % Haskind relations
 % set the remaining coeffs to zero since not sure how to approximate them
 A_c_over_rho = 0;
 B_c_over_rho_w = 0;
-%gamma_phase_f = zeros(size(mu_nondim)); % I would maybe be able to get this from Haskind of MEEM results?
 gamma_phase_s = 0;
 
 end
