@@ -16,7 +16,7 @@ B = hydro.B(3,3,w<w_max);
 B = B(:);
 gamma = hydro.ex_ma(3,1,w<w_max);
 gamma = gamma(:);
-gamma_ph = hydro.ex_ph(3,1,w<w_max);
+gamma_ph = -hydro.ex_ph(3,1,w<w_max);
 gamma_ph = gamma_ph(:);
 
 a2 = 10;
@@ -34,7 +34,8 @@ harmonics = 20;
 
 use_MEEM = true;
 if use_MEEM
-    [A_MDOcean,~,~,B_MDOcean,~,~,gamma_MDOcean,~,gamma_ph_MDOcean,~] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, g, w, harmonics, spar_excitation_coeffs);
+    [A_MDOcean,~,~,B_MDOcean,~,~,...
+     gamma_MDOcean,~,gamma_ph_MDOcean,~] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, g, w, harmonics, spar_excitation_coeffs);
 else
     [A_MDOcean,B_MDOcean,gamma_MDOcean] = get_hydro_coeffs(a2, k, d2);
     A_MDOcean = ones(size(w))* A_MDOcean;
@@ -71,16 +72,16 @@ R2 = [R2_A R2_B R2_G R2_Gph];
 if plot_on
     %% coeff comparison validation figure
     fig = figure;
-    plot(w,A,'--',w,B,'--',w,gamma,'--',w,gamma_ph*1e3,'--','LineWidth',3,'HandleVisibility','off')
+    plot(w,A,'--',w,B,'--',w,gamma,'--',w,gamma_ph*-1e3,'--','LineWidth',3,'HandleVisibility','off')
     hold on
     set(gca,"ColorOrderIndex",1)
     % gamma_ph_MDOcean = B_MDOcean .* w ./ A_MDOcean; % random idea that
     %  gamma phase just comes from Bw/A which is the radiation phase - doesn't work
-    plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean,w,gamma_ph_MDOcean*1e3)
+    plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean,w,gamma_ph_MDOcean*-1e3)
     ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
     leg = legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force Magnitude |\gamma|/(\rhog)',...
-        '1000*Excitation Phase \angle\gamma/(\rhog)',...
+        '-1000*Excitation Phase -\angle\gamma',...
         'MDOcean Simulation (Semi-Analytical MEEM)','"Ground Truth" Simulation (WAMIT BEM)');
     title('Normalized Hydrodynamic Coefficients')
     xlabel('Wave frequency \omega (rad/s)')
