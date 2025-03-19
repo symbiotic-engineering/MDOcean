@@ -7,6 +7,11 @@ if ~exist('p','var')
     warning('parameters were loaded from scratch')
     p = parameters();
 end
+if ~p.use_MEEM
+    meem = 'off';
+else
+    meem = num2str(p.harmonics);
+end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
 b = var_bounds();
 X = [b.X_noms; 1];
@@ -30,7 +35,12 @@ end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
 uuid = char(matlab.lang.internal.uuid());
-output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash '_' uuid];
+C_d_s = num2str(p.C_d_spar);
+C_d_f = num2str(p.C_d_float);
+mb = num2str(p.use_multibody);
+
+output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
+                    '_meem_' meem '_git_' git_hash '_uuid_' uuid];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
