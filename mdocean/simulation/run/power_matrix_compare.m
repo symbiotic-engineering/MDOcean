@@ -92,21 +92,33 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
             subplot(1,num_subplots,1+length(sim)+i)
-            error_levels = 10;
+
             % set contour lines to make plot more readable
-%             if p.C_d_float==0 && p.use_MEEM==false
-%                 power_error_vals = 3;
-%                 X_error_vals = 3;
-%             elseif p.C_d_float==1 && p.use_MEEM==false
-%                 power_error_vals = [-80 -50 -20 0 2:5 7 10 20];
-%                 X_error_vals = [-50 -40 -20 -10 0:5 10];
-%             elseif p.C_d_float==0 && p.use_MEEM==true
-%                 power_error_vals = [-25:5:0 2 5];
-%                 X_error_vals = -20:5:10;
-%             elseif p.C_d_float==1 && p.use_MEEM==true
-%                 power_error_vals = [-85 -50 -20 -14 -12 -10:5:20];
-%                 X_error_vals = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
-%             end
+            if strcmp(var_name,'power_mech_unsat')
+                if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-4:8 10:10:110];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-80 -50 -20 0 2:5 7 10 20];
+                elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-25:5:0 2 5];
+                elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-85 -50 -20 -14 -12 -10:5:20];
+                end
+            elseif strcmp(var_name,'float_amplitude')
+                if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-30:5:0 1 2 3 4];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-50 -40 -20 -10 0:5 10];
+                elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = -20:5:10;
+                elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
+                end
+            else
+                error_levels = 10;
+            end
+            error_levels = sort([error_levels, min(error),max(error)]);
+            
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
