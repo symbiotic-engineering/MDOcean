@@ -11,7 +11,7 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
             %'wecsim_power_sparfloatingcd5_floatcd0_multibody'
         else % singlebody = spar fixed
             if p.C_d_float == 0
-                wecsim_filename = 'wecsim_sparfixed_floatcd0_ctrl-49aa381_4523abe';
+                wecsim_filename = 'wecsim_sparcd0_floatcd0_multibody_0_meem_off_git_8f74f47_uuid_66255df6-2eec-463d-ae72-3178d01d3485';
             elseif p.C_d_float == 1
                 wecsim_filename = 'wecsim_sparfixed_floatcd1_92fac3d';
             else
@@ -92,21 +92,33 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
             subplot(1,num_subplots,1+length(sim)+i)
-            error_levels = 10;
+
             % set contour lines to make plot more readable
-%             if p.C_d_float==0 && p.use_MEEM==false
-%                 power_error_vals = 3;
-%                 X_error_vals = 3;
-%             elseif p.C_d_float==1 && p.use_MEEM==false
-%                 power_error_vals = [-80 -50 -20 0 2:5 7 10 20];
-%                 X_error_vals = [-50 -40 -20 -10 0:5 10];
-%             elseif p.C_d_float==0 && p.use_MEEM==true
-%                 power_error_vals = [-25:5:0 2 5];
-%                 X_error_vals = -20:5:10;
-%             elseif p.C_d_float==1 && p.use_MEEM==true
-%                 power_error_vals = [-85 -50 -20 -14 -12 -10:5:20];
-%                 X_error_vals = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
-%             end
+            if strcmp(var_name,'power_mech_unsat')
+                if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-4:8 10:10:110];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-80 -50 -20 0 2:5 7 10 20];
+                elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-25:5:0 2 5];
+                elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-85 -50 -20 -14 -12 -10:5:20];
+                end
+            elseif strcmp(var_name,'float_amplitude')
+                if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-30:5:0 1 2 3 4];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
+                    error_levels = [-50 -40 -20 -10 0:5 10];
+                elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = -20:5:10;
+                elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
+                    error_levels = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
+                end
+            else
+                error_levels = 10;
+            end
+            error_levels = sort([error_levels, min(error),max(error)]);
+            
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
@@ -203,13 +215,16 @@ function results = load_wecsim_results(wecsim_filename, p)
     sz = size(p.JPD);
     % wecSim spar stationary
     vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
+    idx = find(p.JPD ~= 0);
 
     wecsim_raw = load(wecsim_filename,vars{:});
-    power_mech_unsat = -reshape(wecsim_raw.P, sz) / 1000;
+    [power_mech_unsat,float_amplitude,spar_amplitude,relative_amplitude] = deal(nan(sz));
+    power_mech_unsat(idx) = -wecsim_raw.P / 1000;
+    float_amplitude(idx) = wecsim_raw.float_amplitude;
+    spar_amplitude(idx) = wecsim_raw.spar_amplitude;
+    relative_amplitude(idx) = wecsim_raw.relative_amplitude;
+
     %power_mech_unsat(power_mech_unsat>1e6) = NaN;
-    float_amplitude = reshape(wecsim_raw.float_amplitude,sz);
-    spar_amplitude = reshape(wecsim_raw.spar_amplitude,sz);
-    relative_amplitude = reshape(wecsim_raw.relative_amplitude,sz);
 
     % todo: add damping
 

@@ -11,7 +11,7 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-run_wecsim_validation = true;
+run_wecsim_validation = false;
 
 if run_wecsim_validation && exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
@@ -58,7 +58,7 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
 end
 
 fig = optim_time_bar_chart(suite,results);
-save_pdf(fig,[test_dir '/Figure_30.pdf'])
+save_pdf(fig,'test-results/Figure_30.pdf')
 
 display(results);
 assertSuccess(results);

@@ -14,17 +14,22 @@ N_num = harmonics;
 M_num = harmonics;
 K_num = harmonics;
 
-% run MEEM only for the first row of m0, which should capture all unique freqs
+% run MEEM only unique freqs
+m0_meem = unique(m0(~isnan(m0)));
+if ~isrow(m0_meem)
+    m0_meem = m0_meem.'; % must be row vector
+end
 [mu_nondim, lambda_nondim, gamma_phase_f] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
                                                N_num, M_num, K_num, ...
                                                a1/h, a2/h, d1/h, ...
-                                               d2/h, 1, m0(1,:)*h, ...
+                                               d2/h, 1, m0_meem*h, ...
                                                spatial_res, show_A, plot_phi);
 
-% expand matrix for each Hs
+% expand matrix for each Hs - this assumes that m0 is identical (except nans) in each column
 num_Hs = size(m0,1);
-mu_nondim = repmat(mu_nondim,[num_Hs 1]);
+mu_nondim     = repmat(mu_nondim,     [num_Hs 1]);
 lambda_nondim = repmat(lambda_nondim, [num_Hs 1]);
+gamma_phase_f = repmat(gamma_phase_f, [num_Hs 1]);
 
 normalize = pi * a2^3;
 A_f_over_rho   = mu_nondim     * normalize;
@@ -42,7 +47,6 @@ gamma_f_over_rho_g = sqrt(2 * mult .* B_f_over_rho_w ./ m0); % Haskind relations
 % set the remaining coeffs to zero since not sure how to approximate them
 A_c_over_rho = 0;
 B_c_over_rho_w = 0;
-%gamma_phase_f = zeros(size(mu_nondim)); % I would maybe be able to get this from Haskind of MEEM results?
 gamma_phase_s = 0;
 
 end
