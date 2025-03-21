@@ -1,4 +1,3 @@
-
 function fig = optim_time_bar_chart(suite,results)
 
 full_names = {results.Name};
@@ -38,8 +37,15 @@ if ~isempty(sfp)
 end
 
 figure
+hold on
 fig = bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab));
+for i = 1:idx_matlab
+    if times(i) == 0
+        plot(i,0,'x')
+    end
+end
 title('Runtime (seconds)')
+hold off
 improvePlot
 
 end
