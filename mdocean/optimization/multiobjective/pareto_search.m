@@ -138,15 +138,21 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
 
     for i = 1:rows
         input = x(i,:);
-        x_0_new.D_f = input(1);
-        x_0_new.D_s_ratio = input(2);
-        x_0_new.h_f_ratio = input(3);
-        x_0_new.T_s_ratio = input(4);
-        x_0_new.F_max = input(5);
-        x_0_new.D_int = input(6);
-        x_0_new.w_n = input(7);
-        x0new.(b.var_names(1))
-        %B_p
+        x_0_new.(b.var_names{1}) = input(1);
+        x_0_new.(b.var_names{2}) = input(2);
+        x_0_new.(b.var_names{3}) = input(3);
+        x_0_new.(b.var_names{4}) = input(4);
+        x_0_new.(b.var_names{5}) = input(5);
+        x_0_new.(b.var_names{6}) = input(6);
+        x_0_new.(b.var_names{7}) = input(7);
+        x_0_new.(b.var_names{8}) = input(8);
+        x_0_new.(b.var_names{9}) = input(9);
+        x_0_new.(b.var_names{10}) = input(10);
+        x_0_new.(b.var_names{11}) = input(11);
+        x_0_new.(b.var_names{12}) = input(12);
+        x_0_new.(b.var_names{13}) = input(13);
+        x_0_new.(b.var_names{14}) = input(14);
+
         [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
         g(:,i) = gs;
         Xs_opt_original(8,:) = [];
