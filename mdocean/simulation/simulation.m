@@ -65,7 +65,10 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
-                    X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+ X_constraints,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
+ B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,gamma_f_over_rho_g,...
+ gamma_s_over_rho_g,gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
     FOS_spar_local] = structures(...
@@ -156,6 +159,17 @@ if nargout > 4 % if returning extra struct output for validation
     val.CG_f = CG_f;
     val.vol_f = V_d(1);
     val.vol_s = V_d(2) + V_d(3);
+    val.A_f_over_rho = A_f_over_rho;
+    val.A_s_over_rho = A_s_over_rho;
+    val.A_c_over_rho = A_c_over_rho;
+    val.B_f_over_rho_w = B_f_over_rho_w;
+    val.B_s_over_rho_w = B_s_over_rho_w;
+    val.B_c_over_rho_w = B_c_over_rho_w;
+    val.gamma_f_over_rho_g = gamma_f_over_rho_g;
+    val.gamma_s_over_rho_g = gamma_s_over_rho_g;
+    val.gamma_phase_f = gamma_phase_f;
+    val.gamma_phase_s = gamma_phase_s;
+    val.w = w;
 end
 
 end
