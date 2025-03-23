@@ -1,10 +1,17 @@
-function [ratio, P_wave, CW_max] = check_max_CW(filename_uuid)
-    p = parameters();
-    b = var_bounds();
-    %b.filename_uuid = filename_uuid;
-
-    [~,val] = max_avg_power(p,b);
-
+function [ratio, P_wave, CW_max, P_elec] = check_max_CW(filename_uuid, X, p)
+    
+    if nargin<3
+        p = parameters();
+        b = var_bounds();
+        if nargin==0
+            filename_uuid = '';
+        end
+        b.filename_uuid = filename_uuid;
+    
+        [~,val] = max_avg_power(p,b);    
+    else
+        [~,~,P_elec,~,val] = simulation(X, p);
+    end
     P_mech = val.P_mech;
 
     % calculate capture width
