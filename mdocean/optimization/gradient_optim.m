@@ -147,7 +147,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         % Post process
         if ploton
-            plot_power_matrix(X_opt,p)
+            plot_power_matrix(X_opt,p,b.filename_uuid)
             visualize_geometry(X_opt,p)
         end
     end
