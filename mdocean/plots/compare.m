@@ -139,7 +139,9 @@ DV_table = array2table(X.', ...
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
 scalar_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
-out_table = rows2vars(temp_table(:,scalar_vals));
+hydro_names = {'over_rho','phase'};
+hydro_coeff_rows = contains(temp_table.Properties.VariableNames,hydro_names);
+out_table = rows2vars(temp_table(:,scalar_vals & ~hydro_coeff_rows));
 out_table.Properties.RowNames = out_table.OriginalVariableNames;
 out_table = removevars(out_table,'OriginalVariableNames');
 
