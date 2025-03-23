@@ -94,6 +94,7 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
             subplot(1,num_subplots,1+length(sim)+i)
 
             % set contour lines to make plot more readable
+            error_levels = linspace(min(error,[],'all'),max(error,[],'all'),10);
             if strcmp(var_name,'power_mech_unsat')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
                     error_levels = [-4:8 10:10:110];
@@ -114,10 +115,8 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
                 end
-            else
-                error_levels = 10;
             end
-            error_levels = sort([error_levels, min(error),max(error)]);
+            error_levels = sort(unique([error_levels, min(error),max(error)]));
             
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end

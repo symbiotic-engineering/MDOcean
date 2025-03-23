@@ -78,6 +78,7 @@ end
 function errors = wecsim_error_breakdown(multibody)
     b = var_bounds('wecsim');
     X = [b.X_noms; 1];
+    X(7) = 1e8; % disable power limit
     
     % 1. drag off, wamit coeffs, wecsim geometry: should match wecsim very well <2%
     p = parameters('wecsim');
