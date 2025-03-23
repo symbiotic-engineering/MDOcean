@@ -46,7 +46,7 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
     vars_to_plot = {'power_mech_unsat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
-    comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str)
+    comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p)
     
     % todo: use actual pretty variables titles with units
     % var_names = {'Unweighted Device Power Matrix (kW)',...
@@ -76,7 +76,7 @@ function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     weighted_error = compute_percent_error_matrix(actual_avg, sim_avg);
 end
 
-function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str)
+function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
     num_subplots = 2*length(sim)+1;
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
