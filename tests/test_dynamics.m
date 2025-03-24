@@ -14,11 +14,12 @@ classdef (SharedTestFixtures={ ...
         % Shared setup for the entire test class
 
         function runNominalDynamics(testCase)
-            [singlebody, multibody, report, tab] = validate_dynamics();
-            testCase.errors_singlebody = singlebody;
-            testCase.errors_multibody  = multibody;
-            testCase.errors_report     = report;
-            testCase.table             = tab;
+            %[singlebody, multibody, report, tab] = validate_dynamics();
+            r = load('wecsimresults_all');
+            testCase.errors_singlebody = r.singlebody;
+            testCase.errors_multibody  = r.multibody;
+            testCase.errors_report     = r.report;
+            testCase.table             = r.tab;
         end
     end
 

@@ -19,6 +19,10 @@ if run_wecsim_validation && exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
+    cd("mdocean")
+    [singlebody, multibody, report, tab] = validate_dynamics();
+    save('wecsimresults_all','singlebody','multibody','report','tab')
+    cd("..")
 end
 
 suite = testsuite('tests');
