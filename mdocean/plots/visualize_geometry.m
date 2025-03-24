@@ -76,17 +76,17 @@ end
 
 function center_rect(vec,color)
 
-[x_mid,y_mid,w,h] = deal(vec(1),vec(2),vec(3),vec(4));
-x_left = x_mid - w/2;
-y_botm = y_mid - h/2;
-pos = [x_left y_botm w h];
-
-rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
+    [x_mid,y_mid,w,h] = deal(vec(1),vec(2),vec(3),vec(4));
+    x_left = x_mid - w/2;
+    y_botm = y_mid - h/2;
+    pos = [x_left y_botm w h];
+    
+    rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
 
 end
 
 function trapezoid(base_1,base_2,y_1,y_2,color)
     x = [-base_1/2, base_1/2, base_2/2, -base_2/2, -base_1/2];
     y = [y_1 y_1 y_2 y_2 y_1];
-    plot(x,y,'LineWidth',3,'Color',color)
+    plot(x,y,'LineWidth',3,'Color',color,'IconDisplayStyle','off')
 end
