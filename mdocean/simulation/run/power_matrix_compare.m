@@ -1,24 +1,4 @@
 function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report, override)
-
-    if nargin==0
-        % inputs
-        p = parameters();
-        b = var_bounds();
-        X = [b.X_noms; 1];
-    
-        if p.use_multibody
-            wecsim_filename = 'wecsim_sparcd0_floatcd0_55e8584';
-            %'wecsim_power_sparfloatingcd5_floatcd0_multibody'
-        else % singlebody = spar fixed
-            if p.C_d_float == 0
-                wecsim_filename = 'wecsim_sparcd0_floatcd0_multibody_0_meem_off_git_8f74f47_uuid_66255df6-2eec-463d-ae72-3178d01d3485';
-            elseif p.C_d_float == 1
-                wecsim_filename = 'wecsim_sparfixed_floatcd1_92fac3d';
-            else
-                error('cant find wecsim data for this Cd')
-            end
-        end
-    end
     
     if nargin<4
         report = false;
@@ -80,26 +60,36 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
     num_subplots = 2*length(sim)+1;
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
+
+        % find max and min to use as consistent colorbar axis for sim and actual
+        all_data = [actual.(var_name), sim(:).(var_name)];
+        clims = [min(all_data,[],'all'),max(all_data,[],'all')];
+        if all(clims==[0 0])
+            clims = [0 1];
+        end
+
         figure
         % actual
         subplot(1,num_subplots,1)
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
+        caxis(clims)
 
         for i=1:length(sim)
             % sim
             subplot(1,num_subplots,1+i)
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
+            caxis(clims)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
             subplot(1,num_subplots,1+length(sim)+i)
 
             % set contour lines to make plot more readable
-            error_levels = linspace(min(error,[],'all'),max(error,[],'all'),10);
+            error_levels = [];%linspace(min(error,[],'all'),max(error,[],'all'),10);
             if strcmp(var_name,'power_mech_unsat') || strcmp(var_name,'CW_to_CW_max')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
-                    error_levels = [-40:10:0 1 2];
+                    error_levels = 30:2:48;
                 elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
-                    error_levels = [-80 -50 -20 0 2:5 7 10 20];
+                    error_levels = [-10 0 10 35 50 100 150 200 250 300 350 400];
                 elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-25:5:0 2 5];
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
@@ -107,16 +97,17 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
                 end
             elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
-                    error_levels = -1.5:.5:3;
+                    error_levels = [-5:1:0 1.5 3];
                 elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
                     error_levels = [-50 -40 -20 -10 0:5 10];
                 elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = -20:5:10;
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
+                elseif p.C_d_float==0 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = -10:5:40;
                 end
             end
-            error_levels = sort(unique([error_levels, min(error,[],'all'),max(error,[],'all')]));
             
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
@@ -135,18 +126,21 @@ end
 
 function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     if nargin<5
-        Z_levels = 10;
+        Z_levels = [];
     end
 
     if any(isfinite(Z),'all')
-        [c,h_fig] = contourf(T,H,Z,Z_levels);
+        [c,h_fig] = contourf(T,H,Z);
     else
         c = []; h_fig = [];
     end
     title(Z_title)
     xlabel('Wave Period T (s)')
     ylabel('Wave Height Hs (m)')
-    colorbar
+    cb = colorbar;
+    if ~isempty(h_fig)
+        h_fig.LevelList = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+    end
     grid on
 end
 

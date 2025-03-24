@@ -27,15 +27,32 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
     end
 
     % override to have fewer sea states for the sake of fast debugging
-    override = false;
-    if override
+    runOnlyFewSeaStates = false;
+    if runOnlyFewSeaStates
         p.Hs = p.Hs(3:4);
         p.T = p.T(4:5);
         p.JPD = p.JPD(3:4,4:5);
     end
-
-    wecsim_filename = run_wecsim_validation(p);
-    pct_error = power_matrix_compare(X,p,wecsim_filename,RM3reportOn,override);
+    % rerun wecsim or load files
+    runWecSim = true;
+    if ~runWecSim
+        if ~p.use_MEEM
+            meem = 'off';
+        else
+            meem = num2str(p.harmonics);
+        end
+        C_d_s = num2str(p.C_d_spar);
+        C_d_f = num2str(p.C_d_float);
+        mb = num2str(p.use_multibody);
+        
+        wecsim_filename_start = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
+                            '_meem_' meem];
+        d = dir(['results_3_24\good\**\' wecsim_filename_start '*'] );
+        wecsim_filename = d.name;
+    else
+        wecsim_filename = run_wecsim_validation(p);
+    end
+    pct_error = power_matrix_compare(X,p,wecsim_filename,RM3reportOn,runOnlyFewSeaStates);
 
     make_report(wecsim_filename,p)
 end
