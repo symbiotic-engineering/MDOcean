@@ -9,7 +9,8 @@ idx_figs = contains(full_names,'which_tabs=none');
 idx_matlab_fig = false(size(idx_figs));
 for i=find(idx_figs)
     try
-        fig_path = results(i).Details.DiagnosticRecord.TestDiagnosticResults.Artifacts(1).FullPath;
+        tdr = [results(i).Details.DiagnosticRecord.TestDiagnosticResults];
+        fig_path = tdr.Artifacts(1).FullPath;
         fig = openfig(fig_path,'invisible');
         idx_matlab_fig(i) = isempty(fig.UserData);
     catch
@@ -39,7 +40,7 @@ end
 figOut = figure;
 hold on
 bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab));
-for i = 1:idx_matlab
+for i = 1:length(idx_matlab)
     if times(i) == 0
         plot(i,0,'x')
     end
