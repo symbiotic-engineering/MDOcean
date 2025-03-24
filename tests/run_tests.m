@@ -52,7 +52,9 @@ runner.addPlugin(p4);
 
 runner.ArtifactsRootFolder = test_dir;
 
+tic
 results = runner.runInParallel(suite);
+clockTime = toc;
 
 if ~batchStartupOptionUsed % don't open reports when running on CI server 
     open([cov_dir '/coverageReport/index.html'])
@@ -63,4 +65,5 @@ fig = optim_time_bar_chart(suite,results);
 save_pdf(fig,'test-results/Figure_30.pdf')
 
 display(results);
+fprintf('Testing took %g minutes',clockTime/60)
 assertSuccess(results);
