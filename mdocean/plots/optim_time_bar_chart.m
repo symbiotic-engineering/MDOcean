@@ -1,4 +1,4 @@
-function fig = optim_time_bar_chart(suite,results)
+function figOut = optim_time_bar_chart(suite,results)
 
 full_names = {results.Name};
 times = [results.Duration];
@@ -36,9 +36,9 @@ if ~isempty(sfp)
     fig_tab_names(idx_matlab_fig) = {sfp(1:2:length(sfp)).Name};
 end
 
-figure
+figOut = figure;
 hold on
-fig = bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab));
+bar(categorical(remove_underscores(fig_tab_names(idx_matlab))),times(idx_matlab));
 for i = 1:idx_matlab
     if times(i) == 0
         plot(i,0,'x')
