@@ -69,10 +69,10 @@ end
 
 function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     sim_weighted = sim .* weights / 100;
-    sim_avg = sum(sim_weighted(:));
+    sim_avg = sum(sim_weighted(:),'omitnan');
 
     actual_weighted = actual .* weights / 100;
-    actual_avg = sum(actual_weighted(:));
+    actual_avg = sum(actual_weighted(:),'omitnan');
     weighted_error = compute_percent_error_matrix(actual_avg, sim_avg);
 end
 
