@@ -95,9 +95,9 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
 
             % set contour lines to make plot more readable
             error_levels = linspace(min(error,[],'all'),max(error,[],'all'),10);
-            if strcmp(var_name,'power_mech_unsat')
+            if strcmp(var_name,'power_mech_unsat') || strcmp(var_name,'CW_to_CW_max')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
-                    error_levels = [-4:8 10:10:110];
+                    error_levels = [-40:10:0 1 2];
                 elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
                     error_levels = [-80 -50 -20 0 2:5 7 10 20];
                 elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
@@ -105,9 +105,9 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-85 -50 -20 -14 -12 -10:5:20];
                 end
-            elseif strcmp(var_name,'float_amplitude')
+            elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
-                    error_levels = [-30:5:0 1 2 3 4];
+                    error_levels = -1.5:.5:3;
                 elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==false
                     error_levels = [-50 -40 -20 -10 0:5 10];
                 elseif p.C_d_float==0 && p.use_MEEM==true  && p.use_multibody==false
@@ -116,7 +116,7 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
                     error_levels = [-100 -10 -8 -7 -5 -2 0 2 5 10 20 30];
                 end
             end
-            error_levels = sort(unique([error_levels, min(error),max(error)]));
+            error_levels = sort(unique([error_levels, min(error,[],'all'),max(error,[],'all')]));
             
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
