@@ -29,9 +29,9 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
     % override to have fewer sea states for the sake of fast debugging
     override = true;
     if override
-        p.Hs = p.Hs(1:2);
-        p.T = p.T(1:2);
-        p.JPD = p.JPD(1:2,1:2);
+        p.Hs = p.Hs(3:4);
+        p.T = p.T(4:5);
+        p.JPD = p.JPD(3:4,4:5);
     end
 
     wecsim_filename = run_wecsim_validation(p);
