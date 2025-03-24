@@ -15,18 +15,20 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: lab-computer-becca-account
+    runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
         uses: actions/checkout@v4
+        if: always()
         with:
           path: MDOcean
 
       - name: Checkout WEC-Sim
         uses: actions/checkout@v4
+        if: always()
         with:
           repository: WEC-Sim/WEC-Sim
           path: WEC-Sim
@@ -34,6 +36,7 @@ jobs:
 
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
+        if: always()
         with:
           args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
