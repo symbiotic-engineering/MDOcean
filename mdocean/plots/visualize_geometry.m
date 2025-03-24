@@ -88,5 +88,6 @@ end
 function trapezoid(base_1,base_2,y_1,y_2,color)
     x = [-base_1/2, base_1/2, base_2/2, -base_2/2, -base_1/2];
     y = [y_1 y_1 y_2 y_2 y_1];
-    plot(x,y,'LineWidth',3,'Color',color,'IconDisplayStyle','off')
+    h = plot(x,y,'LineWidth',3,'Color',color);
+    h.Annotation.LegendInformation.IconDisplayStyle= 'off'; % no legend
 end
