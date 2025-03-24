@@ -46,7 +46,7 @@ T = [T;
     table("rho_w","\rho_w",{1000},"site",false,"water density (kg/m3)",{''});
     ...%table("mu","\mu",1e-3,"site",false,"dynamic viscosity of water (Pa s)");
     table("g","g",{g},"site",false,"acceleration of gravity (m/s2)",{''});
-    table("h","h",{45},"site",true,"water depth (m)",{''});
+    table("h","h",{100},"site",true,"water depth (m)",{''});
     table("JPD","JPD",{jpd(2:end,2:end)},"site",false,...
         "joint probability distribution of wave (%)",{''});
     table("Hs","H_s",{jpd(2:end,1)},"site",true,"significant wave height (m)",{'max'});
