@@ -56,7 +56,8 @@ m_tubes = (h_fs_clear + (h_s-T_s) - (h_f - T_f_2)) / ( (D_f-D_s)/2 );
 x_tubes = [-D_f/2, 0, D_f/2];
 y_tube_1 = h_f - T_f_2;
 y_tubes = y_tube_1 + [0, m_tubes * D_f/2, 0];
-plot(x_tubes, y_tubes, color{3},'LineWidth',3)
+h = plot(x_tubes, y_tubes, color{3},'LineWidth',3);
+h.Annotation.LegendInformation.IconDisplayStyle= 'off'; % no legend
 
 % for legend
 plot(NaN,NaN,color{1})
