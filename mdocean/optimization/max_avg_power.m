@@ -12,7 +12,7 @@ x0 = b.X_start_struct;
 % run LCOE minimization (effectively power maximization due to hack above)
 [X_opt,~,flag] = gradient_optim(x0,p_mod,b,1); 
 
-% plug back into unmodified simulation to get unsaturated power
+% plug back into unmodified simulation with regular params to get val
 [~, ~, ~, ~, val] = simulation(X_opt,p);
 
 end
