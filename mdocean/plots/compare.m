@@ -34,7 +34,7 @@ num_designs = length(titles);
 %% geometry comparison
 figure
 % sort by float diameter
-idx_diam = strcmp(b.var_nams,'D_f');
+idx_diam = strcmp(b.var_names,'D_f');
 [~,biggest_to_smallest] = sort(X(:,idx_diam),'descend');
 
 x = linspace(-30,30,100);
