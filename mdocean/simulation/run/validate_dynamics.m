@@ -103,6 +103,7 @@ function errors = wecsim_error_breakdown(multibody)
     p.C_d_float = 0;
     p.C_d_spar = 0;
     p.use_MEEM = false;
+    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_baseline = run_dynamic_validation(X,p);
     
 %     % 2. 1 but drag on: gives me % error that comes from drag
@@ -132,6 +133,7 @@ function errors = wecsim_error_breakdown(multibody)
     % 4. drag meem interaction
     p = parameters('wecsim');
     p.use_multibody = multibody;
+    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_total = run_dynamic_validation(X,p);
 
 end
@@ -146,5 +148,6 @@ function errors = report_error_breakdown()
     
     % 2. 1 but wamit coeffs
     p.use_MEEM = false;
+    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_baseline = run_dynamic_validation(X,p,true);
 end
