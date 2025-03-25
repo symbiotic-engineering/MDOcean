@@ -33,7 +33,9 @@ num_designs = length(titles);
 
 %% geometry comparison
 figure
-biggest_to_smallest = [5, 2, 4, 1, 3];
+% sort by float diameter
+idx_diam = strcmp(b.var_nams,'D_f');
+[~,biggest_to_smallest] = sort(X(:,idx_diam),'descend');
 
 x = linspace(-30,30,100);
 Hs = 3;
@@ -48,7 +50,7 @@ for i=1:num_designs
     visualize_geometry(x,p,false,color{i})
 end
 xlim([-40,40])
-legend({'Balanced','Min LCOE','Max Power','Nominal','Min CAPEX'},'Location','east')
+legend(titles(biggest_to_smallest),'Location','east')
 
 %% power probability comparison
 figure
@@ -106,31 +108,7 @@ text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
-figure
-hold on
-plot(val_nom.w,val_nom.A_f_over_rho,'b-',val_nom.w,val_nom.B_f_over_rho_w,'b--',...
-    val_nom.w,val_nom.B_s_over_rho_w,'b:',val_nom.w,...
-    val_nom.gamma_f_over_rho_g,'b-.',val_nom.w,...
-    val_nom.gamma_s_over_rho_g,'b-x',val_nom.w,val_nom.gamma_phase_f,'b-*')
-plot(val_minCapex.w,val_minCapex.A_f_over_rho,'r-',val_minCapex.w,val_minCapex.B_f_over_rho_w,...
-    'r--',val_minCapex.w,val_minCapex.B_s_over_rho_w,'r:',val_minCapex.w,...
-    val_minCapex.gamma_f_over_rho_g,'r-.',val_minCapex.w,...
-    val_minCapex.gamma_s_over_rho_g,'r-x',val_minCapex.w,val_minCapex.gamma_phase_f,'-*')
-plot(val_maxPower.w,val_maxPower.A_f_over_rho,'g-',val_maxPower.w,val_maxPower.B_f_over_rho_w,...
-    'g--',val_maxPower.w,val_maxPower.B_s_over_rho_w,'g:',val_maxPower.w,...
-    val_maxPower.gamma_f_over_rho_g,'g-.',val_maxPower.w,...
-    val_maxPower.gamma_s_over_rho_g,'g-x',val_maxPower.w,val_maxPower.gamma_phase_f,'g-*')
-plot(val_balanced.w,val_balanced.A_f_over_rho,'k-',val_balanced.w,val_balanced.B_f_over_rho_w,...
-    'k--',val_balanced.w,val_balanced.B_s_over_rho_w,'k:',val_balanced.w,...
-    val_balanced.gamma_f_over_rho_g,'k-.',val_balanced.w,...
-    val_balanced.gamma_s_over_rho_g,'k-x',val_balanced.w,val_balanced.gamma_phase_f,'k-*')
-title('Hydrodynamic Coefficients')
-xlabel('Wave Frequency (\omega)')
-xlim([0.2,1.1])
-ylim([-0.008,64000])
-legend('A_{f}/\rho','B_{f}/\rho','B_{s}/\rho','\gamma_{f}/\rho','\gamma_{s}/\rho','\gamma_{phase, f}')
-hold off
-improvePlot
+hydro_compare(vals,color)
     
 %% design variable table
 DV_table = array2table(X.', ...
@@ -145,4 +123,26 @@ out_table = rows2vars(temp_table(:,scalar_vals & ~hydro_coeff_rows));
 out_table.Properties.RowNames = out_table.OriginalVariableNames;
 out_table = removevars(out_table,'OriginalVariableNames');
 
+end
+
+function hydro_compare(vals,colors)
+    figure
+    hold on
+    for i=1:length(vals)
+        val = vals(i);
+        col = colors{i};
+        plot(val.w, val.A_f_over_rho,      [col '-'],...
+             val.w, val.B_f_over_rho_w,    [col '--'],...
+             val.w, val.B_s_over_rho_w,    [col ':'], ...
+             val.w, val.gamma_f_over_rho_g,[col '-.'], ...
+             val.w, val.gamma_s_over_rho_g,[col '-x'], ...
+             val.w, val.gamma_phase_f,     [col '-*'])
+    end
+    title('Hydrodynamic Coefficients')
+    xlabel('Wave Frequency (\omega)')
+    xlim([0.2,1.1])
+    ylim([-0.008,64000])
+    legend('A_{f}/\rho','B_{f}/\rho','B_{s}/\rho','\gamma_{f}/\rho','\gamma_{s}/\rho','\gamma_{phase, f}')
+    hold off
+    improvePlot
 end
