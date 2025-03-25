@@ -20,8 +20,15 @@ if run_wecsim_validation && exist('../WEC-Sim','dir')
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
     cd("mdocean")
-    [singlebody, multibody, report, tab] = validate_dynamics();
-    save('wecsimresults_all','singlebody','multibody','report','tab')
+    try
+        tic
+        [singlebody, multibody, report, tab] = validate_dynamics();
+        wecsim_runtime = toc;
+        fprintf('WecSim took %g minutes',wecsim_runtime/60)
+        save('wecsimresults_all','singlebody','multibody','report','tab')
+    catch err
+        warning( "wecsim failed: " + newline + formattedDisplayText(err) )
+    end
     cd("..")
 end
 
