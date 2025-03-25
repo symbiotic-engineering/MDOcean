@@ -47,7 +47,7 @@ set(waves,'HandleVisibility','off')
 for i=1:num_designs
     x = X(biggest_to_smallest(i),:);
     hold on
-    visualize_geometry(x,p,false,color{i})
+    visualize_geometry(x,p,false,color{biggest_to_smallest(i)})
 end
 xlim([-40,40])
 legend(titles(biggest_to_smallest),'Location','east')
