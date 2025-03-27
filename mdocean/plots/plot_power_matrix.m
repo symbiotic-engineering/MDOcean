@@ -75,7 +75,7 @@ axis off
 subplot(2,5,9)
 sub_nine=subplot(259);
 sub_nine.Position=[0.6350, 0.1100, 0.26, 0.3412];
-contourf(T,Hs,P_wave .* CW_over_CW_max .* CW_max .* p.JPD)
+contourf(sub_nine,T,Hs,P_wave .* CW_over_CW_max .* CW_max .* p.JPD)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Weighted Power (W)','FontSize',12)
