@@ -159,7 +159,8 @@ function results = load_RM3_report_results(eff_pto, override)
     power_elec_sat = readmatrix(report_filename,'Range','E97:S110',...
                                     'Sheet',sheet);
 
-    JPD = readmatrix(report_filename,'Range','E24:S37','Sheet',sheet)/100;
+    JPD_temp = readmatrix(report_filename,'Range','E24:S37','Sheet',sheet);
+    JPD = JPD_temp/sum(JPD_temp,'all');
 
     wave_resource_sheet = readmatrix(report_filename,'Range','E49:S62','Sheet',sheet);
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
@@ -211,7 +212,9 @@ function results = load_wecsim_results(wecsim_filename, p)
     sz = size(p.JPD);
     % wecSim spar stationary
     vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
-    idx = find(p.JPD ~= 0);
+    file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
+    old_jpd = trim_jpd(readmatrix(file,'Range','A3'));
+    idx = find(old_jpd(2:end,2:end) ~= 0);
 
     wecsim_raw = load(wecsim_filename,vars{:});
     [power_mech_unsat,float_amplitude,spar_amplitude,relative_amplitude] = deal(nan(sz));
