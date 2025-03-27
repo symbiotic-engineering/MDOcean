@@ -66,11 +66,12 @@ text(0.52,0.5,'=','FontSize',30)
 axis off
 
 subplot(2,5,9)
+<<<<<<< HEAD
+sub_nine=subplot(259);
+sub_nine.Position=[0.6350, 0.1100, 0.26, 0.3412];
 P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
+contourf(sub_nine,T,Hs,P_product)
 eff = P_elec ./ P_product;
-sub_nine = subplot(259);
-sub_nine.Position = [0.6350, 0.1100, 0.26, 0.3412];
-contourf(T,Hs,P_product)
 xlabel('Wave Period T (s)')
 ylabel('Wave Height Hs (m)')
 title('Weighted Power (W)','FontSize',12)
