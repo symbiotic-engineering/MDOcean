@@ -106,11 +106,12 @@ function errors = wecsim_error_breakdown(multibody)
     X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_baseline = run_dynamic_validation(X,p);
     
-%     % 2. 1 but drag on: gives me % error that comes from drag
-%     p = parameters('wecsim');
-%     p.use_multibody = multibody;
-%     p.use_MEEM = false;
-%     errors.pct_error_drag = run_dynamic_validation(X,p);
+    % 2. 1 but drag on: gives me % error that comes from drag
+    p = parameters('wecsim');
+    p.use_multibody = multibody;
+    p.use_MEEM = false;
+    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
+    errors.pct_error_drag = run_dynamic_validation(X,p);
 %     
 %     % 3. drag back off but meem coffs: gives % error that comes from meem
 %     p = parameters('wecsim');
