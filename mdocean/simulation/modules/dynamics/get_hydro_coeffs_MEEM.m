@@ -15,7 +15,7 @@ M_num = harmonics;
 K_num = harmonics;
 
 % run MEEM only unique freqs
-m0_meem = unique(m0(~isnan(m0)));
+m0_meem = unique(m0(~isnan(m0)),'stable');
 if ~isrow(m0_meem)
     m0_meem = m0_meem.'; % must be row vector
 end
