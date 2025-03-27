@@ -47,7 +47,7 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
         
         wecsim_filename_start = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
                             '_meem_' meem];
-        d = dir(['results_3_24\good\**\' wecsim_filename_start '*'] );
+        d = dir(['results_3_25\run_2pm_excneg\**\' wecsim_filename_start '*'] );
         wecsim_filename = d.name;
     else
         wecsim_filename = run_wecsim_validation(p);
@@ -142,11 +142,13 @@ function errors = report_error_breakdown()
     p = parameters();
     b = var_bounds();
     X = [b.X_noms; 1];
+    X(7) = 1e8; % disable power limit
     
     % 1. drag on, meem coeffs, report geometry, try to match report 10%?
     errors.pct_error_total = run_dynamic_validation(X,p,true);
     
-    % 2. 1 but wamit coeffs
+    % 2. 1 but wamit coeffs and multibody
+    p.use_multibody = true;
     p.use_MEEM = false;
     X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_baseline = run_dynamic_validation(X,p,true);
