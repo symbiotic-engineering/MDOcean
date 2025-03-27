@@ -144,7 +144,8 @@ parfor imcr=1:length(mcr.cases(:,1))
     Simulink.sdi.clear
 end
 
-save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude','p')
+save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
+    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','p')
 
 clear imcr totalNumOfWorkers
 
