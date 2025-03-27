@@ -28,8 +28,15 @@ else
     D_f_in_over_D_s = 6.5/6;
 end
 
-file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
-jpd = trim_jpd(readmatrix(file,'Range','A3'));
+% file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
+% jpd_full = trim_jpd(readmatrix(file,'Range','A3'));
+mat = readmatrix('RM3-CBS.xlsx','Range','D23:S37','Sheet','Performance & Economics');
+mat(2,end) = eps;
+jpd_full = trim_jpd(mat);
+jpd_Hs =  jpd_full(2:end,1);
+jpd = jpd_full(2:end,2:end)/sum(jpd_full(2:end,2:end),'all')*100;
+jpd_Te = jpd_full(1,2:end);
+
 g = 9.8;
 spar_exc = get_spar_exc(g);
 
@@ -47,10 +54,10 @@ T = [T;
     ...%table("mu","\mu",1e-3,"site",false,"dynamic viscosity of water (Pa s)");
     table("g","g",{g},"site",false,"acceleration of gravity (m/s2)",{''});
     table("h","h",{100},"site",true,"water depth (m)",{''});
-    table("JPD","JPD",{jpd(2:end,2:end)},"site",false,...
+    table("JPD","JPD",{jpd},"site",false,...
         "joint probability distribution of wave (%)",{''});
-    table("Hs","H_s",{jpd(2:end,1)},"site",true,"significant wave height (m)",{'max'});
-    table("T","T",{jpd(1,2:end)},"site",true,"wave energy period (s)",{'max'});
+    table("Hs","H_s",{jpd_Hs},"site",true,"significant wave height (m)",{'max'});
+    table("T","T",{jpd_Te},"site",true,"wave energy period (s)",{'max'});
     table("Hs_struct","H_{s,struct}",{[5 7 9 11.22 9 7 5]*1.9*sqrt(2)},...
         "site",true,"100 year significant individual wave height (m)",{'max'});
     table("T_struct","T_{struct}",{[5.57 8.76 12.18 17.26 21.09 24.92 31.70]},...
@@ -110,8 +117,6 @@ T = [T;
     ...% Economics
     table("m_scale","m_{scale}",{1.1},"economics",false,... 
         "factor to account for mass of neglected stiffeners (-)",{''});
-    table("power_scale","P_{scale}",{85.9/117.7},"economics",false,...
-        "factor to scale power for validation tuning (-)",{''});
     table("FCR","FCR",{0.113},"economics",true,... 
         "fixed charge rate (-), see RM3 report p63",{''});
     table("N_WEC","N_{WEC}",{100},"economics",true,"number of WECs in array (-)",{''});
@@ -147,6 +152,8 @@ T = [T;
     table("C_d_float","C_{d,float}",{1},"dynamics",true,"coefficient of drag for float",{''});
     table("C_d_spar","C_{d,spar}",{1},"dynamics",true,"spar coefficient of drag",{''});
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)",{''});
+    table("power_scale_factor","P_{scale}",{23 ./ (jpd_Te.^2 - 15 * jpd_Te + 86)},"dynamics",...
+        false,"power scale factor to match RM3 report",{'max'});
     ...
     ...% Dynamics: simulation type
     table("control_type","control type",{'damping'},"dynamics",false,... 
