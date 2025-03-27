@@ -142,7 +142,6 @@ function errors = report_error_breakdown()
     p = parameters();
     b = var_bounds();
     X = [b.X_noms; 1];
-    X(7) = 1e8; % disable power limit
     
     % 1. drag on, meem coeffs, report geometry, try to match report 10%?
     errors.pct_error_total = run_dynamic_validation(X,p,true);

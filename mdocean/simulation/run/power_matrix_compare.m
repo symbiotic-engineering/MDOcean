@@ -25,7 +25,7 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
     % options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
-    vars_to_plot = {'power_mech_unsat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
+    vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
     comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p)
     
     % todo: use actual pretty variables titles with units
@@ -84,7 +84,7 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
             subplot(1,num_subplots,1+length(sim)+i)
 
             % set contour lines to make plot more readable
-            error_levels = [];%linspace(min(error,[],'all'),max(error,[],'all'),10);
+            error_levels = [];
             if strcmp(var_name,'power_mech_unsat') || strcmp(var_name,'CW_to_CW_max')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
                     error_levels = 30:2:48;
@@ -184,9 +184,12 @@ end
 function results = compute_mdocean_results(X,p)
 
     % unsaturated power
-    [~, ~, P_matrix, ~, val] = simulation(X,p);
+    X_unsat = X;
+    idx_P = 7;
+    X_unsat(idx_P) = 1e9;
+    [~, ~, P_matrix, ~, val] = simulation(X_unsat,p);
     power_elec_unsat = P_matrix/1000;
-    power_mech_unsat = power_elec_unsat / p.eff_pto;
+    power_mech_unsat = val.P_mech/1000;
     
     % saturated power
     [~, ~, P_matrix] = simulation(X,p);
