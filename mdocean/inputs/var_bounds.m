@@ -25,7 +25,7 @@ b.D_s_start = 6;
 
 % outer diameter of float (m)	
 b.D_f_min = 1;
-b.D_f_max = 60;
+b.D_f_max = 80;
 b.D_f_wecsim = 20;
 b.D_f_nom = 20;
 b.D_f_start = 20;
@@ -60,7 +60,7 @@ b.F_max_start = 5;
 
 % maximum generator power (kW)
 b.P_max_min = 1;
-b.P_max_max = 2000;
+b.P_max_max = 3000;
 b.P_max_nom = 286;
 b.P_max_wecsim = 286;
 b.P_max_start = 286;
@@ -90,7 +90,7 @@ b.t_d_start = 1.0 * in2mm;
 in2m = in2mm / 1000;
 % float stiffener height (m)
 b.h_stiff_f_min = 0;
-b.h_stiff_f_max = 2;
+b.h_stiff_f_max = 3;
 b.h_stiff_f_nom    = 16 * in2m;
 b.h_stiff_f_wecsim = 16 * in2m;
 b.h_stiff_f_start  = 16 * in2m;
@@ -172,7 +172,7 @@ b.idxs_recover = idxs_recover;
 b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
 
 % calibrations of nominal values
-b.F_max_nom = find_nominal_inputs(b, mode, false);
+b.F_max_nom = find_nominal_inputs(b, parameters(mode));
 b.X_noms(strcmp(b.var_names,'F_max')) = b.F_max_nom;
 
 

@@ -105,11 +105,14 @@ pause(1)
 delete savedLog*
 
 % variables to save
-start_idx = simu.rampTime * simu.dt;
+timesteps_per_period = mcr.cases(:,2) / simu.dt; 
 P = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
+float_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+spar_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+relative_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -123,13 +126,21 @@ parfor imcr=1:length(mcr.cases(:,1))
     % Run WEC-Sim
     output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
 
+    % extract signals over the last period
+    N_per_T = timesteps_per_period(imcr);
+    power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
+    float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
+    spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
+    rel_pos = float_pos - spar_pos;
+
     % save specific output variables
-    P(imcr) = mean(output.ptos.powerInternalMechanics(start_idx:end,3));
-    float_pos = output.bodies(1).position(start_idx:end,3);
-    spar_pos  = output.bodies(2).position(start_idx:end,3);
+    P(imcr) = mean(power);
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
-    relative_amplitude(imcr) = 1/2 * (max(float_pos - spar_pos) - min(float_pos - spar_pos));
+    relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
+    float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
+    spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
+    relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
     Simulink.sdi.clear
 end
 

@@ -12,7 +12,7 @@ X = [b.X_noms; 1];
 num_outputs = 4;
 runtime = timeit(@()simulation(X,p),num_outputs);
 
-plot_power_matrix(X,p)
+plot_power_matrix(X,p,'')
 
 figure
 power_PDF(X,p)

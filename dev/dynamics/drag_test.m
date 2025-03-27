@@ -6,7 +6,7 @@ close all; clear
 
 reactive = true;
 
-Cd = 5;%0:1:5;
+Cd = 0:1:2;
 
 P_reactive = sweep_drag(true,false,Cd);
 P_damping = sweep_drag(false,false,Cd);
@@ -55,7 +55,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
         %P_over_H2_2pt5 = .5 * (P_over_H2(H==2.25) + P_over_H2(H==2.75));
         plot(p.T, P_over_H2_2pt5/1000,linestyle,'DisplayName',['Cd=' num2str(Cd(i))])
 
-        disp(val.X(H==2.25))
+        disp(val.X_f(H==2.25))
         disp(val.force_ptrain)
     end
     legend

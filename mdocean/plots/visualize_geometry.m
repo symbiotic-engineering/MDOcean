@@ -56,7 +56,8 @@ m_tubes = (h_fs_clear + (h_s-T_s) - (h_f - T_f_2)) / ( (D_f-D_s)/2 );
 x_tubes = [-D_f/2, 0, D_f/2];
 y_tube_1 = h_f - T_f_2;
 y_tubes = y_tube_1 + [0, m_tubes * D_f/2, 0];
-plot(x_tubes, y_tubes, color{3},'LineWidth',3)
+h = plot(x_tubes, y_tubes, color{3},'LineWidth',3);
+h.Annotation.LegendInformation.IconDisplayStyle= 'off'; % no legend
 
 % for legend
 plot(NaN,NaN,color{1})
@@ -76,17 +77,18 @@ end
 
 function center_rect(vec,color)
 
-[x_mid,y_mid,w,h] = deal(vec(1),vec(2),vec(3),vec(4));
-x_left = x_mid - w/2;
-y_botm = y_mid - h/2;
-pos = [x_left y_botm w h];
-
-rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
+    [x_mid,y_mid,w,h] = deal(vec(1),vec(2),vec(3),vec(4));
+    x_left = x_mid - w/2;
+    y_botm = y_mid - h/2;
+    pos = [x_left y_botm w h];
+    
+    rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
 
 end
 
 function trapezoid(base_1,base_2,y_1,y_2,color)
     x = [-base_1/2, base_1/2, base_2/2, -base_2/2, -base_1/2];
     y = [y_1 y_1 y_2 y_2 y_1];
-    plot(x,y,'LineWidth',3,'Color',color)
+    h = plot(x,y,'LineWidth',3,'Color',color);
+    h.Annotation.LegendInformation.IconDisplayStyle= 'off'; % no legend
 end
