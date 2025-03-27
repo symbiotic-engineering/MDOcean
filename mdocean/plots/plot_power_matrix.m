@@ -66,7 +66,6 @@ text(0.52,0.5,'=','FontSize',30)
 axis off
 
 subplot(2,5,9)
-<<<<<<< HEAD
 sub_nine=subplot(259);
 sub_nine.Position=[0.6350, 0.1100, 0.26, 0.3412];
 P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
