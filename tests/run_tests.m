@@ -27,7 +27,7 @@ if run_wecsim_validation && exist('../WEC-Sim','dir')
         fprintf('WecSim took %g minutes',wecsim_runtime/60)
         save('wecsimresults_all','singlebody','multibody','report','tab')
     catch err
-        warning( "wecsim failed: " + newline + formattedDisplayText(err) )
+        warning( "wecsim failed: " + newline + getReport(err,"extended"))
     end
     cd("..")
 end
