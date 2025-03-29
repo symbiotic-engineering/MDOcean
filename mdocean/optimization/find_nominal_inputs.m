@@ -10,7 +10,7 @@ function F_max_nom = find_nominal_inputs(b, p)
     A_ineq = []; B_ineq = []; A_eq = []; B_eq = [];
     lb = b.F_max_min;
     ub = b.F_max_max;
-    options = optimoptions("fmincon",'SpecifyObjectiveGradient',true);
+    options = optimoptions("fmincon",'SpecifyObjectiveGradient',true,'Display','notify');
     F_max_nom = fmincon(obj, x0, A_ineq, B_ineq, A_eq, B_eq, lb, ub, const, options);
 
 end
