@@ -62,7 +62,8 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
         var_name = vars_to_plot{var_idx};
 
         % find max and min to use as consistent colorbar axis for sim and actual
-        all_data = [actual.(var_name), sim(:).(var_name)];
+        flatten = @(a) a(:);
+        all_data = [flatten(actual.(var_name)); flatten([sim(:).(var_name)])];
         clims = [min(all_data,[],'all'),max(all_data,[],'all')];
         if all(clims==[0 0])
             clims = [0 1];
@@ -139,7 +140,8 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
-        h_fig.LevelList = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+        levs = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+        h_fig.LevelList = levs;
     end
     grid on
 end
@@ -166,10 +168,11 @@ function results = load_RM3_report_results(eff_pto, override)
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 
     if override
-        power_mech_unsat = power_mech_unsat(1:2,1:2);
-        Hs = Hs(1:2); Te = Te(1:2);
-        JPD = JPD(1:2,1:2);
-        wave_resource_sheet = wave_resource_sheet(1:2,1:2);
+        power_mech_unsat = power_mech_unsat(3:4,4:5);
+        power_elec_sat = power_elec_sat(3:4,4:5);
+        Hs = Hs(3:4); Te = Te(4:5);
+        JPD = JPD(3:4,4:5);
+        wave_resource_sheet = wave_resource_sheet(3:4,4:5);
     end
 
     power_elec_unsat = power_mech_unsat * eff_pto;
@@ -214,7 +217,8 @@ function results = load_wecsim_results(wecsim_filename, p)
     vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
     file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
     old_jpd = trim_jpd(readmatrix(file,'Range','A3'));
-    idx = find(old_jpd(2:end,2:end) ~= 0);
+    JPD = p.JPD; % old_jpd(2:end,2:end) - uncomment to use old wec sim results locally
+    idx = find(JPD ~= 0);
 
     wecsim_raw = load(wecsim_filename,vars{:});
     [power_mech_unsat,float_amplitude,spar_amplitude,relative_amplitude] = deal(nan(sz));
