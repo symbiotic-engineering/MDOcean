@@ -19,6 +19,7 @@ if strcmpi(mode,'wecsim')
     D_f_b_over_D_f = 10/20;
     T_f_1_over_T_f_2 = 2/3;
     D_f_in_over_D_s = 6/6;
+    power_coeffs = [1 0 0 1];
 else
     T_s_over_D_s = 35/6;
     h_d_over_D_s = 1*in2m/6;
@@ -26,6 +27,7 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
+    power_coeffs = [23,1,-15,86];
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -152,8 +154,8 @@ T = [T;
     table("C_d_float","C_{d,float}",{1},"dynamics",true,"coefficient of drag for float",{''});
     table("C_d_spar","C_{d,spar}",{1},"dynamics",true,"spar coefficient of drag",{''});
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)",{''});
-    table("power_scale_factor","P_{scale}",{23 ./ (jpd_Te.^2 - 15 * jpd_Te + 86)},"dynamics",...
-        false,"power scale factor to match RM3 report",{'max'});
+    table("power_scale_coeffs","P_{scale}",{power_coeffs},"dynamics",...
+        false,"coefficients for power scale factor to match RM3 report",{'max'});
     ...
     ...% Dynamics: simulation type
     table("control_type","control type",{'damping'},"dynamics",false,... 

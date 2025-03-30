@@ -18,7 +18,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w] = get_power_force(in,T,Hs,m_float,m_spar,...
                                                         V_d,draft,in.F_max, ...
-                                                        zero_prob_idxs, in.T_f_1, in.power_scale_factor);
+                                                        zero_prob_idxs, in.T_f_1, in.power_scale_coeffs);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
@@ -36,7 +36,7 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     % fixme: for storms, should return excitation force, not all hydro force
     [~,X_constraints_storm,~,~,~,~,F_heave_storm,F_surge_storm] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, ...
-                                0, false(size(in.T_struct)), in.T_f_2, 1);
+                                0, false(size(in.T_struct)), in.T_f_2, [1 0 0 1]);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % use all X constraints operationally, only use slamming in storm
@@ -56,7 +56,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, ...
-                                                            F_max, idx_constraint, T_f_slam, power_scale_factor)
+                                                            F_max, idx_constraint, T_f_slam, power_scale_coeffs)
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -91,7 +91,13 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     
     % apply empirical fitted freq-dependent scale factor to adjust power from 
     % singlebody to multibody, to match RM3 report
-    P_matrix = real_P .* power_scale_factor;
+    if in.use_multibody==false
+        c = power_scale_coeffs;
+        power_scale_factor = c(1) ./ ( c(2) * T.^2 + c(3) * T + c(4) );
+        P_matrix = real_P .* power_scale_factor;
+    else
+        P_matrix = real_P;
+    end
     
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
