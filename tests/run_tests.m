@@ -16,6 +16,7 @@ warning('off','MATLAB:nearlySingularMatrix')
 run_wecsim_validation = true;
 
 if run_wecsim_validation && exist('../WEC-Sim','dir')
+    warning('off','MATLAB:contour:ConstantData')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
@@ -29,6 +30,7 @@ if run_wecsim_validation && exist('../WEC-Sim','dir')
     catch err
         warning( "wecsim failed: " + newline + getReport(err,"extended"))
     end
+    warning('on','MATLAB:contour:ConstantData')
     cd("..")
 end
 
