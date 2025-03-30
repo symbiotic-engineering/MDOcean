@@ -27,7 +27,7 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
     end
 
     % override to have fewer sea states for the sake of fast debugging
-    runOnlyFewSeaStates = false;
+    runOnlyFewSeaStates = true;
     if runOnlyFewSeaStates
         p.Hs = p.Hs(3:4);
         p.T = p.T(4:5);
