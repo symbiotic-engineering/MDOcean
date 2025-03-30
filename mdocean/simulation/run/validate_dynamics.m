@@ -154,5 +154,5 @@ function errors = report_error_breakdown()
     errors.pct_error_baseline = run_dynamic_validation(X,p,true);
 
     % drag: placeholder for now
-    errors.pct_error_drag = NaN;
+    errors.pct_error_drag = [NaN NaN];
 end
