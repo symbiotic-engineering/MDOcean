@@ -152,4 +152,7 @@ function errors = report_error_breakdown()
     p.use_MEEM = false;
     X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     errors.pct_error_baseline = run_dynamic_validation(X,p,true);
+
+    % drag: placeholder for now
+    errors.pct_error_drag = NaN;
 end
