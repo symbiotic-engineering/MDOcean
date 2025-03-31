@@ -76,6 +76,7 @@ else
     waves = waveClass('irregular');
     waves.spectrumType = 'PM';                % Specify Wave Spectrum Type
 end
+waves.waterDepth = p.h;
 % waves.height = 2.5;                     % Wave Height [m]
 % waves.period = 8;                       % Wave Period [s]
 
