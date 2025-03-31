@@ -8,13 +8,15 @@ reactive = true;
 
 Cd = 0:1:2;
 
+% singlebody
 P_reactive = sweep_drag(true,false,Cd);
 P_damping = sweep_drag(false,false,Cd);
 
-pct_diff = 100*(P_damping - P_reactive) ./ P_reactive
+% pct_diff = 100*(P_damping - P_reactive) ./ P_reactive
 
-%sweep_drag(true,true,0)
-%sweep_drag(false,true,0)
+% multibody
+sweep_drag(true,true,Cd)
+sweep_drag(false,true,Cd)
 
 function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     p = parameters();
@@ -36,7 +38,9 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     end
 
     b = var_bounds();
-    X = [b.X_noms; 1];    
+    X = [b.X_noms; 1];
+    X(strcmp(b.var_names,'F_max')) = Inf;
+    X(strcmp(b.var_names,'P_max')) = Inf;
     
     %p.T = 6.5;
     %p.Hs = 2.25;
@@ -70,7 +74,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     
     plot(T_new,P_over_H2_max/1000,...
         'DisplayName','Theoretical limit')
-    ylim([0 110])
+    ylim([0 185])
     xlim([4 18])
     title([p.control_type ' Control, ' bodies])
     improvePlot
