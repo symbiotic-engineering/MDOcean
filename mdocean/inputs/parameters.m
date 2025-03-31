@@ -19,6 +19,7 @@ if strcmpi(mode,'wecsim')
     D_f_b_over_D_f = 10/20;
     T_f_1_over_T_f_2 = 2/3;
     D_f_in_over_D_s = 6/6;
+    h = 250; % must be above .4*max(jpd_Te)^2*g/(2*pi) = 213.5 to be all deep water
     power_coeffs = [1 0 0 1];
 else
     T_s_over_D_s = 35/6;
@@ -27,6 +28,7 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
+    h = 45;
     power_coeffs = [22.4,1,-15,86];
 end
 
@@ -55,7 +57,7 @@ T = [T;
     table("rho_w","\rho_w",{1000},"site",false,"water density (kg/m3)",{''});
     ...%table("mu","\mu",1e-3,"site",false,"dynamic viscosity of water (Pa s)");
     table("g","g",{g},"site",false,"acceleration of gravity (m/s2)",{''});
-    table("h","h",{45},"site",true,"water depth (m)",{''});
+    table("h","h",{h},"site",true,"water depth (m)",{''});
     table("JPD","JPD",{jpd},"site",false,...
         "joint probability distribution of wave (%)",{''});
     table("Hs","H_s",{jpd_Hs},"site",true,"significant wave height (m)",{'max'});
