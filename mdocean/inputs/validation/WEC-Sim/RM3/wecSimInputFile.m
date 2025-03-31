@@ -7,14 +7,19 @@ if ~exist('p','var')
     warning('parameters were loaded from scratch')
     p = parameters();
 end
+if ~exist('X','var')
+    warning('design variables were loaded from scratch')
+    b = var_bounds();
+    X = [b.X_noms; 1];
+end
+
 if ~p.use_MEEM
     meem = 'off';
 else
     meem = num2str(p.harmonics);
 end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
-b = var_bounds();
-X = [b.X_noms; 1];
+
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 if regular
     [T,H] = meshgrid(p.T, p.Hs/sqrt(2)); % regular

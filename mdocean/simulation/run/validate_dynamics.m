@@ -50,7 +50,7 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
         d = dir(['results_3_25\run_2pm_excneg\**\' wecsim_filename_start '*'] );
         wecsim_filename = d.name;
     else
-        wecsim_filename = run_wecsim_validation(p);
+        wecsim_filename = run_wecsim_validation(X,p);
     end
     pct_error = power_matrix_compare(X,p,wecsim_filename,RM3reportOn,runOnlyFewSeaStates);
 
@@ -86,8 +86,8 @@ function make_report(wecsim_filename,p)
     %rptview(rpt)
 end
 
-function output_filename = run_wecsim_validation(p)
-    % p needs to be in the workspace for runRM3Parallel script to work right
+function output_filename = run_wecsim_validation(X,p)
+    % X and p need to be in the workspace for runRM3Parallel script to work right
     runRM3Parallel % this script uses p and modifies it, and saves output_filename to workspace
 
 end
@@ -103,14 +103,14 @@ function errors = wecsim_error_breakdown(multibody)
     p.C_d_float = 0;
     p.C_d_spar = 0;
     p.use_MEEM = false;
-    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
+    X(strcmp(b.var_names,'F_max')) = Inf;
     errors.pct_error_baseline = run_dynamic_validation(X,p);
     
     % 2. 1 but drag on: gives me % error that comes from drag
     p = parameters('wecsim');
     p.use_multibody = multibody;
     p.use_MEEM = false;
-    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
+    X(strcmp(b.var_names,'F_max')) = Inf;
     errors.pct_error_drag = run_dynamic_validation(X,p);
 %     
 %     % 3. drag back off but meem coffs: gives % error that comes from meem
@@ -134,7 +134,7 @@ function errors = wecsim_error_breakdown(multibody)
     % 4. drag meem interaction
     p = parameters('wecsim');
     p.use_multibody = multibody;
-    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
+    X(strcmp(b.var_names,'F_max')) = Inf;
     errors.pct_error_total = run_dynamic_validation(X,p);
 
 end
@@ -150,7 +150,7 @@ function errors = report_error_breakdown()
     % 2. 1 but wamit coeffs and multibody
     p.use_multibody = true;
     p.use_MEEM = false;
-    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
+    X(strcmp(b.var_names,'F_max')) = Inf;
     errors.pct_error_baseline = run_dynamic_validation(X,p,true);
 
     % drag: placeholder for now

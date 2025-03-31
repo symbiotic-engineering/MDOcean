@@ -106,7 +106,8 @@ g(14) = P_avg_elec/1e6;                     % positive power
 g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 %g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
 g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
-                                        % this constraint should always be active
+                                        % this constraint should always be
+                                        % active unless F_max==Inf
                                         % and is only required when p.cost_perN = 0.
 g(17) = X_constraints(1);               % prevent float rising above top of spar
 g(18) = X_constraints(2);               % prevent float going below bottom of spar
@@ -116,7 +117,7 @@ g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
-    warning('Inf, NaN, or imaginary constraint detected')
+    warning('Inf, NaN, or imaginary constraint or objective detected')
 end
 
 if nargout > 4 % if returning extra struct output for validation
