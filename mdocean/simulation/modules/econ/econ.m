@@ -26,7 +26,7 @@ function [capex_design_dep, ...
     alpha_pto = 0.206;
     pto_const =    92593 + 1051  *N_WEC^(-alpha_pto);
     pto_power = ( 0.4454 + 0.9099*N_WEC^(-alpha_pto) ) * P_max * cost_perW_mult;
-    pto_force = ( 0.0648 + 0.0893*N_WEC^(-alpha_pto) ) * F_max * cost_perN_mult;
+    pto_force = ( 0.0157 + 0.0216*N_WEC^(-alpha_pto) ) * F_max * cost_perN_mult;
     pto = pto_const + pto_power + pto_force;
     
     % sum design-dependent cost per wec
