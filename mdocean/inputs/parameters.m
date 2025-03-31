@@ -27,7 +27,7 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
-    power_coeffs = [23,1,-15,86];
+    power_coeffs = [22.4,1,-15,86];
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -55,7 +55,7 @@ T = [T;
     table("rho_w","\rho_w",{1000},"site",false,"water density (kg/m3)",{''});
     ...%table("mu","\mu",1e-3,"site",false,"dynamic viscosity of water (Pa s)");
     table("g","g",{g},"site",false,"acceleration of gravity (m/s2)",{''});
-    table("h","h",{100},"site",true,"water depth (m)",{''});
+    table("h","h",{45},"site",true,"water depth (m)",{''});
     table("JPD","JPD",{jpd},"site",false,...
         "joint probability distribution of wave (%)",{''});
     table("Hs","H_s",{jpd_Hs},"site",true,"significant wave height (m)",{'max'});
