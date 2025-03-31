@@ -338,7 +338,7 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
     
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
-    phi_alpha = phase_v_prime - phase_v;
+    phi_alpha = 0; %phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
