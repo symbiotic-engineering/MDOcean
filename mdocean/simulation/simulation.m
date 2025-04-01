@@ -65,7 +65,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
- X_constraints,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
+ X_constraints,~,~,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
  B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,gamma_f_over_rho_g,...
  gamma_s_over_rho_g,gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
@@ -133,7 +133,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,K_p,mag_U,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -152,6 +152,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.FOS_spar = FOS_spar(1);
 	val.c_v = P_var;
     val.B_p = B_p;
+    val.K_p = K_p;
+    val.mag_U = mag_U;
     val.X_u = X_u;
     val.X_f = X_f;
     val.X_s = X_s;
