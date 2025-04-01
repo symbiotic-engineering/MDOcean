@@ -143,10 +143,13 @@ pto(1).stiffness = 0;                           % PTO Stiffness [N/m]
 % pto(1).damping = 1200000;                       % PTO Damping [N/(m/s)]
 pto(1).location = [0 0 0];                      % PTO Location [m]
 
-
+D_s   = X(1);        % inner diameter of float (m)
+D_f   = X(2);        % outer diameter of float (m)
+D_f_in = p.D_f_in_over_D_s * D_s;
+D_d = p.D_d_over_D_s * D_s;
 body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
-body(1).quadDrag.area = [0 0 pi*(10^2-3^2) 0 0 0];
+body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
 body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
-body(2).quadDrag.area = [0 0 pi*15^2 0 0 0];
+body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
 
 
