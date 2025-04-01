@@ -125,7 +125,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
+    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
 
     % extract signals over the last period
     N_per_T = timesteps_per_period(imcr);
