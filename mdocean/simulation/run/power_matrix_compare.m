@@ -253,7 +253,7 @@ function results = assemble_results_struct(sz,varargin)
 
     var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
                  'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-                 'relative_amplitude', 'PTO_damping'};
+                 'relative_amplitude', 'PTO_damping','force_pto'};
 
     p = inputParser;
     for var_idx = 1:length(var_names)
