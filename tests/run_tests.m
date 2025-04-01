@@ -13,7 +13,7 @@ addpath(genpath(sourceCodeFolder))
 
 warning('off','MATLAB:nearlySingularMatrix')
 
-run_wecsim_validation = false;
+run_wecsim_validation = true;
 
 if run_wecsim_validation && exist('../WEC-Sim','dir')
     warning('off','MATLAB:contour:ConstantData')
