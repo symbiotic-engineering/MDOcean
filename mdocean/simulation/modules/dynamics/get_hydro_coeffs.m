@@ -26,9 +26,9 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
 
     % excitation
     gamma_f_wamit = hydro.ex_ma(3,1,:);
-    gamma_phase_f_wamit = hydro.ex_ph(3,1,:);
+    gamma_phase_f_wamit = -hydro.ex_ph(3,1,:);
     gamma_s_wamit = hydro.ex_ma(9,1,:);  
-    gamma_phase_s_wamit = hydro.ex_ph(9,1,:);
+    gamma_phase_s_wamit = -hydro.ex_ph(9,1,:);
 
     % radiation damping
     B_f_wamit = hydro.B(3,3,:);
