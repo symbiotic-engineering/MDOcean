@@ -9,7 +9,7 @@ C_PTO_alpha = 0.206;
 cost_force_N1  = 25740+88411+28600;
 cost_force_N100 = 20037+66308+5720;
 
-F_max_nom = 3.8246e6;
+F_max_nom = 7.016e6;
 C_force_coeff = (cost_force_N1 - cost_force_N100) / (F_max_nom * (1 - 100^(-C_PTO_alpha)))
 C_force_const = (cost_force_N1 / F_max_nom) - C_force_coeff
 
