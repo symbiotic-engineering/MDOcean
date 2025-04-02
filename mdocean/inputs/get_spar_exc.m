@@ -9,7 +9,7 @@ hydro = readWAMIT(hydro,'rm3.out',[]); % function from WECSim
 gamma_over_rho_g = hydro.ex_ma(9,1,:);
 gamma_over_rho_g = gamma_over_rho_g(:);
 
-gamma_phase= hydro.ex_ph(9,1,:);
+gamma_phase= -hydro.ex_ph(9,1,:);
 gamma_phase = gamma_phase(:);
 
 k = hydro.w.^2 / g;

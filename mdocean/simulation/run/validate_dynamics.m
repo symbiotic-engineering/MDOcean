@@ -1,12 +1,12 @@
 function [errors_singlebody, errors_multibody, errors_report, T] = validate_dynamics()
     %% Round 1: singlebody, wamit geometry
-    errors_singlebody = wecsim_error_breakdown(false);
+%     errors_singlebody = wecsim_error_breakdown(false);
     
     %% Round 2: multibody, wamit geometry
     errors_multibody = wecsim_error_breakdown(true);
     
     %% Round 3: report geometry
-    errors_report = report_error_breakdown(); % first index is wecsim to report error, second index is mdocean to report error
+%     errors_report = report_error_breakdown(); % first index is wecsim to report error, second index is mdocean to report error
 
     % make table comparing error of mdocean to various ground truths
     errors_report_mdocean = structfun(@(s)s(2), errors_report,'UniformOutput',false); % just mdocean to report error
@@ -47,7 +47,7 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
         
         wecsim_filename_start = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
                             '_meem_' meem];
-        d = dir(['results_3_25\run_2pm_excneg\**\' wecsim_filename_start '*'] );
+        d = dir(['results_4_1\**\' wecsim_filename_start '*'] );
         wecsim_filename = d.name;
     else
         wecsim_filename = run_wecsim_validation(X,p);
