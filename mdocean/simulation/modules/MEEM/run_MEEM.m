@@ -210,7 +210,7 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
     idx_B_0_e = length(A_num)-K_num;
     B_0_e = x(idx_B_0_e);
     exc_phase = -pi/2 + angle(B_0_e) - angle( besselh(0,m0_num*a2_num) );
-%     exc_phase = -exc_phase; % I have to negate it to match WAMIT, not sure why
+    exc_phase = -exc_phase; % I have to negate it to match WAMIT, not sure why
 
 end
 
