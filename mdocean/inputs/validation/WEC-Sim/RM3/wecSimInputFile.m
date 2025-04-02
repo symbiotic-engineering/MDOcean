@@ -64,6 +64,7 @@ simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & 
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';
 simu.saveWorkspace = false;
+simu.b2b = 1;
 
 %% Wave Information 
 % % noWaveCIC, no waves with radiation CIC  

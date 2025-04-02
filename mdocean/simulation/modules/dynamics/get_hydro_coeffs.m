@@ -22,7 +22,7 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
     % added mass
     A_f_wamit = hydro.A(3,3,:);
     A_s_wamit = hydro.A(9,9,:);
-    A_c_wamit = 0*hydro.A(3,9,:);
+    A_c_wamit = hydro.A(3,9,:);
 
     % excitation
     gamma_f_wamit = hydro.ex_ma(3,1,:);
@@ -33,7 +33,7 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
     % radiation damping
     B_f_wamit = hydro.B(3,3,:);
     B_s_wamit = hydro.B(9,9,:);
-    B_c_wamit = 0*hydro.B(3,9,:);
+    B_c_wamit = hydro.B(3,9,:);
 
     % interpolation
     A_f_over_rho       = interp1(k_wamit,A_f_wamit(:),k);
