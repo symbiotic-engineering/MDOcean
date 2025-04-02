@@ -21,6 +21,7 @@ if strcmpi(mode,'wecsim')
     D_f_in_over_D_s = 6/6;
     h = 250; % must be above .4*max(jpd_Te)^2*g/(2*pi) = 213.5 to be all deep water
     power_coeffs = [1 0 0 1];
+    power_scale_multibody = 1;
 else
     T_s_over_D_s = 35/6;
     h_d_over_D_s = 1*in2m/6;
@@ -30,6 +31,7 @@ else
     D_f_in_over_D_s = 6.5/6;
     h = 45;
     power_coeffs = [22.4,1,-15,86];
+    power_scale_multibody = 0.595;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -157,7 +159,9 @@ T = [T;
     table("C_d_spar","C_{d,spar}",{1},"dynamics",true,"spar coefficient of drag",{''});
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)",{''});
     table("power_scale_coeffs","P_{scale}",{power_coeffs},"dynamics",...
-        false,"coefficients for power scale factor to match RM3 report",{'max'});
+        false,"coefficients for singlebody power scale factor to match RM3 report",{'max'});
+    table("power_scale_multibody","P_{scale,mb}",{power_scale_multibody},"dynamics",...
+        false,"scalar for multibody power scale factor to match RM3 report",{'max'});
     ...
     ...% Dynamics: simulation type
     table("control_type","control type",{'damping'},"dynamics",false,... 

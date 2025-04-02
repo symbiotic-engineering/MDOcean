@@ -96,7 +96,7 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         power_scale_factor = c(1) ./ ( c(2) * T.^2 + c(3) * T + c(4) );
         P_matrix = real_P .* power_scale_factor;
     else
-        P_matrix = real_P;
+        P_matrix = real_P * in.power_scale_multibody;
     end
     
     % set values where JPD=0 to 0 to not include them in constraint
