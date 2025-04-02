@@ -1,5 +1,5 @@
 
-function [A_s_over_rho,gamma_s_over_rho_g,B_s_over_rho_w] = spar_dynamics(Ds_over_Dd, D_d, T_s, ...
+function [A_s_over_rho,gamma_s_over_rho_g,B_s_over_rho_w,gamma_s_phase] = spar_dynamics(Ds_over_Dd, D_d, T_s, ...
                                                     spar_excitation_coeffs, k, mult)
     
     % added mass
@@ -12,6 +12,8 @@ function [A_s_over_rho,gamma_s_over_rho_g,B_s_over_rho_w] = spar_dynamics(Ds_ove
     depth_multiplier = exp(-k * (T_s - spar_excitation_coeffs.T_s));
     gamma_s_over_rho_g = interp1(spar_excitation_coeffs.k * D_d, ...
         spar_excitation_coeffs.gamma_over_rho_g, k * D_d) .* depth_multiplier;
+    gamma_s_phase = interp1(spar_excitation_coeffs.k * D_d, ...
+        spar_excitation_coeffs.gamma_phase, k * D_d);
     
     % radiation damping
     B_s_over_rho_w = k/2 .* gamma_s_over_rho_g.^2 ./ mult; % finite depth haskind relation
