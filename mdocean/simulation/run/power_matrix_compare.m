@@ -26,7 +26,7 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
     vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
-        'float_amplitude','relative_amplitude','spar_amplitude','B_p','force_pto'};
+        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
     comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p)
     
     % todo: use actual pretty variables titles with units
