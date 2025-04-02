@@ -1,12 +1,12 @@
 function [errors_singlebody, errors_multibody, errors_report, T] = validate_dynamics()
     %% Round 1: singlebody, wamit geometry
-%     errors_singlebody = wecsim_error_breakdown(false);
+    errors_singlebody = wecsim_error_breakdown(false);
     
     %% Round 2: multibody, wamit geometry
     errors_multibody = wecsim_error_breakdown(true);
     
     %% Round 3: report geometry
-%     errors_report = report_error_breakdown(); % first index is wecsim to report error, second index is mdocean to report error
+    errors_report = report_error_breakdown(); % first index is wecsim to report error, second index is mdocean to report error
 
     % make table comparing error of mdocean to various ground truths
     errors_report_mdocean = structfun(@(s)s(2), errors_report,'UniformOutput',false); % just mdocean to report error
