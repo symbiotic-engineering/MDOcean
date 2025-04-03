@@ -167,9 +167,14 @@ function [x,fval] = pareto_search(filename_uuid)
     save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end
 
-function neg_pwr_per_capex = objFcn1new(x,oldFcn,p)
-   capex0_per_power = oldFcn(x,{p});
-   pwr_per_capex0 = 1/capex0_per_power;
-   neg_pwr_per_capex = -pwr_per_capex0;
+function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
+
    clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
+
+   % cost0 refers to the part of the numerator of LCOE that does not depend 
+   % on design: cost0 = capex0 + opex0
+   cost0_per_power = oldFcnLCOE(x,{p_zero_design_cost});
+   pwr_per_cost0 = 1/cost0_per_power;
+   neg_pwr_per_cost = -pwr_per_cost0;
+   
 end
