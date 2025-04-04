@@ -217,7 +217,8 @@ function [par_x_star_par_p_global, ...
     delta_p_change_activity_global = delta_p_LCOE_norm;
     
     %% Line plots showing nonlinearity
-    figure(1)
+    fig_num_start = gcf().Number+1;
+    figure(fig_num_start)
     subplot 121
     plot(ratios,LCOE/LCOE_nom)
     xlabel('Parameter Ratio from nominal')
@@ -236,7 +237,7 @@ function [par_x_star_par_p_global, ...
     set(gcf,'Position',[1 41 1536 840]) % full screen
     
     for i = 1:num_DVs
-        f2 = figure(2);
+        f2 = figure(fig_num_start+1);
         subplot(3,5,i)
         plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
         xlabel ('Parameter ratio from nominal')
@@ -245,7 +246,7 @@ function [par_x_star_par_p_global, ...
         %improvePlot
         grid on
         
-        f3 = figure(3);
+        f3 = figure(fig_num_start+2);
         subplot(3,5,i)
         plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
         xlabel ('Parameter ratio from nominal')
