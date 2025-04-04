@@ -25,13 +25,6 @@ end
 fig_success = cell([1,length(which_figs)]);
 tab_success = cell([1,length(which_tabs)]);
 
-if isempty(which_figs)
-    which_figs = 0;
-end
-if isempty(which_tabs)
-    which_tabs = 0;
-end
-
 fig_output = gobjects(1, length(which_figs));
 
 tab_output(1, 1:length(which_tabs)) = {table()};
@@ -260,6 +253,7 @@ end
 empty_idx = cellfun(@isempty,fig_names);
 empty_str = strcat('Fig._', string(find(empty_idx)));
 [fig_names{empty_idx}] = deal(empty_str{:});
+[fig_success{ismember(which_figs,find(empty_idx))}] = deal(MException('all_figures:not_implemented','Figure not implemented yet'));
 
 %% table 12 - validation table
 tab_names{1} = 'Tab. 12: validation against nominal';

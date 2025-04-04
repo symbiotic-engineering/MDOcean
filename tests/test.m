@@ -189,7 +189,11 @@ classdef (SharedTestFixtures={ ...
             end
 
             if isa(success_criterion,'MException')
-                rethrow(success_criterion)
+                if isempty(success_criterion.stack)
+                    throw(success_criterion)
+                else
+                    rethrow(success_criterion)
+                end
             else
                 testCase.verifyGreaterThan(success_criterion, 0, diagnostic);
             end
