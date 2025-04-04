@@ -1,4 +1,4 @@
-function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
+function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, ...
                                                N_num, M_num, K_num, ...
                                                a1_mat, a2_mat, d1_mat, ...
                                                d2_mat, h_mat, m0_mat, ...
@@ -38,7 +38,7 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     fname = ['N' num2str(N_num) '_M' num2str(M_num) '_K' num2str(K_num) '_heaving_' heaving];
 
     % generate matlab functions from symbolic equations if needed
-    if ~exist(['simulation/modules/MEEM/generated/A_b_matrix_' fname],'file') || ...
+    if ~exist(['simulation/modules/MEEM/generated/A_b_c_matrix_' fname],'file') || ...
        ~exist(['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
     end  
@@ -46,6 +46,7 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     % for loop for numeric inputs
     mu_nondim = zeros(1,num_runs);
     lambda_nondim = zeros(1,num_runs);
+    exc_phases = zeros(1,num_runs);
     
     for i = 1:num_runs
         % index into matrix inputs with i and into scalar inputs with 1
@@ -66,12 +67,13 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
                          d2_num < d1_num;
         
         if valid_geometry
-            [mu_nondim(i), lambda_nondim(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
+            [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, ...
                                                                 K_num, show_A, plot_phi, fname);
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
+            exc_phases(i) = 0;
             warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
         end
     end
@@ -84,12 +86,17 @@ function [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs,
     if any(isnan(mu_nondim),'all')
         error('MEEM got NaN as result')
     end
+
+    if any(lambda_nondim<0,'all')
+        lambda_nondim(lambda_nondim<0) = 1e-9;
+        warning('MEEM calculated negative damping. Setting damping to very small positive value.')
+    end
 end
 
-function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
+function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -102,7 +109,7 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
         [R,Z] = meshgrid(r_vec,z_vec);
         
         % get hydro coeffs and potential velocity fields
-        [hydro_nondim_num,phi_i1_num,phi_i2_num,...
+        [~,phi_i1_num,phi_i2_num,...
         phi_e_num,phi_p_i1_num,phi_p_i2_num,...
         phi_h_i1_num,phi_h_i2_num,v_1_r_num,...
         v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,...
@@ -112,10 +119,6 @@ function [mu_nondim, lambda_nondim] = compute_and_plot(a1_num, a2_num, d1_num, d
         assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,phi_i1_num,phi_i2_num,phi_e_num,...
                                      phi_p_i1_num,phi_p_i2_num,phi_h_i1_num,phi_h_i2_num,...
                                      v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num,fname);
-    else
-        % just get hydro coeffs
-        hydro_nondim_num = feval(hydro_fname,a1_num,a2_num,d1_num,d2_num,h_num,...
-                                                    m0_num,m_k_cell{:},x_cell{:},0,0);
     end
 
     mu_nondim = real(hydro_nondim_num);
@@ -133,7 +136,7 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
 
     m_k_num = zeros(1,K_num);
     % using tand instead of tan because finite precision of pi means
@@ -155,13 +158,32 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
     m_k_cell = num2cell(m_k_num);
 
     % get A and b matrices
-    Ab_fname = ['A_b_matrix_' fname];
-    [A_num, b_num] = feval(Ab_fname, a1_num, a2_num, d1_num, d2_num,...
+    Abc_fname = ['A_b_c_matrix_' fname];
+    [A_num, b_num, c_num, c_0_num] = feval(Abc_fname, a1_num, a2_num, d1_num, d2_num,...
                             h_num, m0_num, m_k_cell{:});
+
+    % get rid of expected NaNs
+    m0h_max = acosh(realmax) / 2;
+    if m0_num*h_num > m0h_max
+        len = length(A_num);
+        [col,row] = meshgrid(1:len);
+        bottom_left = (row == len - K_num) & (col < len - K_num);
+        top_right = row < len - K_num & (col == len - K_num);
+        idx_C_m0 = bottom_left | top_right;
+        A_num(idx_C_m0) = 0; % this is shown to converge to zero
+        b_high_freq = -a2_num / (h_num - d2_num) * sqrt(h_num / (2 * m0_num)) * exp(-d2_num * m0_num);
+        b_num(end-K_num) = b_high_freq;
+    end
+
+    % throw warning for unexpected NaNs
     if any(~isfinite(A_num),'all')
         A_num(~isfinite(A_num)) = 0;
         warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
             'perhaps due to too large argument in besseli. Elements will be zeroed.'])
+    end
+    if any(~isfinite(b_num),'all')
+        b_num(~isfinite(b_num)) = 0;
+        warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
     % show A matrix values
     if show_A
@@ -175,7 +197,21 @@ function [x_cell, m_k_cell] = compute_eigen_coeffs(a1_num,a2_num,d1_num,d2_num,h
 
     % solve for x
     x = full(A_num\b_num);
+
+    % sometimes (ie for geometries very close to the seafloor) A_num will
+    % be singular and thus x will be inf/nan. Zero these.
+    x(~isfinite(x)) = 0;
+
     x_cell = num2cell(x);
+    % solve for hydro
+    hydro_nondim_num = c_num * x + c_0_num;
+
+    % see notebook p139 3/3/25 - from eq97 of Chau and Yung 2012
+    idx_B_0_e = length(A_num)-K_num;
+    B_0_e = x(idx_B_0_e);
+    exc_phase = -pi/2 + angle(B_0_e) - angle( besselh(0,m0_num*a2_num) );
+%     exc_phase = -exc_phase; % I have to negate it to match WAMIT, not sure why
+
 end
 
 function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
@@ -189,6 +225,10 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     assumeAlso(n >= 0)
     assumeAlso(m >= 0)
     assumeAlso(k >= 0)
+    assumeAlso(h > d2)
+    assumeAlso(h > d1)
+    assumeAlso(r > 0)
+    assumeAlso(m_k(k) > 0)
     
     % equation numbers refer to Chau & Yeung 2010 unless otherwise noted
     
@@ -240,11 +280,37 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % coupling integrals
     C_nm(n,m) = simplify(int(Z_m_i2(m) * Z_n_i1(n), z, -h, -d1));
     C_mk(m,k) = simplify(int(Z_m_i2(m) * Z_k_e(k),  z, -h, -d2));
-    
-    
+
     dz_1 = h - d1;
     dz_2 = h - d2;
-    
+
+    % coupling integral approximation for large m0h
+    const = piecewise(m==0,1, m>=1,2);
+    C_m0_approx = sqrt(2*h/m0*const) * exp(-d2*m0) * (-1)^m / ( 1 + (lambda_m2/m0)^2 );
+    C_mk_optional_approx(m,k) = piecewise(m0*d2 > 20 & k==0, C_m0_approx, C_mk(m,k));
+
+    plot_error = false;
+    if plot_error
+        syms d2_over_h m0h
+        C_mk_h_approx_plot(m) = expand(simplify(subs( C_m0_approx/h , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_h_actual_plot(m) = expand(simplify(subs( C_mk(m,0)/h   , {d2,m0}, {d2_over_h*h,m0h/h})));
+        C_mk_error = expand(simplify(C_mk_h_approx_plot - C_mk_h_actual_plot));
+        
+        % checking derivation of approximation
+        denom = sqrt(2 * m0h + 2 * cosh(m0h) * sinh(m0h)) * (d2_over_h^2 * m0h^2  - 2 * d2_over_h * m0h^2  + sym(pi)^2*m^2  + m0h^2 );
+        factor = 2*sqrt(2) * (-1)^m * m0h^(3/2) * (1-d2_over_h)^2 / denom;
+        pretty(expand(simplify(C_mk_h_actual_plot / factor))*factor);
+        
+        % plots
+        str = 'C_{mk} for k=0, m=';
+        levels = 10.^(-6:2:-2);
+        for mm = 0:2
+            plot_large_freq_approx_error(C_mk_h_actual_plot(mm),levels,-8,['Actual ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_h_approx_plot(mm),levels,-8,['Approximate ' str num2str(mm)]);
+            plot_large_freq_approx_error(C_mk_error(mm),levels,-8,['Absolute error in ' str num2str(mm)]);
+        end
+    end
+
     % potential matching
     % equation 22 in old 1981 paper, applied to boundary 2-e
     match_2e_potential = dz_2 * ( C_1m_2(m)*subs(R_1m_2(m),r,a2) ...
@@ -307,11 +373,11 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     
     % sum all N terms
     syms N M K real positive integer
-    phi_h_i1 = symsum(phi_h_n_i1, n, 0, N);
-    phi_h_i2 = symsum(phi_h_m_i2, m, 0, M);
+    phi_h_i1 = phi_h_n_i1(0) + symsum(phi_h_n_i1, n, 1, N);
+    phi_h_i2 = phi_h_m_i2(0) + symsum(phi_h_m_i2, m, 1, M);
     phi_i1 = phi_p_i1 + phi_h_i1;
     phi_i2 = phi_p_i2 + phi_h_i2;
-    phi_e  = symsum(phi_e_k, k, 0, K);
+    phi_e  = phi_e_k(0) + symsum(phi_e_k, k, 1, K);
     
     % derivatives to geometric variables
     % hndInfDepth = limit(hnd,h,inf)
@@ -338,8 +404,16 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % IC = heaving inner cylinder
     integrand_OC = subs(r * phi_i2 * v_2z, z, -d2);
     integrand_IC = subs(r * phi_i1 * v_1z, z, -d1);
-    hydro_OC = h^3 * 2*pi* int(integrand_OC,r,a1,a2);
-    hydro_IC = h^3 * 2*pi* int(integrand_IC,r,0,a1);
+    integral_OC = int(integrand_OC,r,a1,a2);
+    integral_IC = int(integrand_IC,r,0,a1);
+
+    % uncomment these to display the c-vector for general NMK
+    %vars = [C_1m_2(0) C_2m_2(0)];
+    %pretty(collect(simplify(integral_OC,'Steps',100), vars))
+    %pretty(collect(simplify(integral_IC,'Steps',100), vars))
+
+    hydro_OC = h^3 * 2*pi* integral_OC;
+    hydro_IC = h^3 * 2*pi* integral_IC;
     
     if heaving_OC && heaving_IC
         hydro_over_rho = hydro_OC + hydro_IC;
@@ -396,6 +470,15 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     hydro_nondim_NMK = var{14};
     eqns_NMK = var{15};
     
+    % generate c-vector
+    c = jacobian(hydro_nondim_NMK,unknowns_const);
+    c_0 = simplify(subs(hydro_nondim_NMK,unknowns_const,0*unknowns_const));
+
+    % uncomment these lines to show the hydro integral for specific NMK
+    %pretty(c.')
+    %pretty(c_0)
+    %isAlways(hydro_nondim_NMK == c_0 + c * unknowns_const.') % check, should return true
+
     % generate linear system
     [A,b] = equationsToMatrix(eqns_NMK,unknowns_const);
     
@@ -412,16 +495,68 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(bars(3)*[1,1], full_line, 'k') % third vertical
 %     
 %     plot(full_line, bars(1)*[1,1], 'k') % first horizontal
-%     plot(full_line, bars(2)*[1,1], 'k') % first horizontal
-%     plot(full_line, bars(3)*[1,1], 'k') % first horizontal
+%     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
+%     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
     
-    matlabFunction(A,b,'File',['simulation/modules/MEEM/generated/A_b_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
+    folder = 'simulation/modules/MEEM/generated/';
+    if ~isfolder(folder)
+        folder = '';
+        warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
+    end
+    matlabFunction(A,b,c,c_0,'File',[folder 'A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
     
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
-                    'File',['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],...
+                    'File',[folder 'hydro_potential_velocity_fields_' fname],...
                     'Vars',[a1,a2,d1,d2,h,m0,m_k_const,unknowns_const,r,z]);
 
+end
+
+function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str)
+    
+    levels_2 = [0 levels];
+
+    % attempt 1: symbolic plot - doesn't allow you to have contour labels
+    fig = figure;
+    hdl = fcontour(sym_error,[0 1 pi acosh(realmax)],'LevelList',levels_2,'Fill','on');
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    colorbar
+    set(gca, 'ColorScale', 'log');
+    
+    % attempt 2: numeric plot - allows contor labels, but log scale can't
+    % show negatives, so plot the absolute value
+    fig2 = figure;
+    [C,hdl2] = contourf(hdl.XData,hdl.YData, abs(hdl.ZData),'LevelList',levels_2);
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title([title_str ' Absolute Value']);
+    clabel(C,hdl2);
+    set(gca, 'ColorScale', 'log');
+    clim([0 max(hdl2.ZData,[],'all')])
+    colorbar;
+    hold on
+
+    % attempt 3: numeric signedlog plot - allows negatives
+    figure
+    signed_log(hdl.ZData,smallest_exp,levels,hdl.XData,hdl.YData)
+    xlabel('d_2/h');
+    ylabel('m_0 h');
+    title(title_str);
+    hold on
+    clabel(C); % use contour label from attempt 2 since it is without log
+    if any(isnan(hdl.ZData),'all')
+        [~,h_nan] = contourf(hdl.XData,hdl.YData, isnan(hdl.ZData), [1 1], 'LineColor', 'none','FaceColor','none');
+        hatchfill2(h_nan,'cross','LineColor','k');
+    end
+    x = (logspace(0,1)-1)/9; % 0 to 1 with more points close to zero
+    plot(x,20./x,'k--','LineWidth',2)
+    ylim([pi acosh(realmax)])
+
+    % close first two figures since just the third one is final
+    close(fig)
+    close(fig2)
 end
 
 function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
@@ -461,7 +596,7 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     plot_potential(phi,R,Z,region_body,'Total Potential');
 
     date_string = [char(datetime('now','Format','yyyy-MM-dd__h-mma')) '_'];
-    folder = ['dev' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
+    folder = ['dev' filesep 'hydro_coeffs' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
     savefig(folder)
     plot_potential(phiH,R,Z,region_body,'Homogeneous Potential');
     plot_potential(phiP,R,Z,region_body,'Particular Potential');

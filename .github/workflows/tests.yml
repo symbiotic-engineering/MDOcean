@@ -4,11 +4,8 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # Triggers the workflow on push events for any branch
   push:
-    branches: [ "main", "ci"]
-  pull_request:
-    branches: [ "main", "ci"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,34 +21,77 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          path: MDOcean
+
+      - name: Checkout WEC-Sim
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          repository: WEC-Sim/WEC-Sim
+          path: WEC-Sim
+          ref: dev
+
+      - name: Check validity of citation.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        if: always()
+        with:
+          args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2
+        if: always()
+        with:
+            products: >
+                Parallel_Computing_Toolbox
+                Global_Optimization_Toolbox
+                Optimization_Toolbox
+                Statistics_and_Machine_Learning_Toolbox
+                MATLAB_Report_Generator
+                Simulink
+                Simscape
+                Simscape_Multibody
       
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v1
-        with:
-          source-folder: mdocean
-          test-results-junit: test-results/results.xml
-          test-results-pdf: test-results/testreport.pdf
-          code-coverage-cobertura: code-coverage/coverage.xml
-
-      - name: Publish code coverage
-        if: always()
-        uses: codecov/codecov-action@v1
-        with:
-          file: code-coverage/coverage.xml
-
-      - name: Publish test report
-        uses: mikepenz/action-junit-report@v3
+        uses: matlab-actions/run-command@v2
         if: always()
         with:
-          report_paths: 'test-results/results.xml'
+          command: cd("MDOcean"), addpath("tests"), run_tests
+
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: MDOcean/code-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to codecov
+        uses: codecov/test-results-action@v1
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: MDOcean/test-results
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to GitHub UI
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: 'MDOcean/test-results/**/junit.xml'
 
       - name: Upload test report PDF
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: test-results/testreport.pdf
+          path: |
+            MDOcean/test-results/**/testreport.pdf
+            MDOcean/test-results/**/table_*.tex
+            MDOcean/code-coverage/**/coverage.xml
+            MDOcean/**/DynamicValidation_*.pdf
+            MDOcean/test-results/Figure_*.pdf
+            MDOcean/mdocean/optimization/multiobjective/pareto_search_results_*.mat
+            MDOcean/**/wecsim_*.mat
