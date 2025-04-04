@@ -1,5 +1,4 @@
 function pareto_curve_heuristics()
-    close all
     p0 = parameters();
     b = var_bounds();
     p_w = parameters('wecsim');
