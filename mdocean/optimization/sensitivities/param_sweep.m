@@ -371,17 +371,18 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
 
     dry_run = true; % true means use random numbers, false means actual optimization
 
-    for j=1:length(ratios)
+    parfor j=1:length(ratios)
         if ratios(j) ~=1   
-            p.(param_name) = ratios(j) * var_nom;
+            new_p = p;
+            new_p.(param_name) = ratios(j) * var_nom;
             if dry_run
                 [Xs_opt, obj_opt, flag] = deal(rand(num_DVs+1,2),rand(2,1),[1 1]);
                 g_lambda_LCOE_tmp = rand(num_constr,1);
                 g_lambda_Pvar_tmp = rand(num_constr,1);
             else
-                [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,p,b);
-                g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),p,b);
-                g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),p,b);
+                [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,new_p,b);
+                g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),new_p,b);
+                g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),new_p,b);
             end
             
             if flag(1) >= 1
