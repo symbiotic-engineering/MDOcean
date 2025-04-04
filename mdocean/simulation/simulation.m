@@ -87,7 +87,7 @@ J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
 num_g = 20+numel(p.JPD)+length(p.T_struct);
-g = zeros(num_g,1);
+g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
 g(3) = V_s_pct;                         % prevent spar too heavy
