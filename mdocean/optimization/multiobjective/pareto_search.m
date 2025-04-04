@@ -59,11 +59,12 @@ function [x,fval] = pareto_search(filename_uuid)
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
-    
-    for i = 1:length(LCOE_seeds)
-        p.LCOE_max = LCOE_seeds(i);
+
+    parfor i = 1:length(LCOE_seeds)
+        new_p = p;
+        new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
-        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,p,b,which_obj);
+        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,b,which_obj);
         if flag_tmp == -2 % Initial pareto point is not feasible - this prevents a LPalg error in paretosearch
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
@@ -71,9 +72,9 @@ function [x,fval] = pareto_search(filename_uuid)
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
-            obj_check = objFcn2(X_opt_tmp(idxs)',{p});
+            obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
-            [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
+            [~, P_var_seeds(i)] = simulation(X_opt_tmp, new_p);
             assert(obj_tmp == P_var_seeds(i))
         end
     end
@@ -82,8 +83,6 @@ function [x,fval] = pareto_search(filename_uuid)
     X_seeds(init_failed,:) = [];
     P_var_seeds(init_failed) = [];
     LCOE_seeds(init_failed) = [];
-
-    p.LCOE_max = LCOE_max;
 
     %% Set up pareto search algorithm
     probMO = probs{1};
