@@ -113,7 +113,8 @@ function [x,fval] = pareto_search(filename_uuid)
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
-        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
+        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
+        'UseParallel',true);
     if ~isempty(X0)
         probMO.options.InitialPoints = X0_struct;
     else
