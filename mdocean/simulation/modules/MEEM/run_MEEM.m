@@ -74,7 +74,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
             exc_phases(i) = 0;
-            warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
+            %warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
         end
     end
 
