@@ -160,12 +160,12 @@ classdef (SharedTestFixtures={ ...
 
             if which_figs ~= 0 % figure
                 success_criterion = testCase.fig_success{which_figs};
-                fig_out = testCase.fig_output(which_figs)
+                fig_out = testCase.fig_output(which_figs);
 
                 fig_name = ['Figure_' num2str(which_figs)];
                 pdf_name = ['../test-results/' fig_name];
                 
-                if ~isa(fig_out,'matlab.graphics.GraphicsPlaceholder') % if figure exists (didn't error first)
+                if isgraphics(fig_out) % if figure exists (didn't error first and wasn't deleted)
                     if ~isempty(fig_out.UserData)
                         % pdf already exists in files, just copy to folder
                         copyfile(fig_out.UserData, pdf_name)
@@ -175,6 +175,8 @@ classdef (SharedTestFixtures={ ...
                     end
                     % in either case, use figure itself, not pdf, for printing the diagnostic
                     diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+                elseif ~isvalid(fig_out)
+                    error('Figure has been deleted, probably because of a "close all" in a subsequent script.')
                 end   
 
             else % table
