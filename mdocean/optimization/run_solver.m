@@ -2,8 +2,10 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
     solver_based = true;
     % create folder for generated objectives if it doesn't already exist        
     if solver_based
-        filename_uuid
-        generated_folder = ['optimization/generated/' filename_uuid]
+        if isa(filename_uuid,'parallel.pool.Constant')
+            filename_uuid = filename_uuid.Value;
+        end
+        generated_folder = ['optimization/generated/' filename_uuid];
         if ~exist(generated_folder,'dir')
             mkdir(generated_folder)
             addpath(generated_folder)
