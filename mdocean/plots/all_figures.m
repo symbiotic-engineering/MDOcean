@@ -15,14 +15,15 @@ num_figs = 36;
 num_tabs = 8;
 fig_names   = cell([1,num_figs]);
 tab_names   = cell([1,num_tabs]);
-fig_success = cell([1,length(which_figs)]);
-tab_success = cell([1,length(which_tabs)]);
 
 if nargin==0
     % if run without arguments, show all figures and tables
     which_figs = 1:num_figs;
     which_tabs = 1:num_tabs;
 end
+
+fig_success = cell([1,length(which_figs)]);
+tab_success = cell([1,length(which_tabs)]);
 
 if isempty(which_figs)
     which_figs = 0;
@@ -86,7 +87,7 @@ for i = 1:length(non_matlab_figs)
             tmp_fig.UserData = ['plots/non_matlab_figs/' fig_file(1:end-4) '.pdf'];
             fig_output(which_figs==fig_num) = tmp_fig;
         catch err
-            fig_success(which_figs==fig_num) = err;
+            fig_success{which_figs==fig_num} = err;
         end
     end
 end
@@ -114,7 +115,7 @@ if any(which_figs == 7 | which_figs == 8)
         fig_output(which_figs==7) = fig7;
         fig_output(which_figs==8) = fig8;
     catch err
-        fig_success{which_figs == 7 | which_figs == 8} = err;
+        fig_success(which_figs == 7 | which_figs == 8) = {err};
     end
 end
 
@@ -172,7 +173,7 @@ if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
         fig_output(which_figs==18) = fig18;
         % fixme: 19 through 21 not implemented
     catch err
-        fig_success{which_figs == 16 | which_figs == 17 | which_figs == 18} = err;
+        fig_success(which_figs == 16 | which_figs == 17 | which_figs == 18) = {err};
     end
 end
 
@@ -195,7 +196,7 @@ if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25
         fig_output(which_figs==24) = fig24;
         fig_output(which_figs==25) = fig25;
     catch err
-        fig_success{which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25} = err;
+        fig_success(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25) = {err};
     end
 end
 
@@ -203,7 +204,7 @@ end
 fig_names{26} = 'Fig. 26: overlaid geometry';
 fig_names{27} = 'Fig. 27: overlaid hydro coeffs';
 fig_names{28} = 'Fig. 28: probability CDF';
-if any(which_figs == 26 | which_figs == 27 | which_figs == 28 | which_tabs == 5 | which_tabs == 6)
+if any(which_figs == 26 | which_figs == 27 | which_figs == 28) || any(which_tabs == 5 | which_tabs == 6)
     try
         [tab5,tab6] = compare(filename_uuid);
         n = gcf().Number;
@@ -214,7 +215,7 @@ if any(which_figs == 26 | which_figs == 27 | which_figs == 28 | which_tabs == 5 
         fig_output(which_figs==27) = fig27;
         fig_output(which_figs==28) = fig28;
     catch err
-        fig_success{which_figs == 26 | which_figs == 27 | which_figs == 28} = err;
+        fig_success(which_figs == 26 | which_figs == 27 | which_figs == 28) = {err};
     end
 end
 
@@ -251,7 +252,7 @@ if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
         fig_output(which_figs==35) = fig35;
         fig_output(which_figs==36) = fig36;
     catch err
-        fig_success{which_figs == 34 | which_figs == 35 | which_figs == 36} = err;
+        fig_success(which_figs == 34 | which_figs == 35 | which_figs == 36) = {err};
     end    
 end
 
