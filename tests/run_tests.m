@@ -12,6 +12,7 @@ sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
 warning('off','MATLAB:nearlySingularMatrix')
+warning('off','MATLAB:singularMatrix')
 
 run_wecsim_validation = false;
 
