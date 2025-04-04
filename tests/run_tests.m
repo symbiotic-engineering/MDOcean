@@ -66,7 +66,9 @@ runner.addPlugin(p4);
 runner.ArtifactsRootFolder = test_dir;
 
 tic
-results = runner.runInParallel(suite);
+results = runner.run(suite,'UseParallel',false); % parallel would make it slower 
+                                                 % because it would run the
+                                                 % test class setup on every worker
 clockTime = toc;
 
 if ~batchStartupOptionUsed % don't open reports when running on CI server 
