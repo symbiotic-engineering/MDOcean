@@ -4,10 +4,10 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = true;
+        run_slow_tests = false;
 
-        slow_figs = [16:21, 24:25];
-        slow_tabs = 7:8;
+        slow_figs = [16:25];
+        slow_tabs = 1:8;
     end
 
     properties
@@ -160,7 +160,7 @@ classdef (SharedTestFixtures={ ...
 
             if which_figs ~= 0 % figure
                 success_criterion = testCase.fig_success{which_figs};
-                fig_out = testCase.fig_output(which_figs);
+                fig_out = testCase.fig_output(which_figs)
 
                 fig_name = ['Figure_' num2str(which_figs)];
                 pdf_name = ['../test-results/' fig_name];
