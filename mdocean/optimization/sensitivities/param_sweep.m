@@ -1,7 +1,6 @@
 function [] = param_sweep(filename_uuid)
 
     %% Setup
-    close all
     b = var_bounds();
     if nargin>0
         b.filename_uuid = filename_uuid;
