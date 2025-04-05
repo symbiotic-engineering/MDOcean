@@ -21,7 +21,7 @@ flags = zeros(1,length(files));
 most_common_wave = cell(1,length(files));
 BW = zeros(1,length(files));
 
-parpool
+gcp
 parfor i=1:length(files)
     new_p = p;
     
