@@ -64,7 +64,14 @@ function [x,fval] = pareto_search(filename_uuid)
         new_p = p;
         new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
-        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,b,which_obj);
+        new_b = b;
+        if isempty(new_b.filename_uuid)
+            t = getCurrentTask();
+            if ~isempty(t)
+                new_b.filename_uuid = num2str(t.ID);
+            end
+        end
+        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,new_b,which_obj);
         if flag_tmp == -2 % Initial pareto point is not feasible - this prevents a LPalg error in paretosearch
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
