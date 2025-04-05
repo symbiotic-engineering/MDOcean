@@ -60,7 +60,7 @@ function [x,fval] = pareto_search(filename_uuid)
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
 
-    parfor i = 1:length(LCOE_seeds)
+    for i = 1:length(LCOE_seeds)
         new_p = p;
         new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
