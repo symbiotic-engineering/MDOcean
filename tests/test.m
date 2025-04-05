@@ -187,7 +187,7 @@ classdef (SharedTestFixtures={ ...
             end
 
             if iscell(success_criterion)
-                success_criterion = success_criterison{:};
+                success_criterion = success_criterion{:};
             end
 
             if isempty(success_criterion)
