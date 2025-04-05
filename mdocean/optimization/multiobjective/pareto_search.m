@@ -60,7 +60,7 @@ function [x,fval] = pareto_search(filename_uuid)
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
 
-    parfor i = 1:length(LCOE_seeds)
+    for i = 1:length(LCOE_seeds)
         new_p = p;
         new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
@@ -113,8 +113,8 @@ function [x,fval] = pareto_search(filename_uuid)
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
-        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
-        'UseParallel',true);
+        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);%,...
+        %'UseParallel',true);
     if ~isempty(X0)
         probMO.options.InitialPoints = X0_struct;
     else
@@ -123,8 +123,8 @@ function [x,fval] = pareto_search(filename_uuid)
     end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
-    delete(gcp("nocreate")); % delete old pool
-    parpool('AttachedFiles','generatedFunction_simulation1_withReuse'); % separate copy of file for each parallel worker
+    %delete(gcp("nocreate")); % delete old pool
+    %parpool('AttachedFiles','generatedFunction_simulation1_withReuse'); % separate copy of file for each parallel worker
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
     try
@@ -171,12 +171,12 @@ end
 
 function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
 
-   clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
-
    % cost0 refers to the part of the numerator of LCOE that does not depend 
    % on design: cost0 = capex0 + opex0
    cost0_per_power = oldFcnLCOE(x,{p_zero_design_cost});
    pwr_per_cost0 = 1/cost0_per_power;
    neg_pwr_per_cost = -pwr_per_cost0;
+
+   clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
    
 end
