@@ -14,15 +14,10 @@ echo "Current contents of the file:"
 cat "$MATLAB_FILE"
 
 # The lines of code to insert
-CODE_TO_INSERT="
-if isRowOriented
-    nonlinCineq = nonlinCineq.';
-    nonlinCeq = nonlinCeq.';
-end
-"
+CODE_TO_INSERT=CODE_TO_INSERT="if isRowOriented\n    nonlinCineq = nonlinCineq.';\n    nonlinCeq = nonlinCeq.';\nend"
 
 # Insert the code at line 17
-sed -i "17i$CODE_TO_INSERT" "$MATLAB_FILE"
+sed -i "17i\\$CODE_TO_INSERT" "$MATLAB_FILE"
 
 # Print new contents of the file to verify the changes
 echo "New contents of the file:"
