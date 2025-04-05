@@ -19,7 +19,7 @@ flags = ones(num_runs,num_objs);
 x0s(1) = b.X_start_struct;
 
 % 20 random ICs
-parpool
+gcp
 parfor i = 2:num_runs
     [x0_vec,x0] = random_x0(b);
     [~, ~, ~, feasible_lin] = is_feasible(0, x0_vec, p, b);

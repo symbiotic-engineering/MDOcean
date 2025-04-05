@@ -186,6 +186,10 @@ classdef (SharedTestFixtures={ ...
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
 
+            if iscell(success_criterion)
+                success_criterion = success_criterion{:};
+            end
+
             if isempty(success_criterion)
                 success_criterion = 1;
             end

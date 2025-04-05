@@ -21,7 +21,7 @@ flags = zeros(1,length(files));
 most_common_wave = cell(1,length(files));
 BW = zeros(1,length(files));
 
-parpool
+gcp
 parfor i=1:length(files)
     new_p = p;
     
@@ -31,19 +31,19 @@ parfor i=1:length(files)
     new_p.T = jpd(1,2:end);
     new_p.h = depths(i);
 
-    b = fix_constraints(new_p,b);
+    new_b = fix_constraints(new_p,b);
 
     [~,idx_most_common] = max(new_p.JPD,[],'all');
     [row,col] = ind2sub(size(new_p.JPD),idx_most_common);
     most_common_wave(i) = {['$H_s = ' num2str(new_p.Hs(row)) '$m, $T_e=' num2str(new_p.T(col)) '$s']};
     BW(i) = round(find_BW(new_p.Hs,new_p.T,new_p.JPD),2);
   
-    X = b.X_start_struct;
+    X = new_b.X_start_struct;
     
     which_obj = 1; % only optimize LCOE
-    [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,b,which_obj);
+    [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,new_b,which_obj);
     
-    plot_power_matrix(X_opts(:,i),new_p)
+    plot_power_matrix(X_opts(:,i),new_p,b.filename_uuid)
     figure(2)
     power_PDF(X_opts(:,i),new_p)
     hold on
