@@ -104,7 +104,7 @@ function table2latex(T, filename, special_col_spec, special_first_row)
                         value = '$\infty$';
                     end
                     exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
-                    mantissa = value / 10^exponent; % Calculate mantissa
+                    mantissa = value / 10.^exponent; % Calculate mantissa
                     if exponent==0
                         value = sprintf('$%.3g $',mantissa);
                     else
