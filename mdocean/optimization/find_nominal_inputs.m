@@ -13,16 +13,17 @@ function F_max_nom = find_nominal_inputs(b, mode, display_on)
     if display_on
         % check feasibility
         X = [b.X_noms; 1];
-        X(5) = F_max_nom;
+        idx_F = strcmp(b.var_names,'F_max');
+        X(idx_F) = F_max_nom;
         [LCOE, P_var, ~, g] = simulation(X,p)
         [feasible,~,failed] = is_feasible(g, X, p, b)
 
         % display x output
-        array2table(F_max_nom,'VariableNames',{'F_max (1e6 N)','B_p (1e6 Ns/m)','w_n (rad/s)'})
+        array2table(F_max_nom,'VariableNames',{'F_max (1e6 N)'})
         
         % display y output
         [~,y] = errFunc(x,y_desired,p,b);
-        results = round([y; y_desired] ./ [1000 1000 1],3,'significant');
+        results = round([y; y_desired] ./ 1000,3,'significant');
         array2table(results,'RowNames',{'Sim Output','RM3 Actual'},...
             'VariableNames','Max Powertrain Force Error (-)')
     end
@@ -31,7 +32,10 @@ end
 
 function err = errFunc(F_max_in,p,b)
     X = [b.X_noms; 1];
-    X(5) = F_max_in;
+    idx_F = strcmp(b.var_names,'F_max');
+    X(idx_F) = F_max_in;
+
     [~, ~, ~, g] = simulation(X, p);
-    err = g(12)^2;
+    idx_F_constr = strcmp(b.constraint_names,'irrelevant_max_force');
+    err = g(idx_F_constr)^2;
 end

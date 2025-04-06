@@ -7,16 +7,18 @@ classdef (SharedTestFixtures={ ...
         errors_singlebody
         errors_multibody
         errors_report
+        table
     end
 
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
         function runNominalDynamics(testCase)
-            [singlebody, multibody, report] = validate_dynamics();
+            [singlebody, multibody, report, tab] = validate_dynamics();
             testCase.errors_singlebody = singlebody;
             testCase.errors_multibody  = multibody;
             testCase.errors_report     = report;
+            testCase.table             = tab;
         end
     end
 
@@ -59,7 +61,10 @@ classdef (SharedTestFixtures={ ...
             % match RM3 report to within 10 percent under assumptions used for optim
         end
 
-
+        function dynamicValidationTable(testCase)
+            diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(testCase.table);
+            testCase.log(diagnostic);
+        end
     end
-    
+
 end

@@ -22,6 +22,7 @@
 \node [Optimization] (opt) {$\text{Optimizer}$};&
 \node [DataInter] (opt-geom) {$\begin{array}{c}\text{Dimensions,} \\ \text{Thicknesses}\end{array}$};&
 \node [DataInter] (opt-hydro) {$\text{Dimensions}$};&
+&
 \node [DataInter] (opt-dynam) {$\begin{array}{c}\text{Generator} \\ \text{ratings}\end{array}$};&
 \node [DataInter] (opt-struct) {$\begin{array}{c}\text{Dimensions,} \\ \text{thicknesses}\end{array}$};&
 \node [DataInter] (opt-econ) {$\begin{array}{c}\text{Generator} \\ \text{ratings}\end{array}$};&
@@ -31,6 +32,7 @@
 &
 &
 \node [Function] (geom) {$\text{Geometry}$};&
+&
 &
 \node [DataInter] (geom-dynam) {$\text{Mass}$};&
 &
@@ -42,6 +44,7 @@
 &
 &
 \node [Function] (hydro) {$\text{Hydrodynamics}$};&
+&
 \node [DataInter] (hydro-dynam) {$\begin{array}{c}\text{Hydrodynamic} \\ \text{coefficients}\end{array}$};&
 &
 &
@@ -52,12 +55,25 @@
 &
 &
 &
+\node [MDA] (solver) {$\text{Iteration}$};&
+\node [DataInter] (solver-dynam) {$\begin{array}{c}\text{Dynamic} \\ \text{response guess}\end{array}$};&
+&
+&
+&
+\\
+%Row 4
+&
+&
+&
+&
+\node [DataInter] (dynam-solver) {$\begin{array}{c}\text{Dynamic} \\ \text{response residual}\end{array}$};&
 \node [Function] (dynam) {$\begin{array}{c}\text{Dynamics} \\ \text{and Control}\end{array}$};&
 \node [DataInter] (dynam-struct) {$\text{Loads}$};&
 \node [DataInter] (dynam-econ) {$\text{Power}$};&
 \node [DataInter] (dynam-F) {$\text{Power}$};&
 \node [DataInter] (dynam-G) {$\text{Amplitude constraints}$};\\
-%Row 4
+%Row 5
+&
 &
 &
 &
@@ -67,7 +83,8 @@
 &
 &
 \node [DataInter] (struct-G) {$\text{Structural constraints}$};\\
-%Row 5
+%Row 6
+&
 &
 &
 &
@@ -77,7 +94,7 @@
 \node [Function] (econ) {$\text{Economics}$};&
 \node [DataInter] (econ-F) {$\begin{array}{c}\text{LCOE,} \\ \text{Capital cost}\end{array}$};&
 \\
-%Row 6
+%Row 7
 \node [DataIO] (left_output_F) {$J^*$};&
 \node [DataInter] (F-opt) {$J$};&
 &
@@ -85,9 +102,10 @@
 &
 &
 &
-\node [Function] (F) {$Objective$};&
+&
+\node [Function] (F) {$\text{Objective}$};&
 \\
-%Row 7
+%Row 8
 \node [DataIO] (left_output_G) {$g^*$};&
 \node [DataInter] (G-opt) {$g$};&
 &
@@ -96,8 +114,10 @@
 &
 &
 &
-\node [Function] (G) {$Constraints$};\\
-%Row 8
+&
+\node [Function] (G) {$\text{Constraints}$};\\
+%Row 9
+&
 &
 &
 &
@@ -120,6 +140,8 @@
 (opt) edge [DataLine] (opt-dynam)
 (opt) edge [DataLine] (opt-struct)
 (opt) edge [DataLine] (opt-econ)
+(solver) edge [DataLine] (solver-dynam)
+(dynam) edge [DataLine] (dynam-solver)
 (geom) edge [DataLine] (geom-dynam)
 (geom) edge [DataLine] (geom-econ)
 (hydro) edge [DataLine] (hydro-dynam)
@@ -141,6 +163,8 @@
 (opt-dynam) edge [DataLine] (dynam)
 (opt-struct) edge [DataLine] (struct)
 (opt-econ) edge [DataLine] (econ)
+(solver-dynam) edge [DataLine] (dynam)
+(dynam-solver) edge [DataLine] (solver)
 (geom-dynam) edge [DataLine] (dynam)
 (geom-econ) edge [DataLine] (econ)
 (hydro-dynam) edge [DataLine] (dynam)

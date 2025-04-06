@@ -3,38 +3,50 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
 
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
-    [P_matrix_mech,X_constraints,B_p,...
+    zero_prob_idxs = in.JPD==0;
+    T(zero_prob_idxs) = NaN;
+    Hs(zero_prob_idxs) = NaN;
+
+    [P_matrix_mech,X_constraints_op,B_p,...
         X_u,X_f,X_s,F_heave_op,...
         F_surge_op,F_ptrain_max] = get_power_force(in,T,Hs,m_float,m_spar,...
-                                                        V_d,draft,in.F_max, in.JPD==0);
+                                                        V_d,draft,in.F_max, ...
+                                                        zero_prob_idxs, in.T_f_1);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix_elec = min(P_matrix_elec,in.power_max);
+    P_matrix_elec = min(P_matrix_elec,in.P_max,'includenan');
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
-    P_avg_elec = sum(P_weighted(:)); 
+    P_avg_elec = sum(P_weighted(:),'omitnan'); 
     
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces
     % fixme: for storms, should return excitation force, not all hydro force
-    [~,~,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
-                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, 0, false(size(in.T_struct)));
+    [~,X_constraints_storm,~,~,~,~,F_heave_storm,F_surge_storm,~] = get_power_force(in, ...
+                                in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, ...
+                                0, false(size(in.T_struct)), in.T_f_2);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
+    % use all X constraints operationally, only use slamming in storm
+    X_constraints_storm = X_constraints_storm(5:end);
+    X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
+    X_constraints = [X_constraints_op X_constraints_storm];
+
     % coefficient of variance (normalized standard deviation) of power
-    P_var = std(P_matrix_elec(:), in.JPD(:)) / P_avg_elec;
+    P_var = std(P_matrix_elec(:), in.JPD(:),'omitnan') / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
     
 
 end
 
 function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
-          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, F_max, idx_constraint)
+          F_heave_f, F_surge, F_ptrain_max] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, ...
+                                                            F_max, idx_constraint, T_f_slam)
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -48,7 +60,7 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
                                             in.rho_w, in.g, ...
                                             in.use_MEEM, in.harmonics, in.hydro);
 
-    X_max = 1e6;%min(Hs / (2*sqrt(2)), in.T_f);
+    X_u_max = 1e6;%min(Hs / (2*sqrt(2)), in.T_f);
 
     % get response: includes drag and force saturation
     [mag_U,phase_U,...
@@ -59,13 +71,14 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
      B_p,K_p] = get_response_drag(w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                             F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
                                             drag_const_f,drag_const_s,mag_v0_f,mag_v0_s, ...
-                                            X_max,in.control_type,in.use_multibody,...
+                                            X_u_max,in.control_type,in.use_multibody,...
                                             in.X_tol,in.phase_X_tol,in.max_drag_iters);
 
 % FIXME: check stability of closed loop multibody system
     
-    % calculate power
-    P_matrix = real_P;
+    % apply empirical fitted "fudge factor" to adjust power from singlebody to multibody
+    fudge_factor = 1;%23.5 ./ (T.^2 - 14*T + 83) * in.power_scale;
+    P_matrix = real_P .* fudge_factor;
     
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
@@ -75,27 +88,28 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     mag_X_s_const = mag_X_s;
     mag_X_s_const(idx_constraint) = 0;
 
-    X_max = max(mag_X_u_const,[],'all');
+    X_u_max = max(mag_X_u_const,[],'all');
+    X_f_max = max(mag_X_f_const,[],'all');
+
     % extra height on spar after accommodating float displacement
-    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_max) / in.h_s;
-    h_s_extra_down = (in.T_s - in.T_f_2 - X_max) / in.h_s;
+    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_u_max) / in.h_s;
+    h_s_extra_down = (in.T_s - in.T_f_2 - in.h_d - X_u_max) / in.h_s;
 
     % sufficient length of float support tube
-    h_fs_extra = in.h_fs_clear / X_max - 1;
+    h_fs_extra = in.h_fs_clear / X_u_max - 1;
 
     % prevent violation of linear wave theory
     X_max_linear = 1/10 * in.D_f;
     
-    X_below_linear = X_max_linear / X_max - 1;
+    X_below_linear = X_max_linear / X_f_max - 1;
 
     % prevent rising out of the water
     wave_amp = Hs/(2*sqrt(2));
-    X_over_A = mag_X_u_const ./ wave_amp;
-    T_over_A = in.T_f_2 ./ wave_amp;
-    R = T_over_A ./ sqrt(1 + X_over_A.^2 - 2 * X_over_A .* cos(phase_X_u)); % ratio derived on p88-89 of notebook
-    long_draft = R-1;
-    small_diameter = 2*pi - 2*real(acos(R)) - k_wvn * in.D_f;
-    X_below_wave = max(long_draft, small_diameter); % one or the other is required, but not necessarily both
+    theta_slam = max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
+    X_slam = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 ) - wave_amp .* cos(theta_slam);
+    X_slam( imag(X_slam)~=0 ) = 0; % slamming occurs even for stationary body
+    X_below_wave = X_slam ./ mag_X_u_const - 1;
+    X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
 
     X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
 
@@ -153,16 +167,27 @@ function [mag_U,phase_U,...
                                         X_max,control_type,multibody,...
                                         X_tol,phase_X_tol,max_drag_iters)
     % initial guess: 2m float amplitude, 0.5m spar amplitude
-    X_f_guess = 2;
-    phase_X_f_guess = 0;
-    X_s_guess = .5;
-    phase_X_s_guess = 0;
+    X_f_guess = 2 * ones(size(w));
+    phase_X_f_guess = zeros(size(w));
+    X_s_guess = .5 * ones(size(w));
+    phase_X_s_guess = zeros(size(w));
 
-    [X_err,phase_X_err] = deal(1);
+    converged = false;
     iters = 0;
 
+    drag_convergence_plot = false; %size(w) == [14,15]; % hack so it runs for operational not storm
+
     % loop until converged
-    while X_err > X_tol || phase_X_err > phase_X_tol
+    while ~converged
+        if drag_convergence_plot
+            % record guesses
+            % 10,1 was found manually to be the problem sea state
+            X_f_guesses(iters+1) = X_f_guess(10,1);
+            X_s_guesses(iters+1) = X_s_guess(10,1);
+            phase_X_f_guesses(iters+1) = phase_X_f_guess(10,1);
+            phase_X_s_guesses(iters+1) = phase_X_s_guess(10,1);
+        end
+
         [mag_U,phase_U,...
          real_P,reactive_P,...
          mag_X_u,phase_X_u,...
@@ -187,7 +212,12 @@ function [mag_U,phase_U,...
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
 
-        % check iterations
+        % check convergence
+        X_converged = X_err < X_tol;
+        phase_X_converged = phase_X_err < phase_X_tol || phase_X_err < 2*pi+phase_X_tol; % the 2pi allows for the solution to oscillate between +pi and -pi
+        converged = X_converged && phase_X_converged;
+
+        % increment iterations and check max iters
         iters = iters + 1;
         if iters > max_drag_iters
             warning(['Drag loop has not converged after ' num2str(max_drag_iters) ' iterations. ' ...
@@ -195,6 +225,31 @@ function [mag_U,phase_U,...
             break
         end
     end
+
+    if drag_convergence_plot
+        x_iter = 1:iters;
+        figure
+        plot(x_iter,X_f_guesses,'DisplayName','|X_f|')
+        hold on
+        plot(x_iter,phase_X_f_guesses,'DisplayName','\angleX_f')
+        if multibody
+            plot(x_iter,X_s_guesses,'DisplayName','|X_s|')
+            plot(x_iter,phase_X_s_guesses,'DisplayName','\angleX_s')
+        end
+        legend
+
+        x_iter_tol = x_iter(2:end-1)+1;
+        plot(x_iter_tol,X_f_guesses(2:end-1)+X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end-1)+phase_X_tol,'k--','HandleVisibility','off')
+        plot(x_iter_tol,X_f_guesses(2:end-1)-X_tol,'k--',x_iter_tol,phase_X_f_guesses(2:end-1)-phase_X_tol,'k--','HandleVisibility','off')
+        if multibody
+            plot(x_iter_tol,X_s_guesses(2:end-1)+X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end-1)+phase_X_tol,'k--','HandleVisibility','off')
+            plot(x_iter_tol,X_s_guesses(2:end-1)-X_tol,'k--',x_iter_tol,phase_X_s_guesses(2:end-1)-phase_X_tol,'k--','HandleVisibility','off')
+        end
+        xlabel('Iterations')
+        title('Drag Nonlinearity Convergence')
+        improvePlot
+    end
+
 end
 
 function [mag_U,phase_U,...
@@ -261,13 +316,14 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
     mag_v0_v_ratio(mag_v==0) = 0; % prevent divide by zero
-    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of my notebook
+    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
     
-    alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of my notebook
+    alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
     phi_alpha = phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
+    B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
     K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
 end
 
@@ -295,54 +351,64 @@ function [mag_U,phase_U,...
     end
 
     % get force-saturated response
-    r = min(F_max ./ mag_U_unsat, 1);%fcn2optimexpr(@min, F_max ./ F_ptrain_unsat, 1);
-    alpha = 2/pi * ( 1./r .* asin(r) + sqrt(1 - r.^2) );
-    alpha(r==0) = 4/pi; % prevent 0/0 when r=0
-    f_sat = alpha .* r;
-    mult = get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
 
-    B_p_sat = mult.*B_p;
-    K_p_sat = mult.*K_p;
+    % notebook p106 2/2/25
+    f_sat = min(4/pi * F_max ./ mag_U_unsat, 1);
 
-    if multibody
-        [mag_U,phase_U,...
-         real_P,reactive_P,...
-         mag_X_u,phase_X_u,...
-         mag_X_f,phase_X_f,...
-         mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
-                                                 m_c, m_f, m_s, w, ...
-                                                 K_p_sat, B_p_sat, ...
-                                                 F_f_mag, F_f_phase, ...
-                                                 F_s_mag, F_s_phase);
-    else
-        b_sat = B_f + B_p_sat;
-        k_sat = K_f + K_p_sat;
+    % fixme: If reactive control, mult should be complex, based on eq4 of IFAC paper.
+    F_err = zeros(size(f_sat));
+    max_err = 1;
+    mult = f_sat;
+    iters = 0;
 
-        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
-        mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
-        mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
-        mag_U = mult .* F_ptrain_over_x .* mag_X_f;
-        
-        phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
-        phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
-        phase_U = phase_V_u + phase_Z_u;            % phase of control force
+    while max_err > 0.01
 
-        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
-        check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
-        reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+        iters = iters + 1;
+        if iters > 100
+            warning('force saturation loop failed to converge. reversing search direction on problem sea states.')
+            F_err(abs(F_err) > max_err) = -F_err(abs(F_err) > max_err);
+        end
+        if iters > 1000
+            warning('force saturation loop failed to converge, and reversing search didnt help')
+            break
+        end
+        mult = mult ./ (F_err+1);%get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
+    
+        B_p_sat = mult.*B_p;
+        K_p_sat = mult.*K_p;
+    
+        if multibody
+            [mag_U,phase_U,...
+             real_P,reactive_P,...
+             mag_X_u,phase_X_u,...
+             mag_X_f,phase_X_f,...
+             mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
+                                                     m_c, m_f, m_s, w, ...
+                                                     K_p_sat, B_p_sat, ...
+                                                     F_f_mag, F_f_phase, ...
+                                                     F_s_mag, F_s_phase);
+        else
+            b_sat = B_f + B_p_sat;
+            k_sat = K_f + K_p_sat;
+    
+            [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
+            mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
+            mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
+            mag_U = mult .* F_ptrain_over_x .* mag_X_f;
+            
+            phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
+            phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
+            phase_U = phase_V_u + phase_Z_u;            % phase of control force
+    
+            real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+            check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
+            reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+        end
+    
+        F_err = mag_U ./ (f_sat .* mag_U_unsat) - 1;
+        max_err = max(abs(F_err),[],'all');
+
     end
-
-    F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
-    F_err_2 = abs(mag_U ./ (f_sat .* mag_U_unsat) - 1);
-    % 0.1 percent error
-%     if any(f_sat<1,'all')
-%         stuff = all(F_err_1(f_sat < 1) < 1e-3, 'all');
-%         if ~stuff
-%             stuff
-%         end
-%         assert(stuff);
-%     end
-%     assert(all(F_err_2 < 1e-3,'all'));
 
     % saturate position - hacky for now
     r_x = min(X_max ./ mag_X_f, 1);

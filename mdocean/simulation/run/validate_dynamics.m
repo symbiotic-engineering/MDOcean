@@ -1,4 +1,4 @@
-function [errors_singlebody, errors_multibody, errors_report] = validate_dynamics()
+function [errors_singlebody, errors_multibody, errors_report, T] = validate_dynamics()
     %% Round 1: singlebody, wamit geometry
     errors_singlebody = wecsim_error_breakdown(false);
     
@@ -6,8 +6,15 @@ function [errors_singlebody, errors_multibody, errors_report] = validate_dynamic
     errors_multibody = wecsim_error_breakdown(true);
     
     %% Round 3: report geometry
-    errors_report = report_error_breakdown();
+    errors_report = report_error_breakdown(); % first index is wecsim to report error, second index is mdocean to report error
 
+    % make table comparing error of mdocean to various ground truths
+    errors_report_mdocean = structfun(@(s)s(2), errors_report,'UniformOutput',false); % just mdocean to report error
+    T_report = struct2table(errors_report_mdocean);
+    T_singlebody = struct2table(errors_singlebody);
+    T_multibody = struct2table(errors_multibody);
+    T = [T_report;T_singlebody;T_multibody];
+    T.Row = {'RM3 Report','WEC-Sim Singlebody','WEC-Sim Multibody'};
 end
 
 % bonus that I have't checked yet: sweep drag, irregular waves, force saturation
@@ -20,7 +27,7 @@ function pct_error = run_dynamic_validation(X,p,RM3reportOn)
     end
 
     % override to have fewer sea states for the sake of fast debugging
-    override = true;
+    override = false;
     if override
         p.Hs = p.Hs(1:2);
         p.T = p.T(1:2);

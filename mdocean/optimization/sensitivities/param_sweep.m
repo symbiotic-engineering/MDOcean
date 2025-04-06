@@ -53,15 +53,21 @@ function [] = param_sweep(filename_uuid)
     dJdp_names = {'local partial','local total linear','local total quadratic','global'};
     
     % color grid plots
+    % fig 1: dJ*/dp combined
     sensitivity_plot(dJdp_combined, 'dJ*/dp normalized', param_names, dJdp_names, ...
         'Parameters p', 'Type of Sensitivity')
+    % fig 2: dJ*/dp global
     sensitivity_plot(dJstar_dp_global, 'dJ*/dp normalized: global', param_names, '', ...
         'Parameters p', '')
     
+    % fig 3: dx*/dp local
     dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local')
+    % fig 4: dx*/dp global
     dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global')
     
+    % fig 5: delta p local
     delta_p_plot(delta_p_change_activity_local,  b, dvar_names, param_names, 'local')
+    % fig 6: delta p global
     delta_p_plot(delta_p_change_activity_global, b, dvar_names, param_names, 'global')
 
 end

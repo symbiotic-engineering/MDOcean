@@ -16,3 +16,5 @@ plot_power_matrix(X,p)
 
 figure
 power_PDF(X,p)
+
+visualize_geometry(X,p)

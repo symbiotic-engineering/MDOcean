@@ -1,4 +1,5 @@
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = gradient_optim(x0_input,p,b,which_objs)
+
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
 
 if nargin == 0
     % set default parameters if function is run without input
@@ -24,6 +25,8 @@ end
 
 % create optimization variables for each of the design variables
 sz = [1 1]; % create scalar variables
+%
+assert(length(b.X_mins)==12) % this code currently assumes hardcoded number of design variables
 x1  = optimvar(b.var_names{1},  sz,'LowerBound',b.X_mins(1),  'UpperBound',b.X_maxs(1));
 x2  = optimvar(b.var_names{2},  sz,'LowerBound',b.X_mins(2),  'UpperBound',b.X_maxs(2));
 x3  = optimvar(b.var_names{3},  sz,'LowerBound',b.X_mins(3),  'UpperBound',b.X_maxs(3));
@@ -36,8 +39,6 @@ x9  = optimvar(b.var_names{9},  sz,'LowerBound',b.X_mins(9),  'UpperBound',b.X_m
 x10 = optimvar(b.var_names{10}, sz,'LowerBound',b.X_mins(10), 'UpperBound',b.X_maxs(10));
 x11 = optimvar(b.var_names{11}, sz,'LowerBound',b.X_mins(11), 'UpperBound',b.X_maxs(11));
 x12 = optimvar(b.var_names{12}, sz,'LowerBound',b.X_mins(12), 'UpperBound',b.X_maxs(12));
-x13 = optimvar(b.var_names{13}, sz,'LowerBound',b.X_mins(13), 'UpperBound',b.X_maxs(13));
-x14 = optimvar(b.var_names{14}, sz,'LowerBound',b.X_mins(14), 'UpperBound',b.X_maxs(14));
 
 opts = optimoptions('fmincon',	'Display',display,...
                                 'Algorithm','sqp',...%'interior-point',...
@@ -53,15 +54,15 @@ opts = optimoptions('fmincon',	'Display',display,...
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
-    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
+    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
@@ -128,15 +129,17 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses] = optimize_bot
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-        [out(1),out(2)] = simulation(X_opt,p);          % rerun sim
+        [out(1),out(2),~,~,val] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;
         if i==1
+            vals = val;
             lambdas = lambda;
         else
+            vals(i) = val;
             lambdas(i) = lambda;
         end
         grads(:,i) = grad;

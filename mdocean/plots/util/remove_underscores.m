@@ -1,7 +1,11 @@
-function [cell_out] = remove_underscores(cell_in)
+function [cell_str_out] = remove_underscores(cell_str_in)
 %REMOVE_UNDERSCORES Replaces underscores with spaces and capitalizes each word
 
-    cell_out = cellfun(@remove_underscores_str,cell_in,'UniformOutput',false);
+    if iscell(cell_str_in)
+        cell_str_out = cellfun(@remove_underscores_str,cell_str_in,'UniformOutput',false);
+    elseif ischar(cell_str_in)
+        cell_str_out = remove_underscores_str(cell_str_in);
+    end
 
 end
 
