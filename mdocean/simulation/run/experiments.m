@@ -60,13 +60,22 @@ for i = 1:num_DVs
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, cost_temp, P_matrix, g, val] = simulation([X_in;b.M_nom],p);
 
-                % only add to results if first 12 constraints are feasible
-                idx_ignore = false(1,length(b.constraint_names));
-                ignore = {'irrelevant_max_force','LCOE_max','linear_theory'};
-                idx_ignore(ismember(b.constraint_names,ignore)) = true;
-                [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                X_vec = [X_in;b.M_nom];
+                [~, ~, failed_lin, feasible_lin] = is_feasible(0, X_vec, p, b);
+                
+                if feasible_lin
+                    [LCOE_temp, cost_temp, P_matrix, g, val] = simulation(X_vec,p);
+    
+                    % only add to results if first 12 nonlin constraints are feasible
+                    idx_ignore = false(1,length(b.constraint_names));
+                    ignore = {'irrelevant_max_force','LCOE_max','linear_theory'};
+                    idx_ignore(ismember(b.constraint_names,ignore)) = true;
+                    [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                else
+                    feasible = feasible_lin;
+                    which_failed = failed_lin;
+                end
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     cost(i,j) = cost_temp;
