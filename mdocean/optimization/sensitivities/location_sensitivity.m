@@ -22,7 +22,6 @@ most_common_wave = cell(1,length(files));
 BW = zeros(1,length(files));
 BW_plot_on = false;
 
-gcp
 parfor i=1:length(files)
     new_p = p;
     

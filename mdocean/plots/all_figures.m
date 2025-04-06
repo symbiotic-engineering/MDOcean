@@ -221,9 +221,13 @@ end
 %% figure 30 - asymptotic b vector
 fig_names{30} = 'Fig. 30: asymptotic b vector';
 if any(which_figs == 30)
-    b_inf_numeric()
-    fig30 = gcf;
-    fig_output(which_figs==30) = fig30;
+    try
+        b_inf_numeric()
+        fig30 = gcf;
+        fig_output(which_figs==30) = fig30;
+    catch err
+        fig_success{which_figs==30} = err;
+    end
 end
 
 %% figure 31-33 - fixme not implemented
