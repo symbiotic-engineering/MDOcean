@@ -4,7 +4,6 @@ function pareto_curve_heuristics()
     p_w = parameters('wecsim');
     b_w = var_bounds('wecsim');
     
-    %[x,fval] = pareto_search();
     d=dir("**/pareto_search_results*");
     load(d(end).name)
 
@@ -26,14 +25,6 @@ function pareto_curve_heuristics()
     X = [X ones(length(X),1)]; % add extra column for material 
     LCOE = fval(:,1);
     Pvar = fval(:,2);
-    
-%     if new_objs
-%         [X_max_pwr,val] = max_avg_power(p,b);
-%         [LCOE_max_pwr,P_var_max_pwr] = simulation(X_max_pwr,p); % fixme do I need a constraint to ensure P_max is tight, like I have for F_max?
-%         LCOE(end+1) = LCOE_max_pwr;
-%         Pvar(end+1) = P_var_max_pwr;
-%         X(end+1,:) = X_max_pwr;
-%     end
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
@@ -460,14 +451,6 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
         h.LabelFormat = '%0.2f'; % for new versions, just round the text
     end
 
-    %h.TextList = round(h.TextList,2);
-    %clabel(c,h,'LabelSpacing',400);
-%     for i=1:size(contour_text) % round labels to 2 decimals
-%         textstr = get(contour_text(i),'String');
-%         textnum = str2double(textstr); 
-%         textstrnew = sprintf('%0.2f', textnum);
-%         set(contour_text(i),'String',textstrnew);
-%     end
     legend('LCOE ($/kWh)','Location','northwest')
 
 end
