@@ -11,9 +11,6 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-warning('off','MATLAB:nearlySingularMatrix')
-warning('off','MATLAB:singularMatrix')
-
 run_wecsim_validation = false;
 
 if run_wecsim_validation && exist('../WEC-Sim','dir')
