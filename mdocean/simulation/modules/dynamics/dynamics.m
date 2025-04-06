@@ -405,21 +405,10 @@ function [mag_U,phase_U,...
             reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
         end
     
-    %     F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
         F_err = mag_U ./ (f_sat .* mag_U_unsat) - 1;
         max_err = max(abs(F_err),[],'all');
 
     end
-
-    % 0.1 percent error
-%     if any(f_sat<1,'all')
-%         stuff = all(F_err_1(f_sat < 1) < 1e-3, 'all');
-%         if ~stuff
-%             stuff
-%         end
-%         assert(stuff);
-%     end
-%     assert(all(F_err_2 < 1e-3,'all'));
 
     % saturate position - hacky for now
     r_x = min(X_max ./ mag_X_f, 1);
