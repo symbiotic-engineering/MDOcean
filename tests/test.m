@@ -121,10 +121,10 @@ classdef (SharedTestFixtures={ ...
             t_output = cell(1,num_tabs);
             t_output(run_tabs) = t_output_run;
 
-            testCase.fig_success = f_success
-            testCase.tab_success = t_success
-            testCase.fig_output  = f_output
-            testCase.tab_output  = t_output
+            testCase.fig_success = f_success;
+            testCase.tab_success = t_success;
+            testCase.fig_output  = f_output;
+            testCase.tab_output  = t_output;
         end
     end
 
