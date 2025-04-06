@@ -18,9 +18,6 @@ if exist('../WEC-Sim','dir')
 end
 
 suite = testsuite('tests');
-if ~run_wecsim_validation
-    suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
-end
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
@@ -48,10 +45,10 @@ runner.addPlugin(p4);
 
 runner.ArtifactsRootFolder = test_dir;
 
-tic
+t = tic;
 results = runner.run(suite);    % parallel would make it slower because it 
                                 % would run the test class setup on every worker
-clockTime = toc;
+clockTime = toc(t);
 
 if ~batchStartupOptionUsed % don't open reports when running on CI server 
     open([cov_dir '/coverageReport/index.html'])
