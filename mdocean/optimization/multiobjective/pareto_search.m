@@ -130,8 +130,7 @@ function [x,fval] = pareto_search(filename_uuid)
     end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
-    delete(gcp("nocreate")); % delete old pool
-    parpool('AttachedFiles','generatedFunction_simulation1_withReuse'); % separate copy of file for each parallel worker
+
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
     try
