@@ -65,7 +65,10 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
-                    X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+ X_constraints,~,~,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
+ B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,gamma_f_over_rho_g,...
+ gamma_s_over_rho_g,gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
     FOS_spar_local] = structures(...
@@ -103,7 +106,8 @@ g(14) = P_avg_elec/1e6;                     % positive power
 g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
 %g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
 g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
-                                        % this constraint should always be active
+                                        % this constraint should always be
+                                        % active unless F_max==Inf
                                         % and is only required when p.cost_perN = 0.
 g(17) = X_constraints(1);               % prevent float rising above top of spar
 g(18) = X_constraints(2);               % prevent float going below bottom of spar
@@ -113,7 +117,7 @@ g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
-    warning('Inf, NaN, or imaginary constraint detected')
+    warning('Inf, NaN, or imaginary constraint or objective detected')
 end
 
 if nargout > 4 % if returning extra struct output for validation
@@ -129,7 +133,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,K_p,mag_U,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -148,6 +152,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.FOS_spar = FOS_spar(1);
 	val.c_v = P_var;
     val.B_p = B_p;
+    val.K_p = K_p;
+    val.mag_U = mag_U;
     val.X_u = X_u;
     val.X_f = X_f;
     val.X_s = X_s;
@@ -156,6 +162,17 @@ if nargout > 4 % if returning extra struct output for validation
     val.CG_f = CG_f;
     val.vol_f = V_d(1);
     val.vol_s = V_d(2) + V_d(3);
+    val.A_f_over_rho = A_f_over_rho;
+    val.A_s_over_rho = A_s_over_rho;
+    val.A_c_over_rho = A_c_over_rho;
+    val.B_f_over_rho_w = B_f_over_rho_w;
+    val.B_s_over_rho_w = B_s_over_rho_w;
+    val.B_c_over_rho_w = B_c_over_rho_w;
+    val.gamma_f_over_rho_g = gamma_f_over_rho_g;
+    val.gamma_s_over_rho_g = gamma_s_over_rho_g;
+    val.gamma_phase_f = gamma_phase_f;
+    val.gamma_phase_s = gamma_phase_s;
+    val.w = w;
 end
 
 end

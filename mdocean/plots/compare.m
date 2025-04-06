@@ -33,7 +33,9 @@ num_designs = length(titles);
 
 %% geometry comparison
 figure
-biggest_to_smallest = [5, 2, 4, 1, 3];
+% sort by float diameter
+idx_diam = strcmp(b.var_names,'D_f');
+[~,biggest_to_smallest] = sort(X(:,idx_diam),'descend');
 
 x = linspace(-30,30,100);
 Hs = 3;
@@ -45,10 +47,10 @@ set(waves,'HandleVisibility','off')
 for i=1:num_designs
     x = X(biggest_to_smallest(i),:);
     hold on
-    visualize_geometry(x,p,false,color{i})
+    visualize_geometry(x,p,false,color{biggest_to_smallest(i)})
 end
 xlim([-40,40])
-legend({'Balanced','Min LCOE','Max Power','Nominal','Min CAPEX'},'Location','east')
+legend(titles(biggest_to_smallest),'Location','east')
 
 %% power probability comparison
 figure
@@ -106,8 +108,8 @@ text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
-
-
+hydro_compare(vals,color)
+    
 %% design variable table
 DV_table = array2table(X.', ...
         'VariableNames',titles, 'RowNames', b.var_names_pretty);
@@ -115,8 +117,32 @@ DV_table = array2table(X.', ...
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
 scalar_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
-out_table = rows2vars(temp_table(:,scalar_vals));
+hydro_names = {'over_rho','phase'};
+hydro_coeff_rows = contains(temp_table.Properties.VariableNames,hydro_names);
+out_table = rows2vars(temp_table(:,scalar_vals & ~hydro_coeff_rows));
 out_table.Properties.RowNames = out_table.OriginalVariableNames;
 out_table = removevars(out_table,'OriginalVariableNames');
 
+end
+
+function hydro_compare(vals,colors)
+    figure
+    hold on
+    for i=1:length(vals)
+        val = vals(i);
+        col = colors{i};
+        plot(val.w, val.A_f_over_rho,      [col '-'],...
+             val.w, val.B_f_over_rho_w,    [col '--'],...
+             val.w, val.B_s_over_rho_w,    [col ':'], ...
+             val.w, val.gamma_f_over_rho_g,[col '-.'], ...
+             val.w, val.gamma_s_over_rho_g,[col '-x'], ...
+             val.w, val.gamma_phase_f,     [col '-*'])
+    end
+    title('Hydrodynamic Coefficients')
+    xlabel('Wave Frequency (\omega)')
+    xlim([0.2,1.1])
+    ylim([-0.008,64000])
+    legend('A_{f}/\rho','B_{f}/\rho','B_{s}/\rho','\gamma_{f}/\rho','\gamma_{s}/\rho','\gamma_{phase, f}')
+    hold off
+    improvePlot
 end

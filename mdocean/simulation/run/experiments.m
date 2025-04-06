@@ -117,17 +117,19 @@ ax1 = nexttile(1);
 cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
         'b:','b--',...                       % PTO
         'g:','g--','g-','g-.','g.'};  % structural
+hold on
 for i = 1:size(cols,2)
     temp_LCOE = LCOE(idx,:).';
     plot(ratios_sorted,temp_LCOE(i,:),cols{i})
     hold on
 end
-yline(1.43835,'LineWidth',2,'Color','k')
+yline(0.605,'LineWidth',2,'Color','k')
 ylab1 = ylabel('LCOE ($/kWh)');
-axis(ax1,[0 3 1 2.5])
+axis(ax1,[0 3 0.55 0.75])
 l = legend(b.var_names_pretty{1:end-1});
 l.Location = 'northeastoutside';
 grid on
+hold off
 
 ax2 = nexttile(2);
 for i=1:size(cols,2)

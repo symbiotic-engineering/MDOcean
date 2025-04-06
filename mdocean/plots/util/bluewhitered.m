@@ -32,7 +32,7 @@ function newmap = bluewhitered(m, white_number)
 
 
 if nargin < 1
-   m = size(get(gcf,'colormap'),1);
+   m = size(get(gca,'colormap'),1);
 end
 if nargin < 2
     white_number = 0;

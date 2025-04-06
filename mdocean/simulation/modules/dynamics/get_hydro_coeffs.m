@@ -17,10 +17,7 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
     % % Added mass
     % A_over_rho = 1/2 * 4/3 * pi * r^3 * 0.63;
 
-    g = 9.8;
-    w = sqrt(g * k); % assumes deep water
-
-    w_wamit = hydro.w;
+    k_wamit = hydro.w.^2 / 9.8;
 
     % added mass
     A_f_wamit = hydro.A(3,3,:);
@@ -39,16 +36,16 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
     B_c_wamit = hydro.B(3,9,:);
 
     % interpolation
-    A_f_over_rho       = interp1(w_wamit,A_f_wamit(:),w);
-    A_s_over_rho       = interp1(w_wamit,A_s_wamit(:),w);
-    A_c_over_rho       = interp1(w_wamit,A_c_wamit(:),w);
-    B_f_over_rho_w     = interp1(w_wamit,B_f_wamit(:),w);
-    B_s_over_rho_w     = interp1(w_wamit,B_s_wamit(:),w);
-    B_c_over_rho_w     = interp1(w_wamit,B_c_wamit(:),w);
-    gamma_f_over_rho_g = interp1(w_wamit,gamma_f_wamit(:),w);
-    gamma_s_over_rho_g = interp1(w_wamit,gamma_s_wamit(:),w);
-    gamma_phase_f      = interp1(w_wamit,gamma_phase_f_wamit(:),w);
-    gamma_phase_s      = interp1(w_wamit,gamma_phase_s_wamit(:),w);
+    A_f_over_rho       = interp1(k_wamit,A_f_wamit(:),k);
+    A_s_over_rho       = interp1(k_wamit,A_s_wamit(:),k);
+    A_c_over_rho       = interp1(k_wamit,A_c_wamit(:),k);
+    B_f_over_rho_w     = interp1(k_wamit,B_f_wamit(:),k);
+    B_s_over_rho_w     = interp1(k_wamit,B_s_wamit(:),k);
+    B_c_over_rho_w     = interp1(k_wamit,B_c_wamit(:),k);
+    gamma_f_over_rho_g = interp1(k_wamit,gamma_f_wamit(:),k);
+    gamma_s_over_rho_g = interp1(k_wamit,gamma_s_wamit(:),k);
+    gamma_phase_f      = interp1(k_wamit,gamma_phase_f_wamit(:),k);
+    gamma_phase_s      = interp1(k_wamit,gamma_phase_s_wamit(:),k);
 
     %B_over_rho_w = k/2 .* gamma_over_rho_g.^2; % Haskind relationship, using the deep water group velocity 
 

@@ -111,7 +111,7 @@ if any(which_figs == 9)
     p = parameters();
     b = var_bounds();
     X = [b.X_noms; 1];
-    plot_power_matrix(X,p)
+    plot_power_matrix(X,p,filename_uuid)
     fig9 = gcf;
     fig_output(which_figs==9) = fig9;
 end
@@ -173,12 +173,12 @@ fig_names{28} = 'Fig. 28: probability CDF';
 if any(which_figs == 26 | which_figs == 27 | which_figs == 28 | which_tabs == 5 | which_tabs == 6)
     [tab5,tab6] = compare(filename_uuid);
     n = gcf().Number;
-    fig28 = figure(n-1);
-    fig26 = figure(n-2);
+    fig27 = figure(n);
+    fig28 = figure(n-2);
+    fig26 = figure(n-3);
     fig_output(which_figs==26) = fig26;
-    fig_output(which_figs==27) = figure;
+    fig_output(which_figs==27) = fig27;
     fig_output(which_figs==28) = fig28;
-    % fixme: 27 not implemented
 end
 
 %% figure 29 - fixme not implemented

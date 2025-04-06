@@ -29,7 +29,7 @@ function pareto_curve_heuristics()
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs);
+     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
@@ -70,7 +70,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
          J2, bestJ2, idx_best_J2, J2_nom, ...
          J2_nom_sim, J2_solar, J2_balanced,...
          x_best_J1, x_best_J2, x_nom, x_balanced, ...
-         idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w, new_objs)
+         idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs)
     
     if new_objs
         num_points = size(X,1);
@@ -256,22 +256,22 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     end
 
     if showImages   % small pictures of best geometries
-        ylim([0.64, 2.28])
+        ylim([0.64, 2.55])
 
-        upper_left = [.78 .45]; %.28,.6
+        upper_left = [.75 .63]; %.28,.6
         mini_plot(upper_left,x_best_J1,p)
 
-        lower_right = [.15 .2]; %.51,.23
+        lower_right = [.09 .19]; %.51,.23
         mini_plot(lower_right,x_best_J2,p)
         
-        balanced_pos = [.415 .30]; %0.1,.35
+        balanced_pos = [.42 .12]; %0.1,.35
         mini_plot(balanced_pos,x_balanced,p)
 
-        report_pos = [.15 .64]; %.7,.53
+        report_pos = [.09 .55]; %.7,.53
         mini_plot(report_pos,x_nom(:,1),p)
         
-        wecsim_pos = [.38 .60]; %.8,.7
-        mini_plot(wecsim_pos,x_nom(:,2),p)
+        %wecsim_pos = [.28 .65]; %.8,.7
+        %mini_plot(wecsim_pos,x_nom(:,2),p)
     end
 
 end

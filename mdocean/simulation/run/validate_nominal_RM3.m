@@ -6,6 +6,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     b = var_bounds(mode); 
     
     X = [b.X_noms; 1];
+    X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     
     [~, ~, ~, g, simulated] = simulation(X,p);
     
@@ -41,7 +42,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
                 
                 if ~strcmp(field,'J_capex_design')
                     ax = nexttile(t);
-                    semilogx(ax, N_WEC,simulated.(field),N_WEC,actual.(field),'--')
+                    semilogx(ax, N_WEC,simulated.(field),'*-',N_WEC,actual.(field),'x--')
                     xlabel(ax,'N_{WEC}')
                     title(ax,remove_underscores({field}))
                     if length(t.Children) == t.GridSize(2)
