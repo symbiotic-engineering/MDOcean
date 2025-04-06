@@ -122,7 +122,11 @@ function table2latex(T, filename, special_col_spec, special_first_row)
             clear row_data;
         end
     catch err
-        error('Unknown error. Make sure that table only contains chars, strings or numeric values.');
+        msg = ['Cannot generate latex table string. Make sure that table only ' ...
+            'contains chars, strings or numeric values.'];
+        base_err = MException('MDOcean:table2latex',msg);
+        base_err = addCause(base_err,err);
+        throw(base_err)
     end
     
     table_string = append(table_string,'\\end{tabular}');
