@@ -105,7 +105,7 @@ function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
     title(titl)
     set(ax,'XTickLabel',xticks)
     set(ax,'YTickLabel',yticks)
-    clim([-10 10])
+    clim([-3 3])
     colormap(bluewhitered)
     xlabel(xlab)
     ylabel(ylab)
@@ -139,7 +139,7 @@ function [par_x_star_par_p_global, ...
     [g_lambda_LCOE, g_lambda_Pvar] = deal(zeros(length(params), length(ratios), num_constr));
     x0 = cell2struct(num2cell(x0_vec),b.var_names',1);
 
-    for i=1:length(params)
+    parfor i=1:length(params)
         param_name = params{i};
         [LCOE(i,:),  X_LCOE(i,:,:), ...
          g_lambda_LCOE(i,:,:),...
@@ -369,7 +369,7 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
 
     var_nom = p.(param_name);
 
-    dry_run = true; % true means use random numbers, false means actual optimization
+    dry_run = false; % true means use random numbers, false means actual optimization
 
     parfor j=1:length(ratios)
         if ratios(j) ~=1   
