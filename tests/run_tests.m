@@ -11,25 +11,10 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-run_wecsim_validation = true;
-
-if run_wecsim_validation && exist('../WEC-Sim','dir')
-    warning('off','MATLAB:contour:ConstantData')
+if exist('../WEC-Sim','dir')    
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
-    cd("mdocean")
-    try
-        tic
-        [singlebody, multibody, report, tab] = validate_dynamics();
-        wecsim_runtime = toc;
-        fprintf('WecSim took %g minutes',wecsim_runtime/60)
-        save('wecsimresults_all','singlebody','multibody','report','tab')
-    catch err
-        warning( "wecsim failed: " + newline + getReport(err,"extended"))
-    end
-    warning('on','MATLAB:contour:ConstantData')
-    cd("..")
 end
 
 suite = testsuite('tests');
