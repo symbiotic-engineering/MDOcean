@@ -81,7 +81,12 @@ function make_report(wecsim_filename,p)
         fig = figs(i);
         pos = fig.Position;
         fig.Position = [pos(1) pos(2) 2*pos(3) pos(4)];
-        append(rpt,Figure(fig))
+        if isvalid(fig)
+            append(rpt,Figure(fig))
+        else
+            warning(['Figure %d of %d has been deleted and was skipped ' ...
+                'from the report.'],i,length(figs))
+        end
     end
 
     close(rpt)
