@@ -12,6 +12,7 @@ classdef (SharedTestFixtures={ ...
         errors_multibody
         errors_report
         table
+        figs
     end
 
     methods(TestClassSetup)
