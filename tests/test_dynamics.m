@@ -4,7 +4,7 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_wecsim_tests = false;
+        run_wecsim_tests = true;
     end
 
     properties
@@ -21,7 +21,8 @@ classdef (SharedTestFixtures={ ...
             if testCase.run_wecsim_tests
                 warning('off','MATLAB:contour:ConstantData')
                 t = tic;
-                [singlebody, multibody, report, tab] = validate_dynamics();
+                [singlebody, multibody, ...
+                 report, tab, fig_sb, fig_mb] = validate_dynamics();
                 wecsim_runtime = toc(t);
                 fprintf('WecSim took %g minutes',wecsim_runtime/60)
                 warning('on','MATLAB:contour:ConstantData')
@@ -30,6 +31,7 @@ classdef (SharedTestFixtures={ ...
                 testCase.errors_multibody  = multibody;
                 testCase.errors_report     = report;
                 testCase.table             = tab;
+                testCase.figs              = [fig_sb fig_mb];
             end
         end
     end
@@ -83,6 +85,17 @@ classdef (SharedTestFixtures={ ...
             diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(testCase.table);
             testCase.log(diagnostic);
             table2latex(testCase.table,'../test-results/table_13.tex')
+        end
+
+        function dynamicValidationFigures(testCase)
+            for i = 1:length(testCase.figs)
+                fig = testCase.figs(i);
+                fig_name = ['Figure_WecSim_' num2str(i)];
+                pdf_name = ['../test-results/' fig_name];
+                save_pdf(fig,pdf_name)
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',[fig_name '_']);
+                testCase.log(diagnostic);
+            end
         end
     end
 
