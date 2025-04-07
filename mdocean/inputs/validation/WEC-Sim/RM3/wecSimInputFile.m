@@ -39,7 +39,7 @@ if ~contains(status,'working tree clean')
     msg = ['you have  uncommitted changes, please commit so the wecsim ' ...
         'settings can be referenced to the commit. Status: ' status];
     err = MException('MDOcean:WecSim:uncommitted',msg);
-    thorw(err)
+    throw(err)
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
