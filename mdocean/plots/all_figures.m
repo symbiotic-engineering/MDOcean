@@ -286,7 +286,9 @@ if any(which_tabs == 1)
         tab1latex = rows2vars(tab1,'VariableNamingRule','preserve','DataVariables',~idx_remove);
         tab1latex.OriginalVariableNames = remove_underscores(tab1latex.OriginalVariableNames);
         tab1latex = renamevars(tab1latex, 'OriginalVariableNames', 'Variable');
-        table2latex(tab1latex,[save_folder 'table_12.tex'])
+        firstrow = '&\multicolumn{3}{l|}{WEC-Sim RM3 Design} & \multicolumn{3}{l}{DOE Report RM3 Design \cite{RM3}} \\';
+        colspec = 'l|l|l|l|l|l|l';
+        table2latex(tab1latex,[save_folder 'table_12.tex'],colspec,firstrow)
     catch err
         tab_success{which_tabs == 1} = err;
     end
@@ -381,7 +383,12 @@ if any(which_tabs == 8)
     
         idx_remove = ismember(tab8.Row,{'flag','Optimal Material index'});
         tab8latex = tab8(~idx_remove,:);
-        colspec = '>{\centering\arraybackslash}p{0.20\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}';
+        colspec = ['>{\centering\arraybackslash}p{0.20\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.08\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.18\linewidth}'];
         firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
         table2latex(tab8latex,[save_folder 'table_22.tex'],colspec,firstrow)
     catch err

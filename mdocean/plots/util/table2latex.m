@@ -50,7 +50,9 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     % Parameters
     n_col = size(T,2);
     col_spec = [];
-    for c = 1:n_col, col_spec = [col_spec 'l']; end
+    for c = 1:n_col
+        col_spec = [col_spec 'l'];
+    end
     col_names = strjoin(T.Properties.VariableNames, ' & ');
     row_names = T.Properties.RowNames;
     if ~isempty(row_names)
@@ -82,35 +84,9 @@ function table2latex(T, filename, special_col_spec, special_first_row)
             row_data{1,n_col} = [];
             for col = 1:n_col
                 value = T{row,col};
-                if isstruct(value)
-                    error('Table must not contain structs.');
-                end
-                while iscell(value)
-                    value = value{1,1};
-                end
-                if ismissing(value)
-                    value = '';
-                end
-                if ~isempty(value) && (ischar(value) || isstring(value))
-                    value = char(value);
-                    if isstrprop(value(1), 'digit')
-                        value = str2double(value);
-                    end
-                end
                 
-                % Format the output
-                if isnumeric(value)
-                    if isinf(value)
-                        value = '$\infty$';
-                    end
-                    exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
-                    mantissa = value / 10.^exponent; % Calculate mantissa
-                    if exponent==0
-                        value = sprintf('$%.3g $',mantissa);
-                    else
-                        value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
-                    end
-                end
+                use_percent = contains(T.Properties.VariableNames{col},'error','IgnoreCase',true);
+                value = format_value(value, use_percent);
                 
                 row_data{1,col} = char(value);
             end
@@ -136,4 +112,39 @@ function table2latex(T, filename, special_col_spec, special_first_row)
 
     % Closing the file
     fclose(fileID);
+end
+
+function value = format_value(value, use_percent)
+    if isstruct(value)
+        error('Table must not contain structs.');
+    end
+    while iscell(value)
+        value = value{1,1};
+    end
+    if ismissing(value)
+        value = '';
+    end
+    if ~isempty(value) && (ischar(value) || isstring(value))
+        value = char(value);
+        if isstrprop(value(1), 'digit')
+            value = str2double(value);
+        end
+    end
+    
+    % Format the output
+    if isnumeric(value)
+        if isinf(value)
+            value = '$\infty$';
+        elseif use_percent
+            value = sprintf('$%.1f\\\\%%%% $',value);
+        else % use engineering notation
+            exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
+            mantissa = value / 10.^exponent; % Calculate mantissa
+            if exponent==0
+                value = sprintf('$%.3g $',mantissa);
+            else
+                value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
+            end
+        end
+    end
 end
