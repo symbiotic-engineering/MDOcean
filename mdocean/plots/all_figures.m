@@ -299,8 +299,8 @@ if any(which_tabs == 1)
         tab1latex.OriginalVariableNames = remove_underscores(modify_suffix(tab1latex.OriginalVariableNames));
         new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
         tab1latex = renamevars(tab1latex, tab1latex.Properties.VariableNames, new_names);
-        firstrow = '&\multicolumn{3}{l|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{l}{WEC-Sim RM3 Design} \\';
-        colspec = 'l|l|l|l|l|l|l';
+        firstrow = '&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\';
+        colspec = '>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r';
         table2latex(tab1latex,[save_folder 'table_12.tex'],colspec,firstrow)
     catch err
         tab_success{which_tabs == 1} = err;
