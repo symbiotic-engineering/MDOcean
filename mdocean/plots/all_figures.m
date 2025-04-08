@@ -138,6 +138,19 @@ if any(which_figs == 12) || any(which_tabs == 1)
     end
 end
 
+% %% figure 14-15 - wecsim validation histograms
+% fig_names{14} = 'Fig. 14: WecSim histogram singlebody';
+% fig_names{15} = 'Fig. 15: WecSim histogram multibody';
+% if any(which_figs == 14 | which_figs == 15)
+%     try
+%         [~, ~, ~, ~, fig_singlebody, fig_multibody] = validate_dynamics();
+%         fig_output(which_figs==14) = fig_singlebody;
+%         fig_output(which_figs==15) = fig_multibody;
+%     catch err
+%         fig_success(which_figs == 14 | which_figs == 15) = {err};
+%     end
+% end
+
 %% figure 15 - design space exploration
 fig_names{15} = 'Fig. 15: design space exploration';
 if any(which_figs == 15)
