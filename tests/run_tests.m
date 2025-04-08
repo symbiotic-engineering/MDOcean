@@ -38,7 +38,7 @@ p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
 p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true);
 p4 = DiagnosticsRecordingPlugin('IncludingPassingDiagnostics',true);
-p5 = LoggingPlugin();
+p5 = LoggingPlugin.withVerbosity(2);
 
 runner.addPlugin(p1);
 runner.addPlugin(p2);
