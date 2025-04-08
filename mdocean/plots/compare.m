@@ -17,8 +17,9 @@ val_minCapex = vals_opt(2);
 
 [X_maxPower,val_maxPower] = max_avg_power(p,b);
 
-p.LCOE_max = 0.1;
-[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p,b,2);
+p_bal = p;
+p_bal.avg_power_min = b.power_balanced;
+[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p_bal,b,2)
 
 X_nom	= [b.X_noms' 1];
 [~,~,~,~,val_nom] = simulation(X_nom,p);

@@ -16,7 +16,7 @@ function pareto_curve_heuristics()
         tol = 1e-6;
     end
 
-    new_objs = true; % switch between LCOE-Pvar and capex-Pavg
+    new_objs = true; % switch between LCOE-Pvar (old) and capex-Pavg (new)
 
     constraint_active_plot(residuals,fval,tol,b,new_objs);
 
@@ -92,7 +92,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
         J1_solar = NaN;
         J2_solar = NaN;
 
-        J2_balanced_approx = 300;
+        J1_balanced_approx = b.power_balanced;
         min_max_sign = [-1 1]; % -1 for maximize, 1 for minimize
 
     else
@@ -110,7 +110,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
         J1_solar = 0.03; % LCOE solar
         J2_solar = 125;  % P var solar
 
-        J2_balanced_approx = 100;
+        J1_balanced_approx = .2;
         min_max_sign = [1 1];
     end
 
@@ -157,7 +157,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
     J2_nom_sim = [J2_report_sim, J2_wecsim_sim];
 
     % balanced design
-    [~,idx_balanced] = min(abs(J2-J2_balanced_approx));
+    [~,idx_balanced] = min(abs(J1-J1_balanced_approx));
     J1_balanced = J1(idx_balanced);
     J2_balanced = J2(idx_balanced);
     
