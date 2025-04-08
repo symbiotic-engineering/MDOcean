@@ -111,6 +111,12 @@ function [errors,f] = wecsim_error_breakdown(multibody)
     X = [b.X_noms; 1];
     X(7) = 1e8; % disable power limit
     
+    if multibody
+        widths = [.15 2 5];
+    else
+        widths = [.05 .25 5];
+    end
+
     % 1. drag off, wamit coeffs, wecsim geometry: should match wecsim very well <2%
     p = parameters('wecsim');
     p.use_multibody = multibody;
@@ -119,7 +125,7 @@ function [errors,f] = wecsim_error_breakdown(multibody)
     p.use_MEEM = false;
     X(strcmp(b.var_names,'F_max')) = Inf;
     ax1 = nexttile(t);
-    errors.pct_error_baseline = create_wecsim_validation_histogram(X,p,ax1,.15);
+    errors.pct_error_baseline = create_wecsim_validation_histogram(X,p,ax1,widths(1));
     subtitle('Drag Off, Identical Hydro Coefficients','FontSize',13)
     
     % 2. 1 but drag on: gives me % error that comes from drag
@@ -129,7 +135,7 @@ function [errors,f] = wecsim_error_breakdown(multibody)
     X(strcmp(b.var_names,'F_max')) = Inf;
     figure(f);
     ax2 = nexttile(t);
-    errors.pct_error_drag = create_wecsim_validation_histogram(X,p,ax2,.25);
+    errors.pct_error_drag = create_wecsim_validation_histogram(X,p,ax2,widths(2));
     subtitle('Drag On, Identical Hydro Coefficients','FontSize',13)
 %     
 %     % 3. drag back off but meem coffs: gives % error that comes from meem
@@ -156,11 +162,11 @@ function [errors,f] = wecsim_error_breakdown(multibody)
     X(strcmp(b.var_names,'F_max')) = Inf;
     figure(f);
     ax3 = nexttile(3);
-    errors.pct_error_total = create_wecsim_validation_histogram(X,p,ax3,5);
+    errors.pct_error_total = create_wecsim_validation_histogram(X,p,ax3,widths(3));
     subtitle('Drag On, Different Hydro Coefficients','FontSize',13)
     leg = legend;
     title(leg,'Error in:')
-    leg.Position = [0.537,0.212,0.226,0.222];
+    leg.Position = [0.514,0.212,0.226,0.222];
     
     if multibody
         mb_string = 'Multi-Body';
@@ -187,7 +193,7 @@ function [weighted_pwr_err,max_amp_err] = create_wecsim_validation_histogram(X,p
         h = histogram(ax,amp_err(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
         hb = bar(ax,h.BinEdges(1:end-1),-h.Values,'histc');
         hb.FaceColor = [0.8500 0.3250 0.0980];
-        hb.FaceAlpha = h.FaceAlpha; 
+        hb.FaceAlpha = 0.6; 
         hb.DisplayName = 'Float Amplitude';
 
         h.EdgeAlpha = 0; h.FaceAlpha = 0; % transparent
