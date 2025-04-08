@@ -5,6 +5,7 @@ import matlab.unittest.plugins.XMLPlugin;
 import matlab.unittest.plugins.codecoverage.CoberturaFormat;
 import matlab.unittest.plugins.TestReportPlugin
 import matlab.unittest.plugins.DiagnosticsRecordingPlugin
+import matlab.unittest.plugins.LoggingPlugin
 import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
 
@@ -37,11 +38,13 @@ p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
 p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true);
 p4 = DiagnosticsRecordingPlugin('IncludingPassingDiagnostics',true);
+p5 = LoggingPlugin();
 
 runner.addPlugin(p1);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
 runner.addPlugin(p4);
+runner.addPlugin(p5);
 
 runner.ArtifactsRootFolder = test_dir;
 
