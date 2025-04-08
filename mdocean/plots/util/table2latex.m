@@ -122,7 +122,7 @@ function value = format_value(value, use_percent)
         value = value{1,1};
     end
     if ismissing(value)
-        value = '';
+        value = '-';
     end
     if ~isempty(value) && (ischar(value) || isstring(value))
         value = char(value);
@@ -136,7 +136,7 @@ function value = format_value(value, use_percent)
         if isinf(value)
             value = '$\infty$';
         elseif use_percent
-            value = sprintf('$%.1f\\\\%%%% $',value);
+            value = sprintf('$%.1f\\\\%%%% $',value*100);
         else % use engineering notation
             exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
             mantissa = value / 10.^exponent; % Calculate mantissa
