@@ -53,13 +53,13 @@ function [weighted_pwr_err,max_amp_err,pwr_err,amp_err] = run_dynamic_validation
     else
         wecsim_filename = run_wecsim_validation(X,p);
     end
-    [weighted_pwr_err,max_amp_err,pwr_err,amp_err] = power_matrix_compare(X,p,wecsim_filename, ...
+    [weighted_pwr_err,max_amp_err,pwr_err,amp_err,figs] = power_matrix_compare(X,p,wecsim_filename, ...
                                                     RM3reportOn,runOnlyFewSeaStates);
 
-    make_report(wecsim_filename,p)
+    make_report(figs,wecsim_filename,p)
 end
 
-function make_report(wecsim_filename,p)
+function make_report(figs,wecsim_filename,p)
     import mlreportgen.report.* 
     import mlreportgen.dom.* 
     rpt = Report(['DynamicValidation_' wecsim_filename],'pdf'); 
@@ -76,7 +76,6 @@ function make_report(wecsim_filename,p)
     append(rpt,struct2table(pDisplay))
 
     % add figures
-    figs = findobj('Type', 'figure');
     for i=1:length(figs)
         fig = figs(i);
         pos = fig.Position;
