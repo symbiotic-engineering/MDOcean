@@ -1,11 +1,4 @@
-function [results] = gradient_mult_x0(filename_uuid)
-
-p = parameters();
-b = var_bounds();
-
-if nargin>0
-    b.filename_uuid = filename_uuid;
-end
+function [results] = gradient_mult_x0(p,b)
 
 num_runs = 3;
 num_DVs = length(b.var_names);

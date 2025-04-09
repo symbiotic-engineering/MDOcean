@@ -1,10 +1,12 @@
 
 % Runs one-at-a-time design of experiments
 
-%clear;clc;close all
+function experiments(p,b)
 
-p = parameters();
-b = var_bounds();
+if nargin==0
+    p = parameters();
+    b = var_bounds();
+end
 
 DOE_strategy = 'ratios'; % 'sample' or 'bounds' or 'ratios'
 n = 20;
@@ -159,3 +161,5 @@ xticks(ax2,xticks(ax1))
 improvePlot
 ylab1.FontSize=16.5;
 ylab2.FontSize=16.5;
+
+end

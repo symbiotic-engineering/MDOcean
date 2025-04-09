@@ -1,10 +1,4 @@
-function [tab] = location_sensitivity(filename_uuid)
-
-p = parameters();
-b = var_bounds();
-if nargin>0
-    b.filename_uuid = filename_uuid;
-end
+function [tab] = location_sensitivity(p,b)
 
 files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...
