@@ -29,7 +29,7 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
-    h = 85;
+    h = 45;
     power_coeffs = [22.4,1,-15,86];
     power_scale_multibody = 0.595;
 end
