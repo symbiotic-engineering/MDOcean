@@ -11,8 +11,8 @@ date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 
-num_figs = 36;
-num_tabs = 8;
+num_figs = 45;
+num_tabs = 29;
 fig_names   = cell([1,num_figs]);
 tab_names   = cell([1,num_tabs]);
 
@@ -30,72 +30,73 @@ fig_output = gobjects(1, length(which_figs));
 tab_output(1, 1:length(which_tabs)) = {table()};
 %%
 
-figs_in_paper(1)  = 'read_non_matlab_figs.RM3_image';
+figs_in_paper = cell([1,num_figs]);
+figs_in_paper{1}  = 'read_non_matlab_figs.RM3_image';
 % 2: modeling methodology
-figs_in_paper(2)  = 'read_non_matlab_figs.methodology_overview';
-figs_in_paper(3)  = 'read_non_matlab_figs.N2_diagram';
-figs_in_paper(4)  = 'read_non_matlab_figs.dimensions';
-figs_in_paper(5)  = 'read_non_matlab_figs.MEEM_geometry';
-figs_in_paper(6)  = 'hydro_coeff_err.hydro_coeff_err';
-figs_in_paper(7)  = 'desc_fcns.drag_desc_fcn';
-figs_in_paper(8)  = 'desc_fcns.saturation_desc_fcn';
-figs_in_paper(9)  = 'run_single.power_matrix_multiply';
-figs_in_paper(10) = 'read_non_matlab_figs.WECSim_error_breakdown';
-figs_in_paper(11) = 'read_non_matlab_figs.FBD';
-figs_in_paper(12) = 'validation.cost_vs_N_WEC';
-figs_in_paper(13) = 'read_non_matlab_figs.sim_runtime';
+figs_in_paper{2}  = 'read_non_matlab_figs.methodology_overview';
+figs_in_paper{3}  = 'read_non_matlab_figs.N2_diagram';
+figs_in_paper{4}  = 'read_non_matlab_figs.dimensions';
+figs_in_paper{5}  = 'read_non_matlab_figs.MEEM_geometry';
+figs_in_paper{6}  = 'hydro_coeff_err.hydro_coeff_err';
+figs_in_paper{7}  = 'desc_fcns.drag_desc_fcn';
+figs_in_paper{8}  = 'desc_fcns.saturation_desc_fcn';
+figs_in_paper{9}  = 'run_single.power_matrix_multiply';
+figs_in_paper{10} = 'read_non_matlab_figs.WECSim_error_breakdown';
+figs_in_paper{11} = 'read_non_matlab_figs.FBD';
+figs_in_paper{12} = 'validation.cost_vs_N_WEC';
+figs_in_paper{13} = 'read_non_matlab_figs.sim_runtime';
 % 3: optimization methodology
-figs_in_paper(14) = 'read_non_matlab_figs.optimization_flowchart';
+figs_in_paper{14} = 'read_non_matlab_figs.optimization_flowchart';
 % 4: results
-figs_in_paper(15) = 'experiments.experiments';
-figs_in_paper(16) = 'param_sensitivities.local_global_objective';
-figs_in_paper(17) = 'param_sensitivities.local_design';
-figs_in_paper(18) = 'param_sensitivities.global_design';
+figs_in_paper{15} = 'experiments.experiments';
+figs_in_paper{16} = 'param_sensitivities.local_global_objective';
+figs_in_paper{17} = 'param_sensitivities.local_design';
+figs_in_paper{18} = 'param_sensitivities.global_design';
 % 19-21 take out
-figs_in_paper(19) = 'pareto.pareto_front_with_design_images';
-figs_in_paper(20) = 'pareto.heuristics';
-figs_in_paper(21) = 'pareto.pareto_front_LCOE_contours';
-figs_in_paper(22) = 'pareto.constraint_activity';
-figs_in_paper(23) = 'compare.overlaid_geometry';
-figs_in_paper(24) = 'compare.overlaid_hydro_coeffs';
-figs_in_paper(25) = 'compare.probability_CDF';
+figs_in_paper{19} = 'pareto.pareto_front_with_design_images';
+figs_in_paper{20} = 'pareto.heuristics';
+figs_in_paper{21} = 'pareto.pareto_front_LCOE_contours';
+figs_in_paper{22} = 'pareto.constraint_activity';
+figs_in_paper{23} = 'compare.overlaid_geometry';
+figs_in_paper{24} = 'compare.overlaid_hydro_coeffs';
+figs_in_paper{25} = 'compare.probability_CDF';
 % 29 taken out due to combining pareto heuristics
-figs_in_paper(26) = 'all_fig_compare.runtime_bar_chart';
-% appendix A- hydro
-figs_in_paper(27) = 'meem.meem_regions';
-figs_in_paper(28) = 'meem.meem_sparsity';
-figs_in_paper(29) = 'meem.meem_validation';
-figs_in_paper(30) = 'meem.meem_matching';
-figs_in_paper(31) = 'meem.meem_convergence';
-figs_in_paper(32) = 'meem.asymptotic_b_vector';
+figs_in_paper{26} = 'all_fig_compare.runtime_bar_chart';
+% appendix A - hydro
+figs_in_paper{27} = 'meem.meem_regions';
+figs_in_paper{28} = 'meem.meem_sparsity';
+figs_in_paper{29} = 'meem.meem_validation';
+figs_in_paper{30} = 'meem.meem_matching';
+figs_in_paper{31} = 'meem.meem_convergence';
+figs_in_paper{32} = 'meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_paper(33) = 'run_single.drag_convergence';
-figs_in_paper(34) = 'slamming.slamming_amplitude';
-figs_in_paper(35) = 'force_sat_results.power_force_sensitivity';
-figs_in_paper(36) = 'wecsim.wecsim_all_sea_states';
+figs_in_paper{33} = 'run_single.drag_convergence';
+figs_in_paper{34} = 'slamming.slamming_amplitude';
+figs_in_paper{35} = 'force_sat_results.power_force_sensitivity';
+figs_in_paper{36} = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-figs_in_paper(37) = 'read_non_matlab_figs.trapezoid';
-figs_in_paper(38) = 'read_non_matlab_figs.damping_plate_flowchart';
-figs_in_paper(39) = 'damping_plate_structures.damping_plate_moment';
-figs_in_paper(40) = 'damping_plate_structures.damping_plate_deflection';
-figs_in_paper(41) = 'damping_plate_structures.damping_plate_aspect_ratio';
+figs_in_paper{37} = 'read_non_matlab_figs.trapezoid';
+figs_in_paper{38} = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper{39} = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper{40} = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper{41} = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
 % appendix F - supplementary results
-figs_in_paper(44) = 'gradient_optim.single_obj_convergence';
+figs_in_paper{44} = 'gradient_optim.single_obj_convergence';
 % graphical abstract (unnumbered so at the end)
-figs_in_paper(45)  = 'read_non_matlab_figs.graphical_abstract';
+figs_in_paper{45}  = 'read_non_matlab_figs.graphical_abstract';
 
 %% TABLES
-tabs_in_paper = cell(1,29);
-tabs_in_paper(12) = 'validation.validation';
-tabs_in_paper(15) = 'constraints';
-tabs_in_paper(16) = 'design variables';
-tabs_in_paper(17) = 'parameters';
-tabs_in_paper(19) = 'compare.optimal_design';
-tabs_in_paper(20) = 'compare.optimal_outputs';
-tabs_in_paper(21) = 'multistart.multistart';
-tabs_in_paper(22) = 'location_sensitivity.location_sensitivity';
+tabs_in_paper = cell([1,29]);
+tabs_in_paper{12} = 'validation.validation';
+tabs_in_paper{15} = 'constraints';
+tabs_in_paper{16} = 'design variables';
+tabs_in_paper{17} = 'parameters';
+tabs_in_paper{19} = 'compare.optimal_design';
+tabs_in_paper{20} = 'compare.optimal_outputs';
+tabs_in_paper{21} = 'multistart.multistart';
+tabs_in_paper{22} = 'location_sensitivity.location_sensitivity';
 
 %%
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
@@ -114,14 +115,14 @@ fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
 fig_names{25} = 'Fig. 25: constraint activity';
 fig_names{30} = 'Fig. 30: asymptotic b vector';
 
-tab_names{1} = 'Tab. 12: validation against nominal';
-tab_names{2} = 'Tab. 15: constraints';
-tab_names{3} = 'Tab. 16: design variables';
-tab_names{4} = 'Tab. 17: parameters';
-tab_names{5} = 'Tab. 19: optimal DVs for various designs';
-tab_names{6} = 'Tab. 20: optimal outputs for various designs';
-tab_names{7} = 'Tab. 21: convergence for different x0s';
-tab_names{8} = 'Tab. 22: optimal DVs for 4 locations';
+tab_names{12} = 'Tab. 12: validation against nominal';
+tab_names{15} = 'Tab. 15: constraints';
+tab_names{16} = 'Tab. 16: design variables';
+tab_names{17} = 'Tab. 17: parameters';
+tab_names{19} = 'Tab. 19: optimal DVs for various designs';
+tab_names{20} = 'Tab. 20: optimal outputs for various designs';
+tab_names{21} = 'Tab. 21: convergence for different x0s';
+tab_names{22} = 'Tab. 22: optimal DVs for 4 locations';
 
 %% Initialize structures to store generated figures and tables
 generated_figs = struct();
@@ -131,14 +132,14 @@ b = var_bounds();
 b.filename_uuid = filename_uuid;
 
 % Loop for figures
-for i = which_figs
+for i = 1:length(which_figs)
     try
         % Get the function name for the figure
-
-        fig_name = split(figs_in_paper{i}, '.');
+        fig_number = which_figs(i);
+        fig_name = split(figs_in_paper{fig_number}, '.');
         func_name = fig_name{1};
         fig_desc = fig_name{2};
-        func_handle = str2func(func_name);
+        func_handle = str2func([func_name '_func']);
         
         % Check if the figure has already been generated
         if ~isfield(generated_figs, func_name)
@@ -163,10 +164,11 @@ for i = which_figs
 end
 
 % Loop for tables
-for i = which_tabs
+for i = 1:length(which_tabs)
     try
+        tab_number = which_tabs(i);
         % Get the function name for the table
-        tab_name = split(tabs_in_paper{i}, '.');
+        tab_name = split(tabs_in_paper{tab_number}, '.');
         func_name = tab_name{1};
         tab_desc = tab_name{2};
         func_handle = str2func(func_name);
@@ -193,6 +195,16 @@ for i = which_tabs
         tab_success{i} = err;  % Store error for the table
     end
 end
+
+if any( ismember(which_figs, 31:33) )
+    fig_output(ismember(which_figs, 31:33)) = figure;
+end
+
+%% fixme: 37 to 45 not implemented, but still name the figures
+empty_idx = cellfun(@isempty,fig_names);
+empty_str = strcat('Fig._', string(find(empty_idx)));
+[fig_names{empty_idx}] = deal(empty_str{:});
+[fig_success{ismember(which_figs,find(empty_idx))}] = deal(MException('MDOcean:all_figures:not_implemented','Figure not implemented yet'));
 
 end
 
@@ -266,7 +278,7 @@ function [figs,tabs] =  hydro_coeff_fig_func(~,~)
 end
 
 % Function to generate drag describing function and saturation time signal figures
-function [figs,tabs] =  drag_saturation_fig_func(~,~)
+function [figs,tabs] =  desc_fcns_func(~,~)
     sin_desc_fcn_demo()
     figs.drag_desc_fcn = gcf;
     figs.saturation_desc_fcn = figure(figs.drag_desc_fcn.Number - 2);
@@ -325,8 +337,8 @@ function [figs,tabs] = design_space_exploration_fig_func(p,b)
 end
 
 % Function to generate overlaid geometry, hydro coeffs, and probability CDF figures
-function [figs,tabs] = comparison_fig_tab_func(p,b)
-    [tabs.optimal_design_vars, tabs.optimal_outputs] = compare(p,b);
+function [figs,tabs] = compare_func(p,b)
+    [tabs.optimal_design_vars, tabs.optimal_outputs] = deal([]);%compare(p,b);
     n = gcf().Number;
     figs.overlaid_geometry = figure(n-3);
     figs.overlaid_hydro_coeffs = figure(n);
@@ -412,17 +424,3 @@ end
 %     end
 % end
 
-
-%% figure 31-33 - fixme not implemented
-if any( ismember(which_figs, 31:33) )
-    fig_output(ismember(which_figs, 31:33)) = figure;
-end
-
-%% fixme: 37 to 45 not implemented, but still name the figures
-empty_idx = cellfun(@isempty,fig_names);
-empty_str = strcat('Fig._', string(find(empty_idx)));
-[fig_names{empty_idx}] = deal(empty_str{:});
-[fig_success{ismember(which_figs,find(empty_idx))}] = deal(MException('all_figures:not_implemented','Figure not implemented yet'));
-
-
-end
