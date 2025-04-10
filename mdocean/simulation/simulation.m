@@ -101,7 +101,7 @@ g(10) = FOS_damping_plate(1) * in.FOS_mult_d / p.FOS_min - 1; % damping plate su
 g(11) = FOS_damping_plate(2) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives fatigue
 g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
 g(13) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-if p.avg_power_min == 0
+if ~isfield(p,'avg_power_min') || p.avg_power_min == 0
     g(14) = P_avg_elec/1e6;                     % positive power
 else
     g(14) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
