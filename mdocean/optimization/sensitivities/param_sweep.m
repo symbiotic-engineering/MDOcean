@@ -1,7 +1,6 @@
 function [] = param_sweep(filename_uuid)
 
     %% Setup
-    close all
     b = var_bounds();
     if nargin>0
         b.filename_uuid = filename_uuid;
@@ -106,7 +105,7 @@ function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
     title(titl)
     set(ax,'XTickLabel',xticks)
     set(ax,'YTickLabel',yticks)
-    clim([-10 10])
+    clim([-3 3])
     colormap(bluewhitered)
     xlabel(xlab)
     ylabel(ylab)
@@ -140,7 +139,7 @@ function [par_x_star_par_p_global, ...
     [g_lambda_LCOE, g_lambda_Pvar] = deal(zeros(length(params), length(ratios), num_constr));
     x0 = cell2struct(num2cell(x0_vec),b.var_names',1);
 
-    for i=1:length(params)
+    parfor i=1:length(params)
         param_name = params{i};
         [LCOE(i,:),  X_LCOE(i,:,:), ...
          g_lambda_LCOE(i,:,:),...
@@ -218,7 +217,8 @@ function [par_x_star_par_p_global, ...
     delta_p_change_activity_global = delta_p_LCOE_norm;
     
     %% Line plots showing nonlinearity
-    figure(1)
+    fig_num_start = gcf().Number+1;
+    figure(fig_num_start)
     subplot 121
     plot(ratios,LCOE/LCOE_nom)
     xlabel('Parameter Ratio from nominal')
@@ -237,7 +237,7 @@ function [par_x_star_par_p_global, ...
     set(gcf,'Position',[1 41 1536 840]) % full screen
     
     for i = 1:num_DVs
-        f2 = figure(2);
+        f2 = figure(fig_num_start+1);
         subplot(3,5,i)
         plot(ratios, X_LCOE(:,:,i)./X_LCOE_nom(i))
         xlabel ('Parameter ratio from nominal')
@@ -246,7 +246,7 @@ function [par_x_star_par_p_global, ...
         %improvePlot
         grid on
         
-        f3 = figure(3);
+        f3 = figure(fig_num_start+2);
         subplot(3,5,i)
         plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
         xlabel ('Parameter ratio from nominal')
@@ -371,17 +371,18 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
 
     dry_run = false; % true means use random numbers, false means actual optimization
 
-    for j=1:length(ratios)
+    parfor j=1:length(ratios)
         if ratios(j) ~=1   
-            p.(param_name) = ratios(j) * var_nom;
+            new_p = p;
+            new_p.(param_name) = ratios(j) * var_nom;
             if dry_run
                 [Xs_opt, obj_opt, flag] = deal(rand(num_DVs+1,2),rand(2,1),[1 1]);
                 g_lambda_LCOE_tmp = rand(num_constr,1);
                 g_lambda_Pvar_tmp = rand(num_constr,1);
             else
-                [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,p,b);
-                g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),p,b);
-                g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),p,b);
+                [Xs_opt, obj_opt, flag, ~, lambdas] = gradient_optim(x0,new_p,b);
+                g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),new_p,b);
+                g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),new_p,b);
             end
             
             if flag(1) >= 1
