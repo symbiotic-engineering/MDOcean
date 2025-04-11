@@ -145,16 +145,11 @@ end
 function hydro_compare(vals,colors)
     figure
     hold on
-    plot(1.25,70000,['k' '-'])
-    plot(1.25,70000,['b' '-'])
-    plot(1.25,70000,['r' '-'])
-    plot(1.25,70000,['g' '-'])
-    plot(1.25,70000,['m' '-'])
-    plot(1.25,70000,['k' 'x'])
-    plot(1.25,70000,['k' 'o'])
-    plot(1.25,70000,['k' '*'])
-    plot(1.25,70000,['k' '.'])
-    plot(1.25,70000,['w' 'o'])
+    dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
+        ['k' 'x'],['k' 'o'],['k' '*'],['k' '.'],['w' 'o']};
+    for i = 1:length(dummy_style)
+        plot(1.25,15000,dummy_style{i})
+    end
     for i=1:length(vals)
         val = vals(i);
         col = colors{i};
@@ -165,8 +160,6 @@ function hydro_compare(vals,colors)
     end
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
-    %xlim([0.2,1.1])
-    %ylim([-0.4,0.1])
     legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
         'A_{f}/\rho','B_{f}/\rho','\gamma_{f}/\rho','\gamma_{phase, f}'}, ...
         'Location','best','NumColumns',2)
