@@ -65,7 +65,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
- X_constraints,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
+ X_constraints,~,~,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
  B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,gamma_f_over_rho_g,...
  gamma_s_over_rho_g,gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
@@ -101,12 +101,16 @@ g(10) = FOS_damping_plate(1) * in.FOS_mult_d / p.FOS_min - 1; % damping plate su
 g(11) = FOS_damping_plate(2) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives fatigue
 g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
 g(13) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-g(14) = P_avg_elec/1e6;                     % positive power
+if ~isfield(p,'avg_power_min') || p.avg_power_min == 0
+    g(14) = P_avg_elec/1e6;                     % positive power
+else
+    g(14) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
+end
 %1 + min(Kp_over_Ks,[],'all');   % spar heave stability (positive effective stiffness)
 g(15) = p.LCOE_max/LCOE - 1;            % prevent more expensive than threshold
-%g(19) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
 g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
-                                        % this constraint should always be active
+                                        % this constraint should always be
+                                        % active unless F_max==Inf
                                         % and is only required when p.cost_perN = 0.
 g(17) = X_constraints(1);               % prevent float rising above top of spar
 g(18) = X_constraints(2);               % prevent float going below bottom of spar
@@ -116,7 +120,7 @@ g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
-    warning('Inf, NaN, or imaginary constraint detected')
+    warning('Inf, NaN, or imaginary constraint or objective detected')
 end
 
 if nargout > 4 % if returning extra struct output for validation
@@ -132,7 +136,7 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,K_p,mag_U,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -151,6 +155,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.FOS_spar = FOS_spar(1);
 	val.c_v = P_var;
     val.B_p = B_p;
+    val.K_p = K_p;
+    val.mag_U = mag_U;
     val.X_u = X_u;
     val.X_f = X_f;
     val.X_s = X_s;

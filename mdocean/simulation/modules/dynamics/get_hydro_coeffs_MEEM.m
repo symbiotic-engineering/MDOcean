@@ -41,12 +41,10 @@ gamma_f_over_rho_g = sqrt(2 * mult .* B_f_over_rho_w ./ m0); % Haskind relations
 
 % since MEEM currently doesn't take the damping plate into account,
 % get the spar values with approximations that include damping plate
-[A_s_over_rho,gamma_s_over_rho_g,B_s_over_rho_w] = spar_dynamics(a1/a3, 2*a3, d1, ...
+[A_s_over_rho,gamma_s_over_rho_g,...
+    B_s_over_rho_w,gamma_phase_s,...
+    A_c_over_rho,B_c_over_rho_w] = spar_dynamics(a1/a3, 2*a3, d1, ...
                                                     spar_excitation_coeffs, m0, mult);
 
-% set the remaining coeffs to zero since not sure how to approximate them
-A_c_over_rho = 0;
-B_c_over_rho_w = 0;
-gamma_phase_s = 0;
 
 end

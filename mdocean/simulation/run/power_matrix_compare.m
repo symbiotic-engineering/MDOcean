@@ -1,4 +1,7 @@
-function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report, override)
+function [weighted_power_error,...
+          max_float_amp_error,...
+          power_mech_err_matrix,...
+          float_amp_err_matrix,figs] = power_matrix_compare(X, p, wecsim_filename, report, override)
     
     if nargin<4
         report = false;
@@ -25,9 +28,23 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
     % options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
-    vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max','float_amplitude','relative_amplitude','spar_amplitude'};
-    comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p)
+    vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
+        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
+    figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
     
+    if ~report
+        power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
+                                                             results_sim.power_mech_unsat);
+        float_amp_err_matrix  = compute_percent_error_matrix(results_actual.float_amplitude, ...
+                                                             results_sim.float_amplitude);
+        max_float_amp_error   = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
+                                                             max(results_sim.float_amplitude,   [],'all') );
+    else
+        power_mech_err_matrix = [];
+        float_amp_err_matrix = [];
+        max_float_amp_error = [];
+    end
+
     % todo: use actual pretty variables titles with units
     % var_names = {'Unweighted Device Power Matrix (kW)',...
     %      'JPD-Weighted Power Matrix (kW)',...
@@ -44,6 +61,8 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
                                                           results_actual.power_mech_unsat, p.JPD);
     end
 
+
+
 end
 %%
 
@@ -56,19 +75,22 @@ function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     weighted_error = compute_percent_error_matrix(actual_avg, sim_avg);
 end
 
-function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
+function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
+    figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
 
         % find max and min to use as consistent colorbar axis for sim and actual
-        all_data = [actual.(var_name), sim(:).(var_name)];
+        flatten = @(a) a(:);
+        all_data = [flatten(actual.(var_name)); flatten([sim(:).(var_name)])];
         clims = [min(all_data,[],'all'),max(all_data,[],'all')];
         if all(clims==[0 0])
             clims = [0 1];
         end
 
-        figure
+        f = figure;
+        figs(var_idx) = f;
         % actual
         subplot(1,num_subplots,1)
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
@@ -139,7 +161,8 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
-        h_fig.LevelList = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+        levs = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+        h_fig.LevelList = levs;
     end
     grid on
 end
@@ -166,10 +189,11 @@ function results = load_RM3_report_results(eff_pto, override)
     wave_resource_sheet(wave_resource_sheet == 0) = NaN;
 
     if override
-        power_mech_unsat = power_mech_unsat(1:2,1:2);
-        Hs = Hs(1:2); Te = Te(1:2);
-        JPD = JPD(1:2,1:2);
-        wave_resource_sheet = wave_resource_sheet(1:2,1:2);
+        power_mech_unsat = power_mech_unsat(3:4,4:5);
+        power_elec_sat = power_elec_sat(3:4,4:5);
+        Hs = Hs(3:4); Te = Te(4:5);
+        JPD = JPD(3:4,4:5);
+        wave_resource_sheet = wave_resource_sheet(3:4,4:5);
     end
 
     power_elec_unsat = power_mech_unsat * eff_pto;
@@ -204,33 +228,41 @@ function results = compute_mdocean_results(X,p)
                                       'float_amplitude', val.X_f, ...
                                       'spar_amplitude',val.X_s, ...
                                       'relative_amplitude',val.X_u, ...
-                                      'PTO_damping',val.B_p);
+                                      'PTO_damping',val.B_p,...
+                                      'force_pto',val.mag_U);
 end
 
 function results = load_wecsim_results(wecsim_filename, p)
 
     sz = size(p.JPD);
     % wecSim spar stationary
-    vars = {'P','float_amplitude','spar_amplitude','relative_amplitude'};
+    vars = {'P','float_amplitude','spar_amplitude','relative_amplitude','force_pto','B_p'};
     file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
     old_jpd = trim_jpd(readmatrix(file,'Range','A3'));
-    idx = find(old_jpd(2:end,2:end) ~= 0);
+    JPD = p.JPD; % old_jpd(2:end,2:end) - uncomment to use old wec sim results locally
+    idx = find(JPD ~= 0);
 
     wecsim_raw = load(wecsim_filename,vars{:});
-    [power_mech_unsat,float_amplitude,spar_amplitude,relative_amplitude] = deal(nan(sz));
+    [power_mech_unsat,...
+     float_amplitude,...
+     spar_amplitude,...
+     relative_amplitude,...
+     force_pto,...
+     B_p] = deal(nan(sz));
+
     power_mech_unsat(idx) = -wecsim_raw.P / 1000;
     float_amplitude(idx) = wecsim_raw.float_amplitude;
     spar_amplitude(idx) = wecsim_raw.spar_amplitude;
     relative_amplitude(idx) = wecsim_raw.relative_amplitude;
+    force_pto(idx) = wecsim_raw.force_pto;
+    B_p(idx) = wecsim_raw.B_p;
 
     %power_mech_unsat(power_mech_unsat>1e6) = NaN;
 
-    % todo: add damping
-
-
     results = assemble_results_struct(size(power_mech_unsat),...
                                          'power_mech_unsat',power_mech_unsat, ...
-                                          'T', p.T, 'H', p.Hs, 'JPD', p.JPD, ...%PTO_damping
+                                          'T', p.T, 'H', p.Hs, 'JPD', p.JPD, ...
+                                          'PTO_damping', B_p,'force_pto',force_pto,...
                                          'float_amplitude', float_amplitude,...
                                          'spar_amplitude',spar_amplitude, ...
                                          'relative_amplitude',relative_amplitude);
@@ -241,7 +273,7 @@ function results = assemble_results_struct(sz,varargin)
 
     var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
                  'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-                 'relative_amplitude', 'PTO_damping'};
+                 'relative_amplitude', 'PTO_damping','force_pto'};
 
     p = inputParser;
     for var_idx = 1:length(var_names)

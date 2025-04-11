@@ -8,6 +8,7 @@ b = var_bounds();
 
 DOE_strategy = 'ratios'; % 'sample' or 'bounds' or 'ratios'
 n = 20;
+num_DVs = length(b.X_noms);
 
 if strcmp(DOE_strategy,'sample')
     X = [ 20 10 30;     % outer diameter of float	
@@ -18,62 +19,63 @@ if strcmp(DOE_strategy,'sample')
           10 5 50       % D_int	
           2*pi/7 2*pi/8 2*pi/9
         ];	
-elseif strcmp(DOE_strategy,'bounds')
-    %X = [ b.D_f_nom, linspace(b.D_f_min, b.D_f_max, n);
-    %      b.D_s_ratio_nom, linspace(b.D_s_ratio_min, b.D_s_ratio_max, n);
-    %      b.h_f_ratio_nom, linspace(b.h_f_ratio_min, b.h_f_ratio_max, n);
-    %      b.T_s_ratio_nom, linspace(b.T_s_ratio_min, b.T_s_ratio_max, n);
-    %      b.F_max_nom, linspace(b.F_max_min, b.F_max_max, n);
-    %      b.B_p_nom, linspace(b.B_p_min, b.B_p_max, n);
-    %      b.w_n_nom, linspace(b.w_n_min, b.w_n_max, n) ];
-    
-    X = zeros(length(b.X_noms),2);
-    for i = 1:length(b.X_mins)
+elseif strcmp(DOE_strategy,'bounds')    
+    X = zeros(num_DVs,1+n);
+    for i = 1:num_DVs
         X(i,1) = b.X_noms(i);
-        X(i,1) = linspace(b.X_mins(i),b.X_maxs(i),n);
+        X(i,2:end) = linspace(b.X_mins(i),b.X_maxs(i),n);
     end
-
     ratios = X./X(:,1);
+
 elseif strcmp(DOE_strategy,'ratios')
     ratios = logspace(log10(1/3),log10(3),n);
     ratios = [1, ratios(ratios~=1)];
     X =  [b.X_noms] * ratios;
 end
 
+
 X_nom = X(:,1);	
 design_size = size(X);	
-num_vars = design_size(1);	
-num_vals_per_var = design_size(2);
-num_vals_swept = num_vals_per_var - 1; % don't sweep 1st value of each variable (corresponding to ratio 1)
+num_vals_per_DV = design_size(2);
+num_vals_swept = num_vals_per_DV - 1; % don't sweep 1st value of each variable (corresponding to ratio 1)
 
 % initialize variables
 LCOE = X*inf;
 cost = X*inf;
 power = X*inf;
-opt_idx = zeros(num_vars,1);	
-recommended = zeros(num_vars,2);	
-number_runs = 1 + num_vars * num_vals_swept; % nominal run plus all sweeps
+opt_idx = zeros(num_DVs,1);	
+recommended = zeros(num_DVs,2);	
+number_runs = 1 + num_DVs * num_vals_swept; % nominal run plus all sweeps
 failed = cell(number_runs,1);	
-X_ins = zeros(number_runs, num_vars);	
+X_ins = zeros(number_runs, num_DVs);	
 design = 0;
 
 % run design of experiments
-for i = 1:num_vars
+for i = 1:num_DVs
     X_in = X_nom;	
-    for j = 1:num_vals_per_var
+    for j = 1:num_vals_per_DV
         if i == 1 || j~=1	% prevent rerunning nominal multiple times
             changed_entry = X(i,j);	
             if ~isnan(changed_entry)	
                 design = design+1;	
                 X_in(i) = changed_entry;	
                 X_ins(design,:) = X_in;	
-                [LCOE_temp, cost_temp, P_matrix, g, val] = simulation([X_in;b.M_nom],p);
 
-                % only add to results if first 12 constraints are feasible
-                idx_ignore = false(1,length(b.constraint_names));
-                ignore = {'irrelevant_max_force','LCOE_max','linear_theory'};
-                idx_ignore(ismember(b.constraint_names,ignore)) = true;
-                [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                X_vec = [X_in;b.M_nom];
+                [~, ~, failed_lin, feasible_lin] = is_feasible(0, X_vec, p, b);
+                
+                if feasible_lin
+                    [LCOE_temp, cost_temp, P_matrix, g, val] = simulation(X_vec,p);
+    
+                    % only add to results if relevant nonlin constraints are feasible
+                    idx_ignore = false(1,length(b.constraint_names));
+                    ignore = {'irrelevant_max_force','LCOE_max','linear_theory','prevent_slamming'};
+                    idx_ignore(contains(b.constraint_names,ignore)) = true;
+                    [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                else
+                    feasible = feasible_lin;
+                    which_failed = failed_lin;
+                end
                 if feasible	
                     LCOE(i,j) = LCOE_temp;	
                     cost(i,j) = cost_temp;
@@ -120,35 +122,40 @@ figure
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 
+% LCOE subplot
 ax1 = nexttile(1);
 cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
         'b:','b--',...                       % PTO
         'g:','g--','g-','g-.','g.'};  % structural
+yline(LCOE(1,1),'LineWidth',2,'Color','k','HandleVisibility','off')
 hold on
-for i=1:size(cols,2)
-    temp = LCOE(idx,:).';
-    plot(ratios_sorted,temp(i,:),cols{i})
+for i = 1:size(cols,2)
+    temp_LCOE = LCOE(idx,:).';
+    plot(ratios_sorted,temp_LCOE(i,:),cols{i})
+    hold on
 end
-%plot(ratios_sorted,LCOE(idx,:).')
-yline(0.605,'LineWidth',2,'Color','k')
-ylab1=ylabel('LCOE ($/kWh)');
-axis(ax1,[0 3 0.55 0.75])
+
+ylab1 = ylabel('LCOE ($/kWh)');
+x_range = [1/3 3];
+axis(ax1,[x_range .6 1.1])
 l = legend(b.var_names_pretty{1:end-1});
 l.Location = 'northeastoutside';
 grid on
 hold off
 
+% cost subplot
 ax2 = nexttile(2);
+yline(cost(1,1),'LineWidth',2,'Color','k')
+hold on
 for i=1:size(cols,2)
-    temp = cost(idx,:).';
-    plot(ratios_sorted,temp(i,:),cols{i})
-    hold on
+    temp_cost = cost(idx,:).';
+    plot(ratios_sorted,temp_cost(i,:),cols{i})
 end
-%plot(ratios_sorted,cost(idx,:).')
-yline(2.16098,'LineWidth',2,'Color','k')
+
 ylab2=ylabel('Structural & PTO Cost ($M)');
 grid on
 
+% shared plot
 title(t,'Design of Experiments Results','FontWeight','bold','FontSize',20)
 grid on
 linkaxes([ax1,ax2],'x');
@@ -158,3 +165,6 @@ xticks(ax2,xticks(ax1))
 improvePlot
 ylab1.FontSize=16.5;
 ylab2.FontSize=16.5;
+xlim(x_range)
+fig = gcf();
+fig.Position(3:4) = [600  666]; % make taller

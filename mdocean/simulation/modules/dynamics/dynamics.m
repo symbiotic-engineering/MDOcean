@@ -1,5 +1,5 @@
 function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ...
-    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, X_u, X_f, X_s, P_matrix_mech,...
+    P_var, P_avg_elec, P_matrix_elec, X_constraints, B_p, K_p, mag_U, X_u, X_f, X_s, P_matrix_mech,...
     A_f_over_rho, A_s_over_rho, A_c_over_rho,B_f_over_rho_w, B_s_over_rho_w,...
     B_c_over_rho_w,gamma_f_over_rho_g, gamma_s_over_rho_g,gamma_phase_f,...
     gamma_phase_s,w] = dynamics(in,m_float,m_spar,V_d,draft)
@@ -11,14 +11,14 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     Hs(zero_prob_idxs) = NaN;
 
     [P_matrix_mech,X_constraints_op,B_p,...
-        X_u,X_f,X_s,F_heave_op,...
+        K_p,mag_U,X_u,X_f,X_s,F_heave_op,...
         F_surge_op,F_ptrain_max,...
         A_f_over_rho,A_s_over_rho, A_c_over_rho,...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w] = get_power_force(in,T,Hs,m_float,m_spar,...
                                                         V_d,draft,in.F_max, ...
-                                                        zero_prob_idxs, in.T_f_1, in.power_scale_factor);
+                                                        zero_prob_idxs, in.T_f_1, in.power_scale_coeffs);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
@@ -34,9 +34,9 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
     
     % use max sea states for structural forces
     % fixme: for storms, should return excitation force, not all hydro force
-    [~,X_constraints_storm,~,~,~,~,F_heave_storm,F_surge_storm] = get_power_force(in, ...
+    [~,X_constraints_storm,~,~,~,~,~,~,F_heave_storm,F_surge_storm] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, ...
-                                0, false(size(in.T_struct)), in.T_f_2, 1);
+                                0, false(size(in.T_struct)), in.T_f_2, [1 0 0 1]);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % use all X constraints operationally, only use slamming in storm
@@ -51,12 +51,12 @@ function [F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, F_ptrain_max, ..
 
 end
 
-function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
+function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,...
           F_heave_f, F_surge, F_ptrain_max,A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w] = get_power_force(in,T,Hs, m_float, m_spar, V_d, draft, ...
-                                                            F_max, idx_constraint, T_f_slam, power_scale_factor)
+                                                            F_max, idx_constraint, T_f_slam, power_scale_coeffs)
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -91,7 +91,13 @@ function [P_matrix, X_constraints, B_p, mag_X_u, mag_X_f, mag_X_s,...
     
     % apply empirical fitted freq-dependent scale factor to adjust power from 
     % singlebody to multibody, to match RM3 report
-    P_matrix = real_P .* power_scale_factor;
+    if in.use_multibody==false
+        c = power_scale_coeffs;
+        power_scale_factor = c(1) ./ ( c(2) * T.^2 + c(3) * T + c(4) );
+        P_matrix = real_P .* power_scale_factor;
+    else
+        P_matrix = real_P * in.power_scale_multibody;
+    end
     
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
@@ -332,7 +338,7 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
     
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
-    phi_alpha = phase_v_prime - phase_v;
+    phi_alpha = 0; %phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
@@ -418,21 +424,10 @@ function [mag_U,phase_U,...
             reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
         end
     
-    %     F_err_1 = abs(mag_U ./ (F_max * alpha) - 1);
         F_err = mag_U ./ (f_sat .* mag_U_unsat) - 1;
         max_err = max(abs(F_err),[],'all');
 
     end
-
-    % 0.1 percent error
-%     if any(f_sat<1,'all')
-%         stuff = all(F_err_1(f_sat < 1) < 1e-3, 'all');
-%         if ~stuff
-%             stuff
-%         end
-%         assert(stuff);
-%     end
-%     assert(all(F_err_2 < 1e-3,'all'));
 
     % saturate position - hacky for now
     r_x = min(X_max ./ mag_X_f, 1);

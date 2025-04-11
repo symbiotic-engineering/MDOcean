@@ -19,6 +19,9 @@ if strcmpi(mode,'wecsim')
     D_f_b_over_D_f = 10/20;
     T_f_1_over_T_f_2 = 2/3;
     D_f_in_over_D_s = 6/6;
+    h = 250; % must be above .4*max(jpd_Te)^2*g/(2*pi) = 213.5 to be all deep water
+    power_coeffs = [1 0 0 1];
+    power_scale_multibody = 1;
 else
     T_s_over_D_s = 35/6;
     h_d_over_D_s = 1*in2m/6;
@@ -26,6 +29,9 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
+    h = 45;
+    power_coeffs = [22.4,1,-15,86];
+    power_scale_multibody = 0.595;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -53,7 +59,7 @@ T = [T;
     table("rho_w","\rho_w",{1000},"site",false,"water density (kg/m3)",{''});
     ...%table("mu","\mu",1e-3,"site",false,"dynamic viscosity of water (Pa s)");
     table("g","g",{g},"site",false,"acceleration of gravity (m/s2)",{''});
-    table("h","h",{100},"site",true,"water depth (m)",{''});
+    table("h","h",{h},"site",true,"water depth (m)",{''});
     table("JPD","JPD",{jpd},"site",false,...
         "joint probability distribution of wave (%)",{''});
     table("Hs","H_s",{jpd_Hs},"site",true,"significant wave height (m)",{'max'});
@@ -121,8 +127,8 @@ T = [T;
         "fixed charge rate (-), see RM3 report p63",{''});
     table("N_WEC","N_{WEC}",{100},"economics",true,"number of WECs in array (-)",{''});
     table("LCOE_max","LCOE_{max}",{1},"economics",true,"maximum LCOE ($/kWh)",{''});
-%     table("avg_power_min","P_{avg,elec,min}",{100},"economics",true,... 
-%         "minimum average electrical power (W)",{''}); % set to a negative number (not zero) to disable constraint
+    table("avg_power_min","P_{avg,elec,min}",{0},"economics",true,... 
+        "minimum average electrical power (W)",{''});
     table("eff_array","\eta_{array}",{0.95*0.98},"economics",true,...
         "array availability and transmission efficiency (-)",{''});
     table("cost_perN_mult", "$/N",{1},"economics",true,...
@@ -152,15 +158,17 @@ T = [T;
     table("C_d_float","C_{d,float}",{1},"dynamics",true,"coefficient of drag for float",{''});
     table("C_d_spar","C_{d,spar}",{1},"dynamics",true,"spar coefficient of drag",{''});
     table("eff_pto","\eta_{pto}",{0.80},"dynamics",true,"PTO efficiency (-)",{''});
-    table("power_scale_factor","P_{scale}",{23 ./ (jpd_Te.^2 - 15 * jpd_Te + 86)},"dynamics",...
-        false,"power scale factor to match RM3 report",{'max'});
+    table("power_scale_coeffs","P_{scale}",{power_coeffs},"dynamics",...
+        false,"coefficients for singlebody power scale factor to match RM3 report",{'max'});
+    table("power_scale_multibody","P_{scale,mb}",{power_scale_multibody},"dynamics",...
+        false,"scalar for multibody power scale factor to match RM3 report",{'max'});
     ...
     ...% Dynamics: simulation type
     table("control_type","control type",{'damping'},"dynamics",false,... 
         "reactive or damping",{''});
     table("use_MEEM","use_MEEM",{true},"dynamics",false,... 
         "whether to use MEEM for hydro coeffs (boolean)",{''});
-    table("use_multibody","use_multibody",{false},"dynamics",false,... 
+    table("use_multibody","use_multibody",{true},"dynamics",false,... 
         "whether to use multibody dynamics (boolean)",{''});
     ...
     ...% Dynamics: numerics and convergence

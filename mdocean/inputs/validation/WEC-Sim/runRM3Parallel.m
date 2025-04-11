@@ -107,6 +107,7 @@ delete savedLog*
 % variables to save
 timesteps_per_period = mcr.cases(:,2) / simu.dt; 
 P = zeros(length(mcr.cases(:,1)), 1);
+force_pto = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
@@ -124,17 +125,19 @@ parfor imcr=1:length(mcr.cases(:,1))
     cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,p);   
+    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
 
     % extract signals over the last period
     N_per_T = timesteps_per_period(imcr);
     power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
+    F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
     float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
     spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
     rel_pos = float_pos - spar_pos;
 
     % save specific output variables
     P(imcr) = mean(power);
+    force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
     float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
     spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
     relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
@@ -144,8 +147,9 @@ parfor imcr=1:length(mcr.cases(:,1))
     Simulink.sdi.clear
 end
 
+B_p = mcr.cases(:,3);
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','p')
+    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p')
 
 clear imcr totalNumOfWorkers
 

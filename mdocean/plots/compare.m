@@ -17,8 +17,9 @@ val_minCapex = vals_opt(2);
 
 [X_maxPower,val_maxPower] = max_avg_power(p,b);
 
-p.LCOE_max = 0.1;
-[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p,b,2);
+p_bal = p;
+p_bal.avg_power_min = b.power_balanced;
+[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p_bal,b,2)
 
 X_nom	= [b.X_noms' 1];
 [~,~,~,~,val_nom] = simulation(X_nom,p);
@@ -34,10 +35,22 @@ num_designs = length(titles);
 %% geometry comparison
 figure
 % sort by float diameter
-idx_diam = strcmp(b.var_names,'D_f');
-[~,biggest_to_smallest] = sort(X(:,idx_diam),'descend');
+idx_D_f = strcmp(b.var_names,'D_f');
+D_f = X(:,idx_D_f);
+[~,biggest_to_smallest] = sort(D_f,'descend');
 
-x = linspace(-30,30,100);
+% find x range
+idx_D_s = strcmp(b.var_names,'D_s');
+D_d = p.D_d_over_D_s * X(:,idx_D_s);
+biggest_diam = max([D_f;D_d]);
+x_max = biggest_diam/2 * 1.1;
+
+% find y range
+T_s = p.T_s_over_D_s * X(:,idx_D_s);
+y_min = -max(T_s) * 1.1;
+
+% waves
+x = linspace(-x_max,x_max,100);
 Hs = 3;
 T = 7.5;
 hold on
@@ -49,20 +62,24 @@ for i=1:num_designs
     hold on
     visualize_geometry(x,p,false,color{biggest_to_smallest(i)})
 end
-xlim([-40,40])
-legend(titles(biggest_to_smallest),'Location','east')
+xlim([-x_max,x_max])
+y_max = max([findobj(gca().Children,'Type','Line').YData]) * 1.1;
+ylim([y_min y_max])
+legend(titles(biggest_to_smallest),'Position',[0.5941    0.3508    0.2663    0.2167])
 
 %% power probability comparison
-figure
+f = figure;
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 ylabel(t,'Probability (-)','FontWeight','bold')
 for i=1:num_designs
     x = X(i,:);
     hold on
-    t = power_PDF(x,p,color{i},t);
+    t = power_PDF(x,p,color{i},t,[false true]);
 end
 legend(titles{:},'location','best')
+delete(nexttile(1)) % delete blank PDF so just CDF remains
+f.Position(3:4) = [792 484];
 
 %% power matrix comparison
 

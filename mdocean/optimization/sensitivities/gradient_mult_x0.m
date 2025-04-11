@@ -19,7 +19,7 @@ flags = ones(num_runs,num_objs);
 x0s(1) = b.X_start_struct;
 
 % 20 random ICs
-for i = 2:num_runs
+parfor i = 2:num_runs
     [x0_vec,x0] = random_x0(b);
     [~, ~, ~, feasible_lin] = is_feasible(0, x0_vec, p, b);
     x0s(i) = x0;
@@ -51,7 +51,7 @@ converged = flags > 0;
 kkt = flags == 1;
 tol = 0.001;
 optimal = abs(objs - min(objs)) < tol; % this assumes that solutions converging 
-% to the same objective have the same optimal DVs, which is not guaranteed 
+% to the same objective value have the same optimal DVs, which is not guaranteed 
 % but seems correct in this case by inspection of the table above
 
 optimal_and_converged = converged & optimal;

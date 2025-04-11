@@ -1,6 +1,9 @@
 
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
 
+warning('off','MATLAB:nearlySingularMatrix')
+warning('off','MATLAB:singularMatrix')
+
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all

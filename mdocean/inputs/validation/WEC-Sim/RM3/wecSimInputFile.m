@@ -7,14 +7,19 @@ if ~exist('p','var')
     warning('parameters were loaded from scratch')
     p = parameters();
 end
+if ~exist('X','var')
+    warning('design variables were loaded from scratch')
+    b = var_bounds();
+    X = [b.X_noms; 1];
+end
+
 if ~p.use_MEEM
     meem = 'off';
 else
     meem = num2str(p.harmonics);
 end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
-b = var_bounds();
-X = [b.X_noms; 1];
+
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 if regular
     [T,H] = meshgrid(p.T, p.Hs/sqrt(2)); % regular
@@ -31,7 +36,10 @@ save('mcrMDOcean.mat','mcr')
 % filename to save
 [~, status] = system('git status');
 if ~contains(status,'working tree clean')
-    error('you have  uncommitted changes, please commit so the wecsim settings can be referenced to the commit')
+    msg = ['you have  uncommitted changes, please commit so the wecsim ' ...
+        'settings can be referenced to the commit. Status: ' status];
+    err = MException('MDOcean:WecSim:uncommitted',msg);
+    %throw(err)
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
@@ -59,6 +67,7 @@ simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & 
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';
 simu.saveWorkspace = false;
+simu.b2b = 1;
 
 %% Wave Information 
 % % noWaveCIC, no waves with radiation CIC  
@@ -71,6 +80,7 @@ else
     waves = waveClass('irregular');
     waves.spectrumType = 'PM';                % Specify Wave Spectrum Type
 end
+waves.waterDepth = p.h;
 % waves.height = 2.5;                     % Wave Height [m]
 % waves.period = 8;                       % Wave Period [s]
 
@@ -137,10 +147,13 @@ pto(1).stiffness = 0;                           % PTO Stiffness [N/m]
 % pto(1).damping = 1200000;                       % PTO Damping [N/(m/s)]
 pto(1).location = [0 0 0];                      % PTO Location [m]
 
-
+D_s   = X(1);        % inner diameter of float (m)
+D_f   = X(2);        % outer diameter of float (m)
+D_f_in = p.D_f_in_over_D_s * D_s;
+D_d = p.D_d_over_D_s * D_s;
 body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
-body(1).quadDrag.area = [0 0 pi*(10^2-3^2) 0 0 0];
+body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
 body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
-body(2).quadDrag.area = [0 0 pi*15^2 0 0 0];
+body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
 
 

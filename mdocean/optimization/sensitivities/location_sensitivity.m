@@ -20,30 +20,32 @@ obj_opts = zeros(1,length(files));
 flags = zeros(1,length(files));
 most_common_wave = cell(1,length(files));
 BW = zeros(1,length(files));
+BW_plot_on = false;
 
-for i=1:length(files)
+parfor i=1:length(files)
+    new_p = p;
     
     jpd = trim_jpd(readmatrix(files{i}, 'Range', 'A3'));
-    p.JPD = jpd(2:end,2:end);
-    p.Hs = jpd(2:end,1);
-    p.T = jpd(1,2:end);
-    p.h = depths(i);
+    new_p.JPD = jpd(2:end,2:end);
+    new_p.Hs = jpd(2:end,1);
+    new_p.T = jpd(1,2:end);
+    new_p.h = depths(i);
 
-    b = fix_constraints(p,b);
+    new_b = fix_constraints(new_p,b);
 
-    [~,idx_most_common] = max(p.JPD,[],'all');
-    [row,col] = ind2sub(size(p.JPD),idx_most_common);
-    most_common_wave(i) = {['$H_s = ' num2str(p.Hs(row)) '$m, $T_e=' num2str(p.T(col)) '$s']};
-    BW(i) = round(find_BW(p.Hs,p.T,p.JPD),2);
+    [~,idx_most_common] = max(new_p.JPD,[],'all');
+    [row,col] = ind2sub(size(new_p.JPD),idx_most_common);
+    most_common_wave(i) = {['$H_s = ' num2str(new_p.Hs(row)) '$m, $T_e=' num2str(new_p.T(col)) '$s']};
+    BW(i) = round(find_BW(new_p.Hs,new_p.T,new_p.JPD,BW_plot_on),2);
   
-    X = b.X_start_struct;
+    X = new_b.X_start_struct;
     
     which_obj = 1; % only optimize LCOE
-    [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,p,b,which_obj);
+    [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,new_b,which_obj);
     
-    plot_power_matrix(X_opts(:,i),p)
+    plot_power_matrix(X_opts(:,i),new_p,b.filename_uuid)
     figure(2)
-    power_PDF(X_opts(:,i),p)
+    power_PDF(X_opts(:,i),new_p)
     hold on
 end
 figure(2)
@@ -77,7 +79,7 @@ pct_diff = (LCOE_hawaii_with_cali_design - obj_opts(4)) / obj_opts(4)
 
 end
 
-function delta_w = find_BW(Hs,Te,JPD)
+function delta_w = find_BW(Hs,Te,JPD,plotOn)
     [T_mesh,Hs_mesh] = meshgrid(Te,Hs);
     energy_weighted_JPD = JPD .* T_mesh .* Hs_mesh.^2;
     energy_weighted_sum = sum(energy_weighted_JPD,1);
@@ -98,12 +100,14 @@ function delta_w = find_BW(Hs,Te,JPD)
     w_half_above = interp1(P_above_pk(P_above_pk>0),w_above_pk(P_above_pk>0),P_half);
     delta_w = w_half_above - w_half_below;
 
-%     figure
-%     plot(w,P)
-%     hold on
-%     plot(w(idx_max),max_power,'mp')
-%     plot(w_half_below,P_half,'ro')
-%     plot(w_half_above,P_half,'go')
+    if plotOn
+        figure
+        plot(w,P)
+        hold on
+        plot(w(idx_max),max_power,'mp')
+        plot(w_half_below,P_half,'ro')
+        plot(w_half_above,P_half,'go')
+    end
 
 end
 

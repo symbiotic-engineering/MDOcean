@@ -59,11 +59,19 @@ function [x,fval] = pareto_search(filename_uuid)
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
-    
-    for i = 1:length(LCOE_seeds)
-        p.LCOE_max = LCOE_seeds(i);
+
+    parfor i = 1:length(LCOE_seeds)
+        new_p = p;
+        new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
-        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,p,b,which_obj);
+        new_b = b;
+        if isempty(new_b.filename_uuid)
+            t = getCurrentTask();
+            if ~isempty(t)
+                new_b.filename_uuid = num2str(t.ID);
+            end
+        end
+        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,new_b,which_obj);
         if flag_tmp == -2 % Initial pareto point is not feasible - this prevents a LPalg error in paretosearch
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
@@ -71,9 +79,9 @@ function [x,fval] = pareto_search(filename_uuid)
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
-            obj_check = objFcn2(X_opt_tmp(idxs)',{p});
+            obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
-            [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
+            [~, P_var_seeds(i)] = simulation(X_opt_tmp, new_p);
             assert(obj_tmp == P_var_seeds(i))
         end
     end
@@ -82,8 +90,6 @@ function [x,fval] = pareto_search(filename_uuid)
     X_seeds(init_failed,:) = [];
     P_var_seeds(init_failed) = [];
     LCOE_seeds(init_failed) = [];
-
-    p.LCOE_max = LCOE_max;
 
     %% Set up pareto search algorithm
     probMO = probs{1};
@@ -114,7 +120,8 @@ function [x,fval] = pareto_search(filename_uuid)
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
-        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
+        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
+        'UseParallel',true);
     if ~isempty(X0)
         probMO.options.InitialPoints = X0_struct;
     else
@@ -123,6 +130,7 @@ function [x,fval] = pareto_search(filename_uuid)
     end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
+
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
     try
@@ -167,9 +175,14 @@ function [x,fval] = pareto_search(filename_uuid)
     save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end
 
-function neg_pwr_per_capex = objFcn1new(x,oldFcn,p)
-   capex0_per_power = oldFcn(x,{p});
-   pwr_per_capex0 = 1/capex0_per_power;
-   neg_pwr_per_capex = -pwr_per_capex0;
+function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
+
+   % cost0 refers to the part of the numerator of LCOE that does not depend 
+   % on design: cost0 = capex0 + opex0
+   cost0_per_power = oldFcnLCOE(x,{p_zero_design_cost});
+   pwr_per_cost0 = 1/cost0_per_power;
+   neg_pwr_per_cost = -pwr_per_cost0;
+
    clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
+   
 end
