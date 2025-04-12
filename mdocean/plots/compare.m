@@ -148,21 +148,28 @@ function hydro_compare(vals,colors)
     dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
         ['k' 'x'],['k' 'o'],['k' '*'],['k' '.'],['w' 'o']};
     for i = 1:length(dummy_style)
-        plot(1.25,15000,dummy_style{i})
+        plot(NaN,NaN,dummy_style{i})
     end
     for i=1:length(vals)
         val = vals(i);
         col = colors{i};
-        plot(val.w, val.A_f_over_rho,      [col 'x'],...
-            val.w, val.B_f_over_rho_w,    [col 'o'],...
-            val.w, val.gamma_f_over_rho_g,[col '*'],...
-            val.w, val.gamma_phase_f,     [col '.'])
+        plot(val.w', val.A_f_over_rho.',      [col '-x'],...
+            val.w', val.B_f_over_rho_w.',    [col '--'],...
+            val.w', val.gamma_f_over_rho_g.',[col '-*'],...
+            val.w', val.gamma_phase_f.',     [col '-'])
     end
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
     legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        'A_{f}/\rho','B_{f}/\rho','\gamma_{f}/\rho','\gamma_{phase, f}'}, ...
+        'A_{f}/\rho','B_{f}/\rho','\gamma_{f}/\rho','\angle\gamma_{f}'}, ...
         'Location','best','NumColumns',2)
+    xlim([0.3,1.45])
+    ylim([-10, 26510])
     hold off
     improvePlot
+    h=findobj(gca().Children,"Type","line");
+    for j = 1:length(h)
+        h(j).MarkerSize = 5;
+        h(j).LineWidth = 1;
+    end
 end
