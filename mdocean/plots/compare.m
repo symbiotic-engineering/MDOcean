@@ -143,33 +143,66 @@ out_table = removevars(out_table,'OriginalVariableNames');
 end
 
 function hydro_compare(vals,colors)
-    figure
+  figure
     hold on
     dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-        ['k' 'x'],['k' 'o'],['k' '*'],['k' '.'],['w' 'o']};
+        ['k' '-*'],['k' '-.']};
     for i = 1:length(dummy_style)
         plot(NaN,NaN,dummy_style{i})
     end
     for i=1:length(vals)
         val = vals(i);
         col = colors{i};
-        plot(val.w', val.A_f_over_rho.',      [col '-x'],...
-            val.w', val.B_f_over_rho_w.',    [col '--'],...
-            val.w', val.gamma_f_over_rho_g.',[col '-*'],...
-            val.w', val.gamma_phase_f.',     [col '-'])
+        w=unique(val.w(~isnan(val.w)),'stable');
+        gamma_f_over_rho_g = unique(val.gamma_f_over_rho_g(~isnan(val.gamma_f_over_rho_g)),'stable');
+        gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
+        plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'],...
+            w(:,1), gamma_phase_f(:,1),     [col '-.'])
     end
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
     legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        'A_{f}/\rho','B_{f}/\rho','\gamma_{f}/\rho','\angle\gamma_{f}'}, ...
-        'Location','best','NumColumns',2)
-    xlim([0.3,1.45])
-    ylim([-10, 26510])
+        '\gamma_{f}/(\rho*g)','\angle\gamma_{f}'}, ...
+        'Location','best')
+    %xlim([0.3,1.45])
+    %ylim([-10, 26510])
     hold off
     improvePlot
     h=findobj(gca().Children,"Type","line");
     for j = 1:length(h)
-        h(j).MarkerSize = 5;
+        %h(j).MarkerSize = 6;
+        h(j).LineWidth = 1;
+    end
+
+
+    figure
+    hold on
+    dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
+        ['k' '--'],['k' '-']};
+    for i = 1:length(dummy_style)
+        plot(NaN,NaN,dummy_style{i})
+    end
+    for i=1:length(vals)
+        val = vals(i);
+        col = colors{i};
+        w=unique(val.w(~isnan(val.w)),'stable');
+        A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
+        B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
+        plot(w(:,1), A_f_over_rho(:,1),[col '--'],...
+            w(:,1), B_f_over_rho_w(:,1),     [col '-'])
+    end
+    title('Hydrodynamic Coefficients')
+    xlabel('Wave Frequency (\omega)')
+    legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
+        'A_{f}/\rho','B_{f}/(\rho*\omega)'}, ...
+        'Location','best')
+    %xlim([0.3,1.45])
+    %ylim([-10, 26510])
+    hold off
+    improvePlot
+    h=findobj(gca().Children,"Type","line");
+    for j = 1:length(h)
+        %h(j).MarkerSize = 6;
         h(j).LineWidth = 1;
     end
 end
