@@ -157,21 +157,21 @@ function hydro_compare(vals,colors)
         gamma_f_over_rho_g = unique(val.gamma_f_over_rho_g(~isnan(val.gamma_f_over_rho_g)),'stable');
         gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
         plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'],...
-            w(:,1), gamma_phase_f(:,1),     [col '-.'])
+            w(:,1), gamma_phase_f(:,1).*1000,     [col '-.'])
     end
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
-    legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        '\gamma_{f}/(\rho*g)','\angle\gamma_{f}'}, ...
-        'Location','best')
-    %xlim([0.3,1.45])
+    xlim([0.3,1.45])
     %ylim([-10, 26510])
+    leg = legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
+        '\gamma_{f}/(\rho*g)','\angle\gamma_{f}*1000'});
     hold off
     improvePlot
+    leg.Location='north';
     h=findobj(gca().Children,"Type","line");
     for j = 1:length(h)
         %h(j).MarkerSize = 6;
-        h(j).LineWidth = 1;
+        %h(j).LineWidth = 1;
     end
 
 
@@ -193,16 +193,16 @@ function hydro_compare(vals,colors)
     end
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
-    legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        'A_{f}/\rho','B_{f}/(\rho*\omega)'}, ...
-        'Location','best')
-    %xlim([0.3,1.45])
-    %ylim([-10, 26510])
+    xlim([0.3,1.45])
+    ylim([-10, 26900])
+    leg2=legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
+        'A_{f}/\rho','B_{f}/(\rho*\omega)'});
     hold off
     improvePlot
+    leg2.Location='best';
     h=findobj(gca().Children,"Type","line");
     for j = 1:length(h)
         %h(j).MarkerSize = 6;
-        h(j).LineWidth = 1;
+        %h(j).LineWidth = 1;
     end
 end
