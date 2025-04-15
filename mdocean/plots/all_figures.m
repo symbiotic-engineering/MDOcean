@@ -48,37 +48,38 @@ figs_in_paper(13) = 'read_non_matlab_figs.sim_runtime';
 figs_in_paper(14) = 'read_non_matlab_figs.optimization_flowchart';
 % 4: results
 figs_in_paper(15) = 'experiments.experiments';
-figs_in_paper(16) = 'param_sensitivities.local_global_objective';
-figs_in_paper(17) = 'param_sensitivities.local_design';
-figs_in_paper(18) = 'param_sensitivities.global_design';
-% 19-21 take out
-figs_in_paper(19) = 'pareto.pareto_front_with_design_images';
-figs_in_paper(20) = 'pareto.heuristics';
-figs_in_paper(21) = 'pareto.pareto_front_LCOE_contours';
-figs_in_paper(22) = 'pareto.constraint_activity';
-figs_in_paper(23) = 'compare.overlaid_geometry';
-figs_in_paper(24) = 'compare.overlaid_hydro_coeffs';
-figs_in_paper(25) = 'compare.probability_CDF';
+figs_in_paper(16) = 'gradient_optim.lagrange_multipliers';
+figs_in_paper(17) = 'multistart.multistart_convergence_tree';
+figs_in_paper(18) = 'param_sensitivities.local_global_objective';
+figs_in_paper(19) = 'param_sensitivities.local_design';
+figs_in_paper(20) = 'param_sensitivities.global_design';
+figs_in_paper(21) = 'pareto.pareto_front_with_design_images';
+figs_in_paper(22) = 'pareto.heuristics';
+figs_in_paper(23) = 'pareto.pareto_front_LCOE_contours';
+figs_in_paper(24) = 'pareto.constraint_activity';
+figs_in_paper(25) = 'compare.overlaid_geometry';
+figs_in_paper(26) = 'compare.overlaid_hydro_coeffs';
+figs_in_paper(27) = 'compare.probability_CDF';
 % 29 taken out due to combining pareto heuristics
-figs_in_paper(26) = 'all_fig_compare.runtime_bar_chart';
+figs_in_paper(28) = 'all_fig_compare.runtime_bar_chart';
 % appendix A- hydro
-figs_in_paper(27) = 'meem.meem_regions';
-figs_in_paper(28) = 'meem.meem_sparsity';
-figs_in_paper(29) = 'meem.meem_validation';
-figs_in_paper(30) = 'meem.meem_matching';
-figs_in_paper(31) = 'meem.meem_convergence';
-figs_in_paper(32) = 'meem.asymptotic_b_vector';
+figs_in_paper(29) = 'meem.meem_regions';
+figs_in_paper(30) = 'meem.meem_sparsity';
+figs_in_paper(31) = 'meem.meem_validation';
+figs_in_paper(32) = 'meem.meem_matching';
+figs_in_paper(33) = 'meem.meem_convergence';
+figs_in_paper(34) = 'meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_paper(33) = 'run_single.drag_convergence';
-figs_in_paper(34) = 'slamming.slamming_amplitude';
-figs_in_paper(35) = 'force_sat_results.power_force_sensitivity';
-figs_in_paper(36) = 'wecsim.wecsim_all_sea_states';
+figs_in_paper(35) = 'run_single.drag_convergence';
+figs_in_paper(36) = 'slamming.slamming_amplitude';
+figs_in_paper(37) = 'force_sat_results.power_force_sensitivity';
+figs_in_paper(38) = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-figs_in_paper(37) = 'read_non_matlab_figs.trapezoid';
-figs_in_paper(38) = 'read_non_matlab_figs.damping_plate_flowchart';
-figs_in_paper(39) = 'damping_plate_structures.damping_plate_moment';
-figs_in_paper(40) = 'damping_plate_structures.damping_plate_deflection';
-figs_in_paper(41) = 'damping_plate_structures.damping_plate_aspect_ratio';
+figs_in_paper(39) = 'read_non_matlab_figs.trapezoid';
+figs_in_paper(40) = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper(41) = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper(42) = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper(43) = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
 % appendix F - supplementary results
