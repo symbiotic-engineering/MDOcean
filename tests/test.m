@@ -29,6 +29,8 @@ classdef (SharedTestFixtures={ ...
         tab_success
         fig_output
         tab_output
+        fig_runtime
+        tab_runtime
     end
 
     % inputs for tests, including passing tolerances
@@ -44,7 +46,7 @@ classdef (SharedTestFixtures={ ...
     % helper methods to enumerate all figures and tables
     methods (Static)
         function which_fig_struct = enumerateFigs()
-            [~,~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+            [~,~,~,~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
 
             which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
@@ -54,7 +56,7 @@ classdef (SharedTestFixtures={ ...
             which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
         end
         function which_tab_struct = enumerateTabs()
-            [~,~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+            [~,~,~,~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
 
             which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
@@ -94,7 +96,7 @@ classdef (SharedTestFixtures={ ...
         end
 
         function runAllFigsTabs(testCase)
-            [~,~,~,~,num_figs,num_tabs] = all_figures( [], [] );
+            [~,~,~,~,~,~,num_figs,num_tabs] = all_figures( [], [] );
 
             all_figs = 1:num_figs;
             all_tabs = 1:num_tabs;
@@ -107,24 +109,59 @@ classdef (SharedTestFixtures={ ...
             end
 
             [f_success_run,t_success_run,...
-             f_output_run, t_output_run] = all_figures( run_figs, run_tabs, testCase.uuid );
+             f_output_run, t_output_run,...
+             f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
 
+            % store success info
             f_success = cell(1,num_figs);
             f_success(run_figs) = f_success_run;
 
             t_success = cell(1,num_tabs);
             t_success(run_tabs) = t_success_run;
 
+            % store output
             f_output = gobjects(1, num_figs);
             f_output(run_figs) = f_output_run;
 
             t_output = cell(1,num_tabs);
             t_output(run_tabs) = t_output_run;
 
+            % store runtimes
+            f_runtime = NaN(1,num_figs);
+            f_runtime(run_figs) = f_runtime_run;
+
+            t_runtime = NaN(1,num_tabs);
+            t_runtime(run_figs) = t_runtime_run;
+
+            % add runtime figure
+            try
+                times = [f_runtime t_runtime];
+                names = [];
+                runtimeFig = figure;
+                hold on
+                bar(categorical(remove_underscores(names)),times);
+                for i = 1:length(times)
+                    if times(i) == 0 || ~isfinite(times(i))
+                        plot(i,0,'rx')
+                    end
+                end
+                title('Runtime (seconds)')
+                hold off
+                improvePlot
+                f_output(30) = runtimeFig;
+            catch err
+                f_success{30} = err;
+            end
+
+
+            % assign all in property
             testCase.fig_success = f_success;
             testCase.tab_success = t_success;
             testCase.fig_output  = f_output;
             testCase.tab_output  = t_output;
+            testCase.fig_runtime = f_runtime;
+            testCase.tab_runtime = t_runtime;
+
         end
     end
 
