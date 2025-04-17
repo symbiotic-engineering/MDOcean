@@ -152,6 +152,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         if ploton
             plot_power_matrix(X_opt,p,b.filename_uuid)
             visualize_geometry(X_opt,p)
+            lagrange_multiplier_bar_chart(b,lambda)
         end
     end
     if ploton
