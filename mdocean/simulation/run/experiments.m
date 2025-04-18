@@ -2,6 +2,7 @@
 % Runs one-at-a-time design of experiments
 
 %clear;clc;close all
+function experiments()
 
 p = parameters();
 b = var_bounds();
@@ -168,3 +169,5 @@ ylab2.FontSize=16.5;
 xlim(x_range)
 fig = gcf();
 fig.Position(3:4) = [600  666]; % make taller
+
+end
