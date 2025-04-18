@@ -1,6 +1,8 @@
 % Generate all figures used in the paper
-function [fig_success,tab_success,fig_output,tab_output,...
-            num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
+function [fig_success,tab_success,...
+          fig_output, tab_output,...
+          fig_runtime,tab_runtime,...
+          num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
 
 if nargin<3
     filename_uuid = ''; % required argument for anything running gradient_optim in parallel,
@@ -26,8 +28,10 @@ fig_success = cell([1,length(which_figs)]);
 tab_success = cell([1,length(which_tabs)]);
 
 fig_output = gobjects(1, length(which_figs));
-
 tab_output(1, 1:length(which_tabs)) = {table()};
+
+fig_runtime = NaN([1,length(which_figs)]);
+tab_runtime = NaN([1,length(which_tabs)]);
 
 %% Define mapping from figures/tables to scripts
 % figure_mapping = zeros(1,num_figs);
@@ -75,13 +79,15 @@ for i = 1:length(non_matlab_figs)
     fig_names{fig_num} = fig_name;
     if any(which_figs == fig_num)
         try
+            t = tic;
             tmp_fig = figure;
             imshow(imread(fig_file),'Parent',axes(tmp_fig));
             tmp_fig.UserData = ['plots/non_matlab_figs/' fig_file(1:end-4) '.pdf'];
-            fig_output(which_figs==fig_num) = tmp_fig;
+            fig_output(which_figs==fig_num) = tmp_fig;    
         catch err
             fig_success{which_figs==fig_num} = err;
         end
+        fig_runtime(which_figs==fig_num) = toc(t);
     end
 end
 
@@ -89,12 +95,14 @@ end
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
 if any(which_figs == 6)
     try
+        t = tic;
         hydro_coeff_err()
         fig6 = gcf;
         fig_output(which_figs==6) = fig6;
     catch err
         fig_success{which_figs==6} = err;
     end
+    fig_runtime(which_figs==6) = toc(t);
 end
 
 %% figure 7, 8 - drag DF, saturation time signal
@@ -102,6 +110,7 @@ fig_names{7} = 'Fig. 7: drag describing function';
 fig_names{8} = 'Fig. 8: force saturation time signal';
 if any(which_figs == 7 | which_figs == 8)
     try
+        t = tic;
         sin_desc_fcn_demo()
         fig7 = gcf;
         fig8 = figure(fig7.Number-2);
@@ -110,12 +119,14 @@ if any(which_figs == 7 | which_figs == 8)
     catch err
         fig_success(which_figs == 7 | which_figs == 8) = {err};
     end
+    fig_runtime(which_figs == 7 | which_figs == 8) = toc(t);
 end
 
 %% figure 9 - JPD multiplication
 fig_names{9} = 'Fig. 9: JPD multiplication';
 if any(which_figs == 9)
     try
+        t = tic;
         p = parameters();
         b = var_bounds();
         X = [b.X_noms; 1];
@@ -125,17 +136,20 @@ if any(which_figs == 9)
     catch err
         fig_success{which_figs == 9} = err;
     end
+    fig_runtime(which_figs==9) = toc(t);
 end
 
 %% figure 12 - cost vs N WEC
 fig_names{12} = 'Fig. 12: cost vs N WEC';
 if any(which_figs == 12) || any(which_tabs == 1)
     try
+        t = tic;
         [~,~,~,~,tab1a,fig12] = validate_nominal_RM3('report');
         fig_output(which_figs==12) = fig12;
     catch err
         fig_success{which_figs == 12} = err;
     end
+    fig_runtime(which_figs==12) = toc(t);
 end
 
 % %% figure 14-15 - wecsim validation histograms
@@ -155,12 +169,14 @@ end
 fig_names{15} = 'Fig. 15: design space exploration';
 if any(which_figs == 15)
     try
+        t = tic;
         experiments()
         fig15 = gcf;
         fig_output(which_figs==15) = fig15;
     catch err
         fig_success{which_figs == 15} = err;
     end
+    fig_runtime(which_figs==15) = toc(t);
 end
 
 %% figure 16, 17, 18 - parameter sensitivities
@@ -169,6 +185,7 @@ fig_names{17} = 'Fig. 17: local optimal design variable parameter sensitivities'
 fig_names{18} = 'Fig. 18: global optimal design variable parameter sensitivities';
 if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     try
+        t = tic;
         param_sweep(filename_uuid)
         figTemp = gcf; % delta p global
         fig18 = figure(figTemp.Number - 2); % dx*/dp global
@@ -181,6 +198,7 @@ if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     catch err
         fig_success(which_figs == 16 | which_figs == 17 | which_figs == 18) = {err};
     end
+    fig_runtime(which_figs == 16 | which_figs == 17 | which_figs == 18) = toc(t);
 end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
@@ -190,6 +208,7 @@ fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
 fig_names{25} = 'Fig. 25: constraint activity';
 if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25)
     try
+        t = tic;
         pareto_search(filename_uuid);
         pareto_curve_heuristics()
         fig23 = gcf;
@@ -204,6 +223,7 @@ if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25
     catch err
         fig_success(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25) = {err};
     end
+    fig_runtime(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25) = toc(t);
 end
 
 %% figure 26, 27, 28 - overlaid geometry, hydro coeffs, probability CDF
@@ -212,6 +232,7 @@ fig_names{27} = 'Fig. 27: overlaid hydro coeffs';
 fig_names{28} = 'Fig. 28: probability CDF';
 if any(which_figs == 26 | which_figs == 27 | which_figs == 28) || any(which_tabs == 5 | which_tabs == 6)
     try
+        t = tic;
         [tab5,tab6] = compare(filename_uuid);
         n = gcf().Number;
         fig27 = figure(n);
@@ -223,6 +244,9 @@ if any(which_figs == 26 | which_figs == 27 | which_figs == 28) || any(which_tabs
     catch err
         fig_success(which_figs == 26 | which_figs == 27 | which_figs == 28) = {err};
     end
+    time = toc(t);
+    fig_runtime(which_figs == 26 | which_figs == 27 | which_figs == 28) = time;
+    tab_runtime(which_tabs == 5 | which_tabs == 6) = time;
 end
 
 %% figure 29 - fixme not implemented
@@ -235,12 +259,14 @@ end
 fig_names{30} = 'Fig. 30: asymptotic b vector';
 if any(which_figs == 30)
     try
+        t = tic;
         b_inf_numeric()
         fig30 = gcf;
         fig_output(which_figs==30) = fig30;
     catch err
         fig_success{which_figs==30} = err;
     end
+    fig_runtime(which_figs==30) = toc(t);
 end
 
 %% figure 31-33 - fixme not implemented
@@ -254,6 +280,7 @@ fig_names{35} = 'Fig. 35: damping plate deflection';
 fig_names{36} = 'Fig. 36: damping plate plate aspect ratio';
 if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
     try
+        t = tic;
         BoedoPrantilAnnularPlate()
         fig36 = gcf;
         fig35 = figure(fig36.Number-1);
@@ -263,7 +290,8 @@ if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
         fig_output(which_figs==36) = fig36;
     catch err
         fig_success(which_figs == 34 | which_figs == 35 | which_figs == 36) = {err};
-    end    
+    end
+    fig_runtime(which_figs == 34 | which_figs == 35 | which_figs == 36) = toc(t);
 end
 
 %% fixme: 37 to 45 not implemented, but still name the figures
@@ -276,6 +304,7 @@ empty_str = strcat('Fig._', string(find(empty_idx)));
 tab_names{1} = 'Tab. 12: validation against nominal';
 if any(which_tabs == 1)
     try
+        t = tic;
         % tab1a was generated with fig 12 above
         display(tab1a)
         [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
@@ -305,12 +334,14 @@ if any(which_tabs == 1)
     catch err
         tab_success{which_tabs == 1} = err;
     end
+    tab_runtime(which_tabs == 1) = toc(t);
 end
 
 %% table 15 - constraints table
 tab_names{2} = 'Tab. 15: constraints';
 if any(which_tabs == 2)
     try
+        t = tic;
         b = var_bounds();
         tab2 = b.constraint_names';
         display(tab2)
@@ -318,12 +349,14 @@ if any(which_tabs == 2)
     catch err
         tab_success{which_tabs == 2} = err;
     end
+    tab_runtime(which_tabs == 2) = toc(t);
 end
 
 %% table 16 - design variables table
 tab_names{3} = 'Tab. 16: design variables';
 if any(which_tabs == 3)
     try
+        t = tic;
         b = var_bounds();
         tab3 = array2table([b.X_mins b.X_noms b.X_maxs], ...
             'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', b.var_names(1:end-1));
@@ -332,24 +365,28 @@ if any(which_tabs == 3)
     catch err
         tab_success{which_tabs == 3} = err;
     end
+    tab_runtime(which_tabs == 3) = toc(t);
 end
 
 %% table 17 - parameters table
 tab_names{4} = 'Tab. 17: parameters';
 if any(which_tabs == 4)
     try
+        t = tic;
         [~,tab4] = parameters();
         display(tab4)
         tab_output{which_tabs==4} = tab4;
     catch err
         tab_success{which_tabs == 4} = err;
     end
+    tab_runtime(which_tabs == 4) = toc(t);
 end
 
 %% table 19 - optimal DVs for various designs
 tab_names{5} = 'Tab. 19: optimal DVs for various designs';
 if any(which_tabs == 5)
     try
+        t = tic;
         % computation above with figures 27-29
         display(tab5);
         tab_output{which_tabs==5} = tab5;
@@ -357,12 +394,14 @@ if any(which_tabs == 5)
     catch err
         tab_success{which_tabs == 5} = err;
     end
+    tab_runtime(which_tabs == 5) = tab_runtime(which_tabs == 5) + toc(t);
 end
 
 %% table 20 - optimal outputs for various designs
 tab_names{6} = 'Tab. 20: optimal outputs for various designs';
 if any(which_tabs == 6)
     try
+        t = tic;
         % computation above with figures 27-29
         display(tab6);
         tab_output{which_tabs==6} = tab6;
@@ -370,24 +409,28 @@ if any(which_tabs == 6)
     catch err
         tab_success{which_tabs == 6} = err;
     end
+    tab_runtime(which_tabs == 6) = tab_runtime(which_tabs == 6) + toc(t);
 end
 
 %% table 21 - convergence for different x0s
 tab_names{7} = 'Tab. 21: convergence for different x0s';
 if any(which_tabs == 7)
     try
+        t = tic;
         tab7 = gradient_mult_x0(filename_uuid);
         tab_output{which_tabs==7} = tab7;
         table2latex(tab7,[save_folder 'table_21.tex'])
     catch err
         tab_success{which_tabs == 7} = err;
     end
+    tab_runtime(which_tabs == 7) = toc(t);
 end
 
 %% table 22 - optimal DVs for 4 locations
 tab_names{8} = 'Tab. 22: optimal DVs for 4 locations';
 if any(which_tabs == 8)
     try
+        t = tic;
         tab8 = location_sensitivity(filename_uuid);
         display(tab8);
         tab_output{which_tabs==8} = tab8;
@@ -407,6 +450,7 @@ if any(which_tabs == 8)
     catch err
         tab_success{which_tabs == 8} = err;
     end
+    tab_runtime(which_tabs == 8) = toc(t);
 end
 
 
