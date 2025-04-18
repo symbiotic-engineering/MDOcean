@@ -167,7 +167,7 @@ function hydro_compare(vals,colors)
         '\gamma_{f}/(\rho*g)','\angle\gamma_{f}*1000'});
     hold off
     improvePlot
-    leg.Location='north';
+    leg.Location='best';
     h=findobj(gca().Children,"Type","line");
     for j = 1:length(h)
         %h(j).MarkerSize = 6;
@@ -194,7 +194,7 @@ function hydro_compare(vals,colors)
     title('Hydrodynamic Coefficients')
     xlabel('Wave Frequency (\omega)')
     xlim([0.3,1.45])
-    ylim([-10, 26900])
+    %ylim([-10, 26900])
     leg2=legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
         'A_{f}/\rho','B_{f}/(\rho*\omega)'});
     hold off
