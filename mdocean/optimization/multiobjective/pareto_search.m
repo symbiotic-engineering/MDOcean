@@ -9,6 +9,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     idxs = b.idxs_sort;
     num_DVs = length(b.X_starts);
     
+    turnLCOEtoPower = true;
     objFcnName = 'generatedObjective';
     objFcn1 = str2func([objFcnName b.obj_names{1}]);
     objFcn2 = str2func([objFcnName b.obj_names{2}]);
@@ -21,9 +22,17 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     LCOE_max = p.LCOE_max;
     LCOE_min = objs_opt(1);
     P_var_min = objs_opt(2);
+    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
+
+    % max power seed
+    if turnLCOEtoPower
+        [X_opt_pwr,val,flag_max_pwr] = max_avg_power(p,b);
+        X_opt(:,end+1) = X_opt_pwr;
+        fvals_opt(end+1,:) = [val.LCOE val.J_capex_design];
+        flag_opt(end+1) = flag_max_pwr;
+    end
 
     % remove infeasible single-objective optima
-    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
     single_obj_failed = flag_opt == -2;
     X_opt(:,single_obj_failed) = [];
     fvals_opt(single_obj_failed,:) = [];
@@ -43,10 +52,10 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     if LCOE_max < LCOE_min
         LCOE_max = 2*LCOE_min;
     end
-    num_seeds = 8;
-    LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
-    LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
-    LCOE_seeds = [LCOE_seeds(1) (LCOE_seeds(1)+LCOE_seeds(2))/2 LCOE_seeds(2:end)]; % add extra seed between first and second to fill gap there
+    num_seeds = 20;
+    theta = linspace(0,pi/2,num_seeds+2);
+    theta = theta(2:end-1);
+    LCOE_seeds = LCOE_min + (1-sin(theta))*(LCOE_max-LCOE_min);
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
@@ -78,13 +87,30 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
 
     %% Set up pareto search algorithm
     probMO = probs{1};
-    scale = [10 0.1];
+    scale = [10 1];
     
-    probMO.objective = @(x)[objFcn1(x,{p})*scale(1), objFcn2(x,{p})*scale(2)];
+    if turnLCOEtoPower
+        p_zero_design_cost = p;
+        % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
+        p_zero_design_cost.cost_perN_mult = 0;
+        p_zero_design_cost.cost_perW_mult = 0;
+        p_zero_design_cost.cost_perkg_mult = [0 0 0];
+
+        objFcn1Revised = @(x)objFcn1new(x,objFcn1,p_zero_design_cost);
+        scale(1) = 1;
+    else
+        objFcn1Revised = @(x)objFcn1(x,{p});
+    end
+
+    probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
     
     X0 = [X_0; X_opt(idxs,:)'; X_seeds];
     fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
+
+    if turnLCOEtoPower
+        X0_struct.Fvals = [];
+    end
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
@@ -121,6 +147,12 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     hold on
     
     plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
+
+    if turnLCOEtoPower
+        for i=1:length(fval)
+            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
+        end
+    end
 
     fval = fval ./ repmat(scale,length(fval),1);
 
@@ -170,6 +202,14 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
     save('optimization/multiobjective/pareto_search_results',"fval","x","residuals",...
     "lambda")
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
+end
+
+function neg_pwr_per_capex = objFcn1new(x,oldFcn,p)
+   capex0_per_power = oldFcn(x,{p});
+   pwr_per_capex0 = 1/capex0_per_power;
+   neg_pwr_per_capex = -pwr_per_capex0;
+   clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)

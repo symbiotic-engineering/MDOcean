@@ -1,3 +1,4 @@
+% called by r_k_zeta - has been replaced by get_dynamic_coeffs  / get_dynamic_coeffs_MEEM
 function [w,A,B,K,Fd,k,drag_const,mag_v0] = dynamics_simple(Hs, T, D_f, T_f, D_s, T_s, h, C_d, rho_w, g, use_MEEM, harmonics, hydro)
     w = 2*pi./T;        % angular frequency
     k = w.^2 / g;       % wave number (dispersion relation for deep water)

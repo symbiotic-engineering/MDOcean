@@ -11,14 +11,33 @@ import matlab.unittest.constraints.ContainsSubstring
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-if exist('../WEC-Sim','dir')
+warning('off','MATLAB:nearlySingularMatrix')
+
+run_wecsim_validation = false;
+
+if run_wecsim_validation && exist('../WEC-Sim','dir')
+    warning('off','MATLAB:contour:ConstantData')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
+    cd("mdocean")
+    try
+        tic
+        [singlebody, multibody, report, tab] = validate_dynamics();
+        wecsim_runtime = toc;
+        fprintf('WecSim took %g minutes',wecsim_runtime/60)
+        save('wecsimresults_all','singlebody','multibody','report','tab')
+    catch err
+        warning( "wecsim failed: " + newline + getReport(err,"extended"))
+    end
+    warning('on','MATLAB:contour:ConstantData')
+    cd("..")
 end
 
 suite = testsuite('tests');
-suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
+if ~run_wecsim_validation
+    suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
+end
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
@@ -46,12 +65,18 @@ runner.addPlugin(p4);
 
 runner.ArtifactsRootFolder = test_dir;
 
+tic
 results = runner.runInParallel(suite);
+clockTime = toc;
 
 if ~batchStartupOptionUsed % don't open reports when running on CI server 
     open([cov_dir '/coverageReport/index.html'])
     open([test_dir '/testreport.pdf'])
 end
 
+fig = optim_time_bar_chart(suite,results);
+save_pdf(fig,'test-results/Figure_30.pdf')
+
 display(results);
+fprintf('Testing took %g minutes',clockTime/60)
 assertSuccess(results);
