@@ -1,4 +1,4 @@
-function figOut = optim_time_bar_chart(suite,results)
+function figOut = unittest_time_bar_chart(suite,results)
 
 full_names = {results.Name};
 times = [results.Duration];
