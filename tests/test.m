@@ -131,7 +131,7 @@ classdef (SharedTestFixtures={ ...
             f_runtime(run_figs) = f_runtime_run;
 
             t_runtime = NaN(1,num_tabs);
-            t_runtime(run_figs) = t_runtime_run;
+            t_runtime(run_tabs) = t_runtime_run;
 
             % add runtime figure
             try
