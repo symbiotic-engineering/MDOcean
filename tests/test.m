@@ -148,9 +148,9 @@ classdef (SharedTestFixtures={ ...
                 title('Runtime (seconds)')
                 hold off
                 improvePlot
-                f_output(30) = runtimeFig;
+                f_output(31) = runtimeFig;
             catch err
-                f_success{30} = err;
+                f_success{31} = err;
             end
 
 
