@@ -19,8 +19,14 @@ cat "$MATLAB_FILE"
 # The lines of code to insert
 CODE_TO_INSERT="if isRowOriented\n    nonlinCineq = nonlinCineq.';\n    nonlinCeq = nonlinCeq.';\nend"
 
-# Insert the code at line 17
-sed -i "17i\\$CODE_TO_INSERT" "$MATLAB_FILE"
+# Check if the code block is already in the file
+if grep -Fq "if isRowOriented" "$MATLAB_FILE"; then
+    echo "Code block already present. Skipping insertion."
+else
+    echo "Inserting code block..."
+    # Insert code at line 17
+    sed -i "17i\\$CODE_TO_INSERT" "$MATLAB_FILE"
+fi
 
 # Print new contents of the file to verify the changes
 echo "New contents of the file:"
