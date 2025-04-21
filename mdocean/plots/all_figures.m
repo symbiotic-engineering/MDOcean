@@ -180,13 +180,13 @@ if any(which_figs == 15)
 end
 
 %% figure 16, 17, 18 - parameter sensitivities
-fig_names{16} = 'Fig. 16: local and global objective parameter sensitivities';
-fig_names{17} = 'Fig. 17: local optimal design variable parameter sensitivities';
-fig_names{18} = 'Fig. 18: global optimal design variable parameter sensitivities';
+fig_names{16} = 'Fig. 16: post-optimality and re-optimization dJ*/dp sensitivities';
+fig_names{17} = 'Fig. 17: post-optimality dx*/dp sensitivities';
+fig_names{18} = 'Fig. 18: re-optimization dx*/dp sensitivities';
 if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     try
         t = tic;
-        param_sweep(filename_uuid)
+        [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid);
         figTemp = gcf; % delta p global
         fig18 = figure(figTemp.Number - 2); % dx*/dp global
         fig17 = figure(figTemp.Number - 3); % dx*/dp local
@@ -195,10 +195,14 @@ if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
         fig_output(which_figs==17) = fig17;
         fig_output(which_figs==18) = fig18;
         % fixme: 19 through 21 not implemented
+        fig_runtime(which_figs==17) = runtimeLocal;
+        fig_runtime(which_figs==18) = runtimeGlobal;
+        fig_runtime(which_figs==16) = runtimeLocal + runtimeGlobal;
     catch err
         fig_success(which_figs == 16 | which_figs == 17 | which_figs == 18) = {err};
+        fig_runtime(which_figs == 16 | which_figs == 17 | which_figs == 18) = toc(t);
     end
-    fig_runtime(which_figs == 16 | which_figs == 17 | which_figs == 18) = toc(t);
+    
 end
 
 %% figure 22, 23, 24, 25, 26 - pareto front, design heuristics

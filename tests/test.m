@@ -145,20 +145,31 @@ classdef (SharedTestFixtures={ ...
             % add runtime figure
             try
                 times = [f_runtime t_runtime];
-                names = remove_underscores([fig_names tab_names]);
-                
+
+                idx_plot = false([1,length(times)]);
+                idx_plot([15 17 18 22 26 end-1 end]) = true;
+                times_plot = times(idx_plot)/60;
+
+                %names = remove_underscores([fig_names tab_names]);
+                %names = names(idx_plot);
+                names = {'Fig. 15: design space exploration',...
+                    'Figs. 44-45: post-optimality parameter sensitivities',...
+                    'Figs. 22-23, 46: re-optimization parameter sensitivities',...
+                    'Figs. 24-27: pareto front',...
+                    'Figs. 16-18: single objective optimization comparisons',...
+                    'Fig. 21: multi-start',...
+                    'Tab. 21: location sensitivity'};
+                names = reordercats(categorical(names),names);
+
                 runtimeFig = figure;
                 hold on
-                idx_plot = false([1,length(times)]);
-                idx_plot([15 16 22 26 end-1 end]) = true;
-                names = reordercats(categorical(names(idx_plot)),names(idx_plot));
-                bar(names,times(idx_plot));
-                for i = 1:length(times)
-                    if times(i) == 0 || ~isfinite(times(i))
+                bar(names,times_plot);
+                for i = 1:length(times_plot)
+                    if times_plot(i) == 0 || ~isfinite(times_plot(i))
                         plot(i,0,'rx')
                     end
                 end
-                title('Runtime (seconds)')
+                title('Runtime (minutes)')
                 hold off
                 improvePlot
                 set(runtimeFig,"Position",[1 41 1536 845])

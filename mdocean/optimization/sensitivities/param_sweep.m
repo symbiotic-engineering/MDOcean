@@ -1,4 +1,4 @@
-function [] = param_sweep(filename_uuid)
+function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
 
     %% Setup
     b = var_bounds();
@@ -30,26 +30,26 @@ function [] = param_sweep(filename_uuid)
     
     %% Obtain normalized local sensitivity 
     disp('done optimizing, starting local param sensitivity')
-    tic
+    t = tic;
     [par_x_star_par_p_local, ...
      dJ_star_dp_lin_local, dJ_star_dp_quad_local, ...
      par_J_par_p_local, ...
      delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, J0, p, params, p_val, p_idxs, ...
                                                                     lambdas, grads, hesses, num_constr_nl);
-    toc
+    runtimeLocal = toc(t);
 
     %% Obtain normalized global sensitivity
     disp('done local, starting global param sensitivity')
-    tic
+    t = tic;
     [par_x_star_par_p_global, dJstar_dp_global, ...
         delta_p_change_activity_global] = global_sens_all_param(params, param_names, p_val, ...
                                                                 x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                 p, b, colors, groups);
-    toc
+    runtimeGlobal = toc(t);
 
     %% Post processing
     dJdp_combined = [par_J_par_p_local; dJ_star_dp_quad_local; dJ_star_dp_lin_local; dJstar_dp_global];
-    dJdp_names = {'local partial','local total linear','local total quadratic','global'};
+    dJdp_names = {'partial','total linear','total quadratic','re-optimization'};
     
     % color grid plots
     % fig 1: dJ*/dp combined
