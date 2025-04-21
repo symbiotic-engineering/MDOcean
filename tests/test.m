@@ -113,6 +113,14 @@ classdef (SharedTestFixtures={ ...
              f_output_run, t_output_run,...
              f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
 
+            % comment above and uncomment below to dry run
+%             f_success_run = cell([1,length(run_figs)]);
+%             t_success_run = cell([1,length(run_tabs)]);
+%             f_output_run = gobjects(1,length(run_figs));
+%             t_output_run = cell([1,length(run_tabs)]);
+%             f_runtime_run = rand([1,length(run_figs)]);
+%             t_runtime_run = rand([1,length(run_tabs)]);
+
             % store success info
             f_success = cell(1,num_figs);
             f_success(run_figs) = f_success_run;
@@ -137,10 +145,14 @@ classdef (SharedTestFixtures={ ...
             % add runtime figure
             try
                 times = [f_runtime t_runtime];
-                names = [fig_names tab_names];
+                names = remove_underscores([fig_names tab_names]);
+                
                 runtimeFig = figure;
                 hold on
-                bar(categorical(remove_underscores(names)),times);
+                idx_plot = false([1,length(times)]);
+                idx_plot([15 16 22 26 end-1 end]) = true;
+                names = reordercats(categorical(names(idx_plot)),names(idx_plot));
+                bar(names,times(idx_plot));
                 for i = 1:length(times)
                     if times(i) == 0 || ~isfinite(times(i))
                         plot(i,0,'rx')
@@ -149,6 +161,7 @@ classdef (SharedTestFixtures={ ...
                 title('Runtime (seconds)')
                 hold off
                 improvePlot
+                set(runtimeFig,"Position",[1 41 1536 845])
                 f_output(31) = runtimeFig;
             catch err
                 f_success{31} = err;
