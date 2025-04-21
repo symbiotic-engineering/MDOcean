@@ -3,14 +3,14 @@ function plot_power_matrix(X,p,filename_uuid)
 [CW_over_CW_max, P_wave, CW_max, P_elec] = check_max_CW(filename_uuid, X, p);
 
 [T,Hs] = meshgrid(p.T,p.Hs);
-figure
+fig = figure;
 
 % subplot(2,6,1)
 % sub_one = subplot(261);
 % sub_one.Position = [0.06, 0.5838, 0.12, 0.3412];
 % contourf(sub_one,T,Hs,P_wave);
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % title('Raw Wave Power Density (W/m)', 'FontSize', 10, 'Position', [11, 7, 0])
 % colorbar
 % 
@@ -24,8 +24,8 @@ figure
 % sub_three = subplot(263);
 % sub_three.Position = [0.36, 0.5838, 0.12, 0.3412];
 % contourf(sub_three,T,Hs,CW_over_CW_max)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % title('Device Capture Efficiency','FontSize',10, 'Position', [11.75, 7, 0])
 % colorbar
 % 
@@ -39,8 +39,8 @@ figure
 % sub_five = subplot(265);
 % sub_five.Position = [0.68, 0.5838, 0.12, 0.3412];
 % contourf(sub_five,T,Hs,CW_max)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % title('Radiation Capture Width Limit (m)','FontSize',10, 'Position', [11.75, 7, 0])
 % colorbar
 % 
@@ -54,8 +54,8 @@ figure
 % sub_seven = subplot(267);
 % sub_seven.Position = [0.1, 0.1100, 0.12, 0.3412];
 % contourf(sub_seven,T,Hs,p.JPD)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % title('Probability at Site (%)','FontSize',10)
 % colorbar
 % 
@@ -71,8 +71,8 @@ figure
 % P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
 % eff = P_elec ./ P_product;
 % contourf(sub_nine,T,Hs,eff)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % title('Efficiency','FontSize',10)
 % colorbar
 % 
@@ -85,8 +85,8 @@ figure
 % sub_eleven.Position=[0.756, 0.1100, 0.12, 0.3412];
 % P_product_new = P_product .* eff;
 % contourf(sub_eleven,T,Hs,P_product_new)
-% xlabel('Wave Period T (s)')
-% ylabel('Wave Height Hs (m)')
+% xlabel('Wave Period T_e (s)')
+% ylabel('Wave Height H_s (m)')
 % colorbar
 
 
@@ -94,24 +94,24 @@ t = tiledlayout(2,12);
 %t.TileSpacing = 'compact';
 %t.Padding = 'compact';
 nexttile([1 3])
-contourf(T,Hs,P_wave);
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Raw Wave Power Density (W/m)', 'FontSize', 10, 'Position', [11, 7, 0])
+contourf(T,Hs,P_wave/1000);
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
+title('Raw Wave Power Density (kW/m)', 'FontSize', 10, 'Position', [11, 7, 0])
 c = colorbar;
-c.Position(1) = c.Position(1)-0.025;
-c.Position(3) = c.Position(3)/2.7;
-c.Position(4) = c.Position(4)/1.09;
+% c.Position(1) = c.Position(1)-0.025;
+% c.Position(3) = c.Position(3)/2.7;
+% c.Position(4) = c.Position(4)/1.09;
 
 nexttile
 text(0.5,0.5,'x','FontSize',50)
 axis off
 
 nexttile([1 3])
-contourf(T,Hs,CW_over_CW_max)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Device Capture Efficiency','FontSize',10, 'Position', [11.75, 7, 0])
+contourf(T,Hs,CW_over_CW_max*100)
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
+title('Device Capture Efficiency (%)','FontSize',10, 'Position', [11.75, 7, 0])
 colorbar
 
 nexttile
@@ -120,8 +120,8 @@ axis off
 
 nexttile([1 3])
 contourf(T,Hs,CW_max)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
 title('Radiation Capture Width Limit (m)','FontSize',10, 'Position', [11.75, 7, 0])
 colorbar
 
@@ -130,11 +130,12 @@ text(0.55,0.5,'x','FontSize',50)
 axis off
 
 nexttile([1 3])
-p.JPD(p.JPD>0 & p.JPD < .001) = 0;
-contourf(T,Hs,p.JPD)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Probability at Site (%)','FontSize',10)
+P_mech = P_wave .* CW_over_CW_max .* CW_max;
+eff = P_elec ./ P_mech; % 0-1
+contourf(T,Hs,eff*100)
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
+title('Efficiency (%)','FontSize',10)
 colorbar
 
 nexttile
@@ -142,12 +143,13 @@ text(0.52,0.5, 'x','FontSize',50)
 axis off
 
 nexttile([1 3])
-P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
-eff = P_elec ./ P_product;
-contourf(T,Hs,eff)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Efficiency','FontSize',10)
+p.JPD(p.JPD>0 & p.JPD < .001) = 0;
+hrs_in_yr = 8766;
+hours = p.JPD/100 * hrs_in_yr;
+contourf(T,Hs,p.JPD)
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
+title('Probability at Site (%)','FontSize',10)
 colorbar
 
 nexttile
@@ -155,12 +157,15 @@ text(0.52,0.5, '=','FontSize',50)
 axis off
 
 nexttile([1 3])
-P_product_new = P_product .* eff;
-contourf(T,Hs,P_product_new)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
+energy = P_elec .* hours;
+contourf(T,Hs,energy/1e6)
+xlabel('Wave Period T_e (s)')
+ylabel('Wave Height H_s (m)')
+title('Annual Energy Production (MWh)')
 colorbar
 
 improvePlot
+
+set(fig,'Position',[95 123 1370 700])
 
 end
