@@ -96,7 +96,8 @@ classdef (SharedTestFixtures={ ...
         end
 
         function runAllFigsTabs(testCase)
-            [~,~,~,~,~,~,num_figs,num_tabs] = all_figures( [], [] );
+            [~,~,~,~,~,~,num_figs,num_tabs,...
+                fig_names,tab_names] = all_figures( [], [] );
 
             all_figs = 1:num_figs;
             all_tabs = 1:num_tabs;
@@ -136,7 +137,7 @@ classdef (SharedTestFixtures={ ...
             % add runtime figure
             try
                 times = [f_runtime t_runtime];
-                names = [];
+                names = [fig_names tab_names];
                 runtimeFig = figure;
                 hold on
                 bar(categorical(remove_underscores(names)),times);
