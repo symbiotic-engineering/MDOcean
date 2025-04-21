@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Path to the target MATLAB script
-MATLAB_FILE="/opt/hostedtoolcache/MATLAB/2024.2.999/x64/toolbox/globaloptim/+globaloptim/+internal/@FcnEvaluator/evaluate_constr_obj_on_feasible_parallel.m"
+# for github runner
+# MATLAB_FILE="/opt/hostedtoolcache/MATLAB/2024.2.999/x64/toolbox/globaloptim/+globaloptim/+internal/@FcnEvaluator/evaluate_constr_obj_on_feasible_parallel.m"
+# for self hosted runner
+MATLAB_FILE="/home/becca/Documents/git/actions-runner/_work/_tool/MATLAB/2024.2.999/x64/toolbox/globaloptim/+globaloptim/+internal/@FcnEvaluator/evaluate_constr_obj_on_feasible_parallel.m"
 
 # Check if the file exists
 if [ ! -f "$MATLAB_FILE" ]; then
