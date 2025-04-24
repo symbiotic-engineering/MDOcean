@@ -53,7 +53,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
-    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 matl];
+    X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
     [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
@@ -109,7 +109,6 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs]
             error('x0 input struct has wrong size')
         end
           
-        x0
         [X_opt_raw,obj_opt,flag,...
             output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
@@ -129,7 +128,6 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs]
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-<<<<<<< HEAD
         [out(1),out(2),~,g] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
@@ -138,10 +136,10 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs]
         objs_opt(i) = obj_opt;
         flags(i) = flag;
         if i==1
-            vals = val;
+            %vals = val;
             lambdas = lambda;
         else
-            vals(i) = val;
+            %vals(i) = val;
             lambdas(i) = lambda;
         end
         grads(:,i) = grad;
