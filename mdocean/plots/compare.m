@@ -167,8 +167,8 @@ title('Hydrodynamic Coefficients')
 xlabel('Wave Frequency (\omega)')
 xlim([0.3,1.45])
 %ylim([-10, 26510])
-leg = legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-    '\gamma_{f}/(\rho*g)','\angle\gamma_{f}'});
+leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
+    '\gamma_{f}/(\rhog)','\angle\gamma_{f}'});
 hold off
 improvePlot
 leg.Location='best';
@@ -199,8 +199,8 @@ title('Hydrodynamic Coefficients')
 xlabel('Wave Frequency (\omega)')
 xlim([0.3,1.45])
 %ylim([-10, 26900])
-leg2=legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-    'A_{f}/\rho','B_{f}/(\rho*\omega)'});
+leg2=legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
+    'A_{f}/\rho','B_{f}/(\rho\omega)'});
 hold off
 improvePlot
 leg2.Location='best';
