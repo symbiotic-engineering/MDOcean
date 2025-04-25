@@ -90,10 +90,8 @@ fig = figure;
 % colorbar
 
 
-t = tiledlayout(2,12);
-%t.TileSpacing = 'compact';
-%t.Padding = 'compact';
-nexttile([1 3])
+t = tiledlayout(2,9);
+nexttile([1 2])
 contourf(T,Hs,P_wave/1000);
 xlabel('Wave Period T_e (s)')
 ylabel('Wave Height H_s (m)')
@@ -103,11 +101,11 @@ c = colorbar;
 % c.Position(3) = c.Position(3)/2.7;
 % c.Position(4) = c.Position(4)/1.09;
 
-nexttile
-text(0.5,0.5,'x','FontSize',50)
+nexttile;
+text(0,0.5,'x','FontSize',40)
 axis off
 
-nexttile([1 3])
+nexttile([1 2])
 contourf(T,Hs,CW_over_CW_max*100)
 xlabel('Wave Period T_e (s)')
 ylabel('Wave Height H_s (m)')
@@ -115,10 +113,10 @@ title('Device Capture Efficiency (%)','FontSize',10, 'Position', [11.75, 7, 0])
 colorbar
 
 nexttile
-text(0.5,0.5,'x','FontSize',50)
+text(0,0.5,'x','FontSize',40)
 axis off
 
-nexttile([1 3])
+nexttile([1 2])
 contourf(T,Hs,CW_max)
 xlabel('Wave Period T_e (s)')
 ylabel('Wave Height H_s (m)')
@@ -126,10 +124,10 @@ title('Radiation Capture Width Limit (m)','FontSize',10, 'Position', [11.75, 7, 
 colorbar
 
 nexttile
-text(0.55,0.5,'x','FontSize',50)
+text(0,0.5,'x','FontSize',40)
 axis off
 
-nexttile([1 3])
+nexttile([1 2])
 P_mech = P_wave .* CW_over_CW_max .* CW_max;
 eff = P_elec ./ P_mech; % 0-1
 contourf(T,Hs,eff*100)
@@ -139,10 +137,10 @@ title('Efficiency (%)','FontSize',10)
 colorbar
 
 nexttile
-text(0.52,0.5, 'x','FontSize',50)
+text(0,0.5, 'x','FontSize',40)
 axis off
 
-nexttile([1 3])
+nexttile([1 2])
 p.JPD(p.JPD>0 & p.JPD < .001) = 0;
 hrs_in_yr = 8766;
 hours = p.JPD/100 * hrs_in_yr;
@@ -153,10 +151,10 @@ title('Probability at Site (%)','FontSize',10)
 colorbar
 
 nexttile
-text(0.52,0.5, '=','FontSize',50)
+text(0,0.5, '=','FontSize',40)
 axis off
 
-nexttile([1 3])
+nexttile([1 2])
 energy = P_elec .* hours;
 contourf(T,Hs,energy/1e6)
 xlabel('Wave Period T_e (s)')
