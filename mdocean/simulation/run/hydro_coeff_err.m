@@ -72,16 +72,28 @@ R2 = [R2_A R2_B R2_G R2_Gph];
 if plot_on
     %% coeff comparison validation figure
     fig = figure;
-    plot(w,A,'--',w,B,'--',w,gamma,'--',w,gamma_ph*-1e3,'--','LineWidth',3,'HandleVisibility','off')
     hold on
+    colors = ["#000000" "#7E2F8E"];
+    colororder(colors)
+    yyaxis left
+    plot(w,A,'--','color',[0 0.4470 0.7410],'Linewidth',3,'HandleVisibility','off')
+    plot(w,B,'--','color',[0.8500 0.3250 0.0980], 'LineWidth',3,'HandleVisibility','off')
+    plot(w,gamma,'--','color',[0.9290 0.6940 0.1250],'LineWidth',3,'HandleVisibility','off')
+    yyaxis right
+    plot(w,gamma_ph,'--','color',[0.4940 0.1840 0.5560],'LineWidth',3,'HandleVisibility','off')
     set(gca,"ColorOrderIndex",1)
     % gamma_ph_MDOcean = B_MDOcean .* w ./ A_MDOcean; % random idea that
     %  gamma phase just comes from Bw/A which is the radiation phase - doesn't work
-    plot(w,A_MDOcean,w,B_MDOcean,w,gamma_MDOcean,w,gamma_ph_MDOcean*-1e3)
-    ylim([0 4000])
+    yyaxis left
+    plot(w,A_MDOcean,'-','color',[0 0.4470 0.7410],'LineWidth',3)
+    plot(w,B_MDOcean,'-','color',[0.8500 0.3250 0.0980],'Linewidth',3)
+    plot(w,gamma_MDOcean,'-','color',[0.9290 0.6940 0.1250],'Linewidth',3)
+    yyaxis right
+    plot(w,gamma_ph_MDOcean,'-','color',[0.4940 0.1840 0.5560],'Linewidth',3)
+    %ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
     leg = legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force Magnitude |\gamma|/(\rhog)',...
-        '-1000*Excitation Phase -\angle\gamma',...
+        'Excitation Phase -\angle\gamma',...
         'MDOcean Simulation (Semi-Analytical MEEM)','"Ground Truth" Simulation (WAMIT BEM)');
     title('Normalized Hydrodynamic Coefficients')
     xlabel('Wave frequency \omega (rad/s)')
