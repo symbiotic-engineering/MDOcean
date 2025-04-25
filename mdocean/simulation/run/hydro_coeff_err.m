@@ -85,10 +85,12 @@ if plot_on
     % gamma_ph_MDOcean = B_MDOcean .* w ./ A_MDOcean; % random idea that
     %  gamma phase just comes from Bw/A which is the radiation phase - doesn't work
     yyaxis left
+    ylim([0,4000])
     plot(w,A_MDOcean,'-','color',[0 0.4470 0.7410],'LineWidth',3)
     plot(w,B_MDOcean,'-','color',[0.8500 0.3250 0.0980],'Linewidth',3)
     plot(w,gamma_MDOcean,'-','color',[0.9290 0.6940 0.1250],'Linewidth',3)
     yyaxis right
+    ylim([-1.8,1.1])
     plot(w,gamma_ph_MDOcean,'-','color',[0.4940 0.1840 0.5560],'Linewidth',3)
     %ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
