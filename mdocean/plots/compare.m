@@ -85,11 +85,11 @@ f.Position(3:4) = [792 484];
 
 figure
 for i=1:num_designs
-    x = X(i,:);   
+    x = X(i,:);
     [~,~,P_matrix] = simulation(x, p);
     P_matrix = P_matrix / 1e3; % convert W to kW
-    [T,Hs] = meshgrid(p.T,p.Hs); 
-    
+    [T,Hs] = meshgrid(p.T,p.Hs);
+
     subplot(2,3,i);
     hold on
     contourf(T,Hs,P_matrix .* p.JPD/100)
@@ -126,10 +126,10 @@ text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
 hydro_compare(vals,color)
-    
+
 %% design variable table
 DV_table = array2table(X.', ...
-        'VariableNames',titles, 'RowNames', b.var_names_pretty);
+    'VariableNames',titles, 'RowNames', b.var_names_pretty);
 
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
@@ -143,66 +143,70 @@ out_table = removevars(out_table,'OriginalVariableNames');
 end
 
 function hydro_compare(vals,colors)
-  figure
-    hold on
-    dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-        ['k' '-*'],['k' '-.']};
-    for i = 1:length(dummy_style)
-        plot(NaN,NaN,dummy_style{i})
-    end
-    for i=1:length(vals)
-        val = vals(i);
-        col = colors{i};
-        w=unique(val.w(~isnan(val.w)),'stable');
-        gamma_f_over_rho_g = unique(val.gamma_f_over_rho_g(~isnan(val.gamma_f_over_rho_g)),'stable');
-        gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
-        plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'],...
-            w(:,1), gamma_phase_f(:,1).*1000,     [col '-.'])
-    end
-    title('Hydrodynamic Coefficients')
-    xlabel('Wave Frequency (\omega)')
-    xlim([0.3,1.45])
-    %ylim([-10, 26510])
-    leg = legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        '\gamma_{f}/(\rho*g)','\angle\gamma_{f}*1000'});
-    hold off
-    improvePlot
-    leg.Location='best';
-    h=findobj(gca().Children,"Type","line");
-    for j = 1:length(h)
-        %h(j).MarkerSize = 6;
-        %h(j).LineWidth = 1;
-    end
+figure
+subplot(1,2,1)
+hold on
+dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
+    ['k' '-*'],['c' '-.']};
+for i = 1:length(dummy_style)
+    plot(NaN,NaN,dummy_style{i})
+end
+colororder({'k','c'})
+for i=1:length(vals)
+    val = vals(i);
+    col = colors{i};
+    w=unique(val.w(~isnan(val.w)),'stable');
+    gamma_f_over_rho_g = unique(val.gamma_f_over_rho_g(~isnan(val.gamma_f_over_rho_g)),'stable');
+    gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
+    yyaxis left
+    plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'])
+    yyaxis right
+    plot(w(:,1), gamma_phase_f(:,1),     [col '-.'])
+end
+title('Hydrodynamic Coefficients')
+xlabel('Wave Frequency (\omega)')
+xlim([0.3,1.45])
+%ylim([-10, 26510])
+leg = legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
+    '\gamma_{f}/(\rho*g)','\angle\gamma_{f}'});
+hold off
+improvePlot
+leg.Location='best';
+h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
+end
 
 
-    figure
-    hold on
-    dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-        ['k' '--'],['k' '-']};
-    for i = 1:length(dummy_style)
-        plot(NaN,NaN,dummy_style{i})
-    end
-    for i=1:length(vals)
-        val = vals(i);
-        col = colors{i};
-        w=unique(val.w(~isnan(val.w)),'stable');
-        A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
-        B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
-        plot(w(:,1), A_f_over_rho(:,1),[col '--'],...
-            w(:,1), B_f_over_rho_w(:,1),     [col '-'])
-    end
-    title('Hydrodynamic Coefficients')
-    xlabel('Wave Frequency (\omega)')
-    xlim([0.3,1.45])
-    %ylim([-10, 26900])
-    leg2=legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
-        'A_{f}/\rho','B_{f}/(\rho*\omega)'});
-    hold off
-    improvePlot
-    leg2.Location='best';
-    h=findobj(gca().Children,"Type","line");
-    for j = 1:length(h)
-        %h(j).MarkerSize = 6;
-        %h(j).LineWidth = 1;
-    end
+subplot(1,2,2)
+hold on
+dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
+    ['k' '--'],['k' '-']};
+for i = 1:length(dummy_style)
+    plot(NaN,NaN,dummy_style{i})
+end
+for i=1:length(vals)
+    val = vals(i);
+    col = colors{i};
+    w=unique(val.w(~isnan(val.w)),'stable');
+    A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
+    B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
+    plot(w(:,1), A_f_over_rho(:,1),[col '--'],...
+        w(:,1), B_f_over_rho_w(:,1),     [col '-'])
+end
+title('Hydrodynamic Coefficients')
+xlabel('Wave Frequency (\omega)')
+xlim([0.3,1.45])
+%ylim([-10, 26900])
+leg2=legend({'nominal','min LCOE','min CAPEX','max power','balanced', ...
+    'A_{f}/\rho','B_{f}/(\rho*\omega)'});
+hold off
+improvePlot
+leg2.Location='best';
+h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
+end
 end
