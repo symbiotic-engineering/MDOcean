@@ -3,23 +3,43 @@ classdef (SharedTestFixtures={ ...
         }) test_dynamics < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
+    properties (Constant)
+        run_wecsim_tests = false;
+    end
+
     properties
         errors_singlebody
         errors_multibody
         errors_report
         table
+        figs
     end
 
     methods(TestClassSetup)
         % Shared setup for the entire test class
 
         function runNominalDynamics(testCase)
-            %[singlebody, multibody, report, tab] = validate_dynamics();
-            r = load('wecsimresults_all');
-            testCase.errors_singlebody = r.singlebody;
-            testCase.errors_multibody  = r.multibody;
-            testCase.errors_report     = r.report;
-            testCase.table             = r.tab;
+            if testCase.run_wecsim_tests
+                warning('off','MATLAB:contour:ConstantData')
+                t = tic;
+                [singlebody, multibody, ...
+                 report, tab, fig_sb, fig_mb] = validate_dynamics();
+                wecsim_runtime = toc(t);
+                fprintf('WecSim took %g minutes',wecsim_runtime/60)
+                warning('on','MATLAB:contour:ConstantData')
+
+                testCase.errors_singlebody = singlebody;
+                testCase.errors_multibody  = multibody;
+                testCase.errors_report     = report;
+                testCase.table             = tab;
+                testCase.figs              = [fig_sb fig_mb];
+            end
+        end
+    end
+
+    methods(TestMethodSetup)
+        function check_whether_to_run(testCase)
+            testCase.assumeTrue(testCase.run_wecsim_tests)
         end
     end
 
@@ -65,6 +85,18 @@ classdef (SharedTestFixtures={ ...
         function dynamicValidationTable(testCase)
             diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(testCase.table);
             testCase.log(diagnostic);
+            table2latex(testCase.table,'../test-results/table_13.tex')
+        end
+
+        function dynamicValidationFigures(testCase)
+            for i = 1:length(testCase.figs)
+                fig = testCase.figs(i);
+                fig_name = ['Figure_WecSim_' num2str(i)];
+                pdf_name = ['../test-results/' fig_name];
+                save_pdf(fig,pdf_name)
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',[fig_name '_']);
+                testCase.log(diagnostic);
+            end
         end
     end
 

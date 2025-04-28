@@ -5,39 +5,22 @@ import matlab.unittest.plugins.XMLPlugin;
 import matlab.unittest.plugins.codecoverage.CoberturaFormat;
 import matlab.unittest.plugins.TestReportPlugin
 import matlab.unittest.plugins.DiagnosticsRecordingPlugin
+import matlab.unittest.plugins.LoggingPlugin
 import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
+
+load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-warning('off','MATLAB:nearlySingularMatrix')
-
-run_wecsim_validation = false;
-
-if run_wecsim_validation && exist('../WEC-Sim','dir')
-    warning('off','MATLAB:contour:ConstantData')
+if exist('../WEC-Sim','dir')    
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
-    cd("mdocean")
-    try
-        tic
-        [singlebody, multibody, report, tab] = validate_dynamics();
-        wecsim_runtime = toc;
-        fprintf('WecSim took %g minutes',wecsim_runtime/60)
-        save('wecsimresults_all','singlebody','multibody','report','tab')
-    catch err
-        warning( "wecsim failed: " + newline + getReport(err,"extended"))
-    end
-    warning('on','MATLAB:contour:ConstantData')
-    cd("..")
 end
 
 suite = testsuite('tests');
-if ~run_wecsim_validation
-    suite = selectIf(suite,~HasName(ContainsSubstring("dynamics"))); % filter out wecsim tests
-end
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
@@ -55,27 +38,30 @@ codeFilePaths(filePathsToExclude) = [];
 
 p1 = CodeCoveragePlugin.forFile(codeFilePaths, 'Producing', reportFormat);
 p2 = XMLPlugin.producingJUnitFormat([test_dir '/junit.xml']);
-p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true);
+p3 = TestReportPlugin.producingPDF([test_dir '/testreport.pdf'],'IncludingPassingDiagnostics',true,'LoggingLevel',2);
 p4 = DiagnosticsRecordingPlugin('IncludingPassingDiagnostics',true);
+p5 = LoggingPlugin.withVerbosity(2);
 
 runner.addPlugin(p1);
 runner.addPlugin(p2);
 runner.addPlugin(p3);
 runner.addPlugin(p4);
+runner.addPlugin(p5);
 
 runner.ArtifactsRootFolder = test_dir;
 
-tic
-results = runner.runInParallel(suite);
-clockTime = toc;
+t = tic;
+results = runner.run(suite);    % parallel would make it slower because it 
+                                % would run the test class setup on every worker
+clockTime = toc(t);
 
 if ~batchStartupOptionUsed % don't open reports when running on CI server 
     open([cov_dir '/coverageReport/index.html'])
     open([test_dir '/testreport.pdf'])
 end
 
-fig = optim_time_bar_chart(suite,results);
-save_pdf(fig,'test-results/Figure_30.pdf')
+fig = unittest_time_bar_chart(suite,results);
+save_pdf(fig,'test-results/Figure_30_unittest.pdf')
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)

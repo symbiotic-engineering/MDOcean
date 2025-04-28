@@ -1,5 +1,8 @@
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, gs] = gradient_optim(x0_input,p,b,which_objs)
 
+warning('off','MATLAB:nearlySingularMatrix')
+warning('off','MATLAB:singularMatrix')
+
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all
@@ -149,6 +152,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, lambda, g, gs]
         if ploton
             plot_power_matrix(X_opt,p,b.filename_uuid)
             visualize_geometry(X_opt,p)
+            lagrange_multiplier_bar_chart(b,lambda)
         end
     end
     if ploton
