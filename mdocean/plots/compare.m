@@ -151,7 +151,7 @@ dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
 for i = 1:length(dummy_style)
     plot(NaN,NaN,dummy_style{i})
 end
-colororder({'k','c'})
+colororder({'k','k'})
 for i=1:length(vals)
     val = vals(i);
     col = colors{i};
