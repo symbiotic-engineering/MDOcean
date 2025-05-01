@@ -73,8 +73,7 @@ if plot_on
     %% coeff comparison validation figure
     fig = figure;
     hold on
-    colors = ["#000000" "#7E2F8E"];
-    colororder(colors)
+    colororder({'k','k'})
     yyaxis left
     plot(w,A,'--','color',[0 0.4470 0.7410],'Linewidth',3,'HandleVisibility','off')
     plot(w,B,'--','color',[0.8500 0.3250 0.0980], 'LineWidth',3,'HandleVisibility','off')
@@ -89,8 +88,10 @@ if plot_on
     plot(w,A_MDOcean,'-','color',[0 0.4470 0.7410],'LineWidth',3)
     plot(w,B_MDOcean,'-','color',[0.8500 0.3250 0.0980],'Linewidth',3)
     plot(w,gamma_MDOcean,'-','color',[0.9290 0.6940 0.1250],'Linewidth',3)
+    ylabel('A/\rho, B/(\rho\omega), |\gamma|/(\rhog)')
     yyaxis right
     ylim([-1.8,1.1])
+    ylabel('\angle\gamma')
     plot(w,gamma_ph_MDOcean,'-','color',[0.4940 0.1840 0.5560],'Linewidth',3)
     %ylim([0 4000])
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries

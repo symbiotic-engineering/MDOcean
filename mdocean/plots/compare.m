@@ -147,11 +147,11 @@ figure
 subplot(1,2,1)
 hold on
 dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-    ['k' '-*'],['c' '-.']};
+    ['k' '-*'],['k' '-.']};
 for i = 1:length(dummy_style)
     plot(NaN,NaN,dummy_style{i})
 end
-colororder({'k','c'})
+colororder({'k','k'})
 for i=1:length(vals)
     val = vals(i);
     col = colors{i};
@@ -160,8 +160,10 @@ for i=1:length(vals)
     gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
     yyaxis left
     plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'])
+    ylabel('\gamma_{f}/(\rhog)')
     yyaxis right
     plot(w(:,1), gamma_phase_f(:,1),     [col '-.'])
+    ylabel('\angle\gamma_{f}')
 end
 title('Hydrodynamic Coefficients')
 xlabel('Wave Frequency (\omega)')
