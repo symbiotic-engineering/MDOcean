@@ -60,7 +60,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
 
-    parfor i = 1:length(LCOE_seeds)
+    for i = 1:length(LCOE_seeds)
         new_p = p;
         new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
@@ -68,7 +68,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
         if isempty(new_b.filename_uuid)
             t = getCurrentTask();
             if ~isempty(t)
-                new_b.filename_uuid = num2str(t.ID);
+                %new_b.filename_uuid = num2str(t.ID);
             end
         end
         [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,new_b,which_obj);
@@ -221,7 +221,6 @@ function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
 
    clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
    
->>>>>>> origin/force-saturation-fix
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)
