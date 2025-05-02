@@ -18,6 +18,7 @@ if exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
+    rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
 end
 
 suite = testsuite('tests');
