@@ -251,13 +251,25 @@ function [figs,tabs] =  pareto_fig_func(~,~)
 end
 
 % Function to generate parameter sensitivity figures
-function [figs,tabs] =  param_sensitivities_fig_func(~,~)
+function [figs,tabs] =  param_sensitivities_fig_func(~,b)
     param_sweep(filename_uuid)
-    figs.global_constraint = gcf;                   % delta p global
+    figs.global_constraint = gcf;                   % delta p global (grid)
     n = figs.global_constraint.Number;
-    figs.local_design  = figure(n - 3);             % dx*/dp local
-    figs.global_design = figure(n - 2);             % dx*/dp global
-    figs.local_global_objective = figure(n - 5);    % dJ*/dp combined
+    figs.local_constraint= figure(n-1);             % delta p local (grid)
+    figs.global_design = figure(n - 2);             % dx*/dp global (grid)
+    figs.local_design  = figure(n - 3);             % dx*/dp local (grid)
+    figs.global_objective = figure(n - 4);          % dJ*/dp global (grid)
+    figs.local_global_objective = figure(n - 5);    % dJ*/dp combined (grid)
+    figs.global_design_tornado_J2 = figure(n - 6);  % dx*/dp global (tornado)
+    figs.global_design_tornado_J1 = figure(n - 7);  % dx*/dp global (tornado)
+    num_DVs = length(b.var_names);
+    for i = 1:num_DVs
+        name = ['global_design_tornado_' b.var_names(num_DVs+1-i)];
+        figs.(name) = figure(n - (7+i));            % dx*/dp global (tornado)
+    end
+    figs.nonlinear_design_J2 = figure(n - num_DVs - 9);
+    figs.nonlinear_design_J1 = figure(n - num_DVs - 10);
+    figs.nonlinear_objectives = figure(n - num_DVs - 11);
     tabs = [];
 end
 
