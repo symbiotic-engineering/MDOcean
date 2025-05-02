@@ -7,9 +7,19 @@ if ~exist('p','var')
     warning('parameters were loaded from scratch')
     p = parameters();
 end
+if ~exist('X','var')
+    warning('design variables were loaded from scratch')
+    b = var_bounds();
+    X = [b.X_noms; 1];
+end
+
+if ~p.use_MEEM
+    meem = 'off';
+else
+    meem = num2str(p.harmonics);
+end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
-b = var_bounds();
-X = [b.X_noms; 1];
+
 [~, ~, P_matrix, ~, val] = simulation(X,p);
 if regular
     [T,H] = meshgrid(p.T, p.Hs/sqrt(2)); % regular
@@ -18,19 +28,28 @@ else
 end
 
 mcr.header = {'waves.height','waves.period','pto(1).damping'};
-control = val.B_p(:);
-mcr.cases = [H(:),T(:),control];
+idx = p.JPD ~= 0;
+control = val.B_p(idx);
+mcr.cases = [H(idx),T(idx),control];
 save('mcrMDOcean.mat','mcr')
 
 % filename to save
 [~, status] = system('git status');
 if ~contains(status,'working tree clean')
-    error('you have  uncommitted changes, please commit so the wecsim settings can be referenced to the commit')
+    msg = ['you have  uncommitted changes, please commit so the wecsim ' ...
+        'settings can be referenced to the commit. Status: ' status];
+    err = MException('MDOcean:WecSim:uncommitted',msg);
+    %throw(err)
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
 uuid = char(matlab.lang.internal.uuid());
-output_filename = ['wecsim_sparcd' num2str(p.C_d_spar) '_floatcd' num2str(p.C_d_float) '_' git_hash '_' uuid];
+C_d_s = num2str(p.C_d_spar);
+C_d_f = num2str(p.C_d_float);
+mb = num2str(p.use_multibody);
+
+output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
+                    '_meem_' meem '_git_' git_hash '_uuid_' uuid];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
@@ -43,11 +62,12 @@ simu.mode = 'accelerator';                   % Specify Simulation Mode ('normal'
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
 simu.rampTime = 100;                    % Wave Ramp Time [s]
-simu.endTime = 3100;                     % Simulation End Time [s]
+simu.endTime = 200;                     % Simulation End Time [s]
 simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & simu.solver = 'ode45' for variable step 
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';
 simu.saveWorkspace = false;
+simu.b2b = 1;
 
 %% Wave Information 
 % % noWaveCIC, no waves with radiation CIC  
@@ -60,6 +80,7 @@ else
     waves = waveClass('irregular');
     waves.spectrumType = 'PM';                % Specify Wave Spectrum Type
 end
+waves.waterDepth = p.h;
 % waves.height = 2.5;                     % Wave Height [m]
 % waves.period = 8;                       % Wave Period [s]
 
@@ -126,10 +147,13 @@ pto(1).stiffness = 0;                           % PTO Stiffness [N/m]
 % pto(1).damping = 1200000;                       % PTO Damping [N/(m/s)]
 pto(1).location = [0 0 0];                      % PTO Location [m]
 
-
+D_s   = X(1);        % inner diameter of float (m)
+D_f   = X(2);        % outer diameter of float (m)
+D_f_in = p.D_f_in_over_D_s * D_s;
+D_d = p.D_d_over_D_s * D_s;
 body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
-body(1).quadDrag.area = [0 0 pi*(10^2-3^2) 0 0 0];
+body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
 body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
-body(2).quadDrag.area = [0 0 pi*15^2 0 0 0];
+body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
 
 

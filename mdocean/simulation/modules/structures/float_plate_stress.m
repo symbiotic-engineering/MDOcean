@@ -14,13 +14,14 @@ function [sigma_vm_bot,sigma_vm_top] = float_plate_stress(D_f, D_f_in, F_heave, 
     h = (D_f-D_f_in)/2;
 
     % trapezoid interpolation
+    % see page 29 of notebook 12/15/24
+    m = (b_out-b_in)/(2*h);
     if h >= b_avg
-        m = (b_out-b_in)/(2*h);
         shorter_length = b_in*(m+sqrt(1+m^2));
         longer_length = h;
     else
         shorter_length = h;
-        longer_length  = b_out;
+        longer_length  = (b_out+b_in)/2 + h*(1-sqrt(1+m^2));
     end
     
     length_ratio = longer_length / shorter_length;

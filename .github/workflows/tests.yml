@@ -4,11 +4,8 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # Triggers the workflow on push events for any branch
   push:
-    branches: [ "main"]
-  pull_request:
-    branches: [ "main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,18 +15,20 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
         uses: actions/checkout@v4
+        if: always()
         with:
           path: MDOcean
 
       - name: Checkout WEC-Sim
         uses: actions/checkout@v4
+        if: always()
         with:
           repository: WEC-Sim/WEC-Sim
           path: WEC-Sim
@@ -37,6 +36,7 @@ jobs:
 
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
+        if: always()
         with:
           args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
@@ -53,7 +53,7 @@ jobs:
                 Simulink
                 Simscape
                 Simscape_Multibody
-      
+
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-command@v2
         if: always()
@@ -89,7 +89,9 @@ jobs:
           name: test-report
           path: |
             MDOcean/test-results/**/testreport.pdf
+            MDOcean/test-results/**/table_*.tex
             MDOcean/code-coverage/**/coverage.xml
             MDOcean/**/DynamicValidation_*.pdf
             MDOcean/test-results/Figure_*.pdf
-    
+            MDOcean/mdocean/optimization/multiobjective/pareto_search_results_*.mat
+            MDOcean/**/wecsim_*.mat

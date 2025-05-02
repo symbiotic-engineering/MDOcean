@@ -1,11 +1,12 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
          A_c, A_lat_sub, ...
          I, T, V_f_pct, V_s_pct, GM,...
-         A_dt, L_dt, t_d, mass,...
+         A_dt, L_dt, mass,...
          CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f, D_f_in, D_f_b, ...
                                             T_f_1, T_f_2, h_f, h_s, h_fs_clear, D_f_tu, ...
                                             t_f_t, t_f_r, t_f_c, t_f_b, t_f_tu, t_s_r, t_d_tu, ...
-                                            D_d, D_d_tu, theta_d_tu, T_s, h_d, t_d_max, ...
+                                            D_d, D_d_tu, theta_d_tu, T_s, h_d, t_d, ...
+                                            h_stiff_f, w_stiff_f, num_sect_f, ...
                                             h_stiff_d, w_stiff_d, num_stiff_d, ...
                                             M, rho_m, rho_w, m_scale)
 
@@ -20,10 +21,12 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 % _d_tu: damping plate tubular support
 % _f_tu: float tubular support
 
-%               _____                               -
-%              /|   |\                              |
-%             / |   | \Lft                          |
-%            /____Df___\_                       -   |
+%                /\
+%               /  \ Lft
+% h_fs_clear-  /    \                               -
+%           | /  ___ \                              |
+%           -/  |   | \                             |
+%           /____Df____\                        -   |
 %           |           |                       |   |
 % ----------|           |---------  -   -       hf  |
 %           |           |    Tf1    |   |       |   |
@@ -52,7 +55,7 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 % t_f_tu - radial thicknss of float support tube walls
 
 %% Float
-num_gussets = 24;
+num_gussets = 2*num_sect_f;
 num_gussets_loaded_lateral = 2;
 
 % float cross sectional and lateral area for structural purposes
@@ -78,8 +81,14 @@ vert_leg_tube = (1 + D_f/(D_f-D_s)) * (h_fs_clear + h_s - h_f + T_f_2 - T_f_1 - 
 L_ft = sqrt(horiz_leg_tube^2 + vert_leg_tube^2); % length of float tube
 V_f_tubes = num_float_tubes * (D_f_tu^2 - (D_f_tu - 2*t_f_tu)^2) * pi/4 * L_ft;
 
-V_sf_m = V_top_plate + V_bot_plate + V_outer_rim ...
-        + V_inner_rim + V_bot_slant  + V_gussets + V_f_tubes;
+% float stiffeners
+num_stiff_per_sect_f = 2; % top and bottom - neglecting the side stiffeners
+A_stiff_f = num_stiff_per_sect_f * num_sect_f * h_stiff_f * w_stiff_f;
+len_stiff_f = (D_f - D_f_in)/2  * 0.75; % goes ~3/4 of the way along the float
+V_stiff_f = len_stiff_f * A_stiff_f;
+
+V_sf_m = V_top_plate + V_bot_plate + V_outer_rim + V_inner_rim ...
+        + V_bot_slant  + V_gussets + V_f_tubes + V_stiff_f;
 
 m_f_m = V_sf_m * rho_m(M) * m_scale;      % mass of float material without ballast
 
@@ -111,7 +120,15 @@ m_s_tot = rho_w * V_s_d;                % total spar mass
 % vertical column material use
 D_vc_i = D_s - 2 * t_s_r;                % spar column inner diameter
 A_vc_c = pi/4 * (D_s^2 - D_vc_i^2);     % spar column cross sectional area
-V_vc_m = A_vc_c * (h_s - h_d);          % volume of column material
+V_vc_m_body = A_vc_c * (h_s - h_d);
+A_vc_caps = pi/4 * D_vc_i^2;
+t_vc_caps = (1/2 + 2.5) * 0.0254; % middle is 2.5", top is 0.5"
+V_vc_caps = A_vc_caps * t_vc_caps;
+num_stiff_vc = 12;
+A_vc_stiff = 0.658 + 2*0.652 + 0.350; % triangles
+t_vc_stiff = 0.0254;
+V_vc_m_stiff = num_stiff_vc * A_vc_stiff * t_vc_stiff;
+V_vc_m = V_vc_m_body + V_vc_m_stiff + V_vc_caps;          % volume of column material
 
 % damping plate material use
 A_d = pi/4 * D_d^2;                     % damping plate itself
@@ -119,7 +136,6 @@ num_supports = 4;
 L_dt = (D_d - D_s) / (2*cos(theta_d_tu));
 D_dt_i = D_d_tu - 2 * t_d_tu;
 A_dt = pi/4 * (D_d_tu^2 - D_dt_i^2);      % support tube area
-t_d = min(h_d, t_d_max);                % material thickenss of damping plate
 num_unique_stiffeners = length(h_stiff_d)/2;
 num_stiff_repeats = num_stiff_d / num_unique_stiffeners;
 A_stiff_d = num_stiff_repeats * sum(h_stiff_d .* w_stiff_d);

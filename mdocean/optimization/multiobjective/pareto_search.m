@@ -9,6 +9,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     idxs = b.idxs_sort;
     num_DVs = length(b.X_starts);
     
+    turnLCOEtoPower = true;
     objFcnName = 'generatedObjective';
     objFcn1 = str2func([objFcnName b.obj_names{1}]);
     objFcn2 = str2func([objFcnName b.obj_names{2}]);
@@ -21,9 +22,17 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     LCOE_max = p.LCOE_max;
     LCOE_min = objs_opt(1);
     P_var_min = objs_opt(2);
+    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
+
+    % max power seed
+    if turnLCOEtoPower
+        [X_opt_pwr,val,flag_max_pwr] = max_avg_power(p,b);
+        X_opt(:,end+1) = X_opt_pwr;
+        fvals_opt(end+1,:) = [val.LCOE val.J_capex_design];
+        flag_opt(end+1) = flag_max_pwr;
+    end
 
     % remove infeasible single-objective optima
-    fvals_opt = [LCOE_min P_var_min_LCOE; LCOE_max P_var_min];
     single_obj_failed = flag_opt == -2;
     X_opt(:,single_obj_failed) = [];
     fvals_opt(single_obj_failed,:) = [];
@@ -43,18 +52,26 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     if LCOE_max < LCOE_min
         LCOE_max = 2*LCOE_min;
     end
-    num_seeds = 8;
-    LCOE_seeds = linspace(LCOE_min, LCOE_max, num_seeds+2);
-    LCOE_seeds = LCOE_seeds(2:end-1); % remove min and max, since we already have those from gradient optim
-    LCOE_seeds = [LCOE_seeds(1) (LCOE_seeds(1)+LCOE_seeds(2))/2 LCOE_seeds(2:end)]; % add extra seed between first and second to fill gap there
+    num_seeds = 20;
+    theta = linspace(0,pi/2,num_seeds+2);
+    theta = theta(2:end-1);
+    LCOE_seeds = LCOE_min + (1-sin(theta))*(LCOE_max-LCOE_min);
     X_seeds = zeros(length(LCOE_seeds),num_DVs);
     P_var_seeds = zeros(1,length(LCOE_seeds));
     init_failed = false(1,length(LCOE_seeds));
-    
-    for i = 1:length(LCOE_seeds)
-        p.LCOE_max = LCOE_seeds(i);
+
+    parfor i = 1:length(LCOE_seeds)
+        new_p = p;
+        new_p.LCOE_max = LCOE_seeds(i);
         which_obj = 2;
-        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,p,b,which_obj);
+        new_b = b;
+        if isempty(new_b.filename_uuid)
+            t = getCurrentTask();
+            if ~isempty(t)
+                new_b.filename_uuid = num2str(t.ID);
+            end
+        end
+        [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,new_b,which_obj);
         if flag_tmp == -2 % Initial pareto point is not feasible - this prevents a LPalg error in paretosearch
             init_failed(i) = true;
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
@@ -62,9 +79,9 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
             X_seeds(i,:) = X_opt_tmp(idxs)';
     
             % debugging checks on optimization convergence and objective values
-            obj_check = objFcn2(X_opt_tmp(idxs)',{p});
+            obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
-            [~, P_var_seeds(i)] = simulation(X_opt_tmp, p);
+            [~, P_var_seeds(i)] = simulation(X_opt_tmp, new_p);
             assert(obj_tmp == P_var_seeds(i))
         end
     end
@@ -74,21 +91,37 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     P_var_seeds(init_failed) = [];
     LCOE_seeds(init_failed) = [];
 
-    p.LCOE_max = LCOE_max;
-
     %% Set up pareto search algorithm
     probMO = probs{1};
-    scale = [10 0.1];
+    scale = [10 1];
     
-    probMO.objective = @(x)[objFcn1(x,{p})*scale(1), objFcn2(x,{p})*scale(2)];
+    if turnLCOEtoPower
+        p_zero_design_cost = p;
+        % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
+        p_zero_design_cost.cost_perN_mult = 0;
+        p_zero_design_cost.cost_perW_mult = 0;
+        p_zero_design_cost.cost_perkg_mult = [0 0 0];
+
+        objFcn1Revised = @(x)objFcn1new(x,objFcn1,p_zero_design_cost);
+        scale(1) = 1;
+    else
+        objFcn1Revised = @(x)objFcn1(x,{p});
+    end
+
+    probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
     
     X0 = [X_0; X_opt(idxs,:)'; X_seeds];
     fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
 
+    if turnLCOEtoPower
+        X0_struct.Fvals = [];
+    end
+
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
-        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100);
+        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
+        'UseParallel',true);
     if ~isempty(X0)
         probMO.options.InitialPoints = X0_struct;
     else
@@ -97,6 +130,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     end
     probMO.solver = 'paretosearch';
     probMO.nvars = num_DVs;
+
     %% Execute pareto search
     disp('Finished finding pareto seed points. Now starting paretosearch.')
     try
@@ -121,6 +155,12 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     hold on
     
     plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
+
+    if turnLCOEtoPower
+        for i=1:length(fval)
+            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
+        end
+    end
 
     fval = fval ./ repmat(scale,length(fval),1);
 
@@ -168,8 +208,20 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-    save('optimization/multiobjective/pareto_search_results',"fval","x","residuals",...
-    "lambda")
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p","lambda")
+end
+
+function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
+
+   % cost0 refers to the part of the numerator of LCOE that does not depend 
+   % on design: cost0 = capex0 + opex0
+   cost0_per_power = oldFcnLCOE(x,{p_zero_design_cost});
+   pwr_per_cost0 = 1/cost0_per_power;
+   neg_pwr_per_cost = -pwr_per_cost0;
+
+   clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
+   
+>>>>>>> origin/force-saturation-fix
 end
 
 function [idx] = constraint_active_plot(residuals,fval,tol)

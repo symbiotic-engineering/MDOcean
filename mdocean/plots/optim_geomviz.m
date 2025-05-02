@@ -5,8 +5,9 @@ function flag = optim_geomviz(x,p,b)
     grey = [0.8, 0.8, 0.8]; % RGB for light grey
 
     % Get all line and rectangle objects from previous iterations
-    lines = findobj(gca, 'Type', 'line');
-    rectangles = findobj(gca, 'Type', 'rectangle');
+    ax = gca();
+    lines = findobj(ax, 'Type', 'line');
+    rectangles = findobj(ax, 'Type', 'rectangle');
     
     % Change their color to light grey
     for i = 1:length(lines)
