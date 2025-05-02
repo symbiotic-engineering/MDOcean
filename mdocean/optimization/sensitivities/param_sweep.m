@@ -130,7 +130,7 @@ function [par_x_star_par_p_global, ...
                                                                x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
-    ratios = [.9 .95 1 1.05 1.1];
+    ratios = [.9 .98 1 1.02 1.1];
     num_DVs = size(x0_vec,1)-1;
     num_constr = length(b.constraint_names) + length(b.lin_constraint_names) + 2*num_DVs;
     
@@ -262,54 +262,101 @@ function [par_x_star_par_p_global, ...
     %% Tornado chart for overall slope
     sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
     
-    % separate charts for each design variable
+    % separate figures for each design variable, with subplot for each objective
     for i=1:num_DVs
         sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
-                                param_names, colors, groups, ['dx*/dp - ' dvar_names{i}]);
+                                param_names, colors, groups, ['d' dvar_names{i} '^*/dp']);
     end
+
+    % separate figures for each objective, with subplots for each design variable
+    f4 = figure;
+    t = tiledlayout(3,4);
+    for i=1:num_DVs
+        nexttile
+        sensitivity_tornado_barh_inner(slope_X_LCOE_norm(:,i), param_names, colors, 8)
+        title(['d' dvar_names{i} '^*/dp'])
+    end
+    color_legend(groups,colors,'eastoutside')
+    title(t,'Normalized Sensitivities at Minimum LCOE')
+    t.TileSpacing = 'compact';
+    t.Padding = 'compact';
+
+    f5 = figure;
+    t2 = tiledlayout(3,4);
+    for i=1:num_DVs
+        nexttile
+        sensitivity_tornado_barh_inner(slope_X_Pvar_norm(:,i), param_names, colors, 8)
+        title(['d' dvar_names{i} '^*/dp'])
+    end
+    color_legend(groups,colors,'eastoutside')
+    title(t2,'Normalized Sensitivities at Minimum Design Cost')
+    t2.TileSpacing = 'compact';
+    t2.Padding = 'compact';
+
+    set(f4,'Position',[1 41 1536 840]) % full screen
+    set(f5,'Position',[1 41 1536 840]) % full screen
 
 end
 
 
-function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
+function color_legend(groups,colors,loc)
+    [~,first_idx] = ismember(categories(groups),groups);
+    cols = colors(first_idx);
+    h = gobjects([1 length(cols)]);
+    for i=1:length(cols)
+        h(i) = barh(NaN,NaN,cols{i});
+    end
+    set(h,{'DisplayName'},categories(groups));
+    legend('location',loc)
+end
 
-    [~,LCOE_sort_idx] = sort(abs(slope_LCOE),'MissingPlacement','first');
-    [~,Pvar_sort_idx] = sort(abs(slope_Pvar),'MissingPlacement','first');
+function sensitivity_tornado_barh_inner(slope, param_names, colors, k)
 
-    LCOE_params = categorical(param_names, param_names(LCOE_sort_idx));
-    Pvar_params = categorical(param_names, param_names(Pvar_sort_idx));
-    
-    % separate charts for each objective
-    figure
-    subplot 121
-    for i=1:length(LCOE_params)
-        barh(LCOE_params(i),slope_LCOE(i),colors{i})
+    % set k=0 to show all parameters
+    if k==0
+        k = length(param_names);
+    end
+
+    % sort by highest sensitivity
+    [~,sort_idx] = sort(abs(slope),'MissingPlacement','first');
+
+    % only show the parameters with the k highest sensitivities.
+    sort_idx_highest_k = sort_idx(end-k+1:end);
+    slope_highest_k = slope(sort_idx_highest_k);
+    colors_highest_k = colors(sort_idx_highest_k);
+    params = categorical( param_names(sort_idx_highest_k), param_names(sort_idx_highest_k) );
+
+    % bar chart
+    for i=1:length(params)
+        h = barh(params(i),slope_highest_k(i),colors_highest_k{i});
+        h.Annotation.LegendInformation.IconDisplayStyle = 'off';
         hold on
     end
-    xlim([-1 1] + fix(imrange(slope_LCOE)))
+    xlim([-1.2 1.2] + fix(imrange(slope)))
     ax = gca;
     set(ax,'YGrid','on','XGrid','on')
-    title('LCOE')
+    improvePlot
+
+    % reduce fontsize
+    all_axes = findobj(gcf().Children,'Type','Axes'); % all subplots in fig
+    set(all_axes,'FontSize',12)
+end
+
+function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
+    
+    % separate subplots for each objective
+    figure
+    subplot 121
+    sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 0)
+    title('At Minimum LCOE')
     
     subplot 122
-    for i=1:length(LCOE_params)
-        barh(Pvar_params(i),slope_Pvar(i),colors{i})
-        hold on 
-    end
-    xlim([-1 1] + fix(imrange(slope_Pvar)))
-    set(gca,'YGrid','on','XGrid','on')
-    title('c_v')
+    sensitivity_tornado_barh_inner(slope_Pvar, param_names, colors, 0)
+    title('At Minimum Design Cost')
     sgtitle(['Normalized Sensitivities: ' extra_title])
     
     % legend
-    [~,first_idx] = ismember(categories(groups),groups);
-    labels = repmat({''},size(groups));         % create blank labels
-    labels(first_idx) = categories(groups);     % leave most labels blank, except the first of each category
-    legend(labels,'location','south')
-    
-    improvePlot
-    set(gca, 'FontSize', 14)
-    set(ax,'FontSize',14)
+    color_legend(groups,colors,'southeast')
     set(gcf,"Position",[1.8 41.8 698.2 836.8])
     
     % both objectives on the same chart
