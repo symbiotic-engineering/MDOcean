@@ -36,69 +36,72 @@ figs_in_paper(2)  = 'read_non_matlab_figs.methodology_overview';
 figs_in_paper(3)  = 'read_non_matlab_figs.N2_diagram';
 figs_in_paper(4)  = 'read_non_matlab_figs.dimensions';
 figs_in_paper(5)  = 'read_non_matlab_figs.MEEM_geometry';
-figs_in_paper(6)  = 'hydro_coeff_err.hydro_coeff_err';
-figs_in_paper(7)  = 'desc_fcns.saturation_desc_fcn';
-figs_in_paper(8)  = 'desc_fcns.drag_desc_fcn';
-figs_in_paper(9)  = 'run_single.power_matrix_multiply';
-figs_in_paper(10) = 'wecsim.WECSim_error_histograms';
-figs_in_paper(11) = 'read_non_matlab_figs.FBD';
-figs_in_paper(12) = 'validation.cost_vs_N_WEC';
-figs_in_paper(13) = 'read_non_matlab_figs.sim_runtime';
+figs_in_paper(6) =  'spar_hydro.spar_added_mass';
+figs_in_paper(7)  = 'hydro_coeff_err.hydro_coeff_err';
+figs_in_paper(8)  = 'desc_fcns.saturation_desc_fcn';
+figs_in_paper(9)  = 'desc_fcns.drag_desc_fcn';
+figs_in_paper(10)  = 'run_single.power_matrix_multiply';
+figs_in_paper(11) = 'wecsim.WECSim_error_histograms';
+figs_in_paper(12) = 'read_non_matlab_figs.FBD';
+figs_in_paper(13) = 'validation.cost_vs_N_WEC';
+figs_in_paper(14) = 'runtime.sim_runtime';
+figs_in_paper(15) = 'runtime.hydro_runtime';
+figs_in_paper(16) = 'runtime.dynamics_runtime';
 % 3: optimization methodology
-figs_in_paper(14) = 'read_non_matlab_figs.optimization_flowchart';
+figs_in_paper(17) = 'read_non_matlab_figs.optimization_flowchart';
 % 4: results
-figs_in_paper(15) = 'experiments.experiments';
-figs_in_paper(16) = 'compare.overlaid_geometry';
-figs_in_paper(17) = 'compare.overlaid_hydro_coeffs';
-figs_in_paper(18) = 'compare.probability_CDF';
-figs_in_paper(19) = 'gradient_optim.lagrange_multipliers';
-figs_in_paper(20) = 'gradient_optim.dJ_dx_gradient';
-figs_in_paper(21) = 'multistart.multistart_convergence_tree';
-figs_in_paper(22) = 'param_sensitivities.objective_tornadoes';
-figs_in_paper(23) = 'param_sensitivities.design_tornadoes';
-figs_in_paper(24) = 'pareto.pareto_front_with_design_images';
-figs_in_paper(25) = 'pareto.pareto_front_LCOE_contours';
-figs_in_paper(26) = 'pareto.heuristics';
-figs_in_paper(27) = 'pareto.constraint_activity';
-figs_in_paper(28) = 'all_fig_compare.runtime_bar_chart';
+figs_in_paper(18) = 'experiments.experiments';
+figs_in_paper(19) = 'compare.overlaid_geometry';
+figs_in_paper(20) = 'compare.overlaid_hydro_coeffs';
+figs_in_paper(21) = 'compare.probability_CDF';
+figs_in_paper(22) = 'gradient_optim.lagrange_multipliers';
+figs_in_paper(23) = 'gradient_optim.dJ_dx_gradient';
+figs_in_paper(24) = 'multistart.multistart_convergence_tree';
+figs_in_paper(25) = 'param_sensitivities.objective_tornadoes';
+figs_in_paper(26) = 'param_sensitivities.design_tornadoes';
+figs_in_paper(27) = 'pareto.pareto_front_with_design_images';
+figs_in_paper(28) = 'pareto.pareto_front_LCOE_contours';
+figs_in_paper(29) = 'pareto.heuristics';
+figs_in_paper(30) = 'pareto.constraint_activity';
+figs_in_paper(31) = 'all_fig_compare.runtime_bar_chart';
 % appendix A- hydro
-figs_in_paper(29) = 'meem.meem_regions';
-figs_in_paper(30) = 'meem.meem_sparsity';
-figs_in_paper(31) = 'meem.meem_validation';
-figs_in_paper(32) = 'meem.meem_matching';
-figs_in_paper(33) = 'meem.meem_convergence';
-figs_in_paper(34) = 'meem.asymptotic_b_vector';
+figs_in_paper(32) = 'meem.meem_regions';
+figs_in_paper(33) = 'meem.meem_sparsity';
+figs_in_paper(34) = 'meem.meem_validation';
+figs_in_paper(35) = 'meem.meem_matching';
+figs_in_paper(36) = 'meem.meem_convergence';
+figs_in_paper(37) = 'meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_paper(35) = 'run_single.drag_convergence';
-figs_in_paper(36) = 'slamming.slamming_amplitude';
-figs_in_paper(37) = 'force_sat_results.power_force_sensitivity';
-figs_in_paper(38) = 'wecsim.wecsim_all_sea_states';
+figs_in_paper(38) = 'run_single.drag_convergence';
+figs_in_paper(39) = 'slamming.slamming_amplitude';
+figs_in_paper(40) = 'force_sat_results.power_force_sensitivity';
+figs_in_paper(41) = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-figs_in_paper(39) = 'read_non_matlab_figs.trapezoid';
-figs_in_paper(40) = 'read_non_matlab_figs.damping_plate_flowchart';
-figs_in_paper(41) = 'damping_plate_structures.damping_plate_moment';
-figs_in_paper(42) = 'damping_plate_structures.damping_plate_deflection';
-figs_in_paper(43) = 'damping_plate_structures.damping_plate_aspect_ratio';
+figs_in_paper(42) = 'read_non_matlab_figs.trapezoid';
+figs_in_paper(43) = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper(44) = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper(45) = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper(46) = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
-figs_in_paper(44) = 'param_sensitivities.local_global_objective';
-figs_in_paper(45) = 'param_sensitivities.local_design';
-figs_in_paper(46) = 'param_sensitivities.global_design';
+figs_in_paper(47) = 'param_sensitivities.local_global_objective';
+figs_in_paper(48) = 'param_sensitivities.local_design';
+figs_in_paper(49) = 'param_sensitivities.global_design';
 % appendix F - supplementary results
-figs_in_paper(47) = 'gradient_optim.single_obj_convergence';
+figs_in_paper(50) = 'gradient_optim.single_obj_convergence';
 % graphical abstract (unnumbered so at the end)
-figs_in_paper(48)  = 'read_non_matlab_figs.graphical_abstract';
+figs_in_paper(51)  = 'read_non_matlab_figs.graphical_abstract';
 
 %% TABLES
 tabs_in_paper = cell(1,29);
-tabs_in_paper(12) = 'validation.validation';
-tabs_in_paper(15) = 'constraints';
-tabs_in_paper(16) = 'design variables';
-tabs_in_paper(17) = 'parameters';
-tabs_in_paper(19) = 'compare.optimal_design';
-tabs_in_paper(20) = 'compare.optimal_outputs';
-tabs_in_paper(21) = 'multistart.multistart';
-tabs_in_paper(22) = 'location_sensitivity.location_sensitivity';
+tabs_in_paper(12) = 'cost.cost_parameters';
+tabs_in_paper(13) = 'validation.validation';
+tabs_in_paper(14) = 'constraints';
+tabs_in_paper(15) = 'design variables';
+tabs_in_paper(16) = 'parameters';
+tabs_in_paper(18) = 'compare.optimal_design';
+tabs_in_paper(19) = 'compare.optimal_outputs';
+tabs_in_paper(20) = 'location_sensitivity.location_sensitivity';
 
 %%
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
