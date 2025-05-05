@@ -22,8 +22,18 @@ function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     % use the optimal x as x0 to speed up the sweeps
     % and obtain gradients
     x0 = b.X_start_struct;
-    [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
-    
+    x0_vec_1 = gradient_optim(x0,p,b);
+    x0_struct_1 = cell2struct(num2cell(x0_vec_1(1:end-1,:)),b.var_names(1:end-1)',1);
+
+    % rerun nominal optim to check that it's the same as the first time
+    [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0_struct_1,p,b);
+    same_as_before = ismembertol(x0_vec,x0_vec_1,1e-6);
+    if ~all(same_as_before,'all')
+        str = append(['First optimization of nominal parameters gave different x* than second. Using second.' newline ...
+                      '#1 x*:'], newline, formattedDisplayText(x0_vec_1.'),'#2 x*:' ,newline, formattedDisplayText(x0_vec.'), 'Δ x*:', newline, formattedDisplayText(x0_vec_1.'-x0_vec.'));
+        warning(str)
+    end
+
     num_constr_nl = length(b.constraint_names);
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
@@ -347,17 +357,17 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     % separate subplots for each objective
     figure
     subplot 121
-    sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 0)
+    sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 25)
     title('At Minimum LCOE')
     
     subplot 122
-    sensitivity_tornado_barh_inner(slope_Pvar, param_names, colors, 0)
+    sensitivity_tornado_barh_inner(slope_Pvar, param_names, colors, 25)
     title('At Minimum Design Cost')
     sgtitle(['Normalized Sensitivities: ' extra_title])
     
     % legend
     color_legend(groups,colors,'southeast')
-    set(gcf,"Position",[1.8 41.8 698.2 836.8])
+    set(gcf,"Position",[1.8 41.8 930 836.8])
     
     % both objectives on the same chart
 %     figure
