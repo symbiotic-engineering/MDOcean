@@ -28,7 +28,7 @@ function pareto_curve_heuristics()
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs);
+     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p0,p_w,b,b_w,new_objs);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
