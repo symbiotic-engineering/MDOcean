@@ -160,25 +160,19 @@ for i=1:length(vals)
     gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
     yyaxis left
     plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'])
-    ylabel('\gamma_{f}/(\rhog)')
+    ylabel('\gamma_{f}/(\rhog) (m^{2})')
     yyaxis right
     plot(w(:,1), gamma_phase_f(:,1),     [col '-.'])
-    ylabel('\angle\gamma_{f}')
+    ylabel('\angle\gamma_{f} (rad)')
 end
 title('Hydrodynamic Coefficients')
 xlabel('Wave Frequency (\omega)')
 xlim([0.3,1.45])
-%ylim([-10, 26510])
 leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
     '\gamma_{f}/(\rhog)','\angle\gamma_{f}'});
 hold off
 improvePlot
-leg.Location='best';
-h=findobj(gca().Children,"Type","line");
-for j = 1:length(h)
-    %h(j).MarkerSize = 6;
-    %h(j).LineWidth = 1;
-end
+leg.Location='northeast';
 
 
 subplot(1,2,2)
@@ -203,12 +197,9 @@ xlim([0.3,1.45])
 %ylim([-10, 26900])
 leg2=legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
     'A_{f}/\rho','B_{f}/(\rho\omega)'});
+ylabel('A_{f}/\rho (m^{3}), B_{f}/(\rho\omega) (m^{3}/(rad^{2}s^{2}))')
 hold off
 improvePlot
-leg2.Location='best';
+leg2.Location='northeast';
 h=findobj(gca().Children,"Type","line");
-for j = 1:length(h)
-    %h(j).MarkerSize = 6;
-    %h(j).LineWidth = 1;
-end
 end
