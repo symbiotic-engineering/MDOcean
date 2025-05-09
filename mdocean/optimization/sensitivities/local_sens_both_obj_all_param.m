@@ -49,7 +49,7 @@ function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
     delta_p_change_activity_all_params = zeros(length(params),num_constr_tot);
 
     % sweep parameters
-    for i = 1:length(params)
+    parfor i = 1:length(params)
         param_name = params{i};
         param_idx = param_idxs(i);
 

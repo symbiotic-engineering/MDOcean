@@ -29,7 +29,7 @@ if nargout > 2
         end
     end
     for i = 1:length(g_linear)
-        if g_linear < 0
+        if g_linear(i) < 0
             failed = [failed ', ' lin_const_names{i}];
         end
     end

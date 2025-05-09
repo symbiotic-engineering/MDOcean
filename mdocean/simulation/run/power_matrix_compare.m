@@ -1,4 +1,7 @@
-function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, report, override)
+function [weighted_power_error,...
+          max_float_amp_error,...
+          power_mech_err_matrix,...
+          float_amp_err_matrix,figs] = power_matrix_compare(X, p, wecsim_filename, report, override)
     
     if nargin<4
         report = false;
@@ -27,8 +30,21 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
     vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
         'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
-    comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p)
+    figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
     
+    if ~report
+        power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
+                                                             results_sim.power_mech_unsat);
+        float_amp_err_matrix  = compute_percent_error_matrix(results_actual.float_amplitude, ...
+                                                             results_sim.float_amplitude);
+        max_float_amp_error   = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
+                                                             max(results_sim.float_amplitude,   [],'all') );
+    else
+        power_mech_err_matrix = [];
+        float_amp_err_matrix = [];
+        max_float_amp_error = [];
+    end
+
     % todo: use actual pretty variables titles with units
     % var_names = {'Unweighted Device Power Matrix (kW)',...
     %      'JPD-Weighted Power Matrix (kW)',...
@@ -45,6 +61,8 @@ function weighted_power_error = power_matrix_compare(X, p, wecsim_filename, repo
                                                           results_actual.power_mech_unsat, p.JPD);
     end
 
+
+
 end
 %%
 
@@ -57,7 +75,8 @@ function weighted_error = compute_weighted_percent_error(sim, actual, weights)
     weighted_error = compute_percent_error_matrix(actual_avg, sim_avg);
 end
 
-function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
+function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
+    figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
@@ -70,7 +89,8 @@ function comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p
             clims = [0 1];
         end
 
-        figure
+        f = figure;
+        figs(var_idx) = f;
         % actual
         subplot(1,num_subplots,1)
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);

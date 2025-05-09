@@ -64,6 +64,14 @@ function [] = improvePlot()
         end
         
     end
+
+    tiledlayout_handles = findobj(hFig,'type','tiledlayout');
+    for t=tiledlayout_handles
+        % Change font size for axis text labels
+        set(get(t, 'XLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+        set(get(t, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+        set(get(t, 'Title') ,'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+    end
     
     % Find all the lines, and markers
     LineH = findobj(hFig, 'type', 'line', '-or', 'type', 'errorbar');
