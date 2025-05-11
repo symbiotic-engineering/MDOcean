@@ -15,7 +15,7 @@ X_minCapex = Xs_opt(:,2);
 val_minLCOE = vals_opt(1);
 val_minCapex = vals_opt(2);
 
-[X_maxPower,val_maxPower] = max_avg_power(p,b);
+[X_maxPower,val_maxPower] = max_avg_power(p,b,X_minLCOE);
 
 p_bal = p;
 p_bal.avg_power_min = b.power_balanced;
