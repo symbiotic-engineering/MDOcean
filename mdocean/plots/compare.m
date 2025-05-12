@@ -15,7 +15,7 @@ X_minCapex = Xs_opt(:,2);
 val_minLCOE = vals_opt(1);
 val_minCapex = vals_opt(2);
 
-[X_maxPower,val_maxPower] = max_avg_power(p,b);
+[X_maxPower,val_maxPower] = max_avg_power(p,b,X_minLCOE);
 
 p_bal = p;
 p_bal.avg_power_min = b.power_balanced;
@@ -143,14 +143,14 @@ out_table = removevars(out_table,'OriginalVariableNames');
 end
 
 function hydro_compare(vals,colors)
-figure
-subplot(1,2,1)
+f = figure;
+
+% first subplot: excitation
+t = tiledlayout(1,2);
+t.TileSpacing = 'compact';
+nexttile
 hold on
-dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-    ['k' '-*'],['k' '-.']};
-for i = 1:length(dummy_style)
-    plot(NaN,NaN,dummy_style{i})
-end
+plot(NaN,NaN,['k' '-*'],NaN,NaN,['k' '-.']) % dummy for legend
 colororder({'k','k'})
 for i=1:length(vals)
     val = vals(i);
@@ -160,28 +160,29 @@ for i=1:length(vals)
     gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
     yyaxis left
     plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'])
-    ylabel('\gamma_{f}/(\rhog) (m^{2})')
+    ylabel('|\gamma_{f}|/(\rhog) (m^{2})')
     yyaxis right
     plot(w(:,1), gamma_phase_f(:,1),     [col '-.'])
     ylabel('\angle\gamma_{f} (rad)')
 end
-title('Hydrodynamic Coefficients')
+title('Excitation Coefficient')
 xlabel('Wave Frequency (\omega)')
 xlim([0.3,1.45])
-leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
-    '\gamma_{f}/(\rhog)','\angle\gamma_{f}'});
+%ylim([-10, 26510])
+legend({'|\gamma_{f}|/(\rhog)','\angle\gamma_{f}'})
 hold off
 improvePlot
-leg.Location='northeast';
-
-
-subplot(1,2,2)
-hold on
-dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-'],...
-    ['k' '--'],['k' '-']};
-for i = 1:length(dummy_style)
-    plot(NaN,NaN,dummy_style{i})
+h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
 end
+
+% second subplot: radiation 
+nexttile
+hold on
+plot(NaN,NaN,['k' '--'],NaN,NaN,['k' '-']); % dummy for legend
+
 for i=1:length(vals)
     val = vals(i);
     col = colors{i};
@@ -191,15 +192,32 @@ for i=1:length(vals)
     plot(w(:,1), A_f_over_rho(:,1),[col '--'],...
         w(:,1), B_f_over_rho_w(:,1),     [col '-'])
 end
-title('Hydrodynamic Coefficients')
+title('Radiation Coefficients')
 xlabel('Wave Frequency (\omega)')
 xlim([0.3,1.45])
 %ylim([-10, 26900])
-leg2=legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced', ...
-    'A_{f}/\rho','B_{f}/(\rho\omega)'});
+legend({'A_{f}/\rho','B_{f}/(\rho\omega)'});
 ylabel('A_{f}/\rho (m^{3}), B_{f}/(\rho\omega) (m^{3}/(rad^{2}s^{2}))')
 hold off
 improvePlot
-leg2.Location='northeast';
+leg2.Location='best';
 h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
+end
+
+% east border subplot: dummy legend colors
+axLegend = nexttile('east');
+hold on
+dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-']};
+for i = 1:length(dummy_style)
+    plot(NaN,NaN,dummy_style{i})
+end
+leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'});
+leg.Layout.Tile = 'east';
+axLegend.Visible = 'off';
+improvePlot
+
+f.Position(3) = 1530;
 end

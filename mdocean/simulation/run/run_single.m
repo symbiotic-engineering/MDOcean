@@ -9,7 +9,7 @@ X = [b.X_noms; 1];
 
 [feasible,~,failed] = is_feasible(g,X,p,b)
 
-plot_power_matrix(X,p,'')
+plot_power_matrix(X,p,b,'')
 
 figure
 power_PDF(X,p)

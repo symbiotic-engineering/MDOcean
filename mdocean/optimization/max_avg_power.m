@@ -1,4 +1,4 @@
-function [X_opt_2,val_2,flag_2] = max_avg_power(p,b)
+function [X_opt_2,val_2,flag_2] = max_avg_power(p,b,x0_vec)
 
 % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
 p_mod = p;
@@ -7,7 +7,11 @@ p_mod.cost_perW_mult = 0;
 p_mod.cost_perkg_mult = [0 0 0]; 
 
 
-x0 = b.X_start_struct;
+if nargin>2
+    x0 = cell2struct(num2cell(x0_vec(1:end-1)),b.var_names(1:end-1)',1);
+else
+    x0 = b.X_start_struct;
+end
 
 % run LCOE minimization (effectively power maximization due to hack above)
 [X_opt,~,flag] = gradient_optim(x0,p_mod,b,1); 

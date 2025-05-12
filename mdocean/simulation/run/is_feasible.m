@@ -12,6 +12,9 @@ feasible_nonlin = all(g_nonlin(~idx_ignore) >= tol);
 assert(all( strcmp(b.var_names(1:4),{'D_s','D_f','T_f_2','h_s'}) ))
 
 [A_ineq, b_ineq] = lin_ineq_constraints(p);
+if isrow(x)
+    x = x.';
+end
 g_linear = b_ineq-A_ineq*x(1:4);
 
 feasible_lin = all(g_linear >= 0);
