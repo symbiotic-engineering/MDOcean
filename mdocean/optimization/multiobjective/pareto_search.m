@@ -190,8 +190,8 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
         x_0_new.(b.var_names{10}) = input(10);
         x_0_new.(b.var_names{11}) = input(11);
         x_0_new.(b.var_names{12}) = input(12);
-        x_0_new.(b.var_names{13}) = input(13);
-        x_0_new.(b.var_names{14}) = input(14);
+        %x_0_new.(b.var_names{13}) = input(13);
+        %x_0_new.(b.var_names{14}) = input(14);
 
         [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
         g(:,i) = gs;
