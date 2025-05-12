@@ -1,101 +1,21 @@
-function plot_power_matrix(X,p,filename_uuid)
+function plot_power_matrix(X,p,b,filename_uuid)
 
-[CW_over_CW_max, P_wave, CW_max, P_elec] = check_max_CW(filename_uuid, X, p);
+[CW_over_CW_max, P_wave, CW_max, P_elec, ...
+    force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, X, p, b, false);
 
 [T,Hs] = meshgrid(p.T,p.Hs);
 fig = figure;
 
-% subplot(2,6,1)
-% sub_one = subplot(261);
-% sub_one.Position = [0.06, 0.5838, 0.12, 0.3412];
-% contourf(sub_one,T,Hs,P_wave);
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% title('Raw Wave Power Density (W/m)', 'FontSize', 10, 'Position', [11, 7, 0])
-% colorbar
-% 
-% subplot(2,6,2)
-% sub_two = subplot(262);
-% sub_two.Position = [0.24, 0.5838, 0.01, 0.3412];
-% text(0.5,0.5,'x','FontSize',40)
-% axis off
-% 
-% subplot(2,6,3)
-% sub_three = subplot(263);
-% sub_three.Position = [0.36, 0.5838, 0.12, 0.3412];
-% contourf(sub_three,T,Hs,CW_over_CW_max)
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% title('Device Capture Efficiency','FontSize',10, 'Position', [11.75, 7, 0])
-% colorbar
-% 
-% subplot(2,6,4)
-% sub_four = subplot(264);
-% sub_four.Position = [0.54, 0.5838, 0.01, 0.3412];
-% text(0.5,0.5,'x','FontSize',40)
-% axis off
-% 
-% subplot(2,6,5)
-% sub_five = subplot(265);
-% sub_five.Position = [0.68, 0.5838, 0.12, 0.3412];
-% contourf(sub_five,T,Hs,CW_max)
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% title('Radiation Capture Width Limit (m)','FontSize',10, 'Position', [11.75, 7, 0])
-% colorbar
-% 
-% subplot(2,6,6)
-% sub_six = subplot(266);
-% sub_six.Position = [0.92, 0.5838, 0.01, 0.3412];
-% text(0.55,0.5,'x','FontSize',40)
-% axis off
-% 
-% subplot(2,6,7)
-% sub_seven = subplot(267);
-% sub_seven.Position = [0.1, 0.1100, 0.12, 0.3412];
-% contourf(sub_seven,T,Hs,p.JPD)
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% title('Probability at Site (%)','FontSize',10)
-% colorbar
-% 
-% subplot(2,6,8)
-% sub_eight = subplot(268);
-% sub_eight.Position = [0.28, 0.1100, 0.01, 0.3412];
-% text(0.52,0.5, 'x','FontSize',40)
-% axis off
-% 
-% subplot(2,6,9)
-% sub_nine=subplot(269);
-% sub_nine.Position=[0.4269, 0.1100, 0.12, 0.3412];
-% P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
-% eff = P_elec ./ P_product;
-% contourf(sub_nine,T,Hs,eff)
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% title('Efficiency','FontSize',10)
-% colorbar
-% 
-% sub_ten=subplot(2,6,10);
-% sub_ten.Position = [0.6315, 0.1100, 0.01, 0.3412];
-% text(0.52,0.5, '=','FontSize',40)
-% axis off
-% 
-% sub_eleven=subplot(2,6,11);
-% sub_eleven.Position=[0.756, 0.1100, 0.12, 0.3412];
-% P_product_new = P_product .* eff;
-% contourf(sub_eleven,T,Hs,P_product_new)
-% xlabel('Wave Period T_e (s)')
-% ylabel('Wave Height H_s (m)')
-% colorbar
+P_elec_calc = P_wave .* CW_max .* CW_over_CW_max .* drag_ratio .* force_sat_ratio .* eff;
+err = (P_elec - P_elec_calc) ./ P_elec;
+assert(all(abs(err(~isnan(err))) < 1e-3,'all'))
 
-
-t = tiledlayout(2,9);
+t = tiledlayout(2,12);
+t.TileSpacing = 'tight';
+t.Padding = 'compact';
 nexttile([1 2])
-contourf(T,Hs,P_wave/1000);
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Raw Wave Power Density (kW/m)', 'FontSize', 10, 'Position', [11, 7, 0])
+mycontour(T,Hs,P_wave/1000);
+title('Wave Power (kW/m)', 'FontSize', 20, 'Position', [11, 7, 0])
 c = colorbar;
 % c.Position(1) = c.Position(1)-0.025;
 % c.Position(3) = c.Position(3)/2.7;
@@ -106,10 +26,8 @@ text(0,0.5,'x','FontSize',40)
 axis off
 
 nexttile([1 2])
-contourf(T,Hs,CW_over_CW_max*100)
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Device Capture Efficiency (%)','FontSize',10, 'Position', [11.75, 7, 0])
+mycontour(T,Hs,CW_max)
+title('Max Capture Width (m)','FontSize',20, 'Position', [11.75, 7, 0])
 colorbar
 
 nexttile
@@ -117,24 +35,40 @@ text(0,0.5,'x','FontSize',40)
 axis off
 
 nexttile([1 2])
-contourf(T,Hs,CW_max)
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Radiation Capture Width Limit (m)','FontSize',10, 'Position', [11.75, 7, 0])
+mycontour(T,Hs,CW_over_CW_max*100)
+title('Radiation Efficiency (%)','FontSize',20, 'Position', [11.75, 7, 0])
 colorbar
+caxis([0 100])
 
 nexttile
 text(0,0.5,'x','FontSize',40)
 axis off
 
 nexttile([1 2])
-P_mech = P_wave .* CW_over_CW_max .* CW_max;
-eff = P_elec ./ P_mech; % 0-1
-contourf(T,Hs,eff*100)
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Efficiency (%)','FontSize',10)
+mycontour(T,Hs,drag_ratio*100)
+title('Drag Efficiency (%)','FontSize',20, 'Position', [11.75, 7, 0])
 colorbar
+caxis([0 100])
+
+nexttile
+text(0,0.5,'x','FontSize',40)
+axis off
+
+nexttile([1 2])
+mycontour(T,Hs,force_sat_ratio*100)
+title('F_{max} Factor (%)','FontSize',20)
+colorbar
+caxis([0 100])
+
+nexttile
+text(0,0.5,'x','FontSize',40)
+axis off
+
+nexttile([1 2])
+mycontour(T,Hs,eff*100)
+title('Electrical Efficiency (%)','FontSize',20)
+colorbar
+caxis([0 100])
 
 nexttile
 text(0,0.5, 'x','FontSize',40)
@@ -144,10 +78,8 @@ nexttile([1 2])
 p.JPD(p.JPD>0 & p.JPD < .001) = 0;
 hrs_in_yr = 8766;
 hours = p.JPD/100 * hrs_in_yr;
-contourf(T,Hs,p.JPD)
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Probability at Site (%)','FontSize',10)
+mycontour(T,Hs,p.JPD)
+title('Site Probability (%)','FontSize',20)
 colorbar
 
 nexttile
@@ -156,14 +88,29 @@ axis off
 
 nexttile([1 2])
 energy = P_elec .* hours;
-contourf(T,Hs,energy/1e6)
-xlabel('Wave Period T_e (s)')
-ylabel('Wave Height H_s (m)')
-title('Annual Energy Production (MWh)')
+mycontour(T,Hs,energy/1e6)
+title('Annual Energy (MWh)')
 colorbar
 
+xlabel(t,'Wave Period T_e (s)')
+ylabel(t,'Wave Height H_s (m)')
+title(t,' ')
 improvePlot
 
-set(fig,'Position',[95 123 1370 700])
+set(fig,'Position',[0 123 1530 620])
 
 end
+
+
+function mycontour(X,Y,Z)
+    if numel(unique(Z(~isnan(Z)))) == 1
+        % avoid "contour not rendered for constant zdata"
+        x = [min(X,[],'all') max(X,[],'all')];
+        y = [min(Y,[],'all') max(Y,[],'all')];
+        imagesc('XData',x,'YData',y,'CData',Z,'AlphaData',~isnan(Z))
+    else
+        contourf(X,Y,Z)
+    end
+
+end
+
