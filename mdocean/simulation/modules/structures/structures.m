@@ -160,41 +160,42 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
 
     sigma_vm  = sigma_r; % ignore Mt for now
 
-    % uncomment for debugging
-    % just for plot purposes
-%     delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
-%                             + F_tube * sum(delta_plate_con_nondim_vec.',1));
-% 
-%     figure
-%     plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
-%     hold on
-%     plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
-%     plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
-%     legend
-%     xlabel('r')
-%     ylabel('Moment')
-%     improvePlot
-% 
-%     figure
-%     plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
-%     hold on
-%     plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
-%     plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
-%     plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
-%     legend
-%     xlabel('r')
-%     ylabel('Deflection')
-%     improvePlot
-% 
-%     figure
-%     plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
-%     hold on
-%     plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
-%     plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
-%     legend
-%     xlabel('r')
-%     ylabel('Normalized Quantity')
-%     improvePlot
+    plot_on = false;
+    if plot_on
+        delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
+                                + F_tube * sum(delta_plate_con_nondim_vec.',1));
+    
+        figure
+        plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
+        hold on
+        plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
+        plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
+        legend
+        xlabel('r')
+        ylabel('Moment')
+        improvePlot
+    
+        figure
+        plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
+        hold on
+        plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
+        plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
+        plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
+        legend
+        xlabel('r')
+        ylabel('Deflection')
+        improvePlot
+    
+        figure
+        plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
+        hold on
+        plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
+        plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
+        legend
+        xlabel('r')
+        ylabel('Normalized Quantity')
+        improvePlot
+    end
 
 end
 
