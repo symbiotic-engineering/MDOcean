@@ -285,6 +285,7 @@ fig_names{36} = 'Fig. 36: damping plate plate aspect ratio';
 if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
     try
         t = tic;
+        addpath('/damping-plate');
         BoedoPrantilAnnularPlate()
         fig36 = gcf;
         fig35 = figure(fig36.Number-1);
