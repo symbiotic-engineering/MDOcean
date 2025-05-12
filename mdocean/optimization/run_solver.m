@@ -12,8 +12,8 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
         end
         % Convert to solver-based
         problem = prob2struct(prob,x0,...
-            'ObjectiveFunctionName',['generatedObjective' obj]);%,...
-            %'FileLocation',generated_folder);
+            'ObjectiveFunctionName',['generatedObjective' obj],...
+            'FileLocation',generated_folder);
         problem.options = opts;
         
         if strcmp(opts.Algorithm,'sqp')
