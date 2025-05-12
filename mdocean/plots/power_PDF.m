@@ -19,6 +19,10 @@ else
     prob_label_pos = [-5 -.0015];
 end
 
+if nargin < 5
+    which_plots = [true true];
+end
+
 if which_plots(1) % PDF
     ax1 = nexttile(1);
     %h = histogram(P_counts,'BinWidth',10,'Normalization','pdf');
