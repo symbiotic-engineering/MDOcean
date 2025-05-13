@@ -168,7 +168,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     tol = probMO.options.ConstraintTolerance;
     idx = constraint_active_plot(residuals,fval,tol);
 
-    x_sorted = x(idx,b.idxs_recover)
+    x_sorted = x(idx,b.idxs_recover);
 % solve for lambda values
     [rows,~] = size(x);
     for i = 1:length(LCOE_seeds)
@@ -177,21 +177,23 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     end
 
     for i = 1:rows
-        input = x(i,:);
-        x_0_new.(b.var_names{1}) = input(1);
-        x_0_new.(b.var_names{2}) = input(2);
-        x_0_new.(b.var_names{3}) = input(3);
-        x_0_new.(b.var_names{4}) = input(4);
-        x_0_new.(b.var_names{5}) = input(5);
-        x_0_new.(b.var_names{6}) = input(6);
-        x_0_new.(b.var_names{7}) = input(7);
-        x_0_new.(b.var_names{8}) = input(8);
-        x_0_new.(b.var_names{9}) = input(9);
-        x_0_new.(b.var_names{10}) = input(10);
-        x_0_new.(b.var_names{11}) = input(11);
-        x_0_new.(b.var_names{12}) = input(12);
+        input = x_sorted(i,:);
+        %x_0_new.(b.var_names{1}) = input(1);
+        %x_0_new.(b.var_names{2}) = input(2);
+        %x_0_new.(b.var_names{3}) = input(3);
+        %x_0_new.(b.var_names{4}) = input(4);
+        %x_0_new.(b.var_names{5}) = input(5);
+        %x_0_new.(b.var_names{6}) = input(6);
+        %x_0_new.(b.var_names{7}) = input(7);
+        %x_0_new.(b.var_names{8}) = input(8);
+        %x_0_new.(b.var_names{9}) = input(9);
+        %x_0_new.(b.var_names{10}) = input(10);
+        %x_0_new.(b.var_names{11}) = input(11);
+        %x_0_new.(b.var_names{12}) = input(12);
         %x_0_new.(b.var_names{13}) = input(13);
         %x_0_new.(b.var_names{14}) = input(14);
+
+        x_0_new = cell2struct(num2cell(input)',b.var_names(1:end-1),1);
 
         [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
         g(:,i) = gs;
@@ -233,7 +235,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
     subplot 311
 
     %subplot 311
-    H=subplot(3,1,1, 'Position', [0.195 0.787 0.86 0.16]);
+    H=subplot(3,1,1);
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
     yticks(linspace(1,8,8));
@@ -248,7 +250,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
 
     subplot 312
     %subplot 312
-    I=subplot(3,1,2, 'Position', [0.195 0.505 0.86 0.16]);
+    I=subplot(3,1,2);
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
     yticks(linspace(1,8,8))
@@ -262,8 +264,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
     grid on
 
     subplot 313
-    %subplot 313
-    J=subplot(3,1,3, 'Position', [0.2 0.08 0.85 0.3]);
+    J=subplot(3,1,3);
     spy(con_active(idx,:)')
     title('Constraint Active')
     xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
