@@ -178,21 +178,6 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
 
     for i = 1:rows
         input = x_sorted(i,:);
-        %x_0_new.(b.var_names{1}) = input(1);
-        %x_0_new.(b.var_names{2}) = input(2);
-        %x_0_new.(b.var_names{3}) = input(3);
-        %x_0_new.(b.var_names{4}) = input(4);
-        %x_0_new.(b.var_names{5}) = input(5);
-        %x_0_new.(b.var_names{6}) = input(6);
-        %x_0_new.(b.var_names{7}) = input(7);
-        %x_0_new.(b.var_names{8}) = input(8);
-        %x_0_new.(b.var_names{9}) = input(9);
-        %x_0_new.(b.var_names{10}) = input(10);
-        %x_0_new.(b.var_names{11}) = input(11);
-        %x_0_new.(b.var_names{12}) = input(12);
-        %x_0_new.(b.var_names{13}) = input(13);
-        %x_0_new.(b.var_names{14}) = input(14);
-
         x_0_new = cell2struct(num2cell(input)',b.var_names(1:end-1),1);
 
         [Xs_opt_original, ~, ~, ~, lambda_original, gs] = gradient_optim(x_0_new,p,b,which_objs);
@@ -208,7 +193,7 @@ function [x,fval,lambda] = pareto_search(filename_uuid)
     residuals2.upper = Xs_opt'-b.X_maxs';
     [~]=constraint_active_plot(residuals2,fval,tol);
 
-    % save mat file to be read by pareto_heuristics.m
+    % save mat file to be read by pareto_curve_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
     save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p","lambda")
 end
@@ -232,63 +217,59 @@ function [idx] = constraint_active_plot(residuals,fval,tol)
     [~,idx] = sort(fval(:,1)); % order by increasing LCOE
 
     figure
-    subplot 311
-
-    %subplot 311
-    H=subplot(3,1,1);
+    tiledlayout(2,1)
+    nexttile
     spy(lb_active(idx,:)');
     title('Lower Bound Active')
-    yticks(linspace(1,8,8));
-    yticklabels({'WEC Surface Float Outer Diameter', ...
-        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
-        'Ratio of WEC Surface Float Height to Outer Diameter', ...
-        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
-        'Powertrain/Controller Damping','Controller Natural Frequency', ...
-        'Material'});
+    yticks(linspace(1,12,12));
+    yticklabels({'D_{s}','D_{f}','T_{f2}','h_{s}','h_{fs, clear}','F_{max}',...
+        'P_{max}','t_{fb}','t_{sr}','t_{d}','h_{stiff, f}','h_{1, stiff, d}'});
     xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
     grid on
 
-    subplot 312
-    %subplot 312
-    I=subplot(3,1,2);
+    nexttile
     spy(ub_active(idx,:)')
     title('Upper Bound Active')
-    yticks(linspace(1,8,8))
-    yticklabels({'WEC Surface Float Outer Diameter', ...
-        'Ratio of WEC Surface Float Inner Diameter to Outer Diameter', ...
-        'Ratio of WEC Surface Float Height to Outer Diameter', ...
-        'Percent of WEC Spar Submergence','Maximum Powertrain Force', ...
-        'Powertrain/Controller Damping','Controller Natural Frequency', ...
-        'Material'});
+    yticks(linspace(1,12,12))
+    yticklabels({'D_{s}','D_{f}','T_{f2}','h_{s}','h_{fs, clear}','F_{max}',...
+        'P_{max}','t_{fb}','t_{sr}','t_{d}','h_{stiff, f}','h_{1, stiff, d}'});
     xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
     grid on
+    improvePlot
 
-    subplot 313
-    J=subplot(3,1,3);
-    spy(con_active(idx,:)')
+    figure
+    hold on
+    [m,n]=size(con_active);
+    for i = 1:m
+        for j = 22:n
+            if con_active(i,j)==1
+                con_active(i,21)=1;
+            end
+        end
+    end
+    spy(con_active(idx,1:21)')
     title('Constraint Active')
     xlabel("Designs, ordered by increasing LCOE", "Fontsize", 9)
-    yticks(linspace(1,14,14));
-    yticklabels({'Prevent Float Too Heavy', 'Prevent Float Too Light', ...
-        'Prevent Spar Too Heavy','Prevent Spar Too Light', ...
-        'Metacentric Height','Float Yield','Column Yield','Reaction Plate Yield' ...
-        'Column Buckling','Net Generated Power','Minimum Damping Plate Diameter', ...
-        'Prevent Float Above Top of the Spar','Prevent LCOE Greater Than Nominal', ...
-        'Prevent Irrelevant Max Force'});
+    yticks(linspace(1,21,21));
+    yticklabels({'Float Too Heavy','Float Too Light','Spar Too Heavy','Spar Too Light',...
+        'Stability','FOS Float Max','FOS Float Fatigue','FOS Col Max','FOS Col Fatigue',...
+        'FOS Plate Max','FOS Plate Fatigue','FOS Col Local Max','FOS Col Local Fatigue',...
+        'Pos Power','LCOE Max','Irrelevant Max Force','Spar Height Up','Spar Height Down',...
+        'Float Spar Hit','Linear Theory','Prevent Slamming'});
     grid on
-
+    hold off
     improvePlot
 
     %subplot 311
-    set(H, "FontSize",10)
-    title(H,'Lower Bound Active', "FontSize", 16)
-
-    %subplot 312
-    set(I, "FontSize",10)
-    title(I,'Upper Bound Active', "FontSize", 16)
-
-    %subplot 313
-    set(J, "FontSize",9.5)
-    title(J,'Constraint Active', "FontSize", 16)
+    % set(H, "FontSize",10)
+    % title(H,'Lower Bound Active', "FontSize", 16)
+    % 
+    % %subplot 312
+    % set(I, "FontSize",10)
+    % title(I,'Upper Bound Active', "FontSize", 16)
+    % 
+    % subplot 313
+    % set(J, "FontSize",9.5)
+    % title(J,'Constraint Active', "FontSize", 16)
 
 end
