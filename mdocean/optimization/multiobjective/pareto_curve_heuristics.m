@@ -417,11 +417,11 @@ function [] = lagrange_multiplier_plot(lambdaActive, ...
         for j = 1:n
             if j<=20
                 color=color_cell{rem(j,21)};
-                h=plot((i)*100/60,lambdaActive((i),j),'.','MarkerEdgeColor',color,'MarkerFaceColor',color,'MarkerSize',12);
+                %h=plot((i)*100/60,lambdaActive((i),j),'.','MarkerEdgeColor',color,'MarkerFaceColor',color,'MarkerSize',12);
             else
                 color=color_cell{21};
             end
-            %h=plot((i)*100/60,lambdaActive((i),j),'Marker','.','MarkerEdgeColor',color,'MarkerFaceColor',color,'MarkerSize',12);
+            h=plot((i)*100/60,lambdaActive((i),j),'Marker','.','MarkerEdgeColor',color,'MarkerFaceColor',color,'MarkerSize',12);
             set(h,'linestyle','none')
             if abs(lambdaActive(i,j))>tol
                 nonzero(j)=nonzero(j)+1;
