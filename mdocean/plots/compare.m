@@ -200,7 +200,7 @@ legend({'A_{f}/\rho','B_{f}/(\rho\omega)'});
 ylabel('A_{f}/\rho (m^{3}), B_{f}/(\rho\omega) (m^{3}/(rad^{2}s^{2}))')
 hold off
 improvePlot
-leg2.Location='best';
+
 h=findobj(gca().Children,"Type","line");
 for j = 1:length(h)
     %h(j).MarkerSize = 6;
