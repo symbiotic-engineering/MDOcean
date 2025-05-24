@@ -9,10 +9,7 @@ X = [b.X_noms; 1];
 
 [feasible,~,failed] = is_feasible(g,X,p,b)
 
-num_outputs = 4;
-runtime = timeit(@()simulation(X,p),num_outputs);
-
-plot_power_matrix(X,p,'')
+plot_power_matrix(X,p,b,'')
 
 figure
 power_PDF(X,p)

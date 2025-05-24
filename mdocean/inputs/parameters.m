@@ -29,7 +29,7 @@ else
     D_f_b_over_D_f = 6.5/20;
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
-    h = 45;
+    h = 85;
     power_coeffs = [22.4,1,-15,86];
     power_scale_multibody = 0.595;
 end
@@ -127,8 +127,8 @@ T = [T;
         "fixed charge rate (-), see RM3 report p63",{''});
     table("N_WEC","N_{WEC}",{100},"economics",true,"number of WECs in array (-)",{''});
     table("LCOE_max","LCOE_{max}",{1},"economics",true,"maximum LCOE ($/kWh)",{''});
-%     table("avg_power_min","P_{avg,elec,min}",{100},"economics",true,... 
-%         "minimum average electrical power (W)",{''}); % set to a negative number (not zero) to disable constraint
+    table("avg_power_min","P_{avg,elec,min}",{0},"economics",true,... 
+        "minimum average electrical power (W)",{''});
     table("eff_array","\eta_{array}",{0.95*0.98},"economics",true,...
         "array availability and transmission efficiency (-)",{''});
     table("cost_perN_mult", "$/N",{1},"economics",true,...
@@ -170,6 +170,10 @@ T = [T;
         "whether to use MEEM for hydro coeffs (boolean)",{''});
     table("use_multibody","use_multibody",{true},"dynamics",false,... 
         "whether to use multibody dynamics (boolean)",{''});
+    table("use_force_sat","use_force_sat",{true},"dynamics",false,... 
+        "whether to use force saturation (boolean)",{''});
+    table("use_power_sat","use_power_sat",{true},"dynamics",false,... 
+        "whether to use power saturation (boolean)",{''});
     ...
     ...% Dynamics: numerics and convergence
     table("X_tol","X_{tol}",{1e-2},"dynamics",false,... 
