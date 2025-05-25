@@ -86,10 +86,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
     % add nonlinear constraints
     prob = optimproblem();
-    for i = 1:num_constraints
-        name = b.constraint_names{i};
-        prob.Constraints.(name) = g(i) >= 0;
-    end
+    prob.Constraints.NonlinearIneq = g >= 0;
 
     % add linear constraints
     [A_lin,b_lin] = lin_ineq_constraints(p);
