@@ -9,7 +9,7 @@ function [hydro_ratio, P_wave, CW_max, ...
         end
         b.filename_uuid = filename_uuid;
     
-        [~,val] = max_avg_power(p,b);    
+        [~,val,~,P_elec] = max_avg_power(p,b);    
     else
         [~,~,P_elec,~,val] = simulation(X, p);
     end

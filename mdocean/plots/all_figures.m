@@ -130,7 +130,7 @@ if any(which_figs == 9)
         p = parameters();
         b = var_bounds();
         X = [b.X_noms; 1];
-        plot_power_matrix(X,p,filename_uuid)
+        plot_power_matrix(X,p,b,filename_uuid)
         fig9 = gcf;
         fig_output(which_figs==9) = fig9;
     catch err

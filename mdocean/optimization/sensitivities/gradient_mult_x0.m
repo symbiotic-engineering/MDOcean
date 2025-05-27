@@ -95,7 +95,7 @@ edge_weights = [           sum(lin_feasible);                                   
 G_J1 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,1),node_names);
 G_J2 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,2),node_names);
 figure
-t = tiledlayout([1 2]);
+t = tiledlayout(1, 2);
 %t.TileSpacing = 'tight';
 t.Padding = 'compact';
 nexttile
@@ -110,7 +110,7 @@ improvePlot
 
 % parallel axis plot
 figure
-t = tiledlayout([3 4]);
+t = tiledlayout(3, 4);
 %t.TileSpacing = 'tight';
 t.Padding = 'compact';
 for i=1:num_DVs
