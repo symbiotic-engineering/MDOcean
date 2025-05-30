@@ -113,7 +113,7 @@ figure
 t = tiledlayout(3, 4);
 %t.TileSpacing = 'tight';
 t.Padding = 'compact';
-for i=1:num_DVs
+for i=1:num_DVs-1
     nexttile
     var_names = results.Properties.VariableNames;
     dv_idx = contains(var_names,b.var_names{i});
