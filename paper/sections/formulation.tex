@@ -11,14 +11,29 @@ The standard optimization problem formulation is expressed \cite{martins_enginee
 \label{standard}
 \end{aligned}
 \end{equation}
-An optimization algorithm adjusts each element of the design variable vector $\vec{x}$ to values between predetermined lower and upper bounds $\vec{x}_{LB}$ and $\vec{x}_{UB}$, searching for the design which minimizes the objective function(s) $\vec{J}$. Inequality, $\vec{g}$, and equality, $\vec{h}$, constraints prevent the solution from falling in regions of the design space deemed unsuitable or irrelevant. Parameters $\vec{p}$ include any constant inputs that are required to compute the objective or constraints.
+An optimization algorithm adjusts each element of the design variable vector $\vec{x}$ to values between predetermined lower and upper bounds $\vec{x}_{LB}$ and $\vec{x}_{UB}$, searching for the design which minimizes the objective function(s) $\vec{J}$.
+Inequality, $\vec{g}$, and equality, $\vec{h}$, constraints prevent the solution from falling in regions of the design space deemed unsuitable or irrelevant.
+Parameters $\vec{p}$ include any constant inputs that are required to compute the objective or constraints.
 
 \subsubsection{Objective Function}\label{sec:obj}
-For the single-objective formulation, the optimization minimizes $LCOE$, the estimated levelized cost of energy metric shown in equations \eqref{eq:LCOE,eq:LCOE-scale}. LCOE is by far the most common metric that WEC developers use to evaluate market viability \cite{trueworthy_wave_2020} and is a well-known concept across many energy technologies. It is adopted here for its simplicity, although this choice brings three major limitations. First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule of energy generated has equal value. On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}. Thus, capturing nonuniform sources of WEC value like consistency or complementarity would require modifications (e.g. those outlined in \cite{mccabe_system_2023}) outside the scope of the present model.
+For the single-objective formulation, the optimization minimizes $LCOE$, the estimated levelized cost of energy metric shown in equations \eqref{eq:LCOE,eq:LCOE-scale}.
+LCOE is by far the most common metric that WEC developers use to evaluate market viability \cite{trueworthy_wave_2020} and is a well-known concept across many energy technologies.
+It is adopted here for its simplicity, although this choice brings three major limitations.
+First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule of energy generated has equal value.
+On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}.
+Thus, capturing nonuniform sources of WEC value like consistency or complementarity would require modifications (e.g. those outlined in \cite{mccabe_system_2023}) outside the scope of the present model.
 
-A second limitation of LCOE is its high uncertainty for devices in the early design stage. The economic model of section~\ref{sec:econ} only assumes a few cost components (structures and PTO) to scale with design. If fixed cost components or the $FCR$ were to change, it could influence the optimal design. The third limitation is that $LCOE$ has limited relevance in off-grid or micro-grid use cases. These applications include offshore aquaculture, autonomous underwater vehicle charging, and oceanic data collection, and have grown increasingly popular since the 2019 launch of the DOE's ``Powering the Blue Economy" initiative \cite{livecchi_powering_2019}. For instance, while both energy production increase and cost decrease can drive LCOE reduction, only the latter is relevant for applications with a fixed power requirement. Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}. 
+A second limitation of LCOE is its high uncertainty for devices in the early design stage.
+The economic model of section~\ref{sec:econ} only assumes a few cost components (structures and PTO) to scale with design.
+If fixed cost components or the $FCR$ were to change, it could influence the optimal design.
+The third limitation is that $LCOE$ has limited relevance in off-grid or micro-grid use cases.
+These applications include offshore aquaculture, autonomous underwater vehicle charging, and oceanic data collection, and have grown increasingly popular since the 2019 launch of the DOE's ``Powering the Blue Economy" initiative \cite{livecchi_powering_2019}.
+For instance, while both energy production increase and cost decrease can drive LCOE reduction, only the latter is relevant for applications with a fixed power requirement.
+Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}. 
 
-In the multi-objective formulation, instead of $LCOE$, the two objectives optimized are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$. This directly addresses the second and third limitations of LCOE just described. Under this formulation, the fixed charge rate and cost components without accurate design scalings can no longer influence the optimal design, and the minimum-capital design for a given power requirement can be easily identified.
+In the multi-objective formulation, instead of $LCOE$, the two objectives optimized are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$.
+This directly addresses the second and third limitations of LCOE just described.
+Under this formulation, the fixed charge rate and cost components without accurate design scalings can no longer influence the optimal design, and the minimum-capital design for a given power requirement can be easily identified.
 
 The objective function is expressed:
 \begin{equation}
@@ -36,7 +51,10 @@ The objective function is expressed:
 % \end{equation}
 
 \subsubsection{Requirements}\label{sec:requirements}
-This section describes requirements that the optimization formulation must enforce and narrates how the requirements influence the optimization problem formulation. Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions). Constraints are the most common but not the only way to implement these requirements. Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
+This section describes requirements that the optimization formulation must enforce and narrates how the requirements influence the optimization problem formulation.
+Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions).
+Constraints are the most common but not the only way to implement these requirements.
+Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
 (2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever" formulation that overcomes common difficulties in large-scale optimization. 
 
 \tablename~\ref{tab:requirements} shows each requirement along with an indication of its priority in an optimization formulation context and a reference to the section, equation, or figure where it is explained.
@@ -56,15 +74,18 @@ R7 & $T_{f,1}<T_{f,2}$ & Float draft & 2 & Fig. \ref{fig:dims} & Parameter $T_{f
   R9&$\omega_n<\omega_{n,max}$& Spar natural frequency& 2& Eq. \eqref{eq:spar}&Lin. ineq. constraint\\
  R10& $\zeta > \zeta_{min}$& Spar damping ratio& 2&Eq. \eqref{eq:spar} &Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
   R11&$P_{avg}>0$& Positive net power& 2& -&Nonlin. ineq. constraint $g_{NL,14}$\\
- R12& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3& Tab. \ref{tab:DLCs}&Design variable bound\\
+ R12& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3& Tab.
+\ref{tab:DLCs}&Design variable bound\\
   R13&$h_{fs,up}>0$& Float spar tops (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint\\
  R14& $h_{fs,down}>0$& Float spar base (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint\\
   R15&$h_{fs,up}>|X_f-X_s|$& Float spar tops (dynamics)& 3& Eq. \eqref{eq:h-fs-up-down}&Nonlin. ineq. constraint $g_{NL,17}$\\
  R16& $h_{fs,down}>|X_f-X_s|$& Float spar base (dynamic)& 3& Eq. \eqref{eq:h-fs-up-down}&Nonlin. ineq. constraint $g_{NL,18}$\\
- R17& $h_{fs,clear}>|X_f-X_s|$& Float spar tube clearance (dynamic)& 3& Tab. \ref{tab:DLCs}&Nonlin. ineq. constraint $g_{NL,19}$\\
+ R17& $h_{fs,clear}>|X_f-X_s|$& Float spar tube clearance (dynamic)& 3& Tab.
+\ref{tab:DLCs}&Nonlin. ineq. constraint $g_{NL,19}$\\
   R18&$V_{f,struct,min} < V_{f,struct} < V_{f,struct,max}$& Float hydrostatics& 3& Eq. \eqref{eq:vol-constraint}&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
   R19&$V_{s,struct,min} < V_{s,struct} < V_{s,struct,max}$& Spar hydrostatics& 3& Eq. \eqref{eq:vol-constraint}&Nonlin. ineq. constraint $g_{NL,3}-g_{NL,4}$\\
-  R20&$FOS > FOS_{min}$& Structural factors of safety& 3& Tab. \ref{tab:struct}&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
+  R20&$FOS > FOS_{min}$& Structural factors of safety& 3& Tab.
+\ref{tab:struct}&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
   R21&$GM > 0$& Metacentric height (pitch stability)& 3& Eq. \eqref{eq:GM}&Nonlin. ineq. constraint $g_{NL,5}$\\
   R22&$\tau_p = \tau_{max}$& Maximum powertrain force& 3& &Nonlin. ineq. constraint $g_{NL,16}$\\
    R23&$P_{pk,elec} = P_{max}$& Maximum powertrain power& 3& &Nonlin. ineq. constraint $g_{NL,XX}$\\
@@ -78,16 +99,35 @@ R7 & $T_{f,1}<T_{f,2}$ & Float draft & 2 & Fig. \ref{fig:dims} & Parameter $T_{f
 \end{longtable}
 \hl{fill in constraint identifiers}
 
-In this work, priority 1 requirements are model requirements that should not be violated at any time during the optimization because they will cause the simulation to throw an error or return an invalid solution such as \texttt{Inf}, \texttt{NaN}, or imaginary numbers. Some optimization algorithms will fail outright at such invalid solutions, and even robust algorithms can struggle to converge without a valid objective value to determine the next step in the design space. Meanwhile, violation of priority 2 model requirements entails an inaccurate yet still computationally valid objective. Violation during the optimization is still undesirable because the model inaccuracy at those points may lead the optimizer astray, especially for gradient-based optimization, but is not as detrimental as the violation of priority 1 requirements. If implemented with constraints, activity of priority 2 constraints in the final solution is typically undesired, indicating that the optimum point may lie in a region of the design space that cannot be accurately modeled with the given assumptions. Finally, priority 3 requirements return an accurate objective value even when violated, marking a design as undesirable for a reason related to its practical viability or functionality rather than its model validity. The presence of active priority 3 constraints in the end design is acceptable, even expected. Ultimately, this three-level requirement prioritization will inform the selection of design variables and parameters.
+In this work, priority 1 requirements are model requirements that should not be violated at any time during the optimization because they will cause the simulation to throw an error or return an invalid solution such as \texttt{Inf}, \texttt{NaN}, or imaginary numbers.
+Some optimization algorithms will fail outright at such invalid solutions, and even robust algorithms can struggle to converge without a valid objective value to determine the next step in the design space.
+Meanwhile, violation of priority 2 model requirements entails an inaccurate yet still computationally valid objective.
+Violation during the optimization is still undesirable because the model inaccuracy at those points may lead the optimizer astray, especially for gradient-based optimization, but is not as detrimental as the violation of priority 1 requirements.
+If implemented with constraints, activity of priority 2 constraints in the final solution is typically undesired, indicating that the optimum point may lie in a region of the design space that cannot be accurately modeled with the given assumptions.
+Finally, priority 3 requirements return an accurate objective value even when violated, marking a design as undesirable for a reason related to its practical viability or functionality rather than its model validity.
+The presence of active priority 3 constraints in the end design is acceptable, even expected.
+Ultimately, this three-level requirement prioritization will inform the selection of design variables and parameters.
 
-Requirements are ordered by priority in \tablename~\ref{tab:requirements}, and within priority grouped by the way the requirement is enforced. Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (R1, R2, R3), numerical overflow (R4, R5), deviation from the truncated cone shape (R6, R7), submersion below the waterplane (R8), and violation of dynamic assumptions (R9, R10); a power criteria to ensure the WEC generates net energy (R11); height conditions to ensure valid positioning of the float with respect to the spar in the static case (R12, R13, R14) and in operational seas (R15, R16, R17); measures of buoyancy to ensure the float and spar do not sink and can be suitably ballasted (R18, R19); eight structural factors of safety (FOS) to avoid structural failure (R20); a measure of stability to ensure the WEC does not tip (R21); equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (R22, R23); and a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section \ref{sec:multi-obj-process} (R24). \hl{Add R25 and R26}
+Requirements are ordered by priority in \tablename~\ref{tab:requirements}, and within priority grouped by the way the requirement is enforced.
+Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (R1, R2, R3), numerical overflow (R4, R5), deviation from the truncated cone shape (R6, R7), submersion below the waterplane (R8), and violation of dynamic assumptions (R9, R10); a power criteria to ensure the WEC generates net energy (R11); height conditions to ensure valid positioning of the float with respect to the spar in the static case (R12, R13, R14) and in operational seas (R15, R16, R17); measures of buoyancy to ensure the float and spar do not sink and can be suitably ballasted (R18, R19); eight structural factors of safety (FOS) to avoid structural failure (R20); a measure of stability to ensure the WEC does not tip (R21); equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (R22, R23); and a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section \ref{sec:multi-obj-process} (R24).
+\hl{Add R25 and R26}
 
 \subsubsection{Design Variables, Parameters, and Constraints}
-The selection of optimization design variables to encode a given physical design space is non-unique. For example, the float and spar drafts could be encoded directly with dimensions $T_{f,2}$ and $T_s$, or nondimensionally with dimension $T_s$ and ratio $T_{f,2}/T_s$. A certain encoding may be selected because it more directly controls the objective value, makes the problem convex, or helps maintain feasibility and facilitate convergence during optimization. The latter is pursued here. Depending on the choice of design variables and parameters, each requirement could be enforced via parameters, design variable bounds, linear inequality constraints, linear equality constraints, nonlinear inequality constraints, or nonlinear equality constraints, listed in order from least to most difficult for the optimizer to handle. It is desirable, then, to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements to ensure they are satisfied even at intermediate points in the optimization process. 
+The selection of optimization design variables to encode a given physical design space is non-unique.
+For example, the float and spar drafts could be encoded directly with dimensions $T_{f,2}$ and $T_s$, or nondimensionally with dimension $T_s$ and ratio $T_{f,2}/T_s$.
+A certain encoding may be selected because it more directly controls the objective value, makes the problem convex, or helps maintain feasibility and facilitate convergence during optimization.
+The latter is pursued here.
+Depending on the choice of design variables and parameters, each requirement could be enforced via parameters, design variable bounds, linear inequality constraints, linear equality constraints, nonlinear inequality constraints, or nonlinear equality constraints, listed in order from least to most difficult for the optimizer to handle.
+It is desirable, then, to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements to ensure they are satisfied even at intermediate points in the optimization process. 
 
-Continuing with the illustrative example of choosing how to encode the drafts, observe that two of the priority 1 requirements, R3 and R5, contain $T_{f,2}$, while $T_s$ appears in R3 and R4. Assuming for the moment that other variables appearing in those requirements (e.g. $T_{f,1}$ and $h$) are parameters or design variables, then the first (dimensional) encoding would make all three relevant requirements achievable via linear constraint, while the second (nondimensional) encoding would make R3 achievable via bound (preferable) but R5 would require a nonlinear constraint (undesired). Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed that the optimizer frequently violates nonlinear constraints and causes simulation failure, so the dimensional encoding is selected here.
+Continuing with the illustrative example of choosing how to encode the drafts, observe that two of the priority 1 requirements, R3 and R5, contain $T_{f,2}$, while $T_s$ appears in R3 and R4.
+Assuming for the moment that other variables appearing in those requirements (e.g. $T_{f,1}$ and $h$) are parameters or design variables, then the first (dimensional) encoding would make all three relevant requirements achievable via linear constraint, while the second (nondimensional) encoding would make R3 achievable via bound (preferable) but R5 would require a nonlinear constraint (undesired).
+Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed that the optimizer frequently violates nonlinear constraints and causes simulation failure, so the dimensional encoding is selected here.
 
-This sort of logic is repeated for the remaining possible design variables and requirements. After several formulation iterations, the design variable and parameters definitions shown in Tables~\ref{tab:design-vars} and \ref{tab:parameters} emerged as effective. There are 12 design variables representing 5 bulk dimensions, 5 structural dimensions, and 2 generator ratings. Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, this study is the most comprehensive WEC optimization in terms of the breadth of design variable disciplines considered, and it is on the larger end but not the largest in terms of number of design variables.
+This sort of logic is repeated for the remaining possible design variables and requirements.
+After several formulation iterations, the design variable and parameters definitions shown in Tables~\ref{tab:design-vars} and \ref{tab:parameters} emerged as effective.
+There are 12 design variables representing 5 bulk dimensions, 5 structural dimensions, and 2 generator ratings.
+Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, this study is the most comprehensive WEC optimization in terms of the breadth of design variable disciplines considered, and it is on the larger end but not the largest in terms of number of design variables.
 
 \begin{table}[ht]
 \setlength\tabcolsep{1.5pt} % make less wide
@@ -99,8 +139,10 @@ This sort of logic is repeated for the remaining possible design variables and r
  \textbf{\#}&\textbf{Design Variable}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
  $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\ 
  $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\ 
- $x_3$&$T_{f,2}$ & Float draft& 0.5& See sec. \ref{sec:validation}&100& m\\ 
- $x_4$&$h_s$& Spar height  & 5& See sec. \ref{sec:validation}& 100& m\\ 
+ $x_3$&$T_{f,2}$ & Float draft& 0.5& See sec.
+\ref{sec:validation}&100& m\\ 
+ $x_4$&$h_s$& Spar height  & 5& See sec.
+\ref{sec:validation}& 100& m\\ 
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $\tau_{max}$& Generator peak torque rating & 10& 1000& 4000&Nm\\ 
  $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\ 
@@ -114,7 +156,13 @@ This sort of logic is repeated for the remaining possible design variables and r
 \end{center}
 \end{table}
 
-The parameters in \tablename~\ref{tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}. Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$. They hold the geometric proportions of the spar geometry constant, which is required to maintain a sufficiently large damping ratio, requirement R10 (see equation~\eqref{eq:spar}). Together with requirement R9, which sets an upper bound on the spar natural frequency, this means that the spar dynamics are identical to those of the nominal RM3 to maintain the dynamics assumptions described in section~\ref{sec:dynamics}. Essentially, the spar dimensional design space has been restricted in order to comply with the model assumptions. This unfortunately prevents determination of the true optimal spar dimensions under multibody dynamics, but suffices for an initial study with emphasis on float design. \hl{Explain how this manifests as a minimum damping plate diameter.}
+The parameters in \tablename~\ref{tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$.
+They hold the geometric proportions of the spar geometry constant, which is required to maintain a sufficiently large damping ratio, requirement R10 (see equation~\eqref{eq:spar}).
+Together with requirement R9, which sets an upper bound on the spar natural frequency, this means that the spar dynamics are identical to those of the nominal RM3 to maintain the dynamics assumptions described in section~\ref{sec:dynamics}.
+Essentially, the spar dimensional design space has been restricted in order to comply with the model assumptions.
+This unfortunately prevents determination of the true optimal spar dimensions under multibody dynamics, but suffices for an initial study with emphasis on float design.
+\hl{Explain how this manifests as a minimum damping plate diameter.}
 
 \begin{table}[ht]
 \centering
@@ -156,7 +204,10 @@ $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 \end{table}
 
 
-Looking back to \tablename~\ref{tab:requirements}, the final column demonstrates that this encoding of design variables and parameters successfully avoids nonlinear constraints in all priority 1 requirements and all but one of the priority 2 requirements. This clever formulation helps avoid model errors while facilitating convergence of the optimization. A total of \numLinConstraints~linear and \numNonlinConstraints~nonlinear inequality constraints exist, with no equality constraints necessary. The linear constraints are shown in matrix form:
+Looking back to \tablename~\ref{tab:requirements}, the final column demonstrates that this encoding of design variables and parameters successfully avoids nonlinear constraints in all priority 1 requirements and all but one of the priority 2 requirements.
+This clever formulation helps avoid model errors while facilitating convergence of the optimization.
+A total of \numLinConstraints~linear and \numNonlinConstraints~nonlinear inequality constraints exist, with no equality constraints necessary.
+The linear constraints are shown in matrix form:
 % notebook p137 11/16/25
 \begin{equation}
     \begin{bmatrix}
