@@ -259,14 +259,15 @@ These improvements increase to \pctImprovePowerMaxPower~more power and \pctImpro
 Optimal designs have noticeably larger diameters and drafts, lower above-water spar profiles, thinner structural material, and similarly sized powertrains as the nominal RM3.
 Due to the non-convex, highly constrained nature of the problem, a multistart procedure with \numMultistartRequired~random initial conditions is required to ensure a 95\% chance of finding the presumed global optimum.
 Parameter sensitivities show that LCOE is highly senstivity to wave characteristics, efficiency, and the fixed charge rate, while design cost is highly sensitive to bulk and structural damping plate dimensions, the price of PTO power, site parameters, and material choice.
-Design variables are sensitive to wave characteristics, motivating the need for a site-specific design, and to geometric parameters, suggesting the addition of $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ as design variables in future work.
-\hl{Location sens shows XX;
-Modeling assumption sensitivity shows XX}
+Optimal design variables are sensitive to wave characteristics, motivating the need to investigate site-specific designs, and to geometric parameters, suggesting the addition of $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ as design variables in future work.
+A global sensitivity to depolyment location for four U.S. locations reveals that incident wave power drives LCOE and that in Hawaii, where wave periods are shorter, the optimal design unexpectedly has a \HawaiiDesignCharacteristics than on the U.S. West Coast, where longer waves dominate. 
+Finally, the sensitivity to modeling assumptions shows that allowing force saturation as a control strategy enables a \pctImproveLCOEForceSatOptMinLCOE~reduction in LCOE compared to an optimal design without force saturation, compelling evidence for WEC developers to select a powertrain with a force rating below the highest expected impedance-matched force.
+Meanwhile, control scheme, drag, and degrees of freeom \hl{results await analysis}.
 
 After this thorough analysis of the single objective results, the trade-off between cost and power is found using multi-objective optimization.
 The pareto front contains a non-convex cusp where below \powerWhereCusp~kW average power, cost declines sharply for only small power decreases, corresponding to a strategy shift where power saturation, rather than force saturation, becomes optimal at these lower powers. 
 Meanwhile, lower powers also favor larger drafts, smaller float diameters, larger spar diameters, and thinner structural thicknesses.
-\hl{Idea of just changing controller doesn't work}
+A previously-proposed concept to achieve a tradeoff of power and cost for different WEC use cases only through the PTO without modifying the hydrodynamic and structural design is shown to be minimally effective, since most of the cost reduction at low power is due to the reduction in material cost rather than PTO cost.
 The multi-objective optimization runs in just \paretoRuntime on the machine described in \sectionautorefname~\ref{sec:sim-runtime}, a large improvement over the many hours required for previous WEC design optimization studies.
 Surprisingly, however, the use of gradients does not facilitate convergence enough to make up for the additional function evaluations required for finite difference derivative evaluation, and therefore it takes several times as many function evaluations to construct the pareto front as it does for previous optimizations using the genetic algorithm.
 
@@ -274,7 +275,7 @@ Surprisingly, however, the use of gradients does not facilitate convergence enou
 A key feature of this study that other WEC optimizations lack is the modeling of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
 Nonetheless, the structural loads and stresses have high uncertainty, the impact of PTO dynamics and irregular waves are not included, and only a single WEC type (two-body axisymmetric point absorber) is considered.
 Future modeling work should pursue model enhancements to correct these limitations.
-Additionally, the next iteration should consider enhancing the formulation by adding design variables like PTO components and geometric ratios, and requirements like \hl{XX}. 
+Additionally, the next iteration should consider enhancing the formulation by adding design variables like PTO components and geometric ratios, and requirements relating to mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
 Finally, analysis extensions such as a global sensitivity sweep assessing the impact of combined deviations in parameter inputs and model assumptions would allow a more thorough evaluation of the optimal design's robustness to relevant uncertainties and the design space tradeoff between optimality and robustness.
 
 % Impact of findings:

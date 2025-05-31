@@ -301,11 +301,6 @@ The effect of wave conditions on design is especially important considering that
 Wave resource data for four U.S. locations (Humboldt Bay, California; Pac-Wave North, Oregon; Pac-Wave South, Oregon; and Wave Energy Test Site, Hawaii) is obtained from the NREL SAM repository \cite{janzou_sam_2022}, which sources its data from a 2015 report by Sandia National Lab \cite{dallman_characterization_2015}.
 All economic assumptions are held fixed for consistency, which neglects the effect of location-specific bathymetry on foundation cost and distance from shore on installation, operations, and maintenance costs.
 The optimal design variables and LCOE corresponding to each of the four locations are shown in Table~\ref{tab:location}.
-All optimized LCOE values are less expensive than the RM3 baseline.
-The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\hl{XX}/kWh, which makes sense because the incident wave energy flux is highest there.
-The WEC located in WETS, HI has the highest LCOE, \$\hl{XX}/kWh, aligning with its low incident energy.
-The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \hl{smaller float, lower force limit, and higher damping and natural frequency}.
-This is due to the differing wave conditions regionally.
 
 \begin{table}\label{tab:location}\setlength\arraycolsep{1pt}
 \begin{tabular}{>{\centering\arraybackslash}p{0.20\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.18\linewidth}}
@@ -334,9 +329,16 @@ Optimal levelized cost of energy (\$/kWh) & $LCOE^*$ & $605 \cdot 10^{-3}$ & $60
 \caption{Results for Re-Optimization in Four Distinct Locations}
 \end{table}
 
-
-%\hl{replace pac wave north with north carolina?}
-\hl{Also include the results of holding design constant, ie with each output row having another row below it showing the ratio from using} $x^*_{California}$ at that location.
+All optimized LCOE values are less expensive than the RM3 baseline.
+The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\hl{XX}/kWh, which makes sense because the incident wave energy flux is highest there.
+The WEC located in WETS, HI has the highest LCOE, \$\hl{XX}/kWh, aligning with its low incident energy.
+The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \HawaiiDesignCharacteristics.
+This is surprising: using the simple scaling argument $\omega_n = \sqrt{\frac{k}{m}}=\sqrt{\frac{\rho g A}{\rho A T_f C_m}}\sim T_f^{-\frac{1}{2}}$ a WEC's uncontrolled natural frequency scales with its draft to the $\frac{-1}{2}$ power, so a smaller draft would be expected in sites with higher-frequency waves like Hawaii.
+One hypothesis for this reversal is that Hawaii's lower incident energy and thus lower wave excitation force requires a higher oscillation amplitude to achieve comparable energy production, which in turn necessitates a higher draft to avoid slamming.
+\hl{(I'm not sure if this is the true explanation, need to inspect intermediate results to confirm.)}
+This result demonstrates the importance of using a full coupled model to optimize WEC design, as the simple scaling heuristic produces an inaccurate conclusion.
+\hl{(Note: I may replace PacWave North with North Carolina so I have a result from the East coast.
+I would also like to include the results of holding design constant, ie with each output row having another row below it showing the ratio from using} $x^*_{California}$ at that location).
 
 %\subsubsection{Price Global Sensitivity}
 %We also perform a global sensitivity analysis for price parameters $p_\tau$, $p_P$, $p_M$, and $p_0$ from equation~\eqref{eq:LCOE-scale}. For $p_0$, if the design-independent (unmodeled) cost goes to zero, \hl{(and maybe change 80\% efficiency into 100\%)}, that's essentially the best LCOE that a WEC of these technical assumptions (steel point absorber with given operational conditions) can get. We can think of the rest as a cost gap \hl{(explain)}. Meanwhile, the global sensitivity analysis for $p_\tau$ gives preliminary insight into the multi-objective problem, recovering a portion of the pareto front between the four variables that influence $LCOE$: $\tau$, $P_{pk,elec}$, $V_{struct}$, and $P_{avg,elec}$. This shows \hl{XXX conclusion}, to be clarified further in the multi-objective optimization.
@@ -350,7 +352,7 @@ These settings include the control scheme (damping or reactive), the presence of
 \hl{This analysis is left for during scrutineering.}
 
 \paragraph{Force Saturation}
-First examining the optimal LCOE design presented in \sectionautorefname~\ref{sec:results-single}, the lowest force saturation power factor across all sea states in \figureautorefname~\ref{fig:power-matrix-opt} is $\frac{P_{sat}}{P_{unsat}}=$\lowestFmaxFactorMinLCOE, with a corresponding force limit of $\frac{F_{max}}{F_{unsat}}=$\lowestFsatMinLCOE~in that sea state. 
+First examining the optimal LCOE design presented in \sectionautorefname~\ref{sec:results-single}, the lowest force saturation power factor across all sea states in \figureautorefname~\ref{fig:power-matrix-opt} is $\frac{P_{sat}}{P_{unsat}}=\lowestFmaxFactorMinLCOE$, with a corresponding force limit of $\frac{F_{max}}{F_{unsat}}=\lowestFsatMinLCOE$~in that sea state. 
 %This corresponds almost exactly with the relationship expected in the purely resistive Thevenin impedance case in \cite{mccabe_force-limited_2024}:
 %\begin{equation}
 %   \frac{ P_{sat}}{P_{unsat}}=1-\left(\frac{F_{max}}{F_{unsat}}-1\right)^2
@@ -358,7 +360,7 @@ First examining the optimal LCOE design presented in \sectionautorefname~\ref{se
 % see notebook p46 5/16/25
 % fixme: what about the factor of 4/pi in the force ratio? Then the quadratic equation wouldn't apply, it would be more complicated (alpha non zero case) which casts doubt on my conclusion that alpha=0 emerges as optimal. Would need to compute alpha directly I think? I also think that the assumption of damping control means my Im(Gamma)=0 assumption in the notebook is false. Also Psat/Punsat is the the same as Psat/Pmax. So leaving this sentence out.
 Considering all sea states, the optimal force-saturated design sacrifices only \powerLossForceSatMinLCOE~Watts of average power (around \pctPowerLossForceSatMinLCOE) and reduces its PTO cost by \pctPTOSavingsForceSatMinLCOE, leading to an LCOE reduction of \pctImproveLCOEForceSatMinLCOE~compared to the same design with no force saturation, although the unsaturated design violates structural constraints due to the higher force.
-If the optimization is instead re-run to ensure constraint satisfaction while not allowing force saturation, the result has a 0.6\% power gain, 9\% higher PTO cost, 12\% higher structural cost, and 5\% higher LCOE compared to the optimization with saturation.
+If the optimization is instead re-run to ensure constraint satisfaction while not allowing force saturation, the result has a \pctPowerLossForceSatOptMinLCOE power gain, \pctPTOSavingsForceSatOptMinLCOE higher PTO cost, \pctStructSavingsForceSatOptMinLCOE higher structural cost, and \pctImproveLCOEForceSatOptMinLCOE higher LCOE compared to the optimization with saturation.
 
 \paragraph{Drag}
 As section~\ref{sec:sensitivities-local} alludes to, the low sensitivity to drag coefficient suggests that modeling the drag nonlinearity is perhaps not essential.
