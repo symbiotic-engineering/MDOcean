@@ -1,6 +1,9 @@
 
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
 
+warning('off','MATLAB:nearlySingularMatrix')
+warning('off','MATLAB:singularMatrix')
+
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all
@@ -83,10 +86,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
     % add nonlinear constraints
     prob = optimproblem();
-    for i = 1:num_constraints
-        name = b.constraint_names{i};
-        prob.Constraints.(name) = g(i) >= 0;
-    end
+    prob.Constraints.NonlinearIneq = g >= 0;
 
     % add linear constraints
     [A_lin,b_lin] = lin_ineq_constraints(p);
@@ -147,8 +147,9 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         % Post process
         if ploton
-            plot_power_matrix(X_opt,p,b.filename_uuid)
+            plot_power_matrix(X_opt,p,b,b.filename_uuid)
             visualize_geometry(X_opt,p)
+            lagrange_multiplier_bar_chart(b,lambda)
         end
     end
     if ploton
