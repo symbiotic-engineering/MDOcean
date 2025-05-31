@@ -43,7 +43,7 @@ parfor i=1:length(files)
     which_obj = 1; % only optimize LCOE
     [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,new_b,which_obj);
     
-    plot_power_matrix(X_opts(:,i),new_p,b.filename_uuid)
+    plot_power_matrix(X_opts(:,i),new_p,b,b.filename_uuid)
     figure(2)
     power_PDF(X_opts(:,i),new_p)
     hold on
