@@ -8,3 +8,9 @@
   }{$1\n}gx;
   $_ = defined $comment ? "$code%$comment" : $code;
 ' {} +
+
+grep -o '\\newcommand{\\[^}]*}' paper/numbers.tex | sed 's/\\newcommand{//;s/}//' | while read cmd; do
+  grep -rl --include="*.tex" "$cmd " . | while read file; do
+    sed -i "s/${cmd} /${cmd}~/g" "$file"
+  done
+done
