@@ -25,54 +25,37 @@ end
 
 if which_plots(1) % PDF
     ax1 = nexttile(1);
-    %h = histogram(P_counts,'BinWidth',10,'Normalization','pdf');
-    
-    % [N,edges] = histcounts(P_counts,'BinWidth',.1,'Normalization','pdf');
-    % edge_centers = 1/2 *(edges(1:end-1) + edges(2:end));
-    % edges = 10.^(-1:0.1:3); 
-    % hist = histc(P_counts, edges);
-    % centers = sqrt(edges(1:end-1).*edges(2:end));
-    % bar(edges,hist)
-    % h = plot(edge_centers,N,'Color',color);
-    %  hold on
-    
-     if logscale
-         P_x = logspace(log10(P_min),log10(P_max),100);
-     else
-         P_x = linspace(P_min,P_max,100);
-     end
-    [f,xi]= ksdensity(P_counts,P_x,'support', 'positive');
-    if logscale
-        h = semilogx(xi,f);
-        ax1.XScale = 'log';
-        ax1.YScale = 'log';
-        ax1.YMinorGrid = 'off';
+    fit = true; % false for histogram, true for ksdensity fit
+    if ~fit
+%         h = histogram(P_counts,'BinWidth',10,'Normalization','pdf');
+        
+        [N,edges] = histcounts(P_counts,'BinWidth',.1,'Normalization','pdf');
+        edge_centers = 1/2 *(edges(1:end-1) + edges(2:end));
+        edges = 10.^(-1:0.1:3); 
+        hist = histc(P_counts, edges);
+        centers = sqrt(edges(1:end-1).*edges(2:end));
+        bar(edges,hist)
+        h = plot(edge_centers,N,'Color',color);
+        hold on
     else
-        h = plot(xi,f);
+    
+         if logscale
+             P_x = logspace(log10(P_min),log10(P_max),100);
+         else
+             P_x = linspace(P_min,P_max,100);
+         end
+        [f,xi]= ksdensity(P_counts,P_x,'support', 'positive');
+        if logscale
+            h = semilogx(xi,f);
+            ax1.XScale = 'log';
+            ax1.YScale = 'log';
+            ax1.YMinorGrid = 'off';
+        else
+            h = plot(xi,f);
+        end
     end
     ylim([prob_min,prob_max])
-    
-    is_nor = ~lillietest(P_counts,'Distribution','normal');
-    is_exp = ~lillietest(P_counts,'Distribution','exponential');
-    is_ext = ~lillietest(P_counts,'Distribution','extreme value');
-    is_lno = ~lillietest(log(P_counts),'Distribution','normal'); % log normal
-    is_wei = ~lillietest(log(P_counts),'Distribution','extreme value'); % Weibull
-    
-    
-    gamma_dist = fitdist(P_counts,'gamma');
-    % hold on
-    % y = pdf(gamma_dist,P_counts);
-    % plot(P_counts,y,'*')
-    % xlim([0 500])
-    % ylim([0 .01])
-    is_gam = ~kstest(P_counts,'CDF',gamma_dist);
-    
-    is_dist = [is_nor is_exp is_ext is_lno is_wei is_gam];
-    if any(is_dist)
-        dists = {'normal','exponential', 'extreme value', 'lognormal', 'weibull', 'gamma'};
-        disp(dists(is_dist))
-    end
-    
+        
     grid on
     if nargin > 2
         h.Color = color;
