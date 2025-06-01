@@ -1,7 +1,9 @@
 function [hydro_ratio, P_wave, CW_max, ...
     P_elec, force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, X, p, b, plot_on)
     
-    if nargin<4
+    if nargin==2 || nargin==3
+        error('Must have 1, 4, or 5 inputs')
+    elseif nargin==1
         p = parameters();
         b = var_bounds();
         if nargin==0

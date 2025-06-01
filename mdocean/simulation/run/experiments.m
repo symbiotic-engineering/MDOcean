@@ -1,7 +1,6 @@
 
 % Runs one-at-a-time design of experiments
 
-%clear;clc;close all
 function experiments()
 
 p = parameters();
