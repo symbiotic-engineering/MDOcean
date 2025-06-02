@@ -266,17 +266,16 @@ The parameter driving the float draft slant angle, $T_{f,1}/T_{f,2}$, has a high
 The parameter driving the spar slenderness, $T_s/D_s$, significantly affects the spar height and float spar clearance $h_s$ and $h_{fs,clear}$, indicating that $T_s$ should be added as a design variable in addition to $h_s$.
 Finally, the amount of clearance between the float and spar, $D_{f,in}/D_s$, has a large effect on  $h_{stiff,f}$.
 This might suggest the addition of $D_{f,in}$ as a design variable, but a more significant gap between the float and spar would change the hydrodynamics in a way that is not modeled due to moonpool resonance effects, making this addition less straightforward than others. 
+%\hl{Any other params that could have been design variables, show that the sensitivity is hopefully low.}
 In summary, the parameters that should be added as design variables in future optimizations are $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
 
 %Highly sensitive parameters include \hl{XXX}.
 %Insensitive parameters include \hl{XXX.
 %Describe which are sensitive to J vs x vs constraint activity.
 %Maybe also show dJ/dx and that's important because you need that DV exact or not without affecting your bottom line.}
-
 %\hl{Is it possible to use these sensitivities to demonstrate coupling, and predict the effect of holding some DVs constant?) - during re scrutineering} 
 
 The positive value of $\frac{dJ^*}{dT_{f,2}/h_f}$ in \figureautorefname~\ref{fig:param-sens-J-star-tornado} \hl{confirms} the previous suggestion that the above-water float material is unnecessary.
-\hl{Any other params that could have been design variables, show that the sensitivity is hopefully low.}
 
 %For these highly sensitive parameters, it is worthwhile to perform a global sensitivity analysis to observe any nonlinearity. Figure~\ref{fig:param-sens-global} and \ref{fig:x-opt-sens-global} demonstrate the new optimal objective and optimal design variable values respectively under the re-optimization-based OAT global parameter sensitivity process described in section~\ref{sec:single-obj-process}.
 % \begin{figure}\label{fig:param-sens-global}
@@ -330,14 +329,14 @@ Optimal levelized cost of energy (\$/kWh) & $LCOE^*$ & $605 \cdot 10^{-3}$ & $60
 \end{table}
 
 All optimized LCOE values are less expensive than the RM3 baseline.
-The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\hl{XX}/kWh, which makes sense because the incident wave energy flux is highest there.
-The WEC located in WETS, HI has the highest LCOE, \$\hl{XX}/kWh, aligning with its low incident energy.
+The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\LCOEPacWaveNorth/kWh, which makes sense because the incident wave energy flux is highest there.
+The WEC located in WETS, HI has the highest LCOE, \$\LCOEHawaii/kWh, aligning with its low incident energy.
 The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \HawaiiDesignCharacteristics.
 This is surprising: using the simple scaling argument $\omega_n = \sqrt{\frac{k}{m}}=\sqrt{\frac{\rho g A}{\rho A T_f C_m}}\sim T_f^{-\frac{1}{2}}$ a WEC's uncontrolled natural frequency scales with its draft to the $\frac{-1}{2}$ power, so a smaller draft would be expected in sites with higher-frequency waves like Hawaii.
 One hypothesis for this reversal is that Hawaii's lower incident energy and thus lower wave excitation force requires a higher oscillation amplitude to achieve comparable energy production, which in turn necessitates a higher draft to avoid slamming.
 \hl{(I'm not sure if this is the true explanation, need to inspect intermediate results to confirm.)}
 This result demonstrates the importance of using a full coupled model to optimize WEC design, as the simple scaling heuristic produces an inaccurate conclusion.
-\hl{(Note: I may replace PacWave North with North Carolina so I have a result from the East coast.
+\hl{(Note: I may replace one of the PacWaves with North Carolina so I have a result from the East coast.
 I would also like to include the results of holding design constant, ie with each output row having another row below it showing the ratio from using} $x^*_{California}$ at that location).
 
 %\subsubsection{Price Global Sensitivity}
@@ -455,7 +454,7 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 Figure \ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
 The optimization also runs without issue, albeit more slowly, on unspecialized machines such as a Windows 10 laptop computer with MATLAB R2022a.
 %the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
-Each single-objective optimization takes just \singleObjRuntime, requiring \singleObjFcnEvals~function evaluations including both objective and gradient evaluation. 
+Each single-objective optimization takes just \singleObjRuntime, converging in \singleObjIters~iterations and requiring \singleObjFcnEvals~function evaluations including both objective and gradient evaluation. 
 Generating the pareto front takes \paretoRuntime, of which \paretoPctTimeSeeds~is spent generating seeds via epsilon-constraint and the remaining \paretoPctTimePatternSearch~on the pattern search. 
 Gradient-based post-optimality sensitivities run rapidly in just \gradientSensRuntime, while sensitivities obtained via re-optimization take \reoptimSensRuntime.
 
