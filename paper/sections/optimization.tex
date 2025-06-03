@@ -35,8 +35,8 @@ Each subproblem is then an efficient quadratic program, with approximations upda
 The MATLAB implementation of SQP also guarantees that each intermediate design query obeys bounds, which helps stay within the zone of model validity described by the priority 1 requirements in section~\ref{sec:requirements}.
 With any algorithm, it is only possible to verify local, not global, optimality for a non-convex objective.
 Therefore, the multi-start method is used to see whether any better local optima can be found.
-The single-objective optimization is performed for \hl{100} initial guesses.
-\hl{200} designs are randomly drawn from between the upper and lower bounds, and the first \hl{100} that obey linear constraints are evaluated. %\hl{does it make more sense to use design space exploration instead of random sampling here?}
+The single-objective optimization is performed for several initial guesses.
+\numMultistartRandom~designs (typically around \numMultistartObeyConstraint) are randomly drawn from between the upper and lower bounds, and the designs that obey linear constraints are evaluated. %\hl{does it make more sense to use design space exploration instead of random sampling here?}
 
 \paragraph{Derivatives}
 As a gradient-based optimizer, SQP requires derivatives of the objective and constraints with respect to the design variables to inform the search path.
