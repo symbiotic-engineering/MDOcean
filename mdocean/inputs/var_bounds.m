@@ -155,7 +155,8 @@ end
 b.constraint_names_pretty = remove_underscores(b.constraint_names);
 
 b.lin_constraint_names = {'spar_natural_freq','float_spar_diam','float_spar_draft',...
-                          'float_spar_tops','float_seafloor','spar_seafloor'};
+                          'float_spar_tops','float_seafloor','spar_seafloor',...
+                          'damping_plate_thickness','float_stiffener'};
 b.lin_constraint_names_pretty = remove_underscores(b.lin_constraint_names);
 
 % objectives
