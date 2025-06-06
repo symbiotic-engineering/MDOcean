@@ -49,7 +49,7 @@ parfor i=1:length(files)
     hold on
 end
 figure(2)
-locs = {'Humboldt, CA (nominal)','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
+locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
 legend(locs)
 
 site_info = [flux;BW;storm;depths];
@@ -58,7 +58,7 @@ site_info_descs = {'Incident energy flux (kW/m)',...
     'Half-power bandwidth (rad/s)','Storm sea states (m, s)','Water depth (m)'};
 
 design_var_names = cellfun(@(x) ['$' x, '^*$'], b.var_names_pretty, 'UniformOutput', false);
-design_var_descs = cellfun(@(x) ['Optimal ' x], b.var_descs, 'UniformOutput', false);
+design_var_descs = cellfun(@(x) ['Opt. ' x], lower(b.var_descs), 'UniformOutput', false);
 
 symbols = [site_info_vars,  design_var_names,{'$LCOE^*$','flag'}];
 row_descs = [site_info_descs, design_var_descs,{'Optimal levelized cost of energy (\\$/kWh)','flag'}];
