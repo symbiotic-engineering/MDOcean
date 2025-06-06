@@ -13,8 +13,8 @@ figure
 h = plot(x,y,'r--');
 hold on
 plot(x,ysat,'r',x,yfund,'b')
-xlabel('Normalized Time')
-ylabel('Normalized Powertrain Force')
+xlabel('Normalized Time (-)')
+ylabel('Normalized Powertrain Force (-)')
 improvePlot
 set(h,'HandleVisibility','off')
 
@@ -50,8 +50,8 @@ drag_actual = sin(x*2*pi) .* abs(sin(x*2*pi));
 
 figure
 plot(x,drag_actual,'r',x,drag_DF,'b')
-xlabel('Normalized Time')
-ylabel('Normalized Drag Force')
+xlabel('Normalized Time (-)')
+ylabel('Normalized Drag Force (-)')
 legend('Squared Signal $\sin(\omega t)|\sin(\omega t)|$',...
     'Fundamental Amplitude $\frac{8}{3\pi}\sin(\omega t)$','Interpreter','latex')
 improvePlot

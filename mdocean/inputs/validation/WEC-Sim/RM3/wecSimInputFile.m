@@ -36,7 +36,10 @@ save('mcrMDOcean.mat','mcr')
 % filename to save
 [~, status] = system('git status');
 if ~contains(status,'working tree clean')
-    error('you have  uncommitted changes, please commit so the wecsim settings can be referenced to the commit')
+    msg = ['you have  uncommitted changes, please commit so the wecsim ' ...
+        'settings can be referenced to the commit. Status: ' status];
+    err = MException('MDOcean:WecSim:uncommitted',msg);
+    throw(err)
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);

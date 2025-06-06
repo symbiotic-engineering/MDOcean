@@ -1,81 +1,89 @@
-function plot_power_matrix(X,p,filename_uuid)
+function plot_power_matrix(X,p,b,filename_uuid)
 
-[CW_over_CW_max, P_wave, CW_max, P_elec] = check_max_CW(filename_uuid, X, p);
-
+% get matrices to plot
+[CW_over_CW_max, P_wave, CW_max, P_elec, ...
+    force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, X, p, b, false);
 [T,Hs] = meshgrid(p.T,p.Hs);
-figure
+p.JPD(p.JPD>0 & p.JPD < .001) = 0;
+hrs_in_yr = 8766;
+hours = p.JPD/100 * hrs_in_yr;
+energy = P_elec .* hours;
 
-subplot(2,5,1)
-sub_one = subplot(251);
-sub_one.Position = [0.05, 0.5838, 0.23, 0.3412];
-contourf(sub_one,T,Hs,P_wave);
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Raw Wave Power Density (W/m)', 'FontSize', 12, 'Position', [11, 7, 0])
-colorbar
+% check that multiplication is correct
+P_elec_calc = P_wave .* CW_max .* CW_over_CW_max .* drag_ratio .* force_sat_ratio .* eff;
+err = (P_elec - P_elec_calc) ./ P_elec;
+assert(all(abs(err(~isnan(err))) < 1e-3,'all'))
 
-subplot(2,5,2)
-sub_two = subplot(252);
-sub_two.Position = [0.3, 0.5838, 0.01, 0.3412];
-text(0.5,0.5,'x','FontSize',30)
-axis off
+% figure
+fig = figure;
+t = tiledlayout(2,12);
+t.TileSpacing = 'tight';
+t.Padding = 'compact';
 
-subplot(2,5,3)
-sub_three = subplot(253);
-sub_three.Position = [0.385, 0.5838, 0.23, 0.3412];
-contourf(sub_three,T,Hs,CW_over_CW_max)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Device Capture Efficiency','FontSize',12, 'Position', [11.75, 7, 0])
-colorbar
+mycontour(T,Hs,P_wave/1000,'Wave Power (kW/m)',false,true);
 
-subplot(2,5,4)
-sub_four = subplot(254);
-sub_four.Position = [0.655, 0.5838, 0.01, 0.3412];
-text(0.5,0.5,'x','FontSize',30)
-axis off
+plot_char('x')
 
-subplot(2,5,5)
-sub_five = subplot(255);
-sub_five.Position = [0.729, 0.5838, 0.23, 0.3412];
-contourf(sub_five,T,Hs,CW_max)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Radiation Capture Width Limit (m)','FontSize',12, 'Position', [11.75, 7, 0])
-colorbar
+mycontour(T,Hs,CW_max,'Max Capture Width (m)',false,true)
 
-subplot(2,5,6)
-sub_six = subplot(256);
-sub_six.Position = [0.18, 0.1100, 0.01, 0.3412];
-text(0.55,0.5,'x','FontSize',30)
-axis off
+plot_char('x')
 
-subplot(2,5,7)
-sub_seven = subplot(257);
-sub_seven.Position = [0.2632, 0.1100, 0.26, 0.3412];
-contourf(sub_seven,T,Hs,p.JPD)
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Probability at Site (%)','FontSize',12)
-colorbar
+mycontour(T,Hs,CW_over_CW_max*100,'Radiation Efficiency (%)',true,true)
 
-subplot(2,5,8)
-sub_eight = subplot(258);
-sub_eight.Position = [0.5496, 0.1100, 0.01, 0.3412];
-text(0.52,0.5,'=','FontSize',30)
-axis off
+plot_char('x')
 
-subplot(2,5,9)
-sub_nine=subplot(259);
-sub_nine.Position=[0.6350, 0.1100, 0.26, 0.3412];
-P_product = P_wave .* CW_over_CW_max .* CW_max .* p.JPD;
-contourf(sub_nine,T,Hs,P_product)
-eff = P_elec ./ P_product;
-xlabel('Wave Period T (s)')
-ylabel('Wave Height Hs (m)')
-title('Weighted Power (W)','FontSize',12)
-colorbar
+mycontour(T,Hs,drag_ratio*100,'Drag Efficiency (%)',true,true)
 
+plot_char('x')
+
+mycontour(T,Hs,force_sat_ratio*100,'F_{max} Factor (%)',true,false)
+
+plot_char('x')
+
+mycontour(T,Hs,eff*100,'Electrical Efficiency (%)',true,false)
+
+plot_char('x')
+
+mycontour(T,Hs,p.JPD,'Site Probability (%)',false,false)
+
+plot_char('=')
+
+mycontour(T,Hs,energy/1e6,'Annual Energy (MWh)',false,false)
+
+xlabel(t,'Wave Period T_e (s)')
+ylabel(t,'Wave Height H_s (m)')
+title(t,' ')
 improvePlot
 
+set(fig,'Position',[0 123 1530 620])
+
+end
+
+
+function mycontour(X,Y,Z,title_text,scale_100,title_higher)
+    nexttile([1 2])
+
+    if numel(unique(Z(~isnan(Z)))) == 1
+        % avoid "contour not rendered for constant zdata"
+        x = [min(X,[],'all') max(X,[],'all')];
+        y = [min(Y,[],'all') max(Y,[],'all')];
+        imagesc('XData',x,'YData',y,'CData',Z,'AlphaData',~isnan(Z))
+    else
+        contourf(X,Y,Z)
+    end
+    if title_higher
+        title(title_text,'Position', [11.75, 7, 0])
+    else
+        title(title_text)
+    end
+    colorbar
+    if scale_100
+        caxis([0 100])
+    end
+end
+
+function plot_char(c)
+    nexttile;
+    text(0,0.5,c,'FontSize',40)
+    axis off
 end
