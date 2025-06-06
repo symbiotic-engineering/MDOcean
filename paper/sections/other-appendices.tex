@@ -6,19 +6,24 @@ None of these three sources are captured in the MEEM hydrodynamics model due to 
 As described in section \ref{sec:dynamics}, a describing function approximation is used.
 This appendix describes an intricacy glossed over in section \ref{sec:dynamics} and entirely omitted in \cite{quartier_influence_2021}: the dependence of $\dot{x}_{wave}$ and thus $\dot{x}_{rel}$ across the width of the WEC in the direction of wave propagation $y$.
 The authors of \cite{quartier_influence_2021} evaluate the wave velocity $\dot{x}_{wave}$ at the center of the WEC ($y=0$), which results in the drag damping coefficient $B_d$ becoming unrealistically low (even negative) at high frequencies and large wave heights.
+
 A strip-theory approach avoids this issue by integrating the spatially-dependent infinitesimal drag force $dF_d$ over the wetted area $A_w$.
 For a hollow cylinder of radius $R$ and inner radius $R_{in}$, this is expressed: 
 % derived p156-159 notebook 3/10/25
 % simplified p169-173 notebook 3/12/25
-\begin{equation}
+\begin{equation}\label{eq:drag-force-integral}
     F_d(t) = \int_{A_w} dF_d(y,t) = \int_{y=-R}^{R} w(y) P(y,t)dy
 \end{equation}
-where $P(y,t)$ is the local pressure acting vertically due to drag and $w(y)$ is the local width of the WEC perpendicular to $y$:
-\begin{equation}\begin{aligned}
-    w(y) &= \begin{cases}
+where $w(y)$ is the local width of the WEC perpendicular to $y$:
+\begin{equation}\label{eq:drag-width}
+    w(y) = \begin{cases}
         2\sqrt{R^2-y^2}, & R_{in}<|y|<R \\
          2\sqrt{R^2-y^2}-2\sqrt{R_{in}^2-y^2}, &0<|y|< R_{in} \\
-    \end{cases} \\
+    \end{cases}
+\end{equation}
+and $P(y,t)$ is the local pressure acting vertically due to drag:
+\begin{equation}\label{eq:drag-pressure}
+    \begin{aligned}
     P(y,t) &= \frac{1}{2} \rho_w C_d ~\dot{x}_{rel}(y,t) ~|\dot{x}_{rel}(y,t)| \\
    &=  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y)^2 \sin(\omega t+\angle \dot{X}_{rel}(y)) ~\left| \sin(\omega t+\angle \dot{X}_{rel}(y))\right| \\
    &\approx  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y) ^2~\frac{8}{3\pi}\sin(\omega t+\angle \dot{X}_{rel}(y)) 
@@ -33,34 +38,61 @@ Moving into the frequency domain gives complex pressure $\hat{P}$:
  \hat{P}(y,\omega)  &\approx \frac{1}{2} \rho_w C_d \frac{8}{3\pi}\alpha_v(y)^2 \dot{X}^2 e^{i\phi_\alpha(y)+i\angle\dot{X}}
     \end{aligned}
 \end{equation}
-where $\alpha_v(y)$ and $\phi_\alpha$ are the amplitude and phase ratios, respectively, of the relative velocity and WEC velocity:
-\begin{equation}
+where $\alpha_v(y)$ and $\phi_\alpha(y)$ are the amplitude and phase ratios, respectively, of the relative velocity and WEC velocity:
+\begin{equation}\label{eq:drag-alpha-definitions}
 \begin{aligned}
-    \alpha_v^2(y) &= \frac{\dot{X}_{rel}^2(y)}{\dot{X}^2} = 1 + \frac{\dot{X}_{wave}^2}{ \dot{X}^2} - 2 \frac{\dot{X}_{wave}}{ \dot{X}}  \sin\angle \hat{\dot{X}} \\ \\
-    \phi_\alpha(y) &= \angle\left(\frac{\hat{\dot{X}}_{rel}(y)}
-    {\hat{\dot{X}}}\right) = \angle\hat{\dot{X}}_{rel}(y) -  \angle\hat{\dot{X}} = \mathrm{atan2}\left( \sin\angle \hat{\dot{X}} - \frac{\dot{X}_{wave}(y)}{ \dot{X}}, ~\cos\angle \hat{\dot{X}}\right) -  \angle\hat{\dot{X}}
+    \alpha_v(y) &\equiv \frac{\dot{X}_{rel}(y)}{\dot{X}} \\
+    \phi_\alpha(y) &\equiv \angle
+    \left(
+        \frac{\hat{\dot{X}}_{rel}(y)}
+            {\hat{\dot{X}}}
+    \right)   
+    = \angle\hat{\dot{X}}_{rel}(y) -  \angle\hat{\dot{X}} 
 \end{aligned}
 \end{equation}
 
-The integral becomes:
-\begin{equation}
-    \hat{F}_d(\omega) =  \frac{1}{2} \rho_w C_d \frac{8}{3\pi}\dot{X}^2 e^{i\angle\hat{\dot{X}}}\int_{y=-R}^{R} w(y) \alpha_v(y)^2  e^{i\phi_\alpha(y)}dy
-\end{equation}
+Rewriting the relative velocity $\hat{\dot{X}}_{rel}(y)$ in equation \eqref{eq:drag-alpha-definitions} in terms of the finite depth incident wave velocity at a depth equal to the draft $\hat{\dot{X}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-kT} e^{-iky}$ and the WEC velocity $\hat{\dot{X}}$ gives the following expressions for $\alpha_v^2(y)$ and $\phi_\alpha(y)$:
 
+\begin{equation}
+\begin{aligned}
+    \alpha_v^2(y) &= 1 + r^2 e^{-2ky} - 2 r e^{-ky}  \sin\angle \hat{\dot{X}} \\
+    \phi_\alpha(y) &= \mathrm{atan2}\left( \sin\angle \hat{\dot{X}} - r e^{-ky}, ~\cos\angle \hat{\dot{X}}\right) -  \angle\hat{\dot{X}}
+\end{aligned}
+\end{equation}
+where $r = \dot{X}_{wave}(y=0)/ \dot{X}$ is the ratio of the wave velocity at the center of the WEC to the WEC velocity. The drag force integral \eqref{eq:drag-force-integral} becomes:
+\begin{equation}
+    \hat{F}_d(\omega) \approx  \frac{1}{2} \rho_w C_d \frac{8}{3\pi}\dot{X}^2 e^{i\angle\hat{\dot{X}}}\int_{y=-R}^{R} w(y) \alpha_v(y)^2  e^{i\phi_\alpha(y)}dy
+\end{equation}
+noting that both the outer coefficient $e^{i\angle\hat{\dot{X}}}$ and the integral term $e^{i\phi_\alpha(y)}$ are complex phasors.
 Setting $\hat{F}_{d}(\omega)%=\frac{1}{2}\rho_w C_d A_w \frac{8}{3\pi}  \dot{X}_{rel}(\omega)|\dot{X}_{rel}(\omega)|
 =B_{d} \hat{\dot{X}} + K_{d} \hat{X}$ and solving for the coefficients yields
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
-B_{d} &= ~~~~~~\frac{4}{3\pi} \rho_w  A_{w} C_{d} \alpha_v^2 |\dot{X}| \cos(\angle \dot{X}_{rel}- \angle \dot{X}) \\ % real part of c\_f
-K_{d} &= - \omega~\frac{4}{3\pi} \rho_w  A_{w} C_{d} \alpha_v^2 |\dot{X}| \sin(\angle \dot{X}_{rel}- \angle \dot{X}) \\ % -w times imag part of c\_f
-\mathrm{where}\\
-\alpha_v^2 &= 1 + \frac{|\dot{X}_{wave}|^2}{ |\dot{X}|^2} - 2 \frac{|\dot{X}_{wave}|}{ |\dot{X}|}  \sin\angle \dot{X} \\ % derived on p48 of my notebook
-\angle \dot{X}_{rel} &= \mathrm{atan2}\left( \sin\angle \dot{X} - \frac{|\dot{X}_{wave}|}{ |\dot{X}|}, \cos\angle \dot{X}\right) \\ % derived on p67 of my notebook
-|\dot{X}_{wave}| &= \frac{H}{2} \frac{g k}{\omega} \exp(-k  T/2) \\ % finite depth velocity of incident wave
-%|\dot{X}| &= \omega  |X| \\
-%\angle \dot{X} &= \angle X + \pi/2 \\
+B_{d} &= ~~~~~~\frac{4}{3\pi} \rho_w  C_{d} \dot{X} \int_{y=-R}^{R} w(y) \alpha_v(y)^2  \cos(\phi_\alpha(y))dy \\ % real part of c\_f
+K_{d} &= - \omega~\frac{4}{3\pi} \rho_w  C_{d} \dot{X} \int_{y=-R}^{R} w(y) \alpha_v(y)^2  \sin(\phi_\alpha(y))dy \\ % -w times imag part of c\_f
 \end{aligned}
 \end{equation}
+
+Plugging in the expressions for $w(y)$, $\alpha_v(y)$, and $\phi_\alpha(y)$ gives an integral with the following form:
+\begin{equation}
+\begin{aligned}
+    &\int_{y=-R}^{R} w(y) \alpha_v(y)^2  e^{i\phi_\alpha(y)}dy \\
+    = &\int_{y=-R}^{R} w(y) \sqrt{1 + r^2 e^{-2ky} - 2 r e^{-ky}  \sin\angle \hat{\dot{X}}} \left(f_3(\angle\hat{\dot{X}}) + f_2(\angle\hat{\dot{X}})re^{-ky}\right)  dy
+\end{aligned}
+\end{equation}
+where $f_2$ and $f_3$ are trigonometric functions \hl{that I will derive during re-scrutineering, they are different for the cosine (Bd) vs sine (Kd). For now before these integrals are derived, I assume the following:}
+\begin{equation}
+\begin{aligned}
+    \phi_\alpha(y) &= 0 \\
+    \alpha_v(y) &= \alpha_v(y=0) = 1 + r^2 - 2 r \sin\angle \hat{\dot{X}}
+\end{aligned}
+\end{equation}
+
+Comparisons against WEC-Sim confirmed that this assumption yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}, which uses an identical $\alpha_v(y)$ but assumes a different phase: $\phi_\alpha(y)=\phi_\alpha(y=0)$. 
+At high frequencies and large wave heights, $r$ is large and $\phi_\alpha(y=0)$ exceeds $\pi$, causing the drag damping coefficient $B_d$ to be negative (non-dissipative), which is not realistic.
+While setting $\phi_\alpha(y)=0$ does not guarantee that $B_d$ is always positive, it is found through testing to significantly reduce the risk of negative damping and to promote convergence of the drag loop.
+In the optimization, any negative drag damping coefficents are set to zero.
+
 % todo: write out full integral
 %Like \cite{quartier_influence_2021}, this formulation evaluates the wave velocity $\dot{x}_{wave}$ at the center of the WEC rather than considering the variation in wave velocity along the direction of propagation as would be done with strip theory. This avoids cumbersome integral calculations at the cost of a small inaccuracy that will be quantified in section~\ref{sec:validation}.
 
