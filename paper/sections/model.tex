@@ -617,16 +617,23 @@ where table~\ref{tab:DLCs} details $F_p$ and $X$ based on the assumptions of eac
     \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}}
  & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
          \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
-         Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $\tau_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
-Solve \ref{eq:eom-freq-domain} with float coefficients for $F_p$.}\\ 
- Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \ref{eq:eom-freq-domain} with float coefficients}& \parbox[m]{\linewidth}{\centering Given by \ref{eq:eom-freq-domain} with float-spar coefficients and $F_p=0$}\\ 
-         Spar amplitude, $X_s$& Given by \ref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
+         Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $F_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
+Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\ 
+ Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
+         Spar amplitude, $X_s$& Given by \eqref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
  \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|X_f-X_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
- \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{linear}, X_{slam})$&$X_{slam}$\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{linear}, X_{slam})$& N/A %$X_{slam}$\\
     \end{tabular}
     \caption{Force components in each design load case}
     \label{tab:DLCs}
 \end{table}
+
+The calculation of forces and amplitudes in operational seas uses the 2-DOF equation of motion \eqref{eq:eom-freq-domain} with the PTO force $F_p$ set by the chosen controller.
+In storm seas, the brake force could calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+%However, it is not actually necessary to calculate the brake force, since the PTO cost model does not contain a term for the brake cost. -- this is not true, even without a PTO cost model, the brake force is needed to calculate the heave force for structural purposes.
+However, this would require additional time-consuming iteration. Therefore, instead of separately finding the float and spar heave force, the net heave force on both bodies is calculated using the 1-DOF equation of motion \eqref{eq:eom-freq-domain} with zero PTO force $F_p=0$ (since the brake force is an internal force when considering a unifed float-spar rigid body) and the hydrodynamic coefficents corresponding to the float only. \hl{(Note: ideally it would use hydro coefficients for the unified float-spar geometry).}
+For conservativism, this net force is assumed to apply to both the float and spar independently. % For force, this makes way less sense than doing the 2-DOF calc, since the net float-spar force isn't what matters for structures. For amplitude, this is a fine assumption, but I'm not even using the storm amplitude constraint, so it doesn't make any sense.
+
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
    F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (e^{-kz_{top}}-e^{-kT})
@@ -657,7 +664,9 @@ In both operational and storm states, slamming should be avoided since it causes
 Slamming refers to the bottom surface of the WEC rising out of the water and hitting the free surface as it reenters.
 The formula for the critical slamming amplitude $X_{slam}$ in regular waves of height $H$ is derived in \appendixname \ref{sec:appendix-slam} and shown to lie between $T_f-H/2$ and $T_f+H/2$ depending on the wave parameters and float diameter, draft, and oscillation phase.
 For operational waves, $T_f$ is taken as $T_{f,1}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
-For storm waves, $T_f$ is set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
+For storm waves, currently the slamming limit is not applied.
+%since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
+In future work, the storm draft $T_f$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
 
 Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
 This is a questionable assumption, but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
