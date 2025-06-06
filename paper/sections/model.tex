@@ -631,7 +631,9 @@ Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\
 The calculation of forces and amplitudes in operational seas uses the 2-DOF equation of motion \eqref{eq:eom-freq-domain} with the PTO force $F_p$ set by the chosen controller.
 In storm seas, the brake force could calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 %However, it is not actually necessary to calculate the brake force, since the PTO cost model does not contain a term for the brake cost. -- this is not true, even without a PTO cost model, the brake force is needed to calculate the heave force for structural purposes.
-However, this would require additional time-consuming iteration. Therefore, instead of separately finding the float and spar heave force, the net heave force on both bodies is calculated using the 1-DOF equation of motion \eqref{eq:eom-freq-domain} with zero PTO force $F_p=0$ (since the brake force is an internal force when considering a unifed float-spar rigid body) and the hydrodynamic coefficents corresponding to the float only. \hl{(Note: ideally it would use hydro coefficients for the unified float-spar geometry).}
+However, this would require additional time-consuming iteration.
+Therefore, instead of separately finding the float and spar heave force, the net heave force on both bodies is calculated using the 1-DOF equation of motion \eqref{eq:eom-freq-domain} with zero PTO force $F_p=0$ (since the brake force is an internal force when considering a unifed float-spar rigid body) and the hydrodynamic coefficents corresponding to the float only.
+\hl{(Note: ideally it would use hydro coefficients for the unified float-spar geometry).}
 For conservativism, this net force is assumed to apply to both the float and spar independently. % For force, this makes way less sense than doing the 2-DOF calc, since the net float-spar force isn't what matters for structures. For amplitude, this is a fine assumption, but I'm not even using the storm amplitude constraint, so it doesn't make any sense.
 
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
