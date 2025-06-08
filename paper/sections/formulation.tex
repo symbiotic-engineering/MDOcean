@@ -64,7 +64,7 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
     \begin{longtable}{c>{\centering\arraybackslash}p{0.23\linewidth}>{\centering\arraybackslash}p{0.25\linewidth}>{\centering\arraybackslash}p{0.07\linewidth}>{\centering\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}}
           \textbf{\#}&\textbf{Requirement}&  \textbf{Description}& \textbf{Priority}&\textbf{Ref.}&\textbf{Enforcement}\\
          \hline
-    \requirement{float_spar_diam}&$D_s < D_{f,in}$&  Float spar diameter& 1&Fig. \ref{fig:dims}&Parameter $D_{f,in}/D_s$\\
+  \requirement{float_spar_diam}&$D_s < D_{f,in}$&  Float spar diameter& 1&Fig. \ref{fig:dims}&Parameter $D_{f,in}/D_s$\\
   \requirement{float_in_out_diam}&$D_{f,in}<D_{f}$& Float outer/inner diameter& 1& Fig. \ref{fig:dims}&Lin. ineq. constraint $g_{L,2}$\\
   \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Fig. \ref{fig:dims}&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,min}$&  Float seafloor + numerical overflow& 1& Eq. \eqref{eq:delta-z-min-intro}, \eqref{eq:delta-z-min}&Lin. ineq. constraint $g_{L,5}$\\
@@ -77,7 +77,7 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
   \requirement{positive_net_power}&$P_{avg}>0$& Positive net power& 2& -&Nonlin. ineq. constraint $g_{NL,14}$\\
   \requirement{clearance_static}& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3& Tab. \ref{tab:DLCs}&Design variable bound\\
   \requirement{tops_static}&$h_{fs,up}>0$& Float spar tops (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint $g_{L,4}$\\
-  \requirement{base_static}& $h_{fs,down}>0$& Float spar base (static)& 3& Eq. \eqref{eq:h-fs-up-down}&\hl{Lin. ineq. constraint} $g_{L,X}$\\
+  \requirement{base_static}& $h_{fs,down}>0$& Float spar base (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{damping_plate_thickness}& $t_d < h_d$& Maximum damping plate thickness & 3 & & Lin. ineq. constraint $g_{L,7}$\\
   \requirement{float_stiffener_height}& $h_{stiff,f} < h_f / 2$& Maximum float stiffener height& 3 & &Lin. ineq. constraint $g_{L,8}$\\
   \requirement{tops_dynamic}&$h_{fs,up}>|X_f-X_s|$& Float spar tops (dynamics)& 3& Eq. \eqref{eq:h-fs-up-down}&Nonlin. ineq. constraint $g_{NL,19}$\\
@@ -116,7 +116,7 @@ measures of buoyancy to ensure the float and spar do not sink and can be suitabl
 eight structural factors of safety (FOS) to avoid structural failure (\reqref{FOS}); 
 a measure of stability to ensure the WEC does not tip (\reqref{GM}); 
 equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (\reqref{force_max}, \reqref{P_max}); 
-a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section~\ref{sec:multi-obj-process} (\reqref{LCOE}).
+a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section~\ref{sec:multi-obj-process} (\reqref{LCOE}). Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 
 \subsubsection{Design Variables, Parameters, and Constraints}
 The selection of optimization design variables to encode a given physical design space is non-unique.
@@ -132,7 +132,7 @@ Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022}
 
 This sort of logic is repeated for the remaining possible design variables and requirements.
 After several formulation iterations, the design variable and parameters definitions shown in Tables~\ref{tab:design-vars} and \ref{tab:parameters} emerged as effective.
-There are 12 design variables representing 5 bulk dimensions, 5 structural dimensions, and 2 generator ratings.
+There are 12 design variables representing 5 bulk dimensions, 2 generator ratings, and 5 structural dimensions (3 thicknesses and 2 stiffener heights).
 Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, this study is the most comprehensive WEC optimization in terms of the breadth of design variable disciplines considered, and it is on the larger end but not the largest in terms of number of design variables.
 
 \begin{table}[ht]
@@ -150,7 +150,7 @@ Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, t
  $x_4$&$h_s$& Spar height  & 5& See sec.
 \ref{sec:validation}& 100& m\\ 
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
- $x_6$& $\tau_{max}$& Generator peak torque rating & 10& 1000& 4000&Nm\\ 
+ $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\ 
  $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\ 
  $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\ 
  $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\ 
@@ -217,14 +217,14 @@ The linear constraints are shown in matrix form:
 % notebook p137 11/16/25
 \begin{equation}
     \begin{bmatrix}
-    -\frac{D_d}{D_s} & 0 & 0 & 0 & 0 & 0\\
-    \frac{D_{f,in}}{D_s} & -1 & 0 & 0& 0  & 0\\
-    -\frac{T_s}{D_s} & 0 & 1 & 0& 0  & 0\\
-    \frac{T_s}{D_s} & 0 & -1+\frac{1}{T_{f,2}/h_f} & -1 & 0 & 0\\
-    0 & \frac{N}{2\cdot223} & 1 & 0& 0  & 0\\
-    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & 0 & 0 & 0\\
-    -\frac{h_d}{D_s} & 0 & 0 & 0 & 10^{-3} & 0\\
-    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & 0 & 0 & 1 \\
+    -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\
+    \frac{h_d}{D_s}-\frac{T_s}{D_s} & 0 & 1 & ~~~0& 0  & 0\\
+    \frac{T_s}{D_s} & 0 & ~-1+\frac{1}{T_{f,2}/h_f} & ~~-1 & 0 & 0\\
+    0 & \frac{N}{2\cdot223} & 1 & ~~~0& 0  & 0\\
+    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    -\frac{h_d}{D_s} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
+    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & ~~~0 & 0 & 1 \\
     \end{bmatrix}
     \begin{bmatrix} D_s \\ D_f \\ T_{f,2} \\ h_s \\ t_d \\ h_{stiff,f}
     \end{bmatrix}
@@ -237,6 +237,7 @@ The linear constraints are shown in matrix form:
     \end{pmatrix}
 \end{equation}
 where the values of -0.01 on the right hand side provide a small amount of numerical buffer against the constraints to avoid running into model limits, and the constraint identifier $g_{L*}$ is given in parentheses for each row.
+The coefficient for $t_d$ in $g_{L,7} is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
 
 %\hl{second row is wrong, need to use} $D_{f,in}$ not $D_s$.
 
