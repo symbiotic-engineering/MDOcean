@@ -32,7 +32,7 @@ Figure~\ref{fig:meem-regions} illustrates the regions and dimensions: two intern
 Boundary conditions dictate $\phi_p$ and the eigenfunctions for $\phi_h$ in each region, which the textbook \cite{chatjigeorgiou_analytical_2018} describes in detail.
 Table~\ref{tab:MEEM-eigenfunctions} shows the equations originally presented in \cite{chau_inertia_2010,chau_inertia_2012} for the potential and eigenfunctions in each region, which include infinitely many unknown eigencoefficients $C_{1n}^{i1}$, $C_{1m}^{i2}$, $C_{2m}^{i2}$ and $B_{k}^{e}$.
 By construction, this potential obeys all boundary conditions except for zero radial velocity on radial body surfaces.
-The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of section \ref{sec:}.
+The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of section \ref{sec:meem-matching}.
 
 \begin{landscape}
 \begin{table}
@@ -288,6 +288,7 @@ Table~\ref{tab:meem-integrals} lists several integrals of the radial and vertica
 \end{landscape}
 
 \subsection{Matching Across Fluid Boundaries}
+\label{sec:meem-matching}
 
 The eigencoefficients must be selected to enforce the radial velocity body boundary condition and the matching of the potentials and radial velocities at the edges of each region, earning this technique the name Matched Eigenfunction Expansion Method (MEEM).
 The radiation problem was first solved this way for a floating cylinder in 1980 \cite{yeung_added_1981}.
@@ -313,7 +314,7 @@ where $<\cdot,\cdot>$ is the inner product and $\delta_{ij}$ is Kronecker’s de
 In the current hydrodynamics problem, the basis functions are the vertical eigenfunctions $Z_n^{i1}$, $Z_m^{i2}$, and $Z_k^{e}$.
 Orthogonality of each eigenfunction can be verified with the inner product.
 In the first region, for example, $<Z_{n_1}^{i1},Z_{n_2}^{i1}>=\delta_{n_1n_2}$.
-Note that eigenfunctions of different domains are not orthogonal, and their inner products will be expressed as coupling integrals in section \ref{sec:}.
+Note that eigenfunctions of different domains are not orthogonal, and their inner products will be expressed as coupling integrals in \tableautorefname~\ref{tab:meem-integrals}.
 
 For each of the four matching equations, the property of orthogonality applies only after multiplying by the appropriate eigenfunction and integrating over appropriate bounds.
 For the potential matching equations, multiply both sides by the eigenfunction of the region with smaller fluid height (so $Z_n^{i1}$ at $a_1$ and $Z_m^{i2}$ at $a_2$).
@@ -321,7 +322,7 @@ Then integrate over that fluid height ($z=-h$ to $-d_1$ at $a_1$, and $-h$ to $-
 For velocity matching, multiply instead by the eigenfunction corresponding to the larger region, while still integrating over the smaller region.
 In velocity matching, an extra step is required to incorporate the boundary condition of zero radial velocity along the radial surface of the body.
 Since it is zero-valued, the integral of this velocity may be added to one side of the equation (the one corresponding to the velocity of the larger region) to change the integration bounds only on that side.
-This manifests in the bounds of the coupling integrals to be presented in section~\ref{sec:}.
+This manifests in the bounds of the coupling integrals to be presented in \tableautorefname~\ref{tab:meem-integrals}.
 Other combinations of eigenfunction multiplication or integration besides those described above are not useful since they result in integrating a quantity on a region where it is undefined, or a form unsuitable for the application of the orthogonality property.
 
 \subsection{Block Matrix Structure}
@@ -553,11 +554,11 @@ Degrees are used instead of radians so asymptotes occur at rational values.
 The runtime of the MEEM method is the time required to find the eigencoefficients, then obtain the hydrodynamic coefficients from eigencoefficients.
 First, a nonlinear root-finding algorithm runs $K-1$ times to generate the $m_k$ inputs used in the A-matrix and b-vector.
 Then $3N+8M+2K-11$ Bessel functions must be evaluated for the radial terms of the A-matrix. % if I change scaling of i1 from a2 to a1, it reduces by N-1. if I change scaling of i2 from a2 to (a1+a2)/2, it increases by 2*(M-1). So total would be 2N+10M+2K-12. see notebook p51.
-The cost of evaluating vertical coupling integrals \ref{eq} is negligible since they are trigonometric.
+The cost of evaluating vertical coupling integrals (\tableautorefname~\ref{tab:meem-integrals}) is negligible since they are trigonometric.
 Linear solves scale almost cubically with matrix size, so this step scales with $(N+2M+K)^3$.
 The radial integrals for the c-vector do not require evaluating Bessel functions with any arguments that were not already evaluated for the A-matrix.
-For $N=M=K=10$, the simulation averages \hl{\#} ms on a Windows 10 laptop with a 2.5 GHz Intel i9 processor for a single frequency.
-Figure~\ref{fig:} shows the time breakdown.
+For $N=M=K=10$, the simulation averages \MEEMRuntime~ms on a Windows 10 laptop with a 2.5 GHz Intel i9 processor for a single frequency.
+Figure~\ref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
 \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve drives computation cost.

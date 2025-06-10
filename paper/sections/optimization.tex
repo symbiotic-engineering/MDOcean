@@ -10,7 +10,7 @@ The optimization solution and post-optimality analysis process is shown in \figu
 
 First, design space exploration is performed using a one-at-a-time (OAT) sweep, meaning that each design variable is individually changed while the others remain at their nominal values.
 This provides an initial understanding of the problem behavior, can potentially reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
-The OAT method does not yield insight into the effect of coupling between design variables, which would be possible with other methods like orthogonal arrays \cite{box_statistics-1978}, but the computational cheapness of the simulation incentivizes simply moving on to optimization rather than pursuing more thorough design space exploration. 
+The OAT method does not yield insight into the effect of coupling between design variables, which would be possible with other methods like orthogonal arrays \cite{box_statistics_1978}, but the computational cheapness of the simulation incentivizes simply moving on to optimization rather than pursuing more thorough design space exploration. 
 
 \subsubsection{Single Objective Optimization}\label{sec:single-obj-process}
 \paragraph{Algorithm}
@@ -71,13 +71,13 @@ For the SQP algorithm, Hessian scaling is used to further scale the design varia
 \paragraph{Sensitivity Analysis}
 After the optimization is complete, sensitivity analysis is performed, first local then OAT global.
 Local sensitivities provide various gradient values by taking advantage of the Lagrange multiplier output of the SQP solver.
-The Lagrange multiplier vector $\lambda$ represents the sensitivity of the objective $\textbf{J}$ to a small change in each element of the constraint vector $\textbf{g}$ \cite{martins_engineering_2022}:
+The Lagrange multiplier vector $\vec{\lambda}$ represents the sensitivity of the objective $\vec{J}$ to a small change in each element of the constraint vector $\vec{g}$ \cite{martins_engineering_2022}:
 \begin{equation}
-    \lambda = -\frac{dJ}{dg} % eq 5.33 in MDO book
+    \vec{\lambda} = -\frac{dJ}{d\vec{g}} % eq 5.33 in MDO book
 \end{equation}
 Nonzero Lagrange multipliers imply that the associated constraint is active at the optimum, with larger values indicating a more influential constraint.
 Aside from the inherent value of the Lagrange multipliers in analyzing constraint activity and influence, they facilitate calculation of local parameter sensitivities.
-These are obtained analytically from the Lagrange multipliers $\lambda$, other solver outputs like the Hessian $H$ and gradient $\nabla  J$, and additional derivatives obtained via finite difference.
+These are obtained analytically from the Lagrange multipliers $\vec{\lambda}$, other solver outputs like the Hessian $\textbf{H}$ and gradient $\vec{\nabla}  J$, and additional derivatives obtained via finite difference.
 The details of the calculation appear in \appendixname~\ref{sec:appendix-sensitivties}.
 These sensitivities provide estimates not only on how the objective value would change if a parameter changes while the design stays the same, but also on how the optimal objective value, optimal design, and constraint activity would change if the optimization were repeated with the modified parameter value.
 The estimates do not require re-optimizing and thus have very little computational cost.

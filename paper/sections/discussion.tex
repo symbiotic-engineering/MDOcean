@@ -43,7 +43,7 @@ Recalling the discussion of prior WEC optimization studies in section~\ref{sec:l
 Based on the generation count and population sizes stated in references \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, 12,000, 2,200, 6,100, and 2,400 function evaluations are required for convergence respectively.
 The the present study is the first to perform large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer function evaluations to converge.
 Generating the pareto seeds in this study, however, entails performing 20 single-objective optimizations at around 100 iterations each, using finite difference on the 12 design variables.
-This requires an estimated $20\cdot100\cdot(12+1)=26,000$ function evaluations, which dwarfs the function evaluations required by the genetic algorithm in other studies.
+This requires an estimated $20\cdot100\cdot(12+1)=\paretoFcnEvals$ function evaluations, which dwarfs the function evaluations required by the genetic algorithm in other studies.
 This result is surprising and can be attributed to the use of finite difference.
 Despite the greater function evaluations, MDOcean's semi-analytical model means that the optimization likely runs faster than the other BEM-based optimizations, although the relevant papers do not include any runtime information that could verify or deny this claim.
 Because of the fast runtime, effort was not invested to decrease the number of iterations, although moderate reductions should be possible by tuning convergence criteria, utilizing a gradient sparsity pattern to reduce the number of finite difference evaluations needed, and tuning the ratio of the number of seeds to the pattern search set size.
@@ -66,7 +66,7 @@ This allows for a reduction in spar thickness due to the activity of the column 
 The observed impact of these effects on the overall optimization justifies the model complexity in those areas, suggesting that other optimization frameworks should include these complexities for realistic results.
 
 On the other hand, a few other modeling complexities appear perhaps unnecessary in hindsight because they have little effect on the results.
-Section~\ref{sec:sensitivities-local} finds a low sensitivity to drag coefficient, and the re-optimization without drag in \sectionautorefname~\ref{sec:sensitivity-model-assumptions} \hl{confirms this result}.
+Section~\ref{sec:sensitivities-local} finds a low sensitivity to drag coefficient, and the re-optimization without drag in \sectionautorefname~\ref{sec:sensitivity-model-assumptions} confirms this result.%\hl{confirms this result}.
 This suggests that modeling the drag nonlinearity is not essential, and future optimizations may wish to turn off drag to reduce the computation time associated with iterating the drag damping coefficient.
 Likewise, the slamming model is derived to be valid not just in the simple case of long waves but also in intermediate wavelengths, where the maximum amplitude depends on additional values including the phase of the dynamic response.
 \appendixautorefname~\ref{sec:appendix-slam} shows that the simple slamming model is reasonably accurate at sea states with active slamming constraint, suggesting that the intermediate wavelength model may be unnecessary.
@@ -78,7 +78,7 @@ Therefore, users should exercise caution if choosing to simplify the model.
 No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}, 
 a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
 Likewise, the inactivity of the pitch stability constraint mitigates the impact of any error in the metacentric height due to the geometry module's assumption of an even mass distribution when calculating the center of gravity (see section~\ref{sec:geom}).
-On the other hand, the active slamming constraints for operational sea states mean that some assumptions are worth revisiting, particularly the use of an optimization constraint rather than enforcing amplitude limits with the constrained optimal linear controller (see tables \ref{tab:constraint-approaches} and \ref{tab:nonlinearities}), and the assumption that the WEC must operate in all sea states with nonzero probability in the JPD without going into survival mode (see ``Dynamic Limits and Design Load Cases" in section~\ref{sec:dynamics}).
+On the other hand, the active slamming constraints for operational sea states mean that some assumptions are worth revisiting, particularly the use of an optimization constraint rather than enforcing amplitude limits with the constrained optimal linear controller (see tables \ref{tab:constraint-approaches} and \ref{tab:nonlinearities}), and the assumption that the WEC must operate in all sea states with nonzero probability in the JPD without going into survival mode (see ``Dynamic Limits and Design Load Cases'' in section~\ref{sec:dynamics}).
 Additionally, while MDOcean accounts for the effect of the power limit on PTO cost, it does not directly model short-term power variation as would be necessary for sizing energy storage or grid connection, both of which would increase the effect of the power limit on cost.
 
 \paragraph{Neglect of Surge Force}
@@ -118,9 +118,9 @@ This technique has been explored in several WEC papers \cite{da_silva_statistica
 \subsection{Formulation Realism}
 \subsubsection{Design Variable Suitability}
 Section~\ref{sec:formulation} outlined this study's careful choice of design variables to facilitate satisfaction of high-priority requirements to maintain model validity and facilitate optimization convergence while balancing the computational challenges of a large design space.
-The analysis in \sectionautorefname~\ref{sec:sensitivites-local} reveals that the following variables chosen as parameters may be worthy of including as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
+The analysis in \sectionautorefname~\ref{sec:sensitivities-local} reveals that the following variables chosen as parameters may be worthy of including as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
 In addition, the addition of $N_{WEC}$ as a design variable carries little importance in an LCOE minimization, where larger $N_{WEC}$ should always be preferred due to economies of scale, but can offer especially useful insight in a modified multi-objective analysis where the first objective is changed from per-WEC average power to array average power.
-This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether it preferable to meet that requirement using many smaller WECs or one larger WEC.
+This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether it preferable to meet that requirement using multiple smaller WECs or one larger WEC.
 
 Additionally, a sensitivity analysis of design variables perturbed as if they are parameters would help to analyze the extent of coupling between disciplines and potentially inform future formulation simplifications.
 For example, the expected high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ aligns with the choice made in this study to conduct fully coupled MDO, as outlined in section~\ref{sec:model-overview}, but a low value would support the potential disciplinary decoupling.
@@ -129,14 +129,29 @@ Performing this sequential optimization for the current formulation and assessin
 The authors predict, however, that the significant computational speedup of the semi-analytical models introduced in this paper and the extensions discussed herein will be sufficient to allow full coupling even for substantially larger scale WEC optimizations, including the ambitious target of a study comparing multiple hydrodynamic architectures with realistic powertrain models.
 
 \subsubsection{Parameter Suitability}
-The local parameter sensitivity analysis of \sectionautorefname~\ref{sec:sensitivites-local} already yields significant insight on the impact of the choice of parameters in this problem.
-Additional sensitivity and post-optimality analysis work that could produce useful insights includes a sensitivity analysis of hyperparameters, following the same procedure as section~\ref{sec:sensitivities-local}, to ensure numerical convergence and adequate tuning of optimization parameters.
+The local parameter sensitivity analysis of \sectionautorefname~\ref{sec:sensitivities-local} already yields significant insight on the impact of the choice of parameters in this problem.
+Interpreting those results more broadly, parameters with a high design sensitivity $\left(\frac{dx^*}{dp}\right)$, such as dimensional aspect ratios, wave conditions, and material properties, are especially important for engineers to determine early in the design cycle because they affect the optimal design. 
+Where relevant, designers should consider holding the nondimensional versions of these parameters constant across prototype scales, extending the common practice of Froude scaling for wave conditions.
+On the other hand, parameters with a high objective sensitivity $\left(\frac{dJ^*}{dp}\right)$, such as operational wave conditions, PTO efficiency, and financing rates in the LCOE minimization, are most important for funders to determine early in the project implementation cycle and for research funding agencies to incentivize innovation through R\&D proposals because they affect the WEC's economic viability.
+Notably, other parameters such as PTO price, storm wave conditions, and dimensional variables are more relevant for design cost minimization, highlighting that incentives and innovation strategies for Powering the Blue Economy applications may need to be distinct from those for utility-scale energy.
+Meanwhile, the larger number of parameters with high sensitivity in the cost minimization implies that there are more diverse avenues for impactful innovation in PBE applications than in utility-scale energy.
 
-\hl{Research and development priorities based on sensitivity and constraint activity: XX matters early in the design cycle since dx*/dp is high,XX matters early in the funding cycle since dJ*/dp is high}
+Additional sensitivity and post-optimality analysis work that could produce useful insights includes a sensitivity analysis of hyperparameters, following the same procedure as section~\ref{sec:sensitivities-local}, to ensure numerical convergence and adequate tuning of optimization settings.
+A global parameter sensitivity analysis is also suggested, taking into account both nonlinearites in the effect of one parameter across operating points and interaction effects between multiple uncertain parameters.
 
 \subsubsection{Constraint and Requirement Suitability}
 By including \numLinConstraints~linear and \numNonlinConstraints~nonlinear constraints, this optimization captures more realistic design, model, and operational requirements than any other WEC optimization study known to the authors.
-\hl{Sentence about how this affects the results, what do the constraints tell us that other studies didn't.} That said, there still exist many considerations that the formulation fails to capture, requiring caution before asserting that the industry should pursue the optimal design found here.
+The active constraints highlighted in \figureautorefname~\ref{fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming). 
+Constraints related to ballast and pitch stability are inactive, confirming that these design considerations are not primary avenues for innovation.
+While survivability is known to be a critical design requirement for WECs, it is rarely incorporated into optimization studies, and the results of this study demonstrate and quantify the effect of survivability considerations. 
+For example, the Lagrange multipliers of \figureautorefname~\ref{fig:lagrange-multiplier} suggest that improvements to the structural design of the damping plate are worth around 5 times more than equivalent structural improvements to the column and 10 times more than those to the float.
+
+Further innovation in WEC survivability is warranted, both in the incremental and transformative sense.
+Incremental improvements include developing more structurally and hydrodynamically performant detail designs that obey these constraints while reducing material use and sustaining energy production (for example, performing FEA or adding additional stiffeners to justify the removal of more material, replacing welded connections with pins to reduce moment transfer, or modifying the float-spar attachment geometry to allow for more travel with the same bulk body dimensions).
+Transformative improvements include creative design concepts that avoid the need for these constraints altogether or substantially modify their formulation.
+For example, storm survival strategies that involve submerging the WEC, changing the shape using control surfaces, or changing the PTO control strategy to reduce force and amplitude have all been suggested, and the viability of such design changes can be readily estimated by comparing the additional costs (for example, of additional actuator and control hardware and software) against the performance gains again using the Lagrange multipliers of \figureautorefname~\ref{fig:lagrange-multiplier}.
+
+That said, there still exist many considerations that the formulation fails to capture, requiring caution before asserting that the industry should pursue the optimal design found here.
 For one, design variables are assumed continuous, whereas in reality the sizing of structural thicknesses and, to a lesser extent, generator specifications, are constrained based on the discrete sizes available commercially.
 Additional requirement omissions that could reasonably be considered in future work include mooring loads, structural resonant mode frequencies, and overturning moment in the storm design load case.
 Requirements like installation and manufacturing feasibility, environmental and regulatory acceptability, reliability, and social benefit are more difficult to incorporate in the present modeling framework but nonetheless important.
@@ -149,8 +164,7 @@ Due to the high uncertainty inherent in LCOE, this study performs multi-objectiv
 While this overcomes many concerns in optimizing LCOE, there are still limitations.
 For example, prices for steel, powertrain force, and powertrain power must still be assumed, which could be overcome by increasing the number of objectives to consider each cost separately.
 However, moving beyond two objectives limits the intuition and visualization power of results, and the authors believe that the two objectives chosen here represent a good balance.
-Alternatively, a global sensitivity analysis of the price parameters could address this uncertainty, taking into account both nonlinearites in the effect of one parameter across operating points and interaction effects between multiple uncertain parameters.
-Pairing this with uncertainty quantification and robustness analysis would complete the picture.
+Alternatively, a global parameter sensitivity analysis of the price parameters could address this uncertainty. Pairing this with uncertainty quantification and robustness analysis would complete the picture.
 
 Although the cost formulation used here is uncertain, it still represents a significant improvement over cost proxies typically used in WEC optimization such as wetted surface area and hull volume.
 In future work, running the MDOcean optimization using those simplified metrics instead of the structural and powertrain cost model used here would be useful for comparison and to assess the suitability of various proxy metrics. 

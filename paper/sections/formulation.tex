@@ -16,7 +16,7 @@ Inequality, $\vec{g}$, and equality, $\vec{h}$, constraints prevent the solution
 Parameters $\vec{p}$ include any constant inputs that are required to compute the objective or constraints.
 
 \subsubsection{Objective Function}\label{sec:obj}
-For the single-objective formulation, the optimization minimizes $LCOE$, the estimated levelized cost of energy metric shown in equations \eqref{eq:LCOE,eq:LCOE-scale}.
+For the single-objective formulation, the optimization minimizes $LCOE$, the estimated levelized cost of energy metric shown in equations \eqref{eq:LCOE}, \eqref{eq:LCOE-scale}.
 LCOE is by far the most common metric that WEC developers use to evaluate market viability \cite{trueworthy_wave_2020} and is a well-known concept across many energy technologies.
 It is adopted here for its simplicity, although this choice brings three major limitations.
 First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule of energy generated has equal value.
@@ -73,7 +73,7 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
   \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Fig. \ref{fig:dims} & Parameter $T_{f,1}/T_{f,2}$ \\
   \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2& Fig. \ref{fig:dims}&Parameter $T_{f,2}/h_f$\\
   \requirement{spar_damping_ratio}& $\zeta > \zeta_{min}$& Spar damping ratio& 2&Eq. \eqref{eq:spar} &Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
-  \requirement{spar_natural_frequency}&$\omega_n<\omega_{n,max}$& Spar natural frequency& 2& Eq. \eqref{eq:spar}&Lin. ineq. constraint $g_{L,1}$\\
+  \requirement{spar_similarity}&$\omega_n<\omega_{n,max}$& Spar similarity& 2& Eq. \eqref{eq:spar}&Lin. ineq. constraint $g_{L,1}$\\
   \requirement{positive_net_power}&$P_{avg}>0$& Positive net power& 2& -&Nonlin. ineq. constraint $g_{NL,14}$\\
   \requirement{clearance_static}& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3& Tab. \ref{tab:DLCs}&Design variable bound\\
   \requirement{tops_static}&$h_{fs,up}>0$& Float spar tops (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint $g_{L,4}$\\
@@ -91,7 +91,7 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
   \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3& Eq. \eqref{eq:GM}&Nonlin. ineq. constraint $g_{NL,5}$\\
   \requirement{force_max}&$F_p = F_{max}$& Maximum powertrain force& 3& &Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
   \requirement{P_max}&$P_{pk,elec} = P_{max}$& Maximum powertrain power& 3& &Nonlin. ineq. constraint $g_{NL,18}$\\
-  \requirement{LCOE}&$LCOE<LCOE_{max}$& Maximum LCOE& 3& \ref{sec:algorithm}&Nonlin. ineq. constraint $g_{NL,15}$\\
+  \requirement{LCOE}&$LCOE<LCOE_{max}$& Maximum LCOE& 3& \ref{sec:multi-obj-process}&Nonlin. ineq. constraint $g_{NL,15}$\\
 
     \caption{Requirements}
     \label{tab:requirements}
@@ -108,7 +108,7 @@ The presence of active priority 3 constraints in the end design is acceptable, e
 Ultimately, this three-level requirement prioritization will inform the selection of design variables and parameters.
 
 Requirements are ordered by priority in \tablename~\ref{tab:requirements}, and within priority grouped by the way the requirement is enforced.
-Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_natural_frequency}, \reqref{spar_damping_ratio});
+Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_similarity}, \reqref{spar_damping_ratio});
 a power criteria to ensure the WEC generates net energy (\reqref{positive_net_power});
 height conditions to ensure valid positioning of the float with respect to the spar in the static case (\reqref{clearance_static}, \reqref{tops_static}, \reqref{base_static}) and in operational seas (\reqref{tops_dynamic}, \reqref{base_dynamic}, \reqref{clearance_dynamic}); 
 maximum float amplitude based on linearity in operational seas (\reqref{linear_amplitude}) and based on slamming in both operational and storm seas (\reqref{slam_amplitude});
@@ -165,7 +165,8 @@ Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, t
 The parameters in \tablename~\ref{tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
 Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$.
 They hold the geometric proportions of the spar geometry constant, which is required to maintain a sufficiently large damping ratio, requirement \reqref{spar_damping_ratio} (see equation~\eqref{eq:spar}).
-Together with requirement \reqref{spar_natural_frequency}, which sets an upper bound on the spar natural frequency, this means that the spar dynamics are identical to those of the nominal RM3 to maintain the dynamics assumptions described in section~\ref{sec:dynamics}.
+Together with requirement \reqref{spar_similarity}, which enforces geometric similarity on damping plate dimensions%sets an upper bound on the spar natural frequency
+, this means that the spar dynamics are identical to those of the nominal RM3 to maintain the dynamics assumptions described in section~\ref{sec:dynamics}.
 Essentially, the spar dimensional design space has been restricted in order to comply with the model assumptions.
 This unfortunately prevents determination of the true optimal spar dimensions under multibody dynamics, but suffices for an initial study with emphasis on float design.
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
@@ -237,7 +238,7 @@ The linear constraints are shown in matrix form:
     \end{pmatrix}
 \end{equation}
 where the values of -0.01 on the right hand side provide a small amount of numerical buffer against the constraints to avoid running into model limits, and the constraint identifier $g_{L*}$ is given in parentheses for each row.
-The coefficient for $t_d$ in $g_{L,7} is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
+The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
 
 %\hl{second row is wrong, need to use} $D_{f,in}$ not $D_s$.
 

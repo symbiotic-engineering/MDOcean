@@ -54,6 +54,7 @@
 \usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
 \usepackage{stmaryrd} % element wise division symbol used in hessian scaling
 \usepackage{verbatim} %word counts
+\usepackage{textcomp} % cent symbol
 %\usepackage{graphicx}
 %\usepackage{float}
 %\usepackage{placeins}
@@ -72,7 +73,7 @@
 \newcommand{\tableFilepath}[1]{tables/2025-04-11_04.04.45/table_#1.tex}
 
 \newcommand{\requirement}[1]{\refstepcounter{reqnumber}\label{req:#1}R\arabic{reqnumber}}
-\newcommand{\reqref}[1]{\hyperref[req:#1]{R\ref{req:#1}}}
+\newcommand{\reqref}[1]{R\ref{req:#1}}
 
 \newcommand{\summarytexcount}[1]{\textbf{Word Count}
   \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
@@ -164,9 +165,10 @@ The text documents the derivation, assumptions, and optimization implications of
 Validation and computational benchmarking demonstrate that MDOcean's $<50$ms runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
 
 The obtained optimization results achieve a \pctImproveDesignCostMinLCOE~reduction in modeled cost, \pctImprovePowerMinLCOE~increase in power, and resulting \pctImproveLCOEMinLCOE~decrease in LCOE compared to the original RM3 design.
-Parameter sensitivity analysis indicates that LCOE depends more strongly on \hl{XX} parameters than \hl{XX} and that the optimal design is sensitive to \hl{XX}.
+Parameter sensitivity analysis indicates that LCOE depends more strongly on \sensitiveParamCategoriesMinLCOE~parameters than \insensitiveParamCategoriesMinLCOE~parameters and that the optimal design is sensitive to \sensitiveDesignCategoriesMinLCOE~parameters.
 A Pareto trade-off between cost and power reveals different optimal designs depending on which objective is prioritized, suggesting application-specific design heuristics.
 Three representative optimal designs are investigated: a minimum-LCOE design for cost-sensitive operations like utility power, a minimum-cost design for small offshore systems with fixed power needs, and a balanced design for intermediate applications.
+Gradient-based optimization for one objective requires \singleObjFcnEvals~function evaluations, while the combination gradient and gradient-free procedure for two objectives requires over \paretoFcnEvals~evaluations.
 \end{abstract}
 
 %%Graphical abstract
@@ -179,8 +181,9 @@ Three representative optimal designs are investigated: a minimum-LCOE design for
 \begin{highlights}
 \item Develop and validate a rapid ($<\simRuntime$~ms) open-source wave energy simulation incorporating dynamic nonlinearities (generator force saturation, drag), semi-analytical hydrodynamics, and realistic structures (fatigue and storm loadcases, stress and buckling failure modes)
 \item Formulate and solve a constrained multi-objective multidisciplinary design optimization with twelve dimensional, structural, and power take-off design variables to maximize power and minimize estimated capital cost
-\item Optimal designs achieve up to \pctImproveLCOEMinLCOE~LCOE reduction and tend to have \hl{XX characteristic}
-\item Results most sensitive to \hl{XX parameter} and insensitive to \hl{XX parameter}
+\item Optimal designs achieve up to \pctImproveLCOEMinLCOE~LCOE reduction and tend to be \optDesignDescriptionMinLCOE~than the standard RM3 design
+\item Sensitivity analysis reveals LCOE is most sensitive to \sensitiveParamCategoriesMinLCOE, while cost is most sensitive to \sensitiveParamCategoriesMinCapex
+\item Single- and dual-objective optimization require \singleObjFcnEvals~and over \paretoFcnEvals~function evaluations respectively.
 \end{highlights}
 
 %% Keywords
@@ -296,7 +299,7 @@ Any opinion, findings, and conclusions or recommendations expressed in this mate
 \section{Data availability statement}
 The MATLAB code for all simulation, optimization, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at \url{https://github.com/symbiotic-engineering/MDOcean} \cite{mccabe_mdocean_2024}.
 Questions and contributions via GitHub issues and pull requests are welcomed.
-A python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
+A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
 
 \include{sections/meem-appendix}
 \include{sections/other-appendices}

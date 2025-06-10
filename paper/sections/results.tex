@@ -6,7 +6,7 @@ The OAT design sweep, shown in \figureautorefname~\ref{fig:experiments}, immedia
 A slight reduction in the diameter from its nominal value causes the cost to decrease close to linearly but the LCOE to skyrocket due to a substantial reduction in power generation.
 Meanwhile, slightly increasing the diameter causes the power production to grow significantly but increases loads, leading to fatigue failure of the damping plate.
 This is shown as blank on the diagram to indicate infeasibility.
-A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15$\textcent$/kWh reduction in LCOE, representing the best design of the OAT sweep.
+A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15\textcent/kWh reduction in LCOE, representing the best design of the OAT sweep.
 The results also point to the possibility of an even lower LCOE design with float diameter perhaps $\sim20\%$ larger than nominal, if the damping plate can be made feasible by increasing $t_d$ or $h_{1,stiff,d}$ without a major cost penalty. 
 
 \begin{figure}
@@ -19,7 +19,7 @@ Besides $D_f$, the other design variable displaying a non-monotonic relationship
 Together, these insights inform the selection of the starting design for optimization, $\vec{x}_o$.
 The OAT sweep also does not reveal any multimodality in the objectives, a promising sign that only a limited number of multi-starts may be necessary, although objective multimodality could still exist in other parts of the design space.
 Finally, the OAT design sweep shows the highly constrained nature of the problem, with large regions of the design space infeasible.
-In particular, the feasible region $1.3<D_f/D_{f,nom}<2.1$ is an ``island" in the feasible design space, separated from the other feasible points at $D_f/D_{f,nom}<1 $ by the damping plate fatigue constraint.
+In particular, the feasible region $1.3<D_f/D_{f,nom}<2.1$ is an ``island'' in the feasible design space, separated from the other feasible points at $D_f/D_{f,nom}<1 $ by the damping plate fatigue constraint.
 Thus even without objective multimodality, multimodality exists in the Lagrangian (objective plus weighted active constraints), indicating the need for a multi-start optimization procedure as planned.
 
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
@@ -30,8 +30,8 @@ Thus even without objective multimodality, multimodality exists in the Lagrangia
 \
 In the single objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{elec,avg}$ is maximized.
 The SQP algorithm is executed starting with an initial condition corresponding to the nominal RM3 configuration.
-For this $x_0$, the optimizations all converge successfully.
-Optimal designs ($x^*=\text{argmin } J(x)$) are shown visually in \figureautorefname~\ref{fig:overlaid-geometry} and numerically in \tablename~\ref{tab:opt-dv-values}.
+For this $\vec{x_0}$, the optimizations all converge successfully.
+Optimal designs ($\vec{x}^*=\text{argmin } J(\vec{x})$) are shown visually in \figureautorefname~\ref{fig:overlaid-geometry} and numerically in \tablename~\ref{tab:opt-dv-values}.
 Also shown for comparison is the nominal design and a balanced design.
 The latter is a $CAPEX$ minimization run with an additional constraint that the average power must exceed \powerBalanced~kW, a number chosen based on the shape of the multi-objective pareto front that will be presented in section \ref{sec:results-multi} with the intent of obtaining a cost reduction at the expense of a small power reduction compared to the minimum LCOE design.
 This would be preferred whenever design-dependent capital expenditures carry greater importance than modeled here, such as with shorter-duration projects, higher discount rates, lower operational cost, and lower design-independent capital cost.
@@ -58,7 +58,7 @@ This indicates that the optimized floats experience lower hydrodynamic forces an
 In the minimum LCOE design, the lower damping plate thickness occurs in favor of larger damping plate stiffeners, mimicking the observed paradigm in the aerospace industry where sheet metal skin just a few millimeters thick and substantial stiffeners are favored over thicker plate stock.
 In fact, in several scenarios, structural thickness variables converge to their lower bounds.
 The activity of these bound constraints, which represent priority 2 requirements in the language of section~\ref{sec:requirements}, indicates that the structures model is at the edge of its validity for describing thin-skinned stiffened shells.
-Specifically, the assumption that the deflection field resembles that of a plate rather than that of a beam (see section~\ref{sec:appendix-structures}) is called into question.
+Specifically, the assumption that the deflection field resembles that of a plate rather than that of a beam (see \appendixname~\ref{sec:appendix-structures}) is called into question.
 Future expansion of the structures model to remove this assumption could allow the optimization to yield even more efficient structural designs.
 Meanwhile in the minimum cost design, the damping plate stiffeners decrease in size. 
 
@@ -66,7 +66,6 @@ Meanwhile in the minimum cost design, the damping plate stiffeners decrease in s
 
 Upon comparing the above-water geometric profiles of the nominal design with that of the pareto-optimal designs, a consistent trend emerges: the long support tubes of the nominal design have been replaced by a taller float and shorter support tubes.
 This likely occurs because the slamming constraint $g_{NL,23}-g_{NL,239}$ encourages higher draft $T_{f,2}$, and the float height $h_f$ correspondingly grows since the submersion fraction of the float, $T_{f,2}/h_f$, is held constant as a parameter.
-If allowed to vary freely from the draft, the optimal height $h_f$ would likely decrease, since the above-water float material is not structurally necessary and could be replaced by longer support tubes.
 
 \subsubsection{Optimal Performance Outputs}
 Next, analysis on the performance of the optimal designs yields insights into why these designs emerge as optimal.
@@ -121,8 +120,8 @@ Multiplying by the hours per year in each sea state expressed as a percentage yi
 \end{figure}
 
 \subsubsection{Post-Optimality Derivatives}
-Section~\ref{sec:single-obj-process} introduced the Lagrange multipliers $\lambda=-dJ^*/dg$ to quantify the activity and influence of constraints at the optimal point.
-Values of the nonzero Lagrange multipliers $\lambda$ are reported in \figureautorefname~\ref{fig:lagrange-multiplier}, signifying the increase in objective $J$ for a given increase in active constraint $g$.
+Section~\ref{sec:single-obj-process} introduced the Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ to quantify the activity and influence of constraints at the optimal point.
+Values of the nonzero Lagrange multipliers $\vec{\lambda}$ are reported in \figureautorefname~\ref{fig:lagrange-multiplier}, signifying the increase in objective $J$ for a given increase in active constraint $\vec{g}$.
 
 \begin{figure}
 \centering
@@ -136,24 +135,37 @@ The amplitude constraints and the factor of safety on the damping plate in the s
 This motivates a potential future search for creative designs to obviate or mitigate the effect of these constraints, such as underwater submersion as an alternative storm survival technique, and investigating the tradeoff of using bump stops, active control, or other solutions to limit the device amplitude without increasing the dimensions.
 Meanwhile, the activity of the float thickness lower bound and its larger value of $\lambda$ than the float FOS constraint indicates that the float structural model is inadequate in this regime and should be extended to better incorporate local buckling effects that would come to dominate for very thin-skinned designs.
 
-An additional output of the optimization is the gradient itself, $\nabla J=\partial J/\partial x$.
-\figureautorefname~\ref{fig:gradient} depicts the normalized gradient.
-A value of zero is expected if the design variable is not involved in an active constraint.
-The larger values mean that there is a more significant penalty if the design variable cannot be maintained at its optimal value.
+Additional outputs of the optimization are the gradient of the objective, $\vec{\nabla} J=\partial J/\partial \vec{x}$, and the Hessian of the Lagrangian, $\textbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$.
+They are shown in \appendixautorefname~\ref{sec:appendix-supplemental-results} since they are not particularly informative by themselves, especially since the gradient is expected to be zero at the optimum for all design variables not involved in an active constraint.
+The utility of the gradient and Hessian are in their ability to calculate other local sensitivity measures, such as the impact of a design variable or parameter that is perturbed from its optimal value. Local parameter sensitivity analysis occurs in \sectionautorefname~\ref{sec:sensitivities-local}, and design variable perturbation is examined here.
+
+\figureautorefname~\ref{fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimal value, $\Delta J/J$, calculated using equation \eqref{eq:delta-J} and compared against the ``ground truth'' value from simulation re-evaluation.
+
+\begin{equation}\label{eq:delta-J}
+    \Delta J \approx \vec{\nabla} J^T \Delta \vec{x}% + \frac{1}{2} \Delta \vec{x}^T H \Delta \vec{x}
+\end{equation}
+
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{example-image-a}
-\caption{Normalized gradient at optimal point}\label{fig:gradient}
+\includegraphics[width=\linewidth]{figs/delta_x.pdf}
+\caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{fig:delta-J}
 \end{figure}
+
+The design variables with the highest sensitivities are $D_s$, $D_f$,and $h_{stiff,f}$, with a 10\% decrease in the diameters and 10\% increase in the stiffener height leading to a 7.9\%, 4.4\%, and 3.7\% increase in LCOE respectively.
+The remaining design variables have a notably low sensitivity, meaning that they can be perturbed from their optimal value by 10\% in either direction without affecting the objective by more than 1-2\% (although they may affect constraints).
+Finally, the gradient estimates are generally accurate, with the exception of the diameters $D_s$ and $D_f$ and the peak power $P_{max}$.
+For these variables, nonlinearity or curvature exists in the objective function, indicating a tradeoff in the objective that would produce an optimum even without any active constraints.
+For the case of LCOE minimization, this is expected because increasing the diameters and power rating both increase the power production while simultaneously increasing the capital cost.
+More accurate estimates of the perturbed LCOE can be obtained by using the Hessian of the objective to account for curvature, but this would need to be obtained via manual finite differences because the solver only returns the Hessian of the Lagrangian.
 
 \subsubsection{Multi-Start}
 Separately, because non-convex optimization can get stuck in a local minimum, 1000 random initial guesses are tested, although 974 are linear infeasible and discarded.
-Of the 26 linear feasible points, none converge while meeting the Karush-Kuhn-Tucker (KKT) conditions for first-order optimality.
+Of the 26 linear feasible starting points, none converge while meeting the Karush-Kuhn-Tucker (KKT) conditions for first-order optimality.
 For the LCOE-minimization, 17 optimizations converge due to small steps in the design while 9 fail to converge, and for the design cost minimization, that split is reversed, 9 and 17.
-Of the optimizations that converge, 5 and 4 from the LCOE and design cost minimization respectively converge to the same minimum, referred to here as the global minimum, although global optimality is never guaranteed.
-On the other hand, more (12 and 5 respectively) converge to a less optimal local minimum.
+Of the optimizations that converge, 5 and 4 from the LCOE and design cost minimization respectively converge to the same minimum, referred to here as the global minimum since it is the lowest objective obtained across all starting points, although global optimality is never guaranteed.
+On the other hand, more points (12 and 5 respectively) converge to a less optimal local minimum.
 Of the optimizations that fail to converge, only one arrives at the same global minimum in each case.
-\figureautorefname~\ref{fig:multistart} shows this behavior on a probability tree.
+\figureautorefname~\ref{fig:multistart-tree} shows this behavior on a probability tree.
 Overall, around one fifth of the optimizations converge to the presumed global minimum.
 Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with at least $\textrm{ceil}\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\numMultistartRequired$ linear feasible starting points is required.
 %\hl{XX}\% converged to the same point as the initial optimization did and none converged to a more optimal solution. While this does not guarantee a global optimum, the insensitivity to initial guess increases our confidence in the optimization results. 
@@ -162,33 +174,24 @@ Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{\matlabFilepath{15.6_3}}
-\caption{Probability tree for convergence of multi-start}\label{fig:multistart}
+\caption{Probability tree for convergence of multi-start}\label{fig:multistart-tree}
 \end{figure}
 
-It is also worth investigating which characteristics of the starting point contribute to the outcome of the optimization.
-Figure~\ref{fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
-The two starting points that achieve global optima, denoted in green and orange, both have low inital values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
-The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
-On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
-This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the float thickness $t_{f,b}$, that is important for arriving at the global optimum.
-Figure~\ref{fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima in \hl{(DV)} are common, while \hl{(other DVs)} appear to have a single optimal value regardless of the starting point.
-Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
-\hl{This requires further investigation to explain.}
-
-\begin{landscape}
-\begingroup
-\centering
+It is also worth investigating which characteristics of the starting point contribute to the outcome of the optimization. 
+\figureautorefname~\ref{fig:multistart-bar} shows a bar chart of the convergence behavior as a function of the starting point for each design variable.
+It shows that the float draft $T_{f,2}$ and float bottom plate thickness $t_{f,b}$ usually converge to the same optimal $\vec{x}^*$ value regardless of the starting point $\vec{x_0}$, but the other design variables are very sensitive to starting point.
+This sheds light on the convexity of the search space, indicating that the float draft and bottom plate thickness are close to unimodal, while the other design variables are highly multimodal.
 
 \begin{figure}
 \centering
-\includegraphics[width=1.2\linewidth]{figs/multistart_parallel_axis.pdf}
-\caption{Parallel axis plot for effect of starting point on convergence}\label{fig:multistart-parallel-axis}
-\fillandplacepagenumber
+\includegraphics[width=\linewidth]{example-image-a}
+\caption{Bar chart showing impact of starting point on convergence behavior}\label{fig:multistart-bar}
 \end{figure}
 
-\endgroup
-\end{landscape}
-
+Future studies can use this knowledge to potentially reduce the total number of function evaluations required to achieve the global optimum.
+For example, to reduce the number of iterations within each optimization, the multistart procedure could use deterministic starting points for the float draft and bottom plate thickness, since sampling is necessary only for the multimodal design variables.
+Meanwhile, the number of optimizations could be reduced by sampling multimodal variables from a non-uniform distribution to capture both multiple local minima.
+More complete multistart results are shown in \appendixautorefname~\ref{sec:appendix-supplemental-results}.
 
 % \begin{table}
 % \begin{tabular}{c|c|c}
@@ -260,7 +263,7 @@ The two sensitivities are expected to be equal due to the mass-based material co
  \end{landscape}
 %Figure~\ref{fig:constraint-sens} gives the estimated parameter change threshold required to make inactive constraints active and active constraints inactive. Values are again normalized, where here a value of 1 means that a parameter would need to double (increase by 100\%) before the constraint activity changes.
 
-Meanwhile, \figureautorefname~\ref{fig:param-sens-x-star-tornado} depicts sensitivity of optimal design variables to parameters, $\frac{dx^*}{dp}$. 
+Meanwhile, \figureautorefname~\ref{fig:param-sens-x-star-tornado} depicts sensitivity of optimal design variables to parameters, $\frac{d\vec{x}^*}{d\vec{p}}$. 
 Unlike the objective sensitivities, which describe the effect of parameter changes on WEC viability, the design variable sensitivities describe the effect of parameter changes on the optimal design. 
 For parameters representing uncontrollable external inputs, such as many site parameters, high values indicate a need for certainty of the parameter value early in the design cycle to ensure that the ultimate design is appropriate for the real parameter values.
 For parameters representing controllable design choices that were held fixed rather than optimized for the sake of simplicity, such as many geometric parameters, high values indicate that future studies should include the value as a design variable instead of a parameter.
@@ -285,8 +288,6 @@ In summary, the parameters that should be added as design variables in future op
 %Describe which are sensitive to J vs x vs constraint activity.
 %Maybe also show dJ/dx and that's important because you need that DV exact or not without affecting your bottom line.}
 %\hl{Is it possible to use these sensitivities to demonstrate coupling, and predict the effect of holding some DVs constant?) - during re scrutineering} 
-
-The positive value of $\frac{dJ^*}{dT_{f,2}/h_f}$ in \figureautorefname~\ref{fig:param-sens-J-star-tornado} \hl{confirms} the previous suggestion that the above-water float material is unnecessary.
 
 %For these highly sensitive parameters, it is worthwhile to perform a global sensitivity analysis to observe any nonlinearity. Figure~\ref{fig:param-sens-global} and \ref{fig:x-opt-sens-global} demonstrate the new optimal objective and optimal design variable values respectively under the re-optimization-based OAT global parameter sensitivity process described in section~\ref{sec:single-obj-process}.
 % \begin{figure}\label{fig:param-sens-global}
@@ -442,14 +443,23 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 \subsection{Optimization Runtime}
 Figure \ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
 The optimization also runs without issue, albeit more slowly, on unspecialized machines such as a Windows 10 laptop computer with MATLAB R2022a.
-%the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
-Each single-objective optimization takes just \singleObjRuntime, converging in \singleObjIters~iterations and requiring \singleObjFcnEvals~function evaluations including both objective and gradient evaluation. 
-Generating the pareto front takes \paretoRuntime, of which \paretoPctTimeSeeds~is spent generating seeds via epsilon-constraint and the remaining \paretoPctTimePatternSearch~on the pattern search. 
-Gradient-based post-optimality sensitivities run rapidly in just \gradientSensRuntime, while sensitivities obtained via re-optimization take \reoptimSensRuntime.
 
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{\matlabFilepath{26}}
 \caption{Bar chart of optimization and analysis runtimes}
 \label{fig:optim-runtimes}
+\end{figure}
+%the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
+Each single-objective optimization takes just \singleObjRuntime, converging in \singleObjIters~iterations and requiring \singleObjFcnEvals~function evaluations including both objective and gradient evaluation. 
+Generating the pareto front takes \paretoRuntime, of which \paretoPctTimeSeeds~is spent generating seeds via epsilon-constraint and the remaining \paretoPctTimePatternSearch~on the pattern search. 
+Gradient-based post-optimality sensitivities run rapidly in just \gradientSensRuntime, while sensitivities obtained via re-optimization take \reoptimSensRuntime.
+
+\figurename~\ref{fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on the number of function evaluations and hypervolume. (\hl{Analysis is left for during scrutineering.})
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{example-image-a}
+\caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
+\label{fig:pareto-epsilon-runtime-sweep}
 \end{figure}

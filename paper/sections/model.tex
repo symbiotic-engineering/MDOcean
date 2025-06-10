@@ -115,7 +115,7 @@ and the position-independent variable $\zeta(t)=\eta(0,t)$ describes the wave el
 The first-order hydrodynamic forces $\vec{\hat{F}}$ on a group of interacting floating bodies are expressed using linear wave theory in the frequency domain as:
 \setlength\arraycolsep{0pt}
 \newcolumntype{C}{>{{}}c<{{}}}
-\begin{equation}\label{eq:eom}
+\begin{equation}\label{eq:hydro-forces}
 \begin{array}{rCCCCC}
      \vec{\hat{F}} = & \underbrace{\vec{\hat{F}}_{e}}_{\substack{\textrm{wave} \\  \textrm{excitation} }} & +\underbrace{\vec{\hat{F}}_{rad}}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +&  \underbrace{ \vec{\hat{F}}_{res}}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} \\
     = & \overbrace{\vec{\hat{\gamma}} \hat{\zeta}} & \overbrace{-\mathbf{A_h}\vec{\hat{\ddot{\xi}}} - \mathbf{B_h}\vec{\hat{\dot{\xi}}}} &  \overbrace{-\mathbf{K_h}\vec{\hat{\xi}}}
@@ -174,9 +174,9 @@ While exact runtimes will be discussed in section~\ref{sec:sim-runtime}, timing 
 This removes a large bottleneck from design optimization.
 Additional advantages over BEM include lower memory requirements, lack of meshing, and avoiding numerical approximation of the Green's function.
 
-Limitations includes shape restrictions and numerical overflow.
+Limitations include shape restrictions and numerical overflow.
 Since MEEM is a semi-analytical method, it only applies to specific simple geometries.
-The version of MEEM used in this work assumes a dual concentric cylinder shown in \ref{fig:meem-geom}.
+The version of MEEM used in this work assumes a dual concentric cylinder shown in \figurename~\ref{fig:meem-geom}.
 Therefore, the hydrodynamic calculations for the float coefficients must omit the damping plate and approximate the bottom surface of the float as flat rather than slanted, assumptions which have minor impact and could be lifted in future work with a more complicated MEEM formulation, as in \cite{olaya_hydrodynamic_2015,kokkinowrachos_behaviour_1986} respectively.
 \begin{figure}
     \centering
@@ -258,7 +258,7 @@ To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{
 \begin{equation}\label{eq:delta-z-min-intro}
     \Delta z_{min} \sim D
 \end{equation}
-for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in~\ref{fig:meem-geom}.
+for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
 The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
 
 %The current implementation of MEEM yields only the magnitude, not phase, of the excitation coefficient (using equation 99 rather than 97 of \cite{chau_inertia_2012}). Therefore the phase is set to zero, an approximation that will be shown in the following section to be adequate for single body dynamics.
@@ -321,7 +321,7 @@ This approach accurately reflects the maximum power that a linear controller cou
 If the implementation for the optimal constrained linear controller is also not available, then the violating portion of the time-domain signals can be saturated or zeroed (3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 This simple approach does not require any derivations to implement.
-It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method.
+It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
 It is utilized here for the power limit.
 
 As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which \cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
@@ -352,7 +352,7 @@ Because the fundamental amplitude depends on the response, the frequency domain 
 MDOcean uses iteration to handle both the drag and saturation nonlinearity. % and an analytical solution for the force saturation nonlinearity.
 
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
-The RAFT open-source python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
+The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
 Thus, MDOcean's semi-analytical dynamics offer a combination of speed, accuracy, and simplicity that is novel in the wave energy space.
 
 \paragraph{Equation of Motion}
@@ -371,7 +371,7 @@ The equation of motion can be expressed in the time domain as: % todo: this is t
 \end{equation}
 where $x(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
 Forces include wave excitation, hydrodynamic radiation, hydrostatic restoring, drag, and power takeoff.
-For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the MEEM hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
+For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
 The excitation coefficient $\hat{\gamma}$ is complex, and all other coefficients are real.
 In the frequency domain, the complex transfer function from real regular wave height $H$ to complex body amplitude $\hat{X}$ is then:
 \begin{equation}\label{eq:eom-freq-domain}
@@ -382,8 +382,8 @@ where $s=i\omega$ is the Laplace variable.
 \paragraph{PTO Dynamics and Power Production}
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy of the float and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-\cite{penalba_review_2016} reviews common WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-\cite{coe_co-design_2024} uses the transmission matrix form, which groups the effort and flow variables $e$ and $q$ at each port. 
+Reference \cite{penalba_review_2016} reviews common WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{coe_co-design_2024} uses the transmission matrix form, which groups the effort and flow variables $e$ and $q$ at each port. 
 
 A linear model of the drivetrain with mechanical transmission matrix $[a]_m$ takes the form
 % impedance
@@ -437,7 +437,7 @@ A linear control law with impedance $\hat{Z}_u$ split into damping and stiffness
 \begin{equation}
 \tau = \hat{Z}_u \Omega =\left(B_u + \frac{K_u}{s} \right) \Omega
 \end{equation}
-The time-domain power $P(t)$ at any port is simply the product of the port variables.
+The time-domain power $P(t)$ at any port is simply the product of the port effort and flow variables.
 To facilitate this calculation in transmission form, power can be found as the quadratic product of the port variable vector with the two-dimensional exchange matrix $E_2$,
 \begin{equation}
 P(t) = e~q
@@ -446,8 +446,8 @@ P(t) = e~q
  e \\ q
 \end{bmatrix}^T
 \underbrace{\begin{bmatrix}
-0 & 1 \\
-1 & 0
+0~ & 1 \\
+1~ & 0
 \end{bmatrix}}
 _{E_2}
 \begin{bmatrix}
@@ -469,12 +469,12 @@ if the port is terminated with complex impedance $\hat{Z}$.
 Rather than utilize detailed PTO models for co-design, which a number of recent papers (e.g. \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in section \ref{sec:lit}) have already proven the value of, this study chooses to keep the PTO design unspecified by assuming a constant-gain, infinite bandwidth transmission system and a generator with fixed average efficiency $\eta$.
 While obviously unrealistic and insufficient for designing the device's actual PTO hardware, this decision adds simplicity and illustrative value at the system level.
 It highlights the effect of the novel non-PTO (e.g. structural) aspects of WEC co-design that this study introduces while still capturing the effect of PTO rating on system performance and maintaining sufficient generality to incorporate more detailed PTO models in the future.
-Furthermore, setting $\eta=80\%$ maintains consistency with the RM3 design assumption of \cite{RM3} and facilitates validation. 
+Furthermore, setting $\eta=80\%$ maintains consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation. 
 
 More specifically, rather than implement a full generator electrical transmission matrix $[a]_e$, for the optimization study a simple average efficiency $\eta$ describes the gain between the average mechanical power and average electrical power.
 This is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_u\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
 The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
-\begin{equation}
+\begin{equation}\label{eq:power-elec}
 \begin{bmatrix}
 P_{avg,elec} \\
 P_{pk,elec}
@@ -495,14 +495,14 @@ P_{pk,mech}
 Additionally, the drivetrain mechanical transmission matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
 \begin{equation}
 [a]_m = \begin{bmatrix}
-1/R & 0 \\
-0 & R
+1/R &~ 0 \\
+0 &~ R
 \end{bmatrix} = \begin{bmatrix}
-1 & 0 \\
-0 & 1
+1 &~ 0 \\
+0 &~ 1
 \end{bmatrix}
 \end{equation}
-With this $[a]_m$, the control damping and stiffness $B_u$ and $\hat{Z}_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
+With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
 This will simplify the impedance matching procedure described below, requiring matching at only one interface.
 
 %The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
@@ -521,7 +521,7 @@ The power-maximizing PTO damping $B_{p,damp}$ is then
     B_{p,damp} = \sqrt{ (B_{p,reac})^2 + (K_{p,reac}/\omega)^2}
 \end{equation}
 
-Both of these controllers frequently result in excessively large generator torques, especially in reactive control when $K_u=K_p$ is far from zero. $K_{p,reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO damping reduces the natural frequency to.
+Both of these controllers frequently result in excessively large generator torques, especially in reactive control when $K_u=K_p$ is far from zero. $K_{p,reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO damping reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
 Control laws \eqref{eq:matched-controller} and \eqref{eq:damping-control} provide no mechanism to reduce this torque.
 Actuator torque limits are important to model.
 Leaving the generator torque unbounded when modeling energetic sea states would result in excessive structural and powertrain requirements.
@@ -535,9 +535,9 @@ Figure \ref{fig:sat} shows this approximation graphically for a saturated-sine f
 \begin{figure}
 \centering
 \includegraphics[width=.7\linewidth]{\matlabFilepath{7}}
-\caption{Saturated sin vs. time}\label{fig:sat}
+\caption{Saturated sin vs. time (red) and its fundamental amplitude (blue)}\label{fig:sat}
 \end{figure}
-Details of the calculation are provided in \appendixname \ref{sec:appendix-force-sat}.
+Details of the calculation are provided in \appendixname~\ref{sec:appendix-force-sat}.
 The result is updated values for control gains $B_u$ and $K_u$ that result in a torque that obeys the force constraint and is used in place of equations~\eqref{eq:matched-controller} and \eqref{eq:damping-control}.
 
 \paragraph{Drag}
@@ -558,17 +558,17 @@ To improve computational efficiency and allow solution in the frequency domain, 
 \end{equation}
 with drag coefficient $C_d$.
 The nonlinear waveform and describing function approximation are compared in Figure~\ref{fig:drag-df}.
-The amplitude of the sinusoidal approximation is $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
+The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
 \begin{figure}
     \centering
     \includegraphics[width=.7\linewidth]{\matlabFilepath{8}}
     \caption{Conceptual demonstration of the drag describing function in the time domain.
-The nonlinear signal is approximated by its fundamental amplitude.}
+The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}
     \label{fig:drag-df}
 \end{figure}
 
 The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $B_{d}$ and $K_{d}$.
-Further derivation, convergence details, and control implications are discussed in \appendixname \ref{sec:appendix-drag}.
+Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
 
 %\paragraph{Power Saturation}
 %Equation~\eqref{eq:mech-power} shows that the power peak to maximum ratio is at minimum two for a damping controller, 
@@ -577,7 +577,7 @@ Further derivation, convergence details, and control implications are discussed 
 \paragraph{Energy Production}
 To find the overall average power production $P_{avg,elec}$ in a location with a given distribution of sea states, $P_{avg,elec}(H,\omega)$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix.
 This method is illustrated in Figure \ref{fig:JPD-muptiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from \cite{noauthor_system_2020}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from reference \cite{noauthor_system_2020}.
 
 \begin{figure}
 \centering
@@ -622,7 +622,8 @@ Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\
  Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
          Spar amplitude, $X_s$& Given by \eqref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
  \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|X_f-X_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
- \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{linear}, X_{slam})$& N/A %$X_{slam}$\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{f,linear}, X_{f,slam})$& N/A \\ %$X_{slam}$\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable spar amplitude, $|X_s|_{max}$ }& $\min(X_{s,linear}, X_{s,slam})$& N/A %$X_{slam}$\\
     \end{tabular}
     \caption{Force components in each design load case}
     \label{tab:DLCs}
@@ -633,7 +634,7 @@ In storm seas, the brake force could calculated by solving the 2-DOF equation of
 %However, it is not actually necessary to calculate the brake force, since the PTO cost model does not contain a term for the brake cost. -- this is not true, even without a PTO cost model, the brake force is needed to calculate the heave force for structural purposes.
 However, this would require additional time-consuming iteration.
 Therefore, instead of separately finding the float and spar heave force, the net heave force on both bodies is calculated using the 1-DOF equation of motion \eqref{eq:eom-freq-domain} with zero PTO force $F_p=0$ (since the brake force is an internal force when considering a unifed float-spar rigid body) and the hydrodynamic coefficents corresponding to the float only.
-\hl{(Note: ideally it would use hydro coefficients for the unified float-spar geometry).}
+\hl{(Note: ideally it would use hydro coefficients for the merged float-spar geometry, subscript m in the hydro module).}
 For conservativism, this net force is assumed to apply to both the float and spar independently. % For force, this makes way less sense than doing the 2-DOF calc, since the net float-spar force isn't what matters for structures. For amplitude, this is a fine assumption, but I'm not even using the storm amplitude constraint, so it doesn't make any sense.
 
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
@@ -643,7 +644,7 @@ Meanwhile, the surge force for each component is calculated as \cite{newman_moti
 using the respective waterplane areas $A_w$  and drafts $T$ for the float and spar.
 The top vertical height $z_{top}$ is set to zero for the float and $T_{f,2}$ for the spar.
 The design surge force is the maximum surge force over all nonzero-probability sea states.
-This formula assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
+Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
 Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work. 
 Maximum acceptable heave %and surge 
 forces will be evaluated with structural factors of safety in \ref{sec:structures}.
@@ -653,22 +654,25 @@ The table also indicates the maximum permissible amplitudes.
 In operational sea states, the geometric clearance between the float and spar is enforced to prevent overtravel.
 The permissible heights for upward and downward motion of the float relative to the spar are:
 \begin{equation}\label{eq:h-fs-up-down}
-    h_{fs,up} = h_s - T_s - (h_f- T_{f,2})\qquad h_{fs,down} = T_s - T_{f,2} - h_d
+    h_{fs,up} = h_s - T_s - (h_f- T_{f,2}), \qquad h_{fs,down} = T_s - T_{f,2} - h_d
 \end{equation}
-Additionally, a limit of $h_{fs,clear}$ (see \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
+Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
 Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:meem}.
-This maximum amplitude $X_{linear}$ is:
+This maximum amplitude $X_{linear}$ for the float and spar respectively is:
 \begin{equation}
-    X_{linear}  =D_f/10
+    X_{f,linear} = D_f/10, \qquad X_{s,linear}  =D_s/10
 \end{equation}
+
 In both operational and storm states, slamming should be avoided since it causes extremely high loads.
-Slamming refers to the bottom surface of the WEC rising out of the water and hitting the free surface as it reenters.
-The formula for the critical slamming amplitude $X_{slam}$ in regular waves of height $H$ is derived in \appendixname \ref{sec:appendix-slam} and shown to lie between $T_f-H/2$ and $T_f+H/2$ depending on the wave parameters and float diameter, draft, and oscillation phase.
-For operational waves, $T_f$ is taken as $T_{f,1}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
+Slamming refers to the bottom surface of the WEC rising out of the water and hitting the free surface as it reenters (bottom-slamming), or symetrically the top of the WEC becoming fully submerged beneath the free surface (top-slamming).
+The formula for the critical slamming amplitude $X_{slam}$ in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and shown to lie between $\Delta z-H/2$ and $\Delta z+H/2$ for relevant vertcal body dimenson $\Delta z$, depending on the wave parameters and body diameter and oscillation phase.
+For operational waves, $\Delta z$ for float bottom-slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
+Likewise for spar bottom-slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
+The relevant $\Delta z$ for float and spar top-slamming in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
 For storm waves, currently the slamming limit is not applied.
 %since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
-In future work, the storm draft $T_f$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
+In future work, the storm $\Delta z$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
 
 Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
 This is a questionable assumption, but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
@@ -739,7 +743,8 @@ The error in average power compared to the WEC-Sim power is less than 0.1\% in t
 
 Results reveal that the drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
 The extremely low errors in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively) indicate that this is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF. 
-More details of the WEC-Sim validation are described in \appendixname \ref{sec:appendix-wecsim}.
+These errors are deemeed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously optimizing multiple disciplines and the ability to quickly evaluate a large number of design options.
+More details on the WEC-Sim validation are described in \appendixname~\ref{sec:appendix-wecsim}.
 
 %TC:break Structures
 \subsubsection{Structures}\label{sec:structures}
@@ -791,9 +796,9 @@ Local buckling is assessed as well.
 
 The damping plate is a thin stiffened cylindrical plate subject to a vertical distributed force on its bottom surface.
 The force is reacted by the welded connection to the column along the column's circumference, as well as through four welded tubular supports.
-Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
+Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
 
- Further details of all structural calculations are provided in \appendixname \ref{sec:appendix-structures}. 
+ Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}. 
 
 %TC:break Economics
 \subsubsection{Economics}\label{sec:econ}
@@ -806,8 +811,8 @@ The fixed charge rate incorporates the effect of device lifetime as well as a va
 The rationale and limitations of using $LCOE$ as an economic metric will be described in section~\ref{sec:obj}.
 For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are kept in units of 2012 USD without adjusting for inflation.
 The economic model replicates the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} and scales certain cost components with relevant aspects of the device design, shown in \tablename~\ref{tab:CBS}.
-In particular, the structural cost scales with the volume of structural material $V_{struct}$, and the PTO cost scales with the peak electrical power $P_{pk,elc}$ and torque $\tau$.
-Details on the scaling are provided in \appendixname \ref{sec:appendix-econ}.
+In particular, the structural cost scales with the volume of structural material $V_{struct}$, and the PTO cost scales with the peak electrical power $P_{pk,elc}$ and force $F_{max}$. %torque $\tau$.
+Details on the scaling are provided in \appendixname~\ref{sec:appendix-econ}.
 \begin{table}
     \centering
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
@@ -816,7 +821,7 @@ Details on the scaling are provided in \appendixname \ref{sec:appendix-econ}.
          1.2 - Infastructure&  6\%&  4\%&No\\
          1.3 - Mooring/Foundation&  3\%&  12\%&No\\
          1.4 - Structural&  17\%&  46\%&$V_{struct}$\\
-         1.5 - Power Take Off&  4\%&  11\%&$\tau, P_{pk,elec}$\\
+         1.5 - Power Take Off&  4\%&  11\%&$F_{max}, P_{pk,elec}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
@@ -835,8 +840,8 @@ Details on the scaling are provided in \appendixname \ref{sec:appendix-econ}.
 \end{table}
 Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
 For example, installation and decommissioning costs could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
-Likewise, the mooring and foundation costs could scale with storm surge force, and the replacement parts and consumables costs could scale with the PTO power and torque as the PTO capital costs do. %\hl{Note: do I just want to add mooring, parts, and consumables cost scaling to the code, since that's totally possible with the current model?} 
-Section~\ref{sec:formulation} discusses the effect of such uncertainties and how to mitigate their impact on the design optimization.
+Likewise, the mooring and foundation costs could scale with storm surge force, and the replacement parts and consumables costs could scale with the PTO power and force as the PTO capital costs do. %\hl{Note: do I just want to add mooring, parts, and consumables cost scaling to the code, since that's totally possible with the current model?} 
+Section~\ref{sec:formulation} will discuss the effect of such uncertainties and how to mitigate their impact on the design optimization.
 
 Finally, a power law model captures economies of scale, where per-WEC unit costs $C$ decrease with the number of devices $N_{WEC}$:
 \begin{equation}
@@ -855,7 +860,7 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
     \caption{Cost model values for each CBS category}
     \label{tab:econ-model-values}
 \end{table}
-The scaling behavior of economic outputs against the number of WECs is validated in figure~\ref{fig:econ-nwec-validate}.
+The scaling behavior of economic outputs against the number of WECs is validated in \figurename~\ref{fig:econ-nwec-validate}.
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{\matlabFilepath{12}}
@@ -911,11 +916,15 @@ Improving the force model to align with the wave tank data is an area of future 
 
 \subsection{Runtime Benchmarking}
 \label{sec:sim-runtime}
-The following timings are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
-Each simulation run takes around \simRuntime~ms.
+Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
+An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
+Ultimately, each simulation run takes around \simRuntime~ms, solidly meeting the goal.
+The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
+
 Figure~\ref{fig:runtime-modules} visualizes the breakdown of runtime between modules.
+\hl{Note: these figures are created using profiler, which dramatically overestimates all runtimes and can only be relied on for relative timing. This will be solved during re-scrutineering by using the timeit function instead.}
 The MEEM hydrodynamics module takes the majority (\pctRuntimeMEEM) of the time and is broken down in \figureautorefname~\ref{fig:runtime-hydro}.
-The biggest portion is dedicated to evaluating Bessel functions which occur in the semi-analytical solution, another large portion spent unpacking variables from the cell data structure, and a smaller period solving the imaginary modes of the dispersion relation and solving the linear matrix equation.
+The biggest portion is dedicated to evaluating Bessel functions which occur in the semi-analytical solution, another large portion is spent unpacking variables from the cell data structure, and a smaller period solves the imaginary modes of the dispersion relation and solving the linear matrix equation.
 The simulation is an order of magnitude faster than the Capytaine boundary element method solver for similar convergence levels.
 
 \begin{figure}
@@ -932,7 +941,7 @@ The simulation is an order of magnitude faster than the Capytaine boundary eleme
 
 The dynamics and controls module takes the next longest (\pctRuntimeDynamics, enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
 This represents a three order of magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
-Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the results presented here utilize the 2-DOF model.
+Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-DOF model.
 
 \begin{figure}
 \centering
