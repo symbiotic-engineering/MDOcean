@@ -1,7 +1,7 @@
 
 % Runs one-at-a-time design of experiments
 
-function experiments()
+function figs = experiments()
 
 p = parameters();
 b = var_bounds();
@@ -104,8 +104,9 @@ disp(results)
 % plot pareto curve for comparison, if pareto results exist
 d=dir("**/pareto_search_results*");
 if ~isempty(d)
-    pareto_curve_heuristics()
-    figure(3)
+    pareto_figs = pareto_curve_heuristics();
+    pareto_fig_num = pareto_figs(3).Number;
+    fig1 = figure(pareto_fig_num);
     plot(power/1e3, cost, '*--')
     
     title('Design of Experiments Pareto Front')
@@ -118,7 +119,7 @@ end
 LCOE(1,:) = LCOE(1,1); % fill in nominal LCOE results for each DV where it wasn't repeatedly tested
 cost(1,:) = cost(1,1);
 
-figure
+fig2 = figure;
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 
@@ -166,7 +167,8 @@ improvePlot
 ylab1.FontSize=16.5;
 ylab2.FontSize=16.5;
 xlim(x_range)
-fig = gcf();
-fig.Position(3:4) = [600  666]; % make taller
+fig2.Position(3:4) = [600  666]; % make taller
+
+figs = [fig1,fig2];
 
 end

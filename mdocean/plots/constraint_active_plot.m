@@ -1,4 +1,4 @@
-function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
+function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
 
     if nargin<5
         reversed = false;
@@ -25,7 +25,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     end
     [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
-    figure('Color','w')
+    f = figure('Color','w');
     tiledlayout(2,3,'TileSpacing','compact','Padding','compact'); 
     
     nexttile

@@ -1,4 +1,4 @@
-function pareto_curve_heuristics()
+function figs = pareto_curve_heuristics()
     p0 = parameters();
     b = var_bounds();
     p_w = parameters('wecsim');
@@ -18,7 +18,7 @@ function pareto_curve_heuristics()
 
     new_objs = true; % switch between LCOE-Pvar (old) and capex-Pavg (new)
 
-    constraint_active_plot(residuals,fval,tol,b,new_objs);
+    [~,f1] = constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
@@ -34,34 +34,35 @@ function pareto_curve_heuristics()
     showSingleObj = true;
     showImages = false;
     showLCOEContours = false;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+    f2 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs)
+                showImages, showLCOEContours, p, new_objs);
     
     %% simple pareto plot
     showSingleObj = false;
     showImages = false;
     showLCOEContours = true;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+    f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE))
+                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE));
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
     showImages = true;
     showLCOEContours = false;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+    f4 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs)
+                showImages, showLCOEContours, p, new_objs);
     
     %% plots for DVs as a fn of percent along the pareto
     J1_max = Inf;%p.LCOE_max;
-    design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
-                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs)
+    [f5,f6] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
+                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs);
 
+    figs = [f1,f2,f3,f4,f5,f6];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
@@ -181,11 +182,11 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
 end
 
 %%
-function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                           x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
                           showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min)
-    figure
+    f = figure;
     % overall pareto front
     plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
     hold on
@@ -288,7 +289,7 @@ function mini_plot(pos, x, p)
 end
 
 %%
-function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
+function [f_unfiltered,f_filtered] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
                                      overallJ2, J2_best, idx_best_J2, ...
                                      overallX, idxo, J1_max, var_names, new_objs)
 
@@ -325,7 +326,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     [X_filtered,pct_angle_even] = low_pass_filter(pct_angle, X_pareto_ordered_normed, backwards);
     
     % plot unfiltered
-    figure
+    f_unfiltered = figure;
     semilogy(pct_angle,X_pareto_ordered_normed)
     title('Unfiltered Design Heuristics')
     xlabel('Percent along the Pareto Curve')
@@ -340,7 +341,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
             'b:','b--',...                       % PTO
             'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
-    figure
+    f_filtered = figure;
     sub1 = subplot(2,1,1);
     for i=1:size(X_pareto_ordered_normed,2)
         semilogy(pct_angle_even,X_filtered(:,i),cols{i})
