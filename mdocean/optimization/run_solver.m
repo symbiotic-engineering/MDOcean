@@ -88,5 +88,7 @@ function [X_opt,obj_opt,flag,output,...
     grad = inv_scale .* grad_s;
     hess = (inv_scale * inv_scale.') .* hess_s;
     output = output_s;
-    output.bestfeasible.x = scale .* output_s.bestfeasible.x;
+    if ~isempty(output_s.bestfeasible)
+        output.bestfeasible.x = scale .* output_s.bestfeasible.x;
+    end
 end
