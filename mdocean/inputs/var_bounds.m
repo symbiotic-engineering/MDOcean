@@ -58,12 +58,12 @@ b.F_max_wecsim = 100;
 b.F_max_nom = 1;
 b.F_max_start = 5;
 
-% maximum generator power (kW)
-b.P_max_min = 1;
-b.P_max_max = 3000;
-b.P_max_nom = 286;
-b.P_max_wecsim = 286;
-b.P_max_start = 286;
+% maximum generator power (100 kW)
+b.P_max_min = .01;
+b.P_max_max = 30;
+b.P_max_nom = 2.86;
+b.P_max_wecsim = 2.86;
+b.P_max_start = 2.86;
 
 in2mm = 25.4;
 % material thickness of float bottom (mm)
@@ -88,14 +88,14 @@ b.t_d_wecsim = 1.0 * in2mm;
 b.t_d_start = 1.0 * in2mm;
 
 in2m = in2mm / 1000;
-% float stiffener height (m)
+% float stiffener height (dm)
 b.h_stiff_f_min = 0;
-b.h_stiff_f_max = 3;
-b.h_stiff_f_nom    = 16 * in2m;
-b.h_stiff_f_wecsim = 16 * in2m;
-b.h_stiff_f_start  = 16 * in2m;
+b.h_stiff_f_max = 3*10;
+b.h_stiff_f_nom    = 16 * in2m * 10;
+b.h_stiff_f_wecsim = 16 * in2m * 10;
+b.h_stiff_f_start  = 16 * in2m * 10;
 
-% damping plate stiffener height
+% damping plate stiffener height (m)
 b.h1_stiff_d_min = 0;
 b.h1_stiff_d_max = 2;
 b.h1_stiff_d_nom    = 22 * in2m;

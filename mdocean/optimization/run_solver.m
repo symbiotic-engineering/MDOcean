@@ -24,36 +24,15 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
         [X_opt,obj_opt,flag,output,lambda,grad,hess] = fmincon(problem);
         
         if flag <= 0 % if the unscaled optimization did not arrive at an optimal
-            % use the unscaled optimization hessian to find scale factor
-            scale = 1./sqrt(diag(hess));
+            [X_opt,obj_opt,flag,...
+             output,lambda,grad,hess] = scale_and_rerun(hess,problem,output,X_opt);
 
-            % Formulate a new scaled optimization problem     
-            problem_s = problem;
-            problem_s.options.MaxIterations = 150;
-            problem_s.options.MaxFunctionEvaluations = 2000;
-            if ~isempty(problem.options.PlotFcn)
-                problem_s.options.PlotFcn{2} = @(x,in1,in2) problem.options.PlotFcn{2}(x .* scale,in1,in2);  
+            if flag == 2
+                warning(['The scaled optimization converged in x before J. ' ...
+                    'Rescaling and trying again.'])
+                [X_opt,obj_opt,flag,...
+                 output,lambda,grad,hess] = scale_and_rerun(hess,problem,output,X_opt);
             end
-            problem_s.objective = @(x) problem.objective(x .* scale);  
-            problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
-            problem_s.Aineq = problem.Aineq .* scale';
-
-            inv_scale = 1./(scale);
-            if ~isempty(output.bestfeasible)
-                problem_s.x0 = inv_scale .* output.bestfeasible.x;
-            else
-                problem_s.x0 = inv_scale .* X_opt;
-            end
-            problem_s.lb = inv_scale .* problem.lb;
-            problem_s.ub = inv_scale .* problem.ub;
-
-            % Run scaled optimization problem
-            [X_opt,obj_opt,flag,output,lambda,grad,hess] = fmincon(problem_s);
-            X_opt = scale .* X_opt;
-            lambda.lower = inv_scale .* lambda.lower;
-            lambda.upper = inv_scale .* lambda.upper;
-            grad = inv_scale .* grad;
-            hess = (inv_scale * inv_scale.') .* hess;
         end
         
         % Rearrange outputs
@@ -69,4 +48,45 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
                 opt_x.T_s_over_h_s opt_x.F_max ...
                 opt_x.B_p opt_x.w_n opt_x.M opt_x.t_ft opt_x.t_fr opt_x.t_fc opt_x.t_fb opt_x.t_sr opt_x.t_dt opt_x.power_max];
     end
+
+end
+
+
+function [X_opt,obj_opt,flag,output,...
+            lambda,grad,hess] = scale_and_rerun(hess,problem,old_output,X_opt)
+    % use the unscaled optimization hessian to find scale factor
+    scale = 1./sqrt(diag(hess));
+
+    % Formulate a new scaled optimization problem     
+    problem_s = problem;
+    problem_s.options.MaxIterations = 150;
+    problem_s.options.MaxFunctionEvaluations = 2000;
+    if ~isempty(problem.options.PlotFcn)
+        problem_s.options.PlotFcn{2} = @(x,in1,in2) problem.options.PlotFcn{2}(x .* scale,in1,in2);
+        problem_s.options.PlotFcn{3} = @(x,in1,in2) problem.options.PlotFcn{3}(x .* scale,in1,in2);
+    end
+    problem_s.objective = @(x) problem.objective(x .* scale);  
+    problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
+    problem_s.Aineq = problem.Aineq .* scale';
+
+    inv_scale = 1./(scale);
+    problem_s.options.TypicalX = problem.options.TypicalX .* inv_scale;
+    if ~isempty(old_output.bestfeasible)
+        problem_s.x0 = inv_scale .* old_output.bestfeasible.x;
+    else
+        problem_s.x0 = inv_scale .* X_opt;
+    end
+    problem_s.lb = inv_scale .* problem.lb;
+    problem_s.ub = inv_scale .* problem.ub;
+
+    % Run scaled optimization problem
+    [X_opt_s,obj_opt,flag,output_s,lambda_s,grad_s,hess_s] = fmincon(problem_s);
+    X_opt = scale .* X_opt_s;
+    lambda = lambda_s;
+    lambda.lower = inv_scale .* lambda_s.lower;
+    lambda.upper = inv_scale .* lambda_s.upper;
+    grad = inv_scale .* grad_s;
+    hess = (inv_scale * inv_scale.') .* hess_s;
+    output = output_s;
+    output.bestfeasible.x = scale .* output_s.bestfeasible.x;
 end
