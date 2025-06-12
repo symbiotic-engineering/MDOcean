@@ -84,7 +84,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
-num_g = 22+numel(p.JPD)+length(p.T_struct);
+num_g = 23+numel(p.JPD)+length(p.T_struct);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -121,7 +121,8 @@ g(19) = X_constraints(1);               % prevent float rising above top of spar
 g(20) = X_constraints(2);               % prevent float going below bottom of spar
 g(21) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
 g(22) = X_constraints(4);               % float amplitude obeys linear theory
-g(23:end) = X_constraints(5:end);       % prevent rising out of water/slamming
+g(23) = X_constraints(5);               % spar amplitude obeys linear theory
+g(24:end) = X_constraints(6:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
