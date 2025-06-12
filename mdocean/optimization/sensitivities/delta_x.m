@@ -4,7 +4,7 @@ function [] = delta_x(X,grad,hess,J,p,b,which_obj)
 % capital X has all DVs, lowercase x has only continuous DVs
 
 x = X(1:end-1);
-dx = x/20;
+dx = x/10;
 
 % don't use the hessian contribution because it's the hess of the
 % Lagrangian, not of the objective
@@ -25,16 +25,20 @@ end
 dJ_up_actual = J_up - J;
 dJ_down_actual = J_down - J;
 
-figure
-dJ = [dJ_up';dJ_down';dJ_up_actual;dJ_down_actual];
-var = b.var_names_pretty(1:end-1);
+f = figure;
+dJ = [dJ_up';dJ_up_actual;dJ_down';dJ_down_actual];
+var = strcat('$',b.var_names_pretty(1:end-1),'$');
 var_cats = categorical(var,var,var);
-bar(var_cats, dJ)
-title('$\Delta J$ for $\Delta x = \pm x^*/20$','Interpreter','latex')
-legend('+\Deltax: Gradient Estimate','-\Deltax: Gradient Estimate',...
-    '+\Deltax: Actual','+\Deltax: Actual')
-xlabel('x')
-ylabel('\DeltaJ')
+bar(var_cats, dJ/J)
+title('$\frac{\Delta J}{J}$ for $\Delta x = \pm x^*/10$','Interpreter','latex')
+legend('$+\Delta x$: Gradient Estimate','$+\Delta x$: Actual',...
+       '$-\Delta x$: Gradient Estimate','$-\Delta x$: Actual','Interpreter','latex')
+xlabel('$x$','Interpreter','latex')
+ylabel('$\Delta J/J$','Interpreter','latex')
+improvePlot
+set(gca(),'TickLabelInterpreter','latex','YGrid','on')
+ylim([-.09 .09])
+f.Position(3:4) = [705 475];
 
 end
 
