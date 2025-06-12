@@ -11,7 +11,9 @@ if nargin == 0
     b = var_bounds();
     x0_input = b.X_start_struct;
     display = 'iter';
-    plotfn = {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)};
+    plotfn = {@optimplotfvalconstr, ...
+              @(x,optimValues,state)optimplotx_custom(x,optimValues,state,b), ...
+              @(x,~,~)optim_geomviz(x,p,b)};
     ploton = true;
 else
     display = 'off';
