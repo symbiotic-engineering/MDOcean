@@ -149,11 +149,6 @@ for i=1:num_DVs-1
     table_var_names = results.Properties.VariableNames;
     dv_idx = contains(table_var_names,[b.var_names{i} '_']) & contains(table_var_names,'_norm'); % the extra underscore is to avoid h_s picking up h_stiff_f
     vars = [table_var_names(dv_idx) obj_names_star_norm];
-%     if i==9
-%         leg='on';
-%     else
-%         leg='off';
-%     end
     idx_finite = isfinite( results.(obj_names_star{1}) );
     results_finite = results(idx_finite,:);
     h = parallelplot(results_finite,'CoordinateVariables',vars,...
@@ -196,6 +191,16 @@ for i=1:num_DVs-1
 
     end
 end
+
+%% conditional probability bar chart
+figure
+for i=1:num_DVs-1
+    %x_most_opt = X_opt(opt,i,:)
+    nexttile
+    percent
+    %plot()
+end
+
 
 
 end

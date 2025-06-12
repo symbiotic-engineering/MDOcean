@@ -1,6 +1,9 @@
-function [x,fval] = pareto_search(filename_uuid)
-    if nargin==0
+function [x,fval,timeEpsConstraint,timeGradientFree,output] = pareto_search(filename_uuid,num_seeds_vector)
+    if nargin<1
         filename_uuid='';
+    end
+    if nargin<2
+        num_seeds_vector = 20;
     end
     
     p = parameters();
@@ -14,17 +17,18 @@ function [x,fval] = pareto_search(filename_uuid)
     objFcn2 = str2func([objFcnName b.obj_names{2}]);
 
     %% Calculate seed points for the pareto front
+    
     t = tic;
-    [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower);
+    [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower,max(num_seeds_vector));
     timeEpsConstraint = toc(t)
     disp('Finished finding pareto seed points. Now starting paretosearch.')
 
-    %% Pattern search to fill in pareto front
+    %% Gradient free search to fill in pareto front
     t2 = tic;
-    [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower);
-    timePatternSearch = toc(t2)
+    [x,fval,flag,output,residuals,probMO] = run_gradient_free(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower,solver);
+    timeGradientFree = toc(t2)
 
-    percentSeed = timeEpsConstraint / (timeEpsConstraint + timePatternSearch) * 100
+    percentSeed = timeEpsConstraint / (timeEpsConstraint + timeGradientFree) * 100
 
     %% Process and save results
     utopia = min(fval);
@@ -43,10 +47,8 @@ function [x,fval] = pareto_search(filename_uuid)
     save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end
 
-function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower)
-    %% Set up pareto search algorithm
+function [probMO, X0_struct] = create_multiobj_prob(X0,fvals,scale,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower)
     probMO = probs{1};
-    scale = [10 1];
     
     if turnLCOEtoPower
         p_zero_design_cost = p;
@@ -64,23 +66,51 @@ function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs
     probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
     
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
-
+    probMO.nvars = num_DVs;
     if turnLCOEtoPower
         X0_struct.Fvals = [];
     end
+end
+
+function [x,fval,flag,output,residuals,probMO] = run_gradient_free(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower,solver)
+    scale = [10 1];
+    [probMO_base, X0_struct] = create_multiobj_prob(X0,fvals,scale,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower);
+
+    if strcmpi(solver,'patternsearch')
+        [x,fval,flag,output,residuals,probMO] = pattern_search(probMO_base, X0_struct);
+    elseif strcmpi(solver,'genetic')
+        error('GA not yet implemented')
+    else
+        error('invalid solver')
+    end
+
+    if flag==-2
+        error(output.message)
+    end
+
+    if turnLCOEtoPower
+        for i=1:length(fval)
+            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
+        end
+    end
+
+    fval = fval ./ repmat(scale,length(fval),1);
+end
+
+function [x,fval,flag,output,residuals,probMO] = pattern_search(probMO, X0_struct)
+    %% Set up pareto search algorithm
 
     probMO.options = optimoptions('paretosearch','Display','iter',...
         'PlotFcn','psplotparetof','MinPollFraction',1,...
         'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
         'UseParallel',true);
-    if ~isempty(X0)
+    if ~isempty(X0_struct.X0)
         probMO.options.InitialPoints = X0_struct;
     else
         probMO.x0 = [];
         warning('All starting points are infeasible')
     end
     probMO.solver = 'paretosearch';
-    probMO.nvars = num_DVs;
 
     %% Execute pareto search
     try
@@ -96,20 +126,10 @@ function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs
             rethrow(ME)
         end
     end
-    if flag==-2
-        error(output.message)
-    end
 
-    if turnLCOEtoPower
-        for i=1:length(fval)
-            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
-        end
-    end
-
-    fval = fval ./ repmat(scale,length(fval),1);
 end
 
-function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower)
+function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower,num_seeds_vector)
     x0 = b.X_start_struct;
     idxs = b.idxs_sort;
 
@@ -150,7 +170,21 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
     if LCOE_max < LCOE_min
         LCOE_max = 2*LCOE_min;
     end
-    num_seeds = 20;
+
+    [X_seeds,LCOE_seeds,P_var_seeds,init_failed] = get_seeds_scalar(max(num_seeds_vector));
+
+    % remove failed seeds
+    X_seeds(init_failed,:) = [];
+    P_var_seeds(init_failed) = [];
+    LCOE_seeds(init_failed) = [];
+    
+
+    % combine seeds
+    X0 = [X_0; X_opt(idxs,:)'; X_seeds];
+    fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
+end
+
+function [X_seeds,LCOE_seeds,P_var_seeds] = get_seeds_scalar(num_seeds,LCOE_min,LCOE_max,num_DVs,p,b)
     theta = linspace(0,pi/2,num_seeds+2);
     theta = theta(2:end-1);
     LCOE_seeds = LCOE_min + (1-sin(theta))*(LCOE_max-LCOE_min);
@@ -183,15 +217,6 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
             assert(obj_tmp == P_var_seeds(i))
         end
     end
-
-    % remove failed seeds
-    X_seeds(init_failed,:) = [];
-    P_var_seeds(init_failed) = [];
-    LCOE_seeds(init_failed) = [];
-
-    % combine seeds
-    X0 = [X_0; X_opt(idxs,:)'; X_seeds];
-    fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
 end
 
 function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
