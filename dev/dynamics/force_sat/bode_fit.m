@@ -29,7 +29,7 @@ fprintf('R-squared value = %.5f\n', stats.rsquare);
 
 % fit curve
 wfit = logspace(log10(min(w)), log10(max(w)), 400);
-magfit = feval(fitResult, wfit);
+magfit = feval(fit_result, wfit);
 
 % plotting
 figure('Color','w');
