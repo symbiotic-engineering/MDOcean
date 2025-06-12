@@ -153,6 +153,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
             plot_power_matrix(X_opt,p,b,b.filename_uuid)
             visualize_geometry(X_opt,p)
             lagrange_multiplier_bar_chart(b,lambda)
+            delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj)
         end
     end
     if ploton
