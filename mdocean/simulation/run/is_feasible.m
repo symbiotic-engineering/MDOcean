@@ -26,17 +26,14 @@ if nargout > 2
     nl_const_names = b.constraint_names;
     lin_const_names = b.lin_constraint_names;
 
-    failed = '';
-    for i = 1:length(g_nonlin)
-        if g_nonlin(i) < tol
-            failed = [failed ', ' nl_const_names{i}];
-        end
+    failed_nl  = strjoin(nl_const_names(g_nonlin  < tol),', ');
+    failed_lin = strjoin(lin_const_names(g_linear < tol),', ');
+    if isempty(failed_lin) || isempty(failed_nl)
+        delim = '';
+    else
+        delim = ', ';
     end
-    for i = 1:length(g_linear)
-        if g_linear(i) < 0
-            failed = [failed ', ' lin_const_names{i}];
-        end
-    end
+    failed = strjoin({failed_nl,failed_lin},delim);
 
 end
 
