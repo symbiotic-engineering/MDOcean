@@ -205,7 +205,7 @@ if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     
 end
 
-%% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
+%% figure 22, 23, 24, 25 - pareto front, design heuristics
 fig_names{22} = 'Fig. 22: pareto front with design images';
 fig_names{23} = 'Fig. 23: design and objective heuristics';
 fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
