@@ -240,7 +240,9 @@ classdef (SharedTestFixtures={ ...
                     % in either case, use figure itself, not pdf, for printing the diagnostic
                     diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
                 elseif ~isvalid(fig_out)
-                    error('Figure has been deleted, probably because of a "close all" in a subsequent script.')
+                    msg = 'Figure has been deleted, probably because of a "close all" in a subsequent script.';
+                    err = MException('MDOcean:test:deletedFigure',msg);
+                    throw(err)
                 end   
 
             else % table
