@@ -15,10 +15,11 @@ X_minCapex = Xs_opt(:,2);
 val_minLCOE = vals_opt(1);
 val_minCapex = vals_opt(2);
 
-[X_maxPower,val_maxPower] = max_avg_power(p,b);
+[X_maxPower,val_maxPower] = max_avg_power(p,b,X_minLCOE);
 
-p.LCOE_max = 0.1;
-[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p,b,2);
+p_bal = p;
+p_bal.avg_power_min = b.power_balanced;
+[X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p_bal,b,2)
 
 X_nom	= [b.X_noms' 1];
 [~,~,~,~,val_nom] = simulation(X_nom,p);
@@ -34,10 +35,22 @@ num_designs = length(titles);
 %% geometry comparison
 figure
 % sort by float diameter
-idx_diam = strcmp(b.var_names,'D_f');
-[~,biggest_to_smallest] = sort(X(:,idx_diam),'descend');
+idx_D_f = strcmp(b.var_names,'D_f');
+D_f = X(:,idx_D_f);
+[~,biggest_to_smallest] = sort(D_f,'descend');
 
-x = linspace(-30,30,100);
+% find x range
+idx_D_s = strcmp(b.var_names,'D_s');
+D_d = p.D_d_over_D_s * X(:,idx_D_s);
+biggest_diam = max([D_f;D_d]);
+x_max = biggest_diam/2 * 1.1;
+
+% find y range
+T_s = p.T_s_over_D_s * X(:,idx_D_s);
+y_min = -max(T_s) * 1.1;
+
+% waves
+x = linspace(-x_max,x_max,100);
 Hs = 3;
 T = 7.5;
 hold on
@@ -49,30 +62,34 @@ for i=1:num_designs
     hold on
     visualize_geometry(x,p,false,color{biggest_to_smallest(i)})
 end
-xlim([-40,40])
-legend(titles(biggest_to_smallest),'Location','east')
+xlim([-x_max,x_max])
+y_max = max([findobj(gca().Children,'Type','Line').YData]) * 1.1;
+ylim([y_min y_max])
+legend(titles(biggest_to_smallest),'Position',[0.5941    0.3508    0.2663    0.2167])
 
 %% power probability comparison
-figure
+f = figure;
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 ylabel(t,'Probability (-)','FontWeight','bold')
 for i=1:num_designs
     x = X(i,:);
     hold on
-    t = power_PDF(x,p,color{i},t);
+    t = power_PDF(x,p,color{i},t,[false true]);
 end
 legend(titles{:},'location','best')
+delete(nexttile(1)) % delete blank PDF so just CDF remains
+f.Position(3:4) = [792 484];
 
 %% power matrix comparison
 
 figure
 for i=1:num_designs
-    x = X(i,:);   
+    x = X(i,:);
     [~,~,P_matrix] = simulation(x, p);
     P_matrix = P_matrix / 1e3; % convert W to kW
-    [T,Hs] = meshgrid(p.T,p.Hs); 
-    
+    [T,Hs] = meshgrid(p.T,p.Hs);
+
     subplot(2,3,i);
     hold on
     contourf(T,Hs,P_matrix .* p.JPD/100)
@@ -109,10 +126,10 @@ text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
 hydro_compare(vals,color)
-    
+
 %% design variable table
 DV_table = array2table(X.', ...
-        'VariableNames',titles, 'RowNames', b.var_names_pretty);
+    'VariableNames',titles, 'RowNames', b.var_names_pretty);
 
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
@@ -126,23 +143,81 @@ out_table = removevars(out_table,'OriginalVariableNames');
 end
 
 function hydro_compare(vals,colors)
-    figure
-    hold on
-    for i=1:length(vals)
-        val = vals(i);
-        col = colors{i};
-        plot(val.w, val.A_f_over_rho,      [col '-'],...
-             val.w, val.B_f_over_rho_w,    [col '--'],...
-             val.w, val.B_s_over_rho_w,    [col ':'], ...
-             val.w, val.gamma_f_over_rho_g,[col '-.'], ...
-             val.w, val.gamma_s_over_rho_g,[col '-x'], ...
-             val.w, val.gamma_phase_f,     [col '-*'])
-    end
-    title('Hydrodynamic Coefficients')
-    xlabel('Wave Frequency (\omega)')
-    xlim([0.2,1.1])
-    ylim([-0.008,64000])
-    legend('A_{f}/\rho','B_{f}/\rho','B_{s}/\rho','\gamma_{f}/\rho','\gamma_{s}/\rho','\gamma_{phase, f}')
-    hold off
-    improvePlot
+f = figure;
+
+% first subplot: excitation
+t = tiledlayout(1,2);
+t.TileSpacing = 'compact';
+nexttile
+hold on
+plot(NaN,NaN,['k' '-*'],NaN,NaN,['k' '-.']) % dummy for legend
+colororder({'k','k'})
+for i=1:length(vals)
+    val = vals(i);
+    col = colors{i};
+    w=unique(val.w(~isnan(val.w)),'stable');
+    gamma_f_over_rho_g = unique(val.gamma_f_over_rho_g(~isnan(val.gamma_f_over_rho_g)),'stable');
+    gamma_phase_f = unique(val.gamma_phase_f(~isnan(val.gamma_phase_f)),'stable');
+    yyaxis left
+    plot(w(:,1), gamma_f_over_rho_g(:,1),[col '-*'])
+    ylabel('|\gamma_{f}|/(\rhog) (m^{2})')
+    yyaxis right
+    plot(w(:,1), gamma_phase_f(:,1),     [col '-.'])
+    ylabel('\angle\gamma_{f} (rad)')
+end
+title('Excitation Coefficient')
+xlabel('Wave Frequency (\omega)')
+xlim([0.3,1.45])
+%ylim([-10, 26510])
+legend({'|\gamma_{f}|/(\rhog)','\angle\gamma_{f}'})
+hold off
+improvePlot
+h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
+end
+
+% second subplot: radiation 
+nexttile
+hold on
+plot(NaN,NaN,['k' '--'],NaN,NaN,['k' '-']); % dummy for legend
+
+for i=1:length(vals)
+    val = vals(i);
+    col = colors{i};
+    w=unique(val.w(~isnan(val.w)),'stable');
+    A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
+    B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
+    plot(w(:,1), A_f_over_rho(:,1),[col '--'],...
+        w(:,1), B_f_over_rho_w(:,1),     [col '-'])
+end
+title('Radiation Coefficients')
+xlabel('Wave Frequency (\omega)')
+xlim([0.3,1.45])
+%ylim([-10, 26900])
+legend({'A_{f}/\rho','B_{f}/(\rho\omega)'});
+ylabel('A_{f}/\rho (m^{3}), B_{f}/(\rho\omega) (m^{3}/(rad^{2}s^{2}))')
+hold off
+improvePlot
+
+h=findobj(gca().Children,"Type","line");
+for j = 1:length(h)
+    %h(j).MarkerSize = 6;
+    %h(j).LineWidth = 1;
+end
+
+% east border subplot: dummy legend colors
+axLegend = nexttile('east');
+hold on
+dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-']};
+for i = 1:length(dummy_style)
+    plot(NaN,NaN,dummy_style{i})
+end
+leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'});
+leg.Layout.Tile = 'east';
+axLegend.Visible = 'off';
+improvePlot
+
+f.Position(3) = 1530;
 end

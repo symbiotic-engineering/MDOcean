@@ -1,5 +1,4 @@
-function pareto_curve_heuristics()
-    close all
+function figs = pareto_curve_heuristics()
     p0 = parameters();
     b = var_bounds();
     p_w = parameters('wecsim');
@@ -17,9 +16,9 @@ function pareto_curve_heuristics()
         tol = 1e-6;
     end
 
-    new_objs = true; % switch between LCOE-Pvar and capex-Pavg
+    new_objs = true; % switch between LCOE-Pvar (old) and capex-Pavg (new)
 
-    constraint_active_plot(residuals,fval,tol,b,new_objs);
+    [~,f1] = constraint_active_plot(residuals,fval,tol,b,new_objs);
 
     cols = b.idxs_recover;
     X = x(:,cols); % swap indices based on solver generated function
@@ -35,34 +34,35 @@ function pareto_curve_heuristics()
     showSingleObj = true;
     showImages = false;
     showLCOEContours = false;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, NaN*J1_balanced,...
-                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, NaN*J2_balanced,...
+    f2 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+                J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs)
+                showImages, showLCOEContours, p, new_objs);
     
     %% simple pareto plot
     showSingleObj = false;
     showImages = false;
     showLCOEContours = true;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+    f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE))
+                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE));
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
     showImages = true;
     showLCOEContours = false;
-    pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+    f4 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs)
+                showImages, showLCOEContours, p, new_objs);
     
     %% plots for DVs as a fn of percent along the pareto
     J1_max = Inf;%p.LCOE_max;
-    design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
-                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs)
+    [f5,f6] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
+                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs);
 
+    figs = [f1,f2,f3,f4,f5,f6];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
@@ -93,7 +93,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
         J1_solar = NaN;
         J2_solar = NaN;
 
-        J2_balanced_approx = 300;
+        J1_balanced_approx = b.power_balanced;
         min_max_sign = [-1 1]; % -1 for maximize, 1 for minimize
 
     else
@@ -111,7 +111,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
         J1_solar = 0.03; % LCOE solar
         J2_solar = 125;  % P var solar
 
-        J2_balanced_approx = 100;
+        J1_balanced_approx = .2;
         min_max_sign = [1 1];
     end
 
@@ -158,7 +158,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
     J2_nom_sim = [J2_report_sim, J2_wecsim_sim];
 
     % balanced design
-    [~,idx_balanced] = min(abs(J2-J2_balanced_approx));
+    [~,idx_balanced] = min(abs(J1-J1_balanced_approx));
     J1_balanced = J1(idx_balanced);
     J2_balanced = J2(idx_balanced);
     
@@ -182,11 +182,11 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
 end
 
 %%
-function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                           x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
                           showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min)
-    figure
+    f = figure;
     % overall pareto front
     plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
     hold on
@@ -195,18 +195,18 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     plot(bestJ1,bestJ2,'gp','MarkerFaceColor','g','MarkerSize',20,'HandleVisibility','off')
     
     % RM3 nominal reference - report
-    plot(J1_nom(1),    J2_nom(1),    'rd','HandleVisibility','off')
-    plot(J1_nom_sim(1),J2_nom_sim(1),'rs','HandleVisibility','off')
+    plot(J1_nom(1),    J2_nom(1),    'rd','MarkerFaceColor','r','HandleVisibility','off')
+    plot(J1_nom_sim(1),J2_nom_sim(1),'rs','MarkerFaceColor','r','HandleVisibility','off')
 
     % RM3 nominal reference - wecsim
     plot(J1_nom(2),    J2_nom(2),    'md','HandleVisibility','off')
     plot(J1_nom_sim(2),J2_nom_sim(2),'ms','HandleVisibility','off')
     
     if showSingleObj  
-        % black squares for 3 ref points
-        plot(bestJ1,J2(idx_best_J1),'ks','HandleVisibility','off')
-        plot(J1(idx_best_J2),bestJ2,'ks','HandleVisibility','off')
-        plot(J1_balanced,J2_balanced,'ks','HandleVisibility','off')
+        % cyan squares for 3 ref points
+        plot(bestJ1,J2(idx_best_J1), 'cs','MarkerFaceColor','c','HandleVisibility','off')
+        plot(J1(idx_best_J2),bestJ2, 'cs','MarkerFaceColor','c','HandleVisibility','off')
+        plot(J1_balanced,J2_balanced,'cs','MarkerFaceColor','c','HandleVisibility','off')
     end
     
     % axis labels
@@ -246,9 +246,13 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     text(bestJ1+.03,bestJ2-2,'Utopia Point','FontSize',sz)
     text(J1_solar+.03,J2_solar,'Solar','FontSize',sz)
     if showSingleObj
-        text(J1(idx_best_J1)+.03,J2(idx_best_J1),'Most Power','FontSize',sz)
-        text(J1(idx_best_J2)+.03,J2(idx_best_J2)-3,'Least Variable','FontSize',sz)
-        text(J1_balanced-.15,J2_balanced+5,'Balanced Design','FontSize',sz)
+        xx = xlim;
+        yy = ylim;
+        x_spacing = (xx(2) - xx(1)) / 50;
+        y_spacing = (yy(2) - yy(1)) / 50;
+        text(J1(idx_best_J1)+.5*x_spacing, J2(idx_best_J1)+y_spacing,   {'Most','Power'},     'FontSize',sz)
+        text(J1(idx_best_J2)+   x_spacing, J2(idx_best_J2)-y_spacing,    'Least Cost',        'FontSize',sz)
+        text(J1_balanced    -   x_spacing, J2_balanced    -9*y_spacing, {'Balanced','Design'},'FontSize',sz)
     end
 
     if showLCOEContours
@@ -256,21 +260,21 @@ function [] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar,
     end
 
     if showImages   % small pictures of best geometries
-        ylim([0.64, 2.55])
+        ylim([0.58, 2.3])
 
-        upper_left = [.75 .63]; %.28,.6
-        mini_plot(upper_left,x_best_J1,p)
+        upper_right = [.75 .512];
+        mini_plot(upper_right,x_best_J1,p)
 
-        lower_right = [.09 .19]; %.51,.23
-        mini_plot(lower_right,x_best_J2,p)
+        lower_left = [.1 .18];
+        mini_plot(lower_left,x_best_J2,p)
         
-        balanced_pos = [.42 .12]; %0.1,.35
+        balanced_pos = [.55 .35];
         mini_plot(balanced_pos,x_balanced,p)
 
-        report_pos = [.09 .55]; %.7,.53
+        report_pos = [.21,.625];
         mini_plot(report_pos,x_nom(:,1),p)
         
-        %wecsim_pos = [.28 .65]; %.8,.7
+        %wecsim_pos = [.28 .65];
         %mini_plot(wecsim_pos,x_nom(:,2),p)
     end
 
@@ -285,7 +289,7 @@ function mini_plot(pos, x, p)
 end
 
 %%
-function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
+function [f_unfiltered,f_filtered] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
                                      overallJ2, J2_best, idx_best_J2, ...
                                      overallX, idxo, J1_max, var_names, new_objs)
 
@@ -322,7 +326,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     [X_filtered,pct_angle_even] = low_pass_filter(pct_angle, X_pareto_ordered_normed, backwards);
     
     % plot unfiltered
-    figure
+    f_unfiltered = figure;
     semilogy(pct_angle,X_pareto_ordered_normed)
     title('Unfiltered Design Heuristics')
     xlabel('Percent along the Pareto Curve')
@@ -337,8 +341,8 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     cols = {'r:','r--','r-','r-.','r.',...       % bulk dims
             'b:','b--',...                       % PTO
             'g:','g--','g-','g-.','g.'}; % 'g*'  % structural
-    figure
-    s1 = subplot(2,1,1);
+    f_filtered = figure;
+    sub1 = subplot(2,1,1);
     for i=1:size(X_pareto_ordered_normed,2)
         semilogy(pct_angle_even,X_filtered(:,i),cols{i})
         hold on
@@ -351,18 +355,21 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     for i=1:length(y_grid)
         plot(x_grid, y_grid(i)*[1 1],'Color',[.85 .85 .85]);
     end
+
+    y_limits = [.9*min(X_filtered,[],'all'), 1.1*max(X_filtered,[],'all')];
+    plot(pct_angle, y_limits(1) * ones(size(pct_angle)), 'ks','MarkerSize',5,'MarkerFaceColor','k','HandleVisibility','off')
     
     title('Design Trends')
     %xlabel('Percent along the Pareto Curve')
     ylabel('Normalized Optimal Design Value')
-    ylim([.9*min(X_filtered,[],'all'), 1.1*max(X_filtered,[],'all')])
-    set(s1,'YTick',y_tick)
+    ylim(y_limits)
+    set(sub1,'YTick',y_tick)
     improvePlot
     
-    l1 = legend(var_names,'Location','eastoutside');
-    set(s1,'YMinorGrid','on')
-    set(s1,'XGrid','on')
-    set(s1, 'Children', flipud(get(s1, 'Children')) ) % put fake gridlines behind real lines
+    leg1 = legend(var_names,'Location','eastoutside');
+    set(sub1,'YMinorGrid','on')
+    set(sub1,'XGrid','on')
+    set(sub1, 'Children', flipud(get(sub1, 'Children')) ) % put fake gridlines behind real lines
     
     if new_objs
         legend_text = {'Average Electrical Power','Structural and PTO Cost'};
@@ -376,7 +383,7 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     end
 
     % objective heuristics
-    s2 = subplot(2,1,2); %figure
+    sub2 = subplot(2,1,2); %figure
     plot(pct_angle, scale_1 * J1_pareto_ordered_normed,'Color',[0.4940 0.1840 0.5560]) % purple
     hold on
     plot(pct_angle, scale_2 * J2_pareto_ordered_normed,'Color',[0.4660 0.6740 0.1880]) % green
@@ -387,9 +394,9 @@ function [] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1,
     l2 = legend(legend_text,Location='eastoutside');
 
     set(gcf,"Position",[100 100 715 835]) % make wider so x major grid shows for every 20
-    l1.Position(1:2) = [.78 .43];
-    s1.Position(2:4) = [.5 .6 .4];
-    s2.Position(3:4) = [.6 .28];
+    leg1.Position(1:2) = [.78 .43];
+    sub1.Position(2:4) = [.5 .6 .4];
+    sub2.Position(3:4) = [.6 .28];
     l2.Position(1:2) = [.54 .16];
 end
 
@@ -442,7 +449,7 @@ function [] = overlay_LCOE(p, LCOE_nom, LCOE_min)
 
     hold on
     levs = [LCOE_min;
-            .12; .15; .2; .3; .5;
+            .4; .5; .6;
             LCOE_nom];
     grey = [.85 .85 .85];
     [~,h] = contour(P_ELEC/1000,C_DESIGN/1e6,LCOE,levs,'Color',grey,'ShowText','on','LabelSpacing',400);

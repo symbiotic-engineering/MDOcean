@@ -1,4 +1,4 @@
-function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
+function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
 
     if nargin<5
         reversed = false;
@@ -25,7 +25,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     end
     [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
-    figure('Color','w')
+    f = figure('Color','w');
     tiledlayout(2,3,'TileSpacing','compact','Padding','compact'); 
     
     nexttile
@@ -36,7 +36,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     grid on
     set(gca,'ytick',1:size(lb_active,2),'yticklabel',b.var_names_pretty(1:end-1))
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
-    xlabel('Number Along Pareto Front')
+    xlabel('Number Along Pareto Front','FontSize',14)
     legend('Lower bound','Upper bound')
 
     nexttile(4)
@@ -45,7 +45,7 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     set(gca,'ytick',1:size(lincon_active,2),'yticklabel',b.lin_constraint_names_pretty)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
     grid on
-    xlabel('Number Along Pareto Front')
+    xlabel('Number Along Pareto Front','FontSize',14)
 
     nexttile(2,[2 2])
     spy(nlcon_active(idx,:)')
@@ -53,7 +53,8 @@ function [idx] = constraint_active_plot(residuals,fval,tol,b,reversed)
     grid on
     set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',constraint_names_mod)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
-    xlabel('Number Along Pareto Front')
+    xlabel('Number Along Pareto Front','FontSize',14)
 
+    f.Position = [5 160 1500 700];
     %improvePlot
 end
