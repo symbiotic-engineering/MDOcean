@@ -71,7 +71,7 @@ for i = 1:num_DVs
                     idx_ignore = false(1,length(b.constraint_names));
                     ignore = {'irrelevant_max_force','LCOE_max','linear_theory','prevent_slamming'};
                     idx_ignore(contains(b.constraint_names,ignore)) = true;
-                    [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                    [feasible, ~, which_failed] = is_feasible(g, X_vec, p, b, idx_ignore);
                 else
                     feasible = feasible_lin;
                     which_failed = failed_lin;
