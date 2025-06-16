@@ -84,8 +84,8 @@ function plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
     plot(m0h_max_asymptotic_zero/acosh(realmax)*[1 1],ylim,'k-.','DisplayName','1/(d_2/h)')
     
     legend
-    xlabel('m_0h/acosh(realmax)')
-    ylabel('b_{N+2M+1}')
+    xlabel('m_0h/acosh(realmax) (-)')
+    ylabel('b_{N+2M+1} (m^{2})')
     improvePlot
     
     % conclusion: it's not correct, but it goes to zero before it goes to nan,

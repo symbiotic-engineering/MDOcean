@@ -1,6 +1,9 @@
 
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
 
+warning('off','MATLAB:nearlySingularMatrix')
+warning('off','MATLAB:singularMatrix')
+
 if nargin == 0
     % set default parameters if function is run without input
     clc;close all
@@ -8,7 +11,9 @@ if nargin == 0
     b = var_bounds();
     x0_input = b.X_start_struct;
     display = 'iter';
-    plotfn = {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)};
+    plotfn = {@optimplotfvalconstr, ...
+              @(x,optimValues,state)optimplotx_custom(x,optimValues,state,b), ...
+              @(x,~,~)optim_geomviz(x,p,b)};
     ploton = true;
 else
     display = 'off';
@@ -48,7 +53,8 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'MaxIterations',8,...
                                 'FunValCheck','on',...
                                 'ConstraintTolerance',1e-5,...
-                                'FiniteDifferenceStepSize',1e-4);%,...
+                                'FiniteDifferenceStepSize',1e-4,...
+                                'TypicalX',b.X_noms(b.idxs_sort));%,...
                                 %'SpecifyObjectiveGradient',true,...
                                 %'SpecifyConstraintGradient',true); % would require ALL constraints to be AD-supported
 
@@ -83,16 +89,13 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
     % add nonlinear constraints
     prob = optimproblem();
-    for i = 1:num_constraints
-        name = b.constraint_names{i};
-        prob.Constraints.(name) = g(i) >= 0;
-    end
+    prob.Constraints.NonlinearIneq = g >= 0;
 
     % add linear constraints
     [A_lin,b_lin] = lin_ineq_constraints(p);
     for i=1:length(b_lin)
         name = b.lin_constraint_names{i};
-        prob.Constraints.(name) = A_lin(i,:)*X(1:size(A_lin,2)).' <= b_lin(i);
+        prob.Constraints.(name) = A_lin(i,:)*X.' <= b_lin(i);
     end
 
     % iterate through the two objectives: LCOE and P_var
@@ -147,8 +150,10 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         % Post process
         if ploton
-            plot_power_matrix(X_opt,p,b.filename_uuid)
+            plot_power_matrix(X_opt,p,b,b.filename_uuid)
             visualize_geometry(X_opt,p)
+            lagrange_multiplier_bar_chart(b,lambda)
+            delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj)
         end
     end
     if ploton

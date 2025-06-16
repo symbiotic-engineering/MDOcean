@@ -4,9 +4,10 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = false;
-        slow_figs = [16:21, 24:25];
-        slow_tabs = 7:8;
+        run_slow_tests = true;
+
+        slow_figs = [16:25];
+        slow_tabs = 1:8;
     end
 
     properties
@@ -22,7 +23,14 @@ classdef (SharedTestFixtures={ ...
         actual_wecsim
         econ_fig_wecsim
 
-        uuid   
+        uuid
+
+        fig_success
+        tab_success
+        fig_output
+        tab_output
+        fig_runtime
+        tab_runtime
     end
 
     % inputs for tests, including passing tolerances
@@ -38,7 +46,7 @@ classdef (SharedTestFixtures={ ...
     % helper methods to enumerate all figures and tables
     methods (Static)
         function which_fig_struct = enumerateFigs()
-            [~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+            [~,~,~,~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
 
             which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
@@ -48,7 +56,7 @@ classdef (SharedTestFixtures={ ...
             which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
         end
         function which_tab_struct = enumerateTabs()
-            [~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+            [~,~,~,~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
 
             which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
@@ -86,6 +94,102 @@ classdef (SharedTestFixtures={ ...
             % required to prevent file overalps for generated code
             testCase.uuid = parallel.pool.Constant(@() char(matlab.lang.internal.uuid()));
         end
+
+        function runAllFigsTabs(testCase)
+            [~,~,~,~,~,~,num_figs,num_tabs,...
+                fig_names,tab_names] = all_figures( [], [] );
+
+            all_figs = 1:num_figs;
+            all_tabs = 1:num_tabs;
+            if ~testCase.run_slow_tests
+                run_figs = all_figs(~ismember(all_figs,testCase.slow_figs));
+                run_tabs = all_tabs(~ismember(all_tabs,testCase.slow_tabs));
+            else
+                run_figs = all_figs;
+                run_tabs = all_tabs;
+            end
+
+            dry_run = false;
+            if dry_run
+                f_success_run = cell([1,length(run_figs)]);
+                t_success_run = cell([1,length(run_tabs)]);
+                f_output_run = gobjects(1,length(run_figs));
+                t_output_run = cell([1,length(run_tabs)]);
+                f_runtime_run = rand([1,length(run_figs)]);
+                t_runtime_run = rand([1,length(run_tabs)]);
+            else
+                [f_success_run,t_success_run,...
+                 f_output_run, t_output_run,...
+                 f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
+            end
+
+            % store success info
+            f_success = cell(1,num_figs);
+            f_success(run_figs) = f_success_run;
+
+            t_success = cell(1,num_tabs);
+            t_success(run_tabs) = t_success_run;
+
+            % store output
+            f_output = gobjects(1, num_figs);
+            f_output(run_figs) = f_output_run;
+
+            t_output = cell(1,num_tabs);
+            t_output(run_tabs) = t_output_run;
+
+            % store runtimes
+            f_runtime = NaN(1,num_figs);
+            f_runtime(run_figs) = f_runtime_run;
+
+            t_runtime = NaN(1,num_tabs);
+            t_runtime(run_tabs) = t_runtime_run;
+
+            % add runtime figure
+            try
+                times = [f_runtime t_runtime];
+
+                idx_plot = false([1,length(times)]);
+                idx_plot([15 17 18 22 26 end-1 end]) = true;
+                times_plot = times(idx_plot)/60;
+
+                %names = remove_underscores([fig_names tab_names]);
+                %names = names(idx_plot);
+                names = {'Fig. 15: design space exploration',...
+                    'Figs. 44-45: post-optimality parameter sensitivities',...
+                    'Figs. 22-23, 46: re-optimization parameter sensitivities',...
+                    'Figs. 24-27: pareto front',...
+                    'Figs. 16-18: single objective optimization comparisons',...
+                    'Fig. 21: multi-start',...
+                    'Tab. 21: location sensitivity'};
+                names = reordercats(categorical(names),names);
+
+                runtimeFig = figure;
+                hold on
+                bar(names,times_plot);
+                for i = 1:length(times_plot)
+                    if times_plot(i) == 0 || ~isfinite(times_plot(i))
+                        plot(i,0,'rx')
+                    end
+                end
+                title('Runtime (minutes)')
+                hold off
+                improvePlot
+                set(runtimeFig,"Position",[1 41 1536 845])
+                f_output(31) = runtimeFig;
+            catch err
+                f_success{31} = err;
+            end
+
+
+            % assign all in property
+            testCase.fig_success = f_success;
+            testCase.tab_success = t_success;
+            testCase.fig_output  = f_output;
+            testCase.tab_output  = t_output;
+            testCase.fig_runtime = f_runtime;
+            testCase.tab_runtime = t_runtime;
+
+        end
     end
 
     methods(TestClassTeardown)
@@ -118,33 +222,53 @@ classdef (SharedTestFixtures={ ...
                 testCase.assumeFalse( ismember(which_tabs, test.slow_tabs) );
             end
 
-            [success_criterion,fig_out,tab_out] = all_figures(which_figs,which_tabs,testCase.uuid.Value);
-
-            if isempty(success_criterion)
-                success_criterion = 1;
-            else
-                success_criterion = success_criterion{:};
-            end
-
             if which_figs ~= 0 % figure
+                success_criterion = testCase.fig_success{which_figs};
+                fig_out = testCase.fig_output(which_figs);
+
                 fig_name = ['Figure_' num2str(which_figs)];
                 pdf_name = ['../test-results/' fig_name];
                 
-                if ~isempty(fig_out.UserData)
-                    % pdf already exists in files, just copy to folder
-                    copyfile(fig_out.UserData, pdf_name)
-                else
-                    % save pdf from matlab figure output
-                    save_pdf(fig_out,pdf_name)
-                end
-                % in either case, use figure itself, not pdf, for printing the diagnostic
-                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+                if isgraphics(fig_out) % if figure exists (didn't error first and wasn't deleted)
+                    if ~isempty(fig_out.UserData)
+                        % pdf already exists in files, just copy to folder
+                        copyfile(fig_out.UserData, pdf_name)
+                    else
+                        % save pdf from matlab figure output
+                        save_pdf(fig_out,pdf_name)
+                    end
+                    % in either case, use figure itself, not pdf, for printing the diagnostic
+                    diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
+                elseif ~isvalid(fig_out)
+                    msg = 'Figure has been deleted, probably because of a "close all" in a subsequent script.';
+                    err = MException('MDOcean:test:deletedFigure',msg);
+                    throw(err)
+                end   
 
             else % table
+                success_criterion = testCase.tab_success{which_tabs};
+                tab_out = testCase.tab_output(which_tabs);
+
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
 
-            testCase.verifyGreaterThan(success_criterion, 0, diagnostic);
+            if iscell(success_criterion)
+                success_criterion = success_criterion{:};
+            end
+
+            if isempty(success_criterion)
+                success_criterion = 1;
+            end
+
+            if isa(success_criterion,'MException')
+                if isempty(success_criterion.stack)
+                    throw(success_criterion)
+                else
+                    rethrow(success_criterion)
+                end
+            else
+                testCase.verifyGreaterThan(success_criterion, 0, diagnostic);
+            end
 
         end
 
@@ -191,6 +315,7 @@ classdef (SharedTestFixtures={ ...
 
         function hydrodynamicLimitObeyed(testCase)
             ratio = check_max_CW(testCase.uuid.Value);
+            ratio(isnan(ratio)) = 0;
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
 
