@@ -113,6 +113,8 @@ if ~isempty(d)
     l = legend(b.var_names_pretty);
     improvePlot
     l.Location = 'bestoutside';
+else
+    fig1 = gobjects(1,1);
 end
 %% sensitivities plot
 [ratios_sorted,idx] = sort(ratios);
