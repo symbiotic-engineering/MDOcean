@@ -26,7 +26,7 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
     f = figure('Color','w');
-    tiledlayout(2,3,'TileSpacing','compact','Padding','compact'); 
+    tiledlayout(2,3,'TileSpacing','tight','Padding','tight'); 
     
     nexttile
     spy(lb_active(idx,:)','v');
@@ -34,7 +34,8 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     spy(ub_active(idx,:)','^r')
     title('Design Variable Bound Active','FontSize',14)
     grid on
-    set(gca,'ytick',1:size(lb_active,2),'yticklabel',b.var_names_pretty(1:end-1))
+    x_string = strcat('x_{', num2str((1:length(b.var_names)-1).') , "} ", b.var_names_pretty(1:end-1).' );
+    set(gca,'ytick',1:size(lb_active,2),'yticklabel',x_string)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
     xlabel('Number Along Pareto Front','FontSize',14)
     legend('Lower bound','Upper bound')
@@ -42,7 +43,8 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     nexttile(4)
     spy(lincon_active(idx,:)')
     title('Linear Constraint Active','FontSize',14)
-    set(gca,'ytick',1:size(lincon_active,2),'yticklabel',b.lin_constraint_names_pretty)
+    lin_string = strcat('g_{L,', num2str((1:length(b.lin_constraint_names)).') , "} ", b.lin_constraint_names_pretty.' );
+    set(gca,'ytick',1:size(lincon_active,2),'yticklabel',lin_string)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
     grid on
     xlabel('Number Along Pareto Front','FontSize',14)
@@ -51,10 +53,11 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active','FontSize',14)
     grid on
-    set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',constraint_names_mod)
+    nl_string = strcat('g_{L,', num2str((1:length(constraint_names_mod)).') , "} ", constraint_names_mod.' );
+    set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',nl_string)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
     xlabel('Number Along Pareto Front','FontSize',14)
 
-    f.Position = [5 160 1500 700];
+    f.Position = [2 128 1532  626];
     %improvePlot
 end
