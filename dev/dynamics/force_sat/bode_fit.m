@@ -1,10 +1,22 @@
 % load data from MEEM (hardcoded, will replace later)
-dat = readmatrix('mdocean/mdocean/inputs/validation/MEEM_validation/damping.csv');
-w = dat(:,1);
-mag = dat(:,2);
-idx = w > 0;
-w = w(idx);
-mag = mag(idx);
+%dat = readmatrix('mdocean/mdocean/inputs/validation/MEEM_validation/damping.csv');
+%w = dat(:,1);
+%mag = dat(:,2);
+%idx = w > 0;
+%w = w(idx);
+%mag = mag(idx);
+
+p = parameters();
+b = var_bounds();
+X = [b.X_noms; 1];
+[~, ~, ~, ~, val] = simulation(X,p);
+w = val.w;
+F = val.gamma_f_over_rho_g * p.rho_w * p.g * p.Hs / (2*sqrt(2)) ;
+X = val.X_f;
+mag_matrix = X ./ F;
+mag = mag_matrix(1,:); % all freqs at lowest wave height
+
+
 
 % create fit model
 fit_model = fittype(@(zeta,wn,K,w) ...
