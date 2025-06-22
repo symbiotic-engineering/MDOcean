@@ -7,6 +7,20 @@ environments:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+pipeline:
+  stages:
+    build-paper:
+      kind: latex
+      target_path: pubs/journal-paper/mdocean.tex
+      environment: tex
+      silent: true
+      inputs:
+        - pubs/journal-paper/figs
+        - pubs/journal-paper/sections/
+        - pubs/journal-paper/tables
+        - pubs/journal-paper/references.bib
+        - pubs/journal-paper/numbers.tex
+        - pubs/journal-paper/elsarticle-num-names.bst
 publications:
   - path: pubs/journal-paper/mdocean.pdf
     title: Journal Renewable Energy
