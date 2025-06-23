@@ -192,6 +192,38 @@ if nargout > 4 % if returning extra struct output for validation
     val.gamma_phase_f = gamma_phase_f;
     val.gamma_phase_s = gamma_phase_s;
     val.w = w;
+
+    val.V_d = V_d;
+    val.m_m = m_m;
+    val.m_f_tot = m_f_tot;
+    val.m_s_tot = m_s_tot;
+    val.A_c = A_c;
+    val.A_lat_sub = A_lat_sub;
+    val.I = I;
+    val.T = T;
+    val.V_f_pct = V_f_pct;
+    val.V_s_pct = V_s_pct;
+    val.GM = GM;
+    val.A_dt = A_dt;
+    val.L_dt = L_dt;
+    val.F_heave_storm = F_heave_storm;
+    val.F_surge_storm = F_surge_storm;
+    val.F_heave_op = F_heave_op; 
+    val.F_surge_op = F_surge_op;
+    val.F_ptrain_max = F_ptrain_max;
+    val.P_var = P_var;
+    val.P_avg_elec = P_avg_elec;
+    val.P_matrix_elec = P_matrix_elec;
+    val.X_constraints = X_constraints;
+    val.FOS_float = FOS_float;
+    val.FOS_spar = FOS_spar;
+    val.FOS_damping_plate = FOS_damping_plate;
+    val.FOS_spar_local = FOS_spar_local;
+    val.g = g;
+
+
+    t_val = struct2table(val,'AsArray',true);
+    writetable(t_val,'outputs_3f5ae1b.csv')
 end
 
 end
