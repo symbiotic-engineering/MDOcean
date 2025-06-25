@@ -15,6 +15,15 @@ function [F_heave_storm, F_surge_storm, ...
     T(zero_prob_idxs) = NaN;
     Hs(zero_prob_idxs) = NaN;
 
+    if in.use_force_sat
+        F_limit = in.F_max;
+    else
+        F_limit = Inf;
+    end
+
+    T_f_slam_op    = min(in.T_f_1,in.h_f-in.T_f_2);
+    T_f_slam_storm = min(in.T_f_2,in.h_f-in.T_f_2);
+
     [P_matrix_mech,X_constraints_op,B_p,...
         K_p,mag_U,X_u,X_f,X_s,F_heave_op,...
         F_surge_op,F_ptrain_max,P_sat_ratio,...
@@ -22,14 +31,16 @@ function [F_heave_storm, F_surge_storm, ...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w] = get_power_force(in,T,Hs,m_float,m_spar,...
-                                                        V_d,draft,in.F_max, ...
-                                                        zero_prob_idxs, in.T_f_1, in.power_scale_coeffs);
+                                                        V_d,draft,F_limit, ...
+                                                        zero_prob_idxs, T_f_slam_op, in.power_scale_coeffs);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
     
     % saturate maximum power
-    P_matrix_elec = min(P_matrix_elec,in.P_max,'includenan');
+    if in.use_power_sat
+        P_matrix_elec = min(P_matrix_elec,in.P_max,'includenan');
+    end
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
@@ -38,14 +49,14 @@ function [F_heave_storm, F_surge_storm, ...
     assert(isreal(P_avg_elec))
     
     % use max sea states for structural forces
-    % fixme: for storms, should return excitation force, not all hydro force
+    in.use_multibody = false; % storm is alway singlebody dynamics because brake clamps float to spar
     [~,X_constraints_storm,~,~,~,~,~,~,F_heave_storm,F_surge_storm] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, V_d, draft, ...
-                                0, false(size(in.T_struct)), in.T_f_2, [1 0 0 1]);
+                                0, false(size(in.T_struct)), T_f_slam_storm, [1 0 0 1]);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % use all X constraints operationally, only use slamming in storm
-    X_constraints_storm = X_constraints_storm(5:end);
+    X_constraints_storm = X_constraints_storm(6:end);
     X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
     X_constraints = [X_constraints_op X_constraints_storm];
 
@@ -115,8 +126,9 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
 
     X_u_max = max(mag_X_u_const,[],'all');
     X_f_max = max(mag_X_f_const,[],'all');
+    X_s_max = max(mag_X_s_const,[],'all');
 
-    % extra height on spar after accommodating float displacement
+    % extra height on spar after accommodating relative displacement
     h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_u_max) / in.h_s;
     h_s_extra_down = (in.T_s - in.T_f_2 - in.h_d - X_u_max) / in.h_s;
 
@@ -124,74 +136,30 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     h_fs_extra = in.h_fs_clear / X_u_max - 1;
 
     % prevent violation of linear wave theory
-    X_max_linear = 1/10 * in.D_f;
+    X_max_linear_f = 1/10 * in.D_f;
+    X_max_linear_s = 1/10 * in.D_s;
     
-    X_below_linear = X_max_linear / X_f_max - 1;
+    X_below_linear_f = X_max_linear_f / X_f_max - 1;
+    X_below_linear_s = X_max_linear_s / X_s_max - 1;
 
-    % prevent rising out of the water
+    % prevent rising out of the water (slamming)
     wave_amp = Hs/(2*sqrt(2));
     theta_slam = max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
     X_slam = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 ) - wave_amp .* cos(theta_slam);
-    X_slam( imag(X_slam)~=0 ) = 0; % slamming occurs even for stationary body
-    X_below_wave = X_slam ./ mag_X_u_const - 1;
+    X_slam( imag(X_slam)~=0 ) = 0; % case where slamming occurs even for stationary body
+    X_below_wave = X_slam ./ mag_X_f_const - 1;
 
     plot_slamming = false;
     if plot_slamming
         X_star = (X_slam - T_f_slam)./wave_amp;
         X_slam_simple = T_f_slam - wave_amp;
         X_below_simple = X_slam_simple ./ mag_X_u_const - 1;
-
-        f = figure;
-        t = tiledlayout(1,4);
-
-        nexttile
-        contourf(T,Hs,theta_slam/pi);
-        xlabel('T_e'); 
-        ylabel('H_s'); 
-        title('\theta/\pi'); 
-        colorbar; 
-        improvePlot;
-
-        ax = nexttile;
-        contourf(T,Hs,X_star,20);
-        xlabel('T_e'); 
-        ylabel('H_s'); 
-        title('X^*'); 
-        improvePlot; 
-        colormap(ax,bluewhitered)
-        colorbar
-
-        levels = [-.1 0 .05 .25 .5 1:5 10 20 50 100];
-
-        ax = nexttile;
-        [C,h]=contourf(T,Hs,X_below_wave,levels);
-        clim([-.1 5]);
-        xlabel('T_e');
-        ylabel('H_s'); 
-        title('X_{slam}/X - 1'); 
-        colorbar; 
-        colormap(ax,bluewhitered)
-        clabel(C,h); 
-        improvePlot;
-
-        ax = nexttile;
-        [C,h]=contourf(T,Hs,X_below_simple,levels);
-        clim([-.1 5]); 
-        xlabel('T_e'); 
-        ylabel('H_s');
-        title('(T_f-H/2)/X - 1'); 
-        colorbar; 
-        colormap(ax,bluewhitered)
-        clabel(C,h);
-        improvePlot;     
-
-        f.Position(3) = 1500;
-        title(t,'Slamming Model for Min LCOE Design')
+        make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple)
     end
 
     X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear, X_below_wave(:).'];
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear_f, X_below_linear_s, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3

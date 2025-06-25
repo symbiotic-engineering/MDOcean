@@ -1,8 +1,7 @@
 
 % Runs one-at-a-time design of experiments
 
-%clear;clc;close all
-function experiments()
+function figs = experiments()
 
 p = parameters();
 b = var_bounds();
@@ -72,7 +71,7 @@ for i = 1:num_DVs
                     idx_ignore = false(1,length(b.constraint_names));
                     ignore = {'irrelevant_max_force','LCOE_max','linear_theory','prevent_slamming'};
                     idx_ignore(contains(b.constraint_names,ignore)) = true;
-                    [feasible, ~, which_failed] = is_feasible(g, X_in, p, b, idx_ignore);
+                    [feasible, ~, which_failed] = is_feasible(g, X_vec, p, b, idx_ignore);
                 else
                     feasible = feasible_lin;
                     which_failed = failed_lin;
@@ -105,21 +104,24 @@ disp(results)
 % plot pareto curve for comparison, if pareto results exist
 d=dir("**/pareto_search_results*");
 if ~isempty(d)
-    pareto_curve_heuristics()
-    figure(3)
+    pareto_figs = pareto_curve_heuristics();
+    pareto_fig_num = pareto_figs(3).Number;
+    fig1 = figure(pareto_fig_num);
     plot(power/1e3, cost, '*--')
     
     title('Design of Experiments Pareto Front')
     l = legend(b.var_names_pretty);
     improvePlot
     l.Location = 'bestoutside';
+else
+    fig1 = gobjects(1,1);
 end
 %% sensitivities plot
 [ratios_sorted,idx] = sort(ratios);
 LCOE(1,:) = LCOE(1,1); % fill in nominal LCOE results for each DV where it wasn't repeatedly tested
 cost(1,:) = cost(1,1);
 
-figure
+fig2 = figure;
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 
@@ -167,7 +169,8 @@ improvePlot
 ylab1.FontSize=16.5;
 ylab2.FontSize=16.5;
 xlim(x_range)
-fig = gcf();
-fig.Position(3:4) = [600  666]; % make taller
+fig2.Position(3:4) = [600  666]; % make taller
+
+figs = [fig1,fig2];
 
 end

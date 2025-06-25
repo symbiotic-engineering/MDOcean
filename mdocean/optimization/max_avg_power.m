@@ -1,4 +1,4 @@
-function [X_opt_2,val_2,flag_2] = max_avg_power(p,b,x0_vec)
+function [X_opt_2,val_2,flag_2,P_elec_2] = max_avg_power(p,b,x0_vec)
 
 % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
 p_mod = p;
@@ -27,6 +27,6 @@ x0_2 = cell2struct(num2cell(X_opt(1:end-1)),b.var_names(1:end-1)',1);
 [X_opt_2,~,flag_2] = gradient_optim(x0_2,p_mod_2,b,2); 
 
 % plug back into unmodified simulation with regular params to get val
-[~, ~, ~, ~, val_2] = simulation(X_opt_2,p);
+[~, ~, P_elec_2, ~, val_2] = simulation(X_opt_2,p);
 
 end

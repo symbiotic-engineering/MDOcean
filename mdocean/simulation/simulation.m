@@ -11,11 +11,11 @@ in.T_f_2 = X(3);        % draft of float (m)
 in.h_s   = X(4);        % total height of spar (m)
 in.h_fs_clear = X(5);   % vertical clearance between float tubes and spar when at rest (m)
 in.F_max = X(6) * 1e6;  % max powertrain force (N)
-in.P_max = X(7) * 1e3;  % maximum power (W)
+in.P_max = X(7) * 1e5;  % maximum power (W)
 in.t_f_b = X(8) * 1e-3; % float bottom thickness (m)
 in.t_s_r = X(9) * 1e-3; % vertical column thickness (m)
 in.t_d   = X(10)* 1e-3; % damping plate thickness (m)
-in.h_stiff_f  = X(11);  % float stiffener height (m)
+in.h_stiff_f  = X(11)/10;  % float stiffener height (m)
 in.h1_stiff_d = X(12);  % damping plate stiffener larger height (m)
 in.M     = X(13);       % material index (-)
 
@@ -84,7 +84,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
-num_g = 20+numel(p.JPD)+length(p.T_struct);
+num_g = 23+numel(p.JPD)+length(p.T_struct);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -110,11 +110,19 @@ g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be
                                         % active unless F_max==Inf
                                         % and is only required when p.cost_perN = 0.
-g(17) = X_constraints(1);               % prevent float rising above top of spar
-g(18) = X_constraints(2);               % prevent float going below bottom of spar
-g(19) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
-g(20) = X_constraints(4);               % float amplitude obeys linear theory
-g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
+g(17) = in.F_max/F_ptrain_max - 1;      % prevent more PTO force than is available
+                                        % this constraint should always be
+                                        % active unless F_max==Inf and is
+                                        % only required when p.use_force_sat = false.
+g(18) = in.P_max/max(P_matrix_elec,[],'all') - 1; % prevent more PTO power than is avaliable
+                                        % this constraint should always be active
+                                        % and is only required when p.use_power_sat = false.
+g(19) = X_constraints(1);               % prevent float rising above top of spar
+g(20) = X_constraints(2);               % prevent float going below bottom of spar
+g(21) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
+g(22) = X_constraints(4);               % float amplitude obeys linear theory
+g(23) = X_constraints(5);               % spar amplitude obeys linear theory
+g(24:end) = X_constraints(6:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria

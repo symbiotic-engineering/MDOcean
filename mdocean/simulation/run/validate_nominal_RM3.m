@@ -19,23 +19,10 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
         actual = validation_inputs(mode);
         fig = figure;
         econ_fields = {'capex','opex','LCOE','capex_design','capex_struct','capex_PTO','J_capex_design'};
-        %econ_fields = {'capex ($)','opex ($)','LCOE ($/kWh)','capex_design ($)','capex_struct ($)','capex_PTO ($)','J_capex_design'};
         t = tiledlayout(fig,1,length(econ_fields)-1);
         t.TileSpacing = 'compact';
         t.Padding = 'compact';
         fields = fieldnames(actual);
-        fields_units = fields;
-        add_units = [7,8,9,10,11,17];
-        for i = 1:length(add_units)
-           if add_units(i) == 9
-               fields_units{add_units(i)} = strcat(fields{add_units(i)},' ($/kWh)');
-           else
-               fields_units{add_units(i)} = strcat(fields{add_units(i)},' ($)');
-           end
-        end
-        %fields{7} = fields{7} + ' ($)';
-        % 8 opex 9 lcoe 10 capex struct 11 capex pto 17 capex design
-        %= {'Capex ($)', 'Opex ($)', 'LCOE ($/kWh)', 'Capex Struct ($)', 'Capex PTO ($)', 'Capex Design ($)'};
 
         % for economic validation, sweep N_WEC
         N_WEC = [1 10 50 100];
@@ -48,7 +35,6 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
         % sweep through each field (each item to validate)
         for i = 1:length(fields)
             field = fields{i};
-            field_unit = fields_units{i};
 
             % if the field is economic (execpt J_capex_design since it's a duplicate), plot vs N_WEC
             if any(strcmp(field,econ_fields))
@@ -58,7 +44,13 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
                     ax = nexttile(t);
                     semilogx(ax, N_WEC,simulated.(field),'*-',N_WEC,actual.(field),'x--')
                     xlabel(ax,'N_{WEC}')
-                    title(ax,remove_underscores({field_unit}))
+                    if strcmp(field,'LCOE')
+                        unit = ' ($/kWh)';
+                    else
+                        unit = ' ($)';
+                    end
+                    field_unit = strcat(field,unit);
+                    title(ax,remove_underscores(field_unit))
                     if length(t.Children) == t.GridSize(2)
                         legend(ax,'Simulated','Actual','Location','bestoutside') % only add legend to last plot
                     end

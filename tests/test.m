@@ -109,17 +109,19 @@ classdef (SharedTestFixtures={ ...
                 run_tabs = all_tabs;
             end
 
-            [f_success_run,t_success_run,...
-             f_output_run, t_output_run,...
-             f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
-
-            % comment above and uncomment below to dry run
-%             f_success_run = cell([1,length(run_figs)]);
-%             t_success_run = cell([1,length(run_tabs)]);
-%             f_output_run = gobjects(1,length(run_figs));
-%             t_output_run = cell([1,length(run_tabs)]);
-%             f_runtime_run = rand([1,length(run_figs)]);
-%             t_runtime_run = rand([1,length(run_tabs)]);
+            dry_run = false;
+            if dry_run
+                f_success_run = cell([1,length(run_figs)]);
+                t_success_run = cell([1,length(run_tabs)]);
+                f_output_run = gobjects(1,length(run_figs));
+                t_output_run = cell([1,length(run_tabs)]);
+                f_runtime_run = rand([1,length(run_figs)]);
+                t_runtime_run = rand([1,length(run_tabs)]);
+            else
+                [f_success_run,t_success_run,...
+                 f_output_run, t_output_run,...
+                 f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
+            end
 
             % store success info
             f_success = cell(1,num_figs);
@@ -238,7 +240,9 @@ classdef (SharedTestFixtures={ ...
                     % in either case, use figure itself, not pdf, for printing the diagnostic
                     diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
                 elseif ~isvalid(fig_out)
-                    error('Figure has been deleted, probably because of a "close all" in a subsequent script.')
+                    msg = 'Figure has been deleted, probably because of a "close all" in a subsequent script.';
+                    err = MException('MDOcean:test:deletedFigure',msg);
+                    throw(err)
                 end   
 
             else % table

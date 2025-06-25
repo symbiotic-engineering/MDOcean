@@ -74,26 +74,31 @@ if plot_on
     fig = figure;
     hold on
     colororder({'k','k'})
+
+    blue = [0 0.4470 0.7410];
+    red = [0.8500 0.3250 0.0980];
+    yellow = [0.9290 0.6940 0.1250];
+    purple = [0.4940 0.1840 0.5560];
+
     yyaxis left
-    plot(w,A,'--','color',[0 0.4470 0.7410],'Linewidth',3,'HandleVisibility','off')
-    plot(w,B,'--','color',[0.8500 0.3250 0.0980], 'LineWidth',3,'HandleVisibility','off')
-    plot(w,gamma,'--','color',[0.9290 0.6940 0.1250],'LineWidth',3,'HandleVisibility','off')
+    plot(w,A,'--','color',blue,'Linewidth',3,'HandleVisibility','off')
+    plot(w,B,'--','color',red, 'LineWidth',3,'HandleVisibility','off')
+    plot(w,gamma,'--','color',yellow,'LineWidth',3,'HandleVisibility','off')
     yyaxis right
-    plot(w,gamma_ph,'--','color',[0.4940 0.1840 0.5560],'LineWidth',3,'HandleVisibility','off')
+    plot(w,gamma_ph,'--','color',purple,'LineWidth',3,'HandleVisibility','off')
     set(gca,"ColorOrderIndex",1)
-    % gamma_ph_MDOcean = B_MDOcean .* w ./ A_MDOcean; % random idea that
-    %  gamma phase just comes from Bw/A which is the radiation phase - doesn't work
+
     yyaxis left
     ylim([0,4000])
-    plot(w,A_MDOcean,'-','color',[0 0.4470 0.7410],'LineWidth',3)
-    plot(w,B_MDOcean,'-','color',[0.8500 0.3250 0.0980],'Linewidth',3)
-    plot(w,gamma_MDOcean,'-','color',[0.9290 0.6940 0.1250],'Linewidth',3)
+    plot(w,A_MDOcean,'-','color',blue,'LineWidth',3)
+    plot(w,B_MDOcean,'-','color',red,'Linewidth',3)
+    plot(w,gamma_MDOcean,'-','color',yellow,'Linewidth',3)
     ylabel('A/\rho (m^{3}), B/(\rho\omega) (m^{3}/(rad^{2}s^{2})), |\gamma|/(\rhog) (m^{2})')
     yyaxis right
     ylim([-1.8,1.1])
     ylabel('\angle\gamma (rad)')
-    plot(w,gamma_ph_MDOcean,'-','color',[0.4940 0.1840 0.5560],'Linewidth',3)
-    %ylim([0 4000])
+    plot(w,gamma_ph_MDOcean,'-','color',purple,'Linewidth',3)
+
     plot(0,0,'k-',0,0,'k--') % dummy plot so I can get 2 extra legend entries
     leg = legend('Added Mass A/\rho','Radiation Damping B/(\rho\omega)','Excitation Force Magnitude |\gamma|/(\rhog)',...
         'Excitation Phase \angle\gamma',...

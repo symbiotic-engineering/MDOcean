@@ -130,7 +130,7 @@ if any(which_figs == 9)
         p = parameters();
         b = var_bounds();
         X = [b.X_noms; 1];
-        plot_power_matrix(X,p,filename_uuid)
+        plot_power_matrix(X,p,b,filename_uuid)
         fig9 = gcf;
         fig_output(which_figs==9) = fig9;
     catch err
@@ -205,7 +205,7 @@ if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
     
 end
 
-%% figure 22, 23, 24, 25, 26 - pareto front, design heuristics
+%% figure 22, 23, 24, 25 - pareto front, design heuristics
 fig_names{22} = 'Fig. 22: pareto front with design images';
 fig_names{23} = 'Fig. 23: design and objective heuristics';
 fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
@@ -444,11 +444,11 @@ if any(which_tabs == 8)
     
         idx_remove = ismember(tab8.Row,{'flag','Optimal Material index'});
         tab8latex = tab8(~idx_remove,:);
-        colspec = ['>{\centering\arraybackslash}p{0.20\linewidth}' ...
+        colspec = ['>{\centering\arraybackslash}p{0.22\linewidth}' ...
                    '>{\centering\arraybackslash}p{0.08\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.15\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
                    '>{\centering\arraybackslash}p{0.18\linewidth}'];
         firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
         table2latex(tab8latex,[save_folder 'table_22.tex'],colspec,firstrow)

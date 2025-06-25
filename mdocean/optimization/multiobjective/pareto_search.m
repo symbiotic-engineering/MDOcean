@@ -1,12 +1,11 @@
 function [x,fval] = pareto_search(filename_uuid)
-    if nargin==0; filename_uuid=''; end
+    if nargin==0
+        filename_uuid='';
+    end
     
     p = parameters();
     b = var_bounds();
-    
     b.filename_uuid = filename_uuid;
-    x0 = b.X_start_struct;
-    idxs = b.idxs_sort;
     num_DVs = length(b.X_starts);
     
     turnLCOEtoPower = true;
@@ -15,6 +14,105 @@ function [x,fval] = pareto_search(filename_uuid)
     objFcn2 = str2func([objFcnName b.obj_names{2}]);
 
     %% Calculate seed points for the pareto front
+    t = tic;
+    [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower);
+    timeEpsConstraint = toc(t)
+    disp('Finished finding pareto seed points. Now starting paretosearch.')
+
+    %% Pattern search to fill in pareto front
+    t2 = tic;
+    [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower);
+    timePatternSearch = toc(t2)
+
+    percentSeed = timeEpsConstraint / (timeEpsConstraint + timePatternSearch) * 100
+
+    %% Process and save results
+    utopia = min(fval);
+    hold on
+    
+    plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
+
+    % show which constraints are active along the pareto front
+    tol = probMO.options.ConstraintTolerance;
+    idx = constraint_active_plot(residuals,fval,tol,b);
+
+    x_sorted = x(idx,b.idxs_recover)
+
+    % save mat file to be read by pareto_heuristics.m
+    date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
+    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
+end
+
+function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs,num_DVs,objFcn1,objFcn2,turnLCOEtoPower)
+    %% Set up pareto search algorithm
+    probMO = probs{1};
+    scale = [10 1];
+    
+    if turnLCOEtoPower
+        p_zero_design_cost = p;
+        % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
+        p_zero_design_cost.cost_perN_mult = 0;
+        p_zero_design_cost.cost_perW_mult = 0;
+        p_zero_design_cost.cost_perkg_mult = [0 0 0];
+
+        objFcn1Revised = @(x)objFcn1new(x,objFcn1,p_zero_design_cost);
+        scale(1) = 1;
+    else
+        objFcn1Revised = @(x)objFcn1(x,{p});
+    end
+
+    probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
+    
+    X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
+
+    if turnLCOEtoPower
+        X0_struct.Fvals = [];
+    end
+
+    probMO.options = optimoptions('paretosearch','Display','iter',...
+        'PlotFcn','psplotparetof','MinPollFraction',1,...
+        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
+        'UseParallel',true);
+    if ~isempty(X0)
+        probMO.options.InitialPoints = X0_struct;
+    else
+        probMO.x0 = [];
+        warning('All starting points are infeasible')
+    end
+    probMO.solver = 'paretosearch';
+    probMO.nvars = num_DVs;
+
+    %% Execute pareto search
+    try
+        [x,fval,flag,output,residuals] = paretosearch(probMO);
+    catch ME
+        if (strcmp(ME.identifier,'MATLAB:emptyObjectDotAssignment'))
+            msg = ['Pareto search could not find any feasible starting points, ' ...
+                   'so plot errored. Retrying without plot.'];
+            warning(msg)
+            probMO.options.PlotFcn = [];
+            [x,fval,flag,output,residuals] = paretosearch(probMO);
+        else
+            rethrow(ME)
+        end
+    end
+    if flag==-2
+        error(output.message)
+    end
+
+    if turnLCOEtoPower
+        for i=1:length(fval)
+            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
+        end
+    end
+
+    fval = fval ./ repmat(scale,length(fval),1);
+end
+
+function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower)
+    x0 = b.X_start_struct;
+    idxs = b.idxs_sort;
+
     % get pareto front endpoints by running optimization
     [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
     [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
@@ -91,88 +189,9 @@ function [x,fval] = pareto_search(filename_uuid)
     P_var_seeds(init_failed) = [];
     LCOE_seeds(init_failed) = [];
 
-    %% Set up pareto search algorithm
-    probMO = probs{1};
-    scale = [10 1];
-    
-    if turnLCOEtoPower
-        p_zero_design_cost = p;
-        % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
-        p_zero_design_cost.cost_perN_mult = 0;
-        p_zero_design_cost.cost_perW_mult = 0;
-        p_zero_design_cost.cost_perkg_mult = [0 0 0];
-
-        objFcn1Revised = @(x)objFcn1new(x,objFcn1,p_zero_design_cost);
-        scale(1) = 1;
-    else
-        objFcn1Revised = @(x)objFcn1(x,{p});
-    end
-
-    probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
-    
+    % combine seeds
     X0 = [X_0; X_opt(idxs,:)'; X_seeds];
     fvals = [fvals_0; fvals_opt; LCOE_seeds' P_var_seeds'];
-    X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
-
-    if turnLCOEtoPower
-        X0_struct.Fvals = [];
-    end
-
-    probMO.options = optimoptions('paretosearch','Display','iter',...
-        'PlotFcn','psplotparetof','MinPollFraction',1,...
-        'ParetoSetChangeTolerance',1.6e-8,'MaxIterations',100,...
-        'UseParallel',false);
-    if ~isempty(X0)
-        probMO.options.InitialPoints = X0_struct;
-    else
-        probMO.x0 = [];
-        warning('All starting points are infeasible')
-    end
-    probMO.solver = 'paretosearch';
-    probMO.nvars = num_DVs;
-
-    %% Execute pareto search
-    disp('Finished finding pareto seed points. Now starting paretosearch.')
-    try
-        [x,fval,flag,output,residuals] = paretosearch(probMO);
-    catch ME
-        if (strcmp(ME.identifier,'MATLAB:emptyObjectDotAssignment'))
-            msg = ['Pareto search could not find any feasible starting points, ' ...
-                   'so plot errored. Retrying without plot.'];
-            warning(msg)
-            probMO.options.PlotFcn = [];
-            [x,fval,flag,output,residuals] = paretosearch(probMO);
-        else
-            rethrow(ME)
-        end
-    end
-    if flag==-2
-        error(output.message)
-    end
-
-    %% Process and save results
-    utopia = min(fval);
-    hold on
-    
-    plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
-
-    if turnLCOEtoPower
-        for i=1:length(fval)
-            fval(i,1) = objFcn1(x(i,:),{p}); % put LCOE back in to avoid confusing pareto curve heuristics
-        end
-    end
-
-    fval = fval ./ repmat(scale,length(fval),1);
-
-    % show which constaints are active along the pareto front
-    tol = probMO.options.ConstraintTolerance;
-    idx = constraint_active_plot(residuals,fval,tol,b);
-
-    x_sorted = x(idx,b.idxs_recover)
-
-    % save mat file to be read by pareto_heuristics.m
-    date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-    save(['optimization/multiobjective/pareto_search_results_' date '.mat'],"fval","x","residuals","tol","p")
 end
 
 function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
