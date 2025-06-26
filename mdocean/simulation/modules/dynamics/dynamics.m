@@ -470,6 +470,13 @@ function [mag_U,phase_U,...
     real_P  = real_P  .* r_x.^2;
 
     P_sat_ratio = real_P ./ P_unsat;
+
+
+    %{
+    omega_n = 
+    zeta    = 
+    %}
+
 end
 
 function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
