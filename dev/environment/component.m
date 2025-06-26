@@ -1,86 +1,38 @@
-%{
-import openmdao.api as om
-import numpy as np
-}%
+function optimize_environmental_value()
+    % Constants
+    s_points = 0.1764;        % euro/kg (steel)
+    f_points = 6.3757;        % euro/m^2 (fiberglass)
+    d_points = 60.4413;       % euro/mi (distance)
+    SCC = 0.133;              % euro/kg CO2
+    euro2USD = 1.1;           % currency conversion
 
-%{
-class environmentComponent(om.ExplicitComponent):
-    def setup(self):
+    lb = [0, 0, 0, 0];        % lower bounds
+    ub = [5000, 100, 1000, 0.01];  % upper bounds (example limits)
 
-        #adding inputs:
-        some_float_value = 0.0
-        self.add_input(name = 'firstFloatInput', val = 0.0, desc="this is my first float variable")
-        self.add_input(name = 'firstFloatMatrixInput', val = np.zeros((4,5)), shape = (4,5), desc="this is my first float matrix variable" )
+    % initialization
+    x0 = [1000, 50, 200, 0.005];  % [steel, distance, fiberglass, CEM_output]
 
-        #adding output:
-        self.add_output(name = 'firstFloatOutput', desc = "this is my first float variable output")
-        self.add_output(name = 'firstFloatMatrixOutput', shape=(4,5), desc = "this is my first float matrix variable output")
+    options = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp')
+    [x_opt, fval] = fmincon(@(x) -net_eco_value(x, s_points, f_points, ...
+                    d_points, SCC, euro2USD), ...
+                    x0, [], [], [], [], lb, ub, [], options);
+    % resultant vector is structured as [steel, distance, fiberglass, CO2]
 
-        # Partial derivatives required for optimization
-        self.declare_partials('*', '*', method='fd')
+end
 
+function value = net_eco_value(x, s_points, f_points, d_points, SCC, euro2USD)
+    % x = [steel, distance, fiberglass, CEM_output]
+    steel = x(1);
+    distance = x(2);
+    fiberglass = x(3);
+    CEM_output = x(4);
 
-    def compute(self, inputs, outputs):
-        #retrieve inputs
-        firstFloatInput = inputs['firstFloatInput'][0] #[0] index, retrieve float number, otherwise it is an array
-        firstFloatMatrixInput = inputs['firstFloatMatrixInput']
+    CEM_output_kg = CEM_output * 1e9;
 
-        firstFloatOutput = 2 * firstFloatInput
-        firstFloatMatrixOutput = firstFloatOutput * firstFloatMatrixInput
+    % cost and value
+    eco_value = CEM_output_kg * SCC;
+    eco_cost = s_points * steel + f_points * fiberglass + d_points * distance;
 
-        #assign outputs
-        outputs['firstFloatOutput'] = firstFloatOutput
-        outputs['firstFloatMatrixOutput'] = firstFloatMatrixOutput
-}%
-
-%{
-#componentTest
-prob = om.Problem()
-#subsystem name as test
-prob.model.add_subsystem('test', environmentComponent())
-prob.setup()
-firstFloatInput = 0.2
-firstFloatMatrixInput = np.ones((4,5))
-}%
-
-
-&{
-prob.set_val('test.firstFloatInput', firstFloatInput)
-prob.set_val('test.firstFloatMatrixInput', firstFloatMatrixInput)
-
-prob.run_model()
-
-prob.model.list_inputs()
-"""
-varname                  val                 prom_name                 
------------------------  ------------------  --------------------------
-test
-  firstFloatInput        [0.2]               test.firstFloatInput      
-  firstFloatMatrixInput  |4.47213595|        test.firstFloatMatrixInput
-"""
-
-prob.model.list_outputs()
-"""
-varname                   val                   prom_name                  
-------------------------  --------------------  ---------------------------
-test
-  firstFloatOutput        [0.4]                 test.firstFloatOutput      
-  firstFloatMatrixOutput  |1.78885438|          test.firstFloatMatrixOutput
-"""
-
-print(prob.get_val('test.firstFloatMatrixOutput')) # to get matrix output
-
-"""
-[[0.4 0.4 0.4 0.4 0.4]
- [0.4 0.4 0.4 0.4 0.4]
- [0.4 0.4 0.4 0.4 0.4]
- [0.4 0.4 0.4 0.4 0.4]]
-
-
-"""
- 
-}%
-
-% Plan: rewrite everything using the optimization toolboxes in MATLAB.
-
-
+    % convert eco
+    value = (eco_value - eco_cost) * euro2USD;
+end
