@@ -124,7 +124,10 @@ g(22) = X_constraints(4);               % float amplitude obeys linear theory
 g(23) = X_constraints(5);               % spar amplitude obeys linear theory
 g(24:end) = X_constraints(6:end);       % prevent rising out of water/slamming
 
-criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
+no_inf = all(~isinf([g LCOE P_var]));
+no_nan = all(~isnan([g LCOE P_var]));
+no_imag = all(isreal([g LCOE P_var]));
+criteria = no_inf && no_nan && no_imag;
 if ~criteria
     warning('Inf, NaN, or imaginary constraint or objective detected')
 end
