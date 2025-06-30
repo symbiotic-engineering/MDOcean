@@ -153,7 +153,8 @@ if nargout > 4 % if returning extra struct output for validation
      A_f_over_rho, A_s_over_rho,A_c_over_rho,...
      B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,...
      gamma_f_over_rho_g,gamma_s_over_rho_g,...
-     gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+     gamma_phase_f,gamma_phase_s,w,...
+     phase_X_f,phase_X_u] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
@@ -195,6 +196,8 @@ if nargout > 4 % if returning extra struct output for validation
     val.gamma_phase_f = gamma_phase_f;
     val.gamma_phase_s = gamma_phase_s;
     val.w = w;
+    val.phase_X_f = phase_X_f;
+    val.phase_X_u = phase_X_u;
 end
 
 end
