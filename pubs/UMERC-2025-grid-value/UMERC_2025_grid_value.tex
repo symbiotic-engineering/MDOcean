@@ -180,49 +180,45 @@ PowerGenome does not provide data on wave energy converters, so we use the MHKit
 Temporal and spatial resolution and scope are set to encompass one year each decade for three decades, with hourly energy profiles, for a northeast and California grid scenario, containing three and two load zones respectively.
 
 \subsubsection{Reduced order model and lookup table}
-Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (a reduced order model), and then building a surrogate model to predict the CEM outputs from these reduced design characteristics. The model reduction represents the capture width of the WEC, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$. Physics dictates the following form:
+Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (a reduced order model), and then building a surrogate model to predict the CEM outputs from these reduced design characteristics. The model reduction represents the capture width of the WEC, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$ \cite{zou_practical_2023}. Physics dictates the following form:
 \begin{equation}
     \label{eq:CW-fraction}
-    \frac{CW}{CW_{max}} = \frac{2 B_u(\omega) \omega^5}{G \rho_w g^3} |RAO(\omega)|^2
+    \frac{CW}{CW_{max}} = \frac{2 B_u(\omega) \omega^5}{G \rho g^3} |RAO(\omega)|^2
 \end{equation}
-where $G$ is the gain (1 for heaving and 2 for surging/pitching), $B_u$ is the generator control damping, $\omega$ is the wave energy frequency, $\rho_w$ is the water density, $g$ is the gravitational acceleration, and $RAO$ is the response amplitude operator (complex ratio between WEC motion on the generator degree of freedom and wave amplitude, $X/\eta$).
+with gain $G$ (1 for heave, 2 for surge/pitch), control damping $B_u$, wave energy frequency $\omega$, water density $\rho$, gravitational acceleration $g$, and response amplitude operator $RAO$ (the complex ratio of WEC motion and wave amplitude, $X/\eta$).
 %In optimal reactive control, $B_u(\omega)=B_h(\omega)+B_d(\omega,RAO(\omega))$, where $B_h$ is the hydrodynamic damping and $B_d$ is nonlinear drag damping. 
-We assume the RAO has the form of a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$:
+We assume the RAO is a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$ \cite{franklin2014feedback}:
 \begin{equation}
     \label{eq:rao}
     RAO(\omega) = \frac{1}{1-\left(\frac{\omega}{\omega_n}\right)^2 + j 2 \zeta \frac{\omega}{\omega_n}}
 \end{equation}
 with imaginary unit $j$.
-This implies $B_u = \zeta \omega_n$ if optimal reactive control is used, since the second-order assumption forces $B_u$ to be independent of frequency.
-For RM3, this model is found to be valid at frequencies at and below resonance, shown in \figureautorefname~\ref{fig:bode}.
-Capturing the behavior above resonance would require a higher order model such as one with five poles and four zeros, two of which are on the right half plane.
-However, sweeping 9 dynamic inputs to the CEM instead of 2 would be computationally costly, so this study maintains a second order model.
-Future work could also incorporate drag nonlinearities by allowing $\zeta$ to vary with wave height.
-
-
+This second-order assumption implies $\Im(RAO)=2\zeta \omega_n$.
+If combined with the optimal reactive control law $B_u(\omega) = \Im(RAO(\omega))/2$, this forces a frequency-independent control damping.
+The values of $\zeta$ and $\omega_n$ for a given design are determined via a least-squares fit with function \eqref{eq:rao} across all sea states with nonzero probability in the JPD.
+Using $i$ as the frequency index and $j$ as the wave height index, this is expressed as:
 %(equation~\eqref{eq:bode-fit}), 
-
-%\begin{equation}\label{eq:bode-fit}
+%\begin{equation}
 %\begin{aligned}
 %    \zeta,\omega_n &= \mathrm{argmin}\left( \epsilon_{mag}^2 + \epsilon_{phase}^2 \right) \\
 %    \epsilon_{mag} &= xxx \\
 %    \epsilon_{phase} &= xxx
 %\end{aligned}
 %\end{equation}
-    
+\begin{equation}\label{eq:bode-fit}
+    \zeta,\omega_n = \mathrm{argmin}(\epsilon_{mag}^2), \quad
+    \epsilon_{mag} = \sum_{i,j}^{} \left(\left|\frac{X_{ij}}{\eta_j}\right|-\left|\frac{1}{1-\left(\frac{\omega_i}{\omega_n}\right)^2 + j 2 \zeta \frac{\omega_i}{\omega_n}}\right|\right)
+\end{equation}
+For RM3, this model is found to be valid at frequencies at and below resonance, shown in \figureautorefname~\ref{fig:bode}.
+Capturing the behavior above resonance would require a higher order model such as one with five poles, two standard zeros, and two right half plane zeros.
+However, sweeping 9 dynamic inputs to the CEM instead of 2 would be computationally costly, and high frequencies are less common in the ocean, so this study maintains a second order model.
+Future work could also incorporate drag nonlinearities by allowing $\zeta$ to vary with wave height.
+
     %- assumes that the WEC can generate less than its max power without violating any amplitude/force constraints        
     %-  how CEM system cost gets turned into NVOE metric (since CEM enforces NVOE=0)    
 
 Meanwhile, the surrogate model is in this case simply a lookup table with linear interpolation.
 Future work could develop a more mechanistic surrogate model to understand driving factors and allow extrapolation to different grid scenarios.
-
-
-The fit for this model is calculated as a least-squares fit with function \eqref{eq:rao}. Therefore, the error for this model is:
-(placeholder)
-\begin{equation}
-    \sum_{i,j}^{} \left(\left|\frac{X_{ij}}{\eta_j}\right|^{2}-\left|\frac{1}{1-\left(\frac{\omega_i}{\omega_n}\right)^2 + j 2 \zeta \frac{\omega_i}{\omega_n}}\right|^{2}\right)
-\end{equation}
-where $i$ is the frequency index and $j$ is the wave height index.
 
 %In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
 %The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
