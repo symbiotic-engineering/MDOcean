@@ -1,7 +1,8 @@
 clear
 close all
 f = figure;
-tiledlayout(2,1)
+t = tiledlayout(2,1);
+t.TileSpacing = 'compact';
 
 % nominal design
 p = parameters();
@@ -14,7 +15,7 @@ F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
 RAO = true; % true uses X/eta, false uses X/F_f
 relative = false; % true uses X_u, false uses X_f
 fudge = pi; % unsure why this is necessary, otherwise I get a -180deg phase shift as if there were a negative sign
-wn = .54; % guess for now
+
 if relative
     phase_X = val.phase_X_u;
     X = val.X_u;
@@ -23,12 +24,17 @@ else
     X = val.X_f;
 end
 if RAO
+    wn = 0.52;
     mag_matrix = X ./ wave_amp;
     angle_matrix = phase_X - fudge;
     y_lab = 'X/\eta';
     y_lab_extra = '';
-    norm = 1;
+    norm = 2; % not sure why this isn't 1. Technically rather than fudge up DC gain, 
+    % if I want second order system to match, I'd want to make it so DC gain 
+    % is still 1, but at w just below resonance, gain is 2x higher than
+    % DC gain like it is for a second order system.
 else
+    wn = .54; % guess for now
     mag_matrix = X ./ F;
     angle_matrix = phase_X - val.gamma_phase_f - fudge;
     %A = pi/4 * b.D_f_nom^2 - (p.D_f_in_over_D_s * b.D_s_nom)^2;
@@ -121,8 +127,9 @@ nexttile(2)
 xlabel('\omega/\omega_n (-)')
 ylabel(['Phase \angle(' y_lab ') / \pi'])
 xlim([.5 omega_over_omega_n_max])
-ylim([-1 0])
+ylim([-1.2 0])
 plot(NaN,NaN,'k*-','DisplayName','RM3') % dummy for legend
+title(t,'RAO')
 
 % legend, colorbar, and figure size
 improvePlot
@@ -153,14 +160,19 @@ TF_w(isnan(TF_w)) = unique_w(~isnan(unique_w));
 TF_frd = frd(TF_data(~isnan(TF_data)), TF_w(~isnan(TF_w)));
 %np = 4; nz = 2; % okay fit, stable
 %np = 5; nz = 3; % good fit, unstable
-for np=4:6
-    np
-    est_TF = tfest(TF_frd,np)%,nz);
+np = 2:6;
+nz = np*0;
+stable = false(size(np));
+
+for i=1:length(np)
+    np(i)
+    est_TF = tfest(TF_frd,np(i))%,nz);
     [Z,P,K] = zpkdata(est_TF);
     zeros = Z{:}
+    nz(i) = length(zeros);
     poles = P{:}
     gain  = K
-    stable = allmargin(est_TF).Stable
+    stable(i) = allmargin(est_TF).Stable;
     
     figure(2)
     bode(est_TF)
@@ -174,6 +186,8 @@ figure(2)
 bode(TF_frd,'k*')
 % crtlpref > response > phase wrap at -360 (could also do with
 % PhaseWrappingEnabled and PhaseWrappingBranch of bodeplot command)
-legend(num2str((4:6).'))
+stable_str = {'Unstable','Stable'};
+leg_text = strcat(num2str((np).'), " poles, ", num2str((nz).'), " zeros, ", stable_str(stable+1).');
+legend(leg_text)
 improvePlot
 
