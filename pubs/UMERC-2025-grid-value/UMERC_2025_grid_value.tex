@@ -182,19 +182,23 @@ Temporal and spatial resolution and scope are set to encompass one year each dec
 \subsubsection{Reduced order model and lookup table}
 Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (a reduced order model), and then building a surrogate model to predict the CEM outputs from these reduced design characteristics. The model reduction represents the capture width of the WEC, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$. Physics dictates the following form:
 \begin{equation}
+    \label{eq:CW-fraction}
     \frac{CW}{CW_{max}} = \frac{2 B_u(\omega) \omega^5}{G \rho_w g^3} |RAO(\omega)|^2
 \end{equation}
 where $G$ is the gain (1 for heaving and 2 for surging/pitching), $B_u$ is the generator control damping, $\omega$ is the wave energy frequency, $\rho_w$ is the water density, $g$ is the gravitational acceleration, and $RAO$ is the response amplitude operator (complex ratio between WEC motion on the generator degree of freedom and wave amplitude, $X/\eta$).
 %In optimal reactive control, $B_u(\omega)=B_h(\omega)+B_d(\omega,RAO(\omega))$, where $B_h$ is the hydrodynamic damping and $B_d$ is nonlinear drag damping. 
-Inspired by a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$, we assume the RAO has the form 
+We assume the RAO has the form of a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$:
 \begin{equation}
-    RAO(\omega) = \frac{1}{1-(\frac{\omega}{\omega_n})^2 + j 2 \zeta \frac{\omega}{\omega_n}}
+    \label{eq:rao}
+    RAO(\omega) = \frac{1}{1-\left(\frac{\omega}{\omega_n}\right)^2 + j 2 \zeta \frac{\omega}{\omega_n}}
 \end{equation}
 with imaginary unit $j$.
 This implies $B_u = \zeta \omega_n$ if optimal reactive control is used, since the second-order assumption forces $B_u$ to be independent of frequency.
 For RM3, this model is found to be valid at frequencies at and below resonance, shown in \figureautorefname~\ref{fig:bode}.
-Capturing the behavior above resonance would require a higher order model such as one with five poles and four zeros, two of which are on the right half plane, but sweeping 9 dynamic inputs to the CEM instead of 2 would be computationally costly.
-Future work can incorporate drag nonlinearities by allowing $\zeta$ to vary with wave height.
+Capturing the behavior above resonance would require a higher order model such as one with five poles and four zeros, two of which are on the right half plane.
+However, sweeping 9 dynamic inputs to the CEM instead of 2 would be computationally costly, so this study maintains a second order model.
+Future work could also incorporate drag nonlinearities by allowing $\zeta$ to vary with wave height.
+
 
 %(equation~\eqref{eq:bode-fit}), 
 
@@ -211,6 +215,14 @@ Future work can incorporate drag nonlinearities by allowing $\zeta$ to vary with
 
 Meanwhile, the surrogate model is in this case simply a lookup table with linear interpolation.
 Future work could develop a more mechanistic surrogate model to understand driving factors and allow extrapolation to different grid scenarios.
+
+
+The fit for this model is calculated as a least-squares fit with function \eqref{eq:rao}. Therefore, the error for this model is:
+(placeholder)
+\begin{equation}
+    \sum_{i,j}^{} \left(\left|\frac{X_{ij}}{\eta_j}\right|^{2}-\left|\frac{1}{1-\left(\frac{\omega_i}{\omega_n}\right)^2 + j 2 \zeta \frac{\omega_i}{\omega_n}}\right|^{2}\right)
+\end{equation}
+where $i$ is the frequency index and $j$ is the wave height index.
 
 %In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
 %The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
