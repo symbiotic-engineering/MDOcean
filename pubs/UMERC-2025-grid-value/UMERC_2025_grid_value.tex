@@ -114,7 +114,7 @@ Finally, we discuss the broader implications of these findings for future WEC de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Advances in wave energy converter (WEC) multidisciplinary design optimization have reduced the Levelized Cost of Energy (LCOE) X-fold while incorporating realistic constraints such as structural survival, generator force limits, and body amplitude limits \cite{mccabe_mdocean_2024}.
+Advances in wave energy converter (WEC) multidisciplinary design optimization have reduced the Levelized Cost of Energy (LCOE) X-fold while incorporating realistic constraints such as structural survival, generator force limits, and body amplitude limits \cite{mccabe_leveraging_2025}.
 However, LCOE does not fully capture the value of WECs.
 Alternative metrics include net present value and payback period for non-grid Powering the Blue Economy contexts (cite Scott), and total grid system cost and lifetime equivalent CO\textsubscript{2} emissions in energy system planning and climate change mitigation.
 Prior studies of WEC grid integration reveal benefits including reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (cite WEC CEM/EDs and WEC grid value lit).
@@ -123,84 +123,82 @@ Considering energy system factors in the early design phase can steer WEC develo
 Recent studies for other technologies incorporate design considerations into energy system optimization (ie nuclear and long duration energy storage, cite Jesse Jenkins) and energy system considerations into design optimization (ie NVOE metric for offshore wind, cite WISDEM).
 This study is the first to apply integrated design and energy system optimization to WECs, and also a methodological improvement over similar studies for other technologies. 
 Specifically, the use of a surrogate capacity expansion model within a nonlinear design optimization more fully captures design-grid coupling while maintaining computational efficiency, a technique which the authors conceptually introduce in \cite{mccabe_system_2023} and here implement via dynamic system parameterization.
-A second-order fit to a point absorber's nonlinear frequency response is found to be valid at frequencies at and below resonance.
+
 
    % -  prior work showing that CEM is more important than economic dispatch?
 
 \section{Methodology}
-\subsection{Optimization Problem Formulation}
-
-    -  Design variables (quickly summarize MDOcean)
-    -  Objectives: NVOE and net eco value of energy
-    -  when not economically viable, avoid flatness by changing obj to margin to viability
-    -  constraints (quickly summarize MDOcean)
-    -  Algorithm: Summarize SQP, epsilon constraint and refer to MDOcean
-
-
-\lipsum[1]
+\subsection{Optimization problem formulation}
+The WEC to be optimized is the Reference Model 3 (RM3) \cite{neary_reference_2014}, a two-body heaving point absorber.
+We utilize MDOcean \cite{mccabe_mdocean_2024}, an open-source WEC multidisciplinary design optimization framework, with the same design variables and constraints as \cite{mccabe_leveraging_2025}.
+Design variables include five bulk geometric dimensions (float and spar diameter and height, and clearance between the float tubes and spar), two generator ratings (maximum power and maximum force), and five structural dimensions (float, spar, and damping plate material thicknesses, and float and damping plate stiffener heights) for a total of twelve variables.
+\cite{mccabe_leveraging_2025} documents the variable ranges and rationales.
+Constraints create substantial nonconvexity and include pitch stability, hydrostatic balance, structural survival, and dynamic amplitude limits.
+New in this study, the primary optimization objective is the grid cost CEM output, but when the WEC is not economically viable, to avoid flatness the objective becomes the margin to viability.
+For multi-objective optimization, a second new objective of net eco-value per unit energy captures system-level environmental impacts.
+MDOcean utilizes a gradient-based nonlinear programming algorithm for single-objective optimization and combines gradient-based and gradient-free methods for multi-objective optimization \cite{mccabe_leveraging_2025}.
+\figureautorefname~\ref{fig:n2} depicts the optimization structure via an xDSM diagram \cite{lambe_extensions_2012}, with design variables on the top row and objectives and constraints in the rightmost two columns.
 
 \subsection{Modeling}
-\subsubsection{Overall Model Structure}
+\subsubsection{Overall model structure}
+MDOcean integrates hydrodynamic, structural, control, and economic models, detailed in \cite{mccabe_leveraging_2025}.
+%The model handles nonlinear dynamics including drag and generator force limits.
+This study introduces new modules for ``grid'' and ``environment'' to MDOcean. The middle of \figureautorefname~\ref{fig:n2} depicts simulation connections to integrate the modules.
 
-\begin{wrapfigure}[16]{r}{0.62\textwidth}
+\begin{wrapfigure}[30]{r}{0.72\textwidth}
     \centering
-    \includegraphics[width=.6\textwidth]{figures/out/xdsm_grid.pdf}
+    \includegraphics[width=.7\textwidth]{figures/out/xdsm_grid.pdf}
     \caption{xDSM diagram}
     \label{fig:n2}
 \end{wrapfigure}
 
-\lipsum[1]
+As \cite{mccabe_system_2023} proposes, CEM optimizations are performed ahead of the design optimization for a wide set of inputs that reflect the range of possible WEC designs and world scenarios. The grid module of the design optimization captures CEM results in a surrogate model to reduce computation time.
 
-As proposed in \cite{mccabe_system_2023}, CEM runs are performed ahead of time for a wide set of inputs designed to reflect the range of possible WEC designs and world scenarios, and the results are fit to a surrogate model that is used in the design optimization to reduce computation time.
+% \begin{wrapfigure}[18]{r}{0.52\textwidth}
+%     \centering
+%     \includegraphics[width=.5\textwidth]{figures/CEM-flowchart-idetc.png}
+%     \caption{Surrogate model diagram}
+%     \label{fig:surrogate}
+% \end{wrapfigure}
 
-\begin{wrapfigure}[18]{r}{0.52\textwidth}
-    \centering
-    \includegraphics[width=.5\textwidth]{figures/CEM-flowchart-idetc.png}
-    \caption{Surrogate model diagram}
-    \label{fig:surrogate}
-\end{wrapfigure}
-
-\subsubsection{MDOcean}
-
-    -  cost
-    -  power
-    -  quick mention hydro, structures, amplitude limits, force saturation
-\lipsum[1]
-
-\subsubsection{Capacity Expansion Model (CEM)}
-
-    -  GenX: equation~\eqref{eq:CEM-objective} for the LP it solves, what assumptions it makes (equilibrium)
-
-\begin{equation}\label{eq:CEM-objective}
-    \min_{x_{grid}} C_{grid} = \sum_{gen} \sum_{t} p_{gen,t} x_{grid,gen,t}
-\end{equation}
-
+\subsubsection{Capacity expansion model (CEM)}
+The GenX CEM \cite{genx} is an open-source linear programming model that determines the installed capacity of each possible generator to minimize the total grid system cost while meeting demand and emissions constraints.
+It indirectly enforces economic equilibrium since at the optimum, only generators that cost less than the value they provide are installed.
+%    -  GenX: equation~\eqref{eq:CEM-objective} for the LP it solves
+%\begin{equation}\label{eq:CEM-objective}
+%    \min_{x_{grid}} C_{grid} = \sum_{gen} \sum_{t} p_{gen,t} x_{grid,gen,t}
+%\end{equation}
     %-  time domain reduction and what timescales of power variation and demand alignment are captured vs relevant (seasonality, storms, within wave, within sea state between waves)
-    -  scenarios / State of the world sweeps
-    -  choice of spatial and temporal resolution and scope
     %-  Emissions in CEM
     %-  how we're confident enough that the results aren't due to random chance alignment between that day's demand and wave data and are real / significant
-    -  GenX requires as input detailed data on the costs, hourly profiles, and existing infrastructure of all generation, transmission, storage, and load on the grid. This is managed by the PowerGenome package \cite{powergenome}, which consolidates data from multiple sources such as the U.S. Energy Information Administration (EIA) and National Renewable Energy Laboratory (NREL).
-    \figureautorefname~\ref{fig:CEM-data-flow} depicts the data flow. Coefficients $\beta$ are found for each input combination of wave cost, grid scenario, location, damping ratio, and natural frequency. Orange outlines indicate code implemented in this work rather than an existing package. PowerGenome does not provide data on wave energy converters, so we use the MHKit interface to hindcast power densities \cite{mhkit} along with design-dependent capture width information to generate the hourly power profiles of the WECs. 
+GenX requires as input detailed data on the costs, hourly profiles, and existing infrastructure of all generation, transmission, storage, and load on the grid.
+This is managed by the PowerGenome package \cite{schivley_powergenomepowergenome_2025}, which consolidates data from multiple sources such as the U.S. Energy Information Administration (EIA) and National Renewable Energy Laboratory (NREL) including scenarios for reference, moderate, and high levels of electrification.
+PowerGenome also allows control over a grid-wide maximum CO\textsubscript{2} constraint.
+\figureautorefname~\ref{fig:CEM-data-flow} depicts the data flow for the CEM runs prior to design optimization.
+%Coefficients $\beta$ 
+Grid costs and emissions are found for each input combination of WEC cost, grid scenario, location, and WEC dynamics (damping ratio and natural frequency).
+Orange outlines indicate code implemented in this work rather than an existing package.
+PowerGenome does not provide data on wave energy converters, so we use the MHKit interface to hindcast power densities \cite{klise_mhkit_2020} along with design-dependent capture width information to generate the hourly power profiles of the WECs. 
+Temporal and spatial resolution and scope are set to encompass one year each decade for three decades, with hourly energy profiles, for a northeast and California grid scenario, containing three and two load zones respectively.
 
-\subsubsection{Surrogate model to link CEM with design}
-Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (reduced order model), and then building a surrogate model to predict the CEM outputs from these design characteristics.
+\subsubsection{Reduced order model and lookup table}
+Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (a reduced order model), and then building a surrogate model to predict the CEM outputs from these reduced design characteristics. The model reduction represents the capture width of the WEC, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$. Physics dictates the following form:
+\begin{equation}
+    \frac{CW}{CW_{max}} = \frac{2 B_p(\omega) \omega^5}{G \rho_w g^3} |RAO(\omega)|^2
+\end{equation}
+where $G$ is the gain (1 for heaving and 2 for surging/pitching), $B_p$ is the generator control damping, $\omega$ is the wave energy frequency, $\rho_w$ is the water density, $g$ is the gravitational acceleration, and $RAO$ is the response amplitude operator (complex ratio between WEC motion on the generator degree of freedom and wave amplitude).
+%In optimal reactive control, $B_p(\omega)=B_h(\omega)+B_d(\omega,RAO(\omega))$, where $B_h$ is the hydrodynamic damping and $B_d$ is nonlinear drag damping. 
+Inspired by a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$, we assume the RAO has the form 
+\begin{equation}
+    RAO(\omega) = \frac{1}{1-(\frac{\omega}{\omega_n})^2 + j 2 \zeta \frac{\omega}{\omega_n}}
+\end{equation}
+with imaginary unit $j$.
+This implies $B_p = \zeta \omega_n$ if optimal reactive control is used, since the second-order assumption forces $B_p$ to be independent of frequency.
+For RM3, this model is found to be valid at frequencies at and below resonance, shown in \figureautorefname~\ref{fig:bode}.
+Capturing the behavior above resonance would require a higher order model such as one with five poles and four zeros, two of which are on the right half plane, but sweeping 9 dynamic inputs to the CEM instead of 2 would be computationally costly.
+Future work can incorporate drag nonlinearities by allowing $\zeta$ to vary with wave height.
 
-For grid scenarios run in the CEM, the surrogate model can be replaced with a lookup table, but a true surrogate model permits limited extrapolation to different grid scenarios and understanding of driving factors.
-
-12 design variables > 210 capture width vs Hs and T > 8760 power profile variables
-
-Why am I not fitting CW(Hs,T)/CW_{max} = beta_0 + beta_1 Hs + beta_2 T + beta_3 Hs^2 + beta_4 T^2 + beta_5 Hs*T? That's more direct than even the Bode. It captures radiation efficiency (which itself includes amplitude limits, hydro shape, damping vs impedance control), drag efficiency, force saturation, electrical efficiency, and power limits.
-
-In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM 
-, which is used as part of the surrogate model to predict the primary outputs from design inputs. 
-
-For each grid scenario, we identify the maximum threshold cost representing the maximum cost of any generator (with the most favorable generation profile) that would be installed, and 
-
-
-
-    -  idea of doing a bode fit and why it captures the right info
-    -  bode fit figure is only valid for frequencies at and below the natural frequency and neglects change in $\zeta$ and $\omega_n$ with $H_s$%(equation~\eqref{eq:bode-fit}), 
+%(equation~\eqref{eq:bode-fit}), 
 
 %\begin{equation}\label{eq:bode-fit}
 %\begin{aligned}
@@ -212,6 +210,12 @@ For each grid scenario, we identify the maximum threshold cost representing the 
     
     %- assumes that the WEC can generate less than its max power without violating any amplitude/force constraints        
     %-  how CEM system cost gets turned into NVOE metric (since CEM enforces NVOE=0)    
+
+Meanwhile, the surrogate model is in this case simply a lookup table with linear interpolation.
+Future work could develop a more mechanistic surrogate model to understand driving factors and allow extrapolation to different grid scenarios.
+
+%In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
+%The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
 
 \begin{figure}[b]
 \noindent
@@ -237,7 +241,7 @@ For each grid scenario, we identify the maximum threshold cost representing the 
 \end{minipage}
 \end{figure}
 
-\subsubsection{Life Cycle Analysis (LCA)}
+\subsubsection{Life cycle analysis (LCA)}
     -  LCA items considered: steel, fiberglass,
     -  LCA items modeled but not changed in this optim: distance from shore
     -  LCA items not considered: fish, hydraulic fluid, detail design
@@ -352,7 +356,7 @@ Figures should be placed at the top or bottom of a page wherever possible, as cl
 \vspace{1\baselineskip}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Appendix A. CEM Surrogate Model Equation}
+\section*{Appendix A. CEM Surrogate model equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $C$ refers to costs (\$M) (output from CEM), $S$ refers to specific capacity costs (\$M/kW) (input to CEM), $x_{grid}$ refers to installed capacities (decision variable in CEM), and $E$ refers to specific energy costs (\$/kWh). The amount of built wave capacity $x_{grid,WEC}$ is not to be confused with $x_{design}$, the WEC design variables in the outer (MDOcean) optimization that are parameters (held constant) in the CEM.
 
