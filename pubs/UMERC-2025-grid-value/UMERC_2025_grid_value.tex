@@ -120,7 +120,7 @@ Alternative metrics include net present value and payback period for off-grid co
 Prior studies of WEC grid integration reveal benefits including reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (cite WEC CEM/EDs and WEC grid value lit).
 Considering energy system factors in the early design phase can steer WEC development to fully leverage this potential value and maximize climate benefit.
 
-Recent studies for other technologies incorporate linearized design considerations into energy system optimization \cite{schwartz_value_2023,ricks_value_2022}, energy system considerations into design optimization \cite{mehta_designing_2024}, and combined energy system and environmental considerations into design optimization \cite{canet_eco-conscious_2023,kainz_technological_2024}.
+Recent studies for other technologies incorporate linearized design considerations into energy system optimization \cite{schwartz_value_2023,ricks_value_2022}, energy system considerations into design optimization \cite{mehta_designing_2024}, and combined energy system and environmental considerations into design optimization \cite{canet_eco-conscious_2023,kainz_how_2024}.
 This study is the first to apply integrated design and energy system optimization to WECs, and also a methodological improvement over similar studies for other technologies. 
 Specifically, a surrogate capacity expansion model within a nonlinear design optimization more fully captures design-grid coupling while maintaining computational efficiency, a technique which the authors conceptually introduce in \cite{mccabe_system_2023} and here implement via dynamic system parameterization.
    % -  prior work showing that CEM is more important than economic dispatch?
@@ -222,7 +222,7 @@ The reduced order model is used only to capture the effect of WEC design on the 
 Meanwhile, the surrogate model is in this case simply a lookup table with linear interpolation.
 Future work could develop a more mechanistic surrogate model to understand driving factors and allow extrapolation to different grid scenarios.
 The use of the surrogate model makes the computational cost low enough to allow the design optimization to utilize the CEM outputs.
-This approach accurately takes into account marginal generators, unlike wind turbine studies \cite{canet_eco-conscious_2023,kainz_technological_2024} which correlate historical spot market price and grid emissions with wind speed, location, and hub height rather than using a CEM.
+This approach accurately takes into account marginal generators, unlike wind turbine studies \cite{canet_eco-conscious_2023,kainz_how_2024} which correlate historical spot market price and grid emissions with wind speed, location, and hub height rather than using a CEM.
 %In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
 %The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
 
@@ -257,7 +257,7 @@ This includes material use (steel, fiberglass) but not aquatic habitat disruptio
 Although the present study holds distance from shore constant, the environmental model includes offshore transportation (diesel fuel) so future work can evaluate the tradeoff between better energetics but worse survivability, operating cost, and maintenance emissions for WECs further offshore.
 
 MDOcean calculates WEC structural material masses in the MDOcean geometry module and multiplies them by appropriate weighting coefficients in the environment module.
-We utilize the Idemat LCA dataset \cite{idemat}, which provides a set of eco-cost coefficients \cite{vogtlander_lca-based_2010} that express the lifetime environmental impacts of various materials and processes across diverse axes (i.e. water, emissions, pollution) in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
+We utilize the Idemat LCA dataset \cite{van_den_herik_idemat_2024}, which provides a set of Scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express the lifetime environmental impacts of various materials and processes across diverse axes (i.e. water, emissions, pollution) in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon, and finally normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
 
 Inspecting the model reveals three takeaways.
