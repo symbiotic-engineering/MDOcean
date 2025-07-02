@@ -126,7 +126,7 @@ Specifically, a surrogate capacity expansion model within a nonlinear design opt
    % -  prior work showing that CEM is more important than economic dispatch?
 
 \section{Methodology}
-\subsection{Optimization problem formulation}
+\subsection{\textit{Optimization problem formulation}}
 The WEC being optimized is the Reference Model 3 (RM3) point absorber \cite{neary_reference_2014}.
 We utilize MDOcean \cite{mccabe_mdocean_2024}, an open-source WEC design optimization framework, with the same design variables and constraints as \cite{mccabe_leveraging_2025}.
 The twelve design variables include five bulk geometric dimensions (float and spar diameter and height, and float-spar vertical clearance), two generator ratings (power and force), and five structural dimensions (float, spar, and damping plate material thicknesses, and float and damping plate stiffener height).
@@ -138,7 +138,7 @@ A second new objective of net eco-value per energy captures system environmental
 MDOcean utilizes gradient-based nonlinear programming for single-objective optimization and combines gradient and gradient-free methods for multi-objective optimization \cite{mccabe_leveraging_2025}.
 \figureautorefname~\ref{fig:n2} depicts the optimization structure in an xDSM diagram \cite{lambe_extensions_2012}, with design variables on the top row and objectives and constraints in the rightmost two columns.
 
-\subsection{Modeling}
+\subsection{\textit{Modeling}}
 MDOcean integrates hydrodynamic, structural, control, and economic models, detailed in \cite{mccabe_leveraging_2025}.
 %The model handles nonlinear dynamics including drag and generator force limits.
 This study introduces new ``grid'' and ``environment'' modules to MDOcean.
@@ -158,7 +158,7 @@ As \cite{mccabe_system_2023} proposes, we perform CEM optimizations before the d
 % \end{wrapfigure}
 
 \clearpage
-\subsubsection{Capacity expansion model (CEM)}
+\subsubsection{\textit{Capacity expansion model (CEM)}}
 The GenX CEM \cite{bonaldo_genxprojectgenxjl_2025} is an open-source linear programming model that determines the installed capacity of each generator to minimize the total grid system cost while meeting demand and emissions constraints.
 It indirectly enforces economic equilibrium since at the optimum, only generators that cost less than the value they provide are installed.
 This implies that NVOE (net value of electricity), a metric which \cite{mowers_evaluation_2021,mccabe_system_2023} suggest using, is always zero in a CEM.
@@ -180,7 +180,7 @@ Orange outlines indicate code implemented in this work rather than an existing p
 PowerGenome does not provide data on wave energy converters, so we use the MHKit interface \cite{klise_mhkit_2020} to NREL hindcast power densities \cite{wu_development_2020,allahdadi_development_2019} along with design-dependent capture width information to generate the hourly power profiles of the WECs. 
 Temporal and spatial resolution and scope are set to hourly energy profiles for one year each decade for three decades, for Northeast and California grid scenarios with three and two load zones respectively.
 
-\subsubsection{Reduced order model and lookup table}
+\subsubsection{\textit{Reduced order model and lookup table}}
 Linking the design and grid optimization requires first identifying a small number of key design characteristics to collapse the large WEC design space (a reduced order model), and then a surrogate model to predict CEM outputs from these reduced design characteristics.
 The reduced order model represents WEC capture width, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$ \cite{zou_practical_2023}. Physics dictates the following form:
 \begin{equation}
@@ -225,65 +225,72 @@ The surrogate model lowers computational costs enough to allow the design optimi
 This approach accurately accounts for marginal generators, unlike wind turbine studies \cite{canet_eco-conscious_2023,kainz_how_2024} which correlate historical spot market price and grid emissions with wind speed, location, and hub height rather than using a CEM.
 %In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
 %The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
-\begin{figure}[b]
+\begin{figure}[t]
 \noindent
-\begin{minipage}[t]{0.32\textwidth}
+\begin{minipage}[b]{0.64\textwidth}
     \centering
     \includegraphics[width=\linewidth]{figures/PowerGenomeDataFlow_no_beta.pdf}
-    \captionof{figure}{Data flow for the CEM}
+    \captionof{figure}{CEM data flow}
     \label{fig:CEM-data-flow}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.32\textwidth}
+\begin{minipage}[b]{0.36\textwidth}
     \centering
     \includegraphics[width=\linewidth]{figures/bode_second_order.pdf}
     \captionof{figure}{Bode fit}
     \label{fig:bode}
 \end{minipage}
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{example-image-a}
-    \captionof{figure}{CEM output raw data and fit}
-    \label{fig:three}
-\end{minipage}
 \end{figure}
 
-\subsubsection{Life cycle analysis (LCA)}
+\subsubsection{\textit{Life cycle analysis (LCA)}}
 LCA in the early design phase is challenging due to uncertainties in materials, manufacturing, and transportation.
 Fortunately, optimization only requires modeling effects that meaningfully scale with design variables.
 This includes material use (steel, fiberglass) but not aquatic habitat disruption or hydraulic fluid toxicity since they are not captured in MDOcean's low design fidelity.
 Although the present study holds distance from shore constant, the environmental model includes offshore transportation (diesel fuel) so future work can evaluate the tradeoff between better energetics but worse survivability, operating cost, and maintenance emissions for WECs further offshore.
 
-MDOcean calculates WEC structural material masses in the MDOcean geometry module and multiplies them by appropriate weighting coefficients in the environment module.
-We utilize the Idemat LCA dataset \cite{van_den_herik_idemat_2024}, which provides a set of Scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express the lifetime environmental impacts of various materials and processes across diverse axes (i.e. water, emissions, pollution) in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
-Euros are converted to USD using the March 2024 exchange rate of 1.09 \$/\texteuro.
-MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon, and finally normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
+MDOcean's geometry module calculates WEC material masses and the environment module multiplies by appropriate weighting coefficients from the Idemat LCA dataset \cite{van_den_herik_idemat_2024}. These are scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express diverse lifetime environmental impacts (i.e. water, emissions, pollution) of various materials and processes in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
+We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
+MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon. Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
 
 Inspecting the model reveals three takeaways.
-First, the eco-cost computed here represents only around XX\% of the eco-cost of prior WEC LCA studies \cite{LCA}, indicating that most of the eco-cost (is/is not) cemented (before/until) the detail design phase.
-Second, the eco-value far exceeds the eco-cost, indicating that LCA-informed environmental optimization to reduce eco-cost will be less relevant than economic optimization to enable WECs to displace fossil fuel generators.
-Third, the eco-cost coefficients for steel and fiberglass are similar to their economic prices, indicating that the economic-optimal and environmental-optimal designs are expected to be similar.
+First, the eco-cost computed here represents only XX\% of the eco-cost of prior WEC LCA studies \cite{LCA}, indicating that most of the eco-cost (is/is not) cemented (before/until) the detail design phase.
+Second, the eco-value far exceeds the eco-cost, meaning LCA-informed environmental optimization to reduce WEC eco-cost is less relevant than economic optimization to help WECs displace fossil fuels.
+Third, eco-cost coefficients for steel and fiberglass are similar to their economic prices, so the least-cost and least-eco-cost designs should be similar.
 % show this with numbers
-All three of these observations imply that design-for-environment techniques have limited utility at the early design stage, although the multi-objective optimization is still performed to confirm these conclusions.
+All three of these observations imply that design-for-environment techniques have limited utility at the early design stage, although multi-objective optimization is still performed to confirm these conclusions.
 
-\begin{table}[H]
-    \begin{center}
-    \caption{Eco-cost coefficients}
-    \begin{tabular}{ lll } 
-     \hline
-     Material/component & Value & Unit \\ 
-     \hline
-     Steel & 0.192 & \$/kg \\ 
-     Fiberglass & 6.950 & \$/m\textsuperscript{2} \\ 
-     Distance from shore & 65.881 & \$/mile \\ 
-     Social cost of carbon & 0.145 & \$/kgCO\textsubscript{2,e} \\
+\begin{figure}[b]
+\noindent
+\begin{minipage}[b]{0.34\textwidth}
+        \begin{table}[H]
+    \begin{tabular}{ ll } 
+        \hline
+        Component & Value \\ 
+        \hline
+        Steel & 0.192 \$/kg \\ 
+        Fiberglass & 6.950 \$/m\textsuperscript{2} \\ 
+        Dist. from shore & 65.88 \$/mile \\ 
+        Social cost of CO\textsubscript{2} & 0.145 \$/kgCO\textsubscript{2} \\
     \end{tabular}
-    
+    \caption{Eco-cost coefficients}
     \label{tab:lca-weights}
-    \end{center}
-\end{table}
-
+    \end{table}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{example-image-a}
+    \captionof{figure}{CEM output for grid cost}
+    \label{fig:four}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{example-image-a}
+    \captionof{figure}{CEM output for emissions}
+    \label{fig:five}
+\end{minipage}
+\end{figure}
 
 \section{Results}
     -  CEM sweep (no optim) raw vs fitted
@@ -296,19 +303,12 @@ All three of these observations imply that design-for-environment techniques hav
     Enviro not being a big deal: While this study hypothesized the opposite, hoping to quantify an economic-environmental tradeoff, the exercise of building the model suggests that economic and environmental objectives align in the early design phase.
 and that environmentally-conscious engineers can feel satisfied that economic optimization also benefits the environmental bottom line.
 
-\begin{figure}[b]
+\begin{figure}[t]
 \noindent
 \begin{minipage}[t]{0.32\textwidth}
     \centering
     \includegraphics[width=\linewidth]{example-image-a}
-    \captionof{figure}{CEM results: beta and confidence bounds for various grid scenarios}
-    \label{fig:cem-results}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{example-image-a}
-    \captionof{figure}{Comparison of single-objective optima}
+    \captionof{figure}{Single-objective optima}
     \label{fig:single-obj-compare}
 \end{minipage}
 \hfill
@@ -318,9 +318,16 @@ and that environmentally-conscious engineers can feel satisfied that economic op
     \captionof{figure}{Pareto front}
     \label{fig:pareto}
 \end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{example-image-a}
+    \captionof{figure}{Design heuristics}
+    \label{fig:design-heuristics}
+\end{minipage}
 \end{figure}
 
-\lipsum[1-3]
+\lipsum[1]
 
 \section{Conclusions}
 \lipsum[1]
@@ -331,61 +338,35 @@ and that environmentally-conscious engineers can feel satisfied that economic op
 
 \section*{Acknowledgments and Data Availability}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The authors thank Olivia Vitale and Collin Treacy for feedback on a draft manuscript. Code to fully reproduce this work is available open-source: design optimization at \url{github.com/symbiotic-engineering/MDOcean} and capacity expansion model at \url{github.com/symbiotic-engineering/wec-decider}.
+We thank Olivia Vitale and Collin Treacy for feedback on a draft. Open-source code: design optimization at \url{github.com/symbiotic-engineering/MDOcean} and CEM at \url{github.com/symbiotic-engineering/wec-decider}.
 
 \clearpage
-\section{Main Text}
 
-\begin{framed}
-\textbf{Nomenclature} \\
-\normalsize    
-    A\ \ \ \ radius of \\    
-    B \ \ \ \ position of \\    
-    C\ \ \ \ further nomenclature continues down the page inside the text box \\
-\end{framed}
+% \begin{framed}
+% \textbf{Nomenclature} \\
+% \normalsize    
+%     A\ \ \ \ radius of \\    
+%     B \ \ \ \ position of \\    
+%     C\ \ \ \ further nomenclature continues down the page inside the text box \\
+% \end{framed}
 
+% Headings should be placed above tables, left justified.
 
-%------------------------------------------------------------------------------------------------------%
-\subsection{Tables}
-%------------------------------------------------------------------------------------------------------%
-Headings should be placed above tables, left justified. Only horizontal lines should be used within a table, to distinguish the column headings from the body of the table, and immediately above and below the table.
-
-%------------------------------------------------------------------------------------------------------%
-\subsection{Section headings}
-%------------------------------------------------------------------------------------------------------%
-Sub-section headings should be bold, in capital and lower-case italic letters, numbered 1.1, 1.2, etc., and left justified, with second and subsequent lines indented. 
-
-%------------------------------------------------------------------------------------------------------%
-\subsection{Footnotes}
-%------------------------------------------------------------------------------------------------------%
-Footnotes should be avoided if possible. Necessary footnotes should be denoted in the text by consecutive superscript letters\footnote{1 Footnote text.} \cite{mccabe_system_2023,mccabe_mdocean_2024}. The footnotes should be typed single spaced, and in smaller type size (8 pt), at the foot of the page in which they are mentioned, and separated from the main text by a one line space extending at the foot of the column.
-
-%------------------------------------------------------------------------------------------------------%
-\section{Illustrations}
-%------------------------------------------------------------------------------------------------------%
-Figures should be placed at the top or bottom of a page wherever possible, as close as possible to the first reference to them in the paper. The figure number and caption should be typed below the illustration in 8 pt and centered with the image. If two images fit next to each other, these may be placed next to each other to save space.
-
+% The figure number and caption should be typed below the illustration in 8 pt.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section*{Appendix A. CEM Surrogate model equation}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $C$ refers to costs (\$M) (output from CEM), $S$ refers to specific capacity costs (\$M/kW) (input to CEM), $x_{grid}$ refers to installed capacities (decision variable in CEM), and $E$ refers to specific energy costs (\$/kWh). The amount of built wave capacity $x_{grid,WEC}$ is not to be confused with $x_{design}$, the WEC design variables in the outer (MDOcean) optimization that are parameters (held constant) in the CEM.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\vspace{1\baselineskip}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Appendix A. CEM Surrogate model equation}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$C$ refers to costs (\$M) (output from CEM), $S$ refers to specific capacity costs (\$M/kW) (input to CEM), $x_{grid}$ refers to installed capacities (decision variable in CEM), and $E$ refers to specific energy costs (\$/kWh). The amount of built wave capacity $x_{grid,WEC}$ is not to be confused with $x_{design}$, the WEC design variables in the outer (MDOcean) optimization that are parameters (held constant) in the CEM.
-
-\begin{equation}
-\begin{aligned}
-    C_{grid}(p_{grid},x_{design}) &= C_{grid,0}(p_{grid})- \beta_1(p_{grid})~ x_{grid,WEC}(p_{grid},x_{design}) \\
-    \frac{x_{grid,WEC}(p_{grid},x_{design})}{x_{grid,WEC}(p_{grid},x_{design})+\sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design})} &= \min\left(\beta_2(p_{grid}) \times \max\left(\frac{S_{WEC,thresh}(p_{grid},x_{design})}{S_{WEC}(x_{design})}-1,0\right), 1\right) \\
-    S_{WEC,thresh}(p_{grid},x_{design}) &= S_{max,thresh}(p_{grid}) - \beta_3(p_{grid}) \zeta(x_{design}) - \beta_4(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_5(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right) \\
-    \sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design}) &= \sum_{gen}x_{grid,gen,0}(p_{grid})-\beta_6(p_{grid}) \zeta(x_{design}) - \beta_7(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_8(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right)
-\end{aligned}
-\end{equation}
+% \begin{equation}
+% \begin{aligned}
+%     C_{grid}(p_{grid},x_{design}) &= C_{grid,0}(p_{grid})- \beta_1(p_{grid})~ x_{grid,WEC}(p_{grid},x_{design}) \\
+%     \frac{x_{grid,WEC}(p_{grid},x_{design})}{x_{grid,WEC}(p_{grid},x_{design})+\sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design})} &= \min\left(\beta_2(p_{grid}) \times \max\left(\frac{S_{WEC,thresh}(p_{grid},x_{design})}{S_{WEC}(x_{design})}-1,0\right), 1\right) \\
+%     S_{WEC,thresh}(p_{grid},x_{design}) &= S_{max,thresh}(p_{grid}) - \beta_3(p_{grid}) \zeta(x_{design}) - \beta_4(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_5(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right) \\
+%     \sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design}) &= \sum_{gen}x_{grid,gen,0}(p_{grid})-\beta_6(p_{grid}) \zeta(x_{design}) - \beta_7(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_8(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right)
+% \end{aligned}
+% \end{equation}
 
 %improvements to make to above eqn:
 %- debatable whether coeffs should be kept dimensional, ie should $\beta_1$ get divided by total capacity and $C_{grid,0}(p_{grid})$ so it's relating percent cost to percent capacity?
@@ -393,15 +374,6 @@ $C$ refers to costs (\$M) (output from CEM), $S$ refers to specific capacity cos
 %- ideally some of these betas turn out to be independent of p grid, which means more of the p grid dependence can be found just from the 0 (no wec) case for that p, without requiring a whole design sweep. That is the reason all this modeling is potentially more useful than a lookup table.
 %- Could add saturation to make sure $S_{WEC,thresh}>0$ and $C_{grid}>0$.
 %- add hats or some other notation to differentiate predicted (fit) from actual
-
-\vspace{1\baselineskip}
-\textit{A.1 Example of a sub-heading within an appendix}
-\vspace{1\baselineskip}
-
-There is also the option to include a subheading within the Appendix if you wish.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% References
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \printbibliography
 
