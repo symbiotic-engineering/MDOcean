@@ -22,6 +22,9 @@
 \usepackage{caption}
 \usepackage{lipsum}
 \usepackage[backend=biber, sorting=none]{biblatex}
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{calc}
 \addbibresource{references.bib}
 \usepackage[paperheight=27.94cm,paperwidth=21.59cm,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm]{geometry}
 \usepackage{hyperref}
@@ -37,6 +40,23 @@
 \fancyhf{}
 \lhead{\thepage}
 \chead{\textit{McCabe $\vert$ Proceedings of UMERC+OREC 2025}}
+
+\newif\ifplaceholder
+\let\originalincludegraphics\includegraphics
+
+\renewcommand{\includegraphics}[2][]{%
+  \ifplaceholder
+    \begin{tikzpicture}
+      \node[anchor=south west, inner sep=0] (img) at (0,0) {\originalincludegraphics[#1]{#2}};
+      \node at ($(img.south east)!0.5!(img.north west)$)
+        [fill=white,opacity=0.8,text=red,font=\huge] {Placeholder};
+    \end{tikzpicture}
+    \vspace{-\baselineskip}
+  \else
+    \originalincludegraphics[#1]{#2}%
+  \fi
+  \placeholderfalse % Auto-reset
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
@@ -72,8 +92,8 @@
     Anthony Long\textsuperscript{a},
     Khai Xin Kuan\textsuperscript{b},
     Leah Buccino\textsuperscript{a},
-    Alan Liu\textsuperscript{c,d},
-    Maha Haji\textsuperscript{a,e}
+    Alan Liu\textsuperscript{c},
+    Maha Haji\textsuperscript{a,d}
     
     
     \small
@@ -81,8 +101,8 @@
         \textit{\textsuperscript{a}Sibley School of Mechanical and Aerospace Engineering, Cornell University, 124 Hoy Road, Ithaca, NY 14853, USA} \\
         \textit{\textsuperscript{b}Cornell University Department of Information Science, 236 Gates Hall, Ithaca NY 14853, USA} \\
         \textit{\textsuperscript{c}Cornell University Department of Economics, 109 Tower Road, Ithaca, NY 14853, USA} \\
-        \textit{\textsuperscript{d}Cornell University Department of Psychology, 116 Reservoir Ave, Ithaca, NY 14853, USA} \\
-        \textit{\textsuperscript{e}Department of Systems Engineering, Cornell University, 136 Hoy Road, Ithaca, NY 14853, USA}
+        %\textit{\textsuperscript{d}Cornell University Department of Psychology, 116 Reservoir Ave, Ithaca, NY 14853, USA} \\
+        \textit{\textsuperscript{d}Department of Systems Engineering, Cornell University, 136 Hoy Road, Ithaca, NY 14853, USA}
     \end{center}
     \normalsize
 \end{center}         
@@ -117,7 +137,7 @@ Finally, we discuss the broader implications of these findings for future WEC de
 Advances in wave energy converter (WEC) multidisciplinary design optimization show potential to reduce Levelized Cost of Energy (LCOE) X-fold \cite{mccabe_leveraging_2025}.
 However, LCOE does not fully capture WEC value \cite{mowers_evaluation_2021,moraski_beyond_2025}.
 Alternatives include net present value and payback period for off-grid contexts \cite{jenne_powering_2021}, net value of energy and profitability in single-technology economic evaluation \cite{mowers_evaluation_2021,makaremi_economic_2025}, and grid system cost and lifetime equivalent CO\textsubscript{2} emissions in energy system planning and climate change mitigation \cite{moraski_beyond_2025}.
-Prior WEC grid integration studies reveal benefits of reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (cite WEC CEM/EDs and WEC grid value lit).
+Prior WEC grid integration studies reveal benefits of reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (\textbf{cite WEC CEM/EDs and WEC grid value lit}).
 Considering energy system factors in the early design phase can steer WEC development to fully leverage this potential value, maximizing climate benefit.
 
 Recent studies for other technologies incorporate design considerations into grid optimization \cite{schwartz_value_2023,ricks_value_2022}, grid considerations into design optimization \cite{mehta_designing_2024}, and combined grid and environmental considerations into design optimization \cite{canet_eco-conscious_2023,kainz_how_2024}.
@@ -253,12 +273,11 @@ We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon. Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
 
 Inspecting the model reveals three takeaways.
-First, the eco-cost computed here represents only XX\% of the eco-cost of prior WEC LCA studies \cite{LCA}, indicating that most of the eco-cost (is/is not) cemented (before/until) the detail design phase.
+First, the eco-cost computed here represents only XX\% of the eco-cost of prior WEC LCA studies \cite{pennock_life_2022}, indicating that most of the eco-cost (is/is not) cemented (before/until) the detail design phase.
 Second, the eco-value far exceeds the eco-cost, meaning LCA-informed environmental optimization to reduce WEC eco-cost is less relevant than economic optimization to help WECs displace fossil fuels.
 Third, eco-cost coefficients for steel and fiberglass are similar to their economic prices, so the least-cost and least-eco-cost designs should be similar.
 % show this with numbers
 All three of these observations imply that design-for-environment techniques have limited utility at the early design stage, although multi-objective optimization is still performed to confirm these conclusions.
-
 \begin{figure}[b]
 \noindent
 \begin{minipage}[b]{0.34\textwidth}
@@ -279,60 +298,77 @@ All three of these observations imply that design-for-environment techniques hav
 \hfill
 \begin{minipage}[b]{0.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{example-image-a}
+    \placeholdertrue
+    \includegraphics[width=\linewidth]{figures/system-cost.JPG}
     \captionof{figure}{CEM output for grid cost}
     \label{fig:four}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{example-image-a}
+    \placeholdertrue
+    \includegraphics[width=\linewidth]{figures/carbon.JPG}
     \captionof{figure}{CEM output for emissions}
     \label{fig:five}
 \end{minipage}
 \end{figure}
 
 \section{Results}
-    -  CEM sweep (no optim) raw vs fitted
-    -  single obj optim (min NVOE compared to min LCOE)
-    -  multi obj optim (pareto NVOE vs net eco value per power)
-    -  runtime info
-    -  when WECs are viable, what are they replacing (batteries or wind or solar etc)? Find by looking at how does the optimal LP output change with
-    -  can the CEM results be predicted by correlation coefficient of WEC power with demand or with energy storage or with lost load of solar, the capacity factor, sum of hourly profit, other proxies?
+(\textit{Note: trustworthy PowerGenome results are not yet avaliable. Currently, CEM results use a dummy grid system without PowerGenome, and design optimization results are copied from MDOcean. These figures are marked placeholder}).
+Figures \ref{fig:four} and \ref{fig:five} show the grid cost and CO2 emissions from the CEM.
+These results have WEC capacities of zero in the yellow regions due to a lack of economic viability, and therefore have constant system cost and emissions there.
+As the WEC gets cheaper and more consistent power profile, the grid cost and emissions reduce as expected.
+For both $\zeta$ and $\omega_n$, we expect to see local optimum behavior, where $\zeta=XX$ and $\omega_n=XX$ are the best values from the perspective of hourly variability, and values above and below are less optimal.
+The most optimistic combination of $\zeta$ and $\omega_n$ tested (not necessarily achievable while obeying design constraints), reduce the grid cost by around XX\%.
+The effect on emissions is more pronounced, with the most optimistic combination reducing emissions by around XX\%.
+This lets us draw the overall conclusion that XX.
+Examining the optimal capacities of other resources indicates that WECs replace (batteries, wind, solar, or fossil fuels) in XX conditions (seasonal balancing, peak load hours).
+%-  can the CEM results be predicted by correlation coefficient of WEC power with demand or with energy storage or with lost load of solar, the capacity factor, sum of hourly profit, other proxies?
 
-    Enviro not being a big deal: While this study hypothesized the opposite, hoping to quantify an economic-environmental tradeoff, the exercise of building the model suggests that economic and environmental objectives align in the early design phase.
-and that environmentally-conscious engineers can feel satisfied that economic optimization also benefits the environmental bottom line.
+Proceeding to the design optimization results, \figureautorefname~\ref{fig:single-obj-compare} visualizes the optimal designs for the various objectives, alongside the standard RM3 for reference.
+The WEC optimized for grid cost is (larger/smaller) compared to the one optimized for LCOE.
+Meanwhile, the WEC optimized for the net eco-value per energy is (the same as, with XX exceptions) the one optimized for grid cost.
+\figureautorefname~\ref{fig:pareto} shows the Pareto front of the multi-objective optimization.
+We observe XX about the tradeoff, which (confirms/negates) the suggestion from the environmental model inspection that the two objectives minimally conflict.
+While this study initially hypothesized a meaningful environmental-economic tradeoff, insights obtained by building the model suggests that economic and environmental objectives align in the early design phase.
+This means that environmentally-conscious engineers and policymakers can feel satisfied that here, economic optimization also directly benefits the environmental bottom line.
+\figureautorefname~\ref{fig:design-heuristics} shows the design heuristics for the pareto front.
+As we transition from econmically optimal WECs to environmentally optimal WECs, the bulk dimensions (grow/shrink), the generator ratings (grow/shrink), and the structural thicknesses (grow/shrink).
+
+It took XX minutes to run the XX CEM optimizations on (lab computer specs).
+It took XX minutes to run the design optimization, with each simulation taking XX ms and each single-objective optimization taking XX iterations.
 
 \begin{figure}[t]
 \noindent
 \begin{minipage}[t]{0.325\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{example-image-a}
+    \placeholdertrue
+    \includegraphics[width=\linewidth]{figures/mdocean_geometry_compare.pdf}
     \captionof{figure}{Single-objective optima}
     \label{fig:single-obj-compare}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.325\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{example-image-a}
+    \placeholdertrue
+    \includegraphics[width=\linewidth]{figures/mdocean_pareto.pdf}
     \captionof{figure}{Pareto front}
     \label{fig:pareto}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.325\textwidth}
+\begin{minipage}[t]{0.3\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{example-image-a}
+    \placeholdertrue
+    \includegraphics[width=\linewidth]{figures/mdocean_design_heuristics.pdf}
     \captionof{figure}{Design heuristics}
     \label{fig:design-heuristics}
 \end{minipage}
 \end{figure}
 
-
 \section{Conclusions}
-
-- do we see WECs being viable NVOE-wise despite a high LCOE due to their temporal
-
-- does optimizing for NVOE vs LCOE make a big difference in the optimal design?
+\textit{Conclusions will be written once final results are available}.
+When assessed in a CEM that accounts for their temporal value, WECs are actually quite close to viable, despite a high LCOE.
+We also find that optimizing for grid system cost instead of LCOE makes a big difference in the optimal design.
 
 \section*{Acknowledgments and Data Availability}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
