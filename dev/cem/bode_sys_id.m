@@ -6,6 +6,7 @@ t.TileSpacing = 'compact';
 
 % nominal design
 p = parameters();
+p.JPD(p.JPD==0) = 1;
 b = var_bounds();
 X = [b.X_noms; 1];
 [~, ~, ~, ~, val] = simulation(X,p);
