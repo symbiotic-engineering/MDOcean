@@ -20,10 +20,9 @@
 \usepackage{titlesec}
 \usepackage{wrapfig}
 \usepackage{caption}
-\usepackage{lipsum}
+\usepackage{soul} % highlighting
 \usepackage[backend=biber, sorting=none]{biblatex}
 \usepackage{tikz}
-\usetikzlibrary{tikzmark}
 \usetikzlibrary{calc}
 \addbibresource{references.bib}
 \usepackage[paperheight=27.94cm,paperwidth=21.59cm,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm]{geometry}
@@ -101,7 +100,6 @@
         \textit{\textsuperscript{a}Sibley School of Mechanical and Aerospace Engineering, Cornell University, 124 Hoy Road, Ithaca, NY 14853, USA} \\
         \textit{\textsuperscript{b}Cornell University Department of Information Science, 236 Gates Hall, Ithaca NY 14853, USA} \\
         \textit{\textsuperscript{c}Cornell University Department of Economics, 109 Tower Road, Ithaca, NY 14853, USA} \\
-        %\textit{\textsuperscript{d}Cornell University Department of Psychology, 116 Reservoir Ave, Ithaca, NY 14853, USA} \\
         \textit{\textsuperscript{d}Department of Systems Engineering, Cornell University, 136 Hoy Road, Ithaca, NY 14853, USA}
     \end{center}
     \normalsize
@@ -134,15 +132,15 @@ Finally, we discuss the broader implications of these findings for future WEC de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Advances in wave energy converter (WEC) multidisciplinary design optimization show potential to reduce Levelized Cost of Energy (LCOE) X-fold \cite{mccabe_leveraging_2025}.
+Advances in wave energy converter (WEC) multidisciplinary design optimization show potential to reduce Levelized Cost of Energy (LCOE) \hl{X-fold} \cite{mccabe_leveraging_2025}.
 However, LCOE does not fully capture WEC value \cite{mowers_evaluation_2021,moraski_beyond_2025}.
 Alternatives include net present value and payback period for off-grid contexts \cite{jenne_powering_2021}, net value of energy and profitability in single-technology economic evaluation \cite{mowers_evaluation_2021,makaremi_economic_2025}, and grid system cost and lifetime equivalent CO\textsubscript{2} emissions in energy system planning and climate change mitigation \cite{moraski_beyond_2025}.
-Prior WEC grid integration studies reveal benefits of reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (\textbf{cite WEC CEM/EDs and WEC grid value lit}).
+Prior WEC grid integration studies reveal benefits of reduced curtailment, increased capacity factor, and improved grid reliability due to seasonal complementarity with solar, proximity to coastal load, and wave resource consistency (\hl{cite WEC CEM/EDs and WEC grid value lit}).
 Considering energy system factors in the early design phase can steer WEC development to fully leverage this potential value, maximizing climate benefit.
 
 Recent studies for other technologies incorporate design considerations into grid optimization \cite{schwartz_value_2023,ricks_value_2022}, grid considerations into design optimization \cite{mehta_designing_2024}, and combined grid and environmental considerations into design optimization \cite{canet_eco-conscious_2023,kainz_how_2024}.
 This study is the first to apply integrated design and grid optimization to WECs, and also a methodological improvement over similar studies for other technologies. 
-Specifically, a surrogate capacity expansion model within a nonlinear design optimization more fully captures design-grid coupling while maintaining computational efficiency.
+Specifically, a surrogate capacity expansion model (CEM) within a nonlinear design optimization more fully captures design-grid coupling while being computationally efficient.
    % -  prior work showing that CEM is more important than economic dispatch?
 
 \section{Methodology}
@@ -205,19 +203,15 @@ Linking the design and grid optimization requires first identifying a small numb
 The reduced order model represents WEC capture width, $CW$, as a fraction of the maximum radiative capture width, $CW_{max}=Gg/\omega^2$ \cite{zou_practical_2023}. Physics dictates the following form:
 \begin{equation}
     \label{eq:CW-fraction}
-    \frac{CW}{CW_{max}} = \frac{2 B_u(\omega) \omega^5}{G \rho g^3} |RAO(\omega)|^2
+    \frac{CW}{CW_{max}} = \frac{2 B_u(\omega) \omega^5}{G \rho g^3} |\widehat{RAO}(\omega)|^2
 \end{equation}
-with gain $G$ (1 for heave, 2 for surge/pitch), control damping $B_u$, frequency $\omega$, water density $\rho$, gravitational acceleration $g$, and response amplitude operator $RAO$ (the complex ratio of WEC motion to wave amplitude, $X/\eta$).
+with gain $G$ (1 for heave, 2 for surge/pitch), control damping $B_u$, frequency $\omega$, water density $\rho$, gravitational acceleration $g$, and response amplitude operator $\widehat{RAO}$ (the complex ratio of WEC motion to wave amplitude, $\hat{X}/\eta$).
 %In optimal reactive control, $B_u(\omega)=B_h(\omega)+B_d(\omega,RAO(\omega))$, where $B_h$ is the hydrodynamic damping and $B_d$ is nonlinear drag damping. 
-We assume the RAO is a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$, with imaginary unit $i$ \cite{franklin2014feedback}:
-\begin{equation}
-    \label{eq:rao}
-    RAO(\omega) = \frac{1}{1-\left(\frac{\omega}{\omega_n}\right)^2 + i 2 \zeta \frac{\omega}{\omega_n}}
-\end{equation}
-This second-order assumption implies $\Im(1/RAO)=2\zeta\omega/\omega_n$.
-Combined with the impedance relation $Z=1/RAO \cdot F/\eta$ for excitation force $F$, and the optimal reactive control law $B_u(\omega) = \Im(Z(\omega))/(2\omega)$, this forces a form for the control damping related to $F/\eta$ the excitation coefficient.
-The values of $\zeta$ and $\omega_n$ for a given design are determined via a least-squares fit of the dynamics module output to equation \eqref{eq:rao} across all sea states with nonzero probability in the JPD.
-Using wave height index $j$ and frequency index $k$, this is expressed:
+We assume the RAO is a standard second order system with damping ratio $\zeta$ and natural frequency $\omega_n$.
+This second-order assumption implies $\Im(1/\widehat{RAO})=2\zeta\omega/\omega_n$ \cite{franklin2014feedback}.
+Combined with the impedance relation $\hat{Z}=1/\widehat{RAO} \cdot \hat{F}/\eta$ for excitation force $\hat{F}$, and the optimal reactive control law $B_u(\omega) = \Im(\hat{Z}(\omega))/(2\omega)$, this forces a form for the control damping related to $\hat{F}/\eta$ the excitation coefficient.
+The values of $\zeta$ and $\omega_n$ for a given design are determined via a least-squares fit of the dynamics module output for $\hat{X}$ to the second order form across all sea states with nonzero probability in the JPD.
+Using imaginary unit $i$, wave height index $j$, and frequency index $k$, this is expressed:
 %(equation~\eqref{eq:bode-fit}),
 %\begin{equation}
 %\begin{aligned}
@@ -227,8 +221,11 @@ Using wave height index $j$ and frequency index $k$, this is expressed:
 %\end{aligned}
 %\end{equation}
 \begin{equation}\label{eq:bode-fit}
-    \zeta,\omega_n = \mathrm{argmin}(\epsilon_{mag}^2), \quad
-    \epsilon_{mag} = \sum_{j,k}^{} \left(\left|\frac{X_{jk}}{\eta_j}\right|-\left|\frac{1}{1-\left(\frac{\omega_k}{\omega_n}\right)^2 + i 2 \zeta \frac{\omega_k}{\omega_n}}\right|\right)
+    \zeta,\omega_n = \mathrm{argmin}(\epsilon_{mag}^2)
+    ,\quad
+    \epsilon_{mag} = \sum_{j,k}^{} \left(\left|\frac{\hat{X}_{jk}}{\eta_j}\right|-\left|\widehat{RAO}(\omega_k)\right|\right)
+    ,\quad
+    \widehat{RAO}(\omega) = \frac{1}{1-\left(\frac{\omega}{\omega_n}\right)^2 + i 2 \zeta \frac{\omega}{\omega_n}}
 \end{equation}
 For RM3, \figureautorefname~\ref{fig:bode} shows this model is valid at frequencies at and below resonance.
 Capturing behavior above resonance would require a higher order model such as one with five poles, two standard zeros, and two right half plane zeros.
@@ -263,7 +260,7 @@ This approach accurately accounts for marginal generators, unlike wind turbine s
 \end{figure}
 
 \subsubsection{\textit{Life cycle analysis (LCA)}}
-LCA in the early design phase is challenging due to uncertainties in materials, manufacturing, and transportation.
+LCA in the early design phase is challenging due to uncertainties in materials, manufacturing, and transportation \cite{moni_life_2020}.
 Fortunately, optimization only requires modeling effects that meaningfully scale with design variables.
 This includes material use (steel, fiberglass) but not aquatic habitat disruption or hydraulic fluid toxicity since they are not captured in MDOcean's low design fidelity.
 Although the present study holds distance from shore constant, the environmental model includes offshore transportation (diesel fuel) so future work can evaluate the tradeoff between better energetics but worse survivability, operating cost, and maintenance emissions for WECs further offshore.
@@ -273,11 +270,11 @@ We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon. Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
 
 Inspecting the model reveals three takeaways.
-First, the eco-cost computed here represents only XX\% of the eco-cost of prior WEC LCA studies \cite{pennock_life_2022}, indicating that most of the eco-cost (is/is not) cemented (before/until) the detail design phase.
+First, the eco-cost computed here represents only \hl{XX}\% of the eco-cost of prior WEC LCA studies \cite{pennock_life_2022}, indicating that most of the eco-cost \hl{(is/is not)} cemented \hl{(before/until)} the detail design phase.
 Second, the eco-value far exceeds the eco-cost, meaning LCA-informed environmental optimization to reduce WEC eco-cost is less relevant than economic optimization to help WECs displace fossil fuels.
 Third, eco-cost coefficients for steel and fiberglass are similar to their economic prices, so the least-cost and least-eco-cost designs should be similar.
 % show this with numbers
-All three of these observations imply that design-for-environment techniques have limited utility at the early design stage, although multi-objective optimization is still performed to confirm these conclusions.
+All three of these observations imply that design-for-environment techniques have limited utility at the early design stage, although multi-objective optimization is still performed to confirm this conclusion.
 \begin{figure}[b]
 \noindent
 \begin{minipage}[b]{0.34\textwidth}
@@ -318,25 +315,25 @@ All three of these observations imply that design-for-environment techniques hav
 Figures \ref{fig:four} and \ref{fig:five} show the grid cost and CO2 emissions from the CEM.
 These results have WEC capacities of zero in the yellow regions due to a lack of economic viability, and therefore have constant system cost and emissions there.
 As the WEC gets cheaper and more consistent power profile, the grid cost and emissions reduce as expected.
-For both $\zeta$ and $\omega_n$, we expect to see local optimum behavior, where $\zeta=XX$ and $\omega_n=XX$ are the best values from the perspective of hourly variability, and values above and below are less optimal.
-The most optimistic combination of $\zeta$ and $\omega_n$ tested (not necessarily achievable while obeying design constraints), reduce the grid cost by around XX\%.
-The effect on emissions is more pronounced, with the most optimistic combination reducing emissions by around XX\%.
-This lets us draw the overall conclusion that XX.
-Examining the optimal capacities of other resources indicates that WECs replace (batteries, wind, solar, or fossil fuels) in XX conditions (seasonal balancing, peak load hours).
+For both $\zeta$ and $\omega_n$, we expect to see local optimum behavior, \hl{where} $\zeta=XX$ and $\omega_n=XX$ are the best values from the perspective of hourly variability, and values above and below are less optimal.
+The most optimistic combination of $\zeta$ and $\omega_n$ tested (not necessarily achievable while obeying design constraints), reduce the grid cost by around \hl{XX}\%.
+The effect on emissions is more pronounced, with the most optimistic combination reducing emissions by around \hl{XX}\%.
+This lets us draw the overall conclusion that \hl{XX}.
+Examining the optimal capacities of other resources indicates that WECs replace \hl{(batteries, wind, solar, or fossil fuels)} in \hl{XX} conditions \hl{(seasonal balancing, peak load hours)}.
 %-  can the CEM results be predicted by correlation coefficient of WEC power with demand or with energy storage or with lost load of solar, the capacity factor, sum of hourly profit, other proxies?
 
 Proceeding to the design optimization results, \figureautorefname~\ref{fig:single-obj-compare} visualizes the optimal designs for the various objectives, alongside the standard RM3 for reference.
-The WEC optimized for grid cost is (larger/smaller) compared to the one optimized for LCOE.
-Meanwhile, the WEC optimized for the net eco-value per energy is (the same as, with XX exceptions) the one optimized for grid cost.
+The WEC optimized for grid cost is \hl{(larger/smaller)} compared to the one optimized for LCOE.
+Meanwhile, the WEC optimized for the net eco-value per energy is (the same as, with \hl{XX} exceptions) the one optimized for grid cost.
 \figureautorefname~\ref{fig:pareto} shows the Pareto front of the multi-objective optimization.
-We observe XX about the tradeoff, which (confirms/negates) the suggestion from the environmental model inspection that the two objectives minimally conflict.
+We observe \hl{XX} about the tradeoff, which \hl{(confirms/negates)} the suggestion from the environmental model inspection that the two objectives minimally conflict.
 While this study initially hypothesized a meaningful environmental-economic tradeoff, insights obtained by building the model suggests that economic and environmental objectives align in the early design phase.
 This means that environmentally-conscious engineers and policymakers can feel satisfied that here, economic optimization also directly benefits the environmental bottom line.
 \figureautorefname~\ref{fig:design-heuristics} shows the design heuristics for the pareto front.
-As we transition from econmically optimal WECs to environmentally optimal WECs, the bulk dimensions (grow/shrink), the generator ratings (grow/shrink), and the structural thicknesses (grow/shrink).
+As we transition from economically optimal WECs to environmentally optimal WECs, the bulk dimensions \hl{(grow/shrink)}, the generator ratings \hl{(grow/shrink)}, and the structural thicknesses \hl{(grow/shrink)}.
 
-It took XX minutes to run the XX CEM optimizations on (lab computer specs).
-It took XX minutes to run the design optimization, with each simulation taking XX ms and each single-objective optimization taking XX iterations.
+It took \hl{XX} minutes to run the \hl{XX} CEM optimizations on \hl{(lab computer specs)}.
+It took \hl{XX} minutes to run the design optimization, with each simulation taking \hl{XX} ms and each single-objective optimization taking \hl{XX} iterations.
 
 \begin{figure}[t]
 \noindent
@@ -369,6 +366,7 @@ It took XX minutes to run the design optimization, with each simulation taking X
 \textit{Conclusions will be written once final results are available}.
 When assessed in a CEM that accounts for their temporal value, WECs are actually quite close to viable, despite a high LCOE.
 We also find that optimizing for grid system cost instead of LCOE makes a big difference in the optimal design.
+\hl{XX}. 
 
 \section*{Acknowledgments and Data Availability}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
