@@ -204,12 +204,21 @@ fitResults = table(p.Hs(:), omega_n_fit, zeta_fit, k_fit, ...
                    'VariableNames',{'Hs','omega_n','zeta','k'});
 
 %dummy plot
-nexttile(1);  % or whichever axes you want the legend in
+nexttile(1);
 hold on;
 hData = plot(nan, nan, '*-', 'Color', [0 0 0], 'LineWidth', 1,   'HandleVisibility','on');
 hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibility','on');
 hold off;
-legend([hData, hFit], {'MDOcean','Fit'}, 'Location','northwest');
+legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southwest');
+
+%{
+nexttile(2);
+hold on;
+hData = plot(nan, nan, '*-', 'Color', [0 0 0], 'LineWidth', 1,   'HandleVisibility','on');
+hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibility','on');
+hold off;
+legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southeast');
+%}
 
 % indicate area of unused high frequencies
 nexttile(1)
