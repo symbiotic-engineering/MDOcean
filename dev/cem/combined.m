@@ -119,7 +119,7 @@ for i = 1:nStates
 
     % PLOT PHASES
     nexttile(2)
-    semilogx(omegas/wn, angles./pi, '*-', 'Color',col, 'HandleVisibility','off', 'LineWidth',2.0)
+    semilogx(omegas/wn, angles./pi, '*-', 'Color',col, 'LineWidth',2.0)
     xlabel('\omega/\omega_n (-)')
     ylabel(['Phase \angle(' y_lab ') / \pi'])
     hold on
