@@ -2,6 +2,8 @@ clear
 close all
 
 p = parameters();
+p.JPD(p.JPD==0) = 1;
+
 b = var_bounds();
 X = [b.X_noms; 1];
 [~, ~, ~, ~, val] = simulation(X,p);
@@ -85,7 +87,7 @@ zeta_fit_phase    = nan(nStates,1);
 k_fit_phase       = nan(nStates,1);
 
 avgs = mean(omega,1,'omitnan');
-lwb  = 7;  % high‐frequency cutoff index
+lwb  = 8;  % high‐frequency cutoff index
 tol  = 4;  % min points for fitting
 
 
@@ -110,7 +112,7 @@ for i = 1:nStates
     % PLOT MAGNITUDES
     nexttile(1)
 
-    loglog(omegas/wn, mags, '*-', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
+    loglog(omegas, mags, '*-', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
 
     
     ylabel(['Magnitude |' y_lab '| ' y_lab_extra ' (-)'])
@@ -119,8 +121,8 @@ for i = 1:nStates
 
     % PLOT PHASES
     nexttile(2)
-    semilogx(omegas/wn, angles./pi, '*-', 'Color',col, 'HandleVisibility','off', 'LineWidth',2.0)
-    xlabel('\omega/\omega_n (-)')
+    semilogx(omegas, angles./pi, '*-', 'Color',col, 'HandleVisibility','off', 'LineWidth',2.0)
+    xlabel('\omega (-)')
     ylabel(['Phase \angle(' y_lab ') / \pi'])
     hold on
     
@@ -153,7 +155,7 @@ for i = 1:nStates
         mag_fit_vals = 20*log10(abs((mf.k.*mf.omega_n^2) ./ ...
                           (-w_fit.^2 + 1i*2*mf.zeta*mf.omega_n.*w_fit + mf.omega_n^2)));
         nexttile(1)
-        plot(w_fit/wn, mag_fit_vals,'-','Color',col,'DisplayName',sprintf('H_s=%.2f',p.Hs(i)),'Color',[((i-1)/nStates) 0 (1 - (i-1)/nStates)], 'HandleVisibility','off','LineWidth',1.5)
+        plot(w_fit, mag_fit_vals,'-','Color',col,'DisplayName',sprintf('H_s=%.2f',p.Hs(i)),'Color',[((i-1)/nStates) 0 (1 - (i-1)/nStates)], 'HandleVisibility','off','LineWidth',1.5)
     end
     
     % fit phasesm get fit params
@@ -169,7 +171,7 @@ for i = 1:nStates
                           (-w_fit.^2 + 1i*2*pf.zeta*pf.omega_n.*w_fit + pf.omega_n^2)) ./ pi;
         nexttile(2)
 
-        plot(w_fit/wn, phase_fit_vals,'-','Color',col,'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),'Color',[((i-1)/nStates) 0 (1 - (i-1)/nStates)],'HandleVisibility','off','LineWidth',1.5)
+        plot(w_fit, phase_fit_vals,'-','Color',col,'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),'Color',[((i-1)/nStates) 0 (1 - (i-1)/nStates)],'HandleVisibility','off','LineWidth',1.5)
     end
 end
 
@@ -222,11 +224,11 @@ legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southeast');
 
 % indicate area of unused high frequencies
 nexttile(1)
-xregion(plot_omegas(lwb)/wn, plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+xregion(plot_omegas(lwb), plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
 
 
 nexttile(2)
-xregion(plot_omegas(lwb)/wn, plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+xregion(plot_omegas(lwb), plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
 
 
 
