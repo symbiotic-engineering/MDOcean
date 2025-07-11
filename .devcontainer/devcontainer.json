@@ -27,7 +27,6 @@
         "git.autofetch": true,
         "redhat.telemetry.enabled": true,
         "window.menuBarVisibility": "classic",
-        "workbench.colorTheme": "Atom One Dark",
         "editor.minimap.enabled": false,
         "cSpell.userWords": [
           "calkit",
@@ -37,8 +36,12 @@
     }
   },
   "mounts": [
-    "source=${localEnv:HOME}/.calkit,target=/home/vscode/.calkit,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.calkit,target=/home/vscode/.calkit,type=bind,consistency=cached",
+    "source=${env:HOME}/.ssh/ssh-auth.sock,target=/ssh-agent,type=bind"
   ],
+  "containerEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent"
+  },
   "postCreateCommand": "conda init bash",
   "postStartCommand": "docker pull texlive/texlive:latest-full"
 }
