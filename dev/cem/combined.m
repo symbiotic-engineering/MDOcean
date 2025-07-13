@@ -43,13 +43,11 @@ if fill_nan
     angle_matrix = fillmissing(angle_matrix, 'nearest');
 end
 
-% A      = pi/4 * b.D_f_nom^2 - b.D_s_nom^2;
+% A      = pi/4 * (b.D_f_nom^2 - b.D_s_nom^2);
 % K_h    = p.rho_w * p.g * A;
 % K_mult = 6;      % guess
 % K      = K_h * K_mult;
 y_lab       = 'X/F';
-y_lab_extra = '';%'K \omega_n^2';
-% norm        = K * wn^2;
 omega = w;
 
 %% second order model definition
@@ -59,12 +57,13 @@ mag_db_fn    = @(w_n, k, zeta, w) 20*log10( mag_fn(w_n, k, zeta, w) );
 phase_fn     = @(w_n, k, zeta, w) 1/pi * angle( sec_order_fn(w_n, k, zeta, w) );
 
 %% for magnitude fit and plot, convert magnitude to dB, if flagged
-scale_mag_for_fit = 1e6; % to keep values O(1) numerically (helps convergence)
+mag_db = 20*log10(mag_matrix);
+scale_mag_data_for_fit = 1e6; % to keep values O(1) numerically (helps convergence)
 if use_db_for_fit
-    mag_data_for_fit = 20*log10(mag_matrix * scale_mag_for_fit);
+    mag_data_for_fit = mag_db + 20*log10(scale_mag_data_for_fit);
     mag_fn_for_fit = mag_db_fn;
 else
-    mag_data_for_fit = mag_matrix * scale_mag_for_fit;
+    mag_data_for_fit = mag_matrix * scale_mag_data_for_fit;
     mag_fn_for_fit = mag_fn;
 end
 
@@ -72,10 +71,12 @@ if use_db_for_plot
     mag_data_for_plot = mag_db;
     mag_fn_for_plot = mag_db_fn;
     mag_plot_fn = @(varargin)semilogx(varargin{:}); % y axis already log so don't take log again
+    y_add = ', dB';
 else
     mag_data_for_plot = mag_matrix;
     mag_fn_for_plot = mag_fn;
     mag_plot_fn = @(varargin)loglog(varargin{:});
+    y_add = '';
 end
 
 %% define mag and phase fit models
@@ -105,7 +106,7 @@ tol  = 4;  % min points for fitting
 %% loop through wave heights
 for i = 1:nWaveHeights
     omegas = omega(i,:);
-    angles = angle_matrix(i,:);
+    angles = angle_matrix(i,:)/pi;
     
     red = (i-1)/(nWaveHeights-1);
     green = 0;
@@ -115,45 +116,53 @@ for i = 1:nWaveHeights
     % PLOT MAGNITUDE DATA
     nexttile(1)
     mag_plot_fn(omegas, mag_data_for_plot(i,:), '*--', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
-    ylabel(['Magnitude |' y_lab '| ' y_lab_extra ' (-)'])
+    ylabel(['Magnitude |' y_lab '|' y_add])
     hold on
 
     % PLOT PHASE DATA
     nexttile(2)
-    semilogx(omegas, angles./pi, '*--', 'Color',col, 'HandleVisibility','off', 'LineWidth',2.0)
-    xlabel('\omega (-)')
+    semilogx(omegas, angles, '*--', 'Color',col,'LineWidth',2.0)
+    xlabel('Frequency \omega (rad/s)')
     ylabel(['Phase \angle(' y_lab ') / \pi'])
     hold on
     
-    % remove high frequencies (lwb) and clear NaNs (unused if fill_nan is
-    % true)
+    % remove high frequencies (lwb)
     mags_c   = mag_data_for_fit(i,lwb:end);
     om_c     = omegas(lwb:end);
     ang_c    = angles(lwb:end);
     om_c(isnan(om_c)) = avgs(isnan(om_c));
     
-    om_c_mag   = om_c(~isnan(mags_c));
-    om_c_ang   = om_c(~isnan(ang_c));
-    mags_c     = mags_c(~isnan(mags_c));
-    ang_c      = ang_c(~isnan(ang_c));
+    % clear NaNs (unused if fill_nan is true)
+    idx_nan = isnan(mags_c);
+    om_c   = om_c(~idx_nan);
+    mags_c = mags_c(~idx_nan);
+    ang_c  = ang_c(~idx_nan);
     
     % fit magnitudes, get fit params
     if numel(mags_c) > tol
 
-        [mf, gof_m] = fit(om_c_mag.', mags_c.', mag_model, 'StartPoint',[0.5,5,0.05]);
+        [mf, gof_m] = fit(om_c.', mags_c.', mag_model, 'StartPoint',[0.5,5,0.05]);
 
         omega_n_fit(i) = mf.w_n;
         zeta_fit(i)    = mf.zeta;
-        k_fit(i)       = mf.k * scale_mag_for_fit;
+        k_fit(i)       = mf.k * scale_mag_data_for_fit;
         
         fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
 
         w_fit = logspace(log10(min(omega(:),[],'omitnan')), ...
                          log10(max(omega(:),[],'omitnan')), 500);
-        mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_for_fit, mf.zeta, w_fit);
+        mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_data_for_fit, mf.zeta, w_fit);
 
         nexttile(1)
-        mag_plot_fn(w_fit, mag_fit_vals,'-','Color',col,'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), 'HandleVisibility','off','LineWidth',1.5)
+        mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
+            'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
+            'HandleVisibility','off','LineWidth',1.5)
+
+        ymin = 1e-7;
+        if use_db_for_plot
+            ymin = 20*log10(ymin);
+        end
+        ylim([ymin max(mag_data_for_plot,[],'all')])
 
     end
     
@@ -167,10 +176,10 @@ for i = 1:nWaveHeights
             zeta_fit_phase(i)    = NaN;
             k_fit_phase(i)       = NaN;
         else
-            [pf, gof_p] = fit(om_c_ang.', ang_c.', angle_model, 'StartPoint',[0.5,5,0.05]);
+            [pf, gof_p] = fit(om_c.', ang_c.', angle_model, 'StartPoint',[0.5,5,0.05]);
             omega_n_fit_phase(i) = pf.w_n;
             zeta_fit_phase(i)    = pf.zeta;
-            k_fit_phase(i)       = pf.k * scale_mag_for_fit;
+            k_fit_phase(i)       = pf.k * scale_mag_data_for_fit;
 
         end
         
@@ -179,7 +188,9 @@ for i = 1:nWaveHeights
         phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
         nexttile(2)
 
-        semilogx(w_fit, phase_fit_vals,'-','Color',col,'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),'HandleVisibility','off','LineWidth',1.5)
+        semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
+            'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
+            'HandleVisibility','off','LineWidth',1.5)
     end
 end
 
@@ -238,6 +249,7 @@ nexttile(2)
 plot(NaN,NaN,'k*--','DisplayName','RM3')
 
 improvePlot
+set(gcf(),"Position",[100 100 600 680])
 
 %% display of fit tables
 
@@ -257,14 +269,14 @@ t = tiledlayout(3,1);
 nexttile
 plot(p.Hs(:), omega_n_fit, 'g')
 hold on
-plot(p.Hs(:), omega_n_fit_phase,'m')
+plot(p.Hs(:), omega_n_fit_phase,'m-.')
 ylabel({'Natural','Frequency','$\omega_n$'},'Interpreter','latex')
 grid on 
 
 nexttile
 plot(p.Hs(:), zeta_fit, 'g')
 hold on
-plot(p.Hs(:), zeta_fit_phase,'m')
+plot(p.Hs(:), zeta_fit_phase,'m-.')
 ylabel({'Damping','Ratio','$\zeta$'},'Interpreter','latex')
 grid on 
 
@@ -274,12 +286,12 @@ h.Annotation.LegendInformation.IconDisplayStyle = 'off'; % no legend here
 ylabel('Stiffness $K$','Interpreter','latex')
 xlabel('Wave Height $H_s$ (m)','Interpreter','latex')
 hold on
-%plot(p.Hs(:), k_fit_phase,'m') K fit for phase is meaningless because you
+%plot(p.Hs(:), k_fit_phase,'m-.') K fit for phase is meaningless because you
 %can't get any information about K from phase, only from magnitude
 grid on 
 
 plot(NaN,NaN,'g','DisplayName','Magnitude Fit')
-plot(NaN,NaN,'m','DisplayName','Phase Fit')
+plot(NaN,NaN,'m-.','DisplayName','Phase Fit')
 legend
 improvePlot
 
