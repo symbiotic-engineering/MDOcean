@@ -198,28 +198,18 @@ end
 
 %% plot formatting
 
-%nexttile(1); legend('Location','eastoutside');
-
-
 %custom color scheme
-rng = linspace(0, (nWaveHeights-1)/(nWaveHeights-1), 15);
+rng = linspace(0, 1, length(p.Hs));
 color_scheme = [rng; zeros(size(rng)); flip(rng)].';
+colormap( color_scheme )
 
-nexttile(1);
-cb1 = colorbar('eastoutside');
-cb1.Label.String = 'H_s (m)';
-colormap(color_scheme);
-clim([ min(p.Hs)  max(p.Hs) ]); 
-cb1.Label.FontSize  = 20;
-
-%nexttile(2); legend('Location','eastoutside');
-
-nexttile(2);
-cb2 = colorbar('eastoutside');
-colormap(color_scheme);
-clim([ min(p.Hs)  max(p.Hs) ]); 
-cb2.Label.String = 'H_s (m)';
-cb2.Label.FontSize  = 20;
+cb = colorbar;
+cb.Layout.Tile = 'east';
+cb.Label.String = 'H_s (m)'; 
+cb.Label.FontSize  = 20;
+clim([p.Hs(1)-.25; p.Hs(end)+.25])
+cb.Ticks = p.Hs;
+cb.TickLabels = num2str(p.Hs);
 
 %dummy plot
 nexttile(1);
@@ -229,24 +219,14 @@ hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibili
 hold off;
 legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southwest');
 
-%{
-nexttile(2);
-hold on;
-hData = plot(nan, nan, '*-', 'Color', [0 0 0], 'LineWidth', 1,   'HandleVisibility','on');
-hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibility','on');
-hold off;
-legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southeast');
-%}
 
 % indicate area of unused high frequencies
 nexttile(1)
-%xregion(plot_omegas(lwb), plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-
+omega_cutoff = sqrt(omegas(lwb)*omegas(lwb-1));
+xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
 
 nexttile(2)
-%xregion(plot_omegas(lwb), plot_omegas(1)/wn, "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-
-plot(NaN,NaN,'k*--','DisplayName','RM3')
+xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
 
 improvePlot
 set(gcf(),"Position",[100 100 600 680])
