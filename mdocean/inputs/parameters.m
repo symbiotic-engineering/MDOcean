@@ -12,6 +12,7 @@ in2m = 0.0254;  % inch to meter
 yd2m = 0.9144;  % yard to meter
 lb2kg = 1/2.2;  % pound to kilogram
 euro2USD = 1.09; % currency conversion - March 2024 exchange rate
+km2mi = 1/1.609; % kilometer to miles
 
 if strcmpi(mode,'wecsim')
     T_s_over_D_s = 29/6;
@@ -207,7 +208,7 @@ T = [T;
         "environment",true,"eco-cost per mile from shore of fuel for boat travel ($/mi)",{''});
     table("eco_cost_carbon","EC_{carbon}",{0.133*euro2USD},...
         "environment",true,"social cost of carbon ($/kg)",{''});
-    table("distance_from_shore","D_[shore}",{1},... % fixme: placeholder value
+    table("distance_from_shore","D_[shore}",{5.5 * km2mi},... % 5-6 km from p186 of SAND2015-7963 report
         "environment",true,"distance from shore (miles)",{''});
     ...
     ... % Grid CEM

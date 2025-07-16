@@ -4,9 +4,9 @@ function net_eco_value = enviro(steel_mass, distance_from_shore, fiberglass_area
                                 eco_cost_steel, eco_cost_fiberglass, ...
                                 eco_cost_distance, social_cost_carbon)
 
-    % units: [steel_kg, distance_miles, fiberglass_meters_sq, CEM_CO2_GT]
+    % units: [steel_kg, distance_miles, fiberglass_meters_sq, CEM_CO2_tonne]
 
-    CEM_CO2_kg = CEM_CO2 * 1e9; % gigaton to kg
+    CEM_CO2_kg = CEM_CO2 * 1e3; % ton to kg
     num_wecs_CEM = CEM_WEC_capacity / rated_power_per_wec;
 
     % cost and value
