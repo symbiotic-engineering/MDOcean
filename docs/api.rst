@@ -1,27 +1,14 @@
 API
 ===
 
-.. 
-    .. autosummary::
-    :toctree: generated
+.. currentmodule:: ../mdocean
 
-.. automodule:: inputs
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autosummary::
+    :toctree: generated/
+    
+    inputs
+    optimization
+    plots
+    simulation
 
-.. automodule:: optimization
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: plots
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: simulation
-    :members:
-    :undoc-members:
-    :show-inheritance:
 

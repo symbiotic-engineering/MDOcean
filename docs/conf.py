@@ -31,6 +31,7 @@ primary_domain = "mat"
 matlab_src_dir = "../mdocean"
 matlab_auto_link = "all"
 
+autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
