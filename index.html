@@ -14,6 +14,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,10 +33,73 @@
             
   <div class="section" id="mdocean-documentation">
 <h1>MDOcean documentation<a class="headerlink" href="#mdocean-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+<p>This is an open source codebase that uses Multidisciplinary Design Optimization (<strong>MDO</strong>) to optimize an <strong>ocean</strong> wave energy converter (WEC).</p>
+<p>More specifically, it uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.</p>
+<p>For 210 sea states, the model takes 39 ms to run, which is around a 5 order of magnitude improvement compared to the equivalent ~1 hour set of parallel WEC-Sim MCR simulations.</p>
+<p><strong>Context</strong></p>
+<p>The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](<a class="reference external" href="https://sea.mae.cornell.edu/">https://sea.mae.cornell.edu/</a>).</p>
+<p>Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025.</p>
+<p>Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization
+to Reduce Cost and Power Variation of a Wave Energy Converter,”
+<em>International Design Engineering Technical Conferences &amp; Computers and
+Information in Engineering Conference</em>, St. Louis, MO, August 14-17, 2022.
+[<a class="reference external" href="https://doi.org/10.1115/DETC2022-90227](https://doi.org/10.1115/DETC2022-90227">https://doi.org/10.1115/DETC2022-90227](https://doi.org/10.1115/DETC2022-90227</a>).</p>
+<p>A video recording of the conference presentation is available [here](<a class="reference external" href="https://www.youtube.com/watch?v=LjpfXvujUGY">https://www.youtube.com/watch?v=LjpfXvujUGY</a>).</p>
+<p><strong>Software Authors</strong>
+- Rebecca McCabe, <a class="reference external" href="mailto:rgm222&#37;&#52;&#48;cornell&#46;edu">rgm222<span>&#64;</span>cornell<span>&#46;</span>edu</a> (Project lead and point of contact, 2021-present) &#64;rebeccamccabe
+- Madison Dietrich, <a class="reference external" href="mailto:mjd429&#37;&#52;&#48;cornell&#46;edu">mjd429<span>&#64;</span>cornell<span>&#46;</span>edu</a> (Project contributor, 2023-present) &#64;MadisonDietrich
+- Olivia Murphy, <a class="reference external" href="mailto:om66&#37;&#52;&#48;cornell&#46;edu">om66<span>&#64;</span>cornell<span>&#46;</span>edu</a> (Project contributor, 2021-22) &#64;ommurphy
+- Iris Ren, <a class="reference external" href="mailto:zr92&#37;&#52;&#48;cornell&#46;edu">zr92<span>&#64;</span>cornell<span>&#46;</span>edu</a> (Project contributor, 2024)
+- Maha Haji, <a class="reference external" href="mailto:maha&#37;&#52;&#48;cornell&#46;edu">maha<span>&#64;</span>cornell<span>&#46;</span>edu</a> (Advisor, 2021-present) &#64;maha-haji</p>
+<p><strong>License</strong></p>
+<p>This project is released open-source under the MIT License. The validation folder contains code taken from NREL’s WEC-Sim.
+The Apache 2.0 license for this open source WEC-Sim code is included.</p>
+<p><strong>File Structure and Usage</strong></p>
+<p>Clone the repository via Git. If you are unfamiliar with Git, click “Code &gt; Download ZIP” to get a .zip file, or try the “Open in MATLAB Online” button above to use the MATLAB Online IDE instead.</p>
+<ul class="simple">
+<li><p><cite>tests</cite>: continuous integration tests for validation as well as generating a report to reproduce all figures and results. Running <cite>run_tests.m</cite> is the easiest way to reproduce all results. The <cite>run_slow_tests</cite> flag in <cite>test.m</cite> can be toggled to enable or disable the tests which take longer than a few minutes to run.</p></li>
+<li><p><cite>mdocean/inputs</cite>: numerical inputs needed to run the optimiztion, simulation, and validation, including wave data, parameters, design variable bounds, and validation values.</p></li>
+<li><p><cite>mdocean/simulation</cite>: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
+The script <cite>run_single.m</cite> is a good starting point if you want to run the simulation without optimizing.</p></li>
+<li><p><cite>mdocean/optimization</cite>: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script <cite>gradient_optim.m</cite>
+if you want to run single objective optimization for each of the two objectives. For multi-objective, run <cite>pareto_search.m</cite> followed by <cite>pareto_curve_heuristics.m</cite>.</p></li>
+<li><p><cite>mdocean/plots</cite>: helper functions to visualize outputs. Start with the script <cite>all_figures.m</cite> if you want to generate specific figures from the paper.</p></li>
+<li><p><cite>dev</cite>: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.</p></li>
+</ul>
+<p>If you are running individual scipts/functions, you will need to <cite>cd</cite> to the <cite>mdocean</cite> folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via <cite>run_tests.m</cite>.</p>
+<p><strong>Dependencies</strong></p>
+<p>The following packages are used in this code:
+| Package | Required? |
+| —    | —      |
+| MATLAB | Required for simulation |
+| Statistics and Machine Learning Toolbox | Required for simulation |
+| Optimization Toolbox | Required for optimization |
+| Global Optimization Toolbox | Required for optimization |
+| Symbolic Math Toolbox | Optional for simulation code generation |
+| Parallel Computing Toolbox | Optional for speedup |
+| MATLAB Report Generator | Optional for WEC-Sim validation |
+| Simulink | Optional for WEC-Sim validation |
+| Simscape | Optional for WEC-Sim validation |
+| Simscape Multibody | Optional for WEC-Sim validation |
+| [WEC-Sim](<a class="reference external" href="https://github.com/WEC-Sim/WEC-Sim/">https://github.com/WEC-Sim/WEC-Sim/</a>) | Optional for WEC-Sim validation |</p>
+<p>The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.</p>
+<p><strong>Contributing</strong></p>
+<p>Suggestions, questions, bug reports, and contributions are welcome. Open an issue or pull request. To discuss the possibility of broader collaborations, please email <a class="reference external" href="mailto:rgm222&#37;&#52;&#48;cornell&#46;edu">rgm222<span>&#64;</span>cornell<span>&#46;</span>edu</a>.</p>
+<p><strong>Funding Acknowledgement</strong></p>
+<p>This material is based upon work supported by the
+National Science Foundation Graduate Research Fellowship under
+Grant No. DGE–2139899, and the Cornell Engineering Fellowship.
+Any opinion, findings, and conclusions or recommendations
+expressed in this material are those of the authors(s) and do not
+necessarily reflect the views of the National Science Foundation.</p>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This project is under active development.</p>
 </div>
 </div>
 
@@ -56,11 +120,15 @@ documentation for details.</p>
 
 
 <h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="api.html" title="next chapter">API</a></li>
   </ul></li>
 </ul>
 </div>
