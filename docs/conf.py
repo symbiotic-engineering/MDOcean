@@ -30,7 +30,7 @@ extensions = [
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 primary_domain = "mat"
-matlab_src_dir = "../mdocean"
+matlab_src_dir = os.path.abspath(os.path.join("..", "mdocean"))
 matlab_auto_link = "all"
 nitpicky = True
 
