@@ -1,14 +1,10 @@
 API
 ===
 
-.. currentmodule:: ../mdocean
+.. toctree::
 
-.. autosummary::
-    :toctree: generated/
-    
-    inputs
-    optimization
-    plots
-    simulation
-
+    generated/inputs
+    generated/optimization
+    generated/plots
+    generated/simulation
 
