@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join("..", "mdocean")))
+sys.path.insert(0, os.path.abspath('_ext'))
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -22,7 +23,8 @@ extensions = [
     'sphinx.ext.autodoc',
  #   'sphinxcontrib.bibtex',
     'sphinxcontrib.matlab',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
+    'matlab_autosummary'
 ]
 
 templates_path = ['_templates']
