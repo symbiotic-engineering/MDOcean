@@ -1,4 +1,4 @@
-function [zeta_output, omega_n_output] = fit_from_vars(X_u, phase_X_u, gamma_phase_f)
+function [zeta_output, omega_n_output] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f)
 
 %% choose settings
 RAO = false;       % true uses X/eta, false uses X/F_f
@@ -14,12 +14,15 @@ p.JPD(p.JPD==0) = 1;
 
 b = var_bounds();
 X = [b.X_noms; 1];
-[~, ~, ~, ~, val] = simulation(X,p);
-w = val.w;
+%[~, ~, ~, val] = simulation(X,p);
+w = 2*pi./p.T
+
+
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
 %F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
-% new usage as function
-F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
+
+% new implementation
+F = gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
 
 
 %ang(x/f) = ang(x) - ang(f)
@@ -33,13 +36,13 @@ end
 
 % wn = 0.54;        % guess
 
-phase_X = val.phase_X_f;
-X       = val.X_f;
+phase_X = phase_X_u;
+X       = X_u;
 
 % get magnitude matrix
 
 mag_matrix   = X ./ F;
-angle_matrix = phase_X - val.gamma_phase_f - fudge;
+angle_matrix = phase_X - gamma_phase_f - fudge;
 
 % nearest hole-filling (toggle with fill_nan)
 
@@ -54,6 +57,7 @@ end
 % K      = K_h * K_mult;
 y_lab       = 'X/F';
 omega = w;
+
 
 %% second order model definition
 sec_order_fn = @(w_n, k, zeta, w) 1/k * 1./(1 - (w/w_n).^2 + 1i * 2*zeta*w/w_n);
@@ -96,7 +100,7 @@ angle_model = fittype(phase_fn, ...
 % array sizes after removing NaNs. should not throw warnings if fill_nan is
 % toggled on
 
-nWaveHeights = size(omega,1);
+nWaveHeights = size(X_u,1);
 omega_n_fit       = nan(nWaveHeights,1);
 zeta_fit          = nan(nWaveHeights,1);
 k_fit             = nan(nWaveHeights,1);
@@ -135,7 +139,8 @@ for i = 1:nWaveHeights
     mags_c   = mag_data_for_fit(i,lwb:end);
     om_c     = omegas(lwb:end);
     ang_c    = angles(lwb:end);
-    om_c(isnan(om_c)) = avgs(isnan(om_c));
+    %om_c(isnan(om_c)) = avgs(isnan(om_c)); % fixme: check if this affects
+    %anything
     
     % clear NaNs (unused if fill_nan is true)
     idx_nan = isnan(mags_c);
@@ -201,52 +206,7 @@ end
 
 
 
-%% plot formatting
 
-%custom color scheme
-rng = linspace(0, 1, length(p.Hs));
-color_scheme = [rng; zeros(size(rng)); flip(rng)].';
-colormap( color_scheme )
-
-cb = colorbar;
-cb.Layout.Tile = 'east';
-cb.Label.String = 'H_s (m)'; 
-cb.Label.FontSize  = 20;
-clim([p.Hs(1)-.25; p.Hs(end)+.25])
-cb.Ticks = p.Hs;
-cb.TickLabels = num2str(p.Hs);
-
-%dummy plot
-nexttile(1);
-hold on;
-hData = plot(nan, nan, '*-', 'Color', [0 0 0], 'LineWidth', 1,   'HandleVisibility','on');
-hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibility','on');
-hold off;
-legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southwest');
-
-
-
-% indicate area of unused high frequencies
-omega_cutoff = sqrt(omegas(lwb)*omegas(lwb-1));
-unused_x = [omega_cutoff, omega_cutoff, omegas(1), omegas(1)];  
-unused_mags_y = [min(mag_matrix,[],'all'), max(mag_matrix,[],'all'), max(mag_matrix,[],'all'), min(mag_matrix,[],'all')];
-unused_phases_y = [0, -1, -1, 0];
-
-
-nexttile(1)
-hold on;
-fill(unused_x, unused_mags_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.01,'HandleVisibility','off')
-%xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-hold off;
-
-nexttile(2)
-hold on;
-%xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-fill(unused_x, unused_phases_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.001,'HandleVisibility','off')
-hold off;
-
-improvePlot
-set(gcf(),"Position",[100 100 600 680])
 
 %% display of fit tables
 
@@ -259,48 +219,14 @@ fitPhaseResults = table(p.Hs(:), omega_n_fit_phase, zeta_fit_phase, k_fit_phase,
                         'VariableNames',{'Hs','omega_n','zeta','k'});
 disp(fitPhaseResults)
 
-%% Dependence of mag and phase fits on Hs
-figure
-t = tiledlayout(3,1);
-
-nexttile
-plot(p.Hs(:), omega_n_fit, 'g')
-hold on
-plot(p.Hs(:), omega_n_fit_phase,'m-.')
-ylabel({'Natural','Frequency','$\omega_n$'},'Interpreter','latex')
-grid on 
-
-nexttile
-plot(p.Hs(:), zeta_fit, 'g')
-hold on
-plot(p.Hs(:), zeta_fit_phase,'m-.')
-ylabel({'Damping','Ratio','$\zeta$'},'Interpreter','latex')
-grid on 
-
-nexttile
-h = plot(p.Hs(:), k_fit, 'g');
-h.Annotation.LegendInformation.IconDisplayStyle = 'off'; % no legend here
-ylabel('Stiffness $K$','Interpreter','latex')
-xlabel('Wave Height $H_s$ (m)','Interpreter','latex')
-hold on
-%plot(p.Hs(:), k_fit_phase,'m-.') K fit for phase is meaningless because you
-%can't get any information about K from phase, only from magnitude
-grid on 
-
-plot(NaN,NaN,'g','DisplayName','Magnitude Fit')
-plot(NaN,NaN,'m-.','DisplayName','Phase Fit')
-legend
-improvePlot
-
 
 % output results given the gamma
 
-wave_height = 3.75 %fixme: hardcoded wave height for now depend on location later
+wave_height = max(fitResults.Hs,[],"all"); %fixme: hardcoded wave height for now - depend on location later
 
-%height_row = fitResults.Hs == 3.75
 
-zeta_output = fitResults.zeta(height_row);
-omega_n_output = fitResults.omega_n(height_row);
+zeta_output = fitResults.zeta(wave_height);
+omega_n_output = fitResults.omega_n(wave_height);
 
 
 end

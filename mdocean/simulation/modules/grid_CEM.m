@@ -1,20 +1,25 @@
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, capacity_cost, location)
+                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location)
 
 
-    [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_phase_f);
+    [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
 
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location);
 
 end
 
 
-function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_phase_f)
+function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f)
     % fixme put real fit here
 
     %combined()
 
-    [zeta, omega_n] = combined(X_u, phase_X_u, gamma_phase_f)
+    %[zeta, omega_n] = combined(X_u, phase_X_u, gamma_phase_f) don't use
+    %combined.m here
+
+    
+    
+    [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
 
     %zeta = 0.05;
     %omega_n = 0.4;

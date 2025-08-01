@@ -45,7 +45,7 @@ in.T_f_1 = p.T_f_1_over_T_f_2 * in.T_f_2;
 in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 
 % Space between float and spar
-D_f_in = p.D_f_in_over_D_s * in.D_s;
+D_f_in = p.D_f_in_over_D_s * in.D_s; 
 in.D_f_in = min(D_f_in, in.D_f - 1e-6); % ensure positive area to avoid sim breaking for infeasible inputs
 
 %% Run modules
@@ -91,7 +91,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
                             in.F_max, in.P_max, in.eff_array);
 
 [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, capex/in.P_max*1000, in.location);
+                                                gamma_phase_f, gamma_f_over_rho_g, capex/in.P_max*1000, in.location);
 
 net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
                         CEM_CO2, CEM_wec_capacity, in.P_max, ...
