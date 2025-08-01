@@ -5,7 +5,10 @@ b = var_bounds();
 
 X = [b.X_noms; 1];
 
-[LCOE, P_var, ~, g, val] = simulation(X,p)
+[J, ~, g, val] = simulation(X,p)
+
+LCOE = J(1);
+P_var = J(2);
 
 [feasible,~,failed] = is_feasible(g,X,p,b)
 
