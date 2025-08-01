@@ -137,7 +137,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
     fvals_opt(single_obj_failed,:) = [];
 
     % use x0 start as seed, if x0 is feasible
-    [J_x0,~,~,~,g_0] = simulation([b.X_starts; 1],p);
+    [J_x0,~,g_0] = simulation([b.X_starts; 1],p);
     x0_feasible = is_feasible(g_0, [b.X_starts; 1], p, b);
     if x0_feasible
         fvals_0 = J_x0;
