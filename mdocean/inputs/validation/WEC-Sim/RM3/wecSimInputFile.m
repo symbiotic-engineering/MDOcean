@@ -20,7 +20,7 @@ else
 end
 p.use_MEEM = false; % use WAMIT coeffs to get control so it's truly optimal
 
-[~, ~, P_matrix, ~, val] = simulation(X,p);
+[~, P_matrix, ~, val] = simulation(X,p);
 if regular
     [T,H] = meshgrid(p.T, p.Hs/sqrt(2)); % regular
 else
