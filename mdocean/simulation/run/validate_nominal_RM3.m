@@ -8,7 +8,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
     X = [b.X_noms; 1];
     X(strcmp(b.var_names,'F_max')) = find_nominal_inputs(b, p);
     
-    [~, ~, ~, g, simulated] = simulation(X,p);
+    [~, ~, g, simulated] = simulation(X,p);
     
     % whether nominal violates constraints
     idx_ignore = strcmp(b.constraint_names,'irrelevant_max_force');
@@ -29,7 +29,7 @@ function [feasible,failed,simulated,actual,tab,fig] = validate_nominal_RM3(mode)
         simulated_diff_N_WEC = simulated;
         for j = 2:length(N_WEC)
             p.N_WEC = N_WEC(j); 
-            [~, ~, ~, ~, simulated_diff_N_WEC(j)] = simulation(X,p);
+            [~, ~, ~, simulated_diff_N_WEC(j)] = simulation(X,p);
         end
 
         % sweep through each field (each item to validate)

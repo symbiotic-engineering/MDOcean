@@ -1,4 +1,4 @@
-function [LCOE, J_capex_design, P_matrix_elec, g, val] = simulation(X, p)	
+function [J, P_matrix_elec, g, val] = simulation(X, p)	
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
@@ -98,6 +98,8 @@ net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
 
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
+
+J = [LCOE, J_capex_design, CEM_grid_cost, net_eco_value];
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD)+length(p.T_struct);

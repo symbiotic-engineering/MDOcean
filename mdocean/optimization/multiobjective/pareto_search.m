@@ -115,8 +115,9 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
 
     % get pareto front endpoints by running optimization
     [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
-    [~,P_var_min_LCOE] = simulation(X_opt(:,1),p);
-    
+    J_min_LCOE = simulation(X_opt(:,1),p);
+    P_var_min_LCOE = J_min_LCOE(2);
+
     LCOE_max = p.LCOE_max;
     LCOE_min = objs_opt(1);
     P_var_min = objs_opt(2);
@@ -136,10 +137,10 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
     fvals_opt(single_obj_failed,:) = [];
 
     % use x0 start as seed, if x0 is feasible
-    [LCOE_x0,P_var_x0,~,g_0] = simulation([b.X_starts; 1],p);
+    [J_x0,~,~,~,g_0] = simulation([b.X_starts; 1],p);
     x0_feasible = is_feasible(g_0, [b.X_starts; 1], p, b);
     if x0_feasible
-        fvals_0 = [LCOE_x0,P_var_x0];
+        fvals_0 = J_x0;
         X_0 = b.X_starts(idxs);
     else
         fvals_0 = [];
@@ -179,7 +180,8 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
             % debugging checks on optimization convergence and objective values
             obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
-            [~, P_var_seeds(i)] = simulation(X_opt_tmp, new_p);
+            J_seeds = simulation(X_opt_tmp, new_p);
+            P_var_seeds(i) = J_seeds(2);
             assert(obj_tmp == P_var_seeds(i))
         end
     end
