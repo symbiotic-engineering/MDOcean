@@ -1,3 +1,5 @@
+function [zeta, omega_n] = combined2(X, phase_X, gamma)
+
 
 %% choose settings
 RAO = false;       % true uses X/eta, false uses X/F_f
@@ -13,20 +15,14 @@ p.JPD(p.JPD==0) = 1;
 
 b = var_bounds();
 X = [b.X_noms; 1];
-[~, ~, ~, val] = simulation(X,p);
+[~, ~, ~, ~, val] = simulation(X,p);
 w = val.w;
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
 %F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
 % new usage as function
-F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
-
-<<<<<<< Updated upstream
-=======
-
-%ang(x/f) = ang(x) - ang(f)
+F = gamma * p.rho_w * p.g .* wave_amp;
 
 
->>>>>>> Stashed changes
 if phase_uses_mag_fit
     fudge = 0;       % phase shift correction
 else
@@ -43,11 +39,7 @@ X       = val.X_f;
 mag_matrix   = X ./ F;
 angle_matrix = phase_X - val.gamma_phase_f - fudge;
 
-<<<<<<< Updated upstream
-% hole-filling (toggle with fill_nan)
-=======
 % nearest hole-filling (toggle with fill_nan)
->>>>>>> Stashed changes
 
 if fill_nan
     mag_matrix = fillmissing(mag_matrix, 'nearest');
@@ -230,13 +222,6 @@ hFit  = plot(nan, nan, '-',  'Color', [0 0 0], 'LineWidth', 1.5, 'HandleVisibili
 hold off;
 legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southwest');
 
-<<<<<<< Updated upstream
-
-% indicate area of unused high frequencies
-nexttile(1)
-omega_cutoff = sqrt(omegas(lwb)*omegas(lwb-1));
-xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-=======
 
 
 % indicate area of unused high frequencies
@@ -245,7 +230,6 @@ unused_x = [omega_cutoff, omega_cutoff, omegas(1), omegas(1)];
 unused_mags_y = [min(mag_matrix,[],'all'), max(mag_matrix,[],'all'), max(mag_matrix,[],'all'), min(mag_matrix,[],'all')];
 unused_phases_y = [0, -1, -1, 0];
 
->>>>>>> Stashed changes
 
 nexttile(1)
 hold on;
@@ -254,14 +238,10 @@ fill(unused_x, unused_mags_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.01,'HandleV
 hold off;
 
 nexttile(2)
-<<<<<<< Updated upstream
-xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
-=======
 hold on;
 %xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
 fill(unused_x, unused_phases_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.001,'HandleVisibility','off')
 hold off;
->>>>>>> Stashed changes
 
 improvePlot
 set(gcf(),"Position",[100 100 600 680])
@@ -280,7 +260,6 @@ disp(fitPhaseResults)
 %% Dependence of mag and phase fits on Hs
 figure
 t = tiledlayout(3,1);
-<<<<<<< Updated upstream
 
 nexttile
 plot(p.Hs(:), omega_n_fit, 'g')
@@ -311,34 +290,4 @@ plot(NaN,NaN,'m-.','DisplayName','Phase Fit')
 legend
 improvePlot
 
-=======
-
-nexttile
-plot(p.Hs(:), omega_n_fit, 'g')
-hold on
-plot(p.Hs(:), omega_n_fit_phase,'m-.')
-ylabel({'Natural','Frequency','$\omega_n$'},'Interpreter','latex')
-grid on 
-
-nexttile
-plot(p.Hs(:), zeta_fit, 'g')
-hold on
-plot(p.Hs(:), zeta_fit_phase,'m-.')
-ylabel({'Damping','Ratio','$\zeta$'},'Interpreter','latex')
-grid on 
-
-nexttile
-h = plot(p.Hs(:), k_fit, 'g');
-h.Annotation.LegendInformation.IconDisplayStyle = 'off'; % no legend here
-ylabel('Stiffness $K$','Interpreter','latex')
-xlabel('Wave Height $H_s$ (m)','Interpreter','latex')
-hold on
-%plot(p.Hs(:), k_fit_phase,'m-.') K fit for phase is meaningless because you
-%can't get any information about K from phase, only from magnitude
-grid on 
-
-plot(NaN,NaN,'g','DisplayName','Magnitude Fit')
-plot(NaN,NaN,'m-.','DisplayName','Phase Fit')
-legend
-improvePlot
->>>>>>> Stashed changes
+end

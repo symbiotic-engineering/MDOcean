@@ -11,8 +11,13 @@ end
 
 function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_phase_f)
     % fixme put real fit here
-    zeta = 0.05;
-    omega_n = 0.4;
+
+    %combined()
+
+    [zeta, omega_n] = combined(X_u, phase_X_u, gamma_phase_f)
+
+    %zeta = 0.05;
+    %omega_n = 0.4;
 
 end
 

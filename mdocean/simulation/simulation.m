@@ -1,4 +1,6 @@
+
 function [J, P_matrix_elec, g, val] = simulation(X, p)	
+
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 

@@ -73,11 +73,13 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
 
+
     [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
                                             'OutputSize',{[1,num_objectives],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     probs = cell([1 length(objs)]); 
+
     
     % allocate outputs
     Xs_opt = zeros(length(X),num_objectives);
@@ -131,7 +133,9 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
+
         [out,~,~,val] = simulation(X_opt,p);          % rerun sim
+
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;

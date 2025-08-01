@@ -13,7 +13,7 @@ date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 
-num_figs = 36;
+num_figs = 37;
 num_tabs = 8;
 fig_names   = cell([1,num_figs]);
 tab_names   = cell([1,num_tabs]);
@@ -299,7 +299,25 @@ if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
     fig_runtime(which_figs == 34 | which_figs == 35 | which_figs == 36) = toc(t);
 end
 
-%% fixme: 37 to 45 not implemented, but still name the figures
+%% fixme: figure 37 - bode plots for differing wave heights and frequencies (reordering necessary?)
+fig_names{37} = 'Fig. 37: Fit responses for wave heights and frequencies'
+if any(which_figs == 37)
+    try
+        t = tic;
+        
+        addpath('/dev/cem/combined.m');
+        
+        fig37 = gcf;
+
+        fig37.UserData = ['plots/non_matlab_figs/combined_cem.pdf'];
+
+        fig_output(which_figs==37) = fig37;
+    catch err
+        fig_success(which_figs == 37) = {err};
+    end
+    fig_runtime(which_figs == 37) = toc(t);
+end
+%% fixme: 38 to 45 not implemented, but still name the figures
 empty_idx = cellfun(@isempty,fig_names);
 empty_str = strcat('Fig._', string(find(empty_idx)));
 [fig_names{empty_idx}] = deal(empty_str{:});
@@ -457,6 +475,5 @@ if any(which_tabs == 8)
     end
     tab_runtime(which_tabs == 8) = toc(t);
 end
-
 
 end
