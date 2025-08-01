@@ -21,6 +21,9 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
     
     [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
 
+    %zeta
+    %omega_n
+
     %zeta = 0.05;
     %omega_n = 0.4;
 
@@ -31,7 +34,12 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
     %    zeta,omega_n,capacity_cost,power_limit);
     %CEM_capacity = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, capacity_data,...
     %    zeta,omega_n,capacity_cost,power_limit);
-    if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
+
+    
+    %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
+
+    isValidLookupLocation= true; % fixme: placeholder for now until CEM data comes in
+    if (isValidLookupLocation)
         % fixme put real lookup table here
         co2_slope = 2/3;
         cost_slope = 1/3;
