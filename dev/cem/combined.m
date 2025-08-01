@@ -36,7 +36,7 @@ X       = val.X_f;
 mag_matrix   = X ./ F;
 angle_matrix = phase_X - val.gamma_phase_f - fudge;
 
-% hole-filling (toggle with fill_nan)
+% nearest hole-filling (toggle with fill_nan)
 
 if fill_nan
     mag_matrix = fillmissing(mag_matrix, 'nearest');
@@ -220,13 +220,25 @@ hold off;
 legend([hData, hFit], {'MDOcean','Fit'}, 'Location','southwest');
 
 
+
 % indicate area of unused high frequencies
-nexttile(1)
 omega_cutoff = sqrt(omegas(lwb)*omegas(lwb-1));
-xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+unused_x = [omega_cutoff, omega_cutoff, omegas(1), omegas(1)];  
+unused_mags_y = [min(mag_matrix,[],'all'), max(mag_matrix,[],'all'), max(mag_matrix,[],'all'), min(mag_matrix,[],'all')];
+unused_phases_y = [0, -1, -1, 0];
+
+
+nexttile(1)
+hold on;
+fill(unused_x, unused_mags_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.01,'HandleVisibility','off')
+%xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+hold off;
 
 nexttile(2)
-xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+hold on;
+%xregion(omega_cutoff, omegas(1), "FaceColor","black","FaceAlpha",0.1,'HandleVisibility','off')
+fill(unused_x, unused_phases_y, [0,0,0], 'FaceAlpha',0.1,'LineWidth',0.001,'HandleVisibility','off')
+hold off;
 
 improvePlot
 set(gcf(),"Position",[100 100 600 680])
