@@ -15,7 +15,7 @@ p.JPD(p.JPD==0) = 1;
 
 b = var_bounds();
 X = [b.X_noms; 1];
-[~, ~, ~, ~, val] = simulation(X,p);
+[~, ~, ~, val] = simulation(X,p);
 w = val.w;
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
 F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;

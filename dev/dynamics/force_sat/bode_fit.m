@@ -9,7 +9,7 @@
 p = parameters();
 b = var_bounds();
 X = [b.X_noms; 1];
-[~, ~, ~, ~, val] = simulation(X,p);
+[~, ~, ~, val] = simulation(X,p);
 w = val.w;
 F = val.gamma_f_over_rho_g * p.rho_w * p.g .* repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2)) ;
 X = val.X_f;
