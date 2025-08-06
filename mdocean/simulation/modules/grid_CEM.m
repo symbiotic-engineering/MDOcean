@@ -28,46 +28,7 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
     %omega_n = 0.4;
 
 end
-%{
-function row = findNearestRow(zeta0, omega_n0, capCost0, T)
 
-
-    % Extract numeric arrays
-    z = T.zeta;
-    w = T.omega_n;
-    c = T.capacity_cost;
-
-    % Check ranges
-    if zeta0 < min(z) || zeta0 > max(z)
-       disp(zeta0)
-        error('zeta inputs are out of range.');
-        
-    end
-
-    if   omega_n0 < min(w) || omega_n0 > max(w)
-        error('omega are out of range.');
-    end
-
-    if capCost0 < min(c) || capCost0 > max(c)
-        error('capCost out of range')
-
-    end
-    
-
-    % find distance (placeholder interp code, fixme)
-    %difference = (z - zeta0).^2 + (w - omega_n0).^2 + (c - capCost0).^2;
-
-    % Find index of minimum distance
-    %[~, idx] = min(difference);
-
-    % Return that row
-    
-    %row = T(idx, :);
-    queries = [];
-    row = interpn(T.zeta, T.omega, T.capacity_cost, [], 'linear');
-    row
-end
-%}
 function row = findNearestRow_dummy(zeta0, omega_n0, capCost0, T)
 
     % sort vectors for queried values
@@ -177,6 +138,9 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, T)
 
     % return row of lookup table results
     row = struct2table(results);
+
+
+    % write own interpolator?
 end
 
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location)
@@ -212,12 +176,22 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         cost_slope = 1/3;
         cap_slope = 2.5/3;
 
+
+        % placeholders
         cutin_capacity_cost = 750e3;
         cheapest_cost_with_data = 400e3;
 
         no_wec_CO2 = 12.003064e6; % tonnes (typical value 10e6=10 MT)
         no_wec_grid_cost = 2.889863123e9;
-        
+
+        % data
+        d_cutin_capacity_cost = 
+        d_cheapest_cost_with_data = 
+        d_no_wec_CO2 = 
+        d_no_wec_grid_cost = 
+
+
+
         if capacity_cost > cutin_capacity_cost
             % no WECs
             CEM_CO2 = no_wec_CO2;
@@ -230,6 +204,8 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
             CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
             CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
+
+            
         else 
             % not in bounds of model
             error('WEC is too cheap, no CEM data here.')
