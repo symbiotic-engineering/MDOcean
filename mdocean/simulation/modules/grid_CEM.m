@@ -109,8 +109,8 @@ wecCost0
       'omega_n',   omega_n0, ...
       'wec_cost',  wecCost0);
 
-    for i = 1:numel(interpVars)
-        v = interpVars{i};
+    for i = 1:numel(gridAxes)
+        v = gridAxes{i};
         % reshape into [nZ × nW × nC]
         G = reshape(Tsub.(v), [nZ, nW, nC]);
         S.(v) = interpn( ...
