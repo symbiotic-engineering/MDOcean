@@ -7,6 +7,8 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X
 
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location);
 
+   
+
 end
 
 
@@ -16,17 +18,16 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
     %combined()
 
     %[zeta, omega_n] = combined(X_u, phase_X_u, gamma_phase_f) don't use
-    %combined.m here
+    % combined.m here
 
     
     
     [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
-
-    %zeta
-    %omega_n
-
+    zeta
+    omega_n
     %zeta = 0.05;
     %omega_n = 0.4;
+
 
 end
 
@@ -67,87 +68,68 @@ function row = findNearestRow_dummy(zeta0, omega_n0, capCost0, T)
     % wec_capacity_out = interpn(zVals, wVals, cVals, wecGrid, zeta0, omega_n0, capCost0, 'linear');
     row = [zeta0, omega_n0, capCost0, co2_out, gridcost_out];
 end
-function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, T)
 
+function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
-    %check for holes in data
-    %{
-    mask = (T.power_lim == powerLim0) & (T.diameter == diameter0);
-    Tsub = T(mask, :);
+wecCost0
+
+    % use specificed power limit (fixme, add to interpolation later)
+    Tsub = T(T.power_lim == powerLim0, :);
     if isempty(Tsub)
-        error('No data for power_lim=%.1f & diameter=%.1f.', powerLim0, diameter0);
-    end
-    %}
-
-    % Extract grid vectors (replace with Tsub when hole code is working)
-    zVals = unique(T.zeta);
-    wVals = unique(T.omega_n);
-    cVals = unique(T.wec_cost);
-
-    % check for bounds
-    if zeta0 < min(zVals) || zeta0 > max(zVals)
-       disp(zeta0)
-        error('zeta inputs are out of range.');
-        
+        error('No data for power_lim = %g.', powerLim0);
     end
 
-    if   omega_n0 < min(wVals) || omega_n0 > max(wVals)
-        error('omega are out of range.');
+    % grid axes for interpolated values
+    zVals = unique(Tsub.zeta);
+    wVals = unique(Tsub.omega_n);
+    cVals = unique(Tsub.wec_cost);
+
+    % check variable bounds
+    if any([zeta0<min(zVals), zeta0>max(zVals), ...
+            omega_n0<min(wVals), omega_n0>max(wVals), ...
+            wecCost0<min(cVals), wecCost0>max(cVals)])
+        warning('Query outside data bounds.');
     end
 
-    if wecCost0 < min(cVals) || wecCost0 > max(cVals)
-        wecCost0
-        error('weccost out of range')
-
-    end
-
-    %sort arrays
-    T = sortrows(T, {'zeta','omega_n','wec_cost'});
+    % sort values
+    Tsub = sortrows(Tsub, {'zeta','omega_n','wec_cost'});
     nZ = numel(zVals);
     nW = numel(wVals);
     nC = numel(cVals);
 
-    % identify which columns to interpolate:
-    allNames = T.Properties.VariableNames;
-    gridAxes  = {'zeta','omega_n','wec_cost'};
-    fixedCols = {'power_lim','diameter'};
-    % Some columns are categorical or identifiers—exclude those
-    exclude = [gridAxes fixedCols {'electrification','carbon_constraint','year'}];
-    interpVars = setdiff(allNames, exclude, 'stable');
+    % interpolated values
+    varsAll   = Tsub.Properties.VariableNames;
+    gridAxes  = {'power_lim','zeta','omega_n','wec_cost'};
+    interpVars = setdiff(varsAll, gridAxes, 'stable');
 
-    % create arrays for results
-    results = struct();
-    % include the inputs in the output row
-    %results.power_lim = powerLim0;
-    %results.diameter  = diameter0;
-    results.zeta      = zeta0;
-    results.omega_n   = omega_n0;
-    results.wec_cost  = wecCost0;
+    % get interpolated values
+    S = struct( ...
+      'power_lim', powerLim0, ...
+      'zeta',      zeta0, ...
+      'omega_n',   omega_n0, ...
+      'wec_cost',  wecCost0);
 
     for i = 1:numel(interpVars)
-        var = interpVars{i};
-        % Reshape into [nZ × nW × nC]
-        grid3D = reshape(T.(var), [nZ, nW, nC]);
-        % Trilinear interpolation
-        results.(var) = interpn( ...
+        v = interpVars{i};
+        % reshape into [nZ × nW × nC]
+        G = reshape(Tsub.(v), [nZ, nW, nC]);
+        S.(v) = interpn( ...
             zVals, wVals, cVals, ...
-            grid3D, ...
+            G, ...
             zeta0, omega_n0, wecCost0, ...
             'linear' ...
         );
     end
 
-    % return row of lookup table results
-    row = struct2table(results);
-
-
-    % write own interpolator?
+    % return results
+    row = struct2table(S);
 end
+
 
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location)
 
-    dummy = readtable('dummy3.csv'); % this is just placeholder for now, replace with actual data
     data_V1 = readtable('scenario_outputs.csv');
+
     %{
     CEM_co2 = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, CO2_data,...
         zeta,omega_n,capacity_cost,power_limit);
@@ -155,17 +137,12 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         zeta,omega_n,capacity_cost,power_limit);
     %}
 
-    %CEM_co2 = interpn(dummy.zeta, dummy.omega_n, cap_cost_data, power_lim_data, CO2_data,...
-    %    zeta,omega_n,capacity_cost,power_limit);
-    %CEM_capacity = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, capacity_data,...
-    %    zeta,omega_n,capacity_cost,power_limit);
-
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
     
-    %CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, data_V1)
+    powerLim_dummy = 700.0 % fixme: add to simulation later on
 
-    %disp(CEM_data)
+    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, powerLim_dummy, data_V1);
 
     isValidLookupLocation = true;% placeholder
     
@@ -205,8 +182,9 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             
         else 
             % not in bounds of model
-            cheapest_cost_with_data
-            capacity_cost
+
+            %cheapest_cost_with_data
+            %capacity_cost
             error('WEC is too cheap, no CEM data here.')
         end
     else
