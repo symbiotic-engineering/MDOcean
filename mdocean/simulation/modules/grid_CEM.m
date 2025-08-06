@@ -23,6 +23,7 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
     
     
     [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
+
     zeta
     omega_n
     %zeta = 0.05;
@@ -71,8 +72,6 @@ end
 
 function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
-wecCost0
-
     % use specificed power limit (fixme, add to interpolation later)
     Tsub = T(T.power_lim == powerLim0, :);
     if isempty(Tsub)
@@ -98,9 +97,19 @@ wecCost0
     nC = numel(cVals);
 
     % interpolated values
-    varsAll   = Tsub.Properties.VariableNames;
-    gridAxes  = {'power_lim','zeta','omega_n','wec_cost'};
-    interpVars = setdiff(varsAll, gridAxes, 'stable');
+    %varsAll   = Tsub.Properties.VariableNames;
+    %gridAxes  = {'power_lim','zeta','omega_n','wec_cost'};
+    %interpVars = setdiff(varsAll, gridAxes, 'stable');
+    %interpVars = 
+
+
+    % 5a) Grab only the numeric variables
+    numTable   = Tsub(:, vartype('numeric'));  
+    numNames   = numTable.Properties.VariableNames;
+
+    % 5b) Exclude the three grid axes
+    gridAxes   = {'zeta','omega_n','wec_cost'};      
+    interpVars = setdiff(numNames, gridAxes, 'stable');
 
     % get interpolated values
     S = struct( ...
@@ -109,15 +118,15 @@ wecCost0
       'omega_n',   omega_n0, ...
       'wec_cost',  wecCost0);
 
-    for i = 1:numel(gridAxes)
-        v = gridAxes{i};
+    for i = 1:numel(interpVars)
+        v = interpVars{i};
         % reshape into [nZ × nW × nC]
         G = reshape(Tsub.(v), [nZ, nW, nC]);
         S.(v) = interpn( ...
             zVals, wVals, cVals, ...
             G, ...
             zeta0, omega_n0, wecCost0, ...
-            'linear' ...
+            'spline' ...
         );
     end
 
@@ -129,6 +138,7 @@ end
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location)
 
     data_V1 = readtable('scenario_outputs.csv');
+    data_V1.wec_cost( data_V1.wec_cost == 5000 ) = 15000; % fixme: this is just placeholder for testing
 
     %{
     CEM_co2 = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, CO2_data,...
@@ -142,7 +152,11 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
     
     powerLim_dummy = 700.0 % fixme: add to simulation later on
 
-    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, powerLim_dummy, data_V1);
+    zeta
+    omega_n
+    capacity_cost
+
+    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, powerLim_dummy, data_V1)
 
     isValidLookupLocation = true;% placeholder
     
@@ -150,9 +164,9 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         % fixme put real lookup table here
 
 
-        co2_slope = 2/3;
-        cost_slope = 1/3;
-        cap_slope = 2.5/3;
+        %co2_slope = 2/3;
+        %cost_slope = 1/3;
+        %cap_slope = 2.5/3;
 
 
         % placeholders
@@ -165,26 +179,33 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         % data
 
 
-
         if capacity_cost > cutin_capacity_cost
             % no WECs
             CEM_CO2 = no_wec_CO2;
             CEM_wec_capacity = 0;
             CEM_grid_cost = no_wec_grid_cost;
+
+
         elseif capacity_cost > cheapest_cost_with_data
+
+
             % some wecs, and in bounds of model
             capacity_cost_pct_incr = (capacity_cost - 725e3) / 725e3;
     
-            CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
-            CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
-            CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
+            %CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
+            %CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
+            %CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
+
+            CEM_CO2 = CEM_data.carbon;
+            CEM_wec_capacity = CEM_data.wave_capacity;
+            CEM_grid_cost = CEM_data.system_cost;
 
             
         else 
             % not in bounds of model
 
             %cheapest_cost_with_data
-            %capacity_cost
+            capacity_cost
             error('WEC is too cheap, no CEM data here.')
         end
     else
