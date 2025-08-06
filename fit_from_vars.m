@@ -12,10 +12,15 @@ use_db_for_plot = false;
 p = parameters();
 p.JPD(p.JPD==0) = 1;
 
-b = var_bounds();
-X = [b.X_noms; 1];
+%b = var_bounds();
+
+
+%X = [b.X_noms; 1];
+
+X = X_u;
 %[~, ~, ~, val] = simulation(X,p);
-w = 2*pi./p.T
+
+w = repmat(2*pi./p.T, size(X_u, 1), 1)
 
 
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
@@ -222,8 +227,8 @@ disp(fitPhaseResults)
 
 % output results given the gamma
 
-wave_height = max(fitResults.Hs,[],"all"); %fixme: hardcoded wave height for now - depend on location later
-
+%wave_height = fitResults.Hs == max(fitResults.Hs,[],"all"); %fixme: hardcoded wave height for now - depend on location later
+wave_height = fitResults.Hs == fitResults.Hs(lwb)
 
 zeta_output = fitResults.zeta(wave_height);
 omega_n_output = fitResults.omega_n(wave_height);
