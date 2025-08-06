@@ -163,9 +163,9 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
     
-    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, data_V1)
+    %CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, data_V1)
 
-    disp(CEM_data)
+    %disp(CEM_data)
 
     isValidLookupLocation = true;% placeholder
     
@@ -186,10 +186,6 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         no_wec_grid_cost = 2.889863123e9;
 
         % data
-        d_cutin_capacity_cost = 
-        d_cheapest_cost_with_data = 
-        d_no_wec_CO2 = 
-        d_no_wec_grid_cost = 
 
 
 
@@ -209,6 +205,8 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             
         else 
             % not in bounds of model
+            cheapest_cost_with_data
+            capacity_cost
             error('WEC is too cheap, no CEM data here.')
         end
     else
