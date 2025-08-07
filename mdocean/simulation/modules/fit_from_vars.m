@@ -168,10 +168,11 @@ for i = 1:nWaveHeights
                          log10(max(omega(:),[],'omitnan')), 500);
         mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_data_for_fit, mf.zeta, w_fit);
 
-        nexttile(1)
-        mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
-            'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
-            'HandleVisibility','off','LineWidth',1.5)
+
+        %nexttile(1)
+        %mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
+        %    'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
+        %    'HandleVisibility','off','LineWidth',1.5)
 
         ymin = 1e-7;
         if use_db_for_plot
