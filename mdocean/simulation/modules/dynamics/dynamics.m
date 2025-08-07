@@ -12,8 +12,8 @@ function [F_heave_storm, F_surge_storm, ...
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);
     zero_prob_idxs = in.JPD==0;
-    T(zero_prob_idxs) = NaN;
-    Hs(zero_prob_idxs) = NaN;
+%     T(zero_prob_idxs) = NaN;
+%     Hs(zero_prob_idxs) = NaN;
 
     if in.use_force_sat
         F_limit = in.F_max;
