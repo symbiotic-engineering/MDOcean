@@ -20,7 +20,7 @@ p.JPD(p.JPD==0) = 1;
 X = X_u;
 %[~, ~, ~, val] = simulation(X,p);
 
-w = repmat(2*pi./p.T, size(X_u, 1), 1)
+w = repmat(2*pi./p.T, size(X_u, 1), 1);
 
 
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
@@ -122,10 +122,10 @@ for i = 1:nWaveHeights
     omegas = omega(i,:);
     angles = angle_matrix(i,:)/pi;
     
-    red = (i-1)/(nWaveHeights-1);
-    green = 0;
-    blue = 1 - red;
-    col = [red green blue];
+%     red = (i-1)/(nWaveHeights-1);
+%     green = 0;
+%     blue = 1 - red;
+%     col = [red green blue];
     
     % PLOT MAGNITUDE DATA
     %nexttile(1)
@@ -162,7 +162,7 @@ for i = 1:nWaveHeights
         zeta_fit(i)    = mf.zeta;
         k_fit(i)       = mf.k * scale_mag_data_for_fit;
         
-        fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
+        %fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
 
         w_fit = logspace(log10(min(omega(:),[],'omitnan')), ...
                          log10(max(omega(:),[],'omitnan')), 500);
@@ -177,7 +177,7 @@ for i = 1:nWaveHeights
         if use_db_for_plot
             ymin = 20*log10(ymin);
         end
-        ylim([ymin max(mag_data_for_plot,[],'all')])
+        %ylim([ymin max(mag_data_for_plot,[],'all')])
 
     end
     
@@ -198,7 +198,7 @@ for i = 1:nWaveHeights
 
         end
         
-        fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
+        %fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
 
         phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
         %nexttile(2)
@@ -218,17 +218,17 @@ end
 fitResults = table(p.Hs(:), omega_n_fit, zeta_fit, k_fit, ...
                    'VariableNames',{'Hs','omega_n','zeta','k'});
 
-disp(fitResults)
+%disp(fitResults)
 
-fitPhaseResults = table(p.Hs(:), omega_n_fit_phase, zeta_fit_phase, k_fit_phase, ...
-                        'VariableNames',{'Hs','omega_n','zeta','k'});
-disp(fitPhaseResults)
+%fitPhaseResults = table(p.Hs(:), omega_n_fit_phase, zeta_fit_phase, k_fit_phase, ...
+%                        'VariableNames',{'Hs','omega_n','zeta','k'});
+%disp(fitPhaseResults)
 
 
 % output results given the gamma
 
 %wave_height = fitResults.Hs == max(fitResults.Hs,[],"all"); %fixme: hardcoded wave height for now - depend on location later
-wave_height = fitResults.Hs == fitResults.Hs(lwb)
+wave_height = fitResults.Hs == fitResults.Hs(lwb);
 
 zeta_output = fitResults.zeta(wave_height);
 omega_n_output = fitResults.omega_n(wave_height);
