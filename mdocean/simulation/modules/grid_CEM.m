@@ -202,12 +202,11 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             CEM_wec_capacity = 0;
             CEM_grid_cost = no_wec_grid_cost;
 
-
         elseif capacity_cost > cheapest_cost_with_data
 
 
             % some wecs, and in bounds of model
-            %capacity_cost_pct_incr = (capacity_cost - 725e3) / 725e3;
+            capacity_cost_pct_incr = (capacity_cost - 725) / 725;
     
             %CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
             %CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
