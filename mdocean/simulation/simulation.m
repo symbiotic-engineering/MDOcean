@@ -92,7 +92,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 
 
 [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, gamma_f_over_rho_g, capex/(in.N_WEC*in.P_max)*1000, in.location);
+                                                gamma_phase_f, gamma_f_over_rho_g, capex/(in.N_WEC*in.P_max)*1000, in.location, in.cem_data);
 
 
 % old code that doesn't normalize with the number of WECs

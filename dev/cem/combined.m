@@ -1,4 +1,5 @@
-
+clear all
+close all
 %% choose settings
 RAO = false;       % true uses X/eta, false uses X/F_f
 relative = false; % true uses X_u, false uses X_f

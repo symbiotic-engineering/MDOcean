@@ -162,7 +162,7 @@ for i = 1:nWaveHeights
         zeta_fit(i)    = mf.zeta;
         k_fit(i)       = mf.k * scale_mag_data_for_fit;
         
-        fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
+        %fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
 
         w_fit = logspace(log10(min(omega(:),[],'omitnan')), ...
                          log10(max(omega(:),[],'omitnan')), 500);
@@ -199,7 +199,7 @@ for i = 1:nWaveHeights
 
         end
         
-        fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
+        %fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
 
         %phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
         %nexttile(2)

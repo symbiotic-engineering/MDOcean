@@ -1,11 +1,11 @@
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location)
+                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location, CEM_data)
 % capacity cost is in $/kW = $k/MW
 
 
     [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, CEM_data);
 
 end
 
@@ -127,9 +127,10 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 end
 
 
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location)
+function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, CEM_data)
 
-    data_V1 = readtable('scenario_outputs.csv');
+    data_V1 = CEM_data;
+
     data_V1.wec_cost( data_V1.wec_cost == 5000 ) = 15000; % fixme: this is just placeholder for testing
 
     %{
@@ -192,7 +193,7 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             % not in bounds of model
 
             %cheapest_cost_with_data
-            capacity_cost
+            % capacity_cost
             error('WEC is too cheap, no CEM data here.')
         end
     else
