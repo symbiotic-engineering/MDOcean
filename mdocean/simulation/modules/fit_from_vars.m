@@ -168,7 +168,7 @@ for i = 1:nWaveHeights
                          log10(max(omega(:),[],'omitnan')), 500);
         mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_data_for_fit, mf.zeta, w_fit);
 
-        nexttile(1)
+        %nexttile(1)
         %mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
         %    'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
         %    'HandleVisibility','off','LineWidth',1.5)
@@ -203,9 +203,9 @@ for i = 1:nWaveHeights
         phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
         %nexttile(2)
 
-        semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
-            'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
-            'HandleVisibility','off','LineWidth',1.5)
+        %semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
+        %    'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
+        %    'HandleVisibility','off','LineWidth',1.5)
     end
 end
 
