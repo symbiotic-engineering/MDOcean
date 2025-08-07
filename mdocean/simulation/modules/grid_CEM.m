@@ -32,43 +32,7 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
 
 end
 
-function row = findNearestRow_dummy(zeta0, omega_n0, capCost0, T)
 
-    % sort vectors for queried values
-    T = sortrows(T, {'zeta','omega_n','capacity_cost'});
-    zVals = unique(T.zeta);
-    wVals = unique(T.omega_n);
-    cVals = unique(T.capacity_cost);
-
-    % Check input ranges
-    if zeta0 < min(zVals) || zeta0 > max(zVals)
-       disp(zeta0)
-        error('zeta inputs are out of range.');
-        
-    end
-
-    if   omega_n0 < min(wVals) || omega_n0 > max(wVals)
-        error('omega are out of range.');
-    end
-
-    if capCost0 < min(cVals) || capCost0 > max(cVals)
-        error('capCost out of range')
-
-    end
-
-    nZ = numel(zVals);
-    nW = numel(wVals);
-    nC = numel(cVals);
-
-    co2Grid      = reshape(T.co2capacity, [nZ, nW, nC]);
-    gridcostGrid = reshape(T.gridcost, [nZ, nW, nC]);
-
-    % interpolation
-    co2_out      = interpn(zVals, wVals, cVals, co2Grid,      zeta0, omega_n0, capCost0, 'linear');
-    gridcost_out = interpn(zVals, wVals, cVals, gridcostGrid, zeta0, omega_n0, capCost0, 'linear');
-    % wec_capacity_out = interpn(zVals, wVals, cVals, wecGrid, zeta0, omega_n0, capCost0, 'linear');
-    row = [zeta0, omega_n0, capCost0, co2_out, gridcost_out];
-end
 
 function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
@@ -133,22 +97,27 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
     % return results
     row = struct2table(S);
 
+    CEM_wec_capacity = row.wave_capacity;
 
+
+    %{
     if CEM_wec_capacity==0
        % if not viable, use margin to viability instead (how much cost
        % needs to decrease in order to be viable)
        idx_viable = Tsub.wave_capacity > 0;
+        
 
        capacity_viable = Tsub.wave_capacity(idx_viable);
        zeta_viable     = Tsub.zeta(idx_viable);
-       omega_viable    = Tsub.omega_n0(idx_viable);
-       cost_viable     = Tsub.wec_cost(idx_viable);
+       omega_viable    = Tsub.omega_n(idx_viable);
+       cost_viable     = Tsub.wec_cost(idx_viable); 
 
        costViabilityThresholdFcn = griddedInterpolant(zeta_viable, omega_viable, capacity_viable, cost_viable);
        wecCostThresholdViable = costViabilityThresholdFcn(zeta0, omega_n0, 0); %interpn(zVals, wVals, ThresholdViabilityData, zeta0, omega_n0);
        margin_to_viability = wecCost0 - wecCostThresholdViable;
        assert(margin_to_viability>0)
    end
+    %}
 end
 
 
