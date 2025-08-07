@@ -128,17 +128,17 @@ for i = 1:nWaveHeights
     col = [red green blue];
     
     % PLOT MAGNITUDE DATA
-    nexttile(1)
-    mag_plot_fn(omegas, mag_data_for_plot(i,:), '*--', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
-    ylabel(['Magnitude |' y_lab '|' y_add])
-    hold on
+    %nexttile(1)
+    %mag_plot_fn(omegas, mag_data_for_plot(i,:), '*--', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
+    %ylabel(['Magnitude |' y_lab '|' y_add])
+    %hold on
 
     % PLOT PHASE DATA
-    nexttile(2)
-    semilogx(omegas, angles, '*--', 'Color',col,'LineWidth',2.0)
-    xlabel('Frequency \omega (rad/s)')
-    ylabel(['Phase \angle(' y_lab ') / \pi'])
-    hold on
+    %nexttile(2)
+    %semilogx(omegas, angles, '*--', 'Color',col,'LineWidth',2.0)
+    %xlabel('Frequency \omega (rad/s)')
+    %ylabel(['Phase \angle(' y_lab ') / \pi'])
+    %hold on
     
     % remove high frequencies (lwb)
     mags_c   = mag_data_for_fit(i,lwb:end);
@@ -169,9 +169,9 @@ for i = 1:nWaveHeights
         mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_data_for_fit, mf.zeta, w_fit);
 
         nexttile(1)
-        mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
-            'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
-            'HandleVisibility','off','LineWidth',1.5)
+        %mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
+        %    'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
+        %    'HandleVisibility','off','LineWidth',1.5)
 
         ymin = 1e-7;
         if use_db_for_plot
@@ -201,7 +201,7 @@ for i = 1:nWaveHeights
         fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
 
         phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
-        nexttile(2)
+        %nexttile(2)
 
         semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
             'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
