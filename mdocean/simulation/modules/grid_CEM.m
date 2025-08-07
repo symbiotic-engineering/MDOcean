@@ -22,8 +22,7 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
     
     [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
 
-    %zeta
-    %omega_n
+
     %zeta = 0.05;
     %omega_n = 0.4;
 
@@ -95,9 +94,8 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
     % return results
     row = struct2table(S);
 
-    CEM_wec_capacity = row.wave_capacity;
+ %{
 
-    %{
     if row.wave_capacity==0
         % if not viable, use margin to viability instead (how much cost
         % needs to decrease in order to be viable)
@@ -122,8 +120,7 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
         margin_to_viability = wecCost0 - wecCostThresholdViable;
         assert(margin_to_viability>0)
     end
-    %}
-
+ %}
 end
 
 
