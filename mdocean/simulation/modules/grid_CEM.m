@@ -132,6 +132,23 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
     % return results
     row = struct2table(S);
+
+
+    if CEM_wec_capacity==0
+       % if not viable, use margin to viability instead (how much cost
+       % needs to decrease in order to be viable)
+       idx_viable = Tsub.wave_capacity > 0;
+
+       capacity_viable = Tsub.wave_capacity(idx_viable);
+       zeta_viable     = Tsub.zeta(idx_viable);
+       omega_viable    = Tsub.omega_n0(idx_viable);
+       cost_viable     = Tsub.wec_cost(idx_viable);
+
+       costViabilityThresholdFcn = griddedInterpolant(zeta_viable, omega_viable, capacity_viable, cost_viable);
+       wecCostThresholdViable = costViabilityThresholdFcn(zeta0, omega_n0, 0); %interpn(zVals, wVals, ThresholdViabilityData, zeta0, omega_n0);
+       margin_to_viability = wecCost0 - wecCostThresholdViable;
+       assert(margin_to_viability>0)
+   end
 end
 
 
