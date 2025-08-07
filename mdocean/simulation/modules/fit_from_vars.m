@@ -20,7 +20,7 @@ p.JPD(p.JPD==0) = 1;
 X = X_u;
 %[~, ~, ~, val] = simulation(X,p);
 
-w = repmat(2*pi./p.T, size(X_u, 1), 1)
+w = repmat(2*pi./p.T, size(X_u, 1), 1);
 
 
 wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
@@ -169,9 +169,9 @@ for i = 1:nWaveHeights
         mag_fit_vals = mag_fn_for_plot(mf.w_n, mf.k * scale_mag_data_for_fit, mf.zeta, w_fit);
 
         nexttile(1)
-        %mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
-        %    'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
-        %    'HandleVisibility','off','LineWidth',1.5)
+        mag_plot_fn(w_fit, mag_fit_vals,'-','Color',[col .5],...
+            'DisplayName',sprintf('H_s=%.2f',p.Hs(i)), ...
+            'HandleVisibility','off','LineWidth',1.5)
 
         ymin = 1e-7;
         if use_db_for_plot
@@ -200,12 +200,12 @@ for i = 1:nWaveHeights
         
         fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
 
-        phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
+        %phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
         %nexttile(2)
 
-        semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
-            'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
-            'HandleVisibility','off','LineWidth',1.5)
+        %semilogx(w_fit, phase_fit_vals,'-','Color',[col 0.5],...
+        %    'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
+        %    'HandleVisibility','off','LineWidth',1.5)
     end
 end
 
@@ -218,17 +218,17 @@ end
 fitResults = table(p.Hs(:), omega_n_fit, zeta_fit, k_fit, ...
                    'VariableNames',{'Hs','omega_n','zeta','k'});
 
-disp(fitResults)
+%disp(fitResults)
 
 fitPhaseResults = table(p.Hs(:), omega_n_fit_phase, zeta_fit_phase, k_fit_phase, ...
                         'VariableNames',{'Hs','omega_n','zeta','k'});
-disp(fitPhaseResults)
+%disp(fitPhaseResults)
 
 
 % output results given the gamma
 
 %wave_height = fitResults.Hs == max(fitResults.Hs,[],"all"); %fixme: hardcoded wave height for now - depend on location later
-wave_height = fitResults.Hs == fitResults.Hs(lwb)
+wave_height = fitResults.Hs == fitResults.Hs(lwb);
 
 zeta_output = fitResults.zeta(wave_height);
 omega_n_output = fitResults.omega_n(wave_height);
