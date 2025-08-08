@@ -92,7 +92,8 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 
 
 
-[CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
+[CEM_CO2, CEM_wec_capacity, ...
+ CEM_grid_cost, margin_to_viability] = grid_CEM(B_p, X_u, phase_X_u, ...
                                                 gamma_phase_f, gamma_f_over_rho_g, ...
                                                 capex/(in.N_WEC*in.P_max)*1000, power_lim_frac,...
                                                 in.location, in);
@@ -109,9 +110,13 @@ net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
 
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
-J_grid_cost = CEM_grid_cost / 1e9; % convert $ to $B
+if CEM_wec_capacity == 0
+    J_grid = margin_to_viability;
+else
+    J_grid = CEM_grid_cost / 1e9; % convert $ to $B
+end
 
-J = [LCOE, J_capex_design, J_grid_cost, net_eco_value];
+J = [LCOE, J_capex_design, J_grid, net_eco_value];
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD)+length(p.T_struct);

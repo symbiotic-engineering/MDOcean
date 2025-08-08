@@ -1,11 +1,11 @@
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
+function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost, margin_to_viability] = grid_CEM(B_p, X_u, phase_X_u, ...
                                                 gamma_phase_f, gamma_f_over_rho_g, capacity_cost, power_lim_frac, location, params)
 % capacity cost is in $/kW = $k/MW
 
 
     [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params);
 
 end
 
@@ -31,7 +31,7 @@ end
 
 
 
-function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
+function [row, margin_to_viability] = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
     % grid axes for interpolated values
     zVals = unique(T.zeta);
@@ -120,22 +120,27 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
     unviable = row.wave_capacity<=0;
     bad_extrap = any(row.Variables<0); % negative numbers meaningless
-    %{
+    
     if unviable || bad_extrap
         % if not viable, use margin to viability instead (how much cost
         % needs to decrease in order to be viable)
 
-        idx_viable = T.wave_capacity > 0;
+        
 
-        % scattered interpolant only takes 3D, so limit to nearest
+        % scattered interpolant only takes 3D, so limit to nearest zeta
+        nearest_zeta = interp1(zVals,zVals,zeta0,'nearest');
+        idx_nearest_zeta = T.zeta == nearest_zeta;
+        Tsub = T(idx_nearest_zeta,:);
 
-        capacity_viable = T.wave_capacity(idx_viable);
-        zeta_viable     = T.zeta(idx_viable);
-        omega_viable    = T.omega_n(idx_viable);
-        cost_viable     = T.wec_cost(idx_viable);
+        idx_viable = Tsub.wave_capacity > 0;
+
+        capacity_viable = Tsub.wave_capacity(idx_viable);
+        omega_viable    = Tsub.omega_n(idx_viable);
+        power_viable    = Tsub.power_lim(idx_viable);
+        cost_viable     = Tsub.wec_cost(idx_viable);
 
         try
-            costViabilityThresholdFcn = scatteredInterpolant(zeta_viable, omega_viable, capacity_viable, cost_viable);
+            costViabilityThresholdFcn = scatteredInterpolant(omega_viable, capacity_viable, power_viable, cost_viable);
         catch ME
             if (strcmp(ME.identifier,'MATLAB:griddedInterpolant:DegenerateGridErrId'))
                 msg = 'There is not enough CEM data with nonzero capacity.';
@@ -144,34 +149,29 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
             end
             rethrow(ME)
         end
-        wecCostThresholdViable = costViabilityThresholdFcn(zeta0, omega_n0, 0);
+        wecCostThresholdViable = costViabilityThresholdFcn(omega_n0, 0, powerLim0); % solve for 0 capacity point
         margin_to_viability = wecCost0 - wecCostThresholdViable;
         assert(margin_to_viability>0)
+    else
+        margin_to_viability = 0;
     end
-    %}
+    
 end
 
 
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params)
-
-    data_V1 = params.cem_data;
-
-    data_V1.wec_cost( data_V1.wec_cost == 5000 ) = 15000; % fixme: this is just placeholder for testing
-
-    %{
-    CEM_co2 = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, CO2_data,...
-        zeta,omega_n,capacity_cost,power_limit);
-    CEM_capacity = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, capacity_data,...
-        zeta,omega_n,capacity_cost,power_limit);
-    %}
+function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params)
 
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
 
-    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, power_lim_frac*1000, data_V1);
+    [CEM_data,margin_to_viability] = findNearestRow_interp(zeta, omega_n, capacity_cost, power_lim_frac*1000, params.cem_data);
 
-    isValidLookupLocation = true;% placeholder
+    CEM_CO2 = CEM_data.carbon;
+    CEM_wec_capacity = CEM_data.wave_capacity;
+    CEM_grid_cost = CEM_data.system_cost;
     
+    %{
+    isValidLookupLocation = true;% placeholder
     if (isValidLookupLocation)
         % fixme put real lookup table here
 
@@ -203,15 +203,10 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
             % some wecs, and in bounds of model
             capacity_cost_pct_incr = (capacity_cost - 725) / 725;
     
-            %CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
-            %CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
-            %CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
-
-            CEM_CO2 = CEM_data.carbon;
-            CEM_wec_capacity = CEM_data.wave_capacity;
-            CEM_grid_cost = CEM_data.system_cost;
-
-            
+            CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
+            CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
+            CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
+        
         else 
             % not in bounds of model
 
@@ -222,5 +217,6 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
     else
         error('CEM results not available for this zeta, w_n, and location')
     end
+    %}
 
 end
