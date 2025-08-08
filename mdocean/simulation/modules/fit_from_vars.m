@@ -1,4 +1,4 @@
-function [zeta_output, omega_n_output] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f)
+function [zeta_output, omega_n_output] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params)
 
 %% choose settings
 RAO = false;       % true uses X/eta, false uses X/F_f
@@ -9,7 +9,7 @@ use_db_for_fit = true;
 use_db_for_plot = false;
 
 %% define data
-p = parameters();
+p = params;
 p.JPD(p.JPD==0) = 1;
 
 %b = var_bounds();
@@ -183,6 +183,7 @@ for i = 1:nWaveHeights
     end
     
 
+    %{
     % fit phases, get fit params
     if numel(ang_c) > tol
         if phase_uses_mag_fit
@@ -208,6 +209,7 @@ for i = 1:nWaveHeights
         %    'DisplayName',sprintf('\\zeta=%.3f',pf.zeta),...
         %    'HandleVisibility','off','LineWidth',1.5)
     end
+    %}
 end
 
 

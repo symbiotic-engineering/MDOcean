@@ -1,16 +1,16 @@
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location, CEM_data)
+                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location, params)
 % capacity cost is in $/kW = $k/MW
 
 
-    [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
+    [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, CEM_data);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, params);
 
 end
 
 
-function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f)
+function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params)
     % fixme put real fit here
 
     %combined()
@@ -20,7 +20,7 @@ function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho
 
     
     
-    [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f);
+    [zeta, omega_n] = fit_from_vars(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params);
 
 
     %zeta = 0.05;
@@ -124,9 +124,9 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 end
 
 
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, CEM_data)
+function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, params)
 
-    data_V1 = CEM_data;
+    data_V1 = params.cem_data;
 
     data_V1.wec_cost( data_V1.wec_cost == 5000 ) = 15000; % fixme: this is just placeholder for testing
 
