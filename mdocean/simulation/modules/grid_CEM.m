@@ -48,7 +48,7 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
     if any([zeta0<min(zVals), zeta0>max(zVals), ...
             omega_n0<min(wVals), omega_n0>max(wVals), ...
             wecCost0<min(cVals), wecCost0>max(cVals)])
-        warning('Query outside data bounds, with values %.1, %,2, %.3', zeta0, omega_n0, wecCost0);
+        fprintf('Query outside data bounds, with values %.3f, %.3f, %.3f', zeta0, omega_n0, wecCost0);
     end
 
     % sort values
@@ -143,7 +143,7 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
     
-    powerLim_dummy = 700.0; % fixme: add to simulation later on
+    powerLim_dummy = 400.0; % fixme: add to simulation later on
 
     CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, powerLim_dummy, data_V1);
 
