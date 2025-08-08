@@ -1,11 +1,11 @@
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost, margin_to_viability] = grid_CEM(B_p, X_u, phase_X_u, ...
+function [delta_CEM_CO2, CEM_wec_capacity, delta_CEM_grid_cost, margin_to_viability] = grid_CEM(B_p, X_u, phase_X_u, ...
                                                 gamma_phase_f, gamma_f_over_rho_g, capacity_cost, power_lim_frac, location, params)
 % capacity cost is in $/kW = $k/MW
 
 
     [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params);
+    [delta_CEM_CO2, CEM_wec_capacity, delta_CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params);
 
 end
 
@@ -128,7 +128,7 @@ function [row, margin_to_viability] = findNearestRow_interp(zeta0, omega_n0, wec
         
 
         % scattered interpolant only takes 3D, so limit to nearest zeta
-        nearest_zeta = interp1(zVals,zVals,zeta0,'nearest');
+        nearest_zeta = interp1(zVals,zVals,zeta0,'nearest','extrap');
         idx_nearest_zeta = T.zeta == nearest_zeta;
         Tsub = T(idx_nearest_zeta,:);
 
@@ -159,16 +159,23 @@ function [row, margin_to_viability] = findNearestRow_interp(zeta0, omega_n0, wec
 end
 
 
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params)
+function [delta_CEM_CO2, CEM_wec_capacity, delta_CEM_grid_cost,margin_to_viability] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params)
 
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
 
-    [CEM_data,margin_to_viability] = findNearestRow_interp(zeta, omega_n, capacity_cost, power_lim_frac*1000, params.cem_data);
+    [CEM_interped,margin_to_viability] = findNearestRow_interp(zeta, omega_n, capacity_cost, power_lim_frac*1000, params.cem_data);
 
-    CEM_CO2 = CEM_data.carbon;
-    CEM_wec_capacity = CEM_data.wave_capacity;
-    CEM_grid_cost = CEM_data.system_cost;
+    CEM_CO2 = CEM_interped.carbon;
+    CEM_wec_capacity = CEM_interped.wave_capacity;
+    CEM_grid_cost = CEM_interped.system_cost;
+
+    idx_no_wave = find(params.cem_data.wave_capacity==0,1);
+    CEM_grid_cost_no_wave = params.cem_data.system_cost(idx_no_wave);
+    CEM_CO2_no_wave = params.cem_data.carbon(idx_no_wave);
+
+    delta_CEM_grid_cost = CEM_grid_cost_no_wave - CEM_grid_cost;
+    delta_CEM_CO2 = CEM_CO2_no_wave - CEM_CO2;
     
     %{
     isValidLookupLocation = true;% placeholder
