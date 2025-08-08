@@ -1,11 +1,11 @@
 function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, location, params)
+                                                gamma_phase_f, gamma_f_over_rho_g, capacity_cost, power_lim_frac, location, params)
 % capacity cost is in $/kW = $k/MW
 
 
     [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_f_over_rho_g, gamma_phase_f, params);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, params);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params);
 
 end
 
@@ -33,29 +33,29 @@ end
 
 function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
-    % use specificed power limit (fixme, add to interpolation later)
-    Tsub = T(T.power_lim == powerLim0, :);
-    if isempty(Tsub)
-        error('No data for power_lim = %g.', powerLim0);
-    end
-
     % grid axes for interpolated values
-    zVals = unique(Tsub.zeta);
-    wVals = unique(Tsub.omega_n);
-    cVals = unique(Tsub.wec_cost);
+    zVals = unique(T.zeta);
+    wVals = unique(T.omega_n);
+    cVals = unique(T.wec_cost);
+    pVals = unique(T.power_lim);
 
     % check variable bounds
     if any([zeta0<min(zVals), zeta0>max(zVals), ...
             omega_n0<min(wVals), omega_n0>max(wVals), ...
-            wecCost0<min(cVals), wecCost0>max(cVals)])
-        fprintf('Query outside data bounds, with values zeta=%.3f, omega_n=%.3f, cost=%.3f\n', zeta0, omega_n0, wecCost0);
+            wecCost0<min(cVals), wecCost0>max(cVals),...
+            powerLim0<min(pVals), powerLim0>max(pVals)])
+        fprintf(['Query outside data bounds, with values ' ...
+            'zeta=%.3f, omega_n=%.3f, cost=%.3f, power lim=%.3f\n'], ...
+            zeta0, omega_n0, wecCost0, powerLim0);
     end
 
     % sort values
-    Tsub = sortrows(Tsub, {'zeta','omega_n','wec_cost'});
+    gridAxes   = {'zeta','omega_n','wec_cost','power_lim'};
+    T = sortrows(T, gridAxes);
     nZ = numel(zVals);
     nW = numel(wVals);
     nC = numel(cVals);
+    nP = numel(pVals);
 
     % interpolated values
     %varsAll   = Tsub.Properties.VariableNames;
@@ -65,11 +65,10 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 
 
     % 5a) Grab only the numeric variables
-    numTable   = Tsub(:, vartype('numeric'));  
+    numTable   = T(:, vartype('numeric'));  
     numNames   = numTable.Properties.VariableNames;
 
     % 5b) Exclude the three grid axes
-    gridAxes   = {'zeta','omega_n','wec_cost'};      
     interpVars = setdiff(numNames, gridAxes, 'stable');
 
     % get interpolated values
@@ -79,42 +78,64 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
       'omega_n',   omega_n0, ...
       'wec_cost',  wecCost0);
 
-    idx_not_nan = ~isnan(Tsub.wave_capacity);
+    idx_not_nan = ~isnan(T.wave_capacity);
 
     for i = 1:numel(interpVars)
         v = interpVars{i};
         % reshape into [nZ × nW × nC]
-%         G = reshape(Tsub.(v), [nZ, nW, nC]);
+        % this method cannot extrapolate, any dimension number ok, requires
+        % full grid.
+        G = reshape(T.(v), [nZ, nW, nC, nP]);
 %         S.(v) = interpn( ...
 %             zVals, wVals, cVals, ...
 %             G, ...
 %             zeta0, omega_n0, wecCost0, ...
 %             'spline' ...
 %         );
-        interpFcn = scatteredInterpolant(Tsub.zeta(idx_not_nan), ...
-                                        Tsub.omega_n(idx_not_nan), ...
-                                        Tsub.wec_cost(idx_not_nan), ...
-                                        Tsub.(v)(idx_not_nan));
-        S.(v) = interpFcn(zeta0, omega_n0, wecCost0);
+
+% this method is good for when there are nans, so not a full grid. can extrapolate.
+% but can only handle 3 input dimensions (so not power limit)
+%         interpFcn = scatteredInterpolant(T.zeta(idx_not_nan), ...
+%                                         T.omega_n(idx_not_nan), ...
+%                                         T.wec_cost(idx_not_nan), ...
+%                                         T.(v)(idx_not_nan));
+%         S.(v) = interpFcn(zeta0, omega_n0, wecCost0);
+
+% this method requires a full grid and can extrapolate. any dimensions # ok.
+% janky assumption: nans are zero wec capacity
+        G_zero_capacity = G(T.wave_capacity==0);
+        G_filled_nan = G;
+        G_filled_nan(isnan(G)) = G_zero_capacity(1);
+        interpFcn = griddedInterpolant({zVals, ...
+                                       wVals, ...
+                                       cVals, ...
+                                       pVals}, ...
+                                       G_filled_nan);
+        S.(v) = interpFcn(zeta0, omega_n0, wecCost0, powerLim0);
 
     end
 
     % return results
     row = struct2table(S);
 
-    if row.wave_capacity<=0
+    unviable = row.wave_capacity<=0;
+    bad_extrap = any(row.Variables<0); % negative numbers meaningless
+    %{
+    if unviable || bad_extrap
         % if not viable, use margin to viability instead (how much cost
         % needs to decrease in order to be viable)
 
-        idx_viable = Tsub.wave_capacity > 0;
+        idx_viable = T.wave_capacity > 0;
 
-        capacity_viable = Tsub.wave_capacity(idx_viable);
-        zeta_viable     = Tsub.zeta(idx_viable);
-        omega_viable    = Tsub.omega_n(idx_viable);
-        cost_viable     = Tsub.wec_cost(idx_viable);
+        % scattered interpolant only takes 3D, so limit to nearest
+
+        capacity_viable = T.wave_capacity(idx_viable);
+        zeta_viable     = T.zeta(idx_viable);
+        omega_viable    = T.omega_n(idx_viable);
+        cost_viable     = T.wec_cost(idx_viable);
 
         try
-            costViabilityThresholdFcn = griddedInterpolant(zeta_viable, omega_viable, capacity_viable, cost_viable);
+            costViabilityThresholdFcn = scatteredInterpolant(zeta_viable, omega_viable, capacity_viable, cost_viable);
         catch ME
             if (strcmp(ME.identifier,'MATLAB:griddedInterpolant:DegenerateGridErrId'))
                 msg = 'There is not enough CEM data with nonzero capacity.';
@@ -127,11 +148,11 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
         margin_to_viability = wecCost0 - wecCostThresholdViable;
         assert(margin_to_viability>0)
     end
- 
+    %}
 end
 
 
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location, params)
+function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, power_lim_frac, B_p, location, params)
 
     data_V1 = params.cem_data;
 
@@ -146,10 +167,8 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
 
     
     %if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
-    
-    powerLim_dummy = 400.0; % fixme: add to simulation later on
 
-    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, powerLim_dummy, data_V1);
+    CEM_data = findNearestRow_interp(zeta, omega_n, capacity_cost, power_lim_frac*1000, data_V1);
 
     isValidLookupLocation = true;% placeholder
     
