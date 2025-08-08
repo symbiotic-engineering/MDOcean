@@ -48,7 +48,7 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
     if any([zeta0<min(zVals), zeta0>max(zVals), ...
             omega_n0<min(wVals), omega_n0>max(wVals), ...
             wecCost0<min(cVals), wecCost0>max(cVals)])
-        fprintf('Query outside data bounds, with values %.3f, %.3f, %.3f', zeta0, omega_n0, wecCost0);
+        fprintf('Query outside data bounds, with values zeta=%.3f, omega_n=%.3f, cost=%.3f\n', zeta0, omega_n0, wecCost0);
     end
 
     % sort values
@@ -79,6 +79,8 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
       'omega_n',   omega_n0, ...
       'wec_cost',  wecCost0);
 
+    idx_not_nan = ~isnan(Tsub.wave_capacity);
+
     for i = 1:numel(interpVars)
         v = interpVars{i};
         % reshape into [nZ × nW × nC]
@@ -89,7 +91,10 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
 %             zeta0, omega_n0, wecCost0, ...
 %             'spline' ...
 %         );
-        interpFcn = scatteredInterpolant(Tsub.zeta, Tsub.omega_n, Tsub.wec_cost, Tsub.(v));
+        interpFcn = scatteredInterpolant(Tsub.zeta(idx_not_nan), ...
+                                        Tsub.omega_n(idx_not_nan), ...
+                                        Tsub.wec_cost(idx_not_nan), ...
+                                        Tsub.(v)(idx_not_nan));
         S.(v) = interpFcn(zeta0, omega_n0, wecCost0);
 
     end
@@ -97,11 +102,10 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
     % return results
     row = struct2table(S);
 
- %{
-
-    if row.wave_capacity==0
+    if row.wave_capacity<=0
         % if not viable, use margin to viability instead (how much cost
         % needs to decrease in order to be viable)
+
         idx_viable = Tsub.wave_capacity > 0;
 
         capacity_viable = Tsub.wave_capacity(idx_viable);
@@ -123,7 +127,7 @@ function row = findNearestRow_interp(zeta0, omega_n0, wecCost0, powerLim0, T)
         margin_to_viability = wecCost0 - wecCostThresholdViable;
         assert(margin_to_viability>0)
     end
- %}
+ 
 end
 
 
