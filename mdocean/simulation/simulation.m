@@ -106,8 +106,9 @@ net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
 
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
+J_grid_cost = CEM_grid_cost / 1e9; % convert $ to $B
 
-J = [LCOE, J_capex_design, CEM_grid_cost, net_eco_value];
+J = [LCOE, J_capex_design, J_grid_cost, net_eco_value];
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD)+length(p.T_struct);
