@@ -216,7 +216,7 @@ T = [T;
         "grid",false,"location of grid data to use",{''});
     
     % fixme
-    table("cem_data","CEM_data",{readtable("mdocean/simulation/modules/scenario_outputs.csv")},"grid",...
+    table("cem_data","CEM_data",{readtable("mdocean/inputs/scenario_outputs_2.csv")},"grid",...
         false,"read CEM data",{''});
 
     ];
