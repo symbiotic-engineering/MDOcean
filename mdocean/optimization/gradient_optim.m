@@ -22,10 +22,12 @@ else
 end
 
 if nargin<4
-    which_objs = [1 2]; % run both objectives by default
+    which_objs = [3]; % run both objectives by default
     % 1 = min LCOE
     % 2 = min design-dependent capex cost, subject to power above threshold
-    % 3 = max average power
+    % 3 = grid cost
+    % 4 = net eco value
+    % 5 = max average power
 end
 
 % create optimization variables for each of the design variables
@@ -73,12 +75,13 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
     num_constraints = length(b.constraint_names);
     num_objectives = length(which_objs);
 
-    [J1, J2, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, num_constraints]},...
+
+    [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
+                                            'OutputSize',{[1,length(b.obj_names)],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
-    objs = [J1 J2];
-    probs = cell([1 2]); 
+    probs = cell([1 length(objs)]); 
+
     
     % allocate outputs
     Xs_opt = zeros(length(X),num_objectives);
@@ -132,7 +135,9 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-        [out(1),out(2),~,~,val] = simulation(X_opt,p);          % rerun sim
+
+        [out,~,~,val] = simulation(X_opt,p);          % rerun sim
+
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
@@ -161,7 +166,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         objs_opt
         flags
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
-                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound','Nom'})
+                'VariableNames',[strcat("Min ", b.obj_names(which_objs)) , {'Min bound','Max bound','Nom'}])
     end
 
 end
