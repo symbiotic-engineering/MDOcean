@@ -1,27 +1,13 @@
 API
 ===
 
-.. 
-    .. autosummary::
-    :toctree: generated
+- :mod:`inputs`
+- :mod:`optimization`
+- :mod:`plots`
+- :mod:`simulation`
 
-.. automodule:: inputs
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
-.. automodule:: optimization
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. toctree::
+    :hidden:
 
-.. automodule:: plots
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: simulation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+    api_generate
