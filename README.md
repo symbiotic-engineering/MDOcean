@@ -54,6 +54,9 @@ if you want to run single objective optimization for each of the two objectives.
 
 If you are running individual scipts/functions, you will need to `cd` to the `mdocean` folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via `run_tests.m`.
 
+**Documentation**
+Documentation for the function API for this code is in progress at [this Sphinx site](https://symbiotic-engineering.github.io/MDOcean/).
+
 **Dependencies**
 
 The following packages are used in this code:
