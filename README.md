@@ -17,7 +17,7 @@ For 210 sea states, the model takes 39 ms to run, which is around a 5 order of m
 
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025.
+Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1oTIAkMHWSenGTaAQfc8pr4rRl3oylaKt/view?usp=sharing).
 
 Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
@@ -53,6 +53,9 @@ if you want to run single objective optimization for each of the two objectives.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
 
 If you are running individual scipts/functions, you will need to `cd` to the `mdocean` folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via `run_tests.m`.
+
+**Documentation**
+Documentation for the function API for this code is in progress at [this Sphinx site](https://symbiotic-engineering.github.io/MDOcean/).
 
 **Dependencies**
 
