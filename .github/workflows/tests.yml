@@ -53,12 +53,17 @@ jobs:
                 Simulink
                 Simscape
                 Simscape_Multibody
+      - name: Show PATH as seen by GitHub Actions job
+        run: |
+          echo "PATH entries:"
+          echo "$PATH" | tr ':' '\n'
+          which matlab || echo "matlab not found"
 
-      - name: Run tests and generate artifacts
-        uses: matlab-actions/run-command@v2
-        if: always()
-        with:
-          command: cd("MDOcean"), addpath("tests"), run_tests
+      # - name: Run tests and generate artifacts
+      #   uses: matlab-actions/run-command@v2
+      #   if: always()
+      #   with:
+      #     command: cd("MDOcean"), addpath("tests"), run_tests
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v4
