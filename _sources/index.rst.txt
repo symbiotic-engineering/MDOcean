@@ -56,19 +56,22 @@ If you are running individual scipts/functions, you will need to `cd` to the `md
 **Dependencies**
 
 The following packages are used in this code:
-| Package | Required? |
-| ---    | ---      |
-| MATLAB | Required for simulation |
-| Statistics and Machine Learning Toolbox | Required for simulation |
-| Optimization Toolbox | Required for optimization |
-| Global Optimization Toolbox | Required for optimization |
-| Symbolic Math Toolbox | Optional for simulation code generation |
-| Parallel Computing Toolbox | Optional for speedup |
-| MATLAB Report Generator | Optional for WEC-Sim validation |
-| Simulink | Optional for WEC-Sim validation | 
-| Simscape | Optional for WEC-Sim validation | 
-| Simscape Multibody | Optional for WEC-Sim validation |
-| [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
+
+================================================  ===================================
+Package                                           Required?
+================================================  ===================================
+MATLAB                                            Required for simulation
+Statistics and Machine Learning Toolbox           Required for simulation
+Optimization Toolbox                              Required for optimization
+Global Optimization Toolbox                       Required for optimization
+Symbolic Math Toolbox                             Optional for simulation code generation
+Parallel Computing Toolbox                        Optional for speedup
+MATLAB Report Generator                           Optional for WEC-Sim validation
+Simulink                                          Optional for WEC-Sim validation
+Simscape                                          Optional for WEC-Sim validation
+Simscape Multibody                                Optional for WEC-Sim validation
+`WEC-Sim <https://github.com/WEC-Sim/WEC-Sim/>`_  Optional for WEC-Sim validation
+================================================  ===================================
 
 The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
 
