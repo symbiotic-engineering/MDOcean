@@ -96,3 +96,4 @@ necessarily reflect the views of the National Science Foundation.
 
 .. toctree::
    api
+   modification
