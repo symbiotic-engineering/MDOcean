@@ -58,17 +58,11 @@ jobs:
         if: runner.os == 'Linux' && runner.name == 'lab-computer-becca'
         run: echo "/usr/local/bin" >> $GITHUB_PATH
 
-      - name: Show PATH as seen by GitHub Actions job
-        run: |
-          echo "PATH entries:"
-          echo "$PATH" | tr ':' '\n'
-          which matlab || echo "matlab not found"
-
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-command@v2
         if: always()
         with:
-          command: cd("MDOcean"), disp('matlab runs') #addpath("tests"), run_tests
+          command: cd("MDOcean"), addpath("tests"), run_tests
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v4
