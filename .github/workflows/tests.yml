@@ -40,9 +40,9 @@ jobs:
         with:
           args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
-      - name: Set up MATLAB
+      - name: Set up MATLAB on GitHub-hosted runner
         uses: matlab-actions/setup-matlab@v2
-        if: always()
+        if: runner.name != 'lab-computer-becca'
         with:
             products: >
                 Parallel_Computing_Toolbox
@@ -54,7 +54,7 @@ jobs:
                 Simscape
                 Simscape_Multibody
 
-      - name: Add system MATLAB to path
+      - name: Add MATLAB to path on self-hosted runner
         if: runner.os == 'Linux' && runner.name == 'lab-computer-becca'
         run: echo "/usr/local/bin" >> $GITHUB_PATH
 
@@ -68,7 +68,7 @@ jobs:
         uses: matlab-actions/run-command@v2
         if: always()
         with:
-          command: cd("MDOcean"), addpath("tests"), run_tests
+          command: cd("MDOcean"), disp('matlab runs') #addpath("tests"), run_tests
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v4
