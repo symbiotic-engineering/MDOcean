@@ -25,7 +25,9 @@ addpath(genpath(sourceCodeFolder))
 if exist('../WEC-Sim','dir')    
     wecSimFolder = '../WEC-Sim/source';
     disp('before set param')
-    set_param(0, 'ErrorIfLoadNewModel', 'off')
+    if isMATLABReleaseOlderThan("R2025a")
+        set_param(0, 'ErrorIfLoadNewModel', 'off')
+    end
     disp('after set param')
     addpath(genpath(wecSimFolder))
     rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
