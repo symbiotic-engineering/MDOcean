@@ -1,3 +1,5 @@
+disp('first line of run_tests')
+
 import matlab.unittest.plugins.CodeCoveragePlugin
 import matlab.unittest.plugins.codecoverage.CoverageReport
 import matlab.unittest.TestRunner;
@@ -9,7 +11,11 @@ import matlab.unittest.plugins.LoggingPlugin
 import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
 
+disp('after import of run_tests')
+
 load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+
+disp('after load_sl_glibc_patch of run_tests')
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
@@ -23,6 +29,8 @@ end
 
 suite = testsuite('tests');
 runner = testrunner('textoutput');
+
+disp('after runner creation in run_tests')
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 cov_dir = ['code-coverage/' date];
@@ -51,6 +59,7 @@ runner.addPlugin(p5);
 
 runner.ArtifactsRootFolder = test_dir;
 
+disp('right before runner.run in run_tests')
 t = tic;
 results = runner.run(suite);    % parallel would make it slower because it 
                                 % would run the test class setup on every worker
