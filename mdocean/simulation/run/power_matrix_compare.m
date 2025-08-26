@@ -212,12 +212,12 @@ function results = compute_mdocean_results(X,p)
     X_unsat = X;
     idx_P = 7;
     X_unsat(idx_P) = 1e9;
-    [~, ~, P_matrix, ~, val] = simulation(X_unsat,p);
+    [~, P_matrix, ~, val] = simulation(X_unsat,p);
     power_elec_unsat = P_matrix/1000;
     power_mech_unsat = val.P_mech/1000;
     
     % saturated power
-    [~, ~, P_matrix] = simulation(X,p);
+    [~, P_matrix] = simulation(X,p);
     power_elec_sat = P_matrix/1000;
 
     results = assemble_results_struct(size(power_mech_unsat),...

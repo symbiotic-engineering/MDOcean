@@ -17,7 +17,7 @@ end
 [X_opt,~,flag] = gradient_optim(x0,p_mod,b,1); 
 
 % plug back into unmodified simulation with regular params to get average power
-[~, ~, ~, ~, val] = simulation(X_opt,p);
+[~, ~, ~, val] = simulation(X_opt,p);
 
 % since some DVs don't affect power, they are undetermined and we need
 % another optimization to minimize cost while maintaining the same power
@@ -27,6 +27,6 @@ x0_2 = cell2struct(num2cell(X_opt(1:end-1)),b.var_names(1:end-1)',1);
 [X_opt_2,~,flag_2] = gradient_optim(x0_2,p_mod_2,b,2); 
 
 % plug back into unmodified simulation with regular params to get val
-[~, ~, P_elec_2, ~, val_2] = simulation(X_opt_2,p);
+[~, P_elec_2, ~, val_2] = simulation(X_opt_2,p);
 
 end
