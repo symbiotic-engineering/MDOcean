@@ -20,7 +20,7 @@ function [g_out, g_eq] = constrFunc(F_max_in,p,b)
     idx_F = strcmp(b.var_names,'F_max');
     X(idx_F) = F_max_in;
 
-    [~, ~, ~, g] = simulation(X, p);
+    [~, ~, g] = simulation(X, p);
     idx_F_constr = strcmp(b.constraint_names,'irrelevant_max_force');
     g_out = -g(idx_F_constr);
     g_eq = [];

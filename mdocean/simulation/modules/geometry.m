@@ -1,7 +1,7 @@
 function [V_d, m_m, m_f_tot, m_s_tot,...
          A_c, A_lat_sub, ...
          I, T, V_f_pct, V_s_pct, GM,...
-         A_dt, L_dt, mass,...
+         A_dt, L_dt, A_hull, mass,...
          CB_f_from_waterline,CG_f_from_waterline] = geometry(D_s, D_f, D_f_in, D_f_b, ...
                                             T_f_1, T_f_2, h_f, h_s, h_fs_clear, D_f_tu, ...
                                             t_f_t, t_f_r, t_f_c, t_f_b, t_f_tu, t_s_r, t_d_tu, ...
@@ -65,14 +65,26 @@ A_f_cross_bot = pi * (D_f_in)       * t_f_r + num_gussets * t_f_c * (D_f_mean - 
 A_f_l = num_gussets_loaded_lateral * t_f_c * T_f_2;
 
 % float material volume and mass - see drawings on p168-169 of notebook 11/26/24
-V_top_plate = pi * ( (D_f/2)^2 - (D_f_in/2)^2 ) * t_f_t;
-V_bot_plate = pi * (D_f_b/2)^2 * t_f_b;
-slant_height = sqrt((D_f/2 - D_f_b/2)^2 + (T_f_2 - T_f_1)^2); 
-V_bot_slant = pi/2 * (D_f + D_f_b) * slant_height * t_f_b;       % lateral area of frustum
-V_outer_rim = pi * D_f * t_f_r * (h_f - (T_f_2 - T_f_1));
-V_inner_rim = pi * D_f_in * t_f_t * h_f;
+A_top_plate = pi * ( (D_f/2)^2   - (D_f_in/2)^2 );
+V_top_plate = A_top_plate * t_f_t;
+
+A_bot_plate = pi * ( (D_f_b/2)^2 - (D_f_in/2)^2 );
+V_bot_plate = A_bot_plate * t_f_b;
+
+slant_height = sqrt((D_f/2 - D_f_b/2)^2 + (T_f_2 - T_f_1)^2);
+A_bot_slant = pi/2 * (D_f + D_f_b) * slant_height; % lateral area of frustum
+V_bot_slant = A_bot_slant * t_f_b; 
+
+A_outer_rim = pi * D_f * (h_f - (T_f_2 - T_f_1));
+V_outer_rim = A_outer_rim * t_f_r ;
+
+A_inner_rim = pi * D_f_in * h_f;
+V_inner_rim = A_inner_rim * t_f_t;
+
 A_gusset = (h_f - (T_f_2 - T_f_1)) * (D_f - D_f_in)/2 + (T_f_2 - T_f_1) * (D_f_mean - D_f_in)/2;
 V_gussets = num_gussets * A_gusset * t_f_c;
+
+A_hull = A_top_plate + A_bot_plate + A_bot_slant + A_outer_rim + A_inner_rim;
 
 % float support tubes for attaching PTO
 num_float_tubes = 6;

@@ -160,8 +160,8 @@ b.lin_constraint_names = {'spar_natural_freq','float_spar_diam','float_spar_draf
 b.lin_constraint_names_pretty = remove_underscores(b.lin_constraint_names);
 
 % objectives
-b.obj_names = {'LCOE','capex_design'};
-b.obj_names_pretty = {'LCOE','C_{design}'};
+b.obj_names = {'LCOE','capex_design','grid_cost','net_eco_value'};
+b.obj_names_pretty = {'LCOE','C_{design}','C_{grid}','NEV'};
 
 % indices
 [~,idxs_sort] = sort(b.var_names(1:end-1)); % alphabetical design variable indices
@@ -174,7 +174,12 @@ b.idxs_recover = idxs_recover;
 b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
 
 % calibrations of nominal values
-b.F_max_nom = find_nominal_inputs(b, parameters(mode));
+
+% FIXME: reminder to uncomment after debugging
+b.F_max_nom = 6.7731; %find_nominal_inputs(b, parameters(mode));
+
+%b.F_max_nom = find_nominal_inputs(b, parameters(mode));
+
 b.X_noms(strcmp(b.var_names,'F_max')) = b.F_max_nom;
 
 % balanced design

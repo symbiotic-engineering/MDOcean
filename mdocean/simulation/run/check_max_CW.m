@@ -13,7 +13,7 @@ function [hydro_ratio, P_wave, CW_max, ...
     
         [X,val,~,P_elec] = max_avg_power(p,b);    
     else
-        [~,~,P_elec,~,val] = simulation(X, p);
+        [~,P_elec,~,val] = simulation(X, p);
     end
     if nargin<5
         plot_on = true;
@@ -23,16 +23,13 @@ function [hydro_ratio, P_wave, CW_max, ...
     P_mech_unsat =  P_mech ./ force_sat_ratio;
     eff = P_elec ./ P_mech;
 
-    % solution with no force saturation
-    X_unsat = X;
-    idx_F = strcmp(b.var_names,'F_max');
-    X_unsat(idx_F) = Inf;
-
-    % solution with no force sat and no drag
-    p_no_drag = p;
-    p_no_drag.C_d_float = 0;
-    p_no_drag.C_d_spar  = 0;
-    [~,~,~,~,val_no_drag] = simulation(X_unsat, p_no_drag);
+    % solution with no force sat, power sat, or drag
+    p_no_drag_no_sat = p;
+    p_no_drag_no_sat.C_d_float = 0;
+    p_no_drag_no_sat.C_d_spar  = 0;
+    p_no_drag_no_sat.use_force_sat = 0;
+    p_no_drag_no_sat.use_power_sat = 0;
+    [~,~,~,val_no_drag] = simulation(X, p_no_drag_no_sat);
     P_no_drag = val_no_drag.P_mech;
     drag_ratio = P_mech_unsat ./ P_no_drag;
 

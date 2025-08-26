@@ -55,7 +55,7 @@ else
 end
 
 function val_mod = sim_and_print(X_opt_mod,p,b,val)
-    [~,~,~,g,val_mod] = simulation(X_opt_mod,p); 
+    [~,~,g,val_mod] = simulation(X_opt_mod,p); 
     constraint_violated = b.constraint_names(g<0)
     print_saturation_effect(val_mod,val)
 end
