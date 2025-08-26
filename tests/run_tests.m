@@ -29,6 +29,8 @@ if exist('../WEC-Sim','dir')
     rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
 end
 
+disp('after WEC-Sim path setup in run_tests')
+
 suite = testsuite('tests');
 runner = testrunner('textoutput');
 
