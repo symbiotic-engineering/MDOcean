@@ -18,6 +18,7 @@ if exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
+    rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
 end
 
 suite = testsuite('tests');
@@ -60,8 +61,8 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
     open([test_dir '/testreport.pdf'])
 end
 
-fig = optim_time_bar_chart(suite,results);
-save_pdf(fig,'test-results/Figure_30.pdf')
+fig = unittest_time_bar_chart(suite,results);
+save_pdf(fig,'test-results/Figure_30_unittest.pdf')
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)

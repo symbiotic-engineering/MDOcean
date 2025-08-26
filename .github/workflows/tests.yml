@@ -53,11 +53,10 @@ jobs:
                 Simulink
                 Simscape
                 Simscape_Multibody
-      
-      - name: Run bash script to modify MATLAB toolbox file
-        run: |
-          chmod +x ./MDOcean/mdocean/matlab/fix_global_optim.sh
-          ./MDOcean/mdocean/matlab/fix_global_optim.sh
+
+      - name: Add MATLAB to path on self-hosted runner
+        if: runner.os == 'Linux' && runner.name == 'lab-computer-becca'
+        run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
 
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-command@v2

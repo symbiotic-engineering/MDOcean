@@ -1,6 +1,8 @@
 % Generate all figures used in the paper
-function [fig_success,tab_success,fig_output,tab_output,...
-            num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
+function [fig_success,tab_success,...
+          fig_output, tab_output,...
+          fig_runtime,tab_runtime,...
+          num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
 
 if nargin<3
     filename_uuid = ''; % required argument for anything running gradient_optim in parallel,
@@ -26,8 +28,10 @@ fig_success = cell([1,length(which_figs)]);
 tab_success = cell([1,length(which_tabs)]);
 
 fig_output = gobjects(1, length(which_figs));
-
 tab_output(1, 1:length(which_tabs)) = {table()};
+
+fig_runtime = NaN([1,length(which_figs)]);
+tab_runtime = NaN([1,length(which_tabs)]);
 %%
 
 figs_in_paper(1)  = 'read_non_matlab_figs.RM3_image';
@@ -84,9 +88,9 @@ figs_in_paper(45) = 'damping_plate_structures.damping_plate_deflection';
 figs_in_paper(46) = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
-figs_in_paper(47) = 'param_sensitivities.local_global_objective';
-figs_in_paper(48) = 'param_sensitivities.local_design';
-figs_in_paper(49) = 'param_sensitivities.global_design';
+figs_in_paper(47) = 'param_sensitivities.post_optim_re_optim_objective';
+figs_in_paper(48) = 'param_sensitivities.post_optim_design';
+figs_in_paper(49) = 'param_sensitivities.re_optim_design';
 % appendix F - supplementary results
 figs_in_paper(50) = 'gradient_optim.single_obj_convergence';
 % graphical abstract (unnumbered so at the end)
@@ -111,9 +115,9 @@ fig_names{9} = 'Fig. 9: force saturation results';
 fig_names{10} = 'Fig. 10: JPD multiplication';
 fig_names{12} = 'Fig. 12: cost vs N WEC';
 fig_names{15} = 'Fig. 15: design space exploration';
-fig_names{16} = 'Fig. 16: local and global objective parameter sensitivities';
-fig_names{17} = 'Fig. 17: local optimal design variable parameter sensitivities';
-fig_names{18} = 'Fig. 18: global optimal design variable parameter sensitivities';
+fig_names{16} = 'Fig. 16: post-optimality and re-optimization objective parameter sensitivities';
+fig_names{17} = 'Fig. 17: post-optimality optimal design variable parameter sensitivities';
+fig_names{18} = 'Fig. 18: re-optimization optimal design variable parameter sensitivities';
 fig_names{22} = 'Fig. 22: pareto front with design images';
 fig_names{23} = 'Fig. 23: design and objective heuristics';
 fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
@@ -147,6 +151,7 @@ for i = which_figs
         func_handle = str2func(func_name);
         
         % Check if the figure has already been generated
+        t = tic;
         if ~isfield(generated_figs, func_name)
             % Run the function to generate the figure and table
             [figs, tabs] = func_handle(p, b);
@@ -162,7 +167,8 @@ for i = which_figs
         
         % Store the generated figure in fig_output
         fig_output(i) = generated_figs.(func_name).(fig_desc);
-        
+        fig_runtime(i) = toc(t);
+
     catch err
         fig_success{i} = err;  % Store error for the figure
     end
@@ -178,6 +184,7 @@ for i = which_tabs
         func_handle = str2func(func_name);
         
         % Check if the table has already been generated
+        t = tic;
         if ~isfield(generated_tabs, func_name)
             % Run the function to generate the table
             [figs, tabs] = func_handle(p, b);
@@ -193,6 +200,7 @@ for i = which_tabs
         
         % Store the generated table in tab_output
         tab_output{i} = generated_tabs.(func_name).(tab_desc);  % Store the table
+        tab_runtime(i) = toc(t);
         display(tab_output{i})
         
     catch err
@@ -213,7 +221,7 @@ function [figs,tabs] =  read_non_matlab_figs_func(~,~)
                     'methods_flowchart_2_cropped.jpg',...
                     'xdsm.JPG',...
                     'dimensions.jpg',...
-                    'MEEM-dims-basic-2.jpg',...
+                    'MEEM-dims-basic-3.jpg',...
                     'Error_Accumulation_AEP.png',...
                     'structures_FBDs_4.jpg',...
                     'time_breakdown_3.png',...
@@ -255,20 +263,20 @@ end
 
 % Function to generate parameter sensitivity figures
 function [figs,tabs] =  param_sensitivities_fig_func(~,b)
-    param_sweep(filename_uuid)
-    figs.global_constraint = gcf;                   % delta p global (grid)
-    n = figs.global_constraint.Number;
-    figs.local_constraint= figure(n-1);             % delta p local (grid)
-    figs.global_design = figure(n - 2);             % dx*/dp global (grid)
-    figs.local_design  = figure(n - 3);             % dx*/dp local (grid)
-    figs.global_objective = figure(n - 4);          % dJ*/dp global (grid)
-    figs.local_global_objective = figure(n - 5);    % dJ*/dp combined (grid)
-    figs.global_design_tornado_J2 = figure(n - 6);  % dx*/dp global (tornado)
-    figs.global_design_tornado_J1 = figure(n - 7);  % dx*/dp global (tornado)
+    [runtime_post_optim, runtime_re_optim] = param_sweep(filename_uuid); % fixme these runtimes aren't used
+    figs.re_optim_constraint = gcf;                   % delta p re-optimization (grid)
+    n = figs.re_optim_constraint.Number;
+    figs.post_optim_constraint= figure(n-1);          % delta p post optimality (grid)
+    figs.re_optim_design = figure(n - 2);             % dx*/dp re-optimization (grid)
+    figs.post_optim_design  = figure(n - 3);          % dx*/dp post optimality (grid)
+    figs.re_optim_objective = figure(n - 4);          % dJ*/dp re-optimization (grid)
+    figs.post_optim_re_optim_objective = figure(n - 5);  % dJ*/dp combined (grid)
+    figs.re_optim_design_tornado_J2 = figure(n - 6);  % dx*/dp re-optimization (tornado)
+    figs.re_optim_design_tornado_J1 = figure(n - 7);  % dx*/dp re-optimization (tornado)
     num_DVs = length(b.var_names);
     for i = 1:num_DVs
-        name = ['global_design_tornado_' b.var_names(num_DVs+1-i)];
-        figs.(name) = figure(n - (7+i));            % dx*/dp global (tornado)
+        name = ['re_optim_design_tornado_' b.var_names(num_DVs+1-i)];
+        figs.(name) = figure(n - (7+i));            % dx*/dp re-optimization (tornado)
     end
     figs.nonlinear_design_J2 = figure(n - num_DVs - 9);
     figs.nonlinear_design_J1 = figure(n - num_DVs - 10);
@@ -302,7 +310,7 @@ end
 % Function to generate JPD multiplication figure
 function [figs,tabs] = jpd_multiply_fig_func(p, b)
     X = [b.X_noms; 1];
-    plot_power_matrix(X, p, filename_uuid)
+    plot_power_matrix(X, p, b, filename_uuid)
     figs.JPD_multiplication = gcf;
     tabs = [];
 end
@@ -363,6 +371,7 @@ end
 
 % Function to generate damping plate moment, deflection, and aspect ratio figures
 function [figs,tabs] = damping_plate_fig_func(~,~)
+    addpath('/damping-plate');
     BoedoPrantilAnnularPlate()
     n = gcf().Number;
     figs.damping_plate_aspect_ratio = figure(n);
@@ -380,11 +389,11 @@ function [figs,tabs] = location_sensitivity_func(p,b)
 
     idx_remove = ismember(tab.Row,{'flag','Optimal Material index'});
     tablatex = tab(~idx_remove,:);
-    colspec = ['>{\centering\arraybackslash}p{0.20\linewidth}' ...
+    colspec = ['>{\centering\arraybackslash}p{0.22\linewidth}' ...
                '>{\centering\arraybackslash}p{0.08\linewidth}' ...
-               '>{\centering\arraybackslash}p{0.15\linewidth}' ...
-               '>{\centering\arraybackslash}p{0.15\linewidth}' ...
-               '>{\centering\arraybackslash}p{0.15\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
                '>{\centering\arraybackslash}p{0.18\linewidth}'];
     firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
     table2latex(tablatex,[save_folder 'table_22.tex'],colspec,firstrow)

@@ -248,11 +248,9 @@ function [par_J_par_p, par_g_par_p, ...
 
         % linear sensitivities (analytical)
         [~, ~, dAdp, dbdp] = lin_ineq_constraints(p, param_name);
-        num_constr_lin = size(dAdp,1);
-        num_DVs_constr_lin = size(dAdp,2);
-        par_g_lin_par_p = dAdp * x0(1:num_DVs_constr_lin) - dbdp;
-        par_par_g_lin_par_x_par_p = zeros(length(x0)-1, num_constr_lin);
-        par_par_g_lin_par_x_par_p(1:num_DVs_constr_lin,:) = dAdp.';
+        dAdp = dAdp(:,1:end-1); % remove material column
+        par_g_lin_par_p = dAdp * x0(1:end-1) - dbdp;
+        par_par_g_lin_par_x_par_p = dAdp.';
 end
 
 function y = get_sim_outputs_and_derivs(obj,p,param_name,param_value,x0)

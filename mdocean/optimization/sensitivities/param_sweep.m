@@ -1,4 +1,4 @@
-function [] = param_sweep(filename_uuid)
+function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
 
     %% Setup
     b = var_bounds();
@@ -22,34 +22,44 @@ function [] = param_sweep(filename_uuid)
     % use the optimal x as x0 to speed up the sweeps
     % and obtain gradients
     x0 = b.X_start_struct;
-    [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0,p,b);
-    
+    x0_vec_1 = gradient_optim(x0,p,b);
+    x0_struct_1 = cell2struct(num2cell(x0_vec_1(1:end-1,:)),b.var_names(1:end-1)',1);
+
+    % rerun nominal optim to check that it's the same as the first time
+    [x0_vec, J0, ~, ~, lambdas, grads, hesses] = gradient_optim(x0_struct_1,p,b);
+    same_as_before = ismembertol(x0_vec,x0_vec_1,1e-6);
+    if ~all(same_as_before,'all')
+        str = append(['First optimization of nominal parameters gave different x* than second. Using second.' newline ...
+                      '#1 x*:'], newline, formattedDisplayText(x0_vec_1.'),'#2 x*:' ,newline, formattedDisplayText(x0_vec.'), 'Δ x*:', newline, formattedDisplayText(x0_vec_1.'-x0_vec.'));
+        warning(str)
+    end
+
     num_constr_nl = length(b.constraint_names);
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
     
     %% Obtain normalized local sensitivity 
     disp('done optimizing, starting local param sensitivity')
-    tic
+    t = tic;
     [par_x_star_par_p_local, ...
      dJ_star_dp_lin_local, dJ_star_dp_quad_local, ...
      par_J_par_p_local, ...
      delta_p_change_activity_local] = local_sens_both_obj_all_param(x0_vec, J0, p, params, p_val, p_idxs, ...
                                                                     lambdas, grads, hesses, num_constr_nl);
-    toc
+    runtimeLocal = toc(t);
 
     %% Obtain normalized global sensitivity
     disp('done local, starting global param sensitivity')
-    tic
+    t = tic;
     [par_x_star_par_p_global, dJstar_dp_global, ...
         delta_p_change_activity_global] = global_sens_all_param(params, param_names, p_val, ...
                                                                 x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                 p, b, colors, groups);
-    toc
+    runtimeGlobal = toc(t);
 
     %% Post processing
     dJdp_combined = [par_J_par_p_local; dJ_star_dp_quad_local; dJ_star_dp_lin_local; dJstar_dp_global];
-    dJdp_names = {'local partial','local total linear','local total quadratic','global'};
+    dJdp_names = {'partial','total linear','total quadratic','re-optimization'};
     
     % color grid plots
     % fig 1: dJ*/dp combined
@@ -130,7 +140,7 @@ function [par_x_star_par_p_global, ...
                                                                x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
-    ratios = [.9 .95 1 1.05 1.1];
+    ratios = [.9 .98 1 1.02 1.1];
     num_DVs = size(x0_vec,1)-1;
     num_constr = length(b.constraint_names) + length(b.lin_constraint_names) + 2*num_DVs;
     
@@ -262,55 +272,102 @@ function [par_x_star_par_p_global, ...
     %% Tornado chart for overall slope
     sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
     
-    % separate charts for each design variable
+    % separate figures for each design variable, with subplot for each objective
     for i=1:num_DVs
         sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
-                                param_names, colors, groups, ['dx*/dp - ' dvar_names{i}]);
+                                param_names, colors, groups, ['d' dvar_names{i} '^*/dp']);
     end
+
+    % separate figures for each objective, with subplots for each design variable
+    f4 = figure;
+    t = tiledlayout(3,4);
+    for i=1:num_DVs
+        nexttile
+        sensitivity_tornado_barh_inner(slope_X_LCOE_norm(:,i), param_names, colors, 8)
+        title(['d' dvar_names{i} '^*/dp'])
+    end
+    color_legend(groups,colors,'eastoutside')
+    title(t,'Normalized Sensitivities at Minimum LCOE')
+    t.TileSpacing = 'compact';
+    t.Padding = 'compact';
+
+    f5 = figure;
+    t2 = tiledlayout(3,4);
+    for i=1:num_DVs
+        nexttile
+        sensitivity_tornado_barh_inner(slope_X_Pvar_norm(:,i), param_names, colors, 8)
+        title(['d' dvar_names{i} '^*/dp'])
+    end
+    color_legend(groups,colors,'eastoutside')
+    title(t2,'Normalized Sensitivities at Minimum Design Cost')
+    t2.TileSpacing = 'compact';
+    t2.Padding = 'compact';
+
+    set(f4,'Position',[1 41 1536 840]) % full screen
+    set(f5,'Position',[1 41 1536 840]) % full screen
 
 end
 
 
-function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
+function color_legend(groups,colors,loc)
+    [~,first_idx] = ismember(categories(groups),groups);
+    cols = colors(first_idx);
+    h = gobjects([1 length(cols)]);
+    for i=1:length(cols)
+        h(i) = barh(NaN,NaN,cols{i});
+    end
+    set(h,{'DisplayName'},categories(groups));
+    legend('location',loc)
+end
 
-    [~,LCOE_sort_idx] = sort(abs(slope_LCOE),'MissingPlacement','first');
-    [~,Pvar_sort_idx] = sort(abs(slope_Pvar),'MissingPlacement','first');
+function sensitivity_tornado_barh_inner(slope, param_names, colors, k)
 
-    LCOE_params = categorical(param_names, param_names(LCOE_sort_idx));
-    Pvar_params = categorical(param_names, param_names(Pvar_sort_idx));
-    
-    % separate charts for each objective
-    figure
-    subplot 121
-    for i=1:length(LCOE_params)
-        barh(LCOE_params(i),slope_LCOE(i),colors{i})
+    % set k=0 to show all parameters
+    if k==0
+        k = length(param_names);
+    end
+
+    % sort by highest sensitivity
+    [~,sort_idx] = sort(abs(slope),'MissingPlacement','first');
+
+    % only show the parameters with the k highest sensitivities.
+    sort_idx_highest_k = sort_idx(end-k+1:end);
+    slope_highest_k = slope(sort_idx_highest_k);
+    colors_highest_k = colors(sort_idx_highest_k);
+    params = categorical( param_names(sort_idx_highest_k), param_names(sort_idx_highest_k) );
+
+    % bar chart
+    for i=1:length(params)
+        h = barh(params(i),slope_highest_k(i),colors_highest_k{i});
+        h.Annotation.LegendInformation.IconDisplayStyle = 'off';
         hold on
     end
-    xlim([-1 1] + fix(imrange(slope_LCOE)))
+    xlim([-1.2 1.2] + fix(imrange(slope)))
     ax = gca;
     set(ax,'YGrid','on','XGrid','on')
-    title('LCOE')
+    improvePlot
+
+    % reduce fontsize
+    all_axes = findobj(gcf().Children,'Type','Axes'); % all subplots in fig
+    set(all_axes,'FontSize',12)
+end
+
+function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
+    
+    % separate subplots for each objective
+    figure
+    subplot 121
+    sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 25)
+    title('At Minimum LCOE')
     
     subplot 122
-    for i=1:length(LCOE_params)
-        barh(Pvar_params(i),slope_Pvar(i),colors{i})
-        hold on 
-    end
-    xlim([-1 1] + fix(imrange(slope_Pvar)))
-    set(gca,'YGrid','on','XGrid','on')
-    title('c_v')
+    sensitivity_tornado_barh_inner(slope_Pvar, param_names, colors, 25)
+    title('At Minimum Design Cost')
     sgtitle(['Normalized Sensitivities: ' extra_title])
     
     % legend
-    [~,first_idx] = ismember(categories(groups),groups);
-    labels = repmat({''},size(groups));         % create blank labels
-    labels(first_idx) = categories(groups);     % leave most labels blank, except the first of each category
-    legend(labels,'location','south')
-    
-    improvePlot
-    set(gca, 'FontSize', 14)
-    set(ax,'FontSize',14)
-    set(gcf,"Position",[1.8 41.8 698.2 836.8])
+    color_legend(groups,colors,'southeast')
+    set(gcf,"Position",[1.8 41.8 930 836.8])
     
     % both objectives on the same chart
 %     figure

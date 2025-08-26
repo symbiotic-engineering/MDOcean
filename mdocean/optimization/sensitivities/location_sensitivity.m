@@ -37,13 +37,13 @@ parfor i=1:length(files)
     which_obj = 1; % only optimize LCOE
     [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,new_b,which_obj);
     
-    plot_power_matrix(X_opts(:,i),new_p,b.filename_uuid)
+    plot_power_matrix(X_opts(:,i),new_p,b,b.filename_uuid)
     figure(2)
     power_PDF(X_opts(:,i),new_p)
     hold on
 end
 figure(2)
-locs = {'Humboldt, CA (nominal)','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
+locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
 legend(locs)
 
 site_info = [flux;BW;storm;depths];
@@ -52,7 +52,7 @@ site_info_descs = {'Incident energy flux (kW/m)',...
     'Half-power bandwidth (rad/s)','Storm sea states (m, s)','Water depth (m)'};
 
 design_var_names = cellfun(@(x) ['$' x, '^*$'], b.var_names_pretty, 'UniformOutput', false);
-design_var_descs = cellfun(@(x) ['Optimal ' x], b.var_descs, 'UniformOutput', false);
+design_var_descs = cellfun(@(x) ['Opt. ' x], lower(b.var_descs), 'UniformOutput', false);
 
 symbols = [site_info_vars,  design_var_names,{'$LCOE^*$','flag'}];
 row_descs = [site_info_descs, design_var_descs,{'Optimal levelized cost of energy (\\$/kWh)','flag'}];
@@ -106,7 +106,8 @@ function delta_w = find_BW(Hs,Te,JPD,plotOn)
 end
 
 function b = fix_constraints(p,b)
-    desired_length = 20 + numel(p.JPD) + length(p.T_struct);
+    num_non_sea_state_constraints = sum(~contains(b.constraint_names,'slamming'));
+    desired_length = num_non_sea_state_constraints + numel(p.JPD) + length(p.T_struct);
     len = length(b.constraint_names);
     if len < desired_length
         b.constraint_names(end+1 : end+desired_length-len) = {'slamming'};
