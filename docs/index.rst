@@ -1,12 +1,11 @@
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
-![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13997244.svg)](https://doi.org/10.5281/zenodo.13997244)
-[![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=symbiotic-engineering/MDOcean)
-[![View on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/180694-mdocean)
+.. MDOcean documentation master file, created by
+   sphinx-quickstart on Mon Jul 28 14:20:24 2025.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-# MDOcean
+MDOcean documentation
+=====================
+
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
 
 More specifically, it uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
@@ -17,7 +16,7 @@ For 210 sea states, the model takes 39 ms to run, which is around a 5 order of m
 
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1oTIAkMHWSenGTaAQfc8pr4rRl3oylaKt/view?usp=sharing).
+Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025.
 
 Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
@@ -46,16 +45,13 @@ Clone the repository via Git. If you are unfamiliar with Git, click "Code > Down
 - `tests`: continuous integration tests for validation as well as generating a report to reproduce all figures and results. Running `run_tests.m` is the easiest way to reproduce all results. The `run_slow_tests` flag in `test.m` can be toggled to enable or disable the tests which take longer than a few minutes to run.
 - `mdocean/inputs`: numerical inputs needed to run the optimiztion, simulation, and validation, including wave data, parameters, design variable bounds, and validation values.
 - `mdocean/simulation`: the simulation that takes design variables and parameters as inputs and returns objective and constraint values as outputs, and its validation.
-The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
+  The script `run_single.m` is a good starting point if you want to run the simulation without optimizing.
 - `mdocean/optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
-if you want to run single objective optimization for each of the two objectives. For multi-objective, run `pareto_search.m` followed by `pareto_curve_heuristics.m`.
+  if you want to run single objective optimization for each of the two objectives. For multi-objective, run `pareto_search.m` followed by `pareto_curve_heuristics.m`.
 - `mdocean/plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to generate specific figures from the paper.
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
 
 If you are running individual scipts/functions, you will need to `cd` to the `mdocean` folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via `run_tests.m`.
-
-**Documentation**
-Documentation for the function API for this code is in progress at [this Sphinx site](https://symbiotic-engineering.github.io/MDOcean/).
 
 **Dependencies**
 
@@ -88,3 +84,10 @@ Grant No. DGE–2139899, and the Cornell Engineering Fellowship.
 Any opinion, findings, and conclusions or recommendations 
 expressed in this material are those of the authors(s) and do not 
 necessarily reflect the views of the National Science Foundation.
+
+
+.. toctree::
+   api
+
+.. note::
+   This project is under active development.
