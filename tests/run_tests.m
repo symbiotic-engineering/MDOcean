@@ -13,7 +13,9 @@ import matlab.unittest.constraints.ContainsSubstring
 
 disp('after import of run_tests')
 
-load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+if isMATLABReleaseOlderThan("R2025a")
+    load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+end
 
 disp('after load_sl_glibc_patch of run_tests')
 
