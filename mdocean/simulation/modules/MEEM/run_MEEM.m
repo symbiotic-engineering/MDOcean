@@ -188,11 +188,17 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
     % show A matrix values
     if show_A
         cond(A_num)
+        
+        figure
         signed_log(real(A_num))
         title('Real(A)')
         
+        figure
         signed_log(imag(A_num))
         title('Imag(A)')
+
+        figure
+        spy(A_num)
     end
 
     % solve for x

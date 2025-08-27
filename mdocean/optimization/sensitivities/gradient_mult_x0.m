@@ -1,4 +1,4 @@
-function [results] = gradient_mult_x0(p,b)
+function [treeFig, parallelFig, results] = gradient_mult_x0(p,b)
 
 num_runs = 1000;
 num_DVs = length(b.var_names);
@@ -104,7 +104,7 @@ edge_weights = [           sum(lin_feasible);                                   
 
 G_J1 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,1),node_names);
 G_J2 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,2),node_names);
-figure
+treeFig = figure;
 t = tiledlayout(1, 2);
 %t.TileSpacing = 'tight';
 t.Padding = 'compact';
@@ -121,7 +121,7 @@ axis off
 improvePlot
 
 %% parallel axis plot
-figure(Units="normalized", Position=[0.1,0.2,0.3,0.4], Color="white");
+parallelFig = figure(Units="normalized", Position=[0.1,0.2,0.3,0.4], Color="white");
 t = tiledlayout(3, 4);
 t.TileSpacing = 'compact';
 t.Padding = 'compact';

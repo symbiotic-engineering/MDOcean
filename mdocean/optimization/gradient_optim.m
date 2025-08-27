@@ -26,10 +26,10 @@ if nargin<4
     % 3 = max average power
 end
 
-if ~exists('plotfn','var')
+if ~exist('plotfn','var')
     plotfn = [];
 end
-if ~exists('ploton','var')
+if ~exist('ploton','var')
     ploton = false;
 end
 

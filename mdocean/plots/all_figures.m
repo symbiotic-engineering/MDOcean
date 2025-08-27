@@ -2,7 +2,8 @@
 function [fig_success,tab_success,...
           fig_output, tab_output,...
           fig_runtime,tab_runtime,...
-          num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
+          num_figs,num_tabs,...
+          fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
 
 if nargin<3
     filename_uuid = ''; % required argument for anything running gradient_optim in parallel,
@@ -12,8 +13,9 @@ end
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
+table_save_fcn = @(tab,filename,colspec,firstrow) table2latex(tab, [save_folder filename], colspec, firstrow);
 
-num_figs = 36;
+num_figs = 51;
 num_tabs = 8;
 fig_names   = cell([1,num_figs]);
 tab_names   = cell([1,num_tabs]);
@@ -34,78 +36,78 @@ fig_runtime = NaN([1,length(which_figs)]);
 tab_runtime = NaN([1,length(which_tabs)]);
 %%
 
-figs_in_paper(1)  = 'read_non_matlab_figs.RM3_image';
+figs_in_paper{1}  = 'read_non_matlab_figs.RM3_image';
 % 2: modeling methodology
-figs_in_paper(2)  = 'read_non_matlab_figs.methodology_overview';
-figs_in_paper(3)  = 'read_non_matlab_figs.N2_diagram';
-figs_in_paper(4)  = 'read_non_matlab_figs.dimensions';
-figs_in_paper(5)  = 'read_non_matlab_figs.MEEM_geometry';
-figs_in_paper(6) =  'spar_hydro.spar_added_mass';
-figs_in_paper(7)  = 'hydro_coeff_err.hydro_coeff_err';
-figs_in_paper(8)  = 'desc_fcns.saturation_desc_fcn';
-figs_in_paper(9)  = 'desc_fcns.drag_desc_fcn';
-figs_in_paper(10)  = 'run_single.power_matrix_multiply';
-figs_in_paper(11) = 'wecsim.WECSim_error_histograms';
-figs_in_paper(12) = 'read_non_matlab_figs.FBD';
-figs_in_paper(13) = 'validation.cost_vs_N_WEC';
-figs_in_paper(14) = 'runtime.sim_runtime';
-figs_in_paper(15) = 'runtime.hydro_runtime';
-figs_in_paper(16) = 'runtime.dynamics_runtime';
+figs_in_paper{2}  = 'read_non_matlab_figs.methodology_overview';
+figs_in_paper{3}  = 'read_non_matlab_figs.N2_diagram';
+figs_in_paper{4}  = 'read_non_matlab_figs.dimensions';
+figs_in_paper{5}  = 'read_non_matlab_figs.MEEM_geometry';
+figs_in_paper{6}  = 'spar_hydro.spar_added_mass';
+figs_in_paper{7}  = 'hydro_coeff_fig_func.hydro_coeff_err';
+figs_in_paper{8}  = 'desc_fcns.saturation_desc_fcn';
+figs_in_paper{9}  = 'desc_fcns.drag_desc_fcn';
+figs_in_paper{10} = 'run_single_fig_func.nominal_power_matrix';
+figs_in_paper{11} = 'wecsim.WECSim_error_histograms_multibody';
+figs_in_paper{12} = 'read_non_matlab_figs.FBD';
+figs_in_paper{13} = 'validation.cost_vs_N_WEC';
+figs_in_paper{14} = 'runtime.sim_runtime';
+figs_in_paper{15} = 'runtime.hydro_runtime';
+figs_in_paper{16} = 'runtime.dynamics_runtime';
 % 3: optimization methodology
-figs_in_paper(17) = 'read_non_matlab_figs.optimization_flowchart';
+figs_in_paper{17} = 'read_non_matlab_figs.optimization_flowchart';
 % 4: results
-figs_in_paper(18) = 'experiments.experiments';
-figs_in_paper(19) = 'compare.overlaid_geometry';
-figs_in_paper(20) = 'compare.overlaid_hydro_coeffs';
-figs_in_paper(21) = 'compare.probability_CDF';
-figs_in_paper(22) = 'gradient_optim.lagrange_multipliers';
-figs_in_paper(23) = 'gradient_optim.dJ_dx_gradient';
-figs_in_paper(24) = 'multistart.multistart_convergence_tree';
-figs_in_paper(25) = 'param_sensitivities.objective_tornadoes';
-figs_in_paper(26) = 'param_sensitivities.design_tornadoes';
-figs_in_paper(27) = 'pareto.pareto_front_with_design_images';
-figs_in_paper(28) = 'pareto.pareto_front_LCOE_contours';
-figs_in_paper(29) = 'pareto.heuristics';
-figs_in_paper(30) = 'pareto.constraint_activity';
-figs_in_paper(31) = 'all_fig_compare.runtime_bar_chart';
+figs_in_paper{18} = 'design_space_exploration.experiments';
+figs_in_paper{19} = 'comparison.overlaid_geometry';
+figs_in_paper{20} = 'comparison.overlaid_hydro_coeffs';
+figs_in_paper{21} = 'comparison.probability_CDF';
+figs_in_paper{22} = 'gradient_optim_fig_func.lagrange_multipliers';
+figs_in_paper{23} = 'gradient_optim_fig_func.dJ_dx_gradient';
+figs_in_paper{24} = 'multistart.multistart_convergence_tree';
+figs_in_paper{25} = 'param_sensitivities.objective_tornadoes';
+figs_in_paper{26} = 'param_sensitivities.design_tornadoes';
+figs_in_paper{27} = 'pareto_fig_func.pareto_front_with_design_images';
+figs_in_paper{28} = 'pareto_fig_func.pareto_front_LCOE_contours';
+figs_in_paper{29} = 'pareto_fig_func.heuristics';
+figs_in_paper{30} = 'pareto_fig_func.constraint_activity';
+figs_in_paper{31} = 'all_fig_compare.runtime_bar_chart';
 % appendix A- hydro
-figs_in_paper(32) = 'meem.meem_regions';
-figs_in_paper(33) = 'meem.meem_sparsity';
-figs_in_paper(34) = 'meem.meem_validation';
-figs_in_paper(35) = 'meem.meem_matching';
-figs_in_paper(36) = 'meem.meem_convergence';
-figs_in_paper(37) = 'meem.asymptotic_b_vector';
+figs_in_paper{32} = 'meem.meem_regions';
+figs_in_paper{33} = 'meem.meem_sparsity';
+figs_in_paper{34} = 'meem.meem_validation';
+figs_in_paper{35} = 'meem.meem_matching';
+figs_in_paper{36} = 'meem.meem_convergence';
+figs_in_paper{37} = 'meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_paper(38) = 'run_single.drag_convergence';
-figs_in_paper(39) = 'slamming.slamming_amplitude';
-figs_in_paper(40) = 'force_sat_results.power_force_sensitivity';
-figs_in_paper(41) = 'wecsim.wecsim_all_sea_states';
+figs_in_paper{38} = 'run_single_fig_func.drag_convergence';
+figs_in_paper{39} = 'slamming.slamming_amplitude';
+figs_in_paper{40} = 'force_saturation_fig_func.power_force_sensitivity';
+figs_in_paper{41} = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-figs_in_paper(42) = 'read_non_matlab_figs.trapezoid';
-figs_in_paper(43) = 'read_non_matlab_figs.damping_plate_flowchart';
-figs_in_paper(44) = 'damping_plate_structures.damping_plate_moment';
-figs_in_paper(45) = 'damping_plate_structures.damping_plate_deflection';
-figs_in_paper(46) = 'damping_plate_structures.damping_plate_aspect_ratio';
+figs_in_paper{42} = 'read_non_matlab_figs.trapezoid';
+figs_in_paper{43} = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper{44} = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper{45} = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper{46} = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
-figs_in_paper(47) = 'param_sensitivities.post_optim_re_optim_objective';
-figs_in_paper(48) = 'param_sensitivities.post_optim_design';
-figs_in_paper(49) = 'param_sensitivities.re_optim_design';
+figs_in_paper{47} = 'param_sensitivities.post_optim_re_optim_objective';
+figs_in_paper{48} = 'param_sensitivities.post_optim_design';
+figs_in_paper{49} = 'param_sensitivities.re_optim_design';
 % appendix F - supplementary results
-figs_in_paper(50) = 'gradient_optim.single_obj_convergence';
+figs_in_paper{50} = 'gradient_optim_fig_func.single_obj_convergence';
 % graphical abstract (unnumbered so at the end)
-figs_in_paper(51)  = 'read_non_matlab_figs.graphical_abstract';
+figs_in_paper{51}  = 'read_non_matlab_figs.graphical_abstract';
 
 %% TABLES
 tabs_in_paper = cell(1,29);
-tabs_in_paper(12) = 'cost.cost_parameters';
-tabs_in_paper(13) = 'validation.validation';
-tabs_in_paper(14) = 'constraints';
-tabs_in_paper(15) = 'design variables';
-tabs_in_paper(16) = 'parameters';
-tabs_in_paper(18) = 'compare.optimal_design';
-tabs_in_paper(19) = 'compare.optimal_outputs';
-tabs_in_paper(20) = 'location_sensitivity.location_sensitivity';
+tabs_in_paper{12} = 'cost.cost_parameters';
+tabs_in_paper{13} = 'validation.validation';
+tabs_in_paper{14} = 'constraints';
+tabs_in_paper{15} = 'design_vars';
+tabs_in_paper{16} = 'parameters';
+tabs_in_paper{18} = 'comparison.optimal_design';
+tabs_in_paper{19} = 'comparison.optimal_outputs';
+tabs_in_paper{20} = 'location_sensitivity.location_sensitivity';
 
 %%
 fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
@@ -141,20 +143,19 @@ b = var_bounds();
 b.filename_uuid = filename_uuid;
 
 % Loop for figures
-for i = which_figs
+for i = 1:length(which_figs)
     try
         % Get the function name for the figure
 
-        fig_name = split(figs_in_paper{i}, '.');
+        fig_name = split(figs_in_paper{which_figs(i)}, '.');
         func_name = fig_name{1};
         fig_desc = fig_name{2};
-        func_handle = str2func(func_name);
         
         % Check if the figure has already been generated
         t = tic;
         if ~isfield(generated_figs, func_name)
             % Run the function to generate the figure and table
-            [figs, tabs] = func_handle(p, b);
+            [figs, tabs] = feval(func_name, p, b);
             
             % Store the generated figure in the generated_figs structure
             generated_figs.(func_name) = figs;
@@ -175,19 +176,18 @@ for i = which_figs
 end
 
 % Loop for tables
-for i = which_tabs
+for i = 1:length(which_tabs)
     try
         % Get the function name for the table
-        tab_name = split(tabs_in_paper{i}, '.');
+        tab_name = split(tabs_in_paper{which_tabs(i)}, '.');
         func_name = tab_name{1};
         tab_desc = tab_name{2};
-        func_handle = str2func(func_name);
         
         % Check if the table has already been generated
         t = tic;
         if ~isfield(generated_tabs, func_name)
             % Run the function to generate the table
-            [figs, tabs] = func_handle(p, b);
+            [figs, tabs] = feval(func_name, p, b);
             
             % Store the generated table in the generated_tabs structure
             generated_tabs.(func_name) = tabs;
@@ -212,7 +212,7 @@ end
 
 %%
 % Non-MATLAB figure reading function
-function [figs,tabs] =  read_non_matlab_figs_func(~,~)
+function [figs,tabs] =  read_non_matlab_figs(~,~)
 
     fig_names = {'RM3_image','methodology_overview','N2_diagram',...
                 'dimensions','MEEM_geometry','WECSim_error_breakdown', ...
@@ -243,9 +243,17 @@ function [figs,tabs] =  read_non_matlab_figs_func(~,~)
 end
 
 % Function for single objective convergence
-function [figs,tabs] = gradient_optim_func(p,b)
-    gradient_optim(b.X_start_struct,p,b,1,{@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)})
-    figs.convergence = gcf;
+function [figs,tabs] = gradient_optim_fig_func(p,b)
+    gradient_optim(b.X_start_struct,p,b,1,{@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true)
+
+    n = gcf().Number;
+    figs.dJ_dx_gradient              = figure(n);
+    figs.lagrange_multipliers        = figure(n-1);
+    figs.single_obj_opt_geometry     = figure(n-2);
+    figs.single_obj_opt_power_matrix = figure(n-3);
+    figs.single_obj_convergence      = figure(n-4);
+
+    tabs = [];
 end
 
 % Function to generate Pareto figure group
@@ -262,7 +270,7 @@ function [figs,tabs] =  pareto_fig_func(~,~)
 end
 
 % Function to generate parameter sensitivity figures
-function [figs,tabs] =  param_sensitivities_fig_func(~,b)
+function [figs,tabs] =  param_sensitivities(~,b)
     [runtime_post_optim, runtime_re_optim] = param_sweep(filename_uuid); % fixme these runtimes aren't used
     figs.re_optim_constraint = gcf;                   % delta p re-optimization (grid)
     n = figs.re_optim_constraint.Number;
@@ -291,8 +299,14 @@ function [figs,tabs] =  hydro_coeff_fig_func(~,~)
     tabs = [];
 end
 
+function [figs,tabs] = spar_hydro(~,~)
+    fig = spar_hydro_plot();
+    figs.spar_added_mass = fig;
+    tabs = [];
+end
+
 % Function to generate drag describing function and saturation time signal figures
-function [figs,tabs] =  drag_saturation_fig_func(~,~)
+function [figs,tabs] =  desc_fcns(~,~)
     sin_desc_fcn_demo()
     figs.drag_desc_fcn = gcf;
     figs.saturation_desc_fcn = figure(figs.drag_desc_fcn.Number - 2);
@@ -316,7 +330,7 @@ function [figs,tabs] = jpd_multiply_fig_func(p, b)
 end
 
 % Function to generate validation figure for cost vs N WEC
-function [figs,tabs] = cost_vs_nwec_fig_func(~,~)
+function [figs,tabs] = validation(~,~)
 
     [~, ~, ~, ~, tab1a, figs.cost_vs_N_WEC] = validate_nominal_RM3('report');
     [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
@@ -338,28 +352,28 @@ function [figs,tabs] = cost_vs_nwec_fig_func(~,~)
     tab1latex = renamevars(tab1latex, tab1latex.Properties.VariableNames, new_names);
     firstrow = '&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\';
     colspec = '>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r';
-    table2latex(tab1latex,[save_folder 'table_12.tex'],colspec,firstrow)
+    table_save_fcn(tab1latex, 'table_12.tex', colspec, firstrow)
 
-    tabs.validation_table = tab1;
+    tabs.validation = tab1;
 end
 
 % Function to generate design space exploration figure
-function [figs,tabs] = design_space_exploration_fig_func(p,b)
+function [figs,tabs] = design_space_exploration(p,b)
     experiments(p,b)
     figs.experiments = gcf;
     tabs = [];
 end
 
 % Function to generate overlaid geometry, hydro coeffs, and probability CDF figures
-function [figs,tabs] = comparison_fig_tab_func(p,b)
+function [figs,tabs] = comparison(p,b)
     [tabs.optimal_design_vars, tabs.optimal_outputs] = compare(p,b);
     n = gcf().Number;
     figs.overlaid_geometry = figure(n-3);
     figs.overlaid_hydro_coeffs = figure(n);
     figs.probability_CDF = figure(n-2);
 
-    table2latex(tabs.optimal_design_vars,[save_folder 'table_19.tex'])
-    table2latex(tabs.optimal_outputs,    [save_folder 'table_20.tex'])
+    table_save_fcn(tabs.optimal_design_vars,'table_19.tex')
+    table_save_fcn(tabs.optimal_outputs,    'table_20.tex')
 end
 
 % Function to generate asymptotic b vector figure
@@ -370,8 +384,8 @@ function [figs,tabs] = asymptotic_b_vector_fig_func(~,~)
 end
 
 % Function to generate damping plate moment, deflection, and aspect ratio figures
-function [figs,tabs] = damping_plate_fig_func(~,~)
-    addpath('/damping-plate');
+function [figs,tabs] = damping_plate_structures(~,~)
+    addpath('dev/structures/damping-plate');
     BoedoPrantilAnnularPlate()
     n = gcf().Number;
     figs.damping_plate_aspect_ratio = figure(n);
@@ -396,7 +410,7 @@ function [figs,tabs] = location_sensitivity_func(p,b)
                '>{\centering\arraybackslash}p{0.17\linewidth}' ...
                '>{\centering\arraybackslash}p{0.18\linewidth}'];
     firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
-    table2latex(tablatex,[save_folder 'table_22.tex'],colspec,firstrow)
+    table_save_fcn(tablatex,'table_22.tex',colspec,firstrow)
 
     figs = [];
 end
@@ -420,36 +434,58 @@ function [figs,tabs] = params_func(~,~)
 end
 
 function [figs,tabs] = multistart(p,b)
-    tab = gradient_mult_x0(p,b);
-    tabs.multistart = tab;
-    table2latex(tab,[save_folder 'table_21.tex'])
-    figs = [];
+    [treeFig, parallelFig, tab] = gradient_mult_x0(p,b);
+    tabs.multistart_results = tab;
+    table_save_fcn(tab,'table_21.tex')
+    figs.multistart_convergence_tree = treeFig;
+    figs.multistart_parallel_coordinates = parallelFig;
 end
 
-% %% figure 14-15 - wecsim validation histograms
-% fig_names{14} = 'Fig. 14: WecSim histogram singlebody';
-% fig_names{15} = 'Fig. 15: WecSim histogram multibody';
-% if any(which_figs == 14 | which_figs == 15)
-%     try
-%         [~, ~, ~, ~, fig_singlebody, fig_multibody] = validate_dynamics();
-%         fig_output(which_figs==14) = fig_singlebody;
-%         fig_output(which_figs==15) = fig_multibody;
-%     catch err
-%         fig_success(which_figs == 14 | which_figs == 15) = {err};
-%     end
-% end
 
-
-%% figure 31-33 - fixme not implemented
-if any( ismember(which_figs, 31:33) )
-    fig_output(ismember(which_figs, 31:33)) = figure;
+function [figs,tabs] = run_single_fig_func(p,b)
+    p.operational_drag_convergence_plot_on = true;
+    run_single(p,b)
+    n = gcf().Number;
+    figs.nominal_geometry_viz = figure(n);
+    figs.nominal_power_pdf = figure(n-1);
+    figs.nominal_power_matrix = figure(n-2);
+    figs.drag_convergence = figure(n-3);
+    tabs = [];
 end
 
-%% fixme: 37 to 45 not implemented, but still name the figures
-empty_idx = cellfun(@isempty,fig_names);
-empty_str = strcat('Fig._', string(find(empty_idx)));
-[fig_names{empty_idx}] = deal(empty_str{:});
-[fig_success{ismember(which_figs,find(empty_idx))}] = deal(MException('all_figures:not_implemented','Figure not implemented yet'));
+function [figs,tabs] = wecsim(~,~)
+    [~, ~, ~, tab, fig_singlebody, fig_multibody] = validate_dynamics();
+    figs.WECSim_error_histograms_singlebody = fig_singlebody;
+    figs.WECSim_error_histograms_multibody = fig_multibody;
+    %figs.wecsim_all_sea_states = gcf();
+    tabs.WECSim_errors = tab;
+end
 
+function [figs,tabs] = runtime(p,b)
+    [f1, f2, f3] = module_runtime_compare(p,b);
 
+    figs.dynamics_runtime = f1;
+    figs.hydro_runtime    = f2;
+    figs.sim_runtime      = f3;
+
+    tabs = [];
+end
+
+function [figs,tabs] = meem(p,b)
+    [figPotMatch, figVelMatch, figSparsity, figHydroCoeff] = validate_MEEM()
+
+    figs.meem_regions = figure; % fixme
+    figs.meem_sparsity = figSparsity;
+    figs.meem_validation = figHydroCoeff;
+    figs.meem_matching = figPotMatch;
+    figs.meem_convergence = figure; % fixme
+    figs.asymptotic_b_vector = b_inf_numeric();
+
+    tabs = [];
+end
+
+function [figs,tabs] = slamming(~,~)
+    fig = slam_plot();
+    figs.slamming_amplitude = fig;
+    tabs = [];
 end
