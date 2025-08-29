@@ -109,12 +109,13 @@ tabs_in_paper{18} = 'comparison.optimal_design';
 tabs_in_paper{19} = 'comparison.optimal_outputs';
 tabs_in_paper{20} = 'location_sensitivity.location_sensitivity';
 
-%%
-fig_nums = num2str((1:num_figs).');
-tab_nums = num2str(find(~cellfun(@isempty,tabs_in_paper)).');
+%% Auto-generate figure and table names from list above
+fig_nums = cellstr(num2str((1:num_figs).'));
+tab_idxs = ~cellfun(@isempty,tabs_in_paper);
+tab_nums = cellstr(num2str(find(tab_idxs).'));
 
-fig_names = strcat('Fig. ', fig_nums, ': ', figs_in_paper);
-tab_names = strcat('Tab. ', tab_nums, ': ', tabs_in_paper);
+fig_names = strcat("Fig. ", fig_nums, ": ", figs_in_paper.');
+tab_names = strcat("Tab. ", tab_nums, ": ", tabs_in_paper(tab_idxs).');
 
 %% Initialize structures to store generated figures and tables
 generated_figs = struct();
