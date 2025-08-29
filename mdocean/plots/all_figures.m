@@ -110,30 +110,11 @@ tabs_in_paper{19} = 'comparison.optimal_outputs';
 tabs_in_paper{20} = 'location_sensitivity.location_sensitivity';
 
 %%
-fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
-fig_names{7} = 'Fig. 7: drag describing function';
-fig_names{8} = 'Fig. 8: force saturation time signal';
-fig_names{9} = 'Fig. 9: force saturation results';
-fig_names{10} = 'Fig. 10: JPD multiplication';
-fig_names{12} = 'Fig. 12: cost vs N WEC';
-fig_names{15} = 'Fig. 15: design space exploration';
-fig_names{16} = 'Fig. 16: post-optimality and re-optimization objective parameter sensitivities';
-fig_names{17} = 'Fig. 17: post-optimality optimal design variable parameter sensitivities';
-fig_names{18} = 'Fig. 18: re-optimization optimal design variable parameter sensitivities';
-fig_names{22} = 'Fig. 22: pareto front with design images';
-fig_names{23} = 'Fig. 23: design and objective heuristics';
-fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
-fig_names{25} = 'Fig. 25: constraint activity';
-fig_names{30} = 'Fig. 30: asymptotic b vector';
+fig_nums = num2str((1:num_figs).');
+tab_nums = num2str(find(~cellfun(@isempty,tabs_in_paper)).');
 
-tab_names{1} = 'Tab. 12: validation against nominal';
-tab_names{2} = 'Tab. 15: constraints';
-tab_names{3} = 'Tab. 16: design variables';
-tab_names{4} = 'Tab. 17: parameters';
-tab_names{5} = 'Tab. 19: optimal DVs for various designs';
-tab_names{6} = 'Tab. 20: optimal outputs for various designs';
-tab_names{7} = 'Tab. 21: convergence for different x0s';
-tab_names{8} = 'Tab. 22: optimal DVs for 4 locations';
+fig_names = strcat('Fig. ', fig_nums, ': ', figs_in_paper);
+tab_names = strcat('Tab. ', tab_nums, ': ', tabs_in_paper);
 
 %% Initialize structures to store generated figures and tables
 generated_figs = struct();
