@@ -1,4 +1,4 @@
-function [fig] = force_sat_results(p,b)
+function [fig,fig2] = force_sat_results(p,b)
 
 if nargin==0
     p = parameters();
@@ -34,7 +34,7 @@ ylabel('Structural Fatigue Load (MN)')
 xlabel('PTO Force Limit (MN)')
 improvePlot
 
-figure
+fig2 = figure;
 plot(force_lim_frac * F_nom, runtime*1e3)
 ylabel('Simulation Runtime (ms)')
 xlabel('PTO Force Limit (MN)')

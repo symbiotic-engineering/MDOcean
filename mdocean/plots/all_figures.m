@@ -296,9 +296,9 @@ end
 
 % Function to generate force saturation results figure
 function [figs,tabs] =  force_saturation_fig_func(p, b)
-    fig_array = force_sat_results(p, b);
-    figs.power_force_sensitivity = fig_array(1);
-    figs.runtime_sensitivity = fig_array(2);
+    [fig1,fig2] = force_sat_results(p, b);
+    figs.power_force_sensitivity = fig1;
+    figs.runtime_sensitivity = fig2;
     tabs = [];
 end
 
