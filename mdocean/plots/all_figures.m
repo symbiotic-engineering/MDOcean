@@ -239,7 +239,7 @@ end
 
 % Function to generate Pareto figure group
 function [figs,tabs] =  pareto_fig_func(~,~)
-    pareto_search(filename_uuid)
+    pareto_search(b.filename_uuid)
     pareto_design_heuristics()
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
@@ -252,7 +252,7 @@ end
 
 % Function to generate parameter sensitivity figures
 function [figs,tabs] =  param_sensitivities(~,b)
-    [runtime_post_optim, runtime_re_optim] = param_sweep(filename_uuid); % fixme these runtimes aren't used
+    [runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid); % fixme these runtimes aren't used
     figs.re_optim_constraint = gcf;                   % delta p re-optimization (grid)
     n = figs.re_optim_constraint.Number;
     figs.post_optim_constraint= figure(n-1);          % delta p post optimality (grid)
@@ -305,7 +305,7 @@ end
 % Function to generate JPD multiplication figure
 function [figs,tabs] = jpd_multiply_fig_func(p, b)
     X = [b.X_noms; 1];
-    plot_power_matrix(X, p, b, filename_uuid)
+    plot_power_matrix(X, p, b, b.filename_uuid)
     figs.JPD_multiplication = gcf;
     tabs = [];
 end
