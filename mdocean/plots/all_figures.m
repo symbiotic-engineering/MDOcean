@@ -366,7 +366,7 @@ end
 
 % Function to generate damping plate moment, deflection, and aspect ratio figures
 function [figs,tabs] = damping_plate_structures(~,~)
-    addpath('dev/structures/damping-plate');
+    addpath('../dev/structures/damping-plate');
     BoedoPrantilAnnularPlate()
     n = gcf().Number;
     figs.damping_plate_aspect_ratio = figure(n);
