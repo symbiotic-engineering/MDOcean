@@ -250,7 +250,7 @@ end
 % Function to generate Pareto figure group
 function [figs,tabs] =  pareto_fig_func(~,b)
     pareto_search(b.filename_uuid)
-    pareto_design_heuristics()
+    pareto_curve_heuristics()
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
     figs.pareto_with_design_images = figure(n - 2);
@@ -274,7 +274,7 @@ function [figs,tabs] =  param_sensitivities(~,b)
     figs.re_optim_design_tornado_J1 = figure(n - 7);  % dx*/dp re-optimization (tornado)
     num_DVs = length(b.var_names);
     for i = 1:num_DVs
-        name = ['re_optim_design_tornado_' b.var_names(num_DVs+1-i)];
+        name = ['re_optim_design_tornado_' b.var_names{num_DVs+1-i}];
         figs.(name) = figure(n - (7+i));            % dx*/dp re-optimization (tornado)
     end
     figs.nonlinear_design_J2 = figure(n - num_DVs - 9);

@@ -602,7 +602,7 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     plot_potential(phi,R,Z,region_body,'Total Potential');
 
     date_string = [char(datetime('now','Format','yyyy-MM-dd__h-mma')) '_'];
-    folder = ['dev' filesep 'hydro_coeffs' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
+    folder = ['..' filesep 'dev' filesep 'hydro_coeffs' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
     savefig(folder)
     plot_potential(phiH,R,Z,region_body,'Homogeneous Potential');
     plot_potential(phiP,R,Z,region_body,'Particular Potential');
