@@ -166,7 +166,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         objs_opt
         flags
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
-                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound','Nom'})
+                'VariableNames',[strcat("Min ", b.obj_names(which_objs)), {'Min bound','Max bound','Nom'}])
     end
 
 end
