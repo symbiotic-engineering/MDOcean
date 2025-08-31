@@ -15,7 +15,7 @@ save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 table_save_fcn = @(tab,filename,colspec,firstrow) table2latex(tab, [save_folder filename], colspec, firstrow);
 
-num_figs = 51;
+num_figs = 59;
 num_tabs = 8;
 
 if nargin==0
@@ -59,43 +59,51 @@ figs_in_paper{18} = 'design_space_exploration.experiments';
 figs_in_paper{19} = 'comparison.overlaid_geometry';
 figs_in_paper{20} = 'comparison.overlaid_hydro_coeffs';
 figs_in_paper{21} = 'comparison.probability_CDF';
-figs_in_paper{22} = 'gradient_optim_fig_func.lagrange_multipliers';
-figs_in_paper{23} = 'gradient_optim_fig_func.dJ_dx_gradient';
-figs_in_paper{24} = 'multistart.multistart_convergence_tree';
-figs_in_paper{25} = 'param_sensitivities.objective_tornadoes';
-figs_in_paper{26} = 'param_sensitivities.design_tornadoes';
-figs_in_paper{27} = 'pareto_fig_func.pareto_front_with_design_images';
-figs_in_paper{28} = 'pareto_fig_func.pareto_front_LCOE_contours';
-figs_in_paper{29} = 'pareto_fig_func.heuristics';
-figs_in_paper{30} = 'pareto_fig_func.constraint_activity';
-figs_in_paper{31} = 'all_fig_compare.runtime_bar_chart';
+% power mult 22
+figs_in_paper{23} = 'gradient_optim_fig_func.lagrange_multipliers';
+figs_in_paper{24} = 'gradient_optim_fig_func.dJ_dx_gradient';
+figs_in_paper{25} = 'multistart.multistart_convergence_tree';
+% multistart bar chart 26
+figs_in_paper{27} = 'param_sensitivities.objective_tornadoes';
+figs_in_paper{28} = 'param_sensitivities.design_tornadoes_LCOE';
+figs_in_paper{29} = 'param_sensitivities.design_tornadoes_cost';
+figs_in_paper{30} = 'pareto_fig_func.pareto_front_with_design_images';
+figs_in_paper{31} = 'pareto_fig_func.pareto_front_LCOE_contours';
+figs_in_paper{32} = 'pareto_fig_func.heuristics';
+figs_in_paper{33} = 'pareto_fig_func.constraint_activity';
+figs_in_paper{34} = 'all_fig_compare.runtime_bar_chart';
+% 35 epsilon constraint seeds
 % appendix A- hydro
-figs_in_paper{32} = 'meem.meem_regions';
-figs_in_paper{33} = 'meem.meem_sparsity';
-figs_in_paper{34} = 'meem.meem_validation';
-figs_in_paper{35} = 'meem.meem_matching';
-figs_in_paper{36} = 'meem.meem_convergence';
-figs_in_paper{37} = 'meem.asymptotic_b_vector';
+figs_in_paper{36} = 'meem.meem_regions';
+figs_in_paper{37} = 'meem.meem_sparsity';
+figs_in_paper{38} = 'meem.meem_validation';
+figs_in_paper{39} = 'meem.meem_matching';
+figs_in_paper{40} = 'meem.meem_convergence';
+figs_in_paper{41} = 'meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_paper{38} = 'run_single_fig_func.drag_convergence';
-figs_in_paper{39} = 'slamming.slamming_amplitude';
-figs_in_paper{40} = 'force_saturation_fig_func.power_force_sensitivity';
-figs_in_paper{41} = 'wecsim.wecsim_all_sea_states';
+figs_in_paper{42} = 'force_saturation_fig_func.power_force_sensitivity';
+figs_in_paper{43} = 'run_single_fig_func.drag_convergence';
+figs_in_paper{44} = 'slamming.slamming_amplitude';
+% 45 slam model comparison
+figs_in_paper{46} = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-figs_in_paper{42} = 'read_non_matlab_figs.trapezoid';
-figs_in_paper{43} = 'read_non_matlab_figs.damping_plate_flowchart';
-figs_in_paper{44} = 'damping_plate_structures.damping_plate_moment';
-figs_in_paper{45} = 'damping_plate_structures.damping_plate_deflection';
-figs_in_paper{46} = 'damping_plate_structures.damping_plate_aspect_ratio';
+% 47 equivalent stiffness
+figs_in_paper{48} = 'read_non_matlab_figs.trapezoid';
+figs_in_paper{49} = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper{50} = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper{51} = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper{52} = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
-figs_in_paper{47} = 'param_sensitivities.post_optim_re_optim_objective';
-figs_in_paper{48} = 'param_sensitivities.post_optim_design';
-figs_in_paper{49} = 'param_sensitivities.re_optim_design';
+figs_in_paper{53} = 'param_sensitivities.post_optim_re_optim_objective';
+figs_in_paper{54} = 'param_sensitivities.post_optim_design';
+figs_in_paper{55} = 'param_sensitivities.re_optim_design';
 % appendix F - supplementary results
-figs_in_paper{50} = 'gradient_optim_fig_func.single_obj_convergence';
+% 56 normalized gradient
+figs_in_paper{57} = 'gradient_optim_fig_func.single_obj_convergence';
+figs_in_paper{58} = 'multistart.multistart_parallel_coordinates';
 % graphical abstract (unnumbered so at the end)
-figs_in_paper{51}  = 'read_non_matlab_figs.graphical_abstract';
+figs_in_paper{59}  = 'read_non_matlab_figs.graphical_abstract';
 
 %% TABLES
 tabs_in_paper = cell(1,29);
