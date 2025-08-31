@@ -241,7 +241,7 @@ function [figs,tabs] = gradient_optim_fig_func(p,b)
 end
 
 % Function to generate Pareto figure group
-function [figs,tabs] =  pareto_fig_func(~,~)
+function [figs,tabs] =  pareto_fig_func(~,b)
     pareto_search(b.filename_uuid)
     pareto_design_heuristics()
     figs.pareto_heuristics = gcf;
