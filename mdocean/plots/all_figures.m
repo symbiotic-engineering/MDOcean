@@ -17,8 +17,6 @@ table_save_fcn = @(tab,filename,colspec,firstrow) table2latex(tab, [save_folder 
 
 num_figs = 51;
 num_tabs = 8;
-fig_names   = cell([1,num_figs]);
-tab_names   = cell([1,num_tabs]);
 
 if nargin==0
     % if run without arguments, show all figures and tables
@@ -124,6 +122,7 @@ generated_tabs = struct();
 p = parameters();
 b = var_bounds();
 b.filename_uuid = filename_uuid;
+b.table_save_fcn = table_save_fcn;
 
 % Loop for figures
 for i = 1:length(which_figs)
@@ -314,7 +313,7 @@ function [figs,tabs] = jpd_multiply_fig_func(p, b)
 end
 
 % Function to generate validation figure for cost vs N WEC
-function [figs,tabs] = validation(~,~)
+function [figs,tabs] = validation(~,b)
 
     [~, ~, ~, ~, tab1a, figs.cost_vs_N_WEC] = validate_nominal_RM3('report');
     [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
@@ -336,7 +335,7 @@ function [figs,tabs] = validation(~,~)
     tab1latex = renamevars(tab1latex, tab1latex.Properties.VariableNames, new_names);
     firstrow = '&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\';
     colspec = '>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r';
-    table_save_fcn(tab1latex, 'table_12.tex', colspec, firstrow)
+    b.table_save_fcn(tab1latex, 'table_12.tex', colspec, firstrow)
 
     tabs.validation = tab1;
 end
@@ -356,8 +355,8 @@ function [figs,tabs] = comparison(p,b)
     figs.overlaid_hydro_coeffs = figure(n);
     figs.probability_CDF = figure(n-2);
 
-    table_save_fcn(tabs.optimal_design_vars,'table_19.tex')
-    table_save_fcn(tabs.optimal_outputs,    'table_20.tex')
+    b.table_save_fcn(tabs.optimal_design_vars,'table_19.tex')
+    b.table_save_fcn(tabs.optimal_outputs,    'table_20.tex')
 end
 
 % Function to generate asymptotic b vector figure
@@ -394,7 +393,7 @@ function [figs,tabs] = location_sensitivity_func(p,b)
                '>{\centering\arraybackslash}p{0.17\linewidth}' ...
                '>{\centering\arraybackslash}p{0.18\linewidth}'];
     firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
-    table_save_fcn(tablatex,'table_22.tex',colspec,firstrow)
+    b.table_save_fcn(tablatex,'table_22.tex',colspec,firstrow)
 
     figs = [];
 end
@@ -420,7 +419,7 @@ end
 function [figs,tabs] = multistart(p,b)
     [treeFig, parallelFig, tab] = gradient_mult_x0(p,b);
     tabs.multistart_results = tab;
-    table_save_fcn(tab,'table_21.tex')
+    b.table_save_fcn(tab,'table_21.tex')
     figs.multistart_convergence_tree = treeFig;
     figs.multistart_parallel_coordinates = parallelFig;
 end
