@@ -11,11 +11,11 @@ in.T_f_2 = X(3);        % draft of float (m)
 in.h_s   = X(4);        % total height of spar (m)
 in.h_fs_clear = X(5);   % vertical clearance between float tubes and spar when at rest (m)
 in.F_max = X(6) * 1e6;  % max powertrain force (N)
-in.P_max = X(7) * 1e3;  % maximum power (W)
+in.P_max = X(7) * 1e5;  % maximum power (W)
 in.t_f_b = X(8) * 1e-3; % float bottom thickness (m)
 in.t_s_r = X(9) * 1e-3; % vertical column thickness (m)
 in.t_d   = X(10)* 1e-3; % damping plate thickness (m)
-in.h_stiff_f  = X(11);  % float stiffener height (m)
+in.h_stiff_f  = X(11)/10;  % float stiffener height (m)
 in.h1_stiff_d = X(12);  % damping plate stiffener larger height (m)
 in.M     = X(13);       % material index (-)
 
@@ -65,9 +65,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
- X_constraints,~,~,~,~,~,~,~,A_f_over_rho, A_s_over_rho,A_c_over_rho,...
- B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,gamma_f_over_rho_g,...
- gamma_s_over_rho_g,gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+ X_constraints] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
 
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
@@ -86,7 +84,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 %% Assemble constraints g(x) >= 0
-num_g = 20+numel(p.JPD)+length(p.T_struct);
+num_g = 23+numel(p.JPD)+length(p.T_struct);
 g = zeros(1,num_g);
 g(1) = V_f_pct;                         % prevent float too heavy
 g(2) = 1 - V_f_pct;                     % prevent float too light
@@ -101,7 +99,7 @@ g(10) = FOS_damping_plate(1) * in.FOS_mult_d / p.FOS_min - 1; % damping plate su
 g(11) = FOS_damping_plate(2) * in.FOS_mult_d / p.FOS_min - 1; % damping plate survives fatigue
 g(12) = FOS_spar_local(1) / p.FOS_min - 1;    % spar survives max force in local buckling
 g(13) = FOS_spar_local(2) / p.FOS_min - 1;    % spar survives fatigue in local buckling
-if p.avg_power_min == 0
+if ~isfield(p,'avg_power_min') || p.avg_power_min == 0
     g(14) = P_avg_elec/1e6;                     % positive power
 else
     g(14) = P_avg_elec/p.avg_power_min - 1; % prevent less avg power than threshold
@@ -112,11 +110,19 @@ g(16) = F_ptrain_max/in.F_max - 1;      % prevent irrelevant max force -
                                         % this constraint should always be
                                         % active unless F_max==Inf
                                         % and is only required when p.cost_perN = 0.
-g(17) = X_constraints(1);               % prevent float rising above top of spar
-g(18) = X_constraints(2);               % prevent float going below bottom of spar
-g(19) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
-g(20) = X_constraints(4);               % float amplitude obeys linear theory
-g(21:end) = X_constraints(5:end);       % prevent rising out of water/slamming
+g(17) = in.F_max/F_ptrain_max - 1;      % prevent more PTO force than is available
+                                        % this constraint should always be
+                                        % active unless F_max==Inf and is
+                                        % only required when p.use_force_sat = false.
+g(18) = in.P_max/max(P_matrix_elec,[],'all') - 1; % prevent more PTO power than is avaliable
+                                        % this constraint should always be active
+                                        % and is only required when p.use_power_sat = false.
+g(19) = X_constraints(1);               % prevent float rising above top of spar
+g(20) = X_constraints(2);               % prevent float going below bottom of spar
+g(21) = X_constraints(3);               % prevent float support tube (PTO attachment) from hitting spar
+g(22) = X_constraints(4);               % float amplitude obeys linear theory
+g(23) = X_constraints(5);               % spar amplitude obeys linear theory
+g(24:end) = X_constraints(6:end);       % prevent rising out of water/slamming
 
 criteria = all(~isinf([g LCOE P_var])) && all(~isnan([g LCOE P_var])) && all(isreal([g LCOE P_var]));
 if ~criteria
@@ -134,9 +140,18 @@ if nargout > 4 % if returning extra struct output for validation
                                  in.h_stiff_f, in.w_stiff_f, in.num_sections_f, ...
                                  in.h_stiff_d, in.w_stiff_d, in.num_stiff_d, ...
                                  in.M, in.rho_m, in.rho_w, in.m_scale);
+
     [~,~,capex,opex,pto, devicestructure] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, in.FCR, ...
                         in.cost_perN_mult, in.cost_perW_mult, in.F_max, in.P_max, in.eff_array);
-    [~, ~, ~, ~, ~, ~, ~, ~, ~, B_p,K_p,mag_U,X_u,X_f,X_s,P_matrix_mech] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+
+    [~, ~, ~, ~, ~, ~, ~, ~, ~, ...
+     B_p,K_p,mag_U,X_u,X_f,X_s,...
+     P_matrix_mech,P_sat_ratio,...
+     A_f_over_rho, A_s_over_rho,A_c_over_rho,...
+     B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,...
+     gamma_f_over_rho_g,gamma_s_over_rho_g,...
+     gamma_phase_f,gamma_phase_s,w] = dynamics(in, m_f_tot, m_s_tot, V_d, T);
+
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
     val.mass_rp = mass(3);
@@ -162,6 +177,7 @@ if nargout > 4 % if returning extra struct output for validation
     val.X_f = X_f;
     val.X_s = X_s;
     val.P_mech = P_matrix_mech;
+    val.P_sat_ratio = P_sat_ratio;
     val.CB_f = CB_f;
     val.CG_f = CG_f;
     val.vol_f = V_d(1);

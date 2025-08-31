@@ -1,20 +1,24 @@
-clear;close all;clc
-p = parameters();
-b = var_bounds();
+function run_single(p,b,X)
+% Run and plot a single design. Defaults to nominal design if no X input.
 
+    if nargin==0
+        clear;close all;clc
+        p = parameters();
+        b = var_bounds();
+    end
+    if nargin<3
+        X = [b.X_noms; 1];
+    end
 
-X = [b.X_noms; 1];
+    [LCOE, P_var, ~, g, val] = simulation(X,p)
 
-[LCOE, P_var, ~, g, val] = simulation(X,p)
+    [feasible,~,failed] = is_feasible(g,X,p,b)
 
-[feasible,~,failed] = is_feasible(g,X,p,b)
+    plot_power_matrix(X,p,b,'')
 
-num_outputs = 4;
-runtime = timeit(@()simulation(X,p),num_outputs);
+    figure
+    power_PDF(X,p)
 
-plot_power_matrix(X,p,'')
+    visualize_geometry(X,p)
 
-figure
-power_PDF(X,p)
-
-visualize_geometry(X,p)
+end
