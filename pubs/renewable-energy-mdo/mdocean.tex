@@ -125,13 +125,13 @@
 %%             country={}}
 %% \fntext[label3]{}
 
-\title{Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability}
+\title{Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability}
 
 %% use optional labels to link authors explicitly to addresses:
 \author[MAE]{Rebecca McCabe\corref{cor1}}
 \ead{rgm222@cornell.edu}
 \author[MAE]{Madison Dietrich}
-\author[MAE,sys]{Maha Haji}
+\author[mich]{Maha Haji}
 
 \cortext[cor1]{Corresponding Author}
 
@@ -142,11 +142,11 @@
              state={NY},
              country={USA}}
 
-\affiliation[sys]{organization={Department of Systems Engineering, Cornell University},
-             addressline={136 Hoy Rd.},
-             city={Ithaca},
-             postcode={14853},
-             state={NY},
+\affiliation[mich]{organization={Department of Mechanical Engineering, University of Michigan},
+             addressline={G.G. Brown Laboratory, 2350 Hayward},
+             city={Ann Arbor},
+             postcode={48109},
+             state={MI},
              country={USA}}
 
 %% Abstract
@@ -159,10 +159,7 @@ Five hull dimensions, five structural thicknesses, and the generator force and p
 Objectives include the levelized cost of energy (LCOE), power production, and capital cost.
 MDO principles motivate the optimization formulation and solution process.
 
-The optimization's large scope and comprehensive nature are uniquely possible due to the purpose-developed semi-analytical model used for simulation.
-The model incorporates a mesh-free eigenfunction-based linear hydrodynamic solver, a quasi-linearized dynamics engine that handles drag and saturation nonlinearities in the frequency-domain, a structural sizing module with realistic yield/ultimate/buckling failure criteria for storm and fatigue design load cases, and a simple cost estimator to assess techno-economic viability.
-The text documents the derivation, assumptions, and optimization implications of the model, which is called MDOcean and released open-source.
-Validation and computational benchmarking demonstrate that MDOcean's $\simRuntime$ms runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
+The optimization's large scope and comprehensive nature are uniquely possible due to the purpose-developed semi-analytical model used for simulation, which is called MDOcean and released open-source.
 
 The obtained optimization results achieve a \pctImproveDesignCostMinLCOE~reduction in modeled cost, \pctImprovePowerMinLCOE~increase in power, and resulting \pctImproveLCOEMinLCOE~decrease in LCOE compared to the original RM3 design.
 Parameter sensitivity analysis indicates that LCOE depends more strongly on \sensitiveParamCategoriesMinLCOE~parameters than \insensitiveParamCategoriesMinLCOE~parameters and that the optimal design is sensitive to \sensitiveDesignCategoriesMinLCOE~parameters.
@@ -179,7 +176,6 @@ Gradient-based optimization for one objective requires \singleObjFcnEvals~functi
 
 %%Research highlights
 \begin{highlights}
-\item Develop and validate a rapid ($<\simRuntime$~ms) open-source wave energy simulation incorporating dynamic nonlinearities (generator force saturation, drag), semi-analytical hydrodynamics, and realistic structures (fatigue and storm loadcases, stress and buckling failure modes)
 \item Formulate and solve a constrained multi-objective multidisciplinary design optimization with twelve dimensional, structural, and power take-off design variables to maximize power and minimize estimated capital cost
 \item Optimal designs achieve up to \pctImproveLCOEMinLCOE~LCOE reduction and tend to be \optDesignDescriptionMinLCOE~than the standard RM3 design
 \item Sensitivity analysis reveals LCOE is most sensitive to \sensitiveParamCategoriesMinLCOE, while cost is most sensitive to \sensitiveParamCategoriesMinCapex
@@ -188,7 +184,7 @@ Gradient-based optimization for one objective requires \singleObjFcnEvals~functi
 
 %% Keywords
 \begin{keyword}
-wave energy conversion \sep marine renewable energy \sep semi-analytical hydrodynamics \sep structural design \sep survivability analysis \sep sensitivity analysis \sep multidisciplinary design optimization \sep techno-economic optimization \sep control co-design \sep two-body point absorber \sep shape optimization \sep power take-off design
+wave energy conversion \sep marine renewable energy \sep structural design \sep survivability analysis \sep sensitivity analysis \sep multidisciplinary design optimization \sep techno-economic optimization \sep control co-design \sep two-body point absorber \sep shape optimization \sep power take-off design
 %% keywords here, in the form: keyword \sep keyword
 
 %% PACS codes here, in the form: \PACS code \sep code
@@ -237,20 +233,6 @@ wave energy conversion \sep marine renewable energy \sep semi-analytical hydrody
 % Summary:
 In summary, this paper develops fast and accurate semi-analytical models for WEC geometry, hydrodynamics, dynamics, structures, and economics and subsequently applies the Multidisciplinary Design Optimization (MDO) framework to maximize power and minimize cost of the RM3 point absorber. 
 
-% Model
-The geometry module calculates volumes, areas, and the pitch stability margin with simple algebraic relations.
-The hydrodynamics module implements the matched eigenfunction expansion method for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing BEM solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current MEEM model.
-This achieves an order of magnitude speedup compared to the popular BEM solver Capytaine.
-The dynamics module employs describing functions to extend beyond the typical frequency domain formulation to capture nonlinearites and dynamic constraints such as drag and force saturation.
-This achieves a three order of magnitude computational speedup over the common dynamics solver WEC-Sim.
-The structures module uses an equivalent-thickness model of stiffened plates and a library of canonical solution to structural boundary value problems to assess the factor of safety of the float bottom plate, spar shell, and damping plate in cyclic fatigue and storm load cases.
-This represents, to the authors' knowledge, the only public WEC structural simulation regardless of modeling technique.
-Finally, the economics module calculates the design-dependent cost based on structural material volume and powertrain force and power rating, then performing a straightforward LCOE calculation.
-Comparison of the dynamics and float hydrodynamics models against WEC-Sim and BEM respectively across multiple cases serves to comprehensively validate the models, with errors generally less than 1\% for test cases with identical assumptions and around 10\% for more realistic cases with diverging assumptions.
-The geometry, economics, structures, and spar hydrodynamics are compared against the RM3 report, serving as a less comprehensive yet sufficient validation.
-Good agreement is observed for all but the spar added mass, storm loads, and structural margins, necessitating the use of a tuning factor for these quantities.
-All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \simRuntime~seconds.
-
 % Formulation
 The optimization problem formulation is developed systematically and cleverly with numerical implications such as linearity, convergence, and feasibility in mind.
 12 design variables representing bulk dimensions, structural thicknesses, and powertrain ratings are chosen.
@@ -288,7 +270,7 @@ Finally, analysis extensions such as a global sensitivity sweep assessing the im
 The results of this study will inform future WEC design optimization, opening designers' eyes to the complex trade-off associated with power and cost, the necessity of accounting for multidisciplinary coupling, and the power of clever simulation and optimization tricks to reduce runtime and facilitate convergence.
 
 \section{Acknowledgements}
-The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Iris Ren for assistance with optimization code; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
+The authors thank Iris Ren for assistance with optimization code; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
 
 R.M. acknowledges funding from the National Science Foundation Graduate Research Fellowship.
 M.D. acknowledges funding from the Fund for Undergraduate Research on Solutions to Climate Change and the Bill Nye ’77 Award in Undergraduate Research.
@@ -345,7 +327,7 @@ A Python version using the OpenMDAO package is forthcoming. % todo: replace with
 %% https://en.wikibooks.org/wiki/LaTeX/Advanced_Mathematics
 
 \clearpage
-\bibliographystyle{elsarticle-num-names} 
+\bibliographystyle{../elsarticle-num-names} 
 \bibliography{references}
 
 \end{document}
