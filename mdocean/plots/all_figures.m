@@ -13,7 +13,7 @@ end
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
-table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin);
+table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin{:});
 
 num_figs = 59;
 num_tabs = 8;
