@@ -1,4 +1,4 @@
-function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
+function [figs, runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
 
     %% Setup
     b = var_bounds();
@@ -52,7 +52,7 @@ function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     disp('done local, starting global param sensitivity')
     t = tic;
     [par_x_star_par_p_global, dJstar_dp_global, ...
-        delta_p_change_activity_global] = global_sens_all_param(params, param_names, p_val, ...
+        delta_p_change_activity_global,figs_global] = global_sens_all_param(params, param_names, p_val, ...
                                                                 x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                 p, b, colors, groups);
     runtimeGlobal = toc(t);
@@ -63,25 +63,27 @@ function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     
     % color grid plots
     % fig 1: dJ*/dp combined
-    sensitivity_plot(dJdp_combined, 'dJ*/dp normalized', param_names, dJdp_names, ...
-        'Parameters p', 'Type of Sensitivity')
+    f1 = sensitivity_plot(dJdp_combined, 'dJ*/dp normalized', param_names, dJdp_names, ...
+        'Parameters p', 'Type of Sensitivity');
     % fig 2: dJ*/dp global
-    sensitivity_plot(dJstar_dp_global, 'dJ*/dp normalized: global', param_names, '', ...
-        'Parameters p', '')
+    f2 = sensitivity_plot(dJstar_dp_global, 'dJ*/dp normalized: global', param_names, '', ...
+        'Parameters p', '');
     
     % fig 3: dx*/dp local
-    dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local')
+    f3 = dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local');
     % fig 4: dx*/dp global
-    dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global')
+    f4 = dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global');
     
     % fig 5: delta p local
-    delta_p_plot(delta_p_change_activity_local,  b, dvar_names, param_names, 'local')
+    f5 = delta_p_plot(delta_p_change_activity_local,  b, dvar_names, param_names, 'local');
     % fig 6: delta p global
-    delta_p_plot(delta_p_change_activity_global, b, dvar_names, param_names, 'global')
+    f6 = delta_p_plot(delta_p_change_activity_global, b, dvar_names, param_names, 'global');
+
+    figs = [figs_global,f1,f2,f3,f4,f5,f6]; % figs_global has 6+num_dvs=18 so 24 total
 
 end
 
-function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
+function fig = delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
     % combine all the slamming constraints into one so it fits on plot
     constr_names  = [b.constraint_names_pretty b.lin_constraint_names_pretty ...
         strcat(dvar_names," lower"), strcat(dvar_names," upper")];
@@ -97,20 +99,20 @@ function delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
     yticks = param_names;
     xlab = 'Constraints';
     ylab = 'Parameters';
-    sensitivity_plot(delta_p_norm_combine_slamming, titl, xticks, yticks, xlab, ylab)
+    fig = sensitivity_plot(delta_p_norm_combine_slamming, titl, xticks, yticks, xlab, ylab);
 end
 
-function dxdp_plot(dxdp, param_names, dvar_names,title_suffix)
+function fig = dxdp_plot(dxdp, param_names, dvar_names,title_suffix)
     titl = ['dx*/dp normalized: ' title_suffix];
     xticks = param_names;
     yticks = dvar_names;
     xlab = 'Parameters p';
     ylab = 'Design Variables x';
-    sensitivity_plot(dxdp, titl, xticks, yticks, xlab, ylab)
+    fig = sensitivity_plot(dxdp, titl, xticks, yticks, xlab, ylab);
 end
 
-function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
-    color_each_element(matrix)
+function fig = sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
+    fig = color_each_element(matrix);
     ax = gca;
     title(titl)
     set(ax,'XTickLabel',xticks)
@@ -129,14 +131,14 @@ function sensitivity_plot(matrix, titl, xticks, yticks, xlab, ylab)
     if length(yticks) > 40
         ax.YAxis.FontSize = 10;
     end
-    set(gcf,'Position',[1 41 1536 840]) % full screen
+    set(fig,'Position',[1 41 1536 840]) % full screen
 end
 
 %% Rerun optimization for global sensitivities
 function [par_x_star_par_p_global, ...
           dJstar_dp_global, ...
           delta_p_change_activity_global,...
-          LCOE, P_var, X_LCOE, X_Pvar] = global_sens_all_param(params, param_names, p_val, ...
+          LCOE, P_var, X_LCOE, X_Pvar, figs] = global_sens_all_param(params, param_names, p_val, ...
                                                                x0_vec, dvar_names, J0, g_lambda_0, ...
                                                                p, b, colors, groups)
     %ratios = .8 : .1 : 1.2;
@@ -228,7 +230,7 @@ function [par_x_star_par_p_global, ...
     
     %% Line plots showing nonlinearity
     fig_num_start = gcf().Number+1;
-    figure(fig_num_start)
+    f1 = figure(fig_num_start);
     subplot 121
     plot(ratios,LCOE/LCOE_nom)
     xlabel('Parameter Ratio from nominal')
@@ -244,7 +246,7 @@ function [par_x_star_par_p_global, ...
     legend(param_names)
     improvePlot
     grid on
-    set(gcf,'Position',[1 41 1536 840]) % full screen
+    set(f1,'Position',[1 41 1536 840]) % full screen
     
     for i = 1:num_DVs
         f2 = figure(fig_num_start+1);
@@ -270,16 +272,16 @@ function [par_x_star_par_p_global, ...
     set(f3,'Position',[1 41 1536 840]) % full screen
 
     %% Tornado chart for overall slope
-    sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp')
+    f4 = sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp');
     
     % separate figures for each design variable, with subplot for each objective
     for i=1:num_DVs
-        sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
+        f5_arr(i) = sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
                                 param_names, colors, groups, ['d' dvar_names{i} '^*/dp']);
     end
 
     % separate figures for each objective, with subplots for each design variable
-    f4 = figure;
+    f6 = figure;
     t = tiledlayout(3,4);
     for i=1:num_DVs
         nexttile
@@ -291,7 +293,7 @@ function [par_x_star_par_p_global, ...
     t.TileSpacing = 'compact';
     t.Padding = 'compact';
 
-    f5 = figure;
+    f7 = figure;
     t2 = tiledlayout(3,4);
     for i=1:num_DVs
         nexttile
@@ -303,9 +305,10 @@ function [par_x_star_par_p_global, ...
     t2.TileSpacing = 'compact';
     t2.Padding = 'compact';
 
-    set(f4,'Position',[1 41 1536 840]) % full screen
-    set(f5,'Position',[1 41 1536 840]) % full screen
+    set(f6,'Position',[1 41 1536 840]) % full screen
+    set(f7,'Position',[1 41 1536 840]) % full screen
 
+    figs = [f1,f2,f3,f4,f5_arr,f6,f7];
 end
 
 
@@ -352,10 +355,10 @@ function sensitivity_tornado_barh_inner(slope, param_names, colors, k)
     set(all_axes,'FontSize',12)
 end
 
-function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
+function f = sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
     
     % separate subplots for each objective
-    figure
+    f = figure;
     subplot 121
     sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 25)
     title('At Minimum LCOE')
@@ -367,7 +370,7 @@ function sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, g
     
     % legend
     color_legend(groups,colors,'southeast')
-    set(gcf,"Position",[1.8 41.8 930 836.8])
+    set(f,"Position",[1.8 41.8 930 836.8])
     
     % both objectives on the same chart
 %     figure
