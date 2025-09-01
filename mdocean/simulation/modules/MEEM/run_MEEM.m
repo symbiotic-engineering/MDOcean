@@ -118,7 +118,7 @@ function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num
         [phi_p_i1_num,phi_p_i2_num] = fix_scalars(size(R),phi_p_i1_num,phi_p_i2_num);
         assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,phi_i1_num,phi_i2_num,phi_e_num,...
                                      phi_p_i1_num,phi_p_i2_num,phi_h_i1_num,phi_h_i2_num,...
-                                     v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num,fname);
+                                     v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num);
     end
 
     mu_nondim = real(hydro_nondim_num);
@@ -568,8 +568,7 @@ end
 function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
                                      phi_i1_num,phi_i2_num,phi_e_num,...
                                      phi_p_i1_num,phi_p_i2_num,phi_h_i1_num,phi_h_i2_num,...
-                                     v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num,...
-                                     fname)
+                                     v_1_r_num,v_1_z_num,v_2_r_num,v_2_z_num,v_e_r_num,v_e_z_num)
     % assemble total phi based on phi in each region
     regione = R > a2_num;
     region1 = R <= a1_num & Z < -d1_num;
@@ -600,10 +599,6 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
 
     region_body = ~region1 & ~region2 & ~regione;
     plot_potential(phi,R,Z,region_body,'Total Potential');
-
-    date_string = [char(datetime('now','Format','yyyy-MM-dd__h-mma')) '_'];
-    folder = ['..' filesep 'dev' filesep 'hydro_coeffs' filesep 'MEEM' filesep 'MEEM_figs' filesep date_string fname];
-    savefig(folder)
     plot_potential(phiH,R,Z,region_body,'Homogeneous Potential');
     plot_potential(phiP,R,Z,region_body,'Particular Potential');
     plot_potential(v_r,R,Z,region_body,'Radial Velocity')
@@ -618,7 +613,6 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     plot_matching(v_1_r_num,v_2_r_num,v_e_r_num,a1_num,a2_num,R,Z,'Radial Velocity',z_cutoffs_velocity)
     plot([-d1_num -d2_num],[0 0],'m','DisplayName','No flux BC at a1')
     plot([-d2_num 0]      ,[0 0],'c--','DisplayName','No flux BC at a2')
-    savefig([folder '_VelMatch'])
 end
 
 function [] = plot_potential(phi,R,Z,region_body,name)

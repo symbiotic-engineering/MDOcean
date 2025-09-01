@@ -59,20 +59,20 @@ figs_in_paper{18} = 'design_space_exploration.experiments';
 figs_in_paper{19} = 'comparison.overlaid_geometry';
 figs_in_paper{20} = 'comparison.overlaid_hydro_coeffs';
 figs_in_paper{21} = 'comparison.probability_CDF';
-% power mult 22
+figs_in_paper{22} = 'gradient_optim_fig_func.single_obj_opt_power_matrix';
 figs_in_paper{23} = 'gradient_optim_fig_func.lagrange_multipliers';
 figs_in_paper{24} = 'gradient_optim_fig_func.dJ_dx_gradient';
 figs_in_paper{25} = 'multistart.multistart_convergence_tree';
-% multistart bar chart 26
-figs_in_paper{27} = 'param_sensitivities.objective_tornadoes';
-figs_in_paper{28} = 'param_sensitivities.design_tornadoes_LCOE';
-figs_in_paper{29} = 'param_sensitivities.design_tornadoes_cost';
+figs_in_paper{26} = 'multistart.multistart_bar chart';
+figs_in_paper{27} = 'param_sensitivities.re_optim_objective_tornado';
+figs_in_paper{28} = 'param_sensitivities.re_optim_design_tornado_J1';
+figs_in_paper{29} = 'param_sensitivities.re_optim_design_tornado_J2';
 figs_in_paper{30} = 'pareto_fig_func.pareto_front_with_design_images';
 figs_in_paper{31} = 'pareto_fig_func.pareto_front_LCOE_contours';
-figs_in_paper{32} = 'pareto_fig_func.heuristics';
-figs_in_paper{33} = 'pareto_fig_func.constraint_activity';
+figs_in_paper{32} = 'pareto_fig_func.pareto_heuristics';
+figs_in_paper{33} = 'pareto_fig_func.pareto_constraint_activity';
 figs_in_paper{34} = 'all_fig_compare.runtime_bar_chart';
-% 35 epsilon constraint seeds
+figs_in_paper{35} = 'pareto_sweep.sweep_num_seeds';
 % appendix A- hydro
 figs_in_paper{36} = 'meem.meem_regions';
 figs_in_paper{37} = 'meem.meem_sparsity';
@@ -84,10 +84,10 @@ figs_in_paper{41} = 'meem.asymptotic_b_vector';
 figs_in_paper{42} = 'force_saturation_fig_func.power_force_sensitivity';
 figs_in_paper{43} = 'run_single_fig_func.drag_convergence';
 figs_in_paper{44} = 'slamming.slamming_amplitude';
-% 45 slam model comparison
+figs_in_paper{45} = 'run_single_fig_func.slamming_model_comparison';
 figs_in_paper{46} = 'wecsim.wecsim_all_sea_states';
 % appendix C - structures
-% 47 equivalent stiffness
+figs_in_paper{47} = 'read_non_matlab_figs.equivalent_stiffness';
 figs_in_paper{48} = 'read_non_matlab_figs.trapezoid';
 figs_in_paper{49} = 'read_non_matlab_figs.damping_plate_flowchart';
 figs_in_paper{50} = 'damping_plate_structures.damping_plate_moment';
@@ -95,11 +95,11 @@ figs_in_paper{51} = 'damping_plate_structures.damping_plate_deflection';
 figs_in_paper{52} = 'damping_plate_structures.damping_plate_aspect_ratio';
 % appendix D - economics
 % appendix E - optimization process
-figs_in_paper{53} = 'param_sensitivities.post_optim_re_optim_objective';
-figs_in_paper{54} = 'param_sensitivities.post_optim_design';
-figs_in_paper{55} = 'param_sensitivities.re_optim_design';
+figs_in_paper{53} = 'param_sensitivities.post_optim_re_optim_objective_grid';
+figs_in_paper{54} = 'param_sensitivities.post_optim_design_grid';
+figs_in_paper{55} = 'param_sensitivities.re_optim_design_grid';
 % appendix F - supplementary results
-% 56 normalized gradient
+figs_in_paper{56} = 'gradient_optim_fig_func.normalized_gradient';
 figs_in_paper{57} = 'gradient_optim_fig_func.single_obj_convergence';
 figs_in_paper{58} = 'multistart.multistart_parallel_coordinates';
 % graphical abstract (unnumbered so at the end)
@@ -253,7 +253,7 @@ function [figs,tabs] =  pareto_fig_func(~,b)
     pareto_curve_heuristics()
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
-    figs.pareto_with_design_images = figure(n - 2);
+    figs.pareto_front_with_design_images = figure(n - 2);
     figs.pareto_front_LCOE_contours = figure(n - 3);
     figs.pareto_constraint_activity = figure(n - 5); 
     figs.pareto_constraint_activity.Position = [1 41 1536 844.8000];
@@ -262,24 +262,25 @@ end
 
 % Function to generate parameter sensitivity figures
 function [figs,tabs] =  param_sensitivities(~,b)
-    [runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid); % fixme these runtimes aren't used
-    figs.re_optim_constraint = gcf;                   % delta p re-optimization (grid)
-    n = figs.re_optim_constraint.Number;
-    figs.post_optim_constraint= figure(n-1);          % delta p post optimality (grid)
-    figs.re_optim_design = figure(n - 2);             % dx*/dp re-optimization (grid)
-    figs.post_optim_design  = figure(n - 3);          % dx*/dp post optimality (grid)
-    figs.re_optim_objective = figure(n - 4);          % dJ*/dp re-optimization (grid)
-    figs.post_optim_re_optim_objective = figure(n - 5);  % dJ*/dp combined (grid)
-    figs.re_optim_design_tornado_J2 = figure(n - 6);  % dx*/dp re-optimization (tornado)
-    figs.re_optim_design_tornado_J1 = figure(n - 7);  % dx*/dp re-optimization (tornado)
+    [fig_arr, runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid); % fixme these runtimes aren't used
+    figs.re_optim_constraint_grid = fig_arr(end);                   % delta p re-optimization (grid)
+    figs.post_optim_constraint_grid= fig_arr(end-1);          % delta p post optimality (grid)
+    figs.re_optim_design_grid = fig_arr(end - 2);             % dx*/dp re-optimization (grid)
+    figs.post_optim_design_grid  = fig_arr(end - 3);          % dx*/dp post optimality (grid)
+    figs.re_optim_objective_grid = fig_arr(end - 4);          % dJ*/dp re-optimization (grid)
+    figs.post_optim_re_optim_objective_grid = fig_arr(end-5); % dJ*/dp combined (grid)
+
+    figs.re_optim_design_tornado_J2 = fig_arr(end - 6);  % dx*/dp re-optimization (tornado)
+    figs.re_optim_design_tornado_J1 = fig_arr(end - 7);  % dx*/dp re-optimization (tornado)
     num_DVs = length(b.var_names);
     for i = 1:num_DVs
         name = ['re_optim_design_tornado_' b.var_names{num_DVs+1-i}];
-        figs.(name) = figure(n - (7+i));            % dx*/dp re-optimization (tornado)
+        figs.(name) = fig_arr(end - (7+i));            % dx*/dp re-optimization (tornado)
     end
-    figs.nonlinear_design_J2 = figure(n - num_DVs - 9);
-    figs.nonlinear_design_J1 = figure(n - num_DVs - 10);
-    figs.nonlinear_objectives = figure(n - num_DVs - 11);
+    figs.re_optim_objective_tornado = fig_arr(end - num_DVs - 8); % dJ*/dp re-optimization (tornado)
+    figs.nonlinear_design_J2 = fig_arr(end - num_DVs - 9); % x* for J2 line plot 
+    figs.nonlinear_design_J1 = fig_arr(end - num_DVs - 10); % x* for J1 line plot 
+    figs.nonlinear_objectives = fig_arr(end - num_DVs - 11); % J* line plot 
     tabs = [];
 end
 
