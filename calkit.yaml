@@ -1,12 +1,25 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize 
+description: Multidisciplinary Design Optimization (MDO) to optimize
   an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+pipeline:
+  stages:
+    build-paper:
+      kind: latex
+      target_path: pubs/journal-paper/mdocean.tex
+      environment: tex
+      inputs:
+        - pubs/journal-paper/figs
+        - pubs/journal-paper/sections/
+        - pubs/journal-paper/tables
+        - pubs/journal-paper/references.bib
+        - pubs/journal-paper/numbers.tex
+        - pubs/journal-paper/elsarticle-num-names.bst
 publications:
   - path: pubs/renewable-energy-mdo/mdocean.pdf
     title: Journal Renewable Energy
@@ -28,7 +41,7 @@ publications:
         - figs
       last_sync_commit: 9c9ebc1955e169a2f2bff30521f08919b875d820
   - path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
-    title: WEC optimization to maximize grid economic value and 
+    title: WEC optimization to maximize grid economic value and
       avoided emissions
     description:
     kind: conference-paper
