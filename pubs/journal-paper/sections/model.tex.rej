@@ -1,0 +1,21 @@
+diff a/pubs/journal-paper/sections/model.tex b/pubs/journal-paper/sections/model.tex	(rejected hunks)
+@@ -54,10 +54,16 @@ All modules except the dynamics module are explicit, meaning they require no int
+ The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
+ The dynamics iteration occurs separately for each outer iteration of the optimizer.
+ This structure is known as the multiple discipline feasible (MDF) architecture.
+-In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
++In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
++SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
+ The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
+-In MDOcean, SAND would decrease the runtime of a single simulation but would likely require more optimization iterations and invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013}.
+-Since the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation, MDF is chosen to avoid the additional hydrodynamics evaluations that SAND would require.
++
++Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation versus optimization \cite{underactuated}.
++However, in MDO the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
++As \sectionautorefname~\ref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
++This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics) simulation evaluations.
++For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
++Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
+ 
+ \subsection{Module Details}
+ \label{sec:modules}
