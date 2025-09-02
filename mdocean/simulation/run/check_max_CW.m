@@ -1,23 +1,36 @@
 function [hydro_ratio, P_wave, CW_max, ...
-    P_elec, force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, X, p, b, plot_on)
+    P_elec, force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, p, b_or_X, plot_on)
+% Checks whether the maximum radiation-limited capture width is violated.
+% b_or_X: provide b (or no input) if you want to use the design with highest avg power (worst case),
+% vs provide X if you want to check a certain design.
     
-    if nargin==2 || nargin==3
-        error('Must have 1, 4, or 5 inputs')
-    elseif nargin==1
+    if nargin<1
+        filename_uuid = '';
+    end
+    if nargin<2
         p = parameters();
-        b = var_bounds();
-        if nargin==0
-            filename_uuid = '';
-        end
+    end
+    if nargin<3
+        b_or_X = var_bounds();
+    end
+    if nargin<4
+        plot_on = true;
+    end
+    
+    if isstruct(b_or_X)
+        b = b_or_X;
         b.filename_uuid = filename_uuid;
     
         [X,val,~,P_elec] = max_avg_power(p,b);    
-    else
+    elseif isfloat(b_or_X)
+        X = b_or_X;
         [~,P_elec,~,val] = simulation(X, p);
+    else
+        msg = ['b_or_X is ' class(b_or_X) ...
+            ' but should be either struct (b) or float (X)'];
+        error(msg)
     end
-    if nargin<5
-        plot_on = true;
-    end
+
     P_mech = val.P_mech;
     force_sat_ratio = val.P_sat_ratio;
     P_mech_unsat =  P_mech ./ force_sat_ratio;
