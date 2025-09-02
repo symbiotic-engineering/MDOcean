@@ -71,20 +71,21 @@ end
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
-    num_objectives = length(which_objs);
+    num_objectives_total = length(b.obj_names);
+    num_objectives_to_run = length(which_objs);
 
     [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,num_objectives],size(p.JPD),[1, num_constraints]},...
+                                            'OutputSize',{[1,num_objectives_total],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
     probs = cell([1 length(objs)]); 
     
     % allocate outputs
-    Xs_opt = zeros(length(X),num_objectives);
-    objs_opt = zeros(1,num_objectives);
-    flags = zeros(1,num_objectives);
-    grads = zeros(length(X)-1,num_objectives);
-    hesses = zeros(length(X)-1,length(X)-1,num_objectives);
+    Xs_opt = zeros(length(X),num_objectives_to_run);
+    objs_opt = zeros(1,num_objectives_to_run);
+    flags = zeros(1,num_objectives_to_run);
+    grads = zeros(length(X)-1,num_objectives_to_run);
+    hesses = zeros(length(X)-1,length(X)-1,num_objectives_to_run);
 
     % add nonlinear constraints
     prob = optimproblem();
@@ -98,7 +99,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
     end
 
     % iterate through the two objectives: LCOE and P_var
-    for i = 1:num_objectives
+    for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
         
@@ -106,7 +107,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         if length(x0_input)==1
             x0 = x0_input;
-        elseif length(x0_input)==num_objectives
+        elseif length(x0_input)==num_objectives_to_run
             x0 = x0_input(i);
         else
             error('x0 input struct has wrong size')
