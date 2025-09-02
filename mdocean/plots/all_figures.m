@@ -63,7 +63,7 @@ figs_in_paper{22} = 'gradient_optim_fig_func.single_obj_opt_power_matrix';
 figs_in_paper{23} = 'gradient_optim_fig_func.lagrange_multipliers';
 figs_in_paper{24} = 'gradient_optim_fig_func.dJ_dx_gradient';
 figs_in_paper{25} = 'multistart.multistart_convergence_tree';
-figs_in_paper{26} = 'multistart.multistart_bar chart';
+figs_in_paper{26} = 'multistart.multistart_bar_chart';
 figs_in_paper{27} = 'param_sensitivities.re_optim_objective_tornado';
 figs_in_paper{28} = 'param_sensitivities.re_optim_design_tornado_J1';
 figs_in_paper{29} = 'param_sensitivities.re_optim_design_tornado_J2';
@@ -463,7 +463,7 @@ function [figs,tabs] = runtime(p,b)
 end
 
 function [figs,tabs] = meem(p,b)
-    [figPotMatch, figVelMatch, figSparsity, figHydroCoeff] = validate_MEEM()
+    [figPotMatch, figVelMatch, figSparsity, figHydroCoeff] = validate_MEEM();
 
     figs.meem_regions = figure; % fixme
     figs.meem_sparsity = figSparsity;
