@@ -15,7 +15,7 @@ function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     dvar_names = b.var_names_pretty(1:end-1);
     
     groups = categorical(T.subsystem(T.sweep));
-    color_groupings = {'b','g','r','k','y'};
+    color_groupings = {'b','g','r','k','y','m'};
     colors = color_groupings(groups);
     
     %%
