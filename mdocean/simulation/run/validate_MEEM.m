@@ -1,49 +1,66 @@
-clear all
-close all
+function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validate_MEEM()
 
-%% settings 
-auto_BCs = false;
+    %% settings 
+    auto_BCs = false;
 
-num_harmonics = 3;
-N_num = num_harmonics;
-M_num = num_harmonics;
-K_num = num_harmonics;
+    num_harmonics = 3;
+    N_num = num_harmonics;
+    M_num = num_harmonics;
+    K_num = num_harmonics;
 
-heaving_OC = true;
-heaving_IC = false;
+    heaving_OC = true;
+    heaving_IC = false;
 
-plot_phi = true;
-show_A = false;
+    plot_phi = true;
+    show_A = true;
 
-%% set numerical values
-a1_num = .5;
-a2_num = 1;
-d1_num = .5;
-d2_num = .25;
-h_num = 1.001;
-m0_num = 1;
-spatial_res = 30;
+    %% set numerical values
+    a1_num = .5;
+    a2_num = 1;
+    d1_num = .5;
+    d2_num = .25;
+    h_num = 1.001;
+    m0_num = 1;
+    spatial_res = 30;
 
-%% run validation of potential for single frequency
-run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
-                       a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi);
-figure(7)
-plot_potential_validation()
+    %% run validation of potential for single frequency
+    % produces 8 figures if plot_phi is on, + 3 more if show_A is on
+    run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
+                        a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi);
+    n = gcf().Number;
+    figVelMatch  = figure(n);
+    figPotMatch  = figure(n-1);
+    figVelArrows = figure(n-2);
+    figVelZ      = figure(n-3);
+    figVelR      = figure(n-4);
+    figPhiP      = figure(n-5);
+    figPhiH      = figure(n-6);
+    figPhiTotal  = figure(n-7);
 
-%% run validation of hydro coeffs for various frequencies
-m0_nums = [linspace(0,0.1,10), linspace(0.1,6,100)];
-plot_phi = false;
-[mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
-                       a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
+    figAMatrixSparsity = figure(n-8);
+    figAMatrixImag     = figure(n-9);
+    figAMatrixReal     = figure(n-10);
 
-figure
-plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
-ylabel('Nondimensional Hydro Coeff')
-xlabel('Wavenumber m0')
-legend('Added Mass','Damping')
-grid on
-hold on
-plot_hydro_coeff_validation()
+    figure(figPotMatch);
+    plot_potential_validation()
+
+    %% run validation of hydro coeffs for various frequencies
+    m0_nums = [linspace(0,0.1,10), linspace(0.1,6,100)];
+    plot_phi = false;
+    show_A = false;
+    [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
+                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
+
+    figHydroCoeff = figure;
+    plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
+    ylabel('Nondimensional Hydro Coeff')
+    xlabel('Wavenumber m0')
+    legend('Added Mass','Damping')
+    grid on
+    hold on
+    plot_hydro_coeff_validation()
+
+end
 
 %% validation functions
 function plot_potential_validation()

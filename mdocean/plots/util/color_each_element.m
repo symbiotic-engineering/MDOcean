@@ -1,10 +1,10 @@
-function color_each_element(matrix)
+function f = color_each_element(matrix)
 
-figure;
+f = figure;
 imagesc(matrix);
 colormap(bluewhitered);
 
-ax=gca;
+ax = gca;
 
 nx = size(matrix,2);
 ny = size(matrix,1);
