@@ -272,7 +272,7 @@ function [figs,tabs] =  param_sensitivities(~,b)
 
     figs.re_optim_design_tornado_J2 = fig_arr(end - 6);  % dx*/dp re-optimization (tornado)
     figs.re_optim_design_tornado_J1 = fig_arr(end - 7);  % dx*/dp re-optimization (tornado)
-    num_DVs = length(b.var_names);
+    num_DVs = length(b.var_names)-1;
     for i = 1:num_DVs
         name = ['re_optim_design_tornado_' b.var_names{num_DVs+1-i}];
         figs.(name) = fig_arr(end - (7+i));            % dx*/dp re-optimization (tornado)
