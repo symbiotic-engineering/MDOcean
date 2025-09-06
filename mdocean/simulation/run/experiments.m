@@ -65,8 +65,9 @@ for i = 1:num_DVs
                 [~, ~, failed_lin, feasible_lin] = is_feasible(0, X_vec, p, b);
                 
                 if feasible_lin
-                    [LCOE_temp, cost_temp, P_matrix, g, val] = simulation(X_vec,p);
-    
+                    [J_temp,P_matrix, g, val] = simulation(X_vec,p);
+                    LCOE_temp = J_temp(1); 
+                    cost_temp = J_temp(2);
                     % only add to results if relevant nonlin constraints are feasible
                     idx_ignore = false(1,length(b.constraint_names));
                     ignore = {'irrelevant_max_force','LCOE_max','linear_theory','prevent_slamming'};

@@ -2,7 +2,7 @@ function plot_power_matrix(X,p,b,filename_uuid)
 
 % get matrices to plot
 [CW_over_CW_max, P_wave, CW_max, P_elec, ...
-    force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, X, p, b, false);
+    force_sat_ratio, drag_ratio, eff] = check_max_CW(filename_uuid, p, X, false);
 [T,Hs] = meshgrid(p.T,p.Hs);
 p.JPD(p.JPD>0 & p.JPD < .001) = 0;
 hrs_in_yr = 8766;

@@ -15,7 +15,7 @@ function [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     dvar_names = b.var_names_pretty(1:end-1);
     
     groups = categorical(T.subsystem(T.sweep));
-    color_groupings = {'b','g','r','k','y'};
+    color_groupings = {'b','g','r','k','y','m'};
     colors = color_groupings(groups);
     
     %%
@@ -469,7 +469,7 @@ function g_lambda = combine_g_lambda(lambda,X,p,b)
     idx_g = all_lambda == 0;
 
     % sensitivities use g<=0 convention
-    [~,~,~,g_nl] = simulation(X,p);
+    [~,~,g_nl] = simulation(X,p);
     [A_lin, b_lin] = lin_ineq_constraints(p);
     g_lin = A_lin*X(1:size(A_lin,2)) - b_lin;
     g_lb = b.X_mins - X(1:end-1);
