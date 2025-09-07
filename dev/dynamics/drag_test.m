@@ -53,7 +53,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     for i = 1:length(Cd)
         p.C_d_float = Cd(i);
         disp(Cd(i))
-        [~, ~, P_matrix, ~, val] = simulation(X,p);
+        [~, P_matrix, ~, val] = simulation(X,p);
         P_over_H2 = P_matrix ./ H.^2;
         P_over_H2_2pt5 = P_over_H2(H==2.25);
         %P_over_H2_2pt5 = .5 * (P_over_H2(H==2.25) + P_over_H2(H==2.75));

@@ -76,7 +76,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
         num_points = size(X,1);
         P_avg = zeros(num_points, 1);
         for i=1:num_points
-            [~, ~, ~, ~, val] = simulation(X(i,:),p);
+            [~, ~, ~, val] = simulation(X(i,:),p);
             P_avg(i) = val.power_avg;
         end
         J1 = P_avg;
@@ -140,8 +140,8 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
     x_nom = [b.X_noms b_w.X_noms];
     x_nom(end+1,:) = 1;
 
-    [~, ~, ~, ~, val_report_sim] = simulation(x_nom(:,1),p);
-    [~, ~, ~, ~, val_wecsim_sim] = simulation(x_nom(:,2),p_w);
+    [~, ~, ~, val_report_sim] = simulation(x_nom(:,1),p);
+    [~, ~, ~, val_wecsim_sim] = simulation(x_nom(:,2),p_w);
     try
         J1_report_sim = val_report_sim.(J1_fieldname);
         J2_report_sim = val_report_sim.(J2_fieldname);
