@@ -430,7 +430,7 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
 
     var_nom = p.(param_name);
 
-    dry_run = true; % true means use random numbers, false means actual optimization
+    dry_run = false; % true means use random numbers, false means actual optimization
 
     parfor j=1:length(ratios)
         if ratios(j) ~=1   
