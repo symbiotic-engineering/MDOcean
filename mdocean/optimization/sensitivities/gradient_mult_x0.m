@@ -27,10 +27,10 @@ results = struct2table(x0s);
 cents_per_dollar = 100;
 obj_names_star = {[b.obj_names{1} '*'],[b.obj_names{2} '*']};
 obj_names_star_norm = strcat(obj_names_star, '_norm');
-[obj_1_nom,obj_2_nom] = simulation([b.X_noms; 1],p);
+J_nom = simulation([b.X_noms; 1],p);
 scale = repmat([cents_per_dollar 1],num_runs,1); % scale LCOE units for display
 results = addvars(results, objs(:,1).*scale(:,1), objs(:,2).*scale(:,2), ...
-                  objs(:,1)/obj_1_nom, objs(:,2)/obj_2_nom, flags,  ...	
+                  objs(:,1)/J_nom(1), objs(:,2)/J_nom(2), flags,  ...	
     'NewVariableNames', [obj_names_star,obj_names_star_norm,'Flag']);
 
 for i=1:length(b.var_names)-1

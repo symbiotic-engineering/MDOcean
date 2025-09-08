@@ -20,7 +20,7 @@ p_bal.avg_power_min = b.power_balanced;
 [X_balanced,~,~,~,~,~,~,val_balanced] = gradient_optim(x0_input,p_bal,b,2)
 
 X_nom	= [b.X_noms' 1];
-[~,~,~,~,val_nom] = simulation(X_nom,p);
+[~,~,~,val_nom] = simulation(X_nom,p);
 
 %%
 X    = [X_nom;   X_minLCOE';  X_minCapex';  X_maxPower';  X_balanced'];
@@ -84,7 +84,7 @@ f.Position(3:4) = [792 484];
 figure
 for i=1:num_designs
     x = X(i,:);
-    [~,~,P_matrix] = simulation(x, p);
+    [~,P_matrix] = simulation(x, p);
     P_matrix = P_matrix / 1e3; % convert W to kW
     [T,Hs] = meshgrid(p.T,p.Hs);
 
