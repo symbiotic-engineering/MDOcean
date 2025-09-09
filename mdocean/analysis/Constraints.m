@@ -7,12 +7,12 @@ classdef Constraints < GenericAnalysis
         tab_names = {'constraints'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(~,b)
             % Get constraints information
             % Store results for post-processing
-            intermed_result_struct.constraint_names = obj.b.constraint_names;
+            intermed_result_struct.constraint_names = b.constraint_names;
         end
         
         function [fig_array,...

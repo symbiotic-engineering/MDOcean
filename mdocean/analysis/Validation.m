@@ -9,7 +9,7 @@ classdef Validation < GenericAnalysis
     
     methods (Static)
         
-        function intermed_result_struct = analysis_fcn()
+        function intermed_result_struct = analysis_fcn(~,~)
             % Run validation analysis
             [~, ~, ~, ~, tab1a, fig_cost_vs_N_WEC] = validate_nominal_RM3('report');
             [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');

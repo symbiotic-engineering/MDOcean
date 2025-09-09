@@ -7,9 +7,9 @@ classdef Parameters < GenericAnalysis
         tab_names = {'parameters'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Get parameters information
             [~, params_table] = parameters();
             

@@ -7,9 +7,9 @@ classdef DescFcns < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Run describing function demo
             sin_desc_fcn_demo()
             

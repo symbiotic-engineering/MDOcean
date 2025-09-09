@@ -7,11 +7,11 @@ classdef LocationSensitivity < GenericAnalysis
         tab_names = {'location_sensitivity'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run location sensitivity analysis
-            tab = location_sensitivity(obj.p,obj.b);
+            tab = location_sensitivity(p,b);
             
             % Store results for post-processing
             intermed_result_struct.location_table = tab;

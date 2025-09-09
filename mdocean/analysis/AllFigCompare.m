@@ -7,7 +7,7 @@ classdef AllFigCompare < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
         function intermed_result_struct = analysis_fcn(~)
             % Generate runtime comparison bar chart (placeholder)

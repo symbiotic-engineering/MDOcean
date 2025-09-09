@@ -7,13 +7,13 @@ classdef RunSingleFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run single analysis with drag convergence plotting
-            obj.p.operational_drag_convergence_plot_on = true;
-            run_single(obj.p,obj.b)
-            
+            p.operational_drag_convergence_plot_on = true;
+            run_single(p,b)
+
             % Store figure numbers for post-processing
             intermed_result_struct.final_figure_number = gcf().Number;
         end

@@ -7,12 +7,12 @@ classdef JpdMultiplyFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Generate JPD multiplication figure
-            X = [obj.b.X_noms; 1];
-            plot_power_matrix(X, obj.p, obj.b, obj.b.filename_uuid)
+            X = [b.X_noms; 1];
+            plot_power_matrix(X, p, b, b.filename_uuid)
             
             % Store figure for post-processing
             intermed_result_struct.figure_handle = gcf();

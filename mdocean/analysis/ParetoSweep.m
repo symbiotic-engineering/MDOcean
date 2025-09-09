@@ -7,9 +7,9 @@ classdef ParetoSweep < GenericAnalysis
         tab_names = {};
     end
     
-    methods
-        
-        function intermed_result_struct = analysis_fcn(~)
+    methods (Static)
+
+        function intermed_result_struct = analysis_fcn(~,~)
             % Generate Pareto sweep figure (placeholder)
             % This would call the actual sweep function when available
             

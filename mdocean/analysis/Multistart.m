@@ -7,11 +7,11 @@ classdef Multistart < GenericAnalysis
         tab_names = {'multistart_results'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run multistart optimization analysis
-            [treeFig, parallelFig, tab] = gradient_mult_x0(obj.p,obj.b);
+            [treeFig, parallelFig, tab] = gradient_mult_x0(p,b);
             
             % Store results for post-processing
             intermed_result_struct.treeFig = treeFig;

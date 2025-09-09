@@ -7,7 +7,7 @@ classdef AsymptoticBVectorFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
         function intermed_result_struct = analysis_fcn(~)
             % Generate asymptotic b vector figure

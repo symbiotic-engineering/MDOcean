@@ -7,9 +7,9 @@ classdef Wecsim < GenericAnalysis
         tab_names = {'WECSim_errors'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Run WEC-Sim dynamics validation
             [~, ~, ~, tab, fig_singlebody, fig_multibody] = validate_dynamics();
             

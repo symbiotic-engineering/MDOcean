@@ -7,15 +7,15 @@ classdef DesignVars < GenericAnalysis
         tab_names = {'design_vars'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(~,b)
             % Get design variables information
             % Store results for post-processing
-            intermed_result_struct.X_mins = obj.b.X_mins;
-            intermed_result_struct.X_noms = obj.b.X_noms;
-            intermed_result_struct.X_maxs = obj.b.X_maxs;
-            intermed_result_struct.var_names = obj.b.var_names;
+            intermed_result_struct.X_mins = b.X_mins;
+            intermed_result_struct.X_noms = b.X_noms;
+            intermed_result_struct.X_maxs = b.X_maxs;
+            intermed_result_struct.var_names = b.var_names;
         end
         
         function [fig_array,...

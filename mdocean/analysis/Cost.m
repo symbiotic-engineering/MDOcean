@@ -7,9 +7,9 @@ classdef Cost < GenericAnalysis
         tab_names = {'cost_parameters'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Get cost parameters (placeholder - function needs to be implemented)
             % This would call the actual cost parameters function when available
             

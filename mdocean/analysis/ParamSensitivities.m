@@ -12,18 +12,18 @@ classdef ParamSensitivities < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run parameter sweep analysis
-            [fig_arr, runtime_post_optim, runtime_re_optim] = param_sweep(obj.b.filename_uuid);
+            [fig_arr, runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid);
             
             % Store results for post-processing
             intermed_result_struct.fig_arr = fig_arr;
             intermed_result_struct.runtime_post_optim = runtime_post_optim;
             intermed_result_struct.runtime_re_optim = runtime_re_optim;
-            intermed_result_struct.num_DVs = length(obj.b.var_names);
-            intermed_result_struct.var_names = obj.b.var_names;
+            intermed_result_struct.num_DVs = length(b.var_names);
+            intermed_result_struct.var_names = b.var_names;
         end
         
         function [fig_array,...

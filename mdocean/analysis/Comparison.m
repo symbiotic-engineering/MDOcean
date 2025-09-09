@@ -7,11 +7,11 @@ classdef Comparison < GenericAnalysis
         tab_names = {'optimal_design_vars', 'optimal_outputs'};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run comparison analysis
-            [optimal_design_vars, optimal_outputs] = compare(obj.p,obj.b);
+            [optimal_design_vars, optimal_outputs] = compare(p,b);
             
             % Store results for post-processing
             intermed_result_struct.optimal_design_vars = optimal_design_vars;

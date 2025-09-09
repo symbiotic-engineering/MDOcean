@@ -8,11 +8,11 @@ classdef ParetoFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(~,b)
             % Run Pareto search and heuristics
-            pareto_search(obj.b.filename_uuid)
+            pareto_search(b.filename_uuid)
             pareto_curve_heuristics()
             
             % Store figure numbers for post-processing

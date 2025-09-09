@@ -7,11 +7,11 @@ classdef ForceSaturationFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run force saturation analysis
-            [fig1, fig2] = force_sat_results(obj.p, obj.b);
+            [fig1, fig2] = force_sat_results(p, b);
             
             % Store figures for post-processing
             intermed_result_struct.fig1 = fig1;

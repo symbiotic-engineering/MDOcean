@@ -7,12 +7,12 @@ classdef DesignSpaceExploration < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run design space exploration experiments
-            experiments(obj.p,obj.b)
-            
+            experiments(p,b)
+
             % Store figure for post-processing
             intermed_result_struct.figure_handle = gcf();
         end

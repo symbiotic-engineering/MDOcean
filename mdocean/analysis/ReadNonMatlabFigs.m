@@ -10,9 +10,9 @@ classdef ReadNonMatlabFigs < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Store file information for post-processing
             intermed_result_struct.fig_names = {'RM3_image','methodology_overview','N2_diagram',...
                         'dimensions','MEEM_geometry','WECSim_error_breakdown', ...

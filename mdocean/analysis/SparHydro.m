@@ -7,9 +7,9 @@ classdef SparHydro < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Run spar hydrodynamic analysis
             fig = spar_hydro_plot();
             

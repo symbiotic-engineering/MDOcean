@@ -8,12 +8,12 @@ classdef GradientOptimFigFunc < GenericAnalysis
         tab_names = {};
     end
     
-    methods
+    methods (Static)
         
-        function intermed_result_struct = analysis_fcn(obj)
+        function intermed_result_struct = analysis_fcn(p,b)
             % Run gradient optimization with plotting
-            gradient_optim(obj.b.X_start_struct,obj.p,obj.b,1,{@optimplotfval, @(x,~,~)optim_geomviz(x,obj.p,obj.b)},true)
-            
+            gradient_optim(b.X_start_struct,p,b,1,{@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true)
+
             % Store figure numbers for post-processing
             n = gcf().Number;
             intermed_result_struct.final_figure_number = n;
