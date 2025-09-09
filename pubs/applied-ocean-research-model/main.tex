@@ -69,8 +69,8 @@
 
 \newcommand*\rot{\rotatebox{90}} % for rotated table headers
 \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
-\newcommand{\matlabFilepath}[1]{figs/2025-04-11_10.21.55/Figure_#1.pdf}
-\newcommand{\tableFilepath}[1]{tables/2025-04-11_04.04.45/table_#1.tex}
+\newcommand{\matlabFilepath}[1]{../renewable-energy-mdo/figs/2025-04-11_10.21.55/Figure_#1.pdf}
+\newcommand{\tableFilepath}[1]{../renewable-energy-mdo/tables/2025-04-11_04.04.45/table_#1.tex}
 
 \newcommand{\requirement}[1]{\refstepcounter{reqnumber}\label{req:#1}R\arabic{reqnumber}}
 \newcommand{\reqref}[1]{R\ref{req:#1}}
@@ -93,7 +93,7 @@
    \hbox to\linewidth{%
      \hfil\thepage\hfil}\vss}}
 
-\journal{Renewable Energy}
+\journal{Applied Ocean Research}
 
 \begin{document}
 
@@ -125,13 +125,13 @@
 %%             country={}}
 %% \fntext[label3]{}
 
-\title{Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability}
+\title{Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
 
 %% use optional labels to link authors explicitly to addresses:
 \author[MAE]{Rebecca McCabe\corref{cor1}}
 \ead{rgm222@cornell.edu}
 \author[MAE]{Madison Dietrich}
-\author[MAE,sys]{Maha Haji}
+\author[mich]{Maha Haji}
 
 \cortext[cor1]{Corresponding Author}
 
@@ -142,11 +142,11 @@
              state={NY},
              country={USA}}
 
-\affiliation[sys]{organization={Department of Systems Engineering, Cornell University},
-             addressline={136 Hoy Rd.},
-             city={Ithaca},
-             postcode={14853},
-             state={NY},
+\affiliation[mich]{organization={Department of Mechanical Engineering, University of Michigan},
+             addressline={G.G. Brown Laboratory, 2350 Hayward},
+             city={Ann Arbor},
+             postcode={48109},
+             state={MI},
              country={USA}}
 
 %% Abstract
@@ -154,21 +154,12 @@
 %% Text of abstract
 Wave energy converters (WECs) can advance the global energy transition by producing clean power for utility grids and offshore technologies.
 Considering many disciplines concurrently in an optimization process can allow WEC designers to systematically explore interdisciplinary tradeoffs, more fully capture the breadth of design considerations, and leverage coupling for system-wide benefit.
-This paper applies the multidisciplinary design optimization (MDO) methodology to perform single- and multi-objective gradient-based optimization of the Reference Model 3 (RM3), a two-body point absorber WEC design benchmark.
-Five hull dimensions, five structural thicknesses, and the generator force and power rating are simultaneously optimized while obeying various static, dynamic, and structural failure constraints.
-Objectives include the levelized cost of energy (LCOE), power production, and capital cost.
-MDO principles motivate the optimization formulation and solution process.
 
 The optimization's large scope and comprehensive nature are uniquely possible due to the purpose-developed semi-analytical model used for simulation.
 The model incorporates a mesh-free eigenfunction-based linear hydrodynamic solver, a quasi-linearized dynamics engine that handles drag and saturation nonlinearities in the frequency-domain, a structural sizing module with realistic yield/ultimate/buckling failure criteria for storm and fatigue design load cases, and a simple cost estimator to assess techno-economic viability.
 The text documents the derivation, assumptions, and optimization implications of the model, which is called MDOcean and released open-source.
 Validation and computational benchmarking demonstrate that MDOcean's $\simRuntime$ms runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
 
-The obtained optimization results achieve a \pctImproveDesignCostMinLCOE~reduction in modeled cost, \pctImprovePowerMinLCOE~increase in power, and resulting \pctImproveLCOEMinLCOE~decrease in LCOE compared to the original RM3 design.
-Parameter sensitivity analysis indicates that LCOE depends more strongly on \sensitiveParamCategoriesMinLCOE~parameters than \insensitiveParamCategoriesMinLCOE~parameters and that the optimal design is sensitive to \sensitiveDesignCategoriesMinLCOE~parameters.
-A Pareto trade-off between cost and power reveals different optimal designs depending on which objective is prioritized, suggesting application-specific design heuristics.
-Three representative optimal designs are investigated: a minimum-LCOE design for cost-sensitive operations like utility power, a minimum-cost design for small offshore systems with fixed power needs, and a balanced design for intermediate applications.
-Gradient-based optimization for one objective requires \singleObjFcnEvals~function evaluations, while the combination gradient and gradient-free procedure for two objectives requires over \paretoFcnEvals~evaluations.
 \end{abstract}
 
 %%Graphical abstract
@@ -180,15 +171,11 @@ Gradient-based optimization for one objective requires \singleObjFcnEvals~functi
 %%Research highlights
 \begin{highlights}
 \item Develop and validate a rapid ($<\simRuntime$~ms) open-source wave energy simulation incorporating dynamic nonlinearities (generator force saturation, drag), semi-analytical hydrodynamics, and realistic structures (fatigue and storm loadcases, stress and buckling failure modes)
-\item Formulate and solve a constrained multi-objective multidisciplinary design optimization with twelve dimensional, structural, and power take-off design variables to maximize power and minimize estimated capital cost
-\item Optimal designs achieve up to \pctImproveLCOEMinLCOE~LCOE reduction and tend to be \optDesignDescriptionMinLCOE~than the standard RM3 design
-\item Sensitivity analysis reveals LCOE is most sensitive to \sensitiveParamCategoriesMinLCOE, while cost is most sensitive to \sensitiveParamCategoriesMinCapex
-\item Single- and dual-objective optimization require \singleObjFcnEvals~and over \paretoFcnEvals~function evaluations respectively.
 \end{highlights}
 
 %% Keywords
 \begin{keyword}
-wave energy conversion \sep marine renewable energy \sep semi-analytical hydrodynamics \sep structural design \sep survivability analysis \sep sensitivity analysis \sep multidisciplinary design optimization \sep techno-economic optimization \sep control co-design \sep two-body point absorber \sep shape optimization \sep power take-off design
+wave energy conversion \sep marine renewable energy \sep semi-analytical hydrodynamics \sep structural design \sep survivability analysis \sep techno-economic modeling \sep two-body point absorber \sep power take-off modeling \sep validation \sep benchmarking
 %% keywords here, in the form: keyword \sep keyword
 
 %% PACS codes here, in the form: \PACS code \sep code
@@ -212,7 +199,7 @@ wave energy conversion \sep marine renewable energy \sep semi-analytical hydrody
 \listoffigures
 \listoftables
 \clearpage
-\summarytexcount{mdocean}
+\summarytexcount{main}
 \detailtexcount{sections/model}{subsection}
 \detailtexcount{sections/other-appendices}{section}
 \newpage
@@ -220,17 +207,9 @@ wave energy conversion \sep marine renewable energy \sep semi-analytical hydrody
 %% Use \section commands to start a section
 %% Labels are used to cross-reference an item using \ref command.
 
-\include{sections/introduction}
+\include{sections/model-intro}
 \clearpage
 \include{sections/model}
-\clearpage
-\include{sections/formulation}
-\clearpage
-\include{sections/optimization}
-\clearpage
-\include{sections/results}
-\clearpage
-\include{sections/discussion}
 \clearpage
 
 \section{Conclusion}
@@ -251,44 +230,17 @@ The geometry, economics, structures, and spar hydrodynamics are compared against
 Good agreement is observed for all but the spar added mass, storm loads, and structural margins, necessitating the use of a tuning factor for these quantities.
 All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \simRuntime~seconds.
 
-% Formulation
-The optimization problem formulation is developed systematically and cleverly with numerical implications such as linearity, convergence, and feasibility in mind.
-12 design variables representing bulk dimensions, structural thicknesses, and powertrain ratings are chosen.
-All disciplines are optimized at once, overcoming the lack of system optimality that would exist for sequential optimization of systems with disciplinary coupling.
-Constraints are enforced to prevent numerical overflow and structural failure and to ensure geometric physicality, pitch stability, positive buoyancy, sufficient ballast volume, positive power, and compliance with dynamic limits including powertrain ratings and amplitude restrictions. 
-The gradient-based SQP algorithm leverages the problem's underlying smoothness to facilitate convergence and is used for single-objective optimization and to generate seeds for multi-objective optimization.
-After generating \numParetoSeeds~via the epsilon-constraint method, a gradient-free pattern search fills in the pareto front for a total of \numParetoSearchPoints~points.
-
-% Results
-Single-objective optimization to minimize the LCOE yields a design with \pctImproveDesignCostMinLCOE~ lower design cost and \pctImproveDesignCostMinLCOE~higher power, amounting to a \pctImproveLCOEMinLCOE~improvement over the original RM3 design.
-These improvements increase to \pctImprovePowerMaxPower~more power and \pctImproveDesignCostMinCapex~less cost if optimizing for maximum power and minimum cost respectively. 
-Optimal designs have noticeably larger diameters and drafts, lower above-water spar profiles, thinner structural material, and similarly sized powertrains as the nominal RM3.
-Due to the non-convex, highly constrained nature of the problem, a multistart procedure with \numMultistartRequired~random initial conditions is required to ensure a 95\% chance of finding the presumed global optimum.
-Parameter sensitivities show that LCOE is highly senstivity to wave characteristics, efficiency, and the fixed charge rate, while design cost is highly sensitive to bulk and structural damping plate dimensions, the price of PTO power, site parameters, and material choice.
-Optimal design variables are sensitive to wave characteristics, motivating the need to investigate site-specific designs, and to geometric parameters, suggesting the addition of $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ as design variables in future work.
-A global sensitivity to depolyment location for four U.S. locations reveals that incident wave power drives LCOE and that in Hawaii, where wave periods are shorter, the optimal design unexpectedly has a \HawaiiDesignCharacteristics~than on the U.S. West Coast, where longer waves dominate. 
-Finally, the sensitivity to modeling assumptions shows that allowing force saturation as a control strategy enables a \pctImproveLCOEForceSatOptMinLCOE~reduction in LCOE compared to an optimal design without force saturation, compelling evidence for WEC developers to select a powertrain with a force rating below the highest expected impedance-matched force.
-Meanwhile, control scheme, drag, and degrees of freeom \hl{results await analysis}.
-
-After this thorough analysis of the single objective results, the trade-off between cost and power is found using multi-objective optimization.
-The pareto front contains a non-convex cusp where below \powerWhereCusp~kW average power, cost declines sharply for only small power decreases, corresponding to a strategy shift where power saturation, rather than force saturation, becomes optimal at these lower powers. 
-Meanwhile, lower powers also favor larger drafts, smaller float diameters, larger spar diameters, and thinner structural thicknesses.
-A previously-proposed concept to achieve a tradeoff of power and cost for different WEC use cases only through the PTO without modifying the hydrodynamic and structural design is shown to be minimally effective, since most of the cost reduction at low power is due to the reduction in material cost rather than PTO cost.
-The multi-objective optimization runs in just \paretoRuntime~on the machine described in \sectionautorefname~\ref{sec:sim-runtime}, a large improvement over the many hours required for previous WEC design optimization studies.
-Surprisingly, however, the use of gradients does not facilitate convergence enough to make up for the additional function evaluations required for finite difference derivative evaluation, and therefore it takes several times as many function evaluations to construct the pareto front as it does for previous optimizations using the genetic algorithm.
-
 % Discussion
-A key feature of this study that other WEC optimizations lack is the modeling of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
+A key feature of this study that other WEC models lack is the inclusion of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
 Nonetheless, the structural loads and stresses have high uncertainty, the impact of PTO dynamics and irregular waves are not included, and only a single WEC type (two-body axisymmetric point absorber) is considered.
 Future modeling work should pursue model enhancements to correct these limitations.
-Additionally, the next iteration should consider enhancing the formulation by adding design variables like PTO components and geometric ratios, and requirements relating to mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
-Finally, analysis extensions such as a global sensitivity sweep assessing the impact of combined deviations in parameter inputs and model assumptions would allow a more thorough evaluation of the optimal design's robustness to relevant uncertainties and the design space tradeoff between optimality and robustness.
+Additionally, the next iteration should consider enhancing the model by adding mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
 
 % Impact of findings:
-The results of this study will inform future WEC design optimization, opening designers' eyes to the complex trade-off associated with power and cost, the necessity of accounting for multidisciplinary coupling, and the power of clever simulation and optimization tricks to reduce runtime and facilitate convergence.
+The results of this study will inform future WEC design optimization, the necessity of accounting for multidisciplinary coupling, and the power of clever simulation tricks to reduce runtime.
 
 \section{Acknowledgements}
-The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Iris Ren for assistance with optimization code; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
+The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
 
 R.M. acknowledges funding from the National Science Foundation Graduate Research Fellowship.
 M.D. acknowledges funding from the Fund for Undergraduate Research on Solutions to Climate Change and the Bill Nye ’77 Award in Undergraduate Research.
@@ -301,7 +253,7 @@ The MATLAB code for all simulation, optimization, analysis, and visualization to
 Questions and contributions via GitHub issues and pull requests are welcomed.
 A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
 
-\include{sections/meem-appendix}
+\input{../../mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex}
 \include{sections/other-appendices}
 
 %% Displayed equations can be tagged using various environments. 
@@ -345,8 +297,8 @@ A Python version using the OpenMDAO package is forthcoming. % todo: replace with
 %% https://en.wikibooks.org/wiki/LaTeX/Advanced_Mathematics
 
 \clearpage
-\bibliographystyle{elsarticle-num-names} 
-\bibliography{references}
+\bibliographystyle{../../elsarticle-num-names} 
+\bibliography{renewable-energy-mdo/references}
 
 \end{document}
 
