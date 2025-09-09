@@ -21,5 +21,7 @@ for i = 1:length(analysis_list)
 end
 
 disp(stages)
-stages = strjoin(stages(~isempty(stages)),newline);
-disp(stages)
+stages_combined = strjoin(stages,newline);
+disp(stages_combined)
+
+writelines(stages_combined,'calkit_stages.txt') % then manually copy-paste into calkit.yaml
