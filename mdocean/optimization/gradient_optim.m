@@ -1,5 +1,5 @@
 
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs,plotfn,ploton)
 
 warning('off','MATLAB:nearlySingularMatrix')
 warning('off','MATLAB:singularMatrix')
@@ -17,8 +17,6 @@ if nargin == 0
     ploton = true;
 else
     display = 'off';
-    plotfn = [];
-    ploton = false;
 end
 
 if nargin<4
@@ -26,6 +24,13 @@ if nargin<4
     % 1 = min LCOE
     % 2 = min design-dependent capex cost, subject to power above threshold
     % 3 = max average power
+end
+
+if ~exist('plotfn','var')
+    plotfn = [];
+end
+if ~exist('ploton','var')
+    ploton = false;
 end
 
 % create optimization variables for each of the design variables
@@ -161,7 +166,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         objs_opt
         flags
         array2table(table_data,'RowNames',b.var_names(1:end-1),...
-                'VariableNames',{'Min LCOE','Min cv','Min bound','Max bound','Nom'})
+                'VariableNames',[strcat("Min ", b.obj_names(which_objs)), {'Min bound','Max bound','Nom'}])
     end
 
 end

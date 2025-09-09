@@ -1,12 +1,10 @@
-function [DV_table,out_table] = compare(filename_uuid)
+function [DV_table,out_table] = compare(p,b)
 
 if nargin==0
-    filename_uuid = '';
+    p = parameters();
+    b = var_bounds();
 end
 
-p = parameters();
-b = var_bounds();
-b.filename_uuid = filename_uuid;
 x0_input = b.X_start_struct;
 
 [Xs_opt,~,~,~,~,~,~,vals_opt] = gradient_optim(x0_input,p,b);
