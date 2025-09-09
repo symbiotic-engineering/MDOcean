@@ -18,6 +18,11 @@ for i = 1:length(analysis_list)
         stage = '';
     end
     stages{i} = stage;
+    %create_cmd = 'obj=' + class_name + '();';
+    %analysis_cmd = [create_cmd, ' obj.run_analysis();'];
+    %postpro_cmd =  [create_cmd, ' obj.run_all_from_load();'];
+    %writelines(analysis_cmd, fullfile('analysis', 'scripts', ['run_analysis_' class_name '.m']));
+    %writelines(postpro_cmd,  fullfile('analysis', 'scripts', ['run_postpro_'  class_name '.m']));
 end
 
 disp(stages)
@@ -25,3 +30,4 @@ stages_combined = strjoin(stages,newline);
 disp(stages_combined)
 
 writelines(stages_combined,'calkit_stages.txt') % then manually copy-paste into calkit.yaml
+
