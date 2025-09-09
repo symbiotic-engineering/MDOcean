@@ -16,7 +16,7 @@ for i=1:length(force_lim_frac)
     X = X_nom;
     X(idx_F) = force_lim_frac(i) * F_nom;
     tic
-    [~, ~, ~, ~, val] = simulation(X,p);
+    [~, ~, ~, val] = simulation(X,p);
     runtime(i) = toc;
     power(i) = val.power_avg;
     force(i) = val.force_heave_op;
