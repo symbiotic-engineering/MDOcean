@@ -22,7 +22,7 @@ classdef ParamSensitivities < GenericAnalysis
             intermed_result_struct.fig_arr = fig_arr;
             intermed_result_struct.runtime_post_optim = runtime_post_optim;
             intermed_result_struct.runtime_re_optim = runtime_re_optim;
-            intermed_result_struct.num_DVs = length(b.var_names);
+            intermed_result_struct.num_DVs = length(b.var_names) - 1;
             intermed_result_struct.var_names = b.var_names;
         end
         

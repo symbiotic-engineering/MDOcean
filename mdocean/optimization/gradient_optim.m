@@ -76,21 +76,21 @@ end
 function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
-    num_objectives = length(which_objs);
+    num_objectives_total = length(b.obj_names);
+    num_objectives_to_run = length(which_objs);
 
-    [J1, J2, ~, g] = fcn2optimexpr(@simulation,X,p,...
-                                            'OutputSize',{[1,1],[1,1],size(p.JPD),[1, num_constraints]},...
+    [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
+                                            'OutputSize',{[1,num_objectives_total],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
-    objs = [J1 J2];
-    probs = cell([1 2]); 
+    probs = cell([1 length(objs)]); 
     
     % allocate outputs
-    Xs_opt = zeros(length(X),num_objectives);
-    objs_opt = zeros(1,num_objectives);
-    flags = zeros(1,num_objectives);
-    grads = zeros(length(X)-1,num_objectives);
-    hesses = zeros(length(X)-1,length(X)-1,num_objectives);
+    Xs_opt = zeros(length(X),num_objectives_to_run);
+    objs_opt = zeros(1,num_objectives_to_run);
+    flags = zeros(1,num_objectives_to_run);
+    grads = zeros(length(X)-1,num_objectives_to_run);
+    hesses = zeros(length(X)-1,length(X)-1,num_objectives_to_run);
 
     % add nonlinear constraints
     prob = optimproblem();
@@ -104,7 +104,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
     end
 
     % iterate through the two objectives: LCOE and P_var
-    for i = 1:num_objectives
+    for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
         
@@ -112,7 +112,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         if length(x0_input)==1
             x0 = x0_input;
-        elseif length(x0_input)==num_objectives
+        elseif length(x0_input)==num_objectives_to_run
             x0 = x0_input(i);
         else
             error('x0 input struct has wrong size')
@@ -137,7 +137,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-        [out(1),out(2),~,~,val] = simulation(X_opt,p);          % rerun sim
+        [out,~,~,val] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;

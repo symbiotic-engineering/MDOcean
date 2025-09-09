@@ -11,6 +11,8 @@ ksi2pa = 6894757; % 1000 pounds/in2 to Pascal
 in2m = 0.0254;  % inch to meter
 yd2m = 0.9144;  % yard to meter
 lb2kg = 1/2.2;  % pound to kilogram
+euro2USD = 1.09; % currency conversion - March 2024 exchange rate
+km2mi = 1/1.609; % kilometer to miles
 
 if strcmpi(mode,'wecsim')
     T_s_over_D_s = 29/6;
@@ -195,9 +197,26 @@ T = [T;
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
         false,"function from WECSim",{''});
     table("F_heave_mult","F_{heave,mult}",{0.98},"dynamics",true,... 
-        "multiplier to make heave force match with validation (-)",{''})];
+        "multiplier to make heave force match with validation (-)",{''});
     % 1.925 is required to make WAMIT match tank test, and 0.857 is
     % required to make MEEM match WAMIT
+    ...
+    ...% Environment
+    table("eco_cost_steel","EC_{steel}",{0.1764*euro2USD},...
+        "environment",true,"eco-cost of steel ($/kg)",{''});
+    table("eco_cost_fiberglass","EC_{fiberglass}",{6.3757*euro2USD},...
+        "environment",true,"eco-cost of steel ($/m^2)",{''});
+    table("eco_cost_distance","EC_{distance}",{60.4413*euro2USD},...
+        "environment",true,"eco-cost per mile from shore of fuel for boat travel ($/mi)",{''});
+    table("eco_cost_carbon","EC_{carbon}",{0.133*euro2USD},...
+        "environment",true,"social cost of carbon ($/kg)",{''});
+    table("distance_from_shore","D_[shore}",{5.5 * km2mi},... % 5-6 km from p186 of SAND2015-7963 report
+        "environment",true,"distance from shore (miles)",{''});
+    ...
+    ... % Grid CEM
+    table("location","location",{'ISONE'},...
+        "grid",false,"location of grid data to use",{''});
+    ];
 
 T.Properties.VariableNames = cols;
 

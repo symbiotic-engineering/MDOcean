@@ -1,6 +1,6 @@
 function t = power_PDF(X,p,color,t,which_plots)
 
-[~,~,P_matrix] = simulation(X, p);
+[~,P_matrix] = simulation(X, p);
 P_matrix = P_matrix / 1e3; % convert W to kW
 P_counts = repelem(P_matrix(:), round(p.JPD(:)*1000));
 

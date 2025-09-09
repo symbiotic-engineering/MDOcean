@@ -10,7 +10,10 @@ function run_single(p,b,X)
         X = [b.X_noms; 1];
     end
 
-    [LCOE, P_var, ~, g, val] = simulation(X,p)
+    [J, ~, g, val] = simulation(X,p)
+
+    LCOE = J(1);
+    P_var = J(2);
 
     [feasible,~,failed] = is_feasible(g,X,p,b)
 
