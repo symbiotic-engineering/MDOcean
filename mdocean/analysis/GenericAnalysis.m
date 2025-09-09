@@ -34,13 +34,20 @@ classdef (Abstract) GenericAnalysis
     end
 
     methods
-        function obj = GenericAnalysis()
+        function obj = GenericAnalysis(p,b)
             obj.output_folder = ['results' filesep class(obj)];
-            mkdir(obj.output_folder)
-
-            obj.analysis_dependencies = matlab.codetools.requiredFilesAndProducts([class(obj) '.analysis_fcn()']);
+            if ~isfolder(obj.output_folder)
+                mkdir(obj.output_folder)
+            end
+            if nargin > 0
+                obj.p = p;
+            end
+            if nargin > 1
+                obj.b = b;
+            end
+            obj.analysis_dependencies = obj.get_dependencies([class(obj) '.analysis_fcn()']);
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
-            obj.postpro_dependencies = [matlab.codetools.requiredFilesAndProducts([class(obj) '.post_process_fcn()']),...
+            obj.postpro_dependencies = [obj.get_dependencies([class(obj) '.post_process_fcn()']),...
                                         obj.analysis_outputs];
 
             obj.postpro_outputs  = strcat(obj.output_folder,...
@@ -105,7 +112,7 @@ classdef (Abstract) GenericAnalysis
             obj.run_post_process();
         end
 
-        function write_calkit(obj)
+        function stages = write_calkit_stage(obj)
             cell2filelist = @(c) char(join(strcat("    - ",c),newline));
 
             analysis_stage = ['stage: analysis-' class(obj) newline ...
@@ -125,8 +132,28 @@ classdef (Abstract) GenericAnalysis
                               '  outputs: ' newline ...
                               cell2filelist(obj.postpro_outputs.') ];
             stages = [analysis_stage newline postpro_stage];
+        end
+    end
+    methods (Static)
+        function deps_rel = get_dependencies(fcn_name)
+            deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            base = what('..').path;
+            deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
+        end
+        
+        function rel_paths = make_rel_path(abs_paths, base)
+            rel_paths = cell(size(abs_paths));
+            for i = 1:numel(abs_paths)
+                [path_dir, file_name, file_ext] = fileparts(abs_paths{i});
 
-            disp(stages)
+                if startsWith(path_dir, base)
+                    rel_path = strrep(path_dir, base, '.');
+                    rel_path = fullfile(rel_path, strcat(file_name, file_ext));
+                else
+                    error('Dependency outside of base folder')
+                end
+                rel_paths{i} = rel_path;
+            end
         end
     end
 end
