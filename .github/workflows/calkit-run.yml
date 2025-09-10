@@ -18,7 +18,7 @@ concurrency:
 jobs:
   main:
     name: Run
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,6 +34,8 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Install Calkit
         run: uv tool install calkit-python
+      - name: Add matlab to path
+        run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
       - name: Run Calkit
         uses: calkit/run-action@v1
         with:
