@@ -1,5 +1,5 @@
 %% numerically
-function b_inf_numeric()
+function fig = b_inf_numeric()
     a1_num = 6/100;
     a2_num = 20/100;
     d1_num = 75/100;
@@ -7,8 +7,8 @@ function b_inf_numeric()
     h_num = 1;
     
     m0h_max_zero = find_m0h_max(a1_num,a2_num,d1_num,d2_num,h_num);
-    
-    plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
+
+    fig = plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero);
 
 end
 
@@ -49,7 +49,7 @@ function m0h_max_zero = find_m0h_max(a1_num,a2_num,d1_num,d2_num,h_num)
         'normalize by acosh(realmax)','normalize by acosh(realmax)/(d_2/h)')
 end
 
-function plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
+function fig = plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
     % check that my formula for b_high_freq is correct
     
     m0h_max_nan = acosh(realmax) / (1-d2_num/h_num);
@@ -73,7 +73,7 @@ function plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
     b_entry(b_entry==0) = near_zero_b; % so zero shows up on log-log plot
     b_high_freq(b_high_freq==0) = near_zero_b;
     
-    figure
+    fig = figure;
     loglog(m0/acosh(realmax),b_entry,'DisplayName','b')
     hold on
     loglog(m0/acosh(realmax),b_high_freq,'--','DisplayName','Asymptotic b')

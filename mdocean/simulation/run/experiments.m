@@ -1,10 +1,12 @@
 
 % Runs one-at-a-time design of experiments
 
-function figs = experiments()
+function figs = experiments(p,b)
 
-p = parameters();
-b = var_bounds();
+if nargin==0
+    p = parameters();
+    b = var_bounds();
+end
 
 DOE_strategy = 'ratios'; % 'sample' or 'bounds' or 'ratios'
 n = 20;

@@ -2,7 +2,8 @@
 function [fig_success,tab_success,...
           fig_output, tab_output,...
           fig_runtime,tab_runtime,...
-          num_figs,num_tabs,fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
+          num_figs,num_tabs,...
+          fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
 
 if nargin<3
     filename_uuid = ''; % required argument for anything running gradient_optim in parallel,
@@ -12,11 +13,10 @@ end
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
+table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin{:});
 
-num_figs = 36;
+num_figs = 59;
 num_tabs = 8;
-fig_names   = cell([1,num_figs]);
-tab_names   = cell([1,num_tabs]);
 
 if nargin==0
     % if run without arguments, show all figures and tables
@@ -32,431 +32,451 @@ tab_output(1, 1:length(which_tabs)) = {table()};
 
 fig_runtime = NaN([1,length(which_figs)]);
 tab_runtime = NaN([1,length(which_tabs)]);
+%%
 
-%% Define mapping from figures/tables to scripts
-% figure_mapping = zeros(1,num_figs);
-% figure_mapping(3:4) = 1; % sin desc function demo
-% figure_mapping(5) = 2; % JPD
-% figure_mapping(6:7) = 3; % pareto front
-% figure_mapping(8) = 4; % parameter sensitivities
-% figure_mapping(9:10) = 5; % overlaid comparison
-% 
-% table_mapping = zeros(1,num_tabs);
-% table_mapping(1:2) = 6; % var bounds
-% table_mapping(3) = 7; % parameters
-% table_mapping(4) = 8; % validation
-% table_mapping(5) = 5; % 3 design comparison
-% table_mapping(6) = 9; % location sensitivity
-% table_mapping(7) = 10; % convergence
+figs_in_paper = cell([1,num_figs]);
+figs_in_paper{1}  = 'read_non_matlab_figs.RM3_image';
+% 2: modeling methodology
+figs_in_paper{2}  = 'read_non_matlab_figs.methodology_overview';
+figs_in_paper{3}  = 'read_non_matlab_figs.N2_diagram';
+figs_in_paper{4}  = 'read_non_matlab_figs.dimensions';
+figs_in_paper{5}  = 'read_non_matlab_figs.MEEM_geometry';
+figs_in_paper{6}  = 'spar_hydro.spar_added_mass';
+figs_in_paper{7}  = 'hydro_coeff_fig_func.hydro_coeff_err';
+figs_in_paper{8}  = 'desc_fcns.saturation_desc_fcn';
+figs_in_paper{9}  = 'desc_fcns.drag_desc_fcn';
+figs_in_paper{10} = 'run_single_fig_func.nominal_power_matrix';
+figs_in_paper{11} = 'wecsim.WECSim_error_histograms_multibody';
+figs_in_paper{12} = 'read_non_matlab_figs.FBD';
+figs_in_paper{13} = 'validation.cost_vs_N_WEC';
+figs_in_paper{14} = 'runtime.sim_runtime';
+figs_in_paper{15} = 'runtime.hydro_runtime';
+figs_in_paper{16} = 'runtime.dynamics_runtime';
+% 3: optimization methodology
+figs_in_paper{17} = 'read_non_matlab_figs.optimization_flowchart';
+% 4: results
+figs_in_paper{18} = 'design_space_exploration.experiments';
+figs_in_paper{19} = 'comparison.overlaid_geometry';
+figs_in_paper{20} = 'comparison.overlaid_hydro_coeffs';
+figs_in_paper{21} = 'comparison.probability_CDF';
+figs_in_paper{22} = 'gradient_optim_fig_func.single_obj_opt_power_matrix';
+figs_in_paper{23} = 'gradient_optim_fig_func.lagrange_multipliers';
+figs_in_paper{24} = 'gradient_optim_fig_func.dJ_dx_gradient';
+figs_in_paper{25} = 'multistart.multistart_convergence_tree';
+figs_in_paper{26} = 'multistart.multistart_bar_chart';
+figs_in_paper{27} = 'param_sensitivities.re_optim_objective_tornado';
+figs_in_paper{28} = 'param_sensitivities.re_optim_design_tornado_J1';
+figs_in_paper{29} = 'param_sensitivities.re_optim_design_tornado_J2';
+figs_in_paper{30} = 'pareto_fig_func.pareto_front_with_design_images';
+figs_in_paper{31} = 'pareto_fig_func.pareto_front_LCOE_contours';
+figs_in_paper{32} = 'pareto_fig_func.pareto_heuristics';
+figs_in_paper{33} = 'pareto_fig_func.pareto_constraint_activity';
+figs_in_paper{34} = 'all_fig_compare.runtime_bar_chart';
+figs_in_paper{35} = 'pareto_sweep.sweep_num_seeds';
+% appendix A- hydro
+figs_in_paper{36} = 'meem.meem_regions';
+figs_in_paper{37} = 'meem.meem_sparsity';
+figs_in_paper{38} = 'meem.meem_validation';
+figs_in_paper{39} = 'meem.meem_matching';
+figs_in_paper{40} = 'meem.meem_convergence';
+figs_in_paper{41} = 'meem.asymptotic_b_vector';
+% appendix B - dynamics
+figs_in_paper{42} = 'force_saturation_fig_func.power_force_sensitivity';
+figs_in_paper{43} = 'run_single_fig_func.drag_convergence';
+figs_in_paper{44} = 'slamming.slamming_amplitude';
+figs_in_paper{45} = 'run_single_fig_func.slamming_model_comparison';
+figs_in_paper{46} = 'wecsim.wecsim_all_sea_states';
+% appendix C - structures
+figs_in_paper{47} = 'read_non_matlab_figs.equivalent_stiffness';
+figs_in_paper{48} = 'read_non_matlab_figs.trapezoid';
+figs_in_paper{49} = 'read_non_matlab_figs.damping_plate_flowchart';
+figs_in_paper{50} = 'damping_plate_structures.damping_plate_moment';
+figs_in_paper{51} = 'damping_plate_structures.damping_plate_deflection';
+figs_in_paper{52} = 'damping_plate_structures.damping_plate_aspect_ratio';
+% appendix D - economics
+% appendix E - optimization process
+figs_in_paper{53} = 'param_sensitivities.post_optim_re_optim_objective_grid';
+figs_in_paper{54} = 'param_sensitivities.post_optim_design_grid';
+figs_in_paper{55} = 'param_sensitivities.re_optim_design_grid';
+% appendix F - supplementary results
+figs_in_paper{56} = 'gradient_optim_fig_func.normalized_gradient';
+figs_in_paper{57} = 'gradient_optim_fig_func.single_obj_convergence';
+figs_in_paper{58} = 'multistart.multistart_parallel_coordinates';
+% graphical abstract (unnumbered so at the end)
+figs_in_paper{59}  = 'read_non_matlab_figs.graphical_abstract';
 
+%% TABLES
+tabs_in_paper = cell(1,29);
+tabs_in_paper{12} = 'cost.cost_parameters';
+tabs_in_paper{13} = 'validation.validation';
+tabs_in_paper{14} = 'constraints';
+tabs_in_paper{15} = 'design_vars';
+tabs_in_paper{16} = 'parameters';
+tabs_in_paper{18} = 'comparison.optimal_design';
+tabs_in_paper{19} = 'comparison.optimal_outputs';
+tabs_in_paper{20} = 'location_sensitivity.location_sensitivity';
 
-%% non matlab figures
-non_matlab_figs = [1:5 10:11 13:14];
-non_matlab_fig_names = {'Fig. 1: RM3 image',...
-                        'Fig. 2: Methodology overview',...
-                        'Fig. 3: N2 diagram',...
-                        'Fig. 4: Dimensions',...
-                        'Fig. 5: MEEM geometry',...
-                        'Fig. 10: WECSim error breakdown',...
-                        'Fig. 11: FBD',...
-                        'Fig. 13: sim runtime',...
-                        'Fig. 14: Optimization flowchart'};
-non_matlab_fig_files = {'geometry.png',...
-                        'methods_flowchart_2_cropped.jpg',...
-                        'xdsm.JPG',...
-                        'dimensions.jpg',...
-                        'MEEM-dims-basic-3.jpg',...
-                        'Error_Accumulation_AEP.png',...
-                        'structures_FBDs_4.jpg',...
-                        'time_breakdown_3.png',...
-                        'optim_process_flowchart_cropped.jpg'};
+%% Auto-generate figure and table names from list above
+fig_nums = cellstr(num2str((1:num_figs).'));
+tab_idxs = ~cellfun(@isempty,tabs_in_paper);
+tab_nums = cellstr(num2str(find(tab_idxs).'));
 
-for i = 1:length(non_matlab_figs)
-    fig_num = non_matlab_figs(i);
-    fig_name = non_matlab_fig_names{i};
-    fig_file = non_matlab_fig_files{i};
+fig_names = strcat("Fig. ", fig_nums, ": ", figs_in_paper.');
+tab_names = strcat("Tab. ", tab_nums, ": ", tabs_in_paper(tab_idxs).');
 
-    fig_names{fig_num} = fig_name;
-    if any(which_figs == fig_num)
-        try
-            t = tic;
-            tmp_fig = figure;
-            imshow(imread(fig_file),'Parent',axes(tmp_fig));
-            tmp_fig.UserData = ['plots/non_matlab_figs/' fig_file(1:end-4) '.pdf'];
-            fig_output(which_figs==fig_num) = tmp_fig;    
-        catch err
-            fig_success{which_figs==fig_num} = err;
-        end
-        fig_runtime(which_figs==fig_num) = toc(t);
-    end
-end
+%% Initialize structures to store generated figures and tables
+generated_figs = struct();
+generated_tabs = struct();
+p = parameters();
+b = var_bounds();
+b.filename_uuid = filename_uuid;
+b.table_save_fcn = table_save_fcn;
 
-%% figure 6 - hydro coeffs vs freq
-fig_names{6} = 'Fig. 6: hydro coeffs vs freq';
-if any(which_figs == 6)
+% Loop for figures
+for i = 1:length(which_figs)
     try
-        t = tic;
-        hydro_coeff_err()
-        fig6 = gcf;
-        fig_output(which_figs==6) = fig6;
-    catch err
-        fig_success{which_figs==6} = err;
-    end
-    fig_runtime(which_figs==6) = toc(t);
-end
-
-%% figure 7, 8 - drag DF, saturation time signal
-fig_names{7} = 'Fig. 7: drag describing function';
-fig_names{8} = 'Fig. 8: force saturation time signal';
-if any(which_figs == 7 | which_figs == 8)
-    try
-        t = tic;
-        sin_desc_fcn_demo()
-        fig7 = gcf;
-        fig8 = figure(fig7.Number-2);
-        fig_output(which_figs==7) = fig7;
-        fig_output(which_figs==8) = fig8;
-    catch err
-        fig_success(which_figs == 7 | which_figs == 8) = {err};
-    end
-    fig_runtime(which_figs == 7 | which_figs == 8) = toc(t);
-end
-
-%% figure 9 - JPD multiplication
-fig_names{9} = 'Fig. 9: JPD multiplication';
-if any(which_figs == 9)
-    try
-        t = tic;
-        p = parameters();
-        b = var_bounds();
-        X = [b.X_noms; 1];
-        plot_power_matrix(X,p,b,filename_uuid)
-        fig9 = gcf;
-        fig_output(which_figs==9) = fig9;
-    catch err
-        fig_success{which_figs == 9} = err;
-    end
-    fig_runtime(which_figs==9) = toc(t);
-end
-
-%% figure 12 - cost vs N WEC
-fig_names{12} = 'Fig. 12: cost vs N WEC';
-if any(which_figs == 12) || any(which_tabs == 1)
-    try
-        t = tic;
-        [~,~,~,~,tab1a,fig12] = validate_nominal_RM3('report');
-        fig_output(which_figs==12) = fig12;
-    catch err
-        fig_success{which_figs == 12} = err;
-    end
-    fig_runtime(which_figs==12) = toc(t);
-end
-
-% %% figure 14-15 - wecsim validation histograms
-% fig_names{14} = 'Fig. 14: WecSim histogram singlebody';
-% fig_names{15} = 'Fig. 15: WecSim histogram multibody';
-% if any(which_figs == 14 | which_figs == 15)
-%     try
-%         [~, ~, ~, ~, fig_singlebody, fig_multibody] = validate_dynamics();
-%         fig_output(which_figs==14) = fig_singlebody;
-%         fig_output(which_figs==15) = fig_multibody;
-%     catch err
-%         fig_success(which_figs == 14 | which_figs == 15) = {err};
-%     end
-% end
-
-%% figure 15 - design space exploration
-fig_names{15} = 'Fig. 15: design space exploration';
-if any(which_figs == 15)
-    try
-        t = tic;
-        experiments()
-        fig15 = gcf;
-        fig_output(which_figs==15) = fig15;
-    catch err
-        fig_success{which_figs == 15} = err;
-    end
-    fig_runtime(which_figs==15) = toc(t);
-end
-
-%% figure 16, 17, 18 - parameter sensitivities
-fig_names{16} = 'Fig. 16: post-optimality and re-optimization dJ*/dp sensitivities';
-fig_names{17} = 'Fig. 17: post-optimality dx*/dp sensitivities';
-fig_names{18} = 'Fig. 18: re-optimization dx*/dp sensitivities';
-if any(which_figs == 16 | which_figs == 17 | which_figs == 18)
-    try
-        t = tic;
-        [runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid);
-        figTemp = gcf; % delta p global
-        fig18 = figure(figTemp.Number - 2); % dx*/dp global
-        fig17 = figure(figTemp.Number - 3); % dx*/dp local
-        fig16 = figure(figTemp.Number - 5); % dJ*/dp combined
-        fig_output(which_figs==16) = fig16;
-        fig_output(which_figs==17) = fig17;
-        fig_output(which_figs==18) = fig18;
-        % fixme: 19 through 21 not implemented
-        fig_runtime(which_figs==17) = runtimeLocal;
-        fig_runtime(which_figs==18) = runtimeGlobal;
-        fig_runtime(which_figs==16) = runtimeLocal + runtimeGlobal;
-    catch err
-        fig_success(which_figs == 16 | which_figs == 17 | which_figs == 18) = {err};
-        fig_runtime(which_figs == 16 | which_figs == 17 | which_figs == 18) = toc(t);
-    end
-    
-end
-
-%% figure 22, 23, 24, 25 - pareto front, design heuristics
-fig_names{22} = 'Fig. 22: pareto front with design images';
-fig_names{23} = 'Fig. 23: design and objective heuristics';
-fig_names{24} = 'Fig. 24: pareto front with LCOE contours';
-fig_names{25} = 'Fig. 25: constraint activity';
-if any(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25)
-    try
-        t = tic;
-        pareto_search(filename_uuid);
-        pareto_curve_heuristics()
-        fig23 = gcf;
-        fig22 = figure(fig23.Number - 2);
-        fig24 = figure(fig23.Number - 3);
-        fig25 = figure(fig23.Number - 5); % constraint activity
-        fig25.Position = [1 41 1536 844.8000];
-        fig_output(which_figs==22) = fig22;
-        fig_output(which_figs==23) = fig23;
-        fig_output(which_figs==24) = fig24;
-        fig_output(which_figs==25) = fig25;
-    catch err
-        fig_success(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25) = {err};
-    end
-    fig_runtime(which_figs == 22 | which_figs == 23 | which_figs == 24 | which_figs == 25) = toc(t);
-end
-
-%% figure 26, 27, 28 - overlaid geometry, hydro coeffs, probability CDF
-fig_names{26} = 'Fig. 26: overlaid geometry';
-fig_names{27} = 'Fig. 27: overlaid hydro coeffs';
-fig_names{28} = 'Fig. 28: probability CDF';
-if any(which_figs == 26 | which_figs == 27 | which_figs == 28) || any(which_tabs == 5 | which_tabs == 6)
-    try
-        t = tic;
-        [tab5,tab6] = compare(filename_uuid);
-        n = gcf().Number;
-        fig27 = figure(n);
-        fig28 = figure(n-2);
-        fig26 = figure(n-3);
-        fig_output(which_figs==26) = fig26;
-        fig_output(which_figs==27) = fig27;
-        fig_output(which_figs==28) = fig28;
-    catch err
-        fig_success(which_figs == 26 | which_figs == 27 | which_figs == 28) = {err};
-    end
-    time = toc(t);
-    fig_runtime(which_figs == 26 | which_figs == 27 | which_figs == 28) = time;
-    tab_runtime(which_tabs == 5 | which_tabs == 6) = time;
-end
-
-%% figure 29 - fixme not implemented
-fig_names{29} = 'Fig. 29: XXX';
-if any(which_figs == 29)
-    fig_output(which_figs==29) = figure;
-end
-
-%% figure 30 - asymptotic b vector
-fig_names{30} = 'Fig. 30: asymptotic b vector';
-if any(which_figs == 30)
-    try
-        t = tic;
-        b_inf_numeric()
-        fig30 = gcf;
-        fig_output(which_figs==30) = fig30;
-    catch err
-        fig_success{which_figs==30} = err;
-    end
-    fig_runtime(which_figs==30) = toc(t);
-end
-
-%% figure 31-33 - fixme not implemented
-if any( ismember(which_figs, 31:33) )
-    fig_output(ismember(which_figs, 31:33)) = figure;
-end
-
-%% figure 34 to 36 - damping plate moment and deflection
-fig_names{34} = 'Fig. 34: damping plate moment';
-fig_names{35} = 'Fig. 35: damping plate deflection';
-fig_names{36} = 'Fig. 36: damping plate plate aspect ratio';
-if any(which_figs == 34 | which_figs == 35 | which_figs == 36)
-    try
-        t = tic;
-        addpath('/damping-plate');
-        BoedoPrantilAnnularPlate()
-        fig36 = gcf;
-        fig35 = figure(fig36.Number-1);
-        fig34 = figure(fig36.Number-7);
-        fig_output(which_figs==34) = fig34;
-        fig_output(which_figs==35) = fig35;
-        fig_output(which_figs==36) = fig36;
-    catch err
-        fig_success(which_figs == 34 | which_figs == 35 | which_figs == 36) = {err};
-    end
-    fig_runtime(which_figs == 34 | which_figs == 35 | which_figs == 36) = toc(t);
-end
-
-%% fixme: 37 to 45 not implemented, but still name the figures
-empty_idx = cellfun(@isempty,fig_names);
-empty_str = strcat('Fig._', string(find(empty_idx)));
-[fig_names{empty_idx}] = deal(empty_str{:});
-[fig_success{ismember(which_figs,find(empty_idx))}] = deal(MException('all_figures:not_implemented','Figure not implemented yet'));
-
-%% table 12 - validation table
-tab_names{1} = 'Tab. 12: validation against nominal';
-if any(which_tabs == 1)
-    try
-        t = tic;
-        % tab1a was generated with fig 12 above
-        display(tab1a)
-        [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
-        display(tab1b)
-    
-        % merge table 1a and 1b while preserving row order
-        sharedCols = intersect(tab1a.Properties.VariableNames, tab1b.Properties.VariableNames);
-        tab1a.RowNum = (1:length(tab1a.Properties.RowNames))';
-        tab1b.RowNum = length(tab1a.Properties.RowNames) + (1:length(tab1b.Properties.RowNames))';
+        % Get the function name for the figure
+        fig_number = which_figs(i);
+        fig_name = split(figs_in_paper{fig_number}, '.');
+        func_name = fig_name{1};
+        fig_desc = fig_name{2};
         
-        tab1 = outerjoin(tab1a, tab1b, 'Keys', [{'RowNum'},sharedCols], 'MergeKeys', true);
-        tab1 = removevars(tab1,'RowNum');
-        tab1.Properties.RowNames = [tab1a.Properties.RowNames; tab1b.Properties.RowNames];
-        display(tab1)
-    
-        tab_output{which_tabs==1} = tab1;
-    
-        vector_cols = {'capex','capex_design','J_capex_design','capex_struct','capex_PTO','opex','LCOE'};
-        idx_remove = ismember(tab1.Properties.VariableNames,vector_cols); 
-        tab1latex = rows2vars(tab1,'VariableNamingRule','preserve','DataVariables',~idx_remove);
-        tab1latex.OriginalVariableNames = remove_underscores(modify_suffix(tab1latex.OriginalVariableNames));
-        new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
-        tab1latex = renamevars(tab1latex, tab1latex.Properties.VariableNames, new_names);
-        firstrow = '&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\';
-        colspec = '>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r';
-        table2latex(tab1latex,[save_folder 'table_12.tex'],colspec,firstrow)
+        % Check if the figure has already been generated
+        t = tic;
+        if ~isfield(generated_figs, func_name)
+            % Run the function to generate the figure and table
+            [figs, tabs] = feval(func_name, p, b);
+            
+            % Store the generated figure in the generated_figs structure
+            generated_figs.(func_name) = figs;
+            
+            % If the function generates a table, store it in the generated_tabs structure
+            if ~isempty(tabs)
+                generated_tabs.(func_name) = tabs;
+            end
+        end
+        
+        % Store the generated figure in fig_output
+        fig_output(i) = generated_figs.(func_name).(fig_desc);
+        fig_runtime(i) = toc(t);
+
     catch err
-        tab_success{which_tabs == 1} = err;
+        fig_success{i} = err;  % Store error for the figure
     end
-    tab_runtime(which_tabs == 1) = toc(t);
 end
 
-%% table 15 - constraints table
-tab_names{2} = 'Tab. 15: constraints';
-if any(which_tabs == 2)
+% Loop for tables
+for i = 1:length(which_tabs)
     try
+        tab_number = which_tabs(i);
+        % Get the function name for the table
+        tab_name = split(tabs_in_paper{tab_number}, '.');
+        func_name = tab_name{1};
+        tab_desc = tab_name{2};
+        
+        % Check if the table has already been generated
         t = tic;
-        b = var_bounds();
-        tab2 = b.constraint_names';
-        display(tab2)
-        tab_output{which_tabs==2} = tab2;
+        if ~isfield(generated_tabs, func_name)
+            % Run the function to generate the table
+            [figs, tabs] = feval(func_name, p, b);
+            
+            % Store the generated table in the generated_tabs structure
+            generated_tabs.(func_name) = tabs;
+            
+            % If the function generates a figure, store it in the generated_figs structure
+            if ~isempty(figs)
+                generated_figs.(func_name) = figs;
+            end
+        end
+        
+        % Store the generated table in tab_output
+        tab_output{i} = generated_tabs.(func_name).(tab_desc);  % Store the table
+        tab_runtime(i) = toc(t);
+        display(tab_output{i})
+        
     catch err
-        tab_success{which_tabs == 2} = err;
+        tab_success{i} = err;  % Store error for the table
     end
-    tab_runtime(which_tabs == 2) = toc(t);
 end
 
-%% table 16 - design variables table
-tab_names{3} = 'Tab. 16: design variables';
-if any(which_tabs == 3)
-    try
-        t = tic;
-        b = var_bounds();
-        tab3 = array2table([b.X_mins b.X_noms b.X_maxs], ...
+end
+
+%%
+% Non-MATLAB figure reading function
+function [figs,tabs] =  read_non_matlab_figs(~,~)
+
+    fig_names = {'RM3_image','methodology_overview','N2_diagram',...
+                'dimensions','MEEM_geometry','WECSim_error_breakdown', ...
+                'FBD', 'sim_runtime', 'optimization_flowchart'};
+    file_names = {'geometry.png',...
+                    'methods_flowchart_2_cropped.jpg',...
+                    'xdsm.JPG',...
+                    'dimensions.jpg',...
+                    'MEEM-dims-basic-3.jpg',...
+                    'Error_Accumulation_AEP.png',...
+                    'structures_FBDs_4.jpg',...
+                    'time_breakdown_3.png',...
+                    'optim_process_flowchart_cropped.jpg'};
+    % Initialize an empty struct to hold the figures
+    figs = struct();
+    tabs = [];
+
+    % Loop over the requested figure names
+    for i = 1:length(fig_names)
+        fig_name = fig_names{i};
+        file_name = file_names{i};
+        
+        % Create the figure and read in the image file
+        figs.(fig_name) = figure;
+        imshow(imread(file_name), 'Parent', axes(figs.(fig_name)));
+        figs.(fig_name).UserData = ['plots/non_matlab_figs/' file_name(1:end-4) '.pdf'];
+    end
+end
+
+% Function for single objective convergence
+function [figs,tabs] = gradient_optim_fig_func(p,b)
+    gradient_optim(b.X_start_struct,p,b,1,{@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true)
+
+    n = gcf().Number;
+    figs.dJ_dx_gradient              = figure(n);
+    figs.lagrange_multipliers        = figure(n-1);
+    figs.single_obj_opt_geometry     = figure(n-2);
+    figs.single_obj_opt_power_matrix = figure(n-3);
+    figs.single_obj_convergence      = figure(n-4);
+
+    tabs = [];
+end
+
+% Function to generate Pareto figure group
+function [figs,tabs] =  pareto_fig_func(~,b)
+    pareto_search(b.filename_uuid)
+    pareto_curve_heuristics()
+    figs.pareto_heuristics = gcf;
+    n = figs.pareto_heuristics.Number;
+    figs.pareto_front_with_design_images = figure(n - 2);
+    figs.pareto_front_LCOE_contours = figure(n - 3);
+    figs.pareto_constraint_activity = figure(n - 5); 
+    figs.pareto_constraint_activity.Position = [1 41 1536 844.8000];
+    tabs = [];
+end
+
+% Function to generate parameter sensitivity figures
+function [figs,tabs] =  param_sensitivities(~,b)
+    [fig_arr, runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid); % fixme these runtimes aren't used
+    figs.re_optim_constraint_grid = fig_arr(end);                   % delta p re-optimization (grid)
+    figs.post_optim_constraint_grid= fig_arr(end-1);          % delta p post optimality (grid)
+    figs.re_optim_design_grid = fig_arr(end - 2);             % dx*/dp re-optimization (grid)
+    figs.post_optim_design_grid  = fig_arr(end - 3);          % dx*/dp post optimality (grid)
+    figs.re_optim_objective_grid = fig_arr(end - 4);          % dJ*/dp re-optimization (grid)
+    figs.post_optim_re_optim_objective_grid = fig_arr(end-5); % dJ*/dp combined (grid)
+
+    figs.re_optim_design_tornado_J2 = fig_arr(end - 6);  % dx*/dp re-optimization (tornado)
+    figs.re_optim_design_tornado_J1 = fig_arr(end - 7);  % dx*/dp re-optimization (tornado)
+    num_DVs = length(b.var_names)-1;
+    for i = 1:num_DVs
+        name = ['re_optim_design_tornado_' b.var_names{num_DVs+1-i}];
+        figs.(name) = fig_arr(end - (7+i));            % dx*/dp re-optimization (tornado)
+    end
+    figs.re_optim_objective_tornado = fig_arr(end - num_DVs - 8); % dJ*/dp re-optimization (tornado)
+    figs.nonlinear_design_J2 = fig_arr(end - num_DVs - 9); % x* for J2 line plot 
+    figs.nonlinear_design_J1 = fig_arr(end - num_DVs - 10); % x* for J1 line plot 
+    figs.nonlinear_objectives = fig_arr(end - num_DVs - 11); % J* line plot 
+    tabs = [];
+end
+
+% Function to generate hydro coefficient figure
+function [figs,tabs] =  hydro_coeff_fig_func(~,~)
+    hydro_coeff_err()
+    figs.hydro_coeff_err = gcf;
+    tabs = [];
+end
+
+function [figs,tabs] = spar_hydro(~,~)
+    fig = spar_hydro_plot();
+    figs.spar_added_mass = fig;
+    tabs = [];
+end
+
+% Function to generate drag describing function and saturation time signal figures
+function [figs,tabs] =  desc_fcns(~,~)
+    sin_desc_fcn_demo()
+    figs.drag_desc_fcn = gcf;
+    figs.saturation_desc_fcn = figure(figs.drag_desc_fcn.Number - 2);
+    tabs = [];
+end
+
+% Function to generate force saturation results figure
+function [figs,tabs] =  force_saturation_fig_func(p, b)
+    [fig1,fig2] = force_sat_results(p, b);
+    figs.power_force_sensitivity = fig1;
+    figs.runtime_sensitivity = fig2;
+    tabs = [];
+end
+
+% Function to generate JPD multiplication figure
+function [figs,tabs] = jpd_multiply_fig_func(p, b)
+    X = [b.X_noms; 1];
+    plot_power_matrix(X, p, b, b.filename_uuid)
+    figs.JPD_multiplication = gcf;
+    tabs = [];
+end
+
+% Function to generate validation figure for cost vs N WEC
+function [figs,tabs] = validation(~,b)
+
+    [~, ~, ~, ~, tab1a, figs.cost_vs_N_WEC] = validate_nominal_RM3('report');
+    [~,~,~,~,tab1b] = validate_nominal_RM3('wecsim');
+
+    % merge table 1a and 1b while preserving row order
+    sharedCols = intersect(tab1a.Properties.VariableNames, tab1b.Properties.VariableNames);
+    tab1a.RowNum = (1:length(tab1a.Properties.RowNames))';
+    tab1b.RowNum = length(tab1a.Properties.RowNames) + (1:length(tab1b.Properties.RowNames))';
+    
+    tab1 = outerjoin(tab1a, tab1b, 'Keys', [{'RowNum'},sharedCols], 'MergeKeys', true);
+    tab1 = removevars(tab1,'RowNum');
+    tab1.Properties.RowNames = [tab1a.Properties.RowNames; tab1b.Properties.RowNames];
+
+    vector_cols = {'capex','capex_design','J_capex_design','capex_struct','capex_PTO','opex','LCOE'};
+    idx_remove = ismember(tab1.Properties.VariableNames,vector_cols); 
+    tab1latex = rows2vars(tab1,'VariableNamingRule','preserve','DataVariables',~idx_remove);
+    tab1latex.OriginalVariableNames = remove_underscores(modify_suffix(tab1latex.OriginalVariableNames));
+    new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
+    tab1latex = renamevars(tab1latex, tab1latex.Properties.VariableNames, new_names);
+    firstrow = '&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\';
+    colspec = '>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r';
+    b.table_save_fcn(tab1latex, 'table_12.tex', colspec, firstrow)
+
+    tabs.validation = tab1;
+end
+
+% Function to generate design space exploration figure
+function [figs,tabs] = design_space_exploration(p,b)
+    experiments(p,b)
+    figs.experiments = gcf;
+    tabs = [];
+end
+
+% Function to generate overlaid geometry, hydro coeffs, and probability CDF figures
+function [figs,tabs] = comparison(p,b)
+    [tabs.optimal_design_vars, tabs.optimal_outputs] = compare(p,b);
+    n = gcf().Number;
+    figs.overlaid_geometry = figure(n-3);
+    figs.overlaid_hydro_coeffs = figure(n);
+    figs.probability_CDF = figure(n-2);
+
+    b.table_save_fcn(tabs.optimal_design_vars,'table_19.tex')
+    b.table_save_fcn(tabs.optimal_outputs,    'table_20.tex')
+end
+
+% Function to generate asymptotic b vector figure
+function [figs,tabs] = asymptotic_b_vector_fig_func(~,~)
+    b_inf_numeric()
+    figs.asymptotic_b_vector = gcf;
+    tabs = [];
+end
+
+% Function to generate damping plate moment, deflection, and aspect ratio figures
+function [figs,tabs] = damping_plate_structures(~,~)
+    addpath('../dev/structures/damping-plate');
+    BoedoPrantilAnnularPlate()
+    n = gcf().Number;
+    figs.damping_plate_aspect_ratio = figure(n);
+    figs.damping_plate_deflection   = figure(n - 1);
+    figs.damping_plate_moment       = figure(n - 7);
+    tabs = [];
+end
+
+function [figs,tabs] = location_sensitivity_func(p,b)
+    tab = location_sensitivity(p,b);
+    tabs.location_table = tab;
+    location_flags = str2double(tab(strcmp(tab.Row,'flag'),:).Variables);
+    
+    %tab_success{which_tabs == 8} = {location_flags};
+
+    idx_remove = ismember(tab.Row,{'flag','Optimal Material index'});
+    tablatex = tab(~idx_remove,:);
+    colspec = ['>{\centering\arraybackslash}p{0.22\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.08\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.17\linewidth}' ...
+               '>{\centering\arraybackslash}p{0.18\linewidth}'];
+    firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
+    b.table_save_fcn(tablatex,'table_22.tex',colspec,firstrow)
+
+    figs = [];
+end
+
+function [figs,tabs] = constraints_func(~,b)
+    tab = b.constraint_names';
+    tabs.constraints = tab;
+    figs = [];
+end
+
+function [figs,tabs] = design_vars_func(~,b)
+    tab = array2table([b.X_mins b.X_noms b.X_maxs], ...
             'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', b.var_names(1:end-1));
-        display(tab3)
-        tab_output{which_tabs==3} = tab3;
-    catch err
-        tab_success{which_tabs == 3} = err;
-    end
-    tab_runtime(which_tabs == 3) = toc(t);
+    tabs.design_vars = tab;
+    figs = [];
 end
 
-%% table 17 - parameters table
-tab_names{4} = 'Tab. 17: parameters';
-if any(which_tabs == 4)
-    try
-        t = tic;
-        [~,tab4] = parameters();
-        display(tab4)
-        tab_output{which_tabs==4} = tab4;
-    catch err
-        tab_success{which_tabs == 4} = err;
-    end
-    tab_runtime(which_tabs == 4) = toc(t);
+function [figs,tabs] = params_func(~,~)
+    [~,tabs.parameters] = parameters();
+    figs = [];
 end
 
-%% table 19 - optimal DVs for various designs
-tab_names{5} = 'Tab. 19: optimal DVs for various designs';
-if any(which_tabs == 5)
-    try
-        t = tic;
-        % computation above with figures 27-29
-        display(tab5);
-        tab_output{which_tabs==5} = tab5;
-        table2latex(tab5,[save_folder 'table_19.tex'])
-    catch err
-        tab_success{which_tabs == 5} = err;
-    end
-    tab_runtime(which_tabs == 5) = tab_runtime(which_tabs == 5) + toc(t);
+function [figs,tabs] = multistart(p,b)
+    [treeFig, parallelFig, tab] = gradient_mult_x0(p,b);
+    tabs.multistart_results = tab;
+    b.table_save_fcn(tab,'table_21.tex')
+    figs.multistart_convergence_tree = treeFig;
+    figs.multistart_parallel_coordinates = parallelFig;
 end
 
-%% table 20 - optimal outputs for various designs
-tab_names{6} = 'Tab. 20: optimal outputs for various designs';
-if any(which_tabs == 6)
-    try
-        t = tic;
-        % computation above with figures 27-29
-        display(tab6);
-        tab_output{which_tabs==6} = tab6;
-        table2latex(tab6,[save_folder 'table_20.tex'])
-    catch err
-        tab_success{which_tabs == 6} = err;
-    end
-    tab_runtime(which_tabs == 6) = tab_runtime(which_tabs == 6) + toc(t);
+function [figs,tabs] = run_single_fig_func(p,b)
+    p.operational_drag_convergence_plot_on = true;
+    run_single(p,b)
+    n = gcf().Number;
+    figs.nominal_geometry_viz = figure(n);
+    figs.nominal_power_pdf = figure(n-1);
+    figs.nominal_power_matrix = figure(n-2);
+    figs.drag_convergence = figure(n-3);
+    tabs = [];
 end
 
-%% table 21 - convergence for different x0s
-tab_names{7} = 'Tab. 21: convergence for different x0s';
-if any(which_tabs == 7)
-    try
-        t = tic;
-        tab7 = gradient_mult_x0(filename_uuid);
-        tab_output{which_tabs==7} = tab7;
-        table2latex(tab7,[save_folder 'table_21.tex'])
-    catch err
-        tab_success{which_tabs == 7} = err;
-    end
-    tab_runtime(which_tabs == 7) = toc(t);
+function [figs,tabs] = wecsim(~,~)
+    [~, ~, ~, tab, fig_singlebody, fig_multibody] = validate_dynamics();
+    figs.WECSim_error_histograms_singlebody = fig_singlebody;
+    figs.WECSim_error_histograms_multibody = fig_multibody;
+    %figs.wecsim_all_sea_states = gcf();
+    tabs.WECSim_errors = tab;
 end
 
-%% table 22 - optimal DVs for 4 locations
-tab_names{8} = 'Tab. 22: optimal DVs for 4 locations';
-if any(which_tabs == 8)
-    try
-        t = tic;
-        tab8 = location_sensitivity(filename_uuid);
-        display(tab8);
-        tab_output{which_tabs==8} = tab8;
-        location_flags = str2double(tab8(strcmp(tab8.Row,'flag'),:).Variables);
-        tab_success{which_tabs == 8} = {location_flags};
-    
-        idx_remove = ismember(tab8.Row,{'flag','Optimal Material index'});
-        tab8latex = tab8(~idx_remove,:);
-        colspec = ['>{\centering\arraybackslash}p{0.22\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.08\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.17\linewidth}' ...
-                   '>{\centering\arraybackslash}p{0.18\linewidth}'];
-        firstrow = '&& \multicolumn{4}{c}{Location}\\  \cline{3-6}';
-        table2latex(tab8latex,[save_folder 'table_22.tex'],colspec,firstrow)
-    catch err
-        tab_success{which_tabs == 8} = err;
-    end
-    tab_runtime(which_tabs == 8) = toc(t);
+function [figs,tabs] = runtime(p,b)
+    [f1, f2, f3] = module_runtime_compare(p,b);
+
+    figs.dynamics_runtime = f1;
+    figs.hydro_runtime    = f2;
+    figs.sim_runtime      = f3;
+
+    tabs = [];
 end
 
+function [figs,tabs] = meem(p,b)
+    [figPotMatch, figVelMatch, figSparsity, figHydroCoeff] = validate_MEEM();
 
+    figs.meem_regions = figure; % fixme
+    figs.meem_sparsity = figSparsity;
+    figs.meem_validation = figHydroCoeff;
+    figs.meem_matching = figPotMatch;
+    figs.meem_convergence = figure; % fixme
+    figs.asymptotic_b_vector = b_inf_numeric();
+
+    tabs = [];
+end
+
+function [figs,tabs] = slamming(~,~)
+    fig = slam_plot();
+    figs.slamming_amplitude = fig;
+    tabs = [];
 end

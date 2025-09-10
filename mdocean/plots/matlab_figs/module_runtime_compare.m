@@ -1,6 +1,4 @@
-function [f1, f2, f3] = module_runtime_compare()
-    p = parameters();
-    b = var_bounds();
+function [f1, f2, f3] = module_runtime_compare(p,b)
     
     X = [b.X_noms; 1];
 

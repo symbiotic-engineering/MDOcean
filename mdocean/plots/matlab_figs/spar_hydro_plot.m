@@ -1,4 +1,4 @@
-function spar_added_mass_plot()
+function f = spar_hydro_plot()
 
     r = linspace(0,1);
     root_r = sqrt(1-r.^2);
