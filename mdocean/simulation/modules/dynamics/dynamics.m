@@ -418,7 +418,7 @@ function [mag_U,phase_U,...
         X_s_guess = mag_X_s;
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
-        ctrl_mult_guess = ctrl_mult_guess ./ (F_lim_err+1);
+        ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
         phase_ctrl_mult_guess = eps + zeros(size(ctrl_mult_guess));
 
         % check convergence
@@ -658,22 +658,15 @@ function [mag_U,phase_U,...
         end
     
         F_err = mag_U   ./ (f_sat .* mag_U_unsat  ) - 1;
+        X_err = mag_X_f ./ (x_sat .* mag_X_f_unsat) - 1;
 
         if F_max==0
             F_err(mag_U==0) = 0;
             F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
         end
-        X_err = mag_X_f ./ (x_sat .* mag_X_f_unsat) - 1;
+        
 
 %     end
-
-    % saturate position - hacky for now
-%     r_x = min(X_max ./ mag_X_f, 1);
-%     mag_X_u = mag_X_u .* r_x;
-%     mag_X_f = mag_X_f .* r_x;
-%     mag_X_s = mag_X_s .* r_x;
-%     mag_U   = mag_U   .* r_x;
-%     real_P  = real_P  .* r_x.^2;
 
     P_sat_ratio = real_P ./ P_unsat;
 
