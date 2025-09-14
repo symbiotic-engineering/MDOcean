@@ -385,10 +385,11 @@ function [mag_U,phase_U,...
         if drag_convergence_plot_on
             % record guesses
             % 10,1 was found manually to be the problem sea state
-            X_f_guesses(iters+1) = X_f_guess(10,1);
-            X_s_guesses(iters+1) = X_s_guess(10,1);
-            phase_X_f_guesses(iters+1) = phase_X_f_guess(10,1);
-            phase_X_s_guesses(iters+1) = phase_X_s_guess(10,1);
+            sea_state_plot = {5,11};
+            X_f_guesses(iters+1) = X_f_guess(sea_state_plot{:});
+            X_s_guesses(iters+1) = X_s_guess(sea_state_plot{:});
+            phase_X_f_guesses(iters+1) = phase_X_f_guess(sea_state_plot{:});
+            phase_X_s_guesses(iters+1) = phase_X_s_guess(sea_state_plot{:});
         end
 
         [X_f_err,X_s_err,...
