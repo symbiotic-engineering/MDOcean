@@ -303,12 +303,12 @@ function [mag_U,phase_U,...
     unflatten = @(x,n) fill_nan_matrix( x( (1:N_ss_nz) + (n-1)*N_ss_nz ) );
 
     % anonymous function to take 6 sea state matrices and turn into collapsed row vector
-    flatten = @(X1,X2,X3,X4,X5,X6) [X1(isfinite(X1));...
-                                    X2(isfinite(X2));...
-                                    X3(isfinite(X3));...
-                                    X4(isfinite(X4));...
-                                    X5(isfinite(X1));...
-                                    X6(isfinite(X1))];
+    flatten = @(X1,X2,X3,X4,X5,X6) [reshape(X1(isfinite(X1)),[],1);...
+                                    reshape(X2(isfinite(X2)),[],1);...
+                                    reshape(X3(isfinite(X3)),[],1);...
+                                    reshape(X4(isfinite(X4)),[],1);...
+                                    reshape(X5(isfinite(X1)),[],1);...
+                                    reshape(X6(isfinite(X1)),[],1)    ];
 
     % prepare inputs for solver
     x0 = flatten(X_f_guess,X_s_guess,phase_X_f_guess,phase_X_s_guess,...
@@ -326,13 +326,15 @@ function [mag_U,phase_U,...
     sparsity = repmat(eye(N_ss_nz),6);
     opts = optimoptions('fsolve','JacobPattern',sparsity,...
                                  'MaxIterations',max_drag_iters,...
-                                 'StepTolerance',min(X_tol,phase_X_tol));
+                                 'Algorithm','trust-region',...
+                                 ...%'StepTolerance',min(X_tol,phase_X_tol),...
+                                 'Display','final-detailed');
     if drag_convergence_plot_on
-        opts.PlotFcn = 'optimplotx';
+        opts.PlotFcn = {'optimplotx','optimplotfval'};
     end
 
     % solve
-    x_solved = fsolve(@(x)fun_outer(x,fun_inner,flatten),x0,opts);
+    [x_solved,err,flag,out] = fsolve(@(x)fun_outer(x,fun_inner,flatten),x0,opts);
 
     % unpack
     [X_f_solved,X_s_solved,...
@@ -600,9 +602,7 @@ function [mag_U,phase_U,...
 
     % get force-saturated response
 
-    % notebook p106 2/2/25
-    f_sat = min(4/pi * F_max ./ mag_U_unsat,   1);
-    x_sat = min(       X_max ./ mag_X_f_unsat, 1);
+
 
     % fixme: If reactive control, mult should be complex, based on eq4 of IFAC paper.
 %     F_err = zeros(size(f_sat));
@@ -657,16 +657,59 @@ function [mag_U,phase_U,...
             reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
         end
     
-        F_err = mag_U   ./ (f_sat .* mag_U_unsat  ) - 1;
-        X_err = mag_X_f ./ (x_sat .* mag_X_f_unsat) - 1;
 
+        % notebook p106 2/2/25
+%         f_sat = min(4/pi * F_max ./ mag_U_unsat,   1);
+%         x_sat = min(       X_max ./ mag_X_f_unsat, 1);
+
+        % what the force and amp would be if the force-sat and amp-sat
+        % solutions applied
+        force_saturated_U = min(4/pi * F_max, mag_U_unsat);
+        amp_saturated_X   = min(       X_max, mag_X_f_unsat);
+
+        % indices where sat and unsat solutions violate which constraint
+%         idx_force_viol_sat   = mag_U         > force_saturated_U;
+%         idx_force_viol_unsat = mag_U_unsat   > force_saturated_U;
+%         idx_amp_viol_sat     = mag_X_f       > amp_saturated_X;
+%         idx_amp_viol_unsat   = mag_X_f_unsat > amp_saturated_X;
+
+%         both_ok_unsat       = ~idx_force_viol_unsat & ~idx_amp_viol_unsat;
+%         only_force_ok_unsat = ~idx_force_viol_unsat &  idx_amp_viol_unsat;
+%         only_amp_ok_unsat   =  idx_force_viol_unsat & ~idx_amp_viol_unsat;
+
+        % indices where each solution applies. currently overriding amp
+        % constraint. commented forumlas attempt to incorporate both but
+        % should not actually be based purely on whether the 
+        % saturated and/or unsaturated solution violates, it should also
+        % depend on alpha and the limits (see notebook p142-144 9/15/25).
+        idx_force_sat_applies = true(size(w));
+        idx_amp_sat_applies   = false(size(w));
+%         idx_force_sat_applies = both_ok_unsat | idx_force_viol_sat;   % | (idx_amp_viol_sat & idx_force_viol_sat);
+%         idx_amp_sat_applies   = both_ok_unsat | only_force_ok_unsat; % | (idx_amp_viol_sat & idx_force_viol_sat);
+
+        F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
+        X_err_from_amp_sat   = mag_X_f ./ amp_saturated_X   - 1;
+
+        F_err = Inf(size(F_err_from_force_sat));
+        X_err = Inf(size(X_err_from_amp_sat));
+
+        % at sea states where the force-saturated solution applies, 
+        % set F_err as deviation from that solution. Otherwise, set F_err=0
+        % to allow any force to occur.
+        F_err(idx_force_sat_applies) = F_err_from_force_sat(idx_force_sat_applies);
+        F_err(~idx_force_sat_applies) = 0;
+
+        % at sea states where the amplitude-saturated solution applies, 
+        % set X_err as deviation from that solution. Otherwise, set X_err = 0
+        % to allow any amplitude to occur.
+        X_err(idx_amp_sat_applies) = X_err_from_amp_sat(idx_amp_sat_applies);
+        X_err(~idx_amp_sat_applies) = 0;
+
+        % prevent 0/0=NaN when limit of zero is set
         if F_max==0
             F_err(mag_U==0) = 0;
             F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
         end
-        
-
-%     end
 
     P_sat_ratio = real_P ./ P_unsat;
 
