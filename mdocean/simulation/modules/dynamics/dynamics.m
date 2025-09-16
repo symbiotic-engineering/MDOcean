@@ -231,8 +231,8 @@ function [mag_U,phase_U,...
     end
     phase_ctrl_mult_guess = zeros(size(w));
 
-    max_drag_iters_fixed_point = max_drag_iters;
-    max_drag_iters_solver      = max_drag_iters;
+    max_drag_iters_fixed_point = 5;
+    max_drag_iters_solver      = 100;%max_drag_iters;
 
     % package inputs
     dynam_inputs = {w,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
