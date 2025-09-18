@@ -278,6 +278,9 @@ function [mag_U,phase_U,...
                                         ctrl_mult_guess,phase_ctrl_mult_guess,...
                                         dynam_inputs{:},max_drag_iters_solver);
     end
+
+    % zero any negative power
+    real_P(real_P<0) = 0;
 end
 
 function [mag_U,phase_U,...
