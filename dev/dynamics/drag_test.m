@@ -8,17 +8,23 @@ reactive = true;
 
 Cd = 0:1:2;
 
+figure
+ax = subplot('221');
+
 % singlebody
-P_reactive = sweep_drag(true,false,Cd);
-P_damping = sweep_drag(false,false,Cd);
+P_reactive = sweep_drag(true,false,Cd,ax);
+ax = subplot('222');
+P_damping = sweep_drag(false,false,Cd,ax);
 
 % pct_diff = 100*(P_damping - P_reactive) ./ P_reactive
 
 % multibody
-sweep_drag(true,true,Cd)
-sweep_drag(false,true,Cd)
+ax = subplot('223');
+sweep_drag(true,true,Cd,ax)
+ax = subplot('224');
+sweep_drag(false,true,Cd,ax)
 
-function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
+function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd,ax)
     p = parameters();
     p.eff_pto = 1;
     p.use_multibody = multibody;
@@ -50,8 +56,6 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     [~,H] = meshgrid(p.T, p.Hs);
 
     
-    figure;
-    ax = gca();
     hold on
     for i = 1:length(Cd)
         p.C_d_float = Cd(i);
@@ -65,7 +69,9 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
         disp(val.X_f(H==2.25))
         disp(val.force_ptrain)
     end
-    legend
+    if ~multibody && reactive
+        legend
+    end
     xlabel('T (s)')
     ylabel('P / H^2 (kW/m^2) at H=2.5m')
     
@@ -77,8 +83,9 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     
     plot(ax,T_new,P_over_H2_max/1000,...
         'DisplayName','Theoretical limit')
-    ylim([0 185])
-    xlim([4 18])
+    ylim([0 115])
+    xlim([4 17])
     title([p.control_type ' Control, ' bodies])
+    grid on
     improvePlot
 end
