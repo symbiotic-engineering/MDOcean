@@ -630,10 +630,12 @@ function [mag_U,phase_U,...
 %         end
 %         mult = mult ./ (F_err+1);%get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
     
-        ctrl_mult_real = ctrl_mult_guess .* cos(phase_ctrl_mult_guess);
-        ctrl_mult_imag = ctrl_mult_guess .* sin(phase_ctrl_mult_guess);
-        B_p_sat = ctrl_mult_real .* B_p;
-        K_p_sat = ctrl_mult_imag .* K_p;
+        mult = ctrl_mult_guess .* exp(1i*phase_ctrl_mult_guess);
+        Z_p = B_p + K_p ./ (1i * w);
+        Z_p_sat = Z_p .* mult;
+
+        B_p_sat =       real(Z_p_sat);
+        K_p_sat = -w .* imag(Z_p_sat);
     
         if multibody
             [mag_U,phase_U,...
