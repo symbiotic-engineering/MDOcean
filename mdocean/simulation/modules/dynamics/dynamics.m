@@ -688,7 +688,11 @@ function [mag_U,phase_U,...
         % should not actually be based purely on whether the 
         % saturated and/or unsaturated solution violates, it should also
         % depend on alpha and the limits (see notebook p142-144 9/15/25).
-        idx_force_sat_applies = true(size(w));
+        if isinf(F_max)
+            idx_force_sat_applies = false(size(w));
+        else
+            idx_force_sat_applies = true(size(w));
+        end
         idx_amp_sat_applies   = false(size(w));
 %         idx_force_sat_applies = both_ok_unsat | idx_force_viol_sat;   % | (idx_amp_viol_sat & idx_force_viol_sat);
 %         idx_amp_sat_applies   = both_ok_unsat | only_force_ok_unsat; % | (idx_amp_viol_sat & idx_force_viol_sat);

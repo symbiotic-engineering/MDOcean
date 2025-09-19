@@ -22,6 +22,8 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     p = parameters();
     p.eff_pto = 1;
     p.use_multibody = multibody;
+    p.use_force_sat = false;
+    p.use_power_sat = false;
     
     if reactive
         p.control_type = 'Reactive';
@@ -48,7 +50,8 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     [~,H] = meshgrid(p.T, p.Hs);
 
     
-    figure
+    figure;
+    ax = gca();
     hold on
     for i = 1:length(Cd)
         p.C_d_float = Cd(i);
@@ -57,7 +60,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
         P_over_H2 = P_matrix ./ H.^2;
         P_over_H2_2pt5 = P_over_H2(H==2.25);
         %P_over_H2_2pt5 = .5 * (P_over_H2(H==2.25) + P_over_H2(H==2.75));
-        plot(p.T, P_over_H2_2pt5/1000,linestyle,'DisplayName',['Cd=' num2str(Cd(i))])
+        plot(ax, p.T, P_over_H2_2pt5/1000,linestyle,'DisplayName',['Cd=' num2str(Cd(i))])
 
         disp(val.X_f(H==2.25))
         disp(val.force_ptrain)
@@ -72,7 +75,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd)
     lambda = 2*pi./k;
     P_over_H2_max = p.rho_w * p.g^2 * T_new .* lambda / (64 * pi^2);
     
-    plot(T_new,P_over_H2_max/1000,...
+    plot(ax,T_new,P_over_H2_max/1000,...
         'DisplayName','Theoretical limit')
     ylim([0 185])
     xlim([4 18])
