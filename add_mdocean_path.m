@@ -9,5 +9,4 @@ s = split(which(path), filesep);
 MDOcean_folder = strjoin(s(1:end-1), filesep);
 mdocean_folder = [MDOcean_folder filesep 'mdocean'];
 addpath(genpath(mdocean_folder))
-cd(mdocean_folder)
 clear path s MDOcean_folder mdocean_folder

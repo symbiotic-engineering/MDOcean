@@ -73,7 +73,11 @@ classdef (Abstract) GenericAnalysis
         end
 
         function obj = load_intermed_results(obj)
-            obj.intermed_result_struct = load([obj.output_folder filesep 'intermed']);
+            fname = [obj.output_folder filesep 'intermed.mat'];
+            if ~isfile(fname)
+                error('No intermediate results file found. Run analysis first.')
+            end
+            obj.intermed_result_struct = load(fname);
         end
 
         function save_intermed_results(obj)
@@ -102,14 +106,14 @@ classdef (Abstract) GenericAnalysis
             end
         end
 
-        function run_all_from_analysis(obj)
-            obj = run_analysis(obj);
-            obj.run_post_process()
+        function obj = run_all_from_analysis(obj)
+            obj = obj.run_analysis();
+            obj = obj.run_post_process();
         end
 
-        function run_all_from_load(obj)
-            obj.load_intermed_results();
-            obj.run_post_process();
+        function obj = run_all_from_load(obj)
+            obj = obj.load_intermed_results();
+            obj = obj.run_post_process();
         end
 
         function stages = write_calkit_stage(obj)
