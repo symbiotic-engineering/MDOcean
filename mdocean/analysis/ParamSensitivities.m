@@ -14,7 +14,7 @@ classdef ParamSensitivities < GenericAnalysis
     
     methods (Static)
         
-        function intermed_result_struct = analysis_fcn(p,b)
+        function intermed_result_struct = analysis_fcn(~,b)
             % Run parameter sweep analysis
             [fig_arr, runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid);
             

@@ -24,7 +24,7 @@ classdef (Abstract) GenericAnalysis
 
     methods (Abstract, Static)
 
-        intermed_result_struct = analysis_fcn();
+        intermed_result_struct = analysis_fcn(p,b);
 
         [fig_array,...
          tab_array_display,...
@@ -57,7 +57,7 @@ classdef (Abstract) GenericAnalysis
         end
 
         function obj = run_analysis(obj)
-            obj.intermed_result_struct = obj.analysis_fcn();
+            obj.intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
             obj.save_intermed_results();
         end
 

@@ -9,7 +9,7 @@ classdef AllFigCompare < GenericAnalysis
     
     methods (Static)
         
-        function intermed_result_struct = analysis_fcn(~)
+        function intermed_result_struct = analysis_fcn(~,~)
             % Generate runtime comparison bar chart (placeholder)
             % This would call the actual comparison function when available
             
