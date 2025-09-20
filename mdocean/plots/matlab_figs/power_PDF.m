@@ -2,12 +2,13 @@ function t = power_PDF(X,p,color,t,which_plots)
 
 [~,P_matrix] = simulation(X, p);
 P_matrix = P_matrix / 1e3; % convert W to kW
+P_matrix(P_matrix==0) = 1e-3; % remove zeros
 P_counts = repelem(P_matrix(:), round(p.JPD(:)*1000));
 
 logscale = true; % toggle whether power is logscale
 if logscale
-    P_min = 10;
-    P_max = 10000;
+    P_min = min([10;P_matrix(:)]);
+    P_max = min(10000,max(P_matrix(:)));
     prob_min = 1e-4;
     prob_max = 1;
     prob_label_pos = [10^-(1.5),1e-5];
