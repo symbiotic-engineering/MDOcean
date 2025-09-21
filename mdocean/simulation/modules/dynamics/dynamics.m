@@ -559,6 +559,7 @@ function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type,
         B_p = 1 ./ sqrt(mag_G_u_squared);
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
+    B_p = max(B_p,0); % don't allow negative damping
 end
 
 function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const)
@@ -722,6 +723,11 @@ function [mag_U,phase_U,...
             F_err(mag_U==0) = 0;
             F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
         end
+
+        % add penalty for B_p<0 (negative power)
+        tol = 1;
+        B_p_violation = max(-B_p_sat+tol,0);
+        F_err = F_err + B_p_violation;
 
     P_sat_ratio = real_P ./ P_unsat;
 
