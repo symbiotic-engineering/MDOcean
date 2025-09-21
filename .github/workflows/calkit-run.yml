@@ -53,7 +53,9 @@ jobs:
       - name: test matlab can run
         run: matlab -batch "disp('Matlab is working')"
       - name: test matlab license server
-        run: curl -v telnet://${{ env.MLM_LICENSE_FILE }}
+        run: | # Mask the license server IP address in logs
+          echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
+          curl -v --timeout 5 telnet://${{ env.MLM_LICENSE_FILE }}
         if: always()
       - name: Run Calkit
         uses: calkit/run-action@v1
