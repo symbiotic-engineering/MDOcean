@@ -99,3 +99,23 @@ jobs:
             MDOcean/test-results/Figure_*.pdf
             MDOcean/mdocean/optimization/multiobjective/pareto_search_results_*.mat
             MDOcean/**/wecsim_*.mat
+
+      - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          path: MDOcean/test-results-baseline
+
+      - name: Compare test results to base branch
+        run: |
+          ls MDOcean/test-results-baseline/
+          python MDOcean/tests/junit_regression.py MDOcean/test-results-baseline/**/junit.xml MDOcean/test-results/**/junit.xml MDOcean/test-results-baseline/delta-junit.xml
+          cat MDOcean/test-results-baseline/delta-junit.xml
+        shell: bash
+
+      - name: Publish changed tests to GitHub UI
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: 'MDOcean/test-results-baseline/delta-junit.xml'
+          job_name: 'Changed Tests'
