@@ -101,6 +101,7 @@ jobs:
             MDOcean/**/wecsim_*.mat
 
       - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        if: always()
         uses: dawidd6/action-download-artifact@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -108,6 +109,7 @@ jobs:
           path: MDOcean/test-results-baseline
 
       - name: Compare test results to base branch
+        if: always()
         run: |
           ls MDOcean/test-results-baseline/
           python MDOcean/tests/junit_regression.py MDOcean/test-results-baseline/**/junit.xml MDOcean/test-results/**/junit.xml MDOcean/test-results-baseline/delta-junit.xml
@@ -115,6 +117,7 @@ jobs:
         shell: bash
 
       - name: Publish changed tests to GitHub UI
+        if: always()
         uses: mikepenz/action-junit-report@v5
         with:
           report_paths: 'MDOcean/test-results-baseline/delta-junit.xml'
