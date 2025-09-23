@@ -249,8 +249,7 @@ end
 
 % Function to generate Pareto figure group
 function [figs,tabs] =  pareto_fig_func(~,b)
-    pareto_search(b.filename_uuid)
-    pareto_curve_heuristics()
+    damping_vs_reactive(p,b)
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
     figs.pareto_front_with_design_images = figure(n - 2);
