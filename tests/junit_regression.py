@@ -1,9 +1,10 @@
 import xml.etree.ElementTree as ET
 import sys
 from datetime import datetime
+from glob import glob
 
 def parse_junit_xml(file_path):
-    tree = ET.parse(file_path)
+    tree = ET.parse(glob(file_path))
     root = tree.getroot()
     test_cases = {}
     test_elements = {}  # Store actual XML elements
