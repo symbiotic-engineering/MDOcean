@@ -4,7 +4,7 @@ from datetime import datetime
 from glob import glob
 
 def parse_junit_xml(file_path):
-    tree = ET.parse(glob(file_path))
+    tree = ET.parse(glob(file_path)[0])
     root = tree.getroot()
     test_cases = {}
     test_elements = {}  # Store actual XML elements
