@@ -248,7 +248,7 @@ function [figs,tabs] = gradient_optim_fig_func(p,b)
 end
 
 % Function to generate Pareto figure group
-function [figs,tabs] =  pareto_fig_func(~,b)
+function [figs,tabs] =  pareto_fig_func(p,b)
     damping_vs_reactive(p,b)
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
