@@ -78,12 +78,6 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 % \end{align}
 % and these new control gains are then plugged into equation \eqref{eq:eom-freq-domain} to find the saturated displacement amplitude $X_{sat}$.
 
-\begin{figure}
-\centering
-\includegraphics[width=.8\linewidth]{\matlabFilepath{35}}
-\caption{Effect of Force and Power Limit}
-\end{figure}
-
 \clearpage
 \subsection{Drag Model\label{sec:appendix-drag}}
 Drag includes form drag (dominant impact), vortex shedding (moderate impact), and skin friction (minor impact) \cite{quartier_influence_2021}.
@@ -473,14 +467,7 @@ The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
     \caption{Damping plate deflection}
     \label{fig:damping-plate-deflection}
 \end{figure}
-In figure~\ref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
-Stress can be reduced substantially by increasing the plate inner radius, because the same force has a lower lever arm to the column and therefore creates less bending moment.
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{\matlabFilepath{41}}
-    \caption{Effect of damping plate aspect ratio on maximum stress and deflection}
-    \label{fig:damping-plate-maxs}
-\end{figure}
+In Figure~\ref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
 
 \subsection{Column}
 As stated in \ref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
@@ -506,6 +493,7 @@ and the hoop stress $\sigma_\theta$ is
 \begin{equation}
      \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
 \end{equation}
+$P_r$ is a constant and $q$ is the distributed hydrosatic pressure at the bottom of the spar.
 These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \cite{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
 % \begin{equation}
@@ -576,6 +564,88 @@ The values of price and cost constants are given in \sectionautorefname~\ref{sec
 %     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
 % \end{equation}
 
+\section{Damping vs Reactive Control Derivations}
+In a given sea state,
+\begin{equation}\label{eq:matched-controller}
+	B_{p,reac} = B_h + B_d, \qquad K_{p,reac} = (m+A_h) \omega^2 - K_h - K_d
+\end{equation}
 
+Average power:
+\begin{equation}
+    \frac{P_{avg,damp}}{P_{avg,reac}} 
+    = \frac{\frac{1}{2} \Re(\hat{Z}_{damp})|\hat{q}_{damp}|^2} {\frac{1}{2} \Re(\hat{Z}_{reac})|\hat{q}_{reac}|^2 } 
+    = \sqrt{ \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + 1} \cdot \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2
+\end{equation}
+
+Peak power:
+\begin{equation}
+    \frac{P_{pk,damp}}{P_{pk,reac}} 
+    = \frac{P_{avg,damp}}{P_{avg,reac}} 
+    \frac{2}{1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }} = \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2 \cdot \frac{2}{1 + \left(1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  \right)^{-1/2}}
+\end{equation}
+
+Torque:
+\begin{equation}
+    \frac{\tau_{damp}}{\tau_{reac}} = \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|
+\end{equation}
+
+Structural volume:
+For a constant hydrodynamic design, structural volume would increase under reactive control due to the higher structural thickness required to sustain the loads ($V\sim t$), as well as the higher above-water structural height required to prevent the float from going above the top of the spar ($v\sim X$).
+The height increase only applies to the float side plates and the column, not to the float top and bottom plates or the damping plate.
+The float top and bottom plates and damping plate experience bending, which from equation~\eqref{eq:plate-stress} yields a relation $t \sim F^{1/2}$ for the relationship between required thickness $t$ and force $F$.
+On the other hand, the float side plates experience membrane stress, which yields a relation $t \sim F$.
+The column solution interpolates between axial compression and buckling, so $t \sim F^{1/3}$ when closer to pure buckling and $t \sim F$ when closer to pure compression.
+In total, we have $V \sim F^{1/2} + FX + F + F^{1/3}X + F^{1/3}$.
+Since both $X$ and $F$ scale with $\frac{\delta}{\sqrt{2-\delta}}$, we can write:
+
+
+The structural volume ratio is then:
+
+Amplitude:
+\begin{equation}
+\begin{aligned}
+    \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right| &= \left|\frac{
+        (m+A_h)s^2+(B_h+B_d+B_{p,reac})s+(K_h+K_d+K_{p,reac})} 
+        { (m+A_h)s^2+(B_h+B_d+B_{p,damp})s+(K_h+K_d)}\right| \\ 
+        &= \frac{2B_{p,reac}}
+        {\left|B_{p,reac}+\sqrt{B_{p,reac}^2+(K_{p,reac}/\omega)^2}-K_{p,reac}/s\right|} \\ 
+        & = \frac{2}{\left|1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } - \frac{K_{p,reac}/s}{B_{p,reac}}\right|}  \\
+        &= \frac{2}{\sqrt{ \left(1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }\right)^2 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 }} \\ 
+        &= \frac{\sqrt{2}}{\sqrt{ 1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } }} \\
+\end{aligned}
+\end{equation}
+
+rewrite in terms of $\Theta = 1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2 $:
+\begin{equation}
+\begin{aligned}
+    \frac{\tau_{damp}}{\tau_{reac}} &= \frac{\sqrt{2}}{\sqrt{ \Theta + \sqrt{\Theta} }} = \sqrt{\frac{1}{\sqrt{\Theta}} \cdot \frac{2}{\sqrt{\Theta} + 1}} \\
+    \frac{P_{avg,damp}}{P_{avg,reac}} &= \sqrt{\Theta} \cdot \frac{2}{\Theta + \sqrt{\Theta}} = \frac{2}{\sqrt{\Theta} + 1} \\
+    \frac{P_{pk,damp}}{P_{pk,reac}} &= \frac{2}{1 + 1/\sqrt{\Theta}} \cdot \frac{2}{\Theta + \sqrt{\Theta}} = \left(\frac{2}{\sqrt{\Theta} + 1}\right)^2
+\end{aligned}
+\end{equation}
+
+rewrite in terms of $\delta = \frac{2}{\sqrt{\Theta} + 1}$:
+\begin{equation}
+\begin{aligned}
+    \frac{\tau_{damp}}{\tau_{reac}} &= \frac{\delta}{\sqrt{2-\delta} } \\
+    \frac{P_{avg,damp}}{P_{avg,reac}} &= \delta \\
+    \frac{P_{pk,damp}}{P_{pk,reac}} &= \delta^2
+\end{aligned}
+\end{equation}
+
+Cost:
+\begin{equation}
+\begin{aligned}
+    \frac{C_{damp}}{C_{reac}} 
+    &= \frac{C_{const} + C_{drv} P_{pk,damp} + C_{gen} \tau_{damp} + C_{struct} V_{struct,damp} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\ 
+    &= \frac{C_{const} + C_{drv} P_{pk,reac} \delta^2 + C_{gen} \tau_{reac} \frac{\delta}{\sqrt{2-\delta} } + C_{struct} V_{struct,reac} \frac{V_{struct,damp}}{V_{struct,reac}} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\
+\end{aligned}
+\end{equation}
+
+where $(C_0/N_{WEC}) +  C_{fixed}$ has been consolidated into a constant cost $C_{const}$.
+Levelized cost of energy:
+\begin{equation}
+    \frac{LCOE_{damp}}{LCOE_{reac}} = \frac{P_{avg,reac}}{P_{avg,damp}} \cdot \frac{ C_{damp} + OPEX/FCR} { C_{reac} + OPEX/FCR}
+\end{equation}
 
 \end{appendices}
