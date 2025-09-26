@@ -1,0 +1,40 @@
+\section{Runtime Benchmarking}
+\label{sec:sim-runtime}
+Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
+An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
+Ultimately, each simulation run takes around \simRuntime~ms, solidly meeting the goal.
+The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
+
+Figure~\ref{fig:runtime-modules} visualizes the breakdown of runtime between modules.
+\hl{Note: these figures are created using profiler, which dramatically overestimates all runtimes and can only be relied on for relative timing. This will be solved during re-scrutineering by using the timeit function instead.}
+The MEEM hydrodynamics module takes the majority (\pctRuntimeMEEM) of the time and is broken down in \figureautorefname~\ref{fig:runtime-hydro}.
+The biggest portion is dedicated to evaluating Bessel functions which occur in the semi-analytical solution, another large portion is spent unpacking variables from the cell data structure, and a smaller period solves the imaginary modes of the dispersion relation and solving the linear matrix equation.
+The simulation is an order of magnitude faster than the Capytaine boundary element method solver for similar convergence levels.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{\matlabFilepath{13}}
+\caption{Bar chart showing simulation runtime breakdown between modules}\label{fig:runtime-modules}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{\matlabFilepath{13_1}}
+\caption{Bar chart demonstrating the speed improvement of MDOcean's hydro module over baseline solver Capytaine}\label{fig:runtime-hydro}
+\end{figure}
+
+The dynamics and controls module takes the next longest (\pctRuntimeDynamics, enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
+This represents a three order of magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
+Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-DOF model.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{\matlabFilepath{13_2}}
+\caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver WEC-Sim}\label{fig:runtime-dynamics}
+\end{figure}
+
+The structures, geometry, and economics modules are not computationally expensive and together compose the remaining \pctRuntimeOther~of the total runtime. 
+
+% say that it's 210 sea states, that wecsim is parallelized across X cores, that MEEM is using N=M=K=10
+%\hl{Describe the implication of how accurate my model is for being so fast - yay}
+

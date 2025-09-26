@@ -1,28 +1,4 @@
-\section{Modeling Methodology}
-\label{sec:model}
-
-This paper places considerable emphasis not only on the specific methods used but also on the process to select these methods, informed through a lens of MDO and systems thinking, with the intent to guide readers interested in conducting their own multidisciplinary WEC optimization.
-In section~\ref{sec:model-overview}, the research objective and design scope are first used to define a broad problem formulation and module decomposition.
-Next, section~\ref{sec:modules} describes the construction of the simulation model.
-It develops the assumptions, analysis method, and implementation details of each module based on the appropriate balance of accuracy and speed.
-Sections \ref{sec:validation} and \ref{sec:sim-runtime} discuss model validation and runtime benchmarking.
-The simulation capabilities and limitations are then combined with the original broad design optimization intent to inform a detailed optimization problem formulation.
-In this step, the exact objectives, design variables, constraints, and parameters are selected and outlined in section~\ref{sec:formulation}.
-The resulting optimization problem is then characterized and its properties ultimately inform the solution method including algorithm selection, discussed in section~\ref{sec:optim-process}.
-Finally, the process is tweaked iteratively until it yields satisfactory results, with noteworthy insights integrated into the relevant sections \ref{sec:model-overview} to \ref{sec:optim-process}.
-Figure~\ref{fig:overview-methods} depicts this methodology visually.
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{2}}
-    \caption{Methodology overview}
-    \label{fig:overview-methods}
-\end{figure}
-
-\subsection{Overview}
-\label{sec:model-overview}
-\input{../renewable-energy-mdo/sections/model-overview.tex}
-
-\subsection{Module Details}
+\section{Module Details}
 \label{sec:modules}
 
 The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
@@ -32,7 +8,7 @@ The two connect via $x(t)=\Re(\hat{X}e^{i\omega t})=X\cos(\omega t+\angle\hat{X}
 Dots ($\dot{x}=\Re(\hat{\dot{X}}e^{i\omega t})=\Re(s\hat{X}e^{i\omega t})$) indicate time-derivatives, with Laplace variable $s=i\omega$.
 
 %TC:break Geometry
-\subsubsection{Geometry}\label{sec:geom}
+\subsection{Geometry}\label{sec:geom}
 The geometry module calculates the submerged volume $V_{sub}$ and structural material volume $V_{struct}$ using standard formulas, and additionally analyzes the WEC's stability and hydrostatic equilibrium.
 Figure~\ref{fig:dims} shows the bulk dimensions used to characterize the system. $T$ is used to represent drafts, $h$ heights, and $D$ diameters.
 Subscripts $f$, $s$, and $d$ refer to the float, spar, and damping plate respectively.
@@ -69,7 +45,7 @@ Assuming seawater ballast, a common choice due to its zero cost and operational 
 where $V_{surf}$ is the bulk component volume above the surface and $V_{pto}$ is the PTO volume, assumed constant at its nominal value. %The resulting lower bound on $V_{struct}$ can be removed since it is trivially satisfied for structural materials denser than water, which is assumed here.
 
 %TC:break Hydrodynamic Coefficients
-\subsubsection{Hydrodynamic Coefficients}\label{sec:meem}
+\subsection{Hydrodynamic Coefficients}\label{sec:meem}
 A regular water wave with height $H$, wavenumber $k$, and frequency $\omega$ that propagates along direction coordinate $+y$ is described by its free-surface elevation $\eta$,
 \begin{equation}
     \eta(y,t)=\frac{H}{2}\cos(-ky+\omega t)
@@ -237,7 +213,7 @@ This is expected because the BEM solution assumes infinite depth, which requires
 For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
 
 %TC:break Dynamics and Control
-\subsubsection{Dynamics and Control}\label{sec:dynamics}
+\subsection{Dynamics and Control}\label{sec:dynamics}
 \paragraph{Modified Frequency Domain Techniques}
 Methods for WEC dynamics and control simulation in an optimization context were reviewed in section~\ref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
 MDOcean requires the ability to incorporate nonlinearities, at least approximately.
@@ -710,7 +686,7 @@ These errors are deemeed acceptable for the purposes of this study, since the go
 More details on the WEC-Sim validation are described in \appendixname~\ref{sec:appendix-wecsim}.
 
 %TC:break Structures
-\subsubsection{Structures}\label{sec:structures}
+\subsection{Structures}\label{sec:structures}
 The MDOcean structures module uses forces from the dynamics module as well as area and volume outputs from the geometry module to calculate the factors of safety for various structural failure modes.
 The factors of safety represent the multiplicative increase in force before stress would surpass peak limits for storm loads and the endurance limit under operational loads.
 Again aligning with the modeling philosophy of investing the up-front development time to create a simulation that runs extremely quickly with moderate accuracy, MDOcean integrates a combination of explicit algebraic and tabulated semi-analytical structural models that are well-established in the structures community yet rarely utilized for WEC design.
@@ -764,7 +740,7 @@ Two analytical solutions for a thin annular (cylindrical with central hole) plat
  Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}. 
 
 %TC:break Economics
-\subsubsection{Economics}\label{sec:econ}
+\subsection{Economics}\label{sec:econ}
 The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $AEP$:
 \begin{equation}
 	LCOE = \frac{CAPEX\cdot  FCR + OPEX}{AEP}
@@ -831,7 +807,7 @@ The scaling behavior of economic outputs against the number of WECs is validated
     \label{fig:econ-nwec-validate}
 \end{figure}
 
-\subsection{Validation}
+\section{Validation}
 \label{sec:validation}
 The overall model was validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \cite{RM3}, as shown in Table \ref{tab:validation}.
 The mass, power, and cost track well, but the structural force has a significant discrepancy.
@@ -876,44 +852,4 @@ Improving the force model to align with the wave tank data is an area of future 
 \end{table}
 
 %\hl{Explain sources of error and rough uncertainty and the implications of what we can trust}
-
-\subsection{Runtime Benchmarking}
-\label{sec:sim-runtime}
-Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
-An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
-Ultimately, each simulation run takes around \simRuntime~ms, solidly meeting the goal.
-The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
-
-Figure~\ref{fig:runtime-modules} visualizes the breakdown of runtime between modules.
-\hl{Note: these figures are created using profiler, which dramatically overestimates all runtimes and can only be relied on for relative timing. This will be solved during re-scrutineering by using the timeit function instead.}
-The MEEM hydrodynamics module takes the majority (\pctRuntimeMEEM) of the time and is broken down in \figureautorefname~\ref{fig:runtime-hydro}.
-The biggest portion is dedicated to evaluating Bessel functions which occur in the semi-analytical solution, another large portion is spent unpacking variables from the cell data structure, and a smaller period solves the imaginary modes of the dispersion relation and solving the linear matrix equation.
-The simulation is an order of magnitude faster than the Capytaine boundary element method solver for similar convergence levels.
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{\matlabFilepath{13}}
-\caption{Bar chart showing simulation runtime breakdown between modules}\label{fig:runtime-modules}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{\matlabFilepath{13_1}}
-\caption{Bar chart demonstrating the speed improvement of MDOcean's hydro module over baseline solver Capytaine}\label{fig:runtime-hydro}
-\end{figure}
-
-The dynamics and controls module takes the next longest (\pctRuntimeDynamics, enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
-This represents a three order of magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
-Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-DOF model.
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{\matlabFilepath{13_2}}
-\caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver WEC-Sim}\label{fig:runtime-dynamics}
-\end{figure}
-
-The structures, geometry, and economics modules are not computationally expensive and together compose the remaining \pctRuntimeOther~of the total runtime. 
-
-% say that it's 210 sea states, that wecsim is parallelized across X cores, that MEEM is using N=M=K=10
-%\hl{Describe the implication of how accurate my model is for being so fast - yay}
 
