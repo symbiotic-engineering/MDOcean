@@ -564,11 +564,50 @@ The values of price and cost constants are given in \sectionautorefname~\ref{sec
 %     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
 % \end{equation}
 
+\section{Parameters}
+\begin{table}[ht]
+\centering
+
+%\setlength{\tabrowsep}{} % default value:
+\renewcommand{\arraystretch}{1.4}
+
+\begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
+\textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
+$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
+$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
+$h$& Water depth & 100 & m  \\ 
+JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
+$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
+$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
+$\sigma_y$ & Material yield strength& 248 & MPa  \\ 
+$\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
+$E$& Material Young's modulus& 200 & GPa  \\ 
+$cost_m$ & Material cost& 1.89 & \$/kg \\ 
+%$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
+%$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
+%$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
+%$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\ 
+%$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\ 
+%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
+$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\ 
+$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\ 
+$FCR$ & Fixed charge rate& 10.8 & \%  \\ 
+$N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
+$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
+$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
+$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
+$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
+$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
+\end{tabular}
+ \caption{Selected Parameters}\label{tab:parameters}
+\end{table}
+
+
 \section{Damping vs Reactive Control Derivations}
-In a given sea state,
-\begin{equation}\label{eq:matched-controller}
-	B_{p,reac} = B_h + B_d, \qquad K_{p,reac} = (m+A_h) \omega^2 - K_h - K_d
-\end{equation}
+\label{sec:appendix-reactive-vs-damping}
+\hl{This section needs to be significantly cleaned up and currently is more of scratch work.}
 
 Average power:
 \begin{equation}
