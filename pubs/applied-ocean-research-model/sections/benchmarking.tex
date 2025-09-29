@@ -1,4 +1,97 @@
-\section{Runtime Benchmarking}
+\clearpage
+\section{Validation and Benchmarking}
+\label{sec:validation-benchmarking}
+\subsection{Dynamic Validation using WEC-Sim}\label{sec:appendix-wecsim}
+The popular time-domain hydrodynamic simulation software WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is used to validate the dynamics module.
+The WEC-Sim RM3 example is run with regular waves and with the device constrained to oscillate only in heave.
+Notably, the RM3 geometry provided in WEC-Sim differs slightly from the published dimensions in the RM3 report, so for validation the dimensions input to MDOcean are adjusted to match WEC-Sim.
+
+%Both fixed-spar and floating spar configurations are tested to understand the implications of MDOcean's fixed-spar assumption.
+WEC-Sim runs utilize hydrodynamic coefficients obtained with the WAMIT BEM for dynamics, and control coefficients calculated with MDOcean for consistency.
+MDOcean is run with MEEM as usual, and separately also run with the WAMIT coefficients % and with a modified version of the WAMIT coefficients with zero excitation phase.
+to distinguish differences caused by disparate hydrodynamic coefficients from those caused by the underlying dynamics. 
+
+The error in average power compared to the WEC-Sim power is less than 0.1\% in the best case and 38.2\% in the worst case, with an error breakdown for all simulation scenarios and sea states shown in Figure~\ref{fig:error-histogram}. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{\matlabFilepath{10}}
+    \caption{Error breakdown based on WEC-Sim Validation Runs}
+    \label{fig:error-histogram}
+\end{figure}
+% Results reveal that the assumption of zero excitation phase ($\gamma=|\gamma|$) has no effect for single body dynamics in the absence of drag, extremely minor effect (0.34\% annual energy) for fixed-spar dynamics in the presence of drag, and major effects for floating-spar dynamics. 
+
+Results reveal that the drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
+The extremely low errors in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively) indicate that this is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF. 
+These errors are deemeed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously optimizing multiple disciplines and the ability to quickly evaluate a large number of design options.
+More details on the WEC-Sim validation are described in \appendixname~\ref{sec:appendix-dynamic-validation}.
+
+\subsection{Static Validation}
+
+Figure \ref{fig:meem-hydro-coeffs} shows the hydrodynamic coefficients as a function of wave frequency $\omega$ for the nominal RM3 geometry. 
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{\matlabFilepath{6}}
+\caption{Hydrodynamic coefficients vs. frequency}\label{fig:meem-hydro-coeffs}
+\end{figure}
+The MEEM results for the simplified cylindrical geometry are a close match to WAMIT BEM results for the exact RM3 geometry, except at frequencies below 0.3 rad/s.
+This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
+For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
+
+
+The overall model was validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \cite{RM3}, as shown in Table \ref{tab:validation}.
+The mass, power, and cost track well, but the structural force has a significant discrepancy.
+This is because load cases in \cite{RM3} are derived experimentally from wave tank tests rather than a model.
+For this study, a scale factor on force was used to account for the discrepancy.
+Improving the force model to align with the wave tank data is an area of future work.
+
+%\hl{Describe the radiation and amplitude limit and show they aren't violated} \cite{zou_practical_2023}.
+
+%\hl{Describe how there are two different RM3 designs}
+
+% \begin{table}[]
+% \centering
+% \begin{tabular}{l|l|l|l|l}
+%                                                      & \multicolumn{2}{l|}{WEC-Sim RM3 Design}                                      & \multicolumn{2}{l}{DOE Report RM3 Design \cite{RM3}}                               \\
+%                                                      Variable& MDOcean                    & Actual                     & MDOcean                    & Actual                            \\ \hline
+% Float mass                     &                            &                            & 202.4 Mg                   & 208 Mg                            \\
+% Vertical column mass           &                            &                            & \hl{fail}                  &                                   \\
+% Reaction plate mass            &                            &                            & 230.9 Mg                   & 245 Mg                            \\
+% Total mass                     &                            &                            & 614.3 Mg                   & 680 Mg                            \\
+% Float volume                   & 726.8 m\textsuperscript{3} & 725.8 m\textsuperscript{3} & 701.9m\textsuperscript{3}  & 701.97m\textsuperscript{3}        \\
+% Spar volume                    & 887.8 m\textsuperscript{3} & 886.7 m\textsuperscript{3} & 1,007 m\textsuperscript{3} & 1,008 m\textsuperscript{3}        \\
+% CAPEX                          &                            &                            & \hl{fail}                  &                                   \\
+% OPEX                           &                            &                            & [1.0 e6, \hl{...}]         & [1.2, 3.3, 6.6, 9.4] $\cdot 10^6$ \\
+% LCOE                           & \hl{fail}                  &                            & \hl{fail}                  &                                   \\
+% Average power                  &                            &                            &                            &                                   \\
+% Heave force                    &                            &                            & 8.497 MN                   & 8.5 MN                            \\
+% Spar factor of safety          &                            &                            & 11.894                     & 11.1\textsuperscript{*}           \\
+% Power coeff. of variation& \hl{fail}                  &                            & 76.7\%                     & 71.1\%                            \\
+% Float center of buoyancy       & 1.293 m                    & 1.293 m                    &                            &                                   \\
+% Float center of gravity        & 0.283 m                    & 0.283 m                    &                            &                                  
+% \end{tabular}
+% \caption{Validation}
+% \label{tab:validation}
+% \end{table}
+
+\begin{table}[]
+\centering
+\input{ \tableFilepath{12} }
+\caption{Validation}
+\label{tab:validation}
+\end{table}
+
+%\hl{Explain sources of error and rough uncertainty and the implications of what we can trust}
+
+The scaling behavior of economic outputs against the number of WECs is validated in \figurename~\ref{fig:econ-nwec-validate}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{\matlabFilepath{12}}
+    \caption{Validation for cost scaling with number of WECs}
+    \label{fig:econ-nwec-validate}
+\end{figure}
+
+\subsection{Runtime Benchmarking}
 \label{sec:sim-runtime}
 Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
 An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
