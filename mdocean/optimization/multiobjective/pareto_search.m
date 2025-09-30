@@ -1,10 +1,15 @@
-function [x,fval] = pareto_search(filename_uuid)
-    if nargin==0
+function [x,fval] = pareto_search(p,b,filename_uuid)
+
+    if nargin<1
+        p = parameters();
+    end
+    if nargin<2
+        b = var_bounds();
+    end
+    if nargin<3
         filename_uuid='';
     end
-    
-    p = parameters();
-    b = var_bounds();
+
     b.filename_uuid = filename_uuid;
     num_DVs = length(b.X_starts);
     

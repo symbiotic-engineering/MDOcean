@@ -53,7 +53,7 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active','FontSize',14)
     grid on
-    nl_string = strcat('g_{L,', num2str((1:length(constraint_names_mod)).') , "} ", constraint_names_mod.' );
+    nl_string = strcat('g_{NL,', num2str((1:length(constraint_names_mod)).') , "} ", constraint_names_mod.' );
     set(gca,'ytick',1:size(nlcon_active,2),'yticklabel',nl_string)
     set(gca, 'PlotBoxAspectRatio', [1.5 1 1])
     xlabel('Number Along Pareto Front','FontSize',14)

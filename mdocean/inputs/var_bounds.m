@@ -174,7 +174,7 @@ b.idxs_recover = idxs_recover;
 b.filename_uuid = ''; % string to append to generated filenames to prevent parallel overlap
 
 % calibrations of nominal values
-b.F_max_nom = find_nominal_inputs(b, parameters(mode));
+%b.F_max_nom = find_nominal_inputs(b, parameters(mode));
 b.X_noms(strcmp(b.var_names,'F_max')) = b.F_max_nom;
 
 % balanced design

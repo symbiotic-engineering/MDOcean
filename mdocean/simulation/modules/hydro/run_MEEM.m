@@ -38,8 +38,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     fname = ['N' num2str(N_num) '_M' num2str(M_num) '_K' num2str(K_num) '_heaving_' heaving];
 
     % generate matlab functions from symbolic equations if needed
-    if ~exist(['simulation/modules/MEEM/generated/A_b_c_matrix_' fname],'file') || ...
-       ~exist(['simulation/modules/MEEM/generated/hydro_potential_velocity_fields_' fname],'file')
+    if ~exist(['simulation/modules/hydro/generated/A_b_c_matrix_' fname],'file') || ...
+       ~exist(['simulation/modules/hydro/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
     end  
 
@@ -504,7 +504,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
 %     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
     
-    folder = 'simulation/modules/MEEM/generated/';
+    folder = 'simulation/modules/hydro/generated/';
     if ~isfolder(folder)
         folder = '';
         warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
