@@ -152,6 +152,8 @@ no_nan = all(~isnan([g LCOE P_var]));
 no_imag = all(isreal([g LCOE P_var]));
 criteria = no_inf && no_nan && no_imag;
 if ~criteria
+    disp(g)
+    disp(['LCOE: ' num2str(LCOE) ', P_var: ' num2str(P_var)])
     warning('Inf, NaN, or imaginary constraint or objective detected')
 end
 
