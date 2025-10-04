@@ -70,7 +70,7 @@ function [F_heave_storm, F_surge_storm, ...
 end
 
 function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,...
-          F_heave_f, F_surge, F_ptrain_max, P_sat_ratio,...
+          F_heave_f_max, F_surge, F_ptrain_max, P_sat_ratio,...
           A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
@@ -179,8 +179,8 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f_const, phase_X_f, mag_U_const, phase_U, F_max);
         F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s_const, phase_X_s, mag_U_const, phase_U, F_max);
 
-        F_heave_f = max(F_heave_f,[],'all');
-        F_heave_s = max(F_heave_s,[],'all');
+        F_heave_f_max = max(F_heave_f,[],'all');
+        F_heave_s_max = max(F_heave_s,[],'all');
 
         % surge force - from Eq 25 Newman 1963 - assumes slender kR << 1
         % https://apps.dtic.mil/sti/tr/pdf/AD0406333.pdf  
@@ -192,6 +192,26 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         F_surge_s_max = max(F_surge_s(~idx_constraint),[],'all');
 
         F_surge = [F_surge_f_max F_surge_s_max 0];
+
+        if ~isfinite(F_heave_f_max)
+            disp('F heave f:')
+            disp(F_heave_f)
+            disp('m float: ')
+            disp(m_float)
+            disp('w: ')
+            disp(w)
+            disp('mag X f const: ')
+            disp(mag_X_f_const)
+            disp('phase X f: ')
+            disp(phase_X_f)
+            disp('mag U const:')
+            disp(mag_U_const)
+            disp('phase U: ')
+            disp(phase_U)
+            disp('F max: ')
+            disp(F_max)
+        end
+
     end
 end
 
