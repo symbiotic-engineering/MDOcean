@@ -24,6 +24,16 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     % DLC 2: endurance limit (long cycle fatigue)
     [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(...
             F_heave_op, F_surge_op, sigma_e(M), shared_inputs{:});
+
+    if ~all(isfinite(FOS1Y))
+        disp('forces:')
+        disp(F_heave_peak)
+        disp(F_surge_peak)
+        disp(F_heave_op)
+        disp(F_surge_op)
+        disp('shared inputs')
+        disp(shared_inputs{:})
+    end
 end
 
 function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
