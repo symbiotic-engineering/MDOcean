@@ -22,6 +22,10 @@ if exist('../WEC-Sim','dir')
 end
 rmpath(genpath('mdocean/simulation/modules/OpenFLASH')) % prevent using OpenFLASH run_MEEM since it's not integrated yet
 
+% Remove old processes
+myCluster = parcluster('Processes');
+delete(myCluster.Jobs)
+
 suite = testsuite('tests');
 runner = testrunner('textoutput');
 
