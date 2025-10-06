@@ -31,8 +31,16 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
         disp(F_surge_peak)
         disp(F_heave_op)
         disp(F_surge_op)
-        disp('shared inputs')
-        disp(shared_inputs{:})
+        disp('L dt')
+        disp(L_dt)
+        disp('I')
+        disp(I)
+        disp('Ac')
+        disp(A_c)
+        disp('A lat sub')
+        disp(A_lat_sub)
+        disp('A dt')
+        disp(A_dt)
     end
 end
 
