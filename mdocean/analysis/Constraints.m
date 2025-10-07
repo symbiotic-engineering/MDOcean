@@ -12,7 +12,8 @@ classdef Constraints < GenericAnalysis
         function intermed_result_struct = analysis_fcn(~,b)
             % Get constraints information
             % Store results for post-processing
-            intermed_result_struct.constraint_names = b.constraint_names;
+            tab = cell2table(remove_underscores(b.constraint_names.'));
+            intermed_result_struct.constraint_names = tab(1:24);
         end
         
         function [fig_array,...
