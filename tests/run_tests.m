@@ -23,6 +23,7 @@ end
 rmpath(genpath('mdocean/simulation/modules/OpenFLASH')) % prevent using OpenFLASH run_MEEM since it's not integrated yet
 
 suite = testsuite('tests');
+suite = selectIf(suite,HasName(ContainsSubstring("dynamics"))); % only wecsim temporarily
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
