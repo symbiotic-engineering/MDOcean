@@ -433,8 +433,7 @@ function [mag_U,phase_U,...
 
         % check convergence
         X_converged = X_err < X_tol;
-        phase_X_converged = phase_X_err < phase_X_tol || ...
-                abs(phase_X_err - 2*pi) < phase_X_tol ; % the 2pi allows for the solution to oscillate between +pi and -pi
+        phase_X_converged = phase_X_err < phase_X_tol;
 
         F_lim_converged = F_lim_err < F_lim_tol;
         X_lim_converged = X_lim_err < X_lim_tol;
@@ -489,8 +488,8 @@ function [X_f_err,X_s_err,...
     % error
     X_f_err = X_f_guess - mag_X_f;
     X_s_err = X_s_guess - mag_X_s;
-    phase_X_f_err = phase_X_f_guess - phase_X_f;
-    phase_X_s_err = phase_X_s_guess - phase_X_s;
+    phase_X_f_err = wrapToPi(phase_X_f_guess - phase_X_f); % wrapping error -pi to pi maintains continuity at zero,
+    phase_X_s_err = wrapToPi(phase_X_s_guess - phase_X_s); % allowing for the solution to oscillate between +pi and -pi
 
 end
 
