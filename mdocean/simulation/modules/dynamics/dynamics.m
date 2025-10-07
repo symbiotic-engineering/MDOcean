@@ -193,25 +193,6 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
 
         F_surge = [F_surge_f_max F_surge_s_max 0];
 
-        if ~isfinite(F_heave_f_max)
-            disp('F heave f:')
-            disp(F_heave_f)
-            disp('m float: ')
-            disp(m_float)
-            disp('w: ')
-            disp(w)
-            disp('mag X f const: ')
-            disp(mag_X_f_const)
-            disp('phase X f: ')
-            disp(phase_X_f)
-            disp('mag U const:')
-            disp(mag_U_const)
-            disp('phase U: ')
-            disp(phase_U)
-            disp('F max: ')
-            disp(F_max)
-        end
-
     end
 end
 
@@ -412,7 +393,7 @@ function [mag_U,phase_U,...
     while ~converged
         if drag_convergence_plot_on
             % record guesses
-            % 10,1 was found manually to be the problem sea state
+            % 5,11 was found manually to be a problem sea state
             sea_state_plot = {5,11};
             X_f_guesses(iters+1) = X_f_guess(sea_state_plot{:});
             X_s_guesses(iters+1) = X_s_guess(sea_state_plot{:});
@@ -465,8 +446,6 @@ function [mag_U,phase_U,...
         % increment iterations and check max iters
         iters = iters + 1;
         if iters > max_drag_iters
-%             warning(['Drag loop has not converged after ' num2str(max_drag_iters) ' iterations. ' ...
-%                 'X_err = ' num2str(X_err) ', phase_X_err = ' num2str(phase_X_err)])
             break
         end
     end

@@ -25,23 +25,6 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(...
             F_heave_op, F_surge_op, sigma_e(M), shared_inputs{:});
 
-    if ~all(isfinite(FOS1Y))
-        disp('forces:')
-        disp(F_heave_peak)
-        disp(F_surge_peak)
-        disp(F_heave_op)
-        disp(F_surge_op)
-        disp('L dt')
-        disp(L_dt)
-        disp('I')
-        disp(I)
-        disp('Ac')
-        disp(A_c)
-        disp('A lat sub')
-        disp(A_lat_sub)
-        disp('A dt')
-        disp(A_dt)
-    end
 end
 
 function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
