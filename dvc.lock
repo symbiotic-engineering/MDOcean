@@ -1414,3 +1414,70 @@ stages:
       hash: md5
       md5: a65ccc23fe0a8f8c8eb34303fa04b0d2
       size: 1246
+  move-results:
+    cmd: matlab -batch "run('mdocean/plots/move_results_to_pubs.m');"
+    deps:
+    - path: mdocean/plots/move_results_to_pubs.m
+      hash: md5
+      md5: 9d6cff02848ef4764e7accb1c4968bbf
+      size: 886
+    - path: results/
+      hash: md5
+      md5: 1d888d134f7b7370e75733fd1f38d25c.dir
+      size: 37112
+      nfiles: 14
+    outs:
+    - path: pubs/applied-ocean-research-model/figs/
+      hash: md5
+      md5: 6edf33e2f7785f53b90098d99cee436c.dir
+      size: 1471151
+      nfiles: 5
+    - path: pubs/renewable-energy-mdo/figs/
+      hash: md5
+      md5: 8d92d1d10ec578072af62228d1849912.dir
+      size: 900702
+      nfiles: 3
+  build-RE-paper:
+    cmd: calkit xenv -n tex --no-check -- latexmk -cd -interaction=nonstopmode 
+      -silent -synctex=1 -pdf pubs/renewable-energy-mdo/mdocean.tex
+    deps:
+    - path: .calkit/env-locks/tex.json
+      hash: md5
+      md5: b64ef6b84e3eded873443d6c64390220
+      size: 1171
+    - path: pubs/elsarticle-num-names.bst
+      hash: md5
+      md5: b24eb82d1afd0a3fa7d82c6efbe1f559
+      size: 28896
+    - path: pubs/renewable-energy-mdo/figs
+      hash: md5
+      md5: 8d92d1d10ec578072af62228d1849912.dir
+      size: 900702
+      nfiles: 3
+    - path: pubs/renewable-energy-mdo/mdocean.tex
+      hash: md5
+      md5: a9886b8a7a114394df8af62c295539ff
+      size: 19701
+    - path: pubs/renewable-energy-mdo/numbers.tex
+      hash: md5
+      md5: 4494d05832f0abee97537230fed888eb
+      size: 3533
+    - path: pubs/renewable-energy-mdo/references.bib
+      hash: md5
+      md5: fe9f06e4bc6657483a496ac6c7b3191d
+      size: 516895
+    - path: pubs/renewable-energy-mdo/sections/
+      hash: md5
+      md5: 45f842a42ca8aea8af38f2c858fca117.dir
+      size: 215246
+      nfiles: 15
+    - path: pubs/renewable-energy-mdo/tables
+      hash: md5
+      md5: fa2c5d0884538dd060df9dea858dc78f.dir
+      size: 8219
+      nfiles: 5
+    outs:
+    - path: pubs/renewable-energy-mdo/mdocean.pdf
+      hash: md5
+      md5: 59c2f4ed2f735cb402aa6e5e3f0b415a
+      size: 3657387
