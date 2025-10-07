@@ -429,7 +429,7 @@ function [mag_U,phase_U,...
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
         ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
-        phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));
+        phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));   % fixme: If reactive control, phase should be nonzero, based on eq4 of IFAC paper.
 
         % check convergence
         X_converged = X_err < X_tol;
@@ -608,75 +608,47 @@ function [mag_U,phase_U,...
     end
 
     % get force-saturated response
+    mult = ctrl_mult_guess .* exp(1i*phase_ctrl_mult_guess);
+    Z_p = B_p + K_p ./ (1i * w);
+    Z_p_sat = Z_p .* mult;
 
+    B_p_sat =       real(Z_p_sat);
+    K_p_sat = -w .* imag(Z_p_sat);
 
+    if multibody
+        [mag_U,phase_U,...
+            real_P,reactive_P,...
+            mag_X_u,phase_X_u,...
+            mag_X_f,phase_X_f,...
+            mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
+                                                    m_c, m_f, m_s, w, ...
+                                                    K_p_sat, B_p_sat, ...
+                                                    F_f_mag, F_f_phase, ...
+                                                    F_s_mag, F_s_phase);
+    else
+        b_sat = B_f + B_p_sat;
+        k_sat = K_f + K_p_sat;
 
-    % fixme: If reactive control, mult should be complex, based on eq4 of IFAC paper.
-%     F_err = zeros(size(f_sat));
-%     max_err = 1;
-%     mult = f_sat;
-%     iters = 0;
+        [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
+        mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
+        mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
+        mag_U = ctrl_mult_guess .* F_ptrain_over_x .* mag_X_f;
+        
+        phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
+        phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
+        phase_U = phase_V_u + phase_Z_u;            % phase of control force
 
-%     err_thresh = 0.01;
-%     while max_err > err_thresh
-% 
-%         iters = iters + 1;
-%         if iters > 50
-%             warning('force saturation loop failed to converge. reversing search direction on problem sea states.')
-%             F_err(abs(F_err) > err_thresh) = -F_err(abs(F_err) > err_thresh);
-%         end
-%         if iters > 100
-%             warning('force saturation loop failed to converge, and reversing search didnt help')
-%             break
-%         end
-%         mult = mult ./ (F_err+1);%get_multiplier(f_sat,m_f,B_f,K_f,w, B_f./B_p, K_f./K_p); % fixme this is wrong for multibody
-    
-        mult = ctrl_mult_guess .* exp(1i*phase_ctrl_mult_guess);
-        Z_p = B_p + K_p ./ (1i * w);
-        Z_p_sat = Z_p .* mult;
+        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+        check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
+        reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+    end
 
-        B_p_sat =       real(Z_p_sat);
-        K_p_sat = -w .* imag(Z_p_sat);
-    
-        if multibody
-            [mag_U,phase_U,...
-             real_P,reactive_P,...
-             mag_X_u,phase_X_u,...
-             mag_X_f,phase_X_f,...
-             mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
-                                                     m_c, m_f, m_s, w, ...
-                                                     K_p_sat, B_p_sat, ...
-                                                     F_f_mag, F_f_phase, ...
-                                                     F_s_mag, F_s_phase);
-        else
-            b_sat = B_f + B_p_sat;
-            k_sat = K_f + K_p_sat;
-    
-            [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
-            mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
-            mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
-            mag_U = ctrl_mult_guess .* F_ptrain_over_x .* mag_X_f;
-            
-            phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
-            phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
-            phase_U = phase_V_u + phase_Z_u;            % phase of control force
-    
-            real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
-            check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
-            reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
-        end
-    
+    % what the force and amp would be if the force-sat and amp-sat
+    % solutions applied - notebook p106 2/2/25
+    force_saturated_U = min(4/pi * F_max, mag_U_unsat);
+    amp_saturated_X   = min(       X_max, mag_X_f_unsat);
 
-        % notebook p106 2/2/25
-%         f_sat = min(4/pi * F_max ./ mag_U_unsat,   1);
-%         x_sat = min(       X_max ./ mag_X_f_unsat, 1);
-
-        % what the force and amp would be if the force-sat and amp-sat
-        % solutions applied
-        force_saturated_U = min(4/pi * F_max, mag_U_unsat);
-        amp_saturated_X   = min(       X_max, mag_X_f_unsat);
-
-        % indices where sat and unsat solutions violate which constraint
+    % indices where sat and unsat solutions violate which constraint
 %         idx_force_viol_sat   = mag_U         > force_saturated_U;
 %         idx_force_viol_unsat = mag_U_unsat   > force_saturated_U;
 %         idx_amp_viol_sat     = mag_X_f       > amp_saturated_X;
@@ -686,48 +658,48 @@ function [mag_U,phase_U,...
 %         only_force_ok_unsat = ~idx_force_viol_unsat &  idx_amp_viol_unsat;
 %         only_amp_ok_unsat   =  idx_force_viol_unsat & ~idx_amp_viol_unsat;
 
-        % indices where each solution applies. currently overriding amp
-        % constraint. commented forumlas attempt to incorporate both but
-        % should not actually be based purely on whether the 
-        % saturated and/or unsaturated solution violates, it should also
-        % depend on alpha and the limits (see notebook p142-144 9/15/25).
-        if isinf(F_max)
-            idx_force_sat_applies = false(size(w));
-        else
-            idx_force_sat_applies = true(size(w));
-        end
-        idx_amp_sat_applies   = false(size(w));
+    % indices where each solution applies. currently overriding amp
+    % constraint. commented forumlas attempt to incorporate both but
+    % should not actually be based purely on whether the 
+    % saturated and/or unsaturated solution violates, it should also
+    % depend on alpha and the limits (see notebook p142-144 9/15/25).
+    if isinf(F_max)
+        idx_force_sat_applies = false(size(w));
+    else
+        idx_force_sat_applies = true(size(w));
+    end
+    idx_amp_sat_applies   = false(size(w));
 %         idx_force_sat_applies = both_ok_unsat | idx_force_viol_sat;   % | (idx_amp_viol_sat & idx_force_viol_sat);
 %         idx_amp_sat_applies   = both_ok_unsat | only_force_ok_unsat; % | (idx_amp_viol_sat & idx_force_viol_sat);
 
-        F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
-        X_err_from_amp_sat   = mag_X_f ./ amp_saturated_X   - 1;
+    F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
+    X_err_from_amp_sat   = mag_X_f ./ amp_saturated_X   - 1;
 
-        F_err = Inf(size(F_err_from_force_sat));
-        X_err = Inf(size(X_err_from_amp_sat));
+    F_err = Inf(size(F_err_from_force_sat));
+    X_err = Inf(size(X_err_from_amp_sat));
 
-        % at sea states where the force-saturated solution applies, 
-        % set F_err as deviation from that solution. Otherwise, set F_err=0
-        % to allow any force to occur.
-        F_err(idx_force_sat_applies) = F_err_from_force_sat(idx_force_sat_applies);
-        F_err(~idx_force_sat_applies) = 0;
+    % at sea states where the force-saturated solution applies, 
+    % set F_err as deviation from that solution. Otherwise, set F_err=0
+    % to allow any force to occur.
+    F_err(idx_force_sat_applies) = F_err_from_force_sat(idx_force_sat_applies);
+    F_err(~idx_force_sat_applies) = 0;
 
-        % at sea states where the amplitude-saturated solution applies, 
-        % set X_err as deviation from that solution. Otherwise, set X_err = 0
-        % to allow any amplitude to occur.
-        X_err(idx_amp_sat_applies) = X_err_from_amp_sat(idx_amp_sat_applies);
-        X_err(~idx_amp_sat_applies) = 0;
+    % at sea states where the amplitude-saturated solution applies, 
+    % set X_err as deviation from that solution. Otherwise, set X_err = 0
+    % to allow any amplitude to occur.
+    X_err(idx_amp_sat_applies) = X_err_from_amp_sat(idx_amp_sat_applies);
+    X_err(~idx_amp_sat_applies) = 0;
 
-        % prevent 0/0=NaN when limit of zero is set
-        if F_max==0
-            F_err(mag_U==0) = 0;
-            F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
-        end
+    % prevent 0/0=NaN when limit of zero is set
+    if F_max==0
+        F_err(mag_U==0) = 0;
+        F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
+    end
 
-        % add penalty for B_p<0 (negative power)
-        tol = 1;
-        B_p_violation = max(-B_p_sat+tol,0);
-        F_err = F_err + B_p_violation;
+    % add penalty for B_p<0 (negative power)
+    tol = 1;
+    B_p_violation = max(-B_p_sat+tol,0);
+    F_err = F_err + B_p_violation;
 
     P_sat_ratio = real_P ./ P_unsat;
 
