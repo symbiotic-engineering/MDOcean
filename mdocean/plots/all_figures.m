@@ -252,9 +252,9 @@ function [figs,tabs] =  pareto_fig_func(p,b)
     damping_vs_reactive(p,b)
     figs.pareto_heuristics = gcf;
     n = figs.pareto_heuristics.Number;
-    figs.pareto_front_with_design_images = figure(n - 2);
-    figs.pareto_front_LCOE_contours = figure(n - 3);
-    figs.pareto_constraint_activity = figure(n - 5); 
+    figs.pareto_front_with_design_images = figure(n - 3);
+    figs.pareto_front_LCOE_contours = figure(n - 4);
+    figs.pareto_constraint_activity = figure(n - 6); 
     figs.pareto_constraint_activity.Position = [1 41 1536 844.8000];
     tabs = [];
 end

@@ -71,6 +71,8 @@ function figs = pareto_curve_heuristics(load_two)
 
     %% double pareto plot, if plotting two results
     if load_two
+        [~,f7] = constraint_active_plot(r2.residuals,r2.fval,r2.tol,b,new_objs);
+
         X = r2.x(:,cols); % swap indices based on solver generated function
         X = [X ones(length(X),1)]; % add extra column for material 
         LCOE = r2.fval(:,1);
@@ -93,7 +95,7 @@ function figs = pareto_curve_heuristics(load_two)
         ylim([.6 1.85])
     end
 
-    figs = [f1,f2,f3,f4,f5,f6];
+    figs = [f1,f2,f3,f4,f5,f6,f7];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
