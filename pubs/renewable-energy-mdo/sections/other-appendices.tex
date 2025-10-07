@@ -45,6 +45,53 @@ Table~\ref{tab:hyperparams} documents the hyper-parameters used to control conve
     \label{tab:hyperparams}
 \end{table}
 
+\clearpage
+\section{Supplementary Results}
+\label{sec:appendix-supplemental-results}
+
+\subsection{Single Objective Optimization Results}
+\figureautorefname~\ref{fig:gradient} depicts the normalized gradient.
+A value of zero is expected if the design variable is not involved in an active constraint.
+Notably, all values are nonzero, except for $h_{fs,clear}$, which is the only design variable not involved in any active constraint.
+Nonzero values convey the amount that the objective would improve if the design variable changed, although changing this design variable would violate the active constraint(s) that the design variable is involved in.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{example-image-a}
+\caption{Normalized gradient at optimal point}\label{fig:gradient}
+\end{figure}
+
+\figureautorefname~\ref{fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{\matlabFilepath{44}}
+\caption{Single objective convergence plots}\label{fig:single-objective-convergence}
+\end{figure}
+
+Figure~\ref{fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
+The meaning of $x$ in each subplot is indicated by the subplot title.
+The two starting points that achieve global optima, denoted in green and orange, both have low inital values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
+The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
+On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
+This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
+Figure~\ref{fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
+Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
+\hl{This requires further investigation to explain and will be done during re-scrutineering.}
+
+\begin{landscape}
+\begingroup
+\centering
+
+\begin{figure}
+\centering
+\includegraphics[width=1.2\linewidth]{figs/multistart_parallel_axis.pdf}
+\caption{Parallel axis plot for effect of starting point on convergence}\label{fig:multistart-parallel-axis}
+\fillandplacepagenumber
+\end{figure}
+
+\endgroup
+\end{landscape}
+
 \subsection{Local Sensitivities}\label{sec:appendix-sensitivties}
 Figure~\ref{fig:param-sens-local-global-J-star}, \ref{fig:param-sens-local-x-star}, and \ref{fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}
@@ -117,49 +164,5 @@ The global sensitivities of section \ref{sec:sensitivities} only investigate a f
 Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
 This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.
 
-\section{Supplementary Results}
-\label{sec:appendix-supplemental-results}
-
-\figureautorefname~\ref{fig:gradient} depicts the normalized gradient.
-A value of zero is expected if the design variable is not involved in an active constraint.
-Notably, all values are nonzero, except for $h_{fs,clear}$, which is the only design variable not involved in any active constraint.
-Nonzero values convey the amount that the objective would improve if the design variable changed, although changing this design variable would violate the active constraint(s) that the design variable is involved in.
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{example-image-a}
-\caption{Normalized gradient at optimal point}\label{fig:gradient}
-\end{figure}
-
-\figureautorefname~\ref{fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{\matlabFilepath{44}}
-\caption{Single objective convergence plots}\label{fig:single-objective-convergence}
-\end{figure}
-
-Figure~\ref{fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
-The meaning of $x$ in each subplot is indicated by the subplot title.
-The two starting points that achieve global optima, denoted in green and orange, both have low inital values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
-The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
-On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
-This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
-Figure~\ref{fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
-Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
-\hl{This requires further investigation to explain and will be done during re-scrutineering.}
-
-\begin{landscape}
-\begingroup
-\centering
-
-\begin{figure}
-\centering
-\includegraphics[width=1.2\linewidth]{figs/multistart_parallel_axis.pdf}
-\caption{Parallel axis plot for effect of starting point on convergence}\label{fig:multistart-parallel-axis}
-\fillandplacepagenumber
-\end{figure}
-
-\endgroup
-\end{landscape}
 
 \end{appendices}

@@ -153,24 +153,32 @@
 \begin{abstract}
 %% Text of abstract
 Wave energy converters (WECs) can advance the global energy transition by producing clean power for utility grids and offshore technologies.
-Considering many disciplines concurrently in an optimization process can allow WEC designers to systematically explore interdisciplinary tradeoffs, more fully capture the breadth of design considerations, and leverage coupling for system-wide benefit.
-
-The optimization's large scope and comprehensive nature are uniquely possible due to the purpose-developed semi-analytical model used for simulation.
+Considering many domains concurrently in the design process can allow WEC developers to systematically explore tradeoffs, more fully capture the many requirements for viable deployment, and leverage interdisciplinary coupling for system-wide benefit.
+We develop a novel computationally-efficient modular WEC simulation that captures hydrodynamics, dynamics, structures, and economics and is well-suited for early-stage design exploration and large-scale optimization.
+The simulation's comprehensive yet efficient nature is uniquely possible due to the purposeful selection of analytical and semi-analytical methods that achieve runtimes far quicker than traditional numerical approaches with only minimal sacrifices in accuracy.
 The model incorporates a mesh-free eigenfunction-based linear hydrodynamic solver, a quasi-linearized dynamics engine that handles drag and saturation nonlinearities in the frequency-domain, a structural sizing module with realistic yield/ultimate/buckling failure criteria for storm and fatigue design load cases, and a simple cost estimator to assess techno-economic viability.
-The text documents the derivation, assumptions, and optimization implications of the model, which is called MDOcean and released open-source.
-Validation and computational benchmarking demonstrate that MDOcean's $\simRuntime$ms runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
+The present paper documents the derivation and assumptions of the model, which is called MDOcean and released open-source.
+Particular emphasis is placed on the modified frequency-domain dynamics formulation, which contextualizes and improves on frequency-domain constraint handling methods in prior literature.
+Validation and computational benchmarking demonstrate that MDOcean's $\simRuntime$~ms runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
+Finally, the authors highlight the insights that the model provides on limit cases, scaling laws, and tradeoffs in WEC design.
+
 
 \end{abstract}
 
 %%Graphical abstract
 \begin{graphicalabstract}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{45}}
+\includegraphics[width=\linewidth]{figs/graphical_abstract.pdf}
 \end{graphicalabstract}
 
 %%Research highlights
 \begin{highlights}
-\item Develop and validate a rapid ($<\simRuntime$~ms) open-source wave energy simulation incorporating dynamic nonlinearities (generator force saturation, drag), semi-analytical hydrodynamics, and realistic structures (fatigue and storm loadcases, stress and buckling failure modes)
+\item Develop and validate a rapid ($<\simRuntime$~ms) open-source wave energy techno-economic simulation called MDOcean
+\item Quasi-linear frequency domain dynamics model captures nonlinearities such as generator force saturation and drag while running 3 orders of magnitude faster than benchmark time-stepping model
+\item Eigenfunction-based model computes hydrodynamic coefficients 10x faster than benchmark boundary element method (BEM) solver
+\item Analytical stiffened-plate structural model assesses stress and stability failure modes under fatigue and storm survival loadcases
+\item Simple economic model captures scaling of cost with structural material volume and powertrain rating
+\item Validation shows error of <0.2\% (linear) and <10\% (nonlinear) in average power and peak amplitude for Reference Model 3 (RM3) design
 \end{highlights}
 
 %% Keywords
@@ -199,18 +207,23 @@ wave energy conversion \sep marine renewable energy \sep semi-analytical hydrody
 \listoffigures
 \listoftables
 \clearpage
-\summarytexcount{main}
-\detailtexcount{sections/model}{subsection}
-\detailtexcount{sections/other-appendices}{section}
-\newpage
+%\summarytexcount{main}
+%\detailtexcount{sections/model}{subsection}
+%\detailtexcount{sections/other-appendices}{section}
+%\newpage
 
 %% Use \section commands to start a section
 %% Labels are used to cross-reference an item using \ref command.
 
 \include{sections/model-intro}
 \clearpage
-\include{sections/model}
+\include{sections/model-overview}
 \clearpage
+\include{sections/module-details}
+\clearpage
+\include{sections/benchmarking}
+\clearpage
+\include{sections/discussion}
 
 \section{Conclusion}
 % Summary:
@@ -228,7 +241,7 @@ Finally, the economics module calculates the design-dependent cost based on stru
 Comparison of the dynamics and float hydrodynamics models against WEC-Sim and BEM respectively across multiple cases serves to comprehensively validate the models, with errors generally less than 1\% for test cases with identical assumptions and around 10\% for more realistic cases with diverging assumptions.
 The geometry, economics, structures, and spar hydrodynamics are compared against the RM3 report, serving as a less comprehensive yet sufficient validation.
 Good agreement is observed for all but the spar added mass, storm loads, and structural margins, necessitating the use of a tuning factor for these quantities.
-All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \simRuntime~seconds.
+All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \simRuntime~milliseconds.
 
 % Discussion
 A key feature of this study that other WEC models lack is the inclusion of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
@@ -237,9 +250,9 @@ Future modeling work should pursue model enhancements to correct these limitatio
 Additionally, the next iteration should consider enhancing the model by adding mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
 
 % Impact of findings:
-The results of this study will inform future WEC design optimization, the necessity of accounting for multidisciplinary coupling, and the power of clever simulation tricks to reduce runtime.
+The results of this study will inform future WEC design optimization, the necessity of accounting for multidisciplinary coupling, and the power of semi-analytical modeling to reduce simulation runtime and provide design insight.
 
-\section{Acknowledgements}
+\section*{Acknowledgements}
 The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
 
 R.M. acknowledges funding from the National Science Foundation Graduate Research Fellowship.
@@ -248,7 +261,9 @@ This material is based upon work supported by the National Science Foundation Gr
 DGE–2139899.
 Any opinion, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
 
-\section{Data availability statement}
+The graphical abstract uses icons from \url{www.flaticon.com} in accordance with the Flaticon license.
+
+\section*{Data availability statement}
 The MATLAB code for all simulation, optimization, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at \url{https://github.com/symbiotic-engineering/MDOcean} \cite{mccabe_mdocean_2024}.
 Questions and contributions via GitHub issues and pull requests are welcomed.
 A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
