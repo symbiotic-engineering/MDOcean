@@ -13,7 +13,7 @@ classdef Constraints < GenericAnalysis
             % Get constraints information
             % Store results for post-processing
             tab = cell2table(remove_underscores(b.constraint_names.'));
-            intermed_result_struct.constraint_names = tab(1:24);
+            intermed_result_struct.constraint_names = tab(1:24,:);
         end
         
         function [fig_array,...
