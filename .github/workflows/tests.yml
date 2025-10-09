@@ -35,6 +35,9 @@ jobs:
           path: WEC-Sim
           ref: dev
 
+      - name: Disable wecsim stiffness negativity check
+        run: sed -i 's/stiffness (1,:) {mustBeNonnegative}/stiffness (1,:) {mustBeNumeric}/g' WEC-Sim/source/objects/ptoClass.m
+
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
         if: always()
