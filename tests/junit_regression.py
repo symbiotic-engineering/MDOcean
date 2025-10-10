@@ -6,9 +6,6 @@ from glob import glob
 
 def parse_junit_xml(file_path):
     files = glob(file_path)
-    print(f'files={files}')
-    print(f'current dir={os.getcwd()}')
-    print(f'file_path={file_path}')
     tree = ET.parse(files[0])
     root = tree.getroot()
     test_cases = {}
