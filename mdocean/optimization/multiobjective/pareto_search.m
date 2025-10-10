@@ -22,7 +22,7 @@ function [x,fval] = pareto_search(p,b,filename_uuid)
     t = tic;
     [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower);
     timeEpsConstraint = toc(t)
-    disp('Finished finding pareto seed points. Now starting paretosearch.')
+    disp(['Finished finding ' num2str(size(X0,1)) ' pareto seed points. Now starting paretosearch.'])
 
     %% Pattern search to fill in pareto front
     t2 = tic;
