@@ -15,7 +15,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: self-hosted
+    runs-on: ubuntu-latest # self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -92,6 +92,7 @@ jobs:
         with:
           name: test-report
           path: |
+            MDOcean/test-results/**/junit.xml
             MDOcean/test-results/**/testreport.pdf
             MDOcean/test-results/**/table_*.tex
             MDOcean/code-coverage/**/coverage.xml
@@ -105,7 +106,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'ci-test-change' }} # 'main' }}
           path: MDOcean/test-results-baseline
           workflow_conclusion: completed
           check_artifacts: true
