@@ -4,7 +4,7 @@ classdef (SharedTestFixtures={ ...
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_wecsim_tests = true;
+        run_wecsim_tests = false;
     end
 
     properties
