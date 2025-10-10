@@ -1,26 +1,6 @@
 \section{Results}\label{sec:results}
-\hl{Note to scrutineers: all results shown are for pure-damping control.
-I am still generating the results for reactive control and will include them when they are ready.}
-\subsection{Design Space Exploration}
-The OAT design sweep, shown in \figureautorefname~\ref{fig:experiments}, immediately draws attention to the float diameter $D_f$, shown with a red dashed line, as the variable with the strongest effect on the objectives.
-A slight reduction in the diameter from its nominal value causes the cost to decrease close to linearly but the LCOE to skyrocket due to a substantial reduction in power generation.
-Meanwhile, slightly increasing the diameter causes the power production to grow significantly but increases loads, leading to fatigue failure of the damping plate.
-This is shown as blank on the diagram to indicate infeasibility.
-A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15\textcent/kWh reduction in LCOE, representing the best design of the OAT sweep.
-The results also point to the possibility of an even lower LCOE design with float diameter perhaps $\sim20\%$ larger than nominal, if the damping plate can be made feasible by increasing $t_d$ or $h_{1,stiff,d}$ without a major cost penalty. 
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{\matlabFilepath{15}}
-\caption{Design of experiments}\label{fig:experiments}
-\end{figure}
-
-Besides $D_f$, the other design variable displaying a non-monotonic relationship with $LCOE$ is the force limit $F_{max}$, with an optimal at around half the nominal force limit.
-Together, these insights inform the selection of the starting design for optimization, $\vec{x}_o$.
-The OAT sweep also does not reveal any multimodality in the objectives, a promising sign that only a limited number of multi-starts may be necessary, although objective multimodality could still exist in other parts of the design space.
-Finally, the OAT design sweep shows the highly constrained nature of the problem, with large regions of the design space infeasible.
-In particular, the feasible region $1.3<D_f/D_{f,nom}<2.1$ is an ``island'' in the feasible design space, separated from the other feasible points at $D_f/D_{f,nom}<1 $ by the damping plate fatigue constraint.
-Thus even without objective multimodality, multimodality exists in the Lagrangian (objective plus weighted active constraints), indicating the need for a multi-start optimization procedure as planned.
+\hl{Note to scrutineers: all results shown are for pure-damping control, except} figure \ref{fig:pareto-control-compare}.
+\hl{I am still generating the results for reactive control and will include them when they are ready.}
 
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
 
@@ -173,7 +153,7 @@ Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{15.6_3}}
+\includegraphics[width=1.2\linewidth]{\matlabFilepath{15.6_3}}
 \caption{Probability tree for convergence of multi-start}\label{fig:multistart-tree}
 \end{figure}
 
@@ -437,8 +417,21 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 
 %\hl{If there's room/time, consider a bonus pareto of LCOE vs CF.}
 
-%\subsection{Multi-Objective Sensitivity Analysis}
-%\hl{This section I don't have results for yet and can be cut if needed. Maybe show trace out the effect of parameter variation without reoptimizing in multiobjective space, and it shows you how far some param variations bring you from optimal, like the dJ/dp sensitivities before but now for everywhere on the pareto front, and visualized differently. Perhaps also do re-optimized pareto fronts for a parameter or two that was found to be highly influential in the single objective analysis. Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
+\subsection{Multi-Objective Sensitivity Analysis}
+\paragraph{Control Scheme}
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\linewidth]{figs/damping_reactive_pareto.png}
+    \caption{Pareto Front comparison for Damping vs Reactive Control}
+    \label{fig:pareto-control-compare}
+\end{figure}
+\hl{Add explanation and debug why reactive control stops at 120 kW.}
+%\hl{This section I don't have results for yet and can be cut if needed. 
+%Maybe show trace out the effect of parameter variation without reoptimizing in multiobjective space, 
+%and it shows you how far some param variations bring you from optimal, like the dJ/dp sensitivities before 
+%but now for everywhere on the pareto front, and visualized differently. 
+%Perhaps also do re-optimized pareto fronts for a parameter or two that was found to be highly influential in the single objective analysis. 
+%Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
 
 \subsection{Optimization Runtime}
 Figure \ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
