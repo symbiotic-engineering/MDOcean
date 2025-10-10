@@ -1,10 +1,15 @@
 import xml.etree.ElementTree as ET
 import sys
+import os
 from datetime import datetime
 from glob import glob
 
 def parse_junit_xml(file_path):
-    tree = ET.parse(glob(file_path)[0])
+    files = glob(file_path)
+    print(f'files={files}')
+    print(f'current dir={os.getcwd()}')
+    print(f'file_path={file_path}')
+    tree = ET.parse(files[0])
     root = tree.getroot()
     test_cases = {}
     test_elements = {}  # Store actual XML elements
