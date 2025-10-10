@@ -314,7 +314,7 @@ classdef (SharedTestFixtures={ ...
         end
 
         function hydrodynamicLimitObeyed(testCase)
-            ratio = 1; %check_max_CW(testCase.uuid.Value);
+            ratio = error('broken'); %check_max_CW(testCase.uuid.Value);
             ratio(isnan(ratio)) = 0;
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
