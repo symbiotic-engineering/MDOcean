@@ -85,6 +85,7 @@ jobs:
         if: always()
         with:
           report_paths: 'MDOcean/test-results/**/junit.xml'
+          job_name: build
 
       - name: Upload test report PDF
         if: always()
@@ -100,3 +101,30 @@ jobs:
             MDOcean/test-results/Figure_*.pdf
             MDOcean/mdocean/optimization/multiobjective/pareto_search_results_*.mat
             MDOcean/**/wecsim_*.mat
+
+      - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        if: always()
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          path: MDOcean/test-results-baseline
+          workflow_conclusion: completed
+          check_artifacts: true
+
+      - name: Compare test results to base branch
+        if: always()
+        run: |
+          ls MDOcean/test-results-baseline/test-report/test-results
+          python MDOcean/tests/junit_regression.py MDOcean/test-results-baseline/test-report/test-results/**/junit.xml MDOcean/test-results/**/junit.xml MDOcean/test-results-baseline/delta-junit.xml
+          cat MDOcean/test-results-baseline/delta-junit.xml
+        shell: bash
+
+      - name: Publish changed tests to GitHub UI
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: 'MDOcean/test-results-baseline/delta-junit.xml'
+          check_name: 'Changed Tests'
+          job_name: build
+          include_passed: true
