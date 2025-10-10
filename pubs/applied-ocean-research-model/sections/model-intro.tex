@@ -32,9 +32,9 @@ The float oscillates up and down with oncoming incident waves while the spar sta
 \caption{RM3 geometry visualized}\label{fig:rm3-parts}
 \end{figure}
 RM3 has received considerable research attention in the decade since the original report was published.
-The present study builds on that work and presents a multidisciplinary techno-economic optimization of the RM3.
+The present study builds on that work and presents a multidisciplinary techno-economic simulation of the RM3.
 
-The remainder of the introduction will review WEC system modeling literature, articulate the appeal of multidisciplinary design optimization and semi-analytical modeling to address gaps in the field, and identify the paper's key contributions and structure.
+The remainder of the introduction will review WEC system modeling literature, articulate the appeal of semi-analytical modeling to address gaps in the field, and identify the paper's key contributions and structure.
 
 \subsection{WEC System Modeling: State of the Art and Gaps}
 \label{sec:lit}
@@ -75,88 +75,70 @@ Most studies have fewer than five design variables, with the three largest optim
 
 %Need to copy sources over from slide 27 and 35 of F24 reseach slides with original charts (with color)
 
-\begin{landscape}
-\begingroup
-\centering
-
-%\begin{tabular}
-
-\begin{longtable}{>{\centering\arraybackslash}p{0.03\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.040\linewidth}|>{\centering\arraybackslash}p{0.015\linewidth}|>{\centering\arraybackslash}p{0.025\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.02\linewidth}}
-\rot{\textbf{Ref}} & \rot{\textbf{Device}} & \rot{\textbf{Hydro}}& \rot{\textbf{Drag}} & \rot{\textbf{\# DOF}} & \rot{\textbf{Domain}} & \rot{\textbf{Controls}} & \rot{\textbf{Mooring}} & \rot{\textbf{Powertrain}} & \rot{\textbf{Structures}} & \rot{\textbf{Economics}} & \rot{\textbf{Sea state}}
-& \rot{\textbf{Optimizer}}& \rot{\textbf{Objective}} & \rot{\textbf{Constraints}} & \rot{\textbf{\shortstack{Design \\ Variables}}}& \rot{\textbf{\# DVs}} \\
+\begin{longtable}{
+    >{\centering\arraybackslash}p{0.03\linewidth}|
+    >{\centering\arraybackslash}p{0.07\linewidth}|
+    >{\centering\arraybackslash}p{0.072\linewidth}|
+    >{\centering\arraybackslash}p{0.040\linewidth}|
+    >{\centering\arraybackslash}p{0.019\linewidth}|
+    >{\centering\arraybackslash}p{0.025\linewidth}|
+    >{\centering\arraybackslash}p{0.059\linewidth}|
+    >{\centering\arraybackslash}p{0.059\linewidth}|
+    >{\centering\arraybackslash}p{0.059\linewidth}|
+    >{\centering\arraybackslash}p{0.059\linewidth}|
+    >{\centering\arraybackslash}p{0.072\linewidth}|
+    >{\centering\arraybackslash}p{0.072\linewidth}}
+\rot{\textbf{Ref}} & \rot{\textbf{Device}} & \rot{\textbf{Hydro}}& \rot{\textbf{Drag}} & \rot{\textbf{\# DOF}} & \rot{\textbf{Domain}} & \rot{\textbf{Controls}} & \rot{\textbf{Mooring}} & \rot{\textbf{Powertrain}} & \rot{\textbf{Structures}} & \rot{\textbf{Economics}} & \rot{\textbf{Sea state}} \\
 \hline
-This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, STO
-& LOC & ECON, PWR & GEO, AMP, PTO, STA, STR & DIM, STR, PTO & 12 \\
+This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, STO \\
 
-\cite{mccabe_multidisciplinary_2022} & 2-PA & ALG & - & 1 & F+ & PI+ & - & EFF & AN & STR & REG+, STO
-& LOC & ECON, VAR & GEO, PTO & DIM, PTO & 7 \\
+\cite{mccabe_multidisciplinary_2022} & 2-PA & ALG & - & 1 & F+ & PI+ & - & EFF & AN & STR & REG+, STO \\
 
-\cite{khanal_multi-objective_2024} & 1-PA array & BEM & - & 4 & F & PI+ & - & - & - & GEO & REG
-& GA & ECON, ARRY & GEO, PTO & DIM, CTL & 14 \\
+\cite{khanal_multi-objective_2024} & 1-PA array & BEM & - & 4 & F & PI+ & - & - & - & GEO & REG \\
 
-\cite{gaudin_single_2021} & 1-PA array & MEEM & - & 120 & F & PI & DES & - & AN & MOOR & IRR+, STO & GA & PWR, ECON & GEO, STR & DIM, CTL & 4 \\
+\cite{gaudin_single_2021} & 1-PA array & MEEM & - & 120 & F & PI & DES & - & AN & MOOR & IRR+, STO \\
 
-\cite{edwards_optimisation_2022} & 1-PA & BEM & - & 1 & F & P & - & - & - & GEO & REG
-& GA & ECON & AMP, GEO, PWR, STA & DIM, SHP & 15 \\
+\cite{edwards_optimisation_2022} & 1-PA & BEM & - & 1 & F & P & - & - & - & GEO & REG \\
 
-\cite{garcia-teruel_reliability-based_2021}& 1-PA & BEM & LD & 1 & F+ & PI & - & - & LD & - & IRR+
-& GA & PWR, LD & AMP, PTO & DIM, SHP & 66 \\
+\cite{garcia-teruel_reliability-based_2021}& 1-PA & BEM & LD & 1 & F+ & PI & - & - & LD & - & IRR+ \\
 
-\cite{garcia-teruel_design_2022}& 1-PA & BEM & - & 2 & F+ & PI & - & - & - & - & IRR
-& GA & ECON, PWR & AMP, PTO & DIM, SHP & 4 \\
+\cite{garcia-teruel_design_2022}& 1-PA & BEM & - & 2 & F+ & PI & - & - & - & - & IRR \\
 
-\cite{cotten_multi-objective_2022} & ATN & BEM & - & 10 & F+ & P & - & - & LD & - & IRR+
-& GA & ECON, LD & GEO, STA & DIM & 8 \\
+\cite{cotten_multi-objective_2022} & ATN & BEM & - & 10 & F+ & P & - & - & LD & - & IRR+ \\
 
-\cite{abdulkadir_control_2024} & 1-PA & MEEM & LD & 2 & T & NL P & - & - & - & - & IRR
-& GA & PWR & GEO & DIM, SHP, CTL & 8 \\
+\cite{abdulkadir_control_2024} & 1-PA & MEEM & LD & 2 & T & NL P & - & - & - & - & IRR \\
 
-\cite{housner_numerical_2024} & TRM & BEM & - & 4 & T & PI & DYN & - & - & - & REG
-& LOC & PWR & GEO & DIM, SHP, CTL & 3 \\
+\cite{housner_numerical_2024} & TRM & BEM & - & 4 & T & PI & DYN & - & - & - & REG \\
 
-\cite{al_shami_parameter_2019} & 2-PA & BEM & DF & 2 & F & PI & - & - & - & - & REG
-& DOE & PWR, BW & - & DIM, CTL, SHP & 7 \\
+\cite{al_shami_parameter_2019} & 2-PA & BEM & DF & 2 & F & PI & - & - & - & - & REG \\
 
-\cite{RM3} & 2-PA & BEM & Q & 2 & T & P & DES & - & FEA & FULL & IRR+, STO
-& IT & - & - & - & - \\
+\cite{RM3} & 2-PA & BEM & Q & 2 & T & P & DES & - & FEA & FULL & IRR+, STO \\
 
-\cite{mi_multi-scale_2025} & OSW & BEM & Various & 8 & T & PI & DYN, DES & DYN & FEA & FULL & IRR+, STO
-& IT & - & - & - & - \\
+\cite{mi_multi-scale_2025} & OSW & BEM & Various & 8 & T & PI & DYN, DES & DYN & FEA & FULL & IRR+, STO \\
 
-\cite{an_optimal_2024} & OTP & CFD & CFD & - & T & - & - & - & FEA & - & STO
-& ALT & ECON & STR & STR & 4 \\
+\cite{an_optimal_2024} & OTP & CFD & CFD & - & T & - & - & - & FEA & - & STO \\
 
-\cite{ambuhl_reliability-based_2014} & 1-PA & - & Q & - & - & - & DES & - & AN & STR & STO
-& BF & ECON & STR, STA & DIM, STR & 3 \\
+\cite{ambuhl_reliability-based_2014} & 1-PA & - & Q & - & - & - & DES & - & AN & STR & STO \\
 
-\cite{nguyen_theoretical_2024} & OSW & MEEM & LD & 1 & F & PI & - & - & LD & - & IRR
-& BF & ECON, LD & - & DIM & 2 \\
+\cite{nguyen_theoretical_2024} & OSW & MEEM & LD & 1 & F & PI & - & - & LD & - & IRR \\
 
-\cite{ferri_balancing_2014} & 1-PA & BEM & LD & 1 & T & P, PI+, UNS & - & DYN & LD & STR & IRR+
-& LOC & PWR, LD & AMP, PTO & CTL & 3 \\
+\cite{ferri_balancing_2014} & 1-PA & BEM & LD & 1 & T & P, PI+, UNS & - & DYN & LD & STR & IRR+ \\
 
-\cite{rosati_control_2023} & OWC & BEM & - & 1 & T & NL P+ & - & EFF & - & PTO & IRR+
-& BF & ECON, VAR & PTO & PTO, CTL & 2 \\
+\cite{rosati_control_2023} & OWC & BEM & - & 1 & T & NL P+ & - & EFF & - & PTO & IRR+ \\
 
-\cite{son_performance_2016} & 2-PA & MEEM & LD & 1 & F & P & - & EFF & - & - & REG
-& BF & PWR & - & PTO & 2 \\
+\cite{son_performance_2016} & 2-PA & MEEM & LD & 1 & F & P & - & EFF & - & - & REG \\
 
-\cite{gaebele_tpl_2025} & 2-PA & BEM & - & 2 & PS & PI & - & DYN, EFF & - & PTO, GEO & IRR
-& LOC & ECON & PTO & PTO, CTL, DIM & 5 \\
+\cite{gaebele_tpl_2025} & 2-PA & BEM & - & 2 & PS & PI & - & DYN, EFF & - & PTO, GEO & IRR \\
 
-\cite{devin_high-dimensional_2024} & 1-PA & FIT & - & 1 & PS & UNS & - & DYN, EFF & - & - & REG
-& DOE, BF, LOC & PWR & PTO & PTO, CTL & 5 \\
+\cite{devin_high-dimensional_2024} & 1-PA & FIT & - & 1 & PS & UNS & - & DYN, EFF & - & - & REG \\
 
-\cite{grasberger_control_2024} & OSW & BEM & - & 1 & PS & PI & - & DYN & - & GEO & IRR
-& BF, LOC & ECON & AMP, PTO & DIM, PTO, CTL & 2 \\
+\cite{grasberger_control_2024} & OSW & BEM & - & 1 & PS & PI & - & DYN & - & GEO & IRR \\
 
-\cite{herber_dynamic_2014} & 1-PA & FIT & LD & 1 & T & UNS & - & - & - & - & IRR& BF, LOC & PWR & AMP, PTO & DIM, CTL & 2 \\
+\cite{herber_dynamic_2014} & 1-PA & FIT & LD & 1 & T & UNS & - & - & - & - & IRR \\
 
-\cite{lin_fast_2025} & 1-PA & BEM & LD & 1 & F+ & UNS & - & - & - & - & IRR+
-& BF, PMP & ECON & AMP, PTO & DIM & 1 \\
+\cite{lin_fast_2025} & 1-PA & BEM & LD & 1 & F+ & UNS & - & - & - & - & IRR+ \\
 
-\cite{abdulkadir_optimal_2024} & 1-PA array & BEM & - & 3 & T & UNS & - & - & - & - & IRR
-& PMP & PWR & PTO & CTL & - \\
+\cite{abdulkadir_optimal_2024} & 1-PA array & BEM & - & 3 & T & UNS & - & - & - & - & IRR \\
 
 %\cite{zhang_performance_2024} & 3-PA & MEEM & LD & 3 & F & P & DYN & - & - & - & IRR
 %& BF & PWR & - & CTL & 2 \\
@@ -165,23 +147,30 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
 %& DOE, LOC & PWR & STA & DIM, SHP & 3 \\
 
 \hline 
-%\end{tabular}
-\caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation}
+\caption{Comparison of the disciplinary scope and modeling fidelity of previous WEC models used for optimization}
 \label{tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
-\endgroup
-\end{landscape}
 
 \begin{landscape}
 \begingroup
 \begin{table}
     \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}}
+    \begin{tabular}{
+        >{\centering\arraybackslash}p{0.065\linewidth}
+        >{\raggedright\arraybackslash}p{0.13\linewidth}|
+        >{\centering\arraybackslash}p{0.065\linewidth}
+        >{\raggedright\arraybackslash}p{0.13\linewidth}|
+        >{\centering\arraybackslash}p{0.065\linewidth}
+        >{\raggedright\arraybackslash}p{0.13\linewidth}|
+        >{\centering\arraybackslash}p{0.065\linewidth}
+        >{\raggedright\arraybackslash}p{0.11\linewidth}|
+        >{\centering\arraybackslash}p{0.065\linewidth}
+        >{\raggedright\arraybackslash}p{0.13\linewidth}}
          \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
          N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
-         ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
-         TRM&  Terminator&  CFD&  Computational fluid dynamics&  Q& Quadratic & T&Time domain & P+, PI+&P/PI control with extension to incorporate constraints \\
+         ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain extension & PI&Proportional integral (damping and stiffness, aka reactive) \\
+         TRM&  Terminator&  CFD&  Computational fluid dynamics&  Q& Quadratic & T&Time domain & P+, PI+&P/PI control extended to incorporate constraints \\
          OSW&  Oscillating surge WEC&  FIT&  Fit of model to numerical or experimental data&  CFD& Computational fluid dynamics & PS&Pseudo-spectral& NL&Nonlinear structured \\
          OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
         OWC& Oscillating water column& & & & & & & & \\
@@ -207,26 +196,6 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
     \end{tabular}
     \caption{Legend keys for other modeling columns of table~\ref{tab:lit}}
     \label{tab:lit-review-legend-other}
-%\end{table}
-\bigskip
-%\begin{table}
-%    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
-         \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
-         LOC&  Local optimizer (gradient-based, derivative-free)&  
-ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
-         GA&  Genetic algorithm&  
-PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
-         DOE&  Design of experiments (Monte Carlo, Taguchi)&  
-VAR&  Power variability (peak/average, std. dev., capacity factor)&  PTO&  PTO force, power, or electromagnetic feasibility& PTO&Power takeoff\\
-         IT&  Iterated by hand&  
-ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
- ALT
-& Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
- BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
-    \end{tabular}
-    \caption{Legend keys for the optimization columns of table~\ref{tab:lit}}
-    \label{tab:lit-review-legend-optim}
 \end{table}
 
 \endgroup
@@ -303,14 +272,14 @@ However, as \cite{housner_numerical_2024} reveals, it is too slow to use for lar
 Meanwhile, the newer pseudospectral tool WecOptTool \cite{coe_initial_2020} is faster and suitable for control co-design, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like PTO and mooring as needed, and it still can take considerable time for large optimizations.
 Finally, several studies note that uncertainty in the cost model may have a significant impact on the results, evidencing the need for sensitivity analysis.
 
-\subsection{Relevance of MDO and Semi-Analytical Modeling}
+\subsection{Relevance of MDAO and Semi-Analytical Modeling}
 %(Why MDO):
-Multidisciplinary Design Optimization (MDO) has emerged as a powerful strategy to address such challenges.
-MDO is a quantitative methodology to formulate, solve, and interpret the results of complex engineering design problems that involve multiple coupled disciplines \cite{agteMDOAssessmentDirection2009}.
+Multidisciplinary Design Analysis and Optimization (MDAO) has emerged as a powerful strategy to address such challenges.
+MDAO is a quantitative methodology to formulate, solve, and interpret the results of complex engineering design problems that involve multiple coupled disciplines \cite{agteMDOAssessmentDirection2009}.
 Solutions typically utilize local and global optimization algorithms, and the method emphasizes that comprehensive consideration of the coupling between all disciplines often yields designs that perform better than those found by sequentially optimizing each discipline individually \cite{martinsMultidisciplinaryDesignOptimization2013}.
-MDO falls under the umbrella of concurrent design.
-When one of the disciplines considered is controls, MDO is a form of control co-design.
-MDO originated from the field of structural optimization and is well-established in the aerospace industry and gaining traction in the broader energy industry, especially in floating offshore wind turbines (e.g. \cite{abbas_control_2024,jasa_effectively_2022,patryniak_multidisciplinary_2022}).
+MDAO falls under the umbrella of concurrent design.
+When one of the disciplines considered is controls, MDAO is a form of control co-design.
+MDAO originated from the field of structural optimization and is well-established in the aerospace industry and gaining traction in the broader energy industry, especially in floating offshore wind turbines (e.g. \cite{abbas_control_2024,jasa_effectively_2022,patryniak_multidisciplinary_2022}).
 While there is a recognized need and growing interest in leveraging concurrent design and control co-design for WECs \cite{mi_multi-scale_2025,ringwood_empowering_2023}, MDO has not yet caught on in the wave energy space, preventing potential techno-economic breakthroughs.
 It appears that only two existing studies \cite{mccabe_multidisciplinary_2022,khanal_multi-objective_2024} approach WEC design explicitly from an MDO perspective.
 The present study builds directly off \cite{mccabe_multidisciplinary_2022}, a preliminary MDO formulation by the same authors that employs significantly less accurate models and fewer design variables.
@@ -358,8 +327,20 @@ On the other extreme, \cite{mccabe_multidisciplinary_2022} uses an algebraic hyd
 The present paper will combine MDO with semi-analytical models to perform a WEC optimization of unprecedented scope.
 
 \subsection{Paper Contributions and Roadmap}
-To addresses the gaps just described, the authors of this paper (1) create a fast, multidisciplinary, and open-source WEC simulation software.
+To address the gaps just described, the authors of this paper create a fast, multidisciplinary, and open-source WEC simulation software.
 The developed software, called MDOcean \cite{mccabe_mdocean_2024}, implements relevant semi-analytical models from various fields, integrates them in a scalable framework for WEC simulation and concurrent optimization, and validates them in a WEC system context.
-In addition to the results' own merit, the framework articulated here is scalable to more design variables and disciplines, and could ultimately enable systematic design optimization of many WEC architectures.
+The modeling framework articulated here is scalable to more disciplines, and enables systematic WEC design optimization.
 
-In the following sections, the methodology for modeling is described in section~\ref{sec:model}.
+This paper places considerable emphasis not only on the specific methods used but also on the process to select these methods, informed through a lens of MDAO and systems thinking, with the intent to guide readers interested in conducting their own multidisciplinary WEC simulation and optimization.
+In section~\ref{sec:model-structure}, the research objective and design scope are first used to define a broad problem formulation and module decomposition.
+Next, section~\ref{sec:modules} describes the construction of the simulation model.
+It develops the assumptions, analysis method, and implementation details of each module based on the appropriate balance of accuracy and speed.
+Section~\ref{sec:validation-benchmarking} discusses model validation and runtime benchmarking.
+Finally, section~\ref{sec:discussion} showcases results from model sweeps and insights from the model structure.
+Figure~\ref{fig:overview-methods} depicts this organization visually.
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figs/section_flow.pdf}
+    \caption{Paper layout}
+    \label{fig:overview-methods}
+\end{figure}
