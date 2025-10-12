@@ -10,6 +10,7 @@ import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
 
 load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+setenv('MW_PCT_TRANSPORT_HEARTBEAT_INTERVAL', '1000');
 
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
