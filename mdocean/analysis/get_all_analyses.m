@@ -5,7 +5,9 @@ function [analysis_list] = get_all_analyses()
     if isempty(analysis_list)
         analysis_list = dir('mdocean/analysis/*.m');
         if isempty(analysis_list)
-            error('mdocean:get_all_analyses:no analyses found')
+            msg = ['No analyses found. Current dir: ' pwd];
+            ME = MException('mdocean:get_all_analyses:no_analyses', msg);
+            throw(ME);
         end
     end
     analysis_list = {analysis_list.name};
