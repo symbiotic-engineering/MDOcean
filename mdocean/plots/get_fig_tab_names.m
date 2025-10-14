@@ -1,0 +1,47 @@
+function [fig_names,tab_names] = get_fig_tab_names(which_figs, which_tabs)
+% which_figs and which_tabs are string or cell arrays containing 'all',
+% 'RE', and/or 'AOR', corresponding to all figures/tables even if not in a
+% paper, all figs/tabe in the Renewable Energy paper, and all figs/tabs in
+% the Applied Ocean Research paper. Returns cell arrays of class.fig_names
+% and class.tab_names.
+
+    fig_names = {};
+    tab_names = {};
+    [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mapping();
+    if strcmpi(which_figs,'all')
+        analysis_list = get_all_analyses();
+        for i = 1:length(analysis_list)
+            [~, class_name] = fileparts(analysis_list{i});
+            analysis_obj = feval(class_name);
+            figs_this_class = strcat([class_name '.'], analysis_obj.fig_names);
+            tabs_this_class = strcat([class_name '.'], analysis_obj.tab_names);
+            fig_names = [fig_names figs_this_class];
+            tab_names = [tab_names tabs_this_class];
+        end
+    end
+    
+    if any(strcmpi(which_figs,'RE'))
+        fig_names = [fig_names figs_in_RE];
+    end
+    if any(strcmpi(which_figs,'AOR'))
+        fig_names = [fig_names figs_in_AOR];
+    end
+    if isempty(fig_names)
+        error('unrecognized fig names')
+    end
+    
+    if any(strcmpi(which_tabs,'RE'))
+        tab_names = [tab_names tabs_in_RE];
+    end
+    if any(strcmpi(which_figs,'AOR'))
+        tab_names = [tab_names tabs_in_AOR];
+    end
+    if isempty(tab_names)
+        error('unrecognized tab names')
+    end
+    
+    % remove duplicates
+    fig_names = unique(fig_names);
+    tab_names = unique(tab_names);
+
+end

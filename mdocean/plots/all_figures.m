@@ -1,62 +1,49 @@
-% Generate all figures used in the paper
+% Generate all figures and tables specified, without repeating calculations
 function [fig_success,tab_success,...
           fig_output, tab_output,...
-          fig_runtime,tab_runtime,...
-          num_figs,num_tabs,...
-          fig_names,tab_names] = all_figures( which_figs, which_tabs, filename_uuid )
+          fig_runtime,tab_runtime] = all_figures( fig_names, tab_names, filename_uuid )
 
+%% default inputs
+if nargin==0
+    % if run without arguments, show all figures and tables
+    [fig_names,tab_names] = get_fig_tab_names('all','all');
+end
 if nargin<3
     filename_uuid = ''; % required argument for anything running gradient_optim in parallel,
                         % since prob2struct needs unique filenames for code generation
 end
 
+%% prep for saving outputs
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
 save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin{:});
 
-num_figs = 59;
-num_tabs = 8;
+%% preallocate
+num_figs = length(fig_names);
+num_tabs = length(tab_names);
 
-if nargin==0
-    % if run without arguments, show all figures and tables
-    which_figs = 1:num_figs;
-    which_tabs = 1:num_tabs;
-end
+fig_success = cell([1,num_figs]);
+tab_success = cell([1,num_tabs]);
 
-fig_success = cell([1,length(which_figs)]);
-tab_success = cell([1,length(which_tabs)]);
+fig_output = gobjects(1, num_figs);
+tab_output(1, 1:num_tabs) = {table()};
 
-fig_output = gobjects(1, length(which_figs));
-tab_output(1, 1:length(which_tabs)) = {table()};
+fig_runtime = NaN([1,num_figs]);
+tab_runtime = NaN([1,num_tabs]);
 
-fig_runtime = NaN([1,length(which_figs)]);
-tab_runtime = NaN([1,length(which_tabs)]);
-%%
-
-
-
-%% Auto-generate figure and table names from list above
-fig_nums = cellstr(num2str((1:num_figs).'));
-tab_idxs = ~cellfun(@isempty,tabs_in_paper);
-tab_nums = cellstr(num2str(find(tab_idxs).'));
-
-fig_names = strcat("Fig. ", fig_nums, ": ", figs_in_paper.');
-tab_names = strcat("Tab. ", tab_nums, ": ", tabs_in_paper(tab_idxs).');
-
-%% Initialize structures to store generated figures and tables
+% Initialize structures to store generated figures and tables
 generated_figs = struct();
 generated_tabs = struct();
 
 % Create analysis class instances cache
 analysis_instances = containers.Map();
 
-% Loop for figures
-for i = 1:length(which_figs)
+%% Loop for figures
+for i = 1:length(fig_names)
     try
         % Get the class name for the figure
-        fig_number = which_figs(i);
-        fig_name = split(figs_in_paper{fig_number}, '.');
+        fig_name = split(fig_names(i),'.');
         class_name = fig_name{1};
         fig_desc = fig_name{2};
         
@@ -66,7 +53,7 @@ for i = 1:length(which_figs)
             % Create or retrieve analysis instance
             if ~isKey(analysis_instances, class_name)
                 % Create new instance and set filename_uuid and table_save_fcn
-                analysis_obj = eval([class_name '()']);
+                analysis_obj = feval(class_name);
                 analysis_obj.b.filename_uuid = filename_uuid;
                 analysis_obj.b.table_save_fcn = table_save_fcn;
                 analysis_instances(class_name) = analysis_obj;
@@ -113,12 +100,11 @@ for i = 1:length(which_figs)
     end
 end
 
-% Loop for tables
-for i = 1:length(which_tabs)
+%% Loop for tables
+for i = 1:length(tab_names)
     try
-        tab_number = which_tabs(i);
         % Get the class name for the table
-        tab_name = split(tabs_in_paper{tab_number}, '.');
+        tab_name = split(tab_names(i), '.');
         class_name = tab_name{1};
         tab_desc = tab_name{2};
         
@@ -128,7 +114,7 @@ for i = 1:length(which_tabs)
             % Create or retrieve analysis instance
             if ~isKey(analysis_instances, class_name)
                 % Create new instance and set filename_uuid and table_save_fcn
-                eval(['analysis_obj = ' class_name '();']);
+                analysis_obj = feval(class_name);
                 analysis_obj.b.filename_uuid = filename_uuid;
                 analysis_obj.b.table_save_fcn = table_save_fcn;
                 analysis_instances(class_name) = analysis_obj;
