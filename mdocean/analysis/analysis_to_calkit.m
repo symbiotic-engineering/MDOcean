@@ -1,11 +1,9 @@
-analysis_list = dir('analysis/*.m');
-analysis_list = {analysis_list.name};
-analysis_list = analysis_list(~contains(analysis_list, ["GenericAnalysis.m","analysis_to_calkit.m"]));
-
-stages = cell(length(analysis_list),1);
 
 p = parameters();
 b = var_bounds();
+
+analysis_list = get_all_analyses();
+stages = cell(length(analysis_list),1);
 
 for i = 1:length(analysis_list)
     [~, class_name] = fileparts(analysis_list{i});
