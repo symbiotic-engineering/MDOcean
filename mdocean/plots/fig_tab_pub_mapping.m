@@ -1,5 +1,11 @@
 function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mapping()
 
+%% numbers
+num_figs_RE = 30;
+num_figs_AOR = 34;
+num_tabs_AOR = 2;
+num_tabs_RE = 6;
+
 %% RE figures
 
 figs_in_RE = cell([1,num_figs_RE]);
