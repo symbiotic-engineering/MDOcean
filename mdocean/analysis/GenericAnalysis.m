@@ -11,12 +11,13 @@ classdef (Abstract) GenericAnalysis
         intermed_result_struct % all results needed to debug and make plots
         end_result_struct % only summary end results for latex output or tests
         output_folder
-        analysis_dependencies
-        postpro_dependencies
         analysis_outputs
         postpro_outputs
     end
-
+    properties (Dependent)
+        analysis_dependencies
+        postpro_dependencies
+    end
     properties (Abstract)
         fig_names
         tab_names
@@ -45,17 +46,21 @@ classdef (Abstract) GenericAnalysis
             if nargin > 1
                 obj.b = b;
             end
-            obj.analysis_dependencies = obj.get_dependencies([class(obj) '.analysis_fcn()']);
+            
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
-            obj.postpro_dependencies = [obj.get_dependencies([class(obj) '.post_process_fcn()']),...
-                                        obj.analysis_outputs];
 
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.tab_names,'.tex') ...
                           'end.mat']);
         end
-
+        function val = get.analysis_dependencies(obj)
+            val = obj.get_dependencies([class(obj) '.analysis_fcn()']);
+        end
+        function val = get.postpro_dependencies(obj)
+            val = [obj.get_dependencies([class(obj) '.post_process_fcn()']),...
+                                        obj.analysis_outputs];
+        end
         function obj = run_analysis(obj)
             obj.intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
             obj.save_intermed_results();
