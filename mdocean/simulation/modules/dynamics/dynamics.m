@@ -430,7 +430,7 @@ function [mag_U,phase_U,...
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
         ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
-        phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));   % fixme: If reactive control, phase should be nonzero, based on eq4 of IFAC paper.
+        phase_ctrl_mult_guess = eps + zeros(size(ctrl_mult_guess)); % fixme: If reactive control, phase should be nonzero, based on eq4 of IFAC paper.
 
         % check convergence
         X_converged = X_err < X_tol;
