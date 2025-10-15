@@ -153,7 +153,7 @@ parfor imcr=1:length(mcr.cases(:,1))
         relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
     catch ME
         warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
-            mcr.cases(:,1),mcr.cases(:,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
+            mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
         P(imcr) = NaN;
         force_pto(imcr) = NaN;
         float_amplitude(imcr) = NaN;
