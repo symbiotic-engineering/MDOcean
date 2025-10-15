@@ -146,5 +146,7 @@ function value = format_value(value, use_percent)
                 value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
             end
         end
+    else
+        value = formattedDisplayText(value,"UseTrueFalseForLogical",true);
     end
 end
