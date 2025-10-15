@@ -167,7 +167,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
         if isempty(new_b.filename_uuid)
             t = getCurrentTask();
             if ~isempty(t)
-                new_b.filename_uuid = num2str(t.ID);
+                new_b.filename_uuid = sprintf('%s_%s',t.Parent.Name,t.Name);
             end
         end
         [X_opt_tmp,obj_tmp,flag_tmp] = gradient_optim(x0,new_p,new_b,which_obj);
