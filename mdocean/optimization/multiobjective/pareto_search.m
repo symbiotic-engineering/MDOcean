@@ -1,4 +1,4 @@
-function [x,fval] = pareto_search(filename_uuid)
+function [x,fval,residuals,tol,p] = pareto_search(filename_uuid)
     if nargin==0
         filename_uuid='';
     end
