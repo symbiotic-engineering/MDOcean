@@ -2,6 +2,12 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
     solver_based = true;
     % create folder for generated objectives if it doesn't already exist        
     if solver_based
+        if isempty(filename_uuid)
+            t = getCurrentTask();
+            if ~isempty(t)
+                filename_uuid = sprintf('%s_%s',t.Parent.Name,t.Name);
+            end
+        end
         if isa(filename_uuid,'parallel.pool.Constant')
             filename_uuid = filename_uuid.Value;
         end
