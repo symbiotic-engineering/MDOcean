@@ -33,9 +33,15 @@ totalNumOfWorkers=pool.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
-gcp; % open the pool
+pool = gcp; % open the pool
 
 fprintf('Opening the parallel pool took %g seconds.\n', toc)
+
+if isempty(pool)
+    error('Could not open parpool')
+else
+    fprintf("Number of workers: %i",pool.NumWorkers)
+end
 
 evalc('wecSimInputFile');
 
