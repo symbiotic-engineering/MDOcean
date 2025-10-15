@@ -131,31 +131,45 @@ parfor imcr=1:length(mcr.cases(:,1))
     cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
-    output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
-
-    % extract signals over the last period
-    N_per_T = timesteps_per_period(imcr);
-    power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
-    F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
-    float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
-    spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
-    rel_pos = float_pos - spar_pos;
-
-    % save specific output variables
-    P(imcr) = mean(power);
-    force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
-    float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
-    spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
-    relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
-    float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
-    spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
-    relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
+    try
+        output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
+    
+        % extract signals over the last period
+        N_per_T = timesteps_per_period(imcr);
+        power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
+        F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
+        float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
+        spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
+        rel_pos = float_pos - spar_pos;
+    
+        % save specific output variables
+        P(imcr) = mean(power);
+        force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
+        float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
+        spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
+        relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
+        float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
+        spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
+        relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
+    catch ME
+        warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
+            mcr.cases(:,1),mcr.cases(:,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
+        P(imcr) = NaN;
+        force_pto(imcr) = NaN;
+        float_amplitude(imcr) = NaN;
+        spar_amplitude(imcr)  = NaN;
+        relative_amplitude(imcr) = NaN;
+        float_amplitude_rms(imcr) = NaN;
+        spar_amplitude_rms(imcr)  = NaN;
+        relative_amplitude_rms(imcr) = NaN;
+    end
     Simulink.sdi.clear
 end
 
 B_p = mcr.cases(:,3);
+K_p = mcr.cases(:,4);
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p')
+    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p','K_p')
 
 clear imcr totalNumOfWorkers
 
