@@ -28,7 +28,11 @@ function [weighted_pwr_err,max_amp_err,pwr_err,amp_err] = run_dynamic_validation
     end
 
     % override to have fewer sea states for the sake of fast debugging
-    runOnlyFewSeaStates = false;
+    if RM3reportOn
+        runOnlyFewSeaStates = true; % fixme temporary
+    else
+        runOnlyFewSeaStates = false;
+    end
     if runOnlyFewSeaStates
         p.Hs = p.Hs(3:4);
         p.T = p.T(4:5);
