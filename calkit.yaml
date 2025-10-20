@@ -1,14 +1,28 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize
+description: Multidisciplinary Design Optimization (MDO) to optimize 
   an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+  py-jupyter-matlab:
+    path: requirements.txt
+    kind: uv-venv
+    prefix: .venv
 pipeline:
   stages:
+    run-tutorial:
+      kind: jupyter-notebook
+      environment: py-jupyter-matlab
+      notebook_path: tutorials/tutorial.ipynb
+      language: matlab
+      inputs:
+        - mdocean/
+      html_storage: dvc
+      executed_ipynb_storage: null
+      cleaned_ipynb_storage: git
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
@@ -72,3 +86,7 @@ publications:
       push_paths:
         - figures
       last_sync_commit: 19e80b2eb61b274772d9ab359199f8aec05422d1
+notebooks:
+  - path: tutorials/tutorial.ipynb
+    title: MDOcean Tutorial
+    stage: run-tutorial
