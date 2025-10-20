@@ -210,7 +210,7 @@ T = [T;
         "environment",true,"eco-cost per mile from shore of fuel for boat travel ($/mi)",{''});
     table("eco_cost_carbon","EC_{carbon}",{0.133*euro2USD},...
         "environment",true,"social cost of carbon ($/kg)",{''});
-    table("distance_from_shore","D_[shore}",{5.5 * km2mi},... % 5-6 km from p186 of SAND2015-7963 report
+    table("distance_from_shore","D_{shore}",{5.5 * km2mi},... % 5-6 km from p186 of SAND2015-7963 report
         "environment",true,"distance from shore (miles)",{''});
     ...
     ... % Grid CEM
