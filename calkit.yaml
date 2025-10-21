@@ -2282,6 +2282,7 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
         - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+        - ./mdocean/plots/non_matlab_figs/pdf/
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/hatchfill2.m
         - ./mdocean/plots/util/improvePlot.m
@@ -3061,8 +3062,10 @@ pipeline:
       inputs:
         - results/
       outputs:
-        - pubs/renewable-energy-mdo/figs/
-        - pubs/applied-ocean-research-model/figs/
+        - pubs/renewable-energy-mdo/figs/from-matlab/
+        - pubs/renewable-energy-mdo/tables/from-matlab/
+        - pubs/applied-ocean-research-model/figs/from-matlab/
+        - pubs/applied-ocean-research-model/tables/from-matlab/
       script_path: mdocean/plots/move_results_to_pubs.m
     build-RE-paper:
       kind: latex
@@ -3070,9 +3073,9 @@ pipeline:
       environment: tex
       latexmkrc_path: pubs/renewable-energy-mdo/.latexmkrc
       inputs:
-        - pubs/renewable-energy-mdo/figs
+        - pubs/renewable-energy-mdo/figs/
         - pubs/renewable-energy-mdo/sections/
-        - pubs/renewable-energy-mdo/tables
+        - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/numbers.tex
         - pubs/elsarticle-num-names.bst
@@ -3083,6 +3086,8 @@ pipeline:
       latexmkrc_path: pubs/applied-ocean-research-model/.latexmkrc
       inputs:
         - pubs/applied-ocean-research-model/sections/
+        - pubs/applied-ocean-research-model/figs/
+        - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
         - pubs/applied-ocean-research-model/numbers.tex
         - pubs/elsarticle-num-names.bst
