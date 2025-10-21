@@ -30,7 +30,7 @@ end
 mcr.header = {'waves.height','waves.period','pto(1).damping','stiffness'};
 idx = p.JPD ~= 0;
 control_B = val.B_p(idx);
-control_K = val.K_p(idx);
+control_K = -val.K_p(idx);
 mcr.cases = [H(idx),T(idx),control_B,control_K];
 save('mcrMDOcean.mat','mcr')
 
