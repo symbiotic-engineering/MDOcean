@@ -1,4 +1,4 @@
-function [treeFig, parallelFig, results] = gradient_mult_x0(p,b)
+function [treeFig, parallelFig, barFig, results] = gradient_mult_x0(p,b)
 
 num_runs = 1000;
 num_DVs = length(b.var_names);
@@ -190,5 +190,9 @@ for i=1:num_DVs-1
     end
 end
 
+%% bar plot
+barFig = figure;
+bar([1 2 3])
+title('Placeholder for multistart bar figure');
 
 end
