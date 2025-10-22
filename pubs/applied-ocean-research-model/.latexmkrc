@@ -9,3 +9,6 @@ push @BSTINPUTS, "$root/..";
 
 # Optional: ensure TeX inputs are found too
 push @TEXINPUTS, $root;
+
+$out_dir = 'out';
+$aux_dir = 'aux';
