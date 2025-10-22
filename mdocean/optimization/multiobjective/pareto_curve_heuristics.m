@@ -1,34 +1,41 @@
-function figs = pareto_curve_heuristics()
+function figs = pareto_curve_heuristics(load_two)
+    if nargin==0
+        load_two = false;
+    end
+
     p0 = parameters();
     b = var_bounds();
     p_w = parameters('wecsim');
     b_w = var_bounds('wecsim');
     
     d=dir("**/pareto_search_results*");
-    load(d(end).name)
+    r1 = load(d(end).name);
+    if load_two
+        r2 = load(d(end-1).name);
+    end
 
-    if ~isequaln(p,p0)
+    if ~isequaln(r1.p,p0)
         warning(['You are loading results with different parameters than your ' ...
             'local machine right now. WecSim validation results (p_w) may be incorrect.'])
     end
 
     if ~exist('tol','var')
-        tol = 1e-6;
+        r1.tol = 1e-6;
     end
 
     new_objs = true; % switch between LCOE-Pvar (old) and capex-Pavg (new)
 
-    [~,f1] = constraint_active_plot(residuals,fval,tol,b,new_objs);
+    [~,f1] = constraint_active_plot(r1.residuals,r1.fval,r1.tol,b,new_objs);
 
     cols = b.idxs_recover;
-    X = x(:,cols); % swap indices based on solver generated function
+    X = r1.x(:,cols); % swap indices based on solver generated function
     X = [X ones(length(X),1)]; % add extra column for material 
-    LCOE = fval(:,1);
-    Pvar = fval(:,2);
+    LCOE = r1.fval(:,1);
+    Pvar = r1.fval(:,2);
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs);
+     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,r1.p,p_w,b,b_w,new_objs);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
@@ -37,7 +44,7 @@ function figs = pareto_curve_heuristics()
     f2 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs);
+                showImages, showLCOEContours, r1.p, new_objs);
     
     %% simple pareto plot
     showSingleObj = false;
@@ -46,7 +53,7 @@ function figs = pareto_curve_heuristics()
     f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs, LCOE_nom, min(LCOE));
+                showImages, showLCOEContours, r1.p, new_objs, LCOE_nom, min(LCOE));
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
@@ -55,14 +62,40 @@ function figs = pareto_curve_heuristics()
     f4 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, p, new_objs);
+                showImages, showLCOEContours, r1.p, new_objs);
     
     %% plots for DVs as a fn of percent along the pareto
     J1_max = Inf;%p.LCOE_max;
     [f5,f6] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
                            J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs);
 
-    figs = [f1,f2,f3,f4,f5,f6];
+    %% double pareto plot, if plotting two results
+    if load_two
+        [~,f7] = constraint_active_plot(r2.residuals,r2.fval,r2.tol,b,new_objs);
+
+        X = r2.x(:,cols); % swap indices based on solver generated function
+        X = [X ones(length(X),1)]; % add extra column for material 
+        LCOE = r2.fval(:,1);
+        Pvar = r2.fval(:,2);
+    
+        [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
+         J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
+         x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,r2.p,p_w,b,b_w,new_objs);
+        
+        %% simple pareto plot
+        showSingleObj = false;
+        showImages = false;
+        showLCOEContours = true;
+        f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
+                    J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
+                    x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
+                    showImages, showLCOEContours, r2.p, new_objs, LCOE_nom, min(LCOE), f3);
+        legend(r1.p.control_type,'',r2.p.control_type,'LCOE ($/kWh)','Location','northwest');
+        xlim([40 180])
+        ylim([.6 1.85])
+    end
+
+    figs = [f1,f2,f3,f4,f5,f6,f7];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
@@ -185,10 +218,20 @@ end
 function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                           x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
-                          showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min)
-    f = figure;
+                          showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min, fig)
+    if ~exist('fig','var')
+        f = figure;
+        pareto_color = 'b';
+        pareto_shape = 's';
+    else
+        f = figure(fig);
+        pareto_color = '#9999ff';
+        pareto_shape = 'o';
+    end
+
     % overall pareto front
-    plot(J1(idxo),J2(idxo),'bs','MarkerFaceColor','b','HandleVisibility','off')
+    plot(J1(idxo),J2(idxo),pareto_shape,'Color',pareto_color,'MarkerEdgeColor',...
+        pareto_color,'MarkerFaceColor',pareto_color,'HandleVisibility','on')
     hold on
     
     % utopia point

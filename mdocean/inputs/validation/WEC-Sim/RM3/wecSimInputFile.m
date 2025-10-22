@@ -27,10 +27,11 @@ else
     [T,H] = meshgrid(p.T/0.857, p.Hs); % irregular
 end
 
-mcr.header = {'waves.height','waves.period','pto(1).damping'};
+mcr.header = {'waves.height','waves.period','pto(1).damping','stiffness'};
 idx = p.JPD ~= 0;
-control = val.B_p(idx);
-mcr.cases = [H(idx),T(idx),control];
+control_B = val.B_p(idx);
+control_K = -val.K_p(idx);
+mcr.cases = [H(idx),T(idx),control_B,control_K];
 save('mcrMDOcean.mat','mcr')
 
 % filename to save

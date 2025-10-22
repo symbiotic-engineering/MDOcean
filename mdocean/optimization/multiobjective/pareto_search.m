@@ -1,10 +1,15 @@
-function [x,fval] = pareto_search(filename_uuid)
-    if nargin==0
+function [x,fval] = pareto_search(p,b,filename_uuid)
+
+    if nargin<1
+        p = parameters();
+    end
+    if nargin<2
+        b = var_bounds();
+    end
+    if nargin<3
         filename_uuid='';
     end
-    
-    p = parameters();
-    b = var_bounds();
+
     b.filename_uuid = filename_uuid;
     num_DVs = length(b.X_starts);
     
@@ -17,7 +22,7 @@ function [x,fval] = pareto_search(filename_uuid)
     t = tic;
     [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,turnLCOEtoPower);
     timeEpsConstraint = toc(t)
-    disp('Finished finding pareto seed points. Now starting paretosearch.')
+    disp(['Finished finding ' num2str(size(X0,1)) ' pareto seed points. Now starting paretosearch.'])
 
     %% Pattern search to fill in pareto front
     t2 = tic;

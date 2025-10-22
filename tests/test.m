@@ -6,8 +6,8 @@ classdef (SharedTestFixtures={ ...
     properties (Constant)
         run_slow_tests = true;
 
-        slow_figs = [16:25];
-        slow_tabs = 1:8;
+        slow_figs = [25:35, 53:55, 58];
+        slow_tabs = 8;
     end
 
     properties
