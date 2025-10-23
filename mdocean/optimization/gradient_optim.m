@@ -1,5 +1,6 @@
 
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs,plotfn,ploton)
+function [Xs_opt, objs_opt, flags, probs, ...
+          lambdas, grads, hesses, vals, figs] = gradient_optim(x0_input,p,b,which_objs,plotfn,ploton)
 
 warning('off','MATLAB:nearlySingularMatrix')
 warning('off','MATLAB:singularMatrix')
@@ -104,6 +105,8 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
     end
 
     % iterate through the two objectives: LCOE and P_var
+    figs_per_obj = 4;
+    figs = gobjects(1,num_objectives_to_run*figs_per_obj);
     for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
@@ -155,10 +158,11 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
 
         % Post process
         if ploton
-            plot_power_matrix(X_opt,p,b,b.filename_uuid)
-            visualize_geometry(X_opt,p)
-            lagrange_multiplier_bar_chart(b,lambda)
-            delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj)
+            start_fig_num = (i-1)*figs_per_obj;
+            figs(start_fig_num + 1) = plot_power_matrix(X_opt,p,b,b.filename_uuid);
+            figs(start_fig_num + 2) = visualize_geometry(X_opt,p);
+            figs(start_fig_num + 3) = lagrange_multiplier_bar_chart(b,lambda);
+            figs(start_fig_num + 4) = delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj);
         end
     end
     if ploton
