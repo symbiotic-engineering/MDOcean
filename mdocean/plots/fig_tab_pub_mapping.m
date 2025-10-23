@@ -2,7 +2,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 30;
-num_figs_AOR = 34;
+num_figs_AOR = 39;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -49,46 +49,57 @@ figs_in_RE{30}  = 'ReadNonMatlabFigs.graphical_abstract';
 %% AOR figures
 
 figs_in_AOR = cell([1,num_figs_AOR]);
+% 1: introduction
 figs_in_AOR{1}  = 'ReadNonMatlabFigs.RM3_image';
-% 2: modeling methodology
 figs_in_AOR{2}  = 'ReadNonMatlabFigs.methodology_overview';
+% 2: model structure
 figs_in_AOR{3}  = 'ReadNonMatlabFigs.N2_diagram';
-figs_in_AOR{4}  = 'ReadNonMatlabFigs.dimensions';
-figs_in_AOR{5}  = 'ReadNonMatlabFigs.MEEM_geometry';
-figs_in_AOR{6}  = 'SparHydro.spar_added_mass';
-figs_in_AOR{7}  = 'HydroCoeffFigFunc.hydro_coeff_err';
+figs_in_AOR{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
+% 3: module details
+figs_in_AOR{5}  = 'ReadNonMatlabFigs.dimensions';
+figs_in_AOR{6}  = 'ReadNonMatlabFigs.MEEM_geometry';
+figs_in_AOR{7}  = 'SparHydro.spar_added_mass';
 figs_in_AOR{8}  = 'DescFcns.saturation_desc_fcn';
 figs_in_AOR{9}  = 'DescFcns.drag_desc_fcn';
 figs_in_AOR{10} = 'RunSingleFigFunc.nominal_power_matrix';
-figs_in_AOR{11} = 'Wecsim.WECSim_error_histograms_multibody';
-figs_in_AOR{12} = 'ReadNonMatlabFigs.FBD';
-figs_in_AOR{13} = 'Validation.cost_vs_N_WEC';
-figs_in_AOR{14} = 'Runtime.sim_runtime';
-figs_in_AOR{15} = 'Runtime.hydro_runtime';
-figs_in_AOR{16} = 'Runtime.dynamics_runtime';
+figs_in_AOR{11} = 'ReadNonMatlabFigs.FBD';
+% 4: validation and benchmarking
+figs_in_AOR{12} = 'Wecsim.WECSim_error_histograms_multibody';
+figs_in_AOR{13} = 'HydroCoeffFigFunc.hydro_coeff_err';
+figs_in_AOR{14} = 'Validation.cost_vs_N_WEC';
+figs_in_AOR{15} = 'Runtime.sim_runtime';
+figs_in_AOR{16} = 'Runtime.hydro_runtime';
+figs_in_AOR{17} = 'Runtime.dynamics_runtime';
+% 5: insights and discussion
+figs_in_AOR{18} = 'DampingPlateStructures.damping_plate_aspect_ratio';
+figs_in_AOR{19} = 'ForceSaturationFigFunc.power_force_sensitivity';
+figs_in_AOR{20} = 'DesignSpaceExploration.experiments';
+figs_in_AOR{21} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
-figs_in_AOR{17} = 'Meem.meem_regions';
-figs_in_AOR{18} = 'Meem.meem_sparsity';
-figs_in_AOR{19} = 'Meem.meem_validation';
-figs_in_AOR{20} = 'Meem.meem_matching';
-figs_in_AOR{21} = 'Meem.meem_convergence';
-figs_in_AOR{22} = 'Meem.asymptotic_b_vector';
+figs_in_AOR{22} = 'Meem.meem_regions';
+figs_in_AOR{23} = 'Meem.meem_sparsity';
+figs_in_AOR{24} = 'Meem.meem_validation';
+figs_in_AOR{25} = 'Meem.meem_matching';
+figs_in_AOR{26} = 'Meem.meem_convergence';
+figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{23} = 'ForceSaturationFigFunc.power_force_sensitivity';
-figs_in_AOR{24} = 'RunSingleFigFunc.drag_convergence';
-figs_in_AOR{25} = 'Slamming.slamming_amplitude';
-figs_in_AOR{26} = 'RunSingleFigFunc.slamming_model_comparison';
-figs_in_AOR{27} = 'Wecsim.wecsim_all_sea_states';
+figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';
+figs_in_AOR{29} = 'Slamming.slamming_amplitude';
+figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison';
+figs_in_AOR{31} = 'Wecsim.wecsim_all_sea_states';
+figs_in_AOR{31+6} = 'Wecsim.wecsim_all_sea_states_2';
+figs_in_AOR{31+7} = 'Wecsim.wecsim_all_sea_states_3';
 % appendix C - structures
-figs_in_AOR{28} = 'ReadNonMatlabFigs.equivalent_stiffness';
-figs_in_AOR{29} = 'ReadNonMatlabFigs.trapezoid';
-figs_in_AOR{30} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{31} = 'DampingPlateStructures.damping_plate_moment';
-figs_in_AOR{32} = 'DampingPlateStructures.damping_plate_deflection';
-figs_in_AOR{33} = 'DampingPlateStructures.damping_plate_aspect_ratio';
+figs_in_AOR{32} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{33} = 'ReadNonMatlabFigs.trapezoid';
+figs_in_AOR{34} = 'ReadNonMatlabFigs.damping_plate_flowchart';
+figs_in_AOR{35} = 'DampingPlateStructures.damping_plate_moment';
+figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
 % appendix D - economics
+% appendix E - parameters
+
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{34}  = 'ReadNonMatlabFigs.graphical_abstract';
+figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract';
 
 %% TABLES
 
