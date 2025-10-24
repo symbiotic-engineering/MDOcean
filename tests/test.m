@@ -226,37 +226,19 @@ classdef (SharedTestFixtures={ ...
 
             if ~contains(which_figs,'none') % figure
                 valid_name = matlab.lang.makeValidName(which_figs);
+                fig_name = "Figure_" + valid_name;
+
                 idx = strcmp(valid_name,fields(testCase.which_figs));
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
-                fig_name = "Figure_" + valid_name;
-                pdf_name = "../test-results/" + fig_name;
-                
-                if isgraphics(fig_out) % if figure exists (didn't error first and wasn't deleted)
-                    if ~isempty(fig_out.UserData)
-                        % pdf already exists in files, just copy to folder
-                        copyfile(fig_out.UserData, pdf_name)
-                    else
-                        % save pdf from matlab figure output
-                        save_pdf(fig_out,pdf_name)
-                    end
-                    % in either case, use figure itself, not pdf, for printing the diagnostic
-                    diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',fig_name + '_');
-                elseif ~isvalid(fig_out)
-                    msg = 'Figure has been deleted, probably because of a "close all" in a subsequent script.';
-                    err = MException('MDOcean:test:deletedFigure',msg);
-                    throw(err)
-                else % placeholder gobjects figure
-                    diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic('');
-                end   
+                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
 
             else % table
                 tab_names = fields(testCase.which_tabs);
                 idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names,'none')) );
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
-
                
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
