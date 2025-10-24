@@ -10,11 +10,9 @@ classdef DescFcns < GenericAnalysis
     methods (Static)
         
         function intermed_result_struct = analysis_fcn(~,~)
-            % Run describing function demo
-            sin_desc_fcn_demo()
-            
-            % Store figure numbers for post-processing
-            intermed_result_struct.drag_fig_number = gcf().Number;
+            % Run describing function demo and capture returned figure handles
+            figs = sin_desc_fcn_demo();
+            intermed_result_struct.created_figs = figs;
         end
         
         function [fig_array,...
@@ -22,9 +20,9 @@ classdef DescFcns < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            drag_fig_num = intermed_result_struct.drag_fig_number;
-            
-            fig_array = [figure(drag_fig_num), figure(drag_fig_num - 2)];
+            % Return the figures created by the demo; GenericAnalysis will
+            % validate and map them to fig_names.
+            fig_array = intermed_result_struct.created_figs;
             
             tab_array_display = {};
             tab_array_latex = {};

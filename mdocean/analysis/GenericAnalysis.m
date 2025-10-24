@@ -76,6 +76,8 @@ classdef (Abstract) GenericAnalysis
              obj.end_result_struct] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
 
+            obj.fig_array = GenericAnalysis.validate_figs(obj.fig_array);
+
             obj.save_figs();
             obj.save_tabs();
             obj.save_end_results();
@@ -167,6 +169,37 @@ classdef (Abstract) GenericAnalysis
                 end
                 rel_paths{i} = rel_path;
             end
+        end
+
+        function figs_out = validate_figs(figs_in)
+            %VALIDATE_FIGS Return only valid MATLAB figure handles from input
+            % Accepts graphics handles, cell arrays of handles, or empty.
+            if isempty(figs_in)
+                figs_out = gobjects(0);
+                return;
+            end
+
+            % Unwrap cell arrays
+            if iscell(figs_in)
+                try
+                    figs_in = [figs_in{:}];
+                catch
+                    figs_out = gobjects(0);
+                    return;
+                end
+            end
+
+            % Flatten
+            figs_flat = figs_in(:).';
+
+            valid_mask = ishghandle(figs_flat) & strcmp({figs_flat.Type},'figure');
+
+            figs_flat(~valid_mask) = gobjects(1);
+
+            % assign to output, taking into account if figs_flat is smaller or larger than desired
+            figs_out = gobjects(1,length(obj.fig_names));
+            len = min(length(figs_flat), length(figs_out));
+            figs_out(1:len) = figs_flat(1:len);
         end
     end
 end

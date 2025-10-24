@@ -11,12 +11,12 @@ classdef Comparison < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(p,b)
             % Run comparison analysis
-            [optimal_design_vars, optimal_outputs] = compare(p,b);
-            
-            % Store results for post-processing
+            [optimal_design_vars, optimal_outputs, figs] = compare(p,b);
+
+            % Store results and returned figure handles for post-processing
             intermed_result_struct.optimal_design_vars = optimal_design_vars;
             intermed_result_struct.optimal_outputs = optimal_outputs;
-            intermed_result_struct.final_figure_number = gcf().Number;
+            intermed_result_struct.created_figs = figs;
         end
         
         function [fig_array,...
@@ -24,10 +24,9 @@ classdef Comparison < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            n = intermed_result_struct.final_figure_number;
-            
-            % Get figures in the expected order
-            fig_array = [figure(n-3), figure(n), figure(n-2)];
+            % Return the figure handles provided by the analysis function;
+            % mapping/validation is handled by GenericAnalysis.
+            fig_array = intermed_result_struct.created_figs;
             
             tab_array_display = {intermed_result_struct.optimal_design_vars, ...
                                intermed_result_struct.optimal_outputs};

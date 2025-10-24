@@ -1,4 +1,4 @@
-function [DV_table,out_table] = compare(p,b)
+function [DV_table,out_table, figs] = compare(p,b)
 
 if nargin==0
     p = parameters();
@@ -31,7 +31,7 @@ color = {'k','b','r','g','m'};
 num_designs = length(titles);
 
 %% geometry comparison
-figure
+h_geom = figure;
 % sort by float diameter
 idx_D_f = strcmp(b.var_names,'D_f');
 D_f = X(:,idx_D_f);
@@ -66,7 +66,7 @@ ylim([y_min y_max])
 legend(titles(biggest_to_smallest),'Position',[0.5941    0.3508    0.2663    0.2167])
 
 %% power probability comparison
-f = figure;
+h_prob = figure;
 t = tiledlayout(2,1);
 t.TileSpacing = 'compact';
 ylabel(t,'Probability (-)','FontWeight','bold')
@@ -77,11 +77,11 @@ for i=1:num_designs
 end
 legend(titles{:},'location','best')
 delete(nexttile(1)) % delete blank PDF so just CDF remains
-f.Position(3:4) = [792 484];
+h_prob.Position(3:4) = [792 484];
 
 %% power matrix comparison
 
-figure
+h_power_matrix = figure;
 for i=1:num_designs
     x = X(i,:);
     [~,P_matrix] = simulation(x, p);
@@ -123,7 +123,7 @@ text(-10,-2,'Wave Period T (s)','FontWeight','bold','FontSize',16)
 text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
-hydro_compare(vals,color)
+h_hydro = hydro_compare(vals,color);
 
 %% design variable table
 DV_table = array2table(X.', ...
@@ -140,7 +140,8 @@ out_table = removevars(out_table,'OriginalVariableNames');
 
 end
 
-function hydro_compare(vals,colors)
+function f = hydro_compare(vals,colors)
+% Return figure handle so callers can capture it if desired
 f = figure;
 
 % first subplot: excitation

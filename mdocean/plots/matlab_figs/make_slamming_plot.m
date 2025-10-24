@@ -1,4 +1,4 @@
-function make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple)
+function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple)
 
     f = figure;
     t = tiledlayout(1,4);
@@ -46,4 +46,5 @@ function make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple)
 
     f.Position(3) = 1500;
     title(t,'Slamming Model for Min LCOE Design')
+
 end

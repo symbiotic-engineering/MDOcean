@@ -1,7 +1,7 @@
 function fig = plot_drag_convergence(X_f_guesses, X_s_guesses, phase_X_f_guesses, phase_X_s_guesses, ...
                                     iters, multibody, X_tol, phase_X_tol)
     x_iter = 1:iters;
-    figure
+    fig = figure;
     plot(x_iter,X_f_guesses,'DisplayName','|X_f|')
     hold on
     plot(x_iter,phase_X_f_guesses,'DisplayName','\angleX_f')

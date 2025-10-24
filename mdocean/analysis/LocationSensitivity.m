@@ -3,7 +3,7 @@ classdef LocationSensitivity < GenericAnalysis
     %   Generates location sensitivity analysis table
     
     properties
-        fig_names = {};
+        fig_names = {'location_power_matrix', 'location_probability_PDF'};
         tab_names = {'location_sensitivity'};
     end
     
@@ -11,10 +11,12 @@ classdef LocationSensitivity < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(p,b)
             % Run location sensitivity analysis
-            tab = location_sensitivity(p,b);
+            [tab, h_pm, h_prob] = location_sensitivity(p,b);
             
             % Store results for post-processing
             intermed_result_struct.location_table = tab;
+            intermed_result_struct.h_power_matrix = h_pm;
+            intermed_result_struct.h_probability_PDF = h_prob;
         end
         
         function [fig_array,...
@@ -28,7 +30,7 @@ classdef LocationSensitivity < GenericAnalysis
             idx_remove = ismember(tab.Row,{'flag','Optimal Material index'});
             tablatex = tab(~idx_remove,:);
             
-            fig_array = [];
+            fig_array = [intermed_result_struct.h_power_matrix, intermed_result_struct.h_probability_PDF];
             
             tab_array_display = {tab};
             tab_array_latex = {tablatex};

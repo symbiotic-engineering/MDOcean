@@ -1,4 +1,4 @@
-function plot_power_matrix(X,p,b,filename_uuid)
+function fig = plot_power_matrix(X,p,b,filename_uuid)
 
 % get matrices to plot
 [CW_over_CW_max, P_wave, CW_max, P_elec, ...

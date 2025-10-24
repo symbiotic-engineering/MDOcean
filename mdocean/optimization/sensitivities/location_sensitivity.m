@@ -1,4 +1,4 @@
-function [tab] = location_sensitivity(p,b)
+function [tab, h_pm, h_prob] = location_sensitivity(p,b)
 
 files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
     'PacWave-North_Oregon_Wave-Resource.csv',...
@@ -37,12 +37,12 @@ parfor i=1:length(files)
     which_obj = 1; % only optimize LCOE
     [X_opts(:,i), obj_opts(i), flags(i)]  = gradient_optim(X,new_p,new_b,which_obj);
     
-    plot_power_matrix(X_opts(:,i),new_p,b,b.filename_uuid)
-    figure(2)
+    h_pm = plot_power_matrix(X_opts(:,i),new_p,b,b.filename_uuid);
+    h_prob = figure(h_pm.Number + 1);
     power_PDF(X_opts(:,i),new_p)
     hold on
 end
-figure(2)
+figure(h_pm.Number + 1)
 locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
 legend(locs)
 

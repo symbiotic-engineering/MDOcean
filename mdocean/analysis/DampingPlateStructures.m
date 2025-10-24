@@ -15,7 +15,8 @@ classdef DampingPlateStructures < GenericAnalysis
             BoedoPrantilAnnularPlate()
             
             % Store figure numbers for post-processing
-            intermed_result_struct.final_figure_number = gcf().Number;
+            n = gcf().Number;
+            intermed_result_struct.figs = [figure(n), figure(n-1), figure(n-7)];
         end
         
         function [fig_array,...
@@ -23,9 +24,7 @@ classdef DampingPlateStructures < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            n = intermed_result_struct.final_figure_number;
-            
-            fig_array = [figure(n), figure(n-1), figure(n-7)];
+            fig_array = intermed_result_struct.figs;
             
             tab_array_display = {};
             tab_array_latex = {};

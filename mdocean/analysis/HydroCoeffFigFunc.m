@@ -11,10 +11,10 @@ classdef HydroCoeffFigFunc < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(~,~)
             % Run hydrodynamic coefficient error analysis
-            hydro_coeff_err()
+            [~, ~, fig] = hydro_coeff_err();
             
             % Store figure for post-processing
-            intermed_result_struct.figure_handle = gcf();
+            intermed_result_struct.created_figs = fig;
         end
         
         function [fig_array,...
@@ -22,7 +22,8 @@ classdef HydroCoeffFigFunc < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            fig_array = intermed_result_struct.figure_handle;
+            % Return created figures (validation happens in GenericAnalysis)
+            fig_array = intermed_result_struct.created_figs;
             
             tab_array_display = {};
             tab_array_latex = {};
