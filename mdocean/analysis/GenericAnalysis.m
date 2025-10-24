@@ -102,8 +102,7 @@ classdef (Abstract) GenericAnalysis
         function save_figs(obj)
             for i=1:length(obj.fig_names)
                 fig = obj.fig_array(i);
-                fname = [obj.output_folder filesep obj.fig_names{i}];
-                save_pdf(fig, fname)
+                save_fig_with_diagnostic(fig, obj.fig_names{i}, obj.output_folder)
             end
         end
         
