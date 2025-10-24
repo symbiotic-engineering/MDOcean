@@ -10,21 +10,11 @@ classdef DesignSpaceExploration < GenericAnalysis
     methods (Static)
         
         function intermed_result_struct = analysis_fcn(p,b)
-            % Run design space exploration experiments and capture the
-            % figures returned by the experiments helper. experiments()
-            % already returns handles when available.
-            try
-                figs = experiments(p,b);
-            catch err
-                warning('DesignSpaceExploration:experimentsCall','Failed to run experiments(): %s', err.message);
-                figs = [];
-            end
+            % Run design space exploration experiments
+            figs = experiments(p,b);
 
-            if iscell(figs)
-                figs = [figs{:}];
-            end
-
-            intermed_result_struct.created_figs = figs;
+            % Store figure for post-processing
+            intermed_result_struct.figs = figs;
         end
         
         function [fig_array,...
@@ -32,7 +22,7 @@ classdef DesignSpaceExploration < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            fig_array = intermed_result_struct.created_figs;
+            fig_array = intermed_result_struct.figs;
             
             tab_array_display = {};
             tab_array_latex = {};

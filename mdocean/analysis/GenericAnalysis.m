@@ -76,7 +76,7 @@ classdef (Abstract) GenericAnalysis
              obj.end_result_struct] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
 
-            obj.fig_array = GenericAnalysis.validate_figs(obj.fig_array);
+            obj.fig_array = obj.validate_figs(obj.fig_array);
 
             obj.save_figs();
             obj.save_tabs();
@@ -148,30 +148,7 @@ classdef (Abstract) GenericAnalysis
                               cell2filelist(obj.postpro_outputs.') ];
             stages = [analysis_stage newline postpro_stage];
         end
-    end
-    methods (Static)
-        function deps_rel = get_dependencies(fcn_name)
-            deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
-            base = what('..').path;
-            deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
-        end
-        
-        function rel_paths = make_rel_path(abs_paths, base)
-            rel_paths = cell(size(abs_paths));
-            for i = 1:numel(abs_paths)
-                [path_dir, file_name, file_ext] = fileparts(abs_paths{i});
-
-                if startsWith(path_dir, base)
-                    rel_path = strrep(path_dir, base, '.');
-                    rel_path = fullfile(rel_path, strcat(file_name, file_ext));
-                else
-                    error('Dependency outside of base folder')
-                end
-                rel_paths{i} = rel_path;
-            end
-        end
-
-        function figs_out = validate_figs(figs_in)
+        function figs_out = validate_figs(obj, figs_in)
             %VALIDATE_FIGS Return only valid MATLAB figure handles from input
             % Accepts graphics handles, cell arrays of handles, or empty.
             if isempty(figs_in)
@@ -200,6 +177,28 @@ classdef (Abstract) GenericAnalysis
             figs_out = gobjects(1,length(obj.fig_names));
             len = min(length(figs_flat), length(figs_out));
             figs_out(1:len) = figs_flat(1:len);
+        end
+    end
+    methods (Static)
+        function deps_rel = get_dependencies(fcn_name)
+            deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            base = what('..').path;
+            deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
+        end
+        
+        function rel_paths = make_rel_path(abs_paths, base)
+            rel_paths = cell(size(abs_paths));
+            for i = 1:numel(abs_paths)
+                [path_dir, file_name, file_ext] = fileparts(abs_paths{i});
+
+                if startsWith(path_dir, base)
+                    rel_path = strrep(path_dir, base, '.');
+                    rel_path = fullfile(rel_path, strcat(file_name, file_ext));
+                else
+                    error('Dependency outside of base folder')
+                end
+                rel_paths{i} = rel_path;
+            end
         end
     end
 end

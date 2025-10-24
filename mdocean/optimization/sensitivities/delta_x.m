@@ -1,4 +1,4 @@
-function [] = delta_x(X,grad,hess,J,p,b,which_obj)
+function f = delta_x(X,grad,hess,J,p,b,which_obj)
 %DELTA_X Use grad to estimate delta J for given delta x
 
 % capital X has all DVs, lowercase x has only continuous DVs
