@@ -67,14 +67,16 @@ opts = optimoptions('fmincon',	'Display',display,...
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
-    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs, ...
+    lambdas, grads, hesses, vals, figs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, ...
+          lambdas, grads, hesses, vals, figs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives_total = length(b.obj_names);
