@@ -34,7 +34,7 @@ function [F_heave_storm, F_surge_storm, ...
     phase_X_f,phase_X_u] = get_power_force(in,T,Hs,m_float,m_spar,...
                                             F_limit, zero_prob_idxs, ...
                                             T_f_slam_op, in.power_scale_coeffs,...
-                                            in.operational_drag_convergence_plot_on);
+                                            in.operational_dynamics_debug_plots_on);
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
@@ -76,7 +76,15 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
         gamma_phase_f, gamma_phase_s,w,phase_X_f,phase_X_u] = get_power_force(in,T,Hs, m_float, m_spar, ...
                                                             F_max, idx_constraint, T_f_slam, power_scale_coeffs,...
-                                                            drag_convergence_plot_on)
+                                                            dynamics_debug_plots_on)
+
+    if dynamics_debug_plots_on
+        drag_convergence_plot_on = true;
+        plot_slamming = true;
+    else
+        drag_convergence_plot_on = false;
+        plot_slamming = false;
+    end
 
     % get dynamic coefficients for float and spar
     % fixme: eventually should use in.D_f_in to allow a radial gap between float and spar
@@ -153,7 +161,6 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     X_slam( imag(X_slam)~=0 ) = 0; % case where slamming occurs even for stationary body
     X_below_wave = X_slam ./ mag_X_f_const - 1;
 
-    plot_slamming = false;
     if plot_slamming
         X_star = (X_slam - T_f_slam)./wave_amp;
         X_slam_simple = T_f_slam - wave_amp;

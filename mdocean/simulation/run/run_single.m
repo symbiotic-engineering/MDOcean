@@ -18,6 +18,13 @@ function figs = run_single(p,b,X)
     LCOE = J(1);
     P_var = J(2);
 
+    if p.operational_dynamics_debug_plots_on
+        n = gcf().Number;
+        figs_dynamics = [figure(n-1), figure(n)];
+    else
+        figs_dynamics = [];
+    end
+
     [feasible,~,failed] = is_feasible(g,X,p,b)
 
     h_power = plot_power_matrix(X,p,b,'');
@@ -27,6 +34,6 @@ function figs = run_single(p,b,X)
 
     h_geom = visualize_geometry(X,p);
 
-    figs = [h_power, h_pdf, h_geom];
+    figs = [h_geom, h_pdf, h_power, figs_dynamics];
 
 end
