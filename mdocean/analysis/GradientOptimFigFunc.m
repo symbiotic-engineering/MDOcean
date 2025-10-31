@@ -11,11 +11,16 @@ classdef GradientOptimFigFunc < GenericAnalysis
     methods (Static)
         
         function intermed_result_struct = analysis_fcn(p,b)
-            % Run gradient optimization with plotting
-            [Xs_opt, objs_opt, flags, probs, ...
-             lambdas, grads, hesses, vals, figs] = gradient_optim(b.X_start_struct,p,b,1,...
-                                                               {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true)
+            which_objs = 1;
 
+            % Run gradient optimization
+            [Xs_opt, objs_opt, flags, probs, ...
+             lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct,p,b,which_objs,...
+                                                               {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true);
+            
+            intermed_result_struct.p = p;
+            intermed_result_struct.b = b;
+            intermed_result_struct.which_objs = which_objs;
             intermed_result_struct.Xs_opt = Xs_opt;
             intermed_result_struct.objs_opt = objs_opt;
             intermed_result_struct.flags = flags;
@@ -24,7 +29,7 @@ classdef GradientOptimFigFunc < GenericAnalysis
             intermed_result_struct.grads = grads;
             intermed_result_struct.hesses = hesses;
             intermed_result_struct.vals = vals;
-            intermed_result_struct.figs = figs;
+
         end
         
         function [fig_array,...
@@ -32,13 +37,22 @@ classdef GradientOptimFigFunc < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            % Get the figures created by gradient_optim
-            fig_array = intermed_result_struct.figs;
+            p = intermed_result_struct.p;
+            b = intermed_result_struct.b;
+            which_objs = intermed_result_struct.which_objs;
+            Xs_opt = intermed_result_struct.Xs_opt;
+            objs_opt = intermed_result_struct.objs_opt;
+            flags = intermed_result_struct.flags;
+            lambdas = intermed_result_struct.lambdas;
+            grads = intermed_result_struct.grads;
+            hesses = intermed_result_struct.hesses;
+
+            [fig_array,tab] = SOO_result_plots(Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
             
-            tab_array_display = {};
-            tab_array_latex = {};
+            tab_array_display = {tab};
+            tab_array_latex = {tab};
             
-            end_result_struct.convergence_achieved = all(intermed_result_struct.flags > 0);
+            end_result_struct.convergence_achieved = all(flags > 0);
         end
         
     end

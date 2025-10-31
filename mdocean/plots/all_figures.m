@@ -19,6 +19,14 @@ save_folder = ['../test-results/' date '/'];
 mkdir(save_folder)
 table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin{:});
 
+%% allow single fig/tabs to be requested
+if ~iscell(fig_names)
+    fig_names = {fig_names};
+end
+if ~iscell(tab_names)
+    tab_names = {tab_names};
+end
+
 %% preallocate
 num_figs = length(fig_names);
 num_tabs = length(tab_names);

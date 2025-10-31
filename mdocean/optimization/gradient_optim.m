@@ -1,6 +1,6 @@
 
 function [Xs_opt, objs_opt, flags, probs, ...
-          lambdas, grads, hesses, vals, figs] = gradient_optim(x0_input,p,b,which_objs,plotfn,ploton)
+          lambdas, grads, hesses, vals] = gradient_optim(x0_input,p,b,which_objs,plotfn,disp_on)
 
 warning('off','MATLAB:nearlySingularMatrix')
 warning('off','MATLAB:singularMatrix')
@@ -15,7 +15,7 @@ if nargin == 0
     plotfn = {@optimplotfvalconstr, ...
               @(x,optimValues,state)optimplotx_custom(x,optimValues,state,b), ...
               @(x,~,~)optim_geomviz(x,p,b)};
-    ploton = true;
+    disp_on = true;
 else
     display = 'off';
 end
@@ -30,8 +30,8 @@ end
 if ~exist('plotfn','var')
     plotfn = [];
 end
-if ~exist('ploton','var')
-    ploton = false;
+if ~exist('disp_on','var')
+    disp_on = false;
 end
 
 % create optimization variables for each of the design variables
@@ -68,7 +68,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
     [Xs_opt, objs_opt, flags, probs, ...
-    lambdas, grads, hesses, vals, figs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs);
 
 end
 
@@ -76,7 +76,7 @@ end
 
 %%
 function [Xs_opt, objs_opt, flags, probs, ...
-          lambdas, grads, hesses, vals, figs] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+          lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives_total = length(b.obj_names);
@@ -157,6 +157,9 @@ function [Xs_opt, objs_opt, flags, probs, ...
         hesses(:,:,i) = hess;
     end
 
-    figs = SOO_result_plots(ploton,Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
+    if disp_on
+        flags
+        objs_opt
+    end
 
 end
