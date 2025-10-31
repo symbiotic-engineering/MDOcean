@@ -107,8 +107,6 @@ function [Xs_opt, objs_opt, flags, probs, ...
     end
 
     % iterate through the two objectives: LCOE and P_var
-    figs_per_obj = 4;
-    figs = gobjects(1,num_objectives_to_run*figs_per_obj);
     for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
@@ -157,22 +155,8 @@ function [Xs_opt, objs_opt, flags, probs, ...
         end
         grads(:,i) = grad;
         hesses(:,:,i) = hess;
+    end
 
-        % Post process
-        if ploton
-            start_fig_num = (i-1)*figs_per_obj;
-            figs(start_fig_num + 1) = plot_power_matrix(X_opt,p,b,b.filename_uuid);
-            figs(start_fig_num + 2) = visualize_geometry(X_opt,p);
-            figs(start_fig_num + 3) = lagrange_multiplier_bar_chart(b,lambda);
-            figs(start_fig_num + 4) = delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj);
-        end
-    end
-    if ploton
-        table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs b.X_noms];
-        objs_opt
-        flags
-        array2table(table_data,'RowNames',b.var_names(1:end-1),...
-                'VariableNames',[strcat("Min ", b.obj_names(which_objs)), {'Min bound','Max bound','Nom'}])
-    end
+    figs = SOO_result_plots(ploton,Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
 
 end
