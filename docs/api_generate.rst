@@ -15,6 +15,6 @@
     simulation.modules
     simulation.modules.dynamics
     simulation.modules.econ
-    simulation.modules.MEEM
+    simulation.modules.hydro
     simulation.modules.structures
     simulation.run

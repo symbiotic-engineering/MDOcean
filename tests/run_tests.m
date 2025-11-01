@@ -21,6 +21,7 @@ if exist('../WEC-Sim','dir')
     addpath(genpath(wecSimFolder))
     rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
 end
+rmpath(genpath('mdocean/simulation/modules/OpenFLASH')) % prevent using OpenFLASH run_MEEM since it's not integrated yet
 
 suite = testsuite('tests');
 runner = testrunner('textoutput');

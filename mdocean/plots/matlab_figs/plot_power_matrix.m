@@ -63,13 +63,19 @@ end
 function mycontour(X,Y,Z,title_text,scale_100,title_higher)
     nexttile([1 2])
 
-    if numel(unique(Z(~isnan(Z)))) == 1
+    Z_is_constant = numel(unique(Z(~isnan(Z)))) == 1;
+    if Z_is_constant
         % avoid "contour not rendered for constant zdata"
         x = [min(X,[],'all') max(X,[],'all')];
         y = [min(Y,[],'all') max(Y,[],'all')];
         imagesc('XData',x,'YData',y,'CData',Z,'AlphaData',~isnan(Z))
     else
-        contourf(X,Y,Z)
+        if scale_100
+            levels = sort([min(Z(:)),max(Z(:)),0:10:100]);
+        else
+            levels = 10;
+        end
+        contourf(X,Y,Z,levels)
     end
     if title_higher
         title(title_text,'Position', [11.75, 7, 0])

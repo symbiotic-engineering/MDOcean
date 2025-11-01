@@ -62,7 +62,10 @@ end
 function sigma_vm = bottom_plate_stress(length_ratio, shorter_length, P_hydrodynamic, t_bot, h_stiff, w_stiff, width_plate)
 
     % data from table: Timoshenko table 35 p219
-    length_ratio_data = [1 : 0.1 : 2 1000];
+    length_ratio_data = [1 : 0.1 : 2 realmax];
+    if length_ratio > length_ratio_data(end)
+        error(['float structures: plate aspect ratio ' num2str(length_ratio) ' is too high.'])
+    end
     alpha_shorter_data = -0.0001*[513 581 639 687 726 757 780 799 812 822 829 833];
     alpha_longer_data  = -0.0001*[513 538 554 563 568 570 571 571 571 571 571 571];
     alpha_shorter_fcn = @(length_ratio) interp1(length_ratio_data, alpha_shorter_data, length_ratio);

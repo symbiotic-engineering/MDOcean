@@ -1,0 +1,23 @@
+function [r1,r2] = damping_vs_reactive(p,b)
+
+    p.control_type = 'damping';
+    [x, fval, residuals, tol, p] = pareto_search(p, b, b.filename_uuid);
+    
+    p2 = p;
+    p2.control_type = 'reactive';
+    [x2,fval2,residuals2,tol2,p2] = pareto_search(p2, b, b.filename_uuid);
+
+    % Store results
+    r1.x = x;
+    r1.fval = fval;
+    r1.residuals = residuals;
+    r1.tol = tol;
+    r1.p = p;
+
+    r2.x = x2;
+    r2.fval = fval2;
+    r2.residuals = residuals2;
+    r2.tol = tol2;
+    r2.p = p2;
+
+end
