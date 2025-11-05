@@ -36,15 +36,14 @@ figs_in_RE{21} = 'ParetoFigFunc.pareto_damping_reactive';
 figs_in_RE{22} = 'AllFigCompare.runtime_bar_chart';
 figs_in_RE{23} = 'ParetoSweep.sweep_num_seeds';
 % appendix A - supplementary results
-figs_in_RE{24} = 'GradientOptimFigFunc.normalized_gradient_gradient';
-figs_in_RE{25} = 'GradientOptimFigFunc.single_obj_convergence';
-figs_in_RE{26} = 'Multistart.multistart_parallel_coordinates';
+figs_in_RE{24} = 'GradientOptimFigFunc.single_obj_convergence';
+figs_in_RE{25} = 'Multistart.multistart_parallel_coordinates';
 % appendix E - optimization process
-figs_in_RE{27} = 'ParamSensitivities.post_optim_re_optim_objective_grid';
-figs_in_RE{28} = 'ParamSensitivities.post_optim_design_grid';
-figs_in_RE{29} = 'ParamSensitivities.re_optim_design_grid';
+figs_in_RE{26} = 'ParamSensitivities.post_optim_re_optim_objective_grid';
+figs_in_RE{27} = 'ParamSensitivities.post_optim_design_grid';
+figs_in_RE{28} = 'ParamSensitivities.re_optim_design_grid';
 % graphical abstract (unnumbered so at the end)
-figs_in_RE{30}  = 'ReadNonMatlabFigs.graphical_abstract';
+figs_in_RE{29}  = 'ReadNonMatlabFigs.graphical_abstract';
 
 %% AOR figures
 

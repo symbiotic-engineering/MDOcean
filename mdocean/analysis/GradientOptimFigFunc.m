@@ -3,9 +3,12 @@ classdef GradientOptimFigFunc < GenericAnalysis
     %   Generates single objective optimization convergence and visualization figures
     
     properties
-        fig_names = {'dJ_dx_gradient', 'lagrange_multipliers', 'single_obj_opt_geometry', ...
-                    'single_obj_opt_power_matrix', 'single_obj_convergence', 'normalized_gradient','delta_x'};
-        tab_names = {};
+        fig_names = {'single_obj_opt_power_matrix',...
+                    'single_obj_opt_geometry', ...
+                    'lagrange_multipliers',...
+                    'delta_x', ...
+                    'single_obj_convergence'};
+        tab_names = {'single_obj_optim_results'};
     end
     
     methods (Static)
@@ -29,6 +32,7 @@ classdef GradientOptimFigFunc < GenericAnalysis
             intermed_result_struct.grads = grads;
             intermed_result_struct.hesses = hesses;
             intermed_result_struct.vals = vals;
+            intermed_result_struct.convergence_plot = gcf();
 
         end
         
@@ -49,6 +53,8 @@ classdef GradientOptimFigFunc < GenericAnalysis
 
             [fig_array,tab] = SOO_result_plots(Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
             
+            fig_array(end+1) = intermed_result_struct.convergence_plot;
+
             tab_array_display = {tab};
             tab_array_latex = {tab};
             
