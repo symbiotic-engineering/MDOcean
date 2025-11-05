@@ -3,7 +3,7 @@ classdef Comparison < GenericAnalysis
     %   Generates overlaid geometry, hydro coeffs, probability CDF figures and optimal design tables
     
     properties
-        fig_names = {'overlaid_geometry', 'overlaid_hydro_coeffs', 'probability_CDF'};
+        fig_names = {'overlaid_geometry', 'overlaid_hydro_coeffs', 'probability_CDF', 'comparison_power_matrix'};
         tab_names = {'optimal_design_vars', 'optimal_outputs'};
     end
     
@@ -11,12 +11,11 @@ classdef Comparison < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(p,b)
             % Run comparison analysis
-            [optimal_design_vars, optimal_outputs, figs] = compare(p,b);
+            [Xs,vals] = compare_run(p,b);
 
             % Store results and returned figure handles for post-processing
-            intermed_result_struct.optimal_design_vars = optimal_design_vars;
-            intermed_result_struct.optimal_outputs = optimal_outputs;
-            intermed_result_struct.created_figs = figs;
+            intermed_result_struct.Xs = Xs;
+            intermed_result_struct.vals = vals;
         end
         
         function [fig_array,...
@@ -24,17 +23,15 @@ classdef Comparison < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            % Return the figure handles provided by the analysis function;
-            % mapping/validation is handled by GenericAnalysis.
-            fig_array = intermed_result_struct.created_figs;
+            Xs = intermed_result_struct.Xs;
+            vals = intermed_result_struct.vals;
+            [DV_table, out_table, fig_array] = compare(p,b,Xs,vals);
             
-            tab_array_display = {intermed_result_struct.optimal_design_vars, ...
-                               intermed_result_struct.optimal_outputs};
+            tab_array_display = {DV_table, ...
+                                 out_table};
             tab_array_latex = tab_array_display;
             
             end_result_struct.comparison_complete = true;
-            end_result_struct.optimal_design_vars = intermed_result_struct.optimal_design_vars;
-            end_result_struct.optimal_outputs = intermed_result_struct.optimal_outputs;
         end
         
     end
