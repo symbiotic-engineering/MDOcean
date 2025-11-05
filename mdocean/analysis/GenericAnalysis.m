@@ -126,6 +126,19 @@ classdef (Abstract) GenericAnalysis
             obj = obj.run_post_process();
         end
 
+        function obj = run_analysis_from_load_if_possible(obj)
+            if isempty(obj.intermed_result_struct)
+                obj = obj.run_analysis();
+            else
+                obj = obj.load_intermed_results();
+            end
+        end
+
+        function obj = run_all_from_load_if_possible(obj)
+            obj = obj.run_analysis_from_load_if_possible();
+            obj = obj.run_post_process();
+        end
+
         function stages = write_calkit_stage(obj)
             cell2filelist = @(c) char(join(strcat("    - ",c),newline));
 
@@ -168,7 +181,7 @@ classdef (Abstract) GenericAnalysis
             % Flatten
             figs_flat = figs_in(:).';
 
-            valid_mask = ishghandle(figs_flat) & strcmp({figs_flat.Type},'figure');
+            valid_mask = ishghandle(figs_flat) & isprop(figs_flat,'Type') & strcmp({figs_flat.Type},'figure');
 
             figs_flat(~valid_mask) = gobjects(1);
 
