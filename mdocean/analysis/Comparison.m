@@ -14,6 +14,8 @@ classdef Comparison < GenericAnalysis
             [Xs,vals] = compare_run(p,b);
 
             % Store results and returned figure handles for post-processing
+            intermed_result_struct.p = p;
+            intermed_result_struct.b = b;
             intermed_result_struct.Xs = Xs;
             intermed_result_struct.vals = vals;
         end
@@ -22,7 +24,9 @@ classdef Comparison < GenericAnalysis
                  tab_array_display,...
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
-            
+                 
+            p = intermed_result_struct.p;
+            b = intermed_result_struct.b;
             Xs = intermed_result_struct.Xs;
             vals = intermed_result_struct.vals;
             [DV_table, out_table, fig_array] = compare(p,b,Xs,vals);
