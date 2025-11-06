@@ -13,9 +13,11 @@ classdef DesignSpaceExploration < GenericAnalysis
             % Run design space exploration experiments
             [X_ins,ratios,LCOE,cost,power,failed] = experiments(p,b);
 
+            cd('..')
             pareto = ParetoFigFunc(p,b);
             pareto.run_analysis_from_load_if_possible();
             pareto_results_struct = pareto.intermed_result_struct.r1;
+            cd('mdocean')
             
             % Store figure for post-processing
             intermed_result_struct.b = b;
