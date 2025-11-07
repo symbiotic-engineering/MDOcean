@@ -20,7 +20,7 @@ BW_plot_on = false;
 
 parfor i=1:length(files)
     new_p = p;
-    
+
     jpd = trim_jpd(readmatrix(files{i}, 'Range', 'A3'));
     new_p.JPD = jpd(2:end,2:end);
     new_p.Hs = jpd(2:end,1);
@@ -33,17 +33,17 @@ parfor i=1:length(files)
     [row,col] = ind2sub(size(new_p.JPD),idx_most_common);
     most_common_wave(i) = {['$H_s = ' num2str(new_p.Hs(row)) '$m, $T_e=' num2str(new_p.T(col)) '$s']};
     BW(i) = round(find_BW(new_p.Hs,new_p.T,new_p.JPD,BW_plot_on),2);
-  
+
     X = new_b.X_start_struct;
-    
+
     which_obj = 1; % only optimize LCOE
     dry_run = true;
     if dry_run
-        [X_opts(:,i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1); 
+        [X_opts(:,i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1);
     else
         [X_opts(:,i), obj_opts(i), flags(i)] = gradient_optim(X,new_p,new_b,which_obj);
     end
-    
+
     new_ps(i) = new_p;
     new_bs(i) = new_b;
 

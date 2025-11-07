@@ -6,12 +6,12 @@ MEEM = pi*p.harmonics / (p.besseli_argmax*2);
 
 %    x1                               x2 x3                      x4 x5 x6 x7 x8 x9 x10 x11 x12 x13
 A = [-p.D_d_over_D_s                  0  0                        0  0  0  0  0  0  0   0   0   0; % g_lin_1
-      p.D_f_in_over_D_s              -1  0                        0  0  0  0  0  0  0   0   0   0; % g_lin_2 
+      p.D_f_in_over_D_s              -1  0                        0  0  0  0  0  0  0   0   0   0; % g_lin_2
       p.h_d_over_D_s - p.T_s_over_D_s 0  1                        0  0  0  0  0  0  0   0   0   0; % g_lin_3
-      p.T_s_over_D_s,                 0, 1/p.T_f_2_over_h_f - 1, -1  0  0  0  0  0  0   0   0   0; % g_lin_4 
-      0                             MEEM 1                        0  0  0  0  0  0  0   0   0   0; % g_lin_5 
-      MEEM + p.T_s_over_D_s,          0  0                        0  0  0  0  0  0  0   0   0   0; % g_lin_6 
-     -p.h_d_over_D_s                  0  0                        0  0  0  0  0  0 1e-3 0   0   0; % g_lin_7 
+      p.T_s_over_D_s,                 0, 1/p.T_f_2_over_h_f - 1, -1  0  0  0  0  0  0   0   0   0; % g_lin_4
+      0                             MEEM 1                        0  0  0  0  0  0  0   0   0   0; % g_lin_5
+      MEEM + p.T_s_over_D_s,          0  0                        0  0  0  0  0  0  0   0   0   0; % g_lin_6
+     -p.h_d_over_D_s                  0  0                        0  0  0  0  0  0 1e-3 0   0   0; % g_lin_7
       0                               0  -.5/p.T_f_2_over_h_f,    0  0  0  0  0  0  0   .1  0   0];% g_lin_8
 
 %     g1         g2    g3  g4  g5   g6   g7  g8

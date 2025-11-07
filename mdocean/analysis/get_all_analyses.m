@@ -16,4 +16,3 @@ function [analysis_list] = get_all_analyses()
     analysis_list = {analysis_list.name};
     analysis_list = analysis_list(~contains(analysis_list, dont_include));
 end
-

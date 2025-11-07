@@ -5,7 +5,7 @@ function fig = b_inf_numeric()
     d1_num = 75/100;
     d2_num = 60/100;
     h_num = 1;
-    
+
     m0h_max_zero = find_m0h_max(a1_num,a2_num,d1_num,d2_num,h_num);
 
     fig = plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero);
@@ -33,11 +33,11 @@ function m0h_max_zero = find_m0h_max(a1_num,a2_num,d1_num,d2_num,h_num)
         m0h_max_actual(j) = max(m0(isfinite(b_entry)));
         m0h_max_actual_asymptotic(j) = max(m0(b_high_freq~=0));
     end
-    
+
     figure
     yyaxis left
     plot(d2s,m0h_max_actual/acosh(realmax))
-    hold on 
+    hold on
     plot(d2s,m0h_max_actual./m0h_maxs_nan')
     xlabel('d2/h')
     ylabel('normalized m_0h max for NaN')
@@ -51,43 +51,43 @@ end
 
 function fig = plot_b_approx(a1_num,a2_num,d1_num,d2_num,h_num,m0h_max_zero)
     % check that my formula for b_high_freq is correct
-    
+
     m0h_max_nan = acosh(realmax) / (1-d2_num/h_num);
 %     lambert_arg = ( a2_num / (realmin * (1-d2_num/h_num)) )^2 * d2_num/h_num;
     m0h_max_asymptotic_zero = acosh(realmax) ./ d2_num/h_num;
-    
+
     m0 = sort([logspace(log10(m0h_max_zero/100),log10(m0h_max_asymptotic_zero*2)) ...
                 m0h_max_nan m0h_max_zero m0h_max_zero+eps ...
                 m0h_max_asymptotic_zero m0h_max_asymptotic_zero+eps]);
     b_entry = zeros(length(m0),1);
     b_high_freq = zeros(length(m0),1);
-    
+
     for i=1:length(m0)
         [b_entry(i),b_high_freq(i)] = get_b(m0(i),h_num,a1_num,a2_num,d1_num,d2_num);
     end
-    
+
     display([m0' b_entry b_high_freq])
-    
+
     b_both = [b_entry; b_high_freq];
     near_zero_b = max(nonzeros(b_both))/10;
     b_entry(b_entry==0) = near_zero_b; % so zero shows up on log-log plot
     b_high_freq(b_high_freq==0) = near_zero_b;
-    
+
     fig = figure;
     loglog(m0/acosh(realmax),b_entry,'DisplayName','b')
     hold on
     loglog(m0/acosh(realmax),b_high_freq,'--','DisplayName','Asymptotic b')
-    
+
     ylim([min(b_both) near_zero_b])
 %     plot(m0h_max_nan/acosh(realmax) *[1 1],ylim,'k--','DisplayName','1/(1-d_2/h)')
     plot(m0h_max_zero/acosh(realmax)*[1 1],ylim,'k:','DisplayName','1/2')
     plot(m0h_max_asymptotic_zero/acosh(realmax)*[1 1],ylim,'k-.','DisplayName','1/(d_2/h)')
-    
+
     legend
     xlabel('m_0h/acosh(realmax) (-)')
     ylabel('b_{N+2M+1} (m^{2})')
     improvePlot
-    
+
     % conclusion: it's not correct, but it goes to zero before it goes to nan,
     % so I'm ok to just zero it when above the m0h_max_nan threshold.
 end
@@ -95,7 +95,7 @@ end
 function [b_entry,b_high_freq] = get_b(m0_num,h_num,a1_num,a2_num,d1_num,d2_num)
     K_num = 10;
     m_k_cell = get_m_k(m0_num,h_num,K_num);
-    
+
     [A_num, b_num, c_num, c_0_num] = A_b_c_matrix_N10_M10_K10_heaving_outer(a1_num, a2_num, d1_num, d2_num,...
                                 h_num, m0_num, m_k_cell{:});
     b_entry = b_num(end-K_num);
@@ -119,7 +119,7 @@ function m_k_cell = get_m_k(m0_num,h_num,K_num)
 
         m_k_h_deg = fzero(eqn, bounds);
         m_k_num(k_num) = m_k_h_deg * pi/180 / h_num;
-    end    
+    end
 
     m_k_cell = num2cell(m_k_num);
 end

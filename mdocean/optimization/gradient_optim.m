@@ -64,7 +64,7 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 %'SpecifyObjectiveGradient',true,...
                                 %'SpecifyConstraintGradient',true); % would require ALL constraints to be AD-supported
 
-% iterate through material choices                            
+% iterate through material choices
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
     [Xs_opt, objs_opt, flags, probs, ...
@@ -85,9 +85,9 @@ function [Xs_opt, objs_opt, flags, probs, ...
     [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
                                             'OutputSize',{[1,num_objectives_total],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
-    
-    probs = cell([1 length(objs)]); 
-    
+
+    probs = cell([1 length(objs)]);
+
     % allocate outputs
     Xs_opt = zeros(length(X),num_objectives_to_run);
     objs_opt = zeros(1,num_objectives_to_run);
@@ -110,7 +110,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
     for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
-        
+
         %show(prob)
 
         if length(x0_input)==1
@@ -120,7 +120,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
         else
             error('x0 input struct has wrong size')
         end
-            
+
         [X_opt_raw,obj_opt,flag,...
             output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
         probs{i} = problem;
@@ -142,7 +142,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
         [out,~,~,val] = simulation(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
-        
+
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;

@@ -16,7 +16,7 @@ J_down = zeros(1,length(x));
 for i=1:length(x)
     dX = zeros(size(X));
     dX(i) = dx(i);
-    
+
     out_up   = simulation(X+dX,p);
     out_down = simulation(X-dX,p);
 
@@ -43,4 +43,3 @@ ylim([-.09 .09])
 f.Position(3:4) = [705 475];
 
 end
-

@@ -108,7 +108,7 @@ if plot_on
     improvePlot
     set(fig,'Position',[100 100 697.8 600])
     set(leg,'Position',[0.1692 0.6372 0.7027 0.2615])
-    
+
     %% check B formula
 %     figure
 %     plot(w,B./gamma.^2*10000, w,w.^2/(2*9.8)*10000,'--')

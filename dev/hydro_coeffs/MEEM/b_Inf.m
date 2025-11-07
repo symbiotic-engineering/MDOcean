@@ -7,7 +7,7 @@ function b_0_symbolic()
     % term of the bottom block of the b-vector
     clear
     syms a1 a2 d1 d2 h m0 real positive
-    
+
     t16 = d2.*2.0;
     t19 = h.*2.0;
     t35 = m0.*t19;
@@ -21,7 +21,7 @@ function b_0_symbolic()
     t255 = t16+t52;
     t261 = sinh(t244);
     t295 = 1.0./t255;
-    
+
     b0 = -a2.*t54.*t261.*t295.*1.0./sqrt((t53.*t54.*t81)./4.0+1.0./2.0);
     b0 = subs(expand(b0),sinh(m0*h), cosh(m0*h)*tanh(m0*h));
     [num,den] = numden(simplifyFraction(b0));
@@ -31,4 +31,3 @@ function b_0_symbolic()
     b0_approx = subs(new_num/new_den, {tanh(h*m0),1/cosh(h*m0)^2},{1,0});
     pretty(simplify(b0_approx))
 end
-

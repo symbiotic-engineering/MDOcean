@@ -7,11 +7,11 @@ Section~\ref{sec:dynamics} introduced the use of describing functions to quantif
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
 This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \cite{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \cite{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}. 
+For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}.
 
 MDOcean assumes that the saturated control impedance, and thus its fundamental, share the same phase as the optimal unsaturated controller (damping or reactive respectively).
 This is optimal for the damping case, and slightly sub-optimal for the reactive case due to the presence of a small phase shift in the optimal saturated impedance and the matched impedance \cite{mccabe_force-limited_2024}.
-The appropriate scale factor from the optimal unsaturated controller is found with numerical iteration. 
+The appropriate scale factor from the optimal unsaturated controller is found with numerical iteration.
 
 %Mathematically, a saturation factor $0< f_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
 %\begin{equation}
@@ -21,10 +21,10 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 %\begin{equation}
 %    \alpha = \frac{2}{\pi} \left( \frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left(\frac{\tau_{max}}{F_p}\right)^2} \right).
 %\end{equation}
-    
+
 %When $\frac{F_p}{\tau_{max}}$ = 1 (no saturation), then $\alpha= 1$; when $\frac{F_p}{\tau_{max}} \rightarrow \infty$ (full saturation), then $\alpha= \frac{4}{\pi}$. This makes sense because $\frac{4}{\pi}$ is the harmonic amplitude of a unit square wave, and in full saturation the saturated signal approaches a square wave. $\alpha$ is plotted in Figure \ref{fig:alpha-fit}.
 
-%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \cite{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
+%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \cite{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation.
 
 % %Substituting $f_{sat}$ back into the equation of motion reveals that the control gain saturation multiplier $m_{sat}$ is the solution to a quadratic equation $a_q m_{sat}^2 + b_q m_{sat} + c_q = 0$. If the uncontrolled dynamics have a natural frequency $\omega_{n,u}$ and damping ratio $\zeta_u$, and the controlled unsaturated dynamics have natural frequency $\omega_n$ and damping ratio $\zeta$, then the quadratic coefficients can be expressed as:
 
@@ -32,19 +32,19 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 %     \begin{bmatrix}
 %         a_q \\ b_q \\ c_q
 %     \end{bmatrix}
-%     = 
+%     =
 %     \begingroup % keep the row spacing change local
 %     \setlength\arraycolsep{2pt}
 %     \begin{bmatrix} -4 & \frac{4}{f_{sat}^2} & \frac{1}{f_{sat}^2} & -1 & 0 & 0\\
 %     8 & 0 & 0 & 2 & 8 & 2\\
 %     -4 & -4 & -1 & -1 & -8 & -2 \end{bmatrix}
 %     \endgroup
-%     \begin{bmatrix} 
+%     \begin{bmatrix}
 %  (\theta_1)^2  \\
 %   (\theta_2)^2 \\
 %    (\theta_3)^2 \\
 %    (\theta_4)^2  \\
-%    \theta_1 \theta_2 \\  
+%    \theta_1 \theta_2 \\
 %     \theta_3 \theta_4
 %     \end{bmatrix}
 % \end{equation}
@@ -87,7 +87,7 @@ This appendix describes an intricacy glossed over in section \ref{sec:dynamics} 
 The authors of \cite{quartier_influence_2021} evaluate the wave velocity $\dot{x}_{wave}$ at the center of the WEC ($y=0$), which results in the drag damping coefficient $B_d$ becoming unrealistically low (even negative) at high frequencies and large wave heights.
 
 A strip-theory approach avoids this issue by integrating the spatially-dependent infinitesimal drag force $dF_d$ over the wetted area $A_w$.
-For a hollow cylinder of radius $R$ and inner radius $R_{in}$, this is expressed: 
+For a hollow cylinder of radius $R$ and inner radius $R_{in}$, this is expressed:
 % derived p156-159 notebook 3/10/25
 % simplified p169-173 notebook 3/12/25
 \begin{equation}\label{eq:drag-force-integral}
@@ -105,7 +105,7 @@ and $P(y,t)$ is the local pressure acting vertically due to drag:
     \begin{aligned}
     P(y,t) &= \frac{1}{2} \rho_w C_d ~\dot{x}_{rel}(y,t) ~|\dot{x}_{rel}(y,t)| \\
    &=  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y)^2 \sin(\omega t+\angle \dot{X}_{rel}(y)) ~\left| \sin(\omega t+\angle \dot{X}_{rel}(y))\right| \\
-   &\approx  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y) ^2~\frac{8}{3\pi}\sin(\omega t+\angle \dot{X}_{rel}(y)) 
+   &\approx  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y) ^2~\frac{8}{3\pi}\sin(\omega t+\angle \dot{X}_{rel}(y))
     \end{aligned}
 \end{equation}
 %notation: \dot{X}_rel here refers to the magnitude, not the complex phasor
@@ -125,8 +125,8 @@ where $\alpha_v(y)$ and $\phi_\alpha(y)$ are the amplitude and phase ratios, res
     \left(
         \frac{\hat{\dot{X}}_{rel}(y)}
             {\hat{\dot{X}}}
-    \right)   
-    = \angle\hat{\dot{X}}_{rel}(y) -  \angle\hat{\dot{X}} 
+    \right)
+    = \angle\hat{\dot{X}}_{rel}(y) -  \angle\hat{\dot{X}}
 \end{aligned}
 \end{equation}
 
@@ -169,7 +169,7 @@ For now before these integrals are derived, I assume the following:}
 \end{aligned}
 \end{equation}
 
-Comparisons against WEC-Sim confirmed that this assumption yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}, which uses an identical $\alpha_v(y)$ but assumes a different phase: $\phi_\alpha(y)=\phi_\alpha(y=0)$. 
+Comparisons against WEC-Sim confirmed that this assumption yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}, which uses an identical $\alpha_v(y)$ but assumes a different phase: $\phi_\alpha(y)=\phi_\alpha(y=0)$.
 At high frequencies and large wave heights, $r$ is large and $\phi_\alpha(y=0)$ exceeds $\pi$, causing the drag damping coefficient $B_d$ to be negative (non-dissipative), which is not realistic.
 While setting $\phi_\alpha(y)=0$ does not guarantee that $B_d$ is always positive, it is found through testing to significantly reduce the risk of negative damping and to promote convergence of the drag loop.
 In the optimization, any negative drag damping coefficents are set to zero.
@@ -181,7 +181,7 @@ With this approximation, the nonlinear time-domain drag equation is now a quasi-
 The solution for states $|\dot{X}|$ and $\angle \dot{X}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation\eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
 Rather than employ a typical nonlinear root-finding algorithm, MDOcean simply uses the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-This is a form of fixed point iteration where $x_k = g(x_{k-1})$ and is therefore guaranteed to converge as long as $|\frac{\partial g(x)}{\partial x}| < 1$ at the solution. %\hl{find a better place to cite for this besides wikipedia} \url{https://en.wikipedia.org/wiki/Root-finding_algorithm#Fixed_point_iteration_method}. 
+This is a form of fixed point iteration where $x_k = g(x_{k-1})$ and is therefore guaranteed to converge as long as $|\frac{\partial g(x)}{\partial x}| < 1$ at the solution. %\hl{find a better place to cite for this besides wikipedia} \url{https://en.wikipedia.org/wiki/Root-finding_algorithm#Fixed_point_iteration_method}.
 Five to eight iterations on $|\dot{X}|$ and $\angle \dot{X}$ are typically required to converge all sea states to within 0.01~m, % from summer research slide 44 5/30/24
 and a sample convergence plot is shown in Figure~\ref{fig:drag-convergence}.
 
@@ -194,7 +194,7 @@ Instead, if the negative drag exceeds the radiation damping and causes instabili
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal.
 The standard optimal control damping is derived by setting
 \begin{equation}
-0 = \frac{\partial P}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |X|^2}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |\frac{H\gamma/2}{(m+A_h)s^2+(B_h+B_d+B_p)s+(K_h+K_d+K_p)}|^2}{\partial B_p} 
+0 = \frac{\partial P}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |X|^2}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |\frac{H\gamma/2}{(m+A_h)s^2+(B_h+B_d+B_p)s+(K_h+K_d+K_p)}|^2}{\partial B_p}
 \end{equation}
 and the typical simplification $\frac{\partial B_d}{\partial B_p}=\frac{\partial K_d}{\partial B_p}=0$ must be replaced with the implicit dependence of $|X|$ on $B_d$ and $K_d$ from \eqref{eq:drag-coeffs}.
 In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
@@ -212,7 +212,7 @@ In regular waves of height $H$, the conditions for slamming can be derived by co
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
 \begin{aligned}
-    x(t) - \Delta z_{slam,bot} &< \zeta(y,t) \\ 
+    x(t) - \Delta z_{slam,bot} &< \zeta(y,t) \\
     |X|\cos(\omega t+\angle X) - \Delta z_{slam,bot} &< \frac{H}{2}\cos(\omega t - k y)
 \end{aligned}
 \end{equation}
@@ -240,7 +240,7 @@ If $\Delta z_{slam,bot}<H/2\sin\theta$, slamming occurs even for a stationary bo
 \end{figure}
 %\hl{add description of similarities and differences of this to Budal's upper bound}
 
-Separately, there exists a symmetrical counterpart to the above slamming condition, where in addition to requiring the bottom the WEC to remain below the waves, one can require that the top of the WEC remains above the waves, preventing full submersion. 
+Separately, there exists a symmetrical counterpart to the above slamming condition, where in addition to requiring the bottom the WEC to remain below the waves, one can require that the top of the WEC remains above the waves, preventing full submersion.
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
 \begin{equation}\label{eq:top-slamming}
     x(t) + \Delta z_{slam,top} > \zeta(y,t)
@@ -259,7 +259,7 @@ Relevant model values for the minimum-LCOE float design are plotted for each sea
 Although the intermediate wavelengths ($X^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $X_{slam}/X-1 \approx 0$) because in this JPD, large amplitude waves occur only at high periods.
 If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
 This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
-Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the optimization, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
+Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the optimization, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves.
 \begin{figure}
     \centering
     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
@@ -269,13 +269,13 @@ Thus, in this case the more complicated, less conservative slamming model has on
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
-Each of the 210 sea states are simulated individually. %Table~\ref{tab:dynamic-validation} and 
+Each of the 210 sea states are simulated individually. %Table~\ref{tab:dynamic-validation} and
 Figure~\ref{fig:dynamic-validation} compares the results.
 % \begin{table}
 %     \centering
-%     \begin{tabular}{|c|c|c|} \hline 
-%          Power Percent Error: Average, Maximum&  $C_d=0$& $C_d=1$\\ \hline 
-%          WAMIT&  1.90\%, 1.96\%& 5.21\%, -70\%\\ \hline 
+%     \begin{tabular}{|c|c|c|} \hline
+%          Power Percent Error: Average, Maximum&  $C_d=0$& $C_d=1$\\ \hline
+%          WAMIT&  1.90\%, 1.96\%& 5.21\%, -70\%\\ \hline
 %          MEEM&  -6.30\%, -14\%& -2.79\%, -80\%\\ \hline
 %     \end{tabular}
 %     \caption{Dynamic validation showing error in a variety of modeling assumptions}
@@ -341,7 +341,7 @@ This is a reasonable assumption when the stiffeners are small and densely spaced
 The so-called effective breadth ratio $\rho$ is used to quantify the validity of this assumption, where the equivalent-thickness method requires $\rho=1$:
 \begin{equation}
    \rho = \rho_\lambda \rho_\psi
-\quad 
+\quad
 \rho_\lambda = \begin{cases}
         1, & \lambda\leq 0.673 \\
         \frac{1-0.22/\lambda}{\lambda}, & \lambda > 0.673
@@ -349,7 +349,7 @@ The so-called effective breadth ratio $\rho$ is used to quantify the validity of
     \rho_\psi = \begin{cases}
         1, & \psi> -0.236 \\
         \frac{1}{2}+\frac{1}{3-\psi}, & \psi \leq -0.236
-    \end{cases} 
+    \end{cases}
 \end{equation}
 The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\psi$, found as follows:
 \begin{equation}
@@ -383,7 +383,7 @@ The top and bottom plates are the only ones with external heave loads, arising f
 The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \figurename~\ref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
 For example, \cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
-They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{min}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
+They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{min}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors.
 This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{min}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{min}^2$.
 For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{min}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{min}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{min}=b_1$, and intermediate trapezoids to have an $x_{min}$ that depends on the trapezoid slope.
 The nominal RM3 design falls into this intermediate case, with $b_1\approx1.7$~m, $b_2\approx5.2$~m, and $h_0\approx6.8$~m.
@@ -424,7 +424,7 @@ Under these conditions, either the stress at the center $\sigma_{cent}$ or along
 using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in \cite{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$. \hl{(Note: this equation gives unusual results so it is not currently used. The top plate thickness is set via scaling of the bottom plate thicknesses. Will be debugged during scrutineering.)}
 
-The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave. 
+The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave.
 Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design. This prevents the need for a separate structural analysis of the side plates.
 
 \subsection{Damping Plate}
@@ -435,7 +435,7 @@ The 24 radial plate stiffeners are taken into account with the procedure describ
 The tube force $F_{tube}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{plate}=\delta_{tube}$, where the tube displacement is expressed in terms of its bending stiffness $K_{tube}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
 \begin{equation}
-    \sigma_r =  \frac{F_{heave}}{S_{eq}} \left( 
+    \sigma_r =  \frac{F_{heave}}{S_{eq}} \left(
     \overline{M}_{r,dis} + \overline{M}_{r,con} \frac{\overline{\delta}_{plate,dis}}{\frac{D_{eq}}{a^2K_{tube}} - \overline{\delta}_{plate,con}}
     \right)
 \end{equation}
@@ -487,13 +487,13 @@ where $\zeta$ and $\omega$ are defined as follows:
     \omega &= \frac{\sigma_\theta}{2\sigma_Y}  (1 - \frac{\sigma_\theta}{2\sigma_Y})
 \end{aligned}
 \end{equation}
-and the hoop stress $\sigma_\theta$ is 
+and the hoop stress $\sigma_\theta$ is
 \begin{equation}
      \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
 \end{equation}
 $P_r$ is a constant and $q$ is the distributed hydrosatic pressure at the bottom of the spar.
 These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \cite{american_bureau_of_shipping_requirements_2022}.
-%These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
+%These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}.
 % \begin{equation}
 % \begin{split}
 %     \sigma_{vm}^2 = \frac{1}{2} \left( (\sigma_{11} - \sigma_{22})^2 + (\sigma_{22} - \sigma_{33})^2 + (\sigma_{33} - \sigma_{11})^2 \right) \\ + 3 (\sigma_{12}^2 + \sigma_{23}^2 + \sigma_{31}^2)
@@ -573,33 +573,33 @@ The values of price and cost constants are given in \sectionautorefname~\ref{sec
 
 \begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
-$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
-$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
-$h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
-$\sigma_y$ & Material yield strength& 248 & MPa  \\ 
-$\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
-$E$& Material Young's modulus& 200 & GPa  \\ 
-$cost_m$ & Material cost& 1.89 & \$/kg \\ 
-%$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
-%$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
-%$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
-%$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\ 
-%$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\ 
-%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
-$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\ 
-$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\ 
-$FCR$ & Fixed charge rate& 10.8 & \%  \\ 
-$N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
-$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
-$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
-$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
-$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
-$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
+$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\
+$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\
+$h$& Water depth & 100 & m  \\
+JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\
+$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\
+$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\
+$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\
+$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\
+$\sigma_y$ & Material yield strength& 248 & MPa  \\
+$\rho_m$ & Material density& 7850 & kg/$m^3$  \\
+$E$& Material Young's modulus& 200 & GPa  \\
+$cost_m$ & Material cost& 1.89 & \$/kg \\
+%$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\
+%$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\
+%$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\
+%$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\
+%$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\
+%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\
+$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\
+$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\
+$FCR$ & Fixed charge rate& 10.8 & \%  \\
+$N_{WEC}$ & Number of WECs in array& 100 & -  \\
+$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\
+$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\
+$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\
+$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\
+$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 \end{tabular}
  \caption{Selected Parameters}\label{tab:parameters}
 \end{table}
@@ -611,15 +611,15 @@ $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 
 Average power:
 \begin{equation}
-    \frac{P_{avg,damp}}{P_{avg,reac}} 
-    = \frac{\frac{1}{2} \Re(\hat{Z}_{damp})|\hat{q}_{damp}|^2} {\frac{1}{2} \Re(\hat{Z}_{reac})|\hat{q}_{reac}|^2 } 
+    \frac{P_{avg,damp}}{P_{avg,reac}}
+    = \frac{\frac{1}{2} \Re(\hat{Z}_{damp})|\hat{q}_{damp}|^2} {\frac{1}{2} \Re(\hat{Z}_{reac})|\hat{q}_{reac}|^2 }
     = \sqrt{ \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + 1} \cdot \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2
 \end{equation}
 
 Peak power:
 \begin{equation}
-    \frac{P_{pk,damp}}{P_{pk,reac}} 
-    = \frac{P_{avg,damp}}{P_{avg,reac}} 
+    \frac{P_{pk,damp}}{P_{pk,reac}}
+    = \frac{P_{avg,damp}}{P_{avg,reac}}
     \frac{2}{1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }} = \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2 \cdot \frac{2}{1 + \left(1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  \right)^{-1/2}}
 \end{equation}
 
@@ -644,12 +644,12 @@ Amplitude:
 \begin{equation}
 \begin{aligned}
     \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right| &= \left|\frac{
-        (m+A_h)s^2+(B_h+B_d+B_{p,reac})s+(K_h+K_d+K_{p,reac})} 
-        { (m+A_h)s^2+(B_h+B_d+B_{p,damp})s+(K_h+K_d)}\right| \\ 
+        (m+A_h)s^2+(B_h+B_d+B_{p,reac})s+(K_h+K_d+K_{p,reac})}
+        { (m+A_h)s^2+(B_h+B_d+B_{p,damp})s+(K_h+K_d)}\right| \\
         &= \frac{2B_{p,reac}}
-        {\left|B_{p,reac}+\sqrt{B_{p,reac}^2+(K_{p,reac}/\omega)^2}-K_{p,reac}/s\right|} \\ 
+        {\left|B_{p,reac}+\sqrt{B_{p,reac}^2+(K_{p,reac}/\omega)^2}-K_{p,reac}/s\right|} \\
         & = \frac{2}{\left|1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } - \frac{K_{p,reac}/s}{B_{p,reac}}\right|}  \\
-        &= \frac{2}{\sqrt{ \left(1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }\right)^2 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 }} \\ 
+        &= \frac{2}{\sqrt{ \left(1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }\right)^2 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 }} \\
         &= \frac{\sqrt{2}}{\sqrt{ 1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } }} \\
 \end{aligned}
 \end{equation}
@@ -675,8 +675,8 @@ rewrite in terms of $\delta = \frac{2}{\sqrt{\Theta} + 1}$:
 Cost:
 \begin{equation}
 \begin{aligned}
-    \frac{C_{damp}}{C_{reac}} 
-    &= \frac{C_{const} + C_{drv} P_{pk,damp} + C_{gen} \tau_{damp} + C_{struct} V_{struct,damp} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\ 
+    \frac{C_{damp}}{C_{reac}}
+    &= \frac{C_{const} + C_{drv} P_{pk,damp} + C_{gen} \tau_{damp} + C_{struct} V_{struct,damp} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\
     &= \frac{C_{const} + C_{drv} P_{pk,reac} \delta^2 + C_{gen} \tau_{reac} \frac{\delta}{\sqrt{2-\delta} } + C_{struct} V_{struct,reac} \frac{V_{struct,damp}}{V_{struct,reac}} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\
 \end{aligned}
 \end{equation}

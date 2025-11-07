@@ -29,7 +29,7 @@ If fixed cost components or the $FCR$ were to change, it could influence the opt
 The third limitation is that $LCOE$ has limited relevance in off-grid or micro-grid use cases.
 These applications include offshore aquaculture, autonomous underwater vehicle charging, and oceanic data collection, and have grown increasingly popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \cite{livecchi_powering_2019}.
 For instance, while both energy production increase and cost decrease can drive LCOE reduction, only the latter is relevant for applications with a fixed power requirement.
-Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}. 
+Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}.
 
 In the multi-objective formulation, instead of $LCOE$, the two objectives optimized are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$.
 This directly addresses the second and third limitations of LCOE just described.
@@ -54,8 +54,8 @@ The objective function is expressed:
 This section describes requirements that the optimization formulation must enforce and narrates how the requirements influence the optimization problem formulation.
 Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions).
 Constraints are the most common but not the only way to implement these requirements.
-Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
-(2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization. 
+Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions;
+(2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
 
 \tablename~\ref{tab:requirements} shows each requirement along with an indication of its priority in an optimization formulation context and a reference to the section, equation, or figure where it is explained.
 \newcounter{reqnumber}
@@ -110,12 +110,12 @@ Ultimately, this three-level requirement prioritization will inform the selectio
 Requirements are ordered by priority in \tablename~\ref{tab:requirements}, and within priority grouped by the way the requirement is enforced.
 Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_similarity}, \reqref{spar_damping_ratio});
 a power criteria to ensure the WEC generates net energy (\reqref{positive_net_power});
-height conditions to ensure valid positioning of the float with respect to the spar in the static case (\reqref{clearance_static}, \reqref{tops_static}, \reqref{base_static}) and in operational seas (\reqref{tops_dynamic}, \reqref{base_dynamic}, \reqref{clearance_dynamic}); 
+height conditions to ensure valid positioning of the float with respect to the spar in the static case (\reqref{clearance_static}, \reqref{tops_static}, \reqref{base_static}) and in operational seas (\reqref{tops_dynamic}, \reqref{base_dynamic}, \reqref{clearance_dynamic});
 maximum float amplitude based on linearity in operational seas (\reqref{linear_amplitude}) and based on slamming in both operational and storm seas (\reqref{slam_amplitude});
-measures of buoyancy to ensure the float and spar do not sink and can be suitably ballasted (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics}); 
-eight structural factors of safety (FOS) to avoid structural failure (\reqref{FOS}); 
-a measure of stability to ensure the WEC does not tip (\reqref{GM}); 
-equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (\reqref{force_max}, \reqref{P_max}); 
+measures of buoyancy to ensure the float and spar do not sink and can be suitably ballasted (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics});
+eight structural factors of safety (FOS) to avoid structural failure (\reqref{FOS});
+a measure of stability to ensure the WEC does not tip (\reqref{GM});
+equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (\reqref{force_max}, \reqref{P_max});
 a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section~\ref{sec:multi-obj-process} (\reqref{LCOE}). Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 
 \subsubsection{Design Variables, Parameters, and Constraints}
@@ -124,7 +124,7 @@ For example, the float and spar drafts could be encoded directly with dimensions
 A certain encoding may be selected because it more directly controls the objective value, makes the problem convex, or helps maintain feasibility and facilitate convergence during optimization.
 The latter is pursued here.
 Depending on the choice of design variables and parameters, each requirement could be enforced via parameters, design variable bounds, linear inequality constraints, linear equality constraints, nonlinear inequality constraints, or nonlinear equality constraints, listed in order from least to most difficult for the optimizer to handle.
-It is desirable, then, to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements to ensure they are satisfied even at intermediate points in the optimization process. 
+It is desirable, then, to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements to ensure they are satisfied even at intermediate points in the optimization process.
 
 Continuing with the illustrative example of choosing how to encode the drafts, observe that two of the priority 1 requirements, \reqref{float_spar_draft} and \reqref{spar_seafloor_overflow}, contain $T_{f,2}$, while $T_s$ appears in \reqref{float_spar_draft} and \reqref{float_seafloor_overflow}.
 Assuming for the moment that other variables appearing in those requirements (e.g. $T_{f,1}$ and $h$) are parameters or design variables, then the first (dimensional) encoding would make all three relevant requirements achievable via linear constraint, while the second (nondimensional) encoding would make \reqref{float_spar_draft} achievable via bound (preferable) but \reqref{spar_seafloor_overflow} would require a nonlinear constraint (undesired).
@@ -143,20 +143,20 @@ Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, t
 \begin{tabular}{c>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.3\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}c}
 
  \textbf{\#}&\textbf{Design Variable}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
- $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\ 
- $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\ 
+ $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
+ $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\
  $x_3$&$T_{f,2}$ & Float draft& 0.5& See sec.
-\ref{sec:validation}&100& m\\ 
+\ref{sec:validation}&100& m\\
  $x_4$&$h_s$& Spar height  & 5& See sec.
-\ref{sec:validation}& 100& m\\ 
+\ref{sec:validation}& 100& m\\
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
- $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\ 
- $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\ 
- $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\ 
- $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\ 
- $x_{10}$&$t_{d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\ 
+ $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
+ $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\
+ $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\
+ $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\
+ $x_{10}$&$t_{d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\
  $x_{11}$&$h_{stiff,f}$& Float stiffener height& 0& 0.406& 2& m\\
- $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\ 
+ $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
 } \caption{Design Variables}\label{tab:design-vars}
 \end{center}
@@ -179,33 +179,33 @@ This unfortunately prevents determination of the true optimal spar dimensions un
 
 \begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
-$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
-$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
-$h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
-$\sigma_y$ & Material yield strength& 248 & MPa  \\ 
-$\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
-$E$& Material Young's modulus& 200 & GPa  \\ 
-$cost_m$ & Material cost& 1.89 & \$/kg \\ 
-%$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
-%$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
-%$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
-%$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\ 
-%$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\ 
-%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
-$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\ 
-$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\ 
-$FCR$ & Fixed charge rate& 10.8 & \%  \\ 
-$N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
-$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
-$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
-$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
-$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
-$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
+$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\
+$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\
+$h$& Water depth & 100 & m  \\
+JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\
+$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\
+$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\
+$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\
+$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\
+$\sigma_y$ & Material yield strength& 248 & MPa  \\
+$\rho_m$ & Material density& 7850 & kg/$m^3$  \\
+$E$& Material Young's modulus& 200 & GPa  \\
+$cost_m$ & Material cost& 1.89 & \$/kg \\
+%$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\
+%$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\
+%$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\
+%$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\
+%$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\
+%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\
+$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\
+$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\
+$FCR$ & Fixed charge rate& 10.8 & \%  \\
+$N_{WEC}$ & Number of WECs in array& 100 & -  \\
+$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\
+$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\
+$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\
+$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\
+$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 \end{tabular}
  \caption{Selected Parameters}\label{tab:parameters}
 \end{table}
@@ -246,5 +246,4 @@ The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert f
 
 %\subsubsection{Model Checking}
 %\hl{todo: check for redundant constraints, monotonicity, etc} \cite{papalambros_principles_2017}.
-%It was initially speculated that the structural constraints would always be active, 
-
+%It was initially speculated that the structural constraints would always be active,

@@ -18,14 +18,14 @@
 % - get surge coeffs
 % - do low-frequency approximations for cummins equation
 % - take the limit in deep water
-% - get coupling hydro coeffs for when moving at diff velocities (=0 for 
+% - get coupling hydro coeffs for when moving at diff velocities (=0 for
 %   flat-bottom geometries, nvm, only relevant for multi-region slant approx)
 % - extend to many regions
 
 clear all
 close all
 
-%% settings 
+%% settings
 auto_BCs = false;
 
 num_harmonics = 10;

@@ -2,7 +2,7 @@
 clear all
 close all
 
-%% settings 
+%% settings
 auto_BCs = false;
 
 heaving_OC = true;
@@ -41,7 +41,7 @@ function run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs,
                          numel(h_num), numel(m0_num)];
     mu_nondim = zeros(length(num_harmonics), max(numels));
     lambda_nondim = zeros(length(num_harmonics), max(numels));
-    
+
     for i=1:length(num_harmonics)
         N_num = num_harmonics(i);
         M_num = num_harmonics(i);

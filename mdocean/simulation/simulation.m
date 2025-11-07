@@ -1,4 +1,4 @@
-function [J, P_matrix_elec, g, val] = simulation(X, p)	
+function [J, P_matrix_elec, g, val] = simulation(X, p)
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
@@ -92,7 +92,7 @@ model_grid_value = false; % override for merging
 if model_grid_value
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
                                                     gamma_phase_f, capex/in.P_max*1000, in.location);
-    
+
     net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
                             CEM_CO2, CEM_wec_capacity, in.P_max, ...
                             in.eco_cost_steel, in.eco_cost_fiberglass, ...

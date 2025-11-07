@@ -3,27 +3,27 @@ p = parameters();
 b = var_bounds();
 x0_input = b.X_start_struct;
 %[X_opt, ~, ~, ~, ~, ~, ~, val] = gradient_optim(x0_input,p,b,1);
-X_opt_mod = X_opt; 
+X_opt_mod = X_opt;
 
 allow_constr_viol = false; % true will run simulation, false will run optimization
 
 if allow_constr_viol
     % force saturation off
     % find this number manually by adding breakpoint
-    % in dynamics and doing max(mag_U_unsat,[],'all')/1e6 
+    % in dynamics and doing max(mag_U_unsat,[],'all')/1e6
     F_unsat = 11.815;
     X_opt_mod(6) = F_unsat;
     val_mod = print_saturation_effect(X_opt_mod,p,b,val);
     Pavg_factor_force_sat = min(val.P_sat_ratio,[],'all') * 100
     Fmax_factor_force_sat = X_opt(6)/F_unsat * 100
-    
+
     % power saturation off
     P_unsat = max(val.P_mech * p.eff_pto,[],'all');
     X_opt_mod = X_opt;
     X_opt_mod(7) = P_unsat;
     print_saturation_effect(X_opt_mod,p,b,val);
     Pavg_factor_power_sat = val.power_max / P_unsat * 100
-    
+
     % both force and power saturation off
     P_unsat_both = max(val_mod.P_mech * p.eff_pto,[],'all');
     X_opt_mod(6) = F_unsat;
@@ -55,7 +55,7 @@ else
 end
 
 function val_mod = sim_and_print(X_opt_mod,p,b,val)
-    [~,~,g,val_mod] = simulation(X_opt_mod,p); 
+    [~,~,g,val_mod] = simulation(X_opt_mod,p);
     constraint_violated = b.constraint_names(g<0)
     print_saturation_effect(val_mod,val)
 end

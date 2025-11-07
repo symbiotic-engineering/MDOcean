@@ -10,11 +10,11 @@ The optimization solution and post-optimality analysis process is shown in \figu
 
 First, design space exploration is performed using a one-at-a-time (OAT) sweep, meaning that each design variable is individually changed while the others remain at their nominal values.
 This provides an initial understanding of the problem behavior, can potentially reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
-The OAT method does not yield insight into the effect of coupling between design variables, which would be possible with other methods like orthogonal arrays \cite{box_statistics_1978}, but the computational cheapness of the simulation incentivizes simply moving on to optimization rather than pursuing more thorough design space exploration. 
+The OAT method does not yield insight into the effect of coupling between design variables, which would be possible with other methods like orthogonal arrays \cite{box_statistics_1978}, but the computational cheapness of the simulation incentivizes simply moving on to optimization rather than pursuing more thorough design space exploration.
 
 \subsubsection{Single Objective Optimization}\label{sec:single-obj-process}
 \paragraph{Algorithm}
-To choose an appropriate single-objective optimization algorithm, the problem is characterized in the manner recommended in Chapter 1.5 of \cite{martins_engineering_2022}, shown in \tableautorefname~\ref{tab:characterization}. 
+To choose an appropriate single-objective optimization algorithm, the problem is characterized in the manner recommended in Chapter 1.5 of \cite{martins_engineering_2022}, shown in \tableautorefname~\ref{tab:characterization}.
 \begin{table}
     \centering
     \begin{tabular}{cc}
@@ -49,7 +49,7 @@ Future work is required to obtain MEEM gradients, for example via adjoints or al
 Therefore, this study simply uses finite difference to obtain the gradients, with step size determined automatically by the MATLAB Optimization Toolbox.
 This is a viable option due to the simulation's low computational cost.
 Initial concerns that the oscillatory nature of the hydrodynamics would cause problems \cite{mccabe_open-source_2024} turned out to be unfounded.
-This is likely because while individual subfunctions are highly oscillatory, the overall hydrodynamic coefficients are less oscillatory, making gradients still accurate for larger step sizes. 
+This is likely because while individual subfunctions are highly oscillatory, the overall hydrodynamic coefficients are less oscillatory, making gradients still accurate for larger step sizes.
 
 \paragraph{Scaling}
 Scaling of an optimization problem is critical to obtain good results in practice.
@@ -66,7 +66,7 @@ Design variables are implemented in the engineering notation SI unit that makes 
 The objectives are scaled to have a magnitude close to one, using megawatts for power, millions of dollars for cost, and \$/kWh for LCOE.
 
 For the SQP algorithm, Hessian scaling is used to further scale the design variables so that each has a similar effect magnitude on the objective.
-\appendixname~\ref{sec:appendix-scaling} details this procedure. 
+\appendixname~\ref{sec:appendix-scaling} details this procedure.
 
 \paragraph{Sensitivity Analysis}
 After the optimization is complete, sensitivity analysis is performed, first local then OAT global.
@@ -81,11 +81,11 @@ These are obtained analytically from the Lagrange multipliers $\vec{\lambda}$, o
 The details of the calculation appear in \appendixname~\ref{sec:appendix-sensitivties}.
 These sensitivities provide estimates not only on how the objective value would change if a parameter changes while the design stays the same, but also on how the optimal objective value, optimal design, and constraint activity would change if the optimization were repeated with the modified parameter value.
 The estimates do not require re-optimizing and thus have very little computational cost.
-This serves as a screening to quickly identify parameters of high sensitivity for further study in a global parameter sensitivity. 
+This serves as a screening to quickly identify parameters of high sensitivity for further study in a global parameter sensitivity.
 
 %objective parameter sensitivity $dJ^*/dp$, the optimal design parameter sensitivity $\partial x^*/\partial p$, and the parameter change constraint activity threshold $\Delta p_{ij}$ associated with constraint $g_j$
 
-%\hl{Talk about global sensitivities and what the implications of OAT are.} 
+%\hl{Talk about global sensitivities and what the implications of OAT are.}
 
 \subsubsection{Multi-Objective Optimization}\label{sec:multi-obj-process}
 \paragraph{Algorithm}
@@ -99,6 +99,3 @@ Here, the single objective optimums of each objective are used to determine the 
 Specifically, the nadir point ($J_1(J_2=J_2^*), J_2(J_1=J_1^*)$) becomes the center of a circle, and constraint values are chosen to be twenty points equally spaced angularly on the circle.
 The MATLAB  \texttt{paretosearch} function executes the constrained multi-objective pattern search algorithm described in \cite{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and aiming to maximize the Pareto hypervolume and spread.
 This helps quickly fill in the gaps from the epsilon-constraint solutions.
-
-
-

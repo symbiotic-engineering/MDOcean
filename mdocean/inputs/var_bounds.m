@@ -16,14 +16,14 @@ b.var_descs = {'Spar Diameter','Float Diameter','Float Draft','Spar Height',...
     'Float Bottom Thickness','Spar Radial Thickness','Damping Plate Thickness',...
     'Float Stiffener Height','Damping Plate Stiffener Height','Material Index'};
 
-% diameter of spar (m)	
+% diameter of spar (m)
 b.D_s_min = 0;
 b.D_s_max = 30;
 b.D_s_nom = 6;
 b.D_s_wecsim = 6;
 b.D_s_start = 6;
 
-% outer diameter of float (m)	
+% outer diameter of float (m)
 b.D_f_min = 1;
 b.D_f_max = 80;
 b.D_f_wecsim = 20;
@@ -112,7 +112,7 @@ b.M_start = 1;
                  % D_s    D_f   T_f_2   h_s    h_fs_clear  F_max  P_max  thicknesses  stiffener-heights ]
 b.mins_flexible = [false  true  true    true   false       true   true   true(1,3)    false(1,2)]';
 b.maxs_flexible = [true   true  false   false  true        true   true   true(1,3)    true(1,2) ]';
-% if a bound is marked flexible and the bound is active after optimization, 
+% if a bound is marked flexible and the bound is active after optimization,
 % a warning in gradient_optim will remind you to adjust the bound.
 
 % create vectors of mins, maxs, noms, and starts

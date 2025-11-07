@@ -4,7 +4,7 @@ folder = ['dev' filesep 'MEEM_figs'];
 
 phis = {'small-small','large-large'};
 vels = {'small-small','large-small','large-large'};
-figure 
+figure
 tcl = tiledlayout(length(vels),length(phis)*2);
 for i_phi = 1:length(phis)
     for i_vel = 1:length(vels)
@@ -12,7 +12,7 @@ for i_phi = 1:length(phis)
         all_fnames = dir(fullfile(folder,file));
         fname = all_fnames(end).name; % latest
         fig = openfig(fname);
-        
+
         ax = fig.Children(4);
         ax.Parent = tcl;
         ax.Layout.Tile = (i_vel-1)*2*length(phis) + 2*i_phi - 1;
@@ -51,14 +51,14 @@ end
 %% Comparing using binary combinations
 folder = ['dev' filesep 'MEEM_figs'];
 
-figure 
+figure
 
 file = sprintf('*%s*%s*%s*.fig','04-30',', BC = ','VelMatch');
 all_fnames = dir(fullfile(folder,file));
 tile_length = ceil(sqrt(length(all_fnames)));
 tcl = tiledlayout(tile_length,tile_length);
 
-for i = 1:length(all_fnames)   
+for i = 1:length(all_fnames)
     fname = all_fnames(i).name;
     BC_num = regexp(fname, 'BC = (\d+)', 'tokens', 'once');
     fig = openfig(fname);
@@ -72,8 +72,7 @@ for i = 1:length(all_fnames)
     ax.Layout.Tile = i;
     title(ax,['BC = ', BC_num{:}])
 
-    
+
 end
 
 title(tcl,'Radial Velocity for Different Matching Strategies (N=2)')
-

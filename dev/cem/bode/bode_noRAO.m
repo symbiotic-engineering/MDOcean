@@ -31,7 +31,7 @@ X = val.X_f;
 
 
 % Convert magnitude to dB
-mag_db = 20 * log10(mag_matrix); 
+mag_db = 20 * log10(mag_matrix);
 
 % pull data from val/rename
 omega = w;
@@ -86,9 +86,9 @@ for i = 1:size(omega,1)
     color_frac = (i-1)/(length(p.Hs)-1);
     col = [color_frac 0 1-color_frac];
     %mag_norm = mag_data * norm;
-    
+
     nexttile(1)
-    
+
     ylabel(['Magnitude |' y_lab '| ' y_lab_extra ' (-)'])
     %xlim([.5 omega_over_omega_n_max])
 
@@ -97,16 +97,16 @@ for i = 1:size(omega,1)
         'DisplayName',['H_s=' num2str(p.Hs(i))],'Color',col) % TODO: normalize by wn later
     hold on
 
-    
+
     nexttile(2)
 
     xlabel('\omega/\omega_n (-)')
     ylabel(['Phase \angle(' y_lab ') / \pi'])
 
     h = semilogx(omegas, angles/pi,'*-','Color',col);
-    h.Annotation.LegendInformation.IconDisplayStyle = 'off'; 
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
     hold on
-    
+
 
 
     % remove NaN values + high freq values editable with lwb
@@ -114,7 +114,7 @@ for i = 1:size(omega,1)
     mags_clean = mags(1, lwb:end);
     omegas_clean = omegas(1, lwb:end);
     angles_clean = omegas(1, lwb:end);
-    
+
     omegas_clean(isnan(omegas_clean)) = avgs(isnan(omegas_clean));
     omegas_clean_mag = omegas_clean(~isnan(mags_clean));
     omegas_clean_angle = omegas_clean(~isnan(angles_clean));
@@ -122,7 +122,7 @@ for i = 1:size(omega,1)
     mags_clean = mags_clean(~isnan(mags_clean));
     angles_clean = angles_clean(~isnan(angles_clean));
 
-    
+
 
     % input fits and create fit models
 
@@ -132,7 +132,7 @@ for i = 1:size(omega,1)
     'StartPoint', [0.5, 1e-6, 0.1]);
 
     % get results from fit
-    
+
     w_fit = logspace(log10(min(omega, [], "all", "omitnan")), log10(max(omega,[], "all", "omitnan")), 500);
 
     mag_fit_vals = 20*log10(abs((mag_fit.k .* mag_fit.omega_n^2) ./ ...
@@ -145,13 +145,13 @@ for i = 1:size(omega,1)
     nexttile(1)
         plot(w_fit.',mag_fit_vals.',...
         'DisplayName',['\zeta=' num2str(i)],'Color',(i-1)/i*[1 1 1])
-    
+
     else
 
     disp('failed - too few points')
-    
+
     end
-    
+
 end
 improvePlot
 %{

@@ -16,7 +16,7 @@ for i=find(idx_figs)
     catch
         warning("Figure %s errored so it isn't included in the time comparison.\n",full_names{i})
     end
-    
+
 end
 
 idx_matlab = idx_tabs | idx_matlab_fig;

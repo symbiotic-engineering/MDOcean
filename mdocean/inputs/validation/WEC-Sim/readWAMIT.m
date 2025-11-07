@@ -1,13 +1,13 @@
 function hydro = readWAMIT(hydro,filename,exCoeff)
 % Reads data from a WAMIT output file.
-% 
-% If generalized body modes are used, the output directory must also 
+%
+% If generalized body modes are used, the output directory must also
 % include the `*.cfg`, `*.mmx`, and `*.hst` files.
 % If simu.nonlinearHydro = 3 will be used, the output directory must also
 % include the `*.3fk` and `*.3sc` files.
-% 
+%
 % See ``WEC-Sim/examples/BEMIO/WAMIT`` for examples of usage.
-% 
+%
 % Parameters
 % ----------
 %     hydro : struct
@@ -19,14 +19,14 @@ function hydro = readWAMIT(hydro,filename,exCoeff)
 %     exCoeff : integer
 %         Flag indicating the type of excitation force coefficients to
 %         read, ‘diffraction’ (default), ‘haskind’, or ‘rao’
-% 
+%
 % Returns
 % -------
 %     hydro : struct
 %         Structure of hydro data with WAMIT data appended
-% 
+%
 
-%% 
+%%
 [a,b] = size(hydro);  % Check on what is already there
 if b == 1 && ~isfield(hydro(b),'Nb')
     F = 1;
@@ -186,8 +186,8 @@ for n = 1:N
             end
             if i>N break; end
         end
-    end    
-    
+    end
+
     if isempty(strfind(raw{n},'SURGE, SWAY, HEAVE, ROLL, PITCH & YAW DRIFT FORCES (Control Surface)'))==0
         hydro(F).Nh = 0;  % Number of wave headings
         i = n+1;
@@ -247,7 +247,7 @@ for n = 1:N
             if i>N break; end
         end
     end
-    
+
     d = floor(10*n/N);  % Update progress bar every 10%, otherwise slows computation
     if d>e
         %waitbar(n/N);
@@ -282,7 +282,7 @@ if exist([tmp{1} '.3sc'],'file')==2
 end
 
 %% Froude-Krylov force
-hydro(F).fk_ma = NaN(size(hydro(F).ex_ma));  
+hydro(F).fk_ma = NaN(size(hydro(F).ex_ma));
 hydro(F).fk_ph = NaN(size(hydro(F).ex_ph));
 hydro(F).fk_re = NaN(size(hydro(F).ex_re));
 hydro(F).fk_im = NaN(size(hydro(F).ex_im));
@@ -328,7 +328,7 @@ if exist([tmp{1} '.cfg'],'file')==2
             end
         end
     end
-    if sum(hydro(F).dof) > hydro(F).Nb*6  % If there are generalized body modes        
+    if sum(hydro(F).dof) > hydro(F).Nb*6  % If there are generalized body modes
         tmp = strsplit(filename,{' ','.out'});
         fileID = fopen([tmp{1} '.mmx']);    % Read in mass, damping, and stiffness
         raw = textscan(fileID,'%[^\n\r]');  % Read/copy raw output
@@ -344,9 +344,9 @@ if exist([tmp{1} '.cfg'],'file')==2
                     hydro(F).gbm(tmp{1,1}(1),tmp{1,1}(2),3) = tmp{1,1}(5);  % gbm[:,:,3] - Stiffness
                 end
             end
-        end        
+        end
         tmp = strsplit(filename,{' ','.out'});
-        fileID = fopen([tmp{1} '.hst']);    % Read in hydrostatic stiffness 
+        fileID = fopen([tmp{1} '.hst']);    % Read in hydrostatic stiffness
         raw = textscan(fileID,'%[^\n\r]');  % Read/copy raw output
         raw = raw{:};
         fclose(fileID);

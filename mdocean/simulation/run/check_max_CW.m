@@ -3,7 +3,7 @@ function [hydro_ratio, P_wave, CW_max, ...
 % Checks whether the maximum radiation-limited capture width is violated.
 % b_or_X: provide b (or no input) if you want to use the design with highest avg power (worst case),
 % vs provide X if you want to check a certain design.
-    
+
     if nargin<1
         filename_uuid = '';
     end
@@ -16,12 +16,12 @@ function [hydro_ratio, P_wave, CW_max, ...
     if nargin<4
         plot_on = true;
     end
-    
+
     if isstruct(b_or_X)
         b = b_or_X;
         b.filename_uuid = filename_uuid;
-    
-        [X,val,~,P_elec] = max_avg_power(p,b);    
+
+        [X,val,~,P_elec] = max_avg_power(p,b);
     elseif isfloat(b_or_X)
         X = b_or_X;
         [~,P_elec,~,val] = simulation(X, p);
@@ -64,7 +64,7 @@ function [hydro_ratio, P_wave, CW_max, ...
         colorbar
         grid on
         title('CW / CW_{max}')
-    
+
         figure
         plot(p.T,hydro_ratio(1,:))
         xlabel('Wave Period T (s)')
@@ -74,4 +74,3 @@ function [hydro_ratio, P_wave, CW_max, ...
         improvePlot
     end
 end
-

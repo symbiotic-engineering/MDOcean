@@ -8,7 +8,7 @@
 %                   Avoid including structs or cells.                     %
 %       - filename: (Optional) Output path, including the name of the file.
 %                   If not specified, the table will be stored in a       %
-%                   './table.tex' file.                                   %  
+%                   './table.tex' file.                                   %
 % ----------------------------------------------------------------------- %
 %   Example of use:                                                       %
 %       LastName = {'Sanchez';'Johnson';'Li';'Diaz';'Brown'};             %
@@ -18,7 +18,7 @@
 %       Weight = [176;163;131;133;119];                                   %
 %       T = table(Age,Smoker,Height,Weight);                              %
 %       T.Properties.RowNames = LastName;                                 %
-%       table2latex(T);                                                   %                                       
+%       table2latex(T);                                                   %
 % ----------------------------------------------------------------------- %
 %   Version: 1.1                                                          %
 %   Author:  Victor Martinez Cagigal                                      %
@@ -26,11 +26,11 @@
 %   E-mail:  vicmarcag (at) gmail (dot) com                               %
 % ----------------------------------------------------------------------- %
 function table2latex(T, filename, special_col_spec, special_first_row)
-    
+
     % Error detection and default parameters
     if nargin < 2
         filename = 'table.tex';
-        fprintf('Output path is not defined. The table will be written in %s.\n', filename); 
+        fprintf('Output path is not defined. The table will be written in %s.\n', filename);
     elseif ~ischar(filename)
         error('The output file name must be a string.');
     else
@@ -46,7 +46,7 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     if nargin<4
         special_first_row = [];
     end
-    
+
     % Parameters
     n_col = size(T,2);
     col_spec = [];
@@ -56,16 +56,16 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     col_names = strjoin(T.Properties.VariableNames, ' & ');
     row_names = T.Properties.RowNames;
     if ~isempty(row_names)
-        col_spec = ['l' col_spec]; 
+        col_spec = ['l' col_spec];
         col_names = ['& ' col_names];
     end
-    
+
     if ~isempty(special_col_spec)
         col_spec = strrep(special_col_spec, '\', '\\');
     end
 
     % Writing header
-    
+
     table_string = '';
     table_string = append(table_string, ['\\begin{tabular}{' col_spec '}\n']);
 
@@ -84,10 +84,10 @@ function table2latex(T, filename, special_col_spec, special_first_row)
             row_data{1,n_col} = [];
             for col = 1:n_col
                 value = T{row,col};
-                
+
                 use_percent = contains(T.Properties.VariableNames{col},'error','IgnoreCase',true);
                 value = format_value(value, use_percent);
-                
+
                 row_data{1,col} = char(value);
             end
             if ~isempty(row_names)
@@ -104,7 +104,7 @@ function table2latex(T, filename, special_col_spec, special_first_row)
         base_err = addCause(base_err,err);
         throw(base_err)
     end
-    
+
     table_string = append(table_string,'\\end{tabular}');
 
     fileID = fopen(filename, 'w');
@@ -130,7 +130,7 @@ function value = format_value(value, use_percent)
             value = str2double(value);
         end
     end
-    
+
     % Format the output
     if isnumeric(value)
         if isinf(value)

@@ -84,7 +84,7 @@ function center_rect(vec,color)
     x_left = x_mid - w/2;
     y_botm = y_mid - h/2;
     pos = [x_left y_botm w h];
-    
+
     rectangle('Position',pos,'LineWidth',3,'EdgeColor',color)
 
 end

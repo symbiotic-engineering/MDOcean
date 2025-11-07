@@ -64,7 +64,7 @@
 \author{Overleaf}
 \date{\today}
 
-\begin{document}\thispagestyle{empty} 
+\begin{document}\thispagestyle{empty}
 
 \begin{center}
     \begin{figure}[h]
@@ -79,11 +79,11 @@
     \large
     \textit{12-14 August | Corvallis, OR USA} \\
     \vspace{1\baselineskip}
-       
+
     \Large
     WEC optimization to maximize grid economic value and avoided emissions
     \vspace{.5\baselineskip}
-    
+
     \large
     Rebecca McCabe\textsuperscript{a}\footnote{$\ast$ Corresponding author. E-mail address:  rgm222@cornell.edu \\ },
     Madison Dietrich\textsuperscript{a},
@@ -93,8 +93,8 @@
     Leah Buccino\textsuperscript{a},
     Alan Liu\textsuperscript{c},
     Maha Haji\textsuperscript{a,d}
-    
-    
+
+
     \small
     \begin{center}
         \textit{\textsuperscript{a}Sibley School of Mechanical and Aerospace Engineering, Cornell University, 124 Hoy Road, Ithaca, NY 14853, USA} \\
@@ -103,7 +103,7 @@
         \textit{\textsuperscript{d}Department of Systems Engineering, Cornell University, 136 Hoy Road, Ithaca, NY 14853, USA}
     \end{center}
     \normalsize
-\end{center}         
+\end{center}
 \vspace{-\baselineskip}\noindent\rule{\textwidth}{0.4pt}\vspace{-\baselineskip}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Abstract}
@@ -125,7 +125,7 @@ Full design optimization results are pending and will demonstrate the impact of 
 % Meanwhile, the grid system economic objective is hypothesized to favor larger WECs in scenarios with winter generation deficits, such as the U.S. northeast with electrified heat loads, where the value of capturing energetic winter sea states outweighs the cost of surviving them.
 % On the other hand, systems with storage constraints should favor smaller WECs, where the avoided storage cost due to more consistent power generation outweighs the penalty in absorbed power.
 % Finally, we discuss the broader implications of these findings for future WEC design optimization priorities.
- \hfill 
+ \hfill
 
 \vspace{.5\baselineskip}
 \textit{Keywords:} techno-economic model, environmental impact assessment, energy grid integration, multidisciplinary design optimization, life cycle analysis, capacity expansion model
@@ -142,7 +142,7 @@ Prior WEC grid studies reveal benefits of reduced curtailment, higher capacity f
 
 Considering energy system factors in the early design phase can steer WEC development to leverage this value, maximizing climate benefit.
 Recent studies for other technologies incorporate design considerations into grid optimization \cite{schwartz_value_2023,ricks_value_2022}, grid considerations into design optimization \cite{mehta_designing_2024}, and combined grid and environmental considerations into design optimization \cite{canet_eco-conscious_2023,kainz_how_2024}.
-This study is the first to apply integrated design and grid optimization to WECs, and is a methodological improvement over similar work. 
+This study is the first to apply integrated design and grid optimization to WECs, and is a methodological improvement over similar work.
 Specifically, a surrogate capacity expansion model (CEM) within a nonlinear design optimization more fully captures design-grid coupling and is computationally efficient.
    % -  prior work showing that CEM is more important than economic dispatch?
 
@@ -196,13 +196,13 @@ GenX requires detailed input data on the cost, hourly profile, and existing infr
 This is managed by the PowerGenome package \cite{schivley_powergenomepowergenome_2025}, which consolidates data from multiple sources including scenarios for reference, moderate, and high levels of electrification.
 PowerGenome also allows control over a grid-wide maximum CO\textsubscript{2} constraint.
 \figureautorefname~\ref{fig:CEM-data-flow} depicts the data flow for the CEM runs prior to design optimization and documents the grid data sources.
-%Coefficients $\beta$ 
+%Coefficients $\beta$
 Grid costs and emissions are found for each input combination of WEC cost, grid scenario, location, and WEC dynamics (damping ratio and natural frequency).
 Orange outlines indicate code implemented in this work rather than an existing package.
-PowerGenome does not provide WEC data, so we use the MHKit interface \cite{klise_mhkit_2020} to NREL hindcast power densities \cite{wu_development_2020,allahdadi_development_2019} along with design-dependent capture width information to generate the WEC hourly power profiles. 
+PowerGenome does not provide WEC data, so we use the MHKit interface \cite{klise_mhkit_2020} to NREL hindcast power densities \cite{wu_development_2020,allahdadi_development_2019} along with design-dependent capture width information to generate the WEC hourly power profiles.
 Temporal and spatial resolution and scope are set to hourly energy profiles for one year each decade
-% for three decades, 
-for a Northeast %and California 
+% for three decades,
+for a Northeast %and California
 grid scenario with three load zones.
 %and two load zones respectively.
 \begin{figure}[bth]
@@ -223,7 +223,7 @@ grid scenario with three load zones.
 \end{figure}
 \subsubsection{\textit{Reduced order model and lookup table}}
 The two WEC inputs to the CEM are capacity cost and power profile (hourly energy density times capture width $CW$ at matching wave heights and periods).
-Cost can be swept easily, but $CW(H_s,T_e)$ depends on 15 additional inputs. 
+Cost can be swept easily, but $CW(H_s,T_e)$ depends on 15 additional inputs.
 A 16-dimensional sweep is computationally prohibitive, so we use a reduced order model (ROM) to collapse the WEC design space into a few key features and a surrogate model to predict CEM outputs from the reduced space.
 The ROM is used only to capture the effect of WEC design on the hourly CEM variability profile, not to calculate energy.
 
@@ -240,13 +240,13 @@ $\mathcal{D}$ is defined in the appendix.
 % response amplitude operator $\widehat{RAO}$ is the complex ratio of WEC motion to wave amplitude, $\hat{X}/\eta$.
 The ROM seeks to approximate the three functions $\hat{Z}(\mathbf{\Pi_1})$ as functions of a reduced set of values $\mathbf{\Pi_2}$.
 Before the design optimization, the CEM is run for all combinations of $\mathbf{\Pi_2}$.
-During design optimization, we perform a least-squares fit over an error model to find the reduced groups $\mathbf{\Pi_2}$ at each iteration, and then use a surrogate model to find CEM outputs as a function of $\mathbf{\Pi_2}$. 
+During design optimization, we perform a least-squares fit over an error model to find the reduced groups $\mathbf{\Pi_2}$ at each iteration, and then use a surrogate model to find CEM outputs as a function of $\mathbf{\Pi_2}$.
 Currently, the surrogate model is a lookup table with linear interpolation.
 Future work could develop a mechanistic surrogate model to understand CEM driving factors and allow extrapolation to different grid scenarios.
 
 Two approaches are possible in selecting $\mathbf{\Pi_2}$ and the corresponding error model: a pole-zero description of the dynamics to obtain a low-order transfer function, or a hydrodynamics-informed curve fit.
-A pole-zero description, $\mathbf{\Pi_{2,pz}}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics. 
-A variety of existing WEC models use this \cite{bacelli_system_2017} or similar approaches \cite{kristiansen_state-space_2005}. 
+A pole-zero description, $\mathbf{\Pi_{2,pz}}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics.
+A variety of existing WEC models use this \cite{bacelli_system_2017} or similar approaches \cite{kristiansen_state-space_2005}.
 \appendixname~A shows the equation for an arbitrary number of poles and zeros.
 Alternatively, a custom hydrodynamics curve fit, $\mathbf{\Pi_{2,hyd}}$, offers more accuracy at lower order using deep mechanistic understanding of the physics. \appendixname~A shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
 
@@ -261,7 +261,7 @@ The magnitude fit depends significantly more on $H_s$ than the phase fit.
 Mismatch of magnitude and phase fits at low $H_s$ is evidence of a nonminimum phase system, and the larger mismatch at high $H_s$ is due to drag nonlinearities.
 While it doesn't affect the shape of $\hat{Z}(\omega)$, stiffness $K$ also shows nonlinearity.
 
-Difficulty capturing high-frequency behavior is expected from the model structure. 
+Difficulty capturing high-frequency behavior is expected from the model structure.
 A second-order system has equivalent damping $B=\Re(\hat{F}/(i\omega\hat{X}))=2\zeta/\omega_n$, which is constant across frequency, and equivalent reactance $K-(m+A)/\omega^2=\Re(\hat{F}/\hat{X})\sim 1-\omega^2/\omega_n^2$, which only permits added mass frequency-dependence of the form $A = A_\infty + A_0/\omega^2$ \cite{franklin2014feedback}.
 This does not align with the true shape of $\hat{Z}_h(\omega)$, in which $B$ decreases (perhaps after an initial increase) and $A$ often has local minima and maxima.
 Future work should better explore hydrodynamic curve fits $\mathbf{\Pi_{2,hyd}}$.
@@ -269,7 +269,7 @@ Future work should better explore hydrodynamic curve fits $\mathbf{\Pi_{2,hyd}}$
 
 
 
-%In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs. 
+%In addition to the directly used CEM outputs of grid cost and emissions, we use additional CEM outputs (installed capacity of WECs and other generators) and compute indirect CEM outputs (maximum cost threshold) as part of the surrogate model to predict the primary outputs from design inputs.
 %The maximum threshold cost represents the maximum cost of any generator (with the most favorable generation profile) that would be installed for each grid scenario.
 \begin{figure}[bth]
 \noindent
@@ -310,12 +310,12 @@ Future work should better explore hydrodynamic curve fits $\mathbf{\Pi_{2,hyd}}$
 %     \widehat{RAO}(\omega) = \frac{1}{1-\left(\frac{\omega}{\omega_n}\right)^2 + i 2 \zeta \frac{\omega}{\omega_n}}
 % \end{equation}
 
-% It is also required to model 
+% It is also required to model
 % \begin{equation}
 %     B_u = \overline{B_{u}} \omega \exp(-\omega^2)
 % \end{equation}
-    %- assumes that the WEC can generate less than its max power without violating any amplitude/force constraints        
-    %-  how CEM system cost gets turned into NVOE metric (since CEM enforces NVOE=0)    
+    %- assumes that the WEC can generate less than its max power without violating any amplitude/force constraints
+    %-  how CEM system cost gets turned into NVOE metric (since CEM enforces NVOE=0)
 \subsubsection{\textit{Life cycle analysis (LCA)}}
 LCA in the early design phase is challenging due to uncertainties in materials, manufacturing, and transportation \cite{moni_life_2020}.
 Fortunately, optimization only requires modeling effects that meaningfully scale with design variables.
@@ -327,13 +327,13 @@ We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon. Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
 \begin{minipage}[m]{0.34\textwidth}
     \begin{table}[H]
-    \begin{tabular}{ ll } 
+    \begin{tabular}{ ll }
         \hline
-        Component & Value \\ 
+        Component & Value \\
         \hline
-        Steel & 0.192 \$/kg \\ 
-        Fiberglass & 6.950 \$/m\textsuperscript{2} \\ 
-        Dist. from shore & 65.88 \$/mile \\ 
+        Steel & 0.192 \$/kg \\
+        Fiberglass & 6.950 \$/m\textsuperscript{2} \\
+        Dist. from shore & 65.88 \$/mile \\
         Social cost of CO\textsubscript{2} & 0.145 \$/kgCO\textsubscript{2} \\
     \end{tabular}
     \caption{Eco-cost coefficients}
@@ -345,7 +345,7 @@ MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissio
     \vspace{.2\baselineskip}
     \setlength{\parindent}{1.5em}
     The nominal RM3
-    %, which uses 667 tonnes of steel, has a hull area of 924 m\textsuperscript{2}, and is 3.4 miles from shore, 
+    %, which uses 667 tonnes of steel, has a hull area of 924 m\textsuperscript{2}, and is 3.4 miles from shore,
     eco-cost is \$134,800 per WEC.
     95\% is from steel, 5\% from fiberglass, and <1\% from transportation.
     Using the social cost of carbon, each WEC must displace >930 tonnes of CO\textsubscript{2} emissions on the grid over its lifetime to ``break even" (achieve a net positive eco-value).
@@ -361,7 +361,7 @@ MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissio
 \end{minipage}
 \vspace{-\baselineskip}
 \section{Results and conclusions}
-It took 20 minutes to run the 15 CEM optimizations on an Ubuntu 20.04 server with Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz, using up to 28 threads for each optimization and executing successive optimizations in series. Of this time, only around half is spent in GenX, since PowerGenome takes 35 seconds per case. %, downloading MHKit data takes 17 seconds, 
+It took 20 minutes to run the 15 CEM optimizations on an Ubuntu 20.04 server with Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz, using up to 28 threads for each optimization and executing successive optimizations in series. Of this time, only around half is spent in GenX, since PowerGenome takes 35 seconds per case. %, downloading MHKit data takes 17 seconds,
 %It took \hl{XX} minutes to run the design optimization, with each simulation taking \hl{XX} ms and each single-objective optimization taking \hl{XX} iterations.
 Figure~\ref{fig:cem-cost-sweep} shows the normalized grid cost, CO2 emissions, and capacity from the CEM for a WEC with $\zeta=0.05, \omega_n=0.4$, and $B_{u}=10^5\omega e^{-\omega^2}$ (a Rayleigh distribution: an alternative model to the one in \appendixname~A) in the Northeast.
 %These results have WEC capacities of zero in the yellow regions due to a lack of economic viability, and therefore have constant system cost and emissions there.
@@ -427,7 +427,7 @@ Finally, design optimization results will yield insight into whether and how the
 % \section{Conclusions}
 % When assessed in a CEM that accounts for their temporal value, WECs are actually quite close to viable, despite a high LCOE.
 % We also find that optimizing for grid system cost instead of LCOE makes a big difference in the optimal design.
-% \hl{XX}. 
+% \hl{XX}.
 
 \section*{Acknowledgments and Data Availability}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -437,9 +437,9 @@ We thank Olivia Vitale and Collin Treacy for feedback on a draft. Open-source co
 
 % \begin{framed}
 % \textbf{Nomenclature} \\
-% \normalsize    
-%     A\ \ \ \ radius of \\    
-%     B \ \ \ \ position of \\    
+% \normalsize
+%     A\ \ \ \ radius of \\
+%     B \ \ \ \ position of \\
 %     C\ \ \ \ further nomenclature continues down the page inside the text box \\
 % \end{framed}
 
@@ -450,11 +450,11 @@ We thank Olivia Vitale and Collin Treacy for feedback on a draft. Open-source co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Appendix A. Reduced order model details}
 The $CW(H_s,T_e)$ equation initially involves 18 quantities: $CW$, $H_s$, $T_e$,
-6 design variables (generator ratings $F_{lim}$ and $P_{lim}$ and float and spar diameters $D_f$ and $D_s$ and drafts $T_f$ and $T_s$), 
-and 9 parameters (damping plate diameter and thickness $D_d$ and $h_d$, efficiency $\eta_{PTO}$, float and spar drag coefficient $C_{d,f}$ and $C_{d,s}$, damping versus reactive control type $C$, water depth $h$, water density $\rho$, and acceleration of gravity $g$). 
+6 design variables (generator ratings $F_{lim}$ and $P_{lim}$ and float and spar diameters $D_f$ and $D_s$ and drafts $T_f$ and $T_s$),
+and 9 parameters (damping plate diameter and thickness $D_d$ and $h_d$, efficiency $\eta_{PTO}$, float and spar drag coefficient $C_{d,f}$ and $C_{d,s}$, damping versus reactive control type $C$, water depth $h$, water density $\rho$, and acceleration of gravity $g$).
 These span three physical dimensions (length, time, and mass).
-By the Buckingham-$\pi$ theorem, the relationship can be reduced to a function of $18-3=15$ dimensionless groups \cite{mckinley_dimensional_2021}. 
-Capture width is nondimensionalized by the maximum radiative capture width, $CW_{max}=Gg/\omega^2$, with gain $G$ (1 for heave, 2 for surge/pitch) and frequency $\omega$ \cite{zou_practical_2023}. % 1 
+By the Buckingham-$\pi$ theorem, the relationship can be reduced to a function of $18-3=15$ dimensionless groups \cite{mckinley_dimensional_2021}.
+Capture width is nondimensionalized by the maximum radiative capture width, $CW_{max}=Gg/\omega^2$, with gain $G$ (1 for heave, 2 for surge/pitch) and frequency $\omega$ \cite{zou_practical_2023}. % 1
 Wave height is divided by water depth. % 2
 Wave period is captured as the product of wavenumber and water depth, $kh$. % 3
 Generator force and power limits are nondimensionalized by the force and power at the maximum capture width, $F_{max}$ and $P_{max}$. % 4-5
@@ -462,9 +462,9 @@ The six dimensions are divided by each other or the water depth.% 6-11
 The efficiency, drag coefficients, and control type are already nondimensional. % 12-15
 Thus, we have the following $\mathbf{\Pi_1}$ dimensionless groups:
 \begin{equation}
-    \frac{CW}{CW_{max}} = f\left( \mathbf{\Pi_1} \right) = f\left(\frac{H_s}{h}, kh, 
+    \frac{CW}{CW_{max}} = f\left( \mathbf{\Pi_1} \right) = f\left(\frac{H_s}{h}, kh,
     \frac{P_{lim}}{P_{max}}, \frac{F_{lim}}{F_{max}},
-    \frac{D_f}{h}, \frac{D_s}{D_f}, \frac{T_f}{T_s}, \frac{T_s}{h}, \frac{D_d}{D_f}, \frac{t_d}{D_d}, 
+    \frac{D_f}{h}, \frac{D_s}{D_f}, \frac{T_f}{T_s}, \frac{T_s}{h}, \frac{D_d}{D_f}, \frac{t_d}{D_d},
     \eta_{PTO}, C_{d,f}, C_{d,s},  C\right)
 \end{equation}
 Moving to the pole-zero ROM, a general model with $C_P$ complex pole pairs, $C_Z$ complex zero pairs, $R_P$ real poles, and $R_Z$ real zeros has a total of $2C_P+2C_Z+R_P+R_Z$ parameters and is expressed as:
@@ -472,13 +472,13 @@ Moving to the pole-zero ROM, a general model with $C_P$ complex pole pairs, $C_Z
     \mathbf{\Pi_{2,pz}} =  \left(
         \zeta_{p},~ \omega_{n,p},~
         \zeta_{z},~ \omega_{n,z},~
-        \tau_{p},~ 
-        \tau_{z} 
+        \tau_{p},~
+        \tau_{z}
         \right),
     \quad
-    \frac{\hat{X}}{\hat{F}} = 
-    \prod_{r_p=1}^{R_P} 
-    \prod_{r_z=1}^{R_Z} 
+    \frac{\hat{X}}{\hat{F}} =
+    \prod_{r_p=1}^{R_P}
+    \prod_{r_z=1}^{R_Z}
     \prod_{c_p=1}^{C_P}
     \prod_{c_z=1}^{C_Z}
     \frac{1+\tau_{z,r_z} i \omega}

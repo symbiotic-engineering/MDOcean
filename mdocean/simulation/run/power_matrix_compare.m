@@ -2,15 +2,15 @@ function [weighted_power_error,...
           max_float_amp_error,...
           power_mech_err_matrix,...
           float_amp_err_matrix,figs] = power_matrix_compare(X, p, wecsim_filename, report, override)
-    
+
     if nargin<4
         report = false;
     end
-    
+
     results_wecsim = load_wecsim_results(wecsim_filename, p);
-    
+
     results_mdocean = compute_mdocean_results(X,p);
-    
+
     if report
         results_RM3_report = load_RM3_report_results(p.eff_pto, override);
         results_actual = results_RM3_report;
@@ -24,14 +24,14 @@ function [weighted_power_error,...
         actual_str = 'WecSim';
         sim_str = {'MDOcean'};
     end
-    
+
     % options: 'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
     vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
         'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
     figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
-    
+
     if ~report
         power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
                                                              results_sim.power_mech_unsat);
@@ -53,7 +53,7 @@ function [weighted_power_error,...
     %      'Capture Width / Max Capture Width (-)',...
     %      'Capture Width / Max Capture Width (-)',...
     %     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-    
+
     % compare average power over all sea states in JPD
     weighted_power_error = zeros([1,length(results_sim)]);
     for i=1:length(results_sim)
@@ -130,7 +130,7 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                     error_levels = -10:5:40;
                 end
             end
-            
+
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
@@ -174,8 +174,8 @@ function results = load_RM3_report_results(eff_pto, override)
 
     power_mech_unsat = readmatrix(report_filename,'Range','E73:S86',...
                                     'Sheet',sheet);
-    
-    
+
+
     Hs = readmatrix(report_filename,'Range','D73:D86','Sheet',sheet);
     Te = readmatrix(report_filename,'Range','E72:S72','Sheet',sheet);
 
@@ -215,7 +215,7 @@ function results = compute_mdocean_results(X,p)
     [~, P_matrix, ~, val] = simulation(X_unsat,p);
     power_elec_unsat = P_matrix/1000;
     power_mech_unsat = val.P_mech/1000;
-    
+
     % saturated power
     [~, P_matrix] = simulation(X,p);
     power_elec_sat = P_matrix/1000;
@@ -284,7 +284,7 @@ function results = assemble_results_struct(sz,varargin)
 
     % calculated variables
     wave_resource_raw = 1030 * 9.8^2 / (64*pi) * results.T .* results.H.^2 / 1000;
-    
+
     %diameter = X(2);
     results.CW = results.power_mech_unsat ./ wave_resource_raw;    % capture width
     CW_max = 9.8 * results.T.^2 / (4*pi^2);             % max CW for linear hydrodynamics, axisymmetric body

@@ -15,7 +15,7 @@ setenv('MW_PCT_TRANSPORT_HEARTBEAT_INTERVAL', '1000');
 sourceCodeFolder = 'mdocean';
 addpath(genpath(sourceCodeFolder))
 
-if exist('../WEC-Sim','dir')    
+if exist('../WEC-Sim','dir')
     wecSimFolder = '../WEC-Sim/source';
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimFolder))
@@ -54,11 +54,11 @@ runner.addPlugin(p5);
 runner.ArtifactsRootFolder = test_dir;
 
 t = tic;
-results = runner.run(suite);    % parallel would make it slower because it 
+results = runner.run(suite);    % parallel would make it slower because it
                                 % would run the test class setup on every worker
 clockTime = toc(t);
 
-if ~batchStartupOptionUsed % don't open reports when running on CI server 
+if ~batchStartupOptionUsed % don't open reports when running on CI server
     open([cov_dir '/coverageReport/index.html'])
     open([test_dir '/testreport.pdf'])
 end

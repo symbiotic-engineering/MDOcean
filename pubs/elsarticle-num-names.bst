@@ -1,11 +1,11 @@
 %%
 %% This is file `elsarticle-num-names.bst'  (Version 2.1),
-%% 
+%%
 %% Copyright 2009-2024 Elsevier Ltd
-%% 
+%%
 %% This file is part of the 'Elsarticle Bundle'.
 %% ---------------------------------------------
-%% 
+%%
 %% It may be distributed under the conditions of the LaTeX Project Public
 %% License, either version 1.3 of this license or (at your option) any
 %% later version.  The latest version of this license is in
@@ -1509,7 +1509,7 @@ FUNCTION {begin.bib}
 }
 EXECUTE {begin.bib}
 EXECUTE {init.state.consts}
-EXECUTE {init.web.variables} 
+EXECUTE {init.web.variables}
 ITERATE {call.type$}
 FUNCTION {end.bib}
 { newline$
@@ -1531,5 +1531,3 @@ EXECUTE {end.bib}
 %%
 %% 30.08.2012
 %%   a. collaboration added.
-
-

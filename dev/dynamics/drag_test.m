@@ -2,7 +2,7 @@
 % compare against Yu and Li 2013 RANS paper, Figure 21
 % see summer 24 research slideshow, slide 81
 
-close all; clear 
+close all; clear
 
 reactive = true;
 
@@ -30,7 +30,7 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd,ax)
     p.use_multibody = multibody;
     p.use_force_sat = false;
     p.use_power_sat = false;
-    
+
     if reactive
         p.control_type = 'Reactive';
         linestyle = '-';
@@ -49,13 +49,13 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd,ax)
     X = [b.X_noms; 1];
     X(strcmp(b.var_names,'F_max')) = Inf;
     X(strcmp(b.var_names,'P_max')) = Inf;
-    
+
     %p.T = 6.5;
     %p.Hs = 2.25;
     %p.JPD = 1;
     [~,H] = meshgrid(p.T, p.Hs);
 
-    
+
     hold on
     for i = 1:length(Cd)
         p.C_d_float = Cd(i);
@@ -74,13 +74,13 @@ function P_over_H2_2pt5 = sweep_drag(reactive,multibody,Cd,ax)
     end
     xlabel('T (s)')
     ylabel('P / H^2 (kW/m^2) at H=2.5m')
-    
+
     T_new = [4 4.5 p.T]; % extend to lower periods
     w = 2*pi./T_new;
     k = w.^2 / p.g;
     lambda = 2*pi./k;
     P_over_H2_max = p.rho_w * p.g^2 * T_new .* lambda / (64 * pi^2);
-    
+
     plot(ax,T_new,P_over_H2_max/1000,...
         'DisplayName','Theoretical limit')
     ylim([0 115])

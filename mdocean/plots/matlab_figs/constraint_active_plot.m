@@ -26,8 +26,8 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
     [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
     f = figure('Color','w');
-    tiledlayout(2,3,'TileSpacing','tight','Padding','tight'); 
-    
+    tiledlayout(2,3,'TileSpacing','tight','Padding','tight');
+
     nexttile
     spy(lb_active(idx,:)','v');
     hold on

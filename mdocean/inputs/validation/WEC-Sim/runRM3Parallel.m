@@ -71,7 +71,7 @@ else
             end
         end
     end
-    
+
     numConditions=2;
     if length(waves.phaseSeed)>1
         numConditions=numConditions+1;
@@ -82,7 +82,7 @@ else
             mcr.cases(len*(nseed-1)+1:len*(nseed-1)+len,    numConditions) = waves.phaseSeed(nseed);
         end
     end
-    
+
     if exist('pto','var')
         for n=1:size(pto,2)
             if (length(pto(n).damping)>1 || length(pto(n).stiffness)>1)
@@ -91,7 +91,7 @@ else
                 mcr.header{numConditions-1} = name;
                 name = sprintf('pto(%i).stiffness', n);
                 mcr.header{numConditions  } = name;
-                
+
                 len = length(mcr.cases(:,1)); kkk = 0;
                 for l2=1:length(pto(n).stiffness)
                     for l1=1:length(pto(n).damping)
@@ -111,7 +111,7 @@ pause(1)
 delete savedLog*
 
 % variables to save
-timesteps_per_period = mcr.cases(:,2) / simu.dt; 
+timesteps_per_period = mcr.cases(:,2) / simu.dt;
 P = zeros(length(mcr.cases(:,1)), 1);
 force_pto = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude = zeros(length(mcr.cases(:,1)), 1);
@@ -132,8 +132,8 @@ parfor imcr=1:length(mcr.cases(:,1))
     fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
     % Run WEC-Sim
     try
-        output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
-    
+        output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);
+
         % extract signals over the last period
         N_per_T = timesteps_per_period(imcr);
         power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
@@ -141,7 +141,7 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
         spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
         rel_pos = float_pos - spar_pos;
-    
+
         % save specific output variables
         P(imcr) = mean(power);
         force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));

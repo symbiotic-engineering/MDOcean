@@ -8,7 +8,7 @@ function flag = optim_geomviz(x,p,b)
     ax = gca();
     lines = findobj(ax, 'Type', 'line');
     rectangles = findobj(ax, 'Type', 'rectangle');
-    
+
     % Change their color to light grey
     for i = 1:length(lines)
         lines(i).Color = grey;

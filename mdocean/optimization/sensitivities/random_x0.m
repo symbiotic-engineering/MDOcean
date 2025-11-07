@@ -11,4 +11,3 @@ x0(length(b.var_names)) = randi(b.M_max);
 x0_struct = cell2struct(num2cell(x0(1:end-1)),b.var_names(1:end-1));
 
 end
-

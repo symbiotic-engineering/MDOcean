@@ -33,7 +33,7 @@ group_scatter_plot(IN, OUT, GROUP, in_name, out_name, group_name, group_vals)
 
 % Attempt 1: beta indpendent of grid inputs (fit across all grid inputs)
 
-% (step 1) beta 6,7,8: from fitting x_grid_nonwec_data - x_grid_nonwec_0 
+% (step 1) beta 6,7,8: from fitting x_grid_nonwec_data - x_grid_nonwec_0
 % as a function of ZETA, OMEGA_RATIO, and POWER_RATIO:
 % x_grid_nonwec_model - x_grid_nonwec_0 = - beta(6)*ZETA - beta(7)*OMEGA_RATIO - beta(8)*POWER_RATIO;
 in1 = [ZETA(:), OMEGA_RATIO(:), POWER_RATIO(:)];
@@ -111,8 +111,8 @@ function [C_grid_data,percent_capacity_wecs_data,...
 
     % model: what would come out of CEM if my model were perfect
     % data: what comes out of CEM (model + noise)
-    % fit: what the fit to the data using the model predicts 
-    
+    % fit: what the fit to the data using the model predicts
+
     OMEGA_RATIO = OMEGA_N ./ OMEGA_P_0;
     cost_wec_thresh_model = cost_wec_thresh_max_0 - beta(3)*ZETA - beta(4)*OMEGA_RATIO - beta(5)*POWER_RATIO;
     cost_wec_ratio_model = cost_wec_thresh_model ./ COST_WEC;

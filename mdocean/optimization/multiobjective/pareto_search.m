@@ -12,7 +12,7 @@ function [x,fval,residuals,tol,p] = pareto_search(p,b,filename_uuid)
 
     b.filename_uuid = filename_uuid;
     num_DVs = length(b.X_starts);
-    
+
     turnLCOEtoPower = true;
     objFcnName = 'generatedObjective';
     objFcn1 = str2func([objFcnName b.obj_names{1}]);
@@ -34,7 +34,7 @@ function [x,fval,residuals,tol,p] = pareto_search(p,b,filename_uuid)
     %% Process and save results
     utopia = min(fval);
     hold on
-    
+
     plot(utopia(1),utopia(2),'gp','MarkerFaceColor','g','MarkerSize',20)
 
     % show which constraints are active along the pareto front
@@ -52,7 +52,7 @@ function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs
     %% Set up pareto search algorithm
     probMO = probs{1};
     scale = [10 1];
-    
+
     if turnLCOEtoPower
         p_zero_design_cost = p;
         % hack that makes cost constant, so minimizing LCOE is actually maximizing average power
@@ -67,7 +67,7 @@ function [x,fval,flag,output,residuals,probMO] = pattern_search(p,X0,fvals,probs
     end
 
     probMO.objective = @(x)[objFcn1Revised(x)*scale(1), objFcn2(x,{p})*scale(2)];
-    
+
     X0_struct = struct('X0',X0,'Fvals',fvals .* scale);
 
     if turnLCOEtoPower
@@ -181,7 +181,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
             warning('Initial pareto point not feasible (fmincon returned -2 flag), removing.')
         else
             X_seeds(i,:) = X_opt_tmp(idxs)';
-    
+
             % debugging checks on optimization convergence and objective values
             obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
@@ -203,12 +203,12 @@ end
 
 function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
 
-   % cost0 refers to the part of the numerator of LCOE that does not depend 
+   % cost0 refers to the part of the numerator of LCOE that does not depend
    % on design: cost0 = capex0 + opex0
    cost0_per_power = oldFcnLCOE(x,{p_zero_design_cost});
    pwr_per_cost0 = 1/cost0_per_power;
    neg_pwr_per_cost = -pwr_per_cost0;
 
    clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
-   
+
 end

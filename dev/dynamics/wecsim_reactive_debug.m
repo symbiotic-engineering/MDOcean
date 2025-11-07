@@ -80,7 +80,7 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                     error_levels = -10:5:40;
                 end
             end
-            
+
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
@@ -124,8 +124,8 @@ function results = load_RM3_report_results(eff_pto, override)
 
     power_mech_unsat = readmatrix(report_filename,'Range','E73:S86',...
                                     'Sheet',sheet);
-    
-    
+
+
     Hs = readmatrix(report_filename,'Range','D73:D86','Sheet',sheet);
     Te = readmatrix(report_filename,'Range','E72:S72','Sheet',sheet);
 
@@ -165,7 +165,7 @@ function results = compute_mdocean_results(X,p)
     [~, P_matrix, ~, val] = simulation(X_unsat,p);
     power_elec_unsat = P_matrix/1000;
     power_mech_unsat = val.P_mech/1000;
-    
+
     % saturated power
     [~, P_matrix] = simulation(X,p);
     power_elec_sat = P_matrix/1000;
@@ -234,7 +234,7 @@ function results = assemble_results_struct(sz,varargin)
 
     % calculated variables
     wave_resource_raw = 1030 * 9.8^2 / (64*pi) * results.T .* results.H.^2 / 1000;
-    
+
     %diameter = X(2);
     results.CW = results.power_mech_unsat ./ wave_resource_raw;    % capture width
     CW_max = 9.8 * results.T.^2 / (4*pi^2);             % max CW for linear hydrodynamics, axisymmetric body

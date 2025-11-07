@@ -31,7 +31,7 @@ plot_omega = true;
 %% numerically solve equations for geometry sweep
 for geom_idx = 1:numel(a2_mat)
     disp(['running geometry ' num2str(geom_idx) ' out of ' num2str(numel(a2_mat))]);
-    
+
     for freq_idx = 1:length(m0_vec)
         disp(['    running frequency ' num2str(freq_idx) ' out of ' num2str(length(m0_vec))]);
 
@@ -66,10 +66,10 @@ function [phi, force] = get_phi_force(eqns, unknowns_const, N, ...
                 phi_p_i1, phi_p_i2, r, z, spatial_res, plot_phi, ...
                 h_num, m_k_num, a1_num, a2_num, d1_num, d2_num, m0_num)
 
-    
+
     % force
     force_2_over_rho_w_eiwt = 1i * int( int(r*(phi_h_i2+phi_p_i2),a1,a2), 0, 2*pi );
-    
+
     %symvar(force_2_over_rho_w_eiwt)
 
     force = real(double(vpa(subs(force_2_over_rho_w_eiwt,{h,a1,a2,d2},{h_num,a1_num,a2_num,d2_num}))));
@@ -93,7 +93,7 @@ function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_o
         Tp = 1;
         amplitude = Hm0 / 2;
         H_force = X3 / amplitude;
-    
+
         % transfer function
         m = 1; % mass
         A = 1;
@@ -106,7 +106,7 @@ function [A,B,sigma_force,sigma_position] = get_frequency_stuff(force,k,h,plot_o
             xlabel('\omega (rad/s)')
             ylabel('|\Xi/A| - Magnitude of Position Transfer Function')
         end
-    
+
         % spectrum and standard deviations
         S = pierson(omega, Hm0, Tp);                    % spectrum
         sigma_force = wkinchin(S,omega,H_force);        % standard deviation force
@@ -119,7 +119,7 @@ end
 
 function E_pm = pierson(omega,Hm0, Tp)
     gamma = 3.3;
-    alpha  = 1. / (.23 + .03 * gamma - .185 / (1.9 + gamma)) / 16. ; 
+    alpha  = 1. / (.23 + .03 * gamma - .185 / (1.9 + gamma)) / 16. ;
     E_pm = alpha .* Hm0^2 * Tp^-4 .* omega.^-5 .* exp(-1.25 * (Tp .* omega).^-4);
 end
 

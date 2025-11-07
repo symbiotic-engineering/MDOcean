@@ -2,7 +2,7 @@ classdef (SharedTestFixtures={ ...
         matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')...
         }) test_dynamics < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
-    
+
     properties (Constant)
         run_wecsim_tests = true;
     end

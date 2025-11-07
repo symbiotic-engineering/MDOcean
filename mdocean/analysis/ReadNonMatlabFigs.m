@@ -1,7 +1,7 @@
 classdef ReadNonMatlabFigs < GenericAnalysis
     %READNONMATLABFIGS Analysis class for non-MATLAB figure reading
     %   Reads external image files and creates MATLAB figures
-    
+
     properties
         fig_names = {'RM3_image','methodology_overview','N2_diagram',...
                     'dimensions','MEEM_geometry','WECSim_error_breakdown', ...
@@ -9,9 +9,9 @@ classdef ReadNonMatlabFigs < GenericAnalysis
                     'trapezoid', 'damping_plate_flowchart', 'graphical_abstract'};
         tab_names = {};
     end
-    
+
     methods (Static)
-        
+
         function intermed_result_struct = analysis_fcn(~,~)
             % Store file information for post-processing
             intermed_result_struct.fig_names = {'RM3_image','methodology_overview','N2_diagram',...
@@ -32,19 +32,19 @@ classdef ReadNonMatlabFigs < GenericAnalysis
                             'damping_plate_flowchart.png',...
                             'graphical_abstract.png'};
         end
-        
+
         function [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
-            
+
             fig_array = [];
-            
+
             % Loop over the requested figure names
             for i = 1:length(intermed_result_struct.fig_names)
                 fig_name = intermed_result_struct.fig_names{i};
                 file_name = intermed_result_struct.file_names{i};
-                
+
                 % Create the figure and read in the image file
                 fig = figure;
                 try
@@ -56,12 +56,12 @@ classdef ReadNonMatlabFigs < GenericAnalysis
                 end
                 fig_array = [fig_array, fig];
             end
-            
+
             tab_array_display = {};
             tab_array_latex = {};
-            
+
             end_result_struct.num_figs_created = length(fig_array);
         end
-        
+
     end
 end

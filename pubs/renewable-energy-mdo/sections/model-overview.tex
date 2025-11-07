@@ -29,7 +29,7 @@ Thus, it would be sub-optimal to optimize the hydrodynamics module strictly for 
 Furthermore, while even in a unified optimization it may be tempting to calculate the structural thicknesses within the structures module as the minimum required to sustain loads without failure, it is important to keep structural thicknesses as design variables because they also contribute to the hydrostatic constraints computed in the geometry module.
 If active, these constraints could make the system-level optimum material thickness larger than what is structurally necessary.
 Reference~\cite{papalambros_principles_2017} describes the monotonicity checking procedure more fully.
-Using a monolithic MDO architecture, in which a single optimizer drives the design of all modules and considers all constraints, addresses this non-monotonic coupling. 
+Using a monolithic MDO architecture, in which a single optimizer drives the design of all modules and considers all constraints, addresses this non-monotonic coupling.
 
 \paragraph{Analysis Architecture}
 All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
@@ -37,7 +37,7 @@ The dynamics module requires iteration to incorporate nonlinearities into the qu
 The dynamics iteration occurs separately for each outer iteration of the optimizer.
 This structure is known as the multiple discipline feasible (MDF) architecture.
 In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
-SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
+SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals.
 The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
 
 Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{underactuated}.
@@ -51,7 +51,7 @@ Another advantage of MDF over SAND is that the latter invites the possibility of
 In control co-design, the nested and simultaneous architectures are often contrasted \cite{sundarrajan_towards_2021,herber_nested_2018}.
 The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \cite{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
 This takes advantage of the fact that the inner optimization is often convex and can be solved quickly.
-On the other hand, the simultaneous architecture uses a single optimizer to optimize design and control variables concurrently, creating a larger (typically non-convex) optimization problem and avoiding the difficulty of inner loop infeasibility that may arise in the nested approach \cite{herber_nested_2018}. 
+On the other hand, the simultaneous architecture uses a single optimizer to optimize design and control variables concurrently, creating a larger (typically non-convex) optimization problem and avoiding the difficulty of inner loop infeasibility that may arise in the nested approach \cite{herber_nested_2018}.
 We presently distinguish two additional types of control co-design architectures in which the controller is not numerically optimized and instead obtained through an optimal control law.
 The optimal control law can be either explicitly derived and applied in the simulation (``explicit'' or analytical), or implicitly solved for by zeroing the residual of an optimal control condition (``implicit'' or semi-analytical).
 

@@ -6,29 +6,29 @@ function [tab, pct_diff, ...
     site_info_vars = {'$J$','$BW$','$H_{s,storm},T_{e,storm}$','$h$'};
     site_info_descs = {'Incident energy flux (kW/m)',...
         'Half-power bandwidth (rad/s)','Storm sea states (m, s)','Water depth (m)'};
-    
+
     design_var_names = cellfun(@(x) ['$' x, '^*$'], b.var_names_pretty, 'UniformOutput', false);
     design_var_descs = cellfun(@(x) ['Opt. ' x], lower(b.var_descs), 'UniformOutput', false);
-    
+
     symbols = [site_info_vars,  design_var_names,{'$LCOE^*$','flag'}];
     row_descs = [site_info_descs, design_var_descs,{'Optimal levelized cost of energy (\\$/kWh)','flag'}];
-    
+
     first_row = array2table(string([{'-'},most_common_wave]),'VariableNames',[{'Symbol'},locs],'RowNames',{'Most frequent wave'});
-    
+
     start_tab = array2table([site_info;X_opts;obj_opts;flags],'VariableNames',locs,'RowNames',row_descs);
     symbol_col = array2table(string(symbols).','VariableNames',{'Symbol'},'RowNames',row_descs);
-    
+
     main_tab =  horzcat(symbol_col,start_tab);
     tab = vertcat(first_row,main_tab);
-    
+
     %% try Hawaii with California design
     X_cali = X_opts(:,1);
-    
+
     LCOE_hawaii_with_cali_design = simulation(X_cali,p);
     pct_diff = (LCOE_hawaii_with_cali_design - obj_opts(4)) / obj_opts(4);
 
     location_flags = str2double(tab(strcmp(tab.Row,'flag'),:).Variables);
-    
+
     %% latex version of table
     idx_remove = ismember(tab.Row,{'flag','Optimal Material index'});
     tablatex = tab(~idx_remove,:);

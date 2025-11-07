@@ -1,5 +1,5 @@
 function fig = lagrange_multiplier_bar_chart(b,lambda)
-%LAGRANGE_MULTIPLIER_BAR_CHART 
+%LAGRANGE_MULTIPLIER_BAR_CHART
 
 idx_lb         = lambda.lower ~= 0;
 idx_ub         = lambda.upper ~= 0;
@@ -28,4 +28,3 @@ title('Lagrange Multipliers \lambda=-\partial J/\partial g')
 improvePlot
 
 end
-

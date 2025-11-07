@@ -6,18 +6,18 @@ function [figs, runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
         b.filename_uuid = filename_uuid;
     end
     [p,T] = parameters();
-    
+
     param_names = T.name_pretty(T.sweep);  % list of parameters to sweep
     params = T.name(T.sweep);
     p_val  = [T.value_normalize{T.sweep}];
     p_idxs = T.index_normalize(T.sweep);
 
     dvar_names = b.var_names_pretty(1:end-1);
-    
+
     groups = categorical(T.subsystem(T.sweep));
     color_groupings = {'b','g','r','k','y','m'};
     colors = color_groupings(groups);
-    
+
     %%
     % use the optimal x as x0 to speed up the sweeps
     % and obtain gradients
@@ -37,8 +37,8 @@ function [figs, runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     num_constr_nl = length(b.constraint_names);
     g_lambda_0(:,1) = combine_g_lambda(lambdas(1),x0_vec(:,1),p,b);
     g_lambda_0(:,2) = combine_g_lambda(lambdas(2),x0_vec(:,2),p,b);
-    
-    %% Obtain normalized local sensitivity 
+
+    %% Obtain normalized local sensitivity
     disp('done optimizing, starting local param sensitivity')
     t = tic;
     [par_x_star_par_p_local, ...
@@ -61,7 +61,7 @@ function [figs, runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     %% Post processing
     dJdp_combined = [par_J_par_p_local; dJ_star_dp_quad_local; dJ_star_dp_lin_local; dJstar_dp_global];
     dJdp_names = {'partial','total linear','total quadratic','re-optimization'};
-    
+
     % color grid plots
     % fig 1: dJ*/dp combined
     f1 = sensitivity_plot(dJdp_combined, 'dJ*/dp normalized', param_names, dJdp_names, ...
@@ -69,12 +69,12 @@ function [figs, runtimeLocal, runtimeGlobal] = param_sweep(filename_uuid)
     % fig 2: dJ*/dp global
     f2 = sensitivity_plot(dJstar_dp_global, 'dJ*/dp normalized: global', param_names, '', ...
         'Parameters p', '');
-    
+
     % fig 3: dx*/dp local
     f3 = dxdp_plot(par_x_star_par_p_local,  param_names, dvar_names, 'local');
     % fig 4: dx*/dp global
     f4 = dxdp_plot(par_x_star_par_p_global, param_names, dvar_names, 'global');
-    
+
     % fig 5: delta p local
     f5 = delta_p_plot(delta_p_change_activity_local,  b, dvar_names, param_names, 'local');
     % fig 6: delta p global
@@ -94,7 +94,7 @@ function fig = delta_p_plot(delta_p_norm,b,dvar_names,param_names,title_suffix)
     [~,idx_delta_p_slam] = min(abs(delta_p_norm_slam),[],2);
     idx_delta_p_slam = sub2ind(size(delta_p_norm_slam),1:length(param_names),idx_delta_p_slam');
     delta_p_norm_combine_slamming(:,end+1) = delta_p_norm_slam(idx_delta_p_slam);
-    
+
     titl = ['Normalized \Deltap to change constraint activity: ' title_suffix];
     xticks = [constr_names(~idx_slam),'Slamming'];
     yticks = param_names;
@@ -146,7 +146,7 @@ function [par_x_star_par_p_global, ...
     ratios = [.9 .98 1 1.02 1.1];
     num_DVs = size(x0_vec,1)-1;
     num_constr = length(b.constraint_names) + length(b.lin_constraint_names) + 2*num_DVs;
-    
+
     [LCOE, P_var]    = deal(zeros(length(params), length(ratios)));
     [X_LCOE, X_Pvar] = deal(zeros(length(params), length(ratios), num_DVs));
     [g_lambda_LCOE, g_lambda_Pvar] = deal(zeros(length(params), length(ratios), num_constr));
@@ -158,9 +158,9 @@ function [par_x_star_par_p_global, ...
          g_lambda_LCOE(i,:,:),...
          P_var(i,:), X_Pvar(i,:,:),...
          g_lambda_Pvar(i,:,:)] = global_sens_reoptimize(x0, p, b, param_name, ratios, num_DVs, num_constr);
-    
+
     end
-    
+
     % fill in ratios == 1 (left blank since same as initial)
     X_LCOE_0_3d = permute(repmat(x0_vec(1:end-1,1).',length(params),1,sum(ratios==1)),[1 3 2]);
     X_Pvar_0_3d = permute(repmat(x0_vec(1:end-1,2).',length(params),1,sum(ratios==1)),[1 3 2]);
@@ -172,19 +172,19 @@ function [par_x_star_par_p_global, ...
     X_Pvar(:,ratios==1,:) = X_Pvar_0_3d;
     g_lambda_LCOE(:,ratios==1,:) = g_lambda_LCOE_0_3d;
     g_lambda_Pvar(:,ratios==1,:) = g_lambda_Pvar_0_3d;
-    
+
     % check if deltas too small, indicating potential finite precision error
     delta_x_LCOE = abs(X_LCOE - X_LCOE_0_3d(:,1,:));
     delta_x_Pvar = abs(X_Pvar - X_Pvar_0_3d(:,1,:));
     delta = [delta_x_LCOE delta_x_Pvar];
     delta_too_small = (delta < 1e-6) & (delta ~= 0);
-    if any(delta_too_small,'all') 
+    if any(delta_too_small,'all')
         warning(['The global sensitivity is potentially inaccurate ' ...
             'due to finite precision effects. You must either decrease ' ...
             'options.StepTolerance in gradient_optim, or increase ' ...
             'abs(ratios-1) in param_sweep.'])
     end
-    
+
     % info for optimal design with nominal parameter values (not nominal design)
     col_nom = find(ratios==1);
     LCOE_nom = LCOE(1,col_nom);
@@ -193,12 +193,12 @@ function [par_x_star_par_p_global, ...
     X_Pvar_nom = squeeze(X_Pvar(1,col_nom,:));
     g_lambda_LCOE_nom = squeeze(g_lambda_LCOE(1,col_nom,:)).';
     g_lambda_Pvar_nom = squeeze(g_lambda_Pvar(1,col_nom,:)).';
-    
+
     %% Calculate objective sensitivities
-    
+
     slope_LCOE = get_slope(LCOE, ratios);
     slope_Pvar = get_slope(P_var, ratios);
-    
+
     slope_LCOE_norm = slope_LCOE.' / LCOE_nom; % normalize
     slope_Pvar_norm = slope_Pvar.' / Pvar_nom;
 
@@ -208,14 +208,14 @@ function [par_x_star_par_p_global, ...
             'slope_LCOE = ', num2str(slope_LCOE(:).'), ' and slope_Pvar = ', num2str(slope_Pvar(:).')];
         error(msg)
     end
-    
+
     %% Calculate design variable sensitivities
     slope_X_LCOE = get_slope(X_LCOE, ratios);
     slope_X_Pvar = get_slope(X_Pvar, ratios);
-    
+
     slope_X_LCOE_norm  = slope_X_LCOE ./ X_LCOE_nom.'; % normalize
     slope_X_Pvar_norm  = slope_X_Pvar ./ X_Pvar_nom.';
-    
+
     %% calculate lagrange multiplier and constraint sensitivities
     dlambda_g_dp_LCOE = get_slope(g_lambda_LCOE, ratios);
     dlambda_g_dp_Pvar = get_slope(g_lambda_Pvar, ratios);
@@ -228,7 +228,7 @@ function [par_x_star_par_p_global, ...
     dJstar_dp_global = slope_LCOE_norm;
     par_x_star_par_p_global = slope_X_LCOE_norm.';
     delta_p_change_activity_global = delta_p_LCOE_norm;
-    
+
     %% Line plots showing nonlinearity
     fig_num_start = gcf().Number+1;
     f1 = figure(fig_num_start);
@@ -239,7 +239,7 @@ function [par_x_star_par_p_global, ...
     legend(param_names)
     improvePlot
     grid on
-    
+
     subplot 122
     plot(ratios,P_var/Pvar_nom)
     xlabel('Parameter ratio from nominal')
@@ -248,7 +248,7 @@ function [par_x_star_par_p_global, ...
     improvePlot
     grid on
     set(f1,'Position',[1 41 1536 840]) % full screen
-    
+
     for i = 1:num_DVs
         f2 = figure(fig_num_start+1);
         subplot(3,5,i)
@@ -258,7 +258,7 @@ function [par_x_star_par_p_global, ...
         title([dvar_names{i} ' - min LCOE'])
         %improvePlot
         grid on
-        
+
         f3 = figure(fig_num_start+2);
         subplot(3,5,i)
         plot(ratios, X_Pvar(:,:,i)./X_Pvar_nom(i))
@@ -274,7 +274,7 @@ function [par_x_star_par_p_global, ...
 
     %% Tornado chart for overall slope
     f4 = sensitivity_tornado_barh(slope_LCOE_norm, slope_Pvar_norm, param_names, colors, groups, 'dJ*/dp');
-    
+
     % separate figures for each design variable, with subplot for each objective
     for i=1:num_DVs
         f5_arr(i) = sensitivity_tornado_barh(slope_X_LCOE_norm(:,i), slope_X_Pvar_norm(:,i), ...
@@ -357,22 +357,22 @@ function sensitivity_tornado_barh_inner(slope, param_names, colors, k)
 end
 
 function f = sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, colors, groups, extra_title)
-    
+
     % separate subplots for each objective
     f = figure;
     subplot 121
     sensitivity_tornado_barh_inner(slope_LCOE, param_names, colors, 25)
     title('At Minimum LCOE')
-    
+
     subplot 122
     sensitivity_tornado_barh_inner(slope_Pvar, param_names, colors, 25)
     title('At Minimum Design Cost')
     sgtitle(['Normalized Sensitivities: ' extra_title])
-    
+
     % legend
     color_legend(groups,colors,'southeast')
     set(f,"Position",[1.8 41.8 930 836.8])
-    
+
     % both objectives on the same chart
 %     figure
 %     barh(categorical(param_names),[slope_LCOE, slope_Pvar])
@@ -385,7 +385,7 @@ function f = sensitivity_tornado_barh(slope_LCOE, slope_Pvar, param_names, color
 end
 
 function slope = get_slope(y, x)
-    % y is a 2D (ie J*) or 3D (ie X*) array, and x is a 1D vector (ie ratios), 
+    % y is a 2D (ie J*) or 3D (ie X*) array, and x is a 1D vector (ie ratios),
     % then slope is similar to
     % (y(:,end,:) - y(:,1,:) ./ (x(end) - x(1))
     % but if y contains NaNs at those indices, then more inner indices are used.
@@ -416,7 +416,7 @@ function slope = get_slope(y, x)
     x_first = x(sub_dim2_first);
     x_last = x(sub_dim2_last);
     slope = (y_last - y_first) ./ (x_last - x_first);
-    
+
 end
 
 function [LCOE, X_LCOE, g_lambda_LCOE, ...
@@ -433,7 +433,7 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
     dry_run = false; % true means use random numbers, false means actual optimization
 
     parfor j=1:length(ratios)
-        if ratios(j) ~=1   
+        if ratios(j) ~=1
             new_p = p;
             new_p.(param_name) = ratios(j) * var_nom;
             if dry_run
@@ -445,7 +445,7 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
                 g_lambda_LCOE_tmp = combine_g_lambda(lambdas(1),Xs_opt(:,1),new_p,b);
                 g_lambda_Pvar_tmp = combine_g_lambda(lambdas(2),Xs_opt(:,2),new_p,b);
             end
-            
+
             if flag(1) >= 1
                 LCOE(j) = obj_opt(1);
                 X_LCOE(j,:) = Xs_opt(1:end-1,1);
@@ -455,13 +455,13 @@ function [LCOE, X_LCOE, g_lambda_LCOE, ...
             end
             if flag(2) >= 1
                 P_var(j) = obj_opt(2);
-                X_Pvar(j,:)= Xs_opt(1:end-1,2); 
+                X_Pvar(j,:)= Xs_opt(1:end-1,2);
                 g_lambda_Pvar(j,:) = g_lambda_Pvar_tmp;
             else
                 [X_Pvar(j,:), P_var(j),g_lambda_Pvar(j,:)] = deal(NaN);
             end
         end
-    end   
+    end
 
 end
 
@@ -484,4 +484,3 @@ function g_lambda = combine_g_lambda(lambda,X,p,b)
     g_lambda(idx_g) = all_g(idx_g);
 
 end
-

@@ -1,5 +1,5 @@
 function [f1, f2, f3] = module_runtime_compare(p,b)
-    
+
     X = [b.X_noms; 1];
 
     % just dynamics
@@ -81,7 +81,7 @@ function [f1, f2, f3] = module_runtime_compare(p,b)
     f2.Position = [100 100 1410 600];
 
     % comparing all modules
-    
+
     t_struct = extract_runtime(p_singlebody,'structures_one_case');
     t_geom   = extract_runtime(p_singlebody,'geometry');
     t_econ   = extract_runtime(p_singlebody,'econ');
@@ -155,4 +155,3 @@ function split_labels_by_space(ax)
     new_labels = strtrim(sprintf(pattern, labelArray{:}));
     ax.YTickLabel = new_labels;
 end
-

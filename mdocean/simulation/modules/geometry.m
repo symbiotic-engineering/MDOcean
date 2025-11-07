@@ -73,7 +73,7 @@ V_bot_plate = A_bot_plate * t_f_b;
 
 slant_height = sqrt((D_f/2 - D_f_b/2)^2 + (T_f_2 - T_f_1)^2);
 A_bot_slant = pi/2 * (D_f + D_f_b) * slant_height; % lateral area of frustum
-V_bot_slant = A_bot_slant * t_f_b; 
+V_bot_slant = A_bot_slant * t_f_b;
 
 A_outer_rim = pi * D_f * (h_f - (T_f_2 - T_f_1));
 V_outer_rim = A_outer_rim * t_f_r ;
@@ -163,7 +163,7 @@ m_s_b = m_s_tot - m_s_m;                % mass of spar ballast
 V_s_b = m_s_b / rho_w;                  % volume of spar ballast
 V_pto = .75 * pi * 3^2 * 12;            % volume of PTO (assume constant)
 V_s_tot = pi/4 * D_s^2 * h_s - V_pto;   % total volume available on spar for ballast
-V_s_pct = V_s_b / V_s_tot;              % percent of available volume used by ballast on spar            
+V_s_pct = V_s_b / V_s_tot;              % percent of available volume used by ballast on spar
 
 I_vc = pi * (D_s^4 - D_vc_i^4) / 64;    % area moment of inertia
 A_vc_l = 1/2 * pi * D_s * (T_s-h_d);    % lateral area

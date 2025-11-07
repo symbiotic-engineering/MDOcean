@@ -1,12 +1,12 @@
 function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
 % saves a pdf of a figure, robustly handling cases of gobjects, deleted
 % handles, and invalid figures
-    
+
     if nargin<3
         pdf_prefix = '';
     end
     pdf_name = fullfile(pdf_prefix, fig_name);
-    
+
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
         if ~isempty(fig.UserData)
             % pdf already exists in files, just copy to folder
@@ -30,5 +30,5 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
         if nargout > 0
             diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic('');
         end
-    end   
+    end
 end

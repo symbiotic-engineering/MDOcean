@@ -46,7 +46,7 @@ classdef (Abstract) GenericAnalysis
             if nargin > 1
                 obj.b = b;
             end
-            
+
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
 
             obj.postpro_outputs  = strcat(obj.output_folder,...
@@ -107,7 +107,7 @@ classdef (Abstract) GenericAnalysis
                 save_fig_with_diagnostic(fig, obj.fig_names{i}, obj.output_folder)
             end
         end
-        
+
         function save_tabs(obj)
             for i=1:length(obj.tab_names)
                 tab = obj.tab_array_latex{i};
@@ -197,7 +197,7 @@ classdef (Abstract) GenericAnalysis
             base = what('..').path;
             deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
         end
-        
+
         function rel_paths = make_rel_path(abs_paths, base)
             rel_paths = cell(size(abs_paths));
             for i = 1:numel(abs_paths)

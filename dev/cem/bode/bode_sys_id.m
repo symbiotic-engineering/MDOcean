@@ -30,8 +30,8 @@ if RAO
     angle_matrix = phase_X - fudge;
     y_lab = 'X/\eta';
     y_lab_extra = '';
-    norm = 2; % not sure why this isn't 1. Technically rather than fudge up DC gain, 
-    % if I want second order system to match, I'd want to make it so DC gain 
+    norm = 2; % not sure why this isn't 1. Technically rather than fudge up DC gain,
+    % if I want second order system to match, I'd want to make it so DC gain
     % is still 1, but at w just below resonance, gain is 2x higher than
     % DC gain like it is for a second order system.
 else
@@ -52,11 +52,11 @@ end
 for i=1:length(p.Hs)
     mag_data = mag_matrix(i,:);
     angle_data = angle_matrix(i,:);
-    
+
     color_frac = (i-1)/(length(p.Hs)-1);
     col = [color_frac 0 1-color_frac];
     mag_norm = mag_data * norm;
-    
+
     nexttile(1)
     loglog(w(i,:)/wn, mag_norm, '*-', ...
         'DisplayName',['H_s=' num2str(p.Hs(i))],'Color',col)
@@ -64,7 +64,7 @@ for i=1:length(p.Hs)
 
     nexttile(2)
     h = semilogx(w(i,:)/wn, angle_data/pi,'*-','Color',col);
-    h.Annotation.LegendInformation.IconDisplayStyle = 'off'; 
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
     hold on
 
 end
@@ -174,11 +174,11 @@ for i=1:length(np)
     poles = P{:}
     gain  = K
     stable(i) = allmargin(est_TF).Stable;
-    
+
     figure(2)
     bode(est_TF)
     hold on
-    
+
     figure(3)
     pzplot(est_TF)
     hold on
@@ -191,4 +191,3 @@ stable_str = {'Unstable','Stable'};
 leg_text = strcat(num2str((np).'), " poles, ", num2str((nz).'), " zeros, ", stable_str(stable+1).');
 legend(leg_text)
 improvePlot
-

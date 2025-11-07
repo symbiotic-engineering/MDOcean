@@ -21,12 +21,12 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
     d1 = T_s;
     A_w_f = pi * (a2^2 - a1^2);     % waterplane area
     A_w_s = pi/4 * D_s^2; % fixme: for drag, should the area be the damping plate area, not the waterplane area?
-    
+
     if use_MEEM
         [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
         gamma_f_over_rho_g, gamma_s_over_rho_g, ...
-        gamma_phase_f, gamma_phase_s] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, g, w, harmonics, spar_excitation_coeffs); 
+        gamma_phase_f, gamma_phase_s] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, a3, h, g, w, harmonics, spar_excitation_coeffs);
     else
         [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
         B_f_over_rho_w, B_s_over_rho_w, B_c_over_rho_w, ...
@@ -51,7 +51,7 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
 
     K_h_f   = rho_w * g * A_w_f;              % hydrostatic stiffness
     K_h_s   = rho_w * g * A_w_s;
-    
+
     H       = Hs / sqrt(2);                   % equivalent regular wave height
 
     F_f_mag = gamma_f .* H / 2;               % excitation force of wave
@@ -68,5 +68,3 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
     mag_v0_f = H/2 * g .* k ./ w .* exp(-k * T_f/2); % finite depth velocity of incident wave
     mag_v0_s = H/2 * g .* k ./ w .* exp(-k * T_s/2);
 end
-
-

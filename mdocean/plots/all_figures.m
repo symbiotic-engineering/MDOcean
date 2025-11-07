@@ -54,7 +54,7 @@ for i = 1:length(fig_names)
         fig_name = split(fig_names(i),'.');
         class_name = fig_name{1};
         fig_desc = fig_name{2};
-        
+
         % Check if the figure has already been generated
         t = tic;
         if ~isfield(generated_figs, class_name)
@@ -68,14 +68,14 @@ for i = 1:length(fig_names)
             else
                 analysis_obj = analysis_instances(class_name);
             end
-            
+
             % Run the analysis if not already done
             if isempty(analysis_obj.fig_array)
                 analysis_obj = analysis_obj.run_analysis();
                 analysis_obj = analysis_obj.run_post_process();
                 analysis_instances(class_name) = analysis_obj;
             end
-            
+
             % Extract figures and tables from the analysis object
             figs = struct();
             tabs = struct();
@@ -89,16 +89,16 @@ for i = 1:length(fig_names)
                     tabs.(analysis_obj.tab_names{j}) = analysis_obj.tab_array_display{j};
                 end
             end
-            
+
             % Store the generated figure in the generated_figs structure
             generated_figs.(class_name) = figs;
-            
+
             % If the function generates a table, store it in the generated_tabs structure
             if ~isempty(tabs)
                 generated_tabs.(class_name) = tabs;
             end
         end
-        
+
         % Store the generated figure in fig_output
         fig_output(i) = generated_figs.(class_name).(fig_desc);
         fig_runtime(i) = toc(t);
@@ -115,7 +115,7 @@ for i = 1:length(tab_names)
         tab_name = split(tab_names(i), '.');
         class_name = tab_name{1};
         tab_desc = tab_name{2};
-        
+
         % Check if the table has already been generated
         t = tic;
         if ~isfield(generated_tabs, class_name)
@@ -129,14 +129,14 @@ for i = 1:length(tab_names)
             else
                 analysis_obj = analysis_instances(class_name);
             end
-            
+
             % Run the analysis if not already done
             if isempty(analysis_obj.tab_array_display)
                 analysis_obj = analysis_obj.run_analysis();
                 analysis_obj = analysis_obj.run_post_process();
                 analysis_instances(class_name) = analysis_obj;
             end
-            
+
             % Extract figures and tables from the analysis object
             figs = struct();
             tabs = struct();
@@ -150,21 +150,21 @@ for i = 1:length(tab_names)
                     tabs.(analysis_obj.tab_names{j}) = analysis_obj.tab_array_display{j};
                 end
             end
-            
+
             % Store the generated table in the generated_tabs structure
             generated_tabs.(class_name) = tabs;
-            
+
             % If the function generates a figure, store it in the generated_figs structure
             if ~isempty(figs)
                 generated_figs.(class_name) = figs;
             end
         end
-        
+
         % Store the generated table in tab_output
         tab_output{i} = generated_tabs.(class_name).(tab_desc);  % Store the table
         tab_runtime(i) = toc(t);
         display(tab_output{i})
-        
+
     catch err
         tab_success{i} = err;  % Store error for the table
     end

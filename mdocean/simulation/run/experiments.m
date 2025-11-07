@@ -13,15 +13,15 @@ n = 20;
 num_DVs = length(b.X_noms);
 
 if strcmp(DOE_strategy,'sample')
-    X = [ 20 10 30;     % outer diameter of float	
-          .3 .1 .5;     % inner diameter ratio of float	
-          1.5 1.2 2;    % outer diameter of reaction plate	
-          1 2 3;        % material	
-          10 1 20;      % Number of WECs in array	
-          10 5 50       % D_int	
+    X = [ 20 10 30;     % outer diameter of float
+          .3 .1 .5;     % inner diameter ratio of float
+          1.5 1.2 2;    % outer diameter of reaction plate
+          1 2 3;        % material
+          10 1 20;      % Number of WECs in array
+          10 5 50       % D_int
           2*pi/7 2*pi/8 2*pi/9
-        ];	
-elseif strcmp(DOE_strategy,'bounds')    
+        ];
+elseif strcmp(DOE_strategy,'bounds')
     X = zeros(num_DVs,1+n);
     for i = 1:num_DVs
         X(i,1) = b.X_noms(i);
@@ -36,8 +36,8 @@ elseif strcmp(DOE_strategy,'ratios')
 end
 
 
-X_nom = X(:,1);	
-design_size = size(X);	
+X_nom = X(:,1);
+design_size = size(X);
 num_vals_per_DV = design_size(2);
 num_vals_swept = num_vals_per_DV - 1; % don't sweep 1st value of each variable (corresponding to ratio 1)
 
@@ -45,30 +45,30 @@ num_vals_swept = num_vals_per_DV - 1; % don't sweep 1st value of each variable (
 LCOE = X*inf;
 cost = X*inf;
 power = X*inf;
-opt_idx = zeros(num_DVs,1);	
-recommended = zeros(num_DVs,2);	
+opt_idx = zeros(num_DVs,1);
+recommended = zeros(num_DVs,2);
 number_runs = 1 + num_DVs * num_vals_swept; % nominal run plus all sweeps
-failed = cell(number_runs,1);	
-X_ins = zeros(number_runs, num_DVs);	
+failed = cell(number_runs,1);
+X_ins = zeros(number_runs, num_DVs);
 design = 0;
 
 % run design of experiments
 for i = 1:num_DVs
-    X_in = X_nom;	
+    X_in = X_nom;
     for j = 1:num_vals_per_DV
         if i == 1 || j~=1	% prevent rerunning nominal multiple times
-            changed_entry = X(i,j);	
-            if ~isnan(changed_entry)	
-                design = design+1;	
-                X_in(i) = changed_entry;	
-                X_ins(design,:) = X_in;	
+            changed_entry = X(i,j);
+            if ~isnan(changed_entry)
+                design = design+1;
+                X_in(i) = changed_entry;
+                X_ins(design,:) = X_in;
 
                 X_vec = [X_in;b.M_nom];
                 [~, ~, failed_lin, feasible_lin] = is_feasible(0, X_vec, p, b);
-                
+
                 if feasible_lin
                     [J_temp,P_matrix, g, val] = simulation(X_vec,p);
-                    LCOE_temp = J_temp(1); 
+                    LCOE_temp = J_temp(1);
                     cost_temp = J_temp(2);
                     % only add to results if relevant nonlin constraints are feasible
                     idx_ignore = false(1,length(b.constraint_names));
@@ -79,20 +79,20 @@ for i = 1:num_DVs
                     feasible = feasible_lin;
                     which_failed = failed_lin;
                 end
-                if feasible	
-                    LCOE(i,j) = LCOE_temp;	
+                if feasible
+                    LCOE(i,j) = LCOE_temp;
                     cost(i,j) = cost_temp;
                     power(i,j) = val.power_avg;
-                else	
+                else
                     LCOE(i,j) = NaN;
                     cost(i,j) = NaN;
-                end	
+                end
                 failed{design} = which_failed;
-            end	
-        end	
-    end	
-    [~, opt_idx(i)] = min(LCOE(i,:));	
-    recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];	
+            end
+        end
+    end
+    [~, opt_idx(i)] = min(LCOE(i,:));
+    recommended(i,:) = [X(i,opt_idx(i)), opt_idx(i)];
 end
 
 end

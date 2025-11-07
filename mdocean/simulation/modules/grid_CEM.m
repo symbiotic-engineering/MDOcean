@@ -32,7 +32,7 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
 
         no_wec_CO2 = 12.003064e6; % tonnes (typical value 10e6=10 MT)
         no_wec_grid_cost = 2.889863123e9;
-        
+
         if capacity_cost > cutin_capacity_cost
             % no WECs
             CEM_CO2 = no_wec_CO2;
@@ -41,11 +41,11 @@ function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, ome
         elseif capacity_cost > cheapest_cost_with_data
             % some wecs, and in bounds of model
             capacity_cost_pct_incr = (capacity_cost - 725e3) / 725e3;
-    
+
             CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
             CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
             CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
-        else 
+        else
             % not in bounds of model
             error('WEC is too cheap, no CEM data here.')
         end

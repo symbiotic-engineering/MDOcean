@@ -27,7 +27,7 @@ function newmap = bluewhitered(m, white_number)
 %   colormap(bluewhitered)
 %   axis tight
 %
-%   See also HSV, HOT, COOL, BONE, COPPER, PINK, FLAG, 
+%   See also HSV, HOT, COOL, BONE, COPPER, PINK, FLAG,
 %   COLORMAP, RGBPLOT.
 
 
@@ -58,21 +58,21 @@ if bluepart > 0 && redpart > 0
     ratio_blue = bluepart / (bluepart + redpart);
     bluelen = round(m*ratio_blue);
     redlen = m - bluelen;
-    
+
     bluemap = resize_cmap(bluemap_basic,bluelen);
     redmap = resize_cmap(redmap_basic,redlen);
     newmap = [bluemap; redmap];
-    
+
 elseif bluepart <= 0
     % Just red (positive)
     redmap_basic = [middle_white; topmiddle_red; top_red];
     newmap = resize_cmap(redmap_basic,m);
-    
+
 else
     % Just blue (negative)
     bluemap_basic = [bottom_blue; botmiddle_blue; middle_white];
     newmap = resize_cmap(bluemap_basic,m);
-    
+
 end
 end
 
@@ -82,7 +82,7 @@ function newmap = resize_cmap(oldmap,newlen)
     oldsteps = linspace(0, 1, oldlen);
     newsteps = linspace(0, 1, newlen);
     newmap = zeros(newlen, 3);
-    
+
     for i=1:3
         % Interpolate over RGB spaces of colormap
         temp = interp1(oldsteps, oldmap(:,i), newsteps);

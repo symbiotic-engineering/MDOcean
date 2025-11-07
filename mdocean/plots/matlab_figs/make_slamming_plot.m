@@ -5,18 +5,18 @@ function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simp
 
     nexttile
     contourf(T,Hs,theta_slam/pi);
-    xlabel('T_e'); 
-    ylabel('H_s'); 
-    title('\theta/\pi'); 
-    colorbar; 
+    xlabel('T_e');
+    ylabel('H_s');
+    title('\theta/\pi');
+    colorbar;
     improvePlot;
 
     ax = nexttile;
     contourf(T,Hs,X_star,20);
-    xlabel('T_e'); 
-    ylabel('H_s'); 
-    title('X^*'); 
-    improvePlot; 
+    xlabel('T_e');
+    ylabel('H_s');
+    title('X^*');
+    improvePlot;
     colormap(ax,bluewhitered)
     colorbar
 
@@ -26,23 +26,23 @@ function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simp
     [C,h]=contourf(T,Hs,X_below_wave,levels);
     clim([-.1 5]);
     xlabel('T_e');
-    ylabel('H_s'); 
-    title('X_{slam}/X - 1'); 
-    colorbar; 
+    ylabel('H_s');
+    title('X_{slam}/X - 1');
+    colorbar;
     colormap(ax,bluewhitered)
-    clabel(C,h); 
+    clabel(C,h);
     improvePlot;
 
     ax = nexttile;
     [C,h]=contourf(T,Hs,X_below_simple,levels);
-    clim([-.1 5]); 
-    xlabel('T_e'); 
+    clim([-.1 5]);
+    xlabel('T_e');
     ylabel('H_s');
-    title('(T_f-H/2)/X - 1'); 
-    colorbar; 
+    title('(T_f-H/2)/X - 1');
+    colorbar;
     colormap(ax,bluewhitered)
     clabel(C,h);
-    improvePlot;     
+    improvePlot;
 
     f.Position(3) = 1500;
     title(t,'Slamming Model for Min LCOE Design')

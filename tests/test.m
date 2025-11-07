@@ -2,7 +2,7 @@ classdef (SharedTestFixtures={ ...
         matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
         test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
-    
+
     properties (Constant)
         run_slow_tests = true;
 
@@ -76,7 +76,7 @@ classdef (SharedTestFixtures={ ...
             % validateNominal and validateNominalFeasible
             [feas_r, fail_r, sim_r, act_r, ~, fig_r] = validate_nominal_RM3('report'); % report
             [feas_w, fail_w, sim_w, act_w, ~, fig_w] = validate_nominal_RM3('wecsim'); % wecsim
-            
+
             testCase.feasible_report  = feas_r;
             testCase.failed_report    = fail_r;
             testCase.simulated_report = sim_r;
@@ -198,7 +198,7 @@ classdef (SharedTestFixtures={ ...
         function deleteGeneratedFiles(testCase)
             % Create a wildcard pattern
             pattern = fullfile('**',['*' testCase.uuid.Value '*']);
-            
+
             % Get a list of folders that match the pattern
             matchingFiles = dir(pattern);
             foldersToDelete = matchingFiles([matchingFiles.isdir]);
@@ -212,7 +212,7 @@ classdef (SharedTestFixtures={ ...
 
         end
     end
-    
+
     % Test methods
     methods(Test, ParameterCombination='sequential')
 
@@ -239,7 +239,7 @@ classdef (SharedTestFixtures={ ...
                 idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names,'none')) );
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
-               
+
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
 
@@ -311,5 +311,5 @@ classdef (SharedTestFixtures={ ...
         end
 
     end
-    
+
 end

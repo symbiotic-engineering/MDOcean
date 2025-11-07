@@ -11,7 +11,7 @@ persistent plotBest feasLegend
 stop = false;
 
 if strcmpi(state,'init')
-    plotBest = gobjects(1,length(x));    
+    plotBest = gobjects(1,length(x));
     feasLegend = [];
 end
 
@@ -26,19 +26,19 @@ best = X;
 marks = {'o', '+', '*', '.', 'x', 's', 'd', '^', 'v', '>', '<', 'p', 'h'};
 
 for i=1:length(x)
-if isa(plotBest(i), 'matlab.graphics.GraphicsPlaceholder')  
+if isa(plotBest(i), 'matlab.graphics.GraphicsPlaceholder')
     xlabel(getString(message('MATLAB:optimfun:funfun:optimplots:LabelIteration')),'interp','none');
-    
-    if isempty(optimValues.fval)        
+
+    if isempty(optimValues.fval)
         ylabel_msg = getString(message('optim:optimplot:YlabelConstrViol'));
         title_msg = getString(message('optim:optimplot:TitleMaxConstrViol',sprintf('%g',best)));
     else
         ylabel_msg = getString(message('MATLAB:optimfun:funfun:optimplots:LabelFunctionValue'));
-        title_msg = getString(message('optim:optimplot:TitleBestFunVal',sprintf('%g',best)));        
+        title_msg = getString(message('optim:optimplot:TitleBestFunVal',sprintf('%g',best)));
     end
     ylabel(ylabel_msg,'interp','none')
-    title(title_msg,'interp','none');    
-    hold on; grid on;    
+    title(title_msg,'interp','none');
+    hold on; grid on;
 end
 
 % Plot points
@@ -66,4 +66,3 @@ if strcmp(state, 'done')
     hold off;
 end
 end
-

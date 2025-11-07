@@ -1,6 +1,6 @@
 function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validate_MEEM()
 
-    %% settings 
+    %% settings
     auto_BCs = false;
 
     num_harmonics = 3;

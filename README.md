@@ -7,7 +7,7 @@
 [![View on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/180694-mdocean)
 
 # MDOcean
-This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
+This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC).
 
 More specifically, it uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
 
@@ -19,9 +19,9 @@ The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab
 
 Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1oTIAkMHWSenGTaAQfc8pr4rRl3oylaKt/view?usp=sharing).
 
-Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
-to Reduce Cost and Power Variation of a Wave Energy Converter,” 
-*International Design Engineering Technical Conferences & Computers and 
+Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization
+to Reduce Cost and Power Variation of a Wave Energy Converter,”
+*International Design Engineering Technical Conferences & Computers and
 Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
 [https://doi.org/10.1115/DETC2022-90227](https://doi.org/10.1115/DETC2022-90227).
 
@@ -36,7 +36,7 @@ A video recording of the conference presentation is available [here](https://www
 
 **License**
 
-This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim. 
+This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim.
 The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **File Structure and Usage**
@@ -69,8 +69,8 @@ The following packages are used in this code:
 | Symbolic Math Toolbox | Optional for simulation code generation |
 | Parallel Computing Toolbox | Optional for speedup |
 | MATLAB Report Generator | Optional for WEC-Sim validation |
-| Simulink | Optional for WEC-Sim validation | 
-| Simscape | Optional for WEC-Sim validation | 
+| Simulink | Optional for WEC-Sim validation |
+| Simscape | Optional for WEC-Sim validation |
 | Simscape Multibody | Optional for WEC-Sim validation |
 | [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
 
@@ -82,9 +82,9 @@ Suggestions, questions, bug reports, and contributions are welcome. Open an issu
 
 **Funding Acknowledgement**
 
-This material is based upon work supported by the 
-National Science Foundation Graduate Research Fellowship under 
+This material is based upon work supported by the
+National Science Foundation Graduate Research Fellowship under
 Grant No. DGE–2139899, and the Cornell Engineering Fellowship.
-Any opinion, findings, and conclusions or recommendations 
-expressed in this material are those of the authors(s) and do not 
+Any opinion, findings, and conclusions or recommendations
+expressed in this material are those of the authors(s) and do not
 necessarily reflect the views of the National Science Foundation.

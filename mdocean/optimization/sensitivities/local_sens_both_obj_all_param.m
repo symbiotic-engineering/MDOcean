@@ -9,7 +9,7 @@ function [par_x_star_par_p_norm, dJstar_dp_norm, ...
         [par_x_star_par_p, dJstar_dp, ...
             dJdp, par_J_par_p, ...
             delta_p_change_activity] = local_sens_one_obj_all_param(x0, p, params, param_idxs, lambda, grad, hess, num_constr, obj);
-        
+
         % normalization
         dJstar_dp_norm   = dJstar_dp.'   .* p_val ./ J0(1);
         dJdp_norm        = dJdp.'        .* p_val ./ J0(1);
@@ -39,7 +39,7 @@ function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
 
     % left hand side matrix - independent of parameter
     matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,active_ub);
-    
+
     % allocate outputs
     par_J_par_p_all_params = zeros(length(params),1);
     dJdp_all_params = zeros(length(params),1);
@@ -77,12 +77,12 @@ function [par_J_par_p, dJ_star_dp_lin, dJ_star_dp_quad, ...
         [vector, par_J_par_p, dJ_star_dp_lin] = local_sens_RHS_vector_and_dJdp(obj, p, param_name, param_idx, x0, num_constr, ...
                                                         lambda_nl, lambda_lin, lambda_lb, lambda_ub, ...
                                                         active, active_lin, active_lb, active_ub);
-    
+
         % matrix solution
         sol = matrix \ vector;
         par_x_star_par_p = sol(1:length(x0)-1);
         par_lam_par_p = sol(length(x0):end);
-    
+
         % total derivative
         par_J_par_x = grad;
         dJ_star_dp_quad = par_J_par_p + par_J_par_x.' * par_x_star_par_p;
@@ -168,7 +168,7 @@ function [vector, par_J_par_p, dJ_star_dp_lin] = local_sens_RHS_vector_and_dJdp(
         par_par_g_lin_par_x_par_p] = get_partials(obj, p, param_name, param_idx, x0, p0,num_constr);
 
     % assume that x bounds are parameter-independent
-    par_g_lb_par_p = zeros(size(active_lb)); 
+    par_g_lb_par_p = zeros(size(active_lb));
     par_g_ub_par_p = zeros(size(active_ub));
 
     % use all constraints for J* linear sensitivity - MDO book section 5.3.4, equation 5.35, page 175
@@ -239,7 +239,7 @@ function [par_J_par_p, par_g_par_p, ...
         else
             par_y_par_p = finite_difference_scalar_x(y_fcn_handle,p0,param_idx);
         end
-    
+
         % decompose par_y_par_p into its sections
         par_J_par_p = par_y_par_p(1,1);
         par_g_par_p = par_y_par_p(1,2 : 1+num_constr).';
@@ -281,7 +281,7 @@ end
 
 function deriv = finite_difference_vector_x(fcn_handle,x_1_vec,ny)
 % fcn handle: a function expecting input vector x and returning output matrix y (size ny)
-    
+
     nx = length(x_1_vec);
     deriv = zeros([nx ny]);
     for i=1:nx
@@ -298,8 +298,8 @@ function deriv = finite_difference_scalar_x(f_handle,x_1,idx)
 
 % x is allowed to be nonscalar only if optional arg idx is passed, which
 % indicates which element of x to use to find delta_x. The calculated
-% delta_x is then applied to the entire x vector at once, so x still acts 
-% like a scalar in terms of the derivative. This is different than 
+% delta_x is then applied to the entire x vector at once, so x still acts
+% like a scalar in terms of the derivative. This is different than
 % finite_difference_vector_x, which perturbs each element of x separately.
 
     if nargin <= 2
@@ -315,4 +315,3 @@ function deriv = finite_difference_scalar_x(f_handle,x_1,idx)
     deriv = delta_y / delta_x;
     % deriv is size(y)
 end
-

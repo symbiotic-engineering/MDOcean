@@ -1,4 +1,4 @@
-% find the value of F_max for the nominal RM3 
+% find the value of F_max for the nominal RM3
 % that is just high enough so there is no saturation
 
 function F_max_nom = find_nominal_inputs(b, p)

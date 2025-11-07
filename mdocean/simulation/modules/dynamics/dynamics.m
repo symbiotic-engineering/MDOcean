@@ -35,28 +35,28 @@ function [F_heave_storm, F_surge_storm, ...
                                             F_limit, zero_prob_idxs, ...
                                             T_f_slam_op, in.power_scale_coeffs,...
                                             in.operational_dynamics_debug_plots_on);
-    
+
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
-    
+
     % saturate maximum power
     if in.use_power_sat
         P_matrix_elec = min(P_matrix_elec,in.P_max,'includenan');
     end
-    
+
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
-    P_avg_elec = sum(P_weighted(:),'omitnan'); 
-    
+    P_avg_elec = sum(P_weighted(:),'omitnan');
+
     assert(isreal(P_avg_elec))
-    
+
     % use max sea states for structural forces
     in.use_multibody = false; % storm is alway singlebody dynamics because brake clamps float to spar
     [~,X_constraints_storm,~,~,~,~,~,~,F_heave_storm,F_surge_storm] = get_power_force(in, ...
                                 in.T_struct, in.Hs_struct, m_float, m_spar, ...
                                 0, false(size(in.T_struct)), T_f_slam_storm, [1 0 0 1], false);
     F_heave_storm = F_heave_storm * in.F_heave_mult;
-    
+
     % use all X constraints operationally, only use slamming in storm
     X_constraints_storm = X_constraints_storm(6:end);
     X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
@@ -65,7 +65,7 @@ function [F_heave_storm, F_surge_storm, ...
     % coefficient of variance (normalized standard deviation) of power
     P_var = std(P_matrix_elec(:), in.JPD(:),'omitnan') / P_avg_elec;
     P_var = P_var * 100; % convert to percentage
-    
+
 
 end
 
@@ -118,8 +118,8 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
                                             drag_convergence_plot_on);
 
 % FIXME: check stability of closed loop multibody system
-    
-    % apply empirical fitted freq-dependent scale factor to adjust power from 
+
+    % apply empirical fitted freq-dependent scale factor to adjust power from
     % singlebody to multibody, to match RM3 report
     if in.use_multibody==false
         c = power_scale_coeffs;
@@ -128,7 +128,7 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     else
         P_matrix = real_P * in.power_scale_multibody;
     end
-    
+
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
     mag_X_u_const(idx_constraint) = 0;
@@ -151,7 +151,7 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     % prevent violation of linear wave theory - notebook p153 9/20/25
     X_max_linear_f = 1/10 * (in.h - in.T_f_2);
     X_max_linear_s = 1/10 * (in.h - in.T_s);
-    
+
     X_below_linear_f = X_max_linear_f / X_f_max - 1;
     X_below_linear_s = X_max_linear_s / X_s_max - 1;
 
@@ -178,12 +178,12 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         % set values where JPD=0 to 0 to not include them in constraint
         mag_U_const = mag_U;
         mag_U_const(idx_constraint) = 0;
-            
+
         % powertrain force
         F_ptrain_max = max(mag_U_const,[],'all');
         F_ptrain_max = min(F_ptrain_max, F_max);
 
-        % heave force: includes powertrain force and D'Alembert force        
+        % heave force: includes powertrain force and D'Alembert force
         F_heave_f = combine_ptrain_dalembert_forces(m_float, w, mag_X_f_const, phase_X_f, mag_U_const, phase_U, F_max);
         F_heave_s = combine_ptrain_dalembert_forces(m_spar,  w, mag_X_s_const, phase_X_s, mag_U_const, phase_U, F_max);
 
@@ -191,7 +191,7 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         F_heave_s_max = max(F_heave_s,[],'all');
 
         % surge force - from Eq 25 Newman 1963 - assumes slender kR << 1
-        % https://apps.dtic.mil/sti/tr/pdf/AD0406333.pdf  
+        % https://apps.dtic.mil/sti/tr/pdf/AD0406333.pdf
         F_surge_coeff = 2 * in.rho_w * w.^2 .* wave_amp ./ k_wvn;
         F_surge_f = F_surge_coeff * pi * in.D_f^2/4 .* (       1             - exp(-k_wvn*in.T_f_2));
         F_surge_s = F_surge_coeff * pi * in.D_s^2/4 .* (exp(-k_wvn*in.T_f_2) - exp(-k_wvn*in.T_s));
@@ -275,7 +275,7 @@ function [mag_U,phase_U,...
     end
     % then do nonlinear solver to finish
     if max_drag_iters_solver > 0
-        
+
         [mag_U,phase_U,...
          real_P,reactive_P,...
          mag_X_u,phase_X_u,...
@@ -314,7 +314,7 @@ function [mag_U,phase_U,...
         col = col.';
     end
     N_ss_nz = nnz(idx_not_nan); % number of nonzero sea states (so not including NaNs)
-    fill_nan_matrix = @(x) accumarray([row col], x, sz, [], NaN) ; 
+    fill_nan_matrix = @(x) accumarray([row col], x, sz, [], NaN) ;
     unflatten = @(x,n) fill_nan_matrix( x( (1:N_ss_nz) + (n-1)*N_ss_nz ) );
 
     % anonymous function to take 6 sea state matrices and turn into collapsed row vector
@@ -337,7 +337,7 @@ function [mag_U,phase_U,...
                                     F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
                                     drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
                                     X_max,control_type,multibody);
-    
+
     sparsity = repmat(eye(N_ss_nz),6);
     opts = optimoptions('fsolve','JacobPattern',sparsity,...
                                  'MaxIterations',max_drag_iters,...
@@ -576,7 +576,7 @@ function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_
     mag_v0_v_ratio = mag_v0 ./ mag_v;
     mag_v0_v_ratio(mag_v==0) = 0; % prevent divide by zero
     phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
-    
+
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
     phi_alpha = 0; %phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
@@ -641,7 +641,7 @@ function [mag_U,phase_U,...
         mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
         mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
         mag_U = ctrl_mult_guess .* F_ptrain_over_x .* mag_X_f;
-        
+
         phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
         phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
         phase_U = phase_V_u + phase_Z_u;            % phase of control force
@@ -668,7 +668,7 @@ function [mag_U,phase_U,...
 
     % indices where each solution applies. currently overriding amp
     % constraint. commented forumlas attempt to incorporate both but
-    % should not actually be based purely on whether the 
+    % should not actually be based purely on whether the
     % saturated and/or unsaturated solution violates, it should also
     % depend on alpha and the limits (see notebook p142-144 9/15/25).
     if isinf(F_max)
@@ -686,13 +686,13 @@ function [mag_U,phase_U,...
     F_err = Inf(size(F_err_from_force_sat));
     X_err = Inf(size(X_err_from_amp_sat));
 
-    % at sea states where the force-saturated solution applies, 
+    % at sea states where the force-saturated solution applies,
     % set F_err as deviation from that solution. Otherwise, set F_err=0
     % to allow any force to occur.
     F_err(idx_force_sat_applies) = F_err_from_force_sat(idx_force_sat_applies);
     F_err(~idx_force_sat_applies) = 0;
 
-    % at sea states where the amplitude-saturated solution applies, 
+    % at sea states where the amplitude-saturated solution applies,
     % set X_err as deviation from that solution. Otherwise, set X_err = 0
     % to allow any amplitude to occur.
     X_err(idx_amp_sat_applies) = X_err_from_amp_sat(idx_amp_sat_applies);

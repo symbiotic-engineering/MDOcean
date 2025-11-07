@@ -16,4 +16,3 @@ function [str_out] = remove_underscores_str(str_in)
     cell_spaces = strcat(cell_capital," ");
     str_out = horzcat(cell_spaces{:});
 end
-

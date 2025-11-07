@@ -18,7 +18,7 @@ Marked points include the keel $K$, center of buoyancy $B$, center of gravity $G
     \includegraphics[width=\linewidth]{figs/from-matlab/dimensions.pdf}
 \caption{Dimension labeling of system}\label{fig:dims}
 \end{figure}
-Additional dimensions representing support sizes and thicknesses will be described in the structures section \ref{sec:structures}. 
+Additional dimensions representing support sizes and thicknesses will be described in the structures section \ref{sec:structures}.
 % add still water line label in figure
 Stability requires the metacenter $M$ to be above the center of gravity G.
 This distance $GM$ can be calculated \cite{newman}:
@@ -74,7 +74,7 @@ For a two body point absorber oscillating in heave under normal operational cond
     \end{bmatrix},~
     \mathbf{A_{h,op}} = \begin{bmatrix}
         A_f & A_c \\ A_c & A_s
-    \end{bmatrix},~ 
+    \end{bmatrix},~
     \mathbf{B_{h,op}} = \begin{bmatrix}
         B_f & B_c \\ B_c & B_s
     \end{bmatrix},~
@@ -87,12 +87,12 @@ Meanwhile, the hydrodynamic coefficients may change in storm conditions, such as
 The assumed storm configuration in this study, to mirror the RM3 report \cite{RM3}, is the float and spar rigidly fixed to each other so they move as if they have been merged $m$:
 \begin{equation}
     \vec{\hat{\xi}}_{storm} = \begin{bmatrix}
-        \hat{X}_m 
+        \hat{X}_m
     \end{bmatrix},~\vec{\hat{\gamma}}_{storm} = \begin{bmatrix}
         \hat{\gamma}_m
     \end{bmatrix},
     ~\mathbf{A_{h,storm}} = \begin{bmatrix}
-        A_m 
+        A_m
     \end{bmatrix},~ \mathbf{B_{h,storm}} = \begin{bmatrix}
         B_m
     \end{bmatrix},~
@@ -142,7 +142,7 @@ Because the damping plate has a more substantial impact on the spar coefficients
 
 %\hl{Describe how I did the WAMIT damping plate scaling for the spar excitation.}
 
-%The MEEM implementation currently cannot take the damping plate into account, and the plate is expected to have a large impact on the spar added mass and damping. Therefore, algebraic approximations of the damping plate coefficients are used instead of the MEEM solution. 
+%The MEEM implementation currently cannot take the damping plate into account, and the plate is expected to have a large impact on the spar added mass and damping. Therefore, algebraic approximations of the damping plate coefficients are used instead of the MEEM solution.
 The spar added mass coefficient $A_s$ is approximated as a frequency-independent quantity based on the mass of water displaced in the spherical projection of the plate \cite{philip_damping_2012}:
 \begin{equation}
   %  C_m = 1 + \frac{\rho_w D_d^3}{3m_s} \frac{1}{\frac{1}{2}(\frac{D_s}{D_d})^3 - (\frac{D_s}{D_d})^2 + 1} % this is what I had in dev/heave_plate.m but I guess it's less correct
@@ -170,7 +170,7 @@ For $|\hat{\gamma}_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{
 %     \frac{F}{m\omega_n^2} & \zeta \geq 1
 %     \end{cases}
 % \end{equation}
-% where damping ratio is $\zeta=\frac{b}{2\sqrt{mk}}$ and natural frequency is $\omega_n=\sqrt{\frac{k}{m}}$. To keep the peak spar amplitude $|X|_{pk}$ low, both $\zeta$ and $m\omega_n^2/F=k/F$ should be kept high. A sufficient criteria for maintaining $|X|_{pk}$ below some nominal threshold $|X|_{pk,nom}$ is therefore to constrain $\zeta=\zeta_{nom}$ and $k/F > (k/F)_{nom}$. While this is not a necessary condition (other designs could also maintain low spar amplitude), a sufficient condition is adequate for preliminary optimization purposes. 
+% where damping ratio is $\zeta=\frac{b}{2\sqrt{mk}}$ and natural frequency is $\omega_n=\sqrt{\frac{k}{m}}$. To keep the peak spar amplitude $|X|_{pk}$ low, both $\zeta$ and $m\omega_n^2/F=k/F$ should be kept high. A sufficient criteria for maintaining $|X|_{pk}$ below some nominal threshold $|X|_{pk,nom}$ is therefore to constrain $\zeta=\zeta_{nom}$ and $k/F > (k/F)_{nom}$. While this is not a necessary condition (other designs could also maintain low spar amplitude), a sufficient condition is adequate for preliminary optimization purposes.
 
 % Expressing these conditions in terms of the uncontrolled spar dynamic coefficients \cite{tao_low_2003}:
 % \begin{equation}\label{eq:spar}
@@ -186,11 +186,11 @@ For $|\hat{\gamma}_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{
 
 % The geometry is required to maintain at least as high damping ratio and at least as low natural frequency as the nominal RM3 design. While this single-body spar analysis does not take into account the dynamic effect of the PTO force on the spar, it is sufficient to provide confidence that the spar response remains similar enough to the nominal design that the float can be analyzed assuming a fixed spar.
 
-% \hl{Describe the frequency dependent fudge factor and add a figure showing that ratio as a function of sea state.} MDOcean scales the fixed-spar mechanical power by a period-dependent rational tuning factor 
+% \hl{Describe the frequency dependent fudge factor and add a figure showing that ratio as a function of sea state.} MDOcean scales the fixed-spar mechanical power by a period-dependent rational tuning factor
 % \begin{equation}
 %     P_{spar~floating} = \frac{c_1}{c_2T^2+c_3T+c_4} P_{spar~fixed}
 % \end{equation}
-% which adjusts only the power (not the amplitude). A fit of MDOcean and RM3 report yielded $[c_1,c_2,c_3,c_4]=[23,1,-15,86]$, and the coefficients can be set to $[1,0,0,1]$ to disable the tuning. 
+% which adjusts only the power (not the amplitude). A fit of MDOcean and RM3 report yielded $[c_1,c_2,c_3,c_4]=[23,1,-15,86]$, and the coefficients can be set to $[1,0,0,1]$ to disable the tuning.
 
 A second limitation of the present implementation of MEEM is numerical overflow.
 To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$:
@@ -198,7 +198,7 @@ To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{
     \Delta z_{min} \sim D
 \end{equation}
 for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
-The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
+The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow.
 
 %The current implementation of MEEM yields only the magnitude, not phase, of the excitation coefficient (using equation 99 rather than 97 of \cite{chau_inertia_2012}). Therefore the phase is set to zero, an approximation that will be shown in the following section to be adequate for single body dynamics.
 
@@ -219,12 +219,12 @@ Therefore, MDOcean pursues a quasi-linear semi-analytical modified frequency dom
 
 When handling dynamic constraints with a modified frequency domain method, first the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
 If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state.
-Otherwise, a variety of approaches are possible to address the violated constraint, summarized in Table~\ref{tab:constraint-approaches} and described below. 
+Otherwise, a variety of approaches are possible to address the violated constraint, summarized in Table~\ref{tab:constraint-approaches} and described below.
 
 \begin{table}
 \centering
 
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.6\linewidth}l l} 
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.6\linewidth}l l}
 \textbf{Approach} & \textbf{Accuracy} & \textbf{Optimality} \\ \hline
 (1) Nonlinear optimal (or near-optimal) controller, linearized via describing functions& High & High \\
 (2) Linear optimal controller& High & Medium \\
@@ -246,7 +246,7 @@ In either case, the nonlinear controller is linearized via the describing functi
 
 If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (2).
 This requires some frequency-domain calculations for an impedance-mismatched linear system described in \cite{mccabe_force-limited_2024} and can be visualized with the Smith chart, a tool common in electrical engineering.
-This approach accurately reflects the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller. 
+This approach accurately reflects the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller.
 
 If the implementation for the optimal constrained linear controller is also not available, then the violating portion of the time-domain signals can be saturated or zeroed (3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
@@ -257,7 +257,7 @@ It is utilized here for the power limit.
 As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which \cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
 These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization though either the objective or constraints.
 The latter approach (5) is actually the only option for slamming amplitude limits in the storm design load case, since the device is already in survival mode and not producing power or applying a control input.
-Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and expedience. 
+Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and expedience.
 
 In future work, MDOcean could instead utilize describing functions (1) and the optimal constrained linear controller (2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
 The describing function for force saturation is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
@@ -313,7 +313,7 @@ where $s=i\omega$ is the Laplace variable.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy of the float and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
 Reference \cite{penalba_review_2016} reviews common WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2024} uses the transmission matrix form, which groups the effort and flow variables $e$ and $q$ at each port. 
+Reference \cite{coe_co-design_2024} uses the transmission matrix form, which groups the effort and flow variables $e$ and $q$ at each port.
 
 A linear model of the drivetrain with mechanical transmission matrix $[a]_m$ takes the form
 % impedance
@@ -363,7 +363,7 @@ _{[a]_e}
 \end{equation}
 with park-transformed quadrature electrical voltage and current $V$ and $I$.
 The system operating point is determined by the controller, which is typically formulated at the generator mechanical port.
-A linear control law with impedance $\hat{Z}_u$ split into damping and stiffness coefficients $B_u$ and $K_u$ has the form 
+A linear control law with impedance $\hat{Z}_u$ split into damping and stiffness coefficients $B_u$ and $K_u$ has the form
 \begin{equation}
 \tau = \hat{Z}_u \Omega =\left(B_u + \frac{K_u}{s} \right) \Omega
 \end{equation}
@@ -384,22 +384,22 @@ _{E_2}
  e \\ q
 \end{bmatrix}
 \end{equation}
-where substituting $[e,q]^T=[F_p,\dot{X}]^T$ yields the floating body mechanical power, $[e,q]^T=[\tau,\Omega]^T$ yields the generator mechanical power, and $[e,q]^T=[V,I]^T$ yields the generator electrical power. 
+where substituting $[e,q]^T=[F_p,\dot{X}]^T$ yields the floating body mechanical power, $[e,q]^T=[\tau,\Omega]^T$ yields the generator mechanical power, and $[e,q]^T=[V,I]^T$ yields the generator electrical power.
 
 Moving back to the frequency domain and assuming sinusoidal waveforms, the average and peak powers $P_{avg}$ and $P_{pk}$ in a given sea state can be found as:
 \begin{equation}
 \begin{aligned}
-     P_{avg} &= \frac{1}{2}\Re(\hat{e} \hat{q}^*) = \frac{1}{2} \Re(\hat{Z})|\hat{q}|^2 
+     P_{avg} &= \frac{1}{2}\Re(\hat{e} \hat{q}^*) = \frac{1}{2} \Re(\hat{Z})|\hat{q}|^2
     \\
     P_{pk} &=  P_{avg} + \frac{1}{2}|\hat{e} \hat{q}^*| = P_{avg}\left( 1 + \sqrt{1 + \left(\frac{\Im(\hat{Z})}{\Re(\hat{Z})}\right) ^2  } \right)
 \end{aligned}
 \end{equation}
-if the port is terminated with complex impedance $\hat{Z}$. 
+if the port is terminated with complex impedance $\hat{Z}$.
 
 Rather than utilize detailed PTO models for co-design, which a number of recent papers (e.g. \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in section \ref{sec:lit}) have already proven the value of, this study chooses to keep the PTO design unspecified by assuming a constant-gain, infinite bandwidth transmission system and a generator with fixed average efficiency $\eta$.
 While obviously unrealistic and insufficient for designing the device's actual PTO hardware, this decision adds simplicity and illustrative value at the system level.
 It highlights the effect of the novel non-PTO (e.g. structural) aspects of WEC co-design that this study introduces while still capturing the effect of PTO rating on system performance and maintaining sufficient generality to incorporate more detailed PTO models in the future.
-Furthermore, setting $\eta=80\%$ maintains consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation. 
+Furthermore, setting $\eta=80\%$ maintains consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation.
 
 More specifically, rather than implement a full generator electrical transmission matrix $[a]_e$, for the optimization study a simple average efficiency $\eta$ describes the gain between the average mechanical power and average electrical power.
 This is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_u\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
@@ -409,13 +409,13 @@ The average efficiency is assumed to also apply to the peak powers, though this 
 P_{avg,elec} \\
 P_{pk,elec}
 \end{bmatrix}
-= 
+=
 \eta
 \begin{bmatrix}
 P_{avg,mech} \\
 P_{pk,mech}
 \end{bmatrix}
-= 
+=
 \eta \frac{1}{2} B_u |\hat{\Omega}|^2
 \begin{bmatrix}
 1 \\
@@ -478,7 +478,7 @@ The quadratic form $|F_d|\sim|\dot{x}_{rel}|^2$ implies a nonlinear input-output
 To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with another describing function, following \cite{quartier_influence_2021}:
 \begin{equation}
 \begin{aligned}
-    F_{d}(t) &= \frac{1}{2}\rho_w C_d A_w ~\dot{x}_{rel}(t) |\dot{x}_{rel}(t)| \\     
+    F_{d}(t) &= \frac{1}{2}\rho_w C_d A_w ~\dot{x}_{rel}(t) |\dot{x}_{rel}(t)| \\
     &= \frac{1}{2}\rho_w C_d A_w ~\dot{X}_{rel}^2 \sin(\omega t) | \sin(\omega t)|\\
     &\approx \frac{1}{2}\rho_w C_d A_w ~\dot{X}_{rel}^2\frac{8}{3\pi} \sin(\omega t)\\
    % F_{d}(\omega)&= \frac{1}{2}\rho_w C_d A_w \frac{1}{2\pi}\dot{X}_{rel}(\omega)*|\dot{X}_{rel}(\omega)| \\
@@ -501,7 +501,7 @@ The resulting magnitude and phase of WEC motion are obtained by numerically iter
 Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
 
 %\paragraph{Power Saturation}
-%Equation~\eqref{eq:mech-power} shows that the power peak to maximum ratio is at minimum two for a damping controller, 
+%Equation~\eqref{eq:mech-power} shows that the power peak to maximum ratio is at minimum two for a damping controller,
 %\hl{describe}
 
 \paragraph{Energy Production}
@@ -549,8 +549,8 @@ where table~\ref{tab:DLCs} details $F_p$ and $X$ based on the assumptions of eac
  & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
          \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
          Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $F_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
-Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\ 
- Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
+Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\
+ Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\
          Spar amplitude, $X_s$& Given by \eqref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
  \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|X_f-X_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
  \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{f,linear}, X_{f,slam})$& N/A \\ %$X_{slam}$\\
@@ -576,8 +576,8 @@ using the respective waterplane areas $A_w$  and drafts $T$ for the float and sp
 The top vertical height $z_{top}$ is set to zero for the float and $T_{f,2}$ for the spar.
 The design surge force is the maximum surge force over all nonzero-probability sea states.
 Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
-Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work. 
-Maximum acceptable heave %and surge 
+Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work.
+Maximum acceptable heave %and surge
 forces will be evaluated with structural factors of safety in \ref{sec:structures}.
 The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the optimization.
 
@@ -602,7 +602,7 @@ For operational waves, $\Delta z$ for float bottom-slamming is taken as $T_{f,1}
 Likewise for spar bottom-slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
 The relevant $\Delta z$ for float and spar top-slamming in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
 For storm waves, currently the slamming limit is not applied.
-%since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
+%since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate.
 In future work, the storm $\Delta z$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
 
 Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
@@ -625,7 +625,7 @@ Section~\ref{sec:discussion} will discuss possible future alternatives to this m
 % \hline
 % $X_{linear}$& Operating sea states with nonzero JPD & Ideally, but requires more work \\
 % \hline
-% $X_{slam}$& Storm sea state & Not relevant (controller is off during storm) \\ \hline 
+% $X_{slam}$& Storm sea state & Not relevant (controller is off during storm) \\ \hline
 %  $X_{fs}$& Operating sea states with nonzero JPD&Ideally, but requires more work\\\hline
 % $P_{max}$& Operating sea states with nonzero JPD & Ideally, but requires more work \\
 % \hline
@@ -640,7 +640,7 @@ MDOcean uses a JPD to capture the long-term variation in wave conditions and acc
 Additionally, it assumes that each wave condition within the JPD is a sinusoidal regular wave.
 Regular wave height $H$ and period $T$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}
-    H = \frac{H_s}{\sqrt{2}}, \qquad T = T_e \approx 0.857 ~T_p 
+    H = \frac{H_s}{\sqrt{2}}, \qquad T = T_e \approx 0.857 ~T_p
 \end{equation}
 where the irregular sea state has significant wave height $H_s$, energy period $T_e$, and (for a Pierson-Moskowitz spectrum) peak period $T_p$.
 This regular wave assumption avoids the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
@@ -657,10 +657,10 @@ Section~\ref{sec:discussion} will discuss possible future extensions to incorpor
 The MDOcean structures module uses forces from the dynamics module as well as area and volume outputs from the geometry module to calculate the factors of safety for various structural failure modes.
 The factors of safety represent the multiplicative increase in force before stress would surpass peak limits for storm loads and the endurance limit under operational loads.
 Again aligning with the modeling philosophy of investing the up-front development time to create a simulation that runs extremely quickly with moderate accuracy, MDOcean integrates a combination of explicit algebraic and tabulated semi-analytical structural models that are well-established in the structures community yet rarely utilized for WEC design.
-The structures module therefore runs significantly faster than traditional finite element method (FEM) simulations, though it lacks the ability to easily generalize to other geometries, boundary conditions, and load cases as a FEM model could. 
+The structures module therefore runs significantly faster than traditional finite element method (FEM) simulations, though it lacks the ability to easily generalize to other geometries, boundary conditions, and load cases as a FEM model could.
 
 More specifically, the peak limits analyzed include yield, global buckling, local buckling, and ultimate where appropriate, while the endurance limit assesses high-cycle fatigue.
-The latter is potentially conservative, and future work could implement Miner's law to better represent infrequent operational loads (low-cycle fatigue) \cite{ove_arup__partners_ltd_structural_2016}. 
+The latter is potentially conservative, and future work could implement Miner's law to better represent infrequent operational loads (low-cycle fatigue) \cite{ove_arup__partners_ltd_structural_2016}.
 
 The factor of safety is directly calculated for the most heavily loaded subcomponent in each of the three components: the bottom plate in the float, the cylindrical shell of the spar, and the annular plate of the damping plate.
 Thicknesses of other subcomponents are either held constant or scaled with the dimensions of subcomponents that are directly assessed, as outlined in \tableautorefname~\ref{tab:struct}.
@@ -691,9 +691,9 @@ Figure \ref{fig:FBDs} shows a free body diagram of the applied load on each of t
 \caption{Applied loads and fixed points of each structure}\label{fig:FBDs}
 \end{figure}
 Each of the twelve sections of the float are modeled as a welded shell structure subject to a bottom distributed load and a top fixity at the weld joint to the tube support.
-To simplify the representation of load transfer between plate elements, the bottom %and top 
+To simplify the representation of load transfer between plate elements, the bottom %and top
 float plate is analyzed individually, assuming fixed edges and solving for the reaction loads at these edges.
-This means that the %top and bottom plate are each 
+This means that the %top and bottom plate are each
 plate is conservatively sized assuming the other plate elements are perfectly rigid. %The fixed-edge reaction loads from these top and bottom solutions are then applied to the central shell element modeled as a cross section subject to bending.
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
@@ -702,9 +702,9 @@ Local buckling is assessed as well.
 
 The damping plate is a thin stiffened cylindrical plate subject to a vertical distributed force on its bottom surface.
 The force is reacted by the welded connection to the column along the column's circumference, as well as through four welded tubular supports.
-Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
+Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners.
 
- Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}. 
+ Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}.
 
 %TC:break Economics
 \subsection{Economics}\label{sec:econ}
@@ -746,7 +746,7 @@ Details on the scaling are provided in \appendixname~\ref{sec:appendix-econ}.
 \end{table}
 Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
 For example, installation and decommissioning costs could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
-Likewise, the mooring and foundation costs could scale with storm surge force, and the replacement parts and consumables costs could scale with the PTO power and force as the PTO capital costs do. %\hl{Note: do I just want to add mooring, parts, and consumables cost scaling to the code, since that's totally possible with the current model?} 
+Likewise, the mooring and foundation costs could scale with storm surge force, and the replacement parts and consumables costs could scale with the PTO power and force as the PTO capital costs do. %\hl{Note: do I just want to add mooring, parts, and consumables cost scaling to the code, since that's totally possible with the current model?}
 Section~\ref{sec:formulation} will discuss the effect of such uncertainties and how to mitigate their impact on the design optimization.
 
 Finally, a power law model captures economies of scale, where per-WEC unit costs $C$ decrease with the number of devices $N_{WEC}$:
@@ -766,4 +766,3 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
     \caption{Cost model values for each CBS category}
     \label{tab:econ-model-values}
 \end{table}
-

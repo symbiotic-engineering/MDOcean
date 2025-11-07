@@ -1,6 +1,6 @@
 % plot r_k * zeta as a function of omega for optimal control
 % for the nominal design and LCOE-optimal design
-clear 
+clear
 
 p = parameters();
 b = var_bounds();
@@ -23,7 +23,7 @@ for i = 1:2
     h_s = T_s / b.T_s_ratio_nom;
     h_d = p.h_d_over_D_s * D_s;
     D_d = p.D_d_over_D_s * D_s;
-    
+
     w = linspace(0.1,2);
     T = 2*pi./w;
     Hs = 1;
@@ -33,10 +33,10 @@ for i = 1:2
                                                 p.t_dt, D_d, p.D_dt, p.theta_dt, T_s, h_d, ...
                                                 b.M_nom, p.rho_m, p.rho_w, p.m_scale);
     m = m_float + A;
-    
+
     r_k_zeta = w .* B_h ./ (m*w.^2 - K_h);
-    
-    
+
+
     plot(w,abs(r_k_zeta),linespec{i})
 end
 

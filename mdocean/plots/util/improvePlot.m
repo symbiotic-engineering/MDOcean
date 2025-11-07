@@ -27,13 +27,13 @@ function [] = improvePlot()
         legend_font_size = 16;
         error_bar_cap_size = 10;
     end
-    
+
     marker_outline = 'matching'; % could be 'black' or 'matching'
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Use h as handle for current figure
-    hFig = gcf;                    
+    hFig = gcf;
     % Change figure background colour to white
     set(hFig, 'Color', 'white');
 
@@ -50,19 +50,19 @@ function [] = improvePlot()
 
         % Change default font size (tick labels, legend, etc.)
         set(ax, 'FontSize', axis_tick_font_size, 'FontName', 'Arial', 'LineWidth', box_thickness);
-        
+
         set(ax, 'Box', 'on');
 
         % Change font size for axis text labels
         set(get(ax, 'XLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
         set(get(ax, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
-        
+
         try % try statement to avoid error with categorical axes
         ax.XRuler.Exponent = 0; % Remove exponential notation from the X axis
         ax.YRuler.Exponent = 0; % Remove exponential notation from the Y axis
         catch
         end
-        
+
     end
 
     tiledlayout_handles = findobj(hFig,'type','tiledlayout');
@@ -72,7 +72,7 @@ function [] = improvePlot()
         set(get(t, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
         set(get(t, 'Title') ,'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
     end
-    
+
     % Find all the lines, and markers
     LineH = findobj(hFig, 'type', 'line', '-or', 'type', 'errorbar');
 
@@ -109,7 +109,7 @@ function [] = improvePlot()
         end
     end
 
-    % Find the legend and subplot title, and if there is one, change it  
+    % Find the legend and subplot title, and if there is one, change it
     h = get(hFig,'children');
     for k = 1:length(h)
         if strcmpi(get(h(k),'Tag'),'legend')

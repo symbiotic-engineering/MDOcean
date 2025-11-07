@@ -7,7 +7,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     % Runs MEEM with potentially many numeric inputs (geometries and/or freqencies)
     % while keeping the same setup (number of harmonics, which cylinder is heaving).
     % Each numeric matrix is iterated through at the same time. This code
-    % does not find the combinations of all possible inputs. If you want this, 
+    % does not find the combinations of all possible inputs. If you want this,
     % pre-generate the combinations (ie with meshgrid) and pass the meshes in here).
 
     % check input dimensions
@@ -41,13 +41,13 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     if ~exist(['simulation/modules/hydro/generated/A_b_c_matrix_' fname],'file') || ...
        ~exist(['simulation/modules/hydro/generated/hydro_potential_velocity_fields_' fname],'file')
         create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, fname)
-    end  
+    end
 
     % for loop for numeric inputs
     mu_nondim = zeros(1,num_runs);
     lambda_nondim = zeros(1,num_runs);
     exc_phases = zeros(1,num_runs);
-    
+
     for i = 1:num_runs
         % index into matrix inputs with i and into scalar inputs with 1
         idxs = numel_numeric_inputs;
@@ -65,7 +65,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                          d2_num < h_num  && ...
                          a1_num < a2_num && ...
                          d2_num < d1_num;
-        
+
         if valid_geometry
             [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, ...
@@ -94,8 +94,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
 end
 
 function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
-    % solve for m_k from m_0 and h    
-    
+    % solve for m_k from m_0 and h
+
     [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
@@ -107,7 +107,7 @@ function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num
                             a2_num*(1-a_eps), a2_num*(1+a_eps)]);
         z_vec = linspace(-h_num,0,spatial_res);
         [R,Z] = meshgrid(r_vec,z_vec);
-        
+
         % get hydro coeffs and potential velocity fields
         [~,phi_i1_num,phi_i2_num,...
         phi_e_num,phi_p_i1_num,phi_p_i2_num,...
@@ -153,7 +153,7 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
 
         m_k_h_deg = fzero(eqn, bounds);
         m_k_num(k_num) = m_k_h_deg * pi/180 / h_num;
-    end    
+    end
 
     m_k_cell = num2cell(m_k_num);
 
@@ -188,11 +188,11 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
     % show A matrix values
     if show_A
         cond(A_num)
-        
+
         figure
         signed_log(real(A_num))
         title('Real(A)')
-        
+
         figure
         signed_log(imag(A_num))
         title('Imag(A)')
@@ -225,7 +225,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     syms r z real                                           % coordinates
     syms R_1n_1(n) R_1m_2(m) R_2m_2(m) Z_n_i1(n)  ...       % basis functions
             Z_m_i2(m) Lambda_k(k) N_k(n) Z_k_e(k) m_k(k)
-    syms C_1n_1(n) C_1m_2(m) C_2n_1(n) C_2m_2(m) B_k(k)     % unknown coefficients              
+    syms C_1n_1(n) C_1m_2(m) C_2n_1(n) C_2m_2(m) B_k(k)     % unknown coefficients
     syms h a1 a2 d1 d2 m0 real positive                     % constants
     syms n m k real integer                                 % counter index
     assumeAlso(n >= 0)
@@ -235,14 +235,14 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     assumeAlso(h > d1)
     assumeAlso(r > 0)
     assumeAlso(m_k(k) > 0)
-    
+
     % equation numbers refer to Chau & Yeung 2010 unless otherwise noted
-    
+
     %% setup analytical boundary value problem equations
     % eq 4
     lambda_n1(n) = n*pi/(h-d1);
     lambda_m2(m) = m*pi/(h-d2);
-    
+
     % eq 5
     if heaving_IC
         phi_p_i1 = 1/(2*(h-d1)) * ((z+h)^2 - r^2/2);
@@ -254,35 +254,35 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     else
         phi_p_i2 = 0;
     end
-    
+
     % eq 7
     R_1n_1(n) = piecewise(n==0, 1/2, n>=1, ...
                         besseli(0,lambda_n1(n)*r)/besseli(0,lambda_n1(n)*a2));
     R_1m_2(m) = piecewise(m==0, 1/2, m>=1, ...
                         besseli(0,lambda_m2(m)*r)/besseli(0,lambda_m2(m)*a2));
-    
+
     % eq 8
     R_2n_1(n) = sym(0);
     R_2m_2(m) = piecewise(m==0, 1/2*log(r/a2), ...
         m>=1, besselk(0,lambda_m2(m)*r)/besselk(0,lambda_m2(m)*a2));
-    
+
     % eq 9
     Z_n_i1(n) = piecewise(n==0, 1, n>=1, sqrt(2)*cos(lambda_n1(n)*(z+h)));
     Z_m_i2(m) = piecewise(m==0, 1, m>=1, sqrt(2)*cos(lambda_m2(m)*(z+h)));
-    
+
     % eq 13
     Lambda_k(k) = piecewise(k==0, besselh(0,1,m0*r)/besselh(0,1,m0*a2), ...
         k>=1, besselk(0,m_k(k)*r)/besselk(0,m_k(k)*a2));
-    
-    % eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006 
+
+    % eq 2.34 in analytical methods book, also eq 16 in Seah and Yeung 2006
     N_k(k) = piecewise(k==0, 1/2*(1+sinh(2*m0*h)/(2*m0*h)), ...
                        k>=1, 1/2*(1+sin(2*m_k(k)*h)/(2*m_k(k)*h)) );
-    
+
     % eq 14
     Z_k_e(k) = piecewise(k==0, 1/sqrt(N_k(k)) * cosh(m0 * (z+h)), ...
                          k>=1, 1/sqrt(N_k(k)) * cos(m_k(k) * (z+h)));
-    
-    
+
+
     % coupling integrals
     C_nm(n,m) = simplify(int(Z_m_i2(m) * Z_n_i1(n), z, -h, -d1));
     C_mk(m,k) = simplify(int(Z_m_i2(m) * Z_k_e(k),  z, -h, -d2));
@@ -301,12 +301,12 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
         C_mk_h_approx_plot(m) = expand(simplify(subs( C_m0_approx/h , {d2,m0}, {d2_over_h*h,m0h/h})));
         C_mk_h_actual_plot(m) = expand(simplify(subs( C_mk(m,0)/h   , {d2,m0}, {d2_over_h*h,m0h/h})));
         C_mk_error = expand(simplify(C_mk_h_approx_plot - C_mk_h_actual_plot));
-        
+
         % checking derivation of approximation
         denom = sqrt(2 * m0h + 2 * cosh(m0h) * sinh(m0h)) * (d2_over_h^2 * m0h^2  - 2 * d2_over_h * m0h^2  + sym(pi)^2*m^2  + m0h^2 );
         factor = 2*sqrt(2) * (-1)^m * m0h^(3/2) * (1-d2_over_h)^2 / denom;
         pretty(expand(simplify(C_mk_h_actual_plot / factor))*factor);
-        
+
         % plots
         str = 'C_{mk} for k=0, m=';
         levels = 10.^(-6:2:-2);
@@ -322,20 +322,20 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     match_2e_potential = dz_2 * ( C_1m_2(m)*subs(R_1m_2(m),r,a2) ...
         + C_2m_2(m)*subs(R_2m_2(m),r,a2) ) + int( subs(phi_p_i2,r,a2) * Z_m_i2(m), z, -h, -d2) == ...
         symsum( B_k(k) * subs(Lambda_k,r,a2) * C_mk(m,k), k, 0, K_num);
-    
+
     % equation 22 in old 1981 paper, applied to boundary 1-2
     match_12_potential = C_1n_1(n) * subs(R_1n_1(n),r,a1) * dz_1 == ...
         symsum(( (C_1m_2(m) * subs(R_1m_2(m),r,a1) + ...
           C_2m_2(m) * subs(R_2m_2(m),r,a1) ) * C_nm(n,m) ),m,0,M_num) + ...
         int(subs(phi_p_i2,r,a1)*Z_n_i1(n) - subs(phi_p_i1,r,a1)*Z_n_i1(n), z, -h, -d1);
-    
+
     % velocity matching
     % equation 23 in old 1981 paper, applied to boundary 2-e
     match_2e_velocity = B_k(k) * subs(diff(Lambda_k(k), r), r, a2) * (h) == ...
         symsum((C_1m_2(m) * subs(diff(R_1m_2(m), r), r, a2) + ...
          C_2m_2(m) * subs(diff(R_2m_2(m), r), r, a2) ) * C_mk(m,k), m, 0, M_num) + ...
         int(subs(diff(phi_p_i2,r),r,a2) * Z_k_e(k), z, -h, -d2 );
-    
+
     % equation 23 in old 1981 paper, applied to boundary 1-2
     %     use large region (-h to -d2) and multiply by Z_m_i2
     match_12_velocity = (h-d2) * ( C_1m_2(m) * subs(diff(R_1m_2(m), r), r, a1) + ...
@@ -343,7 +343,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
      symsum((C_1n_1(n) * subs(diff(R_1n_1(n), r), r, a1) + ...
      C_2n_1(n) * subs(diff(R_2n_1(n), r), r, a1) ) * C_nm(n,m), n, 0, N_num) + ...
      int( subs(diff(phi_p_i1,r),r,a1) * Z_m_i2(m), z, -h, -d1 );
-    
+
     if auto_BCs
         error('auto_BCs are broken right now, please set auto_BCs to false')
         % enter a number 0 to 31 for the combination
@@ -352,31 +352,31 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
         % done: 29,25,23,22,21,19,18,17,13,9,7,6,5,3,2,1
         % all Nan: 30,28,27,26,24,20,16,15,14,12,11,10,8,4,0
         binary = dec2bin(num, 5);
-        
+
         % Assign each bit to a separate variable
         bit1 = str2double(binary(1));
         bit2 = str2double(binary(2));
         bit3 = str2double(binary(3));
         bit4 = str2double(binary(4));
         bit5 = str2double(binary(5));
-        
+
         match_12_velocity = generate_BC(bit1,bit2,bit3,bit4,bit5,m,a1,N_num);
         match_2e_velocity = generate_BC(bit1,bit2,bit3,bit4,bit5,k,a2,M_num);
     end
-    
+
     % get potential field
     % eq 6
     phi_h_n_i1(n) = (C_1n_1(n) * R_1n_1(n) + C_2n_1(n) * R_2n_1(n)) * Z_n_i1(n);
     phi_h_m_i2(n) = (C_1m_2(m) * R_1m_2(m) + C_2m_2(m) * R_2m_2(m)) * Z_m_i2(m);
-    
+
     % eq 12
     phi_e_k(k) = B_k(k) .* Lambda_k(k) .* Z_k_e(k);
-    
+
     % simplify
     phi_h_n_i1(n) = simplify(phi_h_n_i1(n),'IgnoreAnalyticConstraints',true);
     phi_h_m_i2(m) = simplify(phi_h_m_i2(m),'IgnoreAnalyticConstraints',true);
     phi_e_k(k)    = simplify(phi_e_k(k),   'IgnoreAnalyticConstraints',true);
-    
+
     % sum all N terms
     syms N M K real positive integer
     phi_h_i1 = phi_h_n_i1(0) + symsum(phi_h_n_i1, n, 1, N);
@@ -384,7 +384,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     phi_i1 = phi_p_i1 + phi_h_i1;
     phi_i2 = phi_p_i2 + phi_h_i2;
     phi_e  = phi_e_k(0) + symsum(phi_e_k, k, 1, K);
-    
+
     % derivatives to geometric variables
     % hndInfDepth = limit(hnd,h,inf)
     % geom_vars = [a1,a2,d1,d2,h];
@@ -395,7 +395,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     % spy(J)
     % xticklabels({'','a_1','a_2','d_1','d_2','h'})
     % yticklabels({'','\mu','\lambda'})
-    
+
     % get symbolic velocity
     v_1r = diff(phi_i1,r);
     v_1z = diff(phi_i1,z);
@@ -403,7 +403,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     v_2z = diff(phi_i2,z);
     v_er = diff(phi_e,r);
     v_ez = diff(phi_e,z);
-    
+
     % get symbolic hydro coeffs
     % equation 28 in old 1981 paper
     % OC = heaving outer cylinder
@@ -420,7 +420,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 
     hydro_OC = h^3 * 2*pi* integral_OC;
     hydro_IC = h^3 * 2*pi* integral_IC;
-    
+
     if heaving_OC && heaving_IC
         hydro_over_rho = hydro_OC + hydro_IC;
         a_normalize = a2;
@@ -434,32 +434,32 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
         error('neither body is setup to move')
     end
     hydro_nondim = hydro_over_rho / (pi * a_normalize^3);
-    
+
     % The above was general for any N,M,K. Now we sub in particular N_num, M_num, K_num.
     % These substituted variables will be called _NMK.
-    
+
     N_vec = (0:N_num);
     M_vec = (0:M_num);
     K_vec = (0:K_num);
-    
+
     % set up equations
     eqns = [subs(match_12_potential,n,N_vec), subs(match_2e_potential,m,M_vec),...
             subs(match_12_velocity, m,M_vec), subs(match_2e_velocity,k,K_vec) ].';
-    
+
     unknowns = [C_1n_1(N_vec) C_1m_2(M_vec) C_2m_2(M_vec) B_k(K_vec)];
     syms C_1n_1_const [1 N_num+1]
     syms C_1m_2_const C_2m_2_const [1 M_num+1]
     syms B_k_const [1 K_num+1]
     unknowns_const = [C_1n_1_const C_1m_2_const C_2m_2_const B_k_const];
     syms m_k_const [1 K_num] real positive
-    
+
     var = {phi_i1,phi_i2,phi_e,phi_p_i1,phi_p_i2,phi_h_i1,phi_h_i2,...
         v_1r,v_1z,v_2r,v_2z,v_er,v_ez,hydro_nondim,eqns};
     for i = 1:length(var)
         var{i} = subs(var{i}, [N M K], [N_num M_num K_num]);
         var{i} = subs(var{i}, [unknowns m_k(1:K_num)], [unknowns_const m_k_const]);
     end
-    
+
     phi_i1_NMK = var{1};
     phi_i2_NMK = var{2};
     phi_e_NMK = var{3};
@@ -475,7 +475,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     v_e_z_NMK = var{13};
     hydro_nondim_NMK = var{14};
     eqns_NMK = var{15};
-    
+
     % generate c-vector
     c = jacobian(hydro_nondim_NMK,unknowns_const);
     c_0 = simplify(subs(hydro_nondim_NMK,unknowns_const,0*unknowns_const));
@@ -487,7 +487,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 
     % generate linear system
     [A,b] = equationsToMatrix(eqns_NMK,unknowns_const);
-    
+
     % visualize sparsity pattern of A
 %     clf
 %     spy(A)
@@ -495,22 +495,22 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 %     widths = [N_num+1, M_num+1, M_num+1, K_num+1];
 %     bars = .5 + [widths(1), sum(widths(1:2)), sum(widths(1:3))];
 %     full_line = [0,1+sum(widths)];
-%     
+%
 %     plot(bars(1)*[1,1], full_line, 'k') % first vertical
 %     plot(bars(2)*[1,1], full_line, 'k') % second vertical
 %     plot(bars(3)*[1,1], full_line, 'k') % third vertical
-%     
+%
 %     plot(full_line, bars(1)*[1,1], 'k') % first horizontal
 %     plot(full_line, bars(2)*[1,1], 'k') % second horizontal
 %     plot(full_line, bars(3)*[1,1], 'k') % third horizontal
-    
+
     folder = 'simulation/modules/hydro/generated/';
     if ~isfolder(folder)
         folder = '';
         warning("Can't find folder for MEEM generated functions. Generating in current directory instead.")
     end
     matlabFunction(A,b,c,c_0,'File',[folder 'A_b_c_matrix_' fname], 'Vars',[a1,a2,d1,d2,h,m0,m_k_const]);
-    
+
     matlabFunction(hydro_nondim_NMK,phi_i1_NMK,phi_i2_NMK,phi_e_NMK,phi_p_i1_NMK,phi_p_i2_NMK,...
                     phi_h_i1_NMK,phi_h_i2_NMK,v_1_r_NMK,v_1_z_NMK,v_2_r_NMK,v_2_z_NMK,v_e_r_NMK,v_e_z_NMK,...
                     'File',[folder 'hydro_potential_velocity_fields_' fname],...
@@ -519,7 +519,7 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
 end
 
 function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str)
-    
+
     levels_2 = [0 levels];
 
     % attempt 1: symbolic plot - doesn't allow you to have contour labels
@@ -530,7 +530,7 @@ function plot_large_freq_approx_error(sym_error, levels, smallest_exp, title_str
     title(title_str);
     colorbar
     set(gca, 'ColorScale', 'log');
-    
+
     % attempt 2: numeric plot - allows contor labels, but log scale can't
     % show negatives, so plot the absolute value
     fig2 = figure;
@@ -573,25 +573,25 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     regione = R > a2_num;
     region1 = R <= a1_num & Z < -d1_num;
     region2 = R > a1_num & R <= a2_num & Z < -d2_num;
-    
+
     phi = NaN(size(R));
     phi(region1) = phi_i1_num(region1);
     phi(region2) = phi_i2_num(region2);
     phi(regione) = phi_e_num(regione);
-    
+
     phiH = NaN(size(R));
     phiH(region1) = phi_h_i1_num(region1);
     phiH(region2) = phi_h_i2_num(region2);
-    
+
     phiP = NaN(size(R));
     phiP(region1) = phi_p_i1_num(region1);
     phiP(region2) = phi_p_i2_num(region2);
-    
+
     v_r = NaN(size(R));
     v_r(region1) = v_1_r_num(region1);
     v_r(region2) = v_2_r_num(region2);
     v_r(regione) = v_e_r_num(regione);
-    
+
     v_z = NaN(size(R));
     v_z(region1) = v_1_z_num(region1);
     v_z(region2) = v_2_z_num(region2);
@@ -630,7 +630,7 @@ function [] = plot_potential(phi,R,Z,region_body,name)
     ylabel('Z')
     title([name ' - Real'])
     colorbar;
-    
+
     imag_phi = imag(phi);
     if numel(unique(imag_phi)) > 1
         imag_phi(region_body) = NaN;

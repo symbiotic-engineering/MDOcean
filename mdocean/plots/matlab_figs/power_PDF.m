@@ -29,17 +29,17 @@ if which_plots(1) % PDF
     fit = true; % false for histogram, true for ksdensity fit
     if ~fit
 %         h = histogram(P_counts,'BinWidth',10,'Normalization','pdf');
-        
+
         [N,edges] = histcounts(P_counts,'BinWidth',.1,'Normalization','pdf');
         edge_centers = 1/2 *(edges(1:end-1) + edges(2:end));
-        edges = 10.^(-1:0.1:3); 
+        edges = 10.^(-1:0.1:3);
         hist = histc(P_counts, edges);
         centers = sqrt(edges(1:end-1).*edges(2:end));
         bar(edges,hist)
         h = plot(edge_centers,N,'Color',color);
         hold on
     else
-    
+
          if logscale
              P_x = logspace(log10(P_min),log10(P_max),100);
          else
@@ -56,7 +56,7 @@ if which_plots(1) % PDF
         end
     end
     ylim([prob_min,prob_max])
-        
+
     grid on
     if nargin > 2
         h.Color = color;
@@ -76,12 +76,12 @@ if which_plots(2) % CDF
     end
     title('Cumulative Distribution Function')
     ylabel('Portion of Hours per Year')
-    
+
     if logscale
         ax2.XScale = 'log';
     end
     grid on
-    
+
     xlabel('Average Electrical Power (kW)')
 end
 

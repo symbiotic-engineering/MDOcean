@@ -1,6 +1,6 @@
 function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stiff, width_plate, width_stiff)
 
-    if     length(h_stiff)==1 && length(width_stiff)==1 
+    if     length(h_stiff)==1 && length(width_stiff)==1
         shape = 'tee';
     elseif length(h_stiff)==2 && length(width_stiff)==2
         shape = 'I';
@@ -9,7 +9,7 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
     else
         error('invalid input length')
     end
-    
+
     % fixme if the stiffeners are spaced far apart, the effective width will be reduced due to shear lag
     if strcmp(shape,'tee')
         [centroid, h_eq_over_h_3, height_max] = T_beam_properties(t_plate, h_stiff, width_plate, width_stiff);
@@ -19,7 +19,7 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
 
     elseif strcmp(shape,'doubleI')
         [centroid, h_eq_over_h_3, height_max] = double_I_beam_properties(t_plate, h_stiff, width_plate, width_stiff);
-    
+
     end
 
     if any(h_eq_over_h_3 < 1) % if equivalent stiffened height is less than unstiffened height
@@ -31,13 +31,13 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
     h_eq = h_eq_over_h * h;
 
     if nargout > 1
-        
+
         y_max = max(centroid, height_max - centroid); % max distance from neutral axis
 
-        if nargout > 2   
-            I = 1/12 * width_plate * h_eq.^3; % moment of inertia, of both the 
+        if nargout > 2
+            I = 1/12 * width_plate * h_eq.^3; % moment of inertia, of both the
                                              % equivalent plate and the original stiffened plate
-        
+
             S_eq = I ./ y_max; % equivalent section modulus
         end
     end
@@ -48,7 +48,7 @@ function [centroid, h_eq_over_h_3, height_max] = double_I_beam_properties(t_plat
     [M0,A0] = first_moment_of_area_rectangle(t_plate, width_plate, t_plate/2);
     [M1,A1] = first_moment_of_area_Ibeam(t_plate, h_stiff(1:2), width_stiff(1:2));
     [M2,A2] = first_moment_of_area_Ibeam(t_plate, h_stiff(3:4), width_stiff(3:4));
-    
+
     moment = M0 + M1 + M2;
     area   = A0 + A1 + A2;
     centroid = moment./area; % centroid from bottom of plate
@@ -79,7 +79,7 @@ end
 function [centroid, h_eq_over_h_3, height_max] = I_beam_properties(t_plate, h_stiff, width_plate, width_stiff)
     [M0,A0] = first_moment_of_area_rectangle(t_plate, width_plate, t_plate/2);
     [M1,A1] = first_moment_of_area_Ibeam(t_plate, h_stiff(1:2), width_stiff(1:2));
-    
+
     moment = M0 + M1;
     area   = A0 + A1;
     centroid = moment/area; % centroid from bottom of plate
@@ -121,7 +121,7 @@ function [centroid, h_eq_over_h_3, height_max] = T_beam_properties(t_plate, h_st
     H = h_stiff;
     a = width_plate/2;
     b = width_stiff;
-    
+
     % eq 7.67 from MIT 2.080, but  fixing typo: b/a should be b/2a
     % finding neutral axis
     num = 1 - b./(2*a) * (H/h)^2;
@@ -130,13 +130,13 @@ function [centroid, h_eq_over_h_3, height_max] = T_beam_properties(t_plate, h_st
     eta = eta_over_h * h; % location of neutral axis, from stiffened face of plate
     centroid = h - eta; % location of neutral axis, from unstiffened face of plate
 
-    % eq 7.69 from MIT 2.080, but fixing typo: ^2 should be ^3 in term2, 
+    % eq 7.69 from MIT 2.080, but fixing typo: ^2 should be ^3 in term2,
     % and eta should be eta over h in term1
     % finding equivalent height that creates equal area moment of inertia
     term1 = 1 - 3 * eta_over_h + 3 * eta_over_h.^2;
     term2 = (H/h)^3 + 3*(H/h)^2 * eta_over_h + 3 * H/h * eta_over_h.^2;
-    h_eq_over_h_3 = 4 * ( term1 + b./(2*a) .* term2 ); 
+    h_eq_over_h_3 = 4 * ( term1 + b./(2*a) .* term2 );
 
     height_max = h + H;
-    
+
 end

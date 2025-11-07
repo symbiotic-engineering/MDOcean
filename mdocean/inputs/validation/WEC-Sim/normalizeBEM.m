@@ -20,7 +20,7 @@ function hydro = normalizeBEM(hydro)
 % -------
 %     hydro : [1 x 1] struct
 %         Normalized hydro data
-% 
+%
 
 [a,b] = size(hydro);  % Last data set in
 F = b;
@@ -39,13 +39,13 @@ if issorted(hydro(F).w)==0  % Sort, if necessary
     if isfield(hydro(F),'md_mc')
         hydro(F).md_mc = hydro(F).md_mc(:,:,I);
     end
-    if isfield(hydro(F),'md_cs')    
+    if isfield(hydro(F),'md_cs')
         hydro(F).md_cs = hydro(F).md_cs(:,:,I);
     end
-    if isfield(hydro(F),'md_pi')    
+    if isfield(hydro(F),'md_pi')
         hydro(F).md_pi = hydro(F).md_pi(:,:,I);
     end
-    
+
     hydro(F).sc_ph = hydro(F).sc_ph(:,:,I);
     hydro(F).sc_re = hydro(F).sc_re(:,:,I);
     hydro(F).sc_im = hydro(F).sc_im(:,:,I);
@@ -58,22 +58,22 @@ end
 if strcmp(hydro(F).code,'WAMIT')==0  % normalize
     hydro(F).Khs = hydro(F).Khs/(hydro(F).g*hydro(F).rho);
     hydro(F).A = hydro(F).A/(hydro(F).rho);
-    hydro(F).Ainf = hydro(F).A(:,:,end); % overwritten with more accurate method by radiationIRF.m 
+    hydro(F).Ainf = hydro(F).A(:,:,end); % overwritten with more accurate method by radiationIRF.m
     for i=1:length(hydro(F).w)
         hydro(F).B(:,:,i) = hydro(F).B(:,:,i)/(hydro(F).rho*hydro(F).w(i));
     end
     hydro(F).ex_ma = hydro(F).ex_ma/(hydro(F).g*hydro(F).rho);
     hydro(F).ex_re = hydro(F).ex_re/(hydro(F).g*hydro(F).rho);
     hydro(F).ex_im = hydro(F).ex_im/(hydro(F).g*hydro(F).rho);
-    if isfield(hydro(F),'md_mc') 
+    if isfield(hydro(F),'md_mc')
         hydro(F).md_mc = hydro(F).md_mc/(hydro(F).g*hydro(F).rho);
     end
-    if isfield(hydro(F),'md_cs')    
-        hydro(F).md_cs = hydro(F).md_cs/(hydro(F).g*hydro(F).rho);    
+    if isfield(hydro(F),'md_cs')
+        hydro(F).md_cs = hydro(F).md_cs/(hydro(F).g*hydro(F).rho);
     end
     if isfield(hydro(F),'md_pi')
         hydro(F).md_pi = hydro(F).md_pi/(hydro(F).g*hydro(F).rho);
-    end        
+    end
     hydro(F).sc_ma = hydro(F).sc_ma/(hydro(F).g*hydro(F).rho);
     hydro(F).sc_re = hydro(F).sc_re/(hydro(F).g*hydro(F).rho);
     hydro(F).sc_im = hydro(F).sc_im/(hydro(F).g*hydro(F).rho);

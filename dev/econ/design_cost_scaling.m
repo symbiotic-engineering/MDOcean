@@ -46,5 +46,3 @@ decommissioning = 0;%installation; % decomissioning cost not used in LCOE
 contingency     = [1589545 5561144 18827150 35435836] ./ N_WEC
 
 non_design_capex = development + infrastructure + mooring + profitmargin + installation + decommissioning + contingency;
-
-

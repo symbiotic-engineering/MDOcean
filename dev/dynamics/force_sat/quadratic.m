@@ -4,8 +4,8 @@ syms r_k real
 
 % define helper ratios r_b and r_k
 % r_b = b/B_p = (B_h+B_p)/B_p and r_k = k/K_p = (K_h+K_p)/K_p
-B_p = b ./ r_b; 
-K_p = k ./ r_k; 
+B_p = b ./ r_b;
+K_p = k ./ r_k;
 B_h = (r_b-1) .* B_p;
 K_h = (r_k-1) .* K_p;
 
@@ -264,7 +264,7 @@ f_sat_new = simplify(f_sat_new);
 % eqn = f_sat_var - f_sat_new == 0;
 % F_max_over_F_d_soln = solve(eqn,F_max_over_F_d);
 % F_max_over_F_d_num = subs(F_max_over_F_d_soln, {r_k_zeta,f_sat_var},{RKZ,F});
-% 
+%
 % figure
 % contourf(F,F_max_over_F_d_soln,energy)
 
@@ -281,6 +281,6 @@ title('Mult')
 figure
 contourf(F, RKZ, energy)
 title('Energy')
-figure 
+figure
 contourf(F,RKZ,FS)
 title('f sat')

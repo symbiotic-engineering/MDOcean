@@ -17,7 +17,7 @@ B_mult = linspace(0.5,1.5,14).';
 % K_p_0 = K_p(1);
 % B_mult = linspace(.5,1.5,size(w,1)).';
 % K_mult = linspace(.8,1.2,size(w,2));
-% B_p = repmat(B_mult,[1 size(w,2)]) * B_p_0; 
+% B_p = repmat(B_mult,[1 size(w,2)]) * B_p_0;
 % K_p = repmat(K_mult,[size(w,1) 1]) * K_p_0;
 
 figure

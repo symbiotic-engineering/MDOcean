@@ -19,7 +19,7 @@ function [fig_names,tab_names] = get_fig_tab_names(which_figs, which_tabs)
             tab_names = [tab_names tabs_this_class];
         end
     end
-    
+
     if any(strcmpi(which_figs,'RE'))
         fig_names = [fig_names figs_in_RE];
     end
@@ -29,7 +29,7 @@ function [fig_names,tab_names] = get_fig_tab_names(which_figs, which_tabs)
     if isempty(fig_names)
         error('unrecognized fig names')
     end
-    
+
     if any(strcmpi(which_tabs,'RE'))
         tab_names = [tab_names tabs_in_RE];
     end
@@ -39,7 +39,7 @@ function [fig_names,tab_names] = get_fig_tab_names(which_figs, which_tabs)
     if isempty(tab_names)
         error('unrecognized tab names')
     end
-    
+
     % remove duplicates
     fig_names = unique(fig_names);
     tab_names = unique(tab_names);

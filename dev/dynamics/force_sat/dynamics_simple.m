@@ -8,11 +8,11 @@ function [w,A,B,K,Fd,k,drag_const,mag_v0] = dynamics_simple(Hs, T, D_f, T_f, D_s
     d2 = T_f;        % draft below waterline
     d1 = T_s;
     A_w = pi * (a2^2 - a1^2);     % waterplane area
-    
+
     if use_MEEM
-        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h, harmonics); 
+        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs_MEEM(a2, k, d2, a1, d1, h, harmonics);
     else
-        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(a2, k, d2, hydro);  
+        [A_over_rho, B_over_rho_w, gamma_over_rho_g] = get_hydro_coeffs(a2, k, d2, hydro);
     end
 
     A = rho_w * A_over_rho;                 % added mass

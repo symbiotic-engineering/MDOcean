@@ -6,11 +6,11 @@ function [sigma_vm_bot,sigma_vm_top] = float_plate_stress(D_f, D_f_in, F_heave, 
     A = pi/4 * (D_f^2 - D_f_in^2);
     P_hydrodynamic = F_heave / A;
     W = F_heave / num_sections;
-    
+
     b_out = pi * D_f    / num_sections;
     b_in  = pi * D_f_in / num_sections;
     b_avg = sqrt(b_out * b_in);
-    
+
     h = (D_f-D_f_in)/2;
 
     % trapezoid interpolation
@@ -23,7 +23,7 @@ function [sigma_vm_bot,sigma_vm_top] = float_plate_stress(D_f, D_f_in, F_heave, 
         shorter_length = h;
         longer_length  = (b_out+b_in)/2 + h*(1-sqrt(1+m^2));
     end
-    
+
     length_ratio = longer_length / shorter_length;
     r0 = 1.02;%D_f_tu / 2;
     width_plate = b_out; % fixme, should be combo of b_out and b_in? but b_in gives imag number
@@ -46,13 +46,13 @@ function sigma_vm_top = top_plate_stress(length_ratio, shorter_length, W, t_top,
     % Roark's table 11.4 case 8b page 514
     % fixme - this is potentially not applicable since it assumes force in
     % middle, but my force is on the edge and therefore creates ~no bending moment
-    % perhaps check ref 26 and 21 to see if they have a more general (off center) equation 
+    % perhaps check ref 26 and 21 to see if they have a more general (off center) equation
     sigma_edge_no_stiff = 3*W/(2*pi*t_top^2) * ( (1+nu)*log(2*shorter_length/(pi*r0)) + beta_1);
     sigma_cent_no_stiff = -beta_2 * W / t_top^2;
 
     M_edge = sigma_edge_no_stiff * t_top^2 / 6;
     M_cent = sigma_cent_no_stiff * t_top^2 / 6;
-    
+
     M_max = max(abs([M_edge,M_cent]));
     sigma_max = stiffened_plate_stress(t_top, h_stiff, width_plate, w_stiff, M_max);
     sigma_vm_top = sigma_max;
@@ -70,15 +70,15 @@ function sigma_vm = bottom_plate_stress(length_ratio, shorter_length, P_hydrodyn
     alpha_longer_data  = -0.0001*[513 538 554 563 568 570 571 571 571 571 571 571];
     alpha_shorter_fcn = @(length_ratio) interp1(length_ratio_data, alpha_shorter_data, length_ratio);
     alpha_longer_fcn  = @(length_ratio) interp1(length_ratio_data, alpha_longer_data,  length_ratio);
-    
+
     M_shorter = alpha_shorter_fcn(length_ratio) * P_hydrodynamic * shorter_length^2;
     M_longer  = alpha_longer_fcn(length_ratio)  * P_hydrodynamic * shorter_length^2;
-    
+
     sigma_shorter = stiffened_plate_stress(t_bot, h_stiff, width_plate, w_stiff, M_shorter);
     sigma_longer  = stiffened_plate_stress(t_bot, h_stiff, width_plate, w_stiff, M_longer);
-    
+
     sigma_zz = P_hydrodynamic;
-    
+
     % von mises
     s_11 = sigma_shorter;
     s_22 = 0;

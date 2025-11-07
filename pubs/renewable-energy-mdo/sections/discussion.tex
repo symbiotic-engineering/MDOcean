@@ -60,9 +60,9 @@ Previous studies such as \cite{garcia-teruel_reliability-based_2021} have called
 \subsubsection{Observed Impact of Modeled Effects}
 A few of the areas of developed model complexity, such as force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the final results, as seen in the constraint activity and difference in results obtained if 1-DOF dynamics corresponding to a stationary spar are used.
 Section~\ref{sec:sensitivity-model-assumptions} analyzed these effects in detail.
-Earlier in \sectionautorefname~\ref{sec:sim-runtime}, \figureautorefname~\ref{fig:runtime-dynamics} reveals that MDOcean's 2-DOF dynamics take an order of magnitude longer to run than 1-DOF dynamics, indicating an area where code enhancements to make the 2-DOF runtime more comparable with the 1-DOF model may be worthwhile given the dynamic importance of including the second degree of freedom. 
+Earlier in \sectionautorefname~\ref{sec:sim-runtime}, \figureautorefname~\ref{fig:runtime-dynamics} reveals that MDOcean's 2-DOF dynamics take an order of magnitude longer to run than 1-DOF dynamics, indicating an area where code enhancements to make the 2-DOF runtime more comparable with the 1-DOF model may be worthwhile given the dynamic importance of including the second degree of freedom.
 Meanwhile, force saturation is seen to be especially relevant since it not only directly reduces the powertrain cost, but also indirectly reduces the structural cost by reducing the operational heave loading.
-This allows for a reduction in spar thickness due to the activity of the column fatigue factor of safety constraint. 
+This allows for a reduction in spar thickness due to the activity of the column fatigue factor of safety constraint.
 The observed impact of these effects on the overall optimization justifies the model complexity in those areas, suggesting that other optimization frameworks should include these complexities for realistic results.
 
 On the other hand, a few other modeling complexities appear perhaps unnecessary in hindsight because they have little effect on the results.
@@ -75,7 +75,7 @@ Finally, even though it is observed that the drag and intermediate wavelength sl
 Therefore, users should exercise caution if choosing to simplify the model.
 
 \subsubsection{Potential Impact of Unmodeled Effects}
-No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}, 
+No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)},
 a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
 Likewise, the inactivity of the pitch stability constraint mitigates the impact of any error in the metacentric height due to the geometry module's assumption of an even mass distribution when calculating the center of gravity (see section~\ref{sec:geom}).
 On the other hand, the active slamming constraints for operational sea states mean that some assumptions are worth revisiting, particularly the use of an optimization constraint rather than enforcing amplitude limits with the constrained optimal linear controller (see tables \ref{tab:constraint-approaches} and \ref{tab:nonlinearities}), and the assumption that the WEC must operate in all sea states with nonzero probability in the JPD without going into survival mode (see ``Dynamic Limits and Design Load Cases'' in section~\ref{sec:dynamics}).
@@ -95,7 +95,7 @@ The authors predict, however, that the significant computational speedup of the 
 
 \subsubsection{Parameter Suitability}
 The local parameter sensitivity analysis of \sectionautorefname~\ref{sec:sensitivities-local} already yields significant insight on the impact of the choice of parameters in this problem.
-Interpreting those results more broadly, parameters with a high design sensitivity $\left(\frac{dx^*}{dp}\right)$, such as dimensional aspect ratios, wave conditions, and material properties, are especially important for engineers to determine early in the design cycle because they affect the optimal design. 
+Interpreting those results more broadly, parameters with a high design sensitivity $\left(\frac{dx^*}{dp}\right)$, such as dimensional aspect ratios, wave conditions, and material properties, are especially important for engineers to determine early in the design cycle because they affect the optimal design.
 Where relevant, designers should consider holding the nondimensional versions of these parameters constant across prototype scales, extending the common practice of Froude scaling for wave conditions.
 On the other hand, parameters with a high objective sensitivity $\left(\frac{dJ^*}{dp}\right)$, such as operational wave conditions, PTO efficiency, and financing rates in the LCOE minimization, are most important for funders to determine early in the project implementation cycle and for research funding agencies to incentivize innovation through R\&D proposals because they affect the WEC's economic viability.
 Notably, other parameters such as PTO price, storm wave conditions, and dimensional variables are more relevant for design cost minimization, highlighting that incentives and innovation strategies for Powering the Blue Economy applications may need to be distinct from those for utility-scale energy.
@@ -106,9 +106,9 @@ A global parameter sensitivity analysis is also suggested, taking into account b
 
 \subsubsection{Constraint and Requirement Suitability}
 By including \numLinConstraints~linear and \numNonlinConstraints~nonlinear constraints, this optimization captures more realistic design, model, and operational requirements than any other WEC optimization study known to the authors.
-The active constraints highlighted in \figureautorefname~\ref{fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming). 
+The active constraints highlighted in \figureautorefname~\ref{fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming).
 Constraints related to ballast and pitch stability are inactive, confirming that these design considerations are not primary avenues for innovation.
-While survivability is known to be a critical design requirement for WECs, it is rarely incorporated into optimization studies, and the results of this study demonstrate and quantify the effect of survivability considerations. 
+While survivability is known to be a critical design requirement for WECs, it is rarely incorporated into optimization studies, and the results of this study demonstrate and quantify the effect of survivability considerations.
 For example, the Lagrange multipliers of \figureautorefname~\ref{fig:lagrange-multiplier} suggest that improvements to the structural design of the damping plate are worth around 5 times more than equivalent structural improvements to the column and 10 times more than those to the float.
 
 Further innovation in WEC survivability is warranted, both in the incremental and transformative sense.
@@ -132,7 +132,7 @@ However, moving beyond two objectives limits the intuition and visualization pow
 Alternatively, a global parameter sensitivity analysis of the price parameters could address this uncertainty. Pairing this with uncertainty quantification and robustness analysis would complete the picture.
 
 Although the cost formulation used here is uncertain, it still represents a significant improvement over cost proxies typically used in WEC optimization such as wetted surface area and hull volume.
-In future work, running the MDOcean optimization using those simplified metrics instead of the structural and powertrain cost model used here would be useful for comparison and to assess the suitability of various proxy metrics. 
+In future work, running the MDOcean optimization using those simplified metrics instead of the structural and powertrain cost model used here would be useful for comparison and to assess the suitability of various proxy metrics.
 
 % 	\paragraph{Not including powertrain impedance/generator model/real control co-design
 
@@ -143,8 +143,8 @@ In future work, running the MDOcean optimization using those simplified metrics 
 
 %% table contents helpers
 \newcommand{\speedups}{
-    Examples of changes that would make it even faster: 
-    1) use gradient sparsity pattern to get rid of FD evaluations, or get rid of FD altogether by using matlab automatic differentiation 
+    Examples of changes that would make it even faster:
+    1) use gradient sparsity pattern to get rid of FD evaluations, or get rid of FD altogether by using matlab automatic differentiation
     2) make multi body code simpler more like single body
 }
 
@@ -153,7 +153,7 @@ In future work, running the MDOcean optimization using those simplified metrics 
 
 	1) more rigorously determine the effect of subsystem coupling - compare to sequential optimization of hydro then PTO sizing then structural - would let you know the benefit of coupled optimization for each subsystem, if it is large enough to justify the extra computational cost
 
-	2) survivability - compare PTO-free vs PTO-braked in storm, to answer question of which type of survival mode is preferable; excitation loads using MEEM when float is sunk (for now could approximate as float with larger draft, once weird-region MEEM exists use that); allow decision on which sea states are operational vs survival could answer the question of whether it makes economic sense to go into survival mode more often. 
+	2) survivability - compare PTO-free vs PTO-braked in storm, to answer question of which type of survival mode is preferable; excitation loads using MEEM when float is sunk (for now could approximate as float with larger draft, once weird-region MEEM exists use that); allow decision on which sea states are operational vs survival could answer the question of whether it makes economic sense to go into survival mode more often.
 
 	3) more detailed PTO study: include a drivetrain with linear dynamics reflecting spring, flywheel, gear ratio, etc. -  If you assume the flywheel inertia and spring stiffness aren't controllable per sea state, would be useful as-is for finding the best inertia/stiffness across sea states to pair with the controller that can adjust per sea state.
     But if you assume adjustable drivetrain, as has been achieved with magnetic spring (cite), this would either need to introduce constraints or a cost term related to these drivetrain parameters, since otherwise the solution should go to zero damping and stiffness equal to what the unconstrained optimal control stiffness is.
@@ -161,8 +161,8 @@ In future work, running the MDOcean optimization using those simplified metrics 
     Could also provide a preliminary answer to the question of optimum gear ratio (low GR means high generator torque so more force saturation for a given generator, but less friction.
     Vs high gear ratio has less force saturation but higher friction), although a generator model would be needed to more conclusively answer the question (discussed below).
 
-    4) Add $N_{WEC}$ as a design variable and see when it's preferable to do many smaller WECs vs one bigger WEC 
-    
+    4) Add $N_{WEC}$ as a design variable and see when it's preferable to do many smaller WECs vs one bigger WEC
+
     5) How do my results compare to optimizing for easier cost proxies (ie structural cost as surface area vs actual force-informed thicknesses)
 }
 
@@ -194,7 +194,7 @@ Would require not only MEEM for the different WEC types, but also semi-analytica
 	4) make lifetime a design variable, and adjust size of storm-wave accordingly. could address the question of what opex cost threshold would make it useful to intentionally design 'single-use' WECs, which might be considered in PBE applications.
 Would require integration with WDRT or similar to get the environmental contour for a given lifetime.
 
-	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different 
+	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different
 
 	6) generator physics and model - building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example whether a high-torque (expensive) generator is worth it compared to a low torque generator.
     The torque limit would essentially impose a constraint on the $F_{max}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
@@ -217,6 +217,3 @@ Would require integration with WDRT or similar to get the environmental contour 
     \caption{Future model and optimization improvements}
     \label{tab:future-studies}
 \end{longtable}
-
-
-

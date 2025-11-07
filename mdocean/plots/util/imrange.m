@@ -1,7 +1,7 @@
 function [minval, maxval] = imrange(inpict)
 %   [min max] = IMRANGE(INPICT)
 %       returns the global min and max pixel values in INPICT
-%       
+%
 %   INPICT can be a vector or array of any dimension or class
 
 % downloaded from https://www.mathworks.com/matlabcentral/answers/1700655-symmetric-diverging-log-color-scale#answer_1380451
@@ -15,6 +15,3 @@ if nargout < 2
 end
 
 end
-
-
-

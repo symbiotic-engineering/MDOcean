@@ -5,7 +5,7 @@ close all
 RAO = false;       % true uses X/eta, false uses X/F_f
 relative = false; % true uses X_u, false uses X_f
 phase_uses_mag_fit = false;
-fill_nan = false; 
+fill_nan = false;
 use_db_for_fit = true;
 use_db_for_plot = false;
 
@@ -107,12 +107,12 @@ tol  = 4;  % min points for fitting
 for i = 1:nWaveHeights
     omegas = omega(i,:);
     angles = angle_matrix(i,:)/pi;
-    
+
     red = (i-1)/(nWaveHeights-1);
     green = 0;
     blue = 1 - red;
     col = [red green blue];
-    
+
     % PLOT MAGNITUDE DATA
     nexttile(1)
     mag_plot_fn(omegas, mag_data_for_plot(i,:), '*--', 'Color',col, 'DisplayName',sprintf('H_s=%.2f',p.Hs(i)))
@@ -125,19 +125,19 @@ for i = 1:nWaveHeights
     xlabel('Frequency \omega (rad/s)')
     ylabel(['Phase \angle(' y_lab ') / \pi'])
     hold on
-    
+
     % remove high frequencies (lwb)
     mags_c   = mag_data_for_fit(i,lwb:end);
     om_c     = omegas(lwb:end);
     ang_c    = angles(lwb:end);
     om_c(isnan(om_c)) = avgs(isnan(om_c));
-    
+
     % clear NaNs (unused if fill_nan is true)
     idx_nan = isnan(mags_c);
     om_c   = om_c(~idx_nan);
     mags_c = mags_c(~idx_nan);
     ang_c  = ang_c(~idx_nan);
-    
+
     % fit magnitudes, get fit params
     if numel(mags_c) > tol
 
@@ -146,7 +146,7 @@ for i = 1:nWaveHeights
         omega_n_fit(i) = mf.w_n;
         zeta_fit(i)    = mf.zeta;
         k_fit(i)       = mf.k * scale_mag_data_for_fit;
-        
+
         fprintf('Magnitude fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_m.rsquare);
 
         w_fit = logspace(log10(min(omega(:),[],'omitnan')), ...
@@ -165,7 +165,7 @@ for i = 1:nWaveHeights
         ylim([ymin max(mag_data_for_plot,[],'all')])
 
     end
-    
+
 
     % fit phases, get fit params
     if numel(ang_c) > tol
@@ -182,7 +182,7 @@ for i = 1:nWaveHeights
             k_fit_phase(i)       = pf.k * scale_mag_data_for_fit;
 
         end
-        
+
         fprintf('Phase fit H_s=%.2f: R^2 = %.4f\n', p.Hs(i), gof_p.rsquare);
 
         phase_fit_vals = angle_model(pf.w_n, pf.k, pf.zeta, w_fit);
@@ -205,7 +205,7 @@ colormap( color_scheme )
 
 cb = colorbar;
 cb.Layout.Tile = 'east';
-cb.Label.String = 'H_s (m)'; 
+cb.Label.String = 'H_s (m)';
 cb.Label.FontSize  = 20;
 clim([p.Hs(1)-.25; p.Hs(end)+.25])
 cb.Ticks = p.Hs;
@@ -251,14 +251,14 @@ plot(p.Hs(:), omega_n_fit, 'g')
 hold on
 plot(p.Hs(:), omega_n_fit_phase,'m-.')
 ylabel({'Natural','Frequency','$\omega_n$'},'Interpreter','latex')
-grid on 
+grid on
 
 nexttile
 plot(p.Hs(:), zeta_fit, 'g')
 hold on
 plot(p.Hs(:), zeta_fit_phase,'m-.')
 ylabel({'Damping','Ratio','$\zeta$'},'Interpreter','latex')
-grid on 
+grid on
 
 nexttile
 h = plot(p.Hs(:), k_fit, 'g');
@@ -268,10 +268,9 @@ xlabel('Wave Height $H_s$ (m)','Interpreter','latex')
 hold on
 %plot(p.Hs(:), k_fit_phase,'m-.') K fit for phase is meaningless because you
 %can't get any information about K from phase, only from magnitude
-grid on 
+grid on
 
 plot(NaN,NaN,'g','DisplayName','Magnitude Fit')
 plot(NaN,NaN,'m-.','DisplayName','Phase Fit')
 legend
 improvePlot
-

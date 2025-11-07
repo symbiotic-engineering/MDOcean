@@ -64,19 +64,19 @@ simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
 simu.rampTime = 100;                    % Wave Ramp Time [s]
 simu.endTime = 200;                     % Simulation End Time [s]
-simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & simu.solver = 'ode45' for variable step 
+simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & simu.solver = 'ode45' for variable step
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';
 simu.saveWorkspace = false;
 simu.b2b = 1;
 
-%% Wave Information 
-% % noWaveCIC, no waves with radiation CIC  
-% waves = waveClass('noWaveCIC');       % Initialize Wave Class and Specify Type  
+%% Wave Information
+% % noWaveCIC, no waves with radiation CIC
+% waves = waveClass('noWaveCIC');       % Initialize Wave Class and Specify Type
 
-% % Regular Waves  
+% % Regular Waves
 if regular
-    waves = waveClass('regular');           % Initialize Wave Class and Specify Type  
+    waves = waveClass('regular');           % Initialize Wave Class and Specify Type
 else
     waves = waveClass('irregular');
     waves.spectrumType = 'PM';                % Specify Wave Spectrum Type
@@ -86,11 +86,11 @@ waves.waterDepth = p.h;
 % waves.period = 8;                       % Wave Period [s]
 
 % % Regular Waves with CIC
-% waves = waveClass('regularCIC');          % Initialize Wave Class and Specify Type                                 
+% waves = waveClass('regularCIC');          % Initialize Wave Class and Specify Type
 % waves.height = 2.5;                       % Wave Height [m]
 % waves.period = 8;                         % Wave Period [s]
 
-% % Irregular Waves using PM Spectrum 
+% % Irregular Waves using PM Spectrum
 %  waves = waveClass('irregular');           % Initialize Wave Class and Specify Type
 %  waves.height = 2.5;                       % Significant Wave Height [m]
 %  waves.period = 8;                         % Peak Period [s]
@@ -101,10 +101,10 @@ waves.waterDepth = p.h;
 % waves.height = 2.5;                       % Significant Wave Height [m]
 % waves.period = 8;                         % Peak Period [s]
 % waves.spectrumType = 'JS';                % Specify Wave Spectrum Type
-% waves.bem.option = 'EqualEnergy';         % Uses 'EqualEnergy' bins (default) 
+% waves.bem.option = 'EqualEnergy';         % Uses 'EqualEnergy' bins (default)
 % waves.phaseSeed = 1;                      % Phase is seeded so eta is the same
 
-% % Irregular Waves using PM Spectrum with Traditional and State Space 
+% % Irregular Waves using PM Spectrum with Traditional and State Space
 % waves = waveClass('irregular');           % Initialize Wave Class and Specify Type
 % waves.height = 2.5;                       % Significant Wave Height [m]
 % waves.period = 8;                         % Peak Period [s]
@@ -116,25 +116,25 @@ simu.stateSpace = 1;                      % Turn on State Space
 % waves = waveClass('spectrumImport');      % Create the Wave Variable and Specify Type
 % waves.spectrumFile = 'spectrumData.mat';  % Name of User-Defined Spectrum File [:,2] = [f, Sf]
 
-% % Waves with imported wave elevation time-history  
+% % Waves with imported wave elevation time-history
 % waves = waveClass('elevationImport');          % Create the Wave Variable and Specify Type
 % waves.elevationFile = 'elevationData.mat';     % Name of User-Defined Time-Series File [:,2] = [time, eta]
 
 %% Body Data
 % Float
-body(1) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5');      
-    % Create the body(1) Variable, Set Location of Hydrodynamic Data File 
-    % and Body Number Within this File.   
+body(1) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5');
+    % Create the body(1) Variable, Set Location of Hydrodynamic Data File
+    % and Body Number Within this File.
 body(1).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/float.stl';    % Location of Geomtry File
-body(1).mass = 'equilibrium';                   
-    % Body Mass. The 'equilibrium' Option Sets it to the Displaced Water 
+body(1).mass = 'equilibrium';
+    % Body Mass. The 'equilibrium' Option Sets it to the Displaced Water
     % Weight.
-body(1).inertia = [20907301 21306090.66 37085481.11];  % Moment of Inertia [kg*m^2]     
+body(1).inertia = [20907301 21306090.66 37085481.11];  % Moment of Inertia [kg*m^2]
 
 % Spar/Plate
-body(2) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5'); 
-body(2).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/plate.stl'; 
-body(2).mass = 'equilibrium';                   
+body(2) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5');
+body(2).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/plate.stl';
+body(2).mass = 'equilibrium';
 body(2).inertia = [94419614.57 94407091.24 28542224.82];
 
 %% PTO and Constraint Parameters
@@ -156,5 +156,3 @@ body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
 body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
 body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
 body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
-
-

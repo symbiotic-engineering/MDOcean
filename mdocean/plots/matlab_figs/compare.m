@@ -153,7 +153,7 @@ for j = 1:length(h)
     %h(j).LineWidth = 1;
 end
 
-% second subplot: radiation 
+% second subplot: radiation
 nexttile
 hold on
 plot(NaN,NaN,['k' '--'],NaN,NaN,['k' '-']); % dummy for legend

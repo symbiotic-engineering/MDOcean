@@ -20,7 +20,7 @@ function [FOS1Y,FOS2Y,FOS3Y,FOS_buckling] = structures(...
     sigma_u = sqrt(sigma_y(M) * sigma_buckle);
     [FOS1Y, FOS2Y, FOS3Y, FOS_buckling] = structures_one_case(...
             F_heave_peak, F_surge_peak, sigma_u, shared_inputs{:});
-    
+
     % DLC 2: endurance limit (long cycle fatigue)
     [FOS1Y(2), FOS2Y(2), FOS3Y(2), FOS_buckling(2)] = structures_one_case(...
             F_heave_op, F_surge_op, sigma_e(M), shared_inputs{:});
@@ -33,7 +33,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
             t_s_r, I, A_c, A_lat_sub, t_bot, t_top, t_d, t_d_tu, h_d, A_dt, ...
             h_stiff_f, w_stiff_f, h_stiff_d, w_stiff_d,...
             rho_w, g, E, nu, num_terms_plate, radial_mesh_plate, num_stiff_d)
-    
+
     depth = T_s; % max depth
     P_hydrostatic = rho_w * g * depth;
 
@@ -57,7 +57,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
     FOS2Y = FOS_spar;
     FOS3Y = sigma_max / radial_stress_damping_plate;
 
-end 
+end
 
 function [FOS_spar, FOS_spar_local] = spar_combined_buckling(F, E, I, L, D, A, t, q, sigma_0, nu)
     % euler buckling
@@ -89,7 +89,7 @@ function [FOS_spar, FOS_spar_local] = spar_combined_buckling(F, E, I, L, D, A, t
 
     % whether the failure mode is pure euler buckling or combined loading
     sigma_EA_thresh = P_r * sigma_F * (1 - sigma_theta / sigma_F);
-    pure_buckling = sigma_EA <= sigma_EA_thresh; 
+    pure_buckling = sigma_EA <= sigma_EA_thresh;
     if pure_buckling
         sigma_C_A_theta = sigma_EA;
     else
@@ -98,7 +98,7 @@ function [FOS_spar, FOS_spar_local] = spar_combined_buckling(F, E, I, L, D, A, t
         Lambda = 1/2 * (zeta + sqrt(zeta^2 + 4*omega));
         sigma_C_A_theta = sigma_F * Lambda;
     end
-    
+
     sigma_ac = F ./ A + q;
     FOS_spar = sigma_C_A_theta / sigma_ac;
 
@@ -110,7 +110,7 @@ end
 function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,width_stiff,...
                                             D_d_tu, t_d_tu, N, radial_mesh_plate, num_stiffeners)
-    
+
     a = D_d/2;
     b = D_s/2;
 
@@ -124,7 +124,7 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     % use deflection at outer edge for compatibility
     delta_plate_dis_nondim = delta_plate_dis_nondim_vec(end);
     delta_plate_con_nondim = delta_plate_con_nondim_vec(end,:);
-    
+
     % sum the four angles for concentrated solution
     delta_plate_con_nondim = sum(delta_plate_con_nondim);
     Mr_con_nondim = sum(Mr_con_nondim_vec,2);
@@ -165,7 +165,7 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     if plot_on
         delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
                                 + F_tube * sum(delta_plate_con_nondim_vec.',1));
-    
+
         figure
         plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
         hold on
@@ -175,7 +175,7 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
         xlabel('r')
         ylabel('Moment')
         improvePlot
-    
+
         figure
         plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
         hold on
@@ -186,7 +186,7 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
         xlabel('r')
         ylabel('Deflection')
         improvePlot
-    
+
         figure
         plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
         hold on
@@ -274,15 +274,15 @@ function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,
     c0 = lam/4 * c0_num / c0_den;
     b0 = c0/2 * (1-nu)/(1+nu) + (3+nu)/(8*(1+nu));
     a0 = -lam^2*b0 - c0*log(lam) - d0*lam^2*log(lam);
-    
+
     d1 = 1/2;
     b1 = -1/4 * (1+nu+lam^2*(1-nu)) / (3+nu+lam^4*(1-nu));
     c1 = -b1*(3+nu)/(1-nu) - 1/4 * (1+nu)/(1-nu);
     a1 = -b1*lam^2 - c1*lam^(-2) - d1*log(lam);
-    
+
     A = (3+nu)/(1-nu);
     B = (1-lam^2)^2 * (n.^2-1) + (lam.^(-2*n+2)+A) .* (lam.^(2*n+2)+A);
-    
+
     dn_num = (1-lam^2)*(n-1) + lam.^( 2*n+2) + A;
     bn_num = (1-lam^2)*(n+1) - lam.^(-2*n+2) - A;
     dn_denom = B.*n.*(n-1)*(1-nu);
@@ -291,25 +291,25 @@ function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,
     bn =  bn_num ./ bn_denom;
     an = -lam^2 * (bn .* (n+1)./n + dn .* lam.^(-2*n)./n);
     cn = -lam^2 * (dn .* (n-1)./n - bn .* lam.^( 2*n)./n);
-    
+
     if length(rho)==1
     abcd  = [a0 b0 c0 d0;
              a1 b1 c1 d1;
              an bn cn dn];
     end
-    
+
     Rho_zero_terms = a0 + b0 * rho.^2 + c0 * log(rho) + d0 * rho.^2 .* log(rho);
     Rho_one_terms = a1*rho + b1 * rho.^3 + c1 * rho.^(-1) + d1 * rho .* log(rho);
 
-    
+
     Rho_two_to_N_terms = an .* RHO.^n + bn .* RHO.^(n+2) + cn .* RHO.^(-n) + dn .* RHO.^(-n+2);
-    
+
     w_nondim = Rho_zero_terms' + Rho_one_terms' * cos(theta) + Rho_two_to_N_terms' * cos(n(:,1)*theta);
-    
+
     e0_d0_coeff = 3 + nu + 2*(1+nu)*log(rho);
     e0 = 2*b0*(1+nu) - c0*rho.^-2*(1-nu) + d0*(e0_d0_coeff);
     e1 = 2*b1*rho*(3+nu) + 2*c1*rho.^-3*(1-nu) + d1*rho.^-1*(1+nu);
-    
+
     en_a_term = an .* RHO.^(n-2) .* n .* (n-1) * (1 - nu);
     en_b_term = bn .* RHO.^n .* (n+1) .* (n + 2 - nu*(n-2));
     en_c_term = cn .* RHO.^(-n-2) .* n .* (n+1) * (1-nu);
@@ -368,7 +368,7 @@ function sigma_vm = damping_plate_structures_old(F_heave, D_d, D_s,P_hydrostatic
     sigma_tz = 0;
     sigma_zr = 0;
 
-    
+
     % uncomment for debugging
     %     sigma = zeros(3,3,3);
     %     for j=1:3
@@ -386,8 +386,7 @@ function s_vm = von_mises(s_11, s_22, s_33, s_12, s_23, s_31)
 
     principal_term = 1/2 * ( (s_11 - s_22).^2 + (s_22 - s_33).^2 + (s_33 - s_11).^2 );
     shear_term = 3 * (s_12.^2 + s_23.^2 + s_31.^2);
-    
+
     s_vm = sqrt( principal_term + shear_term );
 
 end
-

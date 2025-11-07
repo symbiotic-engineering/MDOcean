@@ -3,8 +3,8 @@ function [ p, idxs] = paretoFront( p )
 % Filters a set of points P according to Pareto dominance, i.e., points
 % that are dominated (both weakly and strongly) are filtered.
 %
-% Inputs: 
-% - P    : N-by-D matrix, where N is the number of points and D is the 
+% Inputs:
+% - P    : N-by-D matrix, where N is the number of points and D is the
 %          number of elements (objectives) of each point.
 %
 % Outputs:
@@ -25,5 +25,5 @@ while i >= 1
     p(indices,:) = [];
     idxs(indices) = [];
     i = i - 1 - (old_size - size(p,1)) + sum(indices(i:end));
-end    
+end
 end
