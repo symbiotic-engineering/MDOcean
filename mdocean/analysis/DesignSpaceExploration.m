@@ -15,7 +15,7 @@ classdef DesignSpaceExploration < GenericAnalysis
 
             cd('..')
             pareto = ParetoFigFunc(p,b);
-            pareto.run_analysis_from_load_if_possible();
+            pareto = pareto.run_analysis_from_load_if_possible();
             pareto_results_struct = pareto.intermed_result_struct.r1;
             cd('mdocean')
             
