@@ -1,15 +1,15 @@
 classdef Slamming < GenericAnalysis
-    %SLAMMING Analysis class for slamming figures
+    % SLAMMING Analysis class for slamming figures
     %   Generates slamming amplitude figures
 
     properties
-        fig_names = {'slamming_amplitude'};
-        tab_names = {};
+        fig_names = {'slamming_amplitude'}
+        tab_names = {}
     end
 
     methods (Static)
 
-        function intermed_result_struct = analysis_fcn(~,~)
+        function intermed_result_struct = analysis_fcn(~, ~)
             % Run slamming analysis
             fig = slam_plot();
 
@@ -17,9 +17,9 @@ classdef Slamming < GenericAnalysis
             intermed_result_struct.figure_handle = fig;
         end
 
-        function [fig_array,...
-                 tab_array_display,...
-                 tab_array_latex,...
+        function [fig_array, ...
+                 tab_array_display, ...
+                 tab_array_latex, ...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
 
             fig_array = intermed_result_struct.figure_handle;

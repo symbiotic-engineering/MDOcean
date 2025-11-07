@@ -22,8 +22,8 @@
 %   flat-bottom geometries, nvm, only relevant for multi-region slant approx)
 % - extend to many regions
 
-clear all
-close all
+clear all;
+close all;
 
 %% settings
 auto_BCs = false;
@@ -45,20 +45,20 @@ a2_num = 1;
 d1_num = .5;
 d2_num = .25;
 h_num = 1.001;
-m0_nums = linspace(0.1,5,100);
+m0_nums = linspace(0.1, 5, 100);
 spatial_res = 30;
 
 %% run
-tic
+tic;
 [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
-                       a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
+                                      a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 
-toc
+toc;
 
 %% plot hydro coeffs vs wavenumber
-figure
-plot(m0_nums,mu_nondim, m0_nums,lambda_nondim)
-xlabel('Wavenumber m_0')
-ylabel('Nondimensional Hydro Coeff')
-legend('Added Mass','Damping')
-grid on
+figure;
+plot(m0_nums, mu_nondim, m0_nums, lambda_nondim);
+xlabel('Wavenumber m_0');
+ylabel('Nondimensional Hydro Coeff');
+legend('Added Mass', 'Damping');
+grid on;

@@ -1,34 +1,33 @@
-clear
-close all
+clear;
+close all;
 
 p = parameters();
 b = var_bounds();
 X = [b.X_noms; 1];
-[~, ~, ~, val] = simulation(X,p);
+[~, ~, ~, val] = simulation(X, p);
 w = val.w;
-wave_amp = repmat(p.Hs,[1,size(p.JPD,2)]) / (2*sqrt(2));
+wave_amp = repmat(p.Hs, [1, size(p.JPD, 2)]) / (2 * sqrt(2));
 F = val.gamma_f_over_rho_g * p.rho_w * p.g .* wave_amp;
 RAO = true; % true uses X/eta, false uses X/F_f
 relative = false; % true uses X_u, false uses X_f
 fudge = pi; % unsure why this is necessary, otherwise I get a -180deg phase shift as if there were a negative sign
 
-wn = 0.54 % guess
+wn = 0.54; % guess
 
 phase_X = val.phase_X_f;
 X = val.X_f;
 
 % normalize - no RAO
-    mag_matrix = X ./ F;
-    angle_matrix = phase_X - val.gamma_phase_f - fudge;
-    %A = pi/4 * b.D_f_nom^2 - (p.D_f_in_over_D_s * b.D_s_nom)^2;
-    A = pi/4 * b.D_f_nom^2 - b.D_s_nom^2;
-    K_h = p.rho_w * p.g * A;
-    K_mult = 6; % guess for now
-    K = K_h * K_mult; % no pto stiffness
-    y_lab = 'X/F';
-    y_lab_extra = 'K\omega_n^2';
-    norm = K * wn^2;
-
+mag_matrix = X ./ F;
+angle_matrix = phase_X - val.gamma_phase_f - fudge;
+% A = pi/4 * b.D_f_nom^2 - (p.D_f_in_over_D_s * b.D_s_nom)^2;
+A = pi / 4 * b.D_f_nom^2 - b.D_s_nom^2;
+K_h = p.rho_w * p.g * A;
+K_mult = 6; % guess for now
+K = K_h * K_mult; % no pto stiffness
+y_lab = 'X/F';
+y_lab_extra = 'K\omega_n^2';
+norm = K * wn^2;
 
 % Convert magnitude to dB
 mag_db = 20 * log10(mag_matrix);
@@ -38,15 +37,13 @@ omega = w;
 
 % setup fit model for magnitude
 mag_model = fittype(@(omega_n, k, zeta, w) ...
-    20*log10(abs(((omega_n^2) .* k) ./ (-w.^2 + 1i*2*zeta*omega_n.*w + omega_n^2))), ...
-    'independent', 'w', 'coefficients', {'omega_n', 'k', 'zeta'});
+                    20 * log10(abs(((omega_n^2) .* k) ./ (-w.^2 + 1i * 2 * zeta * omega_n .* w + omega_n^2))), ...
+                    'independent', 'w', 'coefficients', {'omega_n', 'k', 'zeta'});
 
 % setup fit model for angle
 angle_model = fittype(@(omega_n, k, zeta, w) ...
-    20*log10(abs(((omega_n^2) .* k) ./ (-w.^2 + 1i*2*zeta*omega_n.*w + omega_n^2))), ...
-    'independent', 'w', 'coefficients', {'omega_n', 'k', 'zeta'});
-
-
+                      20 * log10(abs(((omega_n^2) .* k) ./ (-w.^2 + 1i * 2 * zeta * omega_n .* w + omega_n^2))), ...
+                      'independent', 'w', 'coefficients', {'omega_n', 'k', 'zeta'});
 
 %{
 mag_data   = mag_matrix(5,:);
@@ -64,8 +61,7 @@ TF_frd = frd(TF_data(~isnan(TF_data)), TF_w(~isnan(TF_w)));
 %}
 
 % pass through and take averages for omega
-avgs = mean(omega, 1, 'omitnan')
-
+avgs = mean(omega, 1, 'omitnan');
 
 % cutoff for limiting points/minimum fit points required. This is due to a
 % minimum of 3 points required for fittype to work, and since the highest
@@ -75,39 +71,35 @@ avgs = mean(omega, 1, 'omitnan')
 lwb = 5;
 tol = 4;
 
-for i = 1:size(omega,1)
+for i = 1:size(omega, 1)
     mags = mag_db(i, :);
     omegas = omega(i, :);
     angles = angle_matrix(i, :);
 
+    % plotting the data as connected points (solid indicates points used in
+    % fit, crosses indicate ignored)
+    color_frac = (i - 1) / (length(p.Hs) - 1);
+    col = [color_frac 0 1 - color_frac];
+    % mag_norm = mag_data * norm;
 
-% plotting the data as connected points (solid indicates points used in
-% fit, crosses indicate ignored)
-    color_frac = (i-1)/(length(p.Hs)-1);
-    col = [color_frac 0 1-color_frac];
-    %mag_norm = mag_data * norm;
+    nexttile(1);
 
-    nexttile(1)
+    ylabel(['Magnitude |' y_lab '| ' y_lab_extra ' (-)']);
+    % xlim([.5 omega_over_omega_n_max])
 
-    ylabel(['Magnitude |' y_lab '| ' y_lab_extra ' (-)'])
-    %xlim([.5 omega_over_omega_n_max])
-
-    wn = 0.54 % placeholder will be replaced later
+    wn = 0.54; % placeholder will be replaced later
     loglog(omegas, mags, '*-', ...
-        'DisplayName',['H_s=' num2str(p.Hs(i))],'Color',col) % TODO: normalize by wn later
-    hold on
+           'DisplayName', ['H_s=' num2str(p.Hs(i))], 'Color', col); % TODO: normalize by wn later
+    hold on;
 
+    nexttile(2);
 
-    nexttile(2)
+    xlabel('\omega/\omega_n (-)');
+    ylabel(['Phase \angle(' y_lab ') / \pi']);
 
-    xlabel('\omega/\omega_n (-)')
-    ylabel(['Phase \angle(' y_lab ') / \pi'])
-
-    h = semilogx(omegas, angles/pi,'*-','Color',col);
+    h = semilogx(omegas, angles / pi, '*-', 'Color', col);
     h.Annotation.LegendInformation.IconDisplayStyle = 'off';
-    hold on
-
-
+    hold on;
 
     % remove NaN values + high freq values editable with lwb
 
@@ -122,38 +114,36 @@ for i = 1:size(omega,1)
     mags_clean = mags_clean(~isnan(mags_clean));
     angles_clean = angles_clean(~isnan(angles_clean));
 
-
-
     % input fits and create fit models
 
     if size(mags_clean, 2) > tol
 
-    [mag_fit, gof_mag] = fit(omegas_clean_mag.', mags_clean.', mag_model, ...
-    'StartPoint', [0.5, 1e-6, 0.1]);
+        [mag_fit, gof_mag] = fit(omegas_clean_mag.', mags_clean.', mag_model, ...
+                                 'StartPoint', [0.5, 1e-6, 0.1]);
 
-    % get results from fit
+        % get results from fit
 
-    w_fit = logspace(log10(min(omega, [], "all", "omitnan")), log10(max(omega,[], "all", "omitnan")), 500);
+        w_fit = logspace(log10(min(omega, [], "all", "omitnan")), log10(max(omega, [], "all", "omitnan")), 500);
 
-    mag_fit_vals = 20*log10(abs((mag_fit.k .* mag_fit.omega_n^2) ./ ...
-    (-w_fit.^2 + 1i*2*mag_fit.zeta*mag_fit.omega_n.*w_fit + mag_fit.omega_n^2)));
+        mag_fit_vals = 20 * log10(abs((mag_fit.k .* mag_fit.omega_n^2) ./ ...
+                                      (-w_fit.^2 + 1i * 2 * mag_fit.zeta * mag_fit.omega_n .* w_fit + mag_fit.omega_n^2)));
 
-    omega_over_omega_n_max = max(omega,[],'all'); % TODO: implement normalization by wn later
+        omega_over_omega_n_max = max(omega, [], 'all'); % TODO: implement normalization by wn later
 
-    %fplot(omega,mag_fit_vals,[0 omega_over_omega_n_max],...
-    %    'DisplayName',['\zeta=' num2str(zeta(i))],'Color',(i-1)/length(zeta)*[1 1 1])
-    nexttile(1)
-        plot(w_fit.',mag_fit_vals.',...
-        'DisplayName',['\zeta=' num2str(i)],'Color',(i-1)/i*[1 1 1])
+        % fplot(omega,mag_fit_vals,[0 omega_over_omega_n_max],...
+        %    'DisplayName',['\zeta=' num2str(zeta(i))],'Color',(i-1)/length(zeta)*[1 1 1])
+        nexttile(1);
+        plot(w_fit.', mag_fit_vals.', ...
+             'DisplayName', ['\zeta=' num2str(i)], 'Color', (i - 1) / i * [1 1 1]);
 
     else
 
-    disp('failed - too few points')
+        disp('failed - too few points');
 
     end
 
 end
-improvePlot
+improvePlot;
 %{
 figure;
 subplot(2,1,1);
@@ -166,11 +156,8 @@ legend('Data', 'fitx');
 grid on;
 %}
 
-
-
-
 % input data
-%[mag_fit, gof_mag] = fit(omega.', mag_db.', mag_model, ...
+% [mag_fit, gof_mag] = fit(omega.', mag_db.', mag_model, ...
 %    'StartPoint', [0.5, 1e-6, 0.1]);
 %{
 % === FIT PHASE MODEL ===
@@ -182,22 +169,22 @@ phase_model = fittype(@(omega_n, k, zeta, w) ...
     'StartPoint', [mag_fit.omega_n, mag_fit.zeta]);
 %}
 % === EVALUATE FITTED CURVES ===
-%w_fit = logspace(log10(min(omega)), log10(max(omega)), 500);
-%mag_fit_vals = 20*log10(abs((mag_fit.k .* mag_fit.omega_n^2) ./ ...
+% w_fit = logspace(log10(min(omega)), log10(max(omega)), 500);
+% mag_fit_vals = 20*log10(abs((mag_fit.k .* mag_fit.omega_n^2) ./ ...
 %    (-w_fit.^2 + 1i*2*mag_fit.zeta*mag_fit.omega_n.*w_fit + mag_fit.omega_n^2)));
 %{
 phase_fit_vals = angle((phase_fit.omega_n^2) ./ ...
     (-w_fit.^2 + 1i*2*phase_fit.zeta*phase_fit.omega_n.*w_fit + phase_fit.omega_n^2));
 %}
 % === PLOTS ===
-%figure;
-%subplot(2,1,1);
-%semilogx(omega, mag_db, 'r.', w_fit, mag_fit_vals, 'b', 'LineWidth', 2);
-%xlabel('Frequency (rad/s)');
-%ylabel('Magnitude (dB)');
-%title('Magnitude Fit');
-%legend('Data', 'fit');
-%grid on;
+% figure;
+% subplot(2,1,1);
+% semilogx(omega, mag_db, 'r.', w_fit, mag_fit_vals, 'b', 'LineWidth', 2);
+% xlabel('Frequency (rad/s)');
+% ylabel('Magnitude (dB)');
+% title('Magnitude Fit');
+% legend('Data', 'fit');
+% grid on;
 %{
 subplot(2,1,2);
 semilogx(omega, phase, 'r.', w_fit, phase_fit_vals, 'b', 'LineWidth', 2);
@@ -210,12 +197,11 @@ grid on;
 %}
 
 % === DISPLAY RESULTS ===
-%fprintf('Fitted omega_n: %.4f rad/s\n', mag_fit.omega_n);
-%fprintf('Fitted k:    %.4f\n', mag_fit.k);
-%fprintf('Fitted zeta:    %.4f\n', mag_fit.zeta);
+% fprintf('Fitted omega_n: %.4f rad/s\n', mag_fit.omega_n);
+% fprintf('Fitted k:    %.4f\n', mag_fit.k);
+% fprintf('Fitted zeta:    %.4f\n', mag_fit.zeta);
 
-
-%disp('Goodness of Fit (Magnitude):'); disp(gof_mag);
+% disp('Goodness of Fit (Magnitude):'); disp(gof_mag);
 %{
 disp('Goodness of Fit (Phase):'); disp(gof_phase);
 %}

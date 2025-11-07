@@ -1,114 +1,113 @@
-syms w t k rho R a T g real positive
-syms x y real
-phi_I = a*w/k * exp(-k*T) * 1i * exp(1i*(w*t - k*x));
-integrand_pressure = rho * diff(phi_I,t);
-integrand_gamma = simplify(integrand_pressure / (a*exp(1i*w*t)));
+syms w t k rho R a T g real positive;
+syms x y real;
+phi_I = a * w / k * exp(-k * T) * 1i * exp(1i * (w * t - k * x));
+integrand_pressure = rho * diff(phi_I, t);
+integrand_gamma = simplify(integrand_pressure / (a * exp(1i * w * t)));
 
-x_min = -sqrt(R^2-y^2);
-x_max = sqrt(R^2-y^2);
-inner_int = int(integrand_gamma,x,x_min,x_max);
+x_min = -sqrt(R^2 - y^2);
+x_max = sqrt(R^2 - y^2);
+inner_int = int(integrand_gamma, x, x_min, x_max);
 
-coeffs = rho*w^2*exp(-T*k)/k^2;
+coeffs = rho * w^2 * exp(-T * k) / k^2;
 inner_int_without_coeffs = inner_int / coeffs;
 
 y_min = -R;
 y_max = R;
-gamma_without_coeffs = int(inner_int_without_coeffs,y,y_min,y_max);
-gamma_without_coeffs = simplify(rewrite(gamma_without_coeffs,'sin'));
-coeffs = subs(coeffs,k^2,k*w^2/g);
-gamma = abs(gamma_without_coeffs * coeffs)
-taylor(gamma_without_coeffs/k,k,'Order',11)
+gamma_without_coeffs = int(inner_int_without_coeffs, y, y_min, y_max);
+gamma_without_coeffs = simplify(rewrite(gamma_without_coeffs, 'sin'));
+coeffs = subs(coeffs, k^2, k * w^2 / g);
+gamma = abs(gamma_without_coeffs * coeffs);
+taylor(gamma_without_coeffs / k, k, 'Order', 11);
 
-derivative = diff(gamma_without_coeffs,'k')
+derivative = diff(gamma_without_coeffs, 'k');
 
 %% try hilbert transform
-clear all
-syms rho g k T R w real positive
-bessel_approx = taylor(besselj(1,k*R),k,'Order',7);
-gamma_bessel = 2*rho*g/k * exp(-k*T) * R * pi * bessel_approx;
+clear all;
+syms rho g k T R w real positive;
+bessel_approx = taylor(besselj(1, k * R), k, 'Order', 7);
+gamma_bessel = 2 * rho * g / k * exp(-k * T) * R * pi * bessel_approx;
 
-b_over_rho_w = k/2 * (gamma_bessel/(rho*g))^2;
+b_over_rho_w = k / 2 * (gamma_bessel / (rho * g))^2;
 b = b_over_rho_w * rho * w;
 
-b = subs(b,k,w^2/g);
-pretty(b)
+b = subs(b, k, w^2 / g);
+pretty(b);
 
-
-a = 1/w^2 * htrans(-w*b,w,w);
-pretty(a)
+a = 1 / w^2 * htrans(-w * b, w, w);
+pretty(a);
 
 fudge = 5;
-b_over_rho_w_eval = vpa(subs(b_over_rho_w,{R,T,k},{10,2*fudge,w^2/9.8}));
-a_over_rho_eval = vpa(subs(a/rho,{g,T,R,rho},{9.8,2*fudge,10,1000}));
-gamma_bessel_eval = vpa(subs(gamma_bessel/(rho*g),{'R','T','k'},{10,2,w^2/9.8}));
-pretty(a_over_rho_eval)
+b_over_rho_w_eval = vpa(subs(b_over_rho_w, {R, T, k}, {10, 2 * fudge, w^2 / 9.8}));
+a_over_rho_eval = vpa(subs(a / rho, {g, T, R, rho}, {9.8, 2 * fudge, 10, 1000}));
+gamma_bessel_eval = vpa(subs(gamma_bessel / (rho * g), {'R', 'T', 'k'}, {10, 2, w^2 / 9.8}));
+pretty(a_over_rho_eval);
 
-figure
-fplot(a_over_rho_eval,[.1 2])
-title('a/rho')
-figure
-fplot(b_over_rho_w_eval,[.1 1.5])
-title('b/rho w')
-figure
-fplot(gamma_bessel_eval,[.1 2])
-title('gamma/rho g')
+figure;
+fplot(a_over_rho_eval, [.1 2]);
+title('a/rho');
+figure;
+fplot(b_over_rho_w_eval, [.1 1.5]);
+title('b/rho w');
+figure;
+fplot(gamma_bessel_eval, [.1 2]);
+title('gamma/rho g');
 
 hydro = struct();
-hydro = readWAMIT(hydro,'rm3.out',[]); % function from WECSim
+hydro = readWAMIT(hydro, 'rm3.out', []); % function from WECSim
 w_wamit = hydro.w;
-gamma = hydro.ex_ma(3,1,:);
+gamma = hydro.ex_ma(3, 1, :);
 gamma = gamma(:)';
-hold on
-plot(w_wamit,gamma)
-ylim([0 300])
+hold on;
+plot(w_wamit, gamma);
+ylim([0 300]);
 
-load("diffraction-k-vs-gamma-over-rho-g-e-kz.mat")
-w_data = sqrt(k_data*9.8);
-plot(w_data,force_data.*exp(-2*k_data))
-legend('FK approx with bessel function','WAMIT','Diffraction bessel hankel function')
-xlabel('\omega')
+load("diffraction-k-vs-gamma-over-rho-g-e-kz.mat");
+w_data = sqrt(k_data * 9.8);
+plot(w_data, force_data .* exp(-2 * k_data));
+legend('FK approx with bessel function', 'WAMIT', 'Diffraction bessel hankel function');
+xlabel('\omega');
 
 %% include diffraction not just froude krylov
-clear all
-syms k r a theta real positive
+clear all;
+syms k r a theta real positive;
 
 exact = false; % toggle between exact (infinite sum) and approx (finite sum)
 if exact == true
-    syms m
-    bessel_m = J(m,k*r) - J_prime(m,k*a) * H(m,k*a) / H_prime(m,k*a);
+    syms m;
+    bessel_m = J(m, k * r) - J_prime(m, k * a) * H(m, k * a) / H_prime(m, k * a);
     eps_m = 2 * (-1i).^m;
-    sum_m = eps_m * bessel_m * cos(m*theta);
-    sum_0 = bessel_m * cos(m*theta);
+    sum_m = eps_m * bessel_m * cos(m * theta);
+    sum_0 = bessel_m * cos(m * theta);
     term_m_0 = symsum(sum_0, m, 0, 0);
     pressure_over_rho_g_A_ekz = term_m_0 + symsum(sum_m, m, 1, Inf);
 else
     m_max = 10; % number of terms in summation to consider
-    syms bessel_m_terms [1,m_max+1]
+    syms bessel_m_terms [1,m_max+1];
 
     m_vec = 0:m_max;
     for m = m_vec
-        idx_m = m+1;
-        bessel_m_terms(idx_m) = J(m,k*r) - J_prime(m,k*a) * H(m,k*a) / H_prime(m,k*a);
+        idx_m = m + 1;
+        bessel_m_terms(idx_m) = J(m, k * r) - J_prime(m, k * a) * H(m, k * a) / H_prime(m, k * a);
     end
 
     eps_m = 2 * (-1i).^m_vec;
     eps_m(1) = 1;
-    pressure_over_rho_g_A_ekz = sum(eps_m .* bessel_m_terms .* cos(m_vec*theta));
+    pressure_over_rho_g_A_ekz = sum(eps_m .* bessel_m_terms .* cos(m_vec * theta));
 end
 
-force_over_rho_g_A_ekz = int( int(r*pressure_over_rho_g_A_ekz,0,a), 0, 2*pi );
+force_over_rho_g_A_ekz = int(int(r * pressure_over_rho_g_A_ekz, 0, a), 0, 2 * pi);
 
 % turn into a single variable function
 % syms ka
 % force_over_rho_g_A_ekz = subs(force_over_rho_g_A_ekz, k*a, ka );
-force_over_rho_g_A_ekz = subs(force_over_rho_g_A_ekz, a, 10 );
+force_over_rho_g_A_ekz = subs(force_over_rho_g_A_ekz, a, 10);
 
 real_force = real(force_over_rho_g_A_ekz);
 
-figure
-fplot(real_force,[0 .5])
-xlabel('k')
-ylabel('force / \rho g A e^{-kT}')
+figure;
+fplot(real_force, [0 .5]);
+xlabel('k');
+ylabel('force / \rho g A e^{-kT}');
 fig = gcf;
 axObjs = fig.Children;
 dataObj = axObjs.Children;
@@ -123,46 +122,44 @@ w = sqrt(k_data * g);
 gamma_over_rho_g_ekz = force_data;
 % gamma_over_rho_g = fudge2 * force_data .* exp(-k_data * T * fudge);
 
-figure
-plot(w,gamma_over_rho_g_ekz)
-xlabel('w')
-ylabel('\gamma / \rho g')
+figure;
+plot(w, gamma_over_rho_g_ekz);
+xlabel('w');
+ylabel('\gamma / \rho g');
 
 % compare to wecsim
-%hydro = struct();
-%hydro = readWAMIT(hydro,'rm3.out',[]); % function from WECSim
+% hydro = struct();
+% hydro = readWAMIT(hydro,'rm3.out',[]); % function from WECSim
 w_wamit = hydro.w;
-gamma = hydro.ex_ma(3,1,:);
+gamma = hydro.ex_ma(3, 1, :);
 gamma = gamma(:)';
 gamma_over_ekz = gamma ./ exp(-w_wamit.^2 / g * T);
-hold on
-plot(w_wamit,gamma_over_ekz)
-ylim([0 300])
+hold on;
+plot(w_wamit, gamma_over_ekz);
+ylim([0 300]);
 
-
-
-function J = J(m,arg)
-    J = besselj(m,arg);
+function J = J(m, arg)
+    J = besselj(m, arg);
 end
 
-function J_prime = J_prime(m,arg)
+function J_prime = J_prime(m, arg)
     if m == 0
-        J_prime = -J(1,arg);
+        J_prime = -J(1, arg);
     else
-        J_prime = J(m-1,arg) - m/arg * J(m,arg);
+        J_prime = J(m - 1, arg) - m / arg * J(m, arg);
     end
 end
 
-function H = H(m,arg)
-    H = besselh(m,2,arg);
+function H = H(m, arg)
+    H = besselh(m, 2, arg);
 end
 
-function H_prime = H_prime(m,arg)
-    if m==0
+function H_prime = H_prime(m, arg)
+    if m == 0
         % check whether this is right
-        H_prime = -H(1,arg);
+        H_prime = -H(1, arg);
     else
-        H_prime = H(m-1,arg) - m/arg * H(m,arg);
+        H_prime = H(m - 1, arg) - m / arg * H(m, arg);
     end
 end
 

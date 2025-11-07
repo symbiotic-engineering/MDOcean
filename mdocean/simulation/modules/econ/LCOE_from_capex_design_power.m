@@ -1,4 +1,4 @@
-function [LCOE,capex,opex] = LCOE_from_capex_design_power(capex_design_dep, N_WEC, P_elec, FCR, efficiency)
+function [LCOE, capex, opex] = LCOE_from_capex_design_power(capex_design_dep, N_WEC, P_elec, FCR, efficiency)
 
     % costs taken from 'CBS (Total)' tab of the RM3 cost breakdown structure
     % https://catalog.data.gov/ne/dataset/reference-model-3-cost-breakdown-rm3-wave-point-absorber
@@ -23,6 +23,6 @@ function [LCOE,capex,opex] = LCOE_from_capex_design_power(capex_design_dep, N_WE
     P_avg = N_WEC * P_elec * efficiency;
     AEP = P_avg * hr_per_yr / 1000; % annual energy production: W to kWh per year
 
-    LCOE = (FCR*capex + opex)./AEP;
+    LCOE = (FCR * capex + opex) ./ AEP;
 
 end

@@ -1,15 +1,15 @@
 classdef Cost < GenericAnalysis
-    %COST Analysis class for cost analysis tables
+    % COST Analysis class for cost analysis tables
     %   Generates cost parameters table
 
     properties
-        fig_names = {};
-        tab_names = {'cost_parameters'};
+        fig_names = {}
+        tab_names = {'cost_parameters'}
     end
 
     methods (Static)
 
-        function intermed_result_struct = analysis_fcn(~,~)
+        function intermed_result_struct = analysis_fcn(~, ~)
             % Get cost parameters (placeholder - function needs to be implemented)
             % This would call the actual cost parameters function when available
 
@@ -17,9 +17,9 @@ classdef Cost < GenericAnalysis
             intermed_result_struct.cost_table = table({'placeholder'}, {0}, 'VariableNames', {'Parameter', 'Value'});
         end
 
-        function [fig_array,...
-                 tab_array_display,...
-                 tab_array_latex,...
+        function [fig_array, ...
+                 tab_array_display, ...
+                 tab_array_latex, ...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
 
             fig_array = [];

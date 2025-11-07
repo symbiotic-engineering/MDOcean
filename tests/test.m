@@ -1,14 +1,14 @@
-classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+classdef (SharedTestFixtures = { ...
+                                matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
         test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
 
     properties (Constant)
-        run_slow_tests = true;
+        run_slow_tests = true
 
-        slow_analyses = {'LocationSensitivity','Multistart','ParamSensitivities',...
-                        'ParetoSweep'}; %,'ParetoFigFunc',...
-                        %'Comparison','GradientOptimFigFunc'};
+        slow_analyses = {'LocationSensitivity', 'Multistart', 'ParamSensitivities', ...
+                         'ParetoSweep'}  % ,'ParetoFigFunc',...
+        % 'Comparison','GradientOptimFigFunc'};
     end
 
     properties
@@ -36,39 +36,42 @@ classdef (SharedTestFixtures={ ...
 
     % inputs for tests, including passing tolerances
     properties (TestParameter)
-        field_report = fieldnames(validation_inputs('report'));
-        field_wecsim = fieldnames(validation_inputs('wecsim'));
-        rel_tol_report = {.1,.1,.1,.1,.01,.01,.25,.25,.25,.1,.1,.1,.1,.1,.1,.1,.1,.1};
-        rel_tol_wecsim = {.01,.01,.01,.01, 0.1,0.1,.1,.1};
+        field_report = fieldnames(validation_inputs('report'))
+        field_wecsim = fieldnames(validation_inputs('wecsim'))
+        rel_tol_report = {.1, .1, .1, .1, .01, .01, .25, .25, .25, .1, .1, .1, .1, .1, .1, .1, .1, .1}
+        rel_tol_wecsim = {.01, .01, .01, .01, 0.1, 0.1, .1, .1}
         which_figs = test.enumerateFigs()
         which_tabs = test.enumerateTabs()
     end
 
     % helper methods to enumerate all figures and tables
     methods (Static)
+
         function which_fig_struct = enumerateFigs()
-            [fig_names,tab_names] = get_fig_tab_names('all', 'all');
+            [fig_names, tab_names] = get_fig_tab_names('all', 'all');
             num_tabs = length(tab_names);
 
-            none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
+            none = strcat(repmat({'none'}, 1, num_tabs), string(1:num_tabs));
             fig_names_fields = matlab.lang.makeValidName([fig_names, none]);
 
             which_figs_cell = num2cell([fig_names, none]);
-            which_fig_struct = cell2struct(which_figs_cell,fig_names_fields,2);
+            which_fig_struct = cell2struct(which_figs_cell, fig_names_fields, 2);
         end
+
         function which_tab_struct = enumerateTabs()
-            [fig_names,tab_names] = get_fig_tab_names('all', 'all');
+            [fig_names, tab_names] = get_fig_tab_names('all', 'all');
             num_figs = length(fig_names);
 
-            none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
+            none = strcat(repmat({'none'}, 1, num_figs), string(1:num_figs));
             tab_names_fields = matlab.lang.makeValidName([none, tab_names]);
 
             which_tabs_cell = num2cell([none, tab_names]);
-            which_tab_struct = cell2struct(which_tabs_cell,tab_names_fields,2);
+            which_tab_struct = cell2struct(which_tabs_cell, tab_names_fields, 2);
         end
+
     end
 
-    methods(TestClassSetup)
+    methods (TestClassSetup)
         % Shared setup for the entire test class
 
         function runNominalValidation(testCase)
@@ -97,13 +100,13 @@ classdef (SharedTestFixtures={ ...
         end
 
         function runAllFigsTabs(testCase)
-            [all_figs,all_tabs] = get_fig_tab_names('all', 'all');
+            [all_figs, all_tabs] = get_fig_tab_names('all', 'all');
             num_figs = length(all_figs);
             num_tabs = length(all_tabs);
 
             if ~testCase.run_slow_tests
-                idx_run_fig = ~contains(all_figs,testCase.slow_analyses);
-                idx_run_tab = ~contains(all_tabs,testCase.slow_analyses);
+                idx_run_fig = ~contains(all_figs, testCase.slow_analyses);
+                idx_run_tab = ~contains(all_tabs, testCase.slow_analyses);
             else
                 idx_run_fig = true(size(all_figs));
                 idx_run_tab = true(size(all_tabs));
@@ -113,75 +116,74 @@ classdef (SharedTestFixtures={ ...
 
             dry_run = false;
             if dry_run
-                f_success_run = cell([1,length(run_figs)]);
-                t_success_run = cell([1,length(run_tabs)]);
-                f_output_run = gobjects(1,length(run_figs));
-                t_output_run = cell([1,length(run_tabs)]);
-                f_runtime_run = rand([1,length(run_figs)]);
-                t_runtime_run = rand([1,length(run_tabs)]);
+                f_success_run = cell([1, length(run_figs)]);
+                t_success_run = cell([1, length(run_tabs)]);
+                f_output_run = gobjects(1, length(run_figs));
+                t_output_run = cell([1, length(run_tabs)]);
+                f_runtime_run = rand([1, length(run_figs)]);
+                t_runtime_run = rand([1, length(run_tabs)]);
             else
-                [f_success_run,t_success_run,...
-                 f_output_run, t_output_run,...
-                 f_runtime_run,t_runtime_run] = all_figures( run_figs, run_tabs, testCase.uuid );
+                [f_success_run, t_success_run, ...
+                 f_output_run, t_output_run, ...
+                 f_runtime_run, t_runtime_run] = all_figures(run_figs, run_tabs, testCase.uuid);
             end
 
             % store success info
-            f_success = cell(1,num_figs);
+            f_success = cell(1, num_figs);
             f_success(idx_run_fig) = f_success_run;
 
-            t_success = cell(1,num_tabs);
+            t_success = cell(1, num_tabs);
             t_success(idx_run_tab) = t_success_run;
 
             % store output
             f_output = gobjects(1, num_figs);
             f_output(idx_run_fig) = f_output_run;
 
-            t_output = cell(1,num_tabs);
+            t_output = cell(1, num_tabs);
             t_output(idx_run_tab) = t_output_run;
 
             % store runtimes
-            f_runtime = NaN(1,num_figs);
+            f_runtime = NaN(1, num_figs);
             f_runtime(idx_run_fig) = f_runtime_run;
 
-            t_runtime = NaN(1,num_tabs);
+            t_runtime = NaN(1, num_tabs);
             t_runtime(idx_run_tab) = t_runtime_run;
 
             % add runtime figure
             try
                 times = [f_runtime t_runtime];
 
-                idx_plot = false([1,length(times)]);
-                idx_plot([15 17 18 22 26 end-1 end]) = true;
-                times_plot = times(idx_plot)/60;
+                idx_plot = false([1, length(times)]);
+                idx_plot([15 17 18 22 26 end - 1 end]) = true;
+                times_plot = times(idx_plot) / 60;
 
-                %names = remove_underscores([fig_names tab_names]);
-                %names = names(idx_plot);
-                names = {'Fig. 15: design space exploration',...
-                    'Figs. 44-45: post-optimality parameter sensitivities',...
-                    'Figs. 22-23, 46: re-optimization parameter sensitivities',...
-                    'Figs. 24-27: pareto front',...
-                    'Figs. 16-18: single objective optimization comparisons',...
-                    'Fig. 21: multi-start',...
-                    'Tab. 21: location sensitivity'};
-                names = reordercats(categorical(names),names);
+                % names = remove_underscores([fig_names tab_names]);
+                % names = names(idx_plot);
+                names = {'Fig. 15: design space exploration', ...
+                         'Figs. 44-45: post-optimality parameter sensitivities', ...
+                         'Figs. 22-23, 46: re-optimization parameter sensitivities', ...
+                         'Figs. 24-27: pareto front', ...
+                         'Figs. 16-18: single objective optimization comparisons', ...
+                         'Fig. 21: multi-start', ...
+                         'Tab. 21: location sensitivity'};
+                names = reordercats(categorical(names), names);
 
                 runtimeFig = figure;
-                hold on
-                bar(names,times_plot);
+                hold on;
+                bar(names, times_plot);
                 for i = 1:length(times_plot)
                     if times_plot(i) == 0 || ~isfinite(times_plot(i))
-                        plot(i,0,'rx')
+                        plot(i, 0, 'rx');
                     end
                 end
-                title('Runtime (minutes)')
-                hold off
-                improvePlot
-                set(runtimeFig,"Position",[1 41 1536 845])
+                title('Runtime (minutes)');
+                hold off;
+                improvePlot;
+                set(runtimeFig, "Position", [1 41 1536 845]);
                 f_output(31) = runtimeFig;
             catch err
                 f_success{31} = err;
             end
-
 
             % assign all in property
             testCase.fig_success = f_success;
@@ -192,43 +194,46 @@ classdef (SharedTestFixtures={ ...
             testCase.tab_runtime = t_runtime;
 
         end
+
     end
 
-    methods(TestClassTeardown)
+    methods (TestClassTeardown)
+
         function deleteGeneratedFiles(testCase)
             % Create a wildcard pattern
-            pattern = fullfile('**',['*' testCase.uuid.Value '*']);
+            pattern = fullfile('**', ['*' testCase.uuid.Value '*']);
 
             % Get a list of folders that match the pattern
             matchingFiles = dir(pattern);
             foldersToDelete = matchingFiles([matchingFiles.isdir]);
-            foldersToDelete = fullfile({foldersToDelete.folder},{foldersToDelete.name});
+            foldersToDelete = fullfile({foldersToDelete.folder}, {foldersToDelete.name});
 
             % Delete matching folders
             for d = 1:length(foldersToDelete)
-                rmpath(foldersToDelete{d})
-                rmdir(foldersToDelete{d},'s');
+                rmpath(foldersToDelete{d});
+                rmdir(foldersToDelete{d}, 's');
             end
 
         end
+
     end
 
     % Test methods
-    methods(Test, ParameterCombination='sequential')
+    methods (Test, ParameterCombination = 'sequential')
 
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
 
             if ~test.run_slow_tests % mark slow tests as filtered
-                testCase.assumeFalse( contains(which_figs, test.slow_analyses) );
-                testCase.assumeFalse( contains(which_tabs, test.slow_analyses) );
+                testCase.assumeFalse(contains(which_figs, test.slow_analyses));
+                testCase.assumeFalse(contains(which_tabs, test.slow_analyses));
             end
 
-            if ~contains(which_figs,'none') % figure
+            if ~contains(which_figs, 'none') % figure
                 valid_name = matlab.lang.makeValidName(which_figs);
                 fig_name = "Figure_" + valid_name;
 
-                idx = strcmp(valid_name,fields(testCase.which_figs));
+                idx = strcmp(valid_name, fields(testCase.which_figs));
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
@@ -236,7 +241,7 @@ classdef (SharedTestFixtures={ ...
 
             else % table
                 tab_names = fields(testCase.which_tabs);
-                idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names,'none')) );
+                idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names, 'none')));
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
 
@@ -251,11 +256,11 @@ classdef (SharedTestFixtures={ ...
                 success_criterion = 1;
             end
 
-            if isa(success_criterion,'MException')
+            if isa(success_criterion, 'MException')
                 if isempty(success_criterion.stack)
-                    throw(success_criterion)
+                    throw(success_criterion);
                 else
-                    rethrow(success_criterion)
+                    rethrow(success_criterion);
                 end
             else
                 testCase.verifyGreaterThan(success_criterion, 0, diagnostic);
@@ -266,48 +271,49 @@ classdef (SharedTestFixtures={ ...
         function validateNominalReport(testCase, field_report, rel_tol_report)
             sim = testCase.simulated_report.(field_report);
             act = testCase.actual_report.(field_report);
-            if strcmp(field_report,'LCOE')
-                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_report,'Prefix','econ_validation_report');
+            if strcmp(field_report, 'LCOE')
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_report, 'Prefix', 'econ_validation_report');
             else
                 diagnostic = '';
             end
-            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_report,diagnostic)
+            testCase.verifyEqual(sim, act, 'RelTol', rel_tol_report, diagnostic);
         end
 
         function validateNominalWecsim(testCase, field_wecsim, rel_tol_wecsim)
             sim = testCase.simulated_wecsim.(field_wecsim);
             act = testCase.actual_wecsim.(field_wecsim);
-            if strcmp(field_wecsim,'LCOE')
-                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_wecsim,'Prefix','econ_validation_wecsim');
+            if strcmp(field_wecsim, 'LCOE')
+                diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(testCase.econ_fig_wecsim, 'Prefix', 'econ_validation_wecsim');
             else
                 diagnostic = '';
             end
-            testCase.verifyEqual(sim, act, 'RelTol',rel_tol_wecsim,diagnostic)
+            testCase.verifyEqual(sim, act, 'RelTol', rel_tol_wecsim, diagnostic);
         end
 
     end
 
-    methods(Test)
+    methods (Test)
+
         % Static tests
         function validateNominalReportFeasible(testCase)
-            testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_report] );
+            testCase.onFailure(['Nominal design violates these constraints: ', testCase.failed_report]);
             testCase.verifyTrue(testCase.feasible_report);
         end
 
         function validateNominalWecsimFeasible(testCase)
-            testCase.onFailure( ['Nominal design violates these constraints: ', testCase.failed_wecsim] );
+            testCase.onFailure(['Nominal design violates these constraints: ', testCase.failed_wecsim]);
             testCase.verifyTrue(testCase.feasible_wecsim);
         end
 
         function validateNominalHydroCoeffs(testCase)
             mean_err = hydro_coeff_err(false);
-            testCase.verifyLessThanOrEqual(mean_err, 0.10)
+            testCase.verifyLessThanOrEqual(mean_err, 0.10);
         end
 
         function hydrodynamicLimitObeyed(testCase)
             ratio = check_max_CW(testCase.uuid.Value);
             ratio(isnan(ratio)) = 0;
-            testCase.verifyLessThanOrEqual( ratio, 1 );
+            testCase.verifyLessThanOrEqual(ratio, 1);
         end
 
     end

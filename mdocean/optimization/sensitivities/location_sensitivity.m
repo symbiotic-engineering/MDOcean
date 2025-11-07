@@ -1,109 +1,109 @@
 function [flux, BW, storm, depths, locs, ...
           most_common_wave, X_opts, ...
-          obj_opts, flags, figs] = location_sensitivity(p,b)
+          obj_opts, flags, figs] = location_sensitivity(p, b)
 
-files = {'Humboldt_California_Wave Resource _SAM CSV.csv',...
-    'PacWave-North_Oregon_Wave-Resource.csv',...
-    'PacWave-South_Oregon_Wave-Resource.csv',...
-    'WETS_Hawaii_Wave-Resource.csv'};
+    files = {'Humboldt_California_Wave Resource _SAM CSV.csv', ...
+             'PacWave-North_Oregon_Wave-Resource.csv', ...
+             'PacWave-South_Oregon_Wave-Resource.csv', ...
+             'WETS_Hawaii_Wave-Resource.csv'};
 
-depths = [45 50 65 55];
-flux = [32.2 37 40.7 14.3];
-storm = [NaN NaN NaN NaN];
+    depths = [45 50 65 55];
+    flux = [32.2 37 40.7 14.3];
+    storm = [NaN NaN NaN NaN];
 
-X_opts = zeros(length(b.var_names),length(files));
-obj_opts = zeros(1,length(files));
-flags = zeros(1,length(files));
-most_common_wave = cell(1,length(files));
-BW = zeros(1,length(files));
-BW_plot_on = false;
+    X_opts = zeros(length(b.var_names), length(files));
+    obj_opts = zeros(1, length(files));
+    flags = zeros(1, length(files));
+    most_common_wave = cell(1, length(files));
+    BW = zeros(1, length(files));
+    BW_plot_on = false;
 
-parfor i=1:length(files)
-    new_p = p;
+    parfor i = 1:length(files)
+        new_p = p;
 
-    jpd = trim_jpd(readmatrix(files{i}, 'Range', 'A3'));
-    new_p.JPD = jpd(2:end,2:end);
-    new_p.Hs = jpd(2:end,1);
-    new_p.T = jpd(1,2:end);
-    new_p.h = depths(i);
+        jpd = trim_jpd(readmatrix(files{i}, 'Range', 'A3'));
+        new_p.JPD = jpd(2:end, 2:end);
+        new_p.Hs = jpd(2:end, 1);
+        new_p.T = jpd(1, 2:end);
+        new_p.h = depths(i);
 
-    new_b = fix_constraints(new_p,b);
+        new_b = fix_constraints(new_p, b);
 
-    [~,idx_most_common] = max(new_p.JPD,[],'all');
-    [row,col] = ind2sub(size(new_p.JPD),idx_most_common);
-    most_common_wave(i) = {['$H_s = ' num2str(new_p.Hs(row)) '$m, $T_e=' num2str(new_p.T(col)) '$s']};
-    BW(i) = round(find_BW(new_p.Hs,new_p.T,new_p.JPD,BW_plot_on),2);
+        [~, idx_most_common] = max(new_p.JPD, [], 'all');
+        [row, col] = ind2sub(size(new_p.JPD), idx_most_common);
+        most_common_wave(i) = {['$H_s = ' num2str(new_p.Hs(row)) '$m, $T_e=' num2str(new_p.T(col)) '$s']};
+        BW(i) = round(find_BW(new_p.Hs, new_p.T, new_p.JPD, BW_plot_on), 2);
 
-    X = new_b.X_start_struct;
+        X = new_b.X_start_struct;
 
-    which_obj = 1; % only optimize LCOE
-    dry_run = true;
-    if dry_run
-        [X_opts(:,i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1);
-    else
-        [X_opts(:,i), obj_opts(i), flags(i)] = gradient_optim(X,new_p,new_b,which_obj);
+        which_obj = 1; % only optimize LCOE
+        dry_run = true;
+        if dry_run
+            [X_opts(:, i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1);
+        else
+            [X_opts(:, i), obj_opts(i), flags(i)] = gradient_optim(X, new_p, new_b, which_obj);
+        end
+
+        new_ps(i) = new_p;
+        new_bs(i) = new_b;
+
     end
 
-    new_ps(i) = new_p;
-    new_bs(i) = new_b;
+    figs = gobjects(length(files) + 1, 1);
+    for i = 1:length(files)
+        new_p = new_ps(i);
+        new_b = new_bs(i);
 
-end
+        figs(i) = plot_power_matrix(X_opts(:, i), new_p, new_b, b.filename_uuid);
+        figs(end) = figure(figs(1).Number + length(files));
+        power_PDF(X_opts(:, i), new_p);
+        hold on;
 
-figs = gobjects(length(files) + 1, 1);
-for i=1:length(files)
-    new_p = new_ps(i);
-    new_b = new_bs(i);
-
-    figs(i) = plot_power_matrix(X_opts(:,i),new_p,new_b,b.filename_uuid);
+    end
     figs(end) = figure(figs(1).Number + length(files));
-    power_PDF(X_opts(:,i),new_p)
-    hold on
-
-end
-figs(end) = figure(figs(1).Number + length(files));
-locs = {'Humboldt, CA','PacWave North, OR', 'PacWave South, OR','Wave Energy Test Site, HI'};
-legend(locs)
+    locs = {'Humboldt, CA', 'PacWave North, OR', 'PacWave South, OR', 'Wave Energy Test Site, HI'};
+    legend(locs);
 
 end
 
-function delta_w = find_BW(Hs,Te,JPD,plotOn)
-    [T_mesh,Hs_mesh] = meshgrid(Te,Hs);
+function delta_w = find_BW(Hs, Te, JPD, plotOn)
+    [T_mesh, Hs_mesh] = meshgrid(Te, Hs);
     energy_weighted_JPD = JPD .* T_mesh .* Hs_mesh.^2;
-    energy_weighted_sum = sum(energy_weighted_JPD,1);
-    w = 2*pi./Te;
+    energy_weighted_sum = sum(energy_weighted_JPD, 1);
+    w = 2 * pi ./ Te;
 
     % flip both so w increases with idx
     w = fliplr(w);
     P = fliplr(energy_weighted_sum);
 
     % full width at half max
-    [max_power,idx_max] = max(P);
-    P_half = max_power/2;
+    [max_power, idx_max] = max(P);
+    P_half = max_power / 2;
     w_below_pk = w(1:idx_max);
     P_below_pk = P(1:idx_max);
     w_above_pk = w(idx_max:end);
     P_above_pk = P(idx_max:end);
-    w_half_below = interp1(P_below_pk(P_below_pk>0),w_below_pk(P_below_pk>0),P_half);
-    w_half_above = interp1(P_above_pk(P_above_pk>0),w_above_pk(P_above_pk>0),P_half);
+    w_half_below = interp1(P_below_pk(P_below_pk > 0), w_below_pk(P_below_pk > 0), P_half);
+    w_half_above = interp1(P_above_pk(P_above_pk > 0), w_above_pk(P_above_pk > 0), P_half);
     delta_w = w_half_above - w_half_below;
 
     if plotOn
-        figure
-        plot(w,P)
-        hold on
-        plot(w(idx_max),max_power,'mp')
-        plot(w_half_below,P_half,'ro')
-        plot(w_half_above,P_half,'go')
+        figure;
+        plot(w, P);
+        hold on;
+        plot(w(idx_max), max_power, 'mp');
+        plot(w_half_below, P_half, 'ro');
+        plot(w_half_above, P_half, 'go');
     end
 
 end
 
-function b = fix_constraints(p,b)
-    num_non_sea_state_constraints = sum(~contains(b.constraint_names,'slamming'));
+function b = fix_constraints(p, b)
+    num_non_sea_state_constraints = sum(~contains(b.constraint_names, 'slamming'));
     desired_length = num_non_sea_state_constraints + numel(p.JPD) + length(p.T_struct);
     len = length(b.constraint_names);
     if len < desired_length
-        b.constraint_names(end+1 : end+desired_length-len) = {'slamming'};
+        b.constraint_names(end + 1:end + desired_length - len) = {'slamming'};
         b.constraint_names_pretty = remove_underscores(b.constraint_names);
     elseif len > desired_length
         b.constraint_names = b.constraint_names(1:desired_length);

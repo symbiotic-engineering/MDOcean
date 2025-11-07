@@ -1,25 +1,25 @@
 classdef GradientOptimFigFunc < GenericAnalysis
-    %GRADIENTOPTIMFIGFUNC Analysis class for gradient optimization figures
+    % GRADIENTOPTIMFIGFUNC Analysis class for gradient optimization figures
     %   Generates single objective optimization convergence and visualization figures
 
     properties
-        fig_names = {'single_obj_opt_power_matrix',...
-                    'single_obj_opt_geometry', ...
-                    'lagrange_multipliers',...
-                    'delta_x', ...
-                    'single_obj_convergence'};
-        tab_names = {'single_obj_optim_results'};
+        fig_names = {'single_obj_opt_power_matrix', ...
+                     'single_obj_opt_geometry', ...
+                     'lagrange_multipliers', ...
+                     'delta_x', ...
+                     'single_obj_convergence'}
+        tab_names = {'single_obj_optim_results'}
     end
 
     methods (Static)
 
-        function intermed_result_struct = analysis_fcn(p,b)
+        function intermed_result_struct = analysis_fcn(p, b)
             which_objs = 1;
 
             % Run gradient optimization
             [Xs_opt, objs_opt, flags, probs, ...
-             lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct,p,b,which_objs,...
-                                                               {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true);
+             lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct, p, b, which_objs, ...
+                                                            {@optimplotfval, @(x, ~, ~)optim_geomviz(x, p, b)}, true);
 
             intermed_result_struct.p = p;
             intermed_result_struct.b = b;
@@ -36,9 +36,9 @@ classdef GradientOptimFigFunc < GenericAnalysis
 
         end
 
-        function [fig_array,...
-                 tab_array_display,...
-                 tab_array_latex,...
+        function [fig_array, ...
+                 tab_array_display, ...
+                 tab_array_latex, ...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
 
             p = intermed_result_struct.p;
@@ -51,9 +51,9 @@ classdef GradientOptimFigFunc < GenericAnalysis
             grads = intermed_result_struct.grads;
             hesses = intermed_result_struct.hesses;
 
-            [fig_array,tab] = SOO_result_plots(Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
+            [fig_array, tab] = SOO_result_plots(Xs_opt, lambdas, grads, hesses, objs_opt, which_objs, p, b);
 
-            fig_array(end+1) = intermed_result_struct.convergence_plot;
+            fig_array(end + 1) = intermed_result_struct.convergence_plot;
 
             tab_array_display = {tab};
             tab_array_latex = {tab};

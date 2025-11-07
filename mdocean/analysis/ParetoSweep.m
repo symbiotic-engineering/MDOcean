@@ -1,20 +1,20 @@
 classdef ParetoSweep < GenericAnalysis
-    %PARETOSWEEP Analysis class for Pareto sweep figures
+    % PARETOSWEEP Analysis class for Pareto sweep figures
     %   Generates sweep number of seeds figure
 
     properties
-        fig_names = {'sweep_num_seeds'};
-        tab_names = {};
+        fig_names = {'sweep_num_seeds'}
+        tab_names = {}
     end
 
     methods (Static)
 
-        function intermed_result_struct = analysis_fcn(~,~)
+        function intermed_result_struct = analysis_fcn(~, ~)
             % Generate Pareto sweep figure (placeholder)
             % This would call the actual sweep function when available
 
             fig = figure;
-            plot(1:10, rand(1,10));
+            plot(1:10, rand(1, 10));
             title('Pareto Sweep - Number of Seeds - Placeholder');
             xlabel('Number of Seeds');
             ylabel('Objective Value');
@@ -23,9 +23,9 @@ classdef ParetoSweep < GenericAnalysis
             intermed_result_struct.figure_handle = fig;
         end
 
-        function [fig_array,...
-                 tab_array_display,...
-                 tab_array_latex,...
+        function [fig_array, ...
+                 tab_array_display, ...
+                 tab_array_latex, ...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
 
             fig_array = intermed_result_struct.figure_handle;

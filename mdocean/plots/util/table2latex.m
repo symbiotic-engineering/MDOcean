@@ -34,21 +34,25 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     elseif ~ischar(filename)
         error('The output file name must be a string.');
     else
-        if ~strcmp(filename(end-3:end), '.tex')
+        if ~strcmp(filename(end - 3:end), '.tex')
             filename = [filename '.tex'];
         end
     end
-    if nargin < 1, error('Not enough parameters.'); end
-    if ~istable(T), error('Input must be a table.'); end
-    if nargin<3
+    if nargin < 1
+        error('Not enough parameters.');
+    end
+    if ~istable(T)
+        error('Input must be a table.');
+    end
+    if nargin < 3
         special_col_spec = [];
     end
-    if nargin<4
+    if nargin < 4
         special_first_row = [];
     end
 
     % Parameters
-    n_col = size(T,2);
+    n_col = size(T, 2);
     col_spec = [];
     for c = 1:n_col
         col_spec = [col_spec 'l'];
@@ -76,19 +80,18 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     table_string = append(table_string, [col_names '\\\\ \n']);
     table_string = append(table_string, '\\hline \n');
 
-
     % Writing the data
     try
-        for row = 1:size(T,1)
-            row_data = cell(1,n_col);
-            row_data{1,n_col} = [];
+        for row = 1:size(T, 1)
+            row_data = cell(1, n_col);
+            row_data{1, n_col} = [];
             for col = 1:n_col
-                value = T{row,col};
+                value = T{row, col};
 
-                use_percent = contains(T.Properties.VariableNames{col},'error','IgnoreCase',true);
+                use_percent = contains(T.Properties.VariableNames{col}, 'error', 'IgnoreCase', true);
                 value = format_value(value, use_percent);
 
-                row_data{1,col} = char(value);
+                row_data{1, col} = char(value);
             end
             if ~isempty(row_names)
                 row_data = [row_names{row}, row_data];
@@ -99,13 +102,13 @@ function table2latex(T, filename, special_col_spec, special_first_row)
         end
     catch err
         msg = ['Cannot generate latex table string. Make sure that table only ' ...
-            'contains chars, strings or numeric values.'];
-        base_err = MException('MDOcean:table2latex',msg);
-        base_err = addCause(base_err,err);
-        throw(base_err)
+               'contains chars, strings or numeric values.'];
+        base_err = MException('MDOcean:table2latex', msg);
+        base_err = addCause(base_err, err);
+        throw(base_err);
     end
 
-    table_string = append(table_string,'\\end{tabular}');
+    table_string = append(table_string, '\\end{tabular}');
 
     fileID = fopen(filename, 'w');
     fprintf(fileID, table_string);
@@ -119,7 +122,7 @@ function value = format_value(value, use_percent)
         error('Table must not contain structs.');
     end
     while iscell(value)
-        value = value{1,1};
+        value = value{1, 1};
     end
     if ismissing(value)
         value = '-';
@@ -136,23 +139,23 @@ function value = format_value(value, use_percent)
         if isinf(value)
             value = '$\infty$';
         elseif use_percent
-            value = sprintf('$%.1f\\\\%%%% $',value*100);
+            value = sprintf('$%.1f\\\\%%%% $', value * 100);
         elseif isscalar(value) % use engineering notation
             value = engr_notation(value);
         else % array
-            numbers = strjoin(arrayfun(@(x) engr_notation(x),value,'UniformOutput',false), ', ');
+            numbers = strjoin(arrayfun(@(x) engr_notation(x), value, 'UniformOutput', false), ', ');
             value = ['[ ' numbers ' ]'];
         end
     else
-        value = formattedDisplayText(value,"UseTrueFalseForLogical",true);
+        value = formattedDisplayText(value, "UseTrueFalseForLogical", true);
     end
 end
 
 function formatted = engr_notation(value)
-    exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
+    exponent = floor(log10(abs(value)) / 3) * 3; % Round down to nearest multiple of 3
     mantissa = value / 10.^exponent; % Calculate mantissa
-    if exponent==0
-        formatted = sprintf('$%.3g $',mantissa);
+    if exponent == 0
+        formatted = sprintf('$%.3g $', mantissa);
     else
         formatted = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
     end

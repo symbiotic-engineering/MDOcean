@@ -1,6 +1,6 @@
-function flag = optim_geomviz(x,p,b)
+function flag = optim_geomviz(x, p, b)
 
-    X =[x(b.idxs_recover); 1]; % reorder indices
+    X = [x(b.idxs_recover); 1]; % reorder indices
 
     grey = [0.8, 0.8, 0.8]; % RGB for light grey
 
@@ -18,7 +18,7 @@ function flag = optim_geomviz(x,p,b)
     end
 
     % plot geomtry of current iteration
-    visualize_geometry(X,p,true);
+    visualize_geometry(X, p, true);
 
     flag = false; % don't stop optimization
 

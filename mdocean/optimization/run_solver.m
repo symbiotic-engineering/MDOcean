@@ -1,43 +1,43 @@
-function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob, obj, x0, opts, idxs, filename_uuid)
+function [X_opt, obj_opt, flag, output, lambda, grad, hess, problem] = run_solver(prob, obj, x0, opts, idxs, filename_uuid)
     solver_based = true;
     % create folder for generated objectives if it doesn't already exist
     if solver_based
         if isempty(filename_uuid)
             t = getCurrentTask();
             if ~isempty(t)
-                filename_uuid = sprintf('%s_%s',t.Parent.Name,t.Name);
+                filename_uuid = sprintf('%s_%s', t.Parent.Name, t.Name);
             end
         end
-        if isa(filename_uuid,'parallel.pool.Constant')
+        if isa(filename_uuid, 'parallel.pool.Constant')
             filename_uuid = filename_uuid.Value;
         end
         generated_folder = ['optimization/generated/' filename_uuid];
-        if ~exist(generated_folder,'dir')
-            mkdir(generated_folder)
+        if ~exist(generated_folder, 'dir')
+            mkdir(generated_folder);
         end
-        addpath(generated_folder)
+        addpath(generated_folder);
         % Convert to solver-based
-        problem = prob2struct(prob,x0,...
-            'ObjectiveFunctionName',['generatedObjective' obj],...
-            'FileLocation',generated_folder);
+        problem = prob2struct(prob, x0, ...
+                              'ObjectiveFunctionName', ['generatedObjective' obj], ...
+                              'FileLocation', generated_folder);
         problem.options = opts;
 
-        if strcmp(opts.Algorithm,'sqp')
+        if strcmp(opts.Algorithm, 'sqp')
             problem.Aineq = full(problem.Aineq); % avoid warning that SQP can't have sparse matrices
         end
 
         % Run unscaled optimization
-        [X_opt,obj_opt,flag,output,lambda,grad,hess] = fmincon(problem);
+        [X_opt, obj_opt, flag, output, lambda, grad, hess] = fmincon(problem);
 
         if flag <= 0 % if the unscaled optimization did not arrive at an optimal
-            [X_opt,obj_opt,flag,...
-             output,lambda,grad,hess] = scale_and_rerun(hess,problem,output,X_opt);
+            [X_opt, obj_opt, flag, ...
+             output, lambda, grad, hess] = scale_and_rerun(hess, problem, output, X_opt);
 
             if flag == 2
                 warning(['The scaled optimization converged in x before J. ' ...
-                    'Rescaling and trying again.'])
-                [X_opt,obj_opt,flag,...
-                 output,lambda,grad,hess] = scale_and_rerun(hess,problem,output,X_opt);
+                         'Rescaling and trying again.']);
+                [X_opt, obj_opt, flag, ...
+                 output, lambda, grad, hess] = scale_and_rerun(hess, problem, output, X_opt);
             end
         end
 
@@ -46,35 +46,34 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
         lambda.lower = lambda.lower(idxs);
         lambda.upper = lambda.upper(idxs);
         grad = grad(idxs);
-        hess = hess(idxs,idxs);
+        hess = hess(idxs, idxs);
 
     else
-        [opt_x, obj_opt, flag,output,lambda] = solve(prob,x0,'Options',opts);
+        [opt_x, obj_opt, flag, output, lambda] = solve(prob, x0, 'Options', opts);
         X_opt = [opt_x.D_f opt_x.D_s_over_D_f opt_x.h_f_over_D_f ...
-                opt_x.T_s_over_h_s opt_x.F_max ...
-                opt_x.B_p opt_x.w_n opt_x.M opt_x.t_ft opt_x.t_fr opt_x.t_fc opt_x.t_fb opt_x.t_sr opt_x.t_dt opt_x.power_max];
+                 opt_x.T_s_over_h_s opt_x.F_max ...
+                 opt_x.B_p opt_x.w_n opt_x.M opt_x.t_ft opt_x.t_fr opt_x.t_fc opt_x.t_fb opt_x.t_sr opt_x.t_dt opt_x.power_max];
     end
 
 end
 
-
-function [X_opt,obj_opt,flag,output,...
-            lambda,grad,hess] = scale_and_rerun(hess,problem,old_output,X_opt)
+function [X_opt, obj_opt, flag, output, ...
+            lambda, grad, hess] = scale_and_rerun(hess, problem, old_output, X_opt)
     % use the unscaled optimization hessian to find scale factor
-    scale = 1./sqrt(diag(hess));
+    scale = 1 ./ sqrt(diag(hess));
 
     % Formulate a new scaled optimization problem
     problem_s = problem;
     problem_s.options.MaxIterations = 150;
     problem_s.options.MaxFunctionEvaluations = 2000;
-    for i=1:length(problem.options.PlotFcn)
-        problem_s.options.PlotFcn{i} = @(x,in1,in2) problem.options.PlotFcn{i}(x .* scale,in1,in2);
+    for i = 1:length(problem.options.PlotFcn)
+        problem_s.options.PlotFcn{i} = @(x, in1, in2) problem.options.PlotFcn{i}(x .* scale, in1, in2);
     end
     problem_s.objective = @(x) problem.objective(x .* scale);
     problem_s.nonlcon   = @(x) problem.nonlcon(x .* scale);
     problem_s.Aineq = problem.Aineq .* scale';
 
-    inv_scale = 1./(scale);
+    inv_scale = 1 ./ (scale);
     problem_s.options.TypicalX = problem.options.TypicalX .* inv_scale;
     if ~isempty(old_output.bestfeasible)
         problem_s.x0 = inv_scale .* old_output.bestfeasible.x;
@@ -85,7 +84,7 @@ function [X_opt,obj_opt,flag,output,...
     problem_s.ub = inv_scale .* problem.ub;
 
     % Run scaled optimization problem
-    [X_opt_s,obj_opt,flag,output_s,lambda_s,grad_s,hess_s] = fmincon(problem_s);
+    [X_opt_s, obj_opt, flag, output_s, lambda_s, grad_s, hess_s] = fmincon(problem_s);
     X_opt = scale .* X_opt_s;
     lambda = lambda_s;
     lambda.lower = inv_scale .* lambda_s.lower;

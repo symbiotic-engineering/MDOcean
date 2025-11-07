@@ -1,8 +1,8 @@
-[fig_success,tab_success, fig_output, tab_output,fig_runtime,tab_runtime] = all_figures(19,[]);
+[fig_success, tab_success, fig_output, tab_output, fig_runtime, tab_runtime] = all_figures(19, []);
 
 fig_success_copy = fig_success;
-idx_success = cellfun(@isempty,fig_success);
-fig_success_copy(idx_success) = {MException('','ok')};
+idx_success = cellfun(@isempty, fig_success);
+fig_success_copy(idx_success) = {MException('', 'ok')};
 
 msg = cellfun(@(c) c.message, fig_success_copy, 'UniformOutput', false);
 stack = cellfun(@(c) c.stack, fig_success_copy, 'UniformOutput', false);
@@ -16,4 +16,4 @@ if ~isempty(top_stack)
     line(~idx_success) = [top_stack.line];
 end
 
-table((1:length(msg)).', msg, file, line, 'VariableNames', {'#','Error Message','File','Line'})
+table((1:length(msg)).', msg, file, line, 'VariableNames', {'#', 'Error Message', 'File', 'Line'});

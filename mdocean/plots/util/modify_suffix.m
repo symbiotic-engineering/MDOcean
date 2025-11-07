@@ -1,6 +1,6 @@
 function inputCell = modify_suffix(inputCell)
 
-    for i=1:length(inputCell)
+    for i = 1:length(inputCell)
         inputString = inputCell{i};
 
         if endsWith(inputString, '_s')

@@ -20,33 +20,33 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
     k_wamit = hydro.w.^2 / 9.8;
 
     % added mass
-    A_f_wamit = hydro.A(3,3,:);
-    A_s_wamit = hydro.A(9,9,:);
-    A_c_wamit = hydro.A(3,9,:);
+    A_f_wamit = hydro.A(3, 3, :);
+    A_s_wamit = hydro.A(9, 9, :);
+    A_c_wamit = hydro.A(3, 9, :);
 
     % excitation
-    gamma_f_wamit = hydro.ex_ma(3,1,:);
-    gamma_phase_f_wamit = -hydro.ex_ph(3,1,:);
-    gamma_s_wamit = hydro.ex_ma(9,1,:);
-    gamma_phase_s_wamit = -hydro.ex_ph(9,1,:);
+    gamma_f_wamit = hydro.ex_ma(3, 1, :);
+    gamma_phase_f_wamit = -hydro.ex_ph(3, 1, :);
+    gamma_s_wamit = hydro.ex_ma(9, 1, :);
+    gamma_phase_s_wamit = -hydro.ex_ph(9, 1, :);
 
     % radiation damping
-    B_f_wamit = hydro.B(3,3,:);
-    B_s_wamit = hydro.B(9,9,:);
-    B_c_wamit = hydro.B(3,9,:);
+    B_f_wamit = hydro.B(3, 3, :);
+    B_s_wamit = hydro.B(9, 9, :);
+    B_c_wamit = hydro.B(3, 9, :);
 
     % interpolation
-    A_f_over_rho       = interp1(k_wamit,A_f_wamit(:),k);
-    A_s_over_rho       = interp1(k_wamit,A_s_wamit(:),k);
-    A_c_over_rho       = interp1(k_wamit,A_c_wamit(:),k);
-    B_f_over_rho_w     = interp1(k_wamit,B_f_wamit(:),k);
-    B_s_over_rho_w     = interp1(k_wamit,B_s_wamit(:),k);
-    B_c_over_rho_w     = interp1(k_wamit,B_c_wamit(:),k);
-    gamma_f_over_rho_g = interp1(k_wamit,gamma_f_wamit(:),k);
-    gamma_s_over_rho_g = interp1(k_wamit,gamma_s_wamit(:),k);
-    gamma_phase_f      = interp1(k_wamit,gamma_phase_f_wamit(:),k);
-    gamma_phase_s      = interp1(k_wamit,gamma_phase_s_wamit(:),k);
+    A_f_over_rho       = interp1(k_wamit, A_f_wamit(:), k);
+    A_s_over_rho       = interp1(k_wamit, A_s_wamit(:), k);
+    A_c_over_rho       = interp1(k_wamit, A_c_wamit(:), k);
+    B_f_over_rho_w     = interp1(k_wamit, B_f_wamit(:), k);
+    B_s_over_rho_w     = interp1(k_wamit, B_s_wamit(:), k);
+    B_c_over_rho_w     = interp1(k_wamit, B_c_wamit(:), k);
+    gamma_f_over_rho_g = interp1(k_wamit, gamma_f_wamit(:), k);
+    gamma_s_over_rho_g = interp1(k_wamit, gamma_s_wamit(:), k);
+    gamma_phase_f      = interp1(k_wamit, gamma_phase_f_wamit(:), k);
+    gamma_phase_s      = interp1(k_wamit, gamma_phase_s_wamit(:), k);
 
-    %B_over_rho_w = k/2 .* gamma_over_rho_g.^2; % Haskind relationship, using the deep water group velocity
+    % B_over_rho_w = k/2 .* gamma_over_rho_g.^2; % Haskind relationship, using the deep water group velocity
 
 end

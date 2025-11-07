@@ -23,24 +23,24 @@
 
 %% wecSimPCT
 % WEC-Sim parallel computing toolbox executable
-clear mcr imcr i j k l1 l2 m n name nseed kkk len numConditions
-clear body waves simu output pto constraint ptoSim
+clear mcr imcr i j k l1 l2 m n name nseed kkk len numConditions;
+clear body waves simu output pto constraint ptoSim;
 global mcr
 
 % open the local cluster profile
 pool = parcluster('local');
-totalNumOfWorkers=pool.NumWorkers;
+totalNumOfWorkers = pool.NumWorkers;
 
 % open the parallel pool, recording the time it takes
 tic;
 pool = gcp; % open the pool
 
-fprintf('Opening the parallel pool took %g seconds.\n', toc)
+fprintf('Opening the parallel pool took %g seconds.\n', toc);
 
 if isempty(pool)
-    error('Could not open parpool')
+    error('Could not open parpool');
 else
-    fprintf("Number of workers: %i",pool.NumWorkers)
+    fprintf("Number of workers: %i", pool.NumWorkers);
 end
 
 evalc('wecSimInputFile');
@@ -48,112 +48,114 @@ evalc('wecSimInputFile');
 if isempty(simu.mcrMatFile) == 0
     load(simu.mcrMatFile);
 else
-    kkk=0;
-    mcr.header = {'waves.height','waves.period'};
+    kkk = 0;
+    mcr.header = {'waves.height', 'waves.period'};
     if isempty(simu.mcrExcelFile) == 0
         mcr.waveSS = xlsread(simu.mcrExcelFile);
-        mcr.waveSS(isnan(mcr.waveSS))=0;
-        for i=2:length(mcr.waveSS(:,1))
-            for j=2:length(mcr.waveSS(1,:))
-                if (mcr.waveSS(i,j)>0)
-                    kkk = kkk+1;
-                    mcr.cases(kkk,1) = mcr.waveSS(i,1);
-                    mcr.cases(kkk,2) = mcr.waveSS(1,j);
+        mcr.waveSS(isnan(mcr.waveSS)) = 0;
+        for i = 2:length(mcr.waveSS(:, 1))
+            for j = 2:length(mcr.waveSS(1, :))
+                if mcr.waveSS(i, j) > 0
+                    kkk = kkk + 1;
+                    mcr.cases(kkk, 1) = mcr.waveSS(i, 1);
+                    mcr.cases(kkk, 2) = mcr.waveSS(1, j);
                 end
             end
         end
     else
-        for i=1:length(waves.height)
-            for j=1:length(waves.period)
-                kkk = kkk+1;
-                mcr.cases(kkk,1) = waves.height(i);
-                mcr.cases(kkk,2) = waves.period(j);
+        for i = 1:length(waves.height)
+            for j = 1:length(waves.period)
+                kkk = kkk + 1;
+                mcr.cases(kkk, 1) = waves.height(i);
+                mcr.cases(kkk, 2) = waves.period(j);
             end
         end
     end
 
-    numConditions=2;
-    if length(waves.phaseSeed)>1
-        numConditions=numConditions+1;
+    numConditions = 2;
+    if length(waves.phaseSeed) > 1
+        numConditions = numConditions + 1;
         mcr.header{numConditions} = 'waves.phaseSeed';
-        len = length(mcr.cases(:,1));
-        for nseed=1:length(waves.phaseSeed)
-            mcr.cases(len*(nseed-1)+1:len*(nseed-1)+len,1:numConditions-1) = mcr.cases(1:len,1:numConditions-1);
-            mcr.cases(len*(nseed-1)+1:len*(nseed-1)+len,    numConditions) = waves.phaseSeed(nseed);
+        len = length(mcr.cases(:, 1));
+        for nseed = 1:length(waves.phaseSeed)
+            mcr.cases(len * (nseed - 1) + 1:len * (nseed - 1) + len, 1:numConditions - 1) = mcr.cases(1:len, 1:numConditions - 1);
+            mcr.cases(len * (nseed - 1) + 1:len * (nseed - 1) + len,    numConditions) = waves.phaseSeed(nseed);
         end
     end
 
-    if exist('pto','var')
-        for n=1:size(pto,2)
-            if (length(pto(n).damping)>1 || length(pto(n).stiffness)>1)
-                numConditions=numConditions+2;
+    if exist('pto', 'var')
+        for n = 1:size(pto, 2)
+            if length(pto(n).damping) > 1 || length(pto(n).stiffness) > 1
+                numConditions = numConditions + 2;
                 name = sprintf('pto(%i).damping', n);
-                mcr.header{numConditions-1} = name;
+                mcr.header{numConditions - 1} = name;
                 name = sprintf('pto(%i).stiffness', n);
                 mcr.header{numConditions  } = name;
 
-                len = length(mcr.cases(:,1)); kkk = 0;
-                for l2=1:length(pto(n).stiffness)
-                    for l1=1:length(pto(n).damping)
-                        kkk=kkk+1;
-                        mcr.cases(len*(kkk-1)+1:len*(kkk-1)+len,1:numConditions-2) = mcr.cases(1:len,1:numConditions-2);
-                        mcr.cases(len*(kkk-1)+1:len*(kkk-1)+len,  numConditions-1) = pto(n).damping(l1);
-                        mcr.cases(len*(kkk-1)+1:len*(kkk-1)+len,    numConditions) = pto(n).stiffness(l2);
+                len = length(mcr.cases(:, 1));
+                kkk = 0;
+                for l2 = 1:length(pto(n).stiffness)
+                    for l1 = 1:length(pto(n).damping)
+                        kkk = kkk + 1;
+                        mcr.cases(len * (kkk - 1) + 1:len * (kkk - 1) + len, 1:numConditions - 2) = mcr.cases(1:len, 1:numConditions - 2);
+                        mcr.cases(len * (kkk - 1) + 1:len * (kkk - 1) + len,  numConditions - 1) = pto(n).damping(l1);
+                        mcr.cases(len * (kkk - 1) + 1:len * (kkk - 1) + len,    numConditions) = pto(n).stiffness(l2);
                     end
                 end
             end
-        end; clear i j k l1 l2 m n name nseed kkk len numConditions
+        end
+        clear i j k l1 l2 m n name nseed kkk len numConditions;
     end
 end
 
 %% Execute wecSimPCT
-pause(1)
-delete savedLog*
+pause(1);
+delete savedLog*;
 
 % variables to save
-timesteps_per_period = mcr.cases(:,2) / simu.dt;
-P = zeros(length(mcr.cases(:,1)), 1);
-force_pto = zeros(length(mcr.cases(:,1)), 1);
-float_amplitude = zeros(length(mcr.cases(:,1)), 1);
-spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
-relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
-float_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
-spar_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
-relative_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+timesteps_per_period = mcr.cases(:, 2) / simu.dt;
+P = zeros(length(mcr.cases(:, 1)), 1);
+force_pto = zeros(length(mcr.cases(:, 1)), 1);
+float_amplitude = zeros(length(mcr.cases(:, 1)), 1);
+spar_amplitude = zeros(length(mcr.cases(:, 1)), 1);
+relative_amplitude = zeros(length(mcr.cases(:, 1)), 1);
+float_amplitude_rms = zeros(length(mcr.cases(:, 1)), 1);
+spar_amplitude_rms = zeros(length(mcr.cases(:, 1)), 1);
+relative_amplitude_rms = zeros(length(mcr.cases(:, 1)), 1);
 
-parfor imcr=1:length(mcr.cases(:,1))
+parfor imcr = 1:length(mcr.cases(:, 1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
     t = getCurrentTask();
     filename = sprintf('savedLog%03d.txt', t.ID);
     pctDir = sprintf('pctDir_%g', t.ID);
     getAttachedFilesFolder(pctDir);
-    fileID = fopen(filename,'a');
-    cleanupObj = onCleanup(@()cleanup_fcn(fileID,pctDir));
-    fprintf(fileID,'wecSimPCT Case %g/%g on Worker Number %g/%g \n',imcr,length(mcr.cases(:,1)),t.ID,totalNumOfWorkers);
+    fileID = fopen(filename, 'a');
+    cleanupObj = onCleanup(@()cleanup_fcn(fileID, pctDir));
+    fprintf(fileID, 'wecSimPCT Case %g/%g on Worker Number %g/%g \n', imcr, length(mcr.cases(:, 1)), t.ID, totalNumOfWorkers);
     % Run WEC-Sim
     try
-        output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);
+        output = myWecSimFcn(imcr, mcr, pctDir, totalNumOfWorkers, X, p);
 
         % extract signals over the last period
         N_per_T = timesteps_per_period(imcr);
-        power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
-        F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
-        float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
-        spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
+        power = output.ptos.powerInternalMechanics((end - N_per_T + 1):end, 3);
+        F_PTO = output.ptos.forceInternalMechanics((end - N_per_T + 1):end, 3);
+        float_pos = output.bodies(1).position((end - N_per_T + 1):end, 3);
+        spar_pos  = output.bodies(2).position((end - N_per_T + 1):end, 3);
         rel_pos = float_pos - spar_pos;
 
         % save specific output variables
         P(imcr) = mean(power);
-        force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
-        float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
-        spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
-        relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
-        float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
-        spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
-        relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
+        force_pto(imcr) = 1 / 2 * (max(F_PTO) - min(F_PTO));
+        float_amplitude(imcr) = 1 / 2 * (max(float_pos) - min(float_pos));
+        spar_amplitude(imcr)  = 1 / 2 * (max(spar_pos)  - min(spar_pos));
+        relative_amplitude(imcr) = 1 / 2 * (max(rel_pos) - min(rel_pos));
+        float_amplitude_rms(imcr) = rms(float_pos - mean(float_pos));
+        spar_amplitude_rms(imcr)  = rms(spar_pos  - mean(spar_pos));
+        relative_amplitude_rms(imcr) = rms(rel_pos - mean(rel_pos));
     catch ME
-        warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
-            mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
+        warning(ME.identifier, 'WecSim errored for sea state H=%.2f, T=%.1f: %s', ...
+                mcr.cases(imcr, 1), mcr.cases(imcr, 2), getReport(ME, 'extended', 'hyperlinks', 'off'));
         P(imcr) = NaN;
         force_pto(imcr) = NaN;
         float_amplitude(imcr) = NaN;
@@ -163,17 +165,17 @@ parfor imcr=1:length(mcr.cases(:,1))
         spar_amplitude_rms(imcr)  = NaN;
         relative_amplitude_rms(imcr) = NaN;
     end
-    Simulink.sdi.clear
+    Simulink.sdi.clear;
 end
 
-B_p = mcr.cases(:,3);
-K_p = mcr.cases(:,4);
-save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p','K_p')
+B_p = mcr.cases(:, 3);
+K_p = mcr.cases(:, 4);
+save(output_filename, 'P', 'float_amplitude', 'spar_amplitude', 'relative_amplitude', ...
+     'float_amplitude_rms', 'spar_amplitude_rms', 'relative_amplitude_rms', 'force_pto', 'X', 'p', 'B_p', 'K_p');
 
-clear imcr totalNumOfWorkers
+clear imcr totalNumOfWorkers;
 
-function cleanup_fcn(fileID,pctDir)
+function cleanup_fcn(fileID, pctDir)
     fclose(fileID);
     try
         rmdir(pctDir, 's');
