@@ -189,8 +189,8 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
     y_J2_J = objs(:,2)/J_global_opt(2) - 1;
 
     %% PAWN sensitivity metric
-    n = 100;
-    nboot = 100; % fixme what should these values be?
+    n = 10; % Pianosi and Wagener 2015 says use n=10-50
+    nboot = 200; % Pianosi and Wagener 2015 use nboot=200-1000
     S_J1_X = pawn_indices_givendata(x_J1,y_J1_X,n,nboot);
     S_J1_J = pawn_indices_givendata(x_J1,y_J1_J,n,nboot);
     S_J2_X = pawn_indices_givendata(x_J2,y_J2_X,n,nboot);
