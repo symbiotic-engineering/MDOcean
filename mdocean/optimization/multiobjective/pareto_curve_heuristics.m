@@ -101,7 +101,10 @@ function figs = pareto_curve_heuristics(r1,r2)
         ylim([.6 1.85])
     end
 
-    figs = [f1,f2,f3,f4,f5,f6,f7];
+    figs = [f1, f2, f3, f4, f5, f6];
+    if load_two
+        figs = [figs f7];
+    end
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
