@@ -14,6 +14,8 @@ classdef Multistart < GenericAnalysis
             [X_opt,objs,flags,x0s] = gradient_mult_x0(p,b);
             
             % Store results for post-processing
+            intermed_result_struct.p = p;
+            intermed_result_struct.b = b;
             intermed_result_struct.X_opt = X_opt;
             intermed_result_struct.objs = objs;
             intermed_result_struct.flags = flags;
@@ -31,7 +33,7 @@ classdef Multistart < GenericAnalysis
             objs = intermed_result_struct.objs;
             flags = intermed_result_struct.flags;
             x0s = intermed_result_struct.x0s;
-            
+
             [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s);
 
             fig_array = [treeFig, parallelFig, barFig];
