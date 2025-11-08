@@ -11,13 +11,13 @@ classdef Multistart < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(p,b)
             % Run multistart optimization analysis
-            [treeFig, parallelFig, barFig, tab] = gradient_mult_x0(p,b);
+            [X_opt,objs,flags,x0s] = gradient_mult_x0(p,b);
             
             % Store results for post-processing
-            intermed_result_struct.treeFig = treeFig;
-            intermed_result_struct.parallelFig = parallelFig;
-            intermed_result_struct.barFig = barFig;
-            intermed_result_struct.multistart_table = tab;
+            intermed_result_struct.X_opt = X_opt;
+            intermed_result_struct.objs = objs;
+            intermed_result_struct.flags = flags;
+            intermed_result_struct.x0s = x0s;
         end
         
         function [fig_array,...
@@ -25,13 +25,21 @@ classdef Multistart < GenericAnalysis
                  tab_array_latex,...
                  end_result_struct] = post_process_fcn(intermed_result_struct)
             
-            fig_array = [intermed_result_struct.treeFig, intermed_result_struct.parallelFig, intermed_result_struct.barFig];
+            p = intermed_result_struct.p;
+            b = intermed_result_struct.b;
+            X_opt =intermed_result_struct.X_opt;
+            objs = intermed_result_struct.objs;
+            flags = intermed_result_struct.flags;
+            x0s = intermed_result_struct.x0s;
             
-            tab_array_display = {intermed_result_struct.multistart_table};
-            tab_array_latex = {intermed_result_struct.multistart_table};
+            [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s);
+
+            fig_array = [treeFig, parallelFig, barFig];
             
-            end_result_struct.multistart_complete = true;
-            end_result_struct.multistart_results = intermed_result_struct.multistart_table;
+            tab_array_display = {results};
+            tab_array_latex = {results};
+
+            end_result_struct = struct();
         end
         
     end
