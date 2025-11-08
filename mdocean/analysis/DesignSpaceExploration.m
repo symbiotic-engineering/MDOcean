@@ -49,7 +49,7 @@ classdef DesignSpaceExploration < GenericAnalysis
                                                         pareto_results_struct);
             
             tab_array_display = {results_tab};
-            tab_array_latex = {};
+            tab_array_latex = {results_tab};
             
             end_result_struct.design_space_exploration_complete = true;
         end
