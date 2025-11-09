@@ -1,4 +1,4 @@
-function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s)
+function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s,num_runs)
 
     %% create table for display
     results = struct2table(x0s);

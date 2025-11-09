@@ -11,7 +11,7 @@ classdef Multistart < GenericAnalysis
         
         function intermed_result_struct = analysis_fcn(p,b)
             % Run multistart optimization analysis
-            [X_opt,objs,flags,x0s] = gradient_mult_x0(p,b);
+            [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b);
             
             % Store results for post-processing
             intermed_result_struct.p = p;
@@ -20,6 +20,7 @@ classdef Multistart < GenericAnalysis
             intermed_result_struct.objs = objs;
             intermed_result_struct.flags = flags;
             intermed_result_struct.x0s = x0s;
+            intermed_result_struct.num_runs = num_runs;
         end
         
         function [fig_array,...
@@ -33,8 +34,9 @@ classdef Multistart < GenericAnalysis
             objs = intermed_result_struct.objs;
             flags = intermed_result_struct.flags;
             x0s = intermed_result_struct.x0s;
+            num_runs = intermed_result_struct.num_runs;
 
-            [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s);
+            [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,objs,flags,x0s,num_runs);
 
             fig_array = [treeFig, parallelFig, barFig];
             
