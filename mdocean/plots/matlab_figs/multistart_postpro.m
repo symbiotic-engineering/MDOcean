@@ -115,6 +115,7 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
     widths_used = widths(idx_used);
 
     fontsize = 12;
+    num_DVs = length(b.var_names);
     for i=1:num_DVs-1
         nexttile
         table_var_names = results.Properties.VariableNames;
