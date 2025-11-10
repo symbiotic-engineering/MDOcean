@@ -7,8 +7,20 @@ function [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b)
     X_opt = NaN(num_runs,num_DVs,num_objs);
     flags = zeros(num_runs,num_objs);
     
+    dry_run = true;
+
     % nominal ICs
-    [X_opt(1,:,:), objs(1,:), flags(1,:)] = gradient_optim(b.X_start_struct,p,b);
+    if ~dry_run
+        [X_opt_nom, obj_opt_nom, flag_nom] = gradient_optim(b.X_start_struct,p,b);
+    else
+        X_opt_nom = [b.X_noms; 1];
+        obj_opt_nom = simulation(X_opt_nom,p);
+        obj_opt_nom = obj_opt_nom(1:num_objs);
+        flag_nom = [1 1];
+    end
+    X_opt(1,:,:) = [X_opt_nom X_opt_nom];
+    objs(1,:) = obj_opt_nom;
+    flags(1,:) = flag_nom;
     x0s(1) = b.X_start_struct;
     
     % many random ICs
@@ -17,7 +29,13 @@ function [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b)
         [~, ~, ~, feasible_lin] = is_feasible(0, x0_vec, p, b);
         x0s(i) = x0;
         if feasible_lin
-            [X_opt(i,:,:), objs(i,:), flags(i,:)] = gradient_optim(x0,p,b);
+            if ~dry_run
+                [X_opt(i,:,:), objs(i,:), flags(i,:)] = gradient_optim(x0,p,b);
+            else
+                X_opt(i,:,:) = rand() * [X_opt_nom X_opt_nom];
+                objs(i,:) = rand() * obj_opt_nom;
+                flags(i,:) = randi([-2,2],[1 2]);
+            end
         end
     end
 

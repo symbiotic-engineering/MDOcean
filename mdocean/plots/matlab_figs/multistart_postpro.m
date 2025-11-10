@@ -175,14 +175,14 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
         % capital X is design vars, lowercase x is indep var in sensitivity
         % analysis, y is dependent variable in sensitivity analysis
         X_guess = results.(b.var_names{i});
-        X_optim_result = X_opt(:,i,:);
+        X_optim_result = squeeze(X_opt(:,i,:));
         X_global_opt = X_optim_result(opt);
 
-        x_J1 = X_guess ./ X_global_opt(:,1) - 1;
-        x_J2 = X_guess ./ X_global_opt(:,2) - 1;
+        x_J1(:,i) = X_guess ./ X_global_opt(1) - 1;
+        x_J2(:,i) = X_guess ./ X_global_opt(2) - 1;
 
-        y_J1_X(i) = X_optim_result(:,1) ./ X_global_opt(:,1) - 1;
-        y_J2_X(i) = X_optim_result(:,2) ./ X_global_opt(:,2) - 1;
+        y_J1_X(:,i) = X_optim_result(:,1) ./ X_global_opt(1) - 1;
+        y_J2_X(:,i) = X_optim_result(:,2) ./ X_global_opt(2) - 1;
     end
 
     J_global_opt = objs(opt);
@@ -190,28 +190,43 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
     y_J2_J = objs(:,2)/J_global_opt(2) - 1;
 
     %% PAWN sensitivity metric
-    n = 10; % Pianosi and Wagener 2015 says use n=10-50
-    nboot = 200; % Pianosi and Wagener 2015 use nboot=200-1000
-    S_J1_X = pawn_indices_givendata(x_J1,y_J1_X,n,nboot);
-    S_J1_J = pawn_indices_givendata(x_J1,y_J1_J,n,nboot);
-    S_J2_X = pawn_indices_givendata(x_J2,y_J2_X,n,nboot);
-    S_J2_J = pawn_indices_givendata(x_J2,y_J2_J,n,nboot);
+    for i=1:length(b.var_names)-1
+        [~, S_J1_X_all(i), S_J1_X_self(i)] = call_pawn(x_J1, y_J1_X(:,i), i);
+        [~, S_J2_X_all(i), S_J2_X_self(i)] = call_pawn(x_J1, y_J1_X(:,i), i);
+    end
 
-    if ~iscolumn(S_J1_X) % ensure all row vectors
-        S_J1_X = S_J1_X.';
+    S_J1_J = call_pawn(x_J1, y_J1_J);
+    S_J2_J = call_pawn(x_J2, y_J2_J);
+
+    if ~iscolumn(S_J1_X_all) % ensure all column vectors
+        S_J1_X_self = S_J1_X_self.';
         S_J1_J = S_J1_J.';
-        S_J2_X = S_J2_X.';
+        S_J2_X_self = S_J2_X_self.';
         S_J2_J = S_J2_J.';
     end
 
     %% bar plot
     barFig = figure;
-    bar(labels,[S_J1_X,S_J1_J,S_J2_X,S_J2_J])
+    bar_data = [S_J1_X_self, S_J1_J, S_J2_X_self, S_J2_J];
+    bar_data_clean = fillmissing(bar_data,'constant',0);
+    bar(categorical(b.var_names_pretty(1:end-1)),bar_data_clean)
     title('Sensitivity to starting point');
-    legend({['X* Sensitivity for J_1 = ' b.obj_names{1}], ...
-            ['J* Sensitivity for J_1 = ' b.obj_names{1}], ...
-            ['X* Sensitivity for J_2 = ' b.obj_names{2}], ...
-            ['J* Sensitivity for J_2 = ' b.obj_names{2}], ...
+    legend({['X* Sensitivity for J_1 = ' b.obj_names_pretty{1}], ...
+            ['J* Sensitivity for J_1 = ' b.obj_names_pretty{1}], ...
+            ['X* Sensitivity for J_2 = ' b.obj_names_pretty{2}], ...
+            ['J* Sensitivity for J_2 = ' b.obj_names_pretty{2}], ...
         })
+    improvePlot
+end
+
+function [sens_vec,sens_mean,sens_self] = call_pawn(x,y,idx_self)
+    n = 10; % Pianosi and Wagener 2015 says use n=10-50
+    nboot = 1; % Pianosi and Wagener 2015 use nboot=200-1000
+
+    sens_vec = pawn_indices_givendata(x(~isnan(y),:), y(~isnan(y)), n, nboot); % sens to each var
+    sens_mean = mean(sens_vec,'omitnan'); % sens to all vars start point
+    if nargout > 2
+        sens_self = sens_vec(idx_self);   % sens to self start point
+    end
 
 end
