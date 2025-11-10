@@ -3,7 +3,7 @@ stages:
     cmd: calkit check environment --name tex
     deps: []
     outs:
-      - .calkit/env-locks/tex.json:
+      - .calkit\env-locks\tex.json:
           cache: false
           persist: true
     always_changed: true
@@ -884,7 +884,8 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/DesignSpaceExploration/intermed.mat
     outs:
-      - results/DesignSpaceExploration/experiments.pdf
+      - results/DesignSpaceExploration/experiments_pareto.pdf
+      - results/DesignSpaceExploration/experiments_ratios.pdf
       - results/DesignSpaceExploration/end.mat
     desc: Automatically generated from the 
       'postpro-DesignSpaceExploration' stage in calkit.yaml. Changes 
@@ -2216,7 +2217,8 @@ stages:
       - results/ParetoFigFunc/pareto_front_with_design_images.pdf
       - results/ParetoFigFunc/pareto_front_LCOE_contours.pdf
       - results/ParetoFigFunc/pareto_heuristics.pdf
-      - results/ParetoFigFunc/pareto_constraint_activity.pdf
+      - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
+      - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
       - results/ParetoFigFunc/end.mat
     desc: Automatically generated from the 'postpro-ParetoFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
@@ -2338,7 +2340,6 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/non_matlab_figs/pdf/
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -2421,20 +2422,21 @@ stages:
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
       - results/ReadNonMatlabFigs/intermed.mat
+      - mdocean/plots/non_matlab_figs/
     outs:
+      - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
-      - results/ReadNonMatlabFigs/methodology_overview.pdf
+      - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/N2_diagram.pdf
       - results/ReadNonMatlabFigs/dimensions.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
-      - results/ReadNonMatlabFigs/WECSim_error_breakdown.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/sim_runtime.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/trapezoid.pdf
       - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/end.mat
     desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
       stage in calkit.yaml. Changes made here will be overwritten.
@@ -3148,7 +3150,7 @@ stages:
       - pubs/renewable-energy-mdo/references.bib
       - pubs/renewable-energy-mdo/numbers.tex
       - pubs/elsarticle-num-names.bst
-      - .calkit/env-locks/tex.json
+      - .calkit\env-locks\tex.json
     outs:
       - pubs/renewable-energy-mdo/out/mdocean.pdf
       - pubs/renewable-energy-mdo/out/mdocean.synctex.gz:
@@ -3176,7 +3178,7 @@ stages:
       - pubs/applied-ocean-research-model/numbers.tex
       - pubs/elsarticle-num-names.bst
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
-      - .calkit/env-locks/tex.json
+      - .calkit\env-locks\tex.json
     outs:
       - pubs/applied-ocean-research-model/out/main.pdf
       - pubs/applied-ocean-research-model/out/main.synctex.gz:

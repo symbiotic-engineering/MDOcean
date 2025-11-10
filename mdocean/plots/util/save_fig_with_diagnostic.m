@@ -10,7 +10,12 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
         if ~isempty(fig.UserData)
             % pdf already exists in files, just copy to folder
-            copyfile(fig.UserData, pdf_name)
+            try
+                copyfile(fig.UserData, [pdf_name '.pdf'])
+            catch
+                warning([fig.UserData ' does not exist, saving image to results folder.'])
+                save_pdf(fig,pdf_name) % if pdf does not exist, save the image
+            end
         else
             % save pdf from matlab figure output
             save_pdf(fig,pdf_name)
