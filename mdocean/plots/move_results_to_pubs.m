@@ -27,6 +27,14 @@ function move_results_to_pubs()
 end
 
 function success = copy_result(class_dot_description, extension, dest_folder)
+    if ~isstring(class_dot_description) && ~ischar(class_dot_description) && ~iscellstr(class_dot_description)
+        error('wrong type')
+    end
+    if isempty(class_dot_description)
+        error('empty')
+    end
+    disp(class_dot_description)
+    class(class_dot_description)
     s = split(class_dot_description, '.');
     class_name = s{1};
     fig_tab_desc = s{2};

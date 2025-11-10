@@ -16,7 +16,7 @@ figs_in_RE{3}  = 'ReadNonMatlabFigs.N2_diagram';
 % archs
 figs_in_RE{4} = 'ReadNonMatlabFigs.optimization_flowchart';
 % 4: results
-figs_in_RE{5} = 'DesignSpaceExploration.experiments';
+figs_in_RE{5} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_RE{6} = 'Comparison.overlaid_geometry';
 figs_in_RE{7} = 'Comparison.overlaid_hydro_coeffs';
 figs_in_RE{8} = 'Comparison.probability_CDF';
@@ -31,7 +31,7 @@ figs_in_RE{16} = 'ParamSensitivities.re_optim_design_tornado_J2';
 figs_in_RE{17} = 'ParetoFigFunc.pareto_front_with_design_images';
 figs_in_RE{18} = 'ParetoFigFunc.pareto_front_LCOE_contours';
 figs_in_RE{19} = 'ParetoFigFunc.pareto_heuristics';
-figs_in_RE{20} = 'ParetoFigFunc.pareto_constraint_activity';
+figs_in_RE{20} = 'ParetoFigFunc.pareto_constraint_activity_reactive';
 figs_in_RE{21} = 'ParetoFigFunc.pareto_damping_reactive';
 figs_in_RE{22} = 'AllFigCompare.runtime_bar_chart';
 figs_in_RE{23} = 'ParetoSweep.sweep_num_seeds';
@@ -43,7 +43,7 @@ figs_in_RE{26} = 'ParamSensitivities.post_optim_re_optim_objective_grid';
 figs_in_RE{27} = 'ParamSensitivities.post_optim_design_grid';
 figs_in_RE{28} = 'ParamSensitivities.re_optim_design_grid';
 % graphical abstract (unnumbered so at the end)
-figs_in_RE{29}  = 'ReadNonMatlabFigs.graphical_abstract';
+figs_in_RE{29}  = 'ReadNonMatlabFigs.graphical_abstract_optim';
 
 %% AOR figures
 
@@ -98,7 +98,7 @@ figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
 % appendix E - parameters
 
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract';
+figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 
