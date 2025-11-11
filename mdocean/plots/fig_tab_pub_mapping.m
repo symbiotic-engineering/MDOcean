@@ -11,7 +11,7 @@ num_tabs_RE = 6;
 figs_in_RE = cell([1,num_figs_RE]);
 figs_in_RE{1}  = 'ReadNonMatlabFigs.RM3_image';
 % 2: modeling methodology
-figs_in_RE{2}  = 'ReadNonMatlabFigs.methodology_overview';
+figs_in_RE{2}  = 'ReadNonMatlabFigs.methodology_flowchart';
 figs_in_RE{3}  = 'ReadNonMatlabFigs.N2_diagram';
 % archs
 figs_in_RE{4} = 'ReadNonMatlabFigs.optimization_flowchart';
@@ -50,7 +50,7 @@ figs_in_RE{29}  = 'ReadNonMatlabFigs.graphical_abstract_optim';
 figs_in_AOR = cell([1,num_figs_AOR]);
 % 1: introduction
 figs_in_AOR{1}  = 'ReadNonMatlabFigs.RM3_image';
-figs_in_AOR{2}  = 'ReadNonMatlabFigs.methodology_overview';
+figs_in_AOR{2}  = 'ReadNonMatlabFigs.methodology_flowchart';
 % 2: model structure
 figs_in_AOR{3}  = 'ReadNonMatlabFigs.N2_diagram';
 figs_in_AOR{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
@@ -72,7 +72,7 @@ figs_in_AOR{17} = 'Runtime.dynamics_runtime';
 % 5: insights and discussion
 figs_in_AOR{18} = 'DampingPlateStructures.damping_plate_aspect_ratio';
 figs_in_AOR{19} = 'ForceSaturationFigFunc.power_force_sensitivity';
-figs_in_AOR{20} = 'DesignSpaceExploration.experiments';
+figs_in_AOR{20} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_AOR{21} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
 figs_in_AOR{22} = 'Meem.meem_regions';
