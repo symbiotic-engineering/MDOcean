@@ -1,7 +1,7 @@
 function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mapping()
 
 %% numbers
-num_figs_RE = 30;
+num_figs_RE = 29;
 num_figs_AOR = 39;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
@@ -113,5 +113,9 @@ tabs_in_RE{3} = 'Parameters.parameters';
 tabs_in_RE{4} = 'Comparison.optimal_design_vars';
 tabs_in_RE{5} = 'Comparison.optimal_outputs';
 tabs_in_RE{6} = 'LocationSensitivity.location_sensitivity';
+
+% check for empty - this will happen if you forget to fill in any figs/tabs
+empty = cellfun(@isempty,[figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR]);
+assert(~any(empty))
 
 end

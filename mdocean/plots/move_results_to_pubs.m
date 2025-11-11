@@ -27,14 +27,6 @@ function move_results_to_pubs()
 end
 
 function success = copy_result(class_dot_description, extension, dest_folder)
-    if isempty(class_dot_description)
-        error('empty')
-    end
-    if ~isstring(class_dot_description) && ~ischar(class_dot_description) && ~iscellstr(class_dot_description)
-        disp(class_dot_description)
-        class(class_dot_description)
-        error('wrong type')
-    end
     
     s = split(class_dot_description, '.');
     class_name = s{1};
