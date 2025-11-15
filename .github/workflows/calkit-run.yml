@@ -69,6 +69,7 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: Run Calkit
+        id: run_calkit
         uses: rebeccamccabe/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
@@ -77,3 +78,8 @@ jobs:
       - name: DVC push
         if: always()
         run: calkit save dvc.lock dvc.yaml -m "Run pipeline"
+      - if: steps.run_calkit.outcome == 'failure'
+        run: |
+          echo "Errors from latex:"
+          grep -E "^!" pubs/applied-ocean-research-model/aux/main.log
+          grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log
