@@ -78,7 +78,7 @@ jobs:
       - name: DVC push
         if: always()
         run: calkit save dvc.lock dvc.yaml -m "Run pipeline"
-      - if: steps.run_calkit.outcome == 'failure'
+      - if: ${{ steps.run_calkit.outcome == 'failure' }}
         run: |
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log
