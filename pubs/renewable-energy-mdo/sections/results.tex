@@ -116,7 +116,6 @@ This motivates a potential future search for creative designs to obviate or miti
 Meanwhile, the activity of the float thickness lower bound and its larger value of $\lambda$ than the float FOS constraint indicates that the float structural model is inadequate in this regime and should be extended to better incorporate local buckling effects that would come to dominate for very thin-skinned designs.
 
 Additional outputs of the optimization are the gradient of the objective, $\vec{\nabla} J=\partial J/\partial \vec{x}$, and the Hessian of the Lagrangian, $\textbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$.
-They are shown in \appendixautorefname~\ref{sec:appendix-supplemental-results} since they are not particularly informative by themselves, especially since the gradient is expected to be zero at the optimum for all design variables not involved in an active constraint.
 The utility of the gradient and Hessian are in their ability to calculate other local sensitivity measures, such as the impact of a design variable or parameter that is perturbed from its optimal value. Local parameter sensitivity analysis occurs in \sectionautorefname~\ref{sec:sensitivities-local}, and design variable perturbation is examined here.
 
 \figureautorefname~\ref{fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimal value, $\Delta J/J$, calculated using equation \eqref{eq:delta-J} and compared against the ``ground truth'' value from simulation re-evaluation.
@@ -131,12 +130,16 @@ The utility of the gradient and Hessian are in their ability to calculate other 
 \caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{fig:delta-J}
 \end{figure}
 
+We first note that the gradient $\vec{\nabla} J$, and therefore the gradient estimate of the objective perturbation $\Delta J$, equals zero for all design variables not involved in an active constraint, as long as the optimization has converged.
+Notably, all values are nonzero, indicating that all design variables in some way affect the active constraints identified in \ref{fig:lagrange-multiplier}.
+The values convey the amount that the objective would improve if the design variable changed, although changing this design variable would violate the active constraint(s) that the design variable is involved in.
+
 The design variables with the highest sensitivities are $D_s$, $D_f$,and $h_{stiff,f}$, with a 10\% decrease in the diameters and 10\% increase in the stiffener height leading to a 7.9\%, 4.4\%, and 3.7\% increase in LCOE respectively.
 The remaining design variables have a notably low sensitivity, meaning that they can be perturbed from their optimal value by 10\% in either direction without affecting the objective by more than 1-2\% (although they may affect constraints).
 Finally, the gradient estimates are generally accurate, with the exception of the diameters $D_s$ and $D_f$ and the peak power $P_{max}$.
 For these variables, nonlinearity or curvature exists in the objective function, indicating a tradeoff in the objective that would produce an optimum even without any active constraints.
 For the case of LCOE minimization, this is expected because increasing the diameters and power rating both increase the power production while simultaneously increasing the capital cost.
-More accurate estimates of the perturbed LCOE can be obtained by using the Hessian of the objective to account for curvature, but this would need to be obtained via manual finite differences because the solver only returns the Hessian of the Lagrangian.
+More accurate estimates of the perturbed LCOE can be obtained by using the Hessian of the objective to account for curvature, but the Hessian would need to be obtained via manual finite differences because the solver only returns the Hessian of the Lagrangian.
 
 \subsubsection{Multi-Start}
 Separately, because non-convex optimization can get stuck in a local minimum, 1000 random initial guesses are tested, although 974 are linear infeasible and discarded.
@@ -419,13 +422,12 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 
 \subsection{Multi-Objective Sensitivity Analysis}
 \paragraph{Control Scheme}
-\begin{figure}
-    \centering
-    \includegraphics[width=.8\linewidth]{figs/manual/damping_reactive_pareto.png}
-    \caption{Pareto Front comparison for Damping vs Reactive Control}
-    \label{fig:pareto-control-compare}
-\end{figure}
-\hl{Add explanation and debug why reactive control stops at 120 kW.}
+Figure~\ref{fig:pareto-lcoe} compares the pareto front for the damping control scheme to the reactive control scheme.
+While reactive control achieves higher power ultimately the lowest LCOE as expected, at lower power levels ($<$\dampingReactivePowerIntersect kW) damping control is actually more cost effective.
+This is because the reactive control scheme requires a larger PTO rating to achieve the same power at low power levels, as well as larger structures to withstand the higher forces.
+Incorporating the unmodeled effect that PTOs with both motoring and generation capability can be more expensive than those with only generation capability would further increase the appeal of damping control at low power levels.
+This trend also suggests the possibility that the optimal controller for a given power level may be an alternative controller (neither damping nor reactive control).
+In other words, while reactive control yields the highest power for a given design, it is not necessarily the highest power for a given cost, considering that PTO and structural cost scale with the controller.
 %\hl{This section I don't have results for yet and can be cut if needed. 
 %Maybe show trace out the effect of parameter variation without reoptimizing in multiobjective space, 
 %and it shows you how far some param variations bring you from optimal, like the dJ/dp sensitivities before 
@@ -434,7 +436,7 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 %Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
 
 \subsection{Optimization Runtime}
-Figure \ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
+Figure~\ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
 The optimization also runs without issue, albeit more slowly, on unspecialized machines such as a Windows 10 laptop computer with MATLAB R2022a.
 
 \begin{figure}
