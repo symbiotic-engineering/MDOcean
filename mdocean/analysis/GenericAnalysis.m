@@ -1,6 +1,6 @@
 classdef (Abstract) GenericAnalysis
-    %GENERICANALYSIS Summary of this class goes here
-    %   Detailed explanation goes here
+    %GENERICANALYSIS Abstract class for MDOcean analyses
+    %   Handles saving and loading of intermediate results, figures, and tables.
 
     properties
         p = parameters();
