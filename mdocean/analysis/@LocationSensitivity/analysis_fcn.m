@@ -1,0 +1,21 @@
+function intermed_result_struct = analysis_fcn(p,b)
+    % Run location sensitivity analysis
+    [flux, BW, storm, depths, locs, ...
+     most_common_wave, X_opts, ...
+     obj_opts, flags, figs] = location_sensitivity(p,b);
+    
+    % Store results for post-processing
+    intermed_result_struct.p = p;
+    intermed_result_struct.b = b;
+    intermed_result_struct.flux = flux;
+    intermed_result_struct.BW = BW;
+    intermed_result_struct.storm = storm;
+    intermed_result_struct.depths = depths;
+    intermed_result_struct.locs = locs;
+    intermed_result_struct.most_common_wave = most_common_wave;
+    intermed_result_struct.X_opts = X_opts;
+    intermed_result_struct.obj_opts = obj_opts;
+    intermed_result_struct.flags = flags;
+    intermed_result_struct.h_power_matrix = figs(1:end-1);
+    intermed_result_struct.h_probability_PDF = figs(end);
+end

@@ -1,0 +1,7 @@
+function intermed_result_struct = analysis_fcn(~,~)
+    % Run slamming analysis
+    fig = slam_plot();
+    
+    % Store results for post-processing
+    intermed_result_struct.figure_handle = fig;
+end

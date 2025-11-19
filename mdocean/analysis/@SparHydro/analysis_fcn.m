@@ -1,0 +1,7 @@
+function intermed_result_struct = analysis_fcn(~,~)
+    % Run spar hydrodynamic analysis
+    fig = spar_hydro_plot();
+    
+    % Store figure for post-processing
+    intermed_result_struct.figure_handle = fig;
+end

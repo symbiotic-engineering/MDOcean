@@ -1,0 +1,20 @@
+classdef ParetoFigFunc < GenericAnalysis
+    %PARETOFIGFUNC Analysis class for Pareto optimization figures
+    %   Generates Pareto front figures and heuristics visualization
+
+    properties
+        fig_names = {'pareto_front_with_design_images', 'pareto_front_LCOE_contours', ...
+                    'pareto_heuristics', 'pareto_constraint_activity_damping',...
+                    'pareto_constraint_activity_reactive'};
+        tab_names = {};
+    end
+
+    methods (Static)
+        intermed_result_struct = analysis_fcn(p,b)
+
+        [fig_array,...
+                 tab_array_display,...
+                 tab_array_latex,...
+                 end_result_struct] = post_process_fcn(intermed_result_struct)
+    end
+end

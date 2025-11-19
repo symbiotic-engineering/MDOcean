@@ -1,0 +1,21 @@
+function intermed_result_struct = analysis_fcn(p,b)
+    which_objs = 1;
+
+    % Run gradient optimization
+    [Xs_opt, objs_opt, flags, probs, ...
+     lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct,p,b,which_objs,...
+                                                       {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true);
+    
+    intermed_result_struct.p = p;
+    intermed_result_struct.b = b;
+    intermed_result_struct.which_objs = which_objs;
+    intermed_result_struct.Xs_opt = Xs_opt;
+    intermed_result_struct.objs_opt = objs_opt;
+    intermed_result_struct.flags = flags;
+    intermed_result_struct.probs = probs;
+    intermed_result_struct.lambdas = lambdas;
+    intermed_result_struct.grads = grads;
+    intermed_result_struct.hesses = hesses;
+    intermed_result_struct.vals = vals;
+    intermed_result_struct.convergence_plot = gcf();
+end

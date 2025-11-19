@@ -1,0 +1,30 @@
+function [fig_array,...
+                 tab_array_display,...
+                 tab_array_latex,...
+                 end_result_struct] = post_process_fcn(intermed_result_struct)
+
+    num_figs = length(intermed_result_struct.file_names);
+    fig_array = gobjects(1,num_figs);
+
+    % Loop over the requested figure names
+    for i = 1:num_figs
+        file_name = intermed_result_struct.file_names{i};
+        
+        % Create the figure and read in the image file
+        fig = figure;
+        try
+            imshow(imread(file_name), 'Parent', axes(fig));
+        catch
+            % If image file doesn't exist, create a placeholder
+            warning(['Missing image file (pdf may still exist): ' file_name])
+            text(0.5, 0.5, ['Missing: ' file_name], 'HorizontalAlignment', 'center');
+        end
+        fig.UserData = ['mdocean/plots/non_matlab_figs/pdf/' file_name(1:end-4) '.pdf'];
+        fig_array(i) = fig;
+    end
+
+    tab_array_display = {};
+    tab_array_latex = {};
+
+    end_result_struct.num_figs_created = length(fig_array);
+end
