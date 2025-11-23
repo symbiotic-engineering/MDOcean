@@ -48,6 +48,18 @@ jpd_Te = jpd_full(1,2:end);
 g = 9.8;
 spar_exc = get_spar_exc(g);
 
+%read in wave height and period data from csv created in timeseries.py
+addpath(genpath('..\WEC-DECIDER\modules\CEM'));
+data = readtable("hs_and_t.csv");
+Hs_hourly = data.Hs_hourly;
+T_hourly = data.T_hourly;
+price_interpolated_temp = 50*rand(1,8760)+75;
+emissions = readtable('emissions.csv').Var5(3:end);
+emissions = repmat(emissions,18,1);
+emissions = [emissions; emissions(1:120)];
+carbon_interpolated_temp = emissions;
+[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp);
+
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};
 types = {'string','string',     'cell', 'string',   'logical','string',     'cell'};
 T = table('Size',[0 length(cols)],'VariableTypes',types);
@@ -216,6 +228,12 @@ T = [T;
     ... % Grid CEM
     table("location","location",{'ISONE'},...
         "grid",false,"location of grid data to use",{''});
+    ...
+    ...% carbon and price
+    table("marginal_carbon","carbon",{carbon_contour}," ",false,... 
+        "marginal carbon",{''});
+    table("marginal_price","price",{price_contour}," ",false,... 
+        "marginal price",{''});
     ];
 
 T.Properties.VariableNames = cols;

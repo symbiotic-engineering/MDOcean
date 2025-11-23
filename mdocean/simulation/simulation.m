@@ -74,6 +74,14 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
  gamma_phase_f,gamma_phase_s,w,...
  phase_X_f,phase_X_u]           = dynamics(in, m_f_tot, m_s_tot);
 
+%calculate revenue and avoided carbon
+revenue = P_matrix_elec * in.marginal_price;
+avoided_carbon = P_matrix_elec * in.marginal_carbon;
+net_econ_value = revenue - econ_cost;
+net_env_value = avoided_carbon - env_cost;
+contourf(Hs_mdocean, T_mdocean, price_contour)
+
+
 [FOS_float,FOS_spar,FOS_damping_plate,...
     FOS_spar_local] = structures(...
           	F_heave_storm, F_surge_storm, F_heave_op, F_surge_op, ... % forces
