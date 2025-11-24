@@ -7,7 +7,7 @@ function [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b)
     X_opt = NaN(num_runs,num_DVs,num_objs);
     flags = zeros(num_runs,num_objs);
     
-    dry_run = true;
+    dry_run = false;
 
     % nominal ICs
     if ~dry_run
