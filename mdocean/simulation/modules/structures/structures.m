@@ -49,7 +49,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
 
     %% Damping plate
     plot_on = false;
-    radial_stress_damping_plate = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
+    sigma_damping_plate = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff_d,w_stiff_d, ...
                                             D_d_tu, t_d_tu, num_terms_plate, radial_mesh_plate, ...
                                             num_stiff_d, plot_on);
@@ -57,7 +57,7 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
     FOS2Y = FOS_spar;
-    FOS3Y = sigma_max / radial_stress_damping_plate;
+    FOS3Y = sigma_max / sigma_damping_plate;
 
 end 
 
@@ -117,25 +117,113 @@ function [sigma_vm,delta_max] = damping_plate_structures(F_heave, D_d, D_s,P_hyd
     a = D_d/2;
     b = D_s/2;
 
-    % nondimensional annular plate solutions
     rho = linspace(b/a, 1, radial_mesh_plate); % evaluate at these radial points
+
+    % stiffness ratio and dimensional section properties
+    [plate_tube_K_ratio, h_eq_vec, y_max_vec, D_eq] = get_plate_tube_stiffness(...
+                                                    h_stiff, num_stiffeners, ...
+                                                    rho, a, t_d, width_stiff, E, nu, ...
+                                                    D_d_tu, t_d_tu, ...
+                                                    L_dt, D_d, D_s);
+    
+    % nondimensional moment, displacement, and tube force ratio
+    [Mr_over_F_heave, ...
+     Mt_over_F_heave, ...
+     Q_nondim, ...
+     delta_over_a2Fheave_2piDeq, ...
+     F_tube_over_F_heave]     = combined_plate_nondim(rho, b, a, nu, N, ...
+                                                      plate_tube_K_ratio);
+
+    % dimensional forces/moments
+    F_tube = F_tube_over_F_heave      * F_heave;
+    Mr     = Mr_over_F_heave / (2*pi) * F_heave;
+    Mt     = Mt_over_F_heave / (2*pi) * F_heave;
+    Q      = Q_nondim * a    / (2*pi) * F_heave;
+
+    % dimensional displacement
+    delta_total = a^2 * F_heave / (2*pi * D_eq) * delta_over_a2Fheave_2piDeq;
+    delta_max = max(abs(delta_total));
+
+    % dimensional stress
+    sigma_rr_vec = get_plate_stress(Mr, y_max_vec, h_eq_vec);
+    sigma_tt_vec = get_plate_stress(Mt, t_d/2,     t_d); % stiffeners don't affect section properties in theta 
+    sigma_rz_vec = Q / t_d;
+
+    sigma_zz = 0; sigma_rt = 0; sigma_tz = 0;
+    sigma_vm_vec = von_mises(sigma_rr_vec, sigma_tt_vec, sigma_zz, ...
+                             sigma_rt,     sigma_tz,     sigma_rz_vec);
+
+    % maximum stress at all radii
+    sigma_vm  = max(abs(sigma_vm_vec));
+
+    if plot_on
+        plot_damping_plate(a, D_eq, F_heave, F_tube, r, ...
+            delta_plate_dis_nondim_vec, delta_plate_con_nondim_vec, ...
+            Mr_con_nondim, Mr_dis_nondim_vec, Mr, ...
+            y_max_vec, h_eq_vec, sigma_rr_vec)
+    end
+end
+
+function [Mr_over_F_heave, ...
+          Mt_over_F_heave, ...
+          Q_nondim, ...
+          delta_over_a2Fheave_2piDeq, ...
+          F_tube_over_F_heave]     = combined_plate_nondim(rho, b, a, nu, N, plate_tube_K_ratio)
+
+    % nondimensional annular plate solutions
     theta = [0 pi/2 pi 3*pi/2]; % evaluate at these angles - simulating a 
     % single concentrated load applied at theta=0 evaluated at these 4 angles 
     % and summing is the same as simulating 4 concentrated loads applied at
     % these angles evaluated at theta=0, due to superposition.
 
-    [delta_plate_dis_nondim_vec, Mr_dis_nondim_vec, ...
-                                 Mt_dis_nondim_vec] = distributed_plate_nondim(a,b,F_heave,nu,rho);
-    [delta_plate_con_nondim_vec, Mr_con_nondim_vec] = concentrated_plate_nondim(b/a,nu,theta,rho,N);
+    % distrubuted load
+    q = 1; % actually q = F_heave / (pi * (a^2-b^2)) but q=1 makes it nondimensional
+    [delta_plate_dis_nondim_vec, ... % defined as delta_dis * 2pi * D / (F_heave * a^2) evaluated at all r's
+     Mr_dis_nondim_vec, ...          % defined as Mr_dis * 2pi / F_heave evaluated at all r's
+     Mt_dis_nondim_vec, ...          % defined as Mt_dis * 2pi / F_heave evaluated at all r's
+     Q_dis_nondim_vec] ...           % defined as Q_dis * 2pi / (F_heave * a) evaluated at all r's
+                        = distributed_plate_nondim(a,b,q,nu,rho);
+
+    % concentrated load
+    [delta_plate_con_nondim_vec, ... % defined as delta_con * 2pi * D / (F_tube * a^2) for a single F_tube evaluated at 4 thetas and all r's
+     Mr_con_nondim_vec] ...          % defined as    Mr_con * 2pi / (F_tube)           for a single F_tube evaluated at 4 thetas and all r's
+                        = concentrated_plate_nondim(b/a,nu,theta,rho,N);
+    Mt_con_nondim = 0; % solutions aren't available for theta bending moment and shear for concentrated load, so assume zero
+    Q_con_nondim = 0;
 
     % use deflection at outer edge for compatibility
     delta_plate_dis_nondim = delta_plate_dis_nondim_vec(end);
     delta_plate_con_nondim = delta_plate_con_nondim_vec(end,:);
     
     % sum the four angles for concentrated solution
-    delta_plate_con_nondim = sum(delta_plate_con_nondim);
-    Mr_con_nondim = sum(Mr_con_nondim_vec,2);
+    delta_plate_con_nondim = sum(delta_plate_con_nondim); % total for four equally-spaced F_tubes
+    Mr_con_nondim = sum(Mr_con_nondim_vec,2);             % total for four equally-spaced F_tubes
 
+    % compatibility using tube stiffness (derived from equating plate and tube deflection)
+    % see notebook 7 p70 1/16/25 and notebook 9 p1 11/20/25
+    F_tube_over_F_heave = delta_plate_dis_nondim / (plate_tube_K_ratio - delta_plate_con_nondim);
+
+    % nondim moment superposition
+    Mr_con_over_F_heave = Mr_con_nondim.' * F_tube_over_F_heave; % defined as Mr_con * 2 * pi / F_heave for four equally-spaced F_tubes
+    Mr_dis_over_F_heave = Mr_dis_nondim_vec;                     % defined as Mr_dis * 2 * pi / F_heave
+    Mr_over_F_heave = Mr_con_over_F_heave + Mr_dis_over_F_heave; % defined as Mr * 2 * pi / F_heave for combined loading (dist load F_heave and four equally-spaced point loads F_tube) 
+
+    Mt_con_over_F_heave = Mt_con_nondim.' * F_tube_over_F_heave;
+    Mt_dis_over_F_heave = Mt_dis_nondim_vec;
+    Mt_over_F_heave = Mt_con_over_F_heave + Mt_dis_over_F_heave;
+
+    % nondim shear force superposition
+    Q_nondim = Q_con_nondim.' * F_tube_over_F_heave + Q_dis_nondim_vec;
+
+    % nondim displacement superposition
+    delta_over_a2Fheave_2piDeq = delta_plate_dis_nondim_vec ...
+                                + F_tube_over_F_heave * sum(delta_plate_con_nondim_vec.',1); % defined as delta * 2pi * D / (F_heave * a^2) for combined loading
+end
+
+function [plate_tube_K_ratio, h_eq_vec, y_max_vec, D_eq] = get_plate_tube_stiffness(h_stiff,num_stiffeners, ...
+                                                        rho, a, t_d, width_stiff, E, nu, ...
+                                                        D_d_tu, t_d_tu, ...
+                                                        L_dt, D_d, D_s)
     % stiffeners
     num_unique_stiffeners = length(h_stiff)/2;
     num_stiffener_repeats = num_stiffeners / num_unique_stiffeners;
@@ -154,31 +242,8 @@ function [sigma_vm,delta_max] = damping_plate_structures(F_heave, D_d, D_s,P_hyd
     I_tube = pi/64 * ( D_d_tu^4 - (D_d_tu - 2*t_d_tu)^4 );
     K_tube = 6*E*I_tube / (L_dt^2 * (D_d - D_s));
 
-    % compatbility (derived from equating plate and tube deflection)
-    F_tube = F_heave * delta_plate_dis_nondim / (D_eq/(a^2*K_tube) - delta_plate_con_nondim);
-
-    % moment superposition
-    Mr_con = Mr_con_nondim.' * F_tube;
-    Mr_dis = Mr_dis_nondim_vec * F_heave;
-    Mr = Mr_dis + Mr_con;
-
-    % displacement superposition
-    delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
-                                + F_tube * sum(delta_plate_con_nondim_vec.',1));
-    delta_max = max(abs(delta_total));
-
-    % stress
-    sigma_r_vec = get_plate_stress(Mr, y_max_vec, h_eq_vec);
-    sigma_r  = max(abs(sigma_r_vec));
-
-    sigma_vm  = sigma_r; % ignore Mt for now
-
-    if plot_on
-        plot_damping_plate(a, D_eq, F_heave, F_tube, r, ...
-            delta_plate_dis_nondim_vec, delta_plate_con_nondim_vec, ...
-            Mr_con_nondim, Mr_dis_nondim_vec, Mr, ...
-            y_max_vec, h_eq_vec, sigma_r_vec)
-    end
+    % notebook p1 11/20/25
+    plate_tube_K_ratio = D_eq*2*pi/(a^2*K_tube);
 end
 
 function [] = plot_damping_plate(r, delta_total, ...

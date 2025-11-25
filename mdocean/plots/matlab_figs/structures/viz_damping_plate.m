@@ -21,7 +21,7 @@ function  figs = viz_damping_plate()
     rho = linspace(lam,1,15);
     N = 100;
     
-    [w_nondim,Mr_nondim] = calc_plate(lam,nu,theta,rho,N);
+    [w_nondim,Mr_nondim] = concentrated_plate_nondim(lam,nu,theta,rho,N);
     
     Mr_dim = Mr_nondim * P/(2*pi);
     sigma_dim = Mr_nondim * 3/pi * P/h^2;
@@ -101,25 +101,36 @@ function f = plate_aspect_ratio_sweep(theta,a,F_heave,b_nom,N,nu)
 end
 
 function [w_nondim,Mr_nondim] = calc_plate_superposed(a,b,F_heave,nu,theta,rho,N)
-% fixme: this assumes that F_tube = F_heave/4, ie that all force goes into
-% the tubes and none goes into the bottom of the spar, which is wrong.
-% Should actually use compatibility and tube stiffness to get F_tube, as in 
-% damping_plate_structures() in structures.m.
-    lam = b/a;
-    [w_nondim_conc,Mr_nondim_conc] = calc_plate(lam,nu,theta,rho,N);
-    [w_nondim_dist,Mr_nondim_dist] = plate_distributed(a,b,F_heave,nu,rho);
-    w_nondim = w_nondim_conc   + w_nondim_dist';
-    Mr_nondim = Mr_nondim_conc + Mr_nondim_dist';
-end
+    % fixme: this assumes that F_tube = F_heave/4, ie that all force goes into
+    % the tubes and none goes into the bottom of the spar, which is wrong.
+    % Should actually use compatibility and tube stiffness to get F_tube, as in 
+    % damping_plate_structures() in structures.m.
+    %     lam = b/a;
+    %     [w_nondim_conc,Mr_nondim_conc] = calc_plate(lam,nu,theta,rho,N);
+    %     [w_nondim_dist,Mr_nondim_dist] = plate_distributed(a,b,F_heave,nu,rho);
+    %     w_nondim = w_nondim_conc   + w_nondim_dist';
+    %     Mr_nondim = Mr_nondim_conc + Mr_nondim_dist';
+    
+    vb = var_bounds();
 
-function [w_nondim,Mr_nondim,Mt_nondim] = plate_distributed(a,b,F_heave,nu,rho)
-    [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave/4,nu,rho);
-    w_nondim = -w_nondim;
-    Mr_nondim = -Mr_nondim;
-    Mt_nondim = -Mt_nondim; % different sign convention on all three outputs
-end
+    D_d = 2*a;
+    D_s = 2*b;
+    [P_hydrostatic,A_dt,theta_dt,h_d,A_c] = deal(0); % not used, so set to 0
+    t_d = vb.t_d_nom * 1e-3;
+    L_dt = (D_d - D_s) / (2*cos(theta_d_tu)); % formula copy-pasted from geometry.m
+    h_stiff     = p.h_over_h1_stiff_d * vb.h1_stiff_d;
+    width_stiff = p.w_over_h1_stiff_d * vb.h1_stiff_d;
+    
+    [sigma_vm,delta_max] = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
+                                                theta_dt, L_dt, h_d, A_c, p.E(1), nu, h_stiff, width_stiff,...
+                                                p.D_d_tu, p.t_d_tu, p.num_terms_plate, p.radial_mesh_plate, ...
+                                                p.num_stiff_d, true);
 
-function [w_nondim,Mr_nondim,abcd] = calc_plate(lam,nu,theta,rho,N)
-    [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,N);
-    w_nondim = -w_nondim; % different sign convention on w but same convention on M
+
+    [Mr_over_F_heave, ...
+          Mt_over_F_heave, ...
+          Q_nondim, ...
+          delta_over_a2Fheave_2piDeq, ...
+          F_tube_over_F_heave]     = combined_plate_nondim(rho, b, a, nu, N, plate_tube_K_ratio);
+
 end
