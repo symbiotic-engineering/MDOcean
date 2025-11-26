@@ -72,14 +72,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
  B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,...
  gamma_f_over_rho_g,gamma_s_over_rho_g,...
  gamma_phase_f,gamma_phase_s,w,...
- phase_X_f,phase_X_u]           = dynamics(in, m_f_tot, m_s_tot);
-
-%calculate revenue and avoided carbon
-revenue = P_matrix_elec * in.marginal_price;
-avoided_carbon = P_matrix_elec * in.marginal_carbon;
-net_econ_value = revenue - econ_cost;
-net_env_value = avoided_carbon - env_cost;
-contourf(Hs_mdocean, T_mdocean, price_contour)
+ phase_X_f,phase_X_u,F_heave_mat]           = dynamics(in, m_f_tot, m_s_tot);
 
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
@@ -96,12 +89,12 @@ contourf(Hs_mdocean, T_mdocean, price_contour)
                             in.FCR, in.cost_perN_mult, in.cost_perW_mult, ...
                             in.F_max, in.P_max, in.eff_array);
 
-model_grid_value = false; % override for merging
+model_grid_value = true; % override for merging
 if model_grid_value
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
                                                     gamma_phase_f, capex/in.P_max*1000, in.location);
     
-    net_eco_value = enviro(m_m, in.distance_from_shore, A_hull, ...
+    [net_eco_value, env_cost_per_wec] = enviro(m_m, in.distance_from_shore, A_hull, ...
                             CEM_CO2, CEM_wec_capacity, in.P_max, ...
                             in.eco_cost_steel, in.eco_cost_fiberglass, ...
                             in.eco_cost_distance, in.eco_cost_carbon);
@@ -109,10 +102,10 @@ else
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,net_eco_value] = deal(0);
 end
 
-
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
 J = [LCOE, J_capex_design, CEM_grid_cost, net_eco_value];
+
 
 %% Assemble constraints g(x) >= 0
 num_g = 23+numel(p.JPD)+length(p.T_struct);
@@ -230,6 +223,8 @@ if nargout > 3 % if returning extra struct output for validation
     val.w = w;
     val.phase_X_f = phase_X_f;
     val.phase_X_u = phase_X_u;
+    val.env_cost_per_wec = env_cost_per_wec;
+    val.F_heave_mat = F_heave_mat;
 end
 
 end
