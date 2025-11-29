@@ -19,7 +19,7 @@ function [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b)
         obj_opt_nom = obj_opt_nom(1:num_objs);
         flag_nom = [1 1];
     end
-    X_opt(1,:,:) = X_opt_noms;
+    X_opt(1,:,:) = X_opt_nom;
     objs(1,:) = obj_opt_nom;
     flags(1,:) = flag_nom;
     x0s(1) = b.X_start_struct;
