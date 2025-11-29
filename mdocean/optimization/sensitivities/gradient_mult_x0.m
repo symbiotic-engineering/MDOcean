@@ -13,12 +13,13 @@ function [X_opt,objs,flags,x0s,num_runs] = gradient_mult_x0(p,b)
     if ~dry_run
         [X_opt_nom, obj_opt_nom, flag_nom] = gradient_optim(b.X_start_struct,p,b);
     else
-        X_opt_nom = [b.X_noms; 1];
-        obj_opt_nom = simulation(X_opt_nom,p);
+        X_opt_nom_1obj = [b.X_noms; 1];
+        X_opt_nom = [X_opt_nom_1obj X_opt_nom_1obj];
+        obj_opt_nom = simulation(X_opt_nom_1obj,p);
         obj_opt_nom = obj_opt_nom(1:num_objs);
         flag_nom = [1 1];
     end
-    X_opt(1,:,:) = [X_opt_nom X_opt_nom];
+    X_opt(1,:,:) = X_opt_noms;
     objs(1,:) = obj_opt_nom;
     flags(1,:) = flag_nom;
     x0s(1) = b.X_start_struct;
