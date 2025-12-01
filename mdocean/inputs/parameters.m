@@ -39,7 +39,7 @@ end
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
 % jpd_full = trim_jpd(readmatrix(file,'Range','A3'));
 mat = readmatrix('RM3-CBS.xlsx','Range','D23:S37','Sheet','Performance & Economics');
-mat(2,end) = eps;
+mat(2,end) = min(mat(mat>0))/10;
 jpd_full = trim_jpd(mat);
 jpd_Hs =  jpd_full(2:end,1);
 jpd = jpd_full(2:end,2:end)/sum(jpd_full(2:end,2:end),'all')*100;
@@ -49,17 +49,24 @@ g = 9.8;
 spar_exc = get_spar_exc(g);
 
 %read in wave height and period data from csv created in timeseries.py
-addpath(genpath('..\WEC-DECIDER\modules\CEM'));
+addpath(genpath('..\..\WEC-DECIDER\modules\CEM'));
 data = readtable("hs_and_t.csv");
 Hs_hourly = data.Hs_hourly;
 T_hourly = data.T_hourly;
-price_interpolated_temp = 50*rand(1,8760)+75;
+price_interpolated_temp = 50*rand(1,8760)+75; % 75-125 $/MWh
+price_interpolated_temp = price_interpolated_temp / 1000; % convert to $/kWh
 emissions = readtable('emissions.csv').Var5(3:end);
 emissions = repmat(emissions,18,1);
 emissions = [emissions; emissions(1:120)];
-carbon_interpolated_temp = emissions / 1000; %converting tons to kg
-ploton = false;
-[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp,ploton);
+%carbon_interpolated_temp = emissions / 1000; %converting tons to kg
+%ploton = false;
+%[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp,ploton);
+carbon_interpolated_temp = emissions * 1000; %converting tons to kg
+grid_energy_timeseries = 1000 * ones(8760,1); % MWh (typical 1000 MWh)
+grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
+carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg to kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
+[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price_interpolated_temp);
+price_contour(~isfinite(price_contour)) = 0;
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};
 types = {'string','string',     'cell', 'string',   'logical','string',     'cell'};
@@ -232,9 +239,9 @@ T = [T;
     ...
     ...% carbon and price
     table("marginal_carbon","carbon",{carbon_contour}," ",false,... 
-        "marginal carbon",{''});
+        "marginal carbon",{'kgCO2/kWh'});
     table("marginal_price","price",{price_contour}," ",false,... 
-        "marginal price",{''});
+        "marginal price",{'$/kWh'});
     ];
 
 T.Properties.VariableNames = cols;
