@@ -10,7 +10,7 @@ X = [b.X_noms;1];
 %% power/energy
 % power
 P_weighted = P_matrix_elec .* p.JPD / 100 * in.eff_array; % taken from dynamics.m and LCOE_from_capex_design_power.m
-P_avg = sum(P_weighted,'all','omitnan');
+P_avg = mysum(P_weighted);
 
 % annual energy
 hr_per_yr = 8766;
@@ -20,7 +20,7 @@ AEP = P_avg * in.N_WEC * hr_per_yr / 1000; % kWh per year
 %% force for scaling
 %scale the cost by the amount of steel needed at a given sea state
 %capex equals the sum of the entries of capex_matrix
-factor = 1./sum(val.F_heave_mat,'all','omitnan');
+factor = 1./mysum(val.F_heave_mat);
 force_matrix = val.F_heave_mat.*factor;
 
 %% econ
@@ -43,9 +43,6 @@ levelized_value_matrix = AEP_matrix .* p.marginal_price; % kWh per year * $/kWh 
 % lcoe check
 assert(ismembertol(val.LCOE,LCOE));
 
-% final var renaming
-econ_cost = LCOE_matrix;
-econ_value = LVOE_matrix; 
 
 %% enviro
 
