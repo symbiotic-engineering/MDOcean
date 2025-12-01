@@ -58,7 +58,8 @@ emissions = readtable('emissions.csv').Var5(3:end);
 emissions = repmat(emissions,18,1);
 emissions = [emissions; emissions(1:120)];
 carbon_interpolated_temp = emissions / 1000; %converting tons to kg
-[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp);
+ploton = false;
+[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp,ploton);
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};
 types = {'string','string',     'cell', 'string',   'logical','string',     'cell'};
