@@ -3,8 +3,8 @@ classdef (Abstract) GenericAnalysis
     %   Handles saving and loading of intermediate results, figures, and tables.
 
     properties
-        p = parameters();
-        b = var_bounds();
+        p
+        b
         fig_array
         tab_array_display
         tab_array_latex
@@ -42,9 +42,13 @@ classdef (Abstract) GenericAnalysis
             end
             if nargin > 0
                 obj.p = p;
+            else
+                obj.p = parameters();
             end
             if nargin > 1
                 obj.b = b;
+            else
+                obj.b = var_bounds();
             end
             
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};

@@ -118,4 +118,34 @@ tabs_in_RE{6} = 'LocationSensitivity.location_sensitivity';
 empty = cellfun(@isempty,[figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR]);
 assert(~any(empty))
 
+% check that names all appear in the corresponding analysis class
+figs_split = split([figs_in_AOR,figs_in_RE].', '.');
+tabs_split = split([tabs_in_AOR,tabs_in_RE].', '.');
+figs_classes = figs_split(:,1);
+tabs_classes = tabs_split(:,1);
+for i=1:length(figs_classes)
+    class_name = figs_classes{i};
+    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+    this_fig_name = figs_split(i,2);
+    valid = ismember(this_fig_name,all_fig_names_this_class);
+    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
+    end
+end
+for i=1:length(tabs_classes)
+    class_name = tabs_classes{i};
+    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+    this_tab_name = tabs_split(i,2);
+    valid = ismember(this_tab_name,all_tab_names_this_class);
+    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
+    end
+end
+
 end

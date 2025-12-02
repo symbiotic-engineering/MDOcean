@@ -48,9 +48,11 @@ function [FOS1Y, FOS2Y, FOS3Y, FOS_spar_local] = structures_one_case(...
                                         P_hydrostatic, sigma_max, nu);
 
     %% Damping plate
+    plot_on = false;
     radial_stress_damping_plate = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff_d,w_stiff_d, ...
-                                            D_d_tu, t_d_tu, num_terms_plate, radial_mesh_plate, num_stiff_d);
+                                            D_d_tu, t_d_tu, num_terms_plate, radial_mesh_plate, ...
+                                            num_stiff_d, plot_on);
 
     %% Factor of Safety (FOS) Calculations
     FOS1Y = sigma_max / sigma_float_bot;
@@ -107,16 +109,21 @@ function [FOS_spar, FOS_spar_local] = spar_combined_buckling(F, E, I, L, D, A, t
     FOS_spar_local = 3; % fixme: need to implement
 end
 
-function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
+function [sigma_vm,delta_max] = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
                                             theta_dt,L_dt,h_d,A_c,E,nu, h_stiff,width_stiff,...
-                                            D_d_tu, t_d_tu, N, radial_mesh_plate, num_stiffeners)
+                                            D_d_tu, t_d_tu, N, radial_mesh_plate, ...
+                                            num_stiffeners, plot_on)
     
     a = D_d/2;
     b = D_s/2;
 
     % nondimensional annular plate solutions
     rho = linspace(b/a, 1, radial_mesh_plate); % evaluate at these radial points
-    theta = [0 pi/2 pi 3*pi/2]; % evaluate at these angles
+    theta = [0 pi/2 pi 3*pi/2]; % evaluate at these angles - simulating a 
+    % single concentrated load applied at theta=0 evaluated at these 4 angles 
+    % and summing is the same as simulating 4 concentrated loads applied at
+    % these angles evaluated at theta=0, due to superposition.
+
     [delta_plate_dis_nondim_vec, Mr_dis_nondim_vec, ...
                                  Mt_dis_nondim_vec] = distributed_plate_nondim(a,b,F_heave,nu,rho);
     [delta_plate_con_nondim_vec, Mr_con_nondim_vec] = concentrated_plate_nondim(b/a,nu,theta,rho,N);
@@ -155,230 +162,60 @@ function sigma_vm = damping_plate_structures(F_heave, D_d, D_s,P_hydrostatic,t_d
     Mr_dis = Mr_dis_nondim_vec * F_heave;
     Mr = Mr_dis + Mr_con;
 
+    % displacement superposition
+    delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
+                                + F_tube * sum(delta_plate_con_nondim_vec.',1));
+    delta_max = max(abs(delta_total));
+
     % stress
     sigma_r_vec = get_plate_stress(Mr, y_max_vec, h_eq_vec);
     sigma_r  = max(abs(sigma_r_vec));
 
     sigma_vm  = sigma_r; % ignore Mt for now
 
-    plot_on = false;
     if plot_on
-        delta_total = a^2/D_eq * (F_heave * delta_plate_dis_nondim_vec ...
-                                + F_tube * sum(delta_plate_con_nondim_vec.',1));
-    
-        figure
-        plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
-        hold on
-        plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
-        plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
-        legend
-        xlabel('r')
-        ylabel('Moment')
-        improvePlot
-    
-        figure
-        plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
-        hold on
-        plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
-        plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
-        plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
-        legend
-        xlabel('r')
-        ylabel('Deflection')
-        improvePlot
-    
-        figure
-        plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
-        hold on
-        plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
-        plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
-        legend
-        xlabel('r')
-        ylabel('Normalized Quantity')
-        improvePlot
+        plot_damping_plate(a, D_eq, F_heave, F_tube, r, ...
+            delta_plate_dis_nondim_vec, delta_plate_con_nondim_vec, ...
+            Mr_con_nondim, Mr_dis_nondim_vec, Mr, ...
+            y_max_vec, h_eq_vec, sigma_r_vec)
     end
-
 end
 
-function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a,b,F_heave,nu,rho)
-    A = pi*a^2;
-    q = F_heave/A;
-    P = F_heave;
-    v = nu;
-    r = rho*a;
-    r0 = b;
-
-    C2 = 1/4*(1-(b/a)^2*(1+2*log(a/b)));
-    C3 = b/4/a*(((b/a)^2+1)*log(a/b)+(b/a)^2-1);
-    C8 = 1/2*(1+v+(1-v)*(b/a)^2);
-    C9 = b/a*((1+v)/2*log(a/b)+(1-v)/4*(1-(b/a)^2));
-    %L3 = r0/4/a*(((r0/a)^2+1)*log(a/r0)+(r0/a)^2-1); % for case 1L
-    %L9 = r0/a*((1+v)/2*log(a/r0)+(1-v)/4*(1-(r0/a)^2)); % for case 1L
-    L11 = 1/64*(1+4*(r0/a)^2-5*(r0/a)^4-4*(r0/a)^2*(2+(r0/a)^2)*log(a/r0)); % for end deflection only
-    L17 = 1/4*(1-(1-v)/4*(1-(r0/a)^4)-(r0/a)^2*(1+(1+v)*log(a/r0)));
-    F2 = 1/4 * (1 - (b./r).^2.*(1+2*log(r/b)));
-    F3 = b./(4*r) .* ( ( (b./r).^2 + 1 ).*log(r/b) + (b./r).^2 - 1);
-    F8 = 1/2 * (1+v+(1-v)*(b./r).^2);
-    F9 = b./r .* (1/2*(1+v)*(log(r/b)) + 1/4*(1-v)*(1-(b./r).^2));
-
-    bracket = zeros(size(r));
-    bracket(r > r0) = 1;
-
-    ratio = r0./r;
-    G11 = 1/64 * (1 + 4*ratio.^2 - 5*ratio.^4 - 4*ratio.^2.*(2+ratio.^2).*log(1./ratio) ) .* bracket;
-    G17 = 1/4 * (1 - ((1-v)/4)*(1-ratio.^4) - (ratio).^2.*(1+(1+v)*log(1./ratio))) .* bracket;
-
-    Mrb = -q*a^2/C8 * (C9*(a^2-r0^2)/(2*a*b) - L17);
-    Qb = q/2/b * (a^2 - r0^2);
-    E = 0;% fixme - only needed for Mt
-    D = 0; % fixme E*h^3/12/(1-v^2); - only needed for Mt
-
-    y_over_D = Mrb * r.^2 .* F2 ...
-              + Qb * r.^3 .* F3 ...
-              - q  * r.^4 .* G11;
-    w_nondim = y_over_D * 2*pi/(P*a^2);
-    tilt_angle = 0; % fixme use equation for theta on p463
-
-    Mr = Mrb*F8 + Qb*r.*F9 - q*r.^2.*G17;
-    Mt = tilt_angle*D*(1-nu^2)./r + nu*Mr;
-
-    Mr_nondim = Mr * 2*pi/P;
-    Mt_nondim = Mt * 2*pi/P;
-
-    % use sign convention that positive F_heave results in positive
-    % deflection at outer end and positive moment at inner end
-    w_nondim = -w_nondim;
-    Mr_nondim = -Mr_nondim;
-    Mt_nondim = -Mt_nondim;
-end
-
-function [w_nondim,Mr_nondim,abcd] = concentrated_plate_nondim(lam,nu,theta,rho,N)
-% Boedo and Prantil 1998: corrected solution of clamped ring plate with edge point load
-% https://ascelibrary.org/doi/epdf/10.1061/%28ASCE%290733-9399%281998%29124%3A6%28696%29
-
-    % lam: aspect ratio: b/a = inner radius/outer radius
-    % nu: poisson ratio
-    % theta: angular coordinate
-    % rho: nondim radial coordinate
-    % N: number of terms to compute in infinite sum
-
-    assert(isscalar(lam))
-    assert(isscalar(nu))
-    assert(isscalar(N))
-    % vector inputs only allowed for theta and rho
-
-    [RHO,n] = meshgrid(rho,2:N);
-    d0 = -1/4;
-    c0_num = (1 + 2*log(lam)) * (1+nu) - (3+nu);
-    c0_den = lam^(-1)*(1+nu) + lam*(1-nu);
-    c0 = lam/4 * c0_num / c0_den;
-    b0 = c0/2 * (1-nu)/(1+nu) + (3+nu)/(8*(1+nu));
-    a0 = -lam^2*b0 - c0*log(lam) - d0*lam^2*log(lam);
+function [] = plot_damping_plate(r, delta_total, ...
+            delta_plate_dis_nondim_vec, delta_plate_con_nondim_vec, ...
+            Mr_con_nondim, Mr_dis_nondim_vec, Mr, ...
+            y_max_vec, h_eq_vec, sigma_r_vec)
     
-    d1 = 1/2;
-    b1 = -1/4 * (1+nu+lam^2*(1-nu)) / (3+nu+lam^4*(1-nu));
-    c1 = -b1*(3+nu)/(1-nu) - 1/4 * (1+nu)/(1-nu);
-    a1 = -b1*lam^2 - c1*lam^(-2) - d1*log(lam);
-    
-    A = (3+nu)/(1-nu);
-    B = (1-lam^2)^2 * (n.^2-1) + (lam.^(-2*n+2)+A) .* (lam.^(2*n+2)+A);
-    
-    dn_num = (1-lam^2)*(n-1) + lam.^( 2*n+2) + A;
-    bn_num = (1-lam^2)*(n+1) - lam.^(-2*n+2) - A;
-    dn_denom = B.*n.*(n-1)*(1-nu);
-    bn_denom = B.*n.*(n+1)*(1-nu);
-    dn = -dn_num ./ dn_denom;
-    bn =  bn_num ./ bn_denom;
-    an = -lam^2 * (bn .* (n+1)./n + dn .* lam.^(-2*n)./n);
-    cn = -lam^2 * (dn .* (n-1)./n - bn .* lam.^( 2*n)./n);
-    
-    if length(rho)==1
-    abcd  = [a0 b0 c0 d0;
-             a1 b1 c1 d1;
-             an bn cn dn];
-    end
-    
-    Rho_zero_terms = a0 + b0 * rho.^2 + c0 * log(rho) + d0 * rho.^2 .* log(rho);
-    Rho_one_terms = a1*rho + b1 * rho.^3 + c1 * rho.^(-1) + d1 * rho .* log(rho);
-
-    
-    Rho_two_to_N_terms = an .* RHO.^n + bn .* RHO.^(n+2) + cn .* RHO.^(-n) + dn .* RHO.^(-n+2);
-    
-    w_nondim = Rho_zero_terms' + Rho_one_terms' * cos(theta) + Rho_two_to_N_terms' * cos(n(:,1)*theta);
-    
-    e0_d0_coeff = 3 + nu + 2*(1+nu)*log(rho);
-    e0 = 2*b0*(1+nu) - c0*rho.^-2*(1-nu) + d0*(e0_d0_coeff);
-    e1 = 2*b1*rho*(3+nu) + 2*c1*rho.^-3*(1-nu) + d1*rho.^-1*(1+nu);
-    
-    en_a_term = an .* RHO.^(n-2) .* n .* (n-1) * (1 - nu);
-    en_b_term = bn .* RHO.^n .* (n+1) .* (n + 2 - nu*(n-2));
-    en_c_term = cn .* RHO.^(-n-2) .* n .* (n+1) * (1-nu);
-    en_d_term = dn .* RHO.^-n .* (n-1) .* (n-2 - nu*(n+2));
-    en = en_a_term + en_b_term + en_c_term + en_d_term;
-    Mr_nondim = e0' + e1'*cos(theta) + en'*cos(n(:,1)*theta);
-
-    % use sign convention that positive input force results in negative
-    % deflection at outer end and negative moment at inner end
-    w_nondim = -w_nondim;
-    Mr_nondim = -Mr_nondim;
-end
-
-function sigma_vm = damping_plate_structures_old(F_heave, D_d, D_s,P_hydrostatic,t_d,A_dt,...
-                                            theta_dt,L_dt,h_d,A_c,E)
-    %% Stress calculations
-
-
-    % calculate the deflection of the damping plate
-    r = D_d/2;
-    r_bending = r-(D_s/2);
-
-    x = linspace(0,r_bending-0.01,1500);
-    x1 = linspace(0,r-t_d,1500);
-
-    [sigma_xx,shear,sigma_bending,...
-     sigma_axial,M_x,I_x,F_water,...
-     F_support,y] = damping_plate_func(E,D_d,A_dt,theta_dt,L_dt,h_d,D_s,h_d - t_d,...
-                                          A_c(1),A_c(2),A_c(3),...
-                                          P_hydrostatic,P_hydrostatic,P_hydrostatic,...
-                                          x,x1,F_heave);
-    [y_tip_Roark,l1,l2] = Roark_func(r-0.01,D_s/2,D_d/2,F_support*sin(theta_dt),...
-                                    t_d,E,F_water/r_bending,D_s,0.26);
-
-    %plots for debugging
     figure
+    plot(r,Mr_con_nondim,'DisplayName','Mr con nondim')
     hold on
-    %plot(x,M_x,'DisplayName','M')
-    plot(x,I_x,'DisplayName','I')
-    %plot(x, sigma_xx,'DisplayName','bending')
-    %plot(x, sigma_axial,'DisplayName','axial')
-    %plot(x,y)
+    plot(r,Mr_dis_nondim_vec,'DisplayName','Mr dis nondim')
+    plot(r,Mr/max(abs(Mr)),'DisplayName','Mr normalized')
     legend
-    hold off
+    xlabel('r')
+    ylabel('Moment')
+    improvePlot
 
-    %sigma_surge = F_surge ./ A_lat_sub;
-    %sigma_rr = P_hydrostatic + sigma_surge;     % radial compression
-    %sigma_tt = 0;%P_hydrostatic .* r_over_t;       % hoop stress
-    sigma_zz = F_heave ./ A_c(3);                  % axial compression
-    %sigma_rt = sigma_surge;                     % shear
+    figure
+    plot(r,delta_plate_dis_nondim_vec,'DisplayName','delta dis nondim')
+    hold on
+    plot(r,delta_plate_con_nondim_vec(:,1),'DisplayName','delta con nondim: theta=0')
+    plot(r,sum(delta_plate_con_nondim_vec,2),'DisplayName','delta con nondim: sum all 4 theta')
+    plot(r,delta_total/max(abs(delta_total)),'DisplayName','delta total normalized')
+    legend
+    xlabel('r')
+    ylabel('Deflection')
+    improvePlot
 
-    sigma_rr = max(abs(sigma_xx));
-    sigma_tt = 0;
-    sigma_zz = sigma_zz + P_hydrostatic;
-    sigma_rt = max(abs(shear));
-    sigma_tz = 0;
-    sigma_zr = 0;
-
-    
-    % uncomment for debugging
-    %     sigma = zeros(3,3,3);
-    %     for j=1:3
-    %     sigma(:,:,j) = [sigma_rr(j) sigma_rt(j) sigma_zr(j);
-    %                     sigma_rt(j) sigma_tt(j) sigma_tz(j);
-    %                     sigma_zr(j) sigma_tz(j) sigma_zz(j)];
-    %     end
-
-    % assume ductile material for now - need to use mohr's circle for concrete
-    sigma_vm = von_mises(sigma_rr, sigma_tt, sigma_zz, sigma_rt, sigma_tz, sigma_zr);
+    figure
+    plot(r,y_max_vec/max(y_max_vec),'DisplayName','y max normalized')
+    hold on
+    plot(r,h_eq_vec/max(h_eq_vec),'DisplayName','h eq normalized')
+    plot(r,sigma_r_vec/sigma_r,'DisplayName','sigma r normalized')
+    legend
+    xlabel('r')
+    ylabel('Normalized Quantity')
+    improvePlot
 
 end
 
