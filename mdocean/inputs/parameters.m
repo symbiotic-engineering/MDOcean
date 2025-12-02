@@ -55,13 +55,33 @@ Hs_hourly = data.Hs_hourly;
 T_hourly = data.T_hourly;
 price_interpolated_temp = 50*rand(1,8760)+75; % 75-125 $/MWh
 price_interpolated_temp = price_interpolated_temp / 1000; % convert to $/kWh
-emissions = readtable('emissions.csv').Var5(3:end);
-emissions = repmat(emissions,18,1);
-emissions = [emissions; emissions(1:120)];
-carbon_interpolated_temp = emissions * 1000; %converting tons to kg
-grid_energy_timeseries = 1000 * ones(8760,1); % MWh (typical 1000 MWh)
-grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
-carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg to kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
+
+placeholder_emissions = false;
+if placeholder_emissions
+    emissions = readtable('emissions.csv').Var5(3:end);
+    emissions = repmat(emissions,18,1);
+    emissions = [emissions; emissions(1:120)];
+    carbon_interpolated_temp = emissions * 1000; %converting tons to kg
+    grid_energy_timeseries = 1000 * ones(8760,1); % MWh (typical 1000 MWh)
+    grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
+    carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg to kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
+else
+    carbon_data = readmatrix('emissions_per_power.csv','NumHeaderLines',3,'VariableNamesLine',1);
+    marginal_data = readtable('thermal_marginal.csv');
+    carbon_intensity = NaN([480 1]);
+    for t=1:480
+        marg_gens_this_t = marginal_data.gen(marginal_data.time==t);
+        if isempty(marg_gens_this_t)
+            carbon_intensity(t) = 0;
+        else
+            carbon_intensities = carbon_data(t,marg_gens_this_t);
+            carbon_intensity(t) = max(carbon_intensities);
+        end
+    end
+    carbon_intensity = repmat(carbon_intensity,18,1);
+    carbon_intensity = [carbon_intensity; carbon_intensity(1:120)];
+end
+
 [carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price_interpolated_temp);
 price_contour(~isfinite(price_contour)) = 0;
 
