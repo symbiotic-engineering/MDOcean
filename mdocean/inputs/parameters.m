@@ -81,10 +81,10 @@ else
     carbon_intensity = repmat(carbon_intensity,18,1);
     carbon_intensity = [carbon_intensity; carbon_intensity(1:120)];
 end
-
+%ploton = false;
+%[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp,ploton);
 [carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price_interpolated_temp);
 price_contour(~isfinite(price_contour)) = 0;
-
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};
 types = {'string','string',     'cell', 'string',   'logical','string',     'cell'};
