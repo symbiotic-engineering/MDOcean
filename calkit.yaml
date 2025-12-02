@@ -1430,17 +1430,18 @@ pipeline:
     #   inputs: 
     #     - mdocean/
     move-results:
-      kind: matlab-script
+      kind: matlab-command
       environment: _system
       inputs:
         - results/
         - mdocean/plots/fig_tab_pub_mapping.m
+        - mdocean/plots/move_results_to_pubs.m
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      script_path: mdocean/plots/move_results_to_pubs.m
+      command: add_mdocean_path(); move_results_to_pubs();
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
