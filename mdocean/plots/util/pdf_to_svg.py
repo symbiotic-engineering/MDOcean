@@ -3,7 +3,7 @@ import sys
 import os
 import glob
 
-# example to call this script: python mdocean/plots/util/pdf_to_svg.py pubs/ezra_seminar_slides/figs/N2_diagram
+# example to call this script: python mdocean/plots/util/pdf_to_svg.py pubs/ezra_seminar_slides/figs/pdf/ pubs/ezra_seminar_slides/figs/svg/
 
 def pdf_to_svg(folder_in,folder_out):
     files_in = glob.glob(folder_in + '*.pdf')
