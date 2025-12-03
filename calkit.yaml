@@ -1,6 +1,6 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize
+description: Multidisciplinary Design Optimization (MDO) to optimize 
   an ocean wave energy converter (WEC).
 environments:
   tex:
@@ -14,26 +14,28 @@ pipeline:
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=AllFigCompare; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
-      outputs: 
+      outputs:
         - results/AllFigCompare/intermed.mat
     postpro-AllFigCompare:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=AllFigCompare; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - results/AllFigCompare/intermed.mat
-      outputs: 
+      outputs:
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/end.mat
     analysis-Comparison:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Comparison; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -84,13 +86,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/Comparison/intermed.mat
     postpro-Comparison:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Comparison; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Comparison; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/plots/matlab_figs/compare.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -125,7 +128,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
         - results/Comparison/intermed.mat
-      outputs: 
+      outputs:
         - results/Comparison/overlaid_geometry.pdf
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
@@ -136,56 +139,60 @@ pipeline:
     analysis-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=Constraints; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/plots/util/remove_underscores.m
-      outputs: 
+      outputs:
         - results/Constraints/intermed.mat
     postpro-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Constraints; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Constraints/Constraints.m
         - results/Constraints/intermed.mat
-      outputs: 
+      outputs:
         - results/Constraints/constraints.tex
         - results/Constraints/end.mat
     analysis-Cost:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Cost/Cost.m
-      outputs: 
+      outputs:
         - results/Cost/intermed.mat
     postpro-Cost:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_all_from_load();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Cost/Cost.m
         - results/Cost/intermed.mat
-      outputs: 
+      outputs:
         - results/Cost/cost_parameters.tex
         - results/Cost/end.mat
     analysis-DampingPlateStructures:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DampingPlateStructures; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=DampingPlateStructures; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
-      outputs: 
+      outputs:
         - results/DampingPlateStructures/intermed.mat
     postpro-DampingPlateStructures:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DampingPlateStructures; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DampingPlateStructures; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - results/DampingPlateStructures/intermed.mat
-      outputs: 
+      outputs:
         - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
         - results/DampingPlateStructures/damping_plate_deflection.pdf
         - results/DampingPlateStructures/damping_plate_moment.pdf
@@ -194,28 +201,30 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DescFcns; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/plots/matlab_figs/sin_desc_fcn_demo.m
         - ./mdocean/plots/util/improvePlot.m
-      outputs: 
+      outputs:
         - results/DescFcns/intermed.mat
     postpro-DescFcns:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DescFcns; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DescFcns; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - results/DescFcns/intermed.mat
-      outputs: 
+      outputs:
         - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/saturation_desc_fcn.pdf
         - results/DescFcns/end.mat
     analysis-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignSpaceExploration; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignSpaceExploration; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
@@ -281,13 +290,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/DesignSpaceExploration/intermed.mat
     postpro-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignSpaceExploration; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignSpaceExploration; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -338,7 +348,7 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
         - results/DesignSpaceExploration/intermed.mat
-      outputs: 
+      outputs:
         - results/DesignSpaceExploration/experiments_pareto.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_results.tex
@@ -347,25 +357,27 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DesignVars; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@DesignVars/DesignVars.m
-      outputs: 
+      outputs:
         - results/DesignVars/intermed.mat
     postpro-DesignVars:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignVars; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignVars; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - results/DesignVars/intermed.mat
-      outputs: 
+      outputs:
         - results/DesignVars/design_vars.tex
         - results/DesignVars/end.mat
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ForceSaturationFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -409,24 +421,26 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/ForceSaturationFigFunc/intermed.mat
     postpro-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ForceSaturationFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - results/ForceSaturationFigFunc/intermed.mat
-      outputs: 
+      outputs:
         - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/end.mat
     analysis-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=GradientOptimFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=GradientOptimFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -475,13 +489,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/GradientOptimFigFunc/intermed.mat
     postpro-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=GradientOptimFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=GradientOptimFigFunc; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -537,7 +552,7 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
         - results/GradientOptimFigFunc/intermed.mat
-      outputs: 
+      outputs:
         - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
         - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
         - results/GradientOptimFigFunc/lagrange_multipliers.pdf
@@ -548,8 +563,9 @@ pipeline:
     analysis-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=HydroCoeffFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -568,23 +584,25 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/HydroCoeffFigFunc/intermed.mat
     postpro-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=HydroCoeffFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - results/HydroCoeffFigFunc/intermed.mat
-      outputs: 
+      outputs:
         - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/end.mat
     analysis-LocationSensitivity:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=LocationSensitivity; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -638,13 +656,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/LocationSensitivity/intermed.mat
     postpro-LocationSensitivity:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=LocationSensitivity; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/optimization/sensitivities/location_post_process.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -677,7 +696,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
         - results/LocationSensitivity/intermed.mat
-      outputs: 
+      outputs:
         - results/LocationSensitivity/location_1_power_matrix.pdf
         - results/LocationSensitivity/location_2_power_matrix.pdf
         - results/LocationSensitivity/location_3_power_matrix.pdf
@@ -689,7 +708,7 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/plots/matlab_figs/b_inf_numeric.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -700,16 +719,16 @@ pipeline:
         - ./mdocean/simulation/modules/hydro/generated/A_b_c_matrix_N10_M10_K10_heaving_outer.m
         - ./mdocean/simulation/modules/hydro/run_MEEM.m
         - ./mdocean/simulation/run/validate_MEEM.m
-      outputs: 
+      outputs:
         - results/Meem/intermed.mat
     postpro-Meem:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_all_from_load();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Meem/Meem.m
         - results/Meem/intermed.mat
-      outputs: 
+      outputs:
         - results/Meem/meem_regions.pdf
         - results/Meem/meem_sparsity.pdf
         - results/Meem/meem_validation.pdf
@@ -721,7 +740,7 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Multistart; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -773,13 +792,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/Multistart/intermed.mat
     postpro-Multistart:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Multistart; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Multistart; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/SAFE/PAWN/pawn_cdfs.m
         - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
         - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -818,7 +838,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
         - results/Multistart/intermed.mat
-      outputs: 
+      outputs:
         - results/Multistart/multistart_convergence_tree.pdf
         - results/Multistart/multistart_parallel_coordinates.pdf
         - results/Multistart/multistart_bar_chart.pdf
@@ -827,8 +847,9 @@ pipeline:
     analysis-ParamSensitivities:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParamSensitivities; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -880,13 +901,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/ParamSensitivities/intermed.mat
     postpro-ParamSensitivities:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParamSensitivities; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/plots/matlab_figs/all_sens_plots.m
         - ./mdocean/plots/matlab_figs/global_sens_plots.m
@@ -895,7 +917,7 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - results/ParamSensitivities/intermed.mat
-      outputs: 
+      outputs:
         - results/ParamSensitivities/re_optim_constraint_grid.pdf
         - results/ParamSensitivities/post_optim_constraint_grid.pdf
         - results/ParamSensitivities/re_optim_design_grid.pdf
@@ -925,7 +947,7 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Parameters; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -936,23 +958,25 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/Parameters/intermed.mat
     postpro-Parameters:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Parameters; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Parameters; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Parameters/Parameters.m
         - results/Parameters/intermed.mat
-      outputs: 
+      outputs:
         - results/Parameters/parameters.tex
         - results/Parameters/end.mat
     analysis-ParetoFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -1006,13 +1030,14 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/ParetoFigFunc/intermed.mat
     postpro-ParetoFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -1062,7 +1087,7 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
         - results/ParetoFigFunc/intermed.mat
-      outputs: 
+      outputs:
         - results/ParetoFigFunc/pareto_front_with_design_images.pdf
         - results/ParetoFigFunc/pareto_front_LCOE_contours.pdf
         - results/ParetoFigFunc/pareto_heuristics.pdf
@@ -1072,37 +1097,41 @@ pipeline:
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
-      outputs: 
+      outputs:
         - results/ParetoSweep/intermed.mat
     postpro-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - results/ParetoSweep/intermed.mat
-      outputs: 
+      outputs:
         - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/end.mat
     analysis-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ReadNonMatlabFigs; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
-      outputs: 
+      outputs:
         - results/ReadNonMatlabFigs/intermed.mat
     postpro-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ReadNonMatlabFigs; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - results/ReadNonMatlabFigs/intermed.mat
-      outputs: 
+      outputs:
         - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
         - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
         - results/ReadNonMatlabFigs/dimensions.pdf
@@ -1122,8 +1151,9 @@ pipeline:
     analysis-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=RunSingleFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -1178,16 +1208,17 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/RunSingleFigFunc/intermed.mat
     postpro-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=RunSingleFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - results/RunSingleFigFunc/intermed.mat
-      outputs: 
+      outputs:
         - results/RunSingleFigFunc/nominal_geometry_viz.pdf
         - results/RunSingleFigFunc/nominal_power_pdf.pdf
         - results/RunSingleFigFunc/nominal_power_matrix.pdf
@@ -1198,7 +1229,7 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Runtime; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
         - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
@@ -1232,16 +1263,17 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Runtime/intermed.mat
     postpro-Runtime:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Runtime; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Runtime; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Runtime/Runtime.m
         - results/Runtime/intermed.mat
-      outputs: 
+      outputs:
         - results/Runtime/dynamics_runtime.pdf
         - results/Runtime/hydro_runtime.pdf
         - results/Runtime/sim_runtime.pdf
@@ -1250,48 +1282,50 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Slamming; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/plots/matlab_figs/slam_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/improvePlot.m
-      outputs: 
+      outputs:
         - results/Slamming/intermed.mat
     postpro-Slamming:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Slamming; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Slamming; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Slamming/Slamming.m
         - results/Slamming/intermed.mat
-      outputs: 
+      outputs:
         - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/end.mat
     analysis-SparHydro:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=SparHydro; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/plots/matlab_figs/spar_hydro_plot.m
         - ./mdocean/plots/util/improvePlot.m
-      outputs: 
+      outputs:
         - results/SparHydro/intermed.mat
     postpro-SparHydro:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=SparHydro; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=SparHydro; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - results/SparHydro/intermed.mat
-      outputs: 
+      outputs:
         - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/end.mat
     analysis-Validation:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Validation; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -1339,18 +1373,19 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/Validation/intermed.mat
     postpro-Validation:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Validation; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Validation; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/plots/util/modify_suffix.m
         - ./mdocean/plots/util/remove_underscores.m
         - results/Validation/intermed.mat
-      outputs: 
+      outputs:
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/validation.tex
         - results/Validation/end.mat
@@ -1358,7 +1393,7 @@ pipeline:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Wecsim; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -1366,7 +1401,8 @@ pipeline:
         - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
         - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
         - ./mdocean/inputs/var_bounds.m
-        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave Resource _SAM CSV.csv
+        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
+          Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1406,16 +1442,17 @@ pipeline:
         - ./WEC-Sim/source/functions/BEMIO/addDefaultPlotVars.m
         - ./WEC-Sim/source/functions/BEMIO/normalizeBEM.m
         - ./WEC-Sim/source/functions/BEMIO/readWAMIT.m
-      outputs: 
+      outputs:
         - results/Wecsim/intermed.mat
     postpro-Wecsim:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Wecsim; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Wecsim; 
+        obj.run_all_from_load();
+      inputs:
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - results/Wecsim/intermed.mat
-      outputs: 
+      outputs:
         - results/Wecsim/WECSim_error_histograms_singlebody.pdf
         - results/Wecsim/WECSim_error_histograms_multibody.pdf
         - results/Wecsim/wecsim_all_sea_states.pdf
@@ -1458,9 +1495,9 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
-          storage: null
+          storage:
         - path: pubs/renewable-energy-mdo/aux/
-          storage: null
+          storage:
           delete_before_run: false
     build-AOR-paper:
       kind: latex
@@ -1479,19 +1516,22 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
-          storage: null
+          storage:
         - path: pubs/applied-ocean-research-model/aux/
-          storage: null
+          storage:
           delete_before_run: false
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
-    description: Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters
+    description: Development, Validation, and Benchmarking of a 
+      Multidisciplinary Semi-Analytical Model for Wave Energy 
+      Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
     title: Optimization - Journal (Renewable Energy)
-    description: Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability
+    description: Leveraging Multidisciplinary Design Optimization to 
+      Advance Wave Energy Converter Viability
     kind: journal-article
     stage: build-RE-paper
     overleaf:
@@ -1510,7 +1550,8 @@ publications:
       last_sync_commit: c50eec7a28349c1cdabac90de69d26e7fc493613
   - path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
     title: Grid Value - Conference (UMERC)
-    description: WEC optimization to maximize grid economic value and avoided emissions
+    description: WEC optimization to maximize grid economic value and 
+      avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
     overleaf:
@@ -1523,3 +1564,9 @@ publications:
       push_paths:
         - figures
       last_sync_commit: 19e80b2eb61b274772d9ab359199f8aec05422d1
+  - path: pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pptx
+    kind: presentation
+    title: Ezra emerging scholar seminar
+    description: Slides for the Cornell systems engineering Erza 
+      emerging scholar seminar on 12.5.2025
+    stage:
