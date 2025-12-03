@@ -7,6 +7,9 @@ environments:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+  py-convert:
+    path: environment.yml
+    kind: conda
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
@@ -1520,6 +1523,26 @@ pipeline:
         - path: pubs/applied-ocean-research-model/aux/
           storage:
           delete_before_run: false
+    ezra-figs-to-svg:
+      kind: python-script
+      script_path: mdocean/plots/util/pdf_to_svg.py
+      environment: py-convert
+      args: [pubs/ezra_seminar_slides/figs/pdf/ 
+            pubs/ezra_seminar_slides/figs/svg/]
+      inputs:
+        - pubs/ezra_seminar_slides/figs/pdf/
+      outputs:
+        - pubs/ezra_seminar_slides/figs/svg/
+    ezra-slides-to-pdf:
+      kind: python-script
+      script_path: pubs/pptx_to_pdf.py
+      environment: py-convert
+      args: [pubs/ezra_seminar_slides/]
+      inputs:
+        - pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pptx
+        - pubs/ezra_seminar_slides/figs/
+      outputs:
+        - pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
@@ -1564,9 +1587,9 @@ publications:
       push_paths:
         - figures
       last_sync_commit: 19e80b2eb61b274772d9ab359199f8aec05422d1
-  - path: pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pptx
+  - path: pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pdf
     kind: presentation
     title: Ezra emerging scholar seminar
     description: Slides for the Cornell systems engineering Erza 
       emerging scholar seminar on 12.5.2025
-    stage:
+    stage: ezra-slides-to-pdf

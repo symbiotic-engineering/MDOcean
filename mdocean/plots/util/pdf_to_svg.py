@@ -3,7 +3,7 @@ import sys
 
 # example to call this script: python mdocean/plots/util/pdf_to_svg.py pubs/ezra_seminar_slides/figs/N2_diagram
 
-def pdf_to_svg(filename):
+def pdf_to_svg(filename_in,filename_out):
     doc = pymupdf.open(filename+".pdf")
     page = doc[0]
     
@@ -16,5 +16,5 @@ def pdf_to_svg(filename):
     
     doc.close()
 
-args = sys.argv[1]
-pdf_to_svg(args)
+args = sys.argv[1:]
+pdf_to_svg(args[0],args[1])
