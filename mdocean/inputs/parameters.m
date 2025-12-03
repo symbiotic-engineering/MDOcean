@@ -49,7 +49,6 @@ g = 9.8;
 spar_exc = get_spar_exc(g);
 
 %read in wave height and period data from csv created in timeseries.py
-addpath(genpath('..\..\WEC-DECIDER\modules\CEM'));
 data = readtable("hs_and_t.csv");
 Hs_hourly = data.Hs_hourly;
 T_hourly = data.T_hourly;
@@ -58,13 +57,11 @@ price_interpolated_temp = price_interpolated_temp / 1000; % convert to $/kWh
 
 placeholder_emissions = false;
 if placeholder_emissions
-    emissions = readtable('emissions.csv').Var5(3:end);
-    emissions = repmat(emissions,18,1);
-    emissions = [emissions; emissions(1:120)];
-    carbon_interpolated_temp = emissions * 1000; %converting tons to kg
-    grid_energy_timeseries = 1000 * ones(8760,1); % MWh (typical 1000 MWh)
+    emissions = readtable('inputs/emissions.csv').Var5(3:end);
+    carbon_interpolated_temp = emissions * 1000; % converting tons to kg
+    grid_energy_timeseries = readtable('inputs/power.csv','VariableNamesLine',1).Total(3:end);
     grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
-    carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg to kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
+    carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
 else
     carbon_data = readmatrix('emissions_per_power.csv','NumHeaderLines',3,'VariableNamesLine',1);
     marginal_data = readtable('thermal_marginal.csv');
