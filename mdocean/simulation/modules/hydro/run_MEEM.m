@@ -418,8 +418,8 @@ function create_symbolic_expressions(heaving_IC, heaving_OC, auto_BCs, N_num, M_
     %pretty(collect(simplify(integral_OC,'Steps',100), vars))
     %pretty(collect(simplify(integral_IC,'Steps',100), vars))
 
-    hydro_OC = h^3 * 2*pi* integral_OC;
-    hydro_IC = h^3 * 2*pi* integral_IC;
+    hydro_OC = 2*pi* integral_OC;
+    hydro_IC = 2*pi* integral_IC;
     
     if heaving_OC && heaving_IC
         hydro_over_rho = hydro_OC + hydro_IC;
