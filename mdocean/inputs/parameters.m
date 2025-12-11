@@ -53,19 +53,24 @@ addpath(genpath('..\..\WEC-DECIDER\modules\CEM'));
 data = readtable("hs_and_t.csv");
 Hs_hourly = data.Hs_hourly;
 T_hourly = data.T_hourly;
-price_interpolated_temp = 50*rand(1,8760)+75; % 75-125 $/MWh
+
+%read in price data from prices.csv
+price_data = readtable('prices.csv');
+price_interpolated_temp = price_data.Var4(2:end); %$/MWh?
+price_interpolated_temp = repmat(price_interpolated_temp,18,1);
+price_interpolated_temp = [price_interpolated_temp; price_interpolated_temp(1:120)];
+%price_interpolated_temp = 50*rand(1,8760)+75; % 75-125 $/MWh
 price_interpolated_temp = price_interpolated_temp / 1000; % convert to $/kWh
+
+%read in emisions data from emissions.csv
 emissions = readtable('emissions.csv').Var5(3:end);
-emissions = repmat(emissions,18,1);
-emissions = [emissions; emissions(1:120)];
-%carbon_interpolated_temp = emissions / 1000; %converting tons to kg
-%ploton = false;
-%[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_interpolated_temp,price_interpolated_temp,ploton);
 carbon_interpolated_temp = emissions * 1000; %converting tons to kg
-grid_energy_timeseries = 1000 * ones(8760,1); % MWh (typical 1000 MWh)
+grid_energy_timeseries = readtable("power.csv").Total(3:end); %MWh (typical 1000 MWh)
 grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
 carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg to kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
-[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price_interpolated_temp);
+
+ploton = true;
+[carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price_interpolated_temp,ploton);
 price_contour(~isfinite(price_contour)) = 0;
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};

@@ -24,7 +24,6 @@ factor = 1./mysum(val.F_heave_mat);
 force_matrix = val.F_heave_mat.*factor;
 
 %% econ
-
 levelized_cost = in.FCR * val.capex + val.opex; % $/year
 levelized_cost_matrix_unscaled = in.FCR * val.capex * force_matrix + val.opex; % $/year
 cost_matrix_scale_factor = levelized_cost / mysum(levelized_cost_matrix_unscaled);
@@ -66,10 +65,10 @@ levelized_eco_cost_matrix = levelized_eco_cost * force_matrix;
 f1 = figure;
 tiledlayout(2,5,'TileSpacing','compact','Padding','compact')
 nexttile
-contourf(Hs_mdocean, T_mdocean, P_matrix_elec)
-title("Power")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, P_matrix_elec)
+title("Power (kWh)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -77,10 +76,10 @@ text(0.5,0.5,'x','FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, in.marginal_price)
-title("Marginal Price")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, in.marginal_price)
+title("Marginal Price ($/kWh)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -88,10 +87,10 @@ text(0.5,0.5,'x','FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, p.JPD)
+contourf(T_mdocean, Hs_mdocean, p.JPD)
 title("JPD")
-xlabel("Wave Height")
-ylabel("Wave Period")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -99,10 +98,10 @@ text(0.5,0.5,char(247),'FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, levelized_cost_matrix)
-title("Levelized cost (scaled by force)")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, levelized_cost_matrix)
+title("Levelized Cost Scaled by Force ($)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -110,11 +109,11 @@ text(0.5,0.5,'=','FontSize',50)
 axis off
 
 ax1 = nexttile;
-contourf(ax1, Hs_mdocean, T_mdocean, VCR_matrix)
+contourf(ax1, T_mdocean, Hs_mdocean, VCR_matrix)
 colormap(ax1, bluewhitered(256,1,true))
 title("Economic Value to Cost Ratio")
-xlabel("Wave Height")
-ylabel("Wave Period")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar(ax1)
 improvePlot
 
@@ -122,10 +121,10 @@ improvePlot
 f2 = figure;
 tiledlayout(2,5,'TileSpacing','compact','Padding','compact')
 nexttile
-contourf(Hs_mdocean, T_mdocean, P_matrix_elec)
-title("Power")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, P_matrix_elec)
+title("Power (kWh)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -133,10 +132,10 @@ text(0.5,0.5,'x','FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, in.marginal_carbon)
-title("Marginal Carbon")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, in.marginal_carbon)
+title("Marginal Carbon (kgCO2/kWh)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -144,10 +143,10 @@ text(0.5,0.5,'x','FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, p.JPD)
+contourf(T_mdocean, Hs_mdocean, p.JPD)
 title("JPD")
-xlabel("Wave Height")
-ylabel("Wave Period")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -155,10 +154,10 @@ text(0.5,0.5,char(247),'FontSize',50)
 axis off
 
 nexttile
-contourf(Hs_mdocean, T_mdocean, levelized_eco_cost_matrix)
-title("Environmental Cost")
-xlabel("Wave Height")
-ylabel("Wave Period")
+contourf(T_mdocean, Hs_mdocean, levelized_eco_cost_matrix)
+title("Environmental Cost ($)")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar
 
 nexttile
@@ -166,11 +165,11 @@ text(0.5,0.5,'=','FontSize',50)
 axis off
 
 ax2 = nexttile;
-contourf(ax2, Hs_mdocean, T_mdocean, VCR_matrix_eco)
+contourf(ax2, T_mdocean, Hs_mdocean, VCR_matrix_eco)
 colormap(ax2, bluewhitered(256,1,true))
 title("Environmental Value to Cost Ratio")
-xlabel("Wave Height")
-ylabel("Wave Period")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar(ax2)
 improvePlot
 
@@ -178,15 +177,19 @@ improvePlot
 f3 = figure;
 tiledlayout(1,2)
 ax1 = nexttile;
-contourf(ax1, Hs_mdocean, T_mdocean, net_value_matrix)
+contourf(ax1, T_mdocean, Hs_mdocean, net_value_matrix)
 colormap(ax1, bluewhitered(256,0,true))
 title("Net Economic Value")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar(ax1)
 
 ax2 = nexttile;
-contourf(ax2, Hs_mdocean, T_mdocean, net_value_matrix_eco)
+contourf(ax2, T_mdocean, Hs_mdocean, net_value_matrix_eco)
 colormap(ax2, bluewhitered(256,0,true))
 title("Net Environmental Value")
+xlabel("Wave Period")
+ylabel("Wave Height")
 colorbar(ax2)
 improvePlot
 
