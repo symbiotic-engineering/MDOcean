@@ -3,7 +3,7 @@ classdef DescFcns < GenericAnalysis
     %   Generates drag and saturation describing function figures
 
     properties
-        fig_names = {'drag_desc_fcn', 'saturation_desc_fcn'};
+        fig_names = {'saturation_desc_fcn', 'saturation_desc_fcn_alpha', 'drag_desc_fcn'};
         tab_names = {};
     end
 

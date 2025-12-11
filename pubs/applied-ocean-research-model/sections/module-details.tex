@@ -636,8 +636,8 @@ Section~\ref{sec:discussion} will discuss possible future alternatives to this m
 % \end{table}
 
 \paragraph{Irregular Waves}
-MDOcean uses a JPD to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
-Additionally, it assumes that each wave condition within the JPD is a sinusoidal regular wave.
+MDOcean uses a JPD (joint probability density matrix) to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
+Additionally, it represents each irregular wave condition within the JPD as an equivalent sinusoidal regular wave.
 Regular wave height $H$ and period $T$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}
     H = \frac{H_s}{\sqrt{2}}, \qquad T = T_e \approx 0.857 ~T_p 
@@ -647,7 +647,7 @@ This regular wave assumption avoids the time-consuming convolution integral or s
 
 In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
 If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
-A previous study using a Bretschneider spectrum found the power generation for a point absorber with PI control to be around 92\% of the perfectly matched power \cite{coe_practical_2021}, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
+A previous study using a Bretschneider spectrum found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power \cite{coe_practical_2021}, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 Nonetheless, irregular time-domain transient peaks and the variation of hydrodynamic coefficients over the spectral width of each individual sea state are not considered.
 Therefore, MDOcean likely underestimates the sensitivity to peak force, power, and amplitude constraints.
 Section~\ref{sec:discussion} will discuss possible future extensions to incorporate irregular wave effects into the analysis.
