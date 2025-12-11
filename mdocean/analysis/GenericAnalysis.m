@@ -15,6 +15,7 @@ classdef (Abstract) GenericAnalysis
         postpro_outputs
     end
     properties (Dependent)
+        class_dependencies
         analysis_dependencies
         postpro_dependencies
     end
@@ -58,12 +59,18 @@ classdef (Abstract) GenericAnalysis
                           strcat(obj.tab_names,'.tex') ...
                           'end.mat']);
         end
+        function val = get.class_dependencies(obj)
+            val = obj.get_dependencies(class(obj));
+        end
         function val = get.analysis_dependencies(obj)
-            val = obj.get_dependencies(['@' class(obj) filesep 'analysis_fcn']);
+            all_deps = obj.class_dependencies;
+            to_remove = ['@' class(obj) filesep 'post_process_fcn'];
+            val = all_deps(~contains(all_deps, to_remove));
         end
         function val = get.postpro_dependencies(obj)
-            val = [obj.get_dependencies(['@' class(obj) filesep 'post_process_fcn']),...
-                                        obj.analysis_outputs];
+            all_deps = obj.class_dependencies;
+            to_remove = ['@' class(obj) filesep 'analysis_fcn'];
+            val = all_deps(~contains(all_deps, to_remove));
         end
         function obj = run_analysis(obj)
             cd('mdocean');
