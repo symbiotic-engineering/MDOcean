@@ -37,7 +37,7 @@ parfor i=1:length(files)
     X = new_b.X_start_struct;
     
     which_obj = 1; % only optimize LCOE
-    dry_run = true;
+    dry_run = false;
     if dry_run
         [X_opts(:,i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1); 
     else
