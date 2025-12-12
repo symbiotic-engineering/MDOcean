@@ -3,7 +3,9 @@ classdef DampingPlateStructures < GenericAnalysis
     %   Generates damping plate moment, deflection, and aspect ratio figures
 
     properties
-        fig_names = {'damping_plate_aspect_ratio', 'damping_plate_deflection', 'damping_plate_moment'};
+        fig_names = {'damping_plate_aspect_ratio',...
+                     'damping_plate_deflection',...
+                     'damping_plate_moment'};
         tab_names = {};
     end
 

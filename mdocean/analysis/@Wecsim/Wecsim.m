@@ -3,7 +3,9 @@ classdef Wecsim < GenericAnalysis
     %   Generates WEC-Sim error histograms and validation tables
 
     properties
-        fig_names = {'WECSim_error_histograms_singlebody', 'WECSim_error_histograms_multibody', 'wecsim_all_sea_states'};
+        fig_names = {'WECSim_error_histograms_singlebody',...
+                     'WECSim_error_histograms_multibody',...
+                     'wecsim_all_sea_states'};
         tab_names = {'WECSim_errors'};
     end
 

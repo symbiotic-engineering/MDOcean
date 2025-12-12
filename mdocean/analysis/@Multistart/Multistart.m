@@ -3,7 +3,9 @@ classdef Multistart < GenericAnalysis
     %   Generates multistart convergence tree and parallel coordinates figures with results table
     
     properties
-        fig_names = {'multistart_convergence_tree', 'multistart_parallel_coordinates','multistart_bar_chart'};
+        fig_names = {'multistart_convergence_tree',...
+                     'multistart_parallel_coordinates',...
+                     'multistart_bar_chart'};
         tab_names = {'multistart_results'};
     end
     

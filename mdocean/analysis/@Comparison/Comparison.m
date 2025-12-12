@@ -3,7 +3,10 @@ classdef Comparison < GenericAnalysis
     %   Generates overlaid geometry, hydro coeffs, probability CDF figures and optimal design tables
 
     properties
-        fig_names = {'overlaid_geometry', 'overlaid_hydro_coeffs', 'probability_CDF', 'comparison_power_matrix'};
+        fig_names = {'overlaid_geometry',...
+                     'overlaid_hydro_coeffs',...
+                     'probability_CDF',...
+                     'comparison_power_matrix'};
         tab_names = {'optimal_design_vars', 'optimal_outputs'};
     end
 
