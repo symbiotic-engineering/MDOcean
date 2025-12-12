@@ -64,12 +64,12 @@ classdef (Abstract) GenericAnalysis
         end
         function val = get.analysis_dependencies(obj)
             all_deps = obj.class_dependencies;
-            to_remove = ['@' class(obj) filesep 'post_process_fcn'];
+            to_remove = {['@' class(obj) filesep 'post_process_fcn'], 'OpenFLASH'};
             val = all_deps(~contains(all_deps, to_remove));
         end
         function val = get.postpro_dependencies(obj)
             all_deps = obj.class_dependencies;
-            to_remove = ['@' class(obj) filesep 'analysis_fcn'];
+            to_remove = {['@' class(obj) filesep 'analysis_fcn'], 'OpenFLASH'};
             val = all_deps(~contains(all_deps, to_remove));
         end
         function obj = run_analysis(obj)
@@ -205,7 +205,10 @@ classdef (Abstract) GenericAnalysis
     methods (Static)
         function deps_rel = get_dependencies(fcn_name)
             deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
-            base = what('..').path;
+            path = mfilename('fullpath');
+            s = split(which(path), filesep);
+            MDOcean_folder = strjoin(s(1:end-3), filesep);
+            base = MDOcean_folder
             deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
         end
         
