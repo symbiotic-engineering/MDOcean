@@ -1,4 +1,4 @@
-function [w_nondim,Mr_nondim,Mt_nondim,Q_nondim] = distributed_plate_nondim(a,b,q,nu,rho, ...
+function [w_nondim,Mr_nondim,Mt_nondim,Q_nondim] = distributed_plate_nondim_ortho(a,b,q,nu,rho, ...
                                                                             Dtheta_over_Dr, Drt_over_Dr)
 % Roark's table 11.2, case 2L (page 467)
 % a: outer radius
@@ -9,11 +9,11 @@ function [w_nondim,Mr_nondim,Mt_nondim,Q_nondim] = distributed_plate_nondim(a,b,
 %
 
     % if orthotropic constants aren't given, assume isotropic (all axes the same)
-    if nargin<6
+    if nargin < 6
         Dtheta_over_Dr = 1;
     end
     % approximation for coupling: D_rt = nu * sqrt(Dr * Dtheta), reduces to nu*D for isotropic
-    if nargin<7
+    if nargin < 7
         Drt_over_Dr = nu*sqrt(Dtheta_over_Dr);
     end
 
@@ -21,20 +21,21 @@ function [w_nondim,Mr_nondim,Mt_nondim,Q_nondim] = distributed_plate_nondim(a,b,
     r = rho*a;
     r0 = b;
 
-    C2 = 1/4 * ( 1 - (b/a)^2 * (1 + 2*log(a/b)) );
-    C3 = b/4/a*(((b/a)^2+1)*log(a/b)+(b/a)^2-1);
-    C8 = 1/2 * (1+v+(1-v)*(b/a)^2);
-    C9 = b/a * ( (1+v)/2*log(a/b) + (1-v)/4*(1-(b/a)^2) );
+    C8 = C_function(8, a, b, v);
+    C9 = C_function(9, a, b, v);
 
-    L11 = 1/64 * (1+4*(r0/a)^2-5*(r0/a)^4-4*(r0/a)^2*(2+(r0/a)^2)*log(a/r0));
-    L17 = 1/4 * (1-(1-v)/4*(1-(r0/a)^4)-(r0/a)^2*(1+(1+v)*log(a/r0)));
+    F2 = F_function(2, r, b, v);
+    F3 = F_function(3, r, b, v);
+    F5 = F_function(5, r, b, v);
+    F6 = F_function(6, r, b, v);
+    F8 = F_function(8, r, b, v);
+    F9 = F_function(9, r, b, v);
 
-    F2 = 1/4 * (1 - (b./r).^2.*(1+2*log(r/b)));
-    F3 = b./(4*r) .* ( ( (b./r).^2 + 1 ).*log(r/b) + (b./r).^2 - 1);
-    F5 = 1/2 * (1 - (b./r).^2);
-    F6 = b./(4*r) .* ( (b./r).^2 - 1 + 2*log(r/b) );
-    F8 = 1/2 * (1+v+(1-v)*(b./r).^2);
-    F9 = b./r .* (1/2*(1+v)*(log(r/b)) + 1/4*(1-v)*(1-(b./r).^2));
+    L17 = L_function(17, r0, a, Dtheta_over_Dr);
+
+    G11 = G_function(11, r0, r, Dtheta_over_Dr);
+    G14 = G_function(14, r0, r, Dtheta_over_Dr);
+    G17 = G_function(17, r0, r, Dtheta_over_Dr);
 
     % Mrb: reaction moment per unit length on inner edge
     Mrb = -q*a^2/C8 * (C9*(a^2-r0^2)/(2*a*b) - L17);
@@ -53,15 +54,15 @@ function [w_nondim,Mr_nondim,Mt_nondim,Q_nondim] = distributed_plate_nondim(a,b,
     % case 2 general deflection equation p463, with first two terms
     % ommitted since yb and theta_b are zero for case 2L
     y_times_Dr = Mrb * r.^2 .* F2 ...
-              + Qb * r.^3 .* F3 ...
-              - q  * r.^4 .* G11;
+               + Qb  * r.^3 .* F3 ...
+               - q   * r.^4 .* G11;
 
     % theta_times_D:
     %   Mrb and Qb contributions use Dr
     %   q term uses D_eff
-    theta_times_Dr = Mrb * r .* F5 ...
-                  + Qb * r.^2 .* F6 ...
-                  - q * r.^3 .* (Deff_over_Dr * G14);
+    theta_times_Dr = Mrb * r    .* F5 ...
+                   + Qb  * r.^2 .* F6 ...
+                   - q   * r.^3 .* (Deff_over_Dr * G14);
 
     % =================================================================
     % === Mr and Mt ===================================================
@@ -117,6 +118,34 @@ function G = G_function(number, r0, r, Dtheta_over_Dr)
 
 end
 
+function F = F_function(number, r, b, v)
+    ratio = r/b;
+    F = CF_function(number, ratio, v);
+end
+
+function C = C_function(number, a, b, v)
+    ratio = a/b;
+    C = CF_function(number, ratio, v);
+end
+
+function CF = CF_function(number, ratio, v)
+
+    if number==2
+        CF = 1/4 * (1 - (1./ratio).^2.*(1+2*log(ratio)));
+    elseif number==3
+        CF = 1./ratio/(4) .* ( ( (1./ratio).^2 + 1 ).*log(ratio) + (1./ratio).^2 - 1);
+    elseif number==5
+        CF = 1/2 * (1 - (1./ratio).^2);
+    elseif number==6
+        CF = 1./ratio/(4) .* ( (1./ratio).^2 - 1 + 2*log(ratio) );
+    elseif number==8
+        CF = 1/2 * (1+v+(1-v)*(1./ratio).^2);
+    elseif number==9
+        CF = 1./ratio .* (1/2*(1+v)*(log(ratio)) + 1/4*(1-v)*(1-(1./ratio).^2));
+    else
+        error(['number=' number ' is not implemented'])
+    end
+end
 function LG = LG_function(number, ratio, Dtheta_over_Dr)
 
     if number==11
