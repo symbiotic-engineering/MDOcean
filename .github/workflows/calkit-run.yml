@@ -81,6 +81,9 @@ jobs:
             BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
             echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
             git checkout -b "$BRANCH"
+            # git config below does the equivalent of the --set-upstream option of git push
+            git config branch."$BRANCH".remote origin
+            git config branch."$BRANCH".merge refs/heads/"$BRANCH"
           fi
 
           calkit save dvc.lock dvc.yaml .calkit/ -m "Run pipeline"
