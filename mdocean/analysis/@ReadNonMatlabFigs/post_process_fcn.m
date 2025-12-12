@@ -1,7 +1,9 @@
 function [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
-                 end_result_struct] = post_process_fcn(intermed_result_struct)
+                 end_result_struct,...
+                 tab_firstrows,...
+                 tab_colspecs] = post_process_fcn(intermed_result_struct)
 
     num_figs = length(intermed_result_struct.file_names);
     fig_array = gobjects(1,num_figs);
@@ -25,6 +27,9 @@ function [fig_array,...
 
     tab_array_display = {};
     tab_array_latex = {};
+
+    tab_firstrows = {};
+    tab_colspecs = {};
 
     end_result_struct.num_figs_created = length(fig_array);
 end

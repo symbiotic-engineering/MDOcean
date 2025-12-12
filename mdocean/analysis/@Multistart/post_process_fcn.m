@@ -1,7 +1,9 @@
 function [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
-                 end_result_struct] = post_process_fcn(intermed_result_struct)
+                 end_result_struct,...
+                 tab_firstrows,...
+                 tab_colspecs] = post_process_fcn(intermed_result_struct)
             
             p = intermed_result_struct.p;
             b = intermed_result_struct.b;
@@ -17,6 +19,9 @@ function [fig_array,...
             
             tab_array_display = {results};
             tab_array_latex = {results};
+
+            tab_firstrows = {[]};
+            tab_colspecs = {[]};
 
             end_result_struct = struct();
         end

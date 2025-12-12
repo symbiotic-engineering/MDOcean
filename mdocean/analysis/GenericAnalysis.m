@@ -8,6 +8,8 @@ classdef (Abstract) GenericAnalysis
         fig_array
         tab_array_display
         tab_array_latex
+        tab_firstrows
+        tab_colspecs
         intermed_result_struct % all results needed to debug and make plots
         end_result_struct % only summary end results for latex output or tests
         output_folder
@@ -31,7 +33,9 @@ classdef (Abstract) GenericAnalysis
         [fig_array,...
          tab_array_display,...
          tab_array_latex,...
-         end_result_struct] = post_process_fcn(intermed_result_struct);
+         end_result_struct,...
+         tab_firstrows,...
+         tab_colspecs] = post_process_fcn(intermed_result_struct);
 
     end
 
@@ -82,9 +86,11 @@ classdef (Abstract) GenericAnalysis
         function obj = run_post_process(obj)
             cd('mdocean');
             [obj.fig_array,...
-             obj.tab_array_display,...
-             obj.tab_array_latex,...
-             obj.end_result_struct] = obj.post_process_fcn(obj.intermed_result_struct);
+                obj.tab_array_display,...
+                obj.tab_array_latex,...
+                obj.end_result_struct,...
+                obj.tab_firstrows,...
+                obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
 
             obj.fig_array = obj.validate_figs(obj.fig_array);
@@ -123,7 +129,9 @@ classdef (Abstract) GenericAnalysis
             for i=1:length(obj.tab_names)
                 tab = obj.tab_array_latex{i};
                 fname = [obj.output_folder filesep obj.tab_names{i}];
-                table2latex(tab,fname)
+                colspec = obj.tab_colspecs{i};
+                firstrow = obj.tab_firstrows{i};
+                table2latex(tab,fname,colspec,firstrow)
             end
         end
 

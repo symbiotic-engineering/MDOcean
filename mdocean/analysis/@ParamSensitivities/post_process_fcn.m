@@ -1,7 +1,9 @@
 function [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
-                 end_result_struct] = post_process_fcn(intermed_result_struct)
+                 end_result_struct,...
+                 tab_firstrows,...
+                 tab_colspecs] = post_process_fcn(intermed_result_struct)
             
             ratios = intermed_result_struct.ratios;
             LCOE = intermed_result_struct.LCOE;
@@ -46,8 +48,11 @@ function [fig_array,...
             % fig_local_global has 6 and figs_global has 6+num_dvs=18, so 24 total
             fig_array = [figs_local_global,figs_global];
             
-            tab_array_display = {};
-            tab_array_latex = {};
+            tab_array_display = {param_table};
+            tab_array_latex = {param_table};
+            
+            tab_firstrows = {[]};
+            tab_colspecs = {[]};
             
             end_result_struct.sensitivity_analysis_complete = true;
             end_result_struct.runtime_post_optim = intermed_result_struct.runtime_post_optim;

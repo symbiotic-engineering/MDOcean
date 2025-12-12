@@ -1,7 +1,9 @@
 function [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
-                 end_result_struct] = post_process_fcn(intermed_result_struct)
+                 end_result_struct,...
+                 tab_firstrows,...
+                 tab_colspecs] = post_process_fcn(intermed_result_struct)
             
             b = intermed_result_struct.b;
             X_ins = intermed_result_struct.X_ins;
@@ -18,6 +20,9 @@ function [fig_array,...
             
             tab_array_display = {results_tab};
             tab_array_latex = {results_tab};
+            
+            tab_firstrows = {[]};
+            tab_colspecs = {[]};
             
             end_result_struct.design_space_exploration_complete = true;
 end
