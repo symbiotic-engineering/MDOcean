@@ -32,7 +32,7 @@ set(waves,'HandleVisibility','off')
 for i=1:num_designs
     x = X(biggest_to_smallest(i),:);
     hold on
-    visualize_geometry(x,p,false,color{biggest_to_smallest(i)})
+    visualize_geometry(x,p,false,color{biggest_to_smallest(i)});
 end
 xlim([-x_max,x_max])
 y_max = max([findobj(gca().Children,'Type','Line').YData]) * 1.1;
