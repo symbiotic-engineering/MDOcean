@@ -9,15 +9,38 @@
 # MDOcean
 This is an open source codebase that uses Multidisciplinary Design Optimization (**MDO**) to optimize an **ocean** wave energy converter (WEC). 
 
-More specifically, it uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
+More specifically, it is both a multidisciplinary model and a design optimization framework for two-body point absorber WECs.
+MDOcean uses the SQP and pattern search algorithms to find the geometry, PTO, and structural design which optimizes the levelized cost of energy, capital cost, and average power of the Reference Model 3 (RM3) WEC, using a fast simplified frequency domain WEC model.
+
+**Features**
+
+Model features:
+- semi-analytical hydrodynamic model, using the matched eigenfunction expansion method to model linear potential flow
+- semi-analytical frequency-domain dynamic model, using describing functions to model drag and saturation nonlinearities
+- analytical structural model, using tabulated solutions and the equivalent-thickness method to model stiffened plate ultimate and fatigue limits
+- algebraic cost model, with costs scaling with PTO force and power and structural material volume
+- algebraic geometry model, calculating common areas and volumes
+- (in development) algebraic eco-cost model, with eco-costs scaling with structural material volume, hull area, and maintenance frequency
+- (in development) integration with grid model, capturing energy market prices and grid-wide emissions
 
 For 210 sea states, the model takes 39 ms to run, which is around a 5 order of magnitude improvement compared to the equivalent ~1 hour set of parallel WEC-Sim MCR simulations.
 
-**Context**
+Optimization features:
+-  SQP (gradient-based) single-objective optimization
+-  pattern search (gradient-free) and epsilon constraint SQP (gradient-based) multi-objective optimization
+-  multi-start to see how starting point affects the optimal result
+-  derivative-based local sensitivity analysis to see how parameter values affect the optimal result with very little additional computation
+-  re-optimization-based local sensitivity analysis to see how parameter values affect the optimal result with higher accuracy
+
+Running the single-objective optimization with typical parameters reduces LCOE by 57% compared to the standard RM3 design.
+
+**Academic Context**
 
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization and Semi-Analytical Modeling to Advance Wave Energy Converter Viability,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1oTIAkMHWSenGTaAQfc8pr4rRl3oylaKt/view?usp=sharing).
+Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1egObpiE9zCCdZb5DkxvAwoFdwA6j_a-9/view?usp=sharing).
+
+Optimization journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation, 2026. [Link to draft paper manuscript](https://drive.google.com/file/d/1hL8iIyhYBUG73HbeGz_ji5bXIvY4WKt0/view?usp=sharing).
 
 Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
@@ -27,17 +50,9 @@ Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
 
 A video recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
 
-**Software Authors**
-- Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact, 2021-present) @rebeccamccabe
-- Madison Dietrich, mjd429@cornell.edu (Project contributor, 2023-present) @MadisonDietrich
-- Olivia Murphy, om66@cornell.edu (Project contributor, 2021-22) @ommurphy
-- Iris Ren, zr92@cornell.edu (Project contributor, 2024)
-- Maha Haji, maha@cornell.edu (Advisor, 2021-present) @maha-haji
+**Code Documentation**
 
-**License**
-
-This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim. 
-The Apache 2.0 license for this open source WEC-Sim code is included.
+Documentation for the function API for this code is in progress at [this Sphinx site](https://symbiotic-engineering.github.io/MDOcean/).
 
 **File Structure and Usage**
 
@@ -54,8 +69,25 @@ if you want to run single objective optimization for each of the two objectives.
 
 If you are running individual scipts/functions, you will need to `cd` to the `mdocean` folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via `run_tests.m`.
 
-**Documentation**
-Documentation for the function API for this code is in progress at [this Sphinx site](https://symbiotic-engineering.github.io/MDOcean/).
+**Reproducibility**
+
+This project uses [Calkit](https://docs.calkit.org/) pipelines to ensure all figures and publications are fully reproducible.
+To reproduce, [download calkit](https://docs.calkit.org/installation/) and then enter the command `calkit run`. 
+You can also view the project artifacts on [calkit.io](https://calkit.io/symbiotic-engineering/mdocean). Larger files like images and pdfs are stored in DVC rather than Git.
+
+**Software Authors**
+
+- Rebecca McCabe, rgm222@cornell.edu (Project lead and point of contact, 2021-present) [@rebeccamccabe](https://github.com/rebeccamccabe)
+- Madison Dietrich, mjd429@cornell.edu (Project contributor, 2023-present) [@MadisonDietrich](https://github.com/MadisonDietrich)
+- Anthony Long, anl58@cornell.edu (Project contributor, 2025) [@anthnlong](https://github.com/anthnlong)
+- Olivia Murphy, om66@cornell.edu (Project contributor, 2021-22) [@ommurphy](https://github.com/ommurphy)
+- Iris Ren, zr92@cornell.edu (Project contributor, 2024) [@irin0012](https://github.com/irin0012)
+- Maha Haji, maha@cornell.edu (Advisor, 2021-present) [@maha-haji](https://github.com/maha-haji)
+
+**License**
+
+This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim. 
+The Apache 2.0 license for this open source WEC-Sim code is included.
 
 **Dependencies**
 
@@ -64,6 +96,7 @@ The following packages are used in this code:
 | ---    | ---      |
 | MATLAB | Required for simulation |
 | Statistics and Machine Learning Toolbox | Required for simulation |
+| [OpenFLASH](https://github.com/symbiotic-engineering/OpenFLASH) | Required for simulation |
 | Optimization Toolbox | Required for optimization |
 | Global Optimization Toolbox | Required for optimization |
 | Symbolic Math Toolbox | Optional for simulation code generation |
@@ -73,8 +106,10 @@ The following packages are used in this code:
 | Simscape | Optional for WEC-Sim validation | 
 | Simscape Multibody | Optional for WEC-Sim validation |
 | [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
+| [SAFE](https://github.com/rebeccamccabe/SAFE-matlab) | Optional for sensitivity analysis |
 
-The code has been tested on R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
+The external codes (OpenFLASH, WEC-Sim, and SAFE) are included as submodules for ease of use.
+The code has been tested on MATLAB R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
 
 **Contributing**
 
