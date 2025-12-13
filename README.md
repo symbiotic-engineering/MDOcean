@@ -1,7 +1,7 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
-![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)
+[![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)](https://github.com/symbiotic-engineering/MDOcean/blob/main/LICENSE.md)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13997244.svg)](https://doi.org/10.5281/zenodo.13997244)
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=symbiotic-engineering/MDOcean)
 [![View on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/180694-mdocean)
