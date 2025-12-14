@@ -48,34 +48,50 @@ def generate_matlab_modulelist(app,config):
 
 def setup(app):
     app.add_directive("autosummary", MatlabAutosummary, override=True)
-    app.connect("config-inited", generate_matlab_modulelist)
+    #app.connect("config-inited", generate_matlab_modulelist)
 
     def patch_generate(app, config):
         user_context = config.autosummary_context
 
         original_generate = ag.generate_autosummary_docs
+        original_generate_content = ag.generate_autosummary_content
 
         def patched_generate_autosummary_docs(sources, *args, **kwargs):
             results = []
             for source in sources:
                 name = Path(source).stem
+                print(f"\nSource: {source}, name: {name}")
+
                 # Ensure the config value exists so autosummary won't fail
                 if getattr(app.config, "autosummary_context", None) is None:
                     print("changing none to {}")
                     app.config.autosummary_context = {}
 
                 # Inject your per-page context
-                ctx = user_context.get(name, {})
-                if not ctx:
-                    print(f"No autosummary_context for {name}, setting to empty dict")
-                    app.config.autosummary_context = {}
-                else:
-                    app.config.autosummary_context.update(ctx)
+                # ctx = user_context.get(name, {})
+                # if not ctx:
+                #     print(f"No autosummary_context for {name}, setting to empty dict")
+                #     app.config.autosummary_context = {}
+                # else:
+                #     app.config.autosummary_context.update(ctx)
                 #app.config.autosummary_context = {**user_context.get(name, {})}
                 #if getattr(app.config, "autosummary_context", None) is None:
                 #    print(f"No autosummary_context for {name}")
-                print(f"Generating autosummary for {name} with context {app.config.autosummary_context}")
-                kwargs["app"] = app
+                print(f"Generating autosummary for {name}") # with context {app.config.autosummary_context}")
+                #kwargs["app"] = app
+            
+                def patched_generate_autosummary_content(*args, **kwargs):
+                    # hardcode context (7th argument)
+                    name = args[0]
+                    ctx = user_context.get(name, {})
+                    old_ctx = args[7]
+                    assert type(old_ctx) is dict, f"Expected dict for context, got {type(old_ctx)}"
+                    new_args = args[:7] + (ctx,) + args[8:]
+                    print(f"Generating autosummary content for {name} with context {ctx}")
+                    return original_generate_content(*new_args, **kwargs)
+
+                ag.generate_autosummary_content = patched_generate_autosummary_content
+
                 files = original_generate([source], *args, **kwargs)
                 if files is None:
                     files = []  # avoid NoneType

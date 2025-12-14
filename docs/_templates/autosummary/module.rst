@@ -49,9 +49,8 @@
 DEBUG: matmodules={{ matmodules }}
 
 {%- block matmodules %}
-THIS TEMPLATE IS ACTIVE
 {%- if matmodules %}
-FOUND MATMODULES
+
 .. rubric:: Modules
 
 .. autosummary::
