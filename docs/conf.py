@@ -1,7 +1,7 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join("..", "mdocean")))
-sys.path.insert(0, os.path.abspath('_ext'))
+sys.path.insert(0, os.path.abspath(os.path.join("..", "mdocean"))) # for python autosummary to find the package
+sys.path.insert(0, os.path.abspath('_ext')) # custom matlab_autosummary extension
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -28,7 +28,10 @@ extensions = [
     'myst_parser'
 ]
 
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 primary_domain = "mat"
@@ -38,7 +41,6 @@ nitpicky = True
 
 
 autosummary_generate = True
-
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
