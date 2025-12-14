@@ -23,9 +23,9 @@ extensions = [
     'sphinx.ext.autodoc',
  #   'sphinxcontrib.bibtex',
     'sphinxcontrib.matlab',
-    'sphinx.ext.autosummary',
-    'myst_parser',
-    'matlab_autosummary'
+    'sphinx.ext.autosummary', # must come before matlab_autosummary to avoid ref warnings
+    'matlab_autosummary',
+    'myst_parser'
 ]
 
 source_suffix = {
@@ -43,10 +43,10 @@ nitpicky = True
 autosummary_generate = True
 autosummary_output_dir = "generated"
 autosummary_context = {
-    'inputs': {'modules': ['inputs.validation', 'inputs.wave_conditions']},
-    'optimization': {'modules': ['optimization.sensitivities', 'optimization.multiobjective']},
-    'simulation': {'modules': ['simulation.modules', 'simulation.modules.dynamics', 'simulation.modules.econ']},
-    'plots': {'modules': ['plots.util']}
+    'inputs': {'matmodules': ['inputs.validation', 'inputs.wave_conditions']},
+    'optimization': {'matmodules': ['optimization.sensitivities', 'optimization.multiobjective']},
+    'simulation': {'matmodules': ['simulation.modules', 'simulation.modules.dynamics', 'simulation.modules.econ']},
+    'plots': {'matmodules': ['plots.util']}
 }
 
 autodoc_default_options = {

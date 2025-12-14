@@ -46,14 +46,18 @@
    {% endif %}
    {%- endblock %}
 
-{%- block modules %}
-{%- if modules %}
+DEBUG: matmodules={{ matmodules }}
+
+{%- block matmodules %}
+THIS TEMPLATE IS ACTIVE
+{%- if matmodules %}
+FOUND MATMODULES
 .. rubric:: Modules
 
 .. autosummary::
-   :toctree:
-   :recursive:
-{% for item in modules %}
+   :toctree: .
+
+{% for item in matmodules %}
    {{ item }}
 {%- endfor %}
 {% endif %}
