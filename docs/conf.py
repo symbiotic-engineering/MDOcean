@@ -24,8 +24,8 @@ extensions = [
  #   'sphinxcontrib.bibtex',
     'sphinxcontrib.matlab',
     'sphinx.ext.autosummary',
-    'matlab_autosummary',
-    'myst_parser'
+    'myst_parser',
+    'matlab_autosummary'
 ]
 
 source_suffix = {
@@ -41,6 +41,14 @@ nitpicky = True
 
 
 autosummary_generate = True
+autosummary_output_dir = "generated"
+autosummary_context = {
+    'inputs': {'modules': ['inputs.validation', 'inputs.wave_conditions']},
+    'optimization': {'modules': ['optimization.sensitivities', 'optimization.multiobjective']},
+    'simulation': {'modules': ['simulation.modules', 'simulation.modules.dynamics', 'simulation.modules.econ']},
+    'plots': {'modules': ['plots.util']}
+}
+
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
