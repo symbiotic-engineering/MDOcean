@@ -10,4 +10,8 @@ API
    :maxdepth: 3
    :caption: Contents
 
-   api_generate
+   generated/inputs
+   generated/optimization
+   generated/plots
+   generated/simulation
+

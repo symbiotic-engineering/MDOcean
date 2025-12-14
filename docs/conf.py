@@ -43,10 +43,11 @@ nitpicky = True
 autosummary_generate = True
 autosummary_output_dir = "generated"
 autosummary_context = {
-    'inputs': {'matmodules': ['validation', 'wave_conditions']},
-    'optimization': {'matmodules': ['sensitivities', 'multiobjective']},
-    'simulation': {'matmodules': ['modules', 'modules.dynamics', 'modules.econ']},
-    'plots': {'matmodules': ['util']}
+    'inputs': {'matmodules': ['inputs.validation', 'inputs.wave_conditions']},
+    'optimization': {'matmodules': ['optimization.sensitivities', 'optimization.multiobjective']},
+    'simulation': {'matmodules': ['simulation.modules', 'simulation.run']},
+    'simulation.modules': {'matmodules': ['simulation.modules.dynamics', 'simulation.modules.econ']},
+    'plots': {'matmodules': ['plots.util']}
 }
 
 autodoc_default_options = {
