@@ -6,8 +6,8 @@ classdef (SharedTestFixtures={ ...
     properties (Constant)
         run_slow_tests = true;
 
-        slow_figs = [16:25];
-        slow_tabs = 1:8;
+        slow_figs = [25:35, 53:55, 58];
+        slow_tabs = 8;
     end
 
     properties
@@ -50,7 +50,7 @@ classdef (SharedTestFixtures={ ...
 
             which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
-            fig_names = matlab.lang.makeValidName([fig_names, none]);
+            fig_names = matlab.lang.makeValidName([fig_names.', none]);
 
             which_figs_cell = num2cell(which_figs_vec);
             which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
@@ -60,7 +60,7 @@ classdef (SharedTestFixtures={ ...
 
             which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
-            tab_names = matlab.lang.makeValidName([none, tab_names]);
+            tab_names = matlab.lang.makeValidName([none, tab_names.']);
 
             which_tabs_cell = num2cell(which_tabs_vec);
             which_tab_struct = cell2struct(which_tabs_cell,tab_names,2);

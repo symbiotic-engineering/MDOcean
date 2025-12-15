@@ -8,7 +8,9 @@ X = zeros(num_runs,8);
 for i=1:num_runs
     xx = random_x0(b);
     X(i,:) = xx;
-    [LCOE(i), P_var(i), P_matrix, g] = simulation(xx, p);
+    [J, P_matrix, g] = simulation(xx, p);
+    LCOE(i) = J(1);
+    P_var(i) = J(2);
     feasible(i) = is_feasible(g, xx, p, b);
 end
 

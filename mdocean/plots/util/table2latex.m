@@ -137,14 +137,21 @@ function value = format_value(value, use_percent)
             value = '$\infty$';
         elseif use_percent
             value = sprintf('$%.1f\\\\%%%% $',value*100);
-        else % use engineering notation
-            exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
-            mantissa = value / 10.^exponent; % Calculate mantissa
-            if exponent==0
-                value = sprintf('$%.3g $',mantissa);
-            else
-                value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
-            end
+        elseif isscalar(value) % use engineering notation
+            value = engr_notation(value);
+        else % array
+            numbers = strjoin(arrayfun(@(x) engr_notation(x),value,'UniformOutput',false), ', ');
+            value = ['[ ' numbers ' ]'];
         end
+    end
+end
+
+function formatted = engr_notation(value)
+    exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
+    mantissa = value / 10.^exponent; % Calculate mantissa
+    if exponent==0
+        formatted = sprintf('$%.3g $',mantissa);
+    else
+        formatted = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
     end
 end

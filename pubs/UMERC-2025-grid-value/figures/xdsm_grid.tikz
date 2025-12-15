@@ -1,0 +1,368 @@
+
+%%% Preamble Requirements %%%
+% \usepackage{geometry}
+% \usepackage{amsfonts}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{tikz}
+
+% Optional packages such as sfmath set through python interface
+% \usepackage{sfmath}
+
+% \usetikzlibrary{arrows,chains,positioning,scopes,shapes.geometric,shapes.misc,shadows}
+
+%%% End Preamble Requirements %%%
+
+% Define all the styles used to produce XDSMs for MDO
+
+% Tableau 20 color palette, taken from
+% https://jrnold.github.io/ggthemes/reference/tableau_color_pal.html
+% we use the lighter variants here with 80% opacity
+% Blue
+\definecolor{red}{HTML}{A0CBE8}
+% Orange
+\definecolor{orange}{HTML}{FFBE7D}
+% Cyan
+\definecolor{cyan}{HTML}{86BCB6}
+% Green
+\definecolor{green}{HTML}{8CD17D}
+% Yellow
+\definecolor{yellow}{HTML}{F1CE63}
+% Salmon
+\definecolor{salmon}{HTML}{FF9D9A}
+
+\tikzstyle{every node}=[font=\sffamily,align=center]
+
+\newcommand{\fillOpacity}{80}
+
+% Component shapes
+\newcommand{\compShape}{rectangle}
+\newcommand{\groupShape}{chamfered rectangle}
+\newcommand{\procShape}{rounded rectangle}
+
+% Colors
+\newcommand{\explicitColor}{green}
+\newcommand{\implicitColor}{salmon}
+\newcommand{\optimizationColor}{red} % also used by DOE
+
+% Component types
+\tikzstyle{Optimization} = [\procShape,draw,fill=\optimizationColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{MDA} = [\procShape,draw,fill=orange!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{DOE} = [\procShape,draw,fill=\optimizationColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{SubOptimization} = [\groupShape,draw,fill=\optimizationColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{Group} = [\groupShape,draw,fill=\explicitColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{ImplicitGroup} = [\groupShape,draw,fill=\implicitColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{Function} = [\compShape,draw,fill=\explicitColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{OutlineFunction} = [\compShape,draw=black,line width=2pt,fill=\explicitColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{ImplicitFunction} = [\compShape,draw,fill=\implicitColor!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+\tikzstyle{Metamodel} = [\compShape,draw,fill=yellow!\fillOpacity,inner sep=6pt,minimum height=1cm,text badly centered]
+
+%% A simple command to give the repeated structure look for components and data
+\tikzstyle{stack} = [double copy shadow={shadow xshift=.75ex, shadow yshift=-.75ex}]
+%% A simple command to fade components and data, e.g. demonstrating a sequence of steps in an animation
+\tikzstyle{faded} = [draw=black!10,fill=white,text opacity=0.2]
+
+%% Simple fading commands for the lines
+\tikzstyle{fadeddata} = [color=black!20]
+\tikzstyle{fadedprocess} = [color=black!50]
+
+% Data types
+\newcommand{\dataRightAngle}{105}
+\newcommand{\dataLeftAngle}{75}
+
+\setlength{\arraycolsep}{0pt} % Becca mod 6/30/25
+\tikzstyle{DataInter} = [trapezium,trapezium left angle=\dataLeftAngle,trapezium right angle=\dataRightAngle,draw,fill=black!10]
+\tikzstyle{DataIO} = [trapezium,trapezium left angle=\dataLeftAngle,trapezium right angle=\dataRightAngle,draw,fill=white]
+
+% Edges
+\tikzstyle{DataLine} = [color=black!40,line width=5pt,line cap=rect]
+\tikzstyle{ProcessHV} = [-,line width=1pt,to path={-| (\tikztotarget)}]
+\tikzstyle{ProcessHVA} = [->,line width=1pt,to path={-| (\tikztotarget)}]
+\tikzstyle{ProcessTip} = [-,line width=1pt]
+\tikzstyle{ProcessTipA} = [->, line width=1pt]
+\tikzstyle{FadedProcessHV} = [-,line width=1pt,to path={-| (\tikztotarget)},color=black!30]
+\tikzstyle{FadedProcessHVA} = [->,line width=1pt,to path={-| (\tikztotarget)},color=black!30]
+\tikzstyle{FadedProcessTip} = [-,line width=1pt,color=black!30]
+\tikzstyle{FadedProcessTipA} = [->, line width=1pt,color=black!30]
+
+% Matrix options
+\tikzstyle{MatrixSetup} = [row sep=3mm, column sep=2mm]
+
+% Declare a background layer for showing node connections
+\pgfdeclarelayer{data}
+\pgfdeclarelayer{process}
+\pgfsetlayers{data,process,main}
+
+% A new command to split the component text over multiple lines
+
+\newcommand{\MultilineComponent}[2]
+{
+	\begin{minipage}{#1}
+	\begin{center}
+		#2
+	\end{center}
+	\end{minipage}
+}
+
+\newcommand{\TwolineComponent}[3]
+{
+	\begin{minipage}{#1}
+	\begin{center}
+		#2 \linebreak #3
+	\end{center}
+	\end{minipage}
+}
+
+\newcommand{\ThreelineComponent}[4]
+{
+	\begin{minipage}{#1}
+	\begin{center}
+		#2 \linebreak #3 \linebreak #4
+	\end{center}
+	\end{minipage}
+}
+
+% A new command to split the component text over multiple columns
+\newcommand{\MultiColumnComponent}[5]
+{
+	\begin{minipage}{#1}
+	\begin{center}
+	#2 \linebreak #3
+	\end{center}
+	\begin{minipage}{0.49\textwidth}
+	\begin{center}
+	#4
+	\end{center}
+	\end{minipage}
+	\begin{minipage}{0.49\textwidth}
+	\begin{center}
+	#5
+	\end{center}
+	\end{minipage}
+	\end{minipage}
+}
+
+\def\arraystretch{1} % Becca 6/29/25 changed this from 1.3 to 1
+
+\begin{tikzpicture}
+
+\matrix[MatrixSetup]{
+%Row 0
+\node [DataIO] (left_output_opt) {$x^*$};&
+\node [Optimization] (opt) {$\text{Optimizer}$};&
+\node [DataInter] (opt-geom) {$\begin{array}{c}\text{Dimensions,} \\ \text{Thicknesses}\end{array}$};&
+\node [DataInter] (opt-hydro) {$\text{Dimensions}$};&
+&
+\node [DataInter] (opt-dynam) {$\begin{array}{c}\text{Generator} \\ \text{ratings}\end{array}$};&
+\node [DataInter] (opt-struct) {$\begin{array}{c}\text{Dimensions,} \\ \text{thicknesses}\end{array}$};&
+\node [DataInter] (opt-cost) {$\begin{array}{c}\text{Generator} \\ \text{ratings}\end{array}$};&
+&
+&
+&
+\\
+%Row 1
+&
+&
+\node [Function] (geom) {$\text{Geometry}$};&
+&
+&
+\node [DataInter] (geom-dynam) {$\text{Mass}$};&
+&
+\node [DataInter] (geom-cost) {$\text{Material volume}$};&
+&
+\node [DataInter] (geom-env) {$\text{Material volume}$};&
+&
+\node [DataInter] (geom-G) {$\begin{array}{c}\text{Stability and} \\ \text{hydrostatic constraints}\end{array}$};\\
+%Row 2
+&
+&
+&
+\node [Function] (hydro) {$\text{Hydrodynamics}$};&
+&
+\node [DataInter] (hydro-dynam) {$\begin{array}{c}\text{Hydrodynamic} \\ \text{coefficients}\end{array}$};&
+&
+&
+&
+&
+&
+\\
+%Row 3
+&
+&
+&
+&
+\node [MDA] (solver) {$\text{Iteration}$};&
+\node [DataInter] (solver-dynam) {$\begin{array}{c}\text{Dynamic} \\ \text{response guess}\end{array}$};&
+&
+&
+&
+&
+&
+\\
+%Row 4
+&
+&
+&
+&
+\node [DataInter] (dynam-solver) {$\begin{array}{c}\text{Dynamic} \\ \text{response residual}\end{array}$};&
+\node [Function] (dynam) {$\begin{array}{c}\text{Dynamics} \\ \text{and Control}\end{array}$};&
+\node [DataInter] (dynam-struct) {$\text{Loads}$};&
+\node [DataInter] (dynam-cost) {$\text{Power}$};&
+\node [DataInter] (dynam-grid) {$\zeta,\omega_n$};&
+\node [DataInter] (dynam-env) {$\text{Power}$};&
+&
+\node [DataInter] (dynam-G) {$\text{Amplitude constraints}$};\\
+%Row 5
+&
+&
+&
+&
+&
+&
+\node [Function] (struct) {$\text{Structures}$};&
+&
+&
+&
+&
+\node [DataInter] (struct-G) {$\text{Structural constraints}$};\\
+%Row 6
+&
+&
+&
+&
+&
+&
+&
+\node [Function] (cost) {$\text{Cost}$};&
+\node [DataInter] (cost-grid) {$\text{LCOE}$};&
+&
+&
+\\
+%Row 7
+&
+&
+&
+&
+&
+&
+&
+&
+\node [OutlineFunction] (grid) {$\text{Grid}$};&
+\node [DataInter] (grid-env) {$\text{Grid Emissions}$};&
+\node [DataInter] (grid-F) {$\text{Net Grid Value}$};&
+\\
+%Row 8
+&
+&
+&
+&
+&
+&
+&
+&
+&
+\node [OutlineFunction] (env) {$\text{Environment}$};&
+\node [DataInter] (env-F) {$\text{Net Eco-Value}$};&
+\\
+%Row 9
+\node [DataIO] (left_output_F) {$J^*$};&
+\node [DataInter] (F-opt) {$J$};&
+&
+&
+&
+&
+&
+&
+&
+&
+\node [Function] (F) {$\text{Objective}$};&
+\\
+%Row 10
+\node [DataIO] (left_output_G) {$g^*$};&
+\node [DataInter] (G-opt) {$g$};&
+&
+&
+&
+&
+&
+&
+&
+&
+&
+\node [Function] (G) {$\text{Constraints}$};\\
+%Row 11
+&
+&
+&
+&
+&
+&
+&
+&
+&
+&
+&
+\\
+};
+
+% XDSM process chains
+
+
+\begin{pgfonlayer}{data}
+\path
+% Horizontal edges
+(opt) edge [DataLine] (opt-geom)
+(opt) edge [DataLine] (opt-hydro)
+(opt) edge [DataLine] (opt-dynam)
+(opt) edge [DataLine] (opt-struct)
+(opt) edge [DataLine] (opt-cost)
+(solver) edge [DataLine] (solver-dynam)
+(dynam) edge [DataLine] (dynam-solver)
+(geom) edge [DataLine] (geom-dynam)
+(geom) edge [DataLine] (geom-cost)
+(geom) edge [DataLine] (geom-env)
+(hydro) edge [DataLine] (hydro-dynam)
+(dynam) edge [DataLine] (dynam-struct)
+(dynam) edge [DataLine] (dynam-cost)
+(dynam) edge [DataLine] (dynam-env)
+(dynam) edge [DataLine] (dynam-grid)
+(cost) edge [DataLine] (cost-grid)
+(grid) edge [DataLine] (grid-env)
+(geom) edge [DataLine] (geom-G)
+(dynam) edge [DataLine] (dynam-G)
+(struct) edge [DataLine] (struct-G)
+(grid) edge [DataLine] (grid-F)
+(env) edge [DataLine] (env-F)
+(F) edge [DataLine] (F-opt)
+(G) edge [DataLine] (G-opt)
+(opt) edge [DataLine] (left_output_opt)
+(F) edge [DataLine] (left_output_F)
+(G) edge [DataLine] (left_output_G)
+% Vertical edges
+(opt-geom) edge [DataLine] (geom)
+(opt-hydro) edge [DataLine] (hydro)
+(opt-dynam) edge [DataLine] (dynam)
+(opt-struct) edge [DataLine] (struct)
+(opt-cost) edge [DataLine] (cost)
+(solver-dynam) edge [DataLine] (dynam)
+(dynam-solver) edge [DataLine] (solver)
+(geom-dynam) edge [DataLine] (dynam)
+(geom-cost) edge [DataLine] (cost)
+(geom-env) edge [DataLine] (env)
+(hydro-dynam) edge [DataLine] (dynam)
+(dynam-struct) edge [DataLine] (struct)
+(dynam-cost) edge [DataLine] (cost)
+(dynam-env) edge [DataLine] (env)
+(dynam-grid) edge [DataLine] (grid)
+(cost-grid) edge [DataLine] (grid)
+(grid-env) edge [DataLine] (env)
+(geom-G) edge [DataLine] (G)
+(dynam-G) edge [DataLine] (G)
+(struct-G) edge [DataLine] (G)
+(grid-F) edge [DataLine] (F)
+(env-F) edge [DataLine] (F)
+(F-opt) edge [DataLine] (opt)
+(G-opt) edge [DataLine] (opt);
+\end{pgfonlayer}
+
+\end{tikzpicture}

@@ -271,12 +271,11 @@ end
 
 % wrappers to get the right outputs to make function handles
 function F = get_sim_outputs(X,p,obj)
-    [J1, J2, ~, g] = simulation(X, p);
-    J = [J1,J2];
+    [J, ~, g] = simulation(X, p);
     F = [J(obj),-g]; % g negative because sim is g>0, sens wants g<0
 end
 function g_active = get_constraints(X,p,active)
-    [~, ~, ~, g] = simulation(X, p);
+    [~, ~, g] = simulation(X, p);
     g_active = -g(active); % g negative because sim is g>0, sens wants g<0
 end
 

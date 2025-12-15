@@ -1,11 +1,4 @@
-function [results] = gradient_mult_x0(filename_uuid)
-
-p = parameters();
-b = var_bounds();
-
-if nargin>0
-    b.filename_uuid = filename_uuid;
-end
+function [treeFig, parallelFig, results] = gradient_mult_x0(p,b)
 
 num_runs = 1000;
 num_DVs = length(b.var_names);
@@ -34,10 +27,10 @@ results = struct2table(x0s);
 cents_per_dollar = 100;
 obj_names_star = {[b.obj_names{1} '*'],[b.obj_names{2} '*']};
 obj_names_star_norm = strcat(obj_names_star, '_norm');
-[obj_1_nom,obj_2_nom] = simulation([b.X_noms; 1],p);
+J_nom = simulation([b.X_noms; 1],p);
 scale = repmat([cents_per_dollar 1],num_runs,1); % scale LCOE units for display
 results = addvars(results, objs(:,1).*scale(:,1), objs(:,2).*scale(:,2), ...
-                  objs(:,1)/obj_1_nom, objs(:,2)/obj_2_nom, flags,  ...	
+                  objs(:,1)/J_nom(1), objs(:,2)/J_nom(2), flags,  ...	
     'NewVariableNames', [obj_names_star,obj_names_star_norm,'Flag']);
 
 for i=1:length(b.var_names)-1
@@ -111,7 +104,7 @@ edge_weights = [           sum(lin_feasible);                                   
 
 G_J1 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,1),node_names);
 G_J2 = digraph(edge_connections(:,2),edge_connections(:,1),edge_weights(:,2),node_names);
-figure
+treeFig = figure;
 t = tiledlayout(1, 2);
 %t.TileSpacing = 'tight';
 t.Padding = 'compact';
@@ -128,7 +121,7 @@ axis off
 improvePlot
 
 %% parallel axis plot
-figure(Units="normalized", Position=[0.1,0.2,0.3,0.4], Color="white");
+parallelFig = figure(Units="normalized", Position=[0.1,0.2,0.3,0.4], Color="white");
 t = tiledlayout(3, 4);
 t.TileSpacing = 'compact';
 t.Padding = 'compact';

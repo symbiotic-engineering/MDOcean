@@ -1,13 +1,36 @@
 stages:
-  build-paper:
-    cmd: calkit xenv -n tex -- latexmk -cd -silent -interaction=nonstopmode -pdf pubs/journal-paper/mdocean.tex
+  build-RE-paper:
+    cmd: calkit latex build -e tex --no-check -r 
+      pubs/renewable-energy-mdo/.latexmkrc 
+      pubs/renewable-energy-mdo/mdocean.tex
     deps:
-    - pubs/journal-paper/figs
-    - pubs/journal-paper/mdocean.tex
-    - pubs/journal-paper/sections/
-    - pubs/journal-paper/tables
-    - pubs/journal-paper/references.bib
-    - pubs/journal-paper/numbers.tex
-    - pubs/journal-paper/elsarticle-num-names.bst
+      - pubs/renewable-energy-mdo/mdocean.tex
+      - pubs/renewable-energy-mdo/figs
+      - pubs/renewable-energy-mdo/sections/
+      - pubs/renewable-energy-mdo/tables
+      - pubs/renewable-energy-mdo/references.bib
+      - pubs/renewable-energy-mdo/numbers.tex
+      - pubs/elsarticle-num-names.bst
+      - pubs/renewable-energy-mdo/.latexmkrc
+      - .calkit/env-locks/tex
     outs:
-    - pubs/journal-paper/mdocean.pdf
+      - pubs/renewable-energy-mdo/mdocean.pdf
+    desc: Automatically generated from the 'build-RE-paper' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  build-AOR-paper:
+    cmd: calkit latex build -e tex --no-check -r 
+      pubs/applied-ocean-research-model/.latexmkrc 
+      pubs/applied-ocean-research-model/main.tex
+    deps:
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/numbers.tex
+      - pubs/elsarticle-num-names.bst
+      - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
+      - pubs/applied-ocean-research-model/.latexmkrc
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/applied-ocean-research-model/main.pdf
+    desc: Automatically generated from the 'build-AOR-paper' stage in 
+      calkit.yaml. Changes made here will be overwritten.

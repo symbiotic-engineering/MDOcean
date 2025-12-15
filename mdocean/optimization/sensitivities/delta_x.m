@@ -16,9 +16,11 @@ J_down = zeros(1,length(x));
 for i=1:length(x)
     dX = zeros(size(X));
     dX(i) = dx(i);
-    [out_up(1),  out_up(2)]   = simulation(X+dX,p);
-    J_up(i) = out_up(which_obj);
-    [out_down(1),out_down(2)] = simulation(X-dX,p);
+    
+    out_up   = simulation(X+dX,p);
+    out_down = simulation(X-dX,p);
+
+    J_up(i)   = out_up(which_obj);
     J_down(i) = out_down(which_obj);
 end
 
