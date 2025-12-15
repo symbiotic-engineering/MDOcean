@@ -142,6 +142,12 @@ class MatlabAutosummary(Autosummary):
         env = self.env
         mat_data = env.domains.get('mat').data
         known_modules = set(mat_data.get('modules', {}).keys())
+        known_classes = set(mat_data.get('classes', {}).keys())
+
+        entities_table = mat_types.analyze(self.env.app)
+
+        print("Known modules:", known_modules)
+        print("Known classes:", known_classes)
 
         collected = set()
 
@@ -154,10 +160,14 @@ class MatlabAutosummary(Autosummary):
                 if mod.startswith(prefix) and mod not in collected:
                     print(f"recursing on submodule: {mod}")
                     collect_recursive(mod)
+            for cls in known_classes:
+                if cls.startswith(prefix) and cls not in collected:
+                    print(f"collecting class: {cls}")
+                    collected.add(cls)
 
         for name in names:
             if not name.startswith('__'):
-                if name in known_modules:
+                if name in known_modules or name in known_classes:
                     collect_recursive(name)
                 else:
                     collected.add(name)
