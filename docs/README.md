@@ -1,4 +1,20 @@
-On 7/29/25, I was trying a number of ways to get nested toctrees for matlab.
+# How to build docs
+
+Create/activate environment:
+```
+conda create -n sphinxenv3 -c conda-forge pip sphinxcontrib-matlabdomain myst-parser
+pip install furo==2021.11.16
+conda activate sphinxenv2
+```
+Build:
+```
+rm -rf docs/generated
+sphinx-build -a -W --keep-going -b html docs docs/_build/html
+```
+
+# Docs debugging log
+
+On 7/29/25 and 12/14/25, I was trying a number of ways to get nested toctrees for matlab.
 1. Use the python apidoc extension directly. This does not support the matlab domain and I did not pursue it further.
 2. Use the python autosummary extension directly. This also does not support the matlab domain so results in `py:obj ref not found` warnings, which I fixed by overriding the table to return none, but this had still the issue of containing only the high level modules and functions, not any submodules.
 3. Custom matlab autosummary extension: see `_ext/matlab_autosummary.py` to detect the matlab submodules. This is what ultimately worked. The solution was to modify the context within the python autosummary (overload the `generate_autosummary_content` and `generate_autosummary_docs` functions), combined with a modified table and modifying the `_templates/autosummary/module.rst` template file).

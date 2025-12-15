@@ -59,32 +59,11 @@ def setup(app):
         def patched_generate_autosummary_docs(sources, *args, **kwargs):
             results = []
             for source in sources:
-                name = Path(source).stem
-                print(f"\nSource: {source}, name: {name}")
-
-                # Ensure the config value exists so autosummary won't fail
-                if getattr(app.config, "autosummary_context", None) is None:
-                    print("changing none to {}")
-                    app.config.autosummary_context = {}
-
-                # Inject your per-page context
-                # ctx = user_context.get(name, {})
-                # if not ctx:
-                #     print(f"No autosummary_context for {name}, setting to empty dict")
-                #     app.config.autosummary_context = {}
-                # else:
-                #     app.config.autosummary_context.update(ctx)
-                #app.config.autosummary_context = {**user_context.get(name, {})}
-                #if getattr(app.config, "autosummary_context", None) is None:
-                #    print(f"No autosummary_context for {name}")
-                print(f"Generating autosummary for {name}") # with context {app.config.autosummary_context}")
-                #kwargs["app"] = app
             
                 def patched_generate_autosummary_content(*args, **kwargs):
-                    # hardcode context (7th argument)
                     name = args[0]
                     ctx = user_context.get(name, {})
-                    old_ctx = args[7]
+                    old_ctx = args[7] # hardcode context (7th argument)
                     assert type(old_ctx) is dict, f"Expected dict for context, got {type(old_ctx)}"
                     new_args = args[:7] + (ctx,) + args[8:]
                     print(f"Generating autosummary content for {name} with context {ctx}")
