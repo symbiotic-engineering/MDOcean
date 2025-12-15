@@ -13,5 +13,7 @@ MDOcean documentation
 **Full Function Documentation**
 
 .. toctree::
+   :maxdepth: 3
+
    api
    modification
