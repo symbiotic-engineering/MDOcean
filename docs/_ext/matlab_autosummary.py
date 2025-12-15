@@ -1,4 +1,4 @@
-from sphinx.ext.autosummary import Autosummary, generate as ag
+from sphinx.ext.autosummary import Autosummary, generate as ag, autosummary_table
 from pathlib import Path
 
 def generate_matlab_modulelist(app,config):
@@ -111,8 +111,42 @@ def setup(app):
 
 class MatlabAutosummary(Autosummary):
     def get_table(self, *args, **kwargs):
-        # No table, to avoid py:obj ref warnings
-        return []
+        from docutils import nodes
+        from sphinx.addnodes import pending_xref
+        
+        table = super().get_table(*args, **kwargs)
+        
+        # table is a list of nodes, traverse each one
+        for table_node in table:
+            # Traverse the entire node tree to find pending_xref and literal nodes
+            for node in table_node.traverse():
+                # Change pending_xref attributes from py to mat
+                if isinstance(node, pending_xref):
+                    if node.get('refdomain') == 'py':
+                        node['refdomain'] = 'mat'
+                    if node.get('reftype') == 'obj':
+                        node['reftype'] = 'obj'  # Keep as obj
+                    # Update py:class and py:module attributes
+                    if node.get('py:class'):
+                        node['mat:class'] = node.pop('py:class')
+                    if node.get('py:module'):
+                        node['mat:module'] = node.pop('py:module')
+                
+                # Change literal class attributes from "xref py py-obj" to "xref mat mat-obj"
+                elif isinstance(node, nodes.literal):
+                    classes = node.get('classes', [])
+                    if 'py' in classes:
+                        # Replace 'py' with 'mat' and 'py-obj' with 'mat-obj'
+                        new_classes = []
+                        for cls in classes:
+                            if cls == 'py':
+                                new_classes.append('mat')
+                            elif cls == 'py-obj':
+                                new_classes.append('mat-obj')
+                            else:
+                                new_classes.append(cls)
+                        node['classes'] = new_classes
+        return table
 
     def get_items(self, names):
         print("MatlabAutosummary get_items called with names:", names)
