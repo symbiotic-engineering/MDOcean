@@ -1,69 +1,14 @@
 schema: '2.0'
 stages:
-  build-paper:
-    cmd: calkit xenv -n tex --no-check -- latexmk -cd -interaction=nonstopmode 
-      -silent -synctex=1 -pdf pubs/journal-paper/mdocean.tex
-    deps:
-    - path: mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
-      hash: md5
-      md5: 63642117622f827efc2cccda9c0e4821
-      size: 33226
-    - path: .calkit/env-locks/tex.json
-      hash: md5
-      md5: 06c54a2e51a071a92c34d67ca4c72e01
-      size: 1171
-    - path: pubs/journal-paper/elsarticle-num-names.bst
-      hash: md5
-      md5: b24eb82d1afd0a3fa7d82c6efbe1f559
-      size: 28896
-    - path: pubs/journal-paper/figs
-      hash: md5
-      md5: 39b6ab6963e771df0b4fa4122071b74c.dir
-      size: 4799285
-      nfiles: 58
-    - path: pubs/journal-paper/mdocean.tex
-      hash: md5
-      md5: 81ca33f09e1e323af9058cfea6cb1b9f
-      size: 22952
-    - path: pubs/journal-paper/numbers.tex
-      hash: md5
-      md5: 4494d05832f0abee97537230fed888eb
-      size: 3533
-    - path: pubs/journal-paper/references.bib
-      hash: md5
-      md5: fe9f06e4bc6657483a496ac6c7b3191d
-      size: 516895
-    - path: pubs/journal-paper/sections/
-      hash: md5
-      md5: 7b0d155dcd598065c399283e3d03b36a.dir
-      size: 394706
-      nfiles: 16
-    - path: pubs/journal-paper/tables
-      hash: md5
-      md5: fa2c5d0884538dd060df9dea858dc78f.dir
-      size: 8219
-      nfiles: 5
-    outs:
-    - path: pubs/journal-paper/mdocean.pdf
-      hash: md5
-      md5: 2b1f7b5641545af45e636a2196b4f28c
-      size: 5487594
-  _check-env-tex:
-    cmd: calkit check environment --name tex
-    outs:
-    - path: .calkit/env-locks/tex.json
-      hash: md5
-      md5: 87f2e8b3cce39f893bb2cac182c74026
-      size: 1171
   build-RE-paper:
-    cmd: calkit xenv -n tex --no-check -- latexmk -cd -norc 
-      -interaction=nonstopmode -r pubs/renewable-energy-mdo/.latexmkrc -silent 
-      -synctex=1 -pdf pubs/renewable-energy-mdo/mdocean.tex
+    cmd: calkit latex build -e tex --no-check -r 
+      pubs/renewable-energy-mdo/.latexmkrc pubs/renewable-energy-mdo/mdocean.tex
     deps:
-    - path: .calkit/env-locks/tex.json
+    - path: .calkit/env-locks/tex
       hash: md5
-      md5: 87f2e8b3cce39f893bb2cac182c74026
-      size: 1171
+      md5: bce75e09f8a3deb731513d66d450bb87.dir
+      size: 1147
+      nfiles: 1
     - path: pubs/elsarticle-num-names.bst
       hash: md5
       md5: b24eb82d1afd0a3fa7d82c6efbe1f559
@@ -102,17 +47,18 @@ stages:
     outs:
     - path: pubs/renewable-energy-mdo/mdocean.pdf
       hash: md5
-      md5: b5c7ebfef1eb976b8370a240bdd7559d
-      size: 3658527
+      md5: d1a60e55d9a50dce2f14ec5dcab3a7c7
+      size: 3658523
   build-AOR-paper:
-    cmd: calkit xenv -n tex --no-check -- latexmk -cd -norc 
-      -interaction=nonstopmode -r pubs/applied-ocean-research-model/.latexmkrc 
-      -silent -synctex=1 -pdf pubs/applied-ocean-research-model/main.tex
+    cmd: calkit latex build -e tex --no-check -r 
+      pubs/applied-ocean-research-model/.latexmkrc 
+      pubs/applied-ocean-research-model/main.tex
     deps:
-    - path: .calkit/env-locks/tex.json
+    - path: .calkit/env-locks/tex
       hash: md5
-      md5: 87f2e8b3cce39f893bb2cac182c74026
-      size: 1171
+      md5: bce75e09f8a3deb731513d66d450bb87.dir
+      size: 1147
+      nfiles: 1
     - path: mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       hash: md5
       md5: f969e404053fb2078faa2f2dc3095ab1
@@ -145,5 +91,5 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/main.pdf
       hash: md5
-      md5: 2f13e1d0222b9be0f0dfd7c696bba56b
-      size: 4743270
+      md5: e99c96a29c305d3c061711a382274530
+      size: 4743271
