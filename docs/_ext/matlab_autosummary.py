@@ -10,7 +10,7 @@ def generate_matlab_modulelist(app,config):
 
     entries = []
 
-    for path in toolbox_root.rglob("*"):
+    for path in toolbox_root.glob("*"):
         if not path.is_dir():
             continue
         if path.name.startswith((".", "+private", "@")):
@@ -48,7 +48,7 @@ def generate_matlab_modulelist(app,config):
 
 def setup(app):
     app.add_directive("autosummary", MatlabAutosummary, override=True)
-    #app.connect("config-inited", generate_matlab_modulelist)
+    app.connect("config-inited", generate_matlab_modulelist)
 
     def patch_generate(app, config):
         user_context = config.autosummary_context

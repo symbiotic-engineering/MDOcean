@@ -5,7 +5,9 @@
     :toctree: generated/
     :recursive:
     
+    .. BEGIN MATLAB AUTO API
     inputs
     optimization
-    simulation
     plots
+    simulation
+.. END MATLAB AUTO API
