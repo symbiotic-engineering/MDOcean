@@ -1,13 +1,12 @@
 API
 ===
 
-- :mod:`inputs`
-- :mod:`optimization`
-- :mod:`plots`
-- :mod:`simulation`
-
-
 .. toctree::
-    :hidden:
+   :maxdepth: 3
+   :caption: Contents
 
-    api_generate
+   generated/inputs
+   generated/optimization
+   generated/plots
+   generated/simulation
+
