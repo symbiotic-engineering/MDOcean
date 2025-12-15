@@ -25,7 +25,11 @@ extensions = [
     'sphinxcontrib.matlab',
     'sphinx.ext.autosummary', # must come before matlab_autosummary to avoid ref warnings
     'matlab_autosummary',
-    'myst_parser'
+    'myst_parser',
+    'sphinx_design',
+    'sphinx.ext.viewcode',
+    'sphinx_copybutton',
+    #'sphinx_last_updated_by_git'
 ]
 
 source_suffix = {
@@ -56,8 +60,23 @@ autodoc_default_options = {
     'show-inheritance': True
 }
 
+globaltoc_maxdepth = 2
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_logo = '_static/SEALab_Logo_Light_202101_120ht.png'
+
+html_context = {
+    "display_github": True,
+    "github_user": "symbiotic-engineering",
+    "github_repo": "MDOcean",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
+}
+
+html_theme_options = {
+    'version_selector': True,
+}
