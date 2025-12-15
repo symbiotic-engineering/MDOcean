@@ -48,10 +48,12 @@ autosummary_generate = True
 autosummary_output_dir = "generated"
 autosummary_context = {
     'inputs': {'matmodules': ['inputs.validation', 'inputs.wave_conditions']},
+    'inputs.validation': {'matmodules': ['inputs.validation.MEEM_validation', 'inputs.validation.WECSim']},
     'optimization': {'matmodules': ['optimization.sensitivities', 'optimization.multiobjective']},
     'simulation': {'matmodules': ['simulation.modules', 'simulation.run']},
-    'simulation.modules': {'matmodules': ['simulation.modules.dynamics', 'simulation.modules.econ']},
-    'plots': {'matmodules': ['plots.util']}
+    'simulation.modules': {'matmodules': ['simulation.modules.dynamics', 'simulation.modules.econ','simulation.modules.hydro','simulation.modules.structures']},
+    'plots': {'matmodules': ['plots.util','plots.matlab_figs','plots.non_matlab_figs','plots.matlab_figs.structures']},
+    'analysis': {'matclasses': ['analysis.@Parameters.Parameters', 'analysis.@ReadNonMatlabFigs.ReadNonMatlabFigs', 'analysis.@AllFigCompare.AllFigCompare', 'analysis.@Validation.Validation', 'analysis.@DesignVars.DesignVars']}
 }
 
 autodoc_default_options = {

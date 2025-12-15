@@ -6,6 +6,7 @@
     :recursive:
     
     .. BEGIN MATLAB AUTO API
+    analysis
     inputs
     optimization
     plots
