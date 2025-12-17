@@ -8,7 +8,7 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
 % :param r: r
 % :param k: Wavenumber (1/m)
 % :param draft: draft
-% :param hydro: dynamics
+% :param hydro: function from WECSim
 % :returns: A f / $\\rho$
 % :returns: A s / $\\rho$
 % :returns: A c / $\\rho$

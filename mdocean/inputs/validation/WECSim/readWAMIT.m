@@ -2,10 +2,10 @@
 function hydro = readWAMIT(hydro,filename,exCoeff)
 % Function readWAMIT
 %
-% :param hydro: dynamics
+% :param hydro: function from WECSim
 % :param filename: filename
 % :param exCoeff: exCoeff
-% :returns: dynamics
+% :returns: function from WECSim
 % Reads data from a WAMIT output file.
 % 
 % If generalized body modes are used, the output directory must also 

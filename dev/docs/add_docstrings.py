@@ -128,45 +128,63 @@ def extract_parameters_from_parameters_m(parameters_path):
             content = f.read()
         
         # Find all table() calls
-        # Pattern: table("name", "pretty", {...}, "subsystem", bool, "description", {...})
-        # We need to carefully parse each table row
-        
         lines = content.split('\n')
         i = 0
         while i < len(lines):
             line = lines[i].strip()
             
             if line.startswith('table('):
-                # Collect the full table() call (might span multiple lines)
+                # Collect the full table() call (might span multiple lines with ...)
                 full_call = line
                 paren_depth = line.count('(') - line.count(')')
                 i += 1
                 while paren_depth > 0 and i < len(lines):
-                    full_call += ' ' + lines[i].strip()
-                    paren_depth += lines[i].count('(') - lines[i].count(')')
+                    next_line = lines[i].strip()
+                    # Remove MATLAB continuation marker before joining
+                    if next_line.endswith('...'):
+                        next_line = next_line[:-3].strip()
+                    full_call += ' ' + next_line
+                    paren_depth += next_line.count('(') - next_line.count(')')
                     i += 1
                 
-                # Now parse the table() call for name and description
-                # Extract all quoted strings in order
-                quoted = []
+                # Parse table() call to extract name (1st quoted string) and description (6th quoted string)
+                # Table structure: table("name", "pretty", {...}, "subsystem", bool, "description", {...})
+                # We need to extract quoted strings while respecting bracket depth
+                
+                quoted_strings = []
                 j = 0
+                brace_depth = 0
+                paren_depth_local = 0
+                
                 while j < len(full_call):
-                    if full_call[j] == '"':
+                    char = full_call[j]
+                    
+                    # Track bracket depth to skip quoted strings inside {...}
+                    if char == '{':
+                        brace_depth += 1
+                    elif char == '}':
+                        brace_depth -= 1
+                    elif char == '(':
+                        paren_depth_local += 1
+                    elif char == ')':
+                        paren_depth_local -= 1
+                    
+                    # Only extract quoted strings that are NOT inside braces or function calls
+                    if char == '"' and brace_depth == 0 and paren_depth_local == 1:  # paren_depth_local==1 means inside table()
                         k = j + 1
                         while k < len(full_call) and full_call[k] != '"':
                             k += 1
                         if k < len(full_call):
-                            quoted.append(full_call[j + 1:k])
+                            quoted_strings.append(full_call[j + 1:k])
                         j = k + 1
                     else:
                         j += 1
                 
-                # Table structure: table("name", "pretty_name", {...}, "subsystem", bool, "description", {...})
-                # So we have: [name, pretty_name, subsystem, description]
-                # In order: 0=name, 1=pretty_name, 2=subsystem, 3=description
-                if len(quoted) >= 4:
-                    param_name = quoted[0]
-                    description = quoted[3]
+                # Table structure yields quoted strings in order:
+                # [0]=name, [1]=pretty_name, [2]=subsystem, [3]=description
+                if len(quoted_strings) >= 4:
+                    param_name = quoted_strings[0]
+                    description = quoted_strings[3]
                     param_descriptions[param_name] = description
             else:
                 i += 1
@@ -520,21 +538,16 @@ def has_docstring(content):
                 has_autogen_marker = True
             
             has_manual = False
-            # Look for sphinxcontrib-matlab directives (:param or :returns)
+            # Only treat as manual if sphinxcontrib-matlab directives already present after function
             for j in range(i + 1, min(i + 40, len(lines))):
                 next_line = lines[j].strip()
-                
-                # Look for sphinxcontrib-matlab directives
                 if ':param' in next_line or ':returns' in next_line:
-                    # If we found directives but no autogen marker, it's manual
                     if not has_autogen_marker:
                         has_manual = True
                     return (has_manual, has_autogen_marker)
-                
-                # Stop looking if we hit non-comment code
                 if next_line and not next_line.startswith('%'):
                     return (has_manual, has_autogen_marker)
-            
+
             return (has_manual, has_autogen_marker)
     return (False, False)
 
@@ -621,6 +634,13 @@ def add_docstring_to_file(filepath, design_vars=None, param_descriptions=None):
         design_vars = {}
     if param_descriptions is None:
         param_descriptions = {}
+
+    # Explicit skip list for files with long manual headers we should not touch
+    skip_files = {
+        str(Path('mdocean') / 'plots' / 'util' / 'table2latex.m')
+    }
+    if any(filepath.endswith(s) for s in skip_files):
+        return False, "Already has manual docstring"
     
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -632,14 +652,17 @@ def add_docstring_to_file(filepath, design_vars=None, param_descriptions=None):
         if has_manual:
             return False, "Already has manual docstring"
         
-        if has_autogen:
-            # Remove the old autogenerated docstring
-            content = remove_autogenerated_docstring(content)
-        
-        # Extract function signature (returns start and end indices)
+        # Extract function signature BEFORE modifying content
         func_line, line_start_idx, line_end_idx = extract_function_signature(content)
         if func_line is None:
             return False, "Could not parse function"
+        
+        # Now remove the old autogenerated docstring if present
+        if has_autogen:
+            # Remove the old autogenerated docstring
+            content = remove_autogenerated_docstring(content)
+            # Re-extract signature after removal (indices may have shifted)
+            func_line, line_start_idx, line_end_idx = extract_function_signature(content)
         
         # Parse function signature
         func_name, inputs, outputs, _ = parse_function_line(func_line)
@@ -683,12 +706,12 @@ def main():
     param_descriptions = extract_parameters_from_parameters_m(str(parameters_file))
     print(f"Loaded {len(param_descriptions)} parameter descriptions\n")
     
-    # Find all .m files, excluding generated and SAFE folders
+    # Find all .m files, excluding generated, SAFE, and OpenFLASH folders
     pattern = str(mdocean_path / '**' / '*.m')
     m_files = glob.glob(pattern, recursive=True)
     
-    # Filter out generated and SAFE
-    m_files = [f for f in m_files if '/generated/' not in f and '/SAFE/' not in f]
+    # Filter out generated, SAFE, and OpenFLASH
+    m_files = [f for f in m_files if '/generated/' not in f and '/SAFE/' not in f and '/OpenFLASH/' not in f]
     
     print(f"Found {len(m_files)} .m files to process\n")
     

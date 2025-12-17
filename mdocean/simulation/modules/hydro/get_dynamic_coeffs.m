@@ -30,7 +30,7 @@ function [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
 % :param g: acceleration of gravity (m/s2)
 % :param use_MEEM: whether to use MEEM for hydro coeffs (boolean)
 % :param harmonics: number of harmonics to use for MEEM (int)
-% :param hydro: dynamics
+% :param hydro: function from WECSim
 % :returns: m_f
 % :returns: B_h_f
 % :returns: K_h_f
