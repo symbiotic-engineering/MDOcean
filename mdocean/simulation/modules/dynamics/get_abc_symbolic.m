@@ -4,7 +4,7 @@ function [a_q,b_q,c_q] = get_abc_symbolic(force,mass,damping,stiffness,w,r_b,r_k
 %
 % :param force: force
 % :param mass: mass
-% :param damping: Damping coefficient
+% :param damping: damping
 % :param stiffness: stiffness
 % :param w: Angular wave frequency (rad/s)
 % :param r_b: r_b

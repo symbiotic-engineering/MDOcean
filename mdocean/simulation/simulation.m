@@ -6,7 +6,7 @@ function [J, P_matrix_elec, g_vec, val] = simulation(X, p)
 % :param p: Parameter struct
 % :returns: Objective function value
 % :returns: Electrical power matrix
-% :returns: Constraint vector
+% :returns: g_vec
 % :returns: Simulation result values struct
 
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers

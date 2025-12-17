@@ -2,11 +2,11 @@
 function signed_log(Z_data,C,levels,X_data,Y_data)
 % Function signed_log
 %
-% :param Z: Z
+% :param Z_data: Z_data
 % :param C: C
 % :param levels: levels
-% :param X: X
-% :param Y: Y
+% :param X_data: X_data
+% :param Y_data: Y_data
 % modified from the following
 % https://www.mathworks.com/matlabcentral/answers/1700655-symmetric-diverging-log-color-scale#answer_1380451
     

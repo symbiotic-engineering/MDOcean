@@ -5,7 +5,7 @@ function [A, b_vec, dAdp, dbdp] = lin_ineq_constraints(p, param_name)
 % :param p: Parameter struct
 % :param param_name: param_name
 % :returns: A
-% :returns: Constraint vector (inequality coefficients)
+% :returns: b_vec
 % :returns: dAdp
 % :returns: dbdp
 
