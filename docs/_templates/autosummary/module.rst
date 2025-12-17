@@ -24,12 +24,12 @@
    {% endif %}
    {%- endblock %}
 
-   {%- block classes %}
-   {%- if classes %}
+   {%- block matclasses %}
+   {%- if matclasses %}
    .. rubric:: {{ _('Classes') }}
 
    .. autosummary::
-   {% for item in classes %}
+   {% for item in matclasses %}
       {{ item }}
    {%- endfor %}
    {% endif %}

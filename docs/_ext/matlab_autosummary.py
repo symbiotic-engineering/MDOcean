@@ -1,5 +1,8 @@
 from sphinx.ext.autosummary import Autosummary, generate as ag, autosummary_table
 from pathlib import Path
+from sphinxcontrib import mat_types
+import sphinx
+sphinx_version = int(sphinx.__version__.split(".")[0])
 
 def generate_matlab_modulelist(app,config):
     srcdir = Path(app.srcdir)
@@ -63,9 +66,16 @@ def setup(app):
                 def patched_generate_autosummary_content(*args, **kwargs):
                     name = args[0]
                     ctx = user_context.get(name, {})
-                    old_ctx = args[7] # hardcode context (7th argument)
+                    if sphinx_version == 8:
+                        idx = 7
+                    elif sphinx_version == 7:
+                        idx = 8
+                    else:
+                        raise RuntimeError(f"Unsupported Sphinx version: {sphinx_version}")
+                    
+                    old_ctx = args[idx] # hardcode context (7th argument)
                     assert type(old_ctx) is dict, f"Expected dict for context, got {type(old_ctx)}"
-                    new_args = args[:7] + (ctx,) + args[8:]
+                    new_args = args[:idx] + (ctx,) + args[idx+1:]
                     print(f"Generating autosummary content for {name} with context {ctx}")
                     return original_generate_content(*new_args, **kwargs)
 
@@ -132,6 +142,12 @@ class MatlabAutosummary(Autosummary):
         env = self.env
         mat_data = env.domains.get('mat').data
         known_modules = set(mat_data.get('modules', {}).keys())
+        known_classes = set(mat_data.get('classes', {}).keys())
+
+        entities_table = mat_types.analyze(self.env.app)
+
+        print("Known modules:", known_modules)
+        print("Known classes:", known_classes)
 
         collected = set()
 
@@ -144,10 +160,14 @@ class MatlabAutosummary(Autosummary):
                 if mod.startswith(prefix) and mod not in collected:
                     print(f"recursing on submodule: {mod}")
                     collect_recursive(mod)
+            for cls in known_classes:
+                if cls.startswith(prefix) and cls not in collected:
+                    print(f"collecting class: {cls}")
+                    collected.add(cls)
 
         for name in names:
             if not name.startswith('__'):
-                if name in known_modules:
+                if name in known_modules or name in known_classes:
                     collect_recursive(name)
                 else:
                     collected.add(name)

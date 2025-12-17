@@ -82,6 +82,7 @@ The script `run_single.m` is a good starting point if you want to run the simula
 - `mdocean/optimization`: scripts and functions to perform single objective and multi-objective optimization and sensitivities. Start with the script `gradient_optim.m`
 if you want to run single objective optimization for each of the two objectives. For multi-objective, run `pareto_search.m` followed by `pareto_curve_heuristics.m`.
 - `mdocean/plots`: helper functions to visualize outputs. Start with the script `all_figures.m` if you want to generate specific figures from the paper.
+- `mdocean/analysis`: classes for running analyses of various sorts, typically wrappers around functions in the `optimization` and `plots` folders. Uses a special cached workflow defined in abstract class `GenericAnalysis.m` so that changes to cheap post-processing scripts (typically plots) do not require rerunning the expensive analysis (typically optimization).
 - `dev`: miscellaneous scripts not core to the codebase that were used to inform the development of the simulation.
 
 If you are running individual scipts/functions, you will need to `cd` to the `mdocean` folder and add all subfolders here to the matlab path. This is done automatically if you are running everything at once via `run_tests.m`.
