@@ -21,10 +21,12 @@
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/mathjax-config.js?v=86b1d7f1"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="simulation.run" href="simulation.run.html" />
+    <link rel="next" title="simulation.modules.hydro" href="simulation.modules.hydro.html" />
     <link rel="prev" title="simulation.modules.dynamics" href="simulation.modules.dynamics.html" /> 
 </head>
 
@@ -84,14 +86,69 @@
 <dl class="mat function" id="module-simulation.modules.econ">
 <dt class="sig sig-object mat" id="simulation.modules.econ.LCOE_from_capex_design_power">
 <span class="sig-prename descclassname"><span class="pre">simulation.modules.econ.</span></span><span class="sig-name descname"><span class="pre">LCOE_from_capex_design_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">capex_design_dep</span></em>, <em class="sig-param"><span class="pre">N_WEC</span></em>, <em class="sig-param"><span class="pre">P_elec</span></em>, <em class="sig-param"><span class="pre">FCR</span></em>, <em class="sig-param"><span class="pre">efficiency</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.econ.LCOE_from_capex_design_power" title="Link to this definition"></a></dt>
-<dd><p>costs taken from ‘CBS (Total)’ tab of the RM3 cost breakdown structure
-<a class="reference external" href="https://catalog.data.gov/ne/dataset/reference-model-3-cost-breakdown-rm3-wave-point-absorber">https://catalog.data.gov/ne/dataset/reference-model-3-cost-breakdown-rm3-wave-point-absorber</a></p>
+<dd><p>Function <a class="reference internal" href="#simulation.modules.econ.LCOE_from_capex_design_power" title="simulation.modules.econ.LCOE_from_capex_design_power"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">LCOE_from_capex_design_power()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>capex_design_dep</strong> – capex_design_dep</p></li>
+<li><p><strong>N_WEC</strong> – number of WECs in array (-)</p></li>
+<li><p><strong>P_elec</strong> – P_elec</p></li>
+<li><p><strong>FCR</strong> – fixed charge rate (-), see RM3 report p63</p></li>
+<li><p><strong>efficiency</strong> – efficiency</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Levelized cost of energy ($/kWh)</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>capex</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>opex</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.modules.econ.econ">
 <span class="sig-prename descclassname"><span class="pre">simulation.modules.econ.</span></span><span class="sig-name descname"><span class="pre">econ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">mass_material</span></em>, <em class="sig-param"><span class="pre">M</span></em>, <em class="sig-param"><span class="pre">cost_perkg_mult</span></em>, <em class="sig-param"><span class="pre">N_WEC</span></em>, <em class="sig-param"><span class="pre">P_elec</span></em>, <em class="sig-param"><span class="pre">FCR</span></em>, <em class="sig-param"><span class="pre">cost_perN_mult</span></em>, <em class="sig-param"><span class="pre">cost_perW_mult</span></em>, <em class="sig-param"><span class="pre">F_max</span></em>, <em class="sig-param"><span class="pre">P_max</span></em>, <em class="sig-param"><span class="pre">efficiency</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.econ.econ" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.modules.econ.econ" title="simulation.modules.econ.econ"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">econ()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass_material</strong> – mass_material</p></li>
+<li><p><strong>M</strong> – Material Index</p></li>
+<li><p><strong>cost_perkg_mult</strong> – material cost ($/kg)</p></li>
+<li><p><strong>N_WEC</strong> – number of WECs in array (-)</p></li>
+<li><p><strong>P_elec</strong> – P_elec</p></li>
+<li><p><strong>FCR</strong> – fixed charge rate (-), see RM3 report p63</p></li>
+<li><p><strong>cost_perN_mult</strong> – cost per Newton multiplier (-), 0.1656 $/N from <a class="reference external" href="https://doi.org/10.1016/j.ifacol.2022.10.531">https://doi.org/10.1016/j.ifacol.2022.10.531</a></p></li>
+<li><p><strong>cost_perW_mult</strong> – cost per Watt multiplier (-)</p></li>
+<li><p><strong>F_max</strong> – Maximum Force</p></li>
+<li><p><strong>P_max</strong> – Maximum Power</p></li>
+<li><p><strong>efficiency</strong> – efficiency</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Levelized cost of energy ($/kWh)</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>capex_design_dep</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>capex</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>opex</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pto</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>devicestructure</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -100,7 +157,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="simulation.modules.dynamics.html" class="btn btn-neutral float-left" title="simulation.modules.dynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="simulation.run.html" class="btn btn-neutral float-right" title="simulation.run" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="simulation.modules.hydro.html" class="btn btn-neutral float-right" title="simulation.modules.hydro" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

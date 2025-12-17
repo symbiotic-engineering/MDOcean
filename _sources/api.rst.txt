@@ -9,4 +9,5 @@ API
    generated/optimization
    generated/plots
    generated/simulation
+   generated/analysis
 

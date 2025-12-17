@@ -21,11 +21,13 @@
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/mathjax-config.js?v=86b1d7f1"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Modification" href="../modification.html" />
-    <link rel="prev" title="simulation.modules.econ" href="simulation.modules.econ.html" /> 
+    <link rel="next" title="analysis" href="analysis.html" />
+    <link rel="prev" title="simulation.modules.structures" href="simulation.modules.structures.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -83,7 +85,39 @@
 <dl class="mat function" id="module-simulation.run">
 <dt class="sig sig-object mat" id="simulation.run.check_max_CW">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">check_max_CW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename_uuid</span></em>, <em class="sig-param"><span class="pre">p</span></em>, <em class="sig-param"><span class="pre">b_or_X</span></em>, <em class="sig-param"><span class="pre">plot_on</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.check_max_CW" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the maximum radiation-limited capture width is violated.
+<dd><p>Function <a class="reference internal" href="#simulation.run.check_max_CW" title="simulation.run.check_max_CW"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">check_max_CW()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename_uuid</strong> – filename_uuid</p></li>
+<li><p><strong>p</strong> – Parameter struct</p></li>
+<li><p><strong>b_or_X</strong> – b_or_X</p></li>
+<li><p><strong>plot_on</strong> – plot_on</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>hydro_ratio</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>P_wave</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CW_max</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>P_elec</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>force_sat_ratio</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>drag_ratio</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>eff</p>
+</dd>
+</dl>
+<p>Checks whether the maximum radiation-limited capture width is violated.
 b_or_X: provide b (or no input) if you want to use the design with highest avg power (worst case),
 vs provide X if you want to check a certain design.</p>
 </dd></dl>
@@ -91,44 +125,209 @@ vs provide X if you want to check a certain design.</p>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.experiments">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">experiments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">p</span></em>, <em class="sig-param"><span class="pre">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.experiments" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.run.experiments" title="simulation.run.experiments"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">experiments()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – Parameter struct</p></li>
+<li><p><strong>b</strong> – Design variable bounds struct</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X_ins</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ratios</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Levelized cost of energy ($/kWh)</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cost</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>power</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Indices or names of violated constraints</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.run_single">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">run_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">p</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.run_single" title="Link to this definition"></a></dt>
-<dd><p>Run and plot a single design. Defaults to nominal design if no X input.</p>
+<dd><p>Function <a class="reference internal" href="#simulation.run.run_single" title="simulation.run.run_single"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">run_single()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – Parameter struct</p></li>
+<li><p><strong>b</strong> – Design variable bounds struct</p></li>
+<li><p><strong>X</strong> – Design variable vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure handles</p>
+</dd>
+</dl>
+<p>Run and plot a single design. Defaults to nominal design if no X input.</p>
 </dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.validate_MEEM">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">validate_MEEM</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.validate_MEEM" title="Link to this definition"></a></dt>
-<dd><p>settings</p>
+<dd><p>Function <a class="reference internal" href="#simulation.run.validate_MEEM" title="simulation.run.validate_MEEM"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">validate_MEEM()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>figPotMatch</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>figVelMatch</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>figAMatrixSparsity</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>figHydroCoeff</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.is_feasible">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">is_feasible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">g_nonlin</span></em>, <em class="sig-param"><span class="pre">x</span></em>, <em class="sig-param"><span class="pre">p</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">idx_ignore</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.is_feasible" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.run.is_feasible" title="simulation.run.is_feasible"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">is_feasible()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g_nonlin</strong> – g_nonlin</p></li>
+<li><p><strong>x</strong> – Design variable vector</p></li>
+<li><p><strong>p</strong> – Parameter struct</p></li>
+<li><p><strong>b</strong> – Design variable bounds struct</p></li>
+<li><p><strong>idx_ignore</strong> – idx_ignore</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>feasible</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A_ineq</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indices or names of violated constraints</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>feasible_lin</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.hydro_coeff_err">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">hydro_coeff_err</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">plot_on</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.hydro_coeff_err" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.run.hydro_coeff_err" title="simulation.run.hydro_coeff_err"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">hydro_coeff_err()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plot_on</strong> – plot_on</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>mean_abs_err</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>R2</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure handle</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.power_matrix_compare">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">power_matrix_compare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">X</span></em>, <em class="sig-param"><span class="pre">p</span></em>, <em class="sig-param"><span class="pre">wecsim_filename</span></em>, <em class="sig-param"><span class="pre">report</span></em>, <em class="sig-param"><span class="pre">override</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.power_matrix_compare" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.run.power_matrix_compare" title="simulation.run.power_matrix_compare"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">power_matrix_compare()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – Design variable vector</p></li>
+<li><p><strong>p</strong> – Parameter struct</p></li>
+<li><p><strong>wecsim_filename</strong> – wecsim_filename</p></li>
+<li><p><strong>report</strong> – report</p></li>
+<li><p><strong>override</strong> – override</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weighted_power_error</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>max_float_amp_error</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>power_mech_err_matrix</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float_amp_err_matrix</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure handles</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.validate_nominal_RM3">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">validate_nominal_RM3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">mode</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.validate_nominal_RM3" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function <a class="reference internal" href="#simulation.run.validate_nominal_RM3" title="simulation.run.validate_nominal_RM3"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">validate_nominal_RM3()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> – mode</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>feasible</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Indices or names of violated constraints</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>simulated</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>actual</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tab</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure handle</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.run.validate_dynamics">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">validate_dynamics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.validate_dynamics" title="Link to this definition"></a></dt>
-<dd><p>Round 1: singlebody, wamit <code class="xref mat mat-func docutils literal notranslate"><span class="pre">geometry()</span></code></p>
+<dd><p>Function <a class="reference internal" href="#simulation.run.validate_dynamics" title="simulation.run.validate_dynamics"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">validate_dynamics()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>errors_singlebody</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>errors_multibody</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>errors_report</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>table_out</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig_singlebody</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig_multibody</p>
+</dd>
+</dl>
+<p>Round 1: singlebody, wamit <code class="xref mat mat-func docutils literal notranslate"><span class="pre">geometry()</span></code></p>
 </dd></dl>
 
 </section>
@@ -137,8 +336,8 @@ vs provide X if you want to check a certain design.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="simulation.modules.econ.html" class="btn btn-neutral float-left" title="simulation.modules.econ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../modification.html" class="btn btn-neutral float-right" title="Modification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="simulation.modules.structures.html" class="btn btn-neutral float-left" title="simulation.modules.structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="analysis.html" class="btn btn-neutral float-right" title="analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
