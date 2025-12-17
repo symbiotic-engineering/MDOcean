@@ -208,39 +208,38 @@ def extract_function_signature(content):
     if func_start_idx is None:
         return None, None, None
     
-    # Strategy: collect lines until we see a complete pattern where:
-    # 1. We find the = sign (separates outputs from inputs)
-    # 2. We find opening ( after =
-    # 3. We find closing ) that balances the opening (
+    # Strategy: Count parentheses () to find end of function inputs
+    # Ignore square brackets [] - they're for outputs
     
     func_lines = []
     func_end_idx = func_start_idx
-    found_equals = False
+    found_func_open_paren = False  # Track if we've found the function's opening (
     paren_depth = 0
     
     for i in range(func_start_idx, min(func_start_idx + 50, len(lines))):  # max 50 lines for signature
         line = lines[i]
         # Remove inline comments
         line_clean = line.split('%')[0]
+        
+        # Check for MATLAB continuation marker
+        has_continuation = line_clean.rstrip().endswith('...')
+        if has_continuation:
+            line_clean = line_clean.rstrip()[:-3].rstrip()  # Remove the ...
+        
         func_lines.append(line_clean)
         
-        # Track whether we've found the = sign (separates outputs from name+inputs)
-        if not found_equals and '=' in line_clean:
-            found_equals = True
+        # Count parentheses (function inputs) - skip square brackets (outputs)
+        for char in line_clean:
+            if char == '(':
+                paren_depth += 1
+                found_func_open_paren = True
+            elif char == ')':
+                paren_depth -= 1
         
-        # Only count parens AFTER finding the = sign (those are the function input parens)
-        if found_equals:
-            for char in line_clean:
-                if char == '(':
-                    paren_depth += 1
-                elif char == ')':
-                    paren_depth -= 1
-                    # When we close the parens after opening, we're done
-                    if paren_depth == 0:
-                        func_end_idx = i
-                        break
-            if paren_depth == 0 and found_equals:
-                break
+        # If we've found opening paren, counted all parens, and no continuation, we're done
+        if found_func_open_paren and paren_depth == 0 and not has_continuation:
+            func_end_idx = i
+            break
     
     # Join all lines and clean up
     func_line = ' '.join(func_lines).strip()
@@ -521,6 +520,7 @@ def has_docstring(content):
                 has_autogen_marker = True
             
             has_manual = False
+            # Look for sphinxcontrib-matlab directives (:param or :returns)
             for j in range(i + 1, min(i + 40, len(lines))):
                 next_line = lines[j].strip()
                 

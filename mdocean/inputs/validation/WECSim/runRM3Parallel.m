@@ -178,8 +178,7 @@ function cleanup_fcn(fileID,pctDir)
 % Function cleanup_fcn
 %
 % :param fileID: fileID
-% :param pctDir) fclose(fileID); try rmdir(pctDir: pctDir) fclose(fileID); try rmdir(pctDir
-% :param 's': 's'
+% :param pctDir: pctDir
     fclose(fileID);
     try
         rmdir(pctDir, 's');
