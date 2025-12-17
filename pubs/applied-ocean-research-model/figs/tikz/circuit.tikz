@@ -1,0 +1,42 @@
+% made using circuit2tikz designer https://www.circuit2tikz.tf.fau.de/designer/
+\begin{tikzpicture}
+	% Paths, nodes and wires:
+	\node[transformer, cute, xscale=0.95, yscale=0.95](N1) at (12.503, 5.247){} node[anchor=south] at ([yshift=0.38cm]N1.center){$N:1$};
+	\draw (4, 6) to[sinusoidal voltage source, l={$\zeta$}] (4, 8);
+	\draw (6, 6) to[controlled sinusoidal voltage source, l={$\hat\Gamma_f \zeta$}, name=float_excitation] (6, 8);
+	\draw (6, 2.5) to[controlled sinusoidal voltage source, l={$\hat\Gamma_s \zeta$}] (6, 4.5);
+	\draw (4, 6) -- (6, 6);
+	\draw (6, 2.5) -- (4, 2.5) -- (4, 6);
+	\node[ocirc] at (4, 8){};
+	\node[fourport, rotate=-90, xscale=0.54, yscale=0.54](Z_i) at (8.004, 5.259){} node[anchor=center] at (Z_i.center){$\hat{\mathbf{Z}}_i$};
+	\draw (6, 4.5) -- (7.75, 4.5) -| (7.759, 4.767);
+	\draw (6, 6) -- (7.75, 6) -- (7.75, 5.75);
+	\node[fourport, rotate=-90, xscale=0.54, yscale=0.54](N2) at (9.754, 5.259){} node[anchor=center] at (N2.center){$\mathbf{T}_{kin}$};
+	\draw (8.25, 5.75) -- (8.25, 6) -- (9.5, 6) -| (9.509, 5.75);
+	\draw (6, 8) -- (10, 8) -- (10, 5.75);
+	\draw (8.25, 4.75) -- (8.25, 4.5) -- (9.5, 4.5) -- (9.5, 4.75) -- (9.509, 4.767);
+	\draw (6, 2.5) -- (10, 2.5) -- (10, 4.75);
+	\node[gyrator, xscale=0.95, yscale=0.95](N3) at (15.885, 5.247){} node[anchor=south] at ([yshift=0.08cm]N3.center){$k_\tau$};
+	\draw (13.362, 6.25) to[european resistor, l={$\hat{Z}_d$}, name=Z_d] (14.75, 6.25);
+	\draw (17.383, 6.245) to[european resistor, l={$\hat{Z}_r$}, name=Z_r] (19.25, 6.25);
+	\draw (19.5, 6) to[european resistor, l={$\hat{Z}_l$}, name=Z_l] (19.5, 4.5);
+	\draw (13.5, 4.25) -- (14.888, 4.25);
+	\draw (10.25, 5) -- (11, 5) -| (11.005, 4.25);
+	\draw (10.25, 5.5) -- (11, 5.5) -| (11.005, 6.245);
+	\draw (19.25, 6.25) -| (19.5, 6);
+	\draw (19.5, 4.5) |- (16.883, 4.25);
+	\node[shape=rectangle, minimum width=0.465cm, minimum height=0.465cm](N4) at (16.883, 6.495){} node[anchor=center] at (N4.text){$V_{emf},I$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N5) at (19.5, 6.5){} node[anchor=center] at (N5.text){$V, I$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N6) at (15.081, 6.5){} node[anchor=center] at (N6.text){$\tau,\Omega$};
+	\node[shape=rectangle, minimum width=1.965cm, minimum height=0.465cm](N7) at (11.75, 6.5){} node[anchor=center] at (N7.text){$F_{PTO}, X_{PTO}$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N8) at (8, 6.25){} node[anchor=center] at (N8.text){$F_{i,f}, \xi_f$};
+	\node[shape=rectangle, minimum width=0.706cm, minimum height=0.465cm](N9) at (8, 4.25){} node[anchor=center] at (N9.text){$F_{i,s}, \xi_s$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N10) at (9.875, 4.25){} node[anchor=center] at (N10.text){$F_{p,s},~ \xi_s$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N11) at (9.875, 6.25){} node[anchor=center] at (N11.text){$F_{p,f},~ \xi_f$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N12) at (6.5, 8.25){} node[anchor=center] at (N12.text){$F_{e,f},\xi_f$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N13) at (6.5, 4.75){} node[anchor=center] at (N13.text){$F_{e,s},\xi_s$};
+	\draw (16.883, 6.245) -- (17.383, 6.245);
+	\draw (14.75, 6.25) -| (14.888, 6.245);
+	\draw (11.005, 6.245) -| (11.505, 6.245);
+	\draw (11.5, 4.25) |- (11, 4.25);
+\end{tikzpicture}

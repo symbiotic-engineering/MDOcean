@@ -286,6 +286,9 @@ The RAFT open-source Python package for offshore wind turbines uses the drag des
 Thus, MDOcean's semi-analytical dynamics offer a combination of speed, accuracy, and simplicity that is novel in the wave energy space.
 
 \paragraph{Equation of Motion}
+Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear frequency domain WEC model.
+Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2024} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
+
 The float and spar are each modeled as a floating rigid body, and the two bodies are coupled to transmit force between them.
 \hl{Note to scrutineers: the typeset equation below is for a single rigid body (stationary spar), but the actual simulation uses the real two-body dynamics.
 The two-body matrix equation will be typeset before submission.} The MDOcean dynamic model assumes %a stationary spar and
@@ -295,19 +298,35 @@ The equation of motion can be expressed in the time domain as: % todo: this is t
 \newcolumntype{C}{>{{}}c<{{}}}
 \begin{equation}\label{eq:eom}
 \begin{array}{rCCCCC}
-     m\ddot{x}(t) = & \underbrace{F_{e}(t)}_{\substack{\textrm{wave} \\  \textrm{excitation} }} & +\underbrace{F_{rad}(t)}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +&  \underbrace{ F_{res}(t)}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} &  +~~~~\underbrace{F_{d}(t)}_{\substack{\textrm{drag} }}~~~~+ & \underbrace{F_{p}(t)}_{\substack{\textrm{power}\\\text{takeoff} }} \\
-    = & \overbrace{\hat{\gamma}~ \zeta(t)} & \overbrace{-A_h\ddot{x}(t) - B_h\dot{x}(t)} &  \overbrace{-K_hx(t)} & \overbrace{-B_d\dot{x}(t)-K_dx(t)}  & \overbrace{-B_p\dot{x}(t)-K_px(t)}
+     \mathbf{M}\ddot{\vec\xi}(t) = 
+     & \underbrace{\vec{F_{e}}(t)}_{\substack{\textrm{wave} \\  \textrm{excitation} }} 
+     & +\underbrace{\vec{F_{rad}}(t)}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +
+     &  \underbrace{\vec{F_{res}}(t)}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} 
+     &  +~~~~\underbrace{\vec{F_{d}}(t)}_{\substack{\textrm{drag} }}~~~~+ 
+     & \underbrace{\vec{F_{p}}(t)}_{\substack{\textrm{power}\\\text{takeoff} }} \\
+    = & \overbrace{\vec{\hat{\gamma}}~ \zeta(t)} 
+    & \overbrace{-\mathbf{A}_h\ddot{\vec{\xi}}(t) - \mathbf{B}_h\dot{\vec{\xi}}(t)} 
+    &  \overbrace{-\mathbf{K}_h\vec{\xi}(t)} 
+    & \overbrace{-\mathbf{B}_d\dot{\vec{\xi}}(t)-\mathbf{K}_d\vec{\xi}(t)}  
+    & \overbrace{-\mathbf{B}_p\dot{\vec{\xi}}(t)-\mathbf{K}_p\vec{\xi}(t)}
 \end{array}
 \end{equation}
-where $x(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
+where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
 Forces include wave excitation, hydrodynamic radiation, hydrostatic restoring, drag, and power takeoff.
 For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
 The excitation coefficient $\hat{\gamma}$ is complex, and all other coefficients are real.
-In the frequency domain, the complex transfer function from real regular wave height $H$ to complex body amplitude $\hat{X}$ is then:
+In the frequency domain, the complex transfer function from real regular wave height $H$ to complex body amplitude $\hat{\xi}$ is then:
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\hat{X}}{H} = \frac{\hat{\gamma}/2}{(m+A_h)s^2+(B_h+B_d+B_p)s+(K_h+K_d+K_p)}
+    \frac{\vec{\hat{\xi}}}{H} = \frac{1}{2}\left[(\mathbf{M}+\mathbf{A}_h)s^2+(\mathbf{B}_h+\mathbf{B}_d+\mathbf{B}_p)s+(\mathbf{K}_h+\mathbf{K}_d+\mathbf{K}_p)\right]^{-1}\vec{\hat{\gamma}}
 \end{equation}
 where $s=i\omega$ is the Laplace variable.
+
+\begin{figure}
+\centering
+    \input{figs/tikz/circuit.tikz}
+\caption{Dynamics represented as a multiport circuit}
+\label{fig:multiport-circuit}
+\end{figure}
 
 \paragraph{PTO Dynamics and Power Production}
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy of the float and the end energy product, in this case electricity.
