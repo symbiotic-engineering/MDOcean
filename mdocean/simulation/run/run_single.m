@@ -8,9 +8,6 @@ function figs = run_single(p,b,X)
 % :returns: Figure handles
 % Run and plot a single design. Defaults to nominal design if no X input.
 
-% Returns:
-%  figs - array of figure handles created by this routine
-
     if nargin==0
         clear;close all;clc
         p = parameters();
