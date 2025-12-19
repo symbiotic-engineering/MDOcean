@@ -20,7 +20,7 @@ else
 end
 
 if nargin<4
-    which_objs = [1 2]; % run both objectives by default
+    which_objs = [3 4]; % run both objectives by default
     % 1 = min LCOE
     % 2 = min design-dependent capex cost, subject to power above threshold
     % 3 = max average power

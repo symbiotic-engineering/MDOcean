@@ -85,21 +85,23 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu, ... % constants
             in.num_terms_plate, in.radial_mesh_plate, in.num_stiff_d);
 
-[LCOE,capex_design,capex] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, ...
+[LCOE,capex_design,capex,opex] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, ...
                             in.FCR, in.cost_perN_mult, in.cost_perW_mult, ...
                             in.F_max, in.P_max, in.eff_array);
 
 model_grid_value = true; % override for merging
 if model_grid_value
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                    gamma_phase_f, capex/in.P_max*1000, in.location);
+    [CEM_CO2, CEM_grid_cost, AEP_matrix,force_matrix] = grid_CEM(F_heave_mat, capex, opex, P_matrix_elec, LCOE);
     
-    [net_eco_value, env_cost_per_wec] = enviro(m_m, in.distance_from_shore, A_hull, ...
-                            CEM_CO2, CEM_wec_capacity, in.P_max, ...
-                            in.eco_cost_steel, in.eco_cost_fiberglass, ...
+    [env_cost_per_wec, eco_cost_total] = enviro(m_m, in.distance_from_shore, A_hull, ...
+                            in.P_max, in.eco_cost_steel, in.eco_cost_fiberglass, ...
                             in.eco_cost_distance, in.eco_cost_carbon);
+        
+    [net_eco_value] = net_value(CEM_CO2, eco_cost_total, in.eco_cost_carbon, env_cost_per_wec, AEP_matrix, p, force_matrix);
+
+
 else
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,net_eco_value] = deal(0);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost, net_eco_value] = deal(0);
 end
 
 J_capex_design = capex_design / 1e6; % convert $ to $M

@@ -1,56 +1,89 @@
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = grid_CEM(B_p, X_u, phase_X_u, ...
-                                                gamma_phase_f, capacity_cost, location)
+function [CEM_CO2,CEM_grid_cost,AEP_matrix,force_matrix] = grid_CEM(F_heave_mat,capex,opex,P_matrix_elec,sim_LCOE)
+
+p = parameters();
+in = p;
+
+%% power/energy
+% power
+P_weighted = P_matrix_elec .* p.JPD / 100 * in.eff_array; % taken from dynamics.m and LCOE_from_capex_design_power.m
+P_avg = mysum(P_weighted);
+
+% annual energy
+hr_per_yr = 8766;
+AEP_matrix = P_weighted * in.N_WEC * hr_per_yr / 1000; % W to kWh per year, all wecs
+AEP = P_avg * in.N_WEC * hr_per_yr / 1000; % kWh per year
+
+%% force for scaling
+%scale the cost by the amount of steel needed at a given sea state
+%capex equals the sum of the entries of capex_matrix
+factor = 1./mysum(F_heave_mat);
+force_matrix = F_heave_mat.*factor;
+
+%% econ
+levelized_cost = in.FCR * capex + opex; % $/year
+levelized_cost_matrix_unscaled = in.FCR * capex * force_matrix + opex; % $/year
+cost_matrix_scale_factor = levelized_cost / mysum(levelized_cost_matrix_unscaled);
+levelized_cost_matrix = levelized_cost_matrix_unscaled * cost_matrix_scale_factor;
+
+levelized_value_matrix = AEP_matrix .* p.marginal_price; % kWh per year * $/kWh = $/year
+
+[LCOE_matrix,LCOE,...
+ LVOE_matrix,LVOE,...
+ NVOE_matrix,NVOE,...
+ net_value_matrix,net_value,...
+ VCR_matrix, VCR] = get_LXOE_NVOE_VCR(levelized_cost_matrix, ...
+                                      levelized_value_matrix, ...
+                                      AEP_matrix);
+
+% lcoe check
+assert(ismembertol(sim_LCOE,LCOE));
+
+CEM_CO2 = in.marginal_carbon;
+CEM_grid_cost = net_value;
+
+%% wave conditions
+[T_mdocean,Hs_mdocean] = meshgrid(p.T,p.Hs);
 
 
-    [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_phase_f);
 
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location);
-
-end
-
-
-function [zeta, omega_n] = fit_second_order_sys(X_u, phase_X_u, gamma_phase_f)
-    % fixme put real fit here
-    zeta = 0.05;
-    omega_n = 0.4;
-
-end
-
-function [CEM_CO2, CEM_wec_capacity, CEM_grid_cost] = CEM_lookup_table(zeta, omega_n, capacity_cost, B_p, location)
-    %CEM_co2 = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, CO2_data,...
-    %    zeta,omega_n,capacity_cost,power_limit);
-    %CEM_capacity = interpn(zeta_data, omega_n_data, cap_cost_data, power_lim_data, capacity_data,...
-    %    zeta,omega_n,capacity_cost,power_limit);
-    if zeta == 0.05 && omega_n == 0.4 && strcmp(location,'ISONE')
-        % fixme put real lookup table here
-        co2_slope = 2/3;
-        cost_slope = 1/3;
-        cap_slope = 2.5/3;
-
-        cutin_capacity_cost = 750e3;
-        cheapest_cost_with_data = 400e3;
-
-        no_wec_CO2 = 12.003064e6; % tonnes (typical value 10e6=10 MT)
-        no_wec_grid_cost = 2.889863123e9;
-        
-        if capacity_cost > cutin_capacity_cost
-            % no WECs
-            CEM_CO2 = no_wec_CO2;
-            CEM_wec_capacity = 0;
-            CEM_grid_cost = no_wec_grid_cost;
-        elseif capacity_cost > cheapest_cost_with_data
-            % some wecs, and in bounds of model
-            capacity_cost_pct_incr = (capacity_cost - 725e3) / 725e3;
+function [LCOE_matrix,LCOE,...
+          LVOE_matrix,LVOE,...
+          NVOE_matrix,NVOE,...
+          net_value_matrix,net_value,...
+          VCR_matrix, VCR] = get_LXOE_NVOE_VCR(levelized_cost_matrix, ...
+                                               levelized_value_matrix, ...
+                                               AEP_matrix)
     
-            CEM_CO2 =  7.551749e6 * (1 + capacity_cost_pct_incr * co2_slope);
-            CEM_wec_capacity = 10.201e3 * (1 - capacity_cost_pct_incr * cap_slope);
-            CEM_grid_cost = 2.468040544e9 * (1 - capacity_cost_pct_incr * cost_slope);
-        else 
-            % not in bounds of model
-            error('WEC is too cheap, no CEM data here.')
-        end
-    else
-        error('CEM results not available for this zeta, w_n, and location')
-    end
+    % lcoe = levelized cost / annual energy production
+    [LCOE_matrix, LCOE] = LXOE(levelized_cost_matrix,  AEP_matrix);
+
+    % lvoe = levelized value / annual energy production
+    [LVOE_matrix, LVOE] = LXOE(levelized_value_matrix, AEP_matrix);
+
+    % net value, NVOE, and value cost ratio matrices
+    net_value_matrix = levelized_value_matrix - levelized_cost_matrix;
+    NVOE_matrix      = LVOE_matrix            -  LCOE_matrix;
+    VCR_matrix       = LVOE_matrix           ./  LCOE_matrix;
+
+    % net value, NVOE, and value cost ratio scalars
+    net_value = mysum(net_value_matrix);
+    NVOE = LVOE - LCOE;
+    VCR  = LVOE / LCOE;
+    
+end
+
+function [LXOE_matrix,LXOE] = LXOE(levelized_X_matrix,AEP_matrix)
+    % lxoe = levelized X (where X = cost or value) / annual energy production
+    LXOE_matrix = levelized_X_matrix ./ AEP_matrix; % from LCOE_from_capex_design_power.m: $/year / kWh/year = $/kWh
+    levelized_X = mysum(levelized_X_matrix);
+    AEP = mysum(AEP_matrix);
+    LXOE = levelized_X ./ AEP;
+end
+
+function out = mysum(in)
+    out = sum(in,'all','omitnan');
+end
+
+
 
 end
