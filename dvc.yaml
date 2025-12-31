@@ -3100,6 +3100,17 @@ stages:
       - pubs/applied-ocean-research-model/tables/from-matlab/
     desc: Automatically generated from the 'move-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  results-to-latex:
+    cmd: calkit latex from-json 'results/**/end.json' --output 
+      'pubs/renewable-energy-mdo/results.tex' --command results
+    deps:
+      - results/**/end.json
+    outs:
+      - pubs/renewable-energy-mdo/results.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'results-to-latex' stage in
+      calkit.yaml. Changes made here will be overwritten.
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc 
