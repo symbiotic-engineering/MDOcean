@@ -3,9 +3,10 @@
 
 The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
 For notation, unbolded unarrowed variables refer to scalars (e.g. $x$ or $X$), arrowed variables refer to vectors ($\vec{x}$ or $\vec{X}$), and bold variables refer to matrices ($\mathbf{x}$ or $\mathbf{X}$).
-For dynamic (time-varying) quantities, the time domain representation is denoted with a lowercase variable ($x(t)$), whereas a hat indicates the complex frequency-domain phasor representation, using the capital variable for magnitude ($\hat{X}(\omega)=\hat{X}=|\hat{X}|e^{i\angle \hat{X}}=Xe^{i\angle \hat{X}}$).
-The two connect via $x(t)=\Re(\hat{X}e^{i\omega t})=X\cos(\omega t+\angle\hat{X})$, with $\Re$ indicating the real part.
-Dots ($\dot{x}=\Re(\hat{\dot{X}}e^{i\omega t})=\Re(s\hat{X}e^{i\omega t})$) indicate time-derivatives, with Laplace variable $s=i\omega$.
+For dynamic (time-varying) quantities, the time domain representation is denoted with a lowercase variable $x(t)$, and can also be represented as the real part of a complex signal $x(t)=\Re\left[\tilde{x}(t)\right]$.
+Assuming the signal is sinusoidal, the complex signal can be expressed as $\tilde{x}(t)=\hat{X}e^{i\omega t}$ with complex phasor $\hat{X}=|\hat{X}|e^{i\angle \hat{X}}$ and angular frequency $\omega$.
+Altogether, this gives $x(t)=|\hat{X}|\cos(\omega t+\angle\hat{X})$. 
+Dots ($\dot{x}=\Re(\hat{\dot{X}}e^{i\omega t})=\Re(i\omega\hat{X}e^{i\omega t})$) indicate time-derivatives.
 
 %TC:break Geometry
 \subsection{Geometry}\label{sec:geom}
@@ -51,7 +52,7 @@ A regular water wave with height $H$, wavenumber $k$, and frequency $\omega$ tha
     \eta(y,t)=\frac{H}{2}\cos(-ky+\omega t)
 \end{equation}
 and the position-independent variable $\zeta(t)=\eta(0,t)$ describes the wave elevation at $y=0$.
-The first-order hydrodynamic forces $\vec{\hat{F}}$ on a group of interacting floating bodies are expressed using linear wave theory in the frequency domain as:
+The first-order hydrodynamic force phasors $\vec{\hat{F}}$ on a group of interacting floating bodies are expressed using linear wave theory in the frequency domain as:
 \setlength\arraycolsep{0pt}
 \newcolumntype{C}{>{{}}c<{{}}}
 \begin{equation}\label{eq:hydro-forces}
@@ -289,43 +290,66 @@ Thus, MDOcean's semi-analytical dynamics offer a combination of speed, accuracy,
 Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear frequency domain WEC model.
 Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2024} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 
-The float and spar are each modeled as a floating rigid body, and the two bodies are coupled to transmit force between them.
-\hl{Note to scrutineers: the typeset equation below is for a single rigid body (stationary spar), but the actual simulation uses the real two-body dynamics.
-The two-body matrix equation will be typeset before submission.} The MDOcean dynamic model assumes %a stationary spar and
-regular waves for reasons to be detailed later this section, so the system experiences monochromatic forced oscillation.
+The float and spar are each modeled as a floating rigid body, and the two bodies are kinematically coupled to transmit force between them.
+The MDOcean dynamic model assumes regular waves for reasons to be detailed later this section, so the system experiences monochromatic forced oscillation.
 The equation of motion can be expressed in the time domain as: % todo: this is time domain so gamma is not allowed to be complex
 \setlength\arraycolsep{0pt}
 \newcolumntype{C}{>{{}}c<{{}}}
 \begin{equation}\label{eq:eom}
 \begin{array}{rCCCCC}
      \mathbf{M}\ddot{\vec\xi}(t) = 
-     & \underbrace{\vec{F_{e}}(t)}_{\substack{\textrm{wave} \\  \textrm{excitation} }} 
-     & +\underbrace{\vec{F_{rad}}(t)}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +
-     &  \underbrace{\vec{F_{res}}(t)}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} 
-     &  +~~~~\underbrace{\vec{F_{d}}(t)}_{\substack{\textrm{drag} }}~~~~+ 
-     & \underbrace{\vec{F_{p}}(t)}_{\substack{\textrm{power}\\\text{takeoff} }} \\
-    = & \overbrace{\vec{\hat{\gamma}}~ \zeta(t)} 
+     & \underbrace{\vec{F}_{e}(t)}_{\substack{\textrm{wave} \\  \textrm{excitation} }} 
+     & +\underbrace{\vec{F}_{rad}(t)}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +
+     &  \underbrace{\vec{F}_{res}(t)}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} 
+     &  +~~~~\underbrace{\vec{F}_{d}(t)}_{\substack{\textrm{drag} }}~~~~+ 
+     & \underbrace{\vec{F}_{p}(t)}_{\substack{\textrm{power}\\\text{takeoff} }} \\
+    = & \overbrace{\Re(\vec{\hat{\gamma}}~ \tilde{\zeta}(t))} 
     & \overbrace{-\mathbf{A}_h\ddot{\vec{\xi}}(t) - \mathbf{B}_h\dot{\vec{\xi}}(t)} 
     &  \overbrace{-\mathbf{K}_h\vec{\xi}(t)} 
     & \overbrace{-\mathbf{B}_d\dot{\vec{\xi}}(t)-\mathbf{K}_d\vec{\xi}(t)}  
     & \overbrace{-\mathbf{B}_p\dot{\vec{\xi}}(t)-\mathbf{K}_p\vec{\xi}(t)}
 \end{array}
 \end{equation}
-where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
+for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
 Forces include wave excitation, hydrodynamic radiation, hydrostatic restoring, drag, and power takeoff.
-For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
-The excitation coefficient $\hat{\gamma}$ is complex, and all other coefficients are real.
-In the frequency domain, the complex transfer function from real regular wave height $H$ to complex body amplitude $\hat{\xi}$ is then:
-\begin{equation}\label{eq:eom-freq-domain}
-    \frac{\vec{\hat{\xi}}}{H} = \frac{1}{2}\left[(\mathbf{M}+\mathbf{A}_h)s^2+(\mathbf{B}_h+\mathbf{B}_d+\mathbf{B}_p)s+(\mathbf{K}_h+\mathbf{K}_d+\mathbf{K}_p)\right]^{-1}\vec{\hat{\gamma}}
+The mass matrix is defined as:
+\begin{equation}
+\mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
 \end{equation}
-where $s=i\omega$ is the Laplace variable.
+For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
+The excitation coefficient $\vec{\hat{\gamma}}$ is complex, and all other coefficients are real.
+The complex transfer function from real regular wave height $H$ to the vector of complex body velocity phasors $\vec{\hat{\dot{\xi}}}$ is then: 
+\begin{equation}\label{eq:eom-freq-domain}
+    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\hat{\mathbf{Z}}_i+\hat{\mathbf{Z}}_p\right]^{-1}\vec{\hat{\gamma}}
+\end{equation}
+where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag terms have been combined into a single intrinsic impedance matrix $\hat{\mathbf{Z}}_{i}$ for compactness: $\hat{\mathbf{Z}}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h+\mathbf{K}_d)$.
+The PTO kinematics and dynamics are yet to be specified, currently represened by generic impedance matrix $\mathbf{Z}_p = \mathbf{B}_p+\frac{\mathbf{K}_p}{i\omega}$.
+\paragraph{PTO Kinematics}
+The PTO kinematics describe the relationship between WEC body motions $\vec{\hat{\xi}}$ to PTO motions $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a drivetrain or generator.
+In general form, the PTO kinematics can be expressed as:
+\begin{equation}
+\vec{\hat{X}}_{PTO} = \mathbf{T_{kin}}(\vec{\hat{\xi}}) \vec{\hat{\xi}}
+\end{equation}
+with kinematic transformation matrix $\mathbf{T_{kin}(\vec{\hat{\xi}})}$ that may depend on the body displacements $\vec{\hat{\xi}}$ if the linkages are nonlinear.
 
+Here, we use kinematics to describe the relationship between not only motions but also forces, which implies lossless massless linkages.
+Linkage dissipation and inertia could be added to the PTO dynamics in the next section if desired.
+
+\begin{equation}
+\vec{\hat{F}}_p = [\mathbf{T_{kin}}(\vec{\hat{\xi}})]^T  \vec{\hat{F}}_{PTO}
+\end{equation}
+
+Multibody WECs are frequently underactuated, meaning that the PTO has fewer controlled degrees of freedom than the hydrodynamic bodies.
+Underactuated sytems receive considerable attention in robotics \cite{tedrake_underactuated_2024}.
+
+where $\vec{\hat{X}}_{PTO}$ is the vector of PTO displacements and $\mathbf{T_{kin}}$ is the kinematic transformation matrix.
+
+The intrinsic dynamics can be represented as a multiport circuit, as shown in \figurename~\ref{fig:multiport-circuit-intrinsic}.
 \begin{figure}
 \centering
-    \input{figs/tikz/circuit.tikz}
-\caption{Dynamics represented as a multiport circuit}
-\label{fig:multiport-circuit}
+    \input{figs/tikz/circuit_intrinsic.tikz}
+\caption{Intrinsic dynamics represented as a multiport circuit}
+\label{fig:multiport-circuit-intrinsic}
 \end{figure}
 
 \paragraph{PTO Dynamics and Power Production}
@@ -386,6 +410,15 @@ A linear control law with impedance $\hat{Z}_u$ split into damping and stiffness
 \begin{equation}
 \tau = \hat{Z}_u \Omega =\left(B_u + \frac{K_u}{s} \right) \Omega
 \end{equation}
+
+The PTO dynamics can be represented as a multiport circuit, as shown in \figurename~\ref{fig:multiport-circuit-pto}.
+\begin{figure}
+\centering
+    \input{figs/tikz/circuit_pto.tikz}
+\caption{PTO (a.) and system (b.) dynamics represented as a multiport circuit}
+\label{fig:multiport-circuit-pto}
+\end{figure}
+
 The time-domain power $P(t)$ at any port is simply the product of the port effort and flow variables.
 To facilitate this calculation in transmission form, power can be found as the quadratic product of the port variable vector with the two-dimensional exchange matrix $E_2$,
 \begin{equation}

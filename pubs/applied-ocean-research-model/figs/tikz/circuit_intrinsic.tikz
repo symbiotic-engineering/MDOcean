@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+	% Paths, nodes and wires:
+	\draw (1.241, 6.733) to[sinusoidal voltage source, l={$\hat{\zeta}$}] (1.241, 8.733);
+	\draw (3.241, 6.733) to[controlled sinusoidal voltage source, l={$\hat\gamma_f \hat{\zeta}$}, name=float_excitation] (3.241, 8.733);
+	\draw (3.241, 3.233) to[controlled sinusoidal voltage source, l={$\hat\gamma_s \hat{\zeta}$}] (3.241, 5.233);
+	\draw (1.241, 6.733) -- (3.241, 6.733);
+	\draw (3.241, 3.233) -- (1.241, 3.233) -- (1.241, 6.733);
+	\node[ocirc] at (1.241, 8.733){};
+	\node[fourport, rotate=-90, xscale=0.54, yscale=0.54](Z_i) at (5.246, 5.991){} node[anchor=center] at (Z_i.center){$\hat{\mathbf{Z}}_i$};
+	\draw (3.241, 5.233) -- (4.991, 5.233) -| (5, 5.5);
+	\draw (3.241, 6.733) -- (4.991, 6.733) -- (4.991, 6.483);
+	\node[fourport, rotate=-90, xscale=0.54, yscale=0.54](N1) at (6.996, 5.991){} node[anchor=center] at (N1.center){$\mathbf{T}_{kin}$};
+	\draw (5.491, 6.483) -- (5.491, 6.733) -- (6.741, 6.733) -| (6.75, 6.483);
+	\draw (3.241, 8.733) -- (7.241, 8.733) -- (7.241, 6.483);
+	\draw (5.491, 5.483) -- (5.491, 5.233) -- (6.741, 5.233) -- (6.741, 5.483) -- (6.75, 5.5);
+	\draw (3.241, 3.233) -- (7.241, 3.233) -- (7.241, 5.483);
+	\draw (7.491, 5.733) -- (8.241, 5.733) -| (8.246, 4.983);
+	\draw (7.491, 6.233) -- (8.241, 6.233) -| (8.246, 6.978);
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N2) at (5.241, 6.983){} node[anchor=center] at (N2.text){$\hat{F}_{i,f},\hat{\dot{\xi}}_f$};
+	\node[shape=rectangle, minimum width=0.706cm, minimum height=0.465cm](N3) at (5.241, 4.983){} node[anchor=center] at (N3.text){$\hat{F}_{i,s},\hat{\dot{\xi}}_s$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N4) at (7.116, 4.983){} node[anchor=center] at (N4.text){$\hat{F}_{p,s},~\hat{\dot{\xi}}_s$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N5) at (7.116, 6.983){} node[anchor=center] at (N5.text){$\hat{F}_{p,f},~\hat{\dot{\xi}}_f$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N6) at (3.741, 8.983){} node[anchor=center] at (N6.text){$\hat{F}_{e,f},\hat{\dot{\xi}}_f$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N7) at (3.741, 5.483){} node[anchor=center] at (N7.text){$\hat{F}_{e,s},\hat{\dot{\xi}}_s$};
+	\draw (8.741, 4.983) |- (8.241, 4.983);
+	\node[shape=rectangle, minimum width=1.965cm, minimum height=0.465cm](N8) at (9.246, 7.228){} node[anchor=center] at (N8.text){$\hat{F}_{PTO}, \hat{\dot{X}}_{PTO}$};
+	\draw (9.486, 6.85) to[european resistor, l={$\hat{Z}_{PTO,th}$}] (9.491, 4.983);
+	\draw (8.246, 6.978) -| (9.486, 6.85);
+	\draw (8.741, 4.983) -- (9.491, 4.983);
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm] at (0.491, 1.233){} node[anchor=north west, align=left, text width=0.577cm, inner sep=6pt] at (-0.009, 1.483){\Huge =};
+	\draw (2.986, 0.233) to[sinusoidal voltage source, l={$\hat{\tilde{F}}_{u}$}] (2.986, 2.233);
+	\draw (7.491, 2.233) to[european resistor, l={$\hat{Z}_{PTO,th}$}] (7.496, 0.365);
+	\draw (3.986, 2.233) to[european resistor, l={$\hat{Z}_{i,th}$}] (5.374, 2.233);
+	\draw (2.986, 2.233) -- (3.986, 2.233);
+	\draw (5.374, 2.233) -- (7.491, 2.233);
+	\draw (7.491, 0.483) |- (2.986, 0.233);
+	\node[shape=rectangle, minimum width=1.965cm, minimum height=0.465cm](N9) at (6.491, 2.483){} node[anchor=center] at (N9.text){$\hat{F}_{PTO}, \hat{\dot{X}}_{PTO}$};
+\end{tikzpicture}
