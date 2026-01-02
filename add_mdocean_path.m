@@ -24,6 +24,7 @@ if any(exist_vec)
     wecSimSourceFolder = [wecSim_folder filesep 'source'];
     if isunix
         load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+        disp('Loaded glibc patch for Simulink')
     end
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimSourceFolder))
