@@ -23,12 +23,12 @@ function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a_out,b_in,F_
     C9 = b_in/a_out*((1+v)/2*log(a_out/b_in)+(1-v)/4*(1-(b_in/a_out)^2));
     %L3 = r0/4/a*(((r0/a)^2+1)*log(a/r0)+(r0/a)^2-1); % for case 1L
     %L9 = r0/a*((1+v)/2*log(a/r0)+(1-v)/4*(1-(r0/a)^2)); % for case 1L
-    L11 = 1/64*(1+4*(r0/a)^2-5*(r0/a)^4-4*(r0/a)^2*(2+(r0/a)^2)*log(a/r0)); % for end deflection only
-    L17 = 1/4*(1-(1-v)/4*(1-(r0/a)^4)-(r0/a)^2*(1+(1+v)*log(a/r0)));
-    F2 = 1/4 * (1 - (b./r).^2.*(1+2*log(r/b)));
-    F3 = b./(4*r) .* ( ( (b./r).^2 + 1 ).*log(r/b) + (b./r).^2 - 1);
-    F8 = 1/2 * (1+v+(1-v)*(b./r).^2);
-    F9 = b./r .* (1/2*(1+v)*(log(r/b)) + 1/4*(1-v)*(1-(b./r).^2));
+    L11 = 1/64*(1+4*(r0/a_out)^2-5*(r0/a_out)^4-4*(r0/a_out)^2*(2+(r0/a_out)^2)*log(a_out/r0)); % for end deflection only
+    L17 = 1/4*(1-(1-v)/4*(1-(r0/a_out)^4)-(r0/a_out)^2*(1+(1+v)*log(a_out/r0)));
+    F2 = 1/4 * (1 - (b_in./r).^2.*(1+2*log(r/b_in)));
+    F3 = b_in./(4*r) .* ( ( (b_in./r).^2 + 1 ).*log(r/b_in) + (b_in./r).^2 - 1);
+    F8 = 1/2 * (1+v+(1-v)*(b_in./r).^2);
+    F9 = b_in./r .* (1/2*(1+v)*(log(r/b_in)) + 1/4*(1-v)*(1-(b_in./r).^2));
 
     bracket = zeros(size(r));
     bracket(r > r0) = 1;
@@ -37,15 +37,15 @@ function [w_nondim,Mr_nondim,Mt_nondim] = distributed_plate_nondim(a_out,b_in,F_
     G11 = 1/64 * (1 + 4*ratio.^2 - 5*ratio.^4 - 4*ratio.^2.*(2+ratio.^2).*log(1./ratio) ) .* bracket;
     G17 = 1/4 * (1 - ((1-v)/4)*(1-ratio.^4) - (ratio).^2.*(1+(1+v)*log(1./ratio))) .* bracket;
 
-    Mrb = -q*a^2/C8 * (C9*(a^2-r0^2)/(2*a*b) - L17);
-    Qb = q/2/b * (a^2 - r0^2);
+    Mrb = -q*a_out^2/C8 * (C9*(a_out^2-r0^2)/(2*a_out*b_in) - L17);
+    Qb = q/2/b_in * (a_out^2 - r0^2);
     E = 0;% fixme - only needed for Mt
     D = 0; % fixme E*h^3/12/(1-v^2); - only needed for Mt
 
     y_over_D = Mrb * r.^2 .* F2 ...
               + Qb * r.^3 .* F3 ...
               - q  * r.^4 .* G11;
-    w_nondim = y_over_D * 2*pi/(P*a^2);
+    w_nondim = y_over_D * 2*pi/(P*a_out^2);
     tilt_angle = 0; % fixme use equation for theta on p463
 
     Mr = Mrb*F8 + Qb*r.*F9 - q*r.^2.*G17;
