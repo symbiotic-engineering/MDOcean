@@ -1,4 +1,5 @@
 # This script iterates through recent runs of a specific workflow and searches for a string
+# run this in an env with gh and jq installed, such as the conda env "github-cli" on the lab computer
 workflow_id="calkit-run.yml"
 grep_for="ld.so"
 grep_for_2="Running stage 'analysis"
@@ -16,4 +17,4 @@ gh run list -w $workflow_id --limit 50 --json databaseId,headBranch,headSha,crea
     #echo "DID NOT RUN ANALYSIS: $run_id (Branch: $branch, Commit: $commit, Date: $timestamp)"
   fi
 done
-# earliest found: STRING WAS FOUND IN RUN: 20153627609 (Branch: figures-class-2, Commit: 985a6b3, Date: 2025-12-12T01:53:52Z)
+# earliest found: STRING WAS FOUND IN RUN: 20153627609 (Branch: figures-class-2, Commit: 985a6b3, Date: 2025-12-12T01:53:52Z) - checked as far back as 200 runs (october 2025)
