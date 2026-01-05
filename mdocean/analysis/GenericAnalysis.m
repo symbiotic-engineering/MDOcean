@@ -72,7 +72,7 @@ classdef (Abstract) GenericAnalysis
             val = all_deps(~contains(all_deps, to_remove));
         end
         function val = get.postpro_dependencies(obj)
-            all_deps = obj.class_dependencies;
+            all_deps = [obj.class_dependencies, obj.analysis_outputs];
             to_remove = {['@' class(obj) filesep 'analysis_fcn'], 'OpenFLASH'};
             val = all_deps(~contains(all_deps, to_remove));
         end
