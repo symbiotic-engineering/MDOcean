@@ -1,0 +1,21 @@
+name: Check version + changelog updated
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            version:
+                - 'mdocean/__version__.py'
+                - 'CHANGELOG.md'
+      - name: Fail if version/changelog not bumped
+        if: steps.changes.outputs.version == 'false'
+        run: exit 1
