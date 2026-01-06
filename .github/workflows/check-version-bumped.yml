@@ -15,7 +15,8 @@ jobs:
           filters: |
             version:
                 - 'mdocean/__version__.py'
+            changelog:
                 - 'CHANGELOG.md'
       - name: Fail if version/changelog not bumped
-        if: steps.changes.outputs.version == 'false'
+        if: steps.changes.outputs.version == 'false' || steps.changes.outputs.changelog == 'false'
         run: exit 1
