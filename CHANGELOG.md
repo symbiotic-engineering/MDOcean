@@ -1,6 +1,14 @@
 
 ## Unreleased
 
+## [v1.0.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-6
+
+### Added
+- Two new CI workflows related to versioning and releasing
+- __version__.py to store version information
+### Changed
+- Trigger behavior of existing CI workflows
+
 ## [v1.0.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.0) - 2025-12-19 - Journal
 Major changes to structures, dynamics, optimization formulation, caching, testing, and reproducibility made over the last year in preparation for upcoming journal paper submissions.
 
