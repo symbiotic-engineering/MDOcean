@@ -64,17 +64,22 @@ classdef (Abstract) GenericAnalysis
                           'end.mat']);
         end
         function val = get.class_dependencies(obj)
-            val = obj.get_dependencies(class(obj));
+            parent = superclasses(obj);
+            val = obj.get_dependencies(parent{:});
         end
         function val = get.analysis_dependencies(obj)
-            all_deps = obj.class_dependencies;
-            to_remove = {['@' class(obj) filesep 'post_process_fcn'], 'OpenFLASH'};
-            val = all_deps(~contains(all_deps, to_remove));
+            analysis_deps = obj.get_dependencies(['@' class(obj) filesep 'analysis_fcn']);
+            all_deps = [obj.class_dependencies, analysis_deps];
+            sorted = sort(unique(all_deps));
+            to_remove = 'OpenFLASH';
+            val = sorted(~contains(sorted, to_remove));
         end
         function val = get.postpro_dependencies(obj)
-            all_deps = [obj.class_dependencies, obj.analysis_outputs];
-            to_remove = {['@' class(obj) filesep 'analysis_fcn'], 'OpenFLASH'};
-            val = all_deps(~contains(all_deps, to_remove));
+            postpro_deps = obj.get_dependencies(['@' class(obj) filesep 'post_process_fcn']);
+            all_deps = [obj.class_dependencies, postpro_deps, obj.analysis_outputs];
+            sorted = sort(unique(all_deps));
+            to_remove = 'OpenFLASH';
+            val = sorted(~contains(sorted, to_remove));
         end
         function obj = run_analysis(obj)
             cd('mdocean');
@@ -212,11 +217,12 @@ classdef (Abstract) GenericAnalysis
     end
     methods (Static)
         function deps_rel = get_dependencies(fcn_name)
-            deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            fcn_deps = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            deps_abs = [fcn_deps, which(fcn_name)];
             path = mfilename('fullpath');
             s = split(which(path), filesep);
             MDOcean_folder = strjoin(s(1:end-3), filesep);
-            base = MDOcean_folder
+            base = MDOcean_folder;
             deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
         end
         
