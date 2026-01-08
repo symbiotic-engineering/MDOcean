@@ -20,7 +20,12 @@ jobs:
       - name: Extract release notes
         id: notes
         run: |
-          RELEASE_NOTES=$(awk '/## \[${{ steps.get_version.outputs.version }}\]/ {flag=1; next} /^## / {flag=0} flag' CHANGELOG.md)
+          VERSION="v${{ steps.get_version.outputs.version }}"
+          RELEASE_NOTES=$(awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {flag=1; next}
+            /^## / {flag=0}
+            flag
+          ' CHANGELOG.md)
           echo "$RELEASE_NOTES"
           echo -e "release_notes<<EOF\n$RELEASE_NOTES\nEOF" >> $GITHUB_OUTPUT
 
