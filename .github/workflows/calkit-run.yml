@@ -62,14 +62,18 @@ jobs:
       #   if: always()
       - name: Run Calkit
         id: run_calkit
+        continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: --ignore-errors --log
           save: false
-      - name: calkit save
-        if: always()
+      - name: calkit saves
         run: |
+          if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
+            exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
+          fi
+  
           set +e # Continue even if pull fails
           calkit pull
           PULL_STATUS=$?
@@ -84,7 +88,7 @@ jobs:
           fi
 
           calkit save dvc.lock dvc.yaml .calkit/ -m "Run pipeline"
-      - if: ${{ always() && steps.run_calkit.outcome == 'failure' }}
+      - if: ${{ steps.run_calkit.outcome == 'failure' }}
         run: |
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true

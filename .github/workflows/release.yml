@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,8 +12,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Release
+
+      - name: Extract version
+        id: get_version
+        run: echo "version=$(grep __version__ mdocean/__version__.py | cut -d '"' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes
+        id: notes
+        run: |
+          VERSION="v${{ steps.get_version.outputs.version }}"
+          RELEASE_NOTES=$(awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {flag=1; next}
+            /^## / {flag=0}
+            flag
+          ' CHANGELOG.md)
+          echo "$RELEASE_NOTES"
+          echo -e "release_notes<<EOF\n$RELEASE_NOTES\nEOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: 'v$(cat mdocean/__version__.py | grep __version__ | cut -d "\"" -f2)'
-          generate_release_notes: true
+            tag_name: v${{ steps.get_version.outputs.version }}
+            generate_release_notes: true
+            body: ${{ steps.notes.outputs.release_notes }}
