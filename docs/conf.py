@@ -96,6 +96,7 @@ html_context = {
     "github_repo": "MDOcean",
     "github_version": "main",
     "conf_py_path": "/docs/",
+    "current_version": release,
 }
 
 html_theme_options = {
