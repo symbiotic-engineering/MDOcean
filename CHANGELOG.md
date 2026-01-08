@@ -4,6 +4,7 @@
 ## [v1.0.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-7
 ### Changed
 - Docs build uses sphinx-versioning to get docs for all versions
+- Release notes use info from CHANGELOG.md
 ### Fixed
 - Problem in deployment of docs to gh-pages branch
 
