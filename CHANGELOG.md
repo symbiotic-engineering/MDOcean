@@ -2,8 +2,11 @@
 ## Unreleased
 
 ## [v1.0.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-7
+### Added
+- Added config for readthedocs
 ### Changed
-- Docs build uses sphinx-versioning to get docs for all versions
+- Move usage instructions from readme to own docs page
+- Minor docs changes
 - Release notes use info from CHANGELOG.md
 ### Fixed
 - Problem in deployment of docs to gh-pages branch
