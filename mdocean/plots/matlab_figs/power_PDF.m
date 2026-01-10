@@ -104,7 +104,7 @@ end
 xlim([P_min P_max])
 improvePlot
 
-nexttile(1)
+nexttile(1);
 
 
 end

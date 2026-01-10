@@ -36,7 +36,7 @@ function [figs,LCOE,val] = run_single(p,b,X)
     h_power = plot_power_matrix(X,p,b,'');
 
     h_pdf = figure;
-    power_PDF(X,p)
+    power_PDF(X,p);
 
     h_geom = visualize_geometry(X,p);
 

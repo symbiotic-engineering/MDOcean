@@ -3058,13 +3058,22 @@ stages:
     desc: Automatically generated from the 'move-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
   results-to-latex:
-    cmd: calkit latex from-json 'results/RunSingleFigFunc/end.json' 
-      --output 'pubs/renewable-energy-mdo/results.tex' --command 
-      results
+    cmd: "calkit latex from-json 'results/GradientOptimFigFunc/end.json'
+      'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
+      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
+      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\\
+      \\%\", \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\\
+      \\%\", \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
+      \\%\"}'"
     deps:
+      - results/GradientOptimFigFunc/end.json
       - results/RunSingleFigFunc/end.json
     outs:
-      - pubs/renewable-energy-mdo/results.tex:
+      - pubs/renewable-energy-mdo/numeric-results.tex:
+          cache: false
+          persist: false
+      - pubs/applied-ocean-research-model/numeric-results.tex:
           cache: false
           persist: false
     desc: Automatically generated from the 'results-to-latex' stage in
@@ -3080,6 +3089,7 @@ stages:
       - pubs/renewable-energy-mdo/tables/
       - pubs/renewable-energy-mdo/references.bib
       - pubs/renewable-energy-mdo/numbers.tex
+      - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/elsarticle-num-names.bst
       - pubs/renewable-energy-mdo/.latexmkrc
       - .calkit/env-locks/tex
@@ -3105,6 +3115,7 @@ stages:
       - pubs/applied-ocean-research-model/tables/
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numbers.tex
+      - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/elsarticle-num-names.bst
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       - pubs/applied-ocean-research-model/.latexmkrc

@@ -2999,7 +2999,7 @@ pipeline:
         # - results/DesignSpaceExploration/end.json
         # - results/DesignVars/end.json
         # - results/ForceSaturationFigFunc/end.json
-        # - results/GradientOptimFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
         # - results/HydroCoeffFigFunc/end.json
         # - results/LocationSensitivity/end.json
         # - results/Meem/end.json
@@ -3016,11 +3016,14 @@ pipeline:
         # - results/Validation/end.json
         # - results/Wecsim/end.json
       outputs: 
-        - pubs/renewable-energy-mdo/results.tex
+        - pubs/renewable-energy-mdo/numeric-results.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
       command_name: results
-     # format:
-     #   sup_over_lol: "{sup / lol:.1f}"
-     #   two_vals: "{sup**2} is {lol}"
+      format:
+        nominalLCOE: "{nominalLCOE:.2f} $/kWh"
+        pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\%"
+        pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\%"
+        pctImprovePowerMinLCOE: "{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\%"
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
@@ -3032,6 +3035,7 @@ pipeline:
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/numbers.tex
+        - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/elsarticle-num-names.bst
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
@@ -3052,6 +3056,7 @@ pipeline:
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
         - pubs/applied-ocean-research-model/numbers.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/elsarticle-num-names.bst
         - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       outputs:

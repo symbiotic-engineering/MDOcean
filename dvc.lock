@@ -7171,8 +7171,8 @@ stages:
       size: 556
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
-      md5: 2b9b5f30562763c16014a840d24c67ac
-      size: 9456
+      md5: f9cba87d23d6ae3f95bc898b83a85944
+      size: 9514
     - path: ./mdocean/inputs/get_spar_exc.m
       hash: md5
       md5: 52d3ff26a5be4f4038a299c05fc99671
@@ -7388,8 +7388,8 @@ stages:
       size: 1430
     - path: ./mdocean/simulation/run/run_single.m
       hash: md5
-      md5: abb3cd18e3e2b201936b711596f9c93b
-      size: 972
+      md5: 852191b239d925c4bafac93fcd19a60a
+      size: 973
     - path: ./mdocean/simulation/simulation.m
       hash: md5
       md5: 006ec1011f7a82f8d018214f2b0395ea
@@ -7397,7 +7397,7 @@ stages:
     outs:
     - path: results/RunSingleFigFunc/intermed.mat
       hash: md5
-      md5: 1c1a9cf75bad31a9cb958fa1d459dbee
+      md5: 501dfb926d3f7e631a73ec9c3b23e782
       size: 234371
   postpro-RunSingleFigFunc:
     cmd: matlab -batch "add_mdocean_path(); obj=RunSingleFigFunc; 
@@ -7409,12 +7409,12 @@ stages:
       size: 800
     - path: ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
       hash: md5
-      md5: 898fcca9940ef8c9f246176f390c2642
-      size: 1011
+      md5: 7264682adabe8da20d56385dde8430c6
+      size: 1173
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
-      md5: 2b9b5f30562763c16014a840d24c67ac
-      size: 9456
+      md5: f9cba87d23d6ae3f95bc898b83a85944
+      size: 9514
     - path: ./mdocean/inputs/get_spar_exc.m
       hash: md5
       md5: 52d3ff26a5be4f4038a299c05fc99671
@@ -7590,32 +7590,36 @@ stages:
       size: 11248
     - path: results/RunSingleFigFunc/intermed.mat
       hash: md5
-      md5: 1c1a9cf75bad31a9cb958fa1d459dbee
+      md5: 501dfb926d3f7e631a73ec9c3b23e782
       size: 234371
     outs:
     - path: results/RunSingleFigFunc/drag_convergence.pdf
       hash: md5
-      md5: a08c652f3b80d012fb564a01f2d42508
+      md5: d26daf4765faac506b13a26916ba1e89
       size: 2565
+    - path: results/RunSingleFigFunc/end.json
+      hash: md5
+      md5: d56f144533dc54b2f9d5a63d8772e402
+      size: 316
     - path: results/RunSingleFigFunc/end.mat
       hash: md5
-      md5: 3ed1a62b3ccaa1ea467916e30a483ed5
-      size: 523
+      md5: aa7dcaa3df2455b7fefd53575ee40411
+      size: 655
     - path: results/RunSingleFigFunc/nominal_geometry_viz.pdf
       hash: md5
-      md5: 9da9cb8348ec5c239bd3ff4a36916e5f
+      md5: 85a941ba78d1e97df2d927a4fa58918d
       size: 4051
     - path: results/RunSingleFigFunc/nominal_power_matrix.pdf
       hash: md5
-      md5: 7ec998dd08d9c933931a9cce50764302
+      md5: 1e5dcc562ad62af9b69d8ecc5fab6181
       size: 42999
     - path: results/RunSingleFigFunc/nominal_power_pdf.pdf
       hash: md5
-      md5: 215c404a9125618e82b4e783e43140a3
+      md5: 84a271de630712884698784279217fb6
       size: 1060
     - path: results/RunSingleFigFunc/slamming_model_comparison.pdf
       hash: md5
-      md5: fd108e1a28801b34133dd997121a505a
+      md5: 1b567cde76a43d09d0ca5f5cbbbdf95a
       size: 30646
   analysis-Slamming:
     cmd: matlab -batch "add_mdocean_path(); obj=Slamming; obj.run_analysis();"
@@ -11816,16 +11820,28 @@ stages:
       size: 11483
       nfiles: 6
   results-to-latex:
-    cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/results.tex'
+    cmd: "calkit latex from-json 'results/GradientOptimFigFunc/end.json' 'results/RunSingleFigFunc/end.json'
+      --output 'pubs/renewable-energy-mdo/numeric-results.tex' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
       --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      }'"
+      , \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\\
+      \\%\", \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\\
+      \\%\", \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
+      \\%\"}'"
     deps:
+    - path: results/GradientOptimFigFunc/end.json
+      hash: md5
+      md5: ef0876e6328608214da645d37be9fa4c
+      size: 640
     - path: results/RunSingleFigFunc/end.json
       hash: md5
-      md5: 30d88acfb9adc5f2e799ce424ed76c26
-      size: 203
+      md5: d56f144533dc54b2f9d5a63d8772e402
+      size: 316
     outs:
-    - path: pubs/renewable-energy-mdo/results.tex
+    - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: 7111c9d63b864ccf9c6119291a0f42e6
-      size: 811
+      md5: 49de6ffb2ab10315da9dd5c1863b7b09
+      size: 3232
+    - path: pubs/renewable-energy-mdo/numeric-results.tex
+      hash: md5
+      md5: 49de6ffb2ab10315da9dd5c1863b7b09
+      size: 3232
