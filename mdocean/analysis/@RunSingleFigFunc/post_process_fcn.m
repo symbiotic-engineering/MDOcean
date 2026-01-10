@@ -29,5 +29,4 @@ function [fig_array,...
     end_result_struct.surgeForceSparNominal  = surgeForce(2);
     end_result_struct.capexDesignNominal = intermed_result_struct.val.capex_design;
     end_result_struct.powerAvgNominal = intermed_result_struct.val.power_avg;
-    end_result_struct.single_run_complete = true;
 end

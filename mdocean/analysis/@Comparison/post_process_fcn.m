@@ -27,8 +27,6 @@ function [fig_array,...
     
     tab_firstrows = {[], []};
     tab_colspecs = {[], []};
-    
-    end_result_struct.comparison_complete = true;
 
     end_result_struct.powerAvgAtMinCapex = vals(3).power_avg;
     end_result_struct.capexDesignMinCapex = vals(3).capex_design;
