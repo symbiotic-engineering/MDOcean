@@ -798,8 +798,8 @@ stages:
       size: 511
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
-      md5: 0d110226a86855082b142834c7905eb6
-      size: 8994
+      md5: f9cba87d23d6ae3f95bc898b83a85944
+      size: 9514
     - path: ./mdocean/inputs/get_spar_exc.m
       hash: md5
       md5: 52d3ff26a5be4f4038a299c05fc99671
@@ -1003,13 +1003,13 @@ stages:
       size: 11062
     - path: ./mdocean/simulation/simulation.m
       hash: md5
-      md5: 7363ce107bb90c0eb395a106d0908962
-      size: 11211
+      md5: 006ec1011f7a82f8d018214f2b0395ea
+      size: 11248
     outs:
     - path: results/Comparison/intermed.mat
       hash: md5
-      md5: 4119217c7058de215f35b6ec0ff80205
-      size: 739785
+      md5: 0a53706bc9fd44615014c7a529a36a5e
+      size: 740023
   postpro-Comparison:
     cmd: matlab -batch "add_mdocean_path(); obj=Comparison; 
       obj.run_all_from_load();"
@@ -1020,12 +1020,12 @@ stages:
       size: 771
     - path: ./mdocean/analysis/@Comparison/post_process_fcn.m
       hash: md5
-      md5: b23d4ada1eb62f6b72ff0288f9369751
-      size: 1009
+      md5: 6fab16f1f288c767a022d9706eb9ac1a
+      size: 1533
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
-      md5: 0d110226a86855082b142834c7905eb6
-      size: 8994
+      md5: f9cba87d23d6ae3f95bc898b83a85944
+      size: 9514
     - path: ./mdocean/inputs/get_spar_exc.m
       hash: md5
       md5: 52d3ff26a5be4f4038a299c05fc99671
@@ -1060,8 +1060,8 @@ stages:
       size: 1023
     - path: ./mdocean/plots/matlab_figs/compare.m
       hash: md5
-      md5: 7143859ac3e36a06b43dbff61372d350
-      size: 5898
+      md5: 3127d9ffa3a0a0de8db32922d4828c59
+      size: 5906
     - path: ./mdocean/plots/matlab_figs/make_slamming_plot.m
       hash: md5
       md5: ce33157e9f2dc0b73a8e0bc9fc01e0e3
@@ -1072,8 +1072,8 @@ stages:
       size: 1652
     - path: ./mdocean/plots/matlab_figs/power_PDF.m
       hash: md5
-      md5: 25c6eb35149a3457d764e4f1310ce3f2
-      size: 2582
+      md5: ab5d96da9d8872efbf4cda8ffcb15c99
+      size: 2583
     - path: ./mdocean/plots/matlab_figs/visualize_geometry.m
       hash: md5
       md5: fc74a9e31716f9db625570ad0f6f9c77
@@ -1209,21 +1209,25 @@ stages:
       size: 11062
     - path: ./mdocean/simulation/simulation.m
       hash: md5
-      md5: 7363ce107bb90c0eb395a106d0908962
-      size: 11211
+      md5: 006ec1011f7a82f8d018214f2b0395ea
+      size: 11248
     - path: results/Comparison/intermed.mat
       hash: md5
-      md5: 4119217c7058de215f35b6ec0ff80205
-      size: 739785
+      md5: 0a53706bc9fd44615014c7a529a36a5e
+      size: 740023
     outs:
     - path: results/Comparison/comparison_power_matrix.pdf
       hash: md5
-      md5: 882fb70a7c31b85091be0510a1725a1c
+      md5: 6afbb46d672d0725b47e0fea8ea2b7ff
       size: 24438
+    - path: results/Comparison/end.json
+      hash: md5
+      md5: 19d4bf7b303fc5f077433d9f5b7b0faf
+      size: 360
     - path: results/Comparison/end.mat
       hash: md5
-      md5: 1d026f75d5d1862c766a915510523faf
-      size: 191
+      md5: 5519a8ba802a927dea483c28cad28ccd
+      size: 716
     - path: results/Comparison/optimal_design_vars.tex
       hash: md5
       md5: 78c1c411abd396397bdf9220a076d070
@@ -1234,15 +1238,15 @@ stages:
       size: 2523
     - path: results/Comparison/overlaid_geometry.pdf
       hash: md5
-      md5: d0c43deb0c771deca2a3345a9e07e2bc
+      md5: 75e88613beae5f929e4c6afcaf295608
       size: 5870
     - path: results/Comparison/overlaid_hydro_coeffs.pdf
       hash: md5
-      md5: 495e493e0fb00c80ddc4e41a1117e8b9
+      md5: d97a251b6bad3523b0edbfd6a40acb58
       size: 17411
     - path: results/Comparison/probability_CDF.pdf
       hash: md5
-      md5: 76900e1958b45f99d0f1d9b29d35a5cb
+      md5: 6ff0ff8e07818a9d48122325d85e396d
       size: 19388
   analysis-Constraints:
     cmd: matlab -batch "add_mdocean_path(); obj=Constraints; 
@@ -11820,14 +11824,23 @@ stages:
       size: 11483
       nfiles: 6
   results-to-latex:
-    cmd: "calkit latex from-json 'results/GradientOptimFigFunc/end.json' 'results/RunSingleFigFunc/end.json'
-      --output 'pubs/renewable-energy-mdo/numeric-results.tex' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
-      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      , \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\\
-      \\%\", \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\\
+    cmd: "calkit latex from-json 'results/Comparison/end.json' 'results/GradientOptimFigFunc/end.json'
+      'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
+      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command results
+      --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\", \"pctImproveLCOEMinLCOE\"\
+      : \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\\\%\", \"pctImproveDesignCostMinLCOE\"\
+      : \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\\
       \\%\", \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
-      \\%\"}'"
+      \\%\", \"pctImproveDesignCostMinCapex\": \"{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}\\\
+      \\%\", \"pctWorsePowerMinCapex\": \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}\\\
+      \\%\", \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
+      \\%\", \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}\\\
+      \\%\", \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}\\\\%\"}'"
     deps:
+    - path: results/Comparison/end.json
+      hash: md5
+      md5: 19d4bf7b303fc5f077433d9f5b7b0faf
+      size: 360
     - path: results/GradientOptimFigFunc/end.json
       hash: md5
       md5: ef0876e6328608214da645d37be9fa4c
@@ -11839,9 +11852,9 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: 49de6ffb2ab10315da9dd5c1863b7b09
-      size: 3232
+      md5: 8e4c899da10c7d5a4d15f2948801a20a
+      size: 4775
     - path: pubs/renewable-energy-mdo/numeric-results.tex
       hash: md5
-      md5: 49de6ffb2ab10315da9dd5c1863b7b09
-      size: 3232
+      md5: 8e4c899da10c7d5a4d15f2948801a20a
+      size: 4775

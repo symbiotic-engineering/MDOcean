@@ -117,10 +117,10 @@ DV_table = array2table(X.', ...
 
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
-scalar_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
-hydro_names = {'over_rho','phase'};
-hydro_coeff_rows = contains(temp_table.Properties.VariableNames,hydro_names);
-out_table = rows2vars(temp_table(:,scalar_vals & ~hydro_coeff_rows));
+numeric_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
+vector_names = {'over_rho','phase','force_surge'};
+vector_rows = contains(temp_table.Properties.VariableNames,vector_names);
+out_table = rows2vars(temp_table(:,numeric_vals & ~vector_rows));
 out_table.Properties.RowNames = out_table.OriginalVariableNames;
 out_table = removevars(out_table,'OriginalVariableNames');
 

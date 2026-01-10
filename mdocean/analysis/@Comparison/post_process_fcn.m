@@ -29,4 +29,16 @@ function [fig_array,...
     tab_colspecs = {[], []};
     
     end_result_struct.comparison_complete = true;
+
+    end_result_struct.powerAvgAtMinCapex = vals(3).power_avg;
+    end_result_struct.capexDesignMinCapex = vals(3).capex_design;
+
+    end_result_struct.powerAvgMaxPower = vals(4).power_avg;
+    end_result_struct.capexDesignMaxPower = vals(4).capex_design;
+
+    end_result_struct.powerBalanced = vals(5).power_avg;
+
+    cost_savings_PTO = vals(2).capex_PTO - vals(3).capex_PTO;
+    cost_savings_total = vals(2).capex - vals(3).capex;
+    end_result_struct.pctCostSavingsFromPTO = cost_savings_PTO / cost_savings_total * 100;
 end
