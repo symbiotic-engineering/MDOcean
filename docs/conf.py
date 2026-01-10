@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join("..", "mdocean"))) # for python autosummary to find the package
 sys.path.insert(0, os.path.abspath('_ext')) # custom matlab_autosummary extension
+from __version__ import __version__
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -22,9 +23,10 @@ mathjax3_config = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'MDOcean'
-copyright = '2025, Rebecca McCabe, Madison Dietrich, Olivia Murphy, Iris Ren, Maha Haji'
+copyright = '2026, Rebecca McCabe, Madison Dietrich, Olivia Murphy, Iris Ren, Maha Haji'
 author = 'Rebecca McCabe, Madison Dietrich, Olivia Murphy, Iris Ren, Maha Haji'
-release = 'v2.1'
+version = f'v{__version__}'
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -94,6 +96,7 @@ html_context = {
     "github_repo": "MDOcean",
     "github_version": "main",
     "conf_py_path": "/docs/",
+    "current_version": release,
 }
 
 html_theme_options = {

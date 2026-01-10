@@ -1,5 +1,27 @@
-
+# Changelog
 ## Unreleased
+
+## [v1.0.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-7
+### Added
+- Added config for readthedocs
+### Changed
+- Move usage instructions from readme to own docs page
+- Minor docs changes
+- Release notes use info from CHANGELOG.md
+### Fixed
+- Problem in deployment of docs to gh-pages branch
+
+## [v1.0.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-6
+
+### Added
+- Two new CI workflows related to versioning and releasing
+- __version__.py to store version information
+### Changed
+- Trigger behavior of existing CI workflows
+### Fixed
+- Incorrect variable naming in damping plate structures
+- Calkit stage dependencies so postpro depends on analysis
+- Reduce likelihood of ld.so error by loading patch earlier
 
 ## [v1.0.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.0) - 2025-12-19 - Journal
 Major changes to structures, dynamics, optimization formulation, caching, testing, and reproducibility made over the last year in preparation for upcoming journal paper submissions.
