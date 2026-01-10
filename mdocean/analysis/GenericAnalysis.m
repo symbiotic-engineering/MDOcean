@@ -61,7 +61,8 @@ classdef (Abstract) GenericAnalysis
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.tab_names,'.tex') ...
-                          'end.mat']);
+                          'end.mat' ...
+                          'end.json']);
         end
         function val = get.class_dependencies(obj)
             parent = superclasses(obj);
@@ -129,7 +130,7 @@ classdef (Abstract) GenericAnalysis
             s =  obj.end_result_struct;
             fname = [obj.output_folder filesep 'end'];
             save(fname,'-struct', 's')
-            json = jsonencode(s);
+            json = jsonencode(s,PrettyPrint=true);
             writelines(json, [fname '.json']);
         end
 

@@ -23,5 +23,9 @@ function [fig_array,...
     tab_firstrows = {};
     tab_colspecs = {};
     
+    end_result_struct.nominalLCOE = intermed_result_struct.LCOE;
+    surgeForce = intermed_result_struct.val.F_surge_storm;
+    end_result_struct.surgeForceFloatNominal = surgeForce(1);
+    end_result_struct.surgeForceSparNominal  = surgeForce(2);
     end_result_struct.single_run_complete = true;
 end
