@@ -25,7 +25,7 @@
 %   Date:    09/10/2018                                                   %
 %   E-mail:  vicmarcag (at) gmail (dot) com                               %
 % ----------------------------------------------------------------------- %
-function table2latex(T, filename, special_col_spec, special_first_row)
+function table2latex(tab, filename, special_col_spec, special_first_row)
     
     % Error detection and default parameters
     if nargin < 2
@@ -39,7 +39,7 @@ function table2latex(T, filename, special_col_spec, special_first_row)
         end
     end
     if nargin < 1, error('Not enough parameters.'); end
-    if ~istable(T), error('Input must be a table.'); end
+    if ~istable(tab), error('Input must be a table.'); end
     if nargin<3
         special_col_spec = [];
     end
@@ -48,13 +48,13 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     end
     
     % Parameters
-    n_col = size(T,2);
+    n_col = size(tab,2);
     col_spec = [];
     for c = 1:n_col
         col_spec = [col_spec 'l'];
     end
-    col_names = strjoin(T.Properties.VariableNames, ' & ');
-    row_names = T.Properties.RowNames;
+    col_names = strjoin(tab.Properties.VariableNames, ' & ');
+    row_names = tab.Properties.RowNames;
     if ~isempty(row_names)
         col_spec = ['l' col_spec]; 
         col_names = ['& ' col_names];
@@ -79,13 +79,13 @@ function table2latex(T, filename, special_col_spec, special_first_row)
 
     % Writing the data
     try
-        for row = 1:size(T,1)
+        for row = 1:size(tab,1)
             row_data = cell(1,n_col);
             row_data{1,n_col} = [];
             for col = 1:n_col
-                value = T{row,col};
+                value = tab{row,col};
                 
-                use_percent = contains(T.Properties.VariableNames{col},'error','IgnoreCase',true);
+                use_percent = contains(tab.Properties.VariableNames{col},'error','IgnoreCase',true);
                 value = format_value(value, use_percent);
                 
                 row_data{1,col} = char(value);
@@ -143,6 +143,8 @@ function value = format_value(value, use_percent)
             numbers = strjoin(arrayfun(@(x) engr_notation(x),value,'UniformOutput',false), ', ');
             value = ['[ ' numbers ' ]'];
         end
+    else
+        value = formattedDisplayText(value,"UseTrueFalseForLogical",true);
     end
 end
 

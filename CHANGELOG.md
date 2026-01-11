@@ -1,5 +1,64 @@
-
+# Changelog
 ## Unreleased
+
+## [v1.0.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-7
+### Added
+- Added config for readthedocs
+### Changed
+- Move usage instructions from readme to own docs page
+- Minor docs changes
+- Release notes use info from CHANGELOG.md
+### Fixed
+- Problem in deployment of docs to gh-pages branch
+
+## [v1.0.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.1) - 2026-1-6
+
+### Added
+- Two new CI workflows related to versioning and releasing
+- __version__.py to store version information
+### Changed
+- Trigger behavior of existing CI workflows
+### Fixed
+- Incorrect variable naming in damping plate structures
+- Calkit stage dependencies so postpro depends on analysis
+- Reduce likelihood of ld.so error by loading patch earlier
+
+## [v1.0.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.0) - 2025-12-19 - Journal
+Major changes to structures, dynamics, optimization formulation, caching, testing, and reproducibility made over the last year in preparation for upcoming journal paper submissions.
+
+### Model
+#### Added
+- Initial environmental and CEM modules
+- Stiffeners considered in structures
+#### Changed
+- Force saturation uses iteration rather than explicit quadratic formula
+- Significant damping plate and float structural model updates
+- Ability to perform iteration with fsolve solver
+#### Fixed
+- Multibody dynamics correction
+- Reactive control now runs rather than failing to converge
+
+### Optimization and Analysis 
+#### Added
+- Local parameter sensitivity
+- Amplitude constraints
+#### Changed
+- Structural thicknesses added to design variables
+- Geometric design variables are dimensional rather than ratios
+- Objectives are output as vector J rather than individual variables
+- Perform post processing without repeating analysis using the caching in GenericAnalysis class
+- Pareto front axes are power and cost rather than LCOE and coefficient of variation
+
+### Tests, Validation, and Supporting Code
+#### Added
+- Dynamics validation in WEC-Sim with reports for single and multi body
+- Publications are part of the codebase (pubs folder)
+- Testcase features: generated files get deleted at end, option to not run slow tests
+- Full reproducibility with calkit pipeline
+- Sphinx documentation
+#### Changed
+- Test case regressions show on GitHub actions GUI
+- Speed up CI: parallelization and get rid of repeats
 
 ## [v2.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v2.1) - 2024-10-26 - Zenodo fix
 ### Fixed

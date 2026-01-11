@@ -9,21 +9,9 @@ import matlab.unittest.plugins.LoggingPlugin
 import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
 
-load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
-
-sourceCodeFolder = 'mdocean';
-addpath(genpath(sourceCodeFolder))
-
-if exist('../WEC-Sim','dir')    
-    wecSimFolder = '../WEC-Sim/source';
-    set_param(0, 'ErrorIfLoadNewModel', 'off')
-    addpath(genpath(wecSimFolder))
-    rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
-end
-rmpath(genpath('mdocean/simulation/modules/OpenFLASH')) % prevent using OpenFLASH run_MEEM since it's not integrated yet
+add_mdocean_path();
 
 suite = testsuite('tests');
-suite = selectIf(suite,HasName(ContainsSubstring("dynamics"))); % only wecsim temporarily
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');

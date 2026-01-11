@@ -18,7 +18,7 @@ This would be preferred whenever design-dependent capital expenditures carry gre
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{23}}
+\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
 \caption{Geometries overlaid}
 \label{fig:overlaid-geometry}
 \end{figure}
@@ -54,13 +54,13 @@ The numerical results are shown in \tablename~\ref{tab:opt-output}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{24}}
+\includegraphics[width=\linewidth]{figs/from-matlab/overlaid_hydro_coeffs.pdf}
 \caption{Hydrodynamic coefficients overlaid}
 \label{fig:overlaid-hydro}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{25}}
+\includegraphics[width=\linewidth]{figs/from-matlab/probability_CDF.pdf}
 \caption{Cumulative distribution function of average power over time}
 \label{fig:overlaid-power-dist}
 \end{figure}
@@ -94,7 +94,7 @@ Finally, the electrical efficiency describes the impact of the generator efficie
 Multiplying by the hours per year in each sea state expressed as a percentage yields the annual energy production.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{PowerMultOpt}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
     \caption{Power matrix multiplicative breakdown for minimum LCOE design}
     \label{fig:power-matrix-opt}
 \end{figure}
@@ -105,7 +105,7 @@ Values of the nonzero Lagrange multipliers $\vec{\lambda}$ are reported in \figu
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{15.5}}
+\includegraphics[width=1\linewidth]{figs/from-matlab/lagrange_multipliers.pdf}
 \caption{Lagrange multipliers for LCOE-minimization}\label{fig:lagrange-multiplier}
 \end{figure}
 
@@ -116,7 +116,6 @@ This motivates a potential future search for creative designs to obviate or miti
 Meanwhile, the activity of the float thickness lower bound and its larger value of $\lambda$ than the float FOS constraint indicates that the float structural model is inadequate in this regime and should be extended to better incorporate local buckling effects that would come to dominate for very thin-skinned designs.
 
 Additional outputs of the optimization are the gradient of the objective, $\vec{\nabla} J=\partial J/\partial \vec{x}$, and the Hessian of the Lagrangian, $\textbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$.
-They are shown in \appendixautorefname~\ref{sec:appendix-supplemental-results} since they are not particularly informative by themselves, especially since the gradient is expected to be zero at the optimum for all design variables not involved in an active constraint.
 The utility of the gradient and Hessian are in their ability to calculate other local sensitivity measures, such as the impact of a design variable or parameter that is perturbed from its optimal value. Local parameter sensitivity analysis occurs in \sectionautorefname~\ref{sec:sensitivities-local}, and design variable perturbation is examined here.
 
 \figureautorefname~\ref{fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimal value, $\Delta J/J$, calculated using equation \eqref{eq:delta-J} and compared against the ``ground truth'' value from simulation re-evaluation.
@@ -127,16 +126,20 @@ The utility of the gradient and Hessian are in their ability to calculate other 
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/delta_x.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/delta_x.pdf}
 \caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{fig:delta-J}
 \end{figure}
+
+We first note that the gradient $\vec{\nabla} J$, and therefore the gradient estimate of the objective perturbation $\Delta J$, equals zero for all design variables not involved in an active constraint, as long as the optimization has converged.
+Notably, all values are nonzero, indicating that all design variables in some way affect the active constraints identified in \ref{fig:lagrange-multiplier}.
+The values convey the amount that the objective would improve if the design variable changed, although changing this design variable would violate the active constraint(s) that the design variable is involved in.
 
 The design variables with the highest sensitivities are $D_s$, $D_f$,and $h_{stiff,f}$, with a 10\% decrease in the diameters and 10\% increase in the stiffener height leading to a 7.9\%, 4.4\%, and 3.7\% increase in LCOE respectively.
 The remaining design variables have a notably low sensitivity, meaning that they can be perturbed from their optimal value by 10\% in either direction without affecting the objective by more than 1-2\% (although they may affect constraints).
 Finally, the gradient estimates are generally accurate, with the exception of the diameters $D_s$ and $D_f$ and the peak power $P_{max}$.
 For these variables, nonlinearity or curvature exists in the objective function, indicating a tradeoff in the objective that would produce an optimum even without any active constraints.
 For the case of LCOE minimization, this is expected because increasing the diameters and power rating both increase the power production while simultaneously increasing the capital cost.
-More accurate estimates of the perturbed LCOE can be obtained by using the Hessian of the objective to account for curvature, but this would need to be obtained via manual finite differences because the solver only returns the Hessian of the Lagrangian.
+More accurate estimates of the perturbed LCOE can be obtained by using the Hessian of the objective to account for curvature, but the Hessian would need to be obtained via manual finite differences because the solver only returns the Hessian of the Lagrangian.
 
 \subsubsection{Multi-Start}
 Separately, because non-convex optimization can get stuck in a local minimum, 1000 random initial guesses are tested, although 974 are linear infeasible and discarded.
@@ -152,9 +155,9 @@ Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with
 \hl{Note to scrutineers: due to the high amount of linear infeasibility, I am going to try this again but generate points that are linear feasible from the start.}
 
 \begin{figure}
-\centering
-\includegraphics[width=1.2\linewidth]{\matlabFilepath{15.6_3}}
-\caption{Probability tree for convergence of multi-start}\label{fig:multistart-tree}
+    \centering
+    \includegraphics[width=1.2\linewidth]{figs/from-matlab/multistart_convergence_tree.pdf}
+    \caption{Probability tree for convergence of multi-start}\label{fig:multistart-tree}
 \end{figure}
 
 It is also worth investigating which characteristics of the starting point contribute to the outcome of the optimization. 
@@ -193,7 +196,7 @@ The re-optimization accounts for nonlinearities and is thus more accurate but re
 Results are normalized such that a value of 1 means that a given percent increase in the parameter from its nominal value causes the same percent increase in  $J^*$ or $x^*$.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{16}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
     \caption{Tornado chart showing highest objective sensitivities}
     \label{fig:param-sens-J-star-tornado}
 \end{figure}
@@ -224,7 +227,7 @@ The two sensitivities are expected to be equal due to the mass-based material co
 \begin{landscape}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{17}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J1.pdf}
 
     \caption{Tornado chart showing highest design variable sensitivities at minimum LCOE}
     \label{fig:param-sens-x-star-tornado}
@@ -234,7 +237,7 @@ The two sensitivities are expected to be equal due to the mass-based material co
 \begin{landscape}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{18}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J2.pdf}
     \caption{Tornado chart showing highest design variable sensitivities at minimum design cost}
     \label{fig:param-sens-x-star-tornado-2}
 \fillandplacepagenumber
@@ -350,13 +353,13 @@ Figure~\ref{fig:pareto-lcoe} provides a zoomed-in version with superimposed cont
 The minimum LCOE design occurs at the point of tangency between the pareto front and the LCOE contours and very nearly coincides with the maximum power design. %\hl{analyze more: how are the max power and min LCOE designs different? talk about the multiple apparent points of tangency (ie at 50 cents/kWh) and whether those are local minimums in LCOE.}
 \begin{figure}
     \centering
-    \includegraphics[width=.8\linewidth]{\matlabFilepath{19}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_front_with_design_images.pdf}
     \caption{Pareto Front}
     \label{fig:pareto}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=.8\linewidth]{\matlabFilepath{20}}
+\includegraphics[width=.8\linewidth]{figs/from-matlab/pareto_front_LCOE_contours.pdf}
 \caption{Pareto front with different LCOE contours overlaid }
 \label{fig:pareto-lcoe}
 \end{figure}
@@ -377,7 +380,7 @@ To facilitate comparison against the pareto front in Figure~\ref{fig:pareto} and
 Structural design variables are green, powertrain ratings are blue, and bulk geometry dimensions are red. 
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{21}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_heuristics.pdf}
     \caption{Design and objective heuristics plot}
     \label{fig:design-heuristics}
 \end{figure}
@@ -410,7 +413,7 @@ Since this constraint was marked as priority two (required for modeling accuracy
 Aside from the irrelevant maximum force constraint, which is always active by design, active nonlinear constraints include the float, column, and damping plate structural factors of safety, and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing slamming of the float.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{\matlabFilepath{22}}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_constraint_activity_reactive.pdf}
     \caption{Constraint Activity}
     \label{fig:constraint-activity}
 \end{figure}
@@ -419,13 +422,12 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 
 \subsection{Multi-Objective Sensitivity Analysis}
 \paragraph{Control Scheme}
-\begin{figure}
-    \centering
-    \includegraphics[width=.8\linewidth]{figs/damping_reactive_pareto.png}
-    \caption{Pareto Front comparison for Damping vs Reactive Control}
-    \label{fig:pareto-control-compare}
-\end{figure}
-\hl{Add explanation and debug why reactive control stops at 120 kW.}
+Figure~\ref{fig:pareto-lcoe} compares the pareto front for the damping control scheme to the reactive control scheme.
+While reactive control achieves higher power ultimately the lowest LCOE as expected, at lower power levels ($<$\dampingReactivePowerIntersect kW) damping control is actually more cost effective.
+This is because the reactive control scheme requires a larger PTO rating to achieve the same power at low power levels, as well as larger structures to withstand the higher forces.
+Incorporating the unmodeled effect that PTOs with both motoring and generation capability can be more expensive than those with only generation capability would further increase the appeal of damping control at low power levels.
+This trend also suggests the possibility that the optimal controller for a given power level may be an alternative controller (neither damping nor reactive control).
+In other words, while reactive control yields the highest power for a given design, it is not necessarily the highest power for a given cost, considering that PTO and structural cost scale with the controller.
 %\hl{This section I don't have results for yet and can be cut if needed. 
 %Maybe show trace out the effect of parameter variation without reoptimizing in multiobjective space, 
 %and it shows you how far some param variations bring you from optimal, like the dJ/dp sensitivities before 
@@ -434,12 +436,12 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 %Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
 
 \subsection{Optimization Runtime}
-Figure \ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
+Figure~\ref{fig:optim-runtimes} shows the runtime for each optimization and analysis routine, as run in parallel on the 14-core server described in section~\ref{sec:sim-runtime}. 
 The optimization also runs without issue, albeit more slowly, on unspecialized machines such as a Windows 10 laptop computer with MATLAB R2022a.
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{\matlabFilepath{26}}
+\includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
 \caption{Bar chart of optimization and analysis runtimes}
 \label{fig:optim-runtimes}
 \end{figure}

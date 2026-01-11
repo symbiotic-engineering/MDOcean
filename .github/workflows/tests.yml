@@ -6,6 +6,8 @@ name: CI
 on:
   # Triggers the workflow on push events for any branch
   push:
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -56,7 +58,7 @@ jobs:
                 Simscape_Multibody
 
       - name: Add MATLAB to path on self-hosted runner
-        if: runner.os == 'Linux' && runner.name == 'lab-computer-becca'
+        if: runner.os == 'Linux' && runner.environment == 'self-hosted'
         run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
 
       - name: Run tests and generate artifacts
