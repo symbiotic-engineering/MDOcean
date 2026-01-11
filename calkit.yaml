@@ -3011,7 +3011,7 @@ pipeline:
         # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
-        # - results/Runtime/end.json
+        - results/Runtime/end.json
         # - results/Slamming/end.json
         # - results/SparHydro/end.json
         # - results/Validation/end.json
@@ -3021,15 +3021,48 @@ pipeline:
         - pubs/applied-ocean-research-model/numeric-results.tex
       command_name: results
       format:
+        # LCOEs
         nominalLCOE: "{nominalLCOE:.2f} $/kWh"
-        pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\%"
-        pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\%"
-        pctImprovePowerMinLCOE: "{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\%"
-        pctImproveDesignCostMinCapex: "{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}\\%"
-        pctWorsePowerMinCapex: "{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}\\%"
-        pctImprovePowerMaxPower: "{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}\\%"
-        pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}\\%"
-        pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}\\%"
+        minLCOE: "{minLCOE:.2f} $/kWh"
+        # powers
+        powerAvgNominal: "{powerAvgNominal/1000:.0f} kW"
+        powerMaxAtMinLCOE: "{powerMaxAtMinLCOE/1000:.0f} kW"
+        powerAvgAtMinLCOE: "{powerAvgAtMinLCOE/1000:.0f} kW"
+        powerAvgAtMinCapex: "{powerAvgAtMinCapex/1000:.0f} kW"
+        powerAvgMaxPower: "{powerAvgMaxPower/1000:.0f} kW"
+        powerBalanced: "{powerBalanced/1000:.0f} kW"
+        # masses
+        structMassAtMinLCOE: "{structMassAtMinLCOE/1000:.0f} Mg"
+        # dimensions
+        DfoptMinLCOE: "{DfoptMinLCOE:.1f} m"
+        # forces
+        forceMaxAtMinLCOE: "{forceMaxAtMinLCOE/1e6:.0f} MN"
+        surgeForceFloatAtMinLCOE: "{surgeForceFloatAtMinLCOE/1e6:.0f} MN"
+        surgeForceSparAtMinLCOE: "{surgeForceSparAtMinLCOE/1e6:.0f} MN"
+        surgeForceFloatNominal: "{surgeForceFloatNominal/1e6:.0f} MN"
+        surgeForceSparNominal: "{surgeForceSparNominal/1e6:.0f} MN"
+        # costs
+        capexAtMinLCOE: "{capexAtMinLCOE/1e6:.0f} $M"
+        capexDesignAtMinLCOE: "{capexDesignAtMinLCOE/1e6:.2f} $M"
+        capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
+        capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
+        capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
+        # runtimes
+        simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        # percent changes
+        pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
+        pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
+        pctImprovePowerMinLCOE: "{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%"
+        pctImproveDesignCostMinCapex: "{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}%"
+        pctWorsePowerMinCapex: "{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%"
+        pctImprovePowerMaxPower: "{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%"
+        pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%"
+        # percentages
+        pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
+        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
+        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
+        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex

@@ -3060,23 +3060,42 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   results-to-latex:
     cmd: "calkit latex from-json 'results/Comparison/end.json' 'results/GradientOptimFigFunc/end.json'
-      'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
-      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
-      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      , \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}\\\
-      \\%\", \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}\\\
-      \\%\", \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
-      \\%\", \"pctImproveDesignCostMinCapex\": \"{(capexDesignNominal -
-      capexDesignMinCapex)/capexDesignNominal*100:.0f}\\\\%\", \"pctWorsePowerMinCapex\"\
-      : \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}\\\
-      \\%\", \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}\\\
-      \\%\", \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}\\\
-      \\%\", \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}\\\\\
-      %\"}'"
+      'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json' --output
+      'pubs/renewable-energy-mdo/numeric-results.tex' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
+      $/kWh\", \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\"\
+      : \"{powerAvgNominal/1000:.0f} kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f}
+      kW\", \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\",
+      \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\"\
+      : \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f}
+      kW\", \"structMassAtMinLCOE\": \"{structMassAtMinLCOE/1000:.0f} Mg\"\
+      , \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f} m\", \"forceMaxAtMinLCOE\"\
+      : \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatAtMinLCOE\"\
+      : \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\", \"surgeForceSparAtMinLCOE\"\
+      : \"{surgeForceSparAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatNominal\"\
+      : \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
+      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f}
+      $M\", \"capexDesignAtMinLCOE\": \"{capexDesignAtMinLCOE/1e6:.2f} $M\"\
+      , \"capexDesignNominal\": \"{capexDesignNominal/1e6:.2f} $M\", \"\
+      capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f} $M\", \"capexDesignMaxPower\"\
+      : \"{capexDesignMaxPower/1e6:.2f} $M\", \"simRuntime\": \"{simRuntime*1000:.0f}
+      ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
+      ms\", \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%\"\
+      , \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%\"\
+      , \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
+      , \"pctImproveDesignCostMinCapex\": \"{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}%\"\
+      , \"pctWorsePowerMinCapex\": \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%\"\
+      , \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
+      , \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%\"\
+      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"\
+      pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\"\
+      : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
+      }'"
     deps:
       - results/Comparison/end.json
       - results/GradientOptimFigFunc/end.json
       - results/RunSingleFigFunc/end.json
+      - results/Runtime/end.json
     outs:
       - pubs/renewable-energy-mdo/numeric-results.tex:
           cache: false
