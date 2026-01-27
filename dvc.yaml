@@ -3098,6 +3098,17 @@ stages:
       - pubs/applied-ocean-research-model/tables/from-matlab/
     desc: Automatically generated from the 'move-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  copy-bib:
+    cmd: calkit map-paths --file-to-file 
+      'pubs/renewable-energy-mdo/references.bib->pubs/applied-ocean-research-model/references.bib'
+    deps:
+      - pubs/renewable-energy-mdo/references.bib
+    outs:
+      - pubs/applied-ocean-research-model/references.bib:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 'copy-bib' stage in 
+      calkit.yaml. Changes made here will be overwritten.
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc 
@@ -3136,6 +3147,7 @@ stages:
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numbers.tex
       - pubs/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       - pubs/applied-ocean-research-model/.latexmkrc
       - .calkit/env-locks/tex

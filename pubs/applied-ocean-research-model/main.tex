@@ -56,7 +56,21 @@
 \usepackage{verbatim} %word counts
 \usepackage{textcomp} % cent symbol
 \usepackage{tikz}
-\usepackage{circuitikz}
+\usepackage{circuitikz} % circuit figures
+
+% set tikz to compile externally to work with latexmk
+\usetikzlibrary{external}
+\tikzset{
+    external/system call={
+      pdflatex \tikzexternalcheckshellescape 
+      -halt-on-error 
+      -interaction=batchmode 
+      -output-directory=aux 
+      -jobname "\image" "\texsource"
+    }
+}
+\tikzexternalize
+
 %\usepackage{graphicx}
 %\usepackage{float}
 %\usepackage{placeins}
@@ -313,7 +327,7 @@ A Python version using the OpenMDAO package is forthcoming. % todo: replace with
 \clearpage
 % Bibliography: point to files one level up in pubs/ so BibTeX can find them
 \bibliographystyle{elsarticle-num-names}
-\bibliography{renewable-energy-mdo/references}
+\bibliography{references}
 
 \end{document}
 
