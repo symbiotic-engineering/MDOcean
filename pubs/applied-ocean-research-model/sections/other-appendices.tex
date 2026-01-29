@@ -1,6 +1,74 @@
 \clearpage
 \section{Dynamics and Control Module Details}
 
+\subsection{Quadratic Program Solution}\label{sec:appendix-qp-solution}
+This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
+
+The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem from $\vec{x} \in \mathbb{C}^2$ to $\vec{x} \in \mathbb{C}^1$.
+Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\vec{n}$, the null space vector of $\vec{c}^{\,*}$:
+\begin{equation}\label{eq:x-p-plus-nullspace}
+    \vec{x} = \underbrace{
+        \frac{\hat{V}_{s,th}}{2\Re(\hat{Z}_s)}
+        \begin{bmatrix} \hat{Z}_s^* \\ 1 \end{bmatrix} 
+    }_{
+        \textrm{particular solution } \vec{x}_p} 
+    -~ \Gamma \cdot \frac{\hat{V}_{s,th}}{2\Re(\hat{Z}_s)}
+    \underbrace{
+        \begin{bmatrix} -\hat{Z}_s^* \\ 1 \end{bmatrix}
+    }_{
+        \textrm{null space } \vec{n}}
+\end{equation}
+where $\Gamma$ is a nondimensional complex scalar representing the remaining degree of freedom in the optimization after enforcing the equality constraint.
+For the particular solution, we have used the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \cref{eq:matched-load} and can be derived from the quadratic program as follows:
+\begin{equation}\label{eq:x-p}
+    \vec{x}_{p} = \frac{d \mathbf{E}_2\vec{c}}{\vec{c}^{\,*}\mathbf{E}_2\vec{c}}
+\end{equation}
+This selection for $\vec{x}_p$ means that the degree of freedom $\Gamma$ represents the deviation of the solution from the impedance-matched solution.
+Using $\hat{I}_p$ for brevity to denote the current in the particular solution, \cref{eq:x-p-plus-nullspace} can be rewritten as:
+\begin{equation}\label{eq:x-p-plus-nullspace-simplified}
+\vec{x} = \vec{x}_p - \Gamma \hat{I}_p \vec{n}
+    %&= \begin{bmatrix}
+    %    1+\Gamma &  0 \\
+    %    0 & 1-\Gamma
+    %\end{bmatrix}
+    %\vec{x}_p
+\end{equation}
+
+Inequality constraints $\mathbf{A}\vec{x} \leq \vec{b}$ further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
+While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution. 
+First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
+\begin{subequations}\label{eq:obj-inequality-alpha}
+\begin{align}
+    P_{avg,VI} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(\hat{Z}_s)}~ (1 - |\Gamma|^2)
+    \label{eq:obj-alpha}\\
+    -\Gamma \hat{I}_p \mathbf{A}\vec{n} &\leq \vec{b} - \mathbf{A} \vec{x}_p
+    \label{eq:inequality-alpha}
+\end{align}
+\end{subequations}
+Rewriting based on the sign of each element $i$ of $-\hat{I}_p\mathbf{A}\vec{n}$ gives upper and lower bounds on $\Gamma$:
+\begin{equation}\label{eq:alpha-bounds}
+\begin{aligned}
+    \Gamma &\leq \min_{i | -\hat{I}_p(\mathbf{A}\vec{n})_i > 0} \frac{(\vec{b} - \mathbf{A} \vec{x}_p)_i}{-\hat{I}_p(\mathbf{A}\vec{n})_i} = \Gamma_{max} \\
+    \Gamma &\geq \max_{i | -\hat{I}_p(\mathbf{A}\vec{n})_i < 0} \frac{(\vec{b} - \mathbf{A} \vec{x}_p)_i}{-\hat{I}_p(\mathbf{A}\vec{n})_i} = \Gamma_{min}
+\end{aligned}
+\end{equation}
+with the additional requirement that $(\vec{b} - \mathbf{A} \vec{x}_p)_i > 0$ for all $i$ where $(\mathbf{A}\vec{n})_i = 0$.
+Since the optimal solution without inequality constraints (\cref{eq:x-p}) corresponds to $\Gamma=0$, and \cref{eq:obj-alpha} shows that power decreases with increasing $|\Gamma|$, we have the following cases for the constrained optimum:
+\begin{equation}\label{eq:alpha-opt}
+\Gamma_{opt} =
+\begin{cases}
+ 0 & \textrm{if } \Gamma_{min} \leq 0 \leq \Gamma_{max} \\
+ \Gamma_{min} &    \textrm{if } 0 < \Gamma_{min} \leq \Gamma_{max}  \\
+ \Gamma_{max} &   \textrm{if } \Gamma_{min} \leq \Gamma_{max} < 0 \\
+ \textrm{infeasible} &  \textrm{if } \Gamma_{min} > \Gamma_{max}
+\end{cases}
+\end{equation}
+Since $\Gamma$ is complex, \cref{eq:inequality-alpha,eq:alpha-bounds,eq:alpha-opt} should be regarded as separate equations for their real and imaginary parts.
+
+Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
+References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss the reflection coefficient for WECs.
+
+
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
 
