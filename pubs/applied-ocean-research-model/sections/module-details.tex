@@ -4,10 +4,11 @@
 
 The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
 For notation, unbolded unarrowed variables refer to scalars (e.g. $x$ or $X$), arrowed variables refer to vectors ($\vec{x}$ or $\vec{X}$), and bold variables refer to matrices ($\mathbf{x}$ or $\mathbf{X}$).
-For dynamic (time-varying) quantities, the time domain representation is denoted with a lowercase variable $x(t)$, and can also be represented as the real part of a complex signal $x(t)=\Re\left[\tilde{x}(t)\right]$.
+For dynamic (time-varying) quantities, the time domain representation is denoted $x(t)$, and can also be represented as the real part of a complex signal $x(t)=\Re\left[\tilde{x}(t)\right]$.
 Assuming the signal is sinusoidal, the complex signal can be expressed as $\tilde{x}(t)=\hat{X}e^{i\omega t}$ with complex phasor $\hat{X}=|\hat{X}|e^{i\angle \hat{X}}$ and angular frequency $\omega$.
 Altogether, this gives $x(t)=|\hat{X}|\cos(\omega t+\angle\hat{X})$. 
 Dots ($\dot{x}(t)=\Re(\hat{\dot{X}}e^{i\omega t})=\Re(i\omega\hat{X}e^{i\omega t})$) indicate time-derivatives.
+For static quantities, no special notation differentiates complex from real variables, as this will be indicated directly in the text or with $\mathbb{R}$ or $\mathbb{C}$ if clarification is needed.
 
 %TC:break Geometry
 \subsection{Geometry}\label{sec:geom}
@@ -294,13 +295,16 @@ While the describing function method used here has been known for over half a ce
 The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
 Thus, MDOcean's semi-analytical dynamics offer a combination of speed, accuracy, and simplicity that is novel in the wave energy space.
 
-\subsubsection{Equation of Motion}
-Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear frequency domain WEC model.
+\subsubsection{Equation of Motion}\label{sec:eom}
+Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
 Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2024} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 
 The float and spar are each modeled as a floating rigid body, and the two bodies are kinematically coupled to transmit force between them.
-The MDOcean dynamic model assumes regular waves for reasons to be detailed later this section, so the system experiences monochromatic forced oscillation.
-The equation of motion can be expressed in the time domain as: % todo: this is time domain so gamma is not allowed to be complex
+Forces include wave excitation, hydrodynamic radiation, hydrostatic restoring, drag, and power takeoff.
+The MDOcean dynamic model assumes regular waves for reasons to be detailed in \cref{sec:irregular-waves}, so the system experiences monochromatic wave forcing.
+Combined with the linearity of the model, this implies that all signals are sinusoids.
+Therefore, the time-domain radiation force is a simple product rather than a convolution integral.
+With these considerations, the equation of motion can be expressed in the time domain as: % todo: this is time domain so gamma is not allowed to be complex
 \setlength\arraycolsep{0pt}
 \newcolumntype{C}{>{{}}c<{{}}}
 \begin{equation}\label{eq:eom}
@@ -320,237 +324,338 @@ The equation of motion can be expressed in the time domain as: % todo: this is t
 \end{equation}
 \setlength\arraycolsep{5pt} % back to default
 for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
-Forces include wave excitation, hydrodynamic radiation, hydrostatic restoring, drag, and power takeoff.
-The mass matrix is defined as:
+The mass matrix is:
 \begin{equation}
 \mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
 \end{equation}
 For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
 The excitation coefficient $\vec{\hat{\gamma}}$ is complex, and all other coefficients are real.
-The complex transfer function from real regular wave height $H$ to the vector of complex body velocity phasors $\vec{\hat{\dot{\xi}}}$ is then: 
+
+In the frequency domain, the complex transfer function from real regular wave height $H$ to the vector of complex body velocity phasors $\vec{\hat{\dot{\xi}}}$ is then: 
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\hat{\mathbf{Z}}_i+\hat{\mathbf{Z}}_p\right]^{-1}\vec{\hat{\gamma}}
+    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}\vec{\hat{\gamma}}
 \end{equation}
-where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag terms have been combined into a single intrinsic impedance matrix $\hat{\mathbf{Z}}_{i}$ for compactness:
+where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag terms have been combined into a single intrinsic impedance matrix $\mathbf{Z}_{i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
-\hat{\mathbf{Z}}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h+\mathbf{K}_d)
+\mathbf{Z}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h+\mathbf{K}_d)
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\mathbf{Z}_p = \mathbf{B}_p+\frac{\mathbf{K}_p}{i\omega}$.
 
-Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} can be visually represented as a multiport circuit, as shown in \figurename~\ref{fig:multiport-circuit-intrinsic}.
+Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} can be represented as a multiport circuit.
+Multiport circuit models often use impedance (Z), cascade (a/ABCD), and hybrid (h) matrices to describe the relationship between ports, with the following conventions:
+\begin{equation}\label{eq:multiport-matrix-definitions}
+\vec{e} =
+\mathbf{Z}
+\vec{q},
+%
+\qquad
+%
+\begin{bmatrix}
+\vec{e}_2 \\ \vec{q}_2
+\end{bmatrix} =
+[\mathbf{a}]_{2\leftarrow1}
+\begin{bmatrix}
+\vec{e}_1 \\ \vec{q}_1
+\end{bmatrix},
+%
+\qquad
+%
+\begin{bmatrix}
+\vec{e}_1 \\ \vec{q}_2
+\end{bmatrix} =
+[\mathbf{h}]_{1,2}
+\begin{bmatrix}
+\vec{q}_1 \\ \vec{e}_2
+\end{bmatrix}
+\end{equation}
+for effort variables $\vec{e}$ and flow variables $\vec{q}$.
+The impedance formulation groups all ports together, while the cascade and hybrid formulations divide the ports into two sets.
+\hl{Todo: Ryan's paper uses the sign convention where q1 is negative, need to go through and make signs consistent and add arrows for the flow direction at each port.}
+The multiport matrix equations apply to both the time-domain and phasor representations of each port.
+Impedances describe the effort required to produce a unit of flow, and have already been shown to arise in the intrinsic dynamics. 
+Cascade parameters describe how effort and flow are transmitted from port group 1 to port group 2, hence the leftward direction of the arrow in the subscript in \cref{eq:multiport-matrix-definitions}.
+For transmission in the other direction, simply invert: $[\mathbf{a}]_{1\leftarrow2} = [\mathbf{a}]_{2\leftarrow1}^{-1}$.
+Cascade matrices uniquely allow sequential multiplication of port variables and will be used for the PTO dynamics.
+Finally, hybrid parameters mix the two, allowing effort (or flow) at one port group to depend on the flow (or effort) at that port group, impedance-style, as well as the corresponding variable at the other port group, cascade-style.
+They will be used for the PTO kinematics.
+Converting between the three multiport conventions is accomplished using the formulas in \cite{reveyrand_multiport_2018}, although some port relationships require a particular convention to capture the physics and are undefined in other conventions.
+
+The circuit showcasing the intrinsic dynamics with two hydrodynamic degrees of freedom is visualized in \figurename~\ref{fig:multiport-circuit-intrinsic}.
 \begin{figure}
 \centering
     \input{figs/tikz/circuit_intrinsic.tikz}
-\caption{Intrinsic dynamics represented as a multiport circuit}
+\caption{Multiport circuit for two hydrodynamic degrees of freedom with intrinsic and powertrain impedances $\mathbf{Z}_i$ and $\mathbf{Z}_p$}
 \label{fig:multiport-circuit-intrinsic}
 \end{figure}
-The excitation forces are represented as dependent voltage sources (diamonds) driven by a single wave elevation source (circle), and the intrinsic and powertrain dynamics are each represented as a two-port impedance matrix.
+Excitation forces are represented as dependent voltage sources (diamonds) driven by a single wave elevation source (circle), and the intrinsic and powertrain dynamics are each represented as a two-port impedance matrix.
 The dependent sources and intrinsic impedance matrix are inherently linked through Haskind relation, which relates excitation coefficient magnitudes $|\hat{\gamma}_i|$ with diagonal elements of the radiation damping $B_{h,ii}$.
 This bounds the maximum absorbed power for any geometry.
 
-\subsubsection{PTO Kinematics and Dynamics}
-We next turn our attention to the PTO kinematics and dynamics, which have so far been left generic in equation~\eqref{eq:eom-freq-domain} as impedance matrix $\hat{\mathbf{Z}}_p$.
+\subsubsection{PTO Model}\label{sec:pto-dynamics}
+We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in equation~\eqref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews common WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2024} uses the transmission matrix form, which groups the effort and flow variables $e$ and $q$ at each port. 
+Reference \cite{penalba_review_2016} reviews WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{coe_co-design_2024} presents a PTO model in cascade matrix form for a single degree of freedom system. 
+This section will provide a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
+\paragraph{PTO Kinematics and Underactuation}
 The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
 In general form, the PTO kinematics can be expressed as:
 \begin{equation}\label{eq:pto-kinematics-motion}
-\vec{\hat{X}}_{PTO} = \mathbf{T_{kin}}(\vec{\hat{\xi}})~ \vec{\hat{\xi}}
+\vec{\hat{X}}_{PTO} = \mathbf{T}_{kin}~ \vec{\hat{\xi}}
 \end{equation}
-with kinematic transformation matrix $\mathbf{T_{kin}(\vec{\hat{\xi}})}$ that may depend on the body displacements $\vec{\hat{\xi}}$ if the linkages are nonlinear.
-
+with kinematic transformation matrix $\mathbf{T}_{kin}$ that may depend on the body displacements $\vec{\hat{\xi}}$ if the linkages are nonlinear, but hereafter is assumed constant for simplicity.
+This assumption means that \cref{eq:pto-kinematics-motion} can be differentiated trivially to yield the same matrix relationship for velocities.
 Assuming power conservation across the linkages, the kinematics describe the relationship between not only motions but also forces: 
 \begin{equation}\label{eq:pto-kinematics-force}
-\vec{\hat{F}}_p = [\mathbf{T_{kin}}(\vec{\hat{\xi}})]^T  \vec{\hat{F}}_{PTO}
+\vec{\hat{F}}_p = [\mathbf{T}_{kin}]^T  \vec{\hat{F}}_{PTO}
 \end{equation}
 To avoid confusion, subscript $PTO$ is used for forces in the PTO degrees of freedom (post-kinematics), while subscript $p$ denotes forces in the hydrodynamic body degrees of freedom (pre-kinematics).
-\Cref{eq:pto-kinematics-motion,eq:pto-kinematics-force} imply rigid lossless massless linkages, but linkage dissipation, deflection, and inertia could be added to the PTO dynamics if desired.
+\Cref{eq:pto-kinematics-motion,eq:pto-kinematics-force} imply rigid lossless massless linkages, and any linkage deflection, dissipation, and inertia would be included in the PTO dynamics rather than kinematics.
 
-Multibody WECs are frequently underactuated, meaning that the PTO has fewer controlled degrees of freedom than the hydrodynamic bodies, and $\mathbf{T_{kin}}$ has more columns than rows.
+Multibody WECs are frequently underactuated, meaning that the PTO has fewer controlled degrees of freedom than the hydrodynamic bodies, and $\mathbf{T}_{kin}$ has more columns than rows.
 Underactuated sytems receive considerable attention in robotics \cite{tedrake_underactuated_2024} but have only recently been explored in the context of wave energy conversion \cite{faedo_principle_2022}.
-In this case, we model two hydrodynamic degrees of freedom (heave of the float and spar respectively) and a single PTO degree of freedom corresponding to the relative heave motion between the float and spar.
-The kinematics matrix is therefore the column vector:
-\begin{equation}
-\mathbf{T_{kin}} = \begin{bmatrix}1 & -1\end{bmatrix}
+Cascade matrices require an identical number of input and output ports and thus cannot be used to describe the unbalanced ports that underactuated kinematics create \cite{reveyrand_multiport_2018}.
+Non-square impedance matrices may be used to capture unbalanced port relations in general, but the impedance is undefined for the specific relations of \cref{eq:pto-kinematics-motion,eq:pto-kinematics-force}.
+Instead, the kinematics can be packaged into a square hybrid matrix $[\mathbf{h}]_{kin}$ which accurately represents the underactuated system:
+\begin{equation}\label{eq:h-matrix-kinematics}
+    \begin{bmatrix}
+        \vec{\hat{F}}_p \\
+        \vec{\hat{\dot{X}}}_{PTO}
+    \end{bmatrix}
+    = \underbrace{
+        \begin{bmatrix}
+            \mathbf{0} & \mathbf{T}_{kin}^T \\
+            \mathbf{T}_{kin} & \mathbf{0}
+        \end{bmatrix}}
+        _{[\mathbf{h}]_{kin}}
+    \begin{bmatrix}
+        \vec{\hat{\dot{\xi}}} \\ \vec{\hat{F}}_{PTO}
+    \end{bmatrix}
+\end{equation}
+
+Here, we model two hydrodynamic degrees of freedom (heave of the float and spar respectively) and a single PTO degree of freedom corresponding to the relative heave motion between the float and spar.
+The kinematics matrix is therefore:
+\begin{equation}\label{eq:T-kin-specific}
+\mathbf{T}_{kin} = \begin{bmatrix}1 & -1\end{bmatrix}
 \end{equation}
 Thus, even absent any mechanism with ``kinematics'' in the traditional sense, the kinematics matrix is filled with zeroes, ones, and negative ones to represent which degrees of freedom are controlled.
 
-In the circuit representation, equations \eqref{eq:pto-kinematics-motion} and \eqref{eq:pto-kinematics-force} can be represented as three-port element, as shown in \figurename~\ref{fig:multiport-circuit-kinematics}.
+In the circuit representation with two hydrodynamic and one PTO degree of freedom, the hybrid matrix \cref{eq:h-matrix-kinematics} can be represented as a three-port element, as shown in \cref{fig:multiport-circuit-kinematics}.
 \begin{figure}
 \centering
     \input{figs/tikz/circuit_kinematics.tikz}
-\caption{Powertrain kinematics represented as a multiport circuit, with the Thevenin equivalent intrinsic dynamics}
+\caption{Multiport circuit with powertrain kinematics represented as a hybrid matrix, followed by the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics}
 \label{fig:multiport-circuit-kinematics}
 \end{figure}
-Taking the Thevenin equivalent of the intrinsic dynamics and kinematics at the PTO port yields a scalar equivalent circuit with voltage source $\hat{\tilde{F}}_u$ and impedance $\hat{Z}_{i,th}$,  shown in the bottom portion of \figureautorefname~\ref{fig:multiport-circuit-kinematics}.
 
-Moving on to the PTO dynamics, a general linear model of the drivetrain with mechanical transmission matrix $[a]_m$ takes the form
-% impedance
-% \begin{equation}
-% \begin{bmatrix}
-% F_p \\ \tau
-% \end{bmatrix}
-% =
-% \underbrace{\begin{bmatrix}
-% Z_{m,11} & Z_{m,12} \\
-% Z_{m,21} & Z_{m,22}
-% \end{bmatrix}}
-% _{Z_m}
-% \begin{bmatrix}
-% \dot{X} \\ \Omega
-% \end{bmatrix}
-% \end{equation}
+\paragraph{Combining Intrinsic Dynamics with PTO Kinematics}
+Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the PTO port yields a scalar equivalent circuit for each PTO degree of freedom, with force sources $\vec{\hat{F}}_{th}$ and mechanical impedances $\vec{Z}_{i,th}$, shown in the bottom portion of \figureautorefname~\ref{fig:multiport-circuit-kinematics} and computed with the following expressions:
+
+\begin{equation}
+\begin{aligned}
+    \vec{\hat{F}}_{th} &= (\mathbf{T}_{kin}\mathbf{T}_{kin}^T)^{-1} \mathbf{T}_{kin} \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta}
+    = \frac{1}{2} [1,~-1] \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta} \\
+    \vec{Z}_{i,th} &= (-\mathbf{T}_{kin}\mathbf{Z}_{i}^{-1}\mathbf{T}_{kin}^T)^{-1} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
+\end{aligned}
+\end{equation}
+where the vector expressions for the general case are shown first, followed by the scalar for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
+
+Although as previously mentioned a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
+Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero, so there is no way to express $\hat{\dot{\xi}}$ as a weighted sum of $\hat{F}_{PTO}$ and $\dot{\hat{X}}_{PTO}$.
+$\hat{\dot{\xi}}$ could be expressed as a function of the PTO variables by substituting $\mathbf{Z}_p=\mathbf{T}_{kin}^T (\vec{\hat{F}}_{PTO}/\vec{\hat{\dot{X}}}_{PTO}) \mathbf{T}_{kin}$ into \cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
+Instead, we can use cascade-like matrices to solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actutal body velocities $\vec{\dot{\xi}}$ and their values if the PTO were disconnected with $F_{PTO}=0$, $\vec{\dot{\xi}}_{0}$:
+\begin{equation}\label{eq:modified-body-velocity}
+    \vec{\dot{\xi}}_\Delta = \vec{\dot{\xi}} - \vec{\dot{\xi}}_{0}
+    \quad \textrm{ where } \quad
+    \vec{\dot{\xi}}_{0} = \mathbf{Z}_i^{-1}~\vec{\hat{\gamma}}~\frac{H}{2}
+\end{equation}
+The cascade-like matrix from the PTO port $\{F_{PTO}, \dot{X}_{PTO}\}$ to the modified body port $\{F_p, \dot{\xi}_\Delta\}$ is then:
+\begin{equation}\label{eq:body-transmission-matrix}
+[\mathbf{a}]_{F_p\xi_\Delta\leftarrow F\dot{X}} = 
+\begin{bmatrix}
+\mathbf{I}_2 \\
+-\mathbf{Z}_i^{-1}
+\end{bmatrix}
+\mathbf{T}_{kin}^T
+\begin{bmatrix}
+1 & 0
+\end{bmatrix}
+\end{equation}
+noting that this matrix is non-square ($\in \mathbb{C}^{4\times2}$) since there are more hydrodynamic than PTO degrees of freedom, and that the matrix label drops the $PTO$ subscripts for compactness.
+\Cref{fig:circuit-kinematics-a} represents this in circuit form, noting that the excitation source must be duplicated to create $\vec{\hat{\dot{\xi}}}_0$.
+
+\paragraph{PTO Dynamics}
+In addition to the PTO port already discussed, we define two additional ports of relevance: the generator mechanical port (torque $\tau$ and rotation speed $\Omega$) and the generator electrical port (voltage $V$ and current $I$).
+Assuming a drivetrain consisting of a linear to rotational gear ratio with equivalent radius $R$ followed by a driveshaft with impedance $Z_{shaft}$, the PTO mechanical dynamics are expressed with cascade matrix $[\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}$:
 \begin{equation}\label{eq:mech-transmission-matrix}
 \begin{bmatrix}
 F_{PTO} \\ \dot{X}_{PTO}
 \end{bmatrix}
 =
 \underbrace{\begin{bmatrix}
-a_{m,11} & a_{m,12} \\
-a_{m,21} & a_{m,22}
+Z_{shaft}/R & 1/R \\
+R & 0
 \end{bmatrix}}
-_{[a]_m}
+_{[\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}}
 \begin{bmatrix}
  \tau\\ \Omega
 \end{bmatrix}
 \end{equation}
-where the PTO force $F_{PTO}$ and velocity $\dot{X}_{PTO}$ are found as a function of the generator torque and rotation speed $\tau$ and $\Omega$.
-Meanwhile, linear generator electrical dynamics are expressed with electrical transmission matrix $[a]_e$:
+
+Meanwhile, a synchronous permanent magnet generator modeled as an ideal gyrator with torque constant $k_\tau$ plus a winding impedance $Z_{w}$ has cascade matrix $[\mathbf{a}]_{\tau \Omega \leftarrow V I}$:
 \begin{equation}\label{eq:elec-transmission-matrix}
 \begin{bmatrix}
  \tau\\ \Omega
 \end{bmatrix}
 =
 \underbrace{\begin{bmatrix}
-a_{e,11} & a_{e,12} \\
-a_{e,21} & a_{e,22}
+0 & k_\tau \\
+1/k_\tau & Z_{w}/k_\tau
 \end{bmatrix}}
-_{[a]_e}
+_{[\mathbf{a}]_{\tau \Omega \leftarrow V I}}
 \begin{bmatrix}
  V \\ I
 \end{bmatrix}
 \end{equation}
-with park-transformed quadrature electrical voltage and current $V$ and $I$.
+with Park-transformed quadrature electrical voltage and current $V$ and $I$.
+
 The system operating point is determined by a controller that applies some electrical load to the generator.
-The controller can be formulated at either the generator mechanical or electrical port.
-The former is more convenient for implementation and constraints, because modern drives typically expect torque commands, while the latter is more convenient for electrical power calculations.
-Here we formulate both as linear impedances with damping and stiffness terms, where the mechanical control impedance $\hat{Z}_u$ and electrical load impedance $\hat{Z}_l$ are defined as follows:
+The controller can be formulated as an impedance at either the generator mechanical or electrical port.
+The former is more convenient for hardware implementation, because modern drives typically expect torque commands, while the latter is more convenient for electrical power calculations and optimal control.
+%Here we formulate both as linear impedances with damping and stiffness terms, where 
+The mechanical control impedance $Z_u$ and electrical load impedance $Z_l$ are defined as follows:
 \begin{equation}\label{eq:controller-impedances}
-\begin{aligned}
-    \hat{Z}_l &= \frac{V}{I} = B_l + \frac{K_l}{s}\\
-    \hat{Z}_u &= \frac{\tau}{\Omega} = B_u + \frac{K_u}{s}
-\end{aligned}
+    Z_l = \frac{V}{I} = B_l + \frac{K_l}{s}
+    ,  \qquad
+    Z_u = \frac{\tau}{\Omega}% = B_u + \frac{K_u}{s}
 \end{equation}
-Combining \cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the following relationship:
+Combining \cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the following expression for $Z_u$ as a function of $Z_l$:
 \begin{equation}\label{eq:control-impedance}
-    \hat{Z}_u = 
+    Z_u = 
     \frac{
     \begin{bmatrix}
     1 & 0
     \end{bmatrix}
-    [a]_e
+    [\mathbf{a}]_{\tau \Omega \leftarrow V I}
     \begin{bmatrix}
-    \hat{Z}_l \\ 1
+    Z_l \\ 1
     \end{bmatrix}
 }{
     \begin{bmatrix}
     0 & 1
     \end{bmatrix}
-    [a]_e 
+    [\mathbf{a}]_{\tau \Omega \leftarrow V I}
     \begin{bmatrix}
-    \hat{Z}_l \\ 1
+    Z_l \\ 1
     \end{bmatrix}
 }
 \end{equation}
-Incorporating \cref{eq:mech-transmission-matrix} yields the Thevenin equivalent scalar PTO impedance at the hydrodynamic body port:
-\begin{equation}\label{eq:pto-impedance}
-\hat{Z}_{PTO,th} = 
-\frac{
-    \begin{bmatrix}
-    1 & 0
-    \end{bmatrix}
-    [a]_m [a]_e
-    \begin{bmatrix}
-    \hat{Z}_l \\ 1
-    \end{bmatrix}
-}{
-    \begin{bmatrix}
-    0 & 1
-    \end{bmatrix}
-    [a]_m [a]_e 
-    \begin{bmatrix}
-    \hat{Z}_l \\ 1
-    \end{bmatrix}
-}
-\end{equation}
-which is useful for calculating the mechanical response of each body.
-
-Transmission matrices $[a]_m$ and $[a]_e$ have so far remained general, able to represent a variety of PTO types. 
-Next we specify the exact components assumed in this study: an effective gear ratio $N$, a drivetrain with linear inertia and damping, and a synchronous permanent magnet generator modeled as an ideal gyrator with winding resistance $R_w$ and inductance $L_w$.
+This equation allows the $Z_l$ identified with optimal control to be implemented as a corresponding $Z_u$ in hardware.
+%Incorporating \cref{eq:mech-transmission-matrix} yields the Th\'{e}venin equivalent scalar PTO impedance at the hydrodynamic body port:
+% \begin{equation}\label{eq:pto-impedance}
+% Z_{PTO,th} = 
+% \frac{
+%     \begin{bmatrix}
+%     1 & 0
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}
+%     [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }{
+%     \begin{bmatrix}
+%     0 & 1
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega} [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }
+% \end{equation}
+% which is useful for calculating the mechanical response of each body.
 
 The PTO dynamics can be represented as a multiport circuit, as shown in \figurename~\ref{fig:multiport-circuit-pto}.
 \begin{figure}
 \centering
     \input{figs/tikz/circuit_pto.tikz}
-\caption{PTO (a.) and system (b.) dynamics represented as a multiport circuit}
+\caption{PTO dynamics represented as a multiport circuit and electrical Th\'{e}venin equivalent}
 \label{fig:multiport-circuit-pto}
 \end{figure}
 
-\subsubsection{Power Production}
-The time-domain power $P(t)$ at any port is simply the product of the port effort and flow variables.
-To facilitate this calculation in transmission form, power can be found as the quadratic product of the port variable vector with the two-dimensional exchange matrix $\mathbf{E}_2$,
-\begin{equation}
-P(t) = e(t)~q(t)
-= \frac{1}{2}
-\begin{bmatrix}
- e(t) \\ q(t)
-\end{bmatrix}^T
-\underbrace{\begin{bmatrix}
-0~ & 1 \\
-1~ & 0
-\end{bmatrix}}
-_{\mathbf{E}_2}
-\begin{bmatrix}
- e(t) \\ q(t)
-\end{bmatrix}
+The intrinsic dynamics, PTO kinematics, and PTO dynamics can be combined into a Th\'{e}venin equivalent source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as follows:
+\begin{equation}\label{eq:Th\'{e}venin-electrical}
+    Z_{s,th} = \frac{
+    \begin{bmatrix}1 & 0\end{bmatrix}
+    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}}
+    {\begin{bmatrix}0 & 1\end{bmatrix}
+    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}
+    } = \frac{B-AZ_{i,th}}{D-CZ_{i,th}} 
+    \qquad \hat{V}_{s,th} = F_{th}(A-CZ_{s,th})
 \end{equation}
-where substituting $[e,q]^T=[F_{p},\dot{\xi}]^T$ yields the floating body mechanical power, $[e,q]^T=[F_{PTO},\dot{X}_{PTO}]^T$ yields the mechanical power at the PTO port, $[e,q]^T=[\tau,\Omega]^T$ yields the generator mechanical power, and $[e,q]^T=[V,I]^T$ yields the instantaneous generator electrical power. 
+where $A,B,C,D$ are the elements of $\mathbf{a}_{VI \leftarrow F\dot{X}}$.
+This is shown in the bottom portion of \cref{fig:multiport-circuit-pto}.
+The load voltage and current can then be found as:
+\begin{equation}\label{eq:voltage-current}
+    \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
+\end{equation}
 
-Moving back to the frequency domain and assuming sinusoidal waveforms, the average and peak powers $P_{avg}$ and $P_{pk}$ in a given sea state can be found as:
-\begin{equation}\label{eq:power-avg-peak}
+\subsubsection{Solution Procedure}
+\Cref{sec:eom,sec:pto-dynamics} introduced models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
+This section unifies the formulation and presents a clear system-level solution procedure for all port variables:
+\begin{enumerate}
+\item Use \cref{eq:Th\'{e}venin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
+\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} will frame the load impedance selection as a constrained optimization problem.
+\item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
+\item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
+\item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
+\end{enumerate}
+Once all the port variables have been calculated, power at each port can be calculated according to the following section.
+
+\subsubsection{Power Production}
+The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $p(t) = e(t)~q(t)$.
+Substituting $\{e,q\}=\{F_{p},\dot{\xi}\}$ yields the floating body mechanical power, $\{e,q\}=\{F_{PTO},\dot{X}_{PTO}\}$ yields the mechanical power at the PTO port, $\{e,q\}=\{\tau,\Omega\}$ yields the generator mechanical power, and $\{e,q\}=\{V,I\}$ yields the generator electrical power. 
+
+In the frequency domain assuming sinusoidal waveforms, we introduce the active power $P$, reactive power $Q$, complex power $S$, and apparent power $|S|$ definitions from electrical engineering \cite{saadat_power_1999}:
+\begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    P_{avg} &= \frac{1}{2}\Re(\hat{e} \hat{q}^*) 
-    = \frac{1}{4} \Re\left(\begin{bmatrix}
-    \hat{e} \\ \hat{q}
-    \end{bmatrix}^*
-    \mathbf{E}_2
-    \begin{bmatrix}
-    \hat{e} \\ \hat{q}
-    \end{bmatrix}\right)  = \frac{1}{2} \Re(\hat{Z})|\hat{q}|^2 
+    P &= \frac{1}{2}\Re(\hat{e} \hat{q}^*) = \frac{1}{2} \Re(Z)|\hat{q}|^2 \qquad
+    Q = \frac{1}{2}\Im(\hat{e} \hat{q}^*) = \frac{1}{2} \Im(Z)|\hat{q}|^2
     \\
-    P_{pk} &=  P_{avg} + \frac{1}{2}|\hat{e} \hat{q}^*| = P_{avg}\left( 1 + \sqrt{1 + \left(\frac{\Im(\hat{Z})}{\Re(\hat{Z})}\right) ^2  } \right)
+    S &= P + iQ = \frac{1}{2}\hat{e} \hat{q}^* = \frac{1}{2} Z |\hat{q}|^2&
+    \\ 
+    |S| &= \sqrt{P^2 + Q^2} = \frac{1}{2}|\hat{e} \hat{q}^*| = \frac{1}{2}|Z| |\hat{q}|^2 = P \sqrt{1 + \left(\frac{\Im(Z)}{\Re(Z)}\right) ^2  }
 \end{aligned}
 \end{equation}
-if the port is terminated with complex impedance $\hat{Z}$, where ${}^*$ refers to the conjugate transpose. 
+where the port is terminated with complex impedance $Z$, and ${}^*$ refers to the conjugate transpose.
+\Cref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ as \cite{saadat_power_1999}:
+\begin{equation}\label{eq:power-time-PQS}
+    p(t) = P + |S| \cos\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\left(\frac{Q}{P}\right)\right)
+\end{equation}
+The average, peak, and minimum powers over a wave period are then:
+\begin{equation}\label{eq:power-avg-peak}
+    p_{avg} = P, \quad p_{pk} = P + |S|, \quad p_{min} = P - |S|
+\end{equation}
 
 To capture non-dynamic power losses such as those in an electrical drive, an additional constant efficiency $\eta$ describes the gain between the average generator electrical power and average absorbed electrical power.
-If the generator transmission matrix is not used (i.e. $[a]_e = \mathbf{I}$), this efficiency can also be used to approximate losses in the generator itself.
+If the generator cascade matrix is not used (i.e. $[a]_{\tau\Omega\leftarrow VI} = \mathbf{I}$), this efficiency can also be used to approximate losses in the generator itself.
 This will be done in \cref{sec:validation}, setting $\eta=80\%$ to maintain consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation. 
-Note that this is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_u\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
+Note that this is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
 The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
 \begin{equation}\label{eq:power-elec}
 \begin{bmatrix}
-P_{avg,elec} \\
-P_{pk,elec}
+p_{avg,elec} \\
+p_{pk,elec}
 \end{bmatrix}
 = 
 \eta
 \begin{bmatrix}
-P_{avg,VI} \\
-P_{pk,VI}
+p_{avg,VI} \\
+p_{pk,VI}
 \end{bmatrix}
 = 
 \eta \frac{1}{2} B_l |\hat{I}|^2
@@ -559,7 +664,7 @@ P_{pk,VI}
  1 + \sqrt{1 + \left(\frac{K_l}{B_l \omega }\right) ^2  }
 \end{bmatrix}
 \end{equation}
-% Additionally, the drivetrain mechanical transmission matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
+% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
 % \begin{equation}
 % [a]_m = \begin{bmatrix}
 % 1/R &~ 0 \\
@@ -574,79 +679,176 @@ P_{pk,VI}
 
 %The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
 
-\subsubsection{Force-Constrained Optimal Reactive Control}\label{sec:optimal-control}
-In the absence of constraints, maximizing power at a given port requires impedance matching at that port.
-We apply matching at the generator electrical port, so the electrical load impedance $\hat{Z}_l$ must be the complex conjugate of the Thevenin equivalent source impedance $\hat{Z}_{s,th}$ seen from that port.
+\subsubsection{Optimal Control}\label{sec:optimal-control}
+\paragraph{Unconstrained}
+In the absence of constraints, maximizing power at a given port requires impedance matching at that port due to the maximum power transfer theorem.
+We apply matching at the generator electrical port, so the electrical load impedance $Z_l$ must be the complex conjugate of the Th\'{e}venin equivalent source impedance $Z_{s,th}$ seen from that port.
 This is called reactive control, with subscript $reac$:
 \begin{equation}\label{eq:matched-load}
-    \hat{Z}_{l,reac} = \hat{Z}_{s,th}^*
-\end{equation}
-Propagating this through to $\hat{Z}_{PTO}$ and $\hat{Z}_u$ via \cref{eq:pto-impedance,eq:control-impedance} respectively gives the optimal control gains $B_{u,reac}$ and $K_{u,reac}$ and optimal Thevenin PTO gains. \hl{fixme}
-\begin{equation}\label{eq:matched-controller}
-\begin{aligned}
-	B_{p,reac} &= B_h + B_d,& \qquad K_{p,reac} &= (m+A_h) \omega^2 - K_h - K_d \\
-    \hat{Z}_{u,reac} &= 
-    \frac{
-        \begin{bmatrix}
-        1 & 0
-        \end{bmatrix}
-        [a]_m [a]_e 
-        \begin{bmatrix}
-        \hat{Z}_{l,reac} \\ 1
-        \end{bmatrix}
-    }{
-        \begin{bmatrix}
-        0 & 1
-        \end{bmatrix}
-        [a]_m [a]_e
-        \begin{bmatrix}
-        \hat{Z}_{l,reac} \\ 1
-        \end{bmatrix}
-    }
-\end{aligned}
+    Z_{l,reac} = Z_{s,th}^*
 \end{equation}
 
-However, the nominal RM3 design features a hydraulic system which lacks reactive capability (the ability to function as a motor and add energy to the system at some times).
-Avoiding reactive power restricts the system to so-called damping control, with subscript $damp$, and requires $K_{p,damp}=0$.
-The power-maximizing PTO damping $B_{p,damp}$ is then (\hl{fixme this doesn't apply when you want a port that's not the generator electrical port to be passive})
+However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
+Avoiding reactive power ($Q=0$) at the electrical port restricts the system to so-called damping control, with subscript $damp$, and requires $K_{l,damp}=0$.
+The power-maximizing PTO damping $B_{l,damp}$ is then: 
 \begin{equation}\label{eq:damping-control}
-    B_{p,damp} = \sqrt{ (B_{p,reac})^2 + (K_{p,reac}/\omega)^2}
+    B_{l,damp} = \sqrt{ (B_{l,reac})^2 + (K_{l,reac}/\omega)^2}
 \end{equation}
+When a port other than the electrical port must avoid reactive power, the constrained solution detailed later this section can be used to enforce $Q=0$ at that port.
 
-Both of these controllers frequently result in excessively large generator torques, especially in reactive control when $K_u=K_p$ is far from zero. $K_{p,reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO damping reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
-Control laws \eqref{eq:matched-controller} and \eqref{eq:damping-control} provide no mechanism to reduce this torque.
-Actuator torque limits are important to model.
-Leaving the generator torque unbounded when modeling energetic sea states would result in excessive structural and powertrain requirements.
-In response, two strategies are pursued at once: (1) to create an intentional linear impedance mismatch, sacrificing power to satisfy a torque limit, and (2) to use nonlinear control to enable satisfaction of the torque limit with less of a power sacrifice.
+Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $K_l$ is far from zero. $K_{l,reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
+Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
 
-For (1), the expression from \cref{eq:power-avg-peak} for average electrical power can be maximized subject to linear constraints on effort and flow variables can be written as a quadratic optimization problem:
+\paragraph{Constrained}
+We first compile expressions for all metrics $M$ which must be constrained.
+To facilitate these calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\mathbf{A}_M$:
+\begin{equation}\label{eq:metrics}
+    M = \frac{1}{4} \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}^*
+    \mathbf{A}_M
+    \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}
+\end{equation}
+The matrices for various metrics are given in Table~\ref{tab:power-metrics}.
+\begin{table}[]
+\centering
+\begin{tabular}{l|ccccc}
+    Metric $M$ & $p_{avg}=P$ & $Q$ & $S$ & $|\hat{e}|^2$ & $|\hat{q}|^2$ \\ \hline
+    Matrix $\mathbf{A}_M$ &
+    $\begin{bmatrix}
+        0 & 1 \\
+        1 & 0
+    \end{bmatrix}$
+    &
+    $\frac{1}{i}
+    \begin{bmatrix}
+        0 & -1 \\
+        1 & 0
+    \end{bmatrix}$
+    &
+    $\begin{bmatrix}
+        0 & 0 \\
+        2 & 0
+    \end{bmatrix}$
+    &
+    $\begin{bmatrix}
+        1 & 0 \\ 
+        0 & 0
+    \end{bmatrix}$
+    & 
+    $\begin{bmatrix}
+        0 & 0 \\ 
+        0 & 1
+    \end{bmatrix}$
+\end{tabular}
+\caption{Matrices for calculating various metrics at a port via \cref{eq:metrics}}
+\label{tab:power-metrics}
+\end{table}
+Note that the apparent power $|S|$, and therefore the peak power from \cref{eq:power-avg-peak}, cannot be written in the quadratic form of \cref{eq:metrics} and is instead fourth-order:
+\begin{equation}
+    |S| = S S^* = \frac{1}{16} \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}^*
+    \mathbf{A}_S
+    \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}
+    \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}^*
+    \mathbf{A}_S^T
+    \begin{bmatrix}
+    \hat{e} \\ \hat{q}
+    \end{bmatrix}
+\end{equation}
+Peak power constraints use a more complicated approach discussed in \cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
+
+To implement the constraints, two strategies are pursued at once: (1) to create an intentional linear impedance mismatch, sacrificing power to satisfy a torque limit, and (2) to use nonlinear control to enable satisfaction of the torque limit with less of a power sacrifice.
+
+For (1), the expression from \cref{eq:power-avg-peak} for average electrical power can be maximized subject to quadratic constraints on effort and flow variables.
+This can be written as an optimization problem, specifically a quadratically constrained quadratic program (QCQP):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
-& \max_{\vec{x} \in \mathbb{C}^2} & P_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{E}_2 \vec{x} \\
-& \text{s.t.} & \mathbf{A}\vec{x} &\leq \vec{b} \\ 
-& & \vec{c}^{\,*}\vec{x} &= d \\
-& \text{where} & \vec{x} &= \begin{bmatrix} \hat{V} & \hat{I} \end{bmatrix}^T \\
-& & \mathbf{A} &= [\vec{a}_i^{~T} \mathbf{a}_i] \quad \forall i \in [1,\cdots, N] \\
-& & \vec{b} &= [\vec{b}_i] \quad \forall i \in [1,\cdots, N] \\
-& & \vec{c}^{\,*} &= \begin{bmatrix} 1 & \hat{Z}_s \end{bmatrix} \\
+& \max_{\vec{x} \in \mathbb{C}^2} & p_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{A}_P \vec{x} \\[3pt]
+& \text{s.t.} 
+& \vec{x}^{\,*}\mathbf{Q}_i\vec{x} 
+    + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\}
+    &\le b_i,
+    \quad \forall i \in [1,\cdots,N] \\[3pt]
+& & \vec{c}^{\,*}\vec{x} &= d \\[3pt]
+& \text{where} 
+& \vec{x} &= \begin{bmatrix} \hat{V} & \hat{I} \end{bmatrix}^T \\[3pt]
+& & \mathbf{Q}_i &\in \mathbb{C}^{2\times 2}, \quad \mathbf{Q}_i = \mathbf{Q}_i^{\,*} \\[3pt]
+& & \vec{a}_i &\in \mathbb{C}^2 \\[3pt]
+& & b_i &\in \mathbb{R} \\[3pt]
+& & \vec{c}^{\,*} &= \begin{bmatrix} 1 & Z_s \end{bmatrix} \\[3pt]
 & & d &= \hat{V}_{s,th}
 \end{aligned}
 \end{equation}
-where the linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ enforces the WEC and PTO dynamics through a voltage current relationship at the generator electrical port, and the linear inequality constraints $\mathbf{A}\vec{x} \leq \vec{b}$ can enforce limits on any linear combination of the effort and flow variables at any port.
-\hl{Insert explanation of the i's and how you get them from limits at each port, with example of $\tau$ and $\xi$ limits.}
+where the linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ enforces the WEC and PTO dynamics through a voltage current relationship at the generator electrical port, and the quadratic inequality constraints 
+$\vec{x}^{\,*}\mathbf{Q}_i\vec{x} 
++ 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\}
+\le b_i$
+can enforce limits on any linear or quadratic combination of the effort and flow variables at any port.
+The specific quantities constrained in this case are shown in \cref{tab:qp-constraints}.
+Specifically, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
+
+\begin{table}[]
+\centering
+\begin{tabular}{lccc}
+    Constraint & $\mathbf{Q}$ & $\vec{a}$ & $b$ \\ \hline
+    $|\hat{\xi}_f| \leq \hat{\xi}_{f,max}$ &
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{f,0}]^T$ & $\hat{\xi}_{f,max} - |\hat{\xi}_{f,0}|$ \\
+    $|\hat{\xi}_s| \leq \hat{\xi}_{s,max}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{s,0}]^T$ & $\hat{\xi}_{s,max} - |\hat{\xi}_{s,0}|$ \\
+    $|\hat{X}_{PTO}| \leq \hat{X}_{PTO,max}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{X}_{PTO,max}^2$ \\
+    $|\hat{\tau}| \leq \hat{\tau}_{max}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{e}|^2}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{\tau}_{max}^2$ \\
+    $P_{\tau\Omega} \leq P_{\tau\Omega,max}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{P}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $P_{\tau\Omega,max}$ \\
+    $P_{VI} \geq 0$ & 
+        $-\mathbf{A}_{P}$ & 
+        $\vec{0}$ & $0$ \\
+\end{tabular}
+\caption{Quadratic constraint coefficients}
+\label{tab:qp-constraints}
+\end{table}
 
 \Cref{eq:opt-problem} has the following solution:
 \begin{equation}\label{eq:constrained-qp-solution}
 \begin{aligned}
     \vec{x}_{opt} &= 
-    \frac{\hat{V}_{s,th}}{2\Re(\hat{Z}_s)}
-        \begin{bmatrix} \hat{Z}_s^* (1+\Gamma) \\ 1-\Gamma \end{bmatrix} \\
-    P_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(\hat{Z}_s)}~ (1 - |\Gamma|^2)
+    \frac{\hat{V}_{s,th}}{2\Re(Z_s)}
+        \begin{bmatrix} Z_s^* (1+\Gamma) \\ 1-\Gamma \end{bmatrix} \\
+    P_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_s)}~ (1 - |\Gamma|^2)
 \end{aligned}
 \end{equation}
-where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient. The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch. Its value can be calculated analytically via a process described in \cref{sec:appendix-qp-solution}, with $\Gamma=0$ corresponding to the impedance-matched solution (no active inequality constraints).
+where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient. The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch. Its value can be calculated semi-analytically via a process described in \cref{sec:appendix-qp-solution}.
+$\Gamma=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
-For (2), actuator limits change the optimal force signal from a pure sinusoid to a saturated waveform, approaching a square wave for sufficiently low force limit.
+For (2), the maximum generator torque constraint is considered separately from the others. 
+This constraint changes the optimal torque signal from a pure sinusoid to a saturated waveform, approaching a square wave for sufficiently low torque limit.
 As is, this nonlinear signal could not be handled with a frequency-domain transfer function and would require time-domain simulation.
 Conveniently, through the describing function method, the saturated signal can be represented with Fourier analysis as a superposition of harmonics.
 Furthermore, because the plant is a second order oscillator and filters out high frequency inputs, harmonics other than the fundamental contain very little energy and can be safely neglected.
@@ -657,7 +859,7 @@ Figure \ref{fig:sat} shows this approximation graphically for a saturated-sine f
 \caption{Saturated sin vs. time (red) and its fundamental amplitude (blue)}\label{fig:sat}
 \end{figure}
 Details of the calculation are provided in \appendixname~\ref{sec:appendix-force-sat}.
-The result is updated values for control gains $B_u$ and $K_u$ that result in a torque that obeys the force constraint and is used in place of equations~\eqref{eq:matched-controller} and \eqref{eq:damping-control}.
+The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \cref{eq:constrained-qp-solution}.
 
 \subsubsection{Drag}
 Modeling drag force is important to avoid unrealistically high resonant peaks in the response amplitude and the resulting overestimate in power production.
@@ -824,7 +1026,7 @@ Section~\ref{sec:discussion} will discuss possible future alternatives to this m
 % \label{tab:sea-state}
 % \end{table}
 
-\subsubsection{Irregular Waves}
+\subsubsection{Irregular Waves}\label{sec:irregular-waves}
 MDOcean uses a JPD (joint probability density matrix) to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
 Additionally, it represents each irregular wave condition within the JPD as an equivalent sinusoidal regular wave.
 Regular wave height $H$ and period $T$ are selected to provide equal energy as the irregular sea state:

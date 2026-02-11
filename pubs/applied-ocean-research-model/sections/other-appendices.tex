@@ -1,27 +1,27 @@
 \clearpage
 \section{Dynamics and Control Module Details}
 
-\subsection{Quadratic Program Solution}\label{sec:appendix-qp-solution}
+\subsection{Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
 This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
-
-The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem from $\vec{x} \in \mathbb{C}^2$ to $\vec{x} \in \mathbb{C}^1$.
+\subsubsection{Reduced Dimension Formulation}
+The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem dimension from $\vec{x} \in \mathbb{C}^2$ to $\mathbb{C}^1$.
 Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\vec{n}$, the null space vector of $\vec{c}^{\,*}$:
 \begin{equation}\label{eq:x-p-plus-nullspace}
     \vec{x} = \underbrace{
-        \frac{\hat{V}_{s,th}}{2\Re(\hat{Z}_s)}
-        \begin{bmatrix} \hat{Z}_s^* \\ 1 \end{bmatrix} 
+        \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
+        \begin{bmatrix} \ Z_{s,th}^* \\ 1 \end{bmatrix} 
     }_{
         \textrm{particular solution } \vec{x}_p} 
-    -~ \Gamma \cdot \frac{\hat{V}_{s,th}}{2\Re(\hat{Z}_s)}
+    -~ \Gamma \cdot \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
     \underbrace{
-        \begin{bmatrix} -\hat{Z}_s^* \\ 1 \end{bmatrix}
+        \begin{bmatrix} -\ Z_{s,th}^* \\ 1 \end{bmatrix}
     }_{
         \textrm{null space } \vec{n}}
 \end{equation}
 where $\Gamma$ is a nondimensional complex scalar representing the remaining degree of freedom in the optimization after enforcing the equality constraint.
-For the particular solution, we have used the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \cref{eq:matched-load} and can be derived from the quadratic program as follows:
+For the particular solution, we have chosen to use the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \cref{eq:matched-load} and can be derived from the quadratic program as follows:
 \begin{equation}\label{eq:x-p}
-    \vec{x}_{p} = \frac{d \mathbf{E}_2\vec{c}}{\vec{c}^{\,*}\mathbf{E}_2\vec{c}}
+    \vec{x}_{p} = \frac{d \mathbf{A}_P\vec{c}}{\vec{c}^{\,*}\mathbf{A}_P\vec{c}}
 \end{equation}
 This selection for $\vec{x}_p$ means that the degree of freedom $\Gamma$ represents the deviation of the solution from the impedance-matched solution.
 Using $\hat{I}_p$ for brevity to denote the current in the particular solution, \cref{eq:x-p-plus-nullspace} can be rewritten as:
@@ -34,40 +34,164 @@ Using $\hat{I}_p$ for brevity to denote the current in the particular solution, 
     %\vec{x}_p
 \end{equation}
 
-Inequality constraints $\mathbf{A}\vec{x} \leq \vec{b}$ further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
-While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution. 
+Inequality constraints 
+$\vec{x}^{\,*}\mathbf{Q}_i\vec{x} + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\} \le b_i$
+further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
+While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition. 
 First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
-\begin{subequations}\label{eq:obj-inequality-alpha}
+\begin{subequations}\label{eq:obj-inequality-gamma}
 \begin{align}
-    P_{avg,VI} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(\hat{Z}_s)}~ (1 - |\Gamma|^2)
-    \label{eq:obj-alpha}\\
-    -\Gamma \hat{I}_p \mathbf{A}\vec{n} &\leq \vec{b} - \mathbf{A} \vec{x}_p
-    \label{eq:inequality-alpha}
+P_{avg,VI}
+&= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
+\label{eq:obj-gamma}
+\\[6pt]
+A_{q,i}|\Gamma|^2 +&
+2\Re\!\left\{
+    B_{q,i}\Gamma
+\right\}+C_{q,i}
+\le
+0
+\quad \forall i
+\label{eq:ineq-gamma}
 \end{align}
 \end{subequations}
-Rewriting based on the sign of each element $i$ of $-\hat{I}_p\mathbf{A}\vec{n}$ gives upper and lower bounds on $\Gamma$:
-\begin{equation}\label{eq:alpha-bounds}
+where quadratic coefficients $A_{q,i}$, $B_{q,i}$, and $C_{q,i}$ from \cref{eq:ineq-gamma} are defined as:
+\begin{equation}
 \begin{aligned}
-    \Gamma &\leq \min_{i | -\hat{I}_p(\mathbf{A}\vec{n})_i > 0} \frac{(\vec{b} - \mathbf{A} \vec{x}_p)_i}{-\hat{I}_p(\mathbf{A}\vec{n})_i} = \Gamma_{max} \\
-    \Gamma &\geq \max_{i | -\hat{I}_p(\mathbf{A}\vec{n})_i < 0} \frac{(\vec{b} - \mathbf{A} \vec{x}_p)_i}{-\hat{I}_p(\mathbf{A}\vec{n})_i} = \Gamma_{min}
+    A_{q,i} &= |\hat{I}_p|^{2}\,
+    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}& &\in \mathbb{R} \\
+    B_{q,i} &= -\hat{I}_p\,
+    \left(\vec{x}_p^{\,*}\mathbf{Q}_i + \vec{a}_i^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
+    C_{q,i} &= 
+        \vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+        +
+        2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+        -b_i&
+    &\in \mathbb{R}
 \end{aligned}
 \end{equation}
-with the additional requirement that $(\vec{b} - \mathbf{A} \vec{x}_p)_i > 0$ for all $i$ where $(\mathbf{A}\vec{n})_i = 0$.
-Since the optimal solution without inequality constraints (\cref{eq:x-p}) corresponds to $\Gamma=0$, and \cref{eq:obj-alpha} shows that power decreases with increasing $|\Gamma|$, we have the following cases for the constrained optimum:
-\begin{equation}\label{eq:alpha-opt}
+Since \cref{eq:obj-gamma} shows that power decreases with increasing $|\Gamma|$, the power maximization problem \cref{eq:opt-problem} can be recast as minimizing the norm of $\Gamma$:
+\begin{subequations}\label{eq:opt-problem-gamma}
+\begin{alignat}{2}
+& \min_{\Gamma \in \mathbb{C}} &  |\Gamma|& \\[3pt]
+& \text{s.t.} &
+S_i|\Gamma - \Gamma_{c,i}|^2 &\le S_i r_i^2,
+\quad \forall i \label{eq:disc-constraint}\\
+& \text{where} &
+\Gamma_{c,i}  &\in \mathbb{C} \nonumber\\
+& & r_i^2 &\in \mathbb{R} \nonumber \\
+& & S_i &\in \left\{-1,1\right\} \nonumber
+\end{alignat}
+\end{subequations}
+where the constraint \cref{eq:disc-constraint} is derived from \cref{eq:ineq-gamma} by completing the square.
+More precisely, when $A_{q,i} \neq 0$, the $i$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,i}$ with radius $r_i$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,i} > 0$ ($S_i=1$) or outside this circle when $A_{q,i} < 0$ ($S_i=-1$). Parameters $\Gamma_{c,i}$, $r_i$, and $S_i$ are defined as:
+\begin{subequations}\label{eq:gamma-disc-params}
+\begin{align}
+\Gamma_{c,i}
+&= \frac{-B_{q,i}^{\,*}}{A_{q,i}} = 
+\frac{
+    \hat{I}_p^{\,*}\,
+    \vec{n}^{\,*}
+    \left(\mathbf{Q}_i\vec{x}_p + \vec{a}_i\right)
+}{
+    |\hat{I}_p|^{2}\,
+    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+}
+\\[6pt]
+r_i^2
+&=
+\frac{|B_{q,i}|^2-A_{q,i}C_{q,i}}{A_{q,i}^2} = 
+\frac{
+b_i
+-
+\vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+-
+2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+}{
+|\hat{I}_p|^{2}\,
+\vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+}
++
+|\Gamma_{c,i}|^2 \\
+S_i &= \textrm{sign}(A_{q,i}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_i\vec{n}\right)
+\end{align}
+\end{subequations}
+
+\subsubsection{Solution}
+\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_i=1$ and exterior to all circles for which $S_i=-1$.
+The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_i C_{q,i} \leq 0 \quad \forall i$.
+If the origin is infeasible, the constrained optimal solution will lie on the boundary of one or more of the circles, specifically either at an intersection of two or more circles or at any circle's point closest to the origin.
+We analytically compute all such candidate points and select the one with the lowest $|\Gamma|$ that satisfies all constraints.
+For $N$ constraints, there are up to $N^2$ candidate points ($N^2-N$ at intersections and $N$ at closest points).
+This leads to the following expression for the constrained optimal solution (valid when $A_{q,i} \neq 0 ~\forall i$):
+\begin{equation}\label{eq:gamma-opt-quadratic}
 \Gamma_{opt} =
 \begin{cases}
- 0 & \textrm{if } \Gamma_{min} \leq 0 \leq \Gamma_{max} \\
- \Gamma_{min} &    \textrm{if } 0 < \Gamma_{min} \leq \Gamma_{max}  \\
- \Gamma_{max} &   \textrm{if } \Gamma_{min} \leq \Gamma_{max} < 0 \\
- \textrm{infeasible} &  \textrm{if } \Gamma_{min} > \Gamma_{max}
+ 0 & \textrm{if } S_i C_{q,i} \leq 0 \quad \forall i \\[3pt]
+ \arg\min\limits_{\Gamma \in \mathcal{F} \bigcap \mathcal{C}} |\Gamma| 
+ & \textrm{otherwise} \\[3pt]
+ \textrm{infeasible} & \textrm{if } \mathcal{F} \bigcap \mathcal{C} = \emptyset
 \end{cases}
 \end{equation}
-Since $\Gamma$ is complex, \cref{eq:inequality-alpha,eq:alpha-bounds,eq:alpha-opt} should be regarded as separate equations for their real and imaginary parts.
+where $\mathcal{F} = \bigcap_i \left\{\Gamma : S_i|\Gamma - \Gamma_{c,i}| \le S_i r_i \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
+\begin{equation}\label{eq:candidate-points}
+\begin{aligned}
+\mathcal{C}_{int} &= \left\{
+    \Gamma : 
+    |\Gamma - \Gamma_{c,i}| = r_i, ~|\Gamma - \Gamma_{c,j}| = r_j, \quad \forall i \neq j
+\right\}. \\
+\mathcal{C}_{cl} &= \left\{
+    \Gamma : 
+    \Gamma = \Gamma_{c,i} - r_i \frac{\Gamma_{c,i}}{|\Gamma_{c,i}|}, \quad \forall i
+\right\}.
+\end{aligned}
+\end{equation}
+Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_i=4$, $S_i=1$, and various $\Gamma_{c,i}$.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figs/manual/qp_circles.pdf}
+    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,i}$, all with radius $r_i=4$ and $S_i=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
+    \label{fig:qp-solution-geometry}
+\end{figure}
 
+If $A_{q,i} = 0$ for any $i$, the $i$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
+This can occur when $\mathbf{Q}_i = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\,*}\mathbf{Q}_i\vec{n} = 0$ ($\mathbf{Q}_i$ is rank-deficient and $\vec{n}$ is in its nullspace).
+The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,i}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
+
+\subsubsection{Quartic Apparent Power Constraints}\label{sec:appendix-mag-S-constraints}
+While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{max}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
+This results in a ``Cassini oval'' curve on the complex plane of $\Gamma$, which consists of two closed curves when $|S_{max}|<|S_0|$ and one curve when $|S_{max}|\geq|S_0|$, where $|S_0|$ is the apparent power of the unconstrained optimum \cite{weisstein_cassini_2026}.
+Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\mathcal{C}_{int,oval-circ}$, oval-oval intersections, and oval closest points $\mathcal{C}_{cl,oval}$ to the set of candidate points $\mathcal{C}$.
+The new candidate points are:
+\begin{equation}
+\begin{aligned}
+\mathcal{C}_{int,oval-circ} &= \left\{
+    \Gamma : 
+    |\Gamma - \Gamma_{c,i}| = r_i, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall i,k
+\right\}. \\
+\mathcal{C}_{cl,oval} &= \left\{
+    \Gamma : 
+    \Gamma = \begin{cases}
+        \pm \sqrt{1-\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|<|S_0| \\
+        \pm \sqrt{1+\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|>|S_0|
+    \end{cases}
+\right\}.
+\end{aligned}
+\end{equation}
+where $i$ indexes circle constraints and $k$ indexes oval constraints.
+While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
+We currently assume there is only one apparent power constraint, so oval-oval intersections are not present.
+
+\subsubsection{Discussion}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
 References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss the reflection coefficient for WECs.
 
+Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
+Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
+Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while \cite{bacelli_geometric_2013} covers amplitude and force limits.
+Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while \cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and \cite{bacelli_geometric_2013} in that of the PTO force.
+Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
@@ -148,6 +272,7 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 
 \clearpage
 \subsection{Drag Model\label{sec:appendix-drag}}
+\hl{todo: replace X with $\xi$ throughout this section and the next.}
 Drag includes form drag (dominant impact), vortex shedding (moderate impact), and skin friction (minor impact) \cite{quartier_influence_2021}.
 None of these three sources are captured in the MEEM hydrodynamics model due to the linear, irrotational, and inviscid assumptions respectively, so drag must be added separately.
 As described in section \ref{sec:dynamics}, a describing function approximation is used.
