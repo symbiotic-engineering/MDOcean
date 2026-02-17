@@ -21,8 +21,8 @@ function [F_heave_storm, F_surge_storm, ...
         F_limit = Inf;
     end
 
-    T_f_slam_op    = min(in.T_f_1,in.h_f-in.T_f_2);
-    T_f_slam_storm = min(in.T_f_2,in.h_f-in.T_f_2);
+    T_f_slam_op    = min(in.T_f_1, in.h_f - in.T_f_2);
+    T_f_slam_storm = min(in.T_f_2, in.h_f - in.T_f_2);
 
     [P_matrix_mech,X_constraints_op,B_p,...
     K_p,mag_U,X_u,X_f,X_s,F_heave_op,...
@@ -157,16 +157,28 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
 
     % prevent rising out of the water (slamming)
     wave_amp = Hs/(2*sqrt(2));
-    theta_slam = max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
-    X_slam = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 ) - wave_amp .* cos(theta_slam);
-    X_slam( imag(X_slam)~=0 ) = 0; % case where slamming occurs even for stationary body
-    X_below_wave = X_slam ./ mag_X_f_const - 1;
+    theta_slam_small_wave = pi + max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
+    theta_slam_large_wave = phase_X_f + k_wvn * in.D_f / 2 .* sign(pi - phase_X_f);
+    idx_large_wave = wave_amp > T_f_slam;
+    theta_slam = theta_slam_small_wave;
+    theta_slam(idx_large_wave) = theta_slam_large_wave(idx_large_wave);
+    sqrt_term = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 );
+    X_slam_max =  sqrt_term + wave_amp .* cos(theta_slam);
+    X_slam_min = -sqrt_term + wave_amp .* cos(theta_slam);
+    X_below_wave_max = X_slam_max ./ mag_X_f_const - 1;
+    X_below_wave_min = mag_X_f_const ./ X_slam_min - 1;
+    X_below_wave = min(X_below_wave_max, X_below_wave_min);
+    idx_imag = imag(X_slam)~=0; % case where slamming occurs even for stationary body
+    X_below_wave( idx_imag ) = -abs(imag(X_slam(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
+    k_max_large_wave = max(   k_wvn(idx_large_wave),[],'all');
+    A_max_large_wave = max(wave_amp(idx_large_wave),[],'all');
+    slamming_diameter_margin = asin(T_f_slam/A_max_large_wave) - k_max_large_wave * in.D_f/2;
 
     if plot_slamming
         X_star = (X_slam - T_f_slam)./wave_amp;
         X_slam_simple = T_f_slam - wave_amp;
         X_below_simple = X_slam_simple ./ mag_X_u_const - 1;
-        make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple)
+        make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple);
     end
 
     X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
