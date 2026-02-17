@@ -60,11 +60,11 @@ The first-order hydrodynamic force phasors $\vec{\hat{F}}$ on a group of interac
 \begin{equation}\label{eq:hydro-forces}
 \begin{array}{rCCCCC}
      \vec{\hat{F}} = & \underbrace{\vec{\hat{F}}_{e}}_{\substack{\textrm{wave} \\  \textrm{excitation} }} & +\underbrace{\vec{\hat{F}}_{rad}}_{\substack{\text{hydrodynamic} \\ \text{radiation} }} +&  \underbrace{ \vec{\hat{F}}_{res}}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} \\
-    = & \overbrace{\vec{\hat{\gamma}} \hat{\zeta}} & \overbrace{-\mathbf{A_h}\vec{\hat{\ddot{\xi}}} - \mathbf{B_h}\vec{\hat{\dot{\xi}}}} &  \overbrace{-\mathbf{K_h}\vec{\hat{\xi}}}
+    = & \overbrace{\vec{\gamma} \hat{\zeta}} & \overbrace{-\mathbf{A_h}\vec{\hat{\ddot{\xi}}} - \mathbf{B_h}\vec{\hat{\dot{\xi}}}} &  \overbrace{-\mathbf{K_h}\vec{\hat{\xi}}}
 \end{array}
 \end{equation}
 \setlength\arraycolsep{5pt} % back to default
-where $\vec{\hat{\xi}}$ represents the body displacements, and hydrodynamic coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, and $\mathbf{K_h}$ denote the wave excitation vector, added mass matrix, radiation damping matrix, and restoring force matrix, respectively.
+where $\vec{\hat{\xi}}$ represents the body displacements, and hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, and $\mathbf{K_h}$ denote the wave excitation vector, added mass matrix, radiation damping matrix, and restoring force matrix, respectively.
 The origin is chosen here as the center of the float at the still waterline.
 The full equation of motion incorporating the effect of additional forces will be given in section~\ref{sec:dynamics}.
 
@@ -73,8 +73,8 @@ For a two body point absorber oscillating only in heave under normal operational
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
     \end{bmatrix},~
-    \vec{\hat{\gamma}}_{op} = \begin{bmatrix}
-        \hat{\gamma}_f \\ \hat{\gamma}_s
+    \vec{\gamma}_{op} = \begin{bmatrix}
+        \gamma_f \\ \gamma_s
     \end{bmatrix},~
     \mathbf{A_{h,op}} = \begin{bmatrix}
         A_f & A_c \\ A_c & A_s
@@ -92,8 +92,8 @@ The assumed storm configuration in this study, to mirror the RM3 report \cite{RM
 \begin{equation}
     \vec{\hat{\xi}}_{storm} = \begin{bmatrix}
         \hat{\xi}_m 
-    \end{bmatrix},~\vec{\hat{\gamma}}_{storm} = \begin{bmatrix}
-        \hat{\gamma}_m
+    \end{bmatrix},~\vec{\gamma}_{storm} = \begin{bmatrix}
+        \gamma_m
     \end{bmatrix},
     ~\mathbf{A_{h,storm}} = \begin{bmatrix}
         A_m 
@@ -136,9 +136,9 @@ Because the damping plate has a more substantial impact on the spar coefficients
     \centering
     \begin{tabular}{cc}
          Coefficient& Method\\ \hline
-         $A_f$, $B_f$, $\hat{\gamma}_f$, $B_m$, $\hat{\gamma}_m$& MEEM\\
+         $A_f$, $B_f$, $\gamma_f$, $B_m$, $\gamma_m$& MEEM\\
          $A_s$& Approximate $\omega\rightarrow\infty$ solution (\equationautorefname~\ref{eq:As})\\
-         $A_c$, $B_s$, $B_c$, $\hat{\gamma}_s$& Nominal BEM solution, scaled with $D_d$ and $T_s$\\
+         $A_c$, $B_s$, $B_c$, $\gamma_s$& Nominal BEM solution, scaled with $D_d$ and $T_s$\\
          $A_m$ & Approximate from $A_f$ and $A_s$ (\equationautorefname~\ref{eq:Am})\\
     \end{tabular}
     \caption{Method of computing different hydrodynamic coefficients in MDOcean}
@@ -161,11 +161,11 @@ The trend is shown in \figureautorefname~\ref{fig:spar_added_mass}.
     \caption{Nondimensional spar added mass as a function of column to damping plate diameter ratio}
     \label{fig:spar_added_mass}
 \end{figure}
-Meanwhile, the spar damping and excitation ($B_s$ and $\hat{\gamma}_s$) and the coupling damping and added mass ($B_c$ and $A_c$), are obtained by interpolating an existing WAMIT BEM solution for the nominal geometry.
+Meanwhile, the spar damping and excitation ($B_s$ and $\gamma_s$) and the coupling damping and added mass ($B_c$ and $A_c$), are obtained by interpolating an existing WAMIT BEM solution for the nominal geometry.
 Specifically, interpolation is performed over the nondimensional damping plate diameter $k D_d$.
-For $|\hat{\gamma}_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{s,nom})}$ is applied to account for the decrease of excitation with depth.
+For $|\gamma_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{s,nom})}$ is applied to account for the decrease of excitation with depth.
 
-Finally, for merged geometry, MEEM is used to calculate the damping $B_m$ and excitation $\hat{\gamma}_m$ since they are less affected by the damping plate, while the added mass $A_m$ is approximated as the sum of the float and spar coefficients:
+Finally, for merged geometry, MEEM is used to calculate the damping $B_m$ and excitation $\gamma_m$ since they are less affected by the damping plate, while the added mass $A_m$ is approximated as the sum of the float and spar coefficients:
 \begin{equation}\label{eq:Am}
     A_m = A_f + A_s
 \end{equation}
@@ -315,10 +315,10 @@ With these considerations, the equation of motion can be expressed in the time d
      &  \underbrace{\vec{F}_{res}(t)}_{\substack{\textrm{hydrostatic} \\ \text{restoring} }} 
      &  +~~~~\underbrace{\vec{F}_{d}(t)}_{\substack{\textrm{drag} }}~~~~+ 
      & \underbrace{\vec{F}_{p}(t)}_{\substack{\textrm{power}\\\text{takeoff} }} \\
-    = & \overbrace{\Re(\vec{\hat{\gamma}}~ \tilde{\zeta}(t))} 
+    = & \overbrace{\Re(\vec{\gamma}~ \tilde{\zeta}(t))} 
     & \overbrace{-\mathbf{A}_h\ddot{\vec{\xi}}(t) - \mathbf{B}_h\dot{\vec{\xi}}(t)} 
     &  \overbrace{-\mathbf{K}_h\vec{\xi}(t)} 
-    & \overbrace{-\mathbf{B}_d\dot{\vec{\xi}}(t)-\mathbf{K}_d\vec{\xi}(t)}  
+    & \overbrace{-\mathbf{B}_d\dot{\vec{\xi}}(t)+\Re(\vec{\gamma}_d~ \tilde{\zeta}(t))}  
     & \overbrace{-\mathbf{B}_p\dot{\vec{\xi}}(t)-\mathbf{K}_p\vec{\xi}(t)}
 \end{array}
 \end{equation}
@@ -328,16 +328,16 @@ The mass matrix is:
 \begin{equation}
 \mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
 \end{equation}
-For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\hat{\gamma}}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\mathbf{K_d}$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
-The excitation coefficient $\vec{\hat{\gamma}}$ is complex, and all other coefficients are real.
+For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\vec{\gamma}_d$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
+The excitation coefficients $\vec{\gamma}$ and $\vec{\gamma}_d$ are complex, and all other coefficients are real.
 
 In the frequency domain, the complex transfer function from real regular wave height $H$ to the vector of complex body velocity phasors $\vec{\hat{\dot{\xi}}}$ is then: 
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}\vec{\hat{\gamma}}
+    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}(\vec{\gamma}+\vec{\gamma}_d)
 \end{equation}
-where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag terms have been combined into a single intrinsic impedance matrix $\mathbf{Z}_{i}$ for compactness:
+where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\mathbf{Z}_{i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
-\mathbf{Z}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h+\mathbf{K}_d)
+\mathbf{Z}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h)
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\mathbf{Z}_p = \mathbf{B}_p+\frac{\mathbf{K}_p}{i\omega}$.
 
@@ -388,7 +388,7 @@ The circuit showcasing the intrinsic dynamics with two hydrodynamic degrees of f
 \label{fig:multiport-circuit-intrinsic}
 \end{figure}
 Excitation forces are represented as dependent voltage sources (diamonds) driven by a single wave elevation source (circle), and the intrinsic and powertrain dynamics are each represented as a two-port impedance matrix.
-The dependent sources and intrinsic impedance matrix are inherently linked through Haskind relation, which relates excitation coefficient magnitudes $|\hat{\gamma}_i|$ with diagonal elements of the radiation damping $B_{h,ii}$.
+The dependent sources and intrinsic impedance matrix are inherently linked through Haskind relation, which relates excitation coefficient magnitudes $|\gamma_i|$ with diagonal elements of the radiation damping $B_{h,ii}$.
 This bounds the maximum absorbed power for any geometry.
 
 \subsubsection{PTO Model}\label{sec:pto-dynamics}
@@ -469,7 +469,7 @@ Instead, we can use cascade-like matrices to solve for a modified variable $\vec
 \begin{equation}\label{eq:modified-body-velocity}
     \vec{\dot{\xi}}_\Delta = \vec{\dot{\xi}} - \vec{\dot{\xi}}_{0}
     \quad \textrm{ where } \quad
-    \vec{\dot{\xi}}_{0} = \mathbf{Z}_i^{-1}~\vec{\hat{\gamma}}~\frac{H}{2}
+    \vec{\dot{\xi}}_{0} = \mathbf{Z}_i^{-1}~\vec{\gamma}~\frac{H}{2}
 \end{equation}
 The cascade-like matrix from the PTO port $\{F_{PTO}, \dot{X}_{PTO}\}$ to the modified body port $\{F_p, \dot{\xi}_\Delta\}$ is then:
 \begin{equation}\label{eq:body-transmission-matrix}
@@ -861,24 +861,33 @@ Figure \ref{fig:sat} shows this approximation graphically for a saturated-sine f
 Details of the calculation are provided in \appendixname~\ref{sec:appendix-force-sat}.
 The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \cref{eq:constrained-qp-solution}.
 
-\subsubsection{Drag}
-Modeling drag force is important to avoid unrealistically high resonant peaks in the response amplitude and the resulting overestimate in power production.
-Drag force $F_d$ is proportional to the product of the relative velocity of the WEC and wave, $\dot{x}_{rel}(t)=\dot{x}(t)-\dot{x}_{wave}(t)$, with its absolute value.
-The use of the relative velocity rather than direct WEC velocity means that the drag contributes not only a damping-like effect, described with coefficient $B_d$, but also a small stiffness-like effect, with coefficient $K_d$.
-The quadratic form $|F_d|\sim|\dot{x}_{rel}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
-To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with another describing function, following \cite{quartier_influence_2021}:
-\begin{equation}
+\subsubsection{Drag}\label{sec:drag}
+The hydrodynamics model of \cref{sec:meem} does not capture all fluid forces on the body due to its linear, irrotational, and inviscid assumptions. 
+More specifically, viscous shear stresses (skin friction),
+higher-order nonlinear potential flow effects, and
+steady and unsteady viscous separation phenomena are all neglected.
+In this section, we model the form drag due to viscous flow separation, including  steady wake losses, turbulence, and cycle-averaged vortex shedding.
+These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
+
+Drag force $\vec{F}_d$ is proportional to the product of the relative velocity of the WEC and incident wave, $\vec{v}_{rel}(y,t)=\vec{\dot{\xi}}(t)-\vec{v}_{wave}(y,t)$, with its absolute value.
+The resulting quadratic form $|\vec{F}_d|\sim|\vec{v}_{rel}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
+To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \cite{quartier_influence_2021}.
+The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ is modeled with empirical drag coefficient vector $\vec{C}_d$:
+\begin{equation}\label{eq:drag-pressure}
 \begin{aligned}
-    F_{d}(t) &= \frac{1}{2}\rho_w C_d A_w ~\dot{x}_{rel}(t) |\dot{x}_{rel}(t)| \\     
-    &= \frac{1}{2}\rho_w C_d A_w ~\dot{X}_{rel}^2 \sin(\omega t) | \sin(\omega t)|\\
-    &\approx \frac{1}{2}\rho_w C_d A_w ~\dot{X}_{rel}^2\frac{8}{3\pi} \sin(\omega t)\\
+    \vec{p}_{d}(y,t) &= \frac{1}{2}\rho_w \vec{C}_d ~\vec{v}_{rel}(y,t) |\vec{v}_{rel}(y,t)| \\     
+    &= \frac{1}{2}\rho_w \vec{C}_d ~|\vec{\hat{V}}_{rel}(y)|^2 \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y)) \left| \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\right|\\
+    &\approx \frac{1}{2}\rho_w \vec{C}_d ~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\\
    % F_{d}(\omega)&= \frac{1}{2}\rho_w C_d A_w \frac{1}{2\pi}\dot{X}_{rel}(\omega)*|\dot{X}_{rel}(\omega)| \\
     %\approx  \frac{1}{2}\rho_w C_d A_w \frac{8}{3\pi}  \dot{X}_{rel,1}(\omega)\dot{X}_{rel,1}(\omega) \\
-    &= B_{d} \dot{X} + K_{d} X
     \end{aligned}
 \end{equation}
-with drag coefficient $C_d$.
-The nonlinear waveform and describing function approximation are compared in Figure~\ref{fig:drag-df}.
+where the last line of \cref{eq:drag-pressure} applies the describing function approximation. 
+The incident wave velocity phasor in finite depth water evaluated at a depth equal to the draft $\vec{T}$ is: 
+\begin{equation}
+\vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
+\end{equation}
+The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in Figure~\ref{fig:drag-df}.
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
 \begin{figure}
     \centering
@@ -888,7 +897,42 @@ The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}
     \label{fig:drag-df}
 \end{figure}
 
-The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $B_{d}$ and $K_{d}$.
+Strip theory allows integration of the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted area $A_w$.
+For a hollow cylinder of radius $\vec{R}$ and inner radius $\vec{R}_{in}$, this is expressed: 
+% derived p156-159 notebook 3/10/25
+% simplified p169-173 notebook 3/12/25
+\begin{equation}\label{eq:drag-force-integral}
+    \vec{\hat{F}}_d = \int_{A_w} d\vec{\hat{F}}_d(y) = -\int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\hat{p}}_d(y)dy
+\end{equation}
+where $\vec{w}(y)$ is the local width of the WEC perpendicular to the direction of wave propagation $y$:
+\begin{equation}\label{eq:drag-width}
+    \vec{w}(y) = \begin{cases}
+        2\sqrt{\vec{R}^2-y^2}, & \vec{R}_{in}<|y|<\vec{R} \\
+         2\sqrt{\vec{R}^2-y^2}-2\sqrt{\vec{R}_{in}^2-y^2}, &0<|y|< \vec{R}_{in} \\
+    \end{cases}
+\end{equation}
+Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term  potentially out of phase with the body motion:
+\begin{equation}\label{eq:drag-damping-excitation}
+    \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
+    + \vec{\gamma}_{d} \hat{\zeta}
+\end{equation}
+The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on \cite{quartier_influence_2021} and is discussed more in \appendixname~\ref{sec:appendix-drag}.
+The coefficients in \cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
+\begin{equation}\label{eq:drag-coeffs}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi}\frac{1}{2} \rho_w \, \textrm{diag}\left(\vec{C}_d |\vec{\hat{\xi}}| \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) dy \right) \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \frac{1}{2} \rho_w \vec{C}_d \, |\vec{\hat{\xi}}| \frac{gke^{-k\vec{T}}}{\omega} \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) e^{-iky} dy 
+\end{aligned}
+\end{equation}
+where we use radii vectors $\vec{R}=[D_f/2,D_d/2]$ and $\vec{R}_{in}=[D_{f,in},0]$ to represent the float and spar.
+$\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velocity:
+\begin{equation}\label{eq:drag-alpha-definitions}
+    \vec{\alpha}_v(y) = \frac{\vec{|\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} e^{-2ky} - 2 \vec{r} e^{-ky}  \sin\angle \vec{\hat{\dot{\xi}}}}
+\end{equation}
+and $\vec{r} = |\hat{V}_{wave}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+
+The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
 Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
 
 %\subsubsection{Power Saturation}
@@ -983,7 +1027,7 @@ Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\r
 Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:meem}.
 This maximum amplitude $X_{linear}$ for the float and spar respectively is:
 \begin{equation}
-    X_{f,linear} = D_f/10, \qquad X_{s,linear}  =D_s/10
+    X_{f,linear} = (h-T_{f,2})/10, \qquad X_{s,linear}  = (h-T_s)/10
 \end{equation}
 
 In both operational and storm states, slamming should be avoided since it causes extremely high loads.
