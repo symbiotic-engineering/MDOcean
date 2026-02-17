@@ -168,8 +168,8 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     X_below_wave_max = X_slam_max ./ mag_X_f_const - 1;
     X_below_wave_min = mag_X_f_const ./ X_slam_min - 1;
     X_below_wave = min(X_below_wave_max, X_below_wave_min);
-    idx_imag = imag(X_slam)~=0; % case where slamming occurs even for stationary body
-    X_below_wave( idx_imag ) = -abs(imag(X_slam(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
+    idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
+    X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
     k_max_large_wave = max(   k_wvn(idx_large_wave),[],'all');
     A_max_large_wave = max(wave_amp(idx_large_wave),[],'all');
     slamming_diameter_margin = asin(T_f_slam/A_max_large_wave) - k_max_large_wave * in.D_f/2;
