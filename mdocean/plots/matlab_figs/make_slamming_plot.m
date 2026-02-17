@@ -15,7 +15,7 @@ function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simp
     contourf(T,Hs,X_star,20);
     xlabel('T_e'); 
     ylabel('H_s'); 
-    title('X^*'); 
+    title('\xi^*'); 
     improvePlot; 
     colormap(ax,bluewhitered)
     colorbar
@@ -27,7 +27,7 @@ function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simp
     clim([-.1 5]);
     xlabel('T_e');
     ylabel('H_s'); 
-    title('X_{slam}/X - 1'); 
+    title('\xi_{slam}/\xi - 1'); 
     colorbar; 
     colormap(ax,bluewhitered)
     clabel(C,h); 
@@ -38,7 +38,7 @@ function f = make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simp
     clim([-.1 5]); 
     xlabel('T_e'); 
     ylabel('H_s');
-    title('(T_f-H/2)/X - 1'); 
+    title('(\Delta z_{slam}-H/2)/\xi - 1'); 
     colorbar; 
     colormap(ax,bluewhitered)
     clabel(C,h);

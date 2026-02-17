@@ -17,19 +17,19 @@ X_map(idx_imag) = NaN;%-2*TF_OVER_H(idx_imag);
 fig = figure;
 contourf(THETA/pi,TWO_TF_OVER_H,real(X_map),10)
 cb=colorbar;
-cb.Label.String = '$X^*$';
+cb.Label.String = '$\xi^*$';
 cb.Label.Interpreter = 'latex';
 cb.Label.Rotation = 0;
 cb.Label.FontSize = 24;
 xlabel('$\theta/\pi$','Interpreter','latex')
-ylabel('$\frac{T_f}{H/2}$','Interpreter','latex')
+ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
 clim([-1 1])
 %title()
-my_text = '$X_{slam}=0 ~\textrm{if}~ \frac{T_f}{H/2} < \sin\theta$';
+my_text = '$\xi_{slam}=0 ~\textrm{if}~ \frac{\Delta z_{slam}}{H/2} < \sin\theta$';
 text(.19,.4,my_text,'Interpreter','latex','FontSize',24)
 improvePlot
 set(gcf,"Position",[100 100 750 600])
-title('$X_{slam}=T_f+\frac{H}{2} X^*$','Interpreter','latex','FontSize',24)
+title('$\xi_{slam}=\Delta z_{slam}+\frac{H}{2} \xi^*$','Interpreter','latex','FontSize',24)
 colormap(bluewhitered)
 
 end
