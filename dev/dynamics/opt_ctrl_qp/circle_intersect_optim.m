@@ -10,7 +10,7 @@ function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r)
 % p_star is returned empty, constraints_active is all true, and a warning is issued.
 
 N = length(r);
-max_num_intersects = N*(N+1)/2;
+max_num_intersects = N * (N-1);
 max_num_candidates = max_num_intersects + N;
 candidates = NaN(max_num_candidates,2);
 circle_indices = zeros(max_num_candidates,2);
