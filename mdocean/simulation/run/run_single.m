@@ -13,7 +13,7 @@ function figs = run_single(p,b,X)
         X = [b.X_noms; 1];
     end
 
-    [J, ~, g, val] = simulation(X,p)
+    [J, ~, g, val] = simulation(X,p);
 
     LCOE = J(1);
     P_var = J(2);
@@ -25,12 +25,12 @@ function figs = run_single(p,b,X)
         figs_dynamics = [];
     end
 
-    [feasible,~,failed] = is_feasible(g,X,p,b)
+    [feasible,~,failed] = is_feasible(g,X,p,b);
 
     h_power = plot_power_matrix(X,p,b,'');
 
     h_pdf = figure;
-    power_PDF(X,p)
+    power_PDF(X,p);
 
     h_geom = visualize_geometry(X,p);
 
