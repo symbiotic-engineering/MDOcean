@@ -1,35 +1,53 @@
 function fig = slam_plot()
 
-theta = linspace(0,pi,200);
+theta = linspace(pi,2*pi,200);
 y_axis_span = linspace(0,1,120);
 two_Tf_over_H_max = 3;
 [THETA,Y_AXIS_SPAN] = meshgrid(theta,y_axis_span);
 
-% this makes it so y_axis_span=0 corresponds to y=sin(theta) and
+% this makes it so y_axis_span=0 corresponds to y=|sin(theta)| and
 % y_axis_span=1 corresponds to y=two_Tf_over_H_max, to get a good sin shape
-TWO_TF_OVER_H = sin(THETA) + Y_AXIS_SPAN .* (two_Tf_over_H_max - sin(THETA));
+TWO_TF_OVER_H = abs(sin(THETA)) + Y_AXIS_SPAN .* (two_Tf_over_H_max - abs(sin(THETA)));
 
-squared = sin(THETA)./(TWO_TF_OVER_H);
-X_map = TWO_TF_OVER_H .* (sqrt(1 - squared.^2) - 1) - cos(THETA);
-idx_imag = X_map~=real(X_map);
-X_map(idx_imag) = NaN;%-2*TF_OVER_H(idx_imag);
+sqrt_term = sqrt(TWO_TF_OVER_H - sin(THETA).^2);
+X_max_over_amp = sqrt_term + cos(THETA);
+X_min_over_amp = -sqrt_term + cos(THETA);
+idx_imag = sqrt_term~=real(sqrt_term);
+X_max_over_amp(idx_imag) = NaN;
+X_min_over_amp(idx_imag) = NaN;
 
 fig = figure;
-contourf(THETA/pi,TWO_TF_OVER_H,real(X_map),10)
-cb=colorbar;
-cb.Label.String = '$X^*$';
-cb.Label.Interpreter = 'latex';
-cb.Label.Rotation = 0;
-cb.Label.FontSize = 24;
+
+% x max plot
+ax1 = subplot(1,2,1);
+contours = sort([0 .1 -.1 linspace( min(X_max_over_amp(:)), max(X_max_over_amp(:)), 10 )]);
+contourf(THETA/pi,TWO_TF_OVER_H,X_max_over_amp,contours)
+colorbar;
 xlabel('$\theta/\pi$','Interpreter','latex')
-ylabel('$\frac{T_f}{H/2}$','Interpreter','latex')
-clim([-1 1])
-%title()
-my_text = '$X_{slam}=0 ~\textrm{if}~ \frac{T_f}{H/2} < \sin\theta$';
-text(.19,.4,my_text,'Interpreter','latex','FontSize',24)
+ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
+my_text = {'$\textrm{Infeasible if}~ \frac{\Delta z_{slam}}{H/2} < 1$','$\textrm{       and } |\theta-\pi|<\pi/2$'};
+text(1.28,.4,my_text,'Interpreter','latex','FontSize',16)
+colormap(ax1,bluewhitered)
+
+p1 = [1.33,0.55];
+p2 = [1.2,0.7];
+arrow(p1,p2)
+
+% x min plot
+subplot 122
+contours = sort([0 .1 -.1 linspace( min(X_min_over_amp(:)), max(X_min_over_amp(:)), 10 )]);
+contourf(THETA/pi,TWO_TF_OVER_H,X_min_over_amp,contours)
+colorbar;
+xlabel('$\theta/\pi$','Interpreter','latex')
+ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
+my_text = '$\textrm{Undefined if}~ \frac{\Delta z_{slam}}{H/2} < |\sin\theta|$';
+text(1.19,.4,my_text,'Interpreter','latex','FontSize',16)
+
+% plot aesthetics for both
 improvePlot
-set(gcf,"Position",[100 100 750 600])
-title('$X_{slam}=T_f+\frac{H}{2} X^*$','Interpreter','latex','FontSize',24)
-colormap(bluewhitered)
+set(gcf,"Position",[20 50 1500 800])
+title(ax1,'$\frac{\xi_{max,slam}}{H/2}$','Interpreter','latex','FontSize',24)
+title('$\frac{\xi_{min,slam}}{H/2}$','Interpreter','latex','FontSize',24)
+colormap(gca,bluewhitered)
 
 end
