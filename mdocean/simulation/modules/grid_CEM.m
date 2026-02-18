@@ -1,6 +1,5 @@
-function [CEM_CO2,CEM_grid_cost,AEP_matrix,force_matrix] = grid_CEM(F_heave_mat,capex,opex,P_matrix_elec,sim_LCOE)
+function [CEM_CO2,CEM_grid_cost,AEP_matrix,force_matrix] = grid_CEM(F_heave_mat,capex,opex,P_matrix_elec,sim_LCOE,p)
 
-p = parameters();
 in = p;
 
 %% power/energy
