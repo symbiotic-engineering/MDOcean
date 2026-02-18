@@ -334,9 +334,9 @@ Manipulating \cref{eq:slamming-time-domain} to ensure the inequality is satisfie
 \begin{equation}
 |\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam,bot}^2-\left(\frac{H}{2}\right)^2
 \end{equation}
-which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:appendix-qp-solution}.
-The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios.
-Completing the square,
+which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:appendix-qp-solution}, once the appropriate worst-case $y$ is substituted.
+The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios and the corresponding worst-case $y$.
+Completing the square results in:
 \begin{equation}\label{eq:slamming-squared}
     \left[ |\hat{\xi}|- \frac{H}{2}\cos(\angle\hat{\xi} + ky)\right]^2 < \Delta z_{slam,bot}^2 - (H/2)^2 \sin^2(\angle\hat{\xi} + ky)
 \end{equation}
@@ -348,8 +348,7 @@ This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{
     \xi_{min,slam} &= \frac{H}{2} \cos\theta - \sqrt{\Delta z_{slam,bot}^2-\left(\frac{H}{2}\sin\theta\right)^2 }
 \end{aligned}
 \end{equation}
-where $\theta$ can take on any value from $\angle\hat{\xi}-kD/2$ to $\angle\hat{\xi}-kD/2$.
-\Cref{eq:slamming-min-max} must be evaluated with the value of $\theta$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
+where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
 The relevant value of $\theta$ differs depending on the wave amplitude.
 
 \subsubsection{Case 1: Small Wave Amplitudes}
@@ -395,9 +394,9 @@ The permissible amplitude range can be widened by decreasing $D$ or moving $\ang
 The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam,bot} < |\hat{\xi}| < H/2+\Delta z_{slam,bot}$.
 
 \subsubsection{Implementation}
-Figure~\ref{fig:slam} visualizes the relationship using the nondimensional parameter $\xi^*=2(\xi_{slam}-\Delta z_{slam,bot})/H$ to map the slamming amplitude onto the range $[-1,1]$.
+Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam,bot}/(H/2)$.
 This reveals that besides increasing the draft, increasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
-If $\Delta z_{slam,bot}<H/2\sin\theta$, slamming occurs even for a stationary body, and the critical slamming amplitude is set to zero to indicate an unviable design.
+If $\Delta z_{slam,bot}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/slamming_amplitude.pdf}
