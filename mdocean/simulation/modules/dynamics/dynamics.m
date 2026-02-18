@@ -58,7 +58,7 @@ function [F_heave_storm, F_surge_storm, ...
     F_heave_storm = F_heave_storm * in.F_heave_mult;
     
     % use all X constraints operationally, only use slamming in storm
-    X_constraints_storm = X_constraints_storm(6:end);
+    X_constraints_storm = X_constraints_storm(8:end);
     X_constraints_storm = 1 + 0*X_constraints_storm; % fixme this overrides the constraint
     X_constraints = [X_constraints_op X_constraints_storm];
 
@@ -129,6 +129,7 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         P_matrix = real_P * in.power_scale_multibody;
     end
     
+    % amplitude constraints
     % set values where JPD=0 to 0 to not include them in constraint
     mag_X_u_const = mag_X_u;
     mag_X_u_const(idx_constraint) = 0;
@@ -155,35 +156,17 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
     X_below_linear_f = X_max_linear_f / X_f_max - 1;
     X_below_linear_s = X_max_linear_s / X_s_max - 1;
 
-    % prevent rising out of the water (slamming)
+    % prevent bottom rising out of the water and top going into water (slamming/submersion)
     wave_amp = Hs/(2*sqrt(2));
-    theta_slam_small_wave = pi + max(0, -k_wvn * in.D_f / 2 + abs(pi - phase_X_f));
-    theta_slam_large_wave = phase_X_f + k_wvn * in.D_f / 2 .* sign(pi - phase_X_f);
-    idx_large_wave = wave_amp > T_f_slam;
-    theta_slam = theta_slam_small_wave;
-    theta_slam(idx_large_wave) = theta_slam_large_wave(idx_large_wave);
-    sqrt_term = sqrt( T_f_slam^2 - (wave_amp .* sin(theta_slam)).^2 );
-    X_slam_max =  sqrt_term + wave_amp .* cos(theta_slam);
-    X_slam_min = -sqrt_term + wave_amp .* cos(theta_slam);
-    X_below_wave_max = X_slam_max ./ mag_X_f_const - 1;
-    X_below_wave_min = mag_X_f_const ./ X_slam_min - 1;
-    X_below_wave = min(X_below_wave_max, X_below_wave_min);
-    idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
-    X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
-    k_max_large_wave = max(   k_wvn(idx_large_wave),[],'all');
-    A_max_large_wave = max(wave_amp(idx_large_wave),[],'all');
-    slamming_diameter_margin = asin(T_f_slam/A_max_large_wave) - k_max_large_wave * in.D_f/2;
+    [X_below_wave_f,D_f_margin] = slamming(wave_amp, k_wvn, in.D_f, phase_X_f, mag_X_f_const, T_f_slam, plot_slamming, T, Hs);
+    [X_below_wave_s,D_s_margin] = slamming(wave_amp, k_wvn, in.D_d, phase_X_s, mag_X_s_const, in.T_s,   plot_slamming, T, Hs);
 
-    if plot_slamming
-        X_star = (X_slam - T_f_slam)./wave_amp;
-        X_slam_simple = T_f_slam - wave_amp;
-        X_below_simple = X_slam_simple ./ mag_X_u_const - 1;
-        make_slamming_plot(T,Hs,theta_slam,X_below_wave,X_star,X_below_simple);
-    end
-
+    X_below_wave = min(X_below_wave_f,X_below_wave_s); % constraint aggregation
     X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
 
-    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, X_below_linear_f, X_below_linear_s, X_below_wave(:).'];
+    % all amplitude constraints together
+    X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, ...
+        X_below_linear_f, X_below_linear_s, D_f_margin, D_s_margin, X_below_wave(:).'];
 
     % calculate forces
     if nargout > 3
@@ -213,6 +196,38 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
 
         F_surge = [F_surge_f_max F_surge_s_max 0];
 
+    end
+end
+
+function [X_below_wave,diameter_margin] = slamming(A, k, D, phase_X, mag_X, delta_z, plot_slamming, T, Hs)
+    idx_large_wave = A > delta_z;
+
+    theta_small_wave = pi + max(0, -k * D / 2 + abs(pi - phase_X));
+    theta_large_wave = phase_X + k * D / 2 .* sign(pi - phase_X);
+    theta = theta_small_wave;
+    theta(idx_large_wave) = theta_large_wave(idx_large_wave);
+
+    sqrt_term = sqrt( delta_z^2 - (A .* sin(theta)).^2 );
+    X_slam_max =  sqrt_term + A .* cos(theta);
+    X_slam_min = -sqrt_term + A .* cos(theta);
+
+    X_below_wave_max = X_slam_max ./ mag_X - 1;
+    X_below_wave_min = 1 - X_slam_min ./ mag_X;
+    X_below_wave = min(X_below_wave_max, X_below_wave_min);
+
+    idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
+    X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
+    
+    if any(idx_large_wave(:))
+        k_max_large_wave = max(k(idx_large_wave),[],'all');
+        A_max_large_wave = max(A(idx_large_wave),[],'all');
+        diameter_margin = asin(delta_z/A_max_large_wave) - k_max_large_wave * D/2;
+    else
+        diameter_margin = 1; % always ok if no large waves
+    end
+
+    if plot_slamming
+        make_slamming_plot(T,Hs,phase_X,theta,X_slam_max,X_slam_min,mag_X);
     end
 end
 
