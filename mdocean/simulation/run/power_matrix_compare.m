@@ -161,7 +161,11 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
-        levs = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
+        z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
+        if length(unique(z))>1
+            z = [cb.Ticks z];
+        end
+        levs = sort(z);
         h_fig.LevelList = levs;
     end
     grid on
