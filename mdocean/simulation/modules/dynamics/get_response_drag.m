@@ -10,6 +10,7 @@ function [mag_U,phase_U,...
                                         X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
                                         max_drag_iters_fixed_point,max_drag_iters_solver,...
                                         drag_convergence_plot_on)
+
     % initial guess: 2m float amplitude, 0.5m spar amplitude, unsaturated
     X_f_guess = 2 * ones(size(w));
     phase_X_f_guess = zeros(size(w));
@@ -44,7 +45,7 @@ function [mag_U,phase_U,...
                                                     dynam_inputs{:}, ...
                                                     max_drag_iters_fixed_point);
 
-        idx_use = (ctrl_mult >= 0 & ctrl_mult < 1e4) | isnan(ctrl_mult);
+        idx_use = ((ctrl_mult >= 0 & ctrl_mult < 1e4) & ~isnan(mag_X_f)) | isnan(B_h_f);
 
         % update guesses
         [X_f_guess(idx_use),phase_X_f_guess(idx_use),...
@@ -107,8 +108,8 @@ function [mag_U,phase_U,...
                                     reshape(X6(idx_not_nan),[],1)    ];
 
     % prepare inputs for solver
-    x0 = flatten(X_f_guess,X_s_guess,phase_X_f_guess,phase_X_s_guess,...
-                ctrl_mult_guess,phase_ctrl_mult_guess);
+    x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess,...
+                ctrl_mult_guess, phase_ctrl_mult_guess);
 
     % fun_inner takes 1 input and returns the 6+ outputs of dynamics_error_wrapper
     fun_inner = @(x) dynamics_error_wrapper(unflatten(x,1),unflatten(x,2),...
@@ -280,6 +281,16 @@ function [X_f_err,X_s_err,...
     phase_X_f_err = wrapToPi(phase_X_f_guess - phase_X_f); % wrapping error -pi to pi maintains continuity at zero,
     phase_X_s_err = wrapToPi(phase_X_s_guess - phase_X_s); % allowing for the solution to oscillate between +pi and -pi
 
+    % Fixme: when response = Inf (closed loop unstable), this should be considered 
+    % controller error when it's the controller's fault (system stabilizable)
+    % and only zeroed when it's inevitable (system not stabilizable). 
+    % For now, we zero these Infs in both cases.
+    X_f_err(mag_X_f==Inf) = 0;
+    X_s_err(mag_X_f==Inf) = 0;
+    phase_X_f_err(mag_X_f==Inf) = 0;
+    phase_X_s_err(mag_X_f==Inf) = 0;
+    force_lim_err(mag_X_f==Inf) = 0;
+    amp_lim_err(mag_X_f==Inf) = 0;
 end
 
 function [mag_U,phase_U,...
@@ -299,7 +310,7 @@ function [mag_U,phase_U,...
 
     % linear system
     [control_evaluation_fcn,...
-        B_f,B_s,K_f,K_s] = linearize_around_guessed_response(X_f_guess, X_s_guess, ...
+        real_G_u, imag_G_u] = linearize_around_guessed_response(X_f_guess, X_s_guess, ...
                                                                 phase_X_f_guess, phase_X_s_guess, ...
                                                                 mag_v0_f, mag_v0_s, w, ...
                                                                 drag_const_f, drag_const_s,...
@@ -308,8 +319,10 @@ function [mag_U,phase_U,...
                                                                 F_f_phase, F_s_mag, ...
                                                                 F_s_phase, multibody);
 
+
+
     % unsaturated optimal control gains
-    [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w,control_type,multibody);
+    [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type);
     Z_p = B_p + K_p ./ (1i * w);
 
     % unsaturated response
@@ -360,7 +373,7 @@ function [mag_U,phase_U,real_P,reactive_P,...
 end
 
 function [control_evaluation_fcn,...
-        B_f,B_s,K_f,K_s] = linearize_around_guessed_response(X_f_guess, X_s_guess, ...
+          real_G_u, imag_G_u] = linearize_around_guessed_response(X_f_guess, X_s_guess, ...
                                                                     phase_X_f_guess, phase_X_s_guess, ...
                                                                     mag_v0_f, mag_v0_s, w, ...
                                                                     drag_const_f, drag_const_s,...
@@ -378,20 +391,26 @@ function [control_evaluation_fcn,...
     K_f = K_h_f + K_drag_f;
     K_s = K_h_s + K_drag_s;
 
-    % function to evaluate any controller for fixed linear system
-    control_evaluation_fcn = @(K_p,B_p) evaluate_any_controller(...
-                                        B_c, B_f, B_s, K_f, K_s, ...
-                                        m_c, m_f, m_s, w, K_p, B_p, ...
-                                        F_f_mag, F_f_phase, F_s_mag, ...
-                                        F_s_phase, multibody);
-end
-
-function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type, multibody)
-
-    % intrinsic admittance of the controlled DOF
+    % thevenin admittance of the controlled DOF as seen from load
     if multibody
         [real_G_u,imag_G_u] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w);
-        mag_G_u_squared = real_G_u.^2 + imag_G_u.^2;
+        
+%         X_f = m_f.*w - K_f./w;
+%         X_s = m_s.*w - K_s./w;
+%         X_c = m_c.*w;
+% 
+%         Z_f = B_f + 1i*X_f;
+%         Z_s = B_s + 1i*X_s;
+%         Z_c = B_c + 1i*X_c;
+% 
+%         det_Z = Z_f .* Z_s - Z_c.^2;
+%         sum_Z = Z_f + Z_s + 2 * Z_c;
+%         Z_th = det_Z ./ sum_Z;
+%         G_u = 1./Z_th;
+% 
+%         mag_G_u_squared = abs(G_u).^2;
+%         real_G_u = real(G_u);
+%         imag_G_u = imag(G_u);
     else
         % derived on page 58 of notebook
         resistance = B_f;
@@ -401,6 +420,23 @@ function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type,
         imag_G_u = -reactance .* mag_G_u_squared;
     end
 
+    idx_not_stabilizable = real_G_u < 0; % controlled dof sees negative source 
+                                         % impedance, so it's not only unstable
+                                         % but also not stabilizable
+
+
+    % function to evaluate any controller for fixed linear system
+    control_evaluation_fcn = @(K_p,B_p) evaluate_any_controller(...
+                                        B_c, B_f, B_s, K_f, K_s, ...
+                                        m_c, m_f, m_s, w, K_p, B_p, ...
+                                        F_f_mag, F_f_phase, F_s_mag, ...
+                                        F_s_phase, multibody, idx_not_stabilizable);
+end
+
+function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
+
+    mag_G_u_squared = real_G_u.^2 + imag_G_u.^2;
+
     % control - set powertrain coefficients
     if strcmpi(control_type,'reactive')
         K_p = -w .* imag_G_u ./ mag_G_u_squared;
@@ -409,7 +445,7 @@ function [B_p,K_p] = controller(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, control_type,
         B_p = 1 ./ sqrt(mag_G_u_squared);
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
-    B_p = max(B_p,0); % don't allow negative damping
+
 end
 
 function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const)
@@ -434,9 +470,71 @@ function [mag_U,phase_U,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s] = evaluate_any_controller(...
                             B_c, B_f, B_s, K_f, K_s, ...
-                            m_c, m_f, m_s, w, K_p_sat, B_p_sat, ...
+                            m_c, m_f, m_s, w, K_l_sat, B_l_sat, ...
                             F_f_mag, F_f_phase, F_s_mag, F_s_phase, ...
-                            multibody)
+                            multibody, idx_not_stabilizable)
+
+    cascade_VI_to_FXdot = eye(2); % fixme neglects PTO dynamics
+
+    % First check if the closed loop system is stable in all stabilizable sea states.
+    % Must be checked individually for every sea state because eig doesn't 
+    % accept arrays of more than 2 dimensions. This check must consider all
+    % modes of the system (2 for multibody), not just the controlled mode.
+    % Only checking closed loop means open loop unstable is allowed (intentionally).
+
+    % The starting assumption idx_not_stabilizable is from a previous check 
+    % that Re(G_u)>0. idx_not_stabilizable = false means that even if the
+    % open loop system is unstable, there exists a controller that can 
+    % stabilize it (ie, the unstable mode is controllable).
+    num_T = size(B_f,2);
+    num_H = size(B_f,1);
+    idx_closed_loop_unstable = idx_not_stabilizable;
+
+    Z_l = B_l_sat - 1i*K_l_sat./w;
+
+    for idx_T = 1:num_T
+        for idx_H = 1:num_H
+            if ~isnan(w(idx_H,idx_T)) && ~idx_not_stabilizable(idx_H,idx_T)
+                % open loop matrices
+                mass_matrix_ol  = [m_f(idx_H,idx_T), m_c(idx_H,idx_T);
+                                  m_c(idx_H,idx_T), m_s(idx_H,idx_T)];
+                damp_matrix_ol  = [B_f(idx_H,idx_T), B_c(idx_H,idx_T);
+                                  B_c(idx_H,idx_T), B_s(idx_H,idx_T)];
+                stiff_matrix_ol = [K_f(idx_H,idx_T), 0;
+                                   0,                K_s(idx_H,idx_T)];
+    
+    
+                num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+                den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+                Z_pto = num ./ den;
+                T = [1, -1]; % kinematics matrix
+                Z_p = T.' * Z_pto * T; % transform PTO impedance onto body DOFs
+                B_p =  real(Z_p);
+                K_p = -imag(Z_p)./w(idx_H,idx_T);            
+                
+                % closed loop matrices
+                mass_matrix_cl  = mass_matrix_ol;
+                damp_matrix_cl  = damp_matrix_ol  + B_p;
+                stiff_matrix_cl = stiff_matrix_ol + K_p;
+                M_inv_K = mass_matrix_cl \ stiff_matrix_cl;
+                M_inv_B = mass_matrix_cl \ damp_matrix_cl;
+                system_matrix_cl = [zeros(2), eye(2);
+                                    -M_inv_K, -M_inv_B];
+    
+                % closed loop eigenvalues
+                real_eigs = real(eig(system_matrix_cl));
+    
+                control_makes_closed_loop_unstable = any(real_eigs>0);
+                if control_makes_closed_loop_unstable
+                    idx_closed_loop_unstable(idx_H,idx_T) = true;
+    %             eig_m = eig(mass_matrix_cl);
+    %             eig_b = eig(damp_matrix_cl);
+    %             eig_k = eig(stiff_matrix_cl);
+                    % fixme compute change in Kp and/or Bp for stability
+                end
+            end
+        end
+    end
 
     if multibody
         [mag_U,phase_U,...
@@ -445,27 +543,39 @@ function [mag_U,phase_U,...
             mag_X_f,phase_X_f,...
             mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
                                                     m_c, m_f, m_s, w, ...
-                                                    K_p_sat, B_p_sat, ...
+                                                    K_l_sat, B_l_sat, ...
                                                     F_f_mag, F_f_phase, ...
                                                     F_s_mag, F_s_phase);
     else
-        b_sat = B_f + B_p_sat;
-        k_sat = K_f + K_p_sat;
+        b_sat = B_f + B_l_sat;
+        k_sat = K_f + K_l_sat;
 
         [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
         mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
         mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
-        F_ptrain_over_x = sqrt( (B_p_sat .* w).^2 + (K_p_sat).^2 );
+        F_ptrain_over_x = sqrt( (B_l_sat .* w).^2 + (K_l_sat).^2 );
         mag_U = F_ptrain_over_x .* mag_X_f;
         
-        phase_Z_u = atan2(-K_p_sat./w, B_p_sat);    % phase of control impedance
+        phase_Z_u = atan2(-K_l_sat./w, B_l_sat);    % phase of control impedance
         phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
         phase_U = phase_V_u + phase_Z_u;            % phase of control force
 
-        real_P = 1/2 * B_p_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+        real_P = 1/2 * B_l_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
         check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
         reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
     end
+
+    % set values to Inf when closed loop unstable
+    mag_U(idx_closed_loop_unstable)      = Inf;
+    phase_U(idx_closed_loop_unstable)    = Inf;
+    real_P(idx_closed_loop_unstable)     = Inf;
+    reactive_P(idx_closed_loop_unstable) = Inf;
+    mag_X_u(idx_closed_loop_unstable)    = Inf;
+    phase_X_u(idx_closed_loop_unstable)  = Inf;
+    mag_X_f(idx_closed_loop_unstable)    = Inf;
+    phase_X_f(idx_closed_loop_unstable)  = Inf;
+    mag_X_s(idx_closed_loop_unstable)    = Inf;
+    phase_X_s(idx_closed_loop_unstable)  = Inf;
 end
 
 function [F_err,X_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
