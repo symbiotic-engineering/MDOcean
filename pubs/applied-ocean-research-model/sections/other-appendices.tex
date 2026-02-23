@@ -1,5 +1,17 @@
 \clearpage
 \section{Dynamics and Control Module Details}
+\subsubsection{Linear Solution Procedure}
+\Cref{sec:eom,sec:pto-dynamics} introduced linear models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
+Here we unify the formulation and present a clear system-level solution procedure for all port variables:
+\begin{enumerate}
+\item Use \cref{eq:Th\'{e}venin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
+\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
+\item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
+\item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
+\item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
+\end{enumerate}
+Once all the port variables have been calculated, power at each port can be calculated according to \cref{sec:power}.
+This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
 
 \subsection{Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
 This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.

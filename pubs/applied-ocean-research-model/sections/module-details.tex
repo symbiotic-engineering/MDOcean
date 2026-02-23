@@ -603,20 +603,9 @@ The load voltage and current can then be found as:
 \begin{equation}\label{eq:voltage-current}
     \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
 \end{equation}
+The linear solution procedure for the combined rigid body dynamics, PTO kinematics, and PTO dynamics is summarized in \cref{sec:appendix-dynamics-solution}. 
 
-\subsubsection{Solution Procedure}
-\Cref{sec:eom,sec:pto-dynamics} introduced models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
-This section unifies the formulation and presents a clear system-level solution procedure for all port variables:
-\begin{enumerate}
-\item Use \cref{eq:Th\'{e}venin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
-\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} will frame the load impedance selection as a constrained optimization problem.
-\item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
-\item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
-\item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
-\end{enumerate}
-Once all the port variables have been calculated, power at each port can be calculated according to the following section.
-
-\subsubsection{Power Production}
+\subsubsection{Power Production}\label{sec:power}
 The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $p(t) = e(t)~q(t)$.
 Substituting $\{e,q\}=\{F_{p},\dot{\xi}\}$ yields the floating body mechanical power, $\{e,q\}=\{F_{PTO},\dot{X}_{PTO}\}$ yields the mechanical power at the PTO port, $\{e,q\}=\{\tau,\Omega\}$ yields the generator mechanical power, and $\{e,q\}=\{V,I\}$ yields the generator electrical power. 
 
