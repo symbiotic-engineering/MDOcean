@@ -1,6 +1,6 @@
 function fig = slam_plot()
 
-theta = linspace(pi,2*pi,200);
+theta = linspace(0,pi,200);
 y_axis_span = linspace(0,1,120);
 two_Tf_over_H_max = 3;
 [THETA,Y_AXIS_SPAN] = meshgrid(theta,y_axis_span);
@@ -26,7 +26,7 @@ colorbar;
 xlabel('$\theta/\pi$','Interpreter','latex')
 ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
 my_text = {'$\textrm{Infeasible if}~ \frac{\Delta z_{slam}}{H/2} < 1$','$\textrm{       and } |\theta-\pi|<\pi/2$'};
-text(1.28,.4,my_text,'Interpreter','latex','FontSize',16)
+text(1.28,.4,my_text,'Interpreter','latex','FontSize',20)
 colormap(ax1,bluewhitered)
 
 p1 = [1.33,0.55];
@@ -41,11 +41,11 @@ colorbar;
 xlabel('$\theta/\pi$','Interpreter','latex')
 ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
 my_text = '$\textrm{Undefined if}~ \frac{\Delta z_{slam}}{H/2} < |\sin\theta|$';
-text(1.19,.4,my_text,'Interpreter','latex','FontSize',16)
+text(1.19,.4,my_text,'Interpreter','latex','FontSize',20)
 
 % plot aesthetics for both
 improvePlot
-set(gcf,"Position",[20 50 1500 800])
+set(gcf,"Position",[20 50 1200 600])
 title(ax1,'$\frac{\xi_{max,slam}}{H/2}$','Interpreter','latex','FontSize',24)
 title('$\frac{\xi_{min,slam}}{H/2}$','Interpreter','latex','FontSize',24)
 colormap(gca,bluewhitered)
