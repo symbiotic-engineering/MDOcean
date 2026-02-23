@@ -24,7 +24,7 @@ results = NaN(n,4);
 timeout_sec = 10;
 
 %% Loop through commits
-for k = 1:10:n
+for k = 1:10:61
     hash = hash_cell{k};
     fprintf('Checking out commit %d/%d: %s\n', k, n, hash);
 
@@ -42,11 +42,7 @@ for k = 1:10:n
         completed = wait(f, 'finished', timeout_sec);
     
         if completed
-            try
-                val = fetchOutputs(f);
-            catch
-                val = NaN(1,4);
-            end
+            val = fetchOutputs(f);
         else
             fprintf('Timeout at commit %s\n', hash);
             cancel(f);
@@ -68,3 +64,23 @@ end
 %% Restore original branch
 fprintf('Restoring branch: %s\n', current_branch);
 system(sprintf('git checkout %s', current_branch));
+
+%% plot
+names = {'A','B','|\gamma|','\angle \gamma'};
+figure
+for i=1:4
+    if i==1 || i==3
+        yyaxis left
+    else
+        yyaxis right
+    end
+    if i==1 || i==2
+        linespec = '*-';
+    else
+        linespec = 'o';
+    end
+    plot(1:n, results(:,i), linespec,'DisplayName',names{i})
+    hold on
+end
+xlabel(['Commits after ' start_date])
+legend
