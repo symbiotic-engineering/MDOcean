@@ -33,7 +33,8 @@ for k = 1:n
 
     try
         % Clear function cache in case file changed
-        clear hydro_coeff_err
+        clear functions
+        rehash
 
         % Run your function
         narg = nargin('hydro_coeff_err');
