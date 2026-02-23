@@ -56,7 +56,14 @@ for k = 1:10:61
         results(k,:) = val;
 
     catch ME
-        warning('Error at commit %s: %s', hash, ME.message);
+        err = ME.cause{1}.remotecause{1};
+        warningMsg = [];
+        for i = 1:length(err.stack)
+            stackInfo = err.stack(i);
+            warningMsg = [warningMsg, sprintf('  at %s (line %d)\n', ...
+                stackInfo.name, stackInfo.line)];
+        end
+        warning('Error at commit %s: %s \n%s', hash, err.message, warningMsg);
         results(k,:) = NaN;
     end
 end
