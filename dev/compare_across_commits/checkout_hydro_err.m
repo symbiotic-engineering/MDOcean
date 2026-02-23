@@ -20,11 +20,11 @@ date_cell = cellfun(@(s) s(8:end),         commit_list_cell, 'UniformOutput', fa
 n = numel(hash_cell);
 
 %% Preallocate results
-results = cell(n,1);
-commit_ids = strings(n,1);
+results = NaN(n,4);
+timeout_sec = 10;
 
 %% Loop through commits
-for k = 1:n
+for k = 1:10:n
     hash = hash_cell{k};
     fprintf('Checking out commit %d/%d: %s\n', k, n, hash);
 
@@ -32,25 +32,33 @@ for k = 1:n
     system(sprintf('git checkout %s', hash));
 
     try
-        % Clear function cache in case file changed
-        clear functions
-        rehash
 
-        % Run your function
-        narg = nargin('hydro_coeff_err');
-        if narg==1
-            val = hydro_coeff_err(false);
-        elseif narg==0
-            val = hydro_coeff_err;
+        % Run asynchronously on worker
+        f = parfeval(@run_hydro_wrapper, 1);
+    
+        completed = wait(f, 'finished', timeout_sec);
+    
+        if completed
+            try
+                val = fetchOutputs(f);
+            catch
+                val = NaN(1,4);
+            end
+        else
+            fprintf('Timeout at commit %s\n', hash);
+            cancel(f);
+            val = NaN(1,4);
         end
 
-        results{k} = val;
-        commit_ids(k) = hash;
+        if numel(val) == 3
+            val = [val NaN];   % pad with NaN
+        end
+
+        results(k,:) = val;
 
     catch ME
         warning('Error at commit %s: %s', hash, ME.message);
-        results{k} = NaN;
-        commit_ids(k) = hash;
+        results(k,:) = NaN;
     end
 end
 
@@ -58,11 +66,16 @@ end
 fprintf('Restoring branch: %s\n', current_branch);
 system(sprintf('git checkout %s', current_branch));
 
+%%
+function val = run_hydro_wrapper()
 
-%% Convert results to matrix if consistent size
+clear functions
+rehash
+
 try
-    results_mat = cell2mat(results);
+    val = hydro_coeff_err(false);
 catch
-    warning('Results have inconsistent sizes; kept as cell array.');
-    results_mat = results;
+    val = NaN;
+end
+
 end
