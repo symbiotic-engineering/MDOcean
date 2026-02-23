@@ -1,6 +1,6 @@
 %% User settings
-start_date = '2024-05-23';
-end_date   = '2025-01-15';
+start_date = '2024-05-10';
+end_date   = '2024-05-23';
 
 %% Get current branch so we can restore it later
 [~, current_branch] = system('git rev-parse --abbrev-ref HEAD');
@@ -24,7 +24,7 @@ results = NaN(n,4);
 timeout_sec = 10;
 
 %% Loop through commits
-for k = 1:10:61
+for k = 1:n
     hash = hash_cell{k};
     fprintf('Checking out commit %d/%d: %s\n', k, n, hash);
 
