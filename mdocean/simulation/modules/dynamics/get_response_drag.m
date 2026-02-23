@@ -323,11 +323,15 @@ function [mag_U,phase_U,...
 
     % unsaturated optimal control gains
     [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type);
-    Z_p = B_p + K_p ./ (1i * w);
 
-    % unsaturated response
-    [mag_U_unsat,~,P_unsat,~,~,~,mag_X_f_unsat] = control_evaluation_fcn(K_p,B_p);
-    
+    % unsaturated response (stabilized)
+    stabilize_B = true;
+    stabilize_K = strcmpi(control_type,'reactive');
+    [mag_U_unsat,~,P_unsat,...
+     ~,~,~,mag_X_f_unsat,~,~,~,...
+     B_p_stabilized,K_p_stabilized] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
+    Z_p = B_p_stabilized + K_p_stabilized ./ (1i * w);
+
     % saturated response and error
     [mag_U,phase_U,...
      real_P,reactive_P,...
@@ -360,12 +364,14 @@ function [mag_U,phase_U,real_P,reactive_P,...
     B_p_sat =       real(Z_p_sat);
     K_p_sat = -w .* imag(Z_p_sat);
 
-    % saturated response
+    % saturated response (unstabilized)
+    stabilize_B = false;
+    stabilize_K = false;
     [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
      mag_X_f,phase_X_f,...
-     mag_X_s,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat);
+     mag_X_s,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat,stabilize_B,stabilize_K);
 
     % control error: uses saturated and unsaturated response
     [force_lim_err,amp_lim_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
@@ -426,11 +432,13 @@ function [control_evaluation_fcn,...
 
 
     % function to evaluate any controller for fixed linear system
-    control_evaluation_fcn = @(K_p,B_p) evaluate_any_controller(...
+    control_evaluation_fcn = @(K_p,B_p,stabilize_B,stabilize_K) evaluate_any_controller(...
                                         B_c, B_f, B_s, K_f, K_s, ...
                                         m_c, m_f, m_s, w, K_p, B_p, ...
                                         F_f_mag, F_f_phase, F_s_mag, ...
-                                        F_s_phase, multibody, idx_not_stabilizable);
+                                        F_s_phase, multibody, ...
+                                        idx_not_stabilizable, ...
+                                        stabilize_B, stabilize_K);
 end
 
 function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
@@ -468,74 +476,53 @@ function [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
      mag_X_f,phase_X_f,...
-     mag_X_s,phase_X_s] = evaluate_any_controller(...
+     mag_X_s,phase_X_s,...
+     B_l,K_l] = evaluate_any_controller(...
                             B_c, B_f, B_s, K_f, K_s, ...
-                            m_c, m_f, m_s, w, K_l_sat, B_l_sat, ...
+                            m_c, m_f, m_s, w, K_l, B_l, ...
                             F_f_mag, F_f_phase, F_s_mag, F_s_phase, ...
-                            multibody, idx_not_stabilizable)
+                            multibody, idx_not_stabilizable,...
+                            stabilize_B,stabilize_K)
 
-    cascade_VI_to_FXdot = eye(2); % fixme neglects PTO dynamics
-
-    % First check if the closed loop system is stable in all stabilizable sea states.
-    % Must be checked individually for every sea state because eig doesn't 
-    % accept arrays of more than 2 dimensions. This check must consider all
-    % modes of the system (2 for multibody), not just the controlled mode.
-    % Only checking closed loop means open loop unstable is allowed (intentionally).
-
-    % The starting assumption idx_not_stabilizable is from a previous check 
-    % that Re(G_u)>0. idx_not_stabilizable = false means that even if the
-    % open loop system is unstable, there exists a controller that can 
-    % stabilize it (ie, the unstable mode is controllable).
-    num_T = size(B_f,2);
-    num_H = size(B_f,1);
-    idx_closed_loop_unstable = idx_not_stabilizable;
-
-    Z_l = B_l_sat - 1i*K_l_sat./w;
-
-    for idx_T = 1:num_T
-        for idx_H = 1:num_H
-            if ~isnan(w(idx_H,idx_T)) && ~idx_not_stabilizable(idx_H,idx_T)
-                % open loop matrices
-                mass_matrix_ol  = [m_f(idx_H,idx_T), m_c(idx_H,idx_T);
-                                  m_c(idx_H,idx_T), m_s(idx_H,idx_T)];
-                damp_matrix_ol  = [B_f(idx_H,idx_T), B_c(idx_H,idx_T);
-                                  B_c(idx_H,idx_T), B_s(idx_H,idx_T)];
-                stiff_matrix_ol = [K_f(idx_H,idx_T), 0;
-                                   0,                K_s(idx_H,idx_T)];
+    % check stability
+    [idx_closed_loop_unstable,...
+     recommended_increase_Bl,...
+     recommended_increase_Kl] = check_cl_stability(B_c, B_f, B_s, K_f, K_s, ...
+                                                    m_c, m_f, m_s, w, ...
+                                                    K_l, B_l, ...
+                                                    idx_not_stabilizable, ...
+                                                    multibody);
+    % stabilize if specified
+    B_l = B_l + stabilize_B * recommended_increase_Bl;
+    K_l = K_l + stabilize_K * recommended_increase_Kl;
     
-    
-                num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
-                den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
-                Z_pto = num ./ den;
-                T = [1, -1]; % kinematics matrix
-                Z_p = T.' * Z_pto * T; % transform PTO impedance onto body DOFs
-                B_p =  real(Z_p);
-                K_p = -imag(Z_p)./w(idx_H,idx_T);            
+    if stabilize_K || stabilize_B
+        need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
+                              + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
+        count = 0;
+        while need_more_stabilizing ~= 0 && count<10
+            count = count+1;
+
+            [idx_closed_loop_unstable,...
+             recommended_increase_Bl,...
+             recommended_increase_Kl] = check_cl_stability(B_c, B_f, B_s, K_f, K_s, ...
+                                                            m_c, m_f, m_s, w, ...
+                                                            K_l, B_l, idx_not_stabilizable, ...
+                                                            multibody);
+
                 
-                % closed loop matrices
-                mass_matrix_cl  = mass_matrix_ol;
-                damp_matrix_cl  = damp_matrix_ol  + B_p;
-                stiff_matrix_cl = stiff_matrix_ol + K_p;
-                M_inv_K = mass_matrix_cl \ stiff_matrix_cl;
-                M_inv_B = mass_matrix_cl \ damp_matrix_cl;
-                system_matrix_cl = [zeros(2), eye(2);
-                                    -M_inv_K, -M_inv_B];
-    
-                % closed loop eigenvalues
-                real_eigs = real(eig(system_matrix_cl));
-    
-                control_makes_closed_loop_unstable = any(real_eigs>0);
-                if control_makes_closed_loop_unstable
-                    idx_closed_loop_unstable(idx_H,idx_T) = true;
-    %             eig_m = eig(mass_matrix_cl);
-    %             eig_b = eig(damp_matrix_cl);
-    %             eig_k = eig(stiff_matrix_cl);
-                    % fixme compute change in Kp and/or Bp for stability
-                end
-            end
+            B_l = B_l + stabilize_B * recommended_increase_Bl;
+            K_l = K_l + stabilize_K * recommended_increase_Kl;
+
+            need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
+                              + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
         end
     end
+    if stabilize_K && stabilize_B
+        assert(all([recommended_increase_Kl(:); recommended_increase_Bl(:)]==0))
+    end
 
+    % response
     if multibody
         [mag_U,phase_U,...
             real_P,reactive_P,...
@@ -543,24 +530,24 @@ function [mag_U,phase_U,...
             mag_X_f,phase_X_f,...
             mag_X_s,phase_X_s] = multibody_response(B_c, B_f, B_s, K_f, K_s, ...
                                                     m_c, m_f, m_s, w, ...
-                                                    K_l_sat, B_l_sat, ...
+                                                    K_l, B_l, ...
                                                     F_f_mag, F_f_phase, ...
                                                     F_s_mag, F_s_phase);
     else
-        b_sat = B_f + B_l_sat;
-        k_sat = K_f + K_l_sat;
+        b_sat = B_f + B_l;
+        k_sat = K_f + K_l;
 
         [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_f, b_sat, k_sat, F_f_mag, F_f_phase);
         mag_X_u = mag_X_f;   phase_X_u = phase_X_f;
         mag_X_s = 0*mag_X_f; phase_X_s = 0*phase_X_f;
-        F_ptrain_over_x = sqrt( (B_l_sat .* w).^2 + (K_l_sat).^2 );
+        F_ptrain_over_x = sqrt( (B_l .* w).^2 + (K_l).^2 );
         mag_U = F_ptrain_over_x .* mag_X_f;
         
-        phase_Z_u = atan2(-K_l_sat./w, B_l_sat);    % phase of control impedance
+        phase_Z_u = atan2(-K_l./w, B_l);    % phase of control impedance
         phase_V_u = pi/2 + phase_X_u;               % phase of control velocity
         phase_U = phase_V_u + phase_Z_u;            % phase of control force
 
-        real_P = 1/2 * B_l_sat .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
+        real_P = 1/2 * B_l .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
         check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
         reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
     end
@@ -576,6 +563,108 @@ function [mag_U,phase_U,...
     phase_X_f(idx_closed_loop_unstable)  = Inf;
     mag_X_s(idx_closed_loop_unstable)    = Inf;
     phase_X_s(idx_closed_loop_unstable)  = Inf;
+end
+
+function [idx_closed_loop_unstable,...
+          recommended_increase_Bl,...
+          recommended_increase_Kl] = check_cl_stability(B_c, B_f, B_s, K_f, K_s, ...
+                            m_c, m_f, m_s, w, K_l_sat, B_l_sat, idx_not_stabilizable, multibody)
+    % Check if the closed loop system is stable in all stabilizable sea states.
+    % Must be checked individually for every sea state because eig doesn't 
+    % accept arrays of more than 2 dimensions. This check must consider all
+    % modes of the system (2 for multibody), not just the controlled mode.
+    % Only checking closed loop means open loop unstable is allowed (intentionally).
+
+    % The unstable sea states (idx_closed_loop_unstable) are then the union 
+    % of unstable stabilizable sea states (idx_ctrl_makes_closed_loop_unstable)
+    % and unstabilizable sea states (idx_not_stabilizable). The latter is 
+    % from a previous check that Re(G_u)>0. idx_not_stabilizable = false 
+    % means that even if the open loop system is unstable, there exists a 
+    % controller that can stabilize it (ie, the unstable mode is controllable).
+
+    % fixme neglects PTO dynamics
+    if multibody
+        cascade_VI_to_FXdot = eye(2);
+        T = [1, -1]; % kinematics matrix
+        ndof = 2;
+    else
+        cascade_VI_to_FXdot = 1;
+        T = 1;
+        ndof = 1;
+    end
+
+    num_T = size(B_f,2);
+    num_H = size(B_f,1);
+    idx_ctrl_makes_closed_loop_unstable = false(size(B_f));
+    recommended_increase_Bl = zeros(size(B_f));
+    recommended_increase_Kl = zeros(size(B_f));
+
+    Z_l = B_l_sat - 1i*K_l_sat./w;
+
+    for idx_T = 1:num_T
+        for idx_H = 1:num_H
+            if ~isnan(w(idx_H,idx_T)) && ~idx_not_stabilizable(idx_H,idx_T)
+                % open loop matrices
+                if multibody
+                    mass_matrix_ol  = [m_f(idx_H,idx_T), m_c(idx_H,idx_T);
+                                       m_c(idx_H,idx_T), m_s(idx_H,idx_T)];
+                    damp_matrix_ol  = [B_f(idx_H,idx_T), B_c(idx_H,idx_T);
+                                       B_c(idx_H,idx_T), B_s(idx_H,idx_T)];
+                    stiff_matrix_ol = [K_f(idx_H,idx_T), 0;
+                                       0,                K_s(idx_H,idx_T)];
+                else
+                    mass_matrix_ol  = m_f(idx_H,idx_T);
+                    damp_matrix_ol  = B_f(idx_H,idx_T);
+                    stiff_matrix_ol = K_f(idx_H,idx_T);
+                end
+    
+                num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+                den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+                Z_pto = num ./ den;
+                Z_p = T.' * Z_pto * T; % transform PTO impedance onto body DOFs
+                B_p =  real(Z_p);
+                K_p = -imag(Z_p).*w(idx_H,idx_T);            
+                
+                % closed loop matrices
+                mass_matrix_cl  = mass_matrix_ol;
+                damp_matrix_cl  = damp_matrix_ol  + B_p;
+                stiff_matrix_cl = stiff_matrix_ol + K_p;
+                M_inv_K = mass_matrix_cl \ stiff_matrix_cl;
+                M_inv_B = mass_matrix_cl \ damp_matrix_cl;
+                system_matrix_cl = [zeros(ndof), eye(ndof);
+                                    -M_inv_K, -M_inv_B];
+    
+                % closed loop eigenvalues
+                real_eigs = real(eig(system_matrix_cl));
+    
+                control_makes_closed_loop_unstable = any(real_eigs>0);
+                if control_makes_closed_loop_unstable
+                    idx_ctrl_makes_closed_loop_unstable(idx_H,idx_T) = true;
+
+                    det_m = det(mass_matrix_cl);
+                    det_b = det(damp_matrix_cl);
+                    det_k = det(stiff_matrix_cl);
+                    if det_m < 0
+                        % I don't think this case is possible, so error if it happens
+                        error('Encountered unstable mass matrix in stabilizable system')
+                    end
+                    % compute required change in control to create
+                    % stability - see notebook 9 p117 2/21/26
+                    if det_b < 0
+                        rec_incr_Bp = abs(det_b) / sum(damp_matrix_cl,'all') * 1.01;
+                        rec_incr_Bl = rec_incr_Bp; % fixme this should use cascade matrix
+                        recommended_increase_Bl(idx_H,idx_T) = rec_incr_Bl;
+                    end
+                    if det_k < 0
+                        rec_incr_Kp = abs(det_k) / sum(stiff_matrix_cl,'all') * 1.01;
+                        rec_incr_Kl = rec_incr_Kp; % fixme this should use cascade matrix
+                        recommended_increase_Kl(idx_H,idx_T) = rec_incr_Kl;
+                    end
+                end
+            end
+        end
+    end
+    idx_closed_loop_unstable = idx_not_stabilizable | idx_ctrl_makes_closed_loop_unstable;
 end
 
 function [F_err,X_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
