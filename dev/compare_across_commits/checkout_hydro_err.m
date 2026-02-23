@@ -31,10 +31,13 @@ for k = 1:10:n
     % Checkout commit
     system(sprintf('git checkout %s', hash));
 
+    clear functions
+    rehash
+
     try
 
         % Run asynchronously on worker
-        f = parfeval(@run_hydro_wrapper, 1);
+        f = parfeval(@()hydro_coeff_err(false), 1);
     
         completed = wait(f, 'finished', timeout_sec);
     
@@ -65,17 +68,3 @@ end
 %% Restore original branch
 fprintf('Restoring branch: %s\n', current_branch);
 system(sprintf('git checkout %s', current_branch));
-
-%%
-function val = run_hydro_wrapper()
-
-clear functions
-rehash
-
-try
-    val = hydro_coeff_err(false);
-catch
-    val = NaN;
-end
-
-end
