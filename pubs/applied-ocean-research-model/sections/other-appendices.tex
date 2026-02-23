@@ -331,53 +331,53 @@ and the typical simplification $\frac{\partial \hat{V}_{s,th}}{\partial B_l}=\fr
 In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
 
 \clearpage
-\subsection{Slamming Amplitude}\label{sec:appendix-slam}
-In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{slam,bot}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
+\subsection{Slamming and Submersion Amplitude}\label{sec:appendix-slam}
+In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{slam}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
 \begin{aligned}
-    \xi(t) - \Delta z_{slam,bot} &< \zeta(y,t) \\ 
-    |\hat{\xi}|\cos(\omega t+\angle \hat{\xi}) - \Delta z_{slam,bot} &< \frac{H}{2}\cos(\omega t - k y)
+    \xi(t) - \Delta z_{slam} &< \zeta(y,t) \\ 
+    |\hat{\xi}|\cos(\omega t+\angle \hat{\xi}) - \Delta z_{slam} &< \frac{H}{2}\cos(\omega t - k y)
 \end{aligned}
 \end{equation}
 must be true at all times and over all positions where the body could exit the waves, $-D/2<y<D/2$.
 Note that this expression assumes a sinusoidal waveshape but still applies for irregular waves if a wave-by-wave approach \cite{lin_fast_2025} is utilized.
 Manipulating \cref{eq:slamming-time-domain} to ensure the inequality is satisfied for all $t$ yields the criterion:
 \begin{equation}
-|\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam,bot}^2-\left(\frac{H}{2}\right)^2
+|\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam}^2-\left(\frac{H}{2}\right)^2
 \end{equation}
 which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:appendix-qp-solution}, once the appropriate worst-case $y$ is substituted.
 The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios and the corresponding worst-case $y$.
 Completing the square results in:
 \begin{equation}\label{eq:slamming-squared}
-    \left[ |\hat{\xi}|- \frac{H}{2}\cos(\angle\hat{\xi} + ky)\right]^2 < \Delta z_{slam,bot}^2 - (H/2)^2 \sin^2(\angle\hat{\xi} + ky)
+    \left[ |\hat{\xi}|- \frac{H}{2}\cos(\angle\hat{\xi} + ky)\right]^2 < \Delta z_{slam}^2 - (H/2)^2 \sin^2(\angle\hat{\xi} + ky)
 \end{equation}
 In general, after taking the square root of \cref{eq:slamming-squared}, both the positive and negative branches must be used.
 This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{min,slam}<|\hat{\xi}|<\xi_{max,slam}$, with the following values:
 \begin{equation}\label{eq:slamming-min-max}
 \begin{aligned}
-    \xi_{max,slam} &= \frac{H}{2} \cos\theta + \sqrt{\Delta z_{slam,bot}^2-\left(\frac{H}{2}\sin\theta\right)^2 } \\
-    \xi_{min,slam} &= \frac{H}{2} \cos\theta - \sqrt{\Delta z_{slam,bot}^2-\left(\frac{H}{2}\sin\theta\right)^2 }
+    \xi_{max,slam} &= \frac{H}{2} \cos\theta + \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 } \\
+    \xi_{min,slam} &= \frac{H}{2} \cos\theta - \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 }
 \end{aligned}
 \end{equation}
 where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
 The relevant value of $\theta$ differs depending on the wave amplitude.
 
 \subsubsection{Case 1: Small Wave Amplitudes}
-For the case of $\Delta z_{slam,bot}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$. This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
+For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$. This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
 The value of $\theta$ that minimizes $\xi_{max,slam}$ over the relevant range is 
 \begin{equation}\label{eq:slamming-limit-small-waves}
-\theta = \pi + \max\left(0,~ \frac{-kD}{2}+|\pi-\angle \xi|\right)
+\theta = \pi - \max\left(0,~ \frac{-kD}{2}+|\pi-\angle \xi|\right)
 \end{equation}
-where the symmetry of \cref{eq:slamming-min-max} has been used to collapse possible values from $[0,2\pi]$ to $[\pi,2\pi]$.
+where the symmetry of \cref{eq:slamming-min-max} has been used to collapse possible values onto $[0,\pi]$.
 
-This expression reduces to the simple limits $\Delta z_{slam,bot}-H/2$ and $\Delta z_{slam,bot}+H/2$ for short wavelengths $(\theta=\pi)$ and long wavelengths $(\theta=2\pi)$ respectively.
-These limits are also the minimum and maximum values of $\xi_{max,slam}$ for any diameter and wave condition where $\Delta z_{slam,bot}>H/2$.
+This expression reduces to the simple limits $\Delta z_{slam}-H/2$ and $\Delta z_{slam}+H/2$ for short wavelengths $(\theta=\pi)$ and long wavelengths $(\theta=0)$ respectively.
+These limits are also the minimum and maximum values of $\xi_{max,slam}$ for any diameter and wave condition where $\Delta z_{slam}>H/2$.
 For intermediate wavelengths, the variable $\theta$ accurately accounts for the effect of body diameter and the phase offset of body motion from the waves.
-Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=2\pi$ allowing the body to get all the way to the wave crest (top) and $\theta=\pi$ requiring the float to remain fully below the wave trough (bottom).
+Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=0$ allowing the body to get all the way to the wave crest (top) and $\theta=\pi$ requiring the float to remain fully below the wave trough (bottom).
 
 \subsubsection{Case 2: Large Wave Amplitudes}
-In sufficiently large waves ($H/2>\Delta z_{slam,bot}$), \cref{eq:slamming-limit-small-waves} does not apply.
+In sufficiently large waves ($H/2>\Delta z_{slam}$), \cref{eq:slamming-limit-small-waves} does not apply.
 Intuitively, when the wave amplitude exceeds the draft, a minimum amplitude of motion in-phase with the incident wave is required to prevent the wave trough from going below the body surface.
 The minimum amplitude arises mathematically when $\xi_{min,slam}>0$, which occurs exactly for waves meeting the amplitude criterion.
 The ``in-phase'' motion requirement is consistent with the observation that in this wave regime, the maximum amplitude in \cref{eq:slamming-min-max} becomes unsatisfiable ($\xi_{max,slam}<0$) for WEC phases that are more than 90 degrees out of phase with the incident wave ($\theta \in [\pi/2,3\pi/2]$).
@@ -386,29 +386,31 @@ For evaluating \cref{eq:slamming-min-max}, the value of $\theta$ that produces b
 \begin{equation}
 \theta = \angle\hat{\xi} + \frac{kD}{2}\textrm{sgn}(\pi-\angle\hat{\xi})
 \end{equation}
+After wrapping the value onto $[0,2\pi]$, it can be mapped to $[0,\pi]$ without changing the value of \cref{eq:slamming-min-max} via the identity $\cos(\theta)=\cos(\pi-|\pi-\theta|)$.
 
 Notably, in this wave regime it becomes possible for the right hand side of \cref{eq:slamming-squared} to become negative for certain values of $\angle\hat{\xi}$ and $D$.
 This means that those combinations of $\angle\hat{\xi}$ and $D$ are prohibited because slamming would occur regardless of the amplitude $|\hat{\xi}|$.
 The following requirement on $D$ ensures that there exist some values of $\angle\hat{\xi}$ without automatic slamming:
 \begin{equation}\label{eq:D-slamming}
-    kD<2\arcsin\left(\frac{\Delta z_{slam,bot}}{H/2}\right)
+    kD<2\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)
 \end{equation}
+which has upper bound $kD<\pi$.
 Once \cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\hat{\xi}$ that avoid negative values for both $\xi_{max,slam}$ and the right hand side of \cref{eq:slamming-squared} are:
 \begin{equation}\label{eq:slamming-allowed-angles}
 \begin{aligned}
-    \angle\hat{\xi} \in &\left[0,~~\arcsin\left(\frac{\Delta z_{slam,bot}}{H/2}\right)-\frac{kD}{2}\right] \\
-    \cup & \left[2\pi-\arcsin\left(\frac{\Delta z_{slam,bot}}{H/2}\right)+\frac{kD}{2}, ~~2\pi\right]
+    \angle\hat{\xi} \in &\left[0,~~\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)-\frac{kD}{2}\right] \\
+    \cup & \left[2\pi-\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)+\frac{kD}{2}, ~~2\pi\right]
 \end{aligned}
 \end{equation}
-At the edge-case $\angle\hat{\xi}$ on the inner boundaries of this interval, only a single amplitude is permitted because the values for $\xi_{max,slam}$ and $\xi_{min,slam}$ coincide at $\sqrt{(H/2)^2-\Delta z_{slam,bot}^2}$.
+At the edge-case $\angle\hat{\xi}$ on the inner boundaries of this interval, only a single amplitude is permitted because the values for $\xi_{max,slam}$ and $\xi_{min,slam}$ coincide at $\sqrt{(H/2)^2-\Delta z_{slam}^2}$.
 At any lower amplitude, the WEC would exit the water at the wave trough, and any higher, the WEC would raise out of the water at the wave crest.
 The permissible amplitude range can be widened by decreasing $D$ or moving $\angle\hat{\xi}$ towards the closer of $0$ and $2\pi$.
-The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam,bot} < |\hat{\xi}| < H/2+\Delta z_{slam,bot}$.
+The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam} < |\hat{\xi}| < H/2+\Delta z_{slam}$.
 
 \subsubsection{Implementation}
-Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam,bot}/(H/2)$.
-This reveals that besides increasing the draft, increasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
-If $\Delta z_{slam,bot}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
+Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam}/(H/2)$.
+This reveals that besides increasing the draft, decreasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
+If $\Delta z_{slam}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/slamming_amplitude.pdf}
@@ -417,32 +419,32 @@ If $\Delta z_{slam,bot}<H/2|\sin\theta|$, the design is unviable and the slammin
 \end{figure}
 %\hl{add description of similarities and differences of this to Budal's upper bound}
 
-Separately, there exists a symmetrical counterpart to the above slamming condition, where in addition to requiring the bottom of the WEC to remain below the waves, one can require that the top of the WEC remains above the waves, preventing submersion. 
+Separately, there exists a symmetrical counterpart to the slamming condition that we will call the submersion condition. 
+While preventing slamming requires that the bottom of the WEC remains below the free surface, preventng submersion requires that the top of the WEC remains above the free surface. 
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
-\begin{equation}\label{eq:top-slamming}
-    \xi(t) + \Delta z_{slam,top} > \zeta(y,t)
+\begin{equation}\label{eq:submersion}
+    \xi(t) + \Delta z_{sub} > \zeta(y,t)
 \end{equation}
 
-Conceptually, both the bottom-slamming requirement \eqref{eq:slamming-time-domain} and the top-slamming requirement \eqref{eq:top-slamming} must be applied to both the float and the spar for a total of 4 constraints for each sea state.
-However, the top-slamming and bottom-slamming requirement for each body is aggregated into a single constraint for each sea state, using $\Delta z_{slam}=\min(\Delta z_{slam,top}, \Delta z_{slam,bot})$, where the values for $\Delta z_{slam,top}$ and $\Delta z_{slam,bot}$ were given in \sectionautorefname~\ref{sec:dynamics}.
-\hl{(Note: There also might be a slight difference in the way theta would be calculated for top and bottom slamming, this will be checked during re-scrutineering).}
-%However, implementing the top-slamming requirement for the float becomes redundant of the float bottom-slamming requirement due to the parameter choice $T_{f,2}/h_f=1/2$ enforcing equal draft and above-water height.
-%If $h_f$ were added as an independent design variable, the float top-slamming requirement would become necessary to implement, although note that the normalized value of $\frac{dLCOE^*}{dT_{f,2}/h_f}$ in \figureautorefname~\ref{fig:param-sens-J-star-tornado} is less than -0.1, suggesting that the addition of $h_f$ as a design variable would provide little benefit and is therefore low priority.
-Meanwhile, it is only required to implement the slamming constraint for the float not the spar because \reqref{base_dynamic} and \reqref{tops_dynamic} already ensure, respectively, that the bottom of the spar remains below the bottom of the float and that the top of the spar remains above the top of the float across all dynamic conditions.
-Since the float slamming requirement applies for all $-D_f/2<y<D_f/2$ and the spar diameter is always smaller than the float's (via \reqref{float_spar_diam}), the spar slamming requirements are redundant. This reduces the number of slamming constraints per sea state from four to one.
+Conceptually, both the slamming requirement \eqref{eq:slamming-time-domain} and the submersion requirement \eqref{eq:submersion} must be applied to both the float and the spar for a total of 4 free surface constraints for each sea state.
+However, the limit on $|\hat{\xi}_f-\hat{\xi}_s|$ described in \cref{tab:DLCs} already ensures that the top of the spar remains above the top of the float across all dynamic conditions.
+Coupled with the fact that the float diameter always exceeds the spar diameter, this means that satisfaction of the float submersion requirement implies automatic satisfaction of the spar submersion requirement.
+While this logic works for submersion, it does not apply for slamming because the damping plate diameter may exceed the float diameter.
+The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
+This reduces the number of free surface constraints per sea state from four to one.
 
-Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($\xi_{slam}=\Delta z_{slam}-H/2; \xi^*=-1$).
-Relevant model values for the \hl{minimum-LCOE} float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
-Although the intermediate wavelengths ($\xi^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $\xi_{slam}/\xi-1 \approx 0$) because in the tested wave conditions, large amplitude waves occur only at high periods.
-If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot of \figureautorefname~\ref{fig:slamming-validation} at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
-This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
-Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the \hl{optimization}, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
-\begin{figure}
-    \centering
-    \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
-    \caption{Slamming Model Comparison for Minimum LCOE Design in Operational Sea States}
-    \label{fig:slamming-validation}
-\end{figure}
+% Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($\xi_{slam}=\Delta z_{slam}-H/2; \xi^*=-1$).
+% Relevant model values for the \hl{minimum-LCOE} float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
+% Although the intermediate wavelengths ($\xi^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $\xi_{slam}/\xi-1 \approx 0$) because in the tested wave conditions, large amplitude waves occur only at high periods.
+% If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot of \figureautorefname~\ref{fig:slamming-validation} at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
+% This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
+% Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the analysis, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
+%     \caption{Slamming Model Comparison for Minimum LCOE Design in Operational Sea States}
+%     \label{fig:slamming-validation}
+% \end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
