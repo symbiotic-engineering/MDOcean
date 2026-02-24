@@ -27,7 +27,7 @@ if any(exist_vec)
     end
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimSourceFolder))
-    rmpath([wecSimSourceFolder '/functions/BEMIO/']) % prevent conflicts with MDOcean's modified readWAMIT
+    addpath([mdocean_folder filesep 'inputs' filesep 'validation' filesep 'WEC-Sim'],'-begin') % make sure MDOcean's modified readWAMIT takes precedence over WecSim's
     clear wecSimSourceFolder wecSim_folder folder_vec
 end
 
