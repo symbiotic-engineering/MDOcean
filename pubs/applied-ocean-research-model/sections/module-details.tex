@@ -69,7 +69,7 @@ The origin is chosen here as the center of the float at the still waterline.
 The full equation of motion incorporating the effect of additional forces will be given in section~\ref{sec:dynamics}.
 
 For a two body point absorber oscillating only in heave under normal operational conditions ($op$), the hydrodynamic matrices are 2x2, representing the float $f$, spar $s$, and coupling between the two $c$:
-\begin{equation}
+\begin{equation}\label{eq:op-hydro-coeffs}
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
     \end{bmatrix},~
@@ -87,27 +87,38 @@ For a two body point absorber oscillating only in heave under normal operational
     \end{bmatrix}
 \end{equation}
 The coupling is symmetric for radiation forces and zero for hydrostatic forces.
-Meanwhile, the hydrodynamic coefficients may change in storm conditions, such as if the devices change their shape or submersion depth as a survival strategy.
+Meanwhile, the hydrodynamic coefficients may change in storm conditions ($st$), such as if the devices change their shape or submersion depth as a survival strategy.
 The assumed storm configuration in this study, to mirror the RM3 report \cite{RM3}, is the float and spar rigidly fixed to each other so they move as if they have been merged, indicated with subscript $m$:
 \begin{equation}
-    \vec{\hat{\xi}}_{storm} = \begin{bmatrix}
+    \vec{\hat{\xi}}_{st} = \begin{bmatrix}
         \hat{\xi}_m 
-    \end{bmatrix},~\vec{\gamma}_{storm} = \begin{bmatrix}
+    \end{bmatrix},~\vec{\gamma}_{st} = \begin{bmatrix}
         \gamma_m
     \end{bmatrix},
-    ~\mathbf{A_{h,storm}} = \begin{bmatrix}
+    ~\mathbf{A_{h,st}} = \begin{bmatrix}
         A_m 
-    \end{bmatrix},~ \mathbf{B_{h,storm}} = \begin{bmatrix}
+    \end{bmatrix},~ \mathbf{B_{h,st}} = \begin{bmatrix}
         B_m
     \end{bmatrix},~
-    \mathbf{K_{h,storm}} = \begin{bmatrix}
+    \mathbf{K_{h,st}} = \begin{bmatrix}
         K_m
     \end{bmatrix}
 \end{equation}
-The question now is the calculation of these different coefficients, postponing discussion on the implication of the operational and storm cases until section~\ref{sec:dynamics}.
-The stiffnesses ($K_f$, $K_s$, and $K_m$) are frequency-independent and can be trivially calculated from the diameters (see equation~\eqref{eq:gamma-K} in \appendixname~\ref{sec:MEEM_details}), while the remaining coefficients must be calculated in the frequency domain as a function of device geometry by solving the radiation boundary value problem for the fluid velocity potential.
+The coefficients for the merged geometry are simply the sum of coefficents for the bodies moving independently.
+This can be seen by first substituting operational coefficients \cref{eq:op-hydro-coeffs} into the force equation \cref{eq:hydro-forces} and then enforcing $\hat{\xi}_f =\hat{\xi}_s =\hat{\xi}_m$.
+This yields the following:
+\begin{equation}
+    \gamma_m = \gamma_f + \gamma_s\,, \quad A_m = A_f + A_s + 2A_c\,, \quad B_m = B_f + B_s + 2 B_c\,, \quad K_m = K_f + K_s
+\end{equation}
+
+The question now is the calculation of the float, spar, and coupling coefficients, postponing discussion on the implication of the operational and storm cases until section~\ref{sec:dynamics}.
+The stiffnesses ($K_f$, $K_s$) are frequency-independent and can be trivially calculated from the diameters (see equation~\eqref{eq:gamma-K} in \appendixname~\ref{sec:MEEM_details}), while the remaining coefficients must be calculated in the frequency domain as a function of device geometry by solving the radiation boundary value problem for the fluid velocity potential.
+
 Traditionally, this is done with a boundary element method (BEM) solver, which meshes the floating bodies and solves a large matrix equation.
-In MDOcean, a faster, semi-analytical method that exploits the cylindrical symmetry of the problem is used instead: the Matched Eigenfunction Expansion Method (MEEM).
+In MDOcean, the float coefficients are instead obtained with a faster, semi-analytical method that exploits the cylindrical symmetry of the problem: the Matched Eigenfunction Expansion Method (MEEM).
+Meanwhile, the spar and coupling coefficients are obtained via a combination of algebraic approximation and interpolation of pre-computed BEM results, and with further model development could eventually be computed with MEEM.
+
+\subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}
 The MEEM radiation solution for two concentric cylinders oscillating in heave was first presented in \cite{mavrakos_hydrodynamic_2004} and later detailed in \cite{chau_inertia_2013}.
 The open-source implementation used in this study is summarized in \appendixname~\ref{sec:MEEM_details} and further described in \cite{mccabe_open-source_2024,mccabe_investigating_2025,khanal_openflash_2025}.
 The present section focuses instead on the high-level capabilities and limitations of the model.
@@ -129,6 +140,15 @@ Dashed lines represent geometry that is neglected in the MEEM calculations}
    \label{fig:meem-geom}
 \end{figure}
 
+A second limitation of the present implementation of MEEM is numerical overflow.
+To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$:
+\begin{equation}\label{eq:delta-z-min-intro}
+    \Delta z_{min} \sim D
+\end{equation}
+for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
+The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
+
+\subsubsection{Other Coefficients: Approximations}
 Because the damping plate has a more substantial impact on the spar coefficients than the float coefficients, the former are found not by using MEEM but by scaling existing solutions that include the damping plate.
 \tableautorefname~\ref{tab:hydro-methods} summarizes the methods used to obtain each coefficient.
 
@@ -136,10 +156,9 @@ Because the damping plate has a more substantial impact on the spar coefficients
     \centering
     \begin{tabular}{cc}
          Coefficient& Method\\ \hline
-         $A_f$, $B_f$, $\gamma_f$, $B_m$, $\gamma_m$& MEEM\\
+         $A_f$, $B_f$, $\gamma_f$ & MEEM\\
          $A_s$& Approximate $\omega\rightarrow\infty$ solution (\equationautorefname~\ref{eq:As})\\
          $A_c$, $B_s$, $B_c$, $\gamma_s$& Nominal BEM solution, scaled with $D_d$ and $T_s$\\
-         $A_m$ & Approximate from $A_f$ and $A_s$ (\equationautorefname~\ref{eq:Am})\\
     \end{tabular}
     \caption{Method of computing different hydrodynamic coefficients in MDOcean}
     \label{tab:hydro-methods}
@@ -165,11 +184,18 @@ Meanwhile, the spar damping and excitation ($B_s$ and $\gamma_s$) and the coupli
 Specifically, interpolation is performed over the nondimensional damping plate diameter $k D_d$.
 For $|\gamma_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{s,nom})}$ is applied to account for the decrease of excitation with depth.
 
-Finally, for merged geometry, MEEM is used to calculate the damping $B_m$ and excitation $\gamma_m$ since they are less affected by the damping plate, while the added mass $A_m$ is approximated as the sum of the float and spar coefficients:
-\begin{equation}\label{eq:Am}
-    A_m = A_f + A_s
+Computing the float coefficients in a different way than the spar and coupling coefficients introduces the possibility of violating physical requirements of the solution.
+In particular, the damping matrix must be positive definite because it represents a dissipative force where outgoing waves remove energy from the system, and the added mass matrix must be positive definite because it represents the kinetic energy of the fluid which must be non-negative.
+\begin{equation}\label{eq:open-loop-stabilty}
+    \det(\mathbf{A_{h,op}})=A_f A_s - A_c^2>0 \,, \quad
+    \det(\mathbf{B_{h,op}})=B_f B_s - B_c^2>0
 \end{equation}
-This approximation is reasonable since the bottom of the damping plate is far from the bottom of the float, so the mass of water that each surface displaces is nearly independent.
+This positive-definiteness may be violated for certain combinations of coefficients and can cause the system dynamics to become unstable.
+Even when other forces such as body inertia, drag, friction, and control stabilize the system, violation of the conditions of \cref{eq:open-loop-stabilty} can artificially inflate power production.
+These conditions must be checked for each sea state and the coefficients adjusted if needed.
+MDOcean chooses to decrease the magnitude of the coupling coefficients $|A_c|$ and $|B_c|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
+This intends to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
+
 %  \subsubsection{Spar Dynamics}
 % The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \cite{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
 % While updating these models is important future work, a fixed spar is assumed for this study. Thus the results can be considered more dynamically representative of a single-body point absorber or a two-body point absorber with bottom-mounted spar, as might be encountered in shallow water. Nonetheless, calculations still utilize the 45 m water depth of Humboldt Bay, and the results provide relevant preliminary design insights about a floating spar device, especially because the spar structures and economics are still considered. To ensure that the fixed spar assumption is reasonably accurate, the spar amplitude is required to remain small.
@@ -201,16 +227,6 @@ This approximation is reasonable since the bottom of the damping plate is far fr
 %     P_{spar~floating} = \frac{c_1}{c_2T^2+c_3T+c_4} P_{spar~fixed}
 % \end{equation}
 % which adjusts only the power (not the amplitude). A fit of MDOcean and RM3 report yielded $[c_1,c_2,c_3,c_4]=[23,1,-15,86]$, and the coefficients can be set to $[1,0,0,1]$ to disable the tuning. 
-
-A second limitation of the present implementation of MEEM is numerical overflow.
-To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$:
-\begin{equation}\label{eq:delta-z-min-intro}
-    \Delta z_{min} \sim D
-\end{equation}
-for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
-The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
-
-%The current implementation of MEEM yields only the magnitude, not phase, of the excitation coefficient (using equation 99 rather than 97 of \cite{chau_inertia_2012}). Therefore the phase is set to zero, an approximation that will be shown in the following section to be adequate for single body dynamics.
 
 
 %TC:break Dynamics and Control
