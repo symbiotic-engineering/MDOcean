@@ -618,6 +618,11 @@ function [idx_closed_loop_unstable,...
                     stiff_matrix_ol = K_f(idx_H,idx_T);
                 end
     
+                % open loop matrices should all be stable, otherwise
+                % indicates an error with the coefficients
+                assert( det(mass_matrix_ol) >0 && det(damp_matrix_ol)>0 ...
+                     && det(stiff_matrix_ol)>0, 'Open loop dynamics are unstable' )
+
                 num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
                 den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
                 Z_pto = num ./ den;

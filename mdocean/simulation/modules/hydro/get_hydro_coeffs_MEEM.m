@@ -46,5 +46,9 @@ gamma_f_over_rho_g = sqrt(2 * mult .* B_f_over_rho_w ./ m0); % Haskind relations
     A_c_over_rho,B_c_over_rho_w] = spar_dynamics(a1/a3, 2*a3, d1, ...
                                                     spar_excitation_coeffs, m0, mult);
 
+% saturate A_c and B_c to ensure positive definite matrices
+% this prevents violation of energy balance
+A_c_over_rho   = sign(A_c_over_rho)   .* min(abs(A_c_over_rho),   0.999 * sqrt(A_f_over_rho   .* A_s_over_rho));
+B_c_over_rho_w = sign(B_c_over_rho_w) .* min(abs(B_c_over_rho_w), 0.999 * sqrt(B_f_over_rho_w .* B_s_over_rho_w));
 
 end
