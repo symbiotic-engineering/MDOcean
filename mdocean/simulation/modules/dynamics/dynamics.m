@@ -133,7 +133,8 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
         P_matrix = real_P * in.power_scale_multibody;
     end
     
-    % set values where JPD=0 to 0 to not include them in constraint
+    % set values where JPD=0 or response=Inf (unstable) to 0 to not include them in constraint
+    idx_constraint = idx_constraint | isinf(mag_X_f);
     mag_X_u_const = mag_X_u;
     mag_X_u_const(idx_constraint) = 0;
     mag_X_f_const = mag_X_f;
