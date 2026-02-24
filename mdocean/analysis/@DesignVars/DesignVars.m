@@ -8,7 +8,7 @@ classdef DesignVars < GenericAnalysis
     end
 
     methods (Static)
-        intermed_result_struct = analysis_fcn(~,b)
+        intermed_result_struct = analysis_fcn(p,b)
 
         [fig_array,...
                  tab_array_display,...
