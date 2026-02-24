@@ -698,9 +698,10 @@ pipeline:
       inputs:
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
-        - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
-        - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
-        - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
+        #- ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
+        #- ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
+        #- ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
+        #- mdocean/results/ParetoFigFunc/intermed.mat
         - ./mdocean/analysis/GenericAnalysis.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -2989,19 +2990,56 @@ pipeline:
     #     - test-results/
     #   inputs: 
     #     - mdocean/
-    move-results:
+    move-re-results:
       kind: matlab-command
       environment: _system
       inputs:
-        - results/
+        - results/ReadNonMatlabFigs/
+        - results/DesignSpaceExploration/
+        - results/Comparison/
+        - results/GradientOptimFigFunc/
+        - results/Multistart/
+        - results/ParamSensitivities/
+        - results/ParetoFigFunc/
+        - results/AllFigCompare/
+        - results/ParetoSweep/
+        - results/Constraints/
+        - results/DesignVars/
+        - results/Parameters/
+        - results/LocationSensitivity/
         - mdocean/plots/fig_tab_pub_mapping.m
         - mdocean/plots/move_results_to_pubs.m
+        - mdocean/plots/non_matlab_figs/pdf/
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
+      command: add_mdocean_path(); move_results_to_pubs('RE');
+    move-aor-results:
+      kind: matlab-command
+      environment: _system
+      inputs:
+        - results/ReadNonMatlabFigs/
+        - results/SparHydro/
+        - results/DescFcns/
+        - results/RunSingleFigFunc/
+        - results/Wecsim/
+        - results/HydroCoeffFigFunc/
+        - results/Validation/
+        - results/Runtime/
+        - results/DampingPlateStructures/
+        - results/ForceSaturationFigFunc/
+        - results/DesignSpaceExploration/
+        - results/Meem/
+        - results/Slamming/
+        - results/Cost/
+        - results/Validation/
+        - mdocean/plots/fig_tab_pub_mapping.m
+        - mdocean/plots/move_results_to_pubs.m
+        - mdocean/plots/non_matlab_figs/pdf/
+      outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs();
+      command: add_mdocean_path(); move_results_to_pubs('AOR');
     copy-bib:
       kind: map-paths
       paths:
