@@ -229,6 +229,7 @@ end
 
 function errors = report_error_breakdown()
     p = parameters();
+    p.control_type = 'damping';
     b = var_bounds();
     X = [b.X_noms; 1];
     
