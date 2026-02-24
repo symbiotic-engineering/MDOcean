@@ -1,5 +1,5 @@
 % add the desired outputs to runRM3Parallel.m and then run runRM3Parallel while in
-% the mdocean/inputs/validation/WEC-Sim/RM3 folder
+% the mdocean/inputs/validation/WECSim/RM3 folder
 
 regular = true;
 
@@ -55,9 +55,9 @@ output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
 if p.use_multibody
-    simu.simMechanicsFile = 'inputs/validation/WEC-Sim/RM3/RM3_translation.slx';      % Specify Simulink Model File
+    simu.simMechanicsFile = 'inputs/validation/WECSim/RM3/RM3_translation.slx';      % Specify Simulink Model File
 else
-    simu.simMechanicsFile = 'inputs/validation/WEC-Sim/RM3/RM3_fixed.slx';
+    simu.simMechanicsFile = 'inputs/validation/WECSim/RM3/RM3_fixed.slx';
 end
 simu.mode = 'accelerator';                   % Specify Simulation Mode ('normal','accelerator','rapid-accelerator')
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
@@ -122,18 +122,18 @@ simu.stateSpace = 1;                      % Turn on State Space
 
 %% Body Data
 % Float
-body(1) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5');      
+body(1) = bodyClass('inputs/validation/WECSim/RM3/hydroData/rm3.h5');      
     % Create the body(1) Variable, Set Location of Hydrodynamic Data File 
     % and Body Number Within this File.   
-body(1).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/float.stl';    % Location of Geomtry File
+body(1).geometryFile = 'inputs/validation/WECSim/RM3/geometry/float.stl';    % Location of Geomtry File
 body(1).mass = 'equilibrium';                   
     % Body Mass. The 'equilibrium' Option Sets it to the Displaced Water 
     % Weight.
 body(1).inertia = [20907301 21306090.66 37085481.11];  % Moment of Inertia [kg*m^2]     
 
 % Spar/Plate
-body(2) = bodyClass('inputs/validation/WEC-Sim/RM3/hydroData/rm3.h5'); 
-body(2).geometryFile = 'inputs/validation/WEC-Sim/RM3/geometry/plate.stl'; 
+body(2) = bodyClass('inputs/validation/WECSim/RM3/hydroData/rm3.h5'); 
+body(2).geometryFile = 'inputs/validation/WECSim/RM3/geometry/plate.stl'; 
 body(2).mass = 'equilibrium';                   
 body(2).inertia = [94419614.57 94407091.24 28542224.82];
 
