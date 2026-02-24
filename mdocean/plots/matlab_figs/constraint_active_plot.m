@@ -21,7 +21,7 @@ function [idx,f] = constraint_active_plot(residuals,fval,tol,b,reversed)
 
     % merge sea state slamming constraints
     idx_slamming = contains(b.constraint_names,'slamming');
-    idx_slamming_first = strcmp(b.constraint_names,'prevent_slamming1');
+    idx_slamming_first = strcmp(b.constraint_names,'prevent_slamming_operational_1');
     idx_slamming_after = idx_slamming & ~idx_slamming_first;
     nlcon_active(:,idx_slamming_first) = any(nlcon_active(:,idx_slamming),2);
     nlcon_active(:,idx_slamming_after) = [];
