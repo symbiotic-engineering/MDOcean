@@ -496,30 +496,19 @@ function [mag_U,phase_U,...
     B_l = B_l + stabilize_B * recommended_increase_Bl;
     K_l = K_l + stabilize_K * recommended_increase_Kl;
     
+    % check that stabilizing worked
     if stabilize_K || stabilize_B
-        need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
-                              + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
-        count = 0;
-        while need_more_stabilizing ~= 0 && count<10
-            count = count+1;
-
-            [idx_closed_loop_unstable,...
+        [idx_closed_loop_unstable,...
              recommended_increase_Bl,...
              recommended_increase_Kl] = check_cl_stability(B_c, B_f, B_s, K_f, K_s, ...
                                                             m_c, m_f, m_s, w, ...
                                                             K_l, B_l, idx_not_stabilizable, ...
                                                             multibody);
 
-                
-            B_l = B_l + stabilize_B * recommended_increase_Bl;
-            K_l = K_l + stabilize_K * recommended_increase_Kl;
-
-            need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
+        need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                               + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
-        end
-    end
-    if stabilize_K && stabilize_B
-        assert(all([recommended_increase_Kl(:); recommended_increase_Bl(:)]==0))
+
+        assert(need_more_stabilizing==0)
     end
 
     % response
