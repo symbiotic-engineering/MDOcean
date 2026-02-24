@@ -29,7 +29,7 @@ if any(exist_vec)
     wecSimSourceFolder = [wecSim_folder filesep 'source'];
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimSourceFolder))
-    addpath([mdocean_folder filesep 'inputs' filesep 'validation' filesep 'WEC-Sim'],'-begin') % make sure MDOcean's modified readWAMIT takes precedence over WecSim's
+    addpath([mdocean_folder filesep 'inputs' filesep 'validation' filesep 'WECSim'],'-begin') % make sure MDOcean's modified readWAMIT takes precedence over WecSim's
     clear wecSimSourceFolder wecSim_folder folder_vec
 end
 
