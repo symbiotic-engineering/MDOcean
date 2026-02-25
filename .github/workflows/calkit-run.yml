@@ -75,7 +75,7 @@ jobs:
           fi
   
           set +e # Continue even if pull fails
-          calkit pull
+          git pull --recurse-submodules
           PULL_STATUS=$?
 
           if [ $PULL_STATUS -ne 0 ]; then
@@ -87,6 +87,7 @@ jobs:
             git config branch."$BRANCH".merge refs/heads/"$BRANCH"
           fi
 
+          calkit dvc pull
           calkit save dvc.lock dvc.yaml .calkit/ -m "Run pipeline"
       - if: ${{ steps.run_calkit.outcome == 'failure' }}
         run: |
