@@ -20,7 +20,7 @@ function fig = make_slamming_plot(T,Hs,phase_X,theta_slam,X_slam_max,X_slam_min,
     theta_new = pi-abs(pi-wrapTo2Pi(theta_slam));
 
     min_level = min([phase_X(:);theta_new(:)]);
-    max_level = max([phase_X(:);theta_new(:)]);
+    max_level = max([phase_X(isfinite(phase_X));theta_new(:)]);
     lims = [min_level,max_level]/pi;
     levels = sort([0.5 0.55 floor(lims(1)):0.1:ceil(lims(2))]);
 

@@ -690,9 +690,6 @@ stages:
     deps:
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
-      - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
-      - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
-      - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
@@ -817,7 +814,6 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/DesignSpaceExploration/intermed.mat
     outs:
-      - results/DesignSpaceExploration/experiments_pareto.pdf
       - results/DesignSpaceExploration/experiments_ratios.pdf
       - results/DesignSpaceExploration/experiments_results.tex
       - results/DesignSpaceExploration/end.mat
@@ -2995,18 +2991,56 @@ stages:
       - results/Wecsim/end.mat
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
-  move-results:
-    cmd: matlab -batch "add_mdocean_path(); move_results_to_pubs();"
+  move-re-results:
+    cmd: matlab -batch "add_mdocean_path(); 
+      move_results_to_pubs('RE');"
     deps:
-      - results/
+      - results/ReadNonMatlabFigs/
+      - results/DesignSpaceExploration/
+      - results/Comparison/
+      - results/GradientOptimFigFunc/
+      - results/Multistart/
+      - results/ParamSensitivities/
+      - results/ParetoFigFunc/
+      - results/AllFigCompare/
+      - results/ParetoSweep/
+      - results/Constraints/
+      - results/DesignVars/
+      - results/Parameters/
+      - results/LocationSensitivity/
       - mdocean/plots/fig_tab_pub_mapping.m
       - mdocean/plots/move_results_to_pubs.m
+      - mdocean/plots/non_matlab_figs/pdf/
     outs:
       - pubs/renewable-energy-mdo/figs/from-matlab/
       - pubs/renewable-energy-mdo/tables/from-matlab/
+    desc: Automatically generated from the 'move-re-results' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  move-aor-results:
+    cmd: matlab -batch "add_mdocean_path(); 
+      move_results_to_pubs('AOR');"
+    deps:
+      - results/ReadNonMatlabFigs/
+      - results/SparHydro/
+      - results/DescFcns/
+      - results/RunSingleFigFunc/
+      - results/Wecsim/
+      - results/HydroCoeffFigFunc/
+      - results/Validation/
+      - results/Runtime/
+      - results/DampingPlateStructures/
+      - results/ForceSaturationFigFunc/
+      - results/DesignSpaceExploration/
+      - results/Meem/
+      - results/Slamming/
+      - results/Cost/
+      - mdocean/plots/fig_tab_pub_mapping.m
+      - mdocean/plots/move_results_to_pubs.m
+      - mdocean/plots/non_matlab_figs/pdf/
+    outs:
       - pubs/applied-ocean-research-model/figs/from-matlab/
       - pubs/applied-ocean-research-model/tables/from-matlab/
-    desc: Automatically generated from the 'move-results' stage in 
+    desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   copy-bib:
     cmd: calkit map-paths --file-to-file 

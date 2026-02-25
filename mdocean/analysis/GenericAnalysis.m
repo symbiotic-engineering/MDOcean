@@ -205,7 +205,11 @@ classdef (Abstract) GenericAnalysis
             % Flatten
             figs_flat = figs_in(:).';
 
-            valid_mask = ishghandle(figs_flat) & isprop(figs_flat,'Type') & strcmp({figs_flat.Type},'figure');
+            % check if figure
+            has_type = isprop(figs_flat,'Type');
+            is_fig = false(size(figs_flat));
+            is_fig(has_type) = strcmp({figs_flat(has_type).Type},'figure');
+            valid_mask = ishghandle(figs_flat) &  is_fig;
 
             figs_flat(~valid_mask) = gobjects(1);
 

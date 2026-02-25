@@ -8,11 +8,11 @@ function intermed_result_struct = analysis_fcn(p,b)
     % Run design space exploration experiments
     [X_ins,ratios,LCOE,cost,power,failed] = experiments(p,b);
 
-    cd('..')
-    pareto = ParetoFigFunc(p,b);
-    pareto = pareto.run_analysis_from_load_if_possible();
-    pareto_results_struct = pareto.intermed_result_struct.r1;
-    cd('mdocean')
+%     cd('..')
+%     pareto = ParetoFigFunc(p,b);
+%     pareto = pareto.run_analysis_from_load_if_possible();
+%     pareto_results_struct = pareto.intermed_result_struct.r1;
+%     cd('mdocean')
     
     % Store figure for post-processing
     intermed_result_struct.b = b;
@@ -22,5 +22,5 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.cost = cost;
     intermed_result_struct.power = power;
     intermed_result_struct.failed = failed;
-    intermed_result_struct.pareto_results_struct = pareto_results_struct;
+%     intermed_result_struct.pareto_results_struct = pareto_results_struct;
 end
