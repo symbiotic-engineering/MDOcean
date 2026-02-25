@@ -169,7 +169,7 @@ end
 B_p = mcr.cases(:,3);
 K_p = mcr.cases(:,4);
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p','K_p')
+    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto','X','p','B_p','K_p','git_hash')
 
 clear imcr totalNumOfWorkers
 
