@@ -44,13 +44,19 @@ if ~contains(status,'working tree clean')
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-uuid = char(matlab.lang.internal.uuid());
 C_d_s = num2str(p.C_d_spar);
 C_d_f = num2str(p.C_d_float);
 mb = num2str(p.use_multibody);
+if p.T_s_over_D_s==29/6
+    geom = 'wecsim';
+elseif p.T_s_over_D_s==35/6
+    geom = 'report';
+else
+    geom='custom';
+end
 
-output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
-                    '_meem_' meem '_git_' git_hash '_uuid_' uuid];
+output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f ...
+                    '_multibody_' mb '_meem_' meem '_geom_' geom];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
