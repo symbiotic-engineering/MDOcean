@@ -6,7 +6,7 @@ function intermed_result_struct = analysis_fcn(~,~)
 % :param ~: ~
 % :returns: Intermediate results struct (cached heavy analyses)
     % Run WEC-Sim dynamics validation
-    runOnlyFewSeaStates = true;
+    runOnlyFewSeaStates = false;
 
     case_cell = make_all_cases(runOnlyFewSeaStates);
     filename_cell = run_wecsim_all_cases(case_cell);
