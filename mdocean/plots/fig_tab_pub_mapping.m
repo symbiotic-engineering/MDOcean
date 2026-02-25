@@ -75,11 +75,11 @@ figs_in_AOR{19} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{20} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_AOR{21} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
-figs_in_AOR{22} = 'Meem.meem_regions';
+figs_in_AOR{22} = 'ReadNonMatlabFigs.meem_regions';
 figs_in_AOR{23} = 'Meem.meem_sparsity';
 figs_in_AOR{24} = 'Meem.meem_validation';
 figs_in_AOR{25} = 'Meem.meem_matching';
-figs_in_AOR{26} = 'Meem.meem_convergence';
+figs_in_AOR{26} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';

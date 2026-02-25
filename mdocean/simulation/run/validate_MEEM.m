@@ -45,7 +45,7 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     plot_potential_validation()
 
     %% run validation of hydro coeffs for various frequencies
-    m0_nums = [linspace(0,0.1,10), linspace(0.1,6,100)];
+    m0_nums = [linspace(0.01,0.1,10), linspace(0.1,6,100)];
     plot_phi = false;
     show_A = false;
     [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
@@ -54,7 +54,7 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     figHydroCoeff = figure;
     plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
     ylabel('Nondimensional Hydro Coeff')
-    xlabel('Wavenumber m0')
+    xlabel('Nondimensional Wavenumber m_0h')
     legend('Added Mass','Damping')
     grid on
     hold on

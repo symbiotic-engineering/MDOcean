@@ -1,6 +1,5 @@
 
-clear all
-close all
+function [fig_vs_omega,fig_vs_NMK] = convergence_study()
 
 %% settings 
 auto_BCs = false;
@@ -31,10 +30,10 @@ m0_nums = linspace(0.1,5,100);
 spatial_res = 30;
 
 num_harmonics = [3 5 10 20 30];
-run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
+[fig_vs_omega,fig_vs_NMK] = run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_nums, spatial_res, show_A, plot_phi);
 
-function run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
+function [fig1,fig2] = run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs, ...
                        a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi)
 
     numels = [numel(a1_num), numel(a2_num), numel(d1_num), numel(d2_num), ...
@@ -51,9 +50,7 @@ function run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs,
     end
 
     %% plot hydro coeffs vs wavenumber
-    if i==1
-        figure
-    end
+    fig1 = figure;
     plot(m0_num,mu_nondim, m0_num,lambda_nondim,'--')
     xlabel('Wavenumber m_0')
     ylabel('Nondimensional Hydro Coeff')
@@ -63,10 +60,12 @@ function run_multiple_harmonics(num_harmonics, heaving_IC, heaving_OC, auto_BCs,
     legend(cellstr(num2str([num_harmonics(:); num_harmonics(:)])))
     improvePlot
 
-    figure
+    fig2 = figure;
     plot(num_harmonics, mu_nondim(:,1), '*-', num_harmonics, lambda_nondim(:,1),'*-')
     xlabel('Number of Harmonics')
     ylabel('Nondimensional Hydro Coefficient')
     legend('Added Mass','Damping')
     improvePlot
+end
+
 end
