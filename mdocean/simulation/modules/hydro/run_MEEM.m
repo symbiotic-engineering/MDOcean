@@ -677,7 +677,8 @@ function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name,z_cutoffs)
     hold on
     plot(Z(idx_a2_minus),phi2_a2,'b-', ...
          Z(idx_a2_plus), phie_a2,'c--')
-    legend({[name '_1 at a_1'],[name '_2 at a_1'],[name '_2 at a_2'],[name '_e at a_2']},'interpreter','tex')
+    legend({[name ' 1 at $a_1$'],[name ' 2 at $a_1$'],[name ' 2 at $a_2$'],[name ' e at $a_2$']},...
+                'interpreter','latex','location','best')
     xlabel('Z')
     ylabel(['Magnitude of ' name])
     title([name ' Matching'])
