@@ -268,7 +268,9 @@ function [X_below_wave,diameter_margin] = slamming(A, k, D, phase_X, mag_X, delt
 
     idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
     X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
-    
+    X_slam_min( idx_imag ) = NaN;
+    X_slam_max( idx_imag ) = NaN;
+
     if any(idx_large_wave(:))
         k_max_large_wave = max(k(idx_large_wave),[],'all');
         A_max_large_wave = max(A(idx_large_wave),[],'all');
