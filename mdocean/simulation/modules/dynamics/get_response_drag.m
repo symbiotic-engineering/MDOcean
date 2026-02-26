@@ -45,7 +45,7 @@ function [mag_U,phase_U,...
                                                     dynam_inputs{:}, ...
                                                     max_drag_iters_fixed_point);
 
-        idx_use = ((ctrl_mult >= 0 & ctrl_mult < 1e4) & ~isnan(mag_X_f)) | isnan(B_h_f);
+        idx_use = ((ctrl_mult >= 0 & ctrl_mult < 1e4) & isfinite(mag_X_f)) | isnan(B_h_f);
 
         % update guesses
         [X_f_guess(idx_use),phase_X_f_guess(idx_use),...
@@ -457,6 +457,11 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
 end
 
 function [B_drag, K_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const)
+
+    idx_inf = isinf(X_guess); % override unstable guesses to prevent extra nans
+    X_guess(idx_inf) = 1;
+    phase_X_guess(idx_inf) = 0;
+
     mag_v = w .* X_guess;
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
