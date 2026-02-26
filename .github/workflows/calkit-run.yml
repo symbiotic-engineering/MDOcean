@@ -89,8 +89,7 @@ jobs:
 
           calkit dvc pull
           calkit save dvc.lock dvc.yaml .calkit/ -m "Run pipeline"
-      - if: ${{ steps.run_calkit.outcome == 'failure' }}
-        run: |
+      - run: |
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
