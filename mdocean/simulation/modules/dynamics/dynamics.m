@@ -234,8 +234,8 @@ function [X_constraints,wave_amp] = amplitude_constraints(mag_X_u_const, mag_X_f
     X_max_linear_f = 1/10 * (in.h - in.T_f_2);
     X_max_linear_s = 1/10 * (in.h - in.T_s);
     
-    X_below_linear_f = X_max_linear_f / X_f_max - 1;
-    X_below_linear_s = X_max_linear_s / X_s_max - 1;
+    X_below_linear_f = 1 - X_f_max / X_max_linear_f;
+    X_below_linear_s = 1 - X_s_max / X_max_linear_s;
 
     % prevent bottom rising out of the water and top going into water (slamming/submersion)
     wave_amp = Hs/(2*sqrt(2));
