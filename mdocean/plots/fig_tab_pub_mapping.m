@@ -70,7 +70,7 @@ figs_in_AOR{9}  = 'DescFcns.drag_desc_fcn';
 figs_in_AOR{10} = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{11} = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
-figs_in_AOR{12} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram.pdf';
+figs_in_AOR{12} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram';
 figs_in_AOR{13} = 'HydroCoeffFigFunc.hydro_coeff_err';
 figs_in_AOR{14} = 'Validation.cost_vs_N_WEC';
 figs_in_AOR{15} = 'Runtime.sim_runtime';
