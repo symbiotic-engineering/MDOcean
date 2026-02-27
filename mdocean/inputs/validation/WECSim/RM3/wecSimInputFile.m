@@ -55,7 +55,7 @@ else
     geom='custom';
 end
 
-output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f ...
+output_filename = ['../results/Wecsim/wecsim_sparcd' C_d_s '_floatcd' C_d_f ...
                     '_multibody_' mb '_meem_' meem '_geom_' geom];
 
 %% Simulation Data

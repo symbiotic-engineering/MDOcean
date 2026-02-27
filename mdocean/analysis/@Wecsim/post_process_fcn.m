@@ -20,16 +20,23 @@ function [fig_array,...
      filename_cell = intermed_result_struct.filename_cell;
      runOnlyFewSeaStates = intermed_result_struct.runOnlyFewSeaStates;
 
-     [err_structs, fig_array, validation_table] = validate_dynamics_plots(case_cell,filename_cell,...
+     [err_structs, fig_cell, validation_table] = validate_dynamics_plots(case_cell,filename_cell,...
                                                             runOnlyFewSeaStates);
 
-     tab_array_display = {validation_table};
-     tab_array_latex = {validation_table};
+    % if histogram_separate_figures=true, 108 figures: fig_cell is 3 nested 
+    %    4x1 cells, each cell has 9 figs
+    % if histogram_separate_figures=false, 99 figures: fig_cell is 3 nested
+    %    5x1 cells, cells 1-4 have 8 figures and cell 5 has 1 figure
+    tmp = [fig_cell{:}]; 
+    fig_array = [tmp{:}]; 
+
+    tab_array_display = {validation_table};
+    tab_array_latex = {validation_table};
      
-     tab_firstrows = {[]};
-     tab_colspecs = {[]};
+    tab_firstrows = {[]};
+    tab_colspecs = {[]};
      
-     end_result_struct.err_structs = err_structs;
+    end_result_struct.err_structs = err_structs;
 end
 
 function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename_cell,runOnlyFewSeaStates)
@@ -45,7 +52,7 @@ function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename
     errors_report_mb = err_structs{3}; % first index is wecsim to report error, second index is mdocean to report error
 
     %% make table comparing error of mdocean to various ground truths
-    errors_report_mdocean = structfun(@(s)s(2), errors_report_mb,'UniformOutput',false); % just mdocean to report error
+    errors_report_mdocean = structfun(@(s)s([2,4]), errors_report_mb,'UniformOutput',false); % just mdocean to report error
     T_report = struct2table(errors_report_mdocean);
     T_singlebody = struct2table(errors_wecsim_sb);
     T_multibody = struct2table(errors_wecsim_mb);
@@ -55,7 +62,7 @@ function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename
 end
 
 function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFewSeaStates)
-    histogram_sep_figures = true;
+    histogram_sep_figures = false;
     num_case_groups = size(case_cell,1);
     err_struct_figs_cell = cell(num_case_groups,2);
 
@@ -80,7 +87,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
 
         % initialize containers for this group
         error_struct = struct();
-        fig_mat = cell(numel(p_array),1);
+        fig_mat = cell(numel(p_array)+1-histogram_sep_figures,1);
 
         for p_idx = 1:numel(p_array)
             p = p_array(p_idx);
@@ -106,7 +113,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
                                                     runOnlyFewSeaStates,ax,width);
 
             if histogram_sep_figures
-                fig_vec = [fig_vec hist_fig];
+                fig_vec = [hist_fig fig_vec];
             end
             
             error_struct.(my_fieldnames{p_idx}) = [weighted_pwr_err, max_amp_err];
@@ -121,7 +128,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             title(leg,'Error in:')
             leg.Position = [0.514,0.212,0.226,0.222];
             
-            if all(p_array.use_multibody)
+            if all([p_array.use_multibody])
                 mb_string = 'Multi-Body';
             else
                 mb_string = 'Single Body';
@@ -131,6 +138,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             title(t,[mb_string ' Dynamics'])
             improvePlot
             hist_fig.Position = [7.4,137,1523.2,600];
+            fig_mat{end} = hist_fig;
         end
         err_struct_figs_cell(case_group_idx,:) = {error_struct, fig_mat};
     end
@@ -156,7 +164,7 @@ end
 function make_report(figs,wecsim_filename,p)
     import mlreportgen.report.* 
     import mlreportgen.dom.* 
-    rpt = Report(['DynamicValidation_' wecsim_filename],'pdf'); 
+    rpt = Report(wecsim_filename,'pdf'); 
     rpt.Layout.Landscape = true;
     pm = PageMargins();
     pm.Left='0.5in'; pm.Right='0.5in';

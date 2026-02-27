@@ -45,17 +45,21 @@ function [weighted_power_error,...
         'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
     figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
     
-    if ~report
-        power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
-                                                             results_sim.power_mech_unsat);
-        float_amp_err_matrix  = compute_percent_error_matrix(results_actual.float_amplitude, ...
-                                                             results_sim.float_amplitude);
-        max_float_amp_error   = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
-                                                             max(results_sim.float_amplitude,   [],'all') );
-    else
-        power_mech_err_matrix = [];
-        float_amp_err_matrix = [];
-        max_float_amp_error = [];
+    % compare power and amplitude error over all sea states in JPD
+    weighted_power_error  = zeros([1,length(results_sim)]);
+    max_float_amp_error   = zeros([1,length(results_sim)]);
+    power_mech_err_matrix = zeros([size(p.JPD) length(results_sim)]);
+    float_amp_err_matrix  = zeros([size(p.JPD) length(results_sim)]);
+
+    for i=1:length(results_sim)
+        power_mech_err_matrix(:,:,i) = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
+                                                             results_sim(i).power_mech_unsat);
+        float_amp_err_matrix(:,:,i)  = compute_percent_error_matrix(results_actual.float_amplitude, ...
+                                                             results_sim(i).float_amplitude);
+        max_float_amp_error(i)  = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
+                                                             max(results_sim(i).float_amplitude,   [],'all') );
+        weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
+                                                          results_actual.power_mech_unsat, p.JPD);
     end
 
     % todo: use actual pretty variables titles with units
@@ -66,15 +70,6 @@ function [weighted_power_error,...
     %      'Capture Width / Max Capture Width (-)',...
     %      'Capture Width / Max Capture Width (-)',...
     %     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-    
-    % compare average power over all sea states in JPD
-    weighted_power_error = zeros([1,length(results_sim)]);
-    for i=1:length(results_sim)
-    weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
-                                                          results_actual.power_mech_unsat, p.JPD);
-    end
-
-
 
 end
 %%
