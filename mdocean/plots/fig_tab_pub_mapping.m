@@ -70,7 +70,7 @@ figs_in_AOR{9}  = 'DescFcns.drag_desc_fcn';
 figs_in_AOR{10} = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{11} = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
-figs_in_AOR{12} = 'Wecsim.WECSim_error_histograms_multibody';
+figs_in_AOR{12} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram.pdf';
 figs_in_AOR{13} = 'HydroCoeffFigFunc.hydro_coeff_err';
 figs_in_AOR{14} = 'Validation.cost_vs_N_WEC';
 figs_in_AOR{15} = 'Runtime.sim_runtime';
@@ -92,17 +92,17 @@ figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
 figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{29} = 'Slamming.slamming_amplitude';
 figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison';
-figs_in_AOR{31} = 'Wecsim.wecsim_all_sea_states';
-figs_in_AOR{31+6} = 'Wecsim.wecsim_all_sea_states_2';
-figs_in_AOR{31+7} = 'Wecsim.wecsim_all_sea_states_3';
+figs_in_AOR{31}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{31+6} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{31+7} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{31+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - structures
 figs_in_AOR{32} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{33} = 'ReadNonMatlabFigs.trapezoid';
 figs_in_AOR{34} = 'ReadNonMatlabFigs.damping_plate_flowchart';
 figs_in_AOR{35} = 'DampingPlateStructures.damping_plate_moment';
 figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
-% appendix D - economics
-% appendix E - parameters
+% appendix D - parameters
 
 % graphical abstract (unnumbered so at the end)
 figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
