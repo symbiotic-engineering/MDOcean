@@ -689,58 +689,7 @@ These equations assume that the spar is compact, meaning that local buckling of 
 %     i = 1..3, ~& j = 1..2
 % \end{aligned}
 % \end{equation}
-\clearpage
-\section{Economic Model Details}
-\label{sec:appendix-econ}
-The capital cost is a simple summation of the device costs, which depend on the WEC design, and the balance of system and financial costs $C_0$, which are assumed constant.
-\begin{equation}
-	CAPEX = N_{WEC}C_{unit} + C_0
-\end{equation}
-The value for $C_0$ is obtained as the development, infrastructure, profit margin, installation, and contingency costs in the RM3 cost breakdown structure \cite{neary_reference_2014}.
 
-Unit device costs include that of the drivetrain $C_{drv}$, generator $C_{gen}$, structural material $C_{struct}$, and a fixed cost $C_{fixed}$ for components like mooring whose scaling with design is not captured here:
-\begin{equation}
-    C_{unit} =  C_{drv}(P_{pk,elec}) + C_{gen}(\tau) + C_{struct}(V_{struct}) + C_{fixed}
-\end{equation}
-The drivetrain cost model used in \cite{RM3} comes from an unpublished design and cost estimate for a hydrualic PTO that ReVision Consulting performed in 2011.
-The ReVision study estimated unit costs for a 100~kW peak device at quantity 1 and 100.
-The reference model project scaled the costs linearly with peak power (except for the riser cable and control system, whose cost does not scale with power) and found component-level progress ratios to describe the economies of scale.
-%\hl{describe my force power scaling}
-% is taken from the NREL System Advisory Model for the RM3 hydraulic system, and scales slightly less than linearly with peak power rating \cite{nakhai_techno-economic_2022}:
-% \begin{equation}
-%     C_{drv} = 7.216 P_{pk,elec}^{0.91}
-% \end{equation}
-% Generator cost estimates come from linear curve fits of commercial electric machines performed in \cite{nakhai_techno-economic_2022}. Induction and permanent magnet machines have different costs, each scaling linearly with the peak torque rating, so the cheaper of the two is chosen with a torque threshold:
-% \begin{equation}
-%     C_{gen} = \begin{cases}
-%     80.86 \tau + 1032, & 0~\leq\tau <47~\text{Nm, ~~~~induction generator} \\
-%     9.151 \tau + 4386, & 47\leq\tau \leq 4000~\text{Nm, permanent magnet generator}
-%     \end{cases}
-% \end{equation}
-%While the RM3 report only specifies a 286 kW power rating and does not specify the maximum PTO torque, the maximum PTO torque is calculated as
-The structural cost is the product of the structural volume and the material price $p_M$:
-\begin{equation}
-    C_{struct} = p_M V_{struct}
-\end{equation}
-
-%The operational expenditure $OPEX$ scales via power law with the number of WECs. The exponent and operational price coefficient $p_{op}$ are determined via a least-squares curve fit to (\hl{cite RM3 CBS data}):
-%\begin{equation}
-  %  OPEX = p_{op} N_{WEC}^{0.4433}
-%\end{equation}
-The annual energy production in kilowatt-hours is the average electrical power from equation~\eqref{eq:power-elec} multiplied by the number of hours per year.
-
-To better see the dependence of LCOE on design, one can divide out the constant factors and introduce various price constants $p_{(*)}$.
-Assuming a fixed $N_{WEC}, FCR,$ and $\eta_{op}$, the LCOE model then scales as:
-\begin{equation}\label{eq:LCOE-scale}
-  LCOE = \frac{p_\tau \tau + p_{P}P_{pk,elec}^{0.91} + p_{struct} V_{struct} + p_0}{P_{avg,elec}}
-\end{equation}
-The values of price and cost constants are given in \sectionautorefname~\ref{sec:appendix-parameters}.
-
-
-% To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
-% \begin{equation}\label{eq:LCOE-scale}
-%     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
-% \end{equation}
 
 \clearpage
 \section{Parameters}
