@@ -8,7 +8,7 @@ stages:
       md5: fea5a3fe219c56ceb0ec1fdcb281bba7
       size: 1171
   analysis-AllFigCompare:
-    cmd: matlab -batch "add_mdocean_path(); obj=AllFigCompare; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=AllFigCompare; 
       obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -199,10 +199,10 @@ stages:
     outs:
     - path: results/AllFigCompare/intermed.mat
       hash: md5
-      md5: de22050883cacf2d729b45dbf9c5e75d
+      md5: cdc997bf642e61a8b90e0cb86fc1d0cd
       size: 4605
   postpro-AllFigCompare:
-    cmd: matlab -batch "add_mdocean_path(); obj=AllFigCompare; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=AllFigCompare; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -392,16 +392,16 @@ stages:
       size: 11216
     - path: results/AllFigCompare/intermed.mat
       hash: md5
-      md5: de22050883cacf2d729b45dbf9c5e75d
+      md5: cdc997bf642e61a8b90e0cb86fc1d0cd
       size: 4605
     outs:
     - path: results/AllFigCompare/end.mat
       hash: md5
-      md5: 3d3e11b6f5d1afaa77d4a1cb15af6f9a
+      md5: 0d42bc07216cbb437923aedae7b8a62d
       size: 198
     - path: results/AllFigCompare/runtime_bar_chart.pdf
       hash: md5
-      md5: 02f0b1a75d73a98d79c40347a78acb61
+      md5: f3f5c3e8858accb09b12f369e5dc8beb
       size: 2233
   analysis-AsymptoticBVectorFigFunc:
     cmd: matlab -batch "add_mdocean_path(); obj=AsymptoticBVectorFigFunc; 
@@ -786,7 +786,8 @@ stages:
       md5: 1a6b8baab7e2b962bf176d018a6bf5d6
       size: 203
   analysis-Comparison:
-    cmd: matlab -batch "add_mdocean_path(); obj=Comparison; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Comparison; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Comparison/Comparison.m
       hash: md5
@@ -1008,10 +1009,10 @@ stages:
     outs:
     - path: results/Comparison/intermed.mat
       hash: md5
-      md5: 3e8587eb6702183291534c30df0a6e60
+      md5: 2ce5a01ac80609e4d7656efbb7e9fa27
       size: 739785
   postpro-Comparison:
-    cmd: matlab -batch "add_mdocean_path(); obj=Comparison; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Comparison; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Comparison/Comparison.m
@@ -1213,16 +1214,16 @@ stages:
       size: 11216
     - path: results/Comparison/intermed.mat
       hash: md5
-      md5: 3e8587eb6702183291534c30df0a6e60
+      md5: 2ce5a01ac80609e4d7656efbb7e9fa27
       size: 739785
     outs:
     - path: results/Comparison/comparison_power_matrix.pdf
       hash: md5
-      md5: d9e6c77c846647fcb4a315dd288eb458
+      md5: 99593949d5189edf0d35a8ec0a187340
       size: 24438
     - path: results/Comparison/end.mat
       hash: md5
-      md5: c7541690916c7a4694e8ab589aee55cd
+      md5: 451e43200b9f69c03ff80a88d729cc7f
       size: 191
     - path: results/Comparison/optimal_design_vars.tex
       hash: md5
@@ -1234,18 +1235,18 @@ stages:
       size: 2523
     - path: results/Comparison/overlaid_geometry.pdf
       hash: md5
-      md5: 47a841f818135d3998c2c59630bc79a4
+      md5: 899af53c942627f5c10448df8b650c01
       size: 5870
     - path: results/Comparison/overlaid_hydro_coeffs.pdf
       hash: md5
-      md5: edcd28451d919ba92ac5648a9765b2d2
+      md5: 204051c62c3ff70282a23bc400c17a33
       size: 17411
     - path: results/Comparison/probability_CDF.pdf
       hash: md5
-      md5: 8a7f3606b4ae2cded5ad7053ee98744e
+      md5: f7d67c361eab28749477c7d9da3531e6
       size: 19388
   analysis-Constraints:
-    cmd: matlab -batch "add_mdocean_path(); obj=Constraints; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Constraints; 
       obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Constraints/Constraints.m
@@ -1436,7 +1437,7 @@ stages:
     outs:
     - path: results/Constraints/intermed.mat
       hash: md5
-      md5: 60417d1de8cb2015f9619453864fd144
+      md5: d51385b01bb7cadb5465874ee2daad27
       size: 1139
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
@@ -1457,8 +1458,8 @@ stages:
       size: 432
     - path: pubs/renewable-energy-mdo/figs/from-matlab/
       hash: md5
-      md5: 28a8c7eabc110630395187c398e7d7a9.dir
-      size: 3032479
+      md5: efbd75af09a2cb26bdc63c3c40c001a1.dir
+      size: 3032445
       nfiles: 29
     - path: pubs/renewable-energy-mdo/mdocean.tex
       hash: md5
@@ -1474,9 +1475,9 @@ stages:
       size: 548851
     - path: pubs/renewable-energy-mdo/sections/
       hash: md5
-      md5: 367892f12e4362b9976177d0c60f36a4.dir
-      size: 295447
-      nfiles: 10
+      md5: 548b2a92378e68aa160628b86c1e22cc.dir
+      size: 180220
+      nfiles: 8
     - path: pubs/renewable-energy-mdo/tables/
       hash: md5
       md5: 33ac979eb610b8d856ed9836865bd62a.dir
@@ -1485,13 +1486,13 @@ stages:
     outs:
     - path: pubs/renewable-energy-mdo/aux/
       hash: md5
-      md5: 44a05db98111ba3b1f8dbe5e70c76895.dir
+      md5: 583fecb03512b17e0dd6901abfc7b84d.dir
       size: 254398
       nfiles: 19
     - path: pubs/renewable-energy-mdo/mdocean.pdf
       hash: md5
-      md5: 13033615ebb933178ac607cebe138170
-      size: 3570334
+      md5: 7381304b7ff243c4532bada8b080ba35
+      size: 3570300
     - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
       hash: md5
       md5: 09172620e8ddecd19889f847cc7783fd
@@ -1516,8 +1517,8 @@ stages:
       size: 659
     - path: pubs/applied-ocean-research-model/figs/from-matlab/
       hash: md5
-      md5: 16d31fddd97834a8d348e53e388cedbc.dir
-      size: 2912679
+      md5: 390a90e27087e5d12eeb3f9f2e0ce8ef.dir
+      size: 2912683
       nfiles: 36
     - path: pubs/applied-ocean-research-model/figs/manual/
       hash: md5
@@ -1562,19 +1563,19 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/aux/
       hash: md5
-      md5: 87d2ef2051cf85ed811b0ddfdba41a01.dir
-      size: 888083
+      md5: 23d3f9b52c39a3ae19d5705775ab91ad.dir
+      size: 888089
       nfiles: 34
     - path: pubs/applied-ocean-research-model/main.pdf
       hash: md5
-      md5: e3adcd62139f2de50dca17eec14f4a60
-      size: 4109249
+      md5: 2673dc09f25b6c5a349ae30b5805f36a
+      size: 4109237
     - path: pubs/applied-ocean-research-model/main.synctex.gz
       hash: md5
       md5: 36cd304d6b215a63c9c6723b6351b2f7
       size: 983864
   postpro-Constraints:
-    cmd: matlab -batch "add_mdocean_path(); obj=Constraints; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Constraints; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Constraints/Constraints.m
@@ -1764,7 +1765,7 @@ stages:
       size: 11216
     - path: results/Constraints/intermed.mat
       hash: md5
-      md5: 60417d1de8cb2015f9619453864fd144
+      md5: d51385b01bb7cadb5465874ee2daad27
       size: 1139
     outs:
     - path: results/Constraints/constraints.tex
@@ -1773,10 +1774,11 @@ stages:
       size: 540
     - path: results/Constraints/end.mat
       hash: md5
-      md5: 898babc34af7fb7b2a23459bdab3648b
+      md5: 37d463642028dac09ae62d88da36cf21
       size: 1132
   analysis-Cost:
-    cmd: matlab -batch "add_mdocean_path(); obj=Cost; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Cost/Cost.m
       hash: md5
@@ -1966,10 +1968,11 @@ stages:
     outs:
     - path: results/Cost/intermed.mat
       hash: md5
-      md5: e76501a00343639b710a9479eb3c12d7
+      md5: 6518802e7a8a6a2dfe62922c6049e8a2
       size: 867
   postpro-Cost:
-    cmd: matlab -batch "add_mdocean_path(); obj=Cost; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost; 
+      obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Cost/Cost.m
       hash: md5
@@ -2158,7 +2161,7 @@ stages:
       size: 11216
     - path: results/Cost/intermed.mat
       hash: md5
-      md5: e76501a00343639b710a9479eb3c12d7
+      md5: 6518802e7a8a6a2dfe62922c6049e8a2
       size: 867
     outs:
     - path: results/Cost/cost_parameters.tex
@@ -2167,10 +2170,11 @@ stages:
       size: 102
     - path: results/Cost/end.mat
       hash: md5
-      md5: b4f99811d730f243f62ad57ae0380b76
+      md5: cb5a509516a95e203d918e272651edb6
       size: 876
   analysis-DescFcns:
-    cmd: matlab -batch "add_mdocean_path(); obj=DescFcns; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DescFcns; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@DescFcns/DescFcns.m
       hash: md5
@@ -2364,10 +2368,10 @@ stages:
     outs:
     - path: results/DescFcns/intermed.mat
       hash: md5
-      md5: 34a8e9af1db94223b55a376d5009e479
+      md5: 24d6fd12bc2a9a95b55d1592f0100683
       size: 22495
   postpro-DescFcns:
-    cmd: matlab -batch "add_mdocean_path(); obj=DescFcns; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DescFcns; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -2557,28 +2561,28 @@ stages:
       size: 11216
     - path: results/DescFcns/intermed.mat
       hash: md5
-      md5: 34a8e9af1db94223b55a376d5009e479
+      md5: 24d6fd12bc2a9a95b55d1592f0100683
       size: 22495
     outs:
     - path: results/DescFcns/drag_desc_fcn.pdf
       hash: md5
-      md5: e2b3cb8204a220631a2863bf5b9506cc
+      md5: c33b9536c48f44c0f80fc360168a35b2
       size: 42053
     - path: results/DescFcns/end.mat
       hash: md5
-      md5: 390a90f94acfe1a7972128792dc5b619
+      md5: 47a5827d1dd15ff15458b2235aa0f5d8
       size: 201
     - path: results/DescFcns/saturation_desc_fcn.pdf
       hash: md5
-      md5: 0c719c7e7e32961109e98999b51a00ad
+      md5: 1cf03642bdecd051548e7dda1964cdba
       size: 26275
     - path: results/DescFcns/saturation_desc_fcn_alpha.pdf
       hash: md5
-      md5: d2b89840202227dd96cf100e67da0954
+      md5: 30b57b47e561c04ec66efca4e8549633
       size: 4350
   analysis-DesignSpaceExploration:
-    cmd: matlab -batch "add_mdocean_path(); obj=DesignSpaceExploration; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DesignSpaceExploration; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       hash: md5
@@ -2844,11 +2848,11 @@ stages:
     outs:
     - path: results/DesignSpaceExploration/intermed.mat
       hash: md5
-      md5: 9d6e32a34490496454acb51923428a5a
+      md5: de49387f26866f49525cddbcb9f3cc8e
       size: 756259
   postpro-DesignSpaceExploration:
-    cmd: matlab -batch "add_mdocean_path(); obj=DesignSpaceExploration; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DesignSpaceExploration; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       hash: md5
@@ -3065,27 +3069,28 @@ stages:
       size: 11216
     - path: results/DesignSpaceExploration/intermed.mat
       hash: md5
-      md5: 9d6e32a34490496454acb51923428a5a
+      md5: de49387f26866f49525cddbcb9f3cc8e
       size: 756259
     outs:
     - path: results/DesignSpaceExploration/end.mat
       hash: md5
-      md5: 8e66e9cee3280758fb0d969c7abb85a3
+      md5: 2a21c533f9f653cac1012054af2392c2
       size: 209
     - path: results/DesignSpaceExploration/experiments_pareto.pdf
       hash: md5
-      md5: 7f419b9cd74f85ed10fca8932e37e0e9
+      md5: 35412a307274c3dbdb6f8b49173a93b5
       size: 8178
     - path: results/DesignSpaceExploration/experiments_ratios.pdf
       hash: md5
-      md5: 58b81007bd6b71e247986fdcd795f3e9
+      md5: 793873482c626e6ab6c6746870beb8c8
       size: 7552
     - path: results/DesignSpaceExploration/experiments_results.tex
       hash: md5
       md5: 1f8075af5be22467369970bddbb1b0cc
       size: 153
   analysis-DesignVars:
-    cmd: matlab -batch "add_mdocean_path(); obj=DesignVars; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DesignVars; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@DesignVars/DesignVars.m
       hash: md5
@@ -3272,8 +3277,13 @@ stages:
       hash: md5
       md5: faf1c5c5e282a47e48a6bd317661d92a
       size: 11216
+    outs:
+    - path: results/DesignVars/intermed.mat
+      hash: md5
+      md5: 0e7784a11adc9f99ba1b2507e4119c7e
+      size: 601
   postpro-DesignVars:
-    cmd: matlab -batch "add_mdocean_path(); obj=DesignVars; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DesignVars; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -3461,6 +3471,10 @@ stages:
       hash: md5
       md5: faf1c5c5e282a47e48a6bd317661d92a
       size: 11216
+    - path: results/DesignVars/intermed.mat
+      hash: md5
+      md5: 0e7784a11adc9f99ba1b2507e4119c7e
+      size: 601
     outs:
     - path: results/DesignVars/design_vars.tex
       hash: md5
@@ -3468,11 +3482,11 @@ stages:
       size: 617
     - path: results/DesignVars/end.mat
       hash: md5
-      md5: 9c2f6282ba107329a17d2f66439462b1
+      md5: 1d4a700a85fa74b90d60f2dec52fc571
       size: 1095
   analysis-ForceSaturationFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=ForceSaturationFigFunc; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ForceSaturationFigFunc; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       hash: md5
@@ -3666,11 +3680,11 @@ stages:
     outs:
     - path: results/ForceSaturationFigFunc/intermed.mat
       hash: md5
-      md5: 75861af7cf0fb2a15b3a6ea9434a241f
-      size: 16163
+      md5: db2a35b389ef57d3388e6831deb709d8
+      size: 16213
   postpro-ForceSaturationFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=ForceSaturationFigFunc; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ForceSaturationFigFunc; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       hash: md5
@@ -3859,24 +3873,24 @@ stages:
       size: 11216
     - path: results/ForceSaturationFigFunc/intermed.mat
       hash: md5
-      md5: 75861af7cf0fb2a15b3a6ea9434a241f
-      size: 16163
+      md5: db2a35b389ef57d3388e6831deb709d8
+      size: 16213
     outs:
     - path: results/ForceSaturationFigFunc/end.mat
       hash: md5
-      md5: c5f875494e44b8a4b627ff6580702ecd
+      md5: 5ada535399345f6d90a7eff6a7ca203c
       size: 209
     - path: results/ForceSaturationFigFunc/power_force_sensitivity.pdf
       hash: md5
-      md5: 4870f33481c3d5cd76c1adc227e1d275
+      md5: 7c40ea0b7e9cff79e972e3d317a7f216
       size: 2996
     - path: results/ForceSaturationFigFunc/runtime_sensitivity.pdf
       hash: md5
-      md5: 7b96f4c183169d9bbfb845416b614e61
-      size: 2290
+      md5: 5be848afedf353c0145b060d6b22785e
+      size: 2441
   analysis-GradientOptimFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=GradientOptimFigFunc; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=GradientOptimFigFunc; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       hash: md5
@@ -4090,11 +4104,11 @@ stages:
     outs:
     - path: results/GradientOptimFigFunc/intermed.mat
       hash: md5
-      md5: a64e086f61232d75aac769d64a3afe56
-      size: 5582531
+      md5: e04770f78b7f6259463bdbd7f7f57ead
+      size: 5582529
   postpro-GradientOptimFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=GradientOptimFigFunc; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=GradientOptimFigFunc; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       hash: md5
@@ -4331,40 +4345,40 @@ stages:
       size: 11216
     - path: results/GradientOptimFigFunc/intermed.mat
       hash: md5
-      md5: a64e086f61232d75aac769d64a3afe56
-      size: 5582531
+      md5: e04770f78b7f6259463bdbd7f7f57ead
+      size: 5582529
     outs:
     - path: results/GradientOptimFigFunc/delta_x.pdf
       hash: md5
-      md5: 0b367a71d09ba5f6dfc9e9545063b861
+      md5: 4b18944e79f2fcdf31fbeac642ececb0
       size: 95902
     - path: results/GradientOptimFigFunc/end.mat
       hash: md5
-      md5: efb063d936d8ef282cd67b064c507612
+      md5: 4ed7083d11ba35fc1204dee6242f6622
       size: 195
     - path: results/GradientOptimFigFunc/lagrange_multipliers.pdf
       hash: md5
-      md5: d9184d2aebff8047076c37248e2c4eae
+      md5: a994b29d84c64f5dbd1dbc9763aef9d7
       size: 3838
     - path: results/GradientOptimFigFunc/single_obj_convergence.pdf
       hash: md5
-      md5: c1012b7b030de085f742425462196cc8
+      md5: 1181fef7c3766849abb63936b8402f60
       size: 13739
     - path: results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
       hash: md5
-      md5: 79daa286efec2ca6f71f719fd9041a07
+      md5: e5d3b6b9769d77950f1c727831e88f78
       size: 4082
     - path: results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
       hash: md5
-      md5: 26b03a23261dc8914dbc3ad2ad0d5d38
+      md5: 60649459e51323bdccb72c162fea77df
       size: 42533
     - path: results/GradientOptimFigFunc/single_obj_optim_results.tex
       hash: md5
       md5: 3de776161edeb24bae32739b955afbd9
       size: 768
   analysis-HydroCoeffFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=HydroCoeffFigFunc; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=HydroCoeffFigFunc; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       hash: md5
@@ -4558,11 +4572,11 @@ stages:
     outs:
     - path: results/HydroCoeffFigFunc/intermed.mat
       hash: md5
-      md5: edab5831a9edbc01047ff7cfcd85cfbc
+      md5: 1a49ac5d58b9355515eb69cdd83c26da
       size: 20616
   postpro-HydroCoeffFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=HydroCoeffFigFunc; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=HydroCoeffFigFunc; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       hash: md5
@@ -4751,16 +4765,16 @@ stages:
       size: 11216
     - path: results/HydroCoeffFigFunc/intermed.mat
       hash: md5
-      md5: edab5831a9edbc01047ff7cfcd85cfbc
+      md5: 1a49ac5d58b9355515eb69cdd83c26da
       size: 20616
     outs:
     - path: results/HydroCoeffFigFunc/end.mat
       hash: md5
-      md5: ddaf59c35d859e056d0185c4a5f9f7c8
+      md5: 80d06001333789486c2e13c60260e258
       size: 202
     - path: results/HydroCoeffFigFunc/hydro_coeff_err.pdf
       hash: md5
-      md5: b6cb7161496c9fb126d86ac5d1d56028
+      md5: 7fd7a50ea68fafcbd4d527d960e2e5ec
       size: 14166
   analysis-JpdMultiplyFigFunc:
     cmd: matlab -batch "add_mdocean_path(); obj=JpdMultiplyFigFunc; 
@@ -5215,7 +5229,8 @@ stages:
       md5: 3b8272cffb1104356365abca86ee7a23
       size: 202
   analysis-Meem:
-    cmd: matlab -batch "add_mdocean_path(); obj=Meem; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Meem/Meem.m
       hash: md5
@@ -5418,10 +5433,11 @@ stages:
     outs:
     - path: results/Meem/intermed.mat
       hash: md5
-      md5: 478d72d9ac5fadafc121ce041faf935e
+      md5: 9790b2d22a94523cf56d5fff71cc3c02
       size: 48657
   postpro-Meem:
-    cmd: matlab -batch "add_mdocean_path(); obj=Meem; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem; 
+      obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Meem/Meem.m
       hash: md5
@@ -5610,39 +5626,40 @@ stages:
       size: 11216
     - path: results/Meem/intermed.mat
       hash: md5
-      md5: 478d72d9ac5fadafc121ce041faf935e
+      md5: 9790b2d22a94523cf56d5fff71cc3c02
       size: 48657
     outs:
     - path: results/Meem/asymptotic_b_vector.pdf
       hash: md5
-      md5: a7cd69c2a0a54ef887076e4e52b9beb3
+      md5: 87c12abf782e74792759ad902d1d910b
       size: 4467
     - path: results/Meem/end.mat
       hash: md5
-      md5: 1980378e8881bb2ab8a1de8ee74fc3f0
+      md5: 14e7ddd4a0e2b68340eb6ebf4ec516a9
       size: 197
     - path: results/Meem/meem_convergence.pdf
       hash: md5
-      md5: 58fe81e5dbf97aed8e1d74ecf0323c48
+      md5: 94f7030902d838d888ebec82eeb891a0
       size: 2010
     - path: results/Meem/meem_matching.pdf
       hash: md5
-      md5: 00d483b730aec63d90162acf2f6f5e5f
+      md5: 236a5833eb7e465c4e1bd5d94053bd67
       size: 5697
     - path: results/Meem/meem_regions.pdf
       hash: md5
-      md5: 8bc7b854bc24a6f4a1d44538273244dc
+      md5: c0fa5bcc505c36af971f13ba58ecd18c
       size: 2006
     - path: results/Meem/meem_sparsity.pdf
       hash: md5
-      md5: fdc186eb22afb8494c9fd229d8ce9754
+      md5: a6e9d10ecefc535668006375eaab6d7f
       size: 2635
     - path: results/Meem/meem_validation.pdf
       hash: md5
-      md5: 41ffa18ef29986d640f1eda3315815ac
+      md5: b80d5d660bbb8bdb7e33c29b1db4dad9
       size: 7454
   analysis-Multistart:
-    cmd: matlab -batch "add_mdocean_path(); obj=Multistart; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Multistart; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Multistart/Multistart.m
       hash: md5
@@ -5868,10 +5885,10 @@ stages:
     outs:
     - path: results/Multistart/intermed.mat
       hash: md5
-      md5: a61346ef2d2bd5b0ca69122d5bf46237
-      size: 800238
+      md5: e8a32a397011fb15ca361568ce0e4190
+      size: 800230
   postpro-Multistart:
-    cmd: matlab -batch "add_mdocean_path(); obj=Multistart; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Multistart; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/SAFE/PAWN/pawn_cdfs.m
@@ -6089,31 +6106,32 @@ stages:
       size: 11216
     - path: results/Multistart/intermed.mat
       hash: md5
-      md5: a61346ef2d2bd5b0ca69122d5bf46237
-      size: 800238
+      md5: e8a32a397011fb15ca361568ce0e4190
+      size: 800230
     outs:
     - path: results/Multistart/end.mat
       hash: md5
-      md5: f5be685a637693a4e2f13081bbf68864
+      md5: bef58ea244d04a27529aab68d71c2653
       size: 128
     - path: results/Multistart/multistart_bar_chart.pdf
       hash: md5
-      md5: a3ca07bc877003127aea20bc49a35266
+      md5: 4e2a19353e421d57b5494d6c722b541f
       size: 3987
     - path: results/Multistart/multistart_convergence_tree.pdf
       hash: md5
-      md5: d97b30a3900dd3aded3ff961c10a99ab
+      md5: 726351972c99aa61419e343a8764bd6a
       size: 6075
     - path: results/Multistart/multistart_parallel_coordinates.pdf
       hash: md5
-      md5: 77dc6bcfa9095cb8efb4b1ca457391fb
-      size: 259231
+      md5: f45b6a9a9f64bf4cebd966af31ec1160
+      size: 259197
     - path: results/Multistart/multistart_results.tex
       hash: md5
-      md5: c8357a5e2d502725021f69b4993c1fef
-      size: 6085
+      md5: b1fa6dcbdfc1adb23d614e4736b85de4
+      size: 6082
   analysis-Parameters:
-    cmd: matlab -batch "add_mdocean_path(); obj=Parameters; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Parameters; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Parameters/Parameters.m
       hash: md5
@@ -6303,10 +6321,10 @@ stages:
     outs:
     - path: results/Parameters/intermed.mat
       hash: md5
-      md5: 25eaeb8fbed55490bfe65762bc592cf1
+      md5: e6c83bf5710c23538e2b6d7648311fc1
       size: 1350871
   analysis-ParetoSweep:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParetoSweep; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoSweep; 
       obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -6497,10 +6515,10 @@ stages:
     outs:
     - path: results/ParetoSweep/intermed.mat
       hash: md5
-      md5: de68b9ed6114cccf38017e44ecc61121
+      md5: e77be57ebc394edf197b2994a82e5649
       size: 4728
   postpro-ParetoSweep:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParetoSweep; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoSweep; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -6690,20 +6708,20 @@ stages:
       size: 11216
     - path: results/ParetoSweep/intermed.mat
       hash: md5
-      md5: de68b9ed6114cccf38017e44ecc61121
+      md5: e77be57ebc394edf197b2994a82e5649
       size: 4728
     outs:
     - path: results/ParetoSweep/end.mat
       hash: md5
-      md5: fbab92cb088812689c1117840ecc3f55
+      md5: 030e019f48f9b4b00433489c262e535c
       size: 195
     - path: results/ParetoSweep/sweep_num_seeds.pdf
       hash: md5
-      md5: c08bf3bc723b6ae1bb24bf4cd0a4b4ef
+      md5: 03edadfe731b92b4181001e93fec3652
       size: 2397
   analysis-ReadNonMatlabFigs:
-    cmd: matlab -batch "add_mdocean_path(); obj=ReadNonMatlabFigs; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ReadNonMatlabFigs; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       hash: md5
@@ -6893,11 +6911,11 @@ stages:
     outs:
     - path: results/ReadNonMatlabFigs/intermed.mat
       hash: md5
-      md5: d3d646ac200a6e9896cb8c0793844891
+      md5: 27cd8a063954468eb736a92d0d0702df
       size: 486
   postpro-ReadNonMatlabFigs:
-    cmd: matlab -batch "add_mdocean_path(); obj=ReadNonMatlabFigs; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ReadNonMatlabFigs; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       hash: md5
@@ -7091,7 +7109,7 @@ stages:
       nfiles: 36
     - path: results/ReadNonMatlabFigs/intermed.mat
       hash: md5
-      md5: d3d646ac200a6e9896cb8c0793844891
+      md5: 27cd8a063954468eb736a92d0d0702df
       size: 486
     outs:
     - path: results/ReadNonMatlabFigs/FBD.pdf
@@ -7120,7 +7138,7 @@ stages:
       size: 208187
     - path: results/ReadNonMatlabFigs/end.mat
       hash: md5
-      md5: 5eb3ceb2fe8117f1f93ae0d6bd667439
+      md5: 68e0cfcab3782187c5455b8a4b5e7159
       size: 186
     - path: results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       hash: md5
@@ -7132,7 +7150,7 @@ stages:
       size: 443977
     - path: results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       hash: md5
-      md5: 2864fc8672e53a9bab7b440ac2d76af2
+      md5: 08ddb26ca8a0aae0b078b349e5b50b00
       size: 1895
     - path: results/ReadNonMatlabFigs/methodology_flowchart.pdf
       hash: md5
@@ -7159,8 +7177,8 @@ stages:
       md5: acb2f2a5f2fef406caee0e9fbe625a8e
       size: 32654
   analysis-RunSingleFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=RunSingleFigFunc; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=RunSingleFigFunc; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       hash: md5
@@ -7398,11 +7416,11 @@ stages:
     outs:
     - path: results/RunSingleFigFunc/intermed.mat
       hash: md5
-      md5: 0932396459a5678713b97e79f38693c4
+      md5: e1e64c15b5db444415fe04f6f24949d3
       size: 221946
   postpro-RunSingleFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=RunSingleFigFunc; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=RunSingleFigFunc; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       hash: md5
@@ -7591,35 +7609,36 @@ stages:
       size: 11216
     - path: results/RunSingleFigFunc/intermed.mat
       hash: md5
-      md5: 0932396459a5678713b97e79f38693c4
+      md5: e1e64c15b5db444415fe04f6f24949d3
       size: 221946
     outs:
     - path: results/RunSingleFigFunc/drag_convergence.pdf
       hash: md5
-      md5: 895fc1028202e05b8ad1d1978180991e
+      md5: 2b8688559463ca7f11f347fcedc94be7
       size: 2565
     - path: results/RunSingleFigFunc/end.mat
       hash: md5
-      md5: 420833139ef6fdba044af85503025ddc
+      md5: 0ef94d12072af873ab198c17ed23fe3f
       size: 194
     - path: results/RunSingleFigFunc/nominal_geometry_viz.pdf
       hash: md5
-      md5: cf19b0aefb2ad6d5044e3d3732d0b2d6
+      md5: a1d674588a9251c0209439d5ff11bb26
       size: 4051
     - path: results/RunSingleFigFunc/nominal_power_matrix.pdf
       hash: md5
-      md5: 2dd14457297ff31e66d8f7bf697da57a
+      md5: 85062c381d2c42cec36f563e3a9003b1
       size: 42999
     - path: results/RunSingleFigFunc/nominal_power_pdf.pdf
       hash: md5
-      md5: b71af66081ae8a9e1a857ec33652e716
+      md5: a4c70988eab5d2218f70a59f436e9f70
       size: 1060
     - path: results/RunSingleFigFunc/slamming_model_comparison.pdf
       hash: md5
-      md5: 172f2e4935f04f3f3f55358200c128f0
+      md5: b3c6e5690f103b6c22dbb858be3b1bc8
       size: 30646
   analysis-Slamming:
-    cmd: matlab -batch "add_mdocean_path(); obj=Slamming; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Slamming; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Slamming/Slamming.m
       hash: md5
@@ -7813,10 +7832,10 @@ stages:
     outs:
     - path: results/Slamming/intermed.mat
       hash: md5
-      md5: 52f9885b33ad15b0ae04e02679c2e404
+      md5: 591134813dcf32cdc4794421445fe3d4
       size: 756631
   postpro-Slamming:
-    cmd: matlab -batch "add_mdocean_path(); obj=Slamming; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Slamming; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Slamming/Slamming.m
@@ -8006,19 +8025,20 @@ stages:
       size: 11216
     - path: results/Slamming/intermed.mat
       hash: md5
-      md5: 52f9885b33ad15b0ae04e02679c2e404
+      md5: 591134813dcf32cdc4794421445fe3d4
       size: 756631
     outs:
     - path: results/Slamming/end.mat
       hash: md5
-      md5: b7b3205b078ff2ac15333587f032d46b
+      md5: 58091b686cec8e19aa8ae9414b06d2b5
       size: 201
     - path: results/Slamming/slamming_amplitude.pdf
       hash: md5
-      md5: ddfc452ba5134e3c18f4d690f79f1b82
+      md5: 015112cff2befcc718def340be360bff
       size: 186422
   analysis-SparHydro:
-    cmd: matlab -batch "add_mdocean_path(); obj=SparHydro; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SparHydro; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@SparHydro/SparHydro.m
       hash: md5
@@ -8212,10 +8232,10 @@ stages:
     outs:
     - path: results/SparHydro/intermed.mat
       hash: md5
-      md5: c16b8f875048894596246f09bf4871d4
+      md5: 99bb925c8a1eb134a964f52ae3e354f4
       size: 8930
   postpro-SparHydro:
-    cmd: matlab -batch "add_mdocean_path(); obj=SparHydro; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SparHydro; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -8405,19 +8425,20 @@ stages:
       size: 11216
     - path: results/SparHydro/intermed.mat
       hash: md5
-      md5: c16b8f875048894596246f09bf4871d4
+      md5: 99bb925c8a1eb134a964f52ae3e354f4
       size: 8930
     outs:
     - path: results/SparHydro/end.mat
       hash: md5
-      md5: 413f1a551dd650a88911322ca9b5d725
+      md5: 3b8ab2ef798e0f97669d9dfbfabe42bc
       size: 203
     - path: results/SparHydro/spar_added_mass.pdf
       hash: md5
-      md5: 98e0706a9c6eedb5f3af74225ceb6101
+      md5: 3ca5cc72dff0adc13ca4ddb2ced2eb57
       size: 18290
   analysis-Validation:
-    cmd: matlab -batch "add_mdocean_path(); obj=Validation; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Validation/Validation.m
       hash: md5
@@ -8627,10 +8648,10 @@ stages:
     outs:
     - path: results/Validation/intermed.mat
       hash: md5
-      md5: 4bf8f5ae756f166fe9da29c7bf61dc2c
+      md5: b9d9d3d17a4b6e4dec3d1517ec5bcf9d
       size: 36586
   postpro-Validation:
-    cmd: matlab -batch "add_mdocean_path(); obj=Validation; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Validation/Validation.m
@@ -8824,24 +8845,24 @@ stages:
       size: 11216
     - path: results/Validation/intermed.mat
       hash: md5
-      md5: 4bf8f5ae756f166fe9da29c7bf61dc2c
+      md5: b9d9d3d17a4b6e4dec3d1517ec5bcf9d
       size: 36586
     outs:
     - path: results/Validation/cost_vs_N_WEC.pdf
       hash: md5
-      md5: 0ce01f1042f96c992499d53fe91c2201
+      md5: 47a57862f7acb7823008b8dc25434b88
       size: 9675
     - path: results/Validation/end.mat
       hash: md5
-      md5: 827b0ba30c9cf974a7acb34d2f7d4063
+      md5: 4b6782c9f593224912f5508759d4dfe8
       size: 2303
     - path: results/Validation/validation.tex
       hash: md5
       md5: 1325b831e1c0cfedc0d2a6644b813ace
       size: 1300
   analysis-ParamSensitivities:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParamSensitivities; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ParamSensitivities; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       hash: md5
@@ -9067,11 +9088,11 @@ stages:
     outs:
     - path: results/ParamSensitivities/intermed.mat
       hash: md5
-      md5: a1070efdd4495b6bc0e79f1e38218a5c
+      md5: ad679bb4788df776a2de28652deb9b1c
       size: 1441221
   postpro-ParamSensitivities:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParamSensitivities; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=ParamSensitivities; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       hash: md5
@@ -9272,111 +9293,111 @@ stages:
       size: 11216
     - path: results/ParamSensitivities/intermed.mat
       hash: md5
-      md5: a1070efdd4495b6bc0e79f1e38218a5c
+      md5: ad679bb4788df776a2de28652deb9b1c
       size: 1441221
     outs:
     - path: results/ParamSensitivities/end.mat
       hash: md5
-      md5: 3bc55d297d46d88edcf2f9c6e48063dd
+      md5: e215b053b24c6ef3ef88230f31c09446
       size: 333
     - path: results/ParamSensitivities/nonlinear_design_J1.pdf
       hash: md5
-      md5: 7c4bf29f599c60916803c8eacf54793b
+      md5: a5c17727e7f643c9e063bca3efc847ba
       size: 32336
     - path: results/ParamSensitivities/nonlinear_design_J2.pdf
       hash: md5
-      md5: 64a032307964a4c03686c066c16c1322
+      md5: 337f400376da7bbfe419ce3dd9b3f2f5
       size: 18510
     - path: results/ParamSensitivities/nonlinear_objectives.pdf
       hash: md5
-      md5: 6a59805b9876c715fcf096c45d820cc8
+      md5: 06fe39330f9b862f3a19c94c270ed6be
       size: 11204
     - path: results/ParamSensitivities/post_optim_constraint_grid.pdf
       hash: md5
-      md5: ca39f53b986b0b0f3aee8c245ad7edd9
+      md5: 0cad2cdcd1877e630ca52843191690b6
       size: 46035
     - path: results/ParamSensitivities/post_optim_design_grid.pdf
       hash: md5
-      md5: d56ae816fa6fe46dac87627926e87f7f
+      md5: 3ac06d7ccd25cfbf4eaa0c6653f86e94
       size: 342331
     - path: results/ParamSensitivities/post_optim_re_optim_objective_grid.pdf
       hash: md5
-      md5: 5ddf1a45b16e323b388fa12d330cc23f
+      md5: 3c93dd1019bcde64cdfd8c0bc3b999d6
       size: 479599
     - path: results/ParamSensitivities/re_optim_constraint_grid.pdf
       hash: md5
-      md5: 43926a7bd514c1e3b932df733864bb3f
+      md5: a53064c7c7045e6b35a673c3f6e0b7ce
       size: 122509
     - path: results/ParamSensitivities/re_optim_design_grid.pdf
       hash: md5
-      md5: c075f3d4a99383aaa3c471c2a281e065
+      md5: 0c12b9fdbcba29c824c3a68596743e00
       size: 168031
     - path: results/ParamSensitivities/re_optim_design_tornado_J1.pdf
       hash: md5
-      md5: 9a018a8ea0222534aa5792ea8e8fa458
+      md5: 5df7f159e5264eabf7899088bec93e10
       size: 29435
     - path: results/ParamSensitivities/re_optim_design_tornado_J2.pdf
       hash: md5
-      md5: 5b9dc02aa64bf0ddd8e929e9e67b5c44
+      md5: 13a4b9339c00a417459f77c45bd1389a
       size: 28772
     - path: results/ParamSensitivities/re_optim_design_tornado_x1.pdf
       hash: md5
-      md5: 8639e8dee07c14d8a58ec6b3390d989e
+      md5: 420a4068f5537af3f9a73f7aaa90fdd4
       size: 15688
     - path: results/ParamSensitivities/re_optim_design_tornado_x10.pdf
       hash: md5
-      md5: 66e42789afa88a8b088a3f4aabd0b617
+      md5: 17c6a0adbf381ea8f45873072defa067
       size: 14765
     - path: results/ParamSensitivities/re_optim_design_tornado_x11.pdf
       hash: md5
-      md5: 1b0d3ef128096191d4d71b7865936107
+      md5: c6194181623adf0bf3c359b705352415
       size: 15195
     - path: results/ParamSensitivities/re_optim_design_tornado_x12.pdf
       hash: md5
-      md5: 9c6043ee6e739ec0c801d3149fec09e3
+      md5: 1f40ffb479b1493d03cc0ce5f6ea1027
       size: 15535
     - path: results/ParamSensitivities/re_optim_design_tornado_x2.pdf
       hash: md5
-      md5: eac580aa5c567dc9ba95a728e214968b
+      md5: bd1bb63905d9787b72b9291ae8ef1b18
       size: 14652
     - path: results/ParamSensitivities/re_optim_design_tornado_x3.pdf
       hash: md5
-      md5: 094fe50618100f46dbee249b356da6c0
+      md5: 024d6b942d3d17a5db2bdde8dcacff09
       size: 14300
     - path: results/ParamSensitivities/re_optim_design_tornado_x4.pdf
       hash: md5
-      md5: 16f8f3b9c7c1842c4573429ce5b44041
+      md5: e2ae1c8dee4ee9671965c3fd896dc776
       size: 14419
     - path: results/ParamSensitivities/re_optim_design_tornado_x5.pdf
       hash: md5
-      md5: 39766f6a81056d5b46d890130d472fc2
+      md5: 4840b0c75a674381d58685e64cf708da
       size: 14869
     - path: results/ParamSensitivities/re_optim_design_tornado_x6.pdf
       hash: md5
-      md5: 288d52e0ae902545463a9789c07ae7ae
+      md5: ced28e90cbea0611b7583a2e7d87065e
       size: 15664
     - path: results/ParamSensitivities/re_optim_design_tornado_x7.pdf
       hash: md5
-      md5: 6aa8a103218d53aab536b4c57d7a9c37
+      md5: c4fda832b573e0b6a2946a58259c0fa7
       size: 15089
     - path: results/ParamSensitivities/re_optim_design_tornado_x8.pdf
       hash: md5
-      md5: c9273f942d2ff0cf4c90405204e1741b
+      md5: db3d6f8a83515910869e929fd9de4b11
       size: 14077
     - path: results/ParamSensitivities/re_optim_design_tornado_x9.pdf
       hash: md5
-      md5: 77cce16805d5e07131823027c733fde5
+      md5: 1ebfd9090a52f9e5779c9b0e1b1d3b1f
       size: 14563
     - path: results/ParamSensitivities/re_optim_objective_grid.pdf
       hash: md5
-      md5: adc95859c49ba34c95eebb8fe87fcc9c
+      md5: db3eed1dd7e4ff092a5d5379825307c4
       size: 132880
     - path: results/ParamSensitivities/re_optim_objective_tornado.pdf
       hash: md5
-      md5: 80ad8fa0d70c5fce3981a36968c89627
+      md5: f44fc7c3baf86a5321dee885e1c3fa95
       size: 15482
   postpro-Parameters:
-    cmd: matlab -batch "add_mdocean_path(); obj=Parameters; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Parameters; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Parameters/Parameters.m
@@ -9566,20 +9587,20 @@ stages:
       size: 11216
     - path: results/Parameters/intermed.mat
       hash: md5
-      md5: 25eaeb8fbed55490bfe65762bc592cf1
+      md5: e6c83bf5710c23538e2b6d7648311fc1
       size: 1350871
     outs:
     - path: results/Parameters/end.mat
       hash: md5
-      md5: 739db399fa8ee5e166cafe7896e9f172
+      md5: 2bcb7a52df23e6f0b9f806a05a241a14
       size: 1350877
     - path: results/Parameters/parameters.tex
       hash: md5
       md5: f6ac338666760b93f81c5471787d4add
       size: 4732
   analysis-LocationSensitivity:
-    cmd: matlab -batch "add_mdocean_path(); obj=LocationSensitivity; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=LocationSensitivity; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
       hash: md5
@@ -9813,10 +9834,10 @@ stages:
     outs:
     - path: results/LocationSensitivity/intermed.mat
       hash: md5
-      md5: fec261f35c290f9fc5b4ec82a5b75873
+      md5: ff4b92f82aab0d7dd04f56ad38d195bc
       size: 1263493
   postpro-ParetoFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParetoFigFunc; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoFigFunc; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -10030,35 +10051,36 @@ stages:
       size: 11216
     - path: results/ParetoFigFunc/intermed.mat
       hash: md5
-      md5: 66cc70323597edb6fc08315303b3b506
+      md5: e468ab728cc3cd9a493dfa43eca8f558
       size: 1466550
     outs:
     - path: results/ParetoFigFunc/end.mat
       hash: md5
-      md5: 2f2e4d1b3a6c699ccd4aaeb85fae1745
+      md5: 97cafd49da6a191fb344436e1ad4a03d
       size: 128
     - path: results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
       hash: md5
-      md5: 515fdb12b74cd0ad14cf3dd0f7877f90
+      md5: eca7a392291a73865becb4edc5c0fd56
       size: 15327
     - path: results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
       hash: md5
-      md5: 7486e96192f3448408ed2738b5766271
+      md5: c865a0a5a565d59b753455b7aef63148
       size: 14858
     - path: results/ParetoFigFunc/pareto_front_LCOE_contours.pdf
       hash: md5
-      md5: f5f463c7c82fe6227fb9193deee96999
+      md5: c0e3422cee68b99e8a21a9f90e914a88
       size: 11291
     - path: results/ParetoFigFunc/pareto_front_with_design_images.pdf
       hash: md5
-      md5: ba223fbdfdfdbb18a8d70a960a5c43d6
+      md5: aa526ceb59f1565f5ccc3cad64326f77
       size: 10583
     - path: results/ParetoFigFunc/pareto_heuristics.pdf
       hash: md5
-      md5: 7b866658797f15a29e364c65dbc168aa
+      md5: 6c145e38e0a990da5395d9913907868b
       size: 14475
   analysis-Wecsim:
-    cmd: matlab -batch "add_mdocean_path(); obj=Wecsim; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Wecsim; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Wecsim/Wecsim.m
       hash: md5
@@ -10266,9 +10288,14 @@ stages:
       hash: md5
       md5: faf1c5c5e282a47e48a6bd317661d92a
       size: 11216
+    outs:
+    - path: results/Wecsim/intermed.mat
+      hash: md5
+      md5: 6b864be39d1630da898688284139605f
+      size: 136710
   analysis-DampingPlateStructures:
-    cmd: matlab -batch "add_mdocean_path(); obj=DampingPlateStructures; 
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DampingPlateStructures; obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       hash: md5
@@ -10466,11 +10493,11 @@ stages:
     outs:
     - path: results/DampingPlateStructures/intermed.mat
       hash: md5
-      md5: b2d7dcff2748f42794a0a9ef25d76781
+      md5: 89a3c59aae0bee9cd007ab708d84ff7d
       size: 44480
   postpro-DampingPlateStructures:
-    cmd: matlab -batch "add_mdocean_path(); obj=DampingPlateStructures; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DampingPlateStructures; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       hash: md5
@@ -10659,28 +10686,28 @@ stages:
       size: 11216
     - path: results/DampingPlateStructures/intermed.mat
       hash: md5
-      md5: b2d7dcff2748f42794a0a9ef25d76781
+      md5: 89a3c59aae0bee9cd007ab708d84ff7d
       size: 44480
     outs:
     - path: results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
       hash: md5
-      md5: 32bd9ba1db5d76644a8643854d0454e1
+      md5: 44aef858df1d3f09e16a706d50081953
       size: 3997
     - path: results/DampingPlateStructures/damping_plate_deflection.pdf
       hash: md5
-      md5: 3c915b65ef55327992c62183e723e4d2
+      md5: ef153b5dba1027a340239e93fb08b737
       size: 10996
     - path: results/DampingPlateStructures/damping_plate_moment.pdf
       hash: md5
-      md5: 6d53723d4609007d696916e4a38ae3e9
+      md5: 863e9da92fa5001a6d0a5e97ce2ca3e2
       size: 13959
     - path: results/DampingPlateStructures/end.mat
       hash: md5
-      md5: 46cdde8926a78b43c1b8beb7a5835496
+      md5: df930931d8abcf570a23243b3a97cd12
       size: 205
   postpro-LocationSensitivity:
-    cmd: matlab -batch "add_mdocean_path(); obj=LocationSensitivity; 
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=LocationSensitivity; obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
       hash: md5
@@ -10873,32 +10900,32 @@ stages:
       size: 11216
     - path: results/LocationSensitivity/intermed.mat
       hash: md5
-      md5: fec261f35c290f9fc5b4ec82a5b75873
+      md5: ff4b92f82aab0d7dd04f56ad38d195bc
       size: 1263493
     outs:
     - path: results/LocationSensitivity/end.mat
       hash: md5
-      md5: 66947f69727d6db4534c35f1c744ce1d
+      md5: 76019c64d8dd3ad8743edb9530db3feb
       size: 288
     - path: results/LocationSensitivity/location_1_power_matrix.pdf
       hash: md5
-      md5: b51744c81be4d2429ed50da0bbb3b007
+      md5: c7e69c8c0b970cf61bc8dbbf869de798
       size: 41432
     - path: results/LocationSensitivity/location_2_power_matrix.pdf
       hash: md5
-      md5: 60c6ce023f9164e09c00f81dca751144
+      md5: 4e6a1c62fcfb64c9ae56a472a2068362
       size: 42596
     - path: results/LocationSensitivity/location_3_power_matrix.pdf
       hash: md5
-      md5: ef6ecbad2512df348500fb5ff8fa7362
+      md5: 97f43e490dcc0bee3cd0f2aa343eed1a
       size: 41210
     - path: results/LocationSensitivity/location_4_power_matrix.pdf
       hash: md5
-      md5: 7595492ce914f300743fb0c2dd23c31c
+      md5: d51746ad93e516895dff642f8acac25b
       size: 38750
     - path: results/LocationSensitivity/location_probability_PDF.pdf
       hash: md5
-      md5: fd308db65684620dcd5f9153eafd6277
+      md5: c3e8387c78547e2f82e6390f54d8623c
       size: 23860
     - path: results/LocationSensitivity/location_sensitivity.tex
       hash: md5
@@ -10908,7 +10935,7 @@ stages:
     cmd: " bash --noprofile --norc -c \"echo 'export QT_QPA_PLATFORM=offscreen' >>
       ~/.bashrc; source ~/.bashrc\""
   analysis-ParetoFigFunc:
-    cmd: matlab -batch "add_mdocean_path(); obj=ParetoFigFunc; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoFigFunc; 
       obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -11143,10 +11170,11 @@ stages:
     outs:
     - path: results/ParetoFigFunc/intermed.mat
       hash: md5
-      md5: 66cc70323597edb6fc08315303b3b506
+      md5: e468ab728cc3cd9a493dfa43eca8f558
       size: 1466550
   analysis-Runtime:
-    cmd: matlab -batch "add_mdocean_path(); obj=Runtime; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Runtime; 
+      obj.run_analysis();"
     deps:
     - path: ./mdocean/analysis/@Runtime/Runtime.m
       hash: md5
@@ -11348,10 +11376,10 @@ stages:
     outs:
     - path: results/Runtime/intermed.mat
       hash: md5
-      md5: 5524b743a257ff505eba305bbe09f183
+      md5: 63057233cf21c758649226d87f59e21a
       size: 22725
   postpro-Runtime:
-    cmd: matlab -batch "add_mdocean_path(); obj=Runtime; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Runtime; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Runtime/Runtime.m
@@ -11541,27 +11569,27 @@ stages:
       size: 11216
     - path: results/Runtime/intermed.mat
       hash: md5
-      md5: 5524b743a257ff505eba305bbe09f183
+      md5: 63057233cf21c758649226d87f59e21a
       size: 22725
     outs:
     - path: results/Runtime/dynamics_runtime.pdf
       hash: md5
-      md5: 31753db3ededb3a422dd268f06712933
-      size: 3712
+      md5: 0d5dadc70ace865be8ddf2ec992dd60e
+      size: 3710
     - path: results/Runtime/end.mat
       hash: md5
-      md5: fadded8ea5b805a191b4c0d0ea2e2aee
+      md5: 67dd5282e57172032d9e5a92708e71fe
       size: 201
     - path: results/Runtime/hydro_runtime.pdf
       hash: md5
-      md5: 2e1f3ef09d961964074b57cd0d530558
-      size: 2849
+      md5: 30b7efcca103be2faf4144ade2b196b4
+      size: 2845
     - path: results/Runtime/sim_runtime.pdf
       hash: md5
-      md5: af9e7dd9940fff9b49591e075613ff7a
-      size: 2843
+      md5: 7c7bc644f8c96d6280b87487357f08b8
+      size: 2853
   postpro-Wecsim:
-    cmd: matlab -batch "add_mdocean_path(); obj=Wecsim; 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Wecsim; 
       obj.run_all_from_load();"
     deps:
     - path: ./mdocean/analysis/@Wecsim/Wecsim.m
@@ -11754,8 +11782,34 @@ stages:
       hash: md5
       md5: faf1c5c5e282a47e48a6bd317661d92a
       size: 11216
+    - path: results/Wecsim/intermed.mat
+      hash: md5
+      md5: 6b864be39d1630da898688284139605f
+      size: 136710
+    outs:
+    - path: results/Wecsim/WECSim_error_histograms_multibody.pdf
+      hash: md5
+      md5: b80ec8901c53c6b18baf7de473fdfcfa
+      size: 3869
+    - path: results/Wecsim/WECSim_error_histograms_singlebody.pdf
+      hash: md5
+      md5: 8cff2c24c6960a560f05c77726b176e5
+      size: 3874
+    - path: results/Wecsim/WECSim_errors.tex
+      hash: md5
+      md5: a8e6ab7510e65fb592bc5052f014515f
+      size: 158
+    - path: results/Wecsim/end.mat
+      hash: md5
+      md5: 40e783efb4aa39fdb9e90e897a01f742
+      size: 1055
+    - path: results/Wecsim/wecsim_all_sea_states.pdf
+      hash: md5
+      md5: b1f67c4e346b5c29d575c3284049ab8b
+      size: 25850
   move-results:
-    cmd: matlab -batch "add_mdocean_path(); move_results_to_pubs();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      move_results_to_pubs();"
     deps:
     - path: mdocean/plots/fig_tab_pub_mapping.m
       hash: md5
@@ -11767,14 +11821,14 @@ stages:
       size: 1560
     - path: results/
       hash: md5
-      md5: 7ac150c4627ac0366516d8316861c9b5.dir
-      size: 22452901
+      md5: 755c3bd441d8f0ea49e6312e0ded8217.dir
+      size: 22453059
       nfiles: 156
     outs:
     - path: pubs/applied-ocean-research-model/figs/from-matlab/
       hash: md5
-      md5: 16d31fddd97834a8d348e53e388cedbc.dir
-      size: 2912679
+      md5: 390a90e27087e5d12eeb3f9f2e0ce8ef.dir
+      size: 2912683
       nfiles: 36
     - path: pubs/applied-ocean-research-model/tables/from-matlab/
       hash: md5
@@ -11783,8 +11837,8 @@ stages:
       nfiles: 2
     - path: pubs/renewable-energy-mdo/figs/from-matlab/
       hash: md5
-      md5: 28a8c7eabc110630395187c398e7d7a9.dir
-      size: 3032479
+      md5: efbd75af09a2cb26bdc63c3c40c001a1.dir
+      size: 3032445
       nfiles: 29
     - path: pubs/renewable-energy-mdo/tables/from-matlab/
       hash: md5
