@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 39;
+num_figs_AOR = 40;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -105,7 +105,7 @@ figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
 % appendix D - parameters
 
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{40}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 
