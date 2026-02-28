@@ -1,4 +1,5 @@
 from pyxdsm.XDSM import XDSM, OPT, SOLVER, FUNC, LEFT
+import shutil
 
 # Change `use_sfmath` to False to use computer modern
 x = XDSM(use_sfmath=True)
@@ -41,4 +42,6 @@ x.connect("G", "opt", "g")
 x.add_output("opt", "x^*", side=LEFT)
 x.add_output("F", "J^*", side=LEFT)
 x.add_output("G", "g^*", side=LEFT)
-x.write("mdocean/plots/non_matlab_figs/xdsm")
+x.write("xdsm",outdir="mdocean/plots/non_matlab_figs")
+
+shutil.copy2("mdocean/plots/non_matlab_figs/xdsm.pdf","mdocean/plots/non_matlab_figs/pdf/xdsm.pdf")

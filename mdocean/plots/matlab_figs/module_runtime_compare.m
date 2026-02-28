@@ -7,10 +7,13 @@ function [figs, ...
                                                 t_singlebody_fullsim_timeit, t_wecsim)
 % Function module_runtime_compare
 %
-% :param profile_multibody: Parameter struct
-% :param profile_singlebody: Design variable bounds struct
+% :param p: Parameter struct
+% :param profile_multibody: profile_multibody
+% :param profile_singlebody: profile_singlebody
+% :param t_multibody_fullsim_timeit: t_multibody_fullsim_timeit
+% :param t_singlebody_fullsim_timeit: t_singlebody_fullsim_timeit
+% :param t_wecsim: t_wecsim
 % :returns: figs
-% :returns: t_multibody_fullsim_timeit
 % :returns: pct_runtime_MEEM
 % :returns: pct_runtime_dynamics
 % :returns: pct_runtime_other
