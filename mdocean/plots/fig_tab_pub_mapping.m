@@ -19,7 +19,7 @@ figs_in_RE = cell([1,num_figs_RE]);
 figs_in_RE{1}  = 'ReadNonMatlabFigs.RM3_image';
 % 2: modeling methodology
 figs_in_RE{2}  = 'ReadNonMatlabFigs.methodology_flowchart';
-figs_in_RE{3}  = 'ReadNonMatlabFigs.N2_diagram';
+figs_in_RE{3}  = 'ReadNonMatlabFigs.xdsm';
 % archs
 figs_in_RE{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 figs_in_RE{5} = 'ReadNonMatlabFigs.optimization_flowchart';
@@ -59,7 +59,7 @@ figs_in_AOR = cell([1,num_figs_AOR]);
 figs_in_AOR{1}  = 'ReadNonMatlabFigs.RM3_image';
 figs_in_AOR{2}  = 'ReadNonMatlabFigs.section_flow';
 % 2: model structure
-figs_in_AOR{3}  = 'ReadNonMatlabFigs.N2_diagram';
+figs_in_AOR{3}  = 'ReadNonMatlabFigs.xdsm';
 figs_in_AOR{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 % 3: module details
 figs_in_AOR{5}  = 'ReadNonMatlabFigs.dimensions';
