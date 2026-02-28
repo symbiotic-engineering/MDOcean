@@ -1137,14 +1137,24 @@ This means that the %top and bottom plate are each
 plate is conservatively sized assuming the other plate elements are perfectly rigid. %The fixed-edge reaction loads from these top and bottom solutions are then applied to the central shell element modeled as a cross section subject to bending.
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
-The column's short length requires an intermediate solution between pure compression and Euler buckling.
-Local buckling is assessed as well.
+The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \cite{previsic_reference_2011}.
 
 The damping plate is a thin stiffened cylindrical plate subject to a vertical distributed force on its bottom surface.
 The force is reacted by the welded connection to the column along the column's circumference, as well as through four welded tubular supports.
 Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
 
- Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}. 
+Further details of all structural calculations performed in the simulation are provided in \appendixname~\ref{sec:appendix-structures}. 
+For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
+\begin{equation}
+\begin{aligned}
+    t_{f} h_{stiff,f}^2 &\sim \frac{F_{heave} D_f}{\left(\frac{D_f}{D_s}-1\right)^2} \\
+    t_{s}^4 &\sim F_{heave} h_s^2 \\
+    t_{d} h_{stiff,d}^2 &\sim \frac{F_{heave}D_d^2}{D_s} \\
+\end{aligned}
+\end{equation}
+Since structural material scales linearly with both the thickness $t$ and the stiffener height $h_{stiff}$, the squaring of stiffener heights in \cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
+We therefore expect that an optimization would potentially drive the thicknesses to their minimum values, and thus it is also required to model the minimum value of $t/h_{stiff}$ for which the stiffened plate assumptions hold.
+These limits are also derived in \appendixname~\ref{sec:appendix-structures}.
 
 %TC:break Economics
 \subsection{Economics}\label{sec:econ}

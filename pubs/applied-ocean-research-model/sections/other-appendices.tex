@@ -305,8 +305,9 @@ With the describing function approximation, the nonlinear time-domain drag equat
 The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
 MDOcean has the option to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-This is a form of fixed point iteration where $x_k = g(x_{k-1})$ and is therefore guaranteed to converge as long as $|\frac{\partial g(x)}{\partial x}| < 1$ at the solution. %\hl{find a better place to cite for this besides wikipedia} \url{https://en.wikipedia.org/wiki/Root-finding_algorithm#Fixed_point_iteration_method}. 
-Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m, % from summer research slide 44 5/30/24
+This is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \cref{eq:eom-freq-domain} and $k$ is the iteration index.
+It is therefore guaranteed to converge as long as the dynamics are contracting, i.e. $|\frac{\partial g(\vec{\hat{\dot{\xi}}})}{\partial \vec{\hat{\dot{\xi}}}}| < 1$ at the solution \cite{chicone_contraction_2006}. 
+Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees, % from summer research slide 44 5/30/24
 and a sample convergence plot is shown in Figure~\ref{fig:drag-convergence}.
 
 \begin{figure}
@@ -486,7 +487,8 @@ Inputs to the structures module include forces, bulk and structural dimensions, 
 It outputs a factor of safety for each limit case.
 First, it obtains equivalent section properties based on the plate and stiffener dimensions.
 Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \cite{young_roarks_2001} and the references therein.
-Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case. %\hl{cite DNV standards, RM3 report+new structures addendum, some WEC structures paper, say that typically structures are designed to an ultimate limit and made of stiffened steel because it is efficient way to handle the spread out surface load of the ocean. Also note that for consistency with the RM3 report, welded joints are assumed everywhere, although using pinned joints such as a rod end attachment on the float and reaction plate tubular support structures could enhance structural efficiency.}
+Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case.
+For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
 \subsection{Equivalent Section Properties for Stiffened Plates}\label{sec:equivalent-thickness}
 Stiffeners are structural elements, frequently with I or T profiles, that can be welded or riveted to flat plates to provide additional load-carrying capacity and prevent buckling.
