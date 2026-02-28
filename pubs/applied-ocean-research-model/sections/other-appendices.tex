@@ -592,20 +592,32 @@ In addition to the shorter side length $x_{min}$, stress in a fixed-edge rectang
     x_{max} = \begin{cases} h_0,& h_0 \geq \sqrt{b_1b_2} \\ \frac{b_1+b_2}{2} + h(1-\sqrt{1+m^2}), & h_0 < \sqrt{b_1 b_2}\end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
-Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then $M_{bot}=\beta q x_{min}^2$ for $\beta$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
 
+\subsubsection{Float Bottom Plate}
+Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then:
+\begin{equation}\label{eq:bottom-plate-moment}
+M_{bot}=\beta q x_{min}^2
+\end{equation}
+for $\beta$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{max}/x_{min}$.
+
+\subsubsection{Float Top Plate}
 The top float plate has equivalent thickness $t_{f,top,eq}$ and the same dimensions and edge fixity as the bottom plate.
 Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $r_0$, where $r_0$ is assumed to be at least half the thickness.
 Under these conditions, either the stress at the center $\sigma_{cent}$ or along the longer edge $\sigma_{edge}$ may dominate:
-\begin{equation}
+\begin{equation}\label{eq:top-plate-stress}
     \begin{aligned}
     \sigma_{edge}&= \frac{3W}{2\pi t_{f,top,eq}^2}\left( (1+\nu)\ln\frac{2x_{min}}{\pi r_0}+\beta_1\right)\\
         \sigma_{cent}&=-\beta_2 W/t_{f,top,eq}^2
     \end{aligned}
 \end{equation}
 using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in \cite{young_roarks_2001}.
-The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$. \hl{(Note: this equation gives unusual results so it is not currently used. The top plate thickness is set via scaling of the bottom plate thicknesses. Will be debugged during scrutineering.)}
+The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$.
+However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in \cite{RM3,previsic_reference_2011}.
+It is unknown whether this is an implementation or modeling issue and remains future work to address.
+In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \cref{tab:struct-calc-vs-scale}.
 
+\subsubsection{Other Float Plates}
 The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave. 
 Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design. This prevents the need for a separate structural analysis of the side plates.
 
