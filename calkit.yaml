@@ -7,6 +7,11 @@ environments:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+  pubs:
+    kind: uv-venv
+    path: pubs/requirements.txt
+    python: '3.14'
+    prefix: pubs/.venv
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
@@ -2220,6 +2225,7 @@ pipeline:
       command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
         obj.run_all_from_load();
       inputs:
+        - mdocean/plots/non_matlab_figs/
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2276,7 +2282,7 @@ pipeline:
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
-        - results/ReadNonMatlabFigs/N2_diagram.pdf
+        - results/ReadNonMatlabFigs/xdsm.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -3110,6 +3116,14 @@ pipeline:
     #     - test-results/
     #   inputs: 
     #     - mdocean/
+    pyxdsm:
+      kind: python-script
+      environment: pubs
+      script_path: mdocean/plots/non_matlab_figs/xdsm.py
+      outputs:
+        - mdocean/plots/non_matlab_figs/xdsm.tikz
+        - mdocean/plots/non_matlab_figs/xdsm.tex
+        - mdocean/plots/non_matlab_figs/xdsm.pdf
     move-re-results:
       kind: matlab-command
       environment: _system

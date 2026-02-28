@@ -2224,6 +2224,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_all_from_load();"
     deps:
+      - mdocean/plots/non_matlab_figs/
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2280,7 +2281,7 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
-      - results/ReadNonMatlabFigs/N2_diagram.pdf
+      - results/ReadNonMatlabFigs/xdsm.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -3122,6 +3123,18 @@ stages:
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  pyxdsm:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      mdocean/plots/non_matlab_figs/xdsm.py
+    deps:
+      - mdocean/plots/non_matlab_figs/xdsm.py
+      - .calkit/env-locks/pubs
+    outs:
+      - mdocean/plots/non_matlab_figs/xdsm.tikz
+      - mdocean/plots/non_matlab_figs/xdsm.tex
+      - mdocean/plots/non_matlab_figs/xdsm.pdf
+    desc: Automatically generated from the 'pyxdsm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-re-results:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
