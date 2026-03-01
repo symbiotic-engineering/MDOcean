@@ -3,7 +3,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                                                N_num, M_num, K_num, ...
                                                a1_mat, a2_mat, d1_mat, ...
                                                d2_mat, h_mat, m0_mat, ...
-                                               spatial_res, show_A, plot_phi)
+                                               spatial_res, show_A, plot_phi, ...
+                                               m_k_h_precomputed)
 % Function run_MEEM
 %
 % :param heaving_IC: heaving_IC
@@ -48,6 +49,22 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
             'All nonscalar numeric inputs must have same number of elements');
     end
 
+    % precompute m_k if not already provided
+    m0_h_mat = m0_mat .* h_mat;
+    if exist("m_k_h_precomputed",'var')
+        msg = sprintf('m_k_h_precomputed is the wrong size. Expected [%i,%i], got [%i,%i]',...
+            length(m0_h_mat), K_num, size(m_k_h_precomputed,1), size(m_k_h_precomputed,2));
+        assert(all(size(m_k_h_precomputed)==[length(m0_h_mat),K_num]),msg)
+        m_k_h_all_m0hs = m_k_h_precomputed;
+    else
+        [m_0_h_unique, ~, idx_unique] = unique(m0_h_mat);
+        unique_m_k_h = zeros(length(m_0_h_unique), K_num);
+        for i=1:length(m_0_h_unique)
+            unique_m_k_h(i,:) = get_m_k_h(m_0_h_unique(i), K_num);
+        end
+        m_k_h_all_m0hs = unique_m_k_h(idx_unique,:);
+    end
+
     % generate filename based on setup
     if heaving_IC && heaving_OC
         heaving = 'both';
@@ -88,9 +105,11 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                          d2_num < d1_num;
         
         if valid_geometry
+            m_k_h = m_k_h_all_m0hs(i,:);
+
             [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, ...
-                                                                K_num, show_A, plot_phi, fname);
+                                                                K_num, show_A, plot_phi, fname, m_k_h);
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
@@ -114,10 +133,10 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     end
 end
 
-function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
-    % solve for m_k from m_0 and h    
+function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname, m_k_h_precomputed)
+  
     
-    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname,m_k_h_precomputed);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -157,25 +176,17 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, ...
+    hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,...
+                                                            h_num,m0_num,K_num,show_A,fname,...
+                                                            m_k_h_precomputed)
 
-    m_k_num = zeros(1,K_num);
-    % using tand instead of tan because finite precision of pi means
-    % inconsistent behaviour around tan(pi/2)
-    eqn = @(m_k_h_deg) (m_k_h_deg * pi/180) .* tand(m_k_h_deg) + m0_num * h_num * tanh(m0_num * h_num);
-
-    for k_num = 1:K_num
-        bounds = 180 * [k_num-1/2, k_num];
-        % apply tweak determined experimentally to be the smallest tweak
-        % that doesn't return +-Inf - see p17 of notebook
-        expo = floor( log(bounds(1)) / log(2) );
-        bound_tweak = eps * (2^(expo - 1) + 1);
-        bounds(1) = bounds(1) + bound_tweak;
-
-        m_k_h_deg = fzero(eqn, bounds);
-        m_k_num(k_num) = m_k_h_deg * pi/180 / h_num;
-    end    
-
+    if exist("m_k_precomputed",'var')
+        m_k_h_num = m_k_h_precomputed;
+    else
+        m_k_h_num = get_m_k_h(m0_num * h_num, K_num);
+    end
+    m_k_num = m_k_h_num ./ h_num;
     m_k_cell = num2cell(m_k_num);
 
     % get A and b matrices
