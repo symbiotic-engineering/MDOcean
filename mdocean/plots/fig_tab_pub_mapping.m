@@ -91,7 +91,7 @@ figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{29} = 'Slamming.slamming_amplitude';
-figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison';
+figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison_float';
 figs_in_AOR{31}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
 figs_in_AOR{31+6} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
 figs_in_AOR{31+7} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
