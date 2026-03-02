@@ -8,7 +8,7 @@
 - Model: new slamming diameter constraints for float and spar
 - Dev: small script to facilitate retuning heave force and average power
 - Dev: scraper that checks out various commits and runs MEEM to facilitate hydro debugging
-- Dev: attempted custom merge strategy for `dvc.lock`, but doesn't work
+- Dev: custom merge strategy for `dvc.lock`
 ### Changed
 - Model: major change to slamming model - now considers both minimum and maximum slamming amplitudes and appropriately differentiates between large and small waves
 - Model: `power_scale_multibody`, `m_scale`, and `F_heave_mult` values increased to align validation
@@ -21,6 +21,7 @@
 - Optimization/analysis: renaming of slamming constraints for clarity
 ### Fixed
 - Model: error in spar dynamics where wrong draft was used for wamit hydro coefficient interpolation. Now uses T_s 29 m instead of 35 m.
+- Analysis: `is_feasible` not respecting ignored constraints
 - Analysis/pipeline: Wecsim stages appropriately split between simulation and figures and save all 100+ figure outputs
 - Analysis: fix `power_matrix_compare` output sizes for `report=true` in Wecsim validation plots
 - Analysis: corrected edge case logic in figure validity for when object does not have a 'Type' property
