@@ -1,6 +1,15 @@
 # Changelog
 ## Unreleased
 
+## [v1.0.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.4) - 2026-3-1
+### Added
+- Pipeline: new stage for saving end results as a json and formatting it for use in latex
+- Paper: updates numbers to read from this json
+### Changed
+- Analysis: runtimes for each analysis class are saved
+### Fixed
+- Pipeline: xdsm stage uses conda environment rather than venv to get around venv activate error
+
 ## [v1.0.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.3) - 2026-2-27
 ### Added
 - Paper: new section on QP for optimal control, PTO multiport dynamic equations
