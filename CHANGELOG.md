@@ -25,6 +25,7 @@
 - Analysis: fix `power_matrix_compare` output sizes for `report=true` in Wecsim validation plots
 - Analysis: corrected edge case logic in figure validity for when object does not have a 'Type' property
 - CI: Calkit workflow issue where a failed dvc pull would be falsely misinterpreted as a git merge conflict
+- Readme: Zenodo badge now always points to newest version instead of old version
 
 ## [v1.0.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.4) - 2026-3-1
 ### Added
