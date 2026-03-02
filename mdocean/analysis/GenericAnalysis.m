@@ -61,7 +61,8 @@ classdef (Abstract) GenericAnalysis
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.tab_names,'.tex') ...
-                          'end.mat']);
+                          'end.mat' ...
+                          'end.json']);
         end
         function val = get.class_dependencies(obj)
             parent = superclasses(obj);
@@ -83,20 +84,27 @@ classdef (Abstract) GenericAnalysis
         end
         function obj = run_analysis(obj)
             cd('mdocean');
-            obj.intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            t = tic;
+            intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            intermed_result_struct.analysis_time = toc(t);
+            obj.intermed_result_struct = intermed_result_struct;
             cd('..');
             obj.save_intermed_results();
         end
 
         function obj = run_post_process(obj)
             cd('mdocean');
+            t = tic;
             [obj.fig_array,...
                 obj.tab_array_display,...
                 obj.tab_array_latex,...
-                obj.end_result_struct,...
+                end_result_struct,...
                 obj.tab_firstrows,...
                 obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
+            end_result_struct.postpro_time = toc(t);
+            end_result_struct.analysis_time = obj.intermed_result_struct.analysis_time;
+            obj.end_result_struct = end_result_struct;
 
             obj.fig_array = obj.validate_figs(obj.fig_array);
 
@@ -120,7 +128,10 @@ classdef (Abstract) GenericAnalysis
 
         function save_end_results(obj)
             s =  obj.end_result_struct;
-            save([obj.output_folder filesep 'end'],'-struct', 's')
+            fname = [obj.output_folder filesep 'end'];
+            save(fname,'-struct', 's')
+            json = jsonencode(s,PrettyPrint=true);
+            writelines(json, [fname '.json']);
         end
 
         function save_figs(obj)
