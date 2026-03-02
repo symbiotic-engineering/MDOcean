@@ -21,11 +21,11 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
                 copyfile(fig.UserData, [pdf_name '.pdf'])
             catch
                 warning([fig.UserData ' does not exist, saving image to results folder.'])
-                save_pdf(fig,pdf_name) % if pdf does not exist, save the image
+                exportgraphics(fig,pdf_name) % if pdf does not exist, save the image
             end
         else
             % save pdf from matlab figure output
-            save_pdf(fig,pdf_name)
+            exportgraphics(fig,pdf_name)
         end
 
         if nargout>0
