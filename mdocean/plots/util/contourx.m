@@ -10,6 +10,6 @@ function [C,h] = contourx(X,Y,Z,varargin)
         h = imagesc('XData',x,'YData',y,'CData',Z,'AlphaData',~isnan(Z));
         C = [];
     else
-        [C,h] = contourf(X,Y,Z,varargin);
+        [C,h] = contourf(X,Y,Z,varargin{:});
     end
 end
