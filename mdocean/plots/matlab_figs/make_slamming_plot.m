@@ -118,7 +118,7 @@ function hatch(bool,ax,T,Hs)
         tmp_clim = clim;
         [~,h2] = contourf(ax,T,Hs,bool,[1 1],'Fill','off');
         hh = hatchfill2(h2,'cross');
-        hh.Color = [0 0 0 .5];
+        hh.Color = [0 0 0 .5]; % black with 50% transparency
         clim(tmp_clim)
     end
 
