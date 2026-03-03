@@ -12,20 +12,20 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
     if nargin<3
         pdf_prefix = '';
     end
-    pdf_name = fullfile(pdf_prefix, fig_name);
+    pdf_name = [fullfile(pdf_prefix, fig_name) '.pdf'];
     
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
         if ~isempty(fig.UserData)
             % pdf already exists in files, just copy to folder
             try
-                copyfile(fig.UserData, [pdf_name '.pdf'])
+                copyfile(fig.UserData, pdf_name)
             catch
                 warning([fig.UserData ' does not exist, saving image to results folder.'])
-                save_pdf(fig,pdf_name) % if pdf does not exist, save the image
+                exportgraphics(fig,pdf_name) % if pdf does not exist, save the image
             end
         else
             % save pdf from matlab figure output
-            save_pdf(fig,pdf_name)
+            exportgraphics(fig,pdf_name)
         end
 
         if nargout>0

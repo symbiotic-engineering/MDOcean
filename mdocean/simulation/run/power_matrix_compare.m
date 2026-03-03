@@ -160,7 +160,7 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     end
 
     if any(isfinite(Z),'all')
-        [c,h_fig] = contourf(T,H,Z);
+        [c,h_fig] = contourx(T,H,Z);
     else
         c = []; h_fig = [];
     end
@@ -174,7 +174,9 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
             z = [cb.Ticks z];
         end
         levs = sort(z);
-        h_fig.LevelList = levs;
+        if isprop(h_fig,'LevelList')
+            h_fig.LevelList = levs;
+        end
     end
     grid on
 end

@@ -48,10 +48,10 @@ function fig_names = fig_names_wrapper()
             group_names{i} = extractBefore(case_names_i{1},'_drag');
             [case_names_mesh_i, contour_names_mesh_i] = meshgrid(case_names_i, contour_names);
             contour_plot_names_i = strcat(case_names_mesh_i(:), '__', contour_names_mesh_i(:)); % 32 per group
-            plot_names(2:end,i) = contour_plot_names_i;
+            plot_names(1:end-1,i) = contour_plot_names_i;
         end
         histogram_names = strcat(group_names,'__histogram');
-        plot_names(1,:) = histogram_names;
+        plot_names(end,:) = histogram_names;
         fig_names = strcat('wecsim_',plot_names(:)).';
     end
 end
