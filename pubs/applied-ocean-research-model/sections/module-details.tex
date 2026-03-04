@@ -969,19 +969,34 @@ The annual energy production $AEP$ in kWh/year is the product of the number of d
 This study considers two design load cases: (1) cyclic operational loading in sea states where power is produced, and (2) storm loading in sea states where the device enters survival mode and stops producing power.
 These correspond roughly with the 1-year and 50-year return periods specified in the wave energy design standard IEC TS 62600-2, and with the fatigue limit state (FLS) and ultimate limit state (ULS) in offshore wind standards.
 When the WEC is in survival mode, an external brake locks the PTO, enforcing the float and spar to move together without loading the generator.
-This section details the maximum amplitudes and forces in each case.
+This section details the allowable amplitudes and forces in each case.
 Currently all sea states in the JPD with nonzero probability are considered operational, since the generator force and power limit serve to reduce loads in energetic sea states.
-Future studies could control the transition from operational to survival mode more finely, perhaps with an additional design variable representing an operational incident energy threshold.
+Future studies could control the transition from operational to survival mode more finely, perhaps with an additional input variable representing an operational incident energy threshold.
 
 The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material, and the PTO force, which acts at the connection between the float and the spar.
-The vertical design load $F_{heave}$ is taken as the maximum of the PTO and fluid force amplitudes, which conservatively neglects the spatial distribution of the D'Alembert forces:
+The float and spar structures therefore experience loads that vary not only in time but also in space along their lengths.
+At any given time, the maximum force in space is the greater of the PTO force and the fluid force.
+Expressing the latter as the difference between the inertial force and the PTO force, this gives:
 \begin{equation}
 \begin{aligned}
-    F_{heave,f} &=\max(|F_p|, |m_f\ddot{X}_f-F_p|) \\
-    F_{heave,s} &=\max(|F_p|, |m_s\ddot{X}_s-F_p|)
+    F_{heave,f}(t) &=\max(F_p(t), m_f\ddot{\xi}_f(t)-F_p(t)) \\
+    F_{heave,s}(t) &=\max(F_p(t), m_s\ddot{\xi}_s(t)-F_p(t))
 \end{aligned}
 \end{equation}
-where table~\ref{tab:DLCs} details $F_p$ and $X$ based on the assumptions of each design load case.
+In operational seas, $F_p(t)$ is determined by the maximum generator torque $\tau_{max}$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$ due to the generator force saturation.
+In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude can be calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
+Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
+\begin{equation}
+\max_t F_{p,op}(t) \approx \frac{1}{R} \left(\left| Z_d \hat{\Omega} \right| + \tau_{max} \right)
+\end{equation}
+while the storm case lacks the control saturation nonlinearity and thus uses the fundamental amplitude $\hat{F}_{p,st}$.
+The 
+
+where table~\ref{tab:DLCs} details $F_p$ and $\xi$ based on the assumptions of each design load case.
+The vertical design load $F_{heave}$ 
+ maximum of the PTO and fluid force amplitudes, which conservatively neglects the spatial distribution of the inertial forces.
+
 
 \begin{table}
     \centering
@@ -990,18 +1005,18 @@ where table~\ref{tab:DLCs} details $F_p$ and $X$ based on the assumptions of eac
          \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
          Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $F_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
 Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\ 
- Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
-         Spar amplitude, $X_s$& Given by \eqref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
- \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|X_f-X_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
- \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{f,linear}, X_{f,slam})$& N/A \\ %$X_{slam}$\\
- \parbox[m]{\linewidth}{\centering Maximum allowable spar amplitude, $|X_s|_{max}$ }& $\min(X_{s,linear}, X_{s,slam})$& N/A %$X_{slam}$\\
+ Float amplitude, $\xi_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
+         Spar amplitude, $\xi_s$& Given by \eqref{eq:eom-freq-domain}&Equals $\xi_f$ due to brake\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|\xi_f-\xi_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|\xi_f|_{max}$ }& $\min(\xi_{f,linear}, \xi_{f,slam})$& N/A \\ %$X_{slam}$\\
+ \parbox[m]{\linewidth}{\centering Maximum allowable spar amplitude, $|\xi_s|_{max}$ }& $\min(\xi_{s,linear}, \xi_{s,slam})$& N/A %$X_{slam}$\\
     \end{tabular}
     \caption{Force components in each design load case}
     \label{tab:DLCs}
 \end{table}
 
 The calculation of forces and amplitudes in operational seas uses the 2-DOF equation of motion \eqref{eq:eom-freq-domain} with the PTO force $F_p$ set by the chosen controller.
-In storm seas, the brake force is calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+In storm seas, the brake force is calculated by 
 For conservativism, this net force is assumed to apply to both the float and spar independently.
 
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
