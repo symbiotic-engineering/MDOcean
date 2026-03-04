@@ -434,18 +434,18 @@ While this logic works for submersion, it does not apply for slamming because th
 The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
-% Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($\xi_{slam}=\Delta z_{slam}-H/2; \xi^*=-1$).
-% Relevant model values for the \hl{minimum-LCOE} float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
-% Although the intermediate wavelengths ($\xi^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $\xi_{slam}/\xi-1 \approx 0$) because in the tested wave conditions, large amplitude waves occur only at high periods.
-% If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot of \figureautorefname~\ref{fig:slamming-validation} at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
-% This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
-% Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the analysis, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
-%     \caption{Slamming Model Comparison for Minimum LCOE Design in Operational Sea States}
-%     \label{fig:slamming-validation}
-% \end{figure}
+Relevant model values for the nominal float design under reactive optimal control are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
+Comparing the first two subplots for the phase of the float motion $\angle\hat{\xi}_f$ and the slamming angle $\theta$ shows that the slamming angle roughly ``wraps'' the motion angle around a value of $\pi/2$, colored white in the figure.
+The third plot shows that the minimum slamming and submersion amplitude is not a concern since it is negative for all sea states and thus will never be an active constraint.
+The fourth plot shows the maximum amplitude limit and the fifth depicts the actual amplitude, with amplitudes in violation of the limit indicated with an overlaid black hatching.
+A significant fraction of sea states violate the limit and will require adjusted control gains.
+Significant wave heights in excess of 5.5 meters have negative maximum slamming amplitudes (colored blue), indicating that control adjustments in those waves must not only decrease $|\hat{\xi}_f|$ but also adjust $\angle\hat{\xi}_f$ to reduce $\theta$.
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
+    \caption{Slamming Model Results for Nominal RM3 Float Design in Operational Sea States}
+    \label{fig:slamming-validation}
+\end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
