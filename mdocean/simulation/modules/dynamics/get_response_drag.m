@@ -578,12 +578,12 @@ function [idx_closed_loop_unstable,...
 
     % fixme neglects PTO dynamics
     if multibody
-        cascade_VI_to_FXdot = eye(2);
-        T = [1, -1]; % kinematics matrix
+%         cascade_VI_to_FXdot = eye(2);
+%         T = [1, -1]; % kinematics matrix
         ndof = 2;
     else
-        cascade_VI_to_FXdot = 1;
-        T = 1;
+%         cascade_VI_to_FXdot = 1;
+%         T = 1;
         ndof = 1;
     end
 
@@ -614,8 +614,7 @@ function [idx_closed_loop_unstable,...
     
                 % open loop matrices should all be stable, otherwise
                 % indicates an error with the coefficients
-                ol_stable = det(mass_matrix_ol)>0 && det(damp_matrix_ol)>0 ...
-                     && det(stiff_matrix_ol)>0;
+                ol_stable = check_posdef_2x2(damp_matrix_ol,stiff_matrix_ol,mass_matrix_ol);
                 if ~ol_stable
                     warning(['Open loop dynamics are unstable for idx_H=%i, ' ...
                         'idx_T=%i. det(M)=%.2g, det(B)=%.2g, det(K)=%.2g.'], ...
@@ -623,10 +622,17 @@ function [idx_closed_loop_unstable,...
                         det(stiff_matrix_ol))
                 end
 
-                num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
-                den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
-                Z_pto = num ./ den;
-                Z_p = T.' * Z_pto * T; % transform PTO impedance onto body DOFs
+                % uncomment these once PTO dynamics are added
+%                 num = [1 0] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+%                 den = [0 1] * cascade_VI_to_FXdot * [Z_l(idx_H,idx_T); 1];
+%                 Z_pto = num ./ den;
+%                 Z_p = T.' * Z_pto * T; % transform PTO impedance onto body DOFs
+                if ndof==1
+                    Z_p = Z_l(idx_H,idx_T);
+                elseif ndof==2
+                    Z_p = Z_l(idx_H,idx_T) * [1 -1; -1 1];
+                end
+
                 B_p =  real(Z_p);
                 K_p = -imag(Z_p).*w(idx_H,idx_T);            
                 
@@ -634,15 +640,9 @@ function [idx_closed_loop_unstable,...
                 mass_matrix_cl  = mass_matrix_ol;
                 damp_matrix_cl  = damp_matrix_ol  + B_p;
                 stiff_matrix_cl = stiff_matrix_ol + K_p;
-                M_inv_K = mass_matrix_cl \ stiff_matrix_cl;
-                M_inv_B = mass_matrix_cl \ damp_matrix_cl;
-                system_matrix_cl = [zeros(ndof), eye(ndof);
-                                    -M_inv_K, -M_inv_B];
-    
-                % closed loop eigenvalues
-                real_eigs = real(eig(system_matrix_cl));
-    
-                control_makes_closed_loop_unstable = any(real_eigs>0);
+
+                cl_stable = check_posdef_2x2(stiff_matrix_cl, damp_matrix_cl, mass_matrix_cl);
+                control_makes_closed_loop_unstable = ~cl_stable;
                 if control_makes_closed_loop_unstable
                     idx_ctrl_makes_closed_loop_unstable(idx_H,idx_T) = true;
 
@@ -670,6 +670,22 @@ function [idx_closed_loop_unstable,...
         end
     end
     idx_closed_loop_unstable = idx_not_stabilizable | idx_ctrl_makes_closed_loop_unstable;
+end
+
+function all_posdef = check_posdef_2x2(A,B,C)
+    if length(A)==2
+        all_posdef = ...
+            A(1,1)>0 && fastDet2(A)>0 && ...
+            B(1,1)>0 && fastDet2(B)>0 && ...
+            C(1,1)>0 && fastDet2(C)>0;
+    elseif length(A)==1
+        all_posdef = A>0 && B>0 && C>0;
+    else
+        error('Wrong size for check_posdef_2x2')
+    end
+end
+function det = fastDet2(A)
+    det = A(1,1)*A(2,2) - A(2,1)*A(1,2);
 end
 
 function [F_err,X_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
