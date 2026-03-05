@@ -86,6 +86,7 @@ end
 function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
     figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
+    
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
 
@@ -99,19 +100,20 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
 
         f = figure;
         figs(var_idx) = f;
+        t = tiledlayout(1,num_subplots,'TileSpacing','Compact');
         % actual
-        subplot(1,num_subplots,1)
+        nexttile
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
-        caxis(clims)
+        clim(clims)
 
         for i=1:length(sim)
             % sim
-            subplot(1,num_subplots,1+i)
+            nexttile
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
-            caxis(clims)
+            clim(clims)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
-            subplot(1,num_subplots,1+length(sim)+i)
+            nexttile
 
             % set contour lines to make plot more readable
             error_levels = [];
@@ -124,6 +126,14 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                     error_levels = [-25:5:0 2 5];
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-85 -50 -20 -14 -12 -10:5:20];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = -25:5:5;
+                elseif p.C_d_float==1 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = -40:5:5;
+                elseif p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = [-2:2 100:200:1100];
+                elseif p.C_d_float==0 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = [-2:2 100:200:1100];
                 end
             elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
@@ -142,7 +152,9 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
-        sgtitle(remove_underscores(var_name))
+        title(t,remove_underscores(var_name))
+        xlabel(t,'Wave Period T (s)')
+        ylabel(t,'Wave Height Hs (m)')
     end
 end
 
@@ -165,8 +177,6 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
         c = []; h_fig = [];
     end
     title(Z_title)
-    xlabel('Wave Period T (s)')
-    ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
         z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
