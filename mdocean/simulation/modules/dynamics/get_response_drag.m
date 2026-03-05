@@ -243,7 +243,7 @@ function [mag_U,phase_U,...
 
     if drag_convergence_plot_on % fixme: have guesses as output of dynamics and save it to vals and plot outside of the sim
         plot_drag_convergence(X_f_guesses, X_s_guesses, phase_X_f_guesses, phase_X_s_guesses, ...
-                              iters, multibody, X_tol, phase_X_tol)
+                              iters, multibody, X_tol, phase_X_tol);
     end
 
 end
