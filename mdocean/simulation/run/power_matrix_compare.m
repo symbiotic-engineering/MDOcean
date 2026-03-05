@@ -131,9 +131,9 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                 elseif p.C_d_float==1 && p.use_MEEM==true && p.use_multibody==true
                     error_levels = -40:5:5;
                 elseif p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==true
-                    error_levels = [-2:2 100:200:1100];
+                    error_levels = [-0.2 -0.15 0:200:1000];
                 elseif p.C_d_float==0 && p.use_MEEM==true && p.use_multibody==true
-                    error_levels = [-2:2 100:200:1100];
+                    error_levels = [-0.2 -0.15 0:200:1000];
                 end
             elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
@@ -153,8 +153,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
         end
 
         title(t,remove_underscores(var_name))
-        xlabel(t,'Wave Period T (s)')
-        ylabel(t,'Wave Height Hs (m)')
+        xlabel(t,'Wave Period T (s)','FontSize',20)
+        ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end
 end
 
