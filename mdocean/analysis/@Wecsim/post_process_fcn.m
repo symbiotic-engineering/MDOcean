@@ -105,12 +105,13 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             else
                 figure(hist_fig);
                 ax = nexttile(t);
-                subtitle(ax,my_subtitles{p_idx},'FontSize',13)
             end
             [weighted_pwr_err,...
             max_amp_err,...
             pwr_err,amp_err,fig_vec] = plot_per_case(X,p,filename,RM3reportOn,...
                                                     runOnlyFewSeaStates,ax,width);
+
+            subtitle(ax,my_subtitles{p_idx},'FontSize',13)
 
             if histogram_sep_figures
                 fig_vec = [hist_fig fig_vec];
