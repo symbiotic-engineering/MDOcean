@@ -105,7 +105,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             else
                 figure(hist_fig);
                 ax = nexttile(t);
-                subtitle(my_subtitles{p_idx},'FontSize',13)
+                subtitle(ax,my_subtitles{p_idx},'FontSize',13)
             end
             [weighted_pwr_err,...
             max_amp_err,...
@@ -220,7 +220,7 @@ function make_histogram_on_axis(ax,width,...
         end
     end
 
-    % box plot
+    % histogram
     axes(ax)
     histogram(ax,pwr_err(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
     hold(ax,'on')
@@ -234,7 +234,10 @@ function make_histogram_on_axis(ax,width,...
 
     ylim([-.55 .55])
     xx = xlim;
-    xlim([-1 1]*max(abs(xx))) % zero centered on x
+    if any(abs(xx) > 100)
+        warning('Outliers >100% error are not shown on the histogram.')
+    end
+    xlim([-1 1]*min(max(abs(xx)),100)) % zero centered on x, don't allow outliers >100%
     yy = ylim;
 
     plot(ax,[1 1]*wp,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
@@ -246,7 +249,7 @@ function make_histogram_on_axis(ax,width,...
     text_offset_if_pos =  max(abs(xx))/18;
     x_text_pwr = wp + text_offset_if_neg*logical(wp<0) ...
                 + text_offset_if_pos*logical(wp>0);
-    x_text_amp = ma      + text_offset_if_neg*logical(ma<0) ...
+    x_text_amp = ma + text_offset_if_neg*logical(ma<0) ...
                 + text_offset_if_pos*logical(ma>0);
 
     text(x_text_pwr, yy(2)*.9, sprintf('%+0.1f%%',wp), ...
