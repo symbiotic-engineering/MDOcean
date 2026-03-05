@@ -1,11 +1,12 @@
 # Changelog
 ## Unreleased
 
-## [v1.1.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.0) - 2026-3-1
+## [v1.1.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.0) - 2026-3-5
 ### Added
 - Model: checks for open loop and closed loop instabilities and, when the system is unstable but stabilizable, calculates the required change to the controller to maintain stability
 - Model: saturate coupling hydro coefficients to enforce positive definite radiation matrices
 - Model: new slamming diameter constraints for float and spar
+- Analysis: `contourx` function that avoids warnings for constant contours
 - Dev: small script to facilitate retuning heave force and average power
 - Dev: scraper that checks out various commits and runs MEEM to facilitate hydro debugging
 - Dev: custom merge strategy for `dvc.lock`
@@ -18,14 +19,19 @@
 - CI: Calkit workflow only runs stages needed for AOR, not RE, paper
 - CI: Calkit workflow upgrades to latest calkit version
 - Analysis: removed pareto from design space exploration for time savings in AOR development
+- Analysis: figure saving in postpro uses `exportgraphics` instead of `print` to avoid cutting off title/etc in large figures
+- Analysis: figure saving in intermediate results uses `savefig` instead of storing in struct, with saved position if needed when figure is larger than the screen, to avoid figure size issues 
 - Optimization/analysis: renaming of slamming constraints for clarity
 ### Fixed
 - Model: error in spar dynamics where wrong draft was used for wamit hydro coefficient interpolation. Now uses T_s 29 m instead of 35 m.
 - Analysis: `is_feasible` not respecting ignored constraints
 - Analysis/pipeline: Wecsim stages appropriately split between simulation and figures and save all 100+ figure outputs
+- Analysis: figure aesthetics for Runtime, Slamming, and Wecsim stages
 - Analysis: fix `power_matrix_compare` output sizes for `report=true` in Wecsim validation plots
 - Analysis: corrected edge case logic in figure validity for when object does not have a 'Type' property
 - CI: Calkit workflow issue where a failed dvc pull would be falsely misinterpreted as a git merge conflict
+- CI: Avoid dvc timeouts by lengthening time and retrying dvc push in workflow
+- CI: Add `numeric-results.tex` as part of the `calkit save`
 - Readme: Zenodo badge now always points to newest version instead of old version
 
 ## [v1.0.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.4) - 2026-3-1
