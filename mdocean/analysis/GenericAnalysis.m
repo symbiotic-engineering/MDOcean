@@ -118,11 +118,42 @@ classdef (Abstract) GenericAnalysis
             if ~isfile(fname)
                 error('No intermediate results file found. Run analysis first.')
             end
-            obj.intermed_result_struct = load(fname);
+            s = load(fname);
+            d = dir([obj.output_folder filesep 'intermed_*.fig']);
+            for i=1:length(d)
+                fig_name = d(i).name;
+                fig_path = [obj.output_folder filesep fig_name];
+                try
+                    fig_handle = openfig(fig_path, 'invisible');
+                    if isfield(fig_handle.UserData, 'Position')
+                        fig_handle.Position(3:4) = fig_handle.UserData.Position;
+                    end
+                    var_name = extractBetween(fig_name, 'intermed_', '.fig');
+                    s.(var_name{1}) = fig_handle;
+                catch
+                    warning(['Could not load figure: ' fig_path])
+                end
+            end
+            obj.intermed_result_struct = s;
         end
 
         function save_intermed_results(obj)
             s = obj.intermed_result_struct;
+            fn = fieldnames(s);
+            for i=1:length(fn)
+                if isgraphics(s.(fn{i}))
+                    fig = s.(fn{i});
+                    pos = fig.Position(3:4);
+                    monitor_size = get(groot,'MonitorPositions');
+                    ratio = pos ./ monitor_size(:,3:4);
+                    if any(ratio > 1)
+                        % figure goes offscreen and needs to have its position saved manually to look the same after saving/reopening
+                        fig.UserData.Position = pos;
+                    end
+                    savefig(fig, [obj.output_folder filesep 'intermed_', fn{i}, '.fig'])
+                    s = rmfield(s, fn{i});
+                end
+            end
             save([obj.output_folder filesep 'intermed'], '-struct', 's')
         end
 

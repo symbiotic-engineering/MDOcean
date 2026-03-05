@@ -15,7 +15,7 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
     pdf_name = [fullfile(pdf_prefix, fig_name) '.pdf'];
     
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
-        if ~isempty(fig.UserData)
+        if ~isempty(fig.UserData) && ischar(fig.UserData)
             % pdf already exists in files, just copy to folder
             try
                 copyfile(fig.UserData, pdf_name)
