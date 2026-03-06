@@ -120,11 +120,12 @@ classdef (Abstract) GenericAnalysis
             end
             s = load(fname);
             d = dir([obj.output_folder filesep 'intermed_*.fig']);
-            tokens = regexp({d.name}, 'intermed_(.+?)_(\d+).fig', 'tokens');
-            var_names = unique(cellfun(@(t) t{1}{1}, tokens, 'UniformOutput', false));
+            fnames = {d.name};
+            tokens = regexp(fnames, 'intermed_(.+?)_(\d+).fig', 'tokens');
+            [var_names,~,idx] = unique(cellfun(@(t) t{1}{1}, tokens, 'UniformOutput', false));
             for i=1:length(var_names)
                 var_name = var_names{i};
-                fig_idxs = extractBetween({d.name}, ['intermed_' var_name '_'], '.fig');
+                fig_idxs = extractBetween(fnames(idx==i), ['intermed_' var_name '_'], '.fig');
                 fig_idxs = str2double(fig_idxs);
                 fig_vec = gobjects(1,length(fig_idxs));
                 for j=1:length(fig_idxs)
