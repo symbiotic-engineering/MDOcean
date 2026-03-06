@@ -3,7 +3,10 @@ classdef Runtime < GenericAnalysis
     %   Generates dynamics, hydro, and simulation runtime figures
 
     properties
-        fig_names = {'dynamics_runtime', 'hydro_runtime', 'sim_runtime'};
+        fig_names = {'dynamics_runtime', ...
+                     'hydro_runtime_logscale', ...
+                     'hydro_runtime_breakdown', ...
+                     'sim_runtime'};
         tab_names = {};
     end
 

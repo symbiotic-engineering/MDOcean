@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 39;
+num_figs_AOR = 40;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -19,7 +19,7 @@ figs_in_RE = cell([1,num_figs_RE]);
 figs_in_RE{1}  = 'ReadNonMatlabFigs.RM3_image';
 % 2: modeling methodology
 figs_in_RE{2}  = 'ReadNonMatlabFigs.methodology_flowchart';
-figs_in_RE{3}  = 'ReadNonMatlabFigs.N2_diagram';
+figs_in_RE{3}  = 'ReadNonMatlabFigs.xdsm';
 % archs
 figs_in_RE{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 figs_in_RE{5} = 'ReadNonMatlabFigs.optimization_flowchart';
@@ -59,7 +59,7 @@ figs_in_AOR = cell([1,num_figs_AOR]);
 figs_in_AOR{1}  = 'ReadNonMatlabFigs.RM3_image';
 figs_in_AOR{2}  = 'ReadNonMatlabFigs.section_flow';
 % 2: model structure
-figs_in_AOR{3}  = 'ReadNonMatlabFigs.N2_diagram';
+figs_in_AOR{3}  = 'ReadNonMatlabFigs.xdsm';
 figs_in_AOR{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 % 3: module details
 figs_in_AOR{5}  = 'ReadNonMatlabFigs.dimensions';
@@ -70,11 +70,11 @@ figs_in_AOR{9}  = 'DescFcns.drag_desc_fcn';
 figs_in_AOR{10} = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{11} = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
-figs_in_AOR{12} = 'Wecsim.WECSim_error_histograms_multibody';
+figs_in_AOR{12} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram';
 figs_in_AOR{13} = 'HydroCoeffFigFunc.hydro_coeff_err';
 figs_in_AOR{14} = 'Validation.cost_vs_N_WEC';
 figs_in_AOR{15} = 'Runtime.sim_runtime';
-figs_in_AOR{16} = 'Runtime.hydro_runtime';
+figs_in_AOR{16} = 'Runtime.hydro_runtime_logscale';
 figs_in_AOR{17} = 'Runtime.dynamics_runtime';
 % 5: insights and discussion
 figs_in_AOR{18} = 'DampingPlateStructures.damping_plate_aspect_ratio';
@@ -91,21 +91,21 @@ figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{29} = 'Slamming.slamming_amplitude';
-figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison';
-figs_in_AOR{31} = 'Wecsim.wecsim_all_sea_states';
-figs_in_AOR{31+6} = 'Wecsim.wecsim_all_sea_states_2';
-figs_in_AOR{31+7} = 'Wecsim.wecsim_all_sea_states_3';
+figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison_float';
+figs_in_AOR{31}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{31+6} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{31+7} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{31+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - structures
 figs_in_AOR{32} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{33} = 'ReadNonMatlabFigs.trapezoid';
 figs_in_AOR{34} = 'ReadNonMatlabFigs.damping_plate_flowchart';
 figs_in_AOR{35} = 'DampingPlateStructures.damping_plate_moment';
 figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
-% appendix D - economics
-% appendix E - parameters
+% appendix D - parameters
 
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{40}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 

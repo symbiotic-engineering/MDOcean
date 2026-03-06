@@ -1,5 +1,209 @@
 \clearpage
 \section{Dynamics and Control Module Details}
+\subsubsection{Linear Solution Procedure}
+\Cref{sec:eom,sec:pto-dynamics} introduced linear models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
+Here we unify the formulation and present a clear system-level solution procedure for all port variables:
+\begin{enumerate}
+\item Use \cref{eq:Th\'{e}venin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
+\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
+\item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
+\item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
+\item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
+\end{enumerate}
+Once all the port variables have been calculated, power at each port can be calculated according to \cref{sec:power}.
+This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
+
+\subsection{Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
+This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
+\subsubsection{Reduced Dimension Formulation}
+The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem dimension from $\vec{x} \in \mathbb{C}^2$ to $\mathbb{C}^1$.
+Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\vec{n}$, the null space vector of $\vec{c}^{\,*}$:
+\begin{equation}\label{eq:x-p-plus-nullspace}
+    \vec{x} = \underbrace{
+        \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
+        \begin{bmatrix} \ Z_{s,th}^* \\ 1 \end{bmatrix} 
+    }_{
+        \textrm{particular solution } \vec{x}_p} 
+    -~ \Gamma \cdot \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
+    \underbrace{
+        \begin{bmatrix} -\ Z_{s,th}^* \\ 1 \end{bmatrix}
+    }_{
+        \textrm{null space } \vec{n}}
+\end{equation}
+where $\Gamma$ is a nondimensional complex scalar representing the remaining degree of freedom in the optimization after enforcing the equality constraint.
+For the particular solution, we have chosen to use the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \cref{eq:matched-load} and can be derived from the quadratic program as follows:
+\begin{equation}\label{eq:x-p}
+    \vec{x}_{p} = \frac{d \mathbf{A}_P\vec{c}}{\vec{c}^{\,*}\mathbf{A}_P\vec{c}}
+\end{equation}
+This selection for $\vec{x}_p$ means that the degree of freedom $\Gamma$ represents the deviation of the solution from the impedance-matched solution.
+Using $\hat{I}_p$ for brevity to denote the current in the particular solution, \cref{eq:x-p-plus-nullspace} can be rewritten as:
+\begin{equation}\label{eq:x-p-plus-nullspace-simplified}
+\vec{x} = \vec{x}_p - \Gamma \hat{I}_p \vec{n}
+    %&= \begin{bmatrix}
+    %    1+\Gamma &  0 \\
+    %    0 & 1-\Gamma
+    %\end{bmatrix}
+    %\vec{x}_p
+\end{equation}
+
+Inequality constraints 
+$\vec{x}^{\,*}\mathbf{Q}_i\vec{x} + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\} \le b_i$
+further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
+While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition. 
+First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
+\begin{subequations}\label{eq:obj-inequality-gamma}
+\begin{align}
+P_{avg,VI}
+&= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
+\label{eq:obj-gamma}
+\\[6pt]
+A_{q,i}|\Gamma|^2 +&
+2\Re\!\left\{
+    B_{q,i}\Gamma
+\right\}+C_{q,i}
+\le
+0
+\quad \forall i
+\label{eq:ineq-gamma}
+\end{align}
+\end{subequations}
+where quadratic coefficients $A_{q,i}$, $B_{q,i}$, and $C_{q,i}$ from \cref{eq:ineq-gamma} are defined as:
+\begin{equation}
+\begin{aligned}
+    A_{q,i} &= |\hat{I}_p|^{2}\,
+    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}& &\in \mathbb{R} \\
+    B_{q,i} &= -\hat{I}_p\,
+    \left(\vec{x}_p^{\,*}\mathbf{Q}_i + \vec{a}_i^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
+    C_{q,i} &= 
+        \vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+        +
+        2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+        -b_i&
+    &\in \mathbb{R}
+\end{aligned}
+\end{equation}
+Since \cref{eq:obj-gamma} shows that power decreases with increasing $|\Gamma|$, the power maximization problem \cref{eq:opt-problem} can be recast as minimizing the norm of $\Gamma$:
+\begin{subequations}\label{eq:opt-problem-gamma}
+\begin{alignat}{2}
+& \min_{\Gamma \in \mathbb{C}} &  |\Gamma|& \\[3pt]
+& \text{s.t.} &
+S_i|\Gamma - \Gamma_{c,i}|^2 &\le S_i r_i^2,
+\quad \forall i \label{eq:disc-constraint}\\
+& \text{where} &
+\Gamma_{c,i}  &\in \mathbb{C} \nonumber\\
+& & r_i^2 &\in \mathbb{R} \nonumber \\
+& & S_i &\in \left\{-1,1\right\} \nonumber
+\end{alignat}
+\end{subequations}
+where the constraint \cref{eq:disc-constraint} is derived from \cref{eq:ineq-gamma} by completing the square.
+More precisely, when $A_{q,i} \neq 0$, the $i$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,i}$ with radius $r_i$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,i} > 0$ ($S_i=1$) or outside this circle when $A_{q,i} < 0$ ($S_i=-1$). Parameters $\Gamma_{c,i}$, $r_i$, and $S_i$ are defined as:
+\begin{subequations}\label{eq:gamma-disc-params}
+\begin{align}
+\Gamma_{c,i}
+&= \frac{-B_{q,i}^{\,*}}{A_{q,i}} = 
+\frac{
+    \hat{I}_p^{\,*}\,
+    \vec{n}^{\,*}
+    \left(\mathbf{Q}_i\vec{x}_p + \vec{a}_i\right)
+}{
+    |\hat{I}_p|^{2}\,
+    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+}
+\\[6pt]
+r_i^2
+&=
+\frac{|B_{q,i}|^2-A_{q,i}C_{q,i}}{A_{q,i}^2} = 
+\frac{
+b_i
+-
+\vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+-
+2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+}{
+|\hat{I}_p|^{2}\,
+\vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+}
++
+|\Gamma_{c,i}|^2 \\
+S_i &= \textrm{sign}(A_{q,i}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_i\vec{n}\right)
+\end{align}
+\end{subequations}
+
+\subsubsection{Solution}
+\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_i=1$ and exterior to all circles for which $S_i=-1$.
+The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_i C_{q,i} \leq 0 \quad \forall i$.
+If the origin is infeasible, the constrained optimal solution will lie on the boundary of one or more of the circles, specifically either at an intersection of two or more circles or at any circle's point closest to the origin.
+We analytically compute all such candidate points and select the one with the lowest $|\Gamma|$ that satisfies all constraints.
+For $N$ constraints, there are up to $N^2$ candidate points ($N^2-N$ at intersections and $N$ at closest points).
+This leads to the following expression for the constrained optimal solution (valid when $A_{q,i} \neq 0 ~\forall i$):
+\begin{equation}\label{eq:gamma-opt-quadratic}
+\Gamma_{opt} =
+\begin{cases}
+ 0 & \textrm{if } S_i C_{q,i} \leq 0 \quad \forall i \\[3pt]
+ \arg\min\limits_{\Gamma \in \mathcal{F} \bigcap \mathcal{C}} |\Gamma| 
+ & \textrm{otherwise} \\[3pt]
+ \textrm{infeasible} & \textrm{if } \mathcal{F} \bigcap \mathcal{C} = \emptyset
+\end{cases}
+\end{equation}
+where $\mathcal{F} = \bigcap_i \left\{\Gamma : S_i|\Gamma - \Gamma_{c,i}| \le S_i r_i \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
+\begin{equation}\label{eq:candidate-points}
+\begin{aligned}
+\mathcal{C}_{int} &= \left\{
+    \Gamma : 
+    |\Gamma - \Gamma_{c,i}| = r_i, ~|\Gamma - \Gamma_{c,j}| = r_j, \quad \forall i \neq j
+\right\}. \\
+\mathcal{C}_{cl} &= \left\{
+    \Gamma : 
+    \Gamma = \Gamma_{c,i} - r_i \frac{\Gamma_{c,i}}{|\Gamma_{c,i}|}, \quad \forall i
+\right\}.
+\end{aligned}
+\end{equation}
+Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_i=4$, $S_i=1$, and various $\Gamma_{c,i}$.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figs/manual/qp_circles.pdf}
+    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,i}$, all with radius $r_i=4$ and $S_i=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
+    \label{fig:qp-solution-geometry}
+\end{figure}
+
+If $A_{q,i} = 0$ for any $i$, the $i$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
+This can occur when $\mathbf{Q}_i = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\,*}\mathbf{Q}_i\vec{n} = 0$ ($\mathbf{Q}_i$ is rank-deficient and $\vec{n}$ is in its nullspace).
+The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,i}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
+
+\subsubsection{Quartic Apparent Power Constraints}\label{sec:appendix-mag-S-constraints}
+While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{max}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
+This results in a ``Cassini oval'' curve on the complex plane of $\Gamma$, which consists of two closed curves when $|S_{max}|<|S_0|$ and one curve when $|S_{max}|\geq|S_0|$, where $|S_0|$ is the apparent power of the unconstrained optimum \cite{weisstein_cassini_2026}.
+Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\mathcal{C}_{int,oval-circ}$, oval-oval intersections, and oval closest points $\mathcal{C}_{cl,oval}$ to the set of candidate points $\mathcal{C}$.
+The new candidate points are:
+\begin{equation}
+\begin{aligned}
+\mathcal{C}_{int,oval-circ} &= \left\{
+    \Gamma : 
+    |\Gamma - \Gamma_{c,i}| = r_i, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall i,k
+\right\}. \\
+\mathcal{C}_{cl,oval} &= \left\{
+    \Gamma : 
+    \Gamma = \begin{cases}
+        \pm \sqrt{1-\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|<|S_0| \\
+        \pm \sqrt{1+\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|>|S_0|
+    \end{cases}
+\right\}.
+\end{aligned}
+\end{equation}
+where $i$ indexes circle constraints and $k$ indexes oval constraints.
+While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
+We currently assume there is only one apparent power constraint, so oval-oval intersections are not present.
+
+\subsubsection{Discussion}
+Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
+References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss the reflection coefficient for WECs.
+
+Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
+Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
+Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while \cite{bacelli_geometric_2013} covers amplitude and force limits.
+Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while \cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and \cite{bacelli_geometric_2013} in that of the PTO force.
+Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
@@ -80,124 +284,30 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 
 \clearpage
 \subsection{Drag Model\label{sec:appendix-drag}}
-Drag includes form drag (dominant impact), vortex shedding (moderate impact), and skin friction (minor impact) \cite{quartier_influence_2021}.
-None of these three sources are captured in the MEEM hydrodynamics model due to the linear, irrotational, and inviscid assumptions respectively, so drag must be added separately.
-As described in section \ref{sec:dynamics}, a describing function approximation is used.
-This appendix describes an intricacy glossed over in section \ref{sec:dynamics} and entirely omitted in \cite{quartier_influence_2021}: the dependence of $\dot{x}_{wave}$ and thus $\dot{x}_{rel}$ across the width of the WEC in the direction of wave propagation $y$.
-The authors of \cite{quartier_influence_2021} evaluate the wave velocity $\dot{x}_{wave}$ at the center of the WEC ($y=0$), which results in the drag damping coefficient $B_d$ becoming unrealistically low (even negative) at high frequencies and large wave heights.
+As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
 
-A strip-theory approach avoids this issue by integrating the spatially-dependent infinitesimal drag force $dF_d$ over the wetted area $A_w$.
-For a hollow cylinder of radius $R$ and inner radius $R_{in}$, this is expressed: 
-% derived p156-159 notebook 3/10/25
-% simplified p169-173 notebook 3/12/25
-\begin{equation}\label{eq:drag-force-integral}
-    F_d(t) = \int_{A_w} dF_d(y,t) = \int_{y=-R}^{R} w(y) P(y,t)dy
-\end{equation}
-where $w(y)$ is the local width of the WEC perpendicular to $y$:
-\begin{equation}\label{eq:drag-width}
-    w(y) = \begin{cases}
-        2\sqrt{R^2-y^2}, & R_{in}<|y|<R \\
-         2\sqrt{R^2-y^2}-2\sqrt{R_{in}^2-y^2}, &0<|y|< R_{in} \\
-    \end{cases}
-\end{equation}
-and $P(y,t)$ is the local pressure acting vertically due to drag:
-\begin{equation}\label{eq:drag-pressure}
-    \begin{aligned}
-    P(y,t) &= \frac{1}{2} \rho_w C_d ~\dot{x}_{rel}(y,t) ~|\dot{x}_{rel}(y,t)| \\
-   &=  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y)^2 \sin(\omega t+\angle \dot{X}_{rel}(y)) ~\left| \sin(\omega t+\angle \dot{X}_{rel}(y))\right| \\
-   &\approx  \frac{1}{2} \rho_w C_d ~\dot{X}_{rel}(y) ^2~\frac{8}{3\pi}\sin(\omega t+\angle \dot{X}_{rel}(y)) 
-    \end{aligned}
-\end{equation}
-%notation: \dot{X}_rel here refers to the magnitude, not the complex phasor
-% todo: I think technically the X's that I am taking the angle of should have a hat because they are complex
+\subsubsection{Comparison to Other Drag Formulations}
+The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
+Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
+This creates the possibility for negative ``damping'' coefficients that would appear to violate energy conservation if interpreted as a true damping coefficient.
+The damping-excitation grouping chosen in \ref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
 
-Moving into the frequency domain gives complex pressure $\hat{P}$:
-\begin{equation}
-\begin{aligned}
- \hat{P}(y,\omega)  &\approx \frac{1}{2} \rho_w C_d \frac{8}{3\pi}\alpha_v(y)^2 \dot{X}^2 e^{i\phi_\alpha(y)+i\angle\dot{X}}
-    \end{aligned}
-\end{equation}
-where $\alpha_v(y)$ and $\phi_\alpha(y)$ are the amplitude and phase ratios, respectively, of the relative velocity and WEC velocity:
-\begin{equation}\label{eq:drag-alpha-definitions}
-\begin{aligned}
-    \alpha_v(y) &\equiv \frac{\dot{X}_{rel}(y)}{\dot{X}} \\
-    \phi_\alpha(y) &\equiv \angle
-    \left(
-        \frac{\hat{\dot{X}}_{rel}(y)}
-            {\hat{\dot{X}}}
-    \right)   
-    = \angle\hat{\dot{X}}_{rel}(y) -  \angle\hat{\dot{X}} 
-\end{aligned}
-\end{equation}
+Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
+\cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+This means that \cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+Early MDOcean simulations that used the \cite{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radation damping) at high frequencies and large wave heights.
+The strip-theory approach presented in \cref{sec:drag} avoids this issue.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}. 
 
-Rewriting the relative velocity $\hat{\dot{X}}_{rel}(y)$ in equation \eqref{eq:drag-alpha-definitions} in terms of the finite depth incident wave velocity at a depth equal to the draft $\hat{\dot{X}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-kT} e^{-iky}$ and the WEC velocity $\hat{\dot{X}}$ gives the following expressions for $\alpha_v^2(y)$ and $\phi_\alpha(y)$:
-
-\begin{equation}
-\begin{aligned}
-    \alpha_v^2(y) &= 1 + r^2 e^{-2ky} - 2 r e^{-ky}  \sin\angle \hat{\dot{X}} \\
-    \phi_\alpha(y) &= \mathrm{atan2}\left( \sin\angle \hat{\dot{X}} - r e^{-ky}, ~\cos\angle \hat{\dot{X}}\right) -  \angle\hat{\dot{X}}
-\end{aligned}
-\end{equation}
-where $r = \dot{X}_{wave}(y=0)/ \dot{X}$ is the ratio of the wave velocity at the center of the WEC to the WEC velocity.
-The drag force integral \eqref{eq:drag-force-integral} becomes:
-\begin{equation}
-    \hat{F}_d(\omega) \approx  \frac{1}{2} \rho_w C_d \frac{8}{3\pi}\dot{X}^2 e^{i\angle\hat{\dot{X}}}\int_{y=-R}^{R} w(y) \alpha_v(y)^2  e^{i\phi_\alpha(y)}dy
-\end{equation}
-noting that both the outer coefficient $e^{i\angle\hat{\dot{X}}}$ and the integral term $e^{i\phi_\alpha(y)}$ are complex phasors.
-Setting $\hat{F}_{d}(\omega)%=\frac{1}{2}\rho_w C_d A_w \frac{8}{3\pi}  \dot{X}_{rel}(\omega)|\dot{X}_{rel}(\omega)|
-=B_{d} \hat{\dot{X}} + K_{d} \hat{X}$ and solving for the coefficients yields
-\begin{equation}\label{eq:drag-coeffs}
-\begin{aligned}
-B_{d} &= ~~~~~~\frac{4}{3\pi} \rho_w  C_{d} \dot{X} \int_{y=-R}^{R} w(y) \alpha_v(y)^2  \cos(\phi_\alpha(y))dy \\ % real part of c\_f
-K_{d} &= - \omega~\frac{4}{3\pi} \rho_w  C_{d} \dot{X} \int_{y=-R}^{R} w(y) \alpha_v(y)^2  \sin(\phi_\alpha(y))dy \\ % -w times imag part of c\_f
-\end{aligned}
-\end{equation}
-
-Plugging in the expressions for $w(y)$, $\alpha_v(y)$, and $\phi_\alpha(y)$ gives an integral with the following form:
-\begin{equation}
-\begin{aligned}
-    &\int_{y=-R}^{R} w(y) \alpha_v(y)^2  e^{i\phi_\alpha(y)}dy \\
-    = &\int_{y=-R}^{R} w(y) \sqrt{1 + r^2 e^{-2ky} - 2 r e^{-ky}  \sin\angle \hat{\dot{X}}} \left(f_3(\angle\hat{\dot{X}}) + f_2(\angle\hat{\dot{X}})re^{-ky}\right)  dy
-\end{aligned}
-\end{equation}
-where $f_2$ and $f_3$ are trigonometric functions \hl{that I will derive during re-scrutineering, they are different for the cosine (Bd) vs sine (Kd).
-For now before these integrals are derived, I assume the following:}
-\begin{equation}
-\begin{aligned}
-    \phi_\alpha(y) &= 0 \\
-    \alpha_v(y) &= \alpha_v(y=0) = 1 + r^2 - 2 r \sin\angle \hat{\dot{X}}
-\end{aligned}
-\end{equation}
-
-Comparisons against WEC-Sim confirmed that this assumption yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}, which uses an identical $\alpha_v(y)$ but assumes a different phase: $\phi_\alpha(y)=\phi_\alpha(y=0)$. 
-At high frequencies and large wave heights, $r$ is large and $\phi_\alpha(y=0)$ exceeds $\pi$, causing the drag damping coefficient $B_d$ to be negative (non-dissipative), which is not realistic.
-While setting $\phi_\alpha(y)=0$ does not guarantee that $B_d$ is always positive, it is found through testing to significantly reduce the risk of negative damping and to promote convergence of the drag loop.
-In the optimization, any negative drag damping coefficents are set to zero.
-
-% todo: write out full integral
-%Like \cite{quartier_influence_2021}, this formulation evaluates the wave velocity $\dot{x}_{wave}$ at the center of the WEC rather than considering the variation in wave velocity along the direction of propagation as would be done with strip theory. This avoids cumbersome integral calculations at the cost of a small inaccuracy that will be quantified in section~\ref{sec:validation}.
-
-With this approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $B_{d}$ and $K_{d}$ prevents true linearity.
-The solution for states $|\dot{X}|$ and $\angle \dot{X}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation\eqref{eq:eom}.
+\subsubsection{Iterative Solution}
+With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
+The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
-Rather than employ a typical nonlinear root-finding algorithm, MDOcean simply uses the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
+MDOcean has the option to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
 This is a form of fixed point iteration where $x_k = g(x_{k-1})$ and is therefore guaranteed to converge as long as $|\frac{\partial g(x)}{\partial x}| < 1$ at the solution. %\hl{find a better place to cite for this besides wikipedia} \url{https://en.wikipedia.org/wiki/Root-finding_algorithm#Fixed_point_iteration_method}. 
-Five to eight iterations on $|\dot{X}|$ and $\angle \dot{X}$ are typically required to converge all sea states to within 0.01~m, % from summer research slide 44 5/30/24
+Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m, % from summer research slide 44 5/30/24
 and a sample convergence plot is shown in Figure~\ref{fig:drag-convergence}.
-
-In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
-This does not violate the dissipative nature of drag \textit{overall}, because $F_d$ always opposes $\dot{X}_{rel}$ even if it does not oppose $\dot{X}$.
-The non-dissipative effect of drag \textit{on the body} can be interpreted as modeling a second-order wave excitation force.
-The effect would likely be mitigated if the position-dependence of the wave velocity were modeled, although this would require a difficult integration over the body surface and is left to future work.
-Instead, if the negative drag exceeds the radiation damping and causes instability, the power for that sea state is zeroed.
-
-Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal.
-The standard optimal control damping is derived by setting
-\begin{equation}
-0 = \frac{\partial P}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |X|^2}{\partial B_p} = \frac{\partial \frac{1}{2} (B_p) \omega^2 |\frac{H\gamma/2}{(m+A_h)s^2+(B_h+B_d+B_p)s+(K_h+K_d+K_p)}|^2}{\partial B_p} 
-\end{equation}
-and the typical simplification $\frac{\partial B_d}{\partial B_p}=\frac{\partial K_d}{\partial B_p}=0$ must be replaced with the implicit dependence of $|X|$ on $B_d$ and $K_d$ from \eqref{eq:drag-coeffs}.
-In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
 
 \begin{figure}
     \centering
@@ -205,33 +315,102 @@ In practice, however, the standard complex conjugate controller was observed to 
     \caption{Convergence plot for drag iteration}
     \label{fig:drag-convergence}
 \end{figure}
+%In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
+
+\subsubsection{Optimal Control Condition}
+Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
+The optimal load damping $B_l$ is derived by setting
+\begin{equation}
+\begin{aligned}
+0 &= \frac{\partial }{\partial B_l} \left[p_{avg,VI}\right]
+= \frac{\partial}{\partial B_l} \left[\frac{1}{2} B_l |\hat{I}|^2\right] \\
+&= \frac{\partial }{\partial B_l} \left[\frac{1}{2} B_l \left|\frac{\hat{V}_{s,th}}{Z_{s,th}+B_l+K_l/s}\right|^2 \right]
+\end{aligned}
+\end{equation}
+and the typical simplification $\frac{\partial \hat{V}_{s,th}}{\partial B_l}=\frac{\partial Z_{s,th}}{\partial B_l}=0$ must be replaced with the implicit dependence of the Th\'{e}venin equivalent parameters on $B_l$ because $B_l$ affects $\hat{\dot\xi}$ and therefore $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ via \eqref{eq:drag-coeffs}.
+In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
 
 \clearpage
-\subsection{Slamming Amplitude}\label{sec:appendix-slam}
-In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $x(t)-\Delta z_{slam,bot}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
+\subsection{Slamming and Submersion Amplitude}\label{sec:appendix-slam}
+In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{slam}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
 \begin{aligned}
-    x(t) - \Delta z_{slam,bot} &< \zeta(y,t) \\ 
-    |X|\cos(\omega t+\angle X) - \Delta z_{slam,bot} &< \frac{H}{2}\cos(\omega t - k y)
+    \xi(t) - \Delta z_{slam} &< \zeta(y,t) \\ 
+    |\hat{\xi}|\cos(\omega t+\angle \hat{\xi}) - \Delta z_{slam} &< \frac{H}{2}\cos(\omega t - k y)
 \end{aligned}
 \end{equation}
 must be true at all times and over all positions where the body could exit the waves, $-D/2<y<D/2$.
 Note that this expression assumes a sinusoidal waveshape but still applies for irregular waves if a wave-by-wave approach \cite{lin_fast_2025} is utilized.
-Manipulation yields the criterion $|X|<X_{slam}$, where the critical amplitude before slamming occurs $X_{slam}$ is
+Manipulating \cref{eq:slamming-time-domain} to ensure the inequality is satisfied for all $t$ yields the criterion:
 \begin{equation}
+|\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam}^2-\left(\frac{H}{2}\right)^2
+\end{equation}
+which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:appendix-qp-solution}, once the appropriate worst-case $y$ is substituted.
+The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios and the corresponding worst-case $y$.
+Completing the square results in:
+\begin{equation}\label{eq:slamming-squared}
+    \left[ |\hat{\xi}|- \frac{H}{2}\cos(\angle\hat{\xi} + ky)\right]^2 < \Delta z_{slam}^2 - (H/2)^2 \sin^2(\angle\hat{\xi} + ky)
+\end{equation}
+In general, after taking the square root of \cref{eq:slamming-squared}, both the positive and negative branches must be used.
+This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{min,slam}<|\hat{\xi}|<\xi_{max,slam}$, with the following values:
+\begin{equation}\label{eq:slamming-min-max}
 \begin{aligned}
-    X_{slam} &= \sqrt{\Delta z_{slam,bot}^2-\left(\frac{H}{2}\sin\theta\right)^2 } - \frac{H}{2} \cos\theta \\
-    \textrm{where } \theta &= \max\left(0,~ \frac{-kD}{2}+|\pi-\angle X|\right).
+    \xi_{max,slam} &= \frac{H}{2} \cos\theta + \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 } \\
+    \xi_{min,slam} &= \frac{H}{2} \cos\theta - \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 }
 \end{aligned}
 \end{equation}
-This expression reduces to the simple limits $\Delta z_{slam,bot}-H/2$ and $\Delta z_{slam,bot}+H/2$ for short wavelengths $(\theta=0)$ and long wavelengths $(\theta=\pi)$ respectively.
-These limits are also the minimum and maximum nonzero critical slamming amplitudes for any design and wave condition.
+where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
+The relevant value of $\theta$ differs depending on the wave amplitude.
+
+\subsubsection{Case 1: Small Wave Amplitudes}
+For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$. This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
+The value of $\theta$ that minimizes $\xi_{max,slam}$ over the relevant range is 
+\begin{equation}\label{eq:slamming-limit-small-waves}
+\theta = \pi - \max\left(0,~ \frac{-kD}{2}+|\pi-\angle \xi|\right)
+\end{equation}
+where the symmetry of \cref{eq:slamming-min-max} has been used to collapse possible values onto $[0,\pi]$.
+
+This expression reduces to the simple limits $\Delta z_{slam}-H/2$ and $\Delta z_{slam}+H/2$ for short wavelengths $(\theta=\pi)$ and long wavelengths $(\theta=0)$ respectively.
+These limits are also the minimum and maximum values of $\xi_{max,slam}$ for any diameter and wave condition where $\Delta z_{slam}>H/2$.
 For intermediate wavelengths, the variable $\theta$ accurately accounts for the effect of body diameter and the phase offset of body motion from the waves.
-Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=\pi$ allowing the body to get all the way to the wave crest (top) and $\theta=0$ requiring the float to remain fully below the trough (bottom).
-Figure~\ref{fig:slam} visualizes the relationship using the nondimensional parameter $X^*$ to map the slamming amplitude onto the range $[-1,1]$.
-This reveals that besides increasing the draft, increasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle X$ via control.
-If $\Delta z_{slam,bot}<H/2\sin\theta$, slamming occurs even for a stationary body, and the critical slamming amplitude is set to zero to indicate an unviable design.
+Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=0$ allowing the body to get all the way to the wave crest (top) and $\theta=\pi$ requiring the float to remain fully below the wave trough (bottom).
+
+\subsubsection{Case 2: Large Wave Amplitudes}
+In sufficiently large waves ($H/2>\Delta z_{slam}$), \cref{eq:slamming-limit-small-waves} does not apply.
+Intuitively, when the wave amplitude exceeds the draft, a minimum amplitude of motion in-phase with the incident wave is required to prevent the wave trough from going below the body surface.
+The minimum amplitude arises mathematically when $\xi_{min,slam}>0$, which occurs exactly for waves meeting the amplitude criterion.
+The ``in-phase'' motion requirement is consistent with the observation that in this wave regime, the maximum amplitude in \cref{eq:slamming-min-max} becomes unsatisfiable ($\xi_{max,slam}<0$) for WEC phases that are more than 90 degrees out of phase with the incident wave ($\theta \in [\pi/2,3\pi/2]$).
+
+For evaluating \cref{eq:slamming-min-max}, the value of $\theta$ that produces both minimum $\xi_{max,slam}$ and maximum $\xi_{min,slam}$ in this regime is:
+\begin{equation}
+\theta = \angle\hat{\xi} + \frac{kD}{2}\textrm{sgn}(\pi-\angle\hat{\xi})
+\end{equation}
+After wrapping the value onto $[0,2\pi]$, it can be mapped to $[0,\pi]$ without changing the value of \cref{eq:slamming-min-max} via the identity $\cos(\theta)=\cos(\pi-|\pi-\theta|)$.
+
+Notably, in this wave regime it becomes possible for the right hand side of \cref{eq:slamming-squared} to become negative for certain values of $\angle\hat{\xi}$ and $D$.
+This means that those combinations of $\angle\hat{\xi}$ and $D$ are prohibited because slamming would occur regardless of the amplitude $|\hat{\xi}|$.
+The following requirement on $D$ ensures that there exist some values of $\angle\hat{\xi}$ without automatic slamming:
+\begin{equation}\label{eq:D-slamming}
+    kD<2\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)
+\end{equation}
+which has upper bound $kD<\pi$.
+Once \cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\hat{\xi}$ that avoid negative values for both $\xi_{max,slam}$ and the right hand side of \cref{eq:slamming-squared} are:
+\begin{equation}\label{eq:slamming-allowed-angles}
+\begin{aligned}
+    \angle\hat{\xi} \in &\left[0,~~\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)-\frac{kD}{2}\right] \\
+    \cup & \left[2\pi-\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)+\frac{kD}{2}, ~~2\pi\right]
+\end{aligned}
+\end{equation}
+At the edge-case $\angle\hat{\xi}$ on the inner boundaries of this interval, only a single amplitude is permitted because the values for $\xi_{max,slam}$ and $\xi_{min,slam}$ coincide at $\sqrt{(H/2)^2-\Delta z_{slam}^2}$.
+At any lower amplitude, the WEC would exit the water at the wave trough, and any higher, the WEC would raise out of the water at the wave crest.
+The permissible amplitude range can be widened by decreasing $D$ or moving $\angle\hat{\xi}$ towards the closer of $0$ and $2\pi$.
+The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam} < |\hat{\xi}| < H/2+\Delta z_{slam}$.
+
+\subsubsection{Implementation}
+Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam}/(H/2)$.
+This reveals that besides increasing the draft, decreasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
+If $\Delta z_{slam}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/slamming_amplitude.pdf}
@@ -240,37 +419,38 @@ If $\Delta z_{slam,bot}<H/2\sin\theta$, slamming occurs even for a stationary bo
 \end{figure}
 %\hl{add description of similarities and differences of this to Budal's upper bound}
 
-Separately, there exists a symmetrical counterpart to the above slamming condition, where in addition to requiring the bottom the WEC to remain below the waves, one can require that the top of the WEC remains above the waves, preventing full submersion. 
+Separately, there exists a symmetrical counterpart to the slamming condition that we will call the submersion condition. 
+While preventing slamming requires that the bottom of the WEC remains below the free surface, preventng submersion requires that the top of the WEC remains above the free surface. 
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
-\begin{equation}\label{eq:top-slamming}
-    x(t) + \Delta z_{slam,top} > \zeta(y,t)
+\begin{equation}\label{eq:submersion}
+    \xi(t) + \Delta z_{sub} > \zeta(y,t)
 \end{equation}
 
-Conceptually, both the bottom-slamming requirement \eqref{eq:slamming-time-domain} and the top-slamming requirement \eqref{eq:top-slamming} must be applied to both the float and the spar for a total of 4 constraints for each sea state.
-However, the top-slamming and bottom-slamming requirement for each body is aggregated into a single constraint for each sea state, using $\Delta z_{slam}=\min(\Delta z_{slam,top}, \Delta z_{slam,bot})$, where the values for $\Delta z_{slam,top}$ and $\Delta z_{slam,bot}$ were given in \sectionautorefname~\ref{sec:dynamics}.
-\hl{(Note: There also might be a slight difference in the way theta would be calculated for top and bottom slamming, this will be checked during re-scrutineering).}
-%However, implementing the top-slamming requirement for the float becomes redundant of the float bottom-slamming requirement due to the parameter choice $T_{f,2}/h_f=1/2$ enforcing equal draft and above-water height.
-%If $h_f$ were added as an independent design variable, the float top-slamming requirement would become necessary to implement, although note that the normalized value of $\frac{dLCOE^*}{dT_{f,2}/h_f}$ in \figureautorefname~\ref{fig:param-sens-J-star-tornado} is less than -0.1, suggesting that the addition of $h_f$ as a design variable would provide little benefit and is therefore low priority.
-Meanwhile, it is only required to implement the slamming constraint for the float not the spar because \reqref{base_dynamic} and \reqref{tops_dynamic} already ensure, respectively, that the bottom of the spar remains below the bottom of the float and that the top of the spar remains above the top of the float across all dynamic conditions.
-Since the float slamming requirement applies for all $-D_f/2<y<D_f/2$ and the spar diameter is always smaller than the float's (via \reqref{float_spar_diam}), the spar slamming requirements are redundant. This reduces the number of slamming constraints per sea state from four to one.
+Conceptually, both the slamming requirement \eqref{eq:slamming-time-domain} and the submersion requirement \eqref{eq:submersion} must be applied to both the float and the spar for a total of 4 free surface constraints for each sea state.
+However, the limit on $|\hat{\xi}_f-\hat{\xi}_s|$ described in \cref{tab:DLCs} already ensures that the top of the spar remains above the top of the float across all dynamic conditions.
+Coupled with the fact that the float diameter always exceeds the spar diameter, this means that satisfaction of the float submersion requirement implies automatic satisfaction of the spar submersion requirement.
+While this logic works for submersion, it does not apply for slamming because the damping plate diameter may exceed the float diameter.
+The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
+This reduces the number of free surface constraints per sea state from four to one.
 
-Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($X_{slam}=\Delta z_{slam}-H/2; X^*=-1$).
-Relevant model values for the minimum-LCOE float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
-Although the intermediate wavelengths ($X^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $X_{slam}/X-1 \approx 0$) because in this JPD, large amplitude waves occur only at high periods.
-If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
-This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
-Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the optimization, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
-\begin{figure}
-    \centering
-    \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison.pdf}
-    \caption{Slamming Model Comparison for Minimum LCOE Design in Operational Sea States}
-    \label{fig:slamming-validation}
-\end{figure}
+% Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($\xi_{slam}=\Delta z_{slam}-H/2; \xi^*=-1$).
+% Relevant model values for the \hl{minimum-LCOE} float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
+% Although the intermediate wavelengths ($\xi^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $\xi_{slam}/\xi-1 \approx 0$) because in the tested wave conditions, large amplitude waves occur only at high periods.
+% If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot of \figureautorefname~\ref{fig:slamming-validation} at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
+% This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
+% Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the analysis, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison_float.pdf}
+%     \caption{Slamming Model Comparison for Nominal Float Design in Operational Sea States}
+%     \label{fig:slamming-validation}
+% \end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
 Each of the 210 sea states are simulated individually. %Table~\ref{tab:dynamic-validation} and 
 Figure~\ref{fig:dynamic-validation} compares the results.
+\hl{Explain results.}
 % \begin{table}
 %     \centering
 %     \begin{tabular}{|c|c|c|} \hline 
@@ -285,11 +465,15 @@ Figure~\ref{fig:dynamic-validation} compares the results.
 \begingroup
 \begin{figure}
 \centering
-\begin{tabular}{c m{1em} | >{\centering\arraybackslash}m{.5\linewidth} >{\centering\arraybackslash}m{.5\linewidth} }
+\begin{tabular}{c m{1em} | >{\centering\arraybackslash}m{.5\linewidth} | >{\centering\arraybackslash}m{.5\linewidth} }
   && \multicolumn{2}{c}{Drag Coefficent}\\
          && $C_d=0$& $C_d=1$\\ \hline
-    \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& \includegraphics[width=\linewidth]{figs/manual/wecsim_all_sea_states_a} & \includegraphics[width=\linewidth]{figs/manual/wecsim_all_sea_states_b} \\
-     &\rot{Different} & \includegraphics[width=.5\linewidth]{example-image-a} & \includegraphics[width=\linewidth]{figs/manual/wecsim_all_sea_states_d} \\
+    \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& 
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf}
+\\ &\rot{Different} & 
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
 \caption{Dynamic validation showing error in a variety of modeling assumptions}
 \label{fig:dynamic-validation}
@@ -313,7 +497,7 @@ Stiffeners are structural elements, frequently with I or T profiles, that can be
 Stiffened plates are common in marine and aerospace structural design because they are an efficient way to carry spatially distributed fluid loads.
 To analyze these compound sections, equivalent properties can be established that describe the overall bending stiffness of the combined section as if it were a simple uniform section, while still utilizing the maximum distance from the neutral axis of the irregular section to accurately determine stress.
 Figure~\ref{fig:stiffened-plate} illustrates the concept of equivalent thickness for a stiffened plate.
-\begin{figure}
+\begin{figure}[hbtp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/equivalent_stiffness.pdf}
     \caption{Equivalent thickness for a stiffened plate}

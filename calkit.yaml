@@ -1,12 +1,16 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize
+description: Multidisciplinary Design Optimization (MDO) to optimize 
   an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
+  pubs:
+    kind: conda
+    path: pubs/environment.yaml
+    python: '3.14'
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
@@ -14,8 +18,9 @@ pipeline:
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=AllFigCompare; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -34,8 +39,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -62,13 +65,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/AllFigCompare/intermed.mat
     postpro-AllFigCompare:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=AllFigCompare; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-AllFigCompare
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -88,7 +93,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -119,11 +123,12 @@ pipeline:
       outputs: 
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/end.mat
+        - results/AllFigCompare/end.json
     analysis-Comparison:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Comparison; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -149,8 +154,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -178,13 +181,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Comparison/intermed.mat
     postpro-Comparison:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Comparison; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Comparison; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Comparison
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -207,7 +212,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -243,11 +247,13 @@ pipeline:
         - results/Comparison/optimal_design_vars.tex
         - results/Comparison/optimal_outputs.tex
         - results/Comparison/end.mat
+        - results/Comparison/end.json
     analysis-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=Constraints; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -266,8 +272,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -294,13 +298,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Constraints/intermed.mat
     postpro-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Constraints; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Constraints
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -320,7 +326,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -351,11 +356,12 @@ pipeline:
       outputs: 
         - results/Constraints/constraints.tex
         - results/Constraints/end.mat
+        - results/Constraints/end.json
     analysis-Cost:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -374,8 +380,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -402,13 +406,14 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Cost/intermed.mat
     postpro-Cost:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_all_from_load();
-      inputs: 
+      inputs:
+        - from_stage_outputs: analysis-Cost
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -428,7 +433,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -459,11 +463,13 @@ pipeline:
       outputs: 
         - results/Cost/cost_parameters.tex
         - results/Cost/end.mat
+        - results/Cost/end.json
     analysis-DampingPlateStructures:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DampingPlateStructures; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=DampingPlateStructures; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -484,8 +490,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -512,13 +516,18 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/DampingPlateStructures/intermed.mat
+        - results/DampingPlateStructures/intermed_figs_1.fig
+        - results/DampingPlateStructures/intermed_figs_2.fig
+        - results/DampingPlateStructures/intermed_figs_3.fig
     postpro-DampingPlateStructures:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DampingPlateStructures; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DampingPlateStructures; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-DampingPlateStructures
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -538,7 +547,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -571,11 +579,12 @@ pipeline:
         - results/DampingPlateStructures/damping_plate_deflection.pdf
         - results/DampingPlateStructures/damping_plate_moment.pdf
         - results/DampingPlateStructures/end.mat
+        - results/DampingPlateStructures/end.json
     analysis-DescFcns:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DescFcns; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -595,8 +604,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -623,13 +630,18 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/DescFcns/intermed.mat
+        - results/DescFcns/intermed_created_figs_1.fig
+        - results/DescFcns/intermed_created_figs_3.fig
+        - results/DescFcns/intermed_created_figs_2.fig
     postpro-DescFcns:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DescFcns; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DescFcns; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-DescFcns
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -649,7 +661,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -677,21 +688,24 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
         - results/DescFcns/intermed.mat
-      outputs: 
+      outputs:
         - results/DescFcns/saturation_desc_fcn.pdf
         - results/DescFcns/saturation_desc_fcn_alpha.pdf
         - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/end.mat
+        - results/DescFcns/end.json
     analysis-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignSpaceExploration; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignSpaceExploration; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
-        - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
-        - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
-        - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
+        #- ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
+        #- ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
+        #- ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
+        #- mdocean/results/ParetoFigFunc/intermed.mat
         - ./mdocean/analysis/GenericAnalysis.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -721,8 +735,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -752,13 +764,15 @@ pipeline:
         - ./mdocean/simulation/run/experiments.m
         - ./mdocean/simulation/run/is_feasible.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/DesignSpaceExploration/intermed.mat
     postpro-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignSpaceExploration; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignSpaceExploration; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-DesignSpaceExploration
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -785,7 +799,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -814,15 +827,16 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DesignSpaceExploration/intermed.mat
       outputs: 
-        - results/DesignSpaceExploration/experiments_pareto.pdf
+       #- results/DesignSpaceExploration/experiments_pareto.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_results.tex
         - results/DesignSpaceExploration/end.mat
+        - results/DesignSpaceExploration/end.json
     analysis-DesignVars:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DesignVars; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -841,8 +855,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -869,13 +881,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/DesignVars/intermed.mat
     postpro-DesignVars:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DesignVars; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=DesignVars; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-DesignVars
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -895,7 +909,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -926,11 +939,13 @@ pipeline:
       outputs: 
         - results/DesignVars/design_vars.tex
         - results/DesignVars/end.mat
+        - results/DesignVars/end.json
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ForceSaturationFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -950,8 +965,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -978,13 +991,17 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/ForceSaturationFigFunc/intermed.mat
+        - results/ForceSaturationFigFunc/intermed_fig2_1.fig
+        - results/ForceSaturationFigFunc/intermed_fig1_1.fig
     postpro-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ForceSaturationFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-ForceSaturationFigFunc
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1004,7 +1021,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1036,11 +1052,13 @@ pipeline:
         - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/end.mat
+        - results/ForceSaturationFigFunc/end.json
     analysis-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=GradientOptimFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=GradientOptimFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1064,8 +1082,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1093,13 +1109,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/GradientOptimFigFunc/intermed.mat
+        - results/GradientOptimFigFunc/intermed_convergence_plot_1.fig
     postpro-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=GradientOptimFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=GradientOptimFigFunc; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-GradientOptimFigFunc
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1129,7 +1148,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1167,11 +1185,13 @@ pipeline:
         - results/GradientOptimFigFunc/single_obj_convergence.pdf
         - results/GradientOptimFigFunc/single_obj_optim_results.tex
         - results/GradientOptimFigFunc/end.mat
+        - results/GradientOptimFigFunc/end.json
     analysis-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=HydroCoeffFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1190,8 +1210,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1219,13 +1237,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/hydro_coeff_err.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/HydroCoeffFigFunc/intermed.mat
+        - results/HydroCoeffFigFunc/intermed_created_figs_1.fig
     postpro-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=HydroCoeffFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-HydroCoeffFigFunc
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1245,7 +1266,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1276,11 +1296,13 @@ pipeline:
       outputs: 
         - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/end.mat
+        - results/HydroCoeffFigFunc/end.json
     analysis-LocationSensitivity:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=LocationSensitivity; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1308,8 +1330,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1338,13 +1358,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/check_max_CW.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/LocationSensitivity/intermed.mat
     postpro-LocationSensitivity:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=LocationSensitivity; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-LocationSensitivity
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1365,7 +1387,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1401,11 +1422,12 @@ pipeline:
         - results/LocationSensitivity/location_probability_PDF.pdf
         - results/LocationSensitivity/location_sensitivity.tex
         - results/LocationSensitivity/end.mat
+        - results/LocationSensitivity/end.json
     analysis-Meem:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1425,8 +1447,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1455,13 +1475,19 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/validate_MEEM.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Meem/intermed.mat
+        - results/Meem/intermed_b_vector_fig_1.fig
+        - results/Meem/intermed_figHydroCoeff_1.fig
+        - results/Meem/intermed_figSparsity_1.fig
+        - results/Meem/intermed_figVelMatch_1.fig
+        - results/Meem/intermed_figPotMatch_1.fig
     postpro-Meem:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_all_from_load();
-      inputs: 
+      inputs:
+        - from_stage_outputs: analysis-Meem
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1481,7 +1507,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1517,11 +1542,12 @@ pipeline:
         - results/Meem/meem_convergence.pdf
         - results/Meem/asymptotic_b_vector.pdf
         - results/Meem/end.mat
+        - results/Meem/end.json
     analysis-Multistart:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Multistart; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/analysis/@Multistart/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1547,8 +1573,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1577,13 +1601,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/is_feasible.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Multistart/intermed.mat
     postpro-Multistart:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Multistart; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Multistart; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Multistart
         - ./mdocean/SAFE/PAWN/pawn_cdfs.m
         - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
         - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -1610,7 +1636,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1644,11 +1669,13 @@ pipeline:
         - results/Multistart/multistart_bar_chart.pdf
         - results/Multistart/multistart_results.tex
         - results/Multistart/end.mat
+        - results/Multistart/end.json
     analysis-ParamSensitivities:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParamSensitivities; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1675,8 +1702,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1704,13 +1729,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/ParamSensitivities/intermed.mat
     postpro-ParamSensitivities:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParamSensitivities; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-ParamSensitivities
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1733,7 +1760,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1787,11 +1813,12 @@ pipeline:
         - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
         - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
         - results/ParamSensitivities/end.mat
+        - results/ParamSensitivities/end.json
     analysis-Parameters:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Parameters; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1810,8 +1837,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1838,13 +1863,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Parameters/intermed.mat
     postpro-Parameters:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Parameters; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Parameters; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Parameters
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1864,7 +1891,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1895,11 +1921,13 @@ pipeline:
       outputs: 
         - results/Parameters/parameters.tex
         - results/Parameters/end.mat
+        - results/Parameters/end.json
     analysis-ParetoFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1927,8 +1955,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -1957,13 +1983,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/is_feasible.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/ParetoFigFunc/intermed.mat
     postpro-ParetoFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-ParetoFigFunc
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1989,7 +2017,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2024,11 +2051,13 @@ pipeline:
         - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
         - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
         - results/ParetoFigFunc/end.mat
+        - results/ParetoFigFunc/end.json
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2047,8 +2076,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2075,13 +2102,15 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/ParetoSweep/intermed.mat
     postpro-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-ParetoSweep
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2101,7 +2130,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2132,11 +2160,13 @@ pipeline:
       outputs: 
         - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/end.mat
+        - results/ParetoSweep/end.json
     analysis-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ReadNonMatlabFigs; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2155,8 +2185,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2183,13 +2211,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/ReadNonMatlabFigs/intermed.mat
     postpro-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ReadNonMatlabFigs; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - mdocean/plots/non_matlab_figs/
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2209,7 +2240,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2246,7 +2276,7 @@ pipeline:
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
-        - results/ReadNonMatlabFigs/N2_diagram.pdf
+        - results/ReadNonMatlabFigs/xdsm.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -2254,11 +2284,13 @@ pipeline:
         - results/ReadNonMatlabFigs/sim_runtime.pdf
         - results/ReadNonMatlabFigs/trapezoid.pdf
         - results/ReadNonMatlabFigs/end.mat
+        - results/ReadNonMatlabFigs/end.json
     analysis-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=RunSingleFigFunc; obj.run_analysis();
-      inputs: 
+      command: add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_analysis();
+      inputs:
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2285,8 +2317,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2317,13 +2347,21 @@ pipeline:
         - ./mdocean/simulation/run/is_feasible.m
         - ./mdocean/simulation/run/run_single.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/RunSingleFigFunc/intermed.mat
+        - results/RunSingleFigFunc/intermed_created_figs_1.fig
+        - results/RunSingleFigFunc/intermed_created_figs_4.fig
+        - results/RunSingleFigFunc/intermed_created_figs_6.fig
+        - results/RunSingleFigFunc/intermed_created_figs_3.fig
+        - results/RunSingleFigFunc/intermed_created_figs_5.fig
+        - results/RunSingleFigFunc/intermed_created_figs_2.fig
     postpro-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=RunSingleFigFunc; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-RunSingleFigFunc
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2343,7 +2381,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2376,13 +2413,15 @@ pipeline:
         - results/RunSingleFigFunc/nominal_power_pdf.pdf
         - results/RunSingleFigFunc/nominal_power_matrix.pdf
         - results/RunSingleFigFunc/drag_convergence.pdf
-        - results/RunSingleFigFunc/slamming_model_comparison.pdf
+        - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
+        - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
         - results/RunSingleFigFunc/end.mat
+        - results/RunSingleFigFunc/end.json
     analysis-Runtime:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Runtime; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2397,15 +2436,12 @@ pipeline:
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/module_runtime_compare.m
         - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/hatchfill2.m
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2432,15 +2468,18 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Runtime/intermed.mat
     postpro-Runtime:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Runtime; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Runtime; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Runtime
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/post_process_fcn.m
+        - ./mdocean/plots/matlab_figs/module_runtime_compare.m
         - ./mdocean/analysis/GenericAnalysis.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
@@ -2458,7 +2497,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2488,14 +2526,16 @@ pipeline:
         - results/Runtime/intermed.mat
       outputs: 
         - results/Runtime/dynamics_runtime.pdf
-        - results/Runtime/hydro_runtime.pdf
+        - results/Runtime/hydro_runtime_logscale.pdf
+        - results/Runtime/hydro_runtime_breakdown.pdf
         - results/Runtime/sim_runtime.pdf
         - results/Runtime/end.mat
+        - results/Runtime/end.json
     analysis-Slamming:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Slamming; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2515,8 +2555,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2543,13 +2581,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Slamming/intermed.mat
+        - results/Slamming/intermed_figure_handle_1.fig
     postpro-Slamming:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Slamming; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Slamming; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Slamming
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2569,7 +2610,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2600,11 +2640,12 @@ pipeline:
       outputs: 
         - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/end.mat
+        - results/Slamming/end.json
     analysis-SparHydro:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=SparHydro; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2624,8 +2665,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2652,13 +2691,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/SparHydro/intermed.mat
+        - results/SparHydro/intermed_figure_handle_1.fig
     postpro-SparHydro:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=SparHydro; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=SparHydro; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-SparHydro
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2678,7 +2720,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2709,11 +2750,12 @@ pipeline:
       outputs: 
         - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/end.mat
+        - results/SparHydro/end.json
     analysis-Validation:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Validation; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2734,8 +2776,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2765,13 +2805,16 @@ pipeline:
         - ./mdocean/simulation/run/is_feasible.m
         - ./mdocean/simulation/run/validate_nominal_RM3.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Validation/intermed.mat
+        - results/Validation/intermed_fig_cost_vs_N_WEC_1.fig
     postpro-Validation:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Validation; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Validation; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Validation
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2792,7 +2835,6 @@ pipeline:
         - ./mdocean/plots/util/modify_suffix.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2824,11 +2866,12 @@ pipeline:
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/validation.tex
         - results/Validation/end.mat
+        - results/Validation/end.json
     analysis-Wecsim:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Wecsim; obj.run_analysis();
-      inputs: 
+      inputs:
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2840,7 +2883,8 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
         - ./mdocean/inputs/var_bounds.m
-        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave Resource _SAM CSV.csv
+        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
+          Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2850,8 +2894,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
-        - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2877,25 +2919,41 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
-        - ./mdocean/simulation/run/power_matrix_compare.m
-        - ./mdocean/simulation/run/validate_dynamics.m
+        - ./mdocean/simulation/run/make_all_cases.m
         - ./mdocean/simulation/simulation.m
-      outputs: 
+      outputs:
         - results/Wecsim/intermed.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.mat
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.mat
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.mat
     postpro-Wecsim:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Wecsim; obj.run_all_from_load();
-      inputs: 
+      command: add_mdocean_path(); obj=Wecsim; 
+        obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-Wecsim
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
+        - ./mdocean/simulation/run/power_matrix_compare.m
         - ./mdocean/inputs/get_spar_exc.m
         - ./mdocean/inputs/parameters.m
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
+          Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2906,7 +2964,6 @@ pipeline:
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
-        - ./mdocean/plots/util/save_pdf.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2935,13 +2992,120 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Wecsim/intermed.mat
       outputs: 
-        - results/Wecsim/WECSim_error_histograms_singlebody.pdf
-        - results/Wecsim/WECSim_error_histograms_multibody.pdf
-        - results/Wecsim/wecsim_all_sea_states.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
         - results/Wecsim/WECSim_errors.tex
         - results/Wecsim/end.mat
-
-
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
+        - results/Wecsim/end.json
     # run-matlab-tests:
     #   kind: matlab-script
     #   environment: _system
@@ -2950,19 +3114,145 @@ pipeline:
     #     - test-results/
     #   inputs: 
     #     - mdocean/
-    move-results:
+    pyxdsm:
+      kind: python-script
+      environment: pubs
+      script_path: mdocean/plots/non_matlab_figs/xdsm.py
+      outputs:
+        - mdocean/plots/non_matlab_figs/xdsm.tikz
+        - mdocean/plots/non_matlab_figs/xdsm.tex
+        - mdocean/plots/non_matlab_figs/xdsm.pdf
+    move-re-results:
       kind: matlab-command
       environment: _system
       inputs:
-        - results/
+        - results/ReadNonMatlabFigs/
+        - results/DesignSpaceExploration/
+        - results/Comparison/
+        - results/GradientOptimFigFunc/
+        - results/Multistart/
+        - results/ParamSensitivities/
+        - results/ParetoFigFunc/
+        - results/AllFigCompare/
+        - results/ParetoSweep/
+        - results/Constraints/
+        - results/DesignVars/
+        - results/Parameters/
+        - results/LocationSensitivity/
         - mdocean/plots/fig_tab_pub_mapping.m
         - mdocean/plots/move_results_to_pubs.m
+        - mdocean/plots/non_matlab_figs/pdf/
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
+      command: add_mdocean_path(); move_results_to_pubs('RE');
+    move-aor-results:
+      kind: matlab-command
+      environment: _system
+      inputs:
+        - results/ReadNonMatlabFigs/
+        - results/SparHydro/
+        - results/DescFcns/
+        - results/RunSingleFigFunc/
+        - results/Wecsim/
+        - results/HydroCoeffFigFunc/
+        - results/Validation/
+        - results/Runtime/
+        - results/DampingPlateStructures/
+        - results/ForceSaturationFigFunc/
+        - results/DesignSpaceExploration/
+        - results/Meem/
+        - results/Slamming/
+        - results/Cost/
+        - results/Validation/
+        - mdocean/plots/fig_tab_pub_mapping.m
+        - mdocean/plots/move_results_to_pubs.m
+        - mdocean/plots/non_matlab_figs/pdf/
+      outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs();
+      command: add_mdocean_path(); move_results_to_pubs('AOR');
+    results-to-latex:
+      kind: json-to-latex
+      inputs: 
+        # - results/AllFigCompare/end.json
+        - results/Comparison/end.json
+        # - results/Constraints/end.json
+        # - results/Cost/end.json
+        # - results/DampingPlateStructures/end.json
+        # - results/DescFcns/end.json
+        # - results/DesignSpaceExploration/end.json
+        # - results/DesignVars/end.json
+        # - results/ForceSaturationFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
+        # - results/HydroCoeffFigFunc/end.json
+        # - results/LocationSensitivity/end.json
+        # - results/Meem/end.json
+        # - results/Multistart/end.json
+        # - results/ParamSensitivities/end.json
+        # - results/Parameters/end.json
+        # - results/ParetoFigFunc/end.json
+        # - results/ParetoSweep/end.json
+        # - results/ReadNonMatlabFigs/end.json
+        - results/RunSingleFigFunc/end.json
+        - results/Runtime/end.json
+        # - results/Slamming/end.json
+        # - results/SparHydro/end.json
+        # - results/Validation/end.json
+        # - results/Wecsim/end.json
+      outputs: 
+        - pubs/renewable-energy-mdo/numeric-results.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
+      command_name: results
+      format:
+        # LCOEs
+        nominalLCOE: "{nominalLCOE:.2f} $/kWh"
+        minLCOE: "{minLCOE:.2f} $/kWh"
+        # powers
+        powerAvgNominal: "{powerAvgNominal/1000:.0f} kW"
+        powerMaxAtMinLCOE: "{powerMaxAtMinLCOE/1000:.0f} kW"
+        powerAvgAtMinLCOE: "{powerAvgAtMinLCOE/1000:.0f} kW"
+        powerAvgAtMinCapex: "{powerAvgAtMinCapex/1000:.0f} kW"
+        powerAvgMaxPower: "{powerAvgMaxPower/1000:.0f} kW"
+        powerBalanced: "{powerBalanced/1000:.0f} kW"
+        # masses
+        structMassAtMinLCOE: "{structMassAtMinLCOE/1000:.0f} Mg"
+        # dimensions
+        DfoptMinLCOE: "{DfoptMinLCOE:.1f} m"
+        # forces
+        forceMaxAtMinLCOE: "{forceMaxAtMinLCOE/1e6:.0f} MN"
+        surgeForceFloatAtMinLCOE: "{surgeForceFloatAtMinLCOE/1e6:.0f} MN"
+        surgeForceSparAtMinLCOE: "{surgeForceSparAtMinLCOE/1e6:.0f} MN"
+        surgeForceFloatNominal: "{surgeForceFloatNominal/1e6:.0f} MN"
+        surgeForceSparNominal: "{surgeForceSparNominal/1e6:.0f} MN"
+        # costs
+        capexAtMinLCOE: "{capexAtMinLCOE/1e6:.0f} $M"
+        capexDesignAtMinLCOE: "{capexDesignAtMinLCOE/1e6:.2f} $M"
+        capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
+        capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
+        capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
+        # runtimes
+        simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        # percent changes
+        pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
+        pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
+        pctImprovePowerMinLCOE: "{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%"
+        pctImproveDesignCostMinCapex: "{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}%"
+        pctWorsePowerMinCapex: "{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%"
+        pctImprovePowerMaxPower: "{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%"
+        pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%"
+        # percentages
+        pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
+        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
+        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
+        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
+    copy-bib:
+      kind: map-paths
+      paths:
+        - src: pubs/renewable-energy-mdo/references.bib
+          dest: pubs/applied-ocean-research-model/references.bib
+          kind: file-to-file
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
@@ -2974,6 +3264,7 @@ pipeline:
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/numbers.tex
+        - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/elsarticle-num-names.bst
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
@@ -2991,10 +3282,13 @@ pipeline:
         - pubs/applied-ocean-research-model/sections/
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/figs/manual/
+        - pubs/applied-ocean-research-model/figs/tikz/
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
         - pubs/applied-ocean-research-model/numbers.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/elsarticle-num-names.bst
+        - pubs/applied-ocean-research-model/references.bib
         - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
@@ -3006,40 +3300,41 @@ pipeline:
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
-    description: Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters
+    description: Development, Validation, and Benchmarking of a 
+      Multidisciplinary Semi-Analytical Model for Wave Energy 
+      Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
     title: Optimization - Journal (Renewable Energy)
-    description: Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability
+    description: Leveraging Multidisciplinary Design Optimization to 
+      Advance Wave Energy Converter Viability
     kind: journal-article
     stage: build-RE-paper
-    overleaf:
-      project_id: 6753a38b61276b931380c29c
-      wdir: pubs/renewable-energy-mdo
-      sync_paths:
-        - mdocean.tex
-        - sections/
-        - ../mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
-        - tables/
-        - references.bib
-        - numbers.tex
-        - ../elsarticle-num-names.bst
-      push_paths:
-        - figs
-      last_sync_commit: c50eec7a28349c1cdabac90de69d26e7fc493613
   - path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
     title: Grid Value - Conference (UMERC)
-    description: WEC optimization to maximize grid economic value and avoided emissions
+    description: WEC optimization to maximize grid economic value and 
+      avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-    overleaf:
-      project_id: 68516ba5bc36663bb61711a6
-      wdir: pubs/UMERC-2025-grid-value
-      sync_paths:
-        - UMERC_2025_grid_value.tex
-        - references.bib
-        - logo.jpg
-      push_paths:
-        - figures
-      last_sync_commit: 19e80b2eb61b274772d9ab359199f8aec05422d1
+overleaf_sync:
+  pubs/renewable-energy-mdo:
+    url: https://www.overleaf.com/project/6753a38b61276b931380c29c
+    sync_paths:
+      - mdocean.tex
+      - sections/
+      - ../mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
+      - tables/
+      - references.bib
+      - numbers.tex
+      - ../elsarticle-num-names.bst
+    push_paths:
+      - figs
+  pubs/UMERC-2025-grid-value:
+    url: https://www.overleaf.com/project/68516ba5bc36663bb61711a6
+    sync_paths:
+      - UMERC_2025_grid_value.tex
+      - references.bib
+      - logo.jpg
+    push_paths:
+      - figures
