@@ -141,7 +141,15 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
         spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
         rel_pos = float_pos - spar_pos;
-    
+        F_drag_f = output.bodies(1).forceMorisonAndViscous((end-N_per_T+1):end,3);
+        F_drag_s = output.bodies(2).forceMorisonAndViscous((end-N_per_T+1):end,3);
+        
+        % extract peak times to determine phase
+        [~,peak_idx_F_drag_f] = max(F_drag_f);
+        [~,peak_idx_F_drag_s] = max(F_drag_s);
+        peak_phase_F_drag_f = (peak_idx_F_drag_f - 1) / N_per_T * 2*pi;
+        peak_phase_F_drag_s = (peak_idx_F_drag_s - 1) / N_per_T * 2*pi;
+
         % save specific output variables
         P(imcr) = mean(power);
         force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
@@ -151,6 +159,10 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
         spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
         relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
+        float_drag_force_rms(imcr) = rms( F_drag_f - mean(F_drag_f) );
+        spar_drag_force_rms(imcr)  = rms( F_drag_s - mean(F_drag_s) );
+        float_drag_force_phase(imcr) = peak_phase_F_drag_f;
+        spar_drag_force_phase(imcr)  = peak_phase_F_drag_s;
     catch ME
         warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
             mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
@@ -162,6 +174,10 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_amplitude_rms(imcr) = NaN;
         spar_amplitude_rms(imcr)  = NaN;
         relative_amplitude_rms(imcr) = NaN;
+        float_drag_force_rms(imcr) = NaN;
+        spar_drag_force_rms(imcr)  = NaN;
+        float_drag_force_phase(imcr) = NaN;
+        spar_drag_force_phase(imcr)  = NaN;
     end
     Simulink.sdi.clear
 end
