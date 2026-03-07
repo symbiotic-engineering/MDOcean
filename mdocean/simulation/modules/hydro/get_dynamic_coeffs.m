@@ -98,8 +98,8 @@ function [m_f,B_h_f,K_h_f,gamma_f_mag,gamma_f_phase,...
     gamma_f_mag = rho_w * g * gamma_f_over_rho_g; % excitation coefficient
     gamma_s_mag = rho_w * g * gamma_s_over_rho_g;
 
-    K_h_f   = rho_w * g * A_w_f;              % hydrostatic stiffness
-    K_h_s   = rho_w * g * A_w_s;
+    K_h_f   = rho_w * g * A_w_f * ones(size(w));              % hydrostatic stiffness
+    K_h_s   = rho_w * g * A_w_s * ones(size(w));
 
     A_drag_s = pi/4 * D_d^2;
 
