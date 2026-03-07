@@ -478,6 +478,9 @@ function [B_drag, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, 
     X_guess(idx_inf) = 1;
     phase_X_guess(idx_inf) = 0;
 
+    idx_neg = X_guess < 0;
+    X_guess(idx_neg) = 0.01;
+
     mag_v = w .* X_guess;
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
@@ -485,50 +488,207 @@ function [B_drag, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, 
     phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
     
     alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
-    phi_alpha = 0; %phase_v_prime - phase_v;
+    phi_alpha = phase_v_prime - phase_v;
     mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
 
     B_drag = mag_cf .* cos(phi_alpha); % real part of c_f
-    B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
-    gamma_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
+%     B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
+    K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
     
-    % integral method: should equal above method when k is small (long waves, large T)
+    % integral method: force should equal above method when k is small
+    % (long waves, large T). We don't expect old Bd=new Bd because they are
+    % defined differently (how much of K vs gamma goes into Bd).
     r = mag_v0_v_ratio;
-    kappa = k_wvn * R;
+    kappa = 0 * k_wvn * R;
     theta = phase_v;
     alpha = R_in / R;
-    B_integral_1 = drag_fcn(r,theta,kappa);
-    B_integral_2 = drag_fcn(r,theta,alpha*kappa);
+    [B_int_1,G_int_real_1,G_int_imag_1] = drag_fcn(r,theta,kappa);
+    [B_int_2,G_int_real_2,G_int_imag_2] = drag_fcn(r,theta,alpha*kappa);
     % derived p127 of notebook 9 2/25/26
-    B_integral_weighted = B_integral_1 - alpha.^2 .* B_integral_2;
+    B_integral_weighted      = B_int_1      - alpha.^2 .* B_int_2;
+    G_integral_real_weighted = G_int_real_1 - alpha.^2 .* G_int_real_2;
+    G_integral_imag_weighted = G_int_imag_1 - alpha.^2 .* G_int_imag_2;
+    G_integral_weighted = G_integral_real_weighted + 1i*G_integral_imag_weighted;
 
     % derived p141 of notebook 9 3/5/26
-    B_drag_2 = drag_const / (pi*(1-alpha^2)) * 2 * mag_v .* B_integral_weighted;
+    mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v;
+    B_drag_2   = mag_v_constant_term           .* B_integral_weighted;
+    gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted * 1i * 0.452;
 
-    plot = true;
-    if plot
-        c_max = max([B_drag(:);B_drag_2(:)]);
-        c_min = min([B_drag(:);B_drag_2(:)]);
+    if nnz(isfinite(gamma_drag)) ~= nnz(isfinite(B_drag))
+        figure
+        subplot 121
+        spy(isfinite(gamma_drag))
+        subplot 122
+        spy(isfinite(B_drag))
+        disp('ohno')
+    end
+    plot = false;
+    if plot % set conditional breakpoint here with condition: any(strcmp({dbstack().name},'solver') & [dbstack().line]==151)
         p=parameters();
+        H = p.Hs/sqrt(2);
+        F_drag_old = -B_drag   .* mag_v .* exp(1i*phase_v) + -K_drag .* X_guess .* exp(1i*phase_X_guess);
+        F_drag_new = -B_drag_2 .* mag_v .* exp(1i*phase_v)  + gamma_drag .* H/2;
+
+        all_mag   = abs(  [F_drag_old(:);F_drag_new(:)]);
+        all_phase = angle([F_drag_old(:);F_drag_new(:)]);
+        c_mag_max = max(all_mag);
+        c_mag_min = min(all_mag);
+        c_phs_max = max(all_phase);
+        c_phs_min = min(all_phase);
+        
+        % total force: magnitude and phase
         figure;
-        t=tiledlayout(1, 2);
+        t=tiledlayout(2, 2);
         nexttile;
-        B_drag_plot = B_drag;
-        B_drag_plot(B_drag==0) = NaN;
-        contourf(p.T, p.Hs, B_drag_plot);
+        F_drag_old_plot = F_drag_old;
+        F_drag_old_plot(F_drag_old==0) = NaN;
+        contourx(p.T, p.Hs, abs(F_drag_old_plot));
         title('Long wavelength approximation');
+        ylabel('Magnitude')
         colorbar
-        clim([c_min c_max])
+        clim([c_mag_min c_mag_max])
         
         nexttile;
-        contourf(p.T, p.Hs, B_drag_2);
+        contourx(p.T, p.Hs, abs(F_drag_new));
         title('Strip theory integral'); 
         colorbar
-        clim([c_min c_max])
+        clim([c_mag_min c_mag_max])
     
-        sgtitle('B_{drag}');
-        xlabel('Wave period T_e');
-        ylabel('Significant wave height H_s');
+        nexttile;
+        contourx(p.T, p.Hs, angle(F_drag_old_plot)/pi);
+        ylabel('Phase/\pi')
+        colorbar
+        colormap(gca,bluewhitered)
+        clim([c_phs_min c_phs_max]/pi)
+        
+        nexttile;
+        contourx(p.T, p.Hs, angle(F_drag_new)/pi);
+        colorbar
+        colormap(gca,bluewhitered)
+        clim([c_phs_min c_phs_max]/pi)
+
+        sgtitle('F_{drag}');
+%         xlabel('Wave period T_e');
+%         ylabel('Significant wave height H_s');
+        improvePlot
+
+        % angles
+        figure;
+        tiledlayout(1,3)
+        nexttile
+        contourx(p.T, p.Hs, angle(gamma_drag)/pi);
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\angle \gamma_{drag}/\pi$','Interpreter','latex')
+        improvePlot
+
+        nexttile
+        contourx(p.T, p.Hs, phase_v/pi);
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\angle \dot{\xi}/\pi$','Interpreter','latex')
+        improvePlot
+
+        nexttile
+        contourx(p.T, p.Hs, phase_X_guess/pi);
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\angle \xi/\pi$','Interpreter','latex')
+        improvePlot
+
+        figure
+        tiledlayout(2,3)
+        nexttile
+        % imag terms: B
+        contourx(p.T, p.Hs, imag(-B_drag   .* mag_v .* exp(1i*phase_v)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(-B_{d,old}\dot{\xi})$','Interpreter','latex')
+        improvePlot
+
+        nexttile(4)
+        contourx(p.T, p.Hs, imag(-B_drag_2   .* mag_v .* exp(1i*phase_v)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(-B_{d,new}\dot{\xi})$','Interpreter','latex')
+        improvePlot
+
+        % imag terms: K/gamma
+        nexttile(2)
+        contourx(p.T, p.Hs, imag(-K_drag .* X_guess .* exp(1i*phase_X_guess)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(-K_{d,old}\xi)$','Interpreter','latex')
+        improvePlot
+
+        nexttile(5)
+        contourx(p.T, p.Hs, imag(gamma_drag .* H/2));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(\gamma_d \zeta)$','Interpreter','latex')
+        improvePlot
+
+        % imag terms: total
+        nexttile(3)
+        contourx(p.T, p.Hs, imag(F_drag_old));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(F_{drag,old})$','Interpreter','latex')
+        improvePlot
+
+        nexttile(6)
+        contourx(p.T, p.Hs, imag(F_drag_new));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Im(F_{drag,new})$','Interpreter','latex')
+        improvePlot
+
+        % real terms: B
+        figure;
+        tiledlayout(2,3)
+        nexttile
+        contourx(p.T, p.Hs, real(-B_drag   .* mag_v .* exp(1i*phase_v)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(-B_{d,old}\dot{\xi})$','Interpreter','latex')
+        improvePlot
+        
+        nexttile(4)
+        contourx(p.T, p.Hs, real(-B_drag_2   .* mag_v .* exp(1i*phase_v)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(-B_{d,new}\dot{\xi})$','Interpreter','latex')
+        improvePlot
+
+        % real terms: K/gamma
+        nexttile(2)
+        contourx(p.T, p.Hs, real(-K_drag .* X_guess .* exp(1i*phase_X_guess)));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(-K_{d,old}\xi)$','Interpreter','latex')
+        improvePlot
+
+        nexttile(5)
+        contourx(p.T, p.Hs, real(gamma_drag .* H/2));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(\gamma_d \zeta)$','Interpreter','latex')
+        improvePlot
+
+        % real terms: total
+        nexttile(3)
+        contourx(p.T, p.Hs, real(F_drag_old));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(F_{drag,old})$','Interpreter','latex')
+        improvePlot
+
+        nexttile(6)
+        contourx(p.T, p.Hs, real(F_drag_new));
+        colorbar
+        colormap(gca,bluewhitered)
+        title('$\Re(F_{drag,new})$','Interpreter','latex')
         improvePlot
     end
 end
