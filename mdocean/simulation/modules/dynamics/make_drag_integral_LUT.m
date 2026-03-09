@@ -29,7 +29,7 @@ function [B,G_real,G_imag] = drag_LUT_or_analytical_or_compute(R,TH,K,LUT_fcn)
     k_zero_const_term = sqrt(1+R(idx_k_zero).^2-2*R(idx_k_zero).*sin(TH(idx_k_zero)));
     B(idx_k_zero) = pi/2 * k_zero_const_term;
     G_imag(idx_k_zero) = 0;
-    G_real(idx_k_zero) = pi * besselj(1,K(idx_k_zero)) ./ (K(idx_k_zero)) * k_zero_const_term;
+    G_real(idx_k_zero) = pi * besselj(1,K(idx_k_zero)) ./ (K(idx_k_zero)) .* k_zero_const_term;
 
     % then use LUT everywhere else (queries outside the LUT will return NaN)
     idx_LUT = ~idx_r_zero & ~idx_k_zero;
