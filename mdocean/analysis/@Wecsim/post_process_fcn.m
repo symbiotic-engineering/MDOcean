@@ -23,10 +23,10 @@ function [fig_array,...
      [err_structs, fig_cell, validation_table] = validate_dynamics_plots(case_cell,filename_cell,...
                                                             runOnlyFewSeaStates);
 
-    % if histogram_separate_figures=true, 108 figures: fig_cell is 3 nested 
-    %    4x1 cells, each cell has 9 figs
-    % if histogram_separate_figures=false, 99 figures: fig_cell is 3 nested
-    %    5x1 cells, cells 1-4 have 8 figures and cell 5 has 1 figure
+    % if histogram_separate_figures=true, 156 figures: fig_cell is 3 nested 
+    %    4x1 cells, each cell has 13 figs
+    % if histogram_separate_figures=false, 147 figures: fig_cell is 3 nested
+    %    5x1 cells, cells 1-4 have 12 figures and cell 5 has 1 figure
     tmp = [fig_cell{:}]; 
     fig_array = [tmp{:}]; 
 
