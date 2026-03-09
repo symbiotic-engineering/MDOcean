@@ -472,7 +472,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
 
 end
 
-function [B_drag, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const, drag_fcn, k_wvn, R, R_in)
+function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const, drag_fcn, k_wvn, R, R_in)
 
     idx_inf = isinf(X_guess); % override unstable guesses to prevent extra nans
     X_guess(idx_inf) = 1;
@@ -513,6 +513,7 @@ function [B_drag, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, 
     % derived p141 of notebook 9 3/5/26
     mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v;
     B_drag_2   = mag_v_constant_term           .* B_integral_weighted;
+    assert(all( B_drag_2(isfinite(B_drag_2)) >= 0 ),'negative damping from integral method')
     gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted * 1i * 0.452;
 
     if nnz(isfinite(gamma_drag)) ~= nnz(isfinite(B_drag))
@@ -521,7 +522,10 @@ function [B_drag, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, 
         spy(isfinite(gamma_drag))
         subplot 122
         spy(isfinite(B_drag))
-        disp('ohno')
+        r_out_of_bounds = r<1/1e6 | r > 1/0.01;
+        k_out_of_bounds = kappa > 8 | kappa < 0;
+        disp(['r out of bounds: ' num2str(r(r_out_of_bounds))])
+        disp(['k out of bounds: ' num2str(kappa(k_out_of_bounds))])
     end
     plot = false;
     if plot % set conditional breakpoint here with condition: any(strcmp({dbstack().name},'solver') & [dbstack().line]==151)
