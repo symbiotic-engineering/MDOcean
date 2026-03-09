@@ -514,7 +514,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v;
     B_drag_2   = mag_v_constant_term           .* B_integral_weighted;
     assert(all( B_drag_2(isfinite(B_drag_2)) >= 0 ),'negative damping from integral method')
-    gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted * 1i * 0.452;
+    gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted;
 
     if nnz(isfinite(gamma_drag)) ~= nnz(isfinite(B_drag))
         figure
