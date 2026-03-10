@@ -1,0 +1,79 @@
+function plot_drag_integral_debug(B_drag,mag_v,phase_v,K_drag,X_guess,phase_X_guess,B_drag_2,gamma_drag)
+    p = parameters();
+    H = p.Hs/sqrt(2);
+    F_drag_old = -B_drag   .* mag_v .* exp(1i*phase_v) + -K_drag .* X_guess .* exp(1i*phase_X_guess);
+    F_drag_old_plot = F_drag_old;
+    F_drag_old_plot(F_drag_old==0) = NaN;
+    F_drag_new = -B_drag_2 .* mag_v .* exp(1i*phase_v)  + gamma_drag .* H/2;
+
+    all_mag   = abs(  [F_drag_old(:);F_drag_new(:)]);
+    all_phase = angle([F_drag_old(:);F_drag_new(:)]);
+    c_mag_max = max(all_mag);
+    c_mag_min = min(all_mag);
+    c_phs_max = max(all_phase);
+    c_phs_min = min(all_phase);
+    
+    drag_contour_fcn = @(varargin) mycontour(p.T, p.Hs, varargin{:});
+
+    % total force: magnitude and phase
+    figure;
+    tiledlayout(2, 2);
+
+    drag_contour_fcn(abs(F_drag_old_plot),'Long wave approx',[c_mag_min c_mag_max])
+    ylabel('Magnitude')
+    
+    drag_contour_fcn(abs(F_drag_new),'Strip theory integral',[c_mag_min c_mag_max])
+
+    drag_contour_fcn(angle(F_drag_old_plot)/pi, '$Phase/\pi$', [c_phs_min c_phs_max]/pi)
+
+    drag_contour_fcn(angle(F_drag_new)/pi, '', [c_phs_min c_phs_max]/pi)
+
+    sgtitle('F_{drag}');
+%         xlabel('Wave period T_e');
+%         ylabel('Significant wave height H_s');
+    improvePlot
+
+    % angles
+    figure;
+    tiledlayout(1,3)
+    drag_contour_fcn( angle(gamma_drag)/pi, '$\angle \gamma_{drag}/\pi$')
+    drag_contour_fcn( phase_v/pi, '$\angle \dot{\xi}/\pi$');
+    drag_contour_fcn( phase_X_guess/pi,'$\angle \xi/\pi$')
+    improvePlot
+
+    % imag terms
+    figure
+    tiledlayout(2,3)
+    drag_contour_fcn( imag(-B_drag   .* mag_v .* exp(1i*phase_v)), '$\Im(-B_{d,old}\dot{\xi})$'); % 1
+    drag_contour_fcn( imag(-K_drag .* X_guess .* exp(1i*phase_X_guess)), '$\Im(-K_{d,old}\xi)$'); % 2
+    drag_contour_fcn( imag(F_drag_old), '$\Im(F_{drag,old})$'); % 3
+    drag_contour_fcn( imag(-B_drag_2 .* mag_v .* exp(1i*phase_v)), '$\Im(-B_{d,new}\dot{\xi})$'); % 4
+    drag_contour_fcn( imag(gamma_drag .* H/2), '$\Im(\gamma_d \zeta)$'); % 5
+    drag_contour_fcn( imag(F_drag_new),'$\Im(F_{drag,new})$'); % 6
+    improvePlot
+
+    % real terms
+    figure
+    tiledlayout(2,3)
+    drag_contour_fcn( real(-B_drag   .* mag_v .* exp(1i*phase_v)), '$\Re(-B_{d,old}\dot{\xi})$'); % 1
+    drag_contour_fcn( real(-K_drag .* X_guess .* exp(1i*phase_X_guess)), '$\Re(-K_{d,old}\xi)$'); % 2
+    drag_contour_fcn( real(F_drag_old), '$\Re(F_{drag,old})$'); % 3
+    drag_contour_fcn( real(-B_drag_2 .* mag_v .* exp(1i*phase_v)), '$\Re(-B_{d,new}\dot{\xi})$'); % 4
+    drag_contour_fcn( real(gamma_drag .* H/2), '$\Re(\gamma_d \zeta)$'); % 5
+    drag_contour_fcn( real(F_drag_new),'$\Re(F_{drag,new})$'); % 6
+    improvePlot
+
+    keyboard
+end
+
+function mycontour(X,Y,Z,my_title,my_clim)
+    
+    nexttile
+    contourx(X, Y, Z);
+    colorbar
+    if nargin>4
+        clim(my_clim)
+    end
+    colormap(gca,bluewhitered)
+    title(my_title,'Interpreter','latex')
+end
