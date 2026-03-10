@@ -426,7 +426,7 @@ function [control_evaluation_fcn,...
     D_f = 20;
     D_f_in = 6; % fixme hardcoded for debugging
     [B_drag_f, gamma_drag_f] = get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f, drag_fcn, k_wvn, D_f/2, D_f_in/2);
-    [B_drag_s, gamma_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s, drag_fcn, k_wvn, D_d,   0);
+    [B_drag_s, gamma_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s, drag_fcn, k_wvn, D_d/2, 0);
 
     % total linear system coefficients
     B_f = B_h_f + B_drag_f;
