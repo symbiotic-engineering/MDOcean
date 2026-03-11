@@ -1,55 +1,75 @@
 n = 5; % number of points per dimension
 
+p = parameters();
+
 zero_to_one   = linspace(0.01,0.99,n);
 zero_to_three = linspace(0.01,3,   n);
 
-m0h   = zero_to_three;
+h     = [10 200]; % gives a range of m0h of 0.36-2.06 and 2.40-39.79 for default wave periods
 a1_a2 = zero_to_one;
-m0a2  = zero_to_three;
+a2_h = zero_to_three;
 d1_h  = zero_to_one;
 d2_d1 = zero_to_one;
 a3_a2 = zero_to_three;
 
-[M0H, A1_A2, M0A2, ...
- D1_H, D2_D1, A3_A2] = ndgrid(m0h, a1_a2, m0a2, d1_h, d2_d1, a3_a2);
+[H, A1_A2, A2_H, ...
+ D1_H, D2_D1, A3_A2] = ndgrid(h, a1_a2, a2_h, d1_h, d2_d1, a3_a2);
 
-A2_H = M0A2  ./ M0H;
 A1_H = A1_A2 .* A2_H;
 D2_H = D2_D1 .* D1_H;
 A3_H = A3_A2 .* A2_H;
 
-p = parameters();
-
-A1 = A1_H * p.h;
-A2 = A2_H * p.h;
-A3 = A3_H * p.h;
-D1 = D1_H * p.h;
-D2 = D2_H * p.h;
+A1 = A1_H .* H;
+A2 = A2_H .* H;
+A3 = A3_H .* H;
+D1 = D1_H .* H;
+D2 = D2_H .* H;
 
 b = var_bounds();
 X = [b.X_noms; 1];
 
+m0h_stored = zeros(length(p.T),length(A1));
+hydro_ratio_result = zeros(length(p.T),length(A1));
+
 for i=1:length(A1)
+
     D_s = 2*A1(i);
     D_f = 2*A2(i);
     D_d = 2*A3(i);
-    T_s = D1;
-    T_f_2 = D2;
+    T_s = D1(i);
+    T_f_2 = D2(i);
 
     % construct params and design vec
     p_i = p;
+    p_i.h = H(i);
     p_i.T_s_over_D_s = T_s / D_s;
     p_i.D_d_over_D_s = D_d / D_s;
     X_i = X;
-    X_i(strcmp(b.var_names),'D_s') = D_s;
-    X_i(strcmp(b.var_names),'D_f') = D_f;
-    X_i(strcmp(b.var_names),'h_s') = T_s + 5;
-    X_i(strcmp(b.var_names),'T_f_2') = T_f_2;
+    X_i(strcmp(b.var_names,'D_s')) = D_s;
+    X_i(strcmp(b.var_names,'D_f')) = D_f;
+    X_i(strcmp(b.var_names,'h_s')) = T_s + 5;
+    X_i(strcmp(b.var_names,'T_f_2')) = T_f_2;
     
+    m0h_stored(:,i) = dispersion(2*pi./p.T, p_i.h, p.g) * p_i.h;
+
     % run simulation (drag and force/power sat are turned off inside check_max_CW)
     [hydro_ratio, ~, ...
-     ~, ~, ~, ~, ~, val] = check_max_CW('', p_i, X_i, false);
+     ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
+    if i==1
+        val = out;
+    else
+        val(i) = out;
+    end
+
+    unique_hydro_ratio = unique(hydro_ratio,'rows');
+    assert(all(length(unique_hydro_ratio)==1))
+
+    hydro_ratio_result(:,i) = unique_hydro_ratio;
 end
+
+
+figure
+parallelplot(hydro_ratio_result)
 
 % NMK = 10;
 % H = 1;
