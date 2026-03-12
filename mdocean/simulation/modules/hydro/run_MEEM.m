@@ -217,6 +217,10 @@ function [x_cell, m_k_cell, ...
         b_num(~isfinite(b_num)) = 0;
         warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
+    if any(~isfinite(c_num),'all')
+        c_num(~isfinite(c_num)) = 0; 
+        warning('MEEM got non-finite result for some elements in c-vector. Elements will be zeroed.')
+    end
     % show A matrix values
     if show_A
         cond(A_num)
