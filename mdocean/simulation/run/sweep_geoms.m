@@ -10,14 +10,14 @@ a1_a2 = zero_to_one;
 a2_h = zero_to_three;
 d1_h  = zero_to_one;
 d2_d1 = zero_to_one;
-a3_a2 = zero_to_three;
+a3_a1 = 1 + zero_to_three;
 
 [H, A1_A2, A2_H, ...
- D1_H, D2_D1, A3_A2] = ndgrid(h, a1_a2, a2_h, d1_h, d2_d1, a3_a2);
+ D1_H, D2_D1, A3_A1] = ndgrid(h, a1_a2, a2_h, d1_h, d2_d1, a3_a1);
 
 A1_H = A1_A2 .* A2_H;
 D2_H = D2_D1 .* D1_H;
-A3_H = A3_A2 .* A2_H;
+A3_H = A3_A1 .* A1_H;
 
 A1 = A1_H .* H;
 A2 = A2_H .* H;
@@ -28,10 +28,10 @@ D2 = D2_H .* H;
 b = var_bounds();
 X = [b.X_noms; 1];
 
-m0h_stored = zeros(length(p.T),length(A1));
-hydro_ratio_result = zeros(length(p.T),length(A1));
+m0h_stored = zeros([length(p.T),size(A1)]);
+hydro_ratio_result = zeros([length(p.T),size(A1)]);
 
-for i=1:length(A1)
+for i=1:numel(A1)
 
     D_s = 2*A1(i);
     D_f = 2*A2(i);
@@ -50,7 +50,8 @@ for i=1:length(A1)
     X_i(strcmp(b.var_names,'h_s')) = T_s + 5;
     X_i(strcmp(b.var_names,'T_f_2')) = T_f_2;
     
-    m0h_stored(:,i) = dispersion(2*pi./p.T, p_i.h, p.g) * p_i.h;
+    subs = {ind2sub(size(A1),i)};
+    m0h_stored(:,subs{:}) = dispersion(2*pi./p.T, p_i.h, p.g) * p_i.h;
 
     % run simulation (drag and force/power sat are turned off inside check_max_CW)
     [hydro_ratio, ~, ...
@@ -61,15 +62,23 @@ for i=1:length(A1)
         val(i) = out;
     end
 
-    unique_hydro_ratio = unique(hydro_ratio,'rows');
-    assert(all(length(unique_hydro_ratio)==1))
-
-    hydro_ratio_result(:,i) = unique_hydro_ratio;
+    hydro_ratio_result(:,subs{:}) = max(hydro_ratio);
 end
 
 
 figure
 parallelplot(hydro_ratio_result)
+
+figure
+% use 0-1 vars for RBG
+red = reshape(A1_A2,[1 size(A1_A2)]);
+green = reshape(D1_H,[1 size(D1_H)]);
+blue = reshape(D1_D2,[1 size(D1_D2)]);
+color = [red; green; blue]; 
+% use A1_A2 for size
+size_var = A1_A2;
+scatter(m0h_stored,hydro_ratio_result,size_var,color)
+
 
 % NMK = 10;
 % H = 1;
