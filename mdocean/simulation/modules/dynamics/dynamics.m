@@ -236,8 +236,8 @@ function [X_constraints,wave_amp] = amplitude_constraints(mag_X_u_const, mag_X_f
     X_max_linear_f = 1/10 * (in.h - in.T_f_2);
     X_max_linear_s = 1/10 * (in.h - in.T_s);
     
-    X_below_linear_f = X_max_linear_f / X_f_max - 1;
-    X_below_linear_s = X_max_linear_s / X_s_max - 1;
+    X_below_linear_f = 1 - X_f_max / X_max_linear_f;
+    X_below_linear_s = 1 - X_s_max / X_max_linear_s;
 
     % prevent bottom rising out of the water and top going into water (slamming/submersion)
     wave_amp = Hs/(2*sqrt(2));
@@ -270,7 +270,9 @@ function [X_below_wave,diameter_margin] = slamming(A, k, D, phase_X, mag_X, delt
 
     idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
     X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
-    
+    X_slam_min( idx_imag ) = NaN;
+    X_slam_max( idx_imag ) = NaN;
+
     if any(idx_large_wave(:))
         k_max_large_wave = max(k(idx_large_wave),[],'all');
         A_max_large_wave = max(A(idx_large_wave),[],'all');

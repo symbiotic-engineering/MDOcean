@@ -45,17 +45,21 @@ function [weighted_power_error,...
         'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
     figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
     
-    if ~report
-        power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
-                                                             results_sim.power_mech_unsat);
-        float_amp_err_matrix  = compute_percent_error_matrix(results_actual.float_amplitude, ...
-                                                             results_sim.float_amplitude);
-        max_float_amp_error   = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
-                                                             max(results_sim.float_amplitude,   [],'all') );
-    else
-        power_mech_err_matrix = [];
-        float_amp_err_matrix = [];
-        max_float_amp_error = [];
+    % compare power and amplitude error over all sea states in JPD
+    weighted_power_error  = zeros([1,length(results_sim)]);
+    max_float_amp_error   = zeros([1,length(results_sim)]);
+    power_mech_err_matrix = zeros([size(p.JPD) length(results_sim)]);
+    float_amp_err_matrix  = zeros([size(p.JPD) length(results_sim)]);
+
+    for i=1:length(results_sim)
+        power_mech_err_matrix(:,:,i) = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
+                                                             results_sim(i).power_mech_unsat);
+        float_amp_err_matrix(:,:,i)  = compute_percent_error_matrix(results_actual.float_amplitude, ...
+                                                             results_sim(i).float_amplitude);
+        max_float_amp_error(i)  = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
+                                                             max(results_sim(i).float_amplitude,   [],'all') );
+        weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
+                                                          results_actual.power_mech_unsat, p.JPD);
     end
 
     % todo: use actual pretty variables titles with units
@@ -66,15 +70,6 @@ function [weighted_power_error,...
     %      'Capture Width / Max Capture Width (-)',...
     %      'Capture Width / Max Capture Width (-)',...
     %     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-    
-    % compare average power over all sea states in JPD
-    weighted_power_error = zeros([1,length(results_sim)]);
-    for i=1:length(results_sim)
-    weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
-                                                          results_actual.power_mech_unsat, p.JPD);
-    end
-
-
 
 end
 %%
@@ -91,6 +86,7 @@ end
 function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
     figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
+    
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
 
@@ -104,19 +100,20 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
 
         f = figure;
         figs(var_idx) = f;
+        t = tiledlayout(1,num_subplots,'TileSpacing','Compact');
         % actual
-        subplot(1,num_subplots,1)
+        nexttile
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
-        caxis(clims)
+        clim(clims)
 
         for i=1:length(sim)
             % sim
-            subplot(1,num_subplots,1+i)
+            nexttile
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
-            caxis(clims)
+            clim(clims)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
-            subplot(1,num_subplots,1+length(sim)+i)
+            nexttile
 
             % set contour lines to make plot more readable
             error_levels = [];
@@ -129,6 +126,14 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                     error_levels = [-25:5:0 2 5];
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-85 -50 -20 -14 -12 -10:5:20];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = -25:5:5;
+                elseif p.C_d_float==1 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = -40:5:5;
+                elseif p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = [-0.2 -0.15 0:200:1000];
+                elseif p.C_d_float==0 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = [-0.2 -0.15 0:200:1000];
                 end
             elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
@@ -147,7 +152,9 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
-        sgtitle(remove_underscores(var_name))
+        title(t,remove_underscores(var_name))
+        xlabel(t,'Wave Period T (s)','FontSize',20)
+        ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end
 end
 
@@ -165,13 +172,11 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     end
 
     if any(isfinite(Z),'all')
-        [c,h_fig] = contourf(T,H,Z);
+        [c,h_fig] = contourx(T,H,Z);
     else
         c = []; h_fig = [];
     end
     title(Z_title)
-    xlabel('Wave Period T (s)')
-    ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
         z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
@@ -179,7 +184,9 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
             z = [cb.Ticks z];
         end
         levs = sort(z);
-        h_fig.LevelList = levs;
+        if isprop(h_fig,'LevelList')
+            h_fig.LevelList = levs;
+        end
     end
     grid on
 end

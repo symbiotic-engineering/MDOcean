@@ -20,7 +20,7 @@ function fig = make_slamming_plot(T,Hs,phase_X,theta_slam,X_slam_max,X_slam_min,
     theta_new = pi-abs(pi-wrapTo2Pi(theta_slam));
 
     min_level = min([phase_X(:);theta_new(:)]);
-    max_level = max([phase_X(:);theta_new(:)]);
+    max_level = max([phase_X(isfinite(phase_X));theta_new(:)]);
     lims = [min_level,max_level]/pi;
     levels = sort([0.5 0.55 floor(lims(1)):0.1:ceil(lims(2))]);
 
@@ -118,7 +118,7 @@ function hatch(bool,ax,T,Hs)
         tmp_clim = clim;
         [~,h2] = contourf(ax,T,Hs,bool,[1 1],'Fill','off');
         hh = hatchfill2(h2,'cross');
-        hh.Color = [0 0 0 .5];
+        hh.Color = [0 0 0 .5]; % black with 50% transparency
         clim(tmp_clim)
     end
 

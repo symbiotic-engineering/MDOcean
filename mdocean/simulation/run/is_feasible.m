@@ -38,7 +38,7 @@ if nargout > 2
     nl_const_names = b.constraint_names;
     lin_const_names = b.lin_constraint_names;
 
-    failed_nl  = strjoin(nl_const_names(g_nonlin  < tol),', ');
+    failed_nl  = strjoin(nl_const_names(g_nonlin(~idx_ignore)  < tol),', ');
     failed_lin = strjoin(lin_const_names(g_linear < tol),', ');
     if isempty(failed_lin) || isempty(failed_nl)
         delim = '';
