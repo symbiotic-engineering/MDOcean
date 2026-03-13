@@ -679,17 +679,29 @@ function [idx_closed_loop_unstable,...
 
     idx_ctrl_makes_closed_loop_unstable = ~cl_stable & ~isnan(w) & ~idx_not_stabilizable;
 
-    if any(idx_ctrl_makes_closed_loop_unstable(:))
+    if any(idx_ctrl_makes_closed_loop_unstable(:)) && ~merge_bodies
         % compute required change in control to create
         % stability - see notebook 9 p117 2/21/26
-        det_B = (B_f+B_p).*(B_s+B_p) - (B_c-B_p).^2;
-        sum_B = B_f + B_s + 2*B_c;
-        rec_incr_Bp = abs(det_B) ./ sum_B * 1.01;
+        if multibody
+            det_B = (B_f+B_p).*(B_s+B_p) - (B_c-B_p).^2;
+            sum_B = B_f + B_s + 2*B_c;
+            denom_B = sum_B;
+
+            det_K = (K_f+K_p).*(K_s+K_p) - (-K_p).^2;
+            sum_K = K_f + K_s;
+            denom_K = sum_K;
+        else
+            det_B = B_f + B_p;
+            denom_B = 1;
+            
+            det_K = K_f + K_p;
+            denom_K = 1;
+        end
+
+        rec_incr_Bp = abs(det_B) ./ denom_B * 1.01;
         rec_incr_Bl = rec_incr_Bp; % fixme this should use cascade matrix
 
-        det_K = (K_f+K_p).*(K_s+K_p) - (-K_p).^2;
-        sum_K = K_f + K_s;
-        rec_incr_Kp = abs(det_K) ./ sum_K * 1.01;
+        rec_incr_Kp = abs(det_K) ./ denom_K * 1.01;
         rec_incr_Kl = rec_incr_Kp; % fixme this should use cascade matrix
 
         idx_change_B = idx_ctrl_makes_closed_loop_unstable & det_B < 0;
