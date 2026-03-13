@@ -1,6 +1,12 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.1) - 2026-3-13
+### Added
+- Model: ability to consider float+spar as one body in storm case
+### Fixed
+- Model: Recommended change in control to ensure stability properly extended to singlebody case 
+
 ## [v1.1.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.0) - 2026-3-5
 ### Added
 - Model: checks for open loop and closed loop instabilities and, when the system is unstable but stabilizable, calculates the required change to the controller to maintain stability
