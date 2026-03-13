@@ -112,14 +112,18 @@ delete savedLog*
 
 % variables to save
 timesteps_per_period = mcr.cases(:,2) / simu.dt; 
-P = zeros(length(mcr.cases(:,1)), 1);
-force_pto = zeros(length(mcr.cases(:,1)), 1);
-float_amplitude = zeros(length(mcr.cases(:,1)), 1);
-spar_amplitude = zeros(length(mcr.cases(:,1)), 1);
-relative_amplitude = zeros(length(mcr.cases(:,1)), 1);
-float_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
-spar_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+P                      = zeros(length(mcr.cases(:,1)), 1);
+force_pto              = zeros(length(mcr.cases(:,1)), 1);
+float_amplitude        = zeros(length(mcr.cases(:,1)), 1);
+spar_amplitude         = zeros(length(mcr.cases(:,1)), 1);
+relative_amplitude     = zeros(length(mcr.cases(:,1)), 1);
+float_amplitude_rms    = zeros(length(mcr.cases(:,1)), 1);
+spar_amplitude_rms     = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+float_drag_force_rms   = zeros(length(mcr.cases(:,1)), 1);
+spar_drag_force_rms    = zeros(length(mcr.cases(:,1)), 1);
+float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
+spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -143,26 +147,27 @@ parfor imcr=1:length(mcr.cases(:,1))
         rel_pos = float_pos - spar_pos;
         F_drag_f = output.bodies(1).forceMorisonAndViscous((end-N_per_T+1):end,3);
         F_drag_s = output.bodies(2).forceMorisonAndViscous((end-N_per_T+1):end,3);
-        
-        % extract peak times to determine phase
-        [~,peak_idx_F_drag_f] = max(F_drag_f);
-        [~,peak_idx_F_drag_s] = max(F_drag_s);
-        peak_phase_F_drag_f = (peak_idx_F_drag_f - 1) / N_per_T * 2*pi;
-        peak_phase_F_drag_s = (peak_idx_F_drag_s - 1) / N_per_T * 2*pi;
 
         % save specific output variables
         P(imcr) = mean(power);
+
         force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
         float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
         spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
         relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
+        
         float_amplitude_rms(imcr) = rms( float_pos - mean(float_pos) );
         spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
         relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
+
+        float_phase(imcr) = get_phase(float_pos);
+        spar_phase(imcr) = get_phase(spar_pos);
+        rel_phase(imcr) = get_phase(rel_pos);
+
         float_drag_force_rms(imcr) = rms( F_drag_f - mean(F_drag_f) );
         spar_drag_force_rms(imcr)  = rms( F_drag_s - mean(F_drag_s) );
-        float_drag_force_phase(imcr) = peak_phase_F_drag_f;
-        spar_drag_force_phase(imcr)  = peak_phase_F_drag_s;
+        float_drag_force_phase(imcr) = get_phase(F_drag_f, N_per_T);
+        spar_drag_force_phase(imcr)  = get_phase(F_drag_s, N_per_T);
     catch ME
         warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
             mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
@@ -201,4 +206,9 @@ function cleanup_fcn(fileID,pctDir)
     try
         rmdir(pctDir, 's');
     end
+end
+
+function phase = get_phase(signal, N_per_T)
+    [~,peak_idx] = max(signal);
+    phase = (peak_idx - 1) / N_per_T * 2*pi;
 end
