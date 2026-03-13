@@ -230,6 +230,7 @@ function areas = circle_strip_area_no_cutout(x_starts,x_ends,R)
     x_larger = max(abs(x_starts),abs(x_ends));
     x_smaller = min(abs(x_starts),abs(x_ends));
 
+    % derivation at https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/28c569c5d8e79b7e1a2be1755de42d25_MIT18_01SCF10_Ses70a.pdf
     area_x_to_center = @(x) R^2*asin(x/R) + x .* sqrt(R^2 - x.^2);
 
     areas_same_sign = area_x_to_center(x_larger) - area_x_to_center(x_smaller);
