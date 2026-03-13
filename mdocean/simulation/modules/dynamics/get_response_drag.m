@@ -538,7 +538,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     % (long waves, large T). We don't expect old Bd=new Bd because they are
     % defined differently (how much of K vs gamma goes into Bd).
     r = mag_v0_v_ratio;
-    kappa = 0 * k_wvn * R;
+    kappa = k_wvn * R;
     theta = phase_v;
     alpha = R_in / R;
     [B_int_1,G_int_real_1,G_int_imag_1] = drag_fcn(r,theta,kappa);
@@ -556,11 +556,16 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted;
 
     plot_on = false;
-    % uncomment the following to plot once solver has converged
-%     if any(strcmp({dbstack().name},'solver') & [dbstack().line]==165)
-%         plot_on = true;
-%     end
-    if plot_on % set conditional breakpoint here with condition: 
+    drag_debug = false;
+    if drag_debug
+        % uncomment the following to plot once solver has converged
+        converged = any(strcmp({dbstack().name},'solver')   & [dbstack().line]==166);
+        op_seas   = any(strcmp({dbstack().name},'dynamics') & [dbstack().line]==72);
+        if converged && op_seas
+            plot_on = true;
+        end
+    end
+    if plot_on
         plot_drag_integral_debug(B_drag, mag_v, phase_v, K_drag, X_guess,...
                                  phase_X_guess, B_drag_2, gamma_drag);
     end
