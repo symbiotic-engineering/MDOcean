@@ -1,4 +1,15 @@
 stages:
+  mermaid-taxonomy:
+    cmd: calkit xenv -n mermaid --no-check -- bash --noprofile --norc 
+      -c "mmdc -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
+      mdocean/plots/non_matlab_figs/taxonomy.pdf"
+    deps:
+      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - .calkit/env-locks/mermaid
+    outs:
+      - mdocean/plots/non_matlab_figs/taxonomy.pdf
+    desc: Automatically generated from the 'mermaid-taxonomy' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();"
@@ -3136,8 +3147,8 @@ stages:
       - pubs/renewable-energy-mdo/references.bib
       - pubs/renewable-energy-mdo/numbers.tex
       - pubs/elsarticle-num-names.bst
-      - pubs/renewable-energy-mdo/.latexmkrc
       - .calkit/env-locks/tex
+      - pubs/renewable-energy-mdo/.latexmkrc
     outs:
       - pubs/renewable-energy-mdo/mdocean.pdf
       - pubs/renewable-energy-mdo/mdocean.synctex.gz:
@@ -3164,8 +3175,8 @@ stages:
       - pubs/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
-      - pubs/applied-ocean-research-model/.latexmkrc
       - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - pubs/applied-ocean-research-model/main.pdf
       - pubs/applied-ocean-research-model/main.synctex.gz:
