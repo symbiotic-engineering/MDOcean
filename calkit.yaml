@@ -12,10 +12,23 @@ environments:
     path: pubs/requirements.txt
     python: '3.14'
     prefix: pubs/.venv
+  mermaid:
+    kind: docker
+    image: minlag/mermaid-cli:latest
+    description: Mermaid CLI via Docker.
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
   stages:
+    mermaid-taxonomy:
+      kind: shell-command
+      environment: mermaid
+      command: mmdc -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
+        mdocean/plots/non_matlab_figs/taxonomy.pdf -f
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.pdf
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system

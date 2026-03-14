@@ -1,0 +1,111 @@
+%%{init: {
+  "flowchart": {
+    "curve": "linear"
+    },
+  "themeVariables": {
+    "fontSize": "40px"
+  }
+}}%%
+flowchart TB
+    Parent["WEC Modeling Choices"]
+
+%% connections to parent
+    ChildA --> Parent
+    ChildB --> Parent
+
+    Parent --> Controls
+    Parent --> ChildC
+    Parent --> ChildD
+    Parent --> ChildE
+
+%% HYDRODYNAMICS (top subgraph, arrows corrected upward)
+subgraph H[" "]
+    ChildA["Hydrodynamics"]
+
+    B1["Linear Potential Flow"] --> ChildA
+    B3["Nonlinear forces"] --> ChildA
+
+    BEM["BEM: Boundary element method"] --> B1
+    MEEM["MEEM: Matched eigenfunction expansion method"] --> B1
+    ALG["ALG: Algebraic approximation"] --> B1
+    FIT["FIT: Fit to numerical/ experimental data"] --> B1
+
+    CFD["CFD: Computational fluid dynamics"] --> B3
+    M["M: Morison strip theory"] --> B3
+    Q["Q: Quadratic drag"] --> B3
+    LD["LD: Linear drag"] --> B3
+    DF["DF: Describing function drag"] --> B3
+    NPF["NPF: Nonlinear Potential Flow"] --> B3
+end
+
+%% DYNAMICS (top subgraph, arrows corrected upward)
+subgraph DY[" "]
+    ChildB["Dynamics"]
+
+    A1["F: Frequency domain"] --> ChildB
+    A2["T: Time domain"] --> ChildB
+    Fplus["F+: Frequency domain extension"] --> ChildB
+    A4["PS: Pseudo-spectral"] --> ChildB
+end
+
+%% CONTROLS (top subgraph, arrows corrected upward)
+subgraph C[" "]
+    Controls["Controls"]
+    
+    Controls --> P["P: Proportional"]
+    Controls --> CPI["PI: Proportional + Integral"] 
+    Controls --> Pplus["P/PI+: P/PI with constraints"]
+    Controls --> NL["NL: Nonlinear structured"]
+    Controls --> UNS["UNS: Nonlinear unstructured"]
+end
+
+%% STRUCTURES (bottom subgraph, flow top-to-bottom)
+subgraph S[" "]
+    ChildC["Structures"]
+
+    ChildC --> AN["AN: Analytical stress model"]
+    ChildC --> LO["LO: Load-only model"]
+    ChildC --> FEA["FEA: Finite element analysis"]
+end
+
+%% ECONOMICS (bottom subgraph, flow top-to-bottom)
+subgraph E[" "]
+    ChildD["Economics"]
+
+    ChildD --> D1["STR: Structural cost"]
+    ChildD --> D2["PTO: Power take-off cost"]
+    ChildD --> D3["GEO: Geometric proxy"]
+    ChildD --> D4["FULL: Full cost model"]
+end
+
+%% SEA STATE (bottom subgraph, flow top-to-bottom)
+subgraph SS[" "]
+    ChildE["Sea state"]
+
+    ChildE --> REG["REG: Regular waves"]
+    ChildE --> IRR["IRR: Irregular spectrum"]
+    ChildE --> JOINT["REG+/IRR+: Joint wave height/period probabilities"]
+    ChildE --> STO["STO: Storm condition"]
+end
+
+linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37 stroke-width:4px
+
+%% Define a "thick" class
+    classDef thick stroke-width:4px,stroke:#000
+
+    %% Apply thick border to just one node per subgraph
+    class MEEM thick
+    class DF thick
+    class Pplus thick
+    class REG thick
+    class JOINT thick
+    class STR thick
+    class GEO thick
+    class AN thick
+    class M thick
+    class D1 thick
+    class D2 thick
+    class STO thick
+    class Fplus thick
+    class ALG thick
+    class FIT thick
