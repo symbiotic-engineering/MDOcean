@@ -89,7 +89,7 @@ For a two body point absorber oscillating only in heave under normal operational
 The coupling is symmetric for radiation forces and zero for hydrostatic forces.
 Meanwhile, the hydrodynamic coefficients may change in storm conditions ($st$), such as if the devices change their shape or submersion depth as a survival strategy.
 The assumed storm configuration in this study, to mirror the RM3 report \cite{RM3}, is the float and spar rigidly fixed to each other so they move as if they have been merged, indicated with subscript $m$:
-\begin{equation}
+\begin{equation}\label{eq:st-hydro-coeffs}
     \vec{\hat{\xi}}_{st} = \begin{bmatrix}
         \hat{\xi}_m 
     \end{bmatrix},~\vec{\gamma}_{st} = \begin{bmatrix}
@@ -611,7 +611,7 @@ The intrinsic dynamics, PTO kinematics, and PTO dynamics can be combined into a 
     \mathbf{a}_{VI \leftarrow F\dot{X}}
     \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}
     } = \frac{B-AZ_{i,th}}{D-CZ_{i,th}} 
-    \qquad \hat{V}_{s,th} = F_{th}(A-CZ_{s,th})
+    \qquad \hat{V}_{s,th} = \hat{F}_{th}(A-CZ_{s,th})
 \end{equation}
 where $A,B,C,D$ are the elements of $\mathbf{a}_{VI \leftarrow F\dot{X}}$.
 This is shown in the bottom portion of \cref{fig:multiport-circuit-pto}.
@@ -973,51 +973,81 @@ This section details the allowable amplitudes and forces in each case.
 Currently all sea states in the JPD with nonzero probability are considered operational, since the generator force and power limit serve to reduce loads in energetic sea states.
 Future studies could control the transition from operational to survival mode more finely, perhaps with an additional input variable representing an operational incident energy threshold.
 
-The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material, and the PTO force, which acts at the connection between the float and the spar.
-The float and spar structures therefore experience loads that vary not only in time but also in space along their lengths.
-At any given time, the maximum force in space is the greater of the PTO force and the fluid force.
+The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the PTO force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
+The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
+Due to force balance in dynamic equilibrium, the maximum magnitude of internal heave force in space at any given time, $F_{heave,f}(t)$, is the greater of the absolute value of the PTO force and the fluid force.
 Expressing the latter as the difference between the inertial force and the PTO force, this gives:
 \begin{equation}
 \begin{aligned}
-    F_{heave,f}(t) &=\max(F_p(t), m_f\ddot{\xi}_f(t)-F_p(t)) \\
-    F_{heave,s}(t) &=\max(F_p(t), m_s\ddot{\xi}_s(t)-F_p(t))
+    F_{heave,f}(t) &=\max(|F_p(t)|,~ |m_f\ddot{\xi}_f(t)-F_p(t)|) \\
+    F_{heave,s}(t) &=\max(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|)
 \end{aligned}
 \end{equation}
-In operational seas, $F_p(t)$ is determined by the maximum generator torque $\tau_{max}$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$ due to the generator force saturation.
+In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$.
 In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude can be calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
+The peak of $\tau(t)$ is lower than its fundamental amplitude due to generator force saturation at $ \tau_{max}$, so using $\tau_{max}$ rather than $|\hat{\tau}|$ is both less conservative and more realistic.
 Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
-\begin{equation}
-\max_t F_{p,op}(t) \approx \frac{1}{R} \left(\left| Z_d \hat{\Omega} \right| + \tau_{max} \right)
+\begin{equation}\label{eq:peak-pto-force}
+\max_t |F_{p,op}(t)| \approx \frac{1}{R} \left(\left| Z_{shaft} \hat{\Omega} \right| + \tau_{max} \right)
 \end{equation}
-while the storm case lacks the control saturation nonlinearity and thus uses the fundamental amplitude $\hat{F}_{p,st}$.
-The 
+Meanwhile, the storm case lacks the control saturation nonlinearity and thus uses the fundamental amplitude $\hat{F}_{p,st}$.
 
-where table~\ref{tab:DLCs} details $F_p$ and $\xi$ based on the assumptions of each design load case.
-The vertical design load $F_{heave}$ 
- maximum of the PTO and fluid force amplitudes, which conservatively neglects the spatial distribution of the inertial forces.
+The nonlinearities in the fluid forces $|m\ddot{\xi}(t)-F_p(t)|$ are not so easily addressed, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
+MDOcean currently uses the fundamental amplitude of the fluid forces for both the storm and operational case:
+\begin{equation}\label{eq:peak-fluid-force}
+\max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|
+\end{equation}
+This could be either an underestimate or overestimate depending on whether the harmonics interfere constructively or destructively with the fundamental.
+The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_t |\xi_f(t)|$ and $\max_t |\xi_s(t)|$ in both cases.
+Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
 
+Table~\ref{tab:DLCs} summarizes the peak forces and amplitudes based on the assumptions of each design load case.
 
 \begin{table}
     \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}}
- & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
-         \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
-         Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $F_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
-Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\ 
- Float amplitude, $\xi_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
-         Spar amplitude, $\xi_s$& Given by \eqref{eq:eom-freq-domain}&Equals $\xi_f$ due to brake\\
- \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|\xi_f-\xi_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
- \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|\xi_f|_{max}$ }& $\min(\xi_{f,linear}, \xi_{f,slam})$& N/A \\ %$X_{slam}$\\
- \parbox[m]{\linewidth}{\centering Maximum allowable spar amplitude, $|\xi_s|_{max}$ }& $\min(\xi_{s,linear}, \xi_{s,slam})$& N/A %$X_{slam}$\\
-    \end{tabular}
-    \caption{Force components in each design load case}
-    \label{tab:DLCs}
+    \begin{tabular}{>{\centering\arraybackslash}p{0.28\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.33\linewidth}}
+    & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
+    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Peak powertrain force, $\max_t |F_p(t)|$ \vspace{8pt} }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-pto-force}} 
+        & \parbox[m]{\linewidth}{\centering
+        Solve \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients for $F_p$}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak fluid force, $\max_t |m\ddot{\xi}(t)-F_p(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-fluid-force} with \cref{eq:op-hydro-coeffs} coefficients and $F_p$ from \cref{eq:peak-pto-force}}
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-fluid-force} with \cref{eq:st-hydro-coeffs} coefficients and $F_p$ from storm case}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak float travel, $\max_t |\xi_f(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:st-hydro-coeffs} coefficients and $F_p=0$}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak spar travel, $\max_t |\xi_s(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        &Equals $\xi_f$ due to brake\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable relative amplitude between float and spar, $|\xi_f-\xi_s|_{max}$ \vspace{8pt}}
+        & \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} 
+        &N/A\\  \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable float amplitude, $|\xi_f|_{max}$ \vspace{8pt} }
+        & $\min(\xi_{f,linear}, \xi_{f,slam})$
+        & N/A \\ \hline %$X_{slam}$\\
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable spar amplitude, $|\xi_s|_{max}$ }
+        & $\min(\xi_{s,linear}, \xi_{s,slam})$
+        & N/A %$X_{slam}$\\
+\end{tabular}
+\caption{Forces, amplitudes, and maximum allowable amplitudes in each design load case}
+\label{tab:DLCs}
 \end{table}
-
-The calculation of forces and amplitudes in operational seas uses the 2-DOF equation of motion \eqref{eq:eom-freq-domain} with the PTO force $F_p$ set by the chosen controller.
-In storm seas, the brake force is calculated by 
-For conservativism, this net force is assumed to apply to both the float and spar independently.
 
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
@@ -1029,7 +1059,7 @@ The design surge force is the maximum surge force over all nonzero-probability s
 Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
 Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work. 
 Maximum acceptable heave %and surge 
-forces will be evaluated with structural factors of safety in \ref{sec:structures}.
+forces will be evaluated with structural factors of safety in \cref{sec:structures}.
 The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the optimization.
 
 The table also indicates the maximum permissible amplitudes.
@@ -1041,17 +1071,22 @@ The permissible heights for upward and downward motion of the float relative to 
 Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
 Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:meem}.
-This maximum amplitude $X_{linear}$ for the float and spar respectively is:
+This maximum amplitude $\xi_{linear}$ for the float and spar respectively is:
 \begin{equation}
-    X_{f,linear} = (h-T_{f,2})/10, \qquad X_{s,linear}  = (h-T_s)/10
+    \xi_{f,linear} = (h-T_{f,2})/10, \qquad \xi_{s,linear}  = (h-T_s)/10
 \end{equation}
+which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
 
-In both operational and storm states, slamming should be avoided since it causes extremely high loads.
-Slamming refers to the bottom surface of the WEC rising out of the water and hitting the free surface as it reenters (bottom-slamming), or symetrically the top of the WEC becoming fully submerged beneath the free surface (top-slamming).
-The formula for the critical slamming amplitude $X_{slam}$ in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and shown to lie between $\Delta z-H/2$ and $\Delta z+H/2$ for relevant vertcal body dimenson $\Delta z$, depending on the wave parameters and body diameter and oscillation phase.
-For operational waves, $\Delta z$ for float bottom-slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
-Likewise for spar bottom-slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
-The relevant $\Delta z$ for float and spar top-slamming in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
+In both operational and storm states, the WEC surface should not transiently pierce the wave free surface since this causes extremely high loads.
+This includes slamming, in which the bottom surface of the WEC rises out of the water and hits the free surface as it reenters, and submersion, in which the top of the WEC becoming fully submerged beneath the free surface.
+The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and can be expressed in a quadratic form compatible with \cref{eq:opt-problem}: 
+\begin{equation}
+    \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
+\end{equation}
+for relevant vertical body dimenson $\Delta z$ and horizontal coordinate $y$, depending on the wave parameters and body diameter and oscillation phase.
+For operational waves, $\Delta z$ for float slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
+Likewise for spar slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
+The relevant $\Delta z$ for float and spar submersion in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
 For storm waves, currently the slamming limit is not applied.
 %since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
 In future work, the storm $\Delta z$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
