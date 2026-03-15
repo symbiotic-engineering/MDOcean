@@ -80,10 +80,13 @@ function [figs, ...
 
     % hydro figure, not broken down, log scale
     f2 = figure;
-    h = barh(cats_hydro,sum(times_hydro,2));
+    hydro_sum = sum(times_hydro,2);
+    h = barh(cats_hydro,hydro_sum);
     title('Hydrodynamics Runtime Comparison')
     subtitle('for a single frequency')
     ylabel('Runtime (s)')
+    exponents = log10(hydro_sum);
+    xlim(10.^[min(floor(exponents)),max(ceil(exponents))])
     if ~isMATLABReleaseOlderThan('R2024b')
         h(1).Labels = h(1).YData;
     end

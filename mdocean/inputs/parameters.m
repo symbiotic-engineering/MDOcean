@@ -38,8 +38,8 @@ else
     T_f_1_over_T_f_2 = 2/3.2;
     D_f_in_over_D_s = 6.5/6;
     h = 85;
-    power_coeffs = [22.4,1,-15,86];
-    power_scale_multibody = 0.595;
+    power_coeffs = [22.4,1,-15,86]; % only used when use_multibody=false
+    power_scale_multibody = 0.6;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -129,7 +129,7 @@ param_table = [param_table;
         "number of damping plate stiffeners (-)",{''});
     ...
     ...% Economics
-    table("m_scale","m_{scale}",{1.1},"economics",false,... 
+    table("m_scale","m_{scale}",{1.12},"economics",false,... 
         "factor to account for mass of neglected stiffeners (-)",{''});
     table("FCR","FCR",{0.113},"economics",true,... 
         "fixed charge rate (-), see RM3 report p63",{''});
@@ -182,6 +182,8 @@ param_table = [param_table;
         "whether to use force saturation (boolean)",{''});
     table("use_power_sat","use_power_sat",{true},"dynamics",false,... 
         "whether to use power saturation (boolean)",{''});
+    table("lock_in_storm","lock_in_storm",{true},"dynamics",false,... 
+        "whether to use lock float and spar together in storm",{''});
     table("operational_dynamics_debug_plots_on",...
         "operational_dynamics_debug_plots_on",{false},"dynamics",false,...
         "whether to plot drag convergence and slamming for operational sea states (boolean)",{''});
@@ -209,7 +211,7 @@ param_table = [param_table;
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3",{''});
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
         false,"function from WECSim",{''});
-    table("F_heave_mult","F_{heave,mult}",{0.98},"dynamics",true,... 
+    table("F_heave_mult","F_{heave,mult}",{1.83},"dynamics",true,... 
         "multiplier to make heave force match with validation (-)",{''});
     % 1.925 is required to make WAMIT match tank test, and 0.857 is
     % required to make MEEM match WAMIT
