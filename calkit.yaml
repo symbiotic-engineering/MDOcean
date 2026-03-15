@@ -21,17 +21,34 @@ env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
   stages:
-    mermaid-taxonomy:
+    mermaid-taxonomy-pdf:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/taxonomy.pdf -f 
-        -o mdocean/plots/non_matlab_figs/taxonomy.svg
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd
+        -o mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f 
       inputs:
         - mdocean/plots/non_matlab_figs/taxonomy.mmd
       outputs:
-        - mdocean/plots/non_matlab_figs/taxonomy.pdf
-        - mdocean/plots/non_matlab_figs/taxonomy.svg
+        - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
+    mermaid-taxonomy-svg:
+      kind: command
+      environment: mermaid
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd 
+        -o mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+          storage:
+    reformat-mermaid-svg:
+      kind: shell-command
+      environment: _system
+      command: xmllint --format mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o mdocean/plots/non_matlab_figs/img/taxonomy.svg
+      inputs: 
+        - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
+          storage: git
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
