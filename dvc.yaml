@@ -1,3 +1,29 @@
+metrics:
+  - results/AllFigCompare/end.json
+  - results/Comparison/end.json
+  - results/Constraints/end.json
+  - results/Cost/end.json
+  - results/DampingPlateStructures/end.json
+  - results/DescFcns/end.json
+  - results/DesignSpaceExploration/end.json
+  - results/DesignVars/end.json
+  - results/ForceSaturationFigFunc/end.json
+  - results/GradientOptimFigFunc/end.json
+  - results/HydroCoeffFigFunc/end.json
+  - results/LocationSensitivity/end.json
+  - results/Meem/end.json
+  - results/Multistart/end.json
+  - results/ParamSensitivities/end.json
+  - results/Parameters/end.json
+  - results/ParetoFigFunc/end.json
+  - results/ParetoSweep/end.json
+  - results/ReadNonMatlabFigs/end.json
+  - results/RunSingleFigFunc/end.json
+  - results/Runtime/end.json
+  - results/Slamming/end.json
+  - results/SparHydro/end.json
+  - results/Validation/end.json
+  - results/Wecsim/end.json
 stages:
   mermaid-taxonomy:
     cmd: calkit xenv -n mermaid --no-check -- -i 
@@ -20,8 +46,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -74,8 +100,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -114,9 +140,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/AllFigCompare/intermed.mat
     outs:
       - results/AllFigCompare/runtime_bar_chart.pdf
       - results/AllFigCompare/end.mat
+      - results/AllFigCompare/end.json
     desc: Automatically generated from the 'postpro-AllFigCompare' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Comparison:
@@ -129,8 +157,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/compare_run.m
@@ -138,12 +166,10 @@ stages:
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
-      - ./mdocean/plots/matlab_figs/compare.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/power_PDF.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
@@ -193,19 +219,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
-      - ./mdocean/optimization/compare_run.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/compare.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/power_PDF.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
@@ -235,7 +255,6 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
@@ -243,6 +262,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Comparison/intermed.mat
     outs:
       - results/Comparison/overlaid_geometry.pdf
       - results/Comparison/overlaid_hydro_coeffs.pdf
@@ -251,6 +271,7 @@ stages:
       - results/Comparison/optimal_design_vars.tex
       - results/Comparison/optimal_outputs.tex
       - results/Comparison/end.mat
+      - results/Comparison/end.json
     desc: Automatically generated from the 'postpro-Comparison' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Constraints:
@@ -263,8 +284,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -317,8 +338,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -357,9 +378,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Constraints/intermed.mat
     outs:
       - results/Constraints/constraints.tex
       - results/Constraints/end.mat
+      - results/Constraints/end.json
     desc: Automatically generated from the 'postpro-Constraints' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Cost:
@@ -372,8 +395,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -426,8 +449,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -466,9 +489,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Cost/intermed.mat
     outs:
       - results/Cost/cost_parameters.tex
       - results/Cost/end.mat
+      - results/Cost/end.json
     desc: Automatically generated from the 'postpro-Cost' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-DampingPlateStructures:
@@ -481,8 +506,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -538,15 +563,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/structures/make_four_loads_plot.m
-      - ./mdocean/plots/matlab_figs/structures/viz_damping_plate.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -580,11 +603,13 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/DampingPlateStructures/intermed.mat
     outs:
       - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
       - results/DampingPlateStructures/damping_plate_deflection.pdf
       - results/DampingPlateStructures/damping_plate_moment.pdf
       - results/DampingPlateStructures/end.mat
+      - results/DampingPlateStructures/end.json
     desc: Automatically generated from the 
       'postpro-DampingPlateStructures' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -598,8 +623,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -653,14 +678,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/sin_desc_fcn_demo.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -694,11 +718,13 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/DescFcns/intermed.mat
     outs:
       - results/DescFcns/saturation_desc_fcn.pdf
       - results/DescFcns/saturation_desc_fcn_alpha.pdf
       - results/DescFcns/drag_desc_fcn.pdf
       - results/DescFcns/end.mat
+      - results/DescFcns/end.json
     desc: Automatically generated from the 'postpro-DescFcns' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-DesignSpaceExploration:
@@ -714,8 +740,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/nominal_c_v.m
       - ./mdocean/inputs/validation/validation_inputs.m
       - ./mdocean/inputs/var_bounds.m
@@ -729,7 +755,6 @@ stages:
       - ./mdocean/optimization/multiobjective/pareto_search.m
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-      - ./mdocean/plots/matlab_figs/experiments_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -782,32 +807,22 @@ stages:
     deps:
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
-      - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
-      - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
-      - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/nominal_c_v.m
       - ./mdocean/inputs/validation/validation_inputs.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
       - ./mdocean/optimization/multiobjective/paretoFront.m
       - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-      - ./mdocean/optimization/multiobjective/pareto_search.m
-      - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
       - ./mdocean/plots/matlab_figs/experiments_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
@@ -836,21 +851,20 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/experiments.m
-      - ./mdocean/simulation/run/is_feasible.m
       - ./mdocean/simulation/simulation.m
+      - results/DesignSpaceExploration/intermed.mat
     outs:
       - results/DesignSpaceExploration/experiments_pareto.pdf
       - results/DesignSpaceExploration/experiments_ratios.pdf
       - results/DesignSpaceExploration/experiments_results.tex
       - results/DesignSpaceExploration/end.mat
+      - results/DesignSpaceExploration/end.json
     desc: Automatically generated from the 
       'postpro-DesignSpaceExploration' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -864,8 +878,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -918,8 +932,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -958,9 +972,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/DesignVars/intermed.mat
     outs:
       - results/DesignVars/design_vars.tex
       - results/DesignVars/end.mat
+      - results/DesignVars/end.json
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
@@ -973,8 +989,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1029,12 +1045,11 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/plots/matlab_figs/force_sat_results.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/util/bluewhitered.m
@@ -1070,10 +1085,12 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/ForceSaturationFigFunc/intermed.mat
     outs:
       - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
       - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
       - results/ForceSaturationFigFunc/end.mat
+      - results/ForceSaturationFigFunc/end.json
     desc: Automatically generated from the 
       'postpro-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -1087,22 +1104,17 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
-      - ./mdocean/optimization/sensitivities/delta_x.m
-      - ./mdocean/plots/matlab_figs/SOO_result_plots.m
-      - ./mdocean/plots/matlab_figs/lagrange_multiplier_bar_chart.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/plot_power_matrix.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
@@ -1137,7 +1149,6 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/check_max_CW.m
       - ./mdocean/simulation/simulation.m
     outs:
       - results/GradientOptimFigFunc/intermed.mat
@@ -1154,8 +1165,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1206,6 +1217,7 @@ stages:
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/run/check_max_CW.m
       - ./mdocean/simulation/simulation.m
+      - results/GradientOptimFigFunc/intermed.mat
     outs:
       - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
       - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
@@ -1214,6 +1226,7 @@ stages:
       - results/GradientOptimFigFunc/single_obj_convergence.pdf
       - results/GradientOptimFigFunc/single_obj_optim_results.tex
       - results/GradientOptimFigFunc/end.mat
+      - results/GradientOptimFigFunc/end.json
     desc: Automatically generated from the 
       'postpro-GradientOptimFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -1227,8 +1240,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1283,8 +1296,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1322,11 +1335,12 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/hydro_coeff_err.m
       - ./mdocean/simulation/simulation.m
+      - results/HydroCoeffFigFunc/intermed.mat
     outs:
       - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
       - results/HydroCoeffFigFunc/end.mat
+      - results/HydroCoeffFigFunc/end.json
     desc: Automatically generated from the 'postpro-HydroCoeffFigFunc'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-LocationSensitivity:
@@ -1339,15 +1353,14 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
-      - ./mdocean/optimization/sensitivities/location_post_process.m
       - ./mdocean/optimization/sensitivities/location_sensitivity.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
@@ -1406,23 +1419,14 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/run_solver.m
       - ./mdocean/optimization/sensitivities/location_post_process.m
-      - ./mdocean/optimization/sensitivities/location_sensitivity.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-      - ./mdocean/plots/matlab_figs/power_PDF.m
-      - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -1449,15 +1453,14 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/check_max_CW.m
       - ./mdocean/simulation/simulation.m
+      - results/LocationSensitivity/intermed.mat
     outs:
       - results/LocationSensitivity/location_1_power_matrix.pdf
       - results/LocationSensitivity/location_2_power_matrix.pdf
@@ -1466,6 +1469,7 @@ stages:
       - results/LocationSensitivity/location_probability_PDF.pdf
       - results/LocationSensitivity/location_sensitivity.tex
       - results/LocationSensitivity/end.mat
+      - results/LocationSensitivity/end.json
     desc: Automatically generated from the 
       'postpro-LocationSensitivity' stage in calkit.yaml. Changes made
       here will be overwritten.
@@ -1479,8 +1483,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1537,12 +1541,11 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/plots/matlab_figs/b_inf_numeric.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/util/bluewhitered.m
@@ -1566,7 +1569,6 @@ stages:
       - ./mdocean/simulation/modules/geometry.m
       - ./mdocean/simulation/modules/grid_CEM.m
       - ./mdocean/simulation/modules/hydro/dispersion.m
-      - ./mdocean/simulation/modules/hydro/generated/A_b_c_matrix_N10_M10_K10_heaving_outer.m
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
@@ -1578,8 +1580,8 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/validate_MEEM.m
       - ./mdocean/simulation/simulation.m
+      - results/Meem/intermed.mat
     outs:
       - results/Meem/meem_sparsity.pdf
       - results/Meem/meem_validation.pdf
@@ -1588,26 +1590,21 @@ stages:
       - results/Meem/meem_convergence_vs_NMK.pdf
       - results/Meem/asymptotic_b_vector.pdf
       - results/Meem/end.mat
+      - results/Meem/end.json
     desc: Automatically generated from the 'postpro-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Multistart:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Multistart; obj.run_analysis();"
     deps:
-      - ./mdocean/SAFE/PAWN/pawn_cdfs.m
-      - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
-      - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
-      - ./mdocean/SAFE/PAWN/pawn_ks.m
-      - ./mdocean/SAFE/PAWN/pawn_split_sample.m
-      - ./mdocean/SAFE/util/empiricalcdf.m
       - ./mdocean/analysis/@Multistart/Multistart.m
       - ./mdocean/analysis/@Multistart/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1616,7 +1613,6 @@ stages:
       - ./mdocean/optimization/sensitivities/gradient_mult_x0.m
       - ./mdocean/optimization/sensitivities/random_x0.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/multistart_postpro.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
@@ -1676,21 +1672,14 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/run_solver.m
-      - ./mdocean/optimization/sensitivities/gradient_mult_x0.m
-      - ./mdocean/optimization/sensitivities/random_x0.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/multistart_postpro.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -1717,21 +1706,21 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/is_feasible.m
       - ./mdocean/simulation/simulation.m
+      - results/Multistart/intermed.mat
     outs:
       - results/Multistart/multistart_convergence_tree.pdf
       - results/Multistart/multistart_parallel_coordinates.pdf
       - results/Multistart/multistart_bar_chart.pdf
       - results/Multistart/multistart_results.tex
       - results/Multistart/end.mat
+      - results/Multistart/end.json
     desc: Automatically generated from the 'postpro-Multistart' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParamSensitivities:
@@ -1744,8 +1733,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1753,8 +1742,6 @@ stages:
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/optimization/sensitivities/local_sens_both_obj_all_param.m
       - ./mdocean/optimization/sensitivities/param_sweep.m
-      - ./mdocean/plots/matlab_figs/all_sens_plots.m
-      - ./mdocean/plots/matlab_figs/global_sens_plots.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -1810,22 +1797,15 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/run_solver.m
-      - ./mdocean/optimization/sensitivities/local_sens_both_obj_all_param.m
-      - ./mdocean/optimization/sensitivities/param_sweep.m
       - ./mdocean/plots/matlab_figs/all_sens_plots.m
       - ./mdocean/plots/matlab_figs/global_sens_plots.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/color_each_element.m
       - ./mdocean/plots/util/hatchfill2.m
@@ -1853,7 +1833,6 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
@@ -1861,6 +1840,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/ParamSensitivities/intermed.mat
     outs:
       - results/ParamSensitivities/re_optim_constraint_grid.pdf
       - results/ParamSensitivities/post_optim_constraint_grid.pdf
@@ -1887,6 +1867,7 @@ stages:
       - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
       - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
       - results/ParamSensitivities/end.mat
+      - results/ParamSensitivities/end.json
     desc: Automatically generated from the 
       'postpro-ParamSensitivities' stage in calkit.yaml. Changes made 
       here will be overwritten.
@@ -1900,8 +1881,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1954,8 +1935,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -1994,9 +1975,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Parameters/intermed.mat
     outs:
       - results/Parameters/parameters.tex
       - results/Parameters/end.mat
+      - results/Parameters/end.json
     desc: Automatically generated from the 'postpro-Parameters' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoFigFunc:
@@ -2009,18 +1992,14 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/nominal_c_v.m
-      - ./mdocean/inputs/validation/validation_inputs.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
-      - ./mdocean/optimization/multiobjective/paretoFront.m
-      - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
       - ./mdocean/optimization/multiobjective/pareto_search.m
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
@@ -2078,24 +2057,17 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/nominal_c_v.m
       - ./mdocean/inputs/validation/validation_inputs.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
       - ./mdocean/optimization/multiobjective/paretoFront.m
       - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-      - ./mdocean/optimization/multiobjective/pareto_search.m
-      - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
@@ -2124,15 +2096,14 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/is_feasible.m
       - ./mdocean/simulation/simulation.m
+      - results/ParetoFigFunc/intermed.mat
     outs:
       - results/ParetoFigFunc/pareto_front_with_design_images.pdf
       - results/ParetoFigFunc/pareto_front_LCOE_contours.pdf
@@ -2140,6 +2111,7 @@ stages:
       - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
       - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
       - results/ParetoFigFunc/end.mat
+      - results/ParetoFigFunc/end.json
     desc: Automatically generated from the 'postpro-ParetoFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoSweep:
@@ -2152,8 +2124,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2206,8 +2178,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2246,9 +2218,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/ParetoSweep/intermed.mat
     outs:
       - results/ParetoSweep/sweep_num_seeds.pdf
       - results/ParetoSweep/end.mat
+      - results/ParetoSweep/end.json
     desc: Automatically generated from the 'postpro-ParetoSweep' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ReadNonMatlabFigs:
@@ -2261,8 +2235,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2317,8 +2291,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2357,6 +2331,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/ReadNonMatlabFigs/intermed.mat
     outs:
       - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
       - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
@@ -2374,6 +2349,7 @@ stages:
       - results/ReadNonMatlabFigs/sim_runtime.pdf
       - results/ReadNonMatlabFigs/trapezoid.pdf
       - results/ReadNonMatlabFigs/end.mat
+      - results/ReadNonMatlabFigs/end.json
     desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-RunSingleFigFunc:
@@ -2386,8 +2362,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2452,21 +2428,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-      - ./mdocean/plots/matlab_figs/power_PDF.m
-      - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -2493,17 +2461,14 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/check_max_CW.m
-      - ./mdocean/simulation/run/is_feasible.m
-      - ./mdocean/simulation/run/run_single.m
       - ./mdocean/simulation/simulation.m
+      - results/RunSingleFigFunc/intermed.mat
     outs:
       - results/RunSingleFigFunc/nominal_geometry_viz.pdf
       - results/RunSingleFigFunc/nominal_power_pdf.pdf
@@ -2511,6 +2476,7 @@ stages:
       - results/RunSingleFigFunc/drag_convergence.pdf
       - results/RunSingleFigFunc/slamming_model_comparison.pdf
       - results/RunSingleFigFunc/end.mat
+      - results/RunSingleFigFunc/end.json
     desc: Automatically generated from the 'postpro-RunSingleFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Runtime:
@@ -2523,10 +2489,10 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/myWecSimFcn.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2580,15 +2546,12 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/module_runtime_compare.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
@@ -2623,11 +2586,14 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Runtime/intermed.mat
     outs:
       - results/Runtime/dynamics_runtime.pdf
-      - results/Runtime/hydro_runtime.pdf
+      - results/Runtime/hydro_runtime_logscale.pdf
+      - results/Runtime/hydro_runtime_breakdown.pdf
       - results/Runtime/sim_runtime.pdf
       - results/Runtime/end.mat
+      - results/Runtime/end.json
     desc: Automatically generated from the 'postpro-Runtime' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Slamming:
@@ -2640,8 +2606,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2695,14 +2661,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/slam_plot.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -2736,9 +2701,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/Slamming/intermed.mat
     outs:
       - results/Slamming/slamming_amplitude.pdf
       - results/Slamming/end.mat
+      - results/Slamming/end.json
     desc: Automatically generated from the 'postpro-Slamming' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-SparHydro:
@@ -2751,8 +2718,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2806,14 +2773,13 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/spar_hydro_plot.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
@@ -2847,9 +2813,11 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/SparHydro/intermed.mat
     outs:
       - results/SparHydro/spar_added_mass.pdf
       - results/SparHydro/end.mat
+      - results/SparHydro/end.json
     desc: Automatically generated from the 'postpro-SparHydro' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
@@ -2862,8 +2830,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/nominal_c_v.m
       - ./mdocean/inputs/validation/validation_inputs.m
       - ./mdocean/inputs/var_bounds.m
@@ -2875,7 +2843,6 @@ stages:
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
-      - ./mdocean/plots/util/modify_suffix.m
       - ./mdocean/plots/util/remove_underscores.m
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/save_pdf.m
@@ -2922,10 +2889,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/nominal_c_v.m
-      - ./mdocean/inputs/validation/validation_inputs.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
@@ -2958,20 +2923,19 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
-      - ./mdocean/simulation/modules/lin_ineq_constraints.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
       - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
       - ./mdocean/simulation/modules/structures/float_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/is_feasible.m
-      - ./mdocean/simulation/run/validate_nominal_RM3.m
       - ./mdocean/simulation/simulation.m
+      - results/Validation/intermed.mat
     outs:
       - results/Validation/cost_vs_N_WEC.pdf
       - results/Validation/validation.tex
       - results/Validation/end.mat
+      - results/Validation/end.json
     desc: Automatically generated from the 'postpro-Validation' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Wecsim:
@@ -2984,10 +2948,10 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/myWecSimFcn.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
         Resource _SAM CSV.csv
@@ -3044,10 +3008,8 @@ stages:
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/validation/WEC-Sim/myWecSimFcn.m
-      - ./mdocean/inputs/validation/WEC-Sim/normalizeBEM.m
-      - ./mdocean/inputs/validation/WEC-Sim/readWAMIT.m
-      - ./mdocean/inputs/validation/WEC-Sim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
         Resource _SAM CSV.csv
@@ -3087,15 +3049,15 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/power_matrix_compare.m
-      - ./mdocean/simulation/run/validate_dynamics.m
       - ./mdocean/simulation/simulation.m
+      - results/Wecsim/intermed.mat
     outs:
       - results/Wecsim/WECSim_error_histograms_singlebody.pdf
       - results/Wecsim/WECSim_error_histograms_multibody.pdf
       - results/Wecsim/wecsim_all_sea_states.pdf
       - results/Wecsim/WECSim_errors.tex
       - results/Wecsim/end.mat
+      - results/Wecsim/end.json
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
   pyxdsm:
@@ -3124,6 +3086,53 @@ stages:
       - pubs/applied-ocean-research-model/tables/from-matlab/
     desc: Automatically generated from the 'move-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  results-to-latex:
+    cmd: "calkit latex from-json 'results/Comparison/end.json' 'results/GradientOptimFigFunc/end.json'
+      'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json' --output
+      'pubs/renewable-energy-mdo/numeric-results.tex' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
+      $/kWh\", \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\"\
+      : \"{powerAvgNominal/1000:.0f} kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f}
+      kW\", \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\",
+      \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\"\
+      : \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f}
+      kW\", \"structMassAtMinLCOE\": \"{structMassAtMinLCOE/1000:.0f} Mg\"\
+      , \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f} m\", \"forceMaxAtMinLCOE\"\
+      : \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatAtMinLCOE\"\
+      : \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\", \"surgeForceSparAtMinLCOE\"\
+      : \"{surgeForceSparAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatNominal\"\
+      : \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
+      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f}
+      $M\", \"capexDesignAtMinLCOE\": \"{capexDesignAtMinLCOE/1e6:.2f} $M\"\
+      , \"capexDesignNominal\": \"{capexDesignNominal/1e6:.2f} $M\", \"\
+      capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f} $M\", \"capexDesignMaxPower\"\
+      : \"{capexDesignMaxPower/1e6:.2f} $M\", \"simRuntime\": \"{simRuntime*1000:.0f}
+      ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
+      ms\", \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%\"\
+      , \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%\"\
+      , \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
+      , \"pctImproveDesignCostMinCapex\": \"{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}%\"\
+      , \"pctWorsePowerMinCapex\": \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%\"\
+      , \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
+      , \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%\"\
+      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"\
+      pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\"\
+      : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
+      }'"
+    deps:
+      - results/Comparison/end.json
+      - results/GradientOptimFigFunc/end.json
+      - results/RunSingleFigFunc/end.json
+      - results/Runtime/end.json
+    outs:
+      - pubs/renewable-energy-mdo/numeric-results.tex:
+          cache: false
+          persist: false
+      - pubs/applied-ocean-research-model/numeric-results.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'results-to-latex' stage in
+      calkit.yaml. Changes made here will be overwritten.
   copy-bib:
     cmd: calkit map-paths --file-to-file 
       'pubs/renewable-energy-mdo/references.bib->pubs/applied-ocean-research-model/references.bib'
@@ -3146,6 +3155,7 @@ stages:
       - pubs/renewable-energy-mdo/tables/
       - pubs/renewable-energy-mdo/references.bib
       - pubs/renewable-energy-mdo/numbers.tex
+      - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/elsarticle-num-names.bst
       - .calkit/env-locks/tex
       - pubs/renewable-energy-mdo/.latexmkrc
@@ -3172,6 +3182,7 @@ stages:
       - pubs/applied-ocean-research-model/tables/
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numbers.tex
+      - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex

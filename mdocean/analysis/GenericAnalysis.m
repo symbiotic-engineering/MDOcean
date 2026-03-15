@@ -61,37 +61,50 @@ classdef (Abstract) GenericAnalysis
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.tab_names,'.tex') ...
-                          'end.mat']);
+                          'end.mat' ...
+                          'end.json']);
         end
         function val = get.class_dependencies(obj)
-            val = obj.get_dependencies(class(obj));
+            parent = superclasses(obj);
+            val = obj.get_dependencies(parent{:});
         end
         function val = get.analysis_dependencies(obj)
-            all_deps = obj.class_dependencies;
-            to_remove = {['@' class(obj) filesep 'post_process_fcn'], 'OpenFLASH'};
-            val = all_deps(~contains(all_deps, to_remove));
+            analysis_deps = obj.get_dependencies(['@' class(obj) filesep 'analysis_fcn']);
+            all_deps = [obj.class_dependencies, analysis_deps];
+            sorted = sort(unique(all_deps));
+            to_remove = 'OpenFLASH';
+            val = sorted(~contains(sorted, to_remove));
         end
         function val = get.postpro_dependencies(obj)
-            all_deps = obj.class_dependencies;
-            to_remove = {['@' class(obj) filesep 'analysis_fcn'], 'OpenFLASH'};
-            val = all_deps(~contains(all_deps, to_remove));
+            postpro_deps = obj.get_dependencies(['@' class(obj) filesep 'post_process_fcn']);
+            all_deps = [obj.class_dependencies, postpro_deps, obj.analysis_outputs];
+            sorted = sort(unique(all_deps));
+            to_remove = 'OpenFLASH';
+            val = sorted(~contains(sorted, to_remove));
         end
         function obj = run_analysis(obj)
             cd('mdocean');
-            obj.intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            t = tic;
+            intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            intermed_result_struct.analysis_time = toc(t);
+            obj.intermed_result_struct = intermed_result_struct;
             cd('..');
             obj.save_intermed_results();
         end
 
         function obj = run_post_process(obj)
             cd('mdocean');
+            t = tic;
             [obj.fig_array,...
                 obj.tab_array_display,...
                 obj.tab_array_latex,...
-                obj.end_result_struct,...
+                end_result_struct,...
                 obj.tab_firstrows,...
                 obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
+            end_result_struct.postpro_time = toc(t);
+            end_result_struct.analysis_time = obj.intermed_result_struct.analysis_time;
+            obj.end_result_struct = end_result_struct;
 
             obj.fig_array = obj.validate_figs(obj.fig_array);
 
@@ -115,7 +128,10 @@ classdef (Abstract) GenericAnalysis
 
         function save_end_results(obj)
             s =  obj.end_result_struct;
-            save([obj.output_folder filesep 'end'],'-struct', 's')
+            fname = [obj.output_folder filesep 'end'];
+            save(fname,'-struct', 's')
+            json = jsonencode(s,PrettyPrint=true);
+            writelines(json, [fname '.json']);
         end
 
         function save_figs(obj)
@@ -212,11 +228,12 @@ classdef (Abstract) GenericAnalysis
     end
     methods (Static)
         function deps_rel = get_dependencies(fcn_name)
-            deps_abs = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            fcn_deps = matlab.codetools.requiredFilesAndProducts(fcn_name);
+            deps_abs = [fcn_deps, which(fcn_name)];
             path = mfilename('fullpath');
             s = split(which(path), filesep);
             MDOcean_folder = strjoin(s(1:end-3), filesep);
-            base = MDOcean_folder
+            base = MDOcean_folder;
             deps_rel = GenericAnalysis.make_rel_path(deps_abs, base);
         end
         

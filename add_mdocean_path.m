@@ -1,3 +1,8 @@
+if isunix
+    load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
+    disp('Loaded glibc patch for Simulink')
+end
+
 path = mfilename('fullpath'); % for regular scripts
 if contains(path,'LiveEditorEvaluationHelper') % for matlab online
     path = matlab.desktop.editor.getActiveFilename;
@@ -17,17 +22,14 @@ wecSim_folder_outside = [MDOcean_folder filesep '../WEC-Sim'];
 wecSim_folder_inside = [MDOcean_folder filesep 'WEC-Sim'];
 exist_outside = exist(wecSim_folder_outside,'dir');
 exist_inside = exist(wecSim_folder_inside,'dir');
-exist_vec = [exist_inside,exist_outside];
+exist_vec = [exist_outside, exist_inside];
 if any(exist_vec)
-    folder_vec = {wecSim_folder_inside,wecSim_folder_outside};
+    folder_vec = {wecSim_folder_outside, wecSim_folder_inside};
     wecSim_folder = folder_vec{find(exist_vec,1)};
     wecSimSourceFolder = [wecSim_folder filesep 'source'];
-    if isunix
-        load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
-    end
     set_param(0, 'ErrorIfLoadNewModel', 'off')
     addpath(genpath(wecSimSourceFolder))
-    rmpath([wecSimSourceFolder '/functions/BEMIO/']) % prevent conflicts with MDOcean's modified readWAMIT
+    addpath([mdocean_folder filesep 'inputs' filesep 'validation' filesep 'WECSim'],'-begin') % make sure MDOcean's modified readWAMIT takes precedence over WecSim's
     clear wecSimSourceFolder wecSim_folder folder_vec
 end
 
