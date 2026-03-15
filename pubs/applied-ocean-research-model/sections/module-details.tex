@@ -916,7 +916,7 @@ where $\vec{w}(y)$ is the local width of the WEC perpendicular to the direction 
          2\sqrt{\vec{R}^2-y^2}-2\sqrt{\vec{R}_{in}^2-y^2}, &0<|y|< \vec{R}_{in} \\
     \end{cases}
 \end{equation}
-Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term  potentially out of phase with the body motion:
+Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
 \begin{equation}\label{eq:drag-damping-excitation}
     \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
     + \vec{\gamma}_{d} \hat{\zeta}
@@ -936,6 +936,26 @@ $\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velo
     \vec{\alpha}_v(y) = \frac{\vec{|\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} e^{-2ky} - 2 \vec{r} e^{-ky}  \sin\angle \vec{\hat{\dot{\xi}}}}
 \end{equation}
 and $\vec{r} = |\hat{V}_{wave}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+
+The integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals $I_B(x_1,x_2,x_3)$ and $I_G(x_1,x_2,x_3)$:
+\begin{equation}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{4}{3} \rho_w R^2 C_d |\hat{\xi}|
+    \left[ 
+        I_B(x_1=1/r,x_2=\angle\hat{\xi},x_3=\kappa) - \alpha^2 I_B(x_1=1/r,x_2=\angle\hat{\xi},x_3=\alpha\kappa)
+    \right]
+    \\
+    \vec{\gamma}_{d} &= \frac{4}{3} \rho_w R^2 C_d |\hat{\xi}| \frac{g k}{\omega} e^{-k\vec{T}}
+    \left[ 
+        I_G(x_1=1/r,x_2=\angle\hat{\xi},x_3=\kappa) - \alpha^2 I_G(x_1=1/r,x_2=\angle\hat{\xi},x_3=\alpha\kappa)
+    \right]
+    \\
+    I_B &= \frac{2}{\pi} \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}}
+    \\
+    I_G &= \frac{2}{\pi} \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} e^{-i\kappa x}
+\end{aligned}
+\end{equation}
+These integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values $x_1, x_2, x_3$ and accessed via a lookup table to reduce runtime.
 
 The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
 Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
