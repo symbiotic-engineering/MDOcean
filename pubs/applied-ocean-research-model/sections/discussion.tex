@@ -71,7 +71,7 @@ This section leverages the analytical multidisciplinary nature of the model to d
 \paragraph{Power Matrix Drivers}
 Similar to \figureautorefname~\ref{fig:JPD-multiply} showing the multiplication of the power matrix by the JPD to obtain average power, \figureautorefname~\ref{fig:power-matrix-decomposition} further decomposes the power matrix into component matrices showing the impact of shape, drag, shape, maximum force, and PTO losses.
 \begin{equation}
-\mathbf{P} = \mathbf{J}_{wave} \mathbf{CW}_{max} \mathbf{\eta}_{rad} \mathbf{\eta}_{drag} \mathbf{\eta}_{force} \mathbf{\eta}_{elec}
+\mathbf{P} = \mathbf{J}_{wave} ~\mathbf{CW}_{max} ~\mathbf{\eta}_{rad} ~\mathbf{\eta}_{drag} ~\mathbf{\eta}_{force} ~\mathbf{\eta}_{elec}
 \end{equation}
 The first two matrices in the product are independent of design, with the wave power density matrix $\mathbf{J}_{wave}$ providing the amount of energy flux per unit width of a wave with the given frequency and amplitude, and the maximum capture width matrix $\mathbf{CW}_{max}$ representing the radiation limit determined by the WEC mode of motion (heave in this case; for surge or pitch  the value would be doubled due to the asymmetry of the outgoing wave field).
 \begin{equation}
@@ -96,10 +96,12 @@ Finally, $\mathbf{\eta}_{elec}$ represents the effect of PTO losses and the powe
 Altogether, this multiplicative decomposition of the power matrix allows for the isolation of the effect of certain design variables and parameters on power, and therefore intuitive identification of which design variables are most important for improving power.
 The dependence is made explicit below:
 \begin{equation}
-\mathbf{\eta}_{rad} = \mathbf{\eta}_{rad}(x_{shape}) \qquad
-\mathbf{\eta}_{drag} = \mathbf{\eta}_{drag}(x_{shape},C_{d,f}, C_{d,s}) \qquad
-\mathbf{\eta}_{force} = \mathbf{\eta}_{force}(x_{shape},C_{d,f}, C_{d,s},F_{max}) \qquad
-\mathbf{\eta}_{elec} = \mathbf{\eta}_{elec}(x_{shape},C_{d,f}, C_{d,s},F_{max}, \eta, P_{max})
+\begin{aligned}
+\mathbf{\eta}_{rad} &= \mathbf{\eta}_{rad}(x_{shape}) &
+\mathbf{\eta}_{elec} &= \mathbf{\eta}_{elec}(x_{shape},C_{d,f}, C_{d,s},F_{max}, \eta, P_{max}) \\
+\mathbf{\eta}_{drag} &= \mathbf{\eta}_{drag}(x_{shape},C_{d,f}, C_{d,s}) &
+\mathbf{\eta}_{force} &= \mathbf{\eta}_{force}(x_{shape},C_{d,f}, C_{d,s},F_{max})
+\end{aligned}
 \end{equation}
 Importantly, the later matrices in the product depend on the design variables and parameters that affect the earlier matrices.
 This coupling means that the effect of the drag coefficients, for example, on power in a device with PTO limits and dynamics must be understood not only through $\mathbf{\eta}_{drag}$ but also through their effect on $\mathbf{\eta}_{force}$ and $\mathbf{\eta}_{elec}$.
