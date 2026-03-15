@@ -16,19 +16,23 @@ environments:
     kind: docker
     image: minlag/mermaid-cli:latest
     description: Mermaid CLI via Docker.
+    wdir: /data
+    command_mode: entrypoint
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
   stages:
     mermaid-taxonomy:
-      kind: shell-command
+      kind: command
       environment: mermaid
-      command: mmdc -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/taxonomy.pdf -f
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
+        mdocean/plots/non_matlab_figs/taxonomy.pdf -f 
+        -o mdocean/plots/non_matlab_figs/taxonomy.svg
       inputs:
         - mdocean/plots/non_matlab_figs/taxonomy.mmd
       outputs:
         - mdocean/plots/non_matlab_figs/taxonomy.pdf
+        - mdocean/plots/non_matlab_figs/taxonomy.svg
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
