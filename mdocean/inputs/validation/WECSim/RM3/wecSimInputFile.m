@@ -160,6 +160,7 @@ D_f   = X(2);        % outer diameter of float (m)
 T_f_2 = X(3);
 D_f_in = p.D_f_in_over_D_s * D_s;
 D_d = p.D_d_over_D_s * D_s;
+T_s = p.T_s_over_D_s * D_s;
 % body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
 % body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
 % body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
