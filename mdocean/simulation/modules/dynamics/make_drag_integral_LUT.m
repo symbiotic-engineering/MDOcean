@@ -20,27 +20,37 @@ end
 function [B,G_real,G_imag] = drag_LUT_or_analytical_or_compute(R,TH,K,LUT_fcn)
     [B,G_real,G_imag] = deal(zeros(size(R)));
     
-    % first compute analytically where possible (only r_prime=0 and K=0 limit cases)
+    % first compute analytically where possible (only r_prime=0, R=0, and K=0 limit cases)
     rp = 1./R;
     idx_rp_zero = rp < 1e-6;
     B(idx_rp_zero) = pi/2;
     G_imag(idx_rp_zero) = 0;
     G_real(idx_rp_zero) = pi * besselj(1,K(idx_rp_zero)) ./ (K(idx_rp_zero));
 
-    idx_k_zero = K == 0;
+    idx_r_zero = R == 0 & K ~= 0;
+    B(idx_r_zero) = 0;
+    G_imag(idx_r_zero) = 0;
+    G_real(idx_r_zero) = pi * besselj(1,K(idx_r_zero)) ./ (K(idx_r_zero));
+
+    idx_k_zero = K == 0 & R ~= 0;
     k_zero_const_term = pi/2 * sqrt(1 + rp(idx_k_zero).^2 - 2*rp(idx_k_zero).*sin(TH(idx_k_zero)));
     B(idx_k_zero) = k_zero_const_term;
     G_imag(idx_k_zero) = 0;
     G_real(idx_k_zero) = k_zero_const_term;
 
+    idx_r_k_zero = R == 0 & K == 0;
+    B(idx_r_k_zero) = 0;
+    G_imag(idx_r_k_zero) = 0;
+    G_real(idx_r_k_zero) = pi/2;
+
     % then use LUT everywhere else (queries outside the LUT will return NaN)
-    idx_LUT = ~idx_rp_zero & ~idx_k_zero;
+    idx_LUT = ~idx_rp_zero & ~idx_k_zero & ~idx_r_zero & ~idx_r_k_zero;
     [B(idx_LUT), G_real(idx_LUT), G_imag(idx_LUT)] = LUT_fcn(R(idx_LUT),TH(idx_LUT),K(idx_LUT));
 
     % for NaNs outside the LUT, compute directly (this is the slowest but should be rare)
     idx_nan = isnan(B) & ~isnan(R);
     if any(idx_nan)
-         disp(['Computing drag integral numerically for rp=' mat2str(1./R(idx_nan)) ', kappa=' mat2str(K(idx_nan)) ...
+         disp(['Computing drag integral numerically for rp=' mat2str(rp(idx_nan)) ', kappa=' mat2str(K(idx_nan)) ...
          ' because they are outside the range of the precomputed lookup table. If you see this message often' ...
          ' and want to reduce compute time, go to parameters.m, find the call to make_drag_integral_LUT(),'... 
          ' and adjust the rp_min, rp_max, and/or kappa_max inputs to expand the lookup table.'])
