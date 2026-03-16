@@ -431,8 +431,8 @@ function [control_evaluation_fcn,...
                                                                     gamma_s_lin_phase, multibody, drag_fcn,...
                                                                     D_f, D_f_in, D_d)
     % drag coefficients linearized around guess response
-    [B_drag_f, gamma_drag_f] = get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f, drag_fcn, k_wvn, D_f/2, D_f_in/2);
-    [B_drag_s, gamma_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s, drag_fcn, k_wvn, D_d/2, 0);
+    [B_drag_f, gamma_drag_f] = get_drag_dynamic_coeffs(X_f_guess, phase_X_f_guess, mag_v0_f, w, drag_const_f, drag_fcn, k_wvn, H, D_f/2, D_f_in/2);
+    [B_drag_s, gamma_drag_s] = get_drag_dynamic_coeffs(X_s_guess, phase_X_s_guess, mag_v0_s, w, drag_const_s, drag_fcn, k_wvn, H, D_d/2, 0);
 
     % total linear system coefficients
     B_f = B_h_f + B_drag_f;
@@ -511,7 +511,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
 
 end
 
-function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const, drag_fcn, k_wvn, R, R_in)
+function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess, mag_v0, w, drag_const, drag_fcn, k_wvn, H, R, R_in)
 
     idx_inf = isinf(X_guess); % override unstable guesses to prevent extra nans
     X_guess(idx_inf) = 1;
@@ -549,11 +549,15 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     G_integral_imag_weighted = G_int_imag_1 - alpha.^2 .* G_int_imag_2;
     G_integral_weighted = G_integral_real_weighted + 1i*G_integral_imag_weighted;
 
+    % excitation only when mag_v = 0
+    mag_v_or_v0 = mag_v;
+    mag_v_or_v0(mag_v == 0) = mag_v0(mag_v == 0);
+
     % derived p141 of notebook 9 3/5/26
-    mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v;
+    mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v_or_v0;
     B_drag_2   = mag_v_constant_term           .* B_integral_weighted;
     assert(all( B_drag_2(isfinite(B_drag_2)) >= 0 ),'negative damping from integral method')
-    gamma_drag = mag_v_constant_term .* mag_v0 .* G_integral_weighted;
+    gamma_drag = mag_v_constant_term .* (mag_v0 ./ (H/2)) .* G_integral_weighted;
 
     plot_on = false;
     drag_debug = false;

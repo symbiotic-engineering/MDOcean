@@ -258,8 +258,8 @@ function results = compute_mdocean_results(X,p)
                                       'force_pto',val.mag_U,...
                                       'float_drag_force_rms',val.F_drag_f,...
                                       'spar_drag_force_rms',val.F_drag_s,...
-                                      'float_drag_force_phase',val.phase_F_drag_f,...
-                                      'spar_drag_force_phase',val.phase_F_drag_s);
+                                      'float_drag_force_phase',wrapTo2Pi(val.phase_F_drag_f),...
+                                      'spar_drag_force_phase',wrapTo2Pi(val.phase_F_drag_s));
 end
 
 function results = load_wecsim_results(wecsim_filename, p)
@@ -294,8 +294,8 @@ function results = load_wecsim_results(wecsim_filename, p)
     B_p(idx) = wecsim_raw.B_p;
     float_drag_force_rms(idx) = wecsim_raw.float_drag_force_rms;
     spar_drag_force_rms(idx)  = wecsim_raw.spar_drag_force_rms;
-    float_drag_force_phase(idx) = wecsim_raw.float_drag_force_phase;
-    spar_drag_force_phase(idx) = wecsim_raw.spar_drag_force_phase;
+    float_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.float_drag_force_phase);
+    spar_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.spar_drag_force_phase);
 
     %power_mech_unsat(power_mech_unsat>1e6) = NaN;
 
