@@ -291,7 +291,7 @@ end
 
 function F_heave = combine_ptrain_dalembert_forces(mass, w, mag_X, phase_X, mag_U, phase_U, F_max)
     F_dAlembert_mag = mass .* w.^2 .* mag_X;
-    F_dAlembert_phase = phase_X;
+    F_dAlembert_phase = phase_X + pi;
 
     F_heave_real = F_dAlembert_mag .* cos(F_dAlembert_phase) + mag_U .* cos(phase_U);
     F_heave_imag = F_dAlembert_mag .* sin(F_dAlembert_phase) + mag_U .* sin(phase_U);
