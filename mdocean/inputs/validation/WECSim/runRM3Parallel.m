@@ -160,9 +160,9 @@ parfor imcr=1:length(mcr.cases(:,1))
         spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
         relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
 
-        float_phase(imcr) = get_phase(float_pos);
-        spar_phase(imcr) = get_phase(spar_pos);
-        rel_phase(imcr) = get_phase(rel_pos);
+        float_phase(imcr) = get_phase(float_pos, N_per_T);
+        spar_phase(imcr) = get_phase(spar_pos, N_per_T);
+        rel_phase(imcr) = get_phase(rel_pos, N_per_T);
 
         float_drag_force_rms(imcr) = rms( F_drag_f - mean(F_drag_f) );
         spar_drag_force_rms(imcr)  = rms( F_drag_s - mean(F_drag_s) );
