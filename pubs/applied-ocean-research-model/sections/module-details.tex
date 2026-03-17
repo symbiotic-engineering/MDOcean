@@ -937,25 +937,8 @@ $\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velo
 \end{equation}
 and $\vec{r} = |\hat{V}_{wave}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
 
-The integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals $I_B(x_1,x_2,x_3)$ and $I_G(x_1,x_2,x_3)$:
-\begin{equation}\label{eq:drag-integrals-IB-IG}
-\begin{aligned}
-    \mathbf{B}_{d} &= \frac{4}{3} \rho_w R^2 C_d |\hat{\xi}|
-    \left[ 
-        I_B(x_1=1/r,x_2=\angle\hat{\xi},x_3=\kappa) - \alpha^2 I_B(x_1=1/r,x_2=\angle\hat{\xi},x_3=\alpha\kappa)
-    \right]
-    \\
-    \vec{\gamma}_{d} &= \frac{4}{3} \rho_w R^2 C_d |\hat{\xi}| \frac{g k}{\omega} e^{-k\vec{T}}
-    \left[ 
-        I_G(x_1=1/r,x_2=\angle\hat{\xi},x_3=\kappa) - \alpha^2 I_G(x_1=1/r,x_2=\angle\hat{\xi},x_3=\alpha\kappa)
-    \right]
-    \\
-    I_B &= \frac{2}{\pi} \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}}
-    \\
-    I_G &= \frac{2}{\pi} \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} e^{-i\kappa x}
-\end{aligned}
-\end{equation}
-These integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values $x_1, x_2, x_3$ and accessed via a lookup table to reduce runtime.
+The integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals detailed in \appendixname~\ref{sec:appendix-drag}.
+These integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values and accessed via a lookup table to reduce runtime.
 
 The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
 Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
