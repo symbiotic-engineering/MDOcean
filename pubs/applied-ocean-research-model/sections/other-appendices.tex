@@ -286,6 +286,44 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 \subsection{Drag Model\label{sec:appendix-drag}}
 As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
 
+\subsubsection{Drag Integrals $I_B$ and $I_G$}
+Nondimensional functions $I_B$ and $I_G$ were defined in \cref{eq:drag-integrals-IB-IG} as integrals over the width of the WEC to obtain the drag coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ respectively.
+The integrals must be evaluated numerically, except for special limit cases for which analytical results are available.
+\Cref{fig:drag-integrals} shows the results of numerical integration for $I_B$ (real) and $I_G$ (complex) across a range of inputs.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_damping_integral.pdf}
+        \caption{Drag damping integral $I_B$.}
+        \label{fig:drag-damping-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_exc_mag_integral.pdf}
+        \caption{Magnitude of drag excitation integral $|I_G|$.}
+        \label{fig:drag-excitation-magnitude-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_exc_phase_integral.pdf}
+        \caption{Phase of drag excitation integral $\angle I_G$.}
+        \label{fig:drag-excitation-phase-integral}
+    \end{subfigure}
+    \caption{Nondimensional drag integrals shown on in polar coordinates, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
+    \label{fig:drag-integrals}
+\end{figure}
+
+The limit cases in question include $r\rightarrow \Inf$ (the incident wave velocity dominates the body velocity), and $r rightarrow 0$ (the body velocity dominates the incident wave velocity), and $\kappa \rightarrow 0$ (the body diameter is small with respect to the wavelength), with the following expressions:
+\begin{equation}
+\begin{aligned}
+    \lim_{r\rightarrow 0} I_B(r,\theta,\kappa) &= 1, & \lim_{r\rightarrow 0} I_G(r,\kappa) &= 0 \\
+    \lim_{r\rightarrow \infty} I_B(r,\theta,\kappa) &= 0, & \lim_{r\rightarrow \infty} I_G(r,\kappa) &= 1 \\
+    \lim_{\kappa \rightarrow 0} I_B(r,\theta,\kappa) &= \frac{1}{(1+r^2)^{3/2}}, & \lim_{\kappa \rightarrow 0} I_G(r,\kappa) &= \frac{r^3 + r}{(1+r^2)^{3/2}}
+\end{aligned}
+\end{equation}
+
+
+
 \subsubsection{Comparison to Other Drag Formulations}
 The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
