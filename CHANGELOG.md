@@ -1,6 +1,22 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.2) - 2026-3-16
+### Added
+- Paper: mermaid diagram for modeling choice taxonomy
+- Paper: explanation of power multiplication and drag integral implementation
+- Paper: stage for building UMERC grid paper
+### Changed
+- Paper: introduction focuses on modeling not optimization
+- Paper: updates to structures, design load cases, econ, fixed point iteration, design variable coupling sections
+- Paper: removed damping vs reactive appendix
+- Paper: moved force saturation commentary from introduction to discussion
+- Pipeline: proper storage of text file outputs in git, and dvc images stored individually instead of by folder
+- Paper: updated graphical abstract
+### Fixed
+- Paper: MEEM appendix plots no longer placeholders with improved aesthetics
+- Paper: fixed citation/reference warnings
+
 ## [v1.1.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.1) - 2026-3-13
 ### Added
 - Model: ability to consider float+spar as one body in storm case

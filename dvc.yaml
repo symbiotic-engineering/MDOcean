@@ -1,30 +1,39 @@
-metrics:
-  - results/AllFigCompare/end.json
-  - results/Comparison/end.json
-  - results/Constraints/end.json
-  - results/Cost/end.json
-  - results/DampingPlateStructures/end.json
-  - results/DescFcns/end.json
-  - results/DesignSpaceExploration/end.json
-  - results/DesignVars/end.json
-  - results/ForceSaturationFigFunc/end.json
-  - results/GradientOptimFigFunc/end.json
-  - results/HydroCoeffFigFunc/end.json
-  - results/LocationSensitivity/end.json
-  - results/Meem/end.json
-  - results/Multistart/end.json
-  - results/ParamSensitivities/end.json
-  - results/Parameters/end.json
-  - results/ParetoFigFunc/end.json
-  - results/ParetoSweep/end.json
-  - results/ReadNonMatlabFigs/end.json
-  - results/RunSingleFigFunc/end.json
-  - results/Runtime/end.json
-  - results/Slamming/end.json
-  - results/SparHydro/end.json
-  - results/Validation/end.json
-  - results/Wecsim/end.json
 stages:
+  mermaid-taxonomy-pdf:
+    cmd: calkit xenv -n mermaid --no-check -- -i 
+      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
+      mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+    deps:
+      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - .calkit/env-locks/mermaid
+    outs:
+      - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
+    desc: Automatically generated from the 'mermaid-taxonomy-pdf' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  mermaid-taxonomy-svg:
+    cmd: calkit xenv -n mermaid --no-check -- -i 
+      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
+      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+    deps:
+      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - .calkit/env-locks/mermaid
+    outs:
+      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'mermaid-taxonomy-svg' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  reformat-mermaid-svg:
+    cmd: ' bash --noprofile --norc -c "xmllint --format mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      -o mdocean/plots/non_matlab_figs/img/taxonomy.svg"'
+    deps:
+      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+    outs:
+      - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'reformat-mermaid-svg' 
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();"
@@ -130,7 +139,9 @@ stages:
     outs:
       - results/AllFigCompare/runtime_bar_chart.pdf
       - results/AllFigCompare/end.mat
-      - results/AllFigCompare/end.json
+      - results/AllFigCompare/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-AllFigCompare' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Comparison:
@@ -254,7 +265,9 @@ stages:
       - results/Comparison/optimal_design_vars.tex
       - results/Comparison/optimal_outputs.tex
       - results/Comparison/end.mat
-      - results/Comparison/end.json
+      - results/Comparison/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Comparison' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Constraints:
@@ -362,7 +375,9 @@ stages:
     outs:
       - results/Constraints/constraints.tex
       - results/Constraints/end.mat
-      - results/Constraints/end.json
+      - results/Constraints/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Constraints' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Cost:
@@ -470,7 +485,9 @@ stages:
     outs:
       - results/Cost/cost_parameters.tex
       - results/Cost/end.mat
-      - results/Cost/end.json
+      - results/Cost/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Cost' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-DampingPlateStructures:
@@ -589,7 +606,9 @@ stages:
       - results/DampingPlateStructures/damping_plate_deflection.pdf
       - results/DampingPlateStructures/damping_plate_moment.pdf
       - results/DampingPlateStructures/end.mat
-      - results/DampingPlateStructures/end.json
+      - results/DampingPlateStructures/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-DampingPlateStructures' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -707,7 +726,9 @@ stages:
       - results/DescFcns/saturation_desc_fcn_alpha.pdf
       - results/DescFcns/drag_desc_fcn.pdf
       - results/DescFcns/end.mat
-      - results/DescFcns/end.json
+      - results/DescFcns/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-DescFcns' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-DesignSpaceExploration:
@@ -840,7 +861,9 @@ stages:
       - results/DesignSpaceExploration/experiments_ratios.pdf
       - results/DesignSpaceExploration/experiments_results.tex
       - results/DesignSpaceExploration/end.mat
-      - results/DesignSpaceExploration/end.json
+      - results/DesignSpaceExploration/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-DesignSpaceExploration' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -949,7 +972,9 @@ stages:
     outs:
       - results/DesignVars/design_vars.tex
       - results/DesignVars/end.mat
-      - results/DesignVars/end.json
+      - results/DesignVars/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
@@ -1064,7 +1089,9 @@ stages:
       - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
       - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
       - results/ForceSaturationFigFunc/end.mat
-      - results/ForceSaturationFigFunc/end.json
+      - results/ForceSaturationFigFunc/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -1199,7 +1226,9 @@ stages:
       - results/GradientOptimFigFunc/single_obj_convergence.pdf
       - results/GradientOptimFigFunc/single_obj_optim_results.tex
       - results/GradientOptimFigFunc/end.mat
-      - results/GradientOptimFigFunc/end.json
+      - results/GradientOptimFigFunc/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-GradientOptimFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
@@ -1312,7 +1341,9 @@ stages:
     outs:
       - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
       - results/HydroCoeffFigFunc/end.mat
-      - results/HydroCoeffFigFunc/end.json
+      - results/HydroCoeffFigFunc/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-HydroCoeffFigFunc'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-LocationSensitivity:
@@ -1438,7 +1469,9 @@ stages:
       - results/LocationSensitivity/location_probability_PDF.pdf
       - results/LocationSensitivity/location_sensitivity.tex
       - results/LocationSensitivity/end.mat
-      - results/LocationSensitivity/end.json
+      - results/LocationSensitivity/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-LocationSensitivity' stage in calkit.yaml. Changes made
       here will be overwritten.
@@ -1492,6 +1525,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/run/validate_MEEM.m
+      - ./mdocean/simulation/run/convergence_study.m
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Meem/intermed.mat
@@ -1558,14 +1592,16 @@ stages:
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
     outs:
-      - results/Meem/meem_regions.pdf
       - results/Meem/meem_sparsity.pdf
       - results/Meem/meem_validation.pdf
       - results/Meem/meem_matching.pdf
-      - results/Meem/meem_convergence.pdf
+      - results/Meem/meem_convergence_vs_omega.pdf
+      - results/Meem/meem_convergence_vs_NMK.pdf
       - results/Meem/asymptotic_b_vector.pdf
       - results/Meem/end.mat
-      - results/Meem/end.json
+      - results/Meem/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Multistart:
@@ -1692,7 +1728,9 @@ stages:
       - results/Multistart/multistart_bar_chart.pdf
       - results/Multistart/multistart_results.tex
       - results/Multistart/end.mat
-      - results/Multistart/end.json
+      - results/Multistart/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Multistart' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParamSensitivities:
@@ -1836,7 +1874,9 @@ stages:
       - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
       - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
       - results/ParamSensitivities/end.mat
-      - results/ParamSensitivities/end.json
+      - results/ParamSensitivities/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 
       'postpro-ParamSensitivities' stage in calkit.yaml. Changes made 
       here will be overwritten.
@@ -1945,7 +1985,9 @@ stages:
     outs:
       - results/Parameters/parameters.tex
       - results/Parameters/end.mat
-      - results/Parameters/end.json
+      - results/Parameters/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Parameters' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoFigFunc:
@@ -2074,7 +2116,9 @@ stages:
       - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
       - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
       - results/ParetoFigFunc/end.mat
-      - results/ParetoFigFunc/end.json
+      - results/ParetoFigFunc/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-ParetoFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoSweep:
@@ -2182,7 +2226,9 @@ stages:
     outs:
       - results/ParetoSweep/sweep_num_seeds.pdf
       - results/ParetoSweep/end.mat
-      - results/ParetoSweep/end.json
+      - results/ParetoSweep/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-ParetoSweep' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ReadNonMatlabFigs:
@@ -2242,7 +2288,8 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_all_from_load();"
     deps:
-      - mdocean/plots/non_matlab_figs/
+      - mdocean/plots/non_matlab_figs/img/
+      - mdocean/plots/non_matlab_figs/pdf/
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2306,7 +2353,9 @@ stages:
       - results/ReadNonMatlabFigs/sim_runtime.pdf
       - results/ReadNonMatlabFigs/trapezoid.pdf
       - results/ReadNonMatlabFigs/end.mat
-      - results/ReadNonMatlabFigs/end.json
+      - results/ReadNonMatlabFigs/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-RunSingleFigFunc:
@@ -2443,7 +2492,9 @@ stages:
       - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
       - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
       - results/RunSingleFigFunc/end.mat
-      - results/RunSingleFigFunc/end.json
+      - results/RunSingleFigFunc/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-RunSingleFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Runtime:
@@ -2557,7 +2608,9 @@ stages:
       - results/Runtime/hydro_runtime_breakdown.pdf
       - results/Runtime/sim_runtime.pdf
       - results/Runtime/end.mat
-      - results/Runtime/end.json
+      - results/Runtime/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Runtime' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Slamming:
@@ -3157,9 +3210,16 @@ stages:
       - mdocean/plots/non_matlab_figs/xdsm.py
       - .calkit/env-locks/pubs
     outs:
-      - mdocean/plots/non_matlab_figs/xdsm.tikz
-      - mdocean/plots/non_matlab_figs/xdsm.tex
-      - mdocean/plots/non_matlab_figs/xdsm.pdf
+      - mdocean/plots/non_matlab_figs/xdsm.tikz:
+          cache: false
+          persist: false
+      - mdocean/plots/non_matlab_figs/xdsm.tex:
+          cache: false
+          persist: false
+      - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
+      - mdocean/plots/non_matlab_figs/xdsm.pdf:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'pyxdsm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-re-results:
@@ -3213,53 +3273,62 @@ stages:
       - pubs/applied-ocean-research-model/tables/from-matlab/
     desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
-  results-to-latex:
+  aor-results-to-latex:
+    cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json'
+      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
+      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
+      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
+      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
+      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+      : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
+      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"}'"
+    deps:
+      - results/RunSingleFigFunc/end.json
+      - results/Runtime/end.json
+    outs:
+      - pubs/applied-ocean-research-model/numeric-results.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'aor-results-to-latex' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  re-results-to-latex:
     cmd: "calkit latex from-json 'results/Comparison/end.json' 'results/GradientOptimFigFunc/end.json'
-      'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json' --output
-      'pubs/renewable-energy-mdo/numeric-results.tex' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
-      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\"\
-      : \"{powerAvgNominal/1000:.0f} kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f}
-      kW\", \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\",
-      \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\"\
-      : \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f}
-      kW\", \"structMassAtMinLCOE\": \"{structMassAtMinLCOE/1000:.0f} Mg\"\
-      , \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f} m\", \"forceMaxAtMinLCOE\"\
-      : \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatAtMinLCOE\"\
-      : \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\", \"surgeForceSparAtMinLCOE\"\
-      : \"{surgeForceSparAtMinLCOE/1e6:.0f} MN\", \"surgeForceFloatNominal\"\
-      : \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
-      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f}
-      $M\", \"capexDesignAtMinLCOE\": \"{capexDesignAtMinLCOE/1e6:.2f} $M\"\
-      , \"capexDesignNominal\": \"{capexDesignNominal/1e6:.2f} $M\", \"\
-      capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f} $M\", \"capexDesignMaxPower\"\
-      : \"{capexDesignMaxPower/1e6:.2f} $M\", \"simRuntime\": \"{simRuntime*1000:.0f}
-      ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
-      ms\", \"pctImproveLCOEMinLCOE\": \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%\"\
-      , \"pctImproveDesignCostMinLCOE\": \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%\"\
+      --output 'pubs/renewable-energy-mdo/numeric-results.tex' --command
+      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\": \"{powerAvgNominal/1000:.0f}
+      kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f} kW\",
+      \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\", \"powerAvgAtMinCapex\"\
+      : \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\": \"{powerAvgMaxPower/1000:.0f}
+      kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f} kW\", \"structMassAtMinLCOE\"\
+      : \"{structMassAtMinLCOE/1000:.0f} Mg\", \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f}
+      m\", \"forceMaxAtMinLCOE\": \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"\
+      surgeForceFloatAtMinLCOE\": \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\"\
+      , \"surgeForceSparAtMinLCOE\": \"{surgeForceSparAtMinLCOE/1e6:.0f}
+      MN\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
+      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
+      MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f} $M\", \"capexDesignAtMinLCOE\"\
+      : \"{capexDesignAtMinLCOE/1e6:.2f} $M\", \"capexDesignNominal\": \"\
+      {capexDesignNominal/1e6:.2f} $M\", \"capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f}
+      $M\", \"capexDesignMaxPower\": \"{capexDesignMaxPower/1e6:.2f} $M\"\
+      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"pctImproveLCOEMinLCOE\"\
+      : \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%\", \"pctImproveDesignCostMinLCOE\"\
+      : \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%\"\
       , \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
       , \"pctImproveDesignCostMinCapex\": \"{(capexDesignNominal - capexDesignMinCapex)/capexDesignNominal*100:.0f}%\"\
       , \"pctWorsePowerMinCapex\": \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%\"\
       , \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
       , \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%\"\
-      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"\
-      pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\"\
-      : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
-      }'"
+      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\"}'"
     deps:
       - results/Comparison/end.json
       - results/GradientOptimFigFunc/end.json
-      - results/RunSingleFigFunc/end.json
-      - results/Runtime/end.json
     outs:
       - pubs/renewable-energy-mdo/numeric-results.tex:
           cache: false
           persist: false
-      - pubs/applied-ocean-research-model/numeric-results.tex:
-          cache: false
-          persist: false
-    desc: Automatically generated from the 'results-to-latex' stage in
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 're-results-to-latex' stage
+      in calkit.yaml. Changes made here will be overwritten.
   copy-bib:
     cmd: calkit map-paths --file-to-file 
       'pubs/renewable-energy-mdo/references.bib->pubs/applied-ocean-research-model/references.bib'
@@ -3284,8 +3353,8 @@ stages:
       - pubs/renewable-energy-mdo/numbers.tex
       - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/elsarticle-num-names.bst
-      - pubs/renewable-energy-mdo/.latexmkrc
       - .calkit/env-locks/tex
+      - pubs/renewable-energy-mdo/.latexmkrc
     outs:
       - pubs/renewable-energy-mdo/mdocean.pdf
       - pubs/renewable-energy-mdo/mdocean.synctex.gz:
@@ -3313,8 +3382,8 @@ stages:
       - pubs/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
-      - pubs/applied-ocean-research-model/.latexmkrc
       - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - pubs/applied-ocean-research-model/main.pdf
       - pubs/applied-ocean-research-model/main.synctex.gz:
@@ -3325,3 +3394,16 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-AOR-paper' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  build-UMERC-paper:
+    cmd: calkit latex build -e tex --no-check 
+      pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+    deps:
+      - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      - pubs/UMERC-2025-grid-value/figures/
+      - pubs/UMERC-2025-grid-value/references.bib
+      - pubs/UMERC-2025-grid-value/logo.jpg
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
+    desc: Automatically generated from the 'build-UMERC-paper' stage 
+      in calkit.yaml. Changes made here will be overwritten.
