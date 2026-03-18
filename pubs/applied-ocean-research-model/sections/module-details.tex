@@ -66,7 +66,7 @@ The first-order hydrodynamic force phasors $\vec{\hat{F}}$ on a group of interac
 \setlength\arraycolsep{5pt} % back to default
 where $\vec{\hat{\xi}}$ represents the body displacements, and hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, and $\mathbf{K_h}$ denote the wave excitation vector, added mass matrix, radiation damping matrix, and restoring force matrix, respectively.
 The origin is chosen here as the center of the float at the still waterline.
-The full equation of motion incorporating the effect of additional forces will be given in section~\ref{sec:dynamics}.
+The full equation of motion incorporating the effect of additional forces will be given in section~\ref{sec:eom}.
 
 For a two body point absorber oscillating only in heave under normal operational conditions ($op$), the hydrodynamic matrices are 2x2, representing the float $f$, spar $s$, and coupling between the two $c$:
 \begin{equation}\label{eq:op-hydro-coeffs}
@@ -111,7 +111,7 @@ This yields the following:
     \gamma_m = \gamma_f + \gamma_s\,, \quad A_m = A_f + A_s + 2A_c\,, \quad B_m = B_f + B_s + 2 B_c\,, \quad K_m = K_f + K_s
 \end{equation}
 
-The question now is the calculation of the float, spar, and coupling coefficients, postponing discussion on the implication of the operational and storm cases until section~\ref{sec:dynamics}.
+The question now is the calculation of the float, spar, and coupling coefficients, postponing discussion on the implication of the operational and storm cases until section~\ref{sec:design-load-cases}.
 The stiffnesses ($K_f$, $K_s$) are frequency-independent and can be trivially calculated from the diameters (see equation~\eqref{eq:gamma-K} in \appendixname~\ref{sec:MEEM_details}), while the remaining coefficients must be calculated in the frequency domain as a function of device geometry by solving the radiation boundary value problem for the fluid velocity potential.
 
 Traditionally, this is done with a boundary element method (BEM) solver, which meshes the floating bodies and solves a large matrix equation.
@@ -269,12 +269,13 @@ If a time-domain PMP control law is available for the constraint under considera
 This differs from the standard PMP method in that the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in \cite{zou_optimal_2017}) or analytical time-integration (as in \cite{lin_fast_2025}).
 For situations without an explicit PMP control law, a nonlinear near-optimal controller can be constructed using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
 In either case, the nonlinear controller is linearized via the describing function method.
+In addition to the control nonlinearity, a describing function is also utilized to linearize the drag nonlinearity.
 
 If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (2).
 This requires some frequency-domain calculations for an impedance-mismatched linear system described in \cite{mccabe_force-limited_2024} and can be visualized with the Smith chart, a tool common in electrical engineering.
 This approach accurately reflects the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller. 
 
-If the implementation for the optimal constrained linear controller is also not available, then the violating portion of the time-domain signals can be saturated or zeroed (3).
+If the implementation for the optimal constrained linear controller is also not available, then the violating portion of the time-domain signals can be saturated or zeroed (3) for the sake of power calculation.
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 This simple approach does not require any derivations to implement.
 It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
@@ -282,13 +283,14 @@ It is utilized here for the power limit.
 
 As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which \cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
 These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization though either the objective or constraints.
-The latter approach (5) is actually the only option for slamming amplitude limits in the storm design load case, since the device is already in survival mode and not producing power or applying a control input.
-Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and expedience. 
+The latter approach (5) is actually the only option for slamming amplitude limits in the storm design load case.
+This is because the device is already in survival mode (preventing method 4), is not producing power (preventing methods 3 and 4), and is not applying a control input (preventing methods 1 and 2).
+Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
 
+Table~\ref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits and the method MDOcean currently uses to handle each. 
+The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
 In future work, MDOcean could instead utilize describing functions (1) and the optimal constrained linear controller (2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
-The describing function for force saturation is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
-A describing function (1) is also utilized for the drag nonlinearity.
-Table~\ref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits and the method MDOcean currently uses to handle each.
+The optimal constrained linear controller for a variety of constraints including the amplitude limit is derived in \cref{sec:optimal-control} for theoretical completeness, though we emphasize that it is not used in the current implementation of MDOcean.
 
 \begin{table}
     \centering
@@ -303,9 +305,11 @@ Table~\ref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits 
 \end{table}
 
 Describing functions assume a certain time-domain nonlinear signal shape and then calculate the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
+The two signals where describing functions are used are both force signals.
 For a force signal, the fundamental amplitude is most the relevant harmonic because not only is it typically the largest amplitude, but it undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
-MDOcean uses iteration to handle both the drag and saturation nonlinearity. % and an analytical solution for the force saturation nonlinearity.
+MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
+The former encodes the describing function formula directly into the simulation (see derivation in \cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \appendixname~\ref{sec:appendix-force-sat}).
 
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
 The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
@@ -968,7 +972,7 @@ The annual energy production $AEP$ in kWh/year is the product of the number of d
 
 %Finally, the standard deviation $\sigma$ of power across all sea states $P(\omega)$ is computed, and normalized by the average power $\mu$ to get the coefficient of variation (see equation \eqref{cv}).
 
-\subsubsection{Dynamic Limits and Design Load Cases}
+\subsubsection{Dynamic Limits and Design Load Cases}\label{sec:design-load-cases}
 This study considers two design load cases: (1) cyclic operational loading in sea states where power is produced, and (2) storm loading in sea states where the device enters survival mode and stops producing power.
 These correspond roughly with the 1-year and 50-year return periods specified in the wave energy design standard IEC TS 62600-2, and with the fatigue limit state (FLS) and ultimate limit state (ULS) in offshore wind standards.
 When the WEC is in survival mode, an external brake locks the PTO, enforcing the float and spar to move together without loading the generator.
