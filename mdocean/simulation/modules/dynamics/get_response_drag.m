@@ -538,7 +538,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     % (long waves, large T). We don't expect old Bd=new Bd because they are
     % defined differently (how much of K vs gamma goes into Bd).
     r = mag_v0_v_ratio;
-    kappa = k_wvn * R;
+    kappa = 0 * k_wvn * R;
     theta = phase_v;
     alpha = R_in / R;
     [B_int_1,G_int_real_1,G_int_imag_1] = drag_fcn(r,theta,kappa);
