@@ -114,16 +114,24 @@ delete savedLog*
 timesteps_per_period = mcr.cases(:,2) / simu.dt; 
 P                      = zeros(length(mcr.cases(:,1)), 1);
 force_pto              = zeros(length(mcr.cases(:,1)), 1);
+
 float_amplitude        = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude         = zeros(length(mcr.cases(:,1)), 1);
+
 relative_amplitude     = zeros(length(mcr.cases(:,1)), 1);
 float_amplitude_rms    = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude_rms     = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+
+float_phase            = zeros(length(mcr.cases(:,1)), 1);
+spar_phase             = zeros(length(mcr.cases(:,1)), 1);
+rel_phase              = zeros(length(mcr.cases(:,1)), 1);
+
 float_drag_force_rms   = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_rms    = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
+
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -179,6 +187,9 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_amplitude_rms(imcr) = NaN;
         spar_amplitude_rms(imcr)  = NaN;
         relative_amplitude_rms(imcr) = NaN;
+        float_phase(imcr) = NaN;
+        spar_phase(imcr) = NaN;
+        rel_phase(imcr) = NaN;
         float_drag_force_rms(imcr) = NaN;
         spar_drag_force_rms(imcr)  = NaN;
         float_drag_force_phase(imcr) = NaN;
@@ -192,7 +203,7 @@ K_p = mcr.cases(:,4);
 save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
     'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto',...
     'float_drag_force_rms','spar_drag_force_rms','float_drag_force_phase','spar_drag_force_phase',...
-    'X','p','B_p','K_p','git_hash')
+    'float_phase','spar_phase','rel_phase','X','p','B_p','K_p','git_hash')
 
 clear imcr totalNumOfWorkers
 
