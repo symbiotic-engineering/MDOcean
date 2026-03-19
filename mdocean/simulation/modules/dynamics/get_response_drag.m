@@ -174,16 +174,6 @@ function [mag_U,phase_U,...
 end
 function out_flat = fun_outer(x,fun_inner,flatten)
     [Y1,Y2,Y3,Y4,Y5,Y6] = fun_inner(x);
-=======
-                                    B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,w,...
-                                    F_f_mag,F_f_phase,F_s_mag,F_s_phase,...
-                                    control_type,multibody,merge_bodies,F_max,X_max,...
-                                    ctrl_mult_solved,phase_ctrl_mult_solved);
->>>>>>> origin/main
-
-end
-function out_flat = fun_outer(x,fun_inner,flatten)
-    [Y1,Y2,Y3,Y4,Y5,Y6] = fun_inner(x);
     out_flat = flatten(Y1,Y2,Y3,Y4,Y5,Y6);
 end
 
