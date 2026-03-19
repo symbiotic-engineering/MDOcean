@@ -11,10 +11,44 @@ environments:
     kind: conda
     path: pubs/environment.yaml
     python: '3.14'
+  mermaid:
+    kind: docker
+    image: minlag/mermaid-cli:latest
+    description: Mermaid CLI via Docker.
+    wdir: /data
+    command_mode: entrypoint
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
   stages:
+    mermaid-taxonomy-pdf:
+      kind: command
+      environment: mermaid
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd
+        -o mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f 
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
+    mermaid-taxonomy-svg:
+      kind: command
+      environment: mermaid
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd 
+        -o mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+          storage:
+    reformat-mermaid-svg:
+      kind: shell-command
+      environment: _system
+      command: xmllint --format mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o mdocean/plots/non_matlab_figs/img/taxonomy.svg
+      inputs: 
+        - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
+          storage: git
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
@@ -123,7 +157,8 @@ pipeline:
       outputs: 
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/end.mat
-        - results/AllFigCompare/end.json
+        - path: results/AllFigCompare/end.json
+          storage: git
     analysis-Comparison:
       kind: matlab-command
       environment: _system
@@ -247,7 +282,8 @@ pipeline:
         - results/Comparison/optimal_design_vars.tex
         - results/Comparison/optimal_outputs.tex
         - results/Comparison/end.mat
-        - results/Comparison/end.json
+        - path: results/Comparison/end.json
+          storage: git
     analysis-Constraints:
       kind: matlab-command
       environment: _system
@@ -356,7 +392,8 @@ pipeline:
       outputs: 
         - results/Constraints/constraints.tex
         - results/Constraints/end.mat
-        - results/Constraints/end.json
+        - path: results/Constraints/end.json
+          storage: git
     analysis-Cost:
       kind: matlab-command
       environment: _system
@@ -463,7 +500,8 @@ pipeline:
       outputs: 
         - results/Cost/cost_parameters.tex
         - results/Cost/end.mat
-        - results/Cost/end.json
+        - path: results/Cost/end.json
+          storage: git
     analysis-DampingPlateStructures:
       kind: matlab-command
       environment: _system
@@ -579,7 +617,8 @@ pipeline:
         - results/DampingPlateStructures/damping_plate_deflection.pdf
         - results/DampingPlateStructures/damping_plate_moment.pdf
         - results/DampingPlateStructures/end.mat
-        - results/DampingPlateStructures/end.json
+        - path: results/DampingPlateStructures/end.json
+          storage: git
     analysis-DescFcns:
       kind: matlab-command
       environment: _system
@@ -693,7 +732,8 @@ pipeline:
         - results/DescFcns/saturation_desc_fcn_alpha.pdf
         - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/end.mat
-        - results/DescFcns/end.json
+        - path: results/DescFcns/end.json
+          storage: git
     analysis-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
@@ -831,7 +871,8 @@ pipeline:
         - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_results.tex
         - results/DesignSpaceExploration/end.mat
-        - results/DesignSpaceExploration/end.json
+        - path: results/DesignSpaceExploration/end.json
+          storage: git
     analysis-DesignVars:
       kind: matlab-command
       environment: _system
@@ -939,7 +980,8 @@ pipeline:
       outputs: 
         - results/DesignVars/design_vars.tex
         - results/DesignVars/end.mat
-        - results/DesignVars/end.json
+        - path: results/DesignVars/end.json
+          storage: git
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
@@ -1052,7 +1094,8 @@ pipeline:
         - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/end.mat
-        - results/ForceSaturationFigFunc/end.json
+        - path: results/ForceSaturationFigFunc/end.json
+          storage: git
     analysis-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
@@ -1185,7 +1228,8 @@ pipeline:
         - results/GradientOptimFigFunc/single_obj_convergence.pdf
         - results/GradientOptimFigFunc/single_obj_optim_results.tex
         - results/GradientOptimFigFunc/end.mat
-        - results/GradientOptimFigFunc/end.json
+        - path: results/GradientOptimFigFunc/end.json
+          storage: git
     analysis-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
@@ -1296,7 +1340,8 @@ pipeline:
       outputs: 
         - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/end.mat
-        - results/HydroCoeffFigFunc/end.json
+        - path: results/HydroCoeffFigFunc/end.json
+          storage: git
     analysis-LocationSensitivity:
       kind: matlab-command
       environment: _system
@@ -1422,7 +1467,8 @@ pipeline:
         - results/LocationSensitivity/location_probability_PDF.pdf
         - results/LocationSensitivity/location_sensitivity.tex
         - results/LocationSensitivity/end.mat
-        - results/LocationSensitivity/end.json
+        - path: results/LocationSensitivity/end.json
+          storage: git
     analysis-Meem:
       kind: matlab-command
       environment: _system
@@ -1474,6 +1520,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/validate_MEEM.m
+        - ./mdocean/simulation/run/convergence_study.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/Meem/intermed.mat
@@ -1535,14 +1582,15 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Meem/intermed.mat
       outputs: 
-        - results/Meem/meem_regions.pdf
         - results/Meem/meem_sparsity.pdf
         - results/Meem/meem_validation.pdf
         - results/Meem/meem_matching.pdf
-        - results/Meem/meem_convergence.pdf
+        - results/Meem/meem_convergence_vs_omega.pdf
+        - results/Meem/meem_convergence_vs_NMK.pdf
         - results/Meem/asymptotic_b_vector.pdf
         - results/Meem/end.mat
-        - results/Meem/end.json
+        - path: results/Meem/end.json
+          storage: git
     analysis-Multistart:
       kind: matlab-command
       environment: _system
@@ -1669,7 +1717,8 @@ pipeline:
         - results/Multistart/multistart_bar_chart.pdf
         - results/Multistart/multistart_results.tex
         - results/Multistart/end.mat
-        - results/Multistart/end.json
+        - path: results/Multistart/end.json
+          storage: git
     analysis-ParamSensitivities:
       kind: matlab-command
       environment: _system
@@ -1813,7 +1862,8 @@ pipeline:
         - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
         - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
         - results/ParamSensitivities/end.mat
-        - results/ParamSensitivities/end.json
+        - path: results/ParamSensitivities/end.json
+          storage: git
     analysis-Parameters:
       kind: matlab-command
       environment: _system
@@ -1921,7 +1971,8 @@ pipeline:
       outputs: 
         - results/Parameters/parameters.tex
         - results/Parameters/end.mat
-        - results/Parameters/end.json
+        - path: results/Parameters/end.json
+          storage: git
     analysis-ParetoFigFunc:
       kind: matlab-command
       environment: _system
@@ -2051,7 +2102,8 @@ pipeline:
         - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
         - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
         - results/ParetoFigFunc/end.mat
-        - results/ParetoFigFunc/end.json
+        - path: results/ParetoFigFunc/end.json
+          storage: git
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
@@ -2160,7 +2212,8 @@ pipeline:
       outputs: 
         - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/end.mat
-        - results/ParetoSweep/end.json
+        - path: results/ParetoSweep/end.json
+          storage: git
     analysis-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
@@ -2220,7 +2273,8 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
-        - mdocean/plots/non_matlab_figs/
+        - mdocean/plots/non_matlab_figs/img/
+        - mdocean/plots/non_matlab_figs/pdf/
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2284,7 +2338,8 @@ pipeline:
         - results/ReadNonMatlabFigs/sim_runtime.pdf
         - results/ReadNonMatlabFigs/trapezoid.pdf
         - results/ReadNonMatlabFigs/end.mat
-        - results/ReadNonMatlabFigs/end.json
+        - path: results/ReadNonMatlabFigs/end.json
+          storage: git
     analysis-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
@@ -2416,7 +2471,8 @@ pipeline:
         - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
         - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
         - results/RunSingleFigFunc/end.mat
-        - results/RunSingleFigFunc/end.json
+        - path: results/RunSingleFigFunc/end.json
+          storage: git
     analysis-Runtime:
       kind: matlab-command
       environment: _system
@@ -2530,7 +2586,8 @@ pipeline:
         - results/Runtime/hydro_runtime_breakdown.pdf
         - results/Runtime/sim_runtime.pdf
         - results/Runtime/end.mat
-        - results/Runtime/end.json
+        - path: results/Runtime/end.json
+          storage: git
     analysis-Slamming:
       kind: matlab-command
       environment: _system
@@ -3167,9 +3224,13 @@ pipeline:
       environment: pubs
       script_path: mdocean/plots/non_matlab_figs/xdsm.py
       outputs:
-        - mdocean/plots/non_matlab_figs/xdsm.tikz
-        - mdocean/plots/non_matlab_figs/xdsm.tex
-        - mdocean/plots/non_matlab_figs/xdsm.pdf
+        - path: mdocean/plots/non_matlab_figs/xdsm.tikz
+          storage: git
+        - path: mdocean/plots/non_matlab_figs/xdsm.tex
+          storage: git
+        - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
+        - path: mdocean/plots/non_matlab_figs/xdsm.pdf
+          storage: null
     move-re-results:
       kind: matlab-command
       environment: _system
@@ -3220,27 +3281,16 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
       command: add_mdocean_path(); move_results_to_pubs('AOR');
-    results-to-latex:
+    aor-results-to-latex:
       kind: json-to-latex
       inputs: 
-        # - results/AllFigCompare/end.json
-        - results/Comparison/end.json
-        # - results/Constraints/end.json
         # - results/Cost/end.json
         # - results/DampingPlateStructures/end.json
         # - results/DescFcns/end.json
         # - results/DesignSpaceExploration/end.json
-        # - results/DesignVars/end.json
         # - results/ForceSaturationFigFunc/end.json
-        - results/GradientOptimFigFunc/end.json
         # - results/HydroCoeffFigFunc/end.json
-        # - results/LocationSensitivity/end.json
         # - results/Meem/end.json
-        # - results/Multistart/end.json
-        # - results/ParamSensitivities/end.json
-        # - results/Parameters/end.json
-        # - results/ParetoFigFunc/end.json
-        # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
@@ -3249,11 +3299,44 @@ pipeline:
         # - results/Validation/end.json
         # - results/Wecsim/end.json
       outputs: 
-        - pubs/renewable-energy-mdo/numeric-results.tex
-        - pubs/applied-ocean-research-model/numeric-results.tex
+        - path: pubs/applied-ocean-research-model/numeric-results.tex
+          storage: git
       command_name: results
       format:
-        # LCOEs
+        # LCOE
+        nominalLCOE: "{nominalLCOE:.2f} $/kWh"
+        # forces
+        surgeForceFloatNominal: "{surgeForceFloatNominal/1e6:.0f} MN"
+        surgeForceSparNominal: "{surgeForceSparNominal/1e6:.0f} MN"
+        # runtimes
+        simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        # percentages
+        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
+        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
+        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
+    re-results-to-latex:
+      kind: json-to-latex
+      inputs: 
+        # - results/AllFigCompare/end.json
+        - results/Comparison/end.json
+        # - results/Constraints/end.json
+        # - results/DesignSpaceExploration/end.json
+        # - results/DesignVars/end.json
+        - results/GradientOptimFigFunc/end.json
+        # - results/LocationSensitivity/end.json
+        # - results/Multistart/end.json
+        # - results/ParamSensitivities/end.json
+        # - results/Parameters/end.json
+        # - results/ParetoFigFunc/end.json
+        # - results/ParetoSweep/end.json
+        # - results/ReadNonMatlabFigs/end.json
+      outputs: 
+        - path: pubs/renewable-energy-mdo/numeric-results.tex
+          storage: git
+      command_name: results
+      format:
+        # LCOE
         nominalLCOE: "{nominalLCOE:.2f} $/kWh"
         minLCOE: "{minLCOE:.2f} $/kWh"
         # powers
@@ -3281,7 +3364,6 @@ pipeline:
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
-        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         # percent changes
         pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
         pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
@@ -3292,9 +3374,6 @@ pipeline:
         pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%"
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
-        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
-        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
-        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
     copy-bib:
       kind: map-paths
       paths:
@@ -3345,6 +3424,16 @@ pipeline:
         - path: pubs/applied-ocean-research-model/aux/
           storage: null
           delete_before_run: false
+    build-UMERC-paper:
+      kind: latex
+      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      environment: tex
+      inputs:
+        - pubs/UMERC-2025-grid-value/figures/
+        - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/logo.jpg
+      outputs:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)

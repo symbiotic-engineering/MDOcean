@@ -89,7 +89,7 @@ For a two body point absorber oscillating only in heave under normal operational
 The coupling is symmetric for radiation forces and zero for hydrostatic forces.
 Meanwhile, the hydrodynamic coefficients may change in storm conditions ($st$), such as if the devices change their shape or submersion depth as a survival strategy.
 The assumed storm configuration in this study, to mirror the RM3 report \cite{RM3}, is the float and spar rigidly fixed to each other so they move as if they have been merged, indicated with subscript $m$:
-\begin{equation}
+\begin{equation}\label{eq:st-hydro-coeffs}
     \vec{\hat{\xi}}_{st} = \begin{bmatrix}
         \hat{\xi}_m 
     \end{bmatrix},~\vec{\gamma}_{st} = \begin{bmatrix}
@@ -119,8 +119,8 @@ In MDOcean, the float coefficients are instead obtained with a faster, semi-anal
 Meanwhile, the spar and coupling coefficients are obtained via a combination of algebraic approximation and interpolation of pre-computed BEM results, and with further model development could eventually be computed with MEEM.
 
 \subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}
-The MEEM radiation solution for two concentric cylinders oscillating in heave was first presented in \cite{mavrakos_hydrodynamic_2004} and later detailed in \cite{chau_inertia_2013}.
-The open-source implementation used in this study is summarized in \appendixname~\ref{sec:MEEM_details} and further described in \cite{mccabe_open-source_2024,mccabe_investigating_2025,khanal_openflash_2025}.
+The MEEM radiation solution for two concentric cylinders oscillating in heave was first presented in \cite{mavrakos_hydrodynamic_2004} and later detailed in \cite{chau_inertia_2012}.
+The open-source implementation used in this study is summarized in \appendixname~\ref{sec:MEEM_details} and further described in \cite{mccabe_open-source_2024,bimali_numerics_2026,best_openflash_2026}.
 The present section focuses instead on the high-level capabilities and limitations of the model.
 
 The primary appeal of MEEM is its speed.
@@ -611,7 +611,7 @@ The intrinsic dynamics, PTO kinematics, and PTO dynamics can be combined into a 
     \mathbf{a}_{VI \leftarrow F\dot{X}}
     \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}
     } = \frac{B-AZ_{i,th}}{D-CZ_{i,th}} 
-    \qquad \hat{V}_{s,th} = F_{th}(A-CZ_{s,th})
+    \qquad \hat{V}_{s,th} = \hat{F}_{th}(A-CZ_{s,th})
 \end{equation}
 where $A,B,C,D$ are the elements of $\mathbf{a}_{VI \leftarrow F\dot{X}}$.
 This is shown in the bottom portion of \cref{fig:multiport-circuit-pto}.
@@ -846,7 +846,7 @@ Specifically, this simulation implements constraints on the maximum allowed gene
     \vec{x}_{opt} &= 
     \frac{\hat{V}_{s,th}}{2\Re(Z_{s,th})}
         \begin{bmatrix} Z_{s,th}^* (1+\Gamma) \\ 1-\Gamma \end{bmatrix} \\
-    P_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
+    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
 \end{aligned}
 \end{equation}
 where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient. The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch. Its value can be calculated semi-analytically via a process described in \cref{sec:appendix-qp-solution}.
@@ -916,7 +916,7 @@ where $\vec{w}(y)$ is the local width of the WEC perpendicular to the direction 
          2\sqrt{\vec{R}^2-y^2}-2\sqrt{\vec{R}_{in}^2-y^2}, &0<|y|< \vec{R}_{in} \\
     \end{cases}
 \end{equation}
-Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term  potentially out of phase with the body motion:
+Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
 \begin{equation}\label{eq:drag-damping-excitation}
     \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
     + \vec{\gamma}_{d} \hat{\zeta}
@@ -937,6 +937,9 @@ $\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velo
 \end{equation}
 and $\vec{r} = |\hat{V}_{wave}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
 
+The integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals detailed in \appendixname~\ref{sec:appendix-drag}.
+These integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values and accessed via a lookup table to reduce runtime.
+
 The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
 Further derivation, convergence details, and control implications are discussed in \appendixname~\ref{sec:appendix-drag}.
 
@@ -947,7 +950,7 @@ Further derivation, convergence details, and control implications are discussed 
 \subsubsection{Energy Production}
 To find the overall average power production $P_{avg,elec}$ in a location with a given distribution of sea states, $P_{avg,elec}(H,\omega)$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix.
 This method is illustrated in Figure \ref{fig:JPD-multiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from reference \cite{noauthor_system_2020}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from reference \cite{janzou_system_2020}.
 
 \begin{figure}
 \centering
@@ -969,44 +972,85 @@ The annual energy production $AEP$ in kWh/year is the product of the number of d
 This study considers two design load cases: (1) cyclic operational loading in sea states where power is produced, and (2) storm loading in sea states where the device enters survival mode and stops producing power.
 These correspond roughly with the 1-year and 50-year return periods specified in the wave energy design standard IEC TS 62600-2, and with the fatigue limit state (FLS) and ultimate limit state (ULS) in offshore wind standards.
 When the WEC is in survival mode, an external brake locks the PTO, enforcing the float and spar to move together without loading the generator.
-This section details the maximum amplitudes and forces in each case.
+This section details the allowable amplitudes and forces in each case.
 Currently all sea states in the JPD with nonzero probability are considered operational, since the generator force and power limit serve to reduce loads in energetic sea states.
-Future studies could control the transition from operational to survival mode more finely, perhaps with an additional design variable representing an operational incident energy threshold.
+Future studies could control the transition from operational to survival mode more finely, perhaps with an additional input variable representing an operational incident energy threshold.
 
-The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material, and the PTO force, which acts at the connection between the float and the spar.
-The vertical design load $F_{heave}$ is taken as the maximum of the PTO and fluid force amplitudes, which conservatively neglects the spatial distribution of the D'Alembert forces:
+The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the PTO force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
+The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
+Due to force balance in dynamic equilibrium, the maximum magnitude of internal heave force in space at any given time, $F_{heave,f}(t)$, is the greater of the absolute value of the PTO force and the fluid force.
+Expressing the latter as the difference between the inertial force and the PTO force, this gives:
 \begin{equation}
 \begin{aligned}
-    F_{heave,f} &=\max(|F_p|, |m_f\ddot{X}_f-F_p|) \\
-    F_{heave,s} &=\max(|F_p|, |m_s\ddot{X}_s-F_p|)
+    F_{heave,f}(t) &=\max(|F_p(t)|,~ |m_f\ddot{\xi}_f(t)-F_p(t)|) \\
+    F_{heave,s}(t) &=\max(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|)
 \end{aligned}
 \end{equation}
-where table~\ref{tab:DLCs} details $F_p$ and $X$ based on the assumptions of each design load case.
+In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$.
+In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude can be calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
+The peak of $\tau(t)$ is lower than its fundamental amplitude due to generator force saturation at $ \tau_{max}$, so using $\tau_{max}$ rather than $|\hat{\tau}|$ is both less conservative and more realistic.
+Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
+\begin{equation}\label{eq:peak-pto-force}
+\max_t |F_{p,op}(t)| \approx \frac{1}{R} \left(\left| Z_{shaft} \hat{\Omega} \right| + \tau_{max} \right)
+\end{equation}
+Meanwhile, the storm case lacks the control saturation nonlinearity and thus uses the fundamental amplitude $\hat{F}_{p,st}$.
+
+The nonlinearities in the fluid forces $|m\ddot{\xi}(t)-F_p(t)|$ are not so easily addressed, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
+MDOcean currently uses the fundamental amplitude of the fluid forces for both the storm and operational case:
+\begin{equation}\label{eq:peak-fluid-force}
+\max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|
+\end{equation}
+This could be either an underestimate or overestimate depending on whether the harmonics interfere constructively or destructively with the fundamental.
+The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_t |\xi_f(t)|$ and $\max_t |\xi_s(t)|$ in both cases.
+Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
+
+Table~\ref{tab:DLCs} summarizes the peak forces and amplitudes based on the assumptions of each design load case.
 
 \begin{table}
     \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}}
- & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
-         \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
-         Powertrain force, $F_p$& \parbox[m]{\linewidth}{\centering Force provided by generator so saturates at $F_{max}$} & \parbox[m]{\linewidth}{\centering Force provided by brake, so no saturation.
-Solve \eqref{eq:eom-freq-domain} for $F_p$.}\\ 
- Float amplitude, $X_f$& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (2-DOF)}& \parbox[m]{\linewidth}{\centering Given by \eqref{eq:eom-freq-domain} (1-DOF) with $F_p=0$}\\ 
-         Spar amplitude, $X_s$& Given by \eqref{eq:eom-freq-domain}&Equals $X_f$ due to brake\\
- \parbox[m]{\linewidth}{\centering Maximum allowable relative amplitude between float and spar, $|X_f-X_s|_{max}$ \vspace{8pt}}& \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} &N/A\\
- \parbox[m]{\linewidth}{\centering Maximum allowable float amplitude, $|X_f|_{max}$ }& $\min(X_{f,linear}, X_{f,slam})$& N/A \\ %$X_{slam}$\\
- \parbox[m]{\linewidth}{\centering Maximum allowable spar amplitude, $|X_s|_{max}$ }& $\min(X_{s,linear}, X_{s,slam})$& N/A %$X_{slam}$\\
-    \end{tabular}
-    \caption{Force components in each design load case}
-    \label{tab:DLCs}
+    \begin{tabular}{>{\centering\arraybackslash}p{0.28\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.33\linewidth}}
+    & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
+    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Peak powertrain force, $\max_t |F_p(t)|$ \vspace{8pt} }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-pto-force}} 
+        & \parbox[m]{\linewidth}{\centering
+        Solve \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients for $F_p$}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak fluid force, $\max_t |m\ddot{\xi}(t)-F_p(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-fluid-force} with \cref{eq:op-hydro-coeffs} coefficients and $F_p$ from \cref{eq:peak-pto-force}}
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:peak-fluid-force} with \cref{eq:st-hydro-coeffs} coefficients and $F_p$ from storm case}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak float travel, $\max_t |\xi_f(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:st-hydro-coeffs} coefficients and $F_p=0$}\\ \hline
+    \parbox[m]{\linewidth}{\centering 
+    Peak spar travel, $\max_t |\xi_s(t)|$ }
+        & \parbox[m]{\linewidth}{\centering 
+        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        &Equals $\xi_f$ due to brake\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable relative amplitude between float and spar, $|\xi_f-\xi_s|_{max}$ \vspace{8pt}}
+        & \shortstack{$\min(h_{fs,clear},h_{fs,up},$\\$h_{fs,down})$} 
+        &N/A\\  \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable float amplitude, $|\xi_f|_{max}$ \vspace{8pt} }
+        & $\min(\xi_{f,linear}, \xi_{f,slam})$
+        & N/A \\ \hline %$X_{slam}$\\
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable spar amplitude, $|\xi_s|_{max}$ }
+        & $\min(\xi_{s,linear}, \xi_{s,slam})$
+        & N/A %$X_{slam}$\\
+\end{tabular}
+\caption{Forces, amplitudes, and maximum allowable amplitudes in each design load case}
+\label{tab:DLCs}
 \end{table}
-
-The calculation of forces and amplitudes in operational seas uses the 2-DOF equation of motion \eqref{eq:eom-freq-domain} with the PTO force $F_p$ set by the chosen controller.
-In storm seas, the brake force could calculated by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
-%However, it is not actually necessary to calculate the brake force, since the PTO cost model does not contain a term for the brake cost. -- this is not true, even without a PTO cost model, the brake force is needed to calculate the heave force for structural purposes.
-However, this would require additional time-consuming iteration.
-Therefore, instead of separately finding the float and spar heave force, the net heave force on both bodies is calculated using the 1-DOF equation of motion \eqref{eq:eom-freq-domain} with zero PTO force $F_p=0$ (since the brake force is an internal force when considering a unifed float-spar rigid body) and the hydrodynamic coefficents corresponding to the float only.
-\hl{(Note: ideally it would use hydro coefficients for the merged float-spar geometry, subscript m in the hydro module).}
-For conservativism, this net force is assumed to apply to both the float and spar independently. % For force, this makes way less sense than doing the 2-DOF calc, since the net float-spar force isn't what matters for structures. For amplitude, this is a fine assumption, but I'm not even using the storm amplitude constraint, so it doesn't make any sense.
 
 Meanwhile, the surge force for each component is calculated as \cite{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
@@ -1018,7 +1062,7 @@ The design surge force is the maximum surge force over all nonzero-probability s
 Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
 Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work. 
 Maximum acceptable heave %and surge 
-forces will be evaluated with structural factors of safety in \ref{sec:structures}.
+forces will be evaluated with structural factors of safety in \cref{sec:structures}.
 The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the optimization.
 
 The table also indicates the maximum permissible amplitudes.
@@ -1030,17 +1074,22 @@ The permissible heights for upward and downward motion of the float relative to 
 Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
 Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:meem}.
-This maximum amplitude $X_{linear}$ for the float and spar respectively is:
+This maximum amplitude $\xi_{linear}$ for the float and spar respectively is:
 \begin{equation}
-    X_{f,linear} = (h-T_{f,2})/10, \qquad X_{s,linear}  = (h-T_s)/10
+    \xi_{f,linear} = (h-T_{f,2})/10, \qquad \xi_{s,linear}  = (h-T_s)/10
 \end{equation}
+which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
 
-In both operational and storm states, slamming should be avoided since it causes extremely high loads.
-Slamming refers to the bottom surface of the WEC rising out of the water and hitting the free surface as it reenters (bottom-slamming), or symetrically the top of the WEC becoming fully submerged beneath the free surface (top-slamming).
-The formula for the critical slamming amplitude $X_{slam}$ in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and shown to lie between $\Delta z-H/2$ and $\Delta z+H/2$ for relevant vertcal body dimenson $\Delta z$, depending on the wave parameters and body diameter and oscillation phase.
-For operational waves, $\Delta z$ for float bottom-slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
-Likewise for spar bottom-slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
-The relevant $\Delta z$ for float and spar top-slamming in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
+In both operational and storm states, the WEC surface should not transiently pierce the wave free surface since this causes extremely high loads.
+This includes slamming, in which the bottom surface of the WEC rises out of the water and hits the free surface as it reenters, and submersion, in which the top of the WEC becoming fully submerged beneath the free surface.
+The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and can be expressed in a quadratic form compatible with \cref{eq:opt-problem}: 
+\begin{equation}
+    \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
+\end{equation}
+for relevant vertical body dimenson $\Delta z$ and horizontal coordinate $y$, depending on the wave parameters and body diameter and oscillation phase.
+For operational waves, $\Delta z$ for float slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
+Likewise for spar slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
+The relevant $\Delta z$ for float and spar submersion in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
 For storm waves, currently the slamming limit is not applied.
 %since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
 In future work, the storm $\Delta z$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
@@ -1106,7 +1155,7 @@ The factor of safety is directly calculated for the most heavily loaded subcompo
 Thicknesses of other subcomponents are either held constant or scaled with the dimensions of subcomponents that are directly assessed, as outlined in \tableautorefname~\ref{tab:struct}.
 In the future, extending the structures module to directly calculate the factor of safety for each subcomponent would allow for more realistic structural design.
 
-\begin{table}
+\begin{table}\label{tab:struct-calc-vs-scale}
     \centering
     \begin{tabular}{ccc}
          \textbf{Component}&  \textbf{Structural Subcomponent}&  \textbf{Method of Analysis}\\ \hline
@@ -1137,14 +1186,24 @@ This means that the %top and bottom plate are each
 plate is conservatively sized assuming the other plate elements are perfectly rigid. %The fixed-edge reaction loads from these top and bottom solutions are then applied to the central shell element modeled as a cross section subject to bending.
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
-The column's short length requires an intermediate solution between pure compression and Euler buckling.
-Local buckling is assessed as well.
+The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \cite{previsic_reference_2011}.
 
 The damping plate is a thin stiffened cylindrical plate subject to a vertical distributed force on its bottom surface.
 The force is reacted by the welded connection to the column along the column's circumference, as well as through four welded tubular supports.
 Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
 
- Further details of all structural calculations are provided in \appendixname~\ref{sec:appendix-structures}. 
+Further details of all structural calculations performed in the simulation are provided in \appendixname~\ref{sec:appendix-structures}. 
+For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
+\begin{equation}\label{eq:struct-scaling}
+\begin{aligned}
+    t_{f} h_{stiff,f}^2 &\sim \frac{F_{heave} D_f}{\left(\frac{D_f}{D_s}-1\right)^2} \\
+    t_{s}^4 &\sim F_{heave} h_s^2 \\
+    t_{d} h_{stiff,d}^2 &\sim \frac{F_{heave}D_d^2}{D_s} \\
+\end{aligned}
+\end{equation}
+Since structural material scales linearly with both the thickness $t$ and the stiffener height $h_{stiff}$, the squaring of stiffener heights in \cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
+We therefore expect that an optimization would potentially drive the thicknesses to their minimum values, and thus it is also required to model the minimum value of $t/h_{stiff}$ for which the stiffened plate assumptions hold.
+These limits are also derived in \appendixname~\ref{sec:appendix-structures}.
 
 %TC:break Economics
 \subsection{Economics}\label{sec:econ}
@@ -1154,11 +1213,10 @@ The common economic metric $LCOE$ is calculated as the ratio of annualized expen
 \end{equation}
 where the numerator consists of the up-front capital expenditure $CAPEX$, annualized via a fixed charge rate $FCR$, plus an annual operational expenditure $OPEX$.
 The fixed charge rate incorporates the effect of device lifetime as well as a variety of financial values affecting the time-value of money such as tax rate, interest rate, depreciation, and how much of the project is financed with debt (loans) compared to equity (investors).
-The rationale and limitations of using $LCOE$ as an economic metric will be described in section~\ref{sec:obj}.
-For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are kept in units of 2012 USD without adjusting for inflation.
-The economic model replicates the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} and scales certain cost components with relevant aspects of the device design, shown in \tablename~\ref{tab:CBS}.
-In particular, the structural cost scales with the volume of structural material $V_{struct}$, and the PTO cost scales with the peak electrical power $P_{pk,elc}$ and force $F_{max}$. %torque $\tau$.
-Details on the scaling are provided in \appendixname~\ref{sec:appendix-econ}.
+
+The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
+With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
+The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014}, shown in \cref{tab:CBS}.
 \begin{table}
     \centering
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
@@ -1184,12 +1242,37 @@ Details on the scaling are provided in \appendixname~\ref{sec:appendix-econ}.
     \caption{Cost Breakdown Structure}
     \label{tab:CBS}
 \end{table}
-Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
-For example, installation and decommissioning costs could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
-Likewise, the mooring and foundation costs could scale with storm surge force, and the replacement parts and consumables costs could scale with the PTO power and force as the PTO capital costs do. %\hl{Note: do I just want to add mooring, parts, and consumables cost scaling to the code, since that's totally possible with the current model?} 
-Section~\ref{sec:formulation} will discuss the effect of such uncertainties and how to mitigate their impact on the design optimization.
+MDOcean captures the scaling of all cost categories with the number of devices $N_{WEC}$ to match the provided estimates for $N_{WEC}=(1,10,50,100)$ \cite{neary_reference_2014}. 
+Since the RM3 CBS only applies to a single WEC design, MDOcean extends its scope to capture the scaling of structural cost (category 1.4) with the volume of structural material $V_{struct}$, and the power take off (PTO) cost (category 1.5) with the peak electrical power $P_{pk,elec}$ and force $F_{max}$.
 
-Finally, a power law model captures economies of scale, where per-WEC unit costs $C$ decrease with the number of devices $N_{WEC}$:
+Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
+For example, installation and decommissioning costs (categories 1.7 and 1.8) could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
+Likewise, the mooring and foundation costs (category 1.3) could scale with storm surge force, and the replacement parts and consumables costs (categories 2.5 and 2.6) could scale with the PTO power and force as the PTO capital costs do.
+
+The chosen scalings are a power law for the number of devices to reflect economies of scale, direct proportionality between structural cost and material volume, and constant plus linear for the PTO cost since the main components of the PTO (generator, drivetrain, and structural support) are generally sized linearly with power and torque.
+\footnote{
+    Linear PTO cost scaling is common for WEC techno-economic analysis.
+    The RM3 cost numbers \cite{RM3} which MDOcean uses as baseline are themselves scaled from estimates for a smaller device.
+    Specifically, the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
+    Meanwhile, the NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent of 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \cite{nakhai_techno-economic_2022}.
+    %the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
+    % \begin{equation}
+    %     C_{gen} = \begin{cases}
+    %     80.86 \tau + 1032, & 0~\leq\tau <47~\text{Nm, ~~~~induction generator} \\
+    %     9.151 \tau + 4386, & 47\leq\tau \leq 4000~\text{Nm, permanent magnet generator}
+    %     \end{cases}
+    % \end{equation}
+}
+This yields:
+\begin{equation}
+\begin{aligned}
+    C_{unit} &=  C_{pto} + C_{struct} + C_{fixed} \\
+    C_{pto} &= C_{pto,constant} + p_{P} P_{pk,elec} +p_{F} F_{max} \\
+    C_{struct} &= p_{s} V_{struct}
+\end{aligned}
+\end{equation}
+where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/kg respectively.
+Additionally, the per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ according to the following power law:
 \begin{equation}
 C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
 \end{equation}
@@ -1206,4 +1289,22 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
     \caption{Cost model values for each CBS category}
     \label{tab:econ-model-values}
 \end{table}
+The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
+For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are kept in units of 2012 USD without adjusting for inflation.
+
+To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors, leaving normalized price constants $p^{'}_{(*)}$.
+The LCOE model then scales as:
+\begin{equation}\label{eq:LCOE-scale}
+  LCOE = \frac{
+    p^{'}_{F} F_{max} + p^{'}_{P}P_{pk,elec} + p^{'}_{s} V_{struct} + p^{'}_0
+    }{P_{avg,elec}}
+\end{equation}
+
+% To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
+% \begin{equation}\label{eq:LCOE-scale}
+%     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
+% \end{equation}
+
+
+
 

@@ -31,7 +31,7 @@ function [fig_array,...
             warning(['Missing image file (pdf may still exist): ' file_name])
             text(0.5, 0.5, ['Missing: ' file_name], 'HorizontalAlignment', 'center');
         end
-        fig.UserData = ['mdocean/plots/non_matlab_figs/pdf/' file_name(1:end-4) '.pdf'];
+        fig.UserData = ['mdocean/plots/non_matlab_figs/pdf/' extractBefore(file_name,'.') '.pdf'];
         fig_array(i) = fig;
     end
 

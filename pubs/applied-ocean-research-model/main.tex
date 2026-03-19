@@ -13,12 +13,12 @@
 %% 
 %% The list of all files belonging to the 'Elsarticle Bundle' is
 %% given in the file `manifest.txt'.
-%% 
+%%
 %% Template article for Elsevier's document class `elsarticle'
 %% with numbered style bibliographic references
 %% SP 2008/03/01
 %% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
-%% 
+%%
 
 \documentclass[preprint,12pt]{elsarticle}
 
@@ -42,7 +42,8 @@
 \usepackage{amssymb}
 %% The amsmath package provides various useful equation environments.
 \usepackage{amsmath}
-\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage[unicode,hypertexnames=false]{hyperref}
 \usepackage{cleveref}
 \usepackage{array} % required for text wrapping in tables
 \usepackage{pdflscape} % for landscape table
@@ -58,6 +59,7 @@
 \usepackage{textcomp} % cent symbol
 \usepackage{tikz}
 \usepackage{circuitikz} % circuit figures
+\usepackage{subcaption} % for subfigures
 
 % set tikz to compile externally to work with latexmk
 \usetikzlibrary{external}
@@ -66,7 +68,7 @@
       pdflatex \tikzexternalcheckshellescape 
       -halt-on-error 
       -interaction=batchmode 
-      -output-directory=aux 
+      -output-directory=aux/
       -jobname "\image" "\texsource"
     }
 }
@@ -110,6 +112,21 @@
 \journal{Applied Ocean Research}
 
 \begin{document}
+% Make PDF metadata explicit and disable fragile commands from frontmatter
+\hypersetup{
+  pdftitle={Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters},
+  pdfauthor={Rebecca McCabe, Madison Dietrich, Maha Haji}
+}
+\makeatletter
+\pdfstringdefDisableCommands{%
+  \def\corref#1{}%
+  \def\cortext#1{}%
+  \def\cnotenum#1{}%
+  \def\tnoteref#1{}%
+  \def\tnotetext#1{}%
+  \def\@corref#1{}%
+}
+\makeatother
 
 \input{numeric-results.tex}
 \begin{frontmatter}

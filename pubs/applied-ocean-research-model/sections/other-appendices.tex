@@ -1,6 +1,6 @@
 \clearpage
 \section{Dynamics and Control Module Details}
-\subsubsection{Linear Solution Procedure}
+\subsection{Linear Solution Procedure}\label{sec:appendix-dynamics-solution}
 \Cref{sec:eom,sec:pto-dynamics} introduced linear models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
 Here we unify the formulation and present a clear system-level solution procedure for all port variables:
 \begin{enumerate}
@@ -285,10 +285,99 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 \clearpage
 \subsection{Drag Model\label{sec:appendix-drag}}
 As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
+\subsubsection{Nondimensional Drag Integrals $I_B$ and $I_G$}
+The drag coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ are expressed in \cref{eq:drag-coeffs} as dimensional integrals over the width of the WEC.
+Here we present an alternative form of the coefficients in terms of nondimensionalized integral functions, which we refer to as $I_B(r,\theta,\kappa)$ and $I_G(r,\theta,\kappa)$:
+\begin{equation}\label{eq:drag-integrals-IB-IG}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}|
+    \left[ 
+        I_B(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B(r,\angle\hat{\dot{\xi}},\alpha k R)
+    \right]
+    \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}| \frac{g k}{\omega} e^{-k\vec{T}}
+    \left[ 
+        I_G(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_G(r,\angle\hat{\dot{\xi}},\alpha kR)
+    \right]
+\end{aligned}
+\end{equation}
+where the nondimensional integral functions $I_B$ (real) and $I_G$ (complex) are defined as:
+\begin{equation}\label{eq:definition-IB-IG}
+\begin{aligned}
+    I_B(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} dx
+    \\
+    I_G(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} e^{-i\kappa x} dx
+\end{aligned}
+\end{equation}
+
+The integrals must be evaluated numerically, except for special limit cases for which analytical results are available.
+\Cref{fig:drag-integrals} shows the results of numerical integration for $I_B$ and $I_G$ across a range of inputs.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_damping_integral.pdf}
+        \caption{Drag damping integral $I_B$, scaled by $\frac{2}{\pi}$.}
+        \label{fig:drag-damping-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_exc_mag_integral.pdf}
+        \caption{Magnitude of drag excitation integral $|I_G|$, scaled by $\frac{2}{\pi}$.}
+        \label{fig:drag-excitation-magnitude-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_exc_phase_integral.pdf}
+        \caption{Phase of drag excitation integral $\angle I_G$, scaled by $\frac{1}{\pi}$.}
+        \label{fig:drag-excitation-phase-integral}
+    \end{subfigure}
+    \caption{Nondimensional drag integrals shown on in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
+    \label{fig:drag-integrals}
+\end{figure}
+
+The limit cases in question include $r \rightarrow 0$ (the body velocity dominates the incident wave velocity) and $\kappa \rightarrow 0$ (the body diameter is small with respect to the wavelength), with the following expressions:
+\begin{equation}
+\begin{aligned}
+    \lim_{r\rightarrow 0} I_B(r,\theta,\kappa) = \frac{\pi}{2},
+    \qquad
+    \lim_{r\rightarrow 0} I_G(r,\theta,\kappa) = \frac{\pi J_1(\kappa)}{\kappa} \\
+    \lim_{\kappa \rightarrow 0} I_B(r,\theta,\kappa) =  \lim_{\kappa \rightarrow 0} I_G(r,\theta,\kappa) = \frac{\pi}{2}\sqrt{1+r^2-2r\sin\theta},
+\end{aligned}
+\end{equation}
+where $J_1$ is the Bessel function of the first kind of order 1.
+An important edge case occurs at the origin of the polar plots in \cref{fig:drag-integrals}, when $r \rightarrow \infty$ (the incident wave velocity dominates the body velocity, so $|\hat{\dot{\xi}}|\rightarrow 0$).
+Here, the integrals as defined in \cref{eq:definition-IB-IG} diverge, and the form of \cref{eq:drag-integrals-IB-IG} does not apply.
+Instead, when $r\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals:
+\begin{equation}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{V}_{wave}|
+    \left[ 
+        I_B'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha k R)
+    \right]
+    \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d  |\hat{V}_{wave}| \frac{gk}{\omega} e^{-k\vec{T}}
+    \left[ 
+        I_G'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_G'(r,\angle\hat{\dot{\xi}},\alpha kR)
+    \right]
+\end{aligned}
+\end{equation}
+The relevant limits are then:
+\begin{equation}
+\begin{aligned}
+    \lim_{r\rightarrow \infty} I_B'(r,\theta,\kappa) = 0,
+    \qquad
+    \lim_{r\rightarrow \infty} I_G'(r,\theta,\kappa) = 
+    \begin{cases}
+    \frac{\pi J_1(\kappa)}{\kappa} & \textrm{if } \kappa \neq 0 \\
+    \frac{\pi}{2} & \textrm{if } \kappa = 0
+    \end{cases}
+\end{aligned}
+\end{equation}
 
 \subsubsection{Comparison to Other Drag Formulations}
 The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
+In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
 Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
 This creates the possibility for negative ``damping'' coefficients that would appear to violate energy conservation if interpreted as a true damping coefficient.
 The damping-excitation grouping chosen in \ref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
@@ -296,17 +385,25 @@ The damping-excitation grouping chosen in \ref{sec:drag} avoids this confusion a
 Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
 \cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
 This means that \cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
-Early MDOcean simulations that used the \cite{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radation damping) at high frequencies and large wave heights.
+Early MDOcean simulations that used the \cite{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}. 
+Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}.
 
 \subsubsection{Iterative Solution}
 With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
 The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
-MDOcean has the option to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-This is a form of fixed point iteration where $x_k = g(x_{k-1})$ and is therefore guaranteed to converge as long as $|\frac{\partial g(x)}{\partial x}| < 1$ at the solution. %\hl{find a better place to cite for this besides wikipedia} \url{https://en.wikipedia.org/wiki/Root-finding_algorithm#Fixed_point_iteration_method}. 
-Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m, % from summer research slide 44 5/30/24
+MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
+This is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \cref{eq:eom-freq-domain} and $k$ is the iteration index.
+It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which has the following criteria \cite{chicone_contraction_2006}:
+\begin{equation}
+ \left|
+    \frac{\partial g\left(\vec{\hat{\dot{\xi}}}~\right)}
+    {\partial \vec{\hat{\dot{\xi}}}}
+\right| < 1
+\end{equation}
+
+Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees, % from summer research slide 44 5/30/24
 and a sample convergence plot is shown in Figure~\ref{fig:drag-convergence}.
 
 \begin{figure}
@@ -433,18 +530,18 @@ While this logic works for submersion, it does not apply for slamming because th
 The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
-% Following section~\ref{sec:discussion}, it is interesting to analyze the impact of the more complicated intermediate-wavelength slamming model compared to the simple and conservative short-wavelength model ($\xi_{slam}=\Delta z_{slam}-H/2; \xi^*=-1$).
-% Relevant model values for the \hl{minimum-LCOE} float design are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
-% Although the intermediate wavelengths ($\xi^*>-1$) occur for many operational sea states, those sea states are not the ones where the slamming constraint is active (where $\xi_{slam}/\xi-1 \approx 0$) because in the tested wave conditions, large amplitude waves occur only at high periods.
-% If the more conservative short-wavelength model is used, the slamming constraint appears violated with a value of $-0.08$ (the small blue portion at the top of the rightmost subplot of \figureautorefname~\ref{fig:slamming-validation} at $T_e=12.5$ s, $H_s=6.75$ m), indicating that the float draft would need to increase by around 8\% to prevent slamming.
-% This would increase total material cost by around 2\% and LCOE by around 0.5\%, an effect likely dwarfed by other sources of uncertainty.
-% Thus, in this case the more complicated, less conservative slamming model has only a minor impact on the analysis, although more substantial impact is expected in seas with co-occurring large-amplitude and low-to-moderate-period waves. 
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison_float.pdf}
-%     \caption{Slamming Model Comparison for Nominal Float Design in Operational Sea States}
-%     \label{fig:slamming-validation}
-% \end{figure}
+Relevant model values for the nominal float design under reactive optimal control are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
+Comparing the first two subplots for the phase of the float motion $\angle\hat{\xi}_f$ and the slamming angle $\theta$ shows that the slamming angle roughly ``wraps'' the motion angle around a value of $\pi/2$, colored white in the figure.
+The third plot shows that the minimum slamming and submersion amplitude is not a concern since it is negative for all sea states and thus will never be an active constraint.
+The fourth plot shows the maximum amplitude limit and the fifth depicts the actual amplitude, with amplitudes in violation of the limit indicated with an overlaid black hatching.
+A significant fraction of sea states violate the limit and will require adjusted control gains.
+Significant wave heights in excess of 5.5 meters have negative maximum slamming amplitudes (colored blue), indicating that control adjustments in those waves must not only decrease $|\hat{\xi}_f|$ but also adjust $\angle\hat{\xi}_f$ to reduce $\theta$.
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison_float.pdf}
+    \caption{Slamming Model Results for Nominal RM3 Float Design in Operational Sea States}
+    \label{fig:slamming-validation}
+\end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
@@ -490,7 +587,8 @@ Inputs to the structures module include forces, bulk and structural dimensions, 
 It outputs a factor of safety for each limit case.
 First, it obtains equivalent section properties based on the plate and stiffener dimensions.
 Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \cite{young_roarks_2001} and the references therein.
-Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case. %\hl{cite DNV standards, RM3 report+new structures addendum, some WEC structures paper, say that typically structures are designed to an ultimate limit and made of stiffened steel because it is efficient way to handle the spread out surface load of the ocean. Also note that for consistency with the RM3 report, welded joints are assumed everywhere, although using pinned joints such as a rod end attachment on the float and reaction plate tubular support structures could enhance structural efficiency.}
+Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case.
+For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
 \subsection{Equivalent Section Properties for Stiffened Plates}\label{sec:equivalent-thickness}
 Stiffeners are structural elements, frequently with I or T profiles, that can be welded or riveted to flat plates to provide additional load-carrying capacity and prevent buckling.
@@ -594,20 +692,32 @@ In addition to the shorter side length $x_{min}$, stress in a fixed-edge rectang
     x_{max} = \begin{cases} h_0,& h_0 \geq \sqrt{b_1b_2} \\ \frac{b_1+b_2}{2} + h(1-\sqrt{1+m^2}), & h_0 < \sqrt{b_1 b_2}\end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
-Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then $M_{bot}=\beta q x_{min}^2$ for $\beta$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
 
+\subsubsection{Float Bottom Plate}
+Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then:
+\begin{equation}\label{eq:bottom-plate-moment}
+M_{bot}=\beta q x_{min}^2
+\end{equation}
+for $\beta$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{max}/x_{min}$.
+
+\subsubsection{Float Top Plate}
 The top float plate has equivalent thickness $t_{f,top,eq}$ and the same dimensions and edge fixity as the bottom plate.
 Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $r_0$, where $r_0$ is assumed to be at least half the thickness.
 Under these conditions, either the stress at the center $\sigma_{cent}$ or along the longer edge $\sigma_{edge}$ may dominate:
-\begin{equation}
+\begin{equation}\label{eq:top-plate-stress}
     \begin{aligned}
     \sigma_{edge}&= \frac{3W}{2\pi t_{f,top,eq}^2}\left( (1+\nu)\ln\frac{2x_{min}}{\pi r_0}+\beta_1\right)\\
         \sigma_{cent}&=-\beta_2 W/t_{f,top,eq}^2
     \end{aligned}
 \end{equation}
 using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in \cite{young_roarks_2001}.
-The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$. \hl{(Note: this equation gives unusual results so it is not currently used. The top plate thickness is set via scaling of the bottom plate thicknesses. Will be debugged during scrutineering.)}
+The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$.
+However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in \cite{RM3,previsic_reference_2011}.
+It is unknown whether this is an implementation or modeling issue and remains future work to address.
+In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \cref{tab:struct-calc-vs-scale}.
 
+\subsubsection{Other Float Plates}
 The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave. 
 Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design. This prevents the need for a separate structural analysis of the side plates.
 
@@ -693,58 +803,7 @@ These equations assume that the spar is compact, meaning that local buckling of 
 %     i = 1..3, ~& j = 1..2
 % \end{aligned}
 % \end{equation}
-\clearpage
-\section{Economic Model Details}
-\label{sec:appendix-econ}
-The capital cost is a simple summation of the device costs, which depend on the WEC design, and the balance of system and financial costs $C_0$, which are assumed constant.
-\begin{equation}
-	CAPEX = N_{WEC}C_{unit} + C_0
-\end{equation}
-The value for $C_0$ is obtained as the development, infrastructure, profit margin, installation, and contingency costs in the RM3 cost breakdown structure \cite{neary_reference_2014}.
 
-Unit device costs include that of the drivetrain $C_{drv}$, generator $C_{gen}$, structural material $C_{struct}$, and a fixed cost $C_{fixed}$ for components like mooring whose scaling with design is not captured here:
-\begin{equation}
-    C_{unit} =  C_{drv}(P_{pk,elec}) + C_{gen}(\tau) + C_{struct}(V_{struct}) + C_{fixed}
-\end{equation}
-The drivetrain cost model used in \cite{RM3} comes from an unpublished design and cost estimate for a hydrualic PTO that ReVision Consulting performed in 2011.
-The ReVision study estimated unit costs for a 100~kW peak device at quantity 1 and 100.
-The reference model project scaled the costs linearly with peak power (except for the riser cable and control system, whose cost does not scale with power) and found component-level progress ratios to describe the economies of scale.
-%\hl{describe my force power scaling}
-% is taken from the NREL System Advisory Model for the RM3 hydraulic system, and scales slightly less than linearly with peak power rating \cite{nakhai_techno-economic_2022}:
-% \begin{equation}
-%     C_{drv} = 7.216 P_{pk,elec}^{0.91}
-% \end{equation}
-% Generator cost estimates come from linear curve fits of commercial electric machines performed in \cite{nakhai_techno-economic_2022}. Induction and permanent magnet machines have different costs, each scaling linearly with the peak torque rating, so the cheaper of the two is chosen with a torque threshold:
-% \begin{equation}
-%     C_{gen} = \begin{cases}
-%     80.86 \tau + 1032, & 0~\leq\tau <47~\text{Nm, ~~~~induction generator} \\
-%     9.151 \tau + 4386, & 47\leq\tau \leq 4000~\text{Nm, permanent magnet generator}
-%     \end{cases}
-% \end{equation}
-%While the RM3 report only specifies a 286 kW power rating and does not specify the maximum PTO torque, the maximum PTO torque is calculated as
-The structural cost is the product of the structural volume and the material price $p_M$:
-\begin{equation}
-    C_{struct} = p_M V_{struct}
-\end{equation}
-
-%The operational expenditure $OPEX$ scales via power law with the number of WECs. The exponent and operational price coefficient $p_{op}$ are determined via a least-squares curve fit to (\hl{cite RM3 CBS data}):
-%\begin{equation}
-  %  OPEX = p_{op} N_{WEC}^{0.4433}
-%\end{equation}
-The annual energy production in kilowatt-hours is the average electrical power from equation~\eqref{eq:power-elec} multiplied by the number of hours per year.
-
-To better see the dependence of LCOE on design, one can divide out the constant factors and introduce various price constants $p_{(*)}$.
-Assuming a fixed $N_{WEC}, FCR,$ and $\eta_{op}$, the LCOE model then scales as:
-\begin{equation}\label{eq:LCOE-scale}
-  LCOE = \frac{p_\tau \tau + p_{P}P_{pk,elec}^{0.91} + p_{struct} V_{struct} + p_0}{P_{avg,elec}}
-\end{equation}
-The values of price and cost constants are given in \sectionautorefname~\ref{sec:appendix-parameters}.
-
-
-% To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
-% \begin{equation}\label{eq:LCOE-scale}
-%     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
-% \end{equation}
 
 \clearpage
 \section{Parameters}
@@ -788,87 +847,5 @@ $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
  \caption{Selected Parameters}\label{tab:parameters}
 \end{table}
 \clearpage
-
-\section{Damping vs Reactive Control Derivations}
-\label{sec:appendix-reactive-vs-damping}
-\hl{This section needs to be cleaned up and currently is more of scratch work.}
-
-Average power:
-\begin{equation}
-    \frac{P_{avg,damp}}{P_{avg,reac}} 
-    = \frac{\frac{1}{2} \Re(\hat{Z}_{damp})|\hat{q}_{damp}|^2} {\frac{1}{2} \Re(\hat{Z}_{reac})|\hat{q}_{reac}|^2 } 
-    = \sqrt{ \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + 1} \cdot \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2
-\end{equation}
-
-Peak power:
-\begin{equation}
-    \frac{P_{pk,damp}}{P_{pk,reac}} 
-    = \frac{P_{avg,damp}}{P_{avg,reac}} 
-    \frac{2}{1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }} = \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|^2 \cdot \frac{2}{1 + \left(1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  \right)^{-1/2}}
-\end{equation}
-
-Torque:
-\begin{equation}
-    \frac{\tau_{damp}}{\tau_{reac}} = \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right|
-\end{equation}
-
-Structural volume:
-For a constant hydrodynamic design, structural volume would increase under reactive control due to the higher structural thickness required to sustain the loads ($V\sim t$), as well as the higher above-water structural height required to prevent the float from going above the top of the spar ($v\sim X$).
-The height increase only applies to the float side plates and the column, not to the float top and bottom plates or the damping plate.
-The float top and bottom plates and damping plate experience bending, which from equation~\eqref{eq:plate-stress} yields a relation $t \sim F^{1/2}$ for the relationship between required thickness $t$ and force $F$.
-On the other hand, the float side plates experience membrane stress, which yields a relation $t \sim F$.
-The column solution interpolates between axial compression and buckling, so $t \sim F^{1/3}$ when closer to pure buckling and $t \sim F$ when closer to pure compression.
-In total, we have $V \sim F^{1/2} + FX + F + F^{1/3}X + F^{1/3}$.
-Since both $X$ and $F$ scale with $\frac{\delta}{\sqrt{2-\delta}}$, we can write:
-
-
-The structural volume ratio is then:
-
-Amplitude:
-\begin{equation}
-\begin{aligned}
-    \left|\frac{ \hat{q}_{damp}}{ \hat{q}_{reac}}\right| &= \left|\frac{
-        (m+A_h)s^2+(B_h+B_d+B_{p,reac})s+(K_h+K_d+K_{p,reac})} 
-        { (m+A_h)s^2+(B_h+B_d+B_{p,damp})s+(K_h+K_d)}\right| \\ 
-        &= \frac{2B_{p,reac}}
-        {\left|B_{p,reac}+\sqrt{B_{p,reac}^2+(K_{p,reac}/\omega)^2}-K_{p,reac}/s\right|} \\ 
-        & = \frac{2}{\left|1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } - \frac{K_{p,reac}/s}{B_{p,reac}}\right|}  \\
-        &= \frac{2}{\sqrt{ \left(1 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  }\right)^2 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 }} \\ 
-        &= \frac{\sqrt{2}}{\sqrt{ 1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right)^2 + \sqrt{1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2  } }} \\
-\end{aligned}
-\end{equation}
-
-rewrite in terms of $\Theta = 1 + \left(\frac{K_{p,reac}/\omega}{B_{p,reac}}\right) ^2 $:
-\begin{equation}
-\begin{aligned}
-    \frac{\tau_{damp}}{\tau_{reac}} &= \frac{\sqrt{2}}{\sqrt{ \Theta + \sqrt{\Theta} }} = \sqrt{\frac{1}{\sqrt{\Theta}} \cdot \frac{2}{\sqrt{\Theta} + 1}} \\
-    \frac{P_{avg,damp}}{P_{avg,reac}} &= \sqrt{\Theta} \cdot \frac{2}{\Theta + \sqrt{\Theta}} = \frac{2}{\sqrt{\Theta} + 1} \\
-    \frac{P_{pk,damp}}{P_{pk,reac}} &= \frac{2}{1 + 1/\sqrt{\Theta}} \cdot \frac{2}{\Theta + \sqrt{\Theta}} = \left(\frac{2}{\sqrt{\Theta} + 1}\right)^2
-\end{aligned}
-\end{equation}
-
-rewrite in terms of $\delta = \frac{2}{\sqrt{\Theta} + 1}$:
-\begin{equation}
-\begin{aligned}
-    \frac{\tau_{damp}}{\tau_{reac}} &= \frac{\delta}{\sqrt{2-\delta} } \\
-    \frac{P_{avg,damp}}{P_{avg,reac}} &= \delta \\
-    \frac{P_{pk,damp}}{P_{pk,reac}} &= \delta^2
-\end{aligned}
-\end{equation}
-
-Cost:
-\begin{equation}
-\begin{aligned}
-    \frac{C_{damp}}{C_{reac}} 
-    &= \frac{C_{const} + C_{drv} P_{pk,damp} + C_{gen} \tau_{damp} + C_{struct} V_{struct,damp} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\ 
-    &= \frac{C_{const} + C_{drv} P_{pk,reac} \delta^2 + C_{gen} \tau_{reac} \frac{\delta}{\sqrt{2-\delta} } + C_{struct} V_{struct,reac} \frac{V_{struct,damp}}{V_{struct,reac}} } {C_{const} + C_{drv} P_{pk,reac} + C_{gen} \tau_{reac} + C_{struct} V_{struct,reac}} \\
-\end{aligned}
-\end{equation}
-
-where $(C_0/N_{WEC}) +  C_{fixed}$ has been consolidated into a constant cost $C_{const}$.
-Levelized cost of energy:
-\begin{equation}
-    \frac{LCOE_{damp}}{LCOE_{reac}} = \frac{P_{avg,reac}}{P_{avg,damp}} \cdot \frac{ C_{damp} + OPEX/FCR} { C_{reac} + OPEX/FCR}
-\end{equation}
 
 \end{appendices}

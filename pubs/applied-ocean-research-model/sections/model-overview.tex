@@ -19,22 +19,26 @@ An optimizer would use the objective $J$ and constraint $g$ outputs from a simul
 \paragraph{Absence of Feedback Coupling}
 The lack of variables in the lower left portion of the diagram indicates that there is no feedback coupling between modules, so an external solver to enforce consistency is not necessary.
 This helps decrease the simulation computation time and is appealing for optimization.
-\paragraph{Presence of Feed-Forward Coupling}
-The presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
+\paragraph{Presence of Design Variable and Feed-Forward Coupling}
+The fact that the same design variable group is an input to multiple modules indicates the presence of design variable coupling.
+Most heavily coupled are the bulk dimensions, which are input to the geometry, hydrodynamics, and structural modules.
+Thicknesses and generator ratings are each input to two modules, with thicknesses coupling geometry and structures and generator ratings coupling dynamics and economics.
+Moreover, the presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
 \caption{Simplified XDSM diagram}\label{fig:n2}
 \end{figure}
-\hl{Even monotonic coupling requires concurrent optimization when DVs are shared across modules.}
-When coupling is \textit{non-monotonic}, concurrent optimization is required to obtain the system optimal design, and optimizing each module sequentially or in parallel would result in a sub-optimal system design.
-The WEC coupling here is non-monotonic because perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
-With an objective $J$ of LCOE, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $J$), it also increases structural loading (detrimental to $g$), and the bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $g$) and increase the required structural material (detrimental to $J$).
+Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
+For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \cite{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \cite{azarm_monotonicity-based_1988,papalambros_principles_2017}.
+The present coupling of WEC disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
+Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
+Non-convexity arises from the presence of both positve and negative curvature in the coupled variable space, leading to multiple local optima.
+With an objective $J$ of LCOE, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $J$), it also increases structural loading (detrimental to $g$), and the larger bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $g$) and increase the required structural material (detrimental to $J$).
 Thus, it would be sub-optimal to optimize the hydrodynamics module strictly for damping or power production followed by a separate optimization considering structures and economics.
 Furthermore, while even in a unified optimization it may be tempting to calculate the structural thicknesses within the structures module as the minimum required to sustain loads without failure, it is important to keep structural thicknesses as design variables because they also contribute to the hydrostatic constraints computed in the geometry module.
-If active, these constraints could make the system-level optimum material thickness larger than what is structurally necessary.
-Reference~\cite{papalambros_principles_2017} describes the monotonicity checking procedure more fully.
-Using a monolithic MDO architecture, in which a single optimizer drives the design of all modules and considers all constraints, addresses this non-monotonic coupling. 
+If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
+Using a single optimizer to drive the design of all modules and consider all constraints addresses this non-monotonic coupling. 
 
 \paragraph{Analysis Architecture}
 All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
