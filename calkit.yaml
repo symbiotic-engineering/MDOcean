@@ -49,12 +49,22 @@ pipeline:
       outputs:
         - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
           storage: git
+    make-drag-integral:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); drag_fcn = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 8); save('./mdocean/inputs/drag_integral.mat','drag_fcn');
+      inputs:
+        - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
+        - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+      outputs:
+        - ./mdocean/inputs/drag_integral.mat
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=AllFigCompare; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -108,6 +118,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -164,6 +175,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Comparison; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -225,6 +237,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Comparison
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -279,8 +292,10 @@ pipeline:
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
         - results/Comparison/comparison_power_matrix.pdf
-        - results/Comparison/optimal_design_vars.tex
-        - results/Comparison/optimal_outputs.tex
+        - path: results/Comparison/optimal_design_vars.tex
+          storage: git
+        - path: results/Comparison/optimal_outputs.tex
+          storage: git
         - results/Comparison/end.mat
         - path: results/Comparison/end.json
           storage: git
@@ -290,6 +305,7 @@ pipeline:
       command: add_mdocean_path(); obj=Constraints; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -343,6 +359,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Constraints
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -390,7 +407,8 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Constraints/intermed.mat
       outputs: 
-        - results/Constraints/constraints.tex
+        - path: results/Constraints/constraints.tex
+          storage: git
         - results/Constraints/end.mat
         - path: results/Constraints/end.json
           storage: git
@@ -399,6 +417,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -451,6 +470,7 @@ pipeline:
       command: add_mdocean_path(); obj=Cost; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Cost
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -498,7 +518,8 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Cost/intermed.mat
       outputs: 
-        - results/Cost/cost_parameters.tex
+        - path: results/Cost/cost_parameters.tex
+          storage: git
         - results/Cost/end.mat
         - path: results/Cost/end.json
           storage: git
@@ -508,6 +529,7 @@ pipeline:
       command: add_mdocean_path(); obj=DampingPlateStructures; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -566,6 +588,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DampingPlateStructures
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -624,6 +647,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=DescFcns; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -681,6 +705,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DescFcns
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -740,6 +765,7 @@ pipeline:
       command: add_mdocean_path(); obj=DesignSpaceExploration; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
         #- ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -813,6 +839,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DesignSpaceExploration
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -869,7 +896,8 @@ pipeline:
       outputs: 
        #- results/DesignSpaceExploration/experiments_pareto.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
-        - results/DesignSpaceExploration/experiments_results.tex
+        - path: results/DesignSpaceExploration/experiments_results.tex
+          storage: git
         - results/DesignSpaceExploration/end.mat
         - path: results/DesignSpaceExploration/end.json
           storage: git
@@ -878,6 +906,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=DesignVars; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -931,6 +960,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DesignVars
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -978,7 +1008,8 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DesignVars/intermed.mat
       outputs: 
-        - results/DesignVars/design_vars.tex
+        - path: results/DesignVars/design_vars.tex
+          storage: git
         - results/DesignVars/end.mat
         - path: results/DesignVars/end.json
           storage: git
@@ -988,6 +1019,7 @@ pipeline:
       command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1044,6 +1076,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ForceSaturationFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1102,6 +1135,7 @@ pipeline:
       command: add_mdocean_path(); obj=GradientOptimFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1162,6 +1196,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1226,7 +1261,8 @@ pipeline:
         - results/GradientOptimFigFunc/lagrange_multipliers.pdf
         - results/GradientOptimFigFunc/delta_x.pdf
         - results/GradientOptimFigFunc/single_obj_convergence.pdf
-        - results/GradientOptimFigFunc/single_obj_optim_results.tex
+        - path: results/GradientOptimFigFunc/single_obj_optim_results.tex
+          storage: git
         - results/GradientOptimFigFunc/end.mat
         - path: results/GradientOptimFigFunc/end.json
           storage: git
@@ -1236,6 +1272,7 @@ pipeline:
       command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1291,6 +1328,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-HydroCoeffFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1348,6 +1386,7 @@ pipeline:
       command: add_mdocean_path(); obj=LocationSensitivity; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1412,6 +1451,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1465,7 +1505,8 @@ pipeline:
         - results/LocationSensitivity/location_3_power_matrix.pdf
         - results/LocationSensitivity/location_4_power_matrix.pdf
         - results/LocationSensitivity/location_probability_PDF.pdf
-        - results/LocationSensitivity/location_sensitivity.tex
+        - path: results/LocationSensitivity/location_sensitivity.tex
+          storage: git
         - results/LocationSensitivity/end.mat
         - path: results/LocationSensitivity/end.json
           storage: git
@@ -1474,6 +1515,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1535,6 +1577,7 @@ pipeline:
       command: add_mdocean_path(); obj=Meem; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Meem
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1596,6 +1639,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Multistart; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/analysis/@Multistart/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1658,6 +1702,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Multistart
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/SAFE/PAWN/pawn_cdfs.m
         - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
         - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -1715,7 +1760,8 @@ pipeline:
         - results/Multistart/multistart_convergence_tree.pdf
         - results/Multistart/multistart_parallel_coordinates.pdf
         - results/Multistart/multistart_bar_chart.pdf
-        - results/Multistart/multistart_results.tex
+        - path: results/Multistart/multistart_results.tex
+          storage: git
         - results/Multistart/end.mat
         - path: results/Multistart/end.json
           storage: git
@@ -1725,6 +1771,7 @@ pipeline:
       command: add_mdocean_path(); obj=ParamSensitivities; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1787,6 +1834,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1869,6 +1917,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Parameters; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1922,6 +1971,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Parameters
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1969,7 +2019,8 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Parameters/intermed.mat
       outputs: 
-        - results/Parameters/parameters.tex
+        - path: results/Parameters/parameters.tex
+          storage: git
         - results/Parameters/end.mat
         - path: results/Parameters/end.json
           storage: git
@@ -1979,6 +2030,7 @@ pipeline:
       command: add_mdocean_path(); obj=ParetoFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2043,6 +2095,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParetoFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2110,6 +2163,7 @@ pipeline:
       command: add_mdocean_path(); obj=ParetoSweep; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2163,6 +2217,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParetoSweep
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2220,6 +2275,7 @@ pipeline:
       command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2273,6 +2329,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - ./mdocean/inputs/drag_integral.mat
         - mdocean/plots/non_matlab_figs/img/
         - mdocean/plots/non_matlab_figs/pdf/
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
@@ -2346,6 +2403,7 @@ pipeline:
       command: add_mdocean_path(); obj=RunSingleFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2417,6 +2475,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-RunSingleFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2478,6 +2537,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Runtime; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2593,6 +2653,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Slamming; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2703,6 +2764,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=SparHydro; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2813,6 +2875,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Validation; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2921,7 +2984,8 @@ pipeline:
         - results/Validation/intermed.mat
       outputs: 
         - results/Validation/cost_vs_N_WEC.pdf
-        - results/Validation/validation.tex
+        - path: results/Validation/validation.tex
+          storage: git
         - results/Validation/end.mat
         - results/Validation/end.json
     analysis-Wecsim:
@@ -2929,6 +2993,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Wecsim; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -3049,106 +3114,155 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Wecsim/intermed.mat
       outputs: 
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_rms.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_rms.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
         - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/WECSim_errors.tex
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_rms.pdf
+        - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
+        - path: results/Wecsim/WECSim_errors.tex
+          storage: git
         - results/Wecsim/end.mat
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
@@ -3162,7 +3276,8 @@ pipeline:
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
         - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
         - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
-        - results/Wecsim/end.json
+        - path: results/Wecsim/end.json
+          storage: git
     # run-matlab-tests:
     #   kind: matlab-script
     #   environment: _system

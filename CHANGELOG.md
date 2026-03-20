@@ -1,6 +1,15 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-19
+### Added
+- Model: drag computed via strip theory integral
+### Changed
+- Validation: WecSim uses Morison drag rather than quadratic drag
+- dvc.lock merge driver no longer requires unchanged dvc.yaml
+### Fixed
+- Model: sign error in phase of d'alembert force
+
 ## [v1.1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.2) - 2026-3-16
 ### Added
 - Paper: mermaid diagram for modeling choice taxonomy

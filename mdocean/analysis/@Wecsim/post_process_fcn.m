@@ -23,10 +23,10 @@ function [fig_array,...
      [err_structs, fig_cell, validation_table] = validate_dynamics_plots(case_cell,filename_cell,...
                                                             runOnlyFewSeaStates);
 
-    % if histogram_separate_figures=true, 108 figures: fig_cell is 3 nested 
-    %    4x1 cells, each cell has 9 figs
-    % if histogram_separate_figures=false, 99 figures: fig_cell is 3 nested
-    %    5x1 cells, cells 1-4 have 8 figures and cell 5 has 1 figure
+    % if histogram_separate_figures=true, 156 figures: fig_cell is 3 nested 
+    %    4x1 cells, each cell has 13 figs
+    % if histogram_separate_figures=false, 147 figures: fig_cell is 3 nested
+    %    5x1 cells, cells 1-4 have 12 figures and cell 5 has 1 figure
     tmp = [fig_cell{:}]; 
     fig_array = [tmp{:}]; 
 
@@ -97,6 +97,11 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             else
                 widths = [.05 .25 .25 5];
             end
+            if p.C_d_float == 0 && p.C_d_spar == 0 && ~p.use_MEEM
+                xlim_thresh = 1;
+            else
+                xlim_thresh = 100;
+            end
             width = widths(p_idx);
 
             if histogram_sep_figures
@@ -109,7 +114,7 @@ function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFe
             [weighted_pwr_err,...
             max_amp_err,...
             pwr_err,amp_err,fig_vec] = plot_per_case(X,p,filename,RM3reportOn,...
-                                                    runOnlyFewSeaStates,ax,width);
+                                                    runOnlyFewSeaStates,ax,width,xlim_thresh);
 
             subtitle(ax,my_subtitles{p_idx},'FontSize',13)
 
@@ -148,7 +153,7 @@ end
 function [weighted_pwr_err,...
           max_amp_err,...
           pwr_err,amp_err,figs] = plot_per_case(X,p,wecsim_filename,RM3reportOn,...
-                                                runOnlyFewSeaStates,ax,width)
+                                                runOnlyFewSeaStates,ax,width,xlim_thresh)
 
     [weighted_pwr_err, max_amp_err, ...
      pwr_err,          amp_err,    figs] = power_matrix_compare(X,p,wecsim_filename, ...
@@ -158,7 +163,7 @@ function [weighted_pwr_err,...
 
     make_histogram_on_axis(ax,width,...
                             pwr_err,amp_err,...
-                            weighted_pwr_err,max_amp_err)
+                            weighted_pwr_err,max_amp_err,xlim_thresh)
 
 end
 
@@ -202,7 +207,7 @@ end
 
 function make_histogram_on_axis(ax,width,...
                                 pwr_err,amp_err,...
-                                weighted_pwr_err,max_amp_err)
+                                weighted_pwr_err,max_amp_err,xlim_thresh)
     % ensure scalar values for plotting vertical lines/text
     if isempty(weighted_pwr_err)
         wp = NaN;
@@ -235,10 +240,10 @@ function make_histogram_on_axis(ax,width,...
 
     ylim([-.55 .55])
     xx = xlim;
-    if any(abs(xx) > 100)
-        warning('Outliers >100% error are not shown on the histogram.')
+    if any(abs(xx) > xlim_thresh)
+        warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
     end
-    xlim([-1 1]*min(max(abs(xx)),100)) % zero centered on x, don't allow outliers >100%
+    xlim([-1 1]*min(max(abs(xx)),xlim_thresh)) % zero centered on x, don't allow outliers > xlim_thresh%
     yy = ylim;
 
     plot(ax,[1 1]*wp,[0 yy(2)],'Color',[0 0.4470 0.7410], ...

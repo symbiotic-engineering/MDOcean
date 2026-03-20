@@ -28,7 +28,9 @@ function fig_names = fig_names_wrapper()
 
     % fixme this is defined separately in power_matrix_compare
     contour_names = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
-        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
+        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping',...
+        'force_pto','float_drag_force_rms','spar_drag_force_rms',...
+        'float_drag_force_phase','spar_drag_force_phase'};
 
     if histogram_sep_figures
         plot_names = ['histogram',contour_names];
@@ -40,14 +42,14 @@ function fig_names = fig_names_wrapper()
         group_names = cell(size(case_desc_cell)); % 1 x 3
         num_groups = length(case_desc_cell); % 3
         num_cases_per_group = length(case_desc_cell{1}); % 4
-        num_contours_per_case = length(contour_names); % 8
-        plot_names = cell(num_contours_per_case * num_cases_per_group + 1,  num_groups); % 33 x 3
+        num_contours_per_case = length(contour_names); % 12
+        plot_names = cell(num_contours_per_case * num_cases_per_group + 1,  num_groups); % 49 x 3
 
         for i = 1:num_groups % create separate plot names for each group
             case_names_i = extractAfter(case_desc_cell{i},'wecsim_');
             group_names{i} = extractBefore(case_names_i{1},'_drag');
             [case_names_mesh_i, contour_names_mesh_i] = meshgrid(case_names_i, contour_names);
-            contour_plot_names_i = strcat(case_names_mesh_i(:), '__', contour_names_mesh_i(:)); % 32 per group
+            contour_plot_names_i = strcat(case_names_mesh_i(:), '__', contour_names_mesh_i(:)); % 48 per group
             plot_names(1:end-1,i) = contour_plot_names_i;
         end
         histogram_names = strcat(group_names,'__histogram');
