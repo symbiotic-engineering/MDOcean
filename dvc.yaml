@@ -34,10 +34,22 @@ stages:
           persist: false
     desc: Automatically generated from the 'reformat-mermaid-svg' 
       stage in calkit.yaml. Changes made here will be overwritten.
+  make-drag-integral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); drag_fcn 
+      = make_drag_integral_LUT(1e-6, .5, 50+1e-6, pi/24, .1, 8); 
+      save('./mdocean/inputs/drag_integral.mat','drag_fcn');"
+    deps:
+      - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
+      - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+    outs:
+      - ./mdocean/inputs/drag_integral.mat
+    desc: Automatically generated from the 'make-drag-integral' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
       - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -90,6 +102,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
       - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -148,6 +161,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Comparison; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Comparison/Comparison.m
       - ./mdocean/analysis/@Comparison/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -208,6 +222,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Comparison; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Comparison/Comparison.m
       - ./mdocean/analysis/@Comparison/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -274,6 +289,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Constraints; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Constraints/Constraints.m
       - ./mdocean/analysis/@Constraints/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -326,6 +342,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Constraints; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Constraints/Constraints.m
       - ./mdocean/analysis/@Constraints/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -384,6 +401,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Cost/Cost.m
       - ./mdocean/analysis/@Cost/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -436,6 +454,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Cost/Cost.m
       - ./mdocean/analysis/@Cost/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -494,6 +513,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DampingPlateStructures; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -552,6 +572,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DampingPlateStructures; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -616,6 +637,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DescFcns; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DescFcns/DescFcns.m
       - ./mdocean/analysis/@DescFcns/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -672,6 +694,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DescFcns; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DescFcns/DescFcns.m
       - ./mdocean/analysis/@DescFcns/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -735,6 +758,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignSpaceExploration; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -804,6 +828,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignSpaceExploration; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -871,6 +896,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignVars; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignVars/DesignVars.m
       - ./mdocean/analysis/@DesignVars/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -923,6 +949,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignVars; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignVars/DesignVars.m
       - ./mdocean/analysis/@DesignVars/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -981,6 +1008,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1037,6 +1065,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1099,6 +1128,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=GradientOptimFigFunc; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1159,6 +1189,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=GradientOptimFigFunc; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1236,6 +1267,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=HydroCoeffFigFunc; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1291,6 +1323,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=HydroCoeffFigFunc; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1350,6 +1383,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=LocationSensitivity; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
       - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1414,6 +1448,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=LocationSensitivity; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
       - ./mdocean/analysis/@LocationSensitivity/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1479,6 +1514,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Meem/Meem.m
       - ./mdocean/analysis/@Meem/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1540,6 +1576,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Meem/Meem.m
       - ./mdocean/analysis/@Meem/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1608,6 +1645,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Multistart; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Multistart/Multistart.m
       - ./mdocean/analysis/@Multistart/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1669,6 +1707,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Multistart; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/SAFE/PAWN/pawn_cdfs.m
       - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
       - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -1737,6 +1776,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParamSensitivities; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1799,6 +1839,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParamSensitivities; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1884,6 +1925,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Parameters; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Parameters/Parameters.m
       - ./mdocean/analysis/@Parameters/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1936,6 +1978,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Parameters; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Parameters/Parameters.m
       - ./mdocean/analysis/@Parameters/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -1994,6 +2037,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoFigFunc; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
       - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2057,6 +2101,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoFigFunc; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
       - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2125,6 +2170,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoSweep; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
       - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2177,6 +2223,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoSweep; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
       - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2235,6 +2282,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2288,6 +2336,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - mdocean/plots/non_matlab_figs/img/
       - mdocean/plots/non_matlab_figs/pdf/
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
@@ -2362,6 +2411,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=RunSingleFigFunc; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2432,6 +2482,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=RunSingleFigFunc; obj.run_all_from_load();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2501,6 +2552,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Runtime; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Runtime/Runtime.m
       - ./mdocean/analysis/@Runtime/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2617,6 +2669,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Slamming; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Slamming/Slamming.m
       - ./mdocean/analysis/@Slamming/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2728,6 +2781,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=SparHydro; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@SparHydro/SparHydro.m
       - ./mdocean/analysis/@SparHydro/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2839,6 +2893,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Validation; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Validation/Validation.m
       - ./mdocean/analysis/@Validation/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -2956,6 +3011,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Wecsim; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Wecsim/Wecsim.m
       - ./mdocean/analysis/@Wecsim/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
