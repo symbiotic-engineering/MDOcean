@@ -11,16 +11,60 @@ environments:
     kind: conda
     path: pubs/environment.yaml
     python: '3.14'
+  mermaid:
+    kind: docker
+    image: minlag/mermaid-cli:latest
+    description: Mermaid CLI via Docker.
+    wdir: /data
+    command_mode: entrypoint
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
   stages:
+    mermaid-taxonomy-pdf:
+      kind: command
+      environment: mermaid
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd
+        -o mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f 
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
+    mermaid-taxonomy-svg:
+      kind: command
+      environment: mermaid
+      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd 
+        -o mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      inputs:
+        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+          storage:
+    reformat-mermaid-svg:
+      kind: shell-command
+      environment: _system
+      command: xmllint --format mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o mdocean/plots/non_matlab_figs/img/taxonomy.svg
+      inputs: 
+        - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
+          storage: git
+    make-drag-integral:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); drag_fcn = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 8); save('./mdocean/inputs/drag_integral.mat','drag_fcn');
+      inputs:
+        - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
+        - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+      outputs:
+        - ./mdocean/inputs/drag_integral.mat
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=AllFigCompare; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -74,6 +118,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -123,12 +168,14 @@ pipeline:
       outputs: 
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/end.mat
-        - results/AllFigCompare/end.json
+        - path: results/AllFigCompare/end.json
+          storage: git
     analysis-Comparison:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Comparison; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -190,6 +237,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Comparison
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -244,16 +292,20 @@ pipeline:
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
         - results/Comparison/comparison_power_matrix.pdf
-        - results/Comparison/optimal_design_vars.tex
-        - results/Comparison/optimal_outputs.tex
+        - path: results/Comparison/optimal_design_vars.tex
+          storage: git
+        - path: results/Comparison/optimal_outputs.tex
+          storage: git
         - results/Comparison/end.mat
-        - results/Comparison/end.json
+        - path: results/Comparison/end.json
+          storage: git
     analysis-Constraints:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Constraints; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -307,6 +359,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Constraints
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -354,14 +407,17 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Constraints/intermed.mat
       outputs: 
-        - results/Constraints/constraints.tex
+        - path: results/Constraints/constraints.tex
+          storage: git
         - results/Constraints/end.mat
-        - results/Constraints/end.json
+        - path: results/Constraints/end.json
+          storage: git
     analysis-Cost:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Cost; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -414,6 +470,7 @@ pipeline:
       command: add_mdocean_path(); obj=Cost; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Cost
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -461,15 +518,18 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Cost/intermed.mat
       outputs: 
-        - results/Cost/cost_parameters.tex
+        - path: results/Cost/cost_parameters.tex
+          storage: git
         - results/Cost/end.mat
-        - results/Cost/end.json
+        - path: results/Cost/end.json
+          storage: git
     analysis-DampingPlateStructures:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DampingPlateStructures; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -528,6 +588,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DampingPlateStructures
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -579,12 +640,14 @@ pipeline:
         - results/DampingPlateStructures/damping_plate_deflection.pdf
         - results/DampingPlateStructures/damping_plate_moment.pdf
         - results/DampingPlateStructures/end.mat
-        - results/DampingPlateStructures/end.json
+        - path: results/DampingPlateStructures/end.json
+          storage: git
     analysis-DescFcns:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DescFcns; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -642,6 +705,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DescFcns
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -693,13 +757,15 @@ pipeline:
         - results/DescFcns/saturation_desc_fcn_alpha.pdf
         - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/end.mat
-        - results/DescFcns/end.json
+        - path: results/DescFcns/end.json
+          storage: git
     analysis-DesignSpaceExploration:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DesignSpaceExploration; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
         #- ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -773,6 +839,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DesignSpaceExploration
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -829,14 +896,17 @@ pipeline:
       outputs: 
        #- results/DesignSpaceExploration/experiments_pareto.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
-        - results/DesignSpaceExploration/experiments_results.tex
+        - path: results/DesignSpaceExploration/experiments_results.tex
+          storage: git
         - results/DesignSpaceExploration/end.mat
-        - results/DesignSpaceExploration/end.json
+        - path: results/DesignSpaceExploration/end.json
+          storage: git
     analysis-DesignVars:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=DesignVars; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -890,6 +960,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-DesignVars
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -937,15 +1008,18 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DesignVars/intermed.mat
       outputs: 
-        - results/DesignVars/design_vars.tex
+        - path: results/DesignVars/design_vars.tex
+          storage: git
         - results/DesignVars/end.mat
-        - results/DesignVars/end.json
+        - path: results/DesignVars/end.json
+          storage: git
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=ForceSaturationFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1002,6 +1076,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ForceSaturationFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1052,13 +1127,15 @@ pipeline:
         - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/end.mat
-        - results/ForceSaturationFigFunc/end.json
+        - path: results/ForceSaturationFigFunc/end.json
+          storage: git
     analysis-GradientOptimFigFunc:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=GradientOptimFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1119,6 +1196,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1183,15 +1261,18 @@ pipeline:
         - results/GradientOptimFigFunc/lagrange_multipliers.pdf
         - results/GradientOptimFigFunc/delta_x.pdf
         - results/GradientOptimFigFunc/single_obj_convergence.pdf
-        - results/GradientOptimFigFunc/single_obj_optim_results.tex
+        - path: results/GradientOptimFigFunc/single_obj_optim_results.tex
+          storage: git
         - results/GradientOptimFigFunc/end.mat
-        - results/GradientOptimFigFunc/end.json
+        - path: results/GradientOptimFigFunc/end.json
+          storage: git
     analysis-HydroCoeffFigFunc:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=HydroCoeffFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1247,6 +1328,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-HydroCoeffFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1296,13 +1378,15 @@ pipeline:
       outputs: 
         - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/end.mat
-        - results/HydroCoeffFigFunc/end.json
+        - path: results/HydroCoeffFigFunc/end.json
+          storage: git
     analysis-LocationSensitivity:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=LocationSensitivity; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1367,6 +1451,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1420,14 +1505,17 @@ pipeline:
         - results/LocationSensitivity/location_3_power_matrix.pdf
         - results/LocationSensitivity/location_4_power_matrix.pdf
         - results/LocationSensitivity/location_probability_PDF.pdf
-        - results/LocationSensitivity/location_sensitivity.tex
+        - path: results/LocationSensitivity/location_sensitivity.tex
+          storage: git
         - results/LocationSensitivity/end.mat
-        - results/LocationSensitivity/end.json
+        - path: results/LocationSensitivity/end.json
+          storage: git
     analysis-Meem:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Meem; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1474,6 +1562,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/validate_MEEM.m
+        - ./mdocean/simulation/run/convergence_study.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/Meem/intermed.mat
@@ -1488,6 +1577,7 @@ pipeline:
       command: add_mdocean_path(); obj=Meem; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Meem
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1535,19 +1625,21 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Meem/intermed.mat
       outputs: 
-        - results/Meem/meem_regions.pdf
         - results/Meem/meem_sparsity.pdf
         - results/Meem/meem_validation.pdf
         - results/Meem/meem_matching.pdf
-        - results/Meem/meem_convergence.pdf
+        - results/Meem/meem_convergence_vs_omega.pdf
+        - results/Meem/meem_convergence_vs_NMK.pdf
         - results/Meem/asymptotic_b_vector.pdf
         - results/Meem/end.mat
-        - results/Meem/end.json
+        - path: results/Meem/end.json
+          storage: git
     analysis-Multistart:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Multistart; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/analysis/@Multistart/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1610,6 +1702,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Multistart
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/SAFE/PAWN/pawn_cdfs.m
         - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
         - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -1667,15 +1760,18 @@ pipeline:
         - results/Multistart/multistart_convergence_tree.pdf
         - results/Multistart/multistart_parallel_coordinates.pdf
         - results/Multistart/multistart_bar_chart.pdf
-        - results/Multistart/multistart_results.tex
+        - path: results/Multistart/multistart_results.tex
+          storage: git
         - results/Multistart/end.mat
-        - results/Multistart/end.json
+        - path: results/Multistart/end.json
+          storage: git
     analysis-ParamSensitivities:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=ParamSensitivities; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1738,6 +1834,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1813,12 +1910,14 @@ pipeline:
         - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
         - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
         - results/ParamSensitivities/end.mat
-        - results/ParamSensitivities/end.json
+        - path: results/ParamSensitivities/end.json
+          storage: git
     analysis-Parameters:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Parameters; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1872,6 +1971,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Parameters
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1919,15 +2019,18 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Parameters/intermed.mat
       outputs: 
-        - results/Parameters/parameters.tex
+        - path: results/Parameters/parameters.tex
+          storage: git
         - results/Parameters/end.mat
-        - results/Parameters/end.json
+        - path: results/Parameters/end.json
+          storage: git
     analysis-ParetoFigFunc:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=ParetoFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -1992,6 +2095,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParetoFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2051,13 +2155,15 @@ pipeline:
         - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
         - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
         - results/ParetoFigFunc/end.mat
-        - results/ParetoFigFunc/end.json
+        - path: results/ParetoFigFunc/end.json
+          storage: git
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=ParetoSweep; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2111,6 +2217,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ParetoSweep
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2160,13 +2267,15 @@ pipeline:
       outputs: 
         - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/end.mat
-        - results/ParetoSweep/end.json
+        - path: results/ParetoSweep/end.json
+          storage: git
     analysis-ReadNonMatlabFigs:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=ReadNonMatlabFigs; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2220,7 +2329,9 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
-        - mdocean/plots/non_matlab_figs/
+        - ./mdocean/inputs/drag_integral.mat
+        - mdocean/plots/non_matlab_figs/img/
+        - mdocean/plots/non_matlab_figs/pdf/
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2284,13 +2395,15 @@ pipeline:
         - results/ReadNonMatlabFigs/sim_runtime.pdf
         - results/ReadNonMatlabFigs/trapezoid.pdf
         - results/ReadNonMatlabFigs/end.mat
-        - results/ReadNonMatlabFigs/end.json
+        - path: results/ReadNonMatlabFigs/end.json
+          storage: git
     analysis-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=RunSingleFigFunc; 
         obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2362,6 +2475,7 @@ pipeline:
         obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-RunSingleFigFunc
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2416,12 +2530,14 @@ pipeline:
         - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
         - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
         - results/RunSingleFigFunc/end.mat
-        - results/RunSingleFigFunc/end.json
+        - path: results/RunSingleFigFunc/end.json
+          storage: git
     analysis-Runtime:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Runtime; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2530,12 +2646,14 @@ pipeline:
         - results/Runtime/hydro_runtime_breakdown.pdf
         - results/Runtime/sim_runtime.pdf
         - results/Runtime/end.mat
-        - results/Runtime/end.json
+        - path: results/Runtime/end.json
+          storage: git
     analysis-Slamming:
       kind: matlab-command
       environment: _system
       command: add_mdocean_path(); obj=Slamming; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2646,6 +2764,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=SparHydro; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2756,6 +2875,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Validation; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2864,7 +2984,8 @@ pipeline:
         - results/Validation/intermed.mat
       outputs: 
         - results/Validation/cost_vs_N_WEC.pdf
-        - results/Validation/validation.tex
+        - path: results/Validation/validation.tex
+          storage: git
         - results/Validation/end.mat
         - results/Validation/end.json
     analysis-Wecsim:
@@ -2872,6 +2993,7 @@ pipeline:
       environment: _system
       command: add_mdocean_path(); obj=Wecsim; obj.run_analysis();
       inputs:
+        - ./mdocean/inputs/drag_integral.mat
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -3139,7 +3261,8 @@ pipeline:
         - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
         - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_rms.pdf
         - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
-        - results/Wecsim/WECSim_errors.tex
+        - path: results/Wecsim/WECSim_errors.tex
+          storage: git
         - results/Wecsim/end.mat
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
@@ -3153,7 +3276,8 @@ pipeline:
         - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
         - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
         - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
-        - results/Wecsim/end.json
+        - path: results/Wecsim/end.json
+          storage: git
     # run-matlab-tests:
     #   kind: matlab-script
     #   environment: _system
@@ -3167,9 +3291,13 @@ pipeline:
       environment: pubs
       script_path: mdocean/plots/non_matlab_figs/xdsm.py
       outputs:
-        - mdocean/plots/non_matlab_figs/xdsm.tikz
-        - mdocean/plots/non_matlab_figs/xdsm.tex
-        - mdocean/plots/non_matlab_figs/xdsm.pdf
+        - path: mdocean/plots/non_matlab_figs/xdsm.tikz
+          storage: git
+        - path: mdocean/plots/non_matlab_figs/xdsm.tex
+          storage: git
+        - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
+        - path: mdocean/plots/non_matlab_figs/xdsm.pdf
+          storage: null
     move-re-results:
       kind: matlab-command
       environment: _system
@@ -3220,27 +3348,16 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
       command: add_mdocean_path(); move_results_to_pubs('AOR');
-    results-to-latex:
+    aor-results-to-latex:
       kind: json-to-latex
       inputs: 
-        # - results/AllFigCompare/end.json
-        - results/Comparison/end.json
-        # - results/Constraints/end.json
         # - results/Cost/end.json
         # - results/DampingPlateStructures/end.json
         # - results/DescFcns/end.json
         # - results/DesignSpaceExploration/end.json
-        # - results/DesignVars/end.json
         # - results/ForceSaturationFigFunc/end.json
-        - results/GradientOptimFigFunc/end.json
         # - results/HydroCoeffFigFunc/end.json
-        # - results/LocationSensitivity/end.json
         # - results/Meem/end.json
-        # - results/Multistart/end.json
-        # - results/ParamSensitivities/end.json
-        # - results/Parameters/end.json
-        # - results/ParetoFigFunc/end.json
-        # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
@@ -3249,11 +3366,44 @@ pipeline:
         # - results/Validation/end.json
         # - results/Wecsim/end.json
       outputs: 
-        - pubs/renewable-energy-mdo/numeric-results.tex
-        - pubs/applied-ocean-research-model/numeric-results.tex
+        - path: pubs/applied-ocean-research-model/numeric-results.tex
+          storage: git
       command_name: results
       format:
-        # LCOEs
+        # LCOE
+        nominalLCOE: "{nominalLCOE:.2f} $/kWh"
+        # forces
+        surgeForceFloatNominal: "{surgeForceFloatNominal/1e6:.0f} MN"
+        surgeForceSparNominal: "{surgeForceSparNominal/1e6:.0f} MN"
+        # runtimes
+        simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        # percentages
+        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
+        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
+        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
+    re-results-to-latex:
+      kind: json-to-latex
+      inputs: 
+        # - results/AllFigCompare/end.json
+        - results/Comparison/end.json
+        # - results/Constraints/end.json
+        # - results/DesignSpaceExploration/end.json
+        # - results/DesignVars/end.json
+        - results/GradientOptimFigFunc/end.json
+        # - results/LocationSensitivity/end.json
+        # - results/Multistart/end.json
+        # - results/ParamSensitivities/end.json
+        # - results/Parameters/end.json
+        # - results/ParetoFigFunc/end.json
+        # - results/ParetoSweep/end.json
+        # - results/ReadNonMatlabFigs/end.json
+      outputs: 
+        - path: pubs/renewable-energy-mdo/numeric-results.tex
+          storage: git
+      command_name: results
+      format:
+        # LCOE
         nominalLCOE: "{nominalLCOE:.2f} $/kWh"
         minLCOE: "{minLCOE:.2f} $/kWh"
         # powers
@@ -3281,7 +3431,6 @@ pipeline:
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
-        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         # percent changes
         pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
         pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
@@ -3292,9 +3441,6 @@ pipeline:
         pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%"
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
-        pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
-        pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
-        pctRuntimeOther: "{pctRuntimeOther:.0f}%"
     copy-bib:
       kind: map-paths
       paths:
@@ -3345,6 +3491,16 @@ pipeline:
         - path: pubs/applied-ocean-research-model/aux/
           storage: null
           delete_before_run: false
+    build-UMERC-paper:
+      kind: latex
+      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      environment: tex
+      inputs:
+        - pubs/UMERC-2025-grid-value/figures/
+        - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/logo.jpg
+      outputs:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)

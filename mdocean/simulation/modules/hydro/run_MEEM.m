@@ -89,7 +89,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
         
         if valid_geometry
             [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
-                                                                h_num, m0_num, spatial_res, ...
+                                                                h_num, m0_num, spatial_res, N_num, M_num, ...
                                                                 K_num, show_A, plot_phi, fname);
         else
             mu_nondim(i) = 1e-9;
@@ -114,10 +114,10 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     end
 end
 
-function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
+function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, N_num, M_num, K_num, show_A, plot_phi, fname)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,N_num,M_num,K_num,show_A,fname);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -157,7 +157,7 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,N_num,M_num,K_num,show_A,fname)
 
     m_k_num = zeros(1,K_num);
     % using tand instead of tan because finite precision of pi means
@@ -220,6 +220,19 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
 
         figure
         spy(A_num)
+        hold on
+        widths = [N_num+1, M_num+1, M_num+1, K_num+1];
+        bars = .5 + [widths(1), sum(widths(1:2)), sum(widths(1:3))];
+        full_line = [0,1+sum(widths)];
+     
+        plot(bars(1)*[1,1], full_line, 'k') % first vertical
+        plot(bars(2)*[1,1], full_line, 'k') % second vertical
+        plot(bars(3)*[1,1], full_line, 'k') % third vertical
+        
+        plot(full_line, bars(1)*[1,1], 'k') % first horizontal
+        plot(full_line, bars(2)*[1,1], 'k') % second horizontal
+        plot(full_line, bars(3)*[1,1], 'k') % third horizontal
+        xlabel('')
     end
 
     % solve for x
@@ -629,7 +642,7 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     z_cutoffs_potential = [-d1_num -d1_num -d2_num -d2_num];
     z_cutoffs_velocity = [-d1_num -d2_num -d2_num 0];
 
-    plot_matching(phi_i1_num,phi_i2_num,phi_e_num,a1_num,a2_num,R,Z,'potential',z_cutoffs_potential)
+    plot_matching(phi_i1_num,phi_i2_num,phi_e_num,a1_num,a2_num,R,Z,'Potential',z_cutoffs_potential)
 
     plot_matching(v_1_r_num,v_2_r_num,v_e_r_num,a1_num,a2_num,R,Z,'Radial Velocity',z_cutoffs_velocity)
     plot([-d1_num -d2_num],[0 0],'m','DisplayName','No flux BC at a1')
@@ -685,9 +698,10 @@ function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name,z_cutoffs)
     hold on
     plot(Z(idx_a2_minus),phi2_a2,'b-', ...
          Z(idx_a2_plus), phie_a2,'c--')
-    legend([name '_1 at a_1'],[name '_2 at a_1'],[name '_2 at a_2'],[name '_e at a_2'])
+    legend({[name ' 1 at $a_1$'],[name ' 2 at $a_1$'],[name ' 2 at $a_2$'],[name ' e at $a_2$']},...
+                'interpreter','latex','location','best')
     xlabel('Z')
-    ylabel(['|' name '|'])
+    ylabel(['Magnitude of ' name])
     title([name ' Matching'])
 end
 

@@ -117,6 +117,7 @@ force_pto              = zeros(length(mcr.cases(:,1)), 1);
 
 float_amplitude        = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude         = zeros(length(mcr.cases(:,1)), 1);
+
 relative_amplitude     = zeros(length(mcr.cases(:,1)), 1);
 
 float_amplitude_rms    = zeros(length(mcr.cases(:,1)), 1);
@@ -135,6 +136,7 @@ float_drag_force_fund  = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_fund   = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
+
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -189,12 +191,23 @@ parfor imcr=1:length(mcr.cases(:,1))
             mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
         P(imcr) = NaN;
         force_pto(imcr) = NaN;
+
         float_amplitude(imcr) = NaN;
         spar_amplitude(imcr)  = NaN;
         relative_amplitude(imcr) = NaN;
+
         float_amplitude_rms(imcr) = NaN;
         spar_amplitude_rms(imcr)  = NaN;
         relative_amplitude_rms(imcr) = NaN;
+
+        float_amplitude_fund(imcr) = NaN;
+        spar_amplitude_fund(imcr) = NaN;
+        rel_amplitude_fund(imcr) = NaN;
+
+        float_phase(imcr) = NaN;
+        spar_phase(imcr) = NaN;
+        rel_phase(imcr) = NaN;
+
         float_drag_force_fund(imcr) = NaN;
         spar_drag_force_fund(imcr)  = NaN;
         float_drag_force_phase(imcr) = NaN;
