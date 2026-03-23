@@ -383,8 +383,8 @@ function [mag_U,phase_U,...
                                                     X_max, mag_X_f_unsat, Z_p, w,...
                                                     control_evaluation_fcn);
     P_sat_ratio = real_P ./ P_unsat;
-    F_drag_f = -B_drag_f .* mag_X_f .* exp(1i * phase_X_f) + gamma_drag_f .* H/2;
-    F_drag_s = -B_drag_s .* mag_X_s .* exp(1i * phase_X_s) + gamma_drag_s .* H/2;
+    F_drag_f = -B_drag_f .* mag_X_f .* w .* exp(1i * (phase_X_f + pi/2)) + gamma_drag_f .* H/2;
+    F_drag_s = -B_drag_s .* mag_X_s .* w .* exp(1i * (phase_X_s + pi/2)) + gamma_drag_s .* H/2;
     mag_F_drag_f = abs(F_drag_f);
     mag_F_drag_s = abs(F_drag_s);
     phase_F_drag_f = angle(F_drag_f);
