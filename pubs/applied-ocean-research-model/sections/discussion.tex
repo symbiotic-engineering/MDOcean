@@ -122,18 +122,55 @@ While it would be possible to formulate variants such as $\mathbf{\eta}_{drag,va
 \end{figure}
 
 
-\subsection{Unmodeled Effects and Limitations}
-\paragraph{Neglect of Surge Force}
-Section~\ref{sec:dynamics} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
-The neglect of surge force means that geometries with significant lateral areas that would experience high surge force perform better than they should in an optimization.
-This is not only because of the impact on the structures module, but also because the surge force drives mooring cost, an effect which is not modeled in this study.
-The minimum LCOE design experiences a storm surge force of \results[surgeForceFloatAtMinLCOE] on the float and \results[surgeForceSparAtMinLCOE] on the spar, compared to the nominal design's \results[surgeForceFloatNominal] and \results[surgeForceSparNominal] respectively.
-With mooring and foundation comprising 12\% of the capital cost (see \tableautorefname~\ref{tab:CBS}), this effect may be substantial.
-Incorporating surge force into the structures module and adding a mooring cost module are recommended for future work.
-If these effects are implemented and confirmed to be important, then it may also be desired to obtain a more accurate estimate of the surge force across frequencies by utilizing the surge hydrodynamic coefficients instead of the long-wavelength approximation in \equationautorefname~\ref{eq:surge-force}. 
+\subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
+Broadly, future work must both address limitations of the model and apply it to answer design questions.
+As MDOcean is open source, the authors encourage the wave energy community to contribute to both areas, and are themselves actively pursuing the latter with a multi-objective optimization of the RM3 WEC \cite{mccabe_leveraging_2026}.
+Table~\ref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
+This section describes the relevance and possible implementation paths for each development area.
 
-\paragraph{Regular, Linear Waves}
-As section~\ref{sec:dynamics} describes, MDOcean uses standard linear wave theory with equivalent regular waves, even for the storm condition.
+\newcommand{\modelTrustBuilders}{
+    \begin{enumerate}
+        \item Surge force and mooring cost
+        \item Nonlinear storm wave forces
+        \item Irregular waves
+        \item Structures: thinner plates, better validation
+        \item Additional PTO nonlinearities
+    \end{enumerate}
+}
+
+\newcommand{\modelStudyEnablers}{
+    \begin{enumerate}
+        \item Spectral power, load, amplitude
+        \item Different WEC archetypes
+        \item Lifetime and sea state contours
+        \item MEEM extensions for damping plate and 3+ cylinders
+        \item Generator magnetics and cost
+        \item Other structural materials
+    \end{enumerate}
+}
+
+\begin{table}
+\begin{tabular}{
+        >{\centering\arraybackslash}p{0.5\linewidth}
+        >{\centering\arraybackslash}p{0.5\linewidth}}
+Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
+\modelTrustBuilders                & \modelStudyEnablers \\
+    \end{tabular}
+    \caption{Future model improvements}
+    \label{tab:future-work}
+\end{table}
+
+\paragraph{Neglect of Surge Force and Mooring Cost}
+Section~\ref{sec:design-load-cases} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
+The neglect of surge force means that geometries with significant lateral areas that would experience high surge force appear to perform better than they should.
+This is not only because of the impact on the structures module, but also because the surge force drives mooring cost, an effect which is not modeled in this study.
+The model predicts that the nominal RM3 design experiences a storm surge force of \results[surgeForceFloatNominal] on the float and \results[surgeForceSparNominal] on the spar, compared to the \results[heaveForceNominal] heave force.
+With mooring and foundation comprising 12\% of the capital cost (see \cref{tab:CBS}), this effect may be substantial.
+Incorporating surge force into the structures module and adding a mooring cost module are recommended for future work.
+If these effects are implemented and confirmed to be important, then it may also be desired to obtain a more accurate estimate of the surge force across frequencies by utilizing the surge hydrodynamic coefficients instead of the long-wavelength approximation in \cref{eq:surge-force}. 
+
+\paragraph{Nonlinear Storm Loads}
+As section~\ref{sec:irregular-waves} describes, MDOcean uses standard linear wave theory with equivalent regular waves, even for the storm condition.
 However, storm waves are nonlinear, and it is generally recommended to utilize higher order potential flow, CFD simulations, or wave tank tests to obtain storm loads \cite{coe_survey_2018}.
 Additionally, even when storm wave analysis uses linear or quasi-linear hydrodynamics, other design procedures typically utilize a time-domain ``design wave elevation'' signal to capture transient peaks.
 The regular wave analysis used in MDOcean cannot capture nonsinusoidal peaks.
@@ -143,83 +180,67 @@ Finding a modeling methodology that captures hydrodynamic nonlinearities and tra
 Second-order MEEM can potentially address the former, but nonlinearities require solving the radiation and diffraction problems separately, and corner discontinuities present new analytical challenges \cite{cong_novel_2020,mavrakos_second-order_2009}.
 Another option is a slender-body approximation for second order loads that was recently implemented in the frequency-domain quasi-linear hydrodynamics solver RAFT \cite{carmo_slender-body_2025}.
 Meanwhile, to address the transient dynamics of an irregular design wave elevation, it requires more investigation to determine whether the semi-analytical dynamics model used here can be adequately extended.
-Alternatives include integrating second-order hydrodynamics into pseudo-spectral methods \cite{coe_initial_2020}, or an effort to speed up time-domain models where second-order hydrodynamics have recently been integrated.\footnote{\url{https://github.com/WEC-Sim/WEC-Sim/pull/1242}}
+Alternatives include integrating second-order hydrodynamics into pseudo-spectral methods \cite{coe_initial_2020}, or an effort to speed up time-domain models where second-order hydrodynamics have recently been integrated \cite{issoglio_second-order_2026}.
 
+\paragraph{Irregular Waves}
 Besides storm loads, the regular wave assumption also affects the operational power and load calculations.
 In the future, the interaction of irregular waves with dynamic constraints could be roughly approximated in MDOcean with minimal implementation effort by computing the probability density function for each signal and saturating any amplitude above the constraint threshold.
 To more fully capture nonlinearities in irregular waves, the describing function mentioned earlier (which quantifies the fundamental amplitude of the response to a deterministic sinusoidal input) could be replaced with its probabilistic counterpart, stochastic linearization (which quantifies the expected value of the fundamental over the spectral input).
 This technique has been explored in several WEC papers \cite{da_silva_statistical_2020,da_silva_stochastic_2023,kluger_synergistic_2017,folley_spectral-domain_2016,spanos_efficient_2016}, including one that performs multi-objective design optimization \cite{neshat_enhancing_2024}.
 
-\paragraph{Power Variation and Grid Integration}
-Additionally, while MDOcean accounts for the effect of the power limit on PTO cost, it does not directly model short-term power variation as would be necessary for sizing energy storage or grid connection, both of which would increase the effect of the power limit on cost.
+\paragraph{Probabilistic Variation in Load, Amplitude, and Power}
+Once implemented, an irregular wave formulation would allow for the quantification of the short-term variability in power, load, and response amplitude within a sea state.
+Specifically, the Wiener-Khinchin theorem describes the spectrum of the output of a linear system in terms of the input spectrum and the transfer function.
+This opens the door for investigations in other disciplines, including the development of a spectral fatigue model, insight into broadband impedance matching and dynamic constraints, and analysis of grid integration.
+A broadband matching study could consider the complementary $Z_i(\omega)$ shapes of different PTO types, WEC shapes, and wave spectra.
+Use of probabilistic amplitude constraints rather than the regular (or equivalent wave-by-wave) analysis assumed in MDOcean would allow a designer to encode a desired level of risk tolerance for extreme events, which may be more appropriate than the current approach of using the maximum nonzero joint probability density for the operational amplitude constraints. 
+
+Additionally, while MDOcean accounts for the effect of the power limit on PTO cost and models long-term power variation across sea states, its failure to model short-term power variation within a sea state means that it cannot reliably be used for sizing energy storage or grid connection.
 In particular, the temporal alignment of power production with grid demand can affect the value of the produced electricity, and therefore the economic viability.
 The authors are actively pursuing this extension, with an initial modeling process described in \cite{mccabe_wec_2025} and ongoing refinements in future work.
-% other unmodeled effects to talk about later:
-% MEEM damping plate, especially for spar added mass vs frequency
-% MEEM non-flat bottoms
-% DF for power limit
-% Real PTO model
-% structures model - adding local buckling, doing structural FEA validation, allowing for more prominent stiffeners using effective breadth
+Going further, future studies could investigate whether the addition of local or grid-connected electrical energy storage or the modulation of hydrodynamic design to smooth the dynamic response is more cost-effective at reducing power variability.
 
+\paragraph{Multi-cylinder MEEM with damping plate}
+Recall from section \cref{sec:hydro-meem} that the present study utilizes a two-cylinder MEEM formulation that neglects the slanted float bottom and damping plate.
+The multi-cylinder MEEM has recently been implemented \cite{best_openflash_2026,bimali_numerics_2026}, but has not yet been integrated into MDOcean.
+Doing so would not only improve the accuracy of the hydrodynamic coefficients, allowing calculation of the spar coefficients without relying on the approximations of \cref{sec:hydro-other}, but also expand the reachable design space to include qualitatively different frequency-dependence of the hydrodynamic coefficients.
+Implementing the damping plate in the MEEM model would further expand the reachable design space to include spar designs that deviate from the nominal aspect ratios imposed by the interpolation in \cref{sec:hydro-other}.
+%would let me actually optimize the spar dimensions, which is important since I'm up against that constraint of min damping plate diameter 
 
-\subsection{Future Work}
-Table~\ref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
+\paragraph{Additional PTO nonlinearities}
+The current model includes describing functions for a force saturation nonlinearity and a drag nonlinearity.
+Other relevant nonlinearities that could be added include drivetrain static friction, hydraulic check valve rectification, and power saturation.
+It would also be possible to utilize the higher harmonics of the existing describing functions if the fundamental approximation is found to be insufficient and a fully nonlinear model is desired.
+This would require a major overhaul to the dynamics model to transition from the quasi-linear frequency domain analysis to a spectral or pseudo-spectral analysis, and might best be implemented in an existing tool such as WecOptTool.
 
-\newcommand{\modelTrustBuilders}{
-
-	1) getting force with different nonlinear method: would make storm force more accurate, important since that is probably the least-theortically-defensible assumption of MDOcean
-
-	2) more structures features: could use fatigue lifetime and in econ have lifetime = min(p.lifetime, fatigue lifetime) to be less conservative in structural sizing (currently uses endurance limit, which implies infinite fatigue lifetime)
-
-    3) drag integral
-
-    4) static friction describing function - ability to model static friction in drivetrain, and hydraulic check valves
-
-    5) use extreme statistics to assess amplitude constraints, instead of max nonzero jpd
-}
-
-\newcommand{\modelStudyEnablers}{
-	1) Multibody: would let me actually optimize the spar dimensions, which is important since I'm up against that constraint of min damping plate diameter
-
-	2) Irregular waves: would let you have more realistic fatigue (ie Miner's rule), and assess power variability (ie with energy storage), which would let you see if variability reductions achieved via design are more preferable than variability reductions achieved via more batteries.
-Would also give more complete results for PTO impedance matching bandwidth, ie are some PTO types or WEC shapes better Z($\omega$) shape matches with each other or with the sea state.
-
-	3) model different WEC archetypes: would let you compare different WEC archetypes in a consistent way in the early concept design phase and start to address the design convergence problem.
-Would require not only MEEM for the different WEC types, but also semi-analytical structural models for each one, or the decision to integrate a lightweight FEA with plate/shell element capabilities (ie pynite).
-
-	4) Explicitly model the storm sea state contour 
-
-	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different 
-
-	6) generator physics and model
-
-    7) structures model for other materials
-}
-
-\begin{table}
-\begin{tabular}{
-        >{\centering\arraybackslash}p{0.3\linewidth}
-        >{\centering\arraybackslash}p{0.6\linewidth}}
-Enhance Trust in Existing Studies  & Unlock New Studies  \\ \hline
-\modelTrustBuilders                & \modelStudyEnablers \\
-    \end{tabular}
-    \caption{Future model improvements - \hl{will be cleaned up}}
-    \label{tab:future-work}
-\end{table}
-
-\paragraph{Generator physics model}
-Building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example whether a high-torque (expensive) generator is worth it compared to a low torque generator.
+\paragraph{Generator magnetics and cost model}
+Building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example determining the conditions under which an expensive high-torque generator outperforms a cheap low-torque generator.
 The torque limit would essentially impose a constraint on the $F_{max}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
-A simplified generator model is explored in the RM3 CCD study \cite{anderson_re-imagining_2024}, or a full generator model as in the offshore wind MDO study \cite{barter_beyond_2023}.
+This analysis could leverage a simplified generator model as explored in the RM3 CCD study \cite{anderson_re-imagining_2024}, or a full generator model as in the offshore wind MDO study \cite{barter_beyond_2023}.
 
-\paragraph{Structures model for other materials}
+\paragraph{Structural model extensions}
+The structures module could be improved for geometries with more prominent stiffeners and thinner skins by adding local buckling failure criteria and effective breadth considerations.
+Confidence in the semi-analytical structures model would be enhanced by performing a systematic validation study using FEA, rather than relying on minimally-documened FEA results in the reference model report.
+
 Extending the structures model to other types of materials would allow the comparison of novel WEC materials with traditional steel designs.
 The existing relations between force and stress should still hold, but the relation between stress and factor of safety require modification for materials with different limit states.
 This is of interest because steel accounts for a significant portion of device cost, and the assumption of steel construction may be holding the WEC industry back from economic viability.
 For example, \cite{roberts_bringing_2021} found inflatable polyurethane coated nylon fabric to be more optimal than steel, reinforced concrete, fiberglass, and rubber based on basic density and cost considerations.
 However, unlike ductile metals, composites require anisotropic analysis, concrete requires brittle fracture analysis such as Mohr's circle, and inflatables require tensioned membrane modeling.
 
-\paragraph{Storm contour modeling}
+\paragraph{Lifetime and storm contour modeling}
+MDOcean's conservative use of the endurance limit to model fatigue implies an infinite structural lifetime.
+A less conservative fatigue analysis that quantifies the fatigue lifetime, such as Miner's law, could in turn couple with the economics module and wave statistics to understand the tradeoff between capital cost and lifetime.
 Explicitly modeling the storm sea state contour as a function of location and device lifetime is possible by integrating with WDRT or a similar tool.
 This is of interest in design scenarios where the WEC lifetime is a design variable.
 This may prove useful to explore the tradeoffs of single-use (set-and-forget) WECs for far-offshore sensing applications where maintenance is particularly difficult or costly.
+
+\paragraph{Different WEC archetypes}
+Extending the model beyond 2-body heaving point absorbers to other WEC archetypes such as oscillating water columns, overtopping devices, or surge/pitch devices would allow systematic quantification of the comparative benefits and drawbacks of each WEC archetype in a consistent way.
+This capability is especially valuable in the early concept design phase to inform architectural decisions and could facilitate design convergence for the field as a whole, which is considered an industry bottleneck \cite{caio_tackling_2019}.
+Generalizing MDOcean's dynamics/controls and economics modules to other archetypes would require minor adaptations including alternate degrees of freedom and cost fits, but not structural modification of the core models.
+On the other hand, the hydrodynamics and structures models would require significant modification since separate semi-analytical continuum models would need to be implemented for each new geometry.
+Before initiating such an undertaking, it would be important to confirm that numerical alternatives remain too inefficient for optimization.
+Since development of MDOcean began in 2021, new numerical tools have emerged that could potentially reduce the computational cost of mesh-based geometry-agnostic computations.
+For example, a differentiable BEM solver in Julia \texttt{MarineHydro.jl} was released in 2025 and is in its infancy \cite{khanal_fully_2025}, while a lightweight FEA tool with plate/shell elements \texttt{pynite} was released in 2021 and has seen widespread adoption.
+Whether semi-analytical or numerical, extension to other archetypes would require significant development effort but unlock new comparative insights.

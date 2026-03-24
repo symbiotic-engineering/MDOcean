@@ -48,7 +48,7 @@ Assuming seawater ballast, a common choice due to its zero cost and operational 
 where $V_{surf}$ is the bulk component volume above the surface and $V_{pto}$ is the PTO volume, assumed constant at its nominal value. %The resulting lower bound on $V_{struct}$ can be removed since it is trivially satisfied for structural materials denser than water, which is assumed here.
 
 %TC:break Hydrodynamic Coefficients
-\subsection{Hydrodynamic Coefficients}\label{sec:meem}
+\subsection{Hydrodynamic Coefficients}\label{sec:hydro}
 A regular water wave with height $H$, wavenumber $k$, and frequency $\omega$ that propagates along direction coordinate $+y$ is described by its free-surface elevation $\eta$,
 \begin{equation}
     \eta(y,t)=\frac{H}{2}\cos(-ky+\omega t)
@@ -118,7 +118,7 @@ Traditionally, this is done with a boundary element method (BEM) solver, which m
 In MDOcean, the float coefficients are instead obtained with a faster, semi-analytical method that exploits the cylindrical symmetry of the problem: the Matched Eigenfunction Expansion Method (MEEM).
 Meanwhile, the spar and coupling coefficients are obtained via a combination of algebraic approximation and interpolation of pre-computed BEM results, and with further model development could eventually be computed with MEEM.
 
-\subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}
+\subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}\label{sec:hydro-meem}
 The MEEM radiation solution for two concentric cylinders oscillating in heave was first presented in \cite{mavrakos_hydrodynamic_2004} and later detailed in \cite{chau_inertia_2012}.
 The open-source implementation used in this study is summarized in \appendixname~\ref{sec:MEEM_details} and further described in \cite{mccabe_open-source_2024,bimali_numerics_2026,best_openflash_2026}.
 The present section focuses instead on the high-level capabilities and limitations of the model.
@@ -148,7 +148,7 @@ To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{
 for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
 The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
 
-\subsubsection{Other Coefficients: Approximations}
+\subsubsection{Other Coefficients: Approximations}\label{sec:hydro-other}
 Because the damping plate has a more substantial impact on the spar coefficients than the float coefficients, the former are found not by using MEEM but by scaling existing solutions that include the damping plate.
 \tableautorefname~\ref{tab:hydro-methods} summarizes the methods used to obtain each coefficient.
 
@@ -183,6 +183,7 @@ The trend is shown in \figureautorefname~\ref{fig:spar_added_mass}.
 Meanwhile, the spar damping and excitation ($B_s$ and $\gamma_s$) and the coupling damping and added mass ($B_c$ and $A_c$), are obtained by interpolating an existing WAMIT BEM solution for the nominal geometry.
 Specifically, interpolation is performed over the nondimensional damping plate diameter $k D_d$.
 For $|\gamma_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{s,nom})}$ is applied to account for the decrease of excitation with depth.
+\hl{I suspect this imposes a constraint on $D_d$ needing to be similar to the nominal design, see notebook 3/20/26 referencing analysis from 4/4/25.}
 
 Computing the float coefficients in a different way than the spar and coupling coefficients introduces the possibility of violating physical requirements of the solution.
 In particular, the damping matrix must be positive definite because it represents a dissipative force where outgoing waves remove energy from the system, and the added mass matrix must be positive definite because it represents the kinetic energy of the fluid which must be non-negative.
@@ -343,7 +344,7 @@ With these considerations, the equation of motion can be expressed in the time d
 \end{array}
 \end{equation}
 \setlength\arraycolsep{5pt} % back to default
-for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:meem}.
+for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in section~\ref{sec:hydro}.
 The mass matrix is:
 \begin{equation}
 \mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
@@ -871,7 +872,7 @@ Details of the calculation are provided in \appendixname~\ref{sec:appendix-force
 The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \cref{eq:constrained-qp-solution}.
 
 \subsubsection{Drag}\label{sec:drag}
-The hydrodynamics model of \cref{sec:meem} does not capture all fluid forces on the body due to its linear, irrotational, and inviscid assumptions. 
+The hydrodynamics model of \cref{sec:hydro} does not capture all fluid forces on the body due to its linear, irrotational, and inviscid assumptions. 
 More specifically, viscous shear stresses (skin friction),
 higher-order nonlinear potential flow effects, and
 steady and unsteady viscous separation phenomena are all neglected.
@@ -1077,7 +1078,7 @@ The permissible heights for upward and downward motion of the float relative to 
 \end{equation}
 Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
-Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:meem}.
+Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:hydro}.
 This maximum amplitude $\xi_{linear}$ for the float and spar respectively is:
 \begin{equation}
     \xi_{f,linear} = (h-T_{f,2})/10, \qquad \xi_{s,linear}  = (h-T_s)/10
@@ -1163,14 +1164,14 @@ In the future, extending the structures module to directly calculate the factor 
     \centering
     \begin{tabular}{ccc}
          \textbf{Component}&  \textbf{Structural Subcomponent}&  \textbf{Method of Analysis}\\ \hline
-         Float&  Bottom trapezoidal plate&  Directly calculated\\
-         &  Top trapezoidal plate&  Scaled from bottom plate\\
-         &  Radial (inner and outer) rectangular plates&  Scaled from bottom plate\\
- & Circumferential rectangular plates& Scaled from bottom plate\\
- & PTO connection tubes& Held constant\\ \hline
- Spar& Cylindrical shell& Directly calculated\\ \hline
- Damping plate& Annular plate& Directly calculated\\
- & Spar connection tubes& Held constant\\
+         \multirow{5}{*}{\centering Float}&  Bottom trapezoidal plate&  Directly calculate\\
+         &  Top trapezoidal plate&  Scale bottom plate\\
+         &  Radial rectangular plates&  Scale bottom plate\\
+        & Circumferential rectangular plates& Scale bottom plate\\
+        & PTO connection tubes& Hold constant\\ \hline
+        Spar& Cylindrical shell& Directly calculate\\ \hline
+        \multirow{2}{*}{\centering Damping plate}& Annular plate& Directly calculate\\
+        & Spar connection tubes& Hold constant\\
     \end{tabular}
     \caption{Structural analysis methodology by subcomponent}
     \label{tab:struct}
@@ -1283,8 +1284,12 @@ C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
 The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values}.
 \begin{table}
     \centering
-    \begin{tabular}{>{\raggedright\arraybackslash}p{0.33\linewidth}>{\centering\arraybackslash}p{0.1\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}}
-         CBS Category& Exponent $\beta$&Large-scale unit cost $C_{\infty}$&Single-unit cost $C_1$\\\hline
+    \begin{tabular}{
+        >{\raggedright\arraybackslash}p{0.33\linewidth}
+        >{\raggedright\arraybackslash}p{0.1\linewidth}
+        >{\raggedright\arraybackslash}p{0.25\linewidth}
+        >{\raggedright\arraybackslash}p{0.25\linewidth}}
+         CBS Category& Exponent $\beta$&Unit cost at scale $C_{\infty}$&Single-unit cost \newline $C_1$\\\hline
          \textbf{1.1-1.3, 1.6-1.9} - Design-Independent CAPEX& 0.741& 1.24 \$M&13.92 \$M\\
          \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
          \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N&Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
@@ -1294,7 +1299,7 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
     \label{tab:econ-model-values}
 \end{table}
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
-For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are kept in units of 2012 USD without adjusting for inflation.
+For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
 
 To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors, leaving normalized price constants $p^{'}_{(*)}$.
 The LCOE model then scales as:
