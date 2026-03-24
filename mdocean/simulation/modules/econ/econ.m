@@ -33,3 +33,4 @@ function [capex_design_dep, ...
     capex_design_dep = devicestructure + pto; 
 
 end
+
