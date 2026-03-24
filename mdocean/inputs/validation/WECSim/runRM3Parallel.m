@@ -218,11 +218,8 @@ end
 
 B_p = mcr.cases(:,3);
 K_p = mcr.cases(:,4);
-save(output_filename, 'P','force_pto','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms',...
-    'float_amplitude_fund','spar_amplitude_fund','rel_amplitude_fund',...
-    'float_drag_force_fund','spar_drag_force_fund','float_drag_force_phase','spar_drag_force_phase',...
-    'float_phase','spar_phase','rel_phase','X','p','B_p','K_p','git_hash')
+var_names = wecsim_var_names();
+save(output_filename, var_names{:})
 
 clear imcr totalNumOfWorkers
 

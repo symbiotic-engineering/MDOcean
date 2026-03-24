@@ -270,9 +270,7 @@ function results = load_wecsim_results(wecsim_filename, p)
 
     sz = size(p.JPD);
     % wecSim spar stationary
-    vars = {'P','float_amplitude','spar_amplitude','relative_amplitude',...
-        'force_pto','B_p','float_drag_force_fund','spar_drag_force_fund',...
-        'float_drag_force_phase','spar_drag_force_phase'};
+    vars = wecsim_var_names();
     file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
     old_jpd = trim_jpd(readmatrix(file,'Range','A3'));
     JPD = p.JPD; % old_jpd(2:end,2:end) - uncomment to use old wec sim results locally
