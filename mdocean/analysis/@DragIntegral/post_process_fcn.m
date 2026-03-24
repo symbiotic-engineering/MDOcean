@@ -21,6 +21,10 @@ function [fig_array,...
     G_mag   = intermed_result_struct.G_mag;
     G_phase = intermed_result_struct.G_phase;
 
+    R = intermed_result_struct.R;
+    TH = intermed_result_struct.TH;
+    kappa_vec = intermed_result_struct.kappa_vec;
+
     int_sign = '\int_{-1}^1';
     basic_integrand = '\sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}}';
     

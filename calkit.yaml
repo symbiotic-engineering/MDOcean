@@ -1023,6 +1023,8 @@ pipeline:
         - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+      outputs:
+        - results/DragIntegral/intermed.mat
     postpro-DragIntegral:
       kind: matlab-command
       environment: _system
@@ -1033,6 +1035,17 @@ pipeline:
         - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
         - ./mdocean/plots/util/bluewhitered.m
+        - results/DragIntegral/intermed.mat
+        - from_stage_outputs: analysis-DragIntegral
+      outputs:
+        - results/DragIntegral/drag_integral_B.pdf
+        - results/DragIntegral/drag_integral_G_r.pdf
+        - results/DragIntegral/drag_integral_G_i.pdf
+        - results/DragIntegral/drag_integral_G_m.pdf
+        - results/DragIntegral/drag_integral_G_p.pdf
+        - results/DragIntegral/end.mat
+        - path: results/DragIntegral/end.json
+          storage: git
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system

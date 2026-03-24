@@ -23,4 +23,8 @@ function intermed_result_struct = analysis_fcn(~,~)
     intermed_result_struct.G_imag  = G_imag;
     intermed_result_struct.G_mag   = G_mag;
     intermed_result_struct.G_phase = G_phase;
+
+    intermed_result_struct.R = R;
+    intermed_result_struct.TH = TH;
+    intermed_result_struct.kappa_vec = kappa_vec;
 end
