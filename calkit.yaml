@@ -1013,6 +1013,26 @@ pipeline:
         - results/DesignVars/end.mat
         - path: results/DesignVars/end.json
           storage: git
+    analysis-DragIntegral:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); obj=DragIntegral; 
+        obj.run_analysis();
+      inputs:
+        - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+        - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
+        - ./mdocean/analysis/GenericAnalysis.m
+        - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+    postpro-DragIntegral:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); obj=DragIntegral; 
+        obj.run_all_from_load();
+      inputs:
+        - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+        - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
+        - ./mdocean/analysis/GenericAnalysis.m
+        - ./mdocean/plots/util/bluewhitered.m
     analysis-ForceSaturationFigFunc:
       kind: matlab-command
       environment: _system
