@@ -1016,6 +1016,28 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  analysis-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_analysis();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+    outs: []
+    desc: Automatically generated from the 'analysis-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  postpro-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/plots/util/bluewhitered.m
+    outs: []
+    desc: Automatically generated from the 'postpro-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
@@ -2794,7 +2816,9 @@ stages:
     outs:
       - results/Slamming/slamming_amplitude.pdf
       - results/Slamming/end.mat
-      - results/Slamming/end.json
+      - results/Slamming/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Slamming' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-SparHydro:
@@ -2906,7 +2930,9 @@ stages:
     outs:
       - results/SparHydro/spar_added_mass.pdf
       - results/SparHydro/end.mat
-      - results/SparHydro/end.json
+      - results/SparHydro/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-SparHydro' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
@@ -3026,7 +3052,9 @@ stages:
           cache: false
           persist: false
       - results/Validation/end.mat
-      - results/Validation/end.json
+      - results/Validation/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Validation' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Wecsim:
