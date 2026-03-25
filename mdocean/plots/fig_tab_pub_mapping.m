@@ -86,7 +86,7 @@ figs_in_AOR{22} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 figs_in_AOR{23} = 'ReadNonMatlabFigs.meem_regions';
 figs_in_AOR{24} = 'Meem.meem_sparsity';
 figs_in_AOR{25} = 'Meem.meem_validation';
-%figs_in_AOR{26} = 'Meem.meem_matching';
+figs_in_AOR{26} = 'Tikz.meem_matching';
 figs_in_AOR{27} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{28} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics

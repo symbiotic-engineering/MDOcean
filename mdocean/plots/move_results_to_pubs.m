@@ -50,17 +50,19 @@ function success = copy_result(class_dot_description, extension, dest_folder)
     
     s = split(class_dot_description, '.');
     class_name = s{1};
-    fig_tab_desc = s{2};
-    src = fullfile('results', class_name, [fig_tab_desc, extension]);
-    dest = fullfile(dest_folder, [fig_tab_desc, extension]);
-    if isfile(src)
-        if ~isfolder(dest_folder)
-            mkdir(dest_folder);
+    if ~strcmp(class_name, 'Tikz')
+        fig_tab_desc = s{2};
+        src = fullfile('results', class_name, [fig_tab_desc, extension]);
+        dest = fullfile(dest_folder, [fig_tab_desc, extension]);
+        if isfile(src)
+            if ~isfolder(dest_folder)
+                mkdir(dest_folder);
+            end
+            copyfile(src, dest);
+            success = true;
+        else
+            warning(['File not found: ' src])
+            success = false;
         end
-        copyfile(src, dest);
-        success = true;
-    else
-        warning(['File not found: ' src])
-        success = false;
     end
 end
