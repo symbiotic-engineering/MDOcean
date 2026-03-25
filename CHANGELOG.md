@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-25
+### Changed
+- Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function in `@Wecsim` folder, called only when needed rather than during general path initialization
+
 ## [v1.1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.2) - 2026-3-16
 ### Added
 - Paper: mermaid diagram for modeling choice taxonomy
