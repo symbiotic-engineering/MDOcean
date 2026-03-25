@@ -5,20 +5,49 @@ function [drag_integral_fcn] = make_drag_integral_LUT(rp_min, rp_step, rp_max, t
     theta_vec = -pi/2 : theta_step : pi/2;
     kappa_vec = 0 : kappa_step : kappa_max;
 
-    [R,TH,K] = meshgrid(r_vec,theta_vec,kappa_vec);
+    [R,TH,K] = meshgrid(fliplr(r_vec),theta_vec,kappa_vec);
 
     [B,G_real,G_imag] = compute_drag_integral(R,TH,K);
 
-    drag_integral_LUT_fcn = ...
-        @(r_q,th_q,k_q) deal(interp3(R,TH,K,B,     r_q,wrapToPiOver2(th_q),k_q),...
-                             interp3(R,TH,K,G_real,r_q,wrapToPiOver2(th_q),k_q),...
-                             interp3(R,TH,K,G_imag,r_q,wrapToPiOver2(th_q),k_q));
+    F_B      = myinterpFcn(R,TH,K,B);
+    F_G_real = myinterpFcn(R,TH,K,G_real);
+    F_G_imag = myinterpFcn(R,TH,K,G_imag);
+
+    drag_integral_LUT_fcn = @(r_q,th_q,k_q) permuteInterpFcn(r_q,th_q,k_q,F_B,F_G_real,F_G_imag);
+
+%     p = [2  1 3];
+%     drag_integral_LUT_fcn_2 = ...
+%         @(r_q,th_q,k_q) deal( permute(      F_B( permute(r_q,p), wrapToPiOver2(permute(th_q,p)), permute(k_q,p) ),p),...
+%                               permute( F_G_real( permute(r_q,p), wrapToPiOver2(permute(th_q,p)), permute(k_q,p) ),p),...
+%                               permute( F_G_imag( permute(r_q,p), wrapToPiOver2(permute(th_q,p)), permute(k_q,p) ),p) );
+%     test_in = [1 2; 3 4]/4;
+%     test_in(:,:,2) = [5 6; 7 8]/4;
+%     [a, b, c] = drag_integral_LUT_fcn(  test_in,2*test_in,3*test_in);
+%     [a2,b2,c2]= drag_integral_LUT_fcn_2(test_in,2*test_in,3*test_in);
 
     drag_integral_fcn = @(r,th,k) drag_LUT_or_analytical_or_compute(r,th,k,drag_integral_LUT_fcn);
 end
 
+function [out_1,out_2,out_3] = permuteInterpFcn(r_q,th_q,k_q,F1,F2,F3)
+    p = [2 1 3];
+    r_p = permute(r_q,p);
+    th_p = wrapToPiOver2(permute(th_q,p));
+    k_p = permute(k_q,p);
+
+    out_1_p = F1(r_p,th_p,k_p);
+    out_2_p = F2(r_p,th_p,k_p);
+    out_3_p = F3(r_p,th_p,k_p);
+
+    out_1 = permute(out_1_p,p);
+    out_2 = permute(out_2_p,p);
+    out_3 = permute(out_3_p,p);
+
+end
+
 function [B,G_real,G_imag] = drag_LUT_or_analytical_or_compute(R,TH,K,LUT_fcn)
-    [B,G_real,G_imag] = deal(zeros(size(R)));
+    B      = zeros(size(R));
+    G_real = zeros(size(R));
+    G_imag = zeros(size(R));
     
     R(R > 1e6) = Inf;
     R(R < 1e-6) = 0;
@@ -76,4 +105,13 @@ function out = wrapToPiOver2(angle)
 
     wrapped = wrapToPi(angle);
     out = sign(wrapped) .* min( abs(wrapped), pi - abs(wrapped));
+end
+
+function F = myinterpFcn(X,Y,Z,V)
+    p = [2 1 3];
+    X = permute(X,p);
+    Y = permute(Y,p);
+    Z = permute(Z,p);
+    V = permute(V,p);
+    F = griddedInterpolant(X,Y,Z,V,'linear','none');
 end
