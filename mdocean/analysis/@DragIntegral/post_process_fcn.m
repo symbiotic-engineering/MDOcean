@@ -108,4 +108,6 @@ end
 cb = colorbar;
 cb.Layout.Tile = 'south';
 title(t,mytitle,'Interpreter','latex')
+fig.Position(3:4) = [450 565];
+
 end
