@@ -50,7 +50,9 @@ function success = copy_result(class_dot_description, extension, dest_folder)
     
     s = split(class_dot_description, '.');
     class_name = s{1};
-    if ~strcmp(class_name, 'Tikz')
+    if strcmp(class_name, 'Tikz')
+        success = true;
+    else
         fig_tab_desc = s{2};
         src = fullfile('results', class_name, [fig_tab_desc, extension]);
         dest = fullfile(dest_folder, [fig_tab_desc, extension]);
