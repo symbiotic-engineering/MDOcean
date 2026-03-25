@@ -90,9 +90,9 @@ figs_in_AOR{26} = 'Meem.meem_matching';
 figs_in_AOR{27} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{28} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{29} = 'ReadNonMatlabFigs.drag_damping_integral';
-figs_in_AOR{29+10} = 'ReadNonMatlabFigs.drag_exc_mag_integral';
-figs_in_AOR{29+11} = 'ReadNonMatlabFigs.drag_exc_phase_integral';
+figs_in_AOR{29} = 'DragIntegral.drag_integral_B';
+figs_in_AOR{29+10} = 'DragIntegral.drag_integral_G_m';
+figs_in_AOR{29+11} = 'DragIntegral.drag_integral_G_p';
 figs_in_AOR{30} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{31} = 'Slamming.slamming_amplitude';
 figs_in_AOR{32} = 'RunSingleFigFunc.slamming_model_comparison_float';
