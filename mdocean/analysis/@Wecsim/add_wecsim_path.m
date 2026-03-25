@@ -6,7 +6,7 @@ if isunix
 end
 
 s = split(mfilename('fullpath'), filesep);
-MDOcean_folder = strjoin(s(1:end-1), filesep);
+MDOcean_folder = strjoin(s(1:end-4), filesep); % up from add_wecsim_path -> @Wecsim -> analysis -> mdocean -> MDOcean root
 mdocean_folder = [MDOcean_folder filesep 'mdocean'];
 
 % allow WEC-Sim if it's installed in the parent directory of MDOcean or inside MDOcean

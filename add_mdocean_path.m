@@ -12,6 +12,4 @@ addpath(genpath(mdocean_folder))
 
 rmpath(genpath([mdocean_folder '/simulation/modules/OpenFLASH'])) % prevent using OpenFLASH run_MEEM since it's not integrated yet
 
-add_wecsim_path()
-
 clear path s MDOcean_folder mdocean_folder
