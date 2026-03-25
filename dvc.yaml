@@ -1016,6 +1016,39 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  analysis-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_analysis();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+    outs:
+      - results/DragIntegral/intermed.mat
+    desc: Automatically generated from the 'analysis-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  postpro-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - results/DragIntegral/intermed.mat
+    outs:
+      - results/DragIntegral/drag_integral_B.pdf
+      - results/DragIntegral/drag_integral_G_r.pdf
+      - results/DragIntegral/drag_integral_G_i.pdf
+      - results/DragIntegral/drag_integral_G_m.pdf
+      - results/DragIntegral/drag_integral_G_p.pdf
+      - results/DragIntegral/end.mat
+      - results/DragIntegral/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
