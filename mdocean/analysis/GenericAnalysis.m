@@ -15,6 +15,7 @@ classdef (Abstract) GenericAnalysis
         output_folder
         analysis_outputs
         postpro_outputs
+        extra_inputs = {'./mdocean/inputs/drag_integral.mat'} % non-code data inputs for calkit stages
     end
     properties (Dependent)
         class_dependencies
@@ -154,13 +155,7 @@ classdef (Abstract) GenericAnalysis
                     figs = s.(fn{i});
                         for j=1:length(figs)
                             fig = figs(j);
-                            pos = fig.Position(3:4);
-                            monitor_size = get(groot,'MonitorPositions');
-                            ratio = pos ./ monitor_size(:,3:4);
-                            if any(ratio > 1)
-                                % figure goes offscreen and needs to have its position saved manually to look the same after saving/reopening
-                                fig.UserData.Position = pos;
-                            end
+                            fig = check_fig_size(fig);
                             savefig(fig, [obj.output_folder filesep 'intermed_', fn{i}, '_', num2str(j), '.fig'])
                         end
                     s = rmfield(s, fn{i});
@@ -218,26 +213,51 @@ classdef (Abstract) GenericAnalysis
         end
 
         function stages = write_calkit_stage(obj)
-            cell2filelist = @(c) char(join(strcat("    - ",c),newline));
-
             analysis_stage = ['analysis-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_analysis();' newline ...
                               '  inputs: ' newline ...
-                              cell2filelist(obj.analysis_dependencies.') newline ...
+                              obj.format_inputs_list(obj.analysis_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.analysis_outputs.') ];
+                              obj.format_outputs(obj.analysis_outputs) ];
             postpro_stage = ['postpro-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
                               '  inputs: ' newline ...
-                              cell2filelist(obj.postpro_dependencies.') newline ...
+                              obj.format_inputs_list(obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.postpro_outputs.') ];
+                              obj.format_outputs(obj.postpro_outputs) ];
             stages = [analysis_stage newline postpro_stage];
         end
+
+        function list_str = format_inputs_list(obj, deps)
+            %FORMAT_INPUTS_LIST Format inputs as YAML list: extra_inputs first, then deps.
+            lines = strcat("    - ", [string(obj.extra_inputs), string(deps)]);
+            list_str = char(join(lines, newline));
+        end
+
+        function list_str = format_outputs(obj, outputs)
+            %FORMAT_OUTPUTS Format a cell array of output paths as YAML list entries.
+            %   .tex and .json outputs include 'storage: git'; others are plain paths.
+            lines = cell(1, numel(outputs));
+            for i = 1:numel(outputs)
+                lines{i} = obj.format_output_entry(outputs{i});
+            end
+            list_str = char(join(string(lines), newline));
+        end
+
+        function entry = format_output_entry(~, p)
+            %FORMAT_OUTPUT_ENTRY Return YAML list entry string for a single output path.
+            [~, ~, ext] = fileparts(p);
+            if any(strcmp(ext, {'.tex', '.json'}))
+                entry = ['    - path: ' p newline '      storage: git'];
+            else
+                entry = ['    - ' p];
+            end
+        end
+
         function figs_out = validate_figs(obj, figs_in)
             %VALIDATE_FIGS Return only valid MATLAB figure handles from input
             % Accepts graphics handles, cell arrays of handles, or empty.

@@ -22,5 +22,5 @@ disp(stages)
 stages_combined = strjoin(stages,newline);
 disp(stages_combined)
 
-writelines(stages_combined,'calkit_stages.txt') % then manually copy-paste into calkit.yaml
+writelines(stages_combined,'calkit_stages.yaml') % then run update_calkit.py to merge into calkit.yaml
 
