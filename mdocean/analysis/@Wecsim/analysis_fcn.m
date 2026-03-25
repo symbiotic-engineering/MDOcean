@@ -8,7 +8,7 @@ function intermed_result_struct = analysis_fcn(~,~)
     % Run WEC-Sim dynamics validation
     runOnlyFewSeaStates = false;
 
-    add_wecsim_path()
+    Wecsim.add_wecsim_path()
 
     case_cell = make_all_cases(runOnlyFewSeaStates);
     filename_cell = run_wecsim_all_cases(case_cell);
