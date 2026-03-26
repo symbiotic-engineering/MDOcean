@@ -1,11 +1,12 @@
 # Changelog
 ## Unreleased
 
-## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-25
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-26
 ### Added
 - Model: drag computed via strip theory integral
 - Pipeline: stages to precompute drag lookup table and analysis for drag integral plots
 - Validation: WecSim saves fundamental of drag force and phases via FFT
+- CI: check to avoid accidental submodule downgrades 
 ### Changed
 - Validation: WecSim uses Morison drag rather than quadratic drag
 - Pipeline: dvc.lock merge driver no longer requires unchanged dvc.yaml

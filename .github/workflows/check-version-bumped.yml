@@ -1,4 +1,4 @@
-name: Check version + changelog updated
+name: Check version + changelog updated and submodules not accidentally downgraded
 on:
   pull_request:
   workflow_dispatch:
@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Check for changes
         uses: dorny/paths-filter@v3
         id: changes
@@ -20,3 +22,36 @@ jobs:
       - name: Fail if version/changelog not bumped
         if: steps.changes.outputs.version == 'false' || steps.changes.outputs.changelog == 'false'
         run: exit 1
+      - name: Check for accidental submodule downgrades
+        run: |
+          git fetch origin main
+          set -e
+          # get list of submodule paths from .gitmodules
+          SUBMODULES=$(git config --file .gitmodules --get-regexp path | awk '{print $2}')
+          ERROR=0
+          
+          for SUB in $SUBMODULES; do
+            echo "Checking submodule: $SUB"
+            
+            # SHA in main
+            MAIN_SHA=$(git rev-parse origin/main:$SUB)
+            # SHA in PR branch
+            HEAD_SHA=$(git rev-parse HEAD:$SUB)
+            
+            echo "  main SHA: $MAIN_SHA"
+            echo "  PR SHA:   $HEAD_SHA"
+            
+            # Check if HEAD contains MAIN_SHA as ancestor
+            git -C $SUB merge-base --is-ancestor $MAIN_SHA $HEAD_SHA
+            if [ $? -ne 0 ]; then
+              echo "  ❌ PR submodule '$SUB' is older than main!"
+              ERROR=1
+            else
+              echo "  ✅ OK"
+            fi
+          done
+          
+          if [ $ERROR -ne 0 ]; then
+            echo "One or more submodules are older than main. Failing CI."
+            exit 1
+          fi
