@@ -26,6 +26,7 @@ jobs:
         run: exit 1
       - name: Check for accidental submodule downgrades
         run: |
+          set +e
           git fetch origin main
           # get list of submodule paths from .gitmodules
           SUBMODULES=$(git config --file .gitmodules --get-regexp path | awk '{print $2}')
