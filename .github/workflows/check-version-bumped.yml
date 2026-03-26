@@ -45,7 +45,8 @@ jobs:
             
             # Check if HEAD contains MAIN_SHA as ancestor
             git -C $SUB merge-base --is-ancestor $MAIN_SHA $HEAD_SHA
-            if [ $? -ne 0 ]; then
+            IS_ANCESTOR=$?
+            if [ $IS_ANCESTOR -ne 0 ]; then
               echo "  ❌ PR submodule '$SUB' is older than main!"
               ERROR=1
             else
