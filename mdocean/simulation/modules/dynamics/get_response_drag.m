@@ -527,15 +527,6 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     phase_v = phase_X_guess + pi/2;
     mag_v0_v_ratio = mag_v0 ./ mag_v;
     mag_v0_v_ratio(mag_v==0) = 0; % prevent divide by zero
-    phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
-    
-    alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
-    phi_alpha = phase_v_prime; % - phase_v;
-    mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
-
-    B_drag = -1*mag_cf .* cos(phi_alpha); % real part of c_f
-%     B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
-    K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
     
     % integral method: force should equal above method when k is small
     % (long waves, large T). We don't expect old Bd=new Bd because they are
@@ -563,7 +554,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     gamma_drag = mag_v_constant_term .* (mag_v0 ./ (H/2)) .* G_integral_weighted;
 
     plot_on = false;
-    drag_debug = false;
+    drag_debug = false; % set true to plot new integral drag vs old drag
     if drag_debug
         % uncomment the following to plot once solver has converged
         converged = any(strcmp({dbstack().name},'solver')   & [dbstack().line]==166);
@@ -573,6 +564,16 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
         end
     end
     if plot_on
+        phase_v_prime = atan2( cos(phase_X_guess) - mag_v0_v_ratio, -sin(phase_X_guess)); % derived on p67 of notebook #6 (10/4/24)
+    
+        alpha_v = sqrt(1 + mag_v0_v_ratio.^2 - 2 * mag_v0_v_ratio .* cos(phase_X_guess)); % derived on p48 of notebook #5 (6/7/24)
+        phi_alpha = phase_v_prime; % - phase_v;
+        mag_cf = drag_const * alpha_v.^2 .* mag_v; % eq 52 in Water paper
+
+        B_drag = -1*mag_cf .* cos(phi_alpha); % real part of c_f
+    %     B_drag = max(B_drag,zeros(size(B_drag))); % prevent negative damping
+        K_drag = - w .* mag_cf .* sin(phi_alpha); % -w times imag part of c_f
+
         plot_drag_integral_debug(B_drag, mag_v, phase_v, K_drag, X_guess,...
                                  phase_X_guess, B_drag_2, gamma_drag);
     end

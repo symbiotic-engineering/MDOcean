@@ -3,7 +3,7 @@
 
 ## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-26
 ### Added
-- Model: drag computed via strip theory integral
+- Model: drag computed via strip theory integral. Note that this increases runtime by over 40%.
 - Pipeline: stages to precompute drag lookup table and analysis for drag integral plots
 - Validation: WecSim saves fundamental of drag force and phases via FFT
 - CI: check to avoid accidental submodule downgrades 
@@ -12,6 +12,7 @@
 - Pipeline: dvc.lock merge driver no longer requires unchanged dvc.yaml
 - Plots: runtime bar chart numbers rounded to nearest ms
 - Plots: end figures saved as .fig in addition to .pdf
+- Paper: moved meem appendix back to this repo from OpenFLASH
 ### Fixed
 - Model: sign error in phase of d'alembert force
 - Pipeline: track text outputs in git for a few stages forgotten last PR
