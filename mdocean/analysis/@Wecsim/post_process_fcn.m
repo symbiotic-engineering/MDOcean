@@ -226,6 +226,13 @@ function make_histogram_on_axis(ax,width,...
         end
     end
 
+    min_num_bars = 10;
+    max_num_bars = 30;
+
+    expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
+
+    width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
+
     % histogram
     axes(ax)
     histogram(ax,pwr_err(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')

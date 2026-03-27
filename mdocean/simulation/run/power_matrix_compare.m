@@ -163,7 +163,9 @@ end
 
 function error_plot(T, H, error, error_title, error_values)
     [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
-    clabel(c,h_fig);
+    if ~isempty(c)
+        clabel(c,h_fig);
+    end
     if ~isempty(h_fig)
         colormap(h_fig.Parent,bluewhitered)
     end
