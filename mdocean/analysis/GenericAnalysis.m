@@ -212,7 +212,6 @@ classdef (Abstract) GenericAnalysis
         end
 
         function stages = write_calkit_stage(obj)
-            cell2filelist = @(c) char(join(strcat("    - ",c),newline));
 
             analysis_stage = ['analysis-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
@@ -227,10 +226,39 @@ classdef (Abstract) GenericAnalysis
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
                               '  inputs: ' newline ...
+                              '    - from_stage_outputs: analysis-' class(obj) newline ...
                               cell2filelist(obj.postpro_dependencies.') newline ...
                               '  outputs: ' newline ...
                               cell2filelist(obj.postpro_outputs.') ];
             stages = [analysis_stage newline postpro_stage];
+
+            function out = cell2filelist(files)
+                %   Regular files get "    - " prepended
+                %   .tex and .json files get two lines:
+                %       - path: <file>
+                %         storage: git
+
+                % Identify .tex and .json files
+                [~,~,exts] = cellfun(@fileparts, files, 'UniformOutput', false);
+                specialMask = ismember(exts,{'.tex','.json'});
+
+                % Regular files
+                regularLines = strcat("    - ", files(~specialMask));
+
+                % Special files
+                specialFiles = files(specialMask);
+                specialLines = strcat("    - path: ", specialFiles);
+                storageLines = repmat("      storage: git", size(specialLines));
+
+                % Interleave special lines
+                specialLines = reshape([specialLines.'; storageLines.'], [], 1);
+
+                % Combine all lines
+                allLines = [regularLines; specialLines];
+
+                % Output as char array with newlines
+                out = char(join(allLines,newline));
+            end
         end
         function figs_out = validate_figs(obj, figs_in)
             %VALIDATE_FIGS Return only valid MATLAB figure handles from input
