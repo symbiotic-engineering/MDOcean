@@ -15,7 +15,7 @@ classdef (Abstract) GenericAnalysis
         output_folder
         analysis_outputs
         postpro_outputs
-        extra_inputs = {'./mdocean/inputs/drag_integral.mat'} % non-code data inputs for calkit stages
+        extra_inputs = {} % non-code data inputs for calkit stages
     end
     properties (Dependent)
         class_dependencies
