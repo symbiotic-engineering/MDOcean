@@ -83,16 +83,16 @@ figs_in_AOR{20} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{21} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_AOR{22} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
-figs_in_AOR{23} = 'ReadNonMatlabFigs.meem_regions';
+figs_in_AOR{23} = 'Tikz.meem_regions';
 figs_in_AOR{24} = 'Meem.meem_sparsity';
 figs_in_AOR{25} = 'Meem.meem_validation';
 figs_in_AOR{26} = 'Meem.meem_matching';
 figs_in_AOR{27} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{28} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{29} = 'ReadNonMatlabFigs.drag_damping_integral';
-figs_in_AOR{29+10} = 'ReadNonMatlabFigs.drag_exc_mag_integral';
-figs_in_AOR{29+11} = 'ReadNonMatlabFigs.drag_exc_phase_integral';
+figs_in_AOR{29} = 'DragIntegral.drag_integral_B';
+figs_in_AOR{29+10} = 'DragIntegral.drag_integral_G_m';
+figs_in_AOR{29+11} = 'DragIntegral.drag_integral_G_p';
 figs_in_AOR{30} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{31} = 'Slamming.slamming_amplitude';
 figs_in_AOR{32} = 'RunSingleFigFunc.slamming_model_comparison_float';
@@ -136,27 +136,32 @@ figs_classes = figs_split(:,1);
 tabs_classes = tabs_split(:,1);
 for i=1:length(figs_classes)
     class_name = figs_classes{i};
-    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
-    this_fig_name = figs_split(i,2);
-    valid = ismember(this_fig_name,all_fig_names_this_class);
-    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
-        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+        this_fig_name = figs_split(i,2);
+        valid = ismember(this_fig_name,all_fig_names_this_class);
+        msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+            class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
 end
 for i=1:length(tabs_classes)
     class_name = tabs_classes{i};
-    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
-    this_tab_name = tabs_split(i,2);
-    valid = ismember(this_tab_name,all_tab_names_this_class);
-    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
-        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+        this_tab_name = tabs_split(i,2);
+        valid = ismember(this_tab_name,all_tab_names_this_class);
+        msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+            class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
+
 end
 
 end

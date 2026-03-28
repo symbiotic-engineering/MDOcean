@@ -164,7 +164,7 @@ end
 
 if nargout > 3 % if returning extra struct output for validation
     [~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,...
-     mass,CB_f,CG_f] = geometry(in.D_s, in.D_f, in.D_f_in, in.D_f_b, ...
+     mass,CB_f,CG_f,CG_s] = geometry(in.D_s, in.D_f, in.D_f_in, in.D_f_b, ...
                                  in.T_f_1, in.T_f_2, in.h_f, in.h_s, ...
                                  in.h_fs_clear, in.D_f_tu, in.t_f_t, ...
                                  in.t_f_r, in.t_f_c, in.t_f_b, in.t_f_tu, ...
@@ -184,7 +184,9 @@ if nargout > 3 % if returning extra struct output for validation
      B_f_over_rho_w, B_s_over_rho_w,B_c_over_rho_w,...
      gamma_f_over_rho_g,gamma_s_over_rho_g,...
      gamma_phase_f,gamma_phase_s,w,...
-     phase_X_f,phase_X_u] = dynamics(in, m_f_tot, m_s_tot);
+     phase_X_f,phase_X_s,phase_X_u,...
+     F_drag_f,F_drag_s,...
+     phase_F_drag_f,phase_F_drag_s] = dynamics(in, m_f_tot, m_s_tot);
 
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
@@ -215,6 +217,7 @@ if nargout > 3 % if returning extra struct output for validation
     val.P_sat_ratio = P_sat_ratio;
     val.CB_f = CB_f;
     val.CG_f = CG_f;
+    val.CG_s = CG_s;
     val.vol_f = V_d(1);
     val.vol_s = V_d(2) + V_d(3);
     val.A_f_over_rho = A_f_over_rho;
@@ -229,7 +232,12 @@ if nargout > 3 % if returning extra struct output for validation
     val.gamma_phase_s = gamma_phase_s;
     val.w = w;
     val.phase_X_f = phase_X_f;
+    val.phase_X_s = phase_X_s;
     val.phase_X_u = phase_X_u;
+    val.F_drag_f = F_drag_f;
+    val.F_drag_s = F_drag_s;
+    val.phase_F_drag_f = phase_F_drag_f;
+    val.phase_F_drag_s = phase_F_drag_s;
 end
 
 end

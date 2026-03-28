@@ -31,11 +31,12 @@ function [figs, ...
 
     f1 = figure;
     cats = {'MDOcean Dynamics 1-DOF','MDOcean Dynamics 2-DOF','WecSim (Parallelized)'};
-    times = [t_singlebody t_multibody t_wecsim];
+    times = [t_singlebody t_multibody round(t_wecsim)];
     cats = reordercats(categorical(cats),cats);
     h = bar(cats,times);
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     title('Dynamics Runtime Comparison')
     subtitle('for all sea states')
@@ -88,7 +89,8 @@ function [figs, ...
     exponents = log10(hydro_sum);
     xlim(10.^[min(floor(exponents)),max(ceil(exponents))])
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ax = h(1).Parent;
     split_labels_by_space(ax)
@@ -107,7 +109,8 @@ function [figs, ...
     subtitle('for a single frequency')
     ylabel('Runtime (s)')
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ax = h(1).Parent;
     split_labels_by_space(ax)
@@ -127,7 +130,8 @@ function [figs, ...
     f4 = figure;
     h = bar(name_modules,t_modules);
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ylabel('Runtime (s)')
     title('Module Time Breakdown')
