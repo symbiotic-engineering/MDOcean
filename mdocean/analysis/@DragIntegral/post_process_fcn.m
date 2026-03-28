@@ -107,7 +107,8 @@ for i=1:length(kappa_vec)
 end
 cb = colorbar;
 cb.Layout.Tile = 'south';
+cb.FontSize = 16;
 %title(t,mytitle,'Interpreter','latex')
-fig.Position(3:4) = [450 500];
+fig.Position(3:4) = [450 490];
 
 end
