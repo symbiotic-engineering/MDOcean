@@ -101,13 +101,13 @@ for i=1:length(kappa_vec)
         set(gca,'colorscale','log')
     end
 
-    title( ['\kappa=' num2str(kappa_vec(i))] )
+    title( ['\kappa=' num2str(kappa_vec(i))], 'FontSize', 20)
     ax = gca;
     ax.Layer = 'top';
 end
 cb = colorbar;
 cb.Layout.Tile = 'south';
-title(t,mytitle,'Interpreter','latex')
-fig.Position(3:4) = [450 565];
+%title(t,mytitle,'Interpreter','latex')
+fig.Position(3:4) = [450 500];
 
 end

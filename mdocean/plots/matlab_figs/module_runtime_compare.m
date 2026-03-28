@@ -31,7 +31,7 @@ function [figs, ...
 
     f1 = figure;
     cats = {'MDOcean Dynamics 1-DOF','MDOcean Dynamics 2-DOF','WecSim (Parallelized)'};
-    times = [t_singlebody t_multibody t_wecsim];
+    times = [t_singlebody t_multibody round(t_wecsim)];
     cats = reordercats(categorical(cats),cats);
     h = bar(cats,times);
     if ~isMATLABReleaseOlderThan('R2024b')
