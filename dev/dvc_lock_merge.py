@@ -25,33 +25,6 @@ def dump_yaml(data, path):
         yaml.safe_dump(data, f, sort_keys=False)
 
 
-def repo_file_modified(filepath):
-    """
-    Returns True if git sees changes/conflicts in the given file.
-    Conservative: abort merge if modified.
-    """
-    try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain", filepath],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        return bool(result.stdout.strip())
-    except Exception:
-        return True  # safest failure mode
-
-
-def check_pipeline_definition_safety():
-    """
-    Abort merge if dvc.yaml is modified or conflicted.
-    """
-    if repo_file_modified("dvc.yaml"):
-        print("Pipeline definition file dvc.yaml is modified or conflicted.")
-        print("Resolve dvc.yaml merge first, then retry.")
-        sys.exit(1)
-
-
 # Helper: normalize path strings for comparison
 def _norm_path(p):
     if not isinstance(p, str):
@@ -220,8 +193,6 @@ def main():
         if has_conflict_markers(path):
             print(f"{name} file already contains conflict markers. Aborting.")
             sys.exit(0)
-
-    check_pipeline_definition_safety()
 
     base = load_yaml(BASE_LOCK)
     ours = load_yaml(OURS_LOCK)
