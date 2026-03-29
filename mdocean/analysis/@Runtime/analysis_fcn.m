@@ -23,6 +23,17 @@ function intermed_result_struct = analysis_fcn(p,b)
     profile_singlebody = profile('info');
     t_singlebody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
 
+    p.use_multibody = true;
+    p.use_force_sat = false;
+    p.use_power_sat = false;
+    p.C_d_float = 0;
+    p.C_d_spar = 0;
+    profile clear
+    profile on
+    simulation(X,p);
+    profile_freq_domain = profile('info');
+    t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
+
     gcp;
     time = tic;
     pause(1)
@@ -32,8 +43,10 @@ function intermed_result_struct = analysis_fcn(p,b)
     % Store results for post-processing
     intermed_result_struct.profile_multibody = profile_multibody;
     intermed_result_struct.profile_singlebody = profile_singlebody;
+    intermed_result_struct.profile_freq_domain = profile_freq_domain;
     intermed_result_struct.t_singlebody_fullsim_timeit = t_singlebody_fullsim_timeit;
     intermed_result_struct.t_multibody_fullsim_timeit = t_multibody_fullsim_timeit;
+    intermed_result_struct.t_freq_domain_fullsim_timeit = t_freq_domain_fullsim_timeit;
     intermed_result_struct.t_wecsim = t_wecsim;
     intermed_result_struct.p = p;
 end
