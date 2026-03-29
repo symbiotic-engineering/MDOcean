@@ -21,9 +21,15 @@ classdef ReadNonMatlabFigs < GenericAnalysis
                     'xdsm',...
                     };
         tab_names = {};
-        extra_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx', ...
-                        'mdocean/plots/non_matlab_figs/img/', ...
-                        'mdocean/plots/non_matlab_figs/pdf/'}
+    end
+
+    methods
+        function obj = ReadNonMatlabFigs(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx', ...
+                                'mdocean/plots/non_matlab_figs/img/', ...
+                                'mdocean/plots/non_matlab_figs/pdf/'};
+        end
     end
 
     methods (Static)
