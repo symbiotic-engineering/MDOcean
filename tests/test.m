@@ -51,7 +51,7 @@ classdef (SharedTestFixtures={ ...
             num_tabs = length(tab_names);
 
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
-            fig_names_fields = matlab.lang.makeValidName([fig_names, none]);
+            fig_names_fields = matlab.lang.makeUniqueStrings(matlab.lang.makeValidName([fig_names, none]));
 
             which_figs_cell = num2cell([fig_names, none]);
             which_fig_struct = cell2struct(which_figs_cell,fig_names_fields,2);
@@ -61,7 +61,7 @@ classdef (SharedTestFixtures={ ...
             num_figs = length(fig_names);
 
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
-            tab_names_fields = matlab.lang.makeValidName([none, tab_names]);
+            tab_names_fields = matlab.lang.makeUniqueStrings(matlab.lang.makeValidName([none, tab_names]));
 
             which_tabs_cell = num2cell([none, tab_names]);
             which_tab_struct = cell2struct(which_tabs_cell,tab_names_fields,2);
@@ -228,15 +228,17 @@ classdef (SharedTestFixtures={ ...
                 valid_name = matlab.lang.makeValidName(which_figs);
                 fig_name = "Figure_" + valid_name;
 
-                idx = strcmp(valid_name,fields(testCase.which_figs));
+                all_figs_values = struct2cell(testCase.which_figs)';
+                idx = strcmp(which_figs, all_figs_values);
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
                 diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
 
             else % table
-                tab_names = fields(testCase.which_tabs);
-                idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names,'none')) );
+                all_tabs_values = struct2cell(testCase.which_tabs)';
+                non_none_tab_values = all_tabs_values(~contains(all_tabs_values, 'none'));
+                idx = strcmp(which_tabs, non_none_tab_values);
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
                

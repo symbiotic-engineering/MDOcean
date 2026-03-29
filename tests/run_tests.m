@@ -11,6 +11,11 @@ import matlab.unittest.constraints.ContainsSubstring
 
 add_mdocean_path();
 
+if ~exist('drag_integral.mat', 'file')
+    make_drag_integral
+end
+sourceCodeFolder = fullfile(fileparts(which('add_mdocean_path')), 'mdocean');
+
 suite = testsuite('tests');
 runner = testrunner('textoutput');
 
