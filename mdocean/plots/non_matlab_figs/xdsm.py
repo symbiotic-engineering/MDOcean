@@ -44,4 +44,4 @@ x.add_output("F", "J^*", side=LEFT)
 x.add_output("G", "g^*", side=LEFT)
 x.write("xdsm",outdir="mdocean/plots/non_matlab_figs")
 
-shutil.copy2("mdocean/plots/non_matlab_figs/xdsm.pdf","mdocean/plots/non_matlab_figs/pdf/xdsm.pdf")
+shutil.move("mdocean/plots/non_matlab_figs/xdsm.pdf","mdocean/plots/non_matlab_figs/pdf/xdsm.pdf")
