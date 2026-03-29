@@ -18,9 +18,7 @@ for i = 1:length(analysis_list)
     stages{i} = stage;
 end
 
-disp(stages)
 stages_combined = strjoin(stages,newline);
-disp(stages_combined)
 
 writelines(stages_combined,'calkit_stages.yaml') % then run update_calkit.py to merge into calkit.yaml
 
