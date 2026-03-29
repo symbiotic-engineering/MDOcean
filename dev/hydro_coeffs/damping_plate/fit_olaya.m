@@ -483,69 +483,60 @@ case_4_x_f1_v2 = cellfun(fun, case_4_x_base, idxs_alpha_cell, idxs_beta_cell, 'U
 fun = @(c, ia, ib) c.^2 * case_4_beta(ib) * (1 + case_4_beta(ib)/case_4_alpha(ia));
 case_4_y_f1_v2 = cellfun(fun, case_4_y_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
-plot_fit_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
-    case_4_alpha, case_4_beta, @semilogx, ...
-    'k h R_x/R_p \alpha^4 / \beta', ...
-    '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ', ...
-    [0 10]);
+% manual fit predictions in y_f1 spaces (for comparison overlay on combined plots)
+fun = @(c, ia, ib) c.^2 * case_4_beta(ib)^2;
+case_4_y_pred_f1_v1 = cellfun(fun, case_4_y_pred_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
+fun = @(c, ia, ib) c.^2 * case_4_beta(ib) * (1 + case_4_beta(ib)/case_4_alpha(ia));
+case_4_y_pred_f1_v2 = cellfun(fun, case_4_y_pred_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
+
+x_label_v1 = 'k h R_x/R_p \alpha^4 / \beta';
+y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
+x_label_v2 = 'k h R_x/R_p \alpha^3 / \beta';
+y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
+
+% version 1: manual fit, all alpha combined
+plot_fit_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+    case_4_alpha, case_4_beta, @semilogx, x_label_v1, y_label_v1, [0 10], case_4_y_pred_f1_v1);
+
+% version 1: auto fit, all alpha combined
+fits_v1 = plot_fit_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+    case_4_alpha, case_4_beta, @semilogx, x_label_v1, y_label_v1, [0 10], case_4_y_pred_f1_v1, ft, fo);
+plot_fit_coeffs_vs_alpha_beta(fits_v1, case_4_alpha, case_4_beta)
+
+% version 2: manual fit, all alpha combined
 plot_fit_all_alpha_beta(case_4_x_f1_v2, case_4_y_f1_v2, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+    case_4_alpha, case_4_beta, @loglog, x_label_v2, y_label_v2, [0 20], case_4_y_pred_f1_v2);
+
+% version 2: auto fit, all alpha combined
+fits_v2 = plot_fit_all_alpha_beta(case_4_x_f1_v2, case_4_y_f1_v2, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+    case_4_alpha, case_4_beta, @loglog, x_label_v2, y_label_v2, [0 20], case_4_y_pred_f1_v2, ft, fo);
+plot_fit_coeffs_vs_alpha_beta(fits_v2, case_4_alpha, case_4_beta)
+
+% version 3: second-order fit in x^1.5 space
+case_4_x_new = case_4_x_f1_v2;
+case_4_y_new = case_4_y_f1_v2;
+
+wn = 3;
+z = 0.005;
+second_order_fit = @(xx) 2*sqrt((wn^1.5-xx.^1.5).^2 + (2*z*xx).^2) / wn^1.5;
+
+fun = @(y, x) y .* x.^1.5;
+case_4_y_new_x15 = cellfun(fun, case_4_y_new, case_4_x_new, 'UniformOutput', false);
+
+fun = @(x) second_order_fit(x);
+case_4_y_pred_new = cellfun(fun, case_4_x_new, 'UniformOutput', false);
+
+plot_fit_all_alpha_beta(case_4_x_new, case_4_y_new_x15, case_4_x_new, case_4_y_new_x15, case_4_y_pred_new, ...
     case_4_alpha, case_4_beta, @loglog, ...
     'k h R_x/R_p \alpha^3 / \beta', ...
-    '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ', ...
-    [0 20]);
-
-
-fun = @(cell,idx_alpha,idx_beta) cell .* case_4_alpha(idx_alpha).^3 ./ case_4_beta(idx_beta);
-case_4_x_new = cellfun(fun, case_4_kh_Rx_over_Rp, num2cell([1 1 1 1; 2 2 2 2; 3 3 3 3]), ...
-    num2cell([1 2 3 4; 1 2 3 4; 1 2 3 4]),'UniformOutput',false);
-
-fun = @(cell,idx_alpha,idx_beta) (cell .* ( 1./abs( besselh(0,case_4_kRx{idx_alpha, idx_beta})) ./ exp(-case_4_kh{idx_alpha, idx_beta} * case_4_e1_over_h) ./ case_4_kh{idx_alpha, idx_beta} ./ case_4_alpha(idx_alpha) ./ max(1,case_4_alpha(idx_alpha)) ) ).^2 .* case_4_beta(idx_beta)*(1+case_4_beta(idx_beta)/case_4_alpha(idx_alpha));
-case_4_y_new = cellfun(fun, case_4_f, num2cell([1 1 1 1; 2 2 2 2; 3 3 3 3]), ...
-    num2cell([1 2 3 4; 1 2 3 4; 1 2 3 4]),'UniformOutput',false);
-
-f4 = figure;
-f5 = figure;
-wn = 3;
-x_log = sort([logspace(-2,2),linspace(.9*wn,1.1*wn)]);
-for i_alpha=1:3
-    for j_beta = 1:4
-
-        figure(f4)
-        x = case_4_x_new{i_alpha,j_beta};
-        y = case_4_y_new{i_alpha,j_beta}.*x.^1.5;
-        alpha_beta_label = ['\alpha=' num2str(case_4_alpha(i_alpha)) ', \beta=' num2str(case_4_beta(j_beta))];
-
-        plot(x,y,'*','HandleVisibility','off')
-        hold on
-        
-        z = 0.005;
-        second_order_fit = @(xx) 2*sqrt((wn^1.5-xx.^1.5).^2 + (2*z*xx).^2) / wn^1.5;
-        plot(x_log,second_order_fit(x_log),'DisplayName',alpha_beta_label);
-
-        figure(f5)
-        y_pred = second_order_fit(x);
-        plot(x,y./y_pred,'DisplayName',alpha_beta_label)
-        hold on
-
-    end
-end
-figure(f4)
-ax = gca();
-ax.XScale = 'log';
-ax.YScale = 'log';
-legend('Location','best')
-
-figure(f5)
-ax = gca();
-ax.XScale = 'log';
-ax.YScale = 'log';
-legend('Location','best')
+    '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2 x^{1.5}$ ', ...
+    [], case_4_y_pred_new);
 
 % case_4_x_mat = cell2mat(case_4_x_new);
 % case_4_y_mat = cell2mat(case_4_x_new);
-case_4_alpha_mat = num2cell(case_4_alpha([1 1 1 1; 2 2 2 2; 3 3 3 3]));
-case_4_beta_mat  = num2cell(case_4_beta([1 2 3 4; 1 2 3 4; 1 2 3 4]));
+case_4_alpha_mat = cellfun(@(ia) case_4_alpha(ia), idxs_alpha_cell, 'UniformOutput', false);
+case_4_beta_mat  = cellfun(@(ib) case_4_beta(ib),  idxs_beta_cell,  'UniformOutput', false);
 
 case_4_xyab = [case_4_x_new(:) case_4_y_new(:) case_4_alpha_mat(:) case_4_beta_mat(:)];
 writecell(case_4_xyab,'case_4_xyab.csv')
@@ -665,23 +656,55 @@ function plot_fit_one_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_
     ylabel(y_string,'Interpreter','latex')
 end
 
-function plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
-        alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim)
+function fits = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+        alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell, ft, fo)
+    % Optional args:
+    %   y_f1_pred_cell (12th): manual-fit predictions in y_f1 space for overlay on f1
+    %   ft, fo         (13th, 14th): fittype/fitoptions for auto fitting; returns fits when provided
+    has_f1_pred  = nargin >= 12 && ~isempty(y_f1_pred_cell);
+    do_auto_fit  = nargin >= 14 && ~isempty(fo);
+    fits = cell(length(alpha_vec), length(beta_vec));
+
     f1 = figure; f2 = figure; f3 = figure;
     for i_alpha = 1:length(alpha_vec)
         for j_beta = 1:length(beta_vec)
             alpha_beta_label = ['\alpha=' num2str(alpha_vec(i_alpha)) ', \beta=' num2str(beta_vec(j_beta))];
+            x_f1 = x_f1_cell{i_alpha, j_beta};
+            y_f1 = y_f1_cell{i_alpha, j_beta};
 
             figure(f1)
-            f1_plot_fcn(x_f1_cell{i_alpha, j_beta}, y_f1_cell{i_alpha, j_beta}, 'DisplayName', alpha_beta_label)
+            if has_f1_pred
+                % data as markers (no legend entry); manual fit as dashed (no legend entry)
+                h = f1_plot_fcn(x_f1, y_f1, '*', 'HandleVisibility', 'off');
+                hold on
+                f1_plot_fcn(x_f1, y_f1_pred_cell{i_alpha, j_beta}, '--', ...
+                    'Color', h.Color, 'HandleVisibility', 'off')
+            else
+                f1_plot_fcn(x_f1, y_f1, 'DisplayName', alpha_beta_label)
+            end
             hold on
 
+            if do_auto_fit
+                f = perform_auto_fit(x_f1, y_f1, ft, fo);
+                fits{i_alpha, j_beta} = f;
+                % overlay auto fit as solid line with legend label
+                x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
+                y_fit_line = exp(feval(f, log(x_fit_line)));
+                h_fit = f1_plot_fcn(x_fit_line, y_fit_line, 'DisplayName', alpha_beta_label);
+                if has_f1_pred
+                    h_fit.Color = h.Color;
+                end
+                y_pred_ij = exp(feval(f, log(x_f1)));
+            else
+                y_pred_ij = y_pred_cell{i_alpha, j_beta};
+            end
+
             figure(f2)
-            scatter(y_cell{i_alpha, j_beta}, y_pred_cell{i_alpha, j_beta}, 'DisplayName', alpha_beta_label)
+            scatter(y_cell{i_alpha, j_beta}, y_pred_ij, 'DisplayName', alpha_beta_label)
             hold on
 
             figure(f3)
-            scatter(x_f3_cell{i_alpha, j_beta}, y_pred_cell{i_alpha, j_beta} ./ y_cell{i_alpha, j_beta} - 1, 'DisplayName', alpha_beta_label)
+            scatter(x_f3_cell{i_alpha, j_beta}, y_pred_ij ./ y_cell{i_alpha, j_beta} - 1, 'DisplayName', alpha_beta_label)
             hold on
         end
     end
@@ -691,7 +714,9 @@ function plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred
     xlabel(x_f1_label)
     ylabel(y_f1_label,'Interpreter','latex')
     title('All case 4 data with fits')
-    ylim(y_f1_lim)
+    if ~isempty(y_f1_lim)
+        ylim(y_f1_lim)
+    end
 
     figure(f2)
     plot([.001 10],[.001 10],'k','LineWidth',2,'DisplayName','Equality')
@@ -737,35 +762,22 @@ function [x1, A0] = get_fit_params(alpha, beta)
 end
 
 function y_pred = perform_manual_fit(x_pred,alpha,beta)
-    C = 1.5; % left intercept
-    m1 = .2; % left slope
-    m2 = 1.8;%4.5*case_4_beta(j_beta);
-    m3 = .3; % right slope
-
     [x1_0, A0] = get_fit_params(alpha, beta);
     x1 = x1_0*alpha^2;
-    A = A0/beta^2;
-
-    left_slope_term = C*x_pred.^-m1;
-    right_slope_term = A*x_pred.^m3;
-
-    left_dip_term = (1-(x_pred/x1).^m2).^2;
-    right_dip_term = (1-(x1./x_pred).^m2).^2;
-
-    switch_term = double(x_pred > x1);
-
-    left_term = left_slope_term .* (1-switch_term) .* left_dip_term;
-    right_term = right_slope_term .* switch_term .* right_dip_term;
-    y_pred = left_term + right_term;
+    y_pred = piecewise_power_law(x_pred, x1, A0, beta);
 end
 
 function y_pred = compute_fit_base(x, alpha, beta, kh)
+    [x1, A0] = get_fit_params(alpha, beta);
+    y_pred = piecewise_power_law(x, x1, A0, beta) ./ sqrt(kh) / (alpha * max(1, alpha));
+end
+
+function y = piecewise_power_law(x, x1, A0, beta)
     C = 1.5; % left intercept
     m1 = .2; % left slope
     m2 = 1.8;%4.5*case_4_beta(j_beta);
     m3 = .3; % right slope
 
-    [x1, A0] = get_fit_params(alpha, beta);
     A = A0/beta^2;
 
     left_slope_term = C*x.^-m1;
@@ -776,6 +788,6 @@ function y_pred = compute_fit_base(x, alpha, beta, kh)
 
     switch_term = double(x > x1);
 
-    y_pred = (left_slope_term .* (1-switch_term) .* left_dip_term + ...
-              right_slope_term .* switch_term .* right_dip_term) ./ sqrt(kh) / (alpha * max(1, alpha));
+    y = left_slope_term .* (1-switch_term) .* left_dip_term + ...
+        right_slope_term .* switch_term .* right_dip_term;
 end
