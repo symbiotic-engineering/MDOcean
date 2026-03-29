@@ -1,7 +1,11 @@
 # Changelog
 ## Unreleased
 
-## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-26
+## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
+### Changed
+- Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization
+
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-29
 ### Added
 - Model: drag computed via strip theory integral. Note that this increases runtime by over 40%.
 - Pipeline: stages to precompute drag lookup table and analysis for drag integral plots
