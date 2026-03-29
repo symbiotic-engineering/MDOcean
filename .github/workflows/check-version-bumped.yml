@@ -31,11 +31,9 @@ jobs:
       - name: Install dependencies
         run: pip install ruamel.yaml
       - name: Update calkit stages
-        run: |
-          if [ -f calkit_stages.yaml ]; then
-            python mdocean/analysis/update_calkit.py --yes
-          else
-            echo "calkit_stages.yaml not found (needs MATLAB to generate); skipping."
+        run: python mdocean/analysis/update_calkit.py
+      - name: Fail if calkit.yaml was modified
+        run: git diff --exit-code calkit.yaml
       - name: Check for accidental submodule downgrades
         run: |
           set +e

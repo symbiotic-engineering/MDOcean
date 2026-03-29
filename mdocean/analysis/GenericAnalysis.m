@@ -15,7 +15,8 @@ classdef (Abstract) GenericAnalysis
         output_folder
         analysis_outputs
         postpro_outputs
-        extra_inputs = {} % non-code data inputs for calkit stages
+        extra_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit stages
+        extra_outputs = {} % non-code extra outputs beyond intermed.mat for calkit analysis stage
     end
     properties (Dependent)
         class_dependencies
@@ -221,7 +222,7 @@ classdef (Abstract) GenericAnalysis
                               '  inputs: ' newline ...
                               obj.format_inputs_list(obj.analysis_dependencies) newline ...
                               '  outputs: ' newline ...
-                              obj.format_outputs(obj.analysis_outputs) ];
+                              obj.format_outputs([obj.analysis_outputs, obj.extra_outputs]) ];
             postpro_stage = ['postpro-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
@@ -240,24 +241,20 @@ classdef (Abstract) GenericAnalysis
             list_str = char(join(lines, newline));
         end
 
-        function list_str = format_outputs(obj, outputs)
+        function list_str = format_outputs(~, outputs)
             %FORMAT_OUTPUTS Format a cell array of output paths as YAML list entries.
             %   .tex and .json outputs include 'storage: git'; others are plain paths.
-            lines = cell(1, numel(outputs));
-            for i = 1:numel(outputs)
-                lines{i} = obj.format_output_entry(outputs{i});
+            outputs = string(outputs);
+            if isempty(outputs)
+                list_str = '';
+                return;
             end
-            list_str = char(join(string(lines), newline));
-        end
-
-        function entry = format_output_entry(~, p)
-            %FORMAT_OUTPUT_ENTRY Return YAML list entry string for a single output path.
-            [~, ~, ext] = fileparts(p);
-            if any(strcmp(ext, {'.tex', '.json'}))
-                entry = ['    - path: ' p newline '      storage: git'];
-            else
-                entry = ['    - ' p];
-            end
+            [~, ~, exts] = fileparts(outputs);
+            is_git = ismember(exts, [".tex", ".json"]);
+            lines = strings(size(outputs));
+            lines(~is_git) = "    - " + outputs(~is_git);
+            lines(is_git) = "    - path: " + outputs(is_git) + newline + "      storage: git";
+            list_str = char(join(lines, newline));
         end
 
         function figs_out = validate_figs(obj, figs_in)

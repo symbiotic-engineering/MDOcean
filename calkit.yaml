@@ -58,6 +58,15 @@ pipeline:
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
       outputs:
         - ./mdocean/inputs/drag_integral.mat
+    make-calkit-stages:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); analysis_to_calkit;
+      inputs:
+        - mdocean/analysis/
+      outputs:
+        - path: calkit_stages.yaml
+          storage: git
     analysis-AllFigCompare:
       kind: matlab-command
       environment: _system

@@ -17,20 +17,19 @@ Workflow
    * Preserving all non-analysis/postpro stages (e.g. mermaid-*, make-drag-integral).
    * Preserving special inputs such as ``from_stage_outputs`` that calkit
      adds manually and that are not emitted by ``write_calkit_stage``.
-   * Prompting the user before discarding any inputs or outputs that exist in
-     the current ``calkit.yaml`` but are absent from the generated stages.
+   * Overwriting all plain-path inputs and outputs with the generated values
+     so that stale removed dependencies do not remain.
    * Inserting brand-new stages in alphabetical order among the existing
      analysis-*/postpro-* stages.
 
 Usage
 -----
-    python mdocean/analysis/update_calkit.py [--calkit FILE] [--stages FILE] [--yes]
+    python mdocean/analysis/update_calkit.py [--calkit FILE] [--stages FILE]
 
 Options
 -------
     --calkit FILE   Path to calkit.yaml          (default: calkit.yaml)
     --stages FILE   Path to calkit_stages.yaml   (default: calkit_stages.yaml)
-    --yes           Keep all manual additions without prompting
 """
 
 import sys
@@ -79,23 +78,13 @@ def is_special(item):
 # Merge logic
 # ---------------------------------------------------------------------------
 
-def ask_keep(kind, path, yes):
-    """Prompt the user whether to keep a manual addition.  Default: keep."""
-    if yes:
-        print(f"    [keep] manual {kind}: {path!r}")
-        return True
-    ans = input(
-        f"  Keep manual {kind} not in generated: {path!r}  [Y/n] "
-    ).strip().lower()
-    return ans != "n"
-
-
-def merge_inputs(old_inputs, new_inputs, stage_key, yes):
+def merge_inputs(old_inputs, new_inputs, stage_key):
     """Return merged inputs list for *stage_key*.
 
-    Order: special items (``from_stage_outputs`` etc.) first, then
-    generated inputs, then any manually-added path items the user wants
-    to keep.
+    Special dict items (e.g. ``from_stage_outputs``) are always preserved
+    from the old list.  All plain-path items are replaced by the generated
+    inputs (overwrite behaviour) so that stale removed dependencies do not
+    remain.
     """
     old_inputs = list(old_inputs or [])
     new_inputs = list(new_inputs or [])
@@ -103,55 +92,16 @@ def merge_inputs(old_inputs, new_inputs, stage_key, yes):
     # Special dict items (e.g. from_stage_outputs) are always preserved.
     special = [x for x in old_inputs if is_special(x)]
 
-    # Paths that the generated stages already cover.
-    new_paths = {get_path(x) for x in new_inputs if get_path(x)}
-
-    # Plain-path items in the old list that are absent from the generated list.
-    manual = [
-        x for x in old_inputs
-        if not is_special(x) and get_path(x) not in new_paths
-    ]
-
-    kept = []
-    if manual:
-        print(
-            f"  Stage {stage_key!r}: "
-            f"{len(manual)} input(s) in calkit.yaml not in generated:"
-        )
-        for item in manual:
-            if ask_keep("input", get_path(item), yes):
-                kept.append(item)
-
-    return special + new_inputs + kept
+    return special + new_inputs
 
 
-def merge_outputs(old_outputs, new_outputs, stage_key, yes):
+def merge_outputs(old_outputs, new_outputs, stage_key):
     """Return merged outputs list for *stage_key*.
 
-    Generated outputs come first; any manually-added outputs the user
-    wishes to keep are appended at the end.
+    Generated outputs completely replace the old outputs (overwrite
+    behaviour) so that stale removed outputs do not remain.
     """
-    old_outputs = list(old_outputs or [])
-    new_outputs = list(new_outputs or [])
-
-    new_paths = {get_path(x) for x in new_outputs if get_path(x)}
-
-    manual = [
-        x for x in old_outputs
-        if get_path(x) not in new_paths
-    ]
-
-    kept = []
-    if manual:
-        print(
-            f"  Stage {stage_key!r}: "
-            f"{len(manual)} output(s) in calkit.yaml not in generated:"
-        )
-        for item in manual:
-            if ask_keep("output", get_path(item), yes):
-                kept.append(item)
-
-    return new_outputs + kept
+    return list(new_outputs or [])
 
 
 # ---------------------------------------------------------------------------
@@ -254,11 +204,6 @@ def main():
         metavar="FILE",
         help="Path to generated stages file  (default: calkit_stages.yaml)",
     )
-    parser.add_argument(
-        "--yes",
-        action="store_true",
-        help="Keep all manual additions without prompting",
-    )
     args = parser.parse_args()
 
     calkit_path = Path(args.calkit)
@@ -314,10 +259,10 @@ def main():
             old = stages[stage_key]
 
             merged_in = merge_inputs(
-                old.get("inputs"), gen_stage.get("inputs"), stage_key, args.yes
+                old.get("inputs"), gen_stage.get("inputs"), stage_key
             )
             merged_out = merge_outputs(
-                old.get("outputs"), gen_stage.get("outputs"), stage_key, args.yes
+                old.get("outputs"), gen_stage.get("outputs"), stage_key
             )
 
             # Only replace inputs and outputs; preserve kind, command, etc.
