@@ -45,6 +45,17 @@ stages:
       - ./mdocean/inputs/drag_integral.mat
     desc: Automatically generated from the 'make-drag-integral' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  make-calkit-stages:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      analysis_to_calkit;"
+    deps:
+      - mdocean/analysis/
+    outs:
+      - calkit_stages.yaml:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'make-calkit-stages' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();"
