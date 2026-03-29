@@ -24,6 +24,10 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
                 exportgraphics(fig,pdf_name) % if pdf does not exist, save the image
             end
         else
+            fig = check_fig_size(fig);
+            % save .fig for later editing
+            savefig(fig, [fullfile(pdf_prefix, fig_name) '.fig'])
+            
             % save pdf from matlab figure output
             exportgraphics(fig,pdf_name)
         end

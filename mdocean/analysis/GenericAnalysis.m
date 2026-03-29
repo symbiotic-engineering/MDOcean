@@ -156,13 +156,7 @@ classdef (Abstract) GenericAnalysis
                     figs = s.(fn{i});
                         for j=1:length(figs)
                             fig = figs(j);
-                            pos = fig.Position(3:4);
-                            monitor_size = get(groot,'MonitorPositions');
-                            ratio = pos ./ monitor_size(:,3:4);
-                            if any(ratio > 1)
-                                % figure goes offscreen and needs to have its position saved manually to look the same after saving/reopening
-                                fig.UserData.Position = pos;
-                            end
+                            fig = check_fig_size(fig);
                             savefig(fig, [obj.output_folder filesep 'intermed_', fn{i}, '_', num2str(j), '.fig'])
                         end
                     s = rmfield(s, fn{i});
@@ -233,6 +227,7 @@ classdef (Abstract) GenericAnalysis
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
                               '  inputs: ' newline ...
+                              '    - from_stage_outputs: analysis-' class(obj) newline ...
                               obj.format_inputs_list(obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
                               obj.format_outputs(obj.postpro_outputs) ];
