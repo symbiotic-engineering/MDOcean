@@ -46,25 +46,19 @@ classdef (SharedTestFixtures={ ...
 
     % helper methods to enumerate all figures and tables
     methods (Static)
-        function which_fig_struct = enumerateFigs()
+        function which_figs_cell = enumerateFigs()
             [fig_names,tab_names] = get_fig_tab_names('all', 'all');
             num_tabs = length(tab_names);
 
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
-            fig_names_fields = matlab.lang.makeUniqueStrings(matlab.lang.makeValidName([fig_names, none]));
-
             which_figs_cell = num2cell([fig_names, none]);
-            which_fig_struct = cell2struct(which_figs_cell,fig_names_fields,2);
         end
-        function which_tab_struct = enumerateTabs()
+        function which_tabs_cell = enumerateTabs()
             [fig_names,tab_names] = get_fig_tab_names('all', 'all');
             num_figs = length(fig_names);
 
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
-            tab_names_fields = matlab.lang.makeUniqueStrings(matlab.lang.makeValidName([none, tab_names]));
-
             which_tabs_cell = num2cell([none, tab_names]);
-            which_tab_struct = cell2struct(which_tabs_cell,tab_names_fields,2);
         end
     end
 
@@ -225,20 +219,17 @@ classdef (SharedTestFixtures={ ...
             end
 
             if ~contains(which_figs,'none') % figure
-                valid_name = matlab.lang.makeValidName(which_figs);
-                fig_name = "Figure_" + valid_name;
+                fig_name = "Figure_" + strrep(which_figs, '.', '_');
 
-                all_figs_values = struct2cell(testCase.which_figs)';
-                idx = strcmp(which_figs, all_figs_values);
+                idx = strcmp(which_figs, testCase.which_figs);
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
                 diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
 
             else % table
-                all_tabs_values = struct2cell(testCase.which_tabs)';
-                non_none_tab_values = all_tabs_values(~contains(all_tabs_values, 'none'));
-                idx = strcmp(which_tabs, non_none_tab_values);
+                non_none_tabs = testCase.which_tabs(~contains(testCase.which_tabs, 'none'));
+                idx = strcmp(which_tabs, non_none_tabs);
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
                
