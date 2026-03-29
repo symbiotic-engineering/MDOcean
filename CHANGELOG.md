@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-29
+### Added
+- Pipeline: python script to update calkit.yaml automatically with matlab auto deps
+- CI: add check that calkit.yaml is up to date with matlab auto deps
+
 ## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
 ### Changed
 - Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization
