@@ -228,7 +228,7 @@ classdef (SharedTestFixtures={ ...
                 diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
 
             else % table
-                non_none_tabs = testCase.which_tabs(~contains(testCase.which_tabs, 'none'));
+                non_none_tabs = testCase.which_tabs(~contains(string(testCase.which_tabs), 'none'));
                 idx = strcmp(which_tabs, non_none_tabs);
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
