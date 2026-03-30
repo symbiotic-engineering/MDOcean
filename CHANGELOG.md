@@ -1,6 +1,17 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
+### Added
+- Pipeline: python script to update calkit.yaml automatically with matlab auto deps
+- CI: enforce calkit.yaml to be up to date with matlab auto deps
+
+## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-30
+### Changed
+- Plot: added frequency domain to dynamics runtime bar plot
+### Fixed
+- Analysis: add forgotten add_wecsim_path in runtime analysis class
+
 ## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
 ### Changed
 - Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization

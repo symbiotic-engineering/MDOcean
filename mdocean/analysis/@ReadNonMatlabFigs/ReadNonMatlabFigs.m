@@ -23,6 +23,15 @@ classdef ReadNonMatlabFigs < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = ReadNonMatlabFigs(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_postpro_inputs = [obj.extra_postpro_inputs, ...
+                                {'mdocean/plots/non_matlab_figs/img/', ...
+                                 'mdocean/plots/non_matlab_figs/pdf/'}];
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 
