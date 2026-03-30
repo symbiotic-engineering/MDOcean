@@ -30,12 +30,8 @@ colorbar;
 xlabel('$\theta/\pi$','Interpreter','latex')
 ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
 my_text = {'$\textrm{Infeasible if}~ \frac{\Delta z_{slam}}{H/2} < 1$','$\textrm{       and } |\theta-\pi|<\pi/2$'};
-text(1.28,.4,my_text,'Interpreter','latex','FontSize',20)
+text(0.24,.3,my_text,'Interpreter','latex','FontSize',20)
 colormap(ax1,bluewhitered)
-
-p1 = [1.33,0.55];
-p2 = [1.2,0.7];
-arrow(p1,p2)
 
 % x min plot
 subplot 122
@@ -44,14 +40,19 @@ contourf(THETA/pi,TWO_TF_OVER_H,X_min_over_amp,contours)
 colorbar;
 xlabel('$\theta/\pi$','Interpreter','latex')
 ylabel('$\displaystyle \frac{\Delta z_{slam}}{H/2}$','Interpreter','latex')
-my_text = '$\textrm{Undefined if}~ \frac{\Delta z_{slam}}{H/2} < |\sin\theta|$';
-text(1.19,.4,my_text,'Interpreter','latex','FontSize',20)
+my_text = {'Undefined if','$\frac{\Delta z_{slam}}{H/2} < |\sin\theta|$'};
+text(0.3,.4,my_text,'Interpreter','latex','FontSize',20)
 
 % plot aesthetics for both
 improvePlot
-set(gcf,"Position",[20 50 1200 600])
-title(ax1,'$\frac{\xi_{max,slam}}{H/2}$','Interpreter','latex','FontSize',24)
-title('$\frac{\xi_{min,slam}}{H/2}$','Interpreter','latex','FontSize',24)
+title(ax1,'$\frac{\xi_{max,slam}}{H/2}$','Interpreter','latex','FontSize',30)
+title('$\frac{\xi_{min,slam}}{H/2}$','Interpreter','latex','FontSize',30)
 colormap(gca,bluewhitered)
+
+p1 = [0.7,0.5];
+p2 = [0.83,0.7];
+arrow(p1,p2,ax1)
+
+set(gcf,"Position",[20 50 1200 600])
 
 end

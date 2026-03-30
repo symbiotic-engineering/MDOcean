@@ -10,10 +10,12 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     %% settings 
     auto_BCs = false;
 
-    num_harmonics = 3;
-    N_num = num_harmonics;
-    M_num = num_harmonics;
-    K_num = num_harmonics;
+    NMK_sparsity = 4;
+    NMK_validate = 10;
+    
+    N_num = NMK_validate;
+    M_num = NMK_validate;
+    K_num = NMK_validate;
 
     heaving_OC = true;
     heaving_IC = false;
@@ -30,6 +32,13 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     m0_num = 1;
     spatial_res = 30;
 
+    %% run with small NMK for sparsity
+
+    run_MEEM(heaving_IC, heaving_OC, auto_BCs, NMK_sparsity, NMK_sparsity, NMK_sparsity, ...
+                        a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi);
+    n = gcf().Number;
+    figAMatrixSparsity = figure(n-8);
+
     %% run validation of potential for single frequency
     % produces 8 figures if plot_phi is on, + 3 more if show_A is on
     run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
@@ -44,7 +53,7 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     figPhiH      = figure(n-6);
     figPhiTotal  = figure(n-7);
 
-    figAMatrixSparsity = figure(n-8);
+    %figAMatrixSparsity = figure(n-8);
     figAMatrixImag     = figure(n-9);
     figAMatrixReal     = figure(n-10);
 
@@ -52,7 +61,7 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     plot_potential_validation()
 
     %% run validation of hydro coeffs for various frequencies
-    m0_nums = [linspace(0,0.1,10), linspace(0.1,6,100)];
+    m0_nums = [linspace(0.01,0.1,10), linspace(0.1,6,100)];
     plot_phi = false;
     show_A = false;
     [mu_nondim, lambda_nondim] = run_MEEM(heaving_IC, heaving_OC, auto_BCs, N_num, M_num, K_num, ...
@@ -60,9 +69,9 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
 
     figHydroCoeff = figure;
     plot(m0_nums, mu_nondim, m0_nums, lambda_nondim)
-    ylabel('Nondimensional Hydro Coeff')
-    xlabel('Wavenumber m0')
-    legend('Added Mass','Damping')
+    ylabel('Nondimensional Hydro Coeff','Interpreter','latex')
+    xlabel('Nondimensional Wavenumber $m_0h$','Interpreter','latex')
+    legend('Added Mass: MDOcean','Damping: MDOcean','Interpreter','latex')
     grid on
     hold on
     plot_hydro_coeff_validation()
@@ -73,8 +82,10 @@ end
 function plot_potential_validation()
     a1_potential = readmatrix("inputs/validation/MEEM_validation/potential_a1.csv");
     a2_potential = readmatrix("inputs/validation/MEEM_validation/potential_a2.csv");
-    plot(a1_potential(:,1),a1_potential(:,2),'m-*','DisplayName','Yeung 2012 at a_1')
-    plot(a2_potential(:,1),a2_potential(:,2),'b-*','DisplayName','Yeung 2012 at a_2')
+    plot(a1_potential(:,1),a1_potential(:,2),'m-*','DisplayName','Chau \& Yeung 2012 at $a_1$')
+    plot(a2_potential(:,1),a2_potential(:,2),'b-*','DisplayName','Chau \& Yeung 2012 at $a_2$')
+    legend('interpreter','latex')
+    improvePlot
 end
 
 function plot_hydro_coeff_validation()
@@ -83,7 +94,9 @@ function plot_hydro_coeff_validation()
     excitation_nondim = readmatrix("inputs/validation/MEEM_validation/excitation.csv");
     excitation_phase_nondim = readmatrix("inputs/validation/MEEM_validation/excitation_phase.csv");
 
-    plot(mu_nondim(:,1),     mu_nondim(:,2),    'c--','DisplayName','Added Mass Yeung 2012')
-    plot(lambda_nondim(:,1), lambda_nondim(:,2),'m--','DisplayName','Damping Yeung 2012')
+    plot(mu_nondim(:,1),     mu_nondim(:,2),    'c--','DisplayName','Added Mass: Chau \& Yeung 2012')
+    plot(lambda_nondim(:,1), lambda_nondim(:,2),'m--','DisplayName','Damping: Chau \& Yeung 2012')
+    legend('interpreter','latex')
     improvePlot
+    xlim([0 mu_nondim(end,1)])
 end

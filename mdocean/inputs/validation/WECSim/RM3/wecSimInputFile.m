@@ -44,13 +44,19 @@ if ~contains(status,'working tree clean')
 end
 [~, git_output] = system('git rev-parse --short HEAD');
 git_hash = git_output(1:end-1);
-uuid = char(matlab.lang.internal.uuid());
 C_d_s = num2str(p.C_d_spar);
 C_d_f = num2str(p.C_d_float);
 mb = num2str(p.use_multibody);
+if p.T_s_over_D_s==29/6
+    geom = 'wecsim';
+elseif p.T_s_over_D_s==35/6
+    geom = 'report';
+else
+    geom='custom';
+end
 
-output_filename = ['wecsim_sparcd' C_d_s '_floatcd' C_d_f '_multibody_' mb ...
-                    '_meem_' meem '_git_' git_hash '_uuid_' uuid];
+output_filename = ['../results/Wecsim/wecsim_sparcd' C_d_s '_floatcd' C_d_f ...
+                    '_multibody_' mb '_meem_' meem '_geom_' geom];
 
 %% Simulation Data
 simu = simulationClass();               % Initialize Simulation Class
@@ -148,13 +154,97 @@ pto(1).stiffness = 0;                           % PTO Stiffness [N/m]
 % pto(1).damping = 1200000;                       % PTO Damping [N/(m/s)]
 pto(1).location = [0 0 0];                      % PTO Location [m]
 
+%% Drag (Morison)
 D_s   = X(1);        % inner diameter of float (m)
 D_f   = X(2);        % outer diameter of float (m)
+T_f_2 = X(3);
 D_f_in = p.D_f_in_over_D_s * D_s;
 D_d = p.D_d_over_D_s * D_s;
-body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
-body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
-body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
-body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
+T_s = p.T_s_over_D_s * D_s;
+% body(1).quadDrag.cd = [0 0 p.C_d_float 0 0 0];
+% body(1).quadDrag.area = [0 0 pi/4*(D_f^2-D_f_in^2) 0 0 0];
+% body(2).quadDrag.cd = [0 0 p.C_d_spar 0 0 0];
+% body(2).quadDrag.area = [0 0 pi/4*D_d^2 0 0 0];
 
+max_w = 2*pi/min(p.T);
+max_k = max_w^2/p.g;
+min_wavelength = 2*pi/max_k;
+max_element_length = min_wavelength/10;
+numMorisonElementsFloat = ceil(D_f/max_element_length);
+numMorisonElementsSpar  = ceil(D_d/max_element_length);
+
+z_ME_float = -T_f_2 + val.CG_f;
+z_ME_spar  = -T_s   + val.CG_s;
+
+body(1).morisonElement = make_morison_struct(D_f, D_f_in, numMorisonElementsFloat, p.C_d_float, z_ME_float);
+body(2).morisonElement = make_morison_struct(D_d, 0,      numMorisonElementsSpar,  p.C_d_spar,  z_ME_spar);
+
+function s = make_morison_struct(D_out,D_in,n,C_d,z_pos)
+
+    [x_pos,A_z]  = circle_strips(D_out,D_in,n);
+
+    cd_mat          = repmat([0 0 C_d],[n,1]);
+    unit_normal_vec = repmat([0 0 1],  [n,1]);
+    y_z_pos         = repmat([0 z_pos],[n,1]);
+    A_x_y           = repmat([0 0],    [n,1]);
+
+    rgME = [x_pos.' y_z_pos];
+    A    = [A_x_y   A_z.'];
+    
+    s = struct('option',1,'cd',cd_mat,'ca',zeros(n,3),...
+               'area',A,'VME',zeros(n,1),'rgME',rgME,'z',unit_normal_vec);
+end
+
+function [x_vec,areas] = circle_strips(D_out,D_in,n)
+    element_length = D_out / n;
+    x_start = -D_out/2 + element_length/2;
+    x_vec = x_start + element_length * (0:(n-1));
+
+    x_starts = x_vec - element_length/2;
+    x_ends   = x_vec + element_length/2;
+
+    no_cutout    = x_starts >= D_in/2 | x_ends <= -D_in/2;
+    all_cutout   = abs(x_starts) <  D_in/2 & abs(x_ends) <  D_in/2;
+    left_cutout  = abs(x_starts) <  D_in/2 & abs(x_ends) >  D_in/2;
+    right_cutout = abs(x_starts) >  D_in/2 & abs(x_ends) <  D_in/2;
+    mid_cutout   = x_starts < -D_in/2 & x_ends > D_in/2;
+    assert(all(no_cutout + all_cutout + left_cutout + right_cutout + mid_cutout == 1))
+
+    areas = zeros(size(x_starts));
+    areas(no_cutout)    = circle_strip_area_no_cutout( x_starts(no_cutout),  x_ends(no_cutout),  D_out/2);
+    areas(all_cutout)   = circle_strip_area_all_cutout(x_starts(all_cutout), x_ends(all_cutout), D_out/2, D_in/2);
+    areas(left_cutout)  = circle_strip_area_all_cutout(x_starts(left_cutout), D_in/2, D_out/2, D_in/2) + ...
+                         circle_strip_area_no_cutout(D_in/2, x_ends(left_cutout), D_out/2);
+    areas(right_cutout) = circle_strip_area_all_cutout(-D_in/2, x_ends(right_cutout), D_out/2, D_in/2) + ...
+                          circle_strip_area_no_cutout(x_starts(right_cutout), -D_in/2, D_out/2);
+    areas(mid_cutout)   = circle_strip_area_no_cutout(x_starts(mid_cutout), -D_in/2, D_out/2) + ...
+                          circle_strip_area_all_cutout(-D_in/2, D_in/2, D_out/2, D_in/2) + ...
+                          circle_strip_area_no_cutout(D_in/2, x_ends(mid_cutout), D_out/2);
+
+    assert(ismembertol(sum(areas), pi/4 * (D_out^2-D_in^2)));
+end
+
+function areas = circle_strip_area_all_cutout(x_starts,x_ends,R_out,R_in)
+    areas = circle_strip_area_no_cutout(x_starts,x_ends,R_out) - circle_strip_area_no_cutout(x_starts,x_ends,R_in);
+end
+
+function areas = circle_strip_area_no_cutout(x_starts,x_ends,R)
+
+    same_sign = sign(x_starts) == sign(x_ends);
+
+    x_larger = max(abs(x_starts),abs(x_ends));
+    x_larger(x_larger>R) = R; % prevent tiny imaginary area that sometimes happens due to finite precision effects 
+    x_smaller = min(abs(x_starts),abs(x_ends));
+
+    % derivation at https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/28c569c5d8e79b7e1a2be1755de42d25_MIT18_01SCF10_Ses70a.pdf
+    area_x_to_center = @(x) R^2*asin(x/R) + x .* sqrt(R^2 - x.^2);
+
+    areas_same_sign = area_x_to_center(x_larger) - area_x_to_center(x_smaller);
+    areas_diff_sign = area_x_to_center(x_larger) + area_x_to_center(x_smaller);
+
+    areas = zeros(size(x_starts));
+    areas(same_sign)  = areas_same_sign(same_sign);
+    areas(~same_sign) = areas_diff_sign(~same_sign);
+
+end
 

@@ -23,8 +23,13 @@ This is because the same force has a lower lever arm to the column and therefore
 \end{figure}
 
 \subsubsection{Effect of PTO Force Limit}
-Previous work \hl{cite} has shown that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power.
-Reference \cite{mccabe_force-limited_2024} shows that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
+Previous work has shown that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power.
+Reference \cite{devin_high-dimensional_2024} found that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
+This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
+This agrees with the conceptual argument of \cite{coe_maybe_2021} and the numerical findings of \cite{mcgilton_optimal_2024}.
+The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\% decrease in annual energy production, a trend consistent across two device archetypes (RM3 and RM5), four locations, and several dimensional scales.
+The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the model.
+Reference \cite{mccabe_force-limited_2024} shows analytically that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
 Intuitively, the sensitivity of annual average power to force limit should be even lower when considering a range of realistic sea states, because large sea states that require higher forces are comparatively rare.
 Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-power-limit}.
 
@@ -65,7 +70,44 @@ This section leverages the analytical multidisciplinary nature of the model to d
 
 \paragraph{Power Matrix Drivers}
 Similar to \figureautorefname~\ref{fig:JPD-multiply} showing the multiplication of the power matrix by the JPD to obtain average power, \figureautorefname~\ref{fig:power-matrix-decomposition} further decomposes the power matrix into component matrices showing the impact of shape, drag, shape, maximum force, and PTO losses.
-\hl{Describe how each matrix is found, and where there is coupling.}
+\begin{equation}
+\mathbf{P} = \mathbf{J}_{wave} ~\mathbf{CW}_{max} ~\mathbf{\eta}_{rad} ~\mathbf{\eta}_{drag} ~\mathbf{\eta}_{force} ~\mathbf{\eta}_{elec}
+\end{equation}
+The first two matrices in the product are independent of design, with the wave power density matrix $\mathbf{J}_{wave}$ providing the amount of energy flux per unit width of a wave with the given frequency and amplitude, and the maximum capture width matrix $\mathbf{CW}_{max}$ representing the radiation limit determined by the WEC mode of motion (heave in this case; for surge or pitch  the value would be doubled due to the asymmetry of the outgoing wave field).
+\begin{equation}
+\mathbf{J}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2 \qquad
+\mathbf{CW}_{max} = \frac{g T_e^2} {4\pi^2}
+\end{equation}
+The next two matrices together represent the WEC's capture width in the absence of dynamic constraints as a fraction of the maximum capture width, and their product should never exceed 1.
+To isolate how much of the deviation from the radiation limit is due to the effect of hull geometry on the linear radiation coefficients and how much is from drag, a separate simulation is run with the drag coefficients $C_{d,f}, C_{d,s}$ set to zero to find $\mathbf{P}_{F\dot{X},no drag}$, the mechanical power at the rigid body in the absence of both drag and dynamic constraints.
+Then, $\mathbf{\eta}_{rad}$ and $\mathbf{\eta}_{drag}$ are computed as:
+\begin{equation}
+\mathbf{\eta}_{rad} = \frac{\mathbf{P}_{F\dot{X},no drag}}{\mathbf{J}_{wave} \mathbf{CW}_{max}} \qquad
+\mathbf{\eta}_{drag} = \frac{\mathbf{P}_{F\dot{X},no limits}}{\mathbf{P}_{F\dot{X},no drag}}
+\end{equation} and $\mathbf{\eta}_{drag}$ representing the effect of drag on the WEC's ability to capture energy.
+It is possible for $\mathbf{\eta}_{drag}$ to be greater than 1 at some frequencies, which does not imply that drag adds energy to the system.
+Rather, it indicates that the drag-free system is so undamped in those sea states that the optimal controller (\cref{eq:matched-load} or \cref{eq:damping-control}) would cause instability, so a sub-optimal controller is used.
+In other words, $\mathbf{\eta}_{drag}>1$ is due not to its numerator being higher than expected, but its denominator being lower than expected to avoid instability.
+In cases where the optimal controller is stable, $\mathbf{\eta}_{drag}<1$ is guaranteed.
+
+The next matrix $\mathbf{\eta}_{force}$ represents the effect of the PTO force limit on power due to impedance mismatch: $\mathbf{\eta}_{force} = \mathbf{P}_{F\dot{X}}/\mathbf{P}_{F\dot{X},no limits}$.
+Finally, $\mathbf{\eta}_{elec}$ represents the effect of PTO losses and the power limit on power, $\mathbf{\eta}_{elec} = \eta\mathbf{P}_{IV}/\mathbf{P}_{F\dot{X}}$.
+
+Altogether, this multiplicative decomposition of the power matrix allows for the isolation of the effect of certain design variables and parameters on power, and therefore intuitive identification of which design variables are most important for improving power.
+The dependence is made explicit below:
+\begin{equation}
+\begin{aligned}
+\mathbf{\eta}_{rad} &= \mathbf{\eta}_{rad}(x_{shape}) &
+\mathbf{\eta}_{elec} &= \mathbf{\eta}_{elec}(x_{shape},C_{d,f}, C_{d,s},F_{max}, \eta, P_{max}) \\
+\mathbf{\eta}_{drag} &= \mathbf{\eta}_{drag}(x_{shape},C_{d,f}, C_{d,s}) &
+\mathbf{\eta}_{force} &= \mathbf{\eta}_{force}(x_{shape},C_{d,f}, C_{d,s},F_{max})
+\end{aligned}
+\end{equation}
+Importantly, the later matrices in the product depend on the design variables and parameters that affect the earlier matrices.
+This coupling means that the effect of the drag coefficients, for example, on power in a device with PTO limits and dynamics must be understood not only through $\mathbf{\eta}_{drag}$ but also through their effect on $\mathbf{\eta}_{force}$ and $\mathbf{\eta}_{elec}$.
+$\mathbf{\eta}_{drag}$
+While it would be possible to formulate variants such as $\mathbf{\eta}_{drag,var} = \mathbf{P}_{IV}/\mathbf{P}_{IV, no drag}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to obtain the overall power matrix, which is a key advantage of the current formulation.
+
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/manual/power_matrix_multiply.pdf}
@@ -74,17 +116,12 @@ Similar to \figureautorefname~\ref{fig:JPD-multiply} showing the multiplication 
 \end{figure}
 
 
-\paragraph{Damping vs Reactive Control}
-The analytical model can be used to investigate the price conditions under which the extra power of reactive control justifies the extra cost compared to damping control.
-\hl{Still in formulation, see} \appendixautorefname~\ref{sec:appendix-reactive-vs-damping}.
-
-
 \subsection{Unmodeled Effects and Limitations}
 \paragraph{Neglect of Surge Force}
 Section~\ref{sec:dynamics} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
 The neglect of surge force means that geometries with significant lateral areas that would experience high surge force perform better than they should in an optimization.
 This is not only because of the impact on the structures module, but also because the surge force drives mooring cost, an effect which is not modeled in this study.
-The minimum LCOE design experiences a surge force of \surgeForceFloatAtMinLCOE~MN on the float and \surgeForceSparAtMinLCOE~MN on the spar, compared to the nominal design's \surgeForceFloatNominal~MN and \surgeForceSparNominal~MN respectively.
+The minimum LCOE design experiences a storm surge force of \results[surgeForceFloatAtMinLCOE] on the float and \results[surgeForceSparAtMinLCOE] on the spar, compared to the nominal design's \results[surgeForceFloatNominal] and \results[surgeForceSparNominal] respectively.
 With mooring and foundation comprising 12\% of the capital cost (see \tableautorefname~\ref{tab:CBS}), this effect may be substantial.
 Incorporating surge force into the structures module and adding a mooring cost module are recommended for future work.
 If these effects are implemented and confirmed to be important, then it may also be desired to obtain a more accurate estimate of the surge force across frequencies by utilizing the surge hydrodynamic coefficients instead of the long-wavelength approximation in \equationautorefname~\ref{eq:surge-force}. 

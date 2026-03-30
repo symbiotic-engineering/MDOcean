@@ -15,16 +15,267 @@ function [fig_array,...
 % :returns: tab_firstrows
 % :returns: tab_colspecs
             
-            fig_array = [intermed_result_struct.fig_singlebody, ...
-                        intermed_result_struct.fig_multibody, ...
-                        intermed_result_struct.all_sea_states_fig];
+
+     case_cell = intermed_result_struct.case_cell;
+     filename_cell = intermed_result_struct.filename_cell;
+     runOnlyFewSeaStates = intermed_result_struct.runOnlyFewSeaStates;
+
+     [err_structs, fig_cell, validation_table] = validate_dynamics_plots(case_cell,filename_cell,...
+                                                            runOnlyFewSeaStates);
+
+    % if histogram_separate_figures=true, 192 figures: fig_cell is 3 nested 
+    %    4x1 cells, each cell has 16 figs
+    % if histogram_separate_figures=false, 183 figures: fig_cell is 3 nested
+    %    5x1 cells, cells 1-4 have 15 figures and cell 5 has 1 figure
+    tmp = [fig_cell{:}]; 
+    fig_array = [tmp{:}]; 
+
+    tab_array_display = {validation_table};
+    tab_array_latex = {validation_table};
+     
+    tab_firstrows = {[]};
+    tab_colspecs = {[]};
+     
+    end_result_struct.err_structs = err_structs;
+end
+
+function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename_cell,runOnlyFewSeaStates)
+    
+    err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFewSeaStates);
+    % keep as column cells
+    err_structs = err_struct_figs_cell(:,1);
+    fig_mats   = err_struct_figs_cell(:,2);
+    
+    % extract actual structs
+    errors_wecsim_sb = err_structs{1};
+    errors_wecsim_mb = err_structs{2};
+    errors_report_mb = err_structs{3}; % first index is wecsim to report error, second index is mdocean to report error
+
+    %% make table comparing error of mdocean to various ground truths
+    errors_report_mdocean = structfun(@(s)s([2,4]), errors_report_mb,'UniformOutput',false); % just mdocean to report error
+    T_report = struct2table(errors_report_mdocean);
+    T_singlebody = struct2table(errors_wecsim_sb);
+    T_multibody = struct2table(errors_wecsim_mb);
+    % vertical concatenation of the three 1xN tables
+    T = [T_report; T_singlebody; T_multibody];
+    T.Row = {'RM3 Report','WEC-Sim Singlebody','WEC-Sim Multibody'};
+end
+
+function err_struct_figs_cell = plot_all_cases(case_cell,filename_cell,runOnlyFewSeaStates)
+    histogram_sep_figures = false;
+    num_case_groups = size(case_cell,1);
+    err_struct_figs_cell = cell(num_case_groups,2);
+
+    for case_group_idx = 1:num_case_groups
+        X = case_cell{case_group_idx,1};
+        p_array = case_cell{case_group_idx,2};
+        filename_array = filename_cell{case_group_idx};
+
+        if ~histogram_sep_figures
+            hist_fig = figure;
+            t = tiledlayout(1, length(p_array));
+        end
+
+        my_fieldnames = {'pct_error_baseline','pct_error_drag','pct_error_meem','pct_error_total'};
+        my_subtitles = ["Drag Off, Identical Hydro Coefficients",...
+                        "Drag On, Identical Hydro Coefficients",...
+                        "Drag Off, Different Hydro Coefficients",...
+                        "Drag On, Different Hydro Coefficients"];
+
+        % set RM3reportOn for report group (third group here)
+        RM3reportOn = (case_group_idx == 3);
+
+        % initialize containers for this group
+        error_struct = struct();
+        fig_mat = cell(numel(p_array)+1-histogram_sep_figures,1);
+
+        for p_idx = 1:numel(p_array)
+            p = p_array(p_idx);
+            filename = filename_array{p_idx};
+            if p.use_multibody
+                widths = [.05 .15 5 5];
+            else
+                widths = [.05 .25 .25 5];
+            end
+            if p.C_d_float == 0 && p.C_d_spar == 0 && ~p.use_MEEM
+                xlim_thresh = 1;
+            else
+                xlim_thresh = 100;
+            end
+            width = widths(p_idx);
+
+            if histogram_sep_figures
+                hist_fig = figure;
+                ax = gca;
+            else
+                figure(hist_fig);
+                ax = nexttile(t);
+            end
+            [weighted_pwr_err,...
+            max_amp_err,...
+            pwr_err,amp_err,fig_vec] = plot_per_case(X,p,filename,RM3reportOn,...
+                                                    runOnlyFewSeaStates,ax,width,xlim_thresh);
+
+            subtitle(ax,my_subtitles{p_idx},'FontSize',13)
+
+            if histogram_sep_figures
+                fig_vec = [hist_fig fig_vec];
+            end
             
-            tab_array_display = {intermed_result_struct.validation_table};
-            tab_array_latex = {intermed_result_struct.validation_table};
+            error_struct.(my_fieldnames{p_idx}) = [weighted_pwr_err, max_amp_err];
+            % weighted_pwr_err_array(p_idx) = weighted_pwr_err;
+            % max_amp_err_array(p_idx) = max_amp_err;
+            % pwr_err_array(p_idx) = pwr_err;
+            % amp_err_array(p_idx) = amp_err;
+            fig_mat{p_idx} = fig_vec;
+        end
+        if ~histogram_sep_figures
+            leg = legend;
+            title(leg,'Error in:')
+            leg.Position = [0.514,0.212,0.226,0.222];
             
-            tab_firstrows = {[]};
-            tab_colspecs = {[]};
-            
-            end_result_struct.wecsim_validation_complete = true;
-            end_result_struct.validation_errors = intermed_result_struct.validation_table;
+            if all([p_array.use_multibody])
+                mb_string = 'Multi-Body';
+            else
+                mb_string = 'Single Body';
+            end
+            xlabel(t, 'Percent Error of MDOcean to WecSim')
+            ylabel(t, 'Fraction of Sea States')
+            title(t,[mb_string ' Dynamics'])
+            improvePlot
+            hist_fig.Position = [7.4,137,1523.2,600];
+            fig_mat{end} = hist_fig;
+        end
+        err_struct_figs_cell(case_group_idx,:) = {error_struct, fig_mat};
+    end
+end
+
+function [weighted_pwr_err,...
+          max_amp_err,...
+          pwr_err,amp_err,figs] = plot_per_case(X,p,wecsim_filename,RM3reportOn,...
+                                                runOnlyFewSeaStates,ax,width,xlim_thresh)
+
+    [weighted_pwr_err, max_amp_err, ...
+     pwr_err,          amp_err,    figs] = power_matrix_compare(X,p,wecsim_filename, ...
+                                                    RM3reportOn,runOnlyFewSeaStates);
+
+    make_report(figs,wecsim_filename,p)
+
+    make_histogram_on_axis(ax,width,...
+                            pwr_err,amp_err,...
+                            weighted_pwr_err,max_amp_err,xlim_thresh)
+
+end
+
+function make_report(figs,wecsim_filename,p)
+    import mlreportgen.report.* 
+    import mlreportgen.dom.* 
+    rpt = Report(wecsim_filename,'pdf'); 
+    rpt.Layout.Landscape = true;
+    pm = PageMargins();
+    pm.Left='0.5in'; pm.Right='0.5in';
+    rpt.Layout.PageMargins = pm;
+    
+    % add parameters
+    display_fields = {'use_MEEM','use_multibody','C_d_float','C_d_spar','harmonics'};
+    for i=1:length(display_fields)
+        pDisplay.(display_fields{i}) = p.(display_fields{i});
+    end
+    append(rpt,struct2table(pDisplay))
+
+    % add figures
+    for i=1:length(figs)
+        fig = figs(i);
+        pos = fig.Position;
+        fig.Position = [pos(1) pos(2) 2*pos(3) pos(4)];
+        if isvalid(fig)
+            try
+                append(rpt,Figure(fig))
+            catch
+                warning(['Figure %d of %d has been deleted and was skipped ' ...
+                'from the report.'],i,length(figs))
+            end
+        else
+            warning(['Figure %d of %d has been deleted and was skipped ' ...
+                'from the report.'],i,length(figs))
+        end
+    end
+
+    close(rpt)
+    %rptview(rpt)
+end
+
+function make_histogram_on_axis(ax,width,...
+                                pwr_err,amp_err,...
+                                weighted_pwr_err,max_amp_err,xlim_thresh)
+    % ensure scalar values for plotting vertical lines/text
+    if isempty(weighted_pwr_err)
+        wp = NaN;
+    else
+        wp = weighted_pwr_err;
+        if ~isscalar(wp)
+            wp = wp(1);
+        end
+    end
+    if isempty(max_amp_err)
+        ma = NaN;
+    else
+        ma = max_amp_err;
+        if ~isscalar(ma)
+            ma = ma(1);
+        end
+    end
+
+    min_num_bars = 10;
+    max_num_bars = 30;
+
+    expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
+    width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
+    
+    pwr_err_capped = pwr_err;
+    pwr_err_capped(abs(pwr_err_capped)>xlim_thresh)=Inf;
+    amp_err_capped = amp_err;
+    amp_err_capped(abs(amp_err_capped)>xlim_thresh)=Inf;
+
+    % histogram
+    axes(ax)
+    histogram(ax,pwr_err_capped(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
+    hold(ax,'on')
+    h = histogram(ax,amp_err_capped(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
+    hb = bar(ax,h.BinEdges(1:end-1),-h.Values,'histc');
+    hb.FaceColor = [0.8500 0.3250 0.0980];
+    hb.FaceAlpha = 0.6; 
+    hb.DisplayName = 'Float Amplitude';
+
+    h.EdgeAlpha = 0; h.FaceAlpha = 0; % transparent
+
+    ylim([-.57 .57])
+    xx = xlim;
+    if any(abs(xx) > xlim_thresh)
+        warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
+    end
+    xlim([-1 1]*min(max(abs(xx)),xlim_thresh)) % zero centered on x, don't allow outliers > xlim_thresh%
+    yy = ylim;
+
+    plot(ax,[1 1]*wp,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
+        'DisplayName','JPD-Weighted Average Power')
+    plot(ax,[1 1]*ma,     [yy(1) 0],'Color',[0.8500 0.3250 0.0980], ...
+        'DisplayName','Maximum Float Amplitude')
+
+    text_offset_if_neg = -max(abs(xx))/3.7;
+    text_offset_if_pos =  max(abs(xx))/18;
+    x_text_pwr = wp + text_offset_if_neg*logical(wp<0) ...
+                + text_offset_if_pos*logical(wp>0);
+    x_text_amp = ma + text_offset_if_neg*logical(ma<0) ...
+                + text_offset_if_pos*logical(ma>0);
+
+    text(x_text_pwr, yy(2)*.9, sprintf('%+0.1f%%',wp), ...
+        "Color",[0 0.4470 0.7410],'FontSize',12)
+    text(x_text_amp, yy(1)*.9, sprintf('%+0.1f%%',ma), ...
+        "Color",[0.8500 0.3250 0.0980],'FontSize',12)
+
+    plot(ax,[0 0],                  yy, 'k--','HandleVisibility','off')
+    plot(ax,[-1 1]*max(abs(xx)),[0 0],'k-','LineWidth',.5,'HandleVisibility','off')
+    xtickformat('percentage')
+
 end

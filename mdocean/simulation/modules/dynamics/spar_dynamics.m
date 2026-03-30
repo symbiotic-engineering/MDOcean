@@ -22,7 +22,8 @@ function [A_s_over_rho,gamma_s_over_rho_g,...
     r = min(Ds_over_Dd, 1);
     root_r = sqrt(1-r^2);
     ratio_term = 1/3 - 1/4 * r^2 * root_r - 1/12 * (1 - root_r)^2 * (2 + root_r);
-    A_s_over_rho = D_d^3 * ratio_term; % added mass
+    A_s_over_rho_const = D_d^3 * ratio_term; % added mass
+    A_s_over_rho = A_s_over_rho_const * ones(size(k));
     
     % excitation - interpolate WAMIT results
     depth_multiplier = exp(-k * (T_s - spar_coeffs.T_s));
