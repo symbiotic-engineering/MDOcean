@@ -15,10 +15,11 @@ Workflow
    The script merges the generated stages into ``calkit.yaml`` while:
 
    * Preserving all non-analysis/postpro stages (e.g. mermaid-*, make-drag-integral).
-   * Preserving special inputs such as ``from_stage_outputs`` that calkit
-     adds manually and that are not emitted by ``write_calkit_stage``.
-   * Overwriting all plain-path inputs and outputs with the generated values
-     so that stale removed dependencies do not remain.
+   * Fully overwriting inputs and outputs for analysis-*/postpro-* stages with
+     the generated values so that stale removed dependencies do not remain.
+     Special directives such as ``from_stage_outputs`` are now included in the
+     generated ``calkit_stages.yaml`` by ``write_calkit_stage`` and do not
+     need separate preservation.
    * Inserting brand-new stages in alphabetical order among the existing
      analysis-*/postpro-* stages.
 
