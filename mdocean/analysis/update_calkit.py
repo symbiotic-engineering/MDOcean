@@ -82,8 +82,8 @@ def _to_commented_seq(seq):
     return cs
 
 
-def merge_inputs(old_inputs, new_inputs, stage_key):
-    """Return merged inputs list for *stage_key*.
+def merge_inputs(old_inputs, new_inputs):
+    """Return merged inputs list.
 
     Special dict items (e.g. ``from_stage_outputs``) are always preserved
     from the old list.  All plain-path items are replaced by the generated
@@ -137,8 +137,8 @@ def merge_inputs(old_inputs, new_inputs, stage_key):
     return seq
 
 
-def merge_outputs(old_outputs, new_outputs, stage_key):
-    """Return merged outputs list for *stage_key*.
+def merge_outputs(old_outputs, new_outputs):
+    """Return merged outputs list.
 
     Generated outputs completely replace the old outputs (overwrite
     behaviour) so that stale removed outputs do not remain.
@@ -345,10 +345,10 @@ def main():
             old = stages[stage_key]
 
             merged_in = merge_inputs(
-                old.get("inputs"), gen_stage.get("inputs"), stage_key
+                old.get("inputs"), gen_stage.get("inputs")
             )
             merged_out = merge_outputs(
-                old.get("outputs"), gen_stage.get("outputs"), stage_key
+                old.get("outputs"), gen_stage.get("outputs")
             )
 
             # Only replace inputs and outputs; preserve kind, command, etc.
