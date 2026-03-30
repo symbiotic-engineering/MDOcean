@@ -442,16 +442,8 @@ fo.StartPoint = [1.5, 1/5, 1/3, .5, 3, .5];
 x_string = 'k h R_x/R_p \alpha^2 / \beta';
 y_string = '$f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}\sqrt{kh})$';
 
-% manual fit
-plot_fit_sep_alpha_beta(case_4_kh_Rx_over_Rp_alpha2_over_beta, case_4_f_over_H0_exp_sqrt_kh, ...
-                                case_4_alpha, case_4_beta, ft, fo, x_string, y_string, false);
-
-% auto fit
-fits = plot_fit_sep_alpha_beta(case_4_kh_Rx_over_Rp_alpha2_over_beta, case_4_f_over_H0_exp_sqrt_kh, ...
-                                case_4_alpha, case_4_beta, ft, fo, x_string, y_string, true);
-
-% auto fit coeffs vs alpha/beta
-plot_fit_coeffs_vs_alpha_beta(fits, case_4_alpha, case_4_beta)
+plot_fit_and_coeffs_sep_alpha_beta(case_4_kh_Rx_over_Rp_alpha2_over_beta, case_4_f_over_H0_exp_sqrt_kh, ...
+    case_4_alpha, case_4_beta, ft, fo, x_string, y_string);
 
 
 
@@ -495,23 +487,13 @@ y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_
 x_label_v2 = 'k h R_x/R_p \alpha^3 / \beta';
 y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
 
-% version 1: manual fit, all alpha combined
-plot_fit_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
-    case_4_alpha, case_4_beta, @semilogx, x_label_v1, y_label_v1, [0 10], case_4_y_pred_f1_v1);
-
-% version 1: auto fit, all alpha combined
-fits_v1 = plot_fit_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+% version 1: all alpha combined (manual + auto fits with coeffs)
+plot_fit_and_coeffs_all_alpha_beta(case_4_x_f1_v1, case_4_y_f1_v1, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
     case_4_alpha, case_4_beta, @semilogx, x_label_v1, y_label_v1, [0 10], case_4_y_pred_f1_v1, ft, fo);
-plot_fit_coeffs_vs_alpha_beta(fits_v1, case_4_alpha, case_4_beta)
 
-% version 2: manual fit, all alpha combined
-plot_fit_all_alpha_beta(case_4_x_f1_v2, case_4_y_f1_v2, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
-    case_4_alpha, case_4_beta, @loglog, x_label_v2, y_label_v2, [0 20], case_4_y_pred_f1_v2);
-
-% version 2: auto fit, all alpha combined
-fits_v2 = plot_fit_all_alpha_beta(case_4_x_f1_v2, case_4_y_f1_v2, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
+% version 2: all alpha combined (manual + auto fits with coeffs)
+plot_fit_and_coeffs_all_alpha_beta(case_4_x_f1_v2, case_4_y_f1_v2, case_4_x_f3, case_4_y_base, case_4_y_pred_base, ...
     case_4_alpha, case_4_beta, @loglog, x_label_v2, y_label_v2, [0 20], case_4_y_pred_f1_v2, ft, fo);
-plot_fit_coeffs_vs_alpha_beta(fits_v2, case_4_alpha, case_4_beta)
 
 % version 3: second-order fit in x^1.5 space
 case_4_x_new = case_4_x_f1_v2;
@@ -543,6 +525,23 @@ writecell(case_4_xyab,'case_4_xyab.csv')
 
 
 % functions
+function plot_fit_and_coeffs_sep_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_string, y_string)
+    % Plots manual fit, auto fit, and fit coefficients vs alpha/beta for separate-alpha subplots.
+    plot_fit_sep_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_string, y_string, false);
+    fits = plot_fit_sep_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_string, y_string, true);
+    plot_fit_coeffs_vs_alpha_beta(fits, alpha_vec, beta_vec);
+end
+
+function plot_fit_and_coeffs_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+        alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell, ft, fo)
+    % Plots manual fit, auto fit, and fit coefficients vs alpha/beta for all-alpha combined plots.
+    plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+        alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell);
+    fits = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+        alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell, ft, fo);
+    plot_fit_coeffs_vs_alpha_beta(fits, alpha_vec, beta_vec);
+end
+
 function plot_fit_coeffs_vs_alpha_beta(fits,alpha_vec,beta_vec)
 cols = {'r','g','b','k'};
 % coeffs vs beta for each alpha
