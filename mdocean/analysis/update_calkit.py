@@ -35,7 +35,6 @@ Options
 import sys
 import argparse
 from pathlib import Path
-import re
 
 try:
     from ruamel.yaml import YAML
@@ -45,20 +44,6 @@ except ImportError:
         "ERROR: ruamel.yaml is required.\n"
         "Install with:  pip install ruamel.yaml"
     )
-
-
-# ---------------------------------------------------------------------------
-# Helpers for YAML item inspection
-# ---------------------------------------------------------------------------
-
-def is_special(item):
-    """True for dict items that are NOT plain file paths.
-
-    Examples: ``{from_stage_outputs: analysis-X}``.
-    These are calkit-specific directives that ``write_calkit_stage`` does not
-    emit and must always be preserved.
-    """
-    return isinstance(item, dict) and "path" not in item
 
 
 # ---------------------------------------------------------------------------
@@ -85,54 +70,17 @@ def _to_commented_seq(seq):
 def merge_inputs(old_inputs, new_inputs):
     """Return merged inputs list.
 
-    Special dict items (e.g. ``from_stage_outputs``) are always preserved
-    from the old list.  All plain-path items are replaced by the generated
-    inputs (overwrite behaviour) so that stale removed dependencies do not
-    remain.
+    Generated inputs completely replace the old inputs (overwrite behaviour)
+    so that stale removed dependencies do not remain.
     """
-    old_inputs = list(old_inputs or [])
     new_inputs = list(new_inputs or [])
 
-    # Preserve special dict items (e.g. from_stage_outputs) from the
-    # old list but allow specials present in the generated list to
-    # replace the old values (avoid duplication).
-    special_map = {}
-    special_order = []
-    for x in old_inputs:
-        if is_special(x):
-            k = next(iter(x.keys()))
-            special_map[k] = x[k]
-            special_order.append(k)
-
-    # Override or add specials from new_inputs if present
-    for x in new_inputs:
-        if is_special(x):
-            k = next(iter(x.keys()))
-            if k not in special_order:
-                special_order.append(k)
-            special_map[k] = x[k]
-
-    special_nodes = [{k: special_map[k]} for k in special_order]
-
-    # Non-specials — convert generated plain paths and path dicts
-    non_specials = []
-    for x in new_inputs:
-        if is_special(x):
-            continue
-        if isinstance(x, dict):
-            non_specials.append(x)
-        else:
-            non_specials.append(x)
-
-    # Build a CommentedSeq preserving node types
     seq = CommentedSeq()
-    for s in special_nodes:
-        seq.append(_to_commented_map(s))
-    for s in non_specials:
-        if isinstance(s, dict):
-            seq.append(_to_commented_map(s))
+    for x in new_inputs:
+        if isinstance(x, dict):
+            seq.append(_to_commented_map(x))
         else:
-            seq.append(s)
+            seq.append(x)
 
     return seq
 
@@ -143,41 +91,14 @@ def merge_outputs(old_outputs, new_outputs):
     Generated outputs completely replace the old outputs (overwrite
     behaviour) so that stale removed outputs do not remain.
     """
-    old_outputs = list(old_outputs or [])
     new_outputs = list(new_outputs or [])
 
-    # Collect intermed_*.fig from old outputs to preserve them if missing
-    intermeds = []
-    for x in old_outputs:
-        p = None
-        if isinstance(x, dict):
-            p = x.get("path")
-        elif isinstance(x, str):
-            p = x
-        if p and re.search(r'/intermed_.*\.fig$', p):
-            intermeds.append(x)
-
-    # Build CommentedSeq for new outputs, then append any missing intermeds
     seq = CommentedSeq()
-    seen = set()
-    def add_item(item):
-        key = None
-        if isinstance(item, dict):
-            key = tuple(item.items())
-        else:
-            key = (item,)
-        if key in seen:
-            return
-        seen.add(key)
-        if isinstance(item, dict):
-            seq.append(_to_commented_map(item))
-        else:
-            seq.append(item)
-
     for x in new_outputs:
-        add_item(x)
-    for x in intermeds:
-        add_item(x)
+        if isinstance(x, dict):
+            seq.append(_to_commented_map(x))
+        else:
+            seq.append(x)
 
     return seq
 
