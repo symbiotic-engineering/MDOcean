@@ -221,7 +221,8 @@ classdef (SharedTestFixtures={ ...
             if ~contains(which_figs,'none') % figure
                 fig_name = "Figure_" + strrep(which_figs, '.', '_');
 
-                idx = strcmp(which_figs, testCase.which_figs);
+                non_none_figs = testCase.which_figs(~contains(string(testCase.which_figs), 'none'));
+                idx = strcmp(which_figs, non_none_figs);
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
