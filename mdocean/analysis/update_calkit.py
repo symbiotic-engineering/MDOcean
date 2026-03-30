@@ -35,7 +35,6 @@ Options
 import sys
 import argparse
 from pathlib import Path
-from io import StringIO
 import re
 
 try:
@@ -51,20 +50,6 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Helpers for YAML item inspection
 # ---------------------------------------------------------------------------
-
-def get_path(item):
-    """Return the canonical file path from a YAML list item.
-
-    Items are either plain strings (``- ./path/to/file``) or dicts with a
-    ``path`` key (``- path: ./file\n  storage: git``).
-    Returns ``None`` for other dict types (e.g. ``from_stage_outputs``).
-    """
-    if isinstance(item, str):
-        return item
-    if isinstance(item, dict) and "path" in item:
-        return item["path"]
-    return None
-
 
 def is_special(item):
     """True for dict items that are NOT plain file paths.
