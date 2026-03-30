@@ -31,8 +31,8 @@ function intermed_result_struct = analysis_fcn(p,b)
     p_freq.use_power_sat = false;
     p_freq.C_d_float = 0;
     p_freq.C_d_spar = 0;
-    p_freq.max_drag_iters_fxp = 0;
-    p_freq.max_drag_iters_slv = 0;
+    p_freq.max_drag_iters_fxp = 1;
+    p_freq.max_drag_iters_slv = 1;
     profile clear
     profile on
     simulation(X,p_freq);
