@@ -540,48 +540,48 @@ function plot_fit_and_coeffs_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_c
 end
 
 function plot_fit_coeffs_vs_alpha_beta(fits,alpha_vec,beta_vec)
-cols = {'r','g','b','k'};
-% coeffs vs beta for each alpha
-coeff_names = coeffnames(fits{1,1});
-figure
-for i_alpha=1:3
-    for i_coeff = 1:length(coeff_names)
-        subplot(1,length(coeff_names),i_coeff)
-        coeff_name = coeff_names{i_coeff};
-        coeff_vals = zeros(1,4);
-        for j_beta = 1:4
-            f = fits{i_alpha,j_beta};
-            coeff_vals(j_beta) = f.(coeff_name);
+    cols = {'r','g','b','k'};
+    % coeffs vs beta for each alpha
+    coeff_names = coeffnames(fits{1,1});
+    figure
+    for i_alpha=1:3
+        for i_coeff = 1:length(coeff_names)
+            subplot(1,length(coeff_names),i_coeff)
+            coeff_name = coeff_names{i_coeff};
+            coeff_vals = zeros(1,4);
+            for j_beta = 1:4
+                f = fits{i_alpha,j_beta};
+                coeff_vals(j_beta) = f.(coeff_name);
+            end
+            alpha_str = ['\alpha=' num2str(alpha_vec(i_alpha))];
+            plot(beta_vec,coeff_vals,cols{i_alpha},'DisplayName',alpha_str)
+            xlabel('\beta')
+            ylabel(coeff_name)
+            hold on
         end
-        alpha_str = ['\alpha=' num2str(alpha_vec(i_alpha))];
-        plot(beta_vec,coeff_vals,cols{i_alpha},'DisplayName',alpha_str)
-        xlabel('\beta')
-        ylabel(coeff_name)
-        hold on
     end
-end
-legend
-
-
-% coeffs vs alpha for each beta
-figure
-for j_beta=1:4
-    for i_coeff = 1:length(coeff_names)
-        subplot(1,length(coeff_names),i_coeff)
-        coeff_name = coeff_names{i_coeff};
-        coeff_vals = zeros(1,3);
-        for i_alpha = 1:3
-            f = fits{i_alpha,j_beta};
-            coeff_vals(i_alpha) = f.(coeff_name);
+    legend
+    
+    
+    % coeffs vs alpha for each beta
+    figure
+    for j_beta=1:4
+        for i_coeff = 1:length(coeff_names)
+            subplot(1,length(coeff_names),i_coeff)
+            coeff_name = coeff_names{i_coeff};
+            coeff_vals = zeros(1,3);
+            for i_alpha = 1:3
+                f = fits{i_alpha,j_beta};
+                coeff_vals(i_alpha) = f.(coeff_name);
+            end
+            beta_str = ['\beta=' num2str(beta_vec(j_beta))];
+            plot(alpha_vec,coeff_vals,cols{j_beta},'DisplayName',beta_str)
+            hold on
+            xlabel('\alpha')
+            ylabel(coeff_name)
         end
-        beta_str = ['\beta=' num2str(beta_vec(j_beta))];
-        plot(alpha_vec,coeff_vals,cols{j_beta},'DisplayName',beta_str)
-        hold on
-        xlabel('\alpha')
-        ylabel(coeff_name)
     end
-end
-legend
+    legend
 
 end
 
