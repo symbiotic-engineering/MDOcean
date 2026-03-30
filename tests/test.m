@@ -221,8 +221,11 @@ classdef (SharedTestFixtures={ ...
             if ~contains(which_figs,'none') % figure
                 fig_name = "Figure_" + strrep(which_figs, '.', '_');
 
-                non_none_figs = testCase.which_figs(~contains(string(testCase.which_figs), 'none'));
-                idx = strcmp(which_figs, non_none_figs);
+                % Use find+string() for a numeric index that is type-safe
+                % (handles char/string mix) and avoids logical-index size
+                % mismatch: testCase.which_figs has N+M entries but
+                % fig_success only has N; real figs are at positions 1..N.
+                idx = find(strcmp(string(which_figs), string(testCase.which_figs)));
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
@@ -230,7 +233,7 @@ classdef (SharedTestFixtures={ ...
 
             else % table
                 non_none_tabs = testCase.which_tabs(~contains(string(testCase.which_tabs), 'none'));
-                idx = strcmp(which_tabs, non_none_tabs);
+                idx = find(strcmp(string(which_tabs), string(non_none_tabs)));
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
                
