@@ -35,10 +35,12 @@ Options
 import sys
 import argparse
 from pathlib import Path
+from io import StringIO
+import re
 
 try:
     from ruamel.yaml import YAML
-    from ruamel.yaml.comments import CommentedMap
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
 except ImportError:
     sys.exit(
         "ERROR: ruamel.yaml is required.\n"
@@ -78,6 +80,23 @@ def is_special(item):
 # Merge logic
 # ---------------------------------------------------------------------------
 
+def _to_commented_map(d):
+    cm = CommentedMap()
+    for k, v in d.items():
+        cm[k] = v
+    return cm
+
+
+def _to_commented_seq(seq):
+    cs = CommentedSeq()
+    for x in seq:
+        if isinstance(x, dict):
+            cs.append(_to_commented_map(x))
+        else:
+            cs.append(x)
+    return cs
+
+
 def merge_inputs(old_inputs, new_inputs, stage_key):
     """Return merged inputs list for *stage_key*.
 
@@ -89,10 +108,48 @@ def merge_inputs(old_inputs, new_inputs, stage_key):
     old_inputs = list(old_inputs or [])
     new_inputs = list(new_inputs or [])
 
-    # Special dict items (e.g. from_stage_outputs) are always preserved.
-    special = [x for x in old_inputs if is_special(x)]
+    # Preserve special dict items (e.g. from_stage_outputs) from the
+    # old list but allow specials present in the generated list to
+    # replace the old values (avoid duplication).
+    special_map = {}
+    special_order = []
+    for x in old_inputs:
+        if is_special(x):
+            k = next(iter(x.keys()))
+            special_map[k] = x[k]
+            special_order.append(k)
 
-    return special + new_inputs
+    # Override or add specials from new_inputs if present
+    for x in new_inputs:
+        if is_special(x):
+            k = next(iter(x.keys()))
+            if k not in special_order:
+                special_order.append(k)
+            special_map[k] = x[k]
+
+    special_nodes = [{k: special_map[k]} for k in special_order]
+
+    # Non-specials — convert generated plain paths and path dicts
+    non_specials = []
+    for x in new_inputs:
+        if is_special(x):
+            continue
+        if isinstance(x, dict):
+            non_specials.append(x)
+        else:
+            non_specials.append(x)
+
+    # Build a CommentedSeq preserving node types
+    seq = CommentedSeq()
+    for s in special_nodes:
+        seq.append(_to_commented_map(s))
+    for s in non_specials:
+        if isinstance(s, dict):
+            seq.append(_to_commented_map(s))
+        else:
+            seq.append(s)
+
+    return seq
 
 
 def merge_outputs(old_outputs, new_outputs, stage_key):
@@ -101,7 +158,43 @@ def merge_outputs(old_outputs, new_outputs, stage_key):
     Generated outputs completely replace the old outputs (overwrite
     behaviour) so that stale removed outputs do not remain.
     """
-    return list(new_outputs or [])
+    old_outputs = list(old_outputs or [])
+    new_outputs = list(new_outputs or [])
+
+    # Collect intermed_*.fig from old outputs to preserve them if missing
+    intermeds = []
+    for x in old_outputs:
+        p = None
+        if isinstance(x, dict):
+            p = x.get("path")
+        elif isinstance(x, str):
+            p = x
+        if p and re.search(r'/intermed_.*\.fig$', p):
+            intermeds.append(x)
+
+    # Build CommentedSeq for new outputs, then append any missing intermeds
+    seq = CommentedSeq()
+    seen = set()
+    def add_item(item):
+        key = None
+        if isinstance(item, dict):
+            key = tuple(item.items())
+        else:
+            key = (item,)
+        if key in seen:
+            return
+        seen.add(key)
+        if isinstance(item, dict):
+            seq.append(_to_commented_map(item))
+        else:
+            seq.append(item)
+
+    for x in new_outputs:
+        add_item(x)
+    for x in intermeds:
+        add_item(x)
+
+    return seq
 
 
 # ---------------------------------------------------------------------------
@@ -225,7 +318,15 @@ def main():
     # parts of calkit.yaml that we do NOT touch.
     yaml_rt = YAML()
     yaml_rt.preserve_quotes = True
-    yaml_rt.width = 4096  # prevent unwanted line wrapping
+    yaml_rt.width = 72  # keep reasonable line width to avoid large diffs
+    yaml_rt.indent(mapping=2, sequence=4, offset=2)
+    # Represent Python None as explicit 'null' in the YAML output
+    try:
+        yaml_rt.representer.add_representer(type(None),
+                                           lambda dumper, value: dumper.represent_scalar('tag:yaml.org,2002:null', 'null'))
+    except Exception:
+        # Fallback: some ruamel versions expose representer differently; ignore if not available
+        pass
 
     print(f"Loading {calkit_path} ...")
     with open(calkit_path) as fh:
@@ -272,7 +373,14 @@ def main():
         else:
             print(f"Inserting {stage_key}")
             after = find_insert_after(stages, stage_key)
-            new_stages = insert_stage(stages, after, stage_key, gen_stage)
+            # Convert generated stage (plain dict) into CommentedMap
+            new_value = CommentedMap()
+            for k, v in gen_stage.items():
+                if k in ("inputs", "outputs"):
+                    new_value[k] = _to_commented_seq(v or [])
+                else:
+                    new_value[k] = v
+            new_stages = insert_stage(stages, after, stage_key, new_value)
             calkit["pipeline"]["stages"] = new_stages
             stages = calkit["pipeline"]["stages"]
 
@@ -280,7 +388,27 @@ def main():
     # Write back
     # ------------------------------------------------------------------
 
+    # Normalize storage values: ensure empty storage entries are explicit nulls
+    def _normalize_storage(node):
+        # Handle mappings
+        if isinstance(node, dict):
+            # If this mapping contains a storage key with empty string, set to None
+            if "storage" in node and (node.get("storage") == "" or node.get("storage") is None):
+                node["storage"] = None
+            for k, v in list(node.items()):
+                _normalize_storage(v)
+        # Handle sequences
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                # If sequence contains a mapping with a storage key
+                if isinstance(v, dict) and "storage" in v and (v.get("storage") == "" or v.get("storage") is None):
+                    v["storage"] = None
+                _normalize_storage(v)
+
+    _normalize_storage(calkit)
+
     print(f"\nWriting {calkit_path} ...")
+
     with open(calkit_path, "w") as fh:
         yaml_rt.dump(calkit, fh)
 

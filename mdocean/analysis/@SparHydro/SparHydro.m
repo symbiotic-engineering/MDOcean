@@ -7,6 +7,16 @@ classdef SparHydro < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = SparHydro(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/SparHydro/intermed.mat', ...
+                'results/SparHydro/intermed_figure_handle_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

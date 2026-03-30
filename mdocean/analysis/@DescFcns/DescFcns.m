@@ -9,6 +9,18 @@ classdef DescFcns < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = DescFcns(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/DescFcns/intermed.mat', ...
+                'results/DescFcns/intermed_created_figs_1.fig', ...
+                'results/DescFcns/intermed_created_figs_3.fig', ...
+                'results/DescFcns/intermed_created_figs_2.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

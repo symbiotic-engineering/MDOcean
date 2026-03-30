@@ -7,6 +7,17 @@ classdef ForceSaturationFigFunc < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = ForceSaturationFigFunc(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/ForceSaturationFigFunc/intermed.mat', ...
+                'results/ForceSaturationFigFunc/intermed_fig2_1.fig', ...
+                'results/ForceSaturationFigFunc/intermed_fig1_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

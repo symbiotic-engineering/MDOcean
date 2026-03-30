@@ -9,6 +9,18 @@ classdef DampingPlateStructures < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = DampingPlateStructures(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/DampingPlateStructures/intermed.mat', ...
+                'results/DampingPlateStructures/intermed_figs_1.fig', ...
+                'results/DampingPlateStructures/intermed_figs_2.fig', ...
+                'results/DampingPlateStructures/intermed_figs_3.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

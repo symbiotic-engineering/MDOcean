@@ -11,6 +11,16 @@ classdef GradientOptimFigFunc < GenericAnalysis
         tab_names = {'single_obj_optim_results'};
     end
 
+    methods
+        function obj = GradientOptimFigFunc(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/GradientOptimFigFunc/intermed.mat', ...
+                'results/GradientOptimFigFunc/intermed_convergence_plot_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

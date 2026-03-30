@@ -7,6 +7,16 @@ classdef HydroCoeffFigFunc < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = HydroCoeffFigFunc(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_outputs = { ...
+                'results/HydroCoeffFigFunc/intermed.mat', ...
+                'results/HydroCoeffFigFunc/intermed_created_figs_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 
