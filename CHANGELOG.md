@@ -4,7 +4,7 @@
 ## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
 ### Added
 - Pipeline: python script to update calkit.yaml automatically with matlab auto deps
-- CI: add check that calkit.yaml is up to date with matlab auto deps
+- CI: enforce calkit.yaml to be up to date with matlab auto deps
 
 ## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-30
 ### Changed
