@@ -14,6 +14,7 @@ function intermed_result_struct = analysis_fcn(p,b)
     profile on
     simulation(X,p);
     profile_multibody = profile('info');
+    profile off
     t_multibody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
 
     p.use_multibody = false;
@@ -21,18 +22,23 @@ function intermed_result_struct = analysis_fcn(p,b)
     profile on
     simulation(X,p);
     profile_singlebody = profile('info');
+    profile off
     t_singlebody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
 
-    p.use_multibody = true;
-    p.use_force_sat = false;
-    p.use_power_sat = false;
-    p.C_d_float = 0;
-    p.C_d_spar = 0;
+    p_freq = p;
+    p_freq.use_multibody = true;
+    p_freq.use_force_sat = false;
+    p_freq.use_power_sat = false;
+    p_freq.C_d_float = 0;
+    p_freq.C_d_spar = 0;
+    p_freq.max_drag_iters_fxp = 0;
+    p_freq.max_drag_iters_slv = 0;
     profile clear
     profile on
-    simulation(X,p);
+    simulation(X,p_freq);
     profile_freq_domain = profile('info');
-    t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
+    profile off
+    t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p_freq),num_outputs);
 
     gcp;
     add_wecsim_path();
