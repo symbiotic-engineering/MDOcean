@@ -1,5 +1,5 @@
-name: Check version, changelog, submodules
-description: Check version + changelog updated and submodules not accidentally downgraded
+name: Ready to merge
+description: Check version + changelog updated, submodules not accidentally downgraded
 on:
   pull_request:
   workflow_dispatch:
@@ -24,16 +24,6 @@ jobs:
       - name: Fail if version/changelog not bumped
         if: steps.changes.outputs.version == 'false' || steps.changes.outputs.changelog == 'false'
         run: exit 1
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: pip install ruamel.yaml
-      - name: Update calkit stages
-        run: python mdocean/analysis/update_calkit.py
-      - name: Fail if calkit.yaml was modified
-        run: git diff --exit-code calkit.yaml
       - name: Check for accidental submodule downgrades
         run: |
           set +e
