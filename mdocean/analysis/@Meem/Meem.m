@@ -12,6 +12,19 @@ classdef Meem < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = Meem(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_analysis_outputs = { ...
+                'results/Meem/intermed_b_vector_fig_1.fig', ...
+                'results/Meem/intermed_figHydroCoeff_1.fig', ...
+                'results/Meem/intermed_figSparsity_1.fig', ...
+                'results/Meem/intermed_figVelMatch_1.fig', ...
+                'results/Meem/intermed_figPotMatch_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

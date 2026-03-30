@@ -7,6 +7,15 @@ classdef Slamming < GenericAnalysis
         tab_names = {};
     end
 
+    methods
+        function obj = Slamming(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_analysis_outputs = { ...
+                'results/Slamming/intermed_figure_handle_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 
