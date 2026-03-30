@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>analysis &mdash; MDOcean v1.1.5 documentation</title>
+  <title>analysis &mdash; MDOcean v1.1.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5f3e0cf0"></script>
+      <script src="../_static/documentation_options.js?v=68c6869a"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -104,7 +104,7 @@
 <dl class="mat script">
 <dt class="sig sig-object mat" id="analysis.analysis_to_calkit">
 <span class="sig-prename descclassname"><span class="pre">analysis.</span></span><span class="sig-name descname"><span class="pre">analysis_to_calkit</span></span><a class="headerlink" href="#analysis.analysis_to_calkit" title="Link to this definition"></a></dt>
-<dd><p>then manually copy-paste into calkit.yaml</p>
+<dd><p>then run update_calkit.py to merge into calkit.yaml</p>
 </dd></dl>
 
 <dl class="mat class">
@@ -144,6 +144,30 @@ Handles saving and loading of intermediate results, figures, and tables.</p>
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis.end_result_struct">
 <span class="sig-name descname"><span class="pre">end_result_struct</span></span><a class="headerlink" href="#analysis.GenericAnalysis.end_result_struct" title="Link to this definition"></a></dt>
 <dd><p>only summary end results for latex output or tests</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.extra_analysis_inputs">
+<span class="sig-name descname"><span class="pre">extra_analysis_inputs</span></span><a class="headerlink" href="#analysis.GenericAnalysis.extra_analysis_inputs" title="Link to this definition"></a></dt>
+<dd><p>non-code data inputs for calkit analysis stage</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.extra_analysis_outputs">
+<span class="sig-name descname"><span class="pre">extra_analysis_outputs</span></span><a class="headerlink" href="#analysis.GenericAnalysis.extra_analysis_outputs" title="Link to this definition"></a></dt>
+<dd><p>non-code extra outputs beyond intermed.mat for calkit analysis stage</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.extra_postpro_inputs">
+<span class="sig-name descname"><span class="pre">extra_postpro_inputs</span></span><a class="headerlink" href="#analysis.GenericAnalysis.extra_postpro_inputs" title="Link to this definition"></a></dt>
+<dd><p>non-code data inputs for calkit postpro stage</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.extra_postpro_outputs">
+<span class="sig-name descname"><span class="pre">extra_postpro_outputs</span></span><a class="headerlink" href="#analysis.GenericAnalysis.extra_postpro_outputs" title="Link to this definition"></a></dt>
+<dd><p>non-code extra outputs for calkit postpro stage</p>
 </dd></dl>
 
 <dl class="mat attribute">
@@ -208,7 +232,20 @@ Handles saving and loading of intermediate results, figures, and tables.</p>
 <dd></dd></dl>
 
 </dd>
-<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.format_inputs_list">
+<span class="sig-name descname"><span class="pre">format_inputs_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em>, <em class="sig-param"><span class="pre">extras</span></em>, <em class="sig-param"><span class="pre">deps</span></em><span class="sig-paren">)</span><a class="headerlink" href="#analysis.GenericAnalysis.format_inputs_list" title="Link to this definition"></a></dt>
+<dd><p>FORMAT_INPUTS_LIST Format inputs as YAML list: extras first, then deps, de-duplicated.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.format_outputs">
+<span class="sig-name descname"><span class="pre">format_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em>, <em class="sig-param"><span class="pre">outputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#analysis.GenericAnalysis.format_outputs" title="Link to this definition"></a></dt>
+<dd><p>FORMAT_OUTPUTS Format a cell array of output paths as YAML list entries.
+.tex and .json outputs include ‘storage: git’; others are plain paths.</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis.get_dependencies">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fcn_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#analysis.GenericAnalysis.get_dependencies" title="Link to this definition"></a></dt>
 <dd></dd></dl>
