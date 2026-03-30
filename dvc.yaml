@@ -49,10 +49,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
       - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -63,15 +63,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -102,10 +107,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=AllFigCompare; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
       - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -116,7 +121,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -126,6 +134,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -161,10 +170,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Comparison; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Comparison/Comparison.m
       - ./mdocean/analysis/@Comparison/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -181,16 +190,21 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -222,10 +236,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Comparison; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Comparison/Comparison.m
       - ./mdocean/analysis/@Comparison/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -237,9 +251,12 @@ stages:
       - ./mdocean/plots/matlab_figs/compare.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/power_PDF.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -249,6 +266,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -277,13 +295,13 @@ stages:
       - results/Comparison/overlaid_hydro_coeffs.pdf
       - results/Comparison/probability_CDF.pdf
       - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/end.mat
       - results/Comparison/optimal_design_vars.tex:
           cache: false
           persist: false
       - results/Comparison/optimal_outputs.tex:
           cache: false
           persist: false
-      - results/Comparison/end.mat
       - results/Comparison/end.json:
           cache: false
           persist: false
@@ -293,10 +311,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Constraints; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Constraints/Constraints.m
       - ./mdocean/analysis/@Constraints/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -307,15 +325,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -346,10 +369,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Constraints; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Constraints/Constraints.m
       - ./mdocean/analysis/@Constraints/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -360,7 +383,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -370,6 +396,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -394,10 +421,10 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/Constraints/intermed.mat
     outs:
+      - results/Constraints/end.mat
       - results/Constraints/constraints.tex:
           cache: false
           persist: false
-      - results/Constraints/end.mat
       - results/Constraints/end.json:
           cache: false
           persist: false
@@ -407,10 +434,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Cost/Cost.m
       - ./mdocean/analysis/@Cost/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -421,15 +448,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -460,10 +492,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Cost/Cost.m
       - ./mdocean/analysis/@Cost/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -474,7 +506,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -484,6 +519,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -508,10 +544,10 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/Cost/intermed.mat
     outs:
+      - results/Cost/end.mat
       - results/Cost/cost_parameters.tex:
           cache: false
           persist: false
-      - results/Cost/end.mat
       - results/Cost/end.json:
           cache: false
           persist: false
@@ -521,10 +557,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DampingPlateStructures; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -535,17 +571,22 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/structures/make_four_loads_plot.m
       - ./mdocean/plots/matlab_figs/structures/viz_damping_plate.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -580,10 +621,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DampingPlateStructures; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
       - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -594,7 +635,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -604,6 +648,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -645,10 +690,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DescFcns; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DescFcns/DescFcns.m
       - ./mdocean/analysis/@DescFcns/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -659,16 +704,21 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/sin_desc_fcn_demo.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -702,10 +752,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DescFcns; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DescFcns/DescFcns.m
       - ./mdocean/analysis/@DescFcns/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -716,7 +766,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -726,6 +779,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -766,42 +820,34 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignSpaceExploration; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
-      - ./mdocean/inputs/validation/nominal_c_v.m
-      - ./mdocean/inputs/validation/validation_inputs.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
-      - ./mdocean/optimization/gradient_optim.m
-      - ./mdocean/optimization/max_avg_power.m
-      - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
-      - ./mdocean/optimization/multiobjective/paretoFront.m
-      - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-      - ./mdocean/optimization/multiobjective/pareto_search.m
-      - ./mdocean/optimization/run_solver.m
-      - ./mdocean/plots/matlab_figs/constraint_active_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-      - ./mdocean/plots/matlab_figs/optim_geomviz.m
-      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-      - ./mdocean/plots/matlab_figs/visualize_geometry.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -836,10 +882,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignSpaceExploration; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
       - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -856,8 +902,11 @@ stages:
       - ./mdocean/plots/matlab_figs/experiments_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -867,6 +916,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -892,10 +942,10 @@ stages:
       - results/DesignSpaceExploration/intermed.mat
     outs:
       - results/DesignSpaceExploration/experiments_ratios.pdf
+      - results/DesignSpaceExploration/end.mat
       - results/DesignSpaceExploration/experiments_results.tex:
           cache: false
           persist: false
-      - results/DesignSpaceExploration/end.mat
       - results/DesignSpaceExploration/end.json:
           cache: false
           persist: false
@@ -906,10 +956,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=DesignVars; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@DesignVars/DesignVars.m
       - ./mdocean/analysis/@DesignVars/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -920,15 +970,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -973,7 +1028,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -983,6 +1041,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1007,23 +1066,149 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/DesignVars/intermed.mat
     outs:
+      - results/DesignVars/end.mat
       - results/DesignVars/design_vars.tex:
           cache: false
           persist: false
-      - results/DesignVars/end.mat
       - results/DesignVars/end.json:
           cache: false
           persist: false
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  analysis-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_analysis();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/DragIntegral/intermed.mat
+    desc: Automatically generated from the 'analysis-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  postpro-DragIntegral:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=DragIntegral; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/analysis/@DragIntegral/DragIntegral.m
+      - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - results/DragIntegral/intermed.mat
+    outs:
+      - results/DragIntegral/drag_integral_B.pdf
+      - results/DragIntegral/drag_integral_G_r.pdf
+      - results/DragIntegral/drag_integral_G_i.pdf
+      - results/DragIntegral/drag_integral_G_m.pdf
+      - results/DragIntegral/drag_integral_G_p.pdf
+      - results/DragIntegral/end.mat
+      - results/DragIntegral/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-DragIntegral' 
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1035,15 +1220,20 @@ stages:
       - ./mdocean/plots/matlab_figs/force_sat_results.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1077,10 +1267,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
       - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1091,7 +1281,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1101,6 +1294,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1140,10 +1334,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=GradientOptimFigFunc; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1158,16 +1352,21 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1201,10 +1400,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=GradientOptimFigFunc; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
       - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1223,9 +1422,12 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/plot_power_matrix.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1235,6 +1437,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1267,10 +1470,10 @@ stages:
       - results/GradientOptimFigFunc/lagrange_multipliers.pdf
       - results/GradientOptimFigFunc/delta_x.pdf
       - results/GradientOptimFigFunc/single_obj_convergence.pdf
+      - results/GradientOptimFigFunc/end.mat
       - results/GradientOptimFigFunc/single_obj_optim_results.tex:
           cache: false
           persist: false
-      - results/GradientOptimFigFunc/end.mat
       - results/GradientOptimFigFunc/end.json:
           cache: false
           persist: false
@@ -1281,10 +1484,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=HydroCoeffFigFunc; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1295,15 +1498,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1337,10 +1545,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=HydroCoeffFigFunc; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
       - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1351,7 +1559,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1361,6 +1572,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1397,10 +1609,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=LocationSensitivity; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
       - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1417,18 +1629,23 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/plot_power_matrix.m
       - ./mdocean/plots/matlab_figs/power_PDF.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1477,7 +1694,10 @@ stages:
       - ./mdocean/optimization/sensitivities/location_post_process.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1487,6 +1707,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1516,10 +1737,10 @@ stages:
       - results/LocationSensitivity/location_3_power_matrix.pdf
       - results/LocationSensitivity/location_4_power_matrix.pdf
       - results/LocationSensitivity/location_probability_PDF.pdf
+      - results/LocationSensitivity/end.mat
       - results/LocationSensitivity/location_sensitivity.tex:
           cache: false
           persist: false
-      - results/LocationSensitivity/end.mat
       - results/LocationSensitivity/end.json:
           cache: false
           persist: false
@@ -1530,10 +1751,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Meem/Meem.m
       - ./mdocean/analysis/@Meem/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1545,15 +1766,20 @@ stages:
       - ./mdocean/plots/matlab_figs/b_inf_numeric.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1576,8 +1802,8 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
-      - ./mdocean/simulation/run/validate_MEEM.m
       - ./mdocean/simulation/run/convergence_study.m
+      - ./mdocean/simulation/run/validate_MEEM.m
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Meem/intermed.mat
@@ -1592,10 +1818,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Meem/Meem.m
       - ./mdocean/analysis/@Meem/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1606,7 +1832,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1616,6 +1845,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1661,10 +1891,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Multistart; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Multistart/Multistart.m
       - ./mdocean/analysis/@Multistart/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1681,16 +1911,21 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1723,7 +1958,6 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Multistart; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/SAFE/PAWN/pawn_cdfs.m
       - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
       - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
@@ -1733,6 +1967,7 @@ stages:
       - ./mdocean/analysis/@Multistart/Multistart.m
       - ./mdocean/analysis/@Multistart/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1744,7 +1979,10 @@ stages:
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/multistart_postpro.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1754,6 +1992,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1781,10 +2020,10 @@ stages:
       - results/Multistart/multistart_convergence_tree.pdf
       - results/Multistart/multistart_parallel_coordinates.pdf
       - results/Multistart/multistart_bar_chart.pdf
+      - results/Multistart/end.mat
       - results/Multistart/multistart_results.tex:
           cache: false
           persist: false
-      - results/Multistart/end.mat
       - results/Multistart/end.json:
           cache: false
           persist: false
@@ -1794,10 +2033,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParamSensitivities; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1814,17 +2053,22 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
       - ./mdocean/plots/util/color_each_element.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1857,10 +2101,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParamSensitivities; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
       - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1873,8 +2117,11 @@ stages:
       - ./mdocean/plots/matlab_figs/global_sens_plots.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
       - ./mdocean/plots/util/color_each_element.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -1884,6 +2131,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1943,10 +2191,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Parameters; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Parameters/Parameters.m
       - ./mdocean/analysis/@Parameters/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1957,15 +2205,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1996,10 +2249,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Parameters; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Parameters/Parameters.m
       - ./mdocean/analysis/@Parameters/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2010,7 +2263,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2020,6 +2276,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2044,10 +2301,10 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/Parameters/intermed.mat
     outs:
+      - results/Parameters/end.mat
       - results/Parameters/parameters.tex:
           cache: false
           persist: false
-      - results/Parameters/end.mat
       - results/Parameters/end.json:
           cache: false
           persist: false
@@ -2057,10 +2314,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoFigFunc; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
       - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2079,16 +2336,21 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2121,10 +2383,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoFigFunc; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
       - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2140,8 +2402,11 @@ stages:
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2151,6 +2416,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2190,10 +2456,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoSweep; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
       - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2204,15 +2470,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2243,10 +2514,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ParetoSweep; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
       - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2257,7 +2528,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2267,6 +2541,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2302,10 +2577,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
       - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2316,15 +2591,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2372,7 +2652,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2382,6 +2665,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2414,13 +2698,14 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
-      - results/ReadNonMatlabFigs/xdsm.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
       - results/ReadNonMatlabFigs/sim_runtime.pdf
+      - results/ReadNonMatlabFigs/taxonomy.pdf
       - results/ReadNonMatlabFigs/trapezoid.pdf
+      - results/ReadNonMatlabFigs/xdsm.pdf
       - results/ReadNonMatlabFigs/end.mat
       - results/ReadNonMatlabFigs/end.json:
           cache: false
@@ -2431,10 +2716,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=RunSingleFigFunc; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2450,18 +2735,23 @@ stages:
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/plot_power_matrix.m
       - ./mdocean/plots/matlab_figs/power_PDF.m
       - ./mdocean/plots/matlab_figs/visualize_geometry.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2502,10 +2792,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=RunSingleFigFunc; obj.run_all_from_load();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
       - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2516,7 +2806,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2526,6 +2819,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2572,10 +2866,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Runtime; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Runtime/Runtime.m
       - ./mdocean/analysis/@Runtime/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2583,20 +2877,26 @@ stages:
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2629,8 +2929,8 @@ stages:
     deps:
       - ./mdocean/analysis/@Runtime/Runtime.m
       - ./mdocean/analysis/@Runtime/post_process_fcn.m
-      - ./mdocean/plots/matlab_figs/module_runtime_compare.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2640,8 +2940,12 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/module_runtime_compare.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2651,6 +2955,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2689,10 +2994,10 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Slamming; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Slamming/Slamming.m
       - ./mdocean/analysis/@Slamming/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2703,16 +3008,22 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/slam_plot.m
+      - ./mdocean/plots/util/arrow.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2747,6 +3058,7 @@ stages:
       - ./mdocean/analysis/@Slamming/Slamming.m
       - ./mdocean/analysis/@Slamming/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2757,7 +3069,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2767,6 +3082,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2794,17 +3110,19 @@ stages:
     outs:
       - results/Slamming/slamming_amplitude.pdf
       - results/Slamming/end.mat
-      - results/Slamming/end.json
+      - results/Slamming/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Slamming' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-SparHydro:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=SparHydro; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@SparHydro/SparHydro.m
       - ./mdocean/analysis/@SparHydro/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2815,16 +3133,21 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/matlab_figs/spar_hydro_plot.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2859,6 +3182,7 @@ stages:
       - ./mdocean/analysis/@SparHydro/SparHydro.m
       - ./mdocean/analysis/@SparHydro/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2869,7 +3193,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2879,6 +3206,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2906,17 +3234,19 @@ stages:
     outs:
       - results/SparHydro/spar_added_mass.pdf
       - results/SparHydro/end.mat
-      - results/SparHydro/end.json
+      - results/SparHydro/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-SparHydro' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Validation; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Validation/Validation.m
       - ./mdocean/analysis/@Validation/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2929,15 +3259,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -2975,6 +3310,7 @@ stages:
       - ./mdocean/analysis/@Validation/Validation.m
       - ./mdocean/analysis/@Validation/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2985,7 +3321,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -2996,6 +3335,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -3022,28 +3362,32 @@ stages:
       - results/Validation/intermed_fig_cost_vs_N_WEC_1.fig
     outs:
       - results/Validation/cost_vs_N_WEC.pdf
+      - results/Validation/end.mat
       - results/Validation/validation.tex:
           cache: false
           persist: false
-      - results/Validation/end.mat
-      - results/Validation/end.json
+      - results/Validation/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Validation' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Wecsim:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=Wecsim; obj.run_analysis();"
     deps:
-      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/analysis/@Wecsim/Wecsim.m
       - ./mdocean/analysis/@Wecsim/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/inputs/validation/WECSim/add_wecsim_path.m
       - ./mdocean/inputs/validation/WECSim/myWecSimFcn.m
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
+      - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
         Resource _SAM CSV.csv
@@ -3051,15 +3395,20 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -3106,12 +3455,13 @@ stages:
       - ./mdocean/analysis/@Wecsim/Wecsim.m
       - ./mdocean/analysis/@Wecsim/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
-      - ./mdocean/simulation/run/power_matrix_compare.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
         Resource _SAM CSV.csv
@@ -3119,7 +3469,10 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
@@ -3129,6 +3482,7 @@ stages:
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -3150,6 +3504,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_plate_stress.m
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/run/power_matrix_compare.m
       - ./mdocean/simulation/simulation.m
       - results/Wecsim/intermed.mat
       - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.mat
@@ -3165,153 +3520,190 @@ stages:
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.mat
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.mat
     outs:
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_rms.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_rms.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_rms.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_rms.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+      - results/Wecsim/end.mat
       - results/Wecsim/WECSim_errors.tex:
           cache: false
           persist: false
@@ -3328,7 +3720,9 @@ stages:
       - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
-      - results/Wecsim/end.json
+      - results/Wecsim/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
   pyxdsm:
@@ -3345,9 +3739,6 @@ stages:
           cache: false
           persist: false
       - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
-      - mdocean/plots/non_matlab_figs/xdsm.pdf:
-          cache: false
-          persist: false
     desc: Automatically generated from the 'pyxdsm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-re-results:
@@ -3379,6 +3770,7 @@ stages:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       move_results_to_pubs('AOR');"
     deps:
+      - results/DragIntegral/
       - results/ReadNonMatlabFigs/
       - results/SparHydro/
       - results/DescFcns/
@@ -3509,7 +3901,6 @@ stages:
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/src/meem-appendix.tex
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:

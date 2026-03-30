@@ -66,7 +66,7 @@ jobs:
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --ignore-errors --log postpro-Wecsim #build-AOR-paper
+          run_args: --ignore-errors --log build-AOR-paper
           save: false
       - name: calkit save
         run: |
@@ -88,7 +88,7 @@ jobs:
           fi
 
           calkit dvc pull
-          calkit save dvc.lock dvc.yaml .calkit/ pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json -m "Run pipeline"
+          calkit save dvc.lock dvc.yaml .calkit/ pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
           PUSH_STATUS=$?
 
           if [ $PUSH_STATUS -ne 0 ]; then

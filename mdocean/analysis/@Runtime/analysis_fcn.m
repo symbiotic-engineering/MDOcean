@@ -36,9 +36,8 @@ function intermed_result_struct = analysis_fcn(p,b)
 
     gcp;
     time = tic;
-    pause(1)
-%     runRM3Parallel
-    t_wecsim = 447; %toc(time); %447
+    runRM3Parallel
+    t_wecsim = toc(time); %447
 
     % Store results for post-processing
     intermed_result_struct.profile_multibody = profile_multibody;

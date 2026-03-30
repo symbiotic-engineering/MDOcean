@@ -119,16 +119,21 @@ float_amplitude        = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude         = zeros(length(mcr.cases(:,1)), 1);
 
 relative_amplitude     = zeros(length(mcr.cases(:,1)), 1);
+
 float_amplitude_rms    = zeros(length(mcr.cases(:,1)), 1);
 spar_amplitude_rms     = zeros(length(mcr.cases(:,1)), 1);
 relative_amplitude_rms = zeros(length(mcr.cases(:,1)), 1);
+
+float_amplitude_fund   = zeros(length(mcr.cases(:,1)), 1);
+spar_amplitude_fund    = zeros(length(mcr.cases(:,1)), 1);
+rel_amplitude_fund     = zeros(length(mcr.cases(:,1)), 1);
 
 float_phase            = zeros(length(mcr.cases(:,1)), 1);
 spar_phase             = zeros(length(mcr.cases(:,1)), 1);
 rel_phase              = zeros(length(mcr.cases(:,1)), 1);
 
-float_drag_force_rms   = zeros(length(mcr.cases(:,1)), 1);
-spar_drag_force_rms    = zeros(length(mcr.cases(:,1)), 1);
+float_drag_force_fund  = zeros(length(mcr.cases(:,1)), 1);
+spar_drag_force_fund   = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
@@ -148,6 +153,7 @@ parfor imcr=1:length(mcr.cases(:,1))
     
         % extract signals over the last period
         N_per_T = timesteps_per_period(imcr);
+        wave_freq  = 2*pi/mcr.cases(imcr,2);
         power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
         F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
         float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
@@ -168,30 +174,42 @@ parfor imcr=1:length(mcr.cases(:,1))
         spar_amplitude_rms(imcr)  = rms( spar_pos  - mean(spar_pos) );
         relative_amplitude_rms(imcr) = rms( rel_pos - mean(rel_pos) );
 
-        float_phase(imcr) = get_phase(float_pos, N_per_T);
-        spar_phase(imcr) = get_phase(spar_pos, N_per_T);
-        rel_phase(imcr) = get_phase(rel_pos, N_per_T);
+        [float_amplitude_fund(imcr),...
+         float_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
+        [spar_amplitude_fund(imcr),...
+         spar_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
+        [rel_amplitude_fund(imcr),...
+         rel_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
 
-        float_drag_force_rms(imcr) = rms( F_drag_f - mean(F_drag_f) );
-        spar_drag_force_rms(imcr)  = rms( F_drag_s - mean(F_drag_s) );
-        float_drag_force_phase(imcr) = get_phase(F_drag_f, N_per_T);
-        spar_drag_force_phase(imcr)  = get_phase(F_drag_s, N_per_T);
+        [float_drag_force_fund(imcr), ...
+         float_drag_force_phase(imcr)] = get_fundamental(F_drag_f, wave_freq, simu.dt);
+        [spar_drag_force_fund(imcr), ...
+         spar_drag_force_phase(imcr)]  = get_fundamental(F_drag_s, wave_freq, simu.dt);
+        
     catch ME
         warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
             mcr.cases(imcr,1),mcr.cases(imcr,2),getReport(ME, 'extended', 'hyperlinks', 'off'));
         P(imcr) = NaN;
         force_pto(imcr) = NaN;
+
         float_amplitude(imcr) = NaN;
         spar_amplitude(imcr)  = NaN;
         relative_amplitude(imcr) = NaN;
+
         float_amplitude_rms(imcr) = NaN;
         spar_amplitude_rms(imcr)  = NaN;
         relative_amplitude_rms(imcr) = NaN;
+
+        float_amplitude_fund(imcr) = NaN;
+        spar_amplitude_fund(imcr) = NaN;
+        rel_amplitude_fund(imcr) = NaN;
+
         float_phase(imcr) = NaN;
         spar_phase(imcr) = NaN;
         rel_phase(imcr) = NaN;
-        float_drag_force_rms(imcr) = NaN;
-        spar_drag_force_rms(imcr)  = NaN;
+
+        float_drag_force_fund(imcr) = NaN;
+        spar_drag_force_fund(imcr)  = NaN;
         float_drag_force_phase(imcr) = NaN;
         spar_drag_force_phase(imcr)  = NaN;
     end
@@ -200,10 +218,8 @@ end
 
 B_p = mcr.cases(:,3);
 K_p = mcr.cases(:,4);
-save(output_filename, 'P','float_amplitude','spar_amplitude','relative_amplitude',...
-    'float_amplitude_rms','spar_amplitude_rms','relative_amplitude_rms','force_pto',...
-    'float_drag_force_rms','spar_drag_force_rms','float_drag_force_phase','spar_drag_force_phase',...
-    'float_phase','spar_phase','rel_phase','X','p','B_p','K_p','git_hash')
+var_names = wecsim_var_names();
+save(output_filename, var_names{:})
 
 clear imcr totalNumOfWorkers
 
@@ -222,4 +238,18 @@ end
 function phase = get_phase(signal, N_per_T)
     [~,peak_idx] = max(signal);
     phase = (peak_idx - 1) / N_per_T * 2*pi;
+end
+
+function [fund,phase] = get_fundamental(signal,wave_freq,dt)
+    Fs = 2*pi/dt;
+    L = length(signal);
+    n = L;
+    Y = fft(signal,n);
+    P2 = Y/L;
+    P1 = P2(1:n/2+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    freqs = 0:(Fs/n):(Fs/2-Fs/n);
+    idx_wave_freq = ismembertol(freqs, wave_freq);
+    fund = abs(P1(idx_wave_freq));
+    phase = angle(P1(idx_wave_freq));
 end

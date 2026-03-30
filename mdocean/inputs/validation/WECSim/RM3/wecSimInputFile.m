@@ -203,19 +203,23 @@ function [x_vec,areas] = circle_strips(D_out,D_in,n)
     x_starts = x_vec - element_length/2;
     x_ends   = x_vec + element_length/2;
 
-    no_cutout    = abs(x_starts) >= D_in/2 & abs(x_ends) >= D_in/2;
+    no_cutout    = x_starts >= D_in/2 | x_ends <= -D_in/2;
     all_cutout   = abs(x_starts) <  D_in/2 & abs(x_ends) <  D_in/2;
     left_cutout  = abs(x_starts) <  D_in/2 & abs(x_ends) >  D_in/2;
     right_cutout = abs(x_starts) >  D_in/2 & abs(x_ends) <  D_in/2;
-    assert(all(no_cutout + all_cutout + left_cutout + right_cutout == 1))
+    mid_cutout   = x_starts < -D_in/2 & x_ends > D_in/2;
+    assert(all(no_cutout + all_cutout + left_cutout + right_cutout + mid_cutout == 1))
 
     areas = zeros(size(x_starts));
-    areas(no_cutout)  = circle_strip_area_no_cutout( x_starts(no_cutout),  x_ends(no_cutout),  D_out/2);
-    areas(all_cutout) = circle_strip_area_all_cutout(x_starts(all_cutout), x_ends(all_cutout), D_out/2, D_in/2);
-    areas(left_cutout) = circle_strip_area_all_cutout(x_starts(left_cutout), D_in/2, D_out/2, D_in/2) + ...
+    areas(no_cutout)    = circle_strip_area_no_cutout( x_starts(no_cutout),  x_ends(no_cutout),  D_out/2);
+    areas(all_cutout)   = circle_strip_area_all_cutout(x_starts(all_cutout), x_ends(all_cutout), D_out/2, D_in/2);
+    areas(left_cutout)  = circle_strip_area_all_cutout(x_starts(left_cutout), D_in/2, D_out/2, D_in/2) + ...
                          circle_strip_area_no_cutout(D_in/2, x_ends(left_cutout), D_out/2);
     areas(right_cutout) = circle_strip_area_all_cutout(-D_in/2, x_ends(right_cutout), D_out/2, D_in/2) + ...
-                         circle_strip_area_no_cutout(x_starts(right_cutout), -D_in/2, D_out/2);
+                          circle_strip_area_no_cutout(x_starts(right_cutout), -D_in/2, D_out/2);
+    areas(mid_cutout)   = circle_strip_area_no_cutout(x_starts(mid_cutout), -D_in/2, D_out/2) + ...
+                          circle_strip_area_all_cutout(-D_in/2, D_in/2, D_out/2, D_in/2) + ...
+                          circle_strip_area_no_cutout(D_in/2, x_ends(mid_cutout), D_out/2);
 
     assert(ismembertol(sum(areas), pi/4 * (D_out^2-D_in^2)));
 end
@@ -229,6 +233,7 @@ function areas = circle_strip_area_no_cutout(x_starts,x_ends,R)
     same_sign = sign(x_starts) == sign(x_ends);
 
     x_larger = max(abs(x_starts),abs(x_ends));
+    x_larger(x_larger>R) = R; % prevent tiny imaginary area that sometimes happens due to finite precision effects 
     x_smaller = min(abs(x_starts),abs(x_ends));
 
     % derivation at https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/28c569c5d8e79b7e1a2be1755de42d25_MIT18_01SCF10_Ses70a.pdf
