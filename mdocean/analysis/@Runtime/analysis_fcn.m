@@ -40,6 +40,9 @@ function intermed_result_struct = analysis_fcn(p,b)
     profile off
     t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p_freq),num_outputs);
 
+    % save p_sim because runRM3Parallel modifies p
+    p_sim = p;
+    p.use_multibody = true;
     gcp;
     add_wecsim_path();
     time = tic;
@@ -54,5 +57,5 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.t_multibody_fullsim_timeit = t_multibody_fullsim_timeit;
     intermed_result_struct.t_freq_domain_fullsim_timeit = t_freq_domain_fullsim_timeit;
     intermed_result_struct.t_wecsim = t_wecsim;
-    intermed_result_struct.p = p;
+    intermed_result_struct.p = p_sim;
 end
