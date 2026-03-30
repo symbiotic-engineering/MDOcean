@@ -24,7 +24,7 @@ function intermed_result_struct = analysis_fcn(p,b)
     t_singlebody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
 
     gcp;
-    add_wecsim_path()
+    add_wecsim_path();
     time = tic;
     runRM3Parallel
     t_wecsim = toc(time); %447
