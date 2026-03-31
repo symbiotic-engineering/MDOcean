@@ -1,4 +1,6 @@
-n = 5; % number of points per dimension
+close all
+
+n = 3; % number of points per dimension
 
 p = parameters();
 
@@ -28,99 +30,157 @@ D2 = D2_H .* H;
 b = var_bounds();
 X = [b.X_noms; 1];
 
-m0h_stored = zeros([length(p.T),size(A1)]);
-hydro_ratio_result = zeros([length(p.T),size(A1)]);
+rerun = false;
 
-for i=1:numel(A1)
+if rerun
+    m0h_stored = zeros([length(p.T),size(A1)]);
+    hydro_ratio_result = zeros([length(p.T),size(A1)]);
 
-    D_s = 2*A1(i);
-    D_f = 2*A2(i);
-    D_d = 2*A3(i);
-    T_s = D1(i);
-    T_f_2 = D2(i);
-
-    % construct params and design vec
-    p_i = p;
-    p_i.h = H(i);
-    p_i.T_s_over_D_s = T_s / D_s;
-    p_i.D_d_over_D_s = D_d / D_s;
-    X_i = X;
-    X_i(strcmp(b.var_names,'D_s')) = D_s;
-    X_i(strcmp(b.var_names,'D_f')) = D_f;
-    X_i(strcmp(b.var_names,'h_s')) = T_s + 5;
-    X_i(strcmp(b.var_names,'T_f_2')) = T_f_2;
+    for i=1:numel(A1)
+        disp(['Running ' num2str(i) ' of ' num2str(numel(A1))])
     
-    subs = {ind2sub(size(A1),i)};
-    m0h_stored(:,subs{:}) = dispersion(2*pi./p.T, p_i.h, p.g) * p_i.h;
-
-    % run simulation (drag and force/power sat are turned off inside check_max_CW)
-    [hydro_ratio, ~, ...
-     ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
-    if i==1
-        val = out;
-    else
-        val(i) = out;
+        D_s = 2*A1(i);
+        D_f = 2*A2(i);
+        D_d = 2*A3(i);
+        T_s = D1(i);
+        T_f_2 = D2(i);
+    
+        % construct params and design vec
+        p_i = p;
+        p_i.h = H(i);
+        p_i.T_s_over_D_s = T_s / D_s;
+        p_i.D_d_over_D_s = D_d / D_s;
+        X_i = X;
+        X_i(strcmp(b.var_names,'D_s')) = D_s;
+        X_i(strcmp(b.var_names,'D_f')) = D_f;
+        X_i(strcmp(b.var_names,'h_s')) = T_s + 5;
+        X_i(strcmp(b.var_names,'T_f_2')) = T_f_2;
+        
+        subs = {ind2sub(size(A1),i)};
+        m0h_stored(:,subs{:}) = dispersion(2*pi./p.T, p_i.h, p.g) * p_i.h;
+    
+        % run simulation (drag and force/power sat are turned off inside check_max_CW)
+        [hydro_ratio, ~, ...
+         ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
+        if i==1
+            val = out;
+        else
+            val(i) = out;
+        end
+    
+        hydro_ratio_result(:,subs{:}) = max(hydro_ratio);
     end
-
-    hydro_ratio_result(:,subs{:}) = max(hydro_ratio);
+else
+    load('sweep_geom_results.mat')
 end
 
 
-figure
-parallelplot(hydro_ratio_result)
+m0h_tmp = m0h_stored(1,:,:,:,:,:,:);
+result_tmp = hydro_ratio_result(1,:,:,:,:,:,:);
+result_disc = discretize(result_tmp,10,'categorical');
+[result_disc_sorted, idx_sort] = sort(result_disc(:));
+idx = idx_sort(~isundefined(result_disc_sorted));
 
+figure
+pp = parallelplot([H(idx),A1_A2(idx),A2_H(idx),D1_H(idx), D2_D1(idx), A3_A1(idx),m0h_tmp(idx),result_tmp(idx)],'GroupData',result_disc_sorted(~isundefined(result_disc_sorted)));
+pp.CoordinateTickLabels = {'h','a_1/a_2','a_2/h','d_1/h','d_2/d_1','a_3/a_1','m_0h','CW/CW_{max}'};
+pp.Color = parula(10);
+
+%% scatter plot
 figure
 % use 0-1 vars for RBG
-red = reshape(A1_A2,[1 size(A1_A2)]);
-green = reshape(D1_H,[1 size(D1_H)]);
-blue = reshape(D1_D2,[1 size(D1_D2)]);
-color = [red; green; blue]; 
-% use A1_A2 for size
-size_var = A1_A2;
-scatter(m0h_stored,hydro_ratio_result,size_var,color)
+red = myresize(A1_A2, length(p.T));
+green = myresize(D1_H, length(p.T));
+blue = myresize(D2_D1, length(p.T));
+color = [red, green, blue]; 
+% use A3_A1 for size
+size_var = myresize(A3_A1, length(p.T));
+scatter(m0h_stored(:),hydro_ratio_result(:),size_var,color)
+xlabel('m_0 h')
+ylabel('CW/CW_{max}')
+ylim([0 1])
 
+%% line plot
+num_m0h = length(p.T)*length(h);
+[m0h_mat,order] = myreshape(m0h_stored,num_m0h);
+result_mat = myreshape(hydro_ratio_result,num_m0h,order(:,1));
 
-% NMK = 10;
-% H = 1;
-% 
-% g_nondim = g; % fixme so mult works out
-% w_nondim = w; % fixme so mult works out
-% 
-% % mult = M0H .* (1 - w2_over_gk.^2) + w2_over_gk;
-% C_d_float = 0; C_d_spar = 0;
-% use_MEEM = true;
-% spar_excitation_coeffs = get_spar_exc(g);
-% hydro = []; % unused (only for use_MEEM = false)
-% 
-% wave_amp = 1;
-% wave_height = 2*wave_amp;
-% Hs = sqrt(2)*wave_height;
-% 
-% [m_f,B_h_f,K_h_f,F_f_mag,F_f_phase,...
-%  m_s,B_h_s,K_h_s,F_s_mag,F_s_phase,...
-%  m_c,B_h_c,drag_const_f,drag_const_s,...
-%  mag_v0_f,mag_v0_s,w,k,A_f_over_rho, ...
-%  A_s_over_rho, A_c_over_rho, ...
-%  B_f_over_rho_w, B_s_over_rho_w, ...
-%  B_c_over_rho_w, gamma_f_over_rho_g, ...
-%  gamma_s_over_rho_g, gamma_phase_f, ...
-%                      gamma_phase_s] = get_dynamic_coeffs(Hs, T, D_f, T_f, ...
-%                                                         D_s, D_d, T_s, h, ...
-%                                                         m_float, m_spar, ...
-%                                                         spar_excitation_coeffs,...
-%                                                         C_d_float, C_d_spar, ...
-%                                                         rho_w, g, use_MEEM, ...
-%                                                         harmonics, hydro);
-% [mag_U,phase_U,...
-%  real_P,reactive_P,...
-%  mag_X_u,phase_X_u,...
-%  mag_X_f,phase_X_f,...
-%  mag_X_s,phase_X_s,...
-%  B_p,K_p,P_sat_ratio] = get_response_drag(w,m_f,m_s,m_c,...
-%                                 B_h_f,B_h_s,B_h_c,...
-%                                 K_h_f,K_h_s,...
-%                                 F_f_mag,F_f_phase,F_s_mag,F_s_phase,F_max,...
-%                                 drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
-%                                 X_max,control_type,multibody,...
-%                                 X_tol,phase_X_tol,max_drag_iters,...
-%                                 drag_convergence_plot_on);
+red2 = A1_A2(1,:,:,:,:,:);
+green2 = D1_H(1,:,:,:,:,:);
+blue2 = D2_D1(1,:,:,:,:,:);
+color2 = [red2(:), green2(:), blue2(:)];
+
+size_var2 = A3_A1(1,:,:,:,:,:);
+size_mult = 3;
+size_var_name = 'a_3/a_1';
+
+marker_type_var = A2_H(1,:,:,:,:,:);
+marker_var_name = 'a_2/h';
+marker_types = {'o','x','v','s','+','.'};
+
+fig = figure;
+ax = gca();
+num_lines = numel(red2);
+h_data = gobjects(num_lines,1);
+for i = 1:num_lines
+    idx_marker = marker_type_var(i) == a2_h;
+    marker = marker_types{idx_marker};
+    h_data(i) = semilogx(ax, m0h_mat(:,i), result_mat(:,i), ['-' marker], 'MarkerSize', size_mult * size_var2(i));
+    set(h_data(i).Annotation.LegendInformation,'IconDisplayStyle','off')
+    hold on
+end
+ax.ColorOrder = color2;
+xlabel('m_0 h')
+ylabel('CW/CW_{max}')
+ylim([0 1.5])
+m0h_minmax = [min(m0h_mat(:)) max(m0h_mat(:))];
+plot(ax,m0h_minmax,[1 1],'k--')
+
+% legend
+h_marker = gobjects(length(a2_h),1);
+for i=1:length(a2_h)
+    h_marker(i) = plot(ax,NaN,NaN,['k' marker_types{i}],'DisplayName',num2str(a2_h(i)));
+end
+h_marker_leg = legend(h_marker,'AutoUpdate','off');
+title(h_marker_leg,marker_var_name)
+
+ah1 = axes('position',get(ax,'position'));
+unique_size = unique(size_var2);
+h_size = gobjects(length(unique_size),1);
+for i=1:length(unique_size)
+    h_size(i) = plot(ax,NaN,NaN,'ko','MarkerSize',size_mult*unique_size(i),'DisplayName',num2str(unique_size(i)));
+    hold on
+end
+h_size_leg = legend(ah1,h_size);
+title(h_size_leg,size_var_name)
+ah1.Visible ='off';
+
+%%
+figure
+plotSVG(loadSVG('RGBCube_a.svg'));
+set(gca,'Ydir','reverse')
+improvePlot
+
+set([h_data; h_marker],'MarkerFaceColor','none')
+fig.Position(3:4)  = [1000 600];
+xlim(ax,m0h_minmax)
+
+function [byfreq,order] = myreshape(A,len,order)
+    reshaped = reshape(A,len,[]);
+
+    if nargin<3
+        [byfreq,order] = sort(reshaped);
+    else
+        byfreq = reshaped(order,:);
+    end
+end
+
+function collapsed = myresize(A,len)
+% Repeats A len times so size(shifted) = [len size(A)].
+% Then collapses into a column vector.
+% Used to add an extra dimension for the period onto geometric meshes.
+    n_repeats = [ ones(1,ndims(A)), len ];
+    repeated = repmat(A,n_repeats);
+    shifted = shiftdim(repeated,ndims(A));
+    collapsed = shifted(:);
+end

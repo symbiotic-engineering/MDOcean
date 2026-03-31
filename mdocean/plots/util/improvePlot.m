@@ -95,9 +95,12 @@ function [] = improvePlot()
                 set(LineH(i), 'LineWidth', marker_line_width)
             end
             % Change lines and markers if they exist on the plot
-            set(LineH(i),   'MarkerSize', marker_size, ...
+            set(LineH(i),   ...
                 'MarkerEdgeColor', marker_outline_color, ...
                 'MarkerFaceColor', this_line_color);
+            if get(LineH(i), 'LineWidth') == 6 % if marker size still set to default
+                set(LineH(i),'MarkerSize',marker_size)
+            end
         end
     end
 

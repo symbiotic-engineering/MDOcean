@@ -110,6 +110,14 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
             [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
                                                                 h_num, m0_num, spatial_res, N_num, M_num, ...
                                                                 K_num, show_A, plot_phi, fname, m_k_h);
+            if mu_nondim(i)<0
+                mu_nondim(i) = 1e-9;
+                warning('MEEM computed negative added mass. Setting added mass to very small value.')
+            end
+            if lambda_nondim(i)<0
+                lambda_nondim(i) = 1e-9;
+                warning('MEEM computed negative damping. Setting damping to very small value.')
+            end
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
