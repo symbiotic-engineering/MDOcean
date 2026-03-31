@@ -11,7 +11,7 @@ function [fig_array,...
 % line variants for each of three characteristic dimensions:
 %   1. a_2      – float radius
 %   2. V^{1/3}  – cube root of displaced volume  (val.vol_f + val.vol_s)
-%   3. sqrt(SA) – square root of wetted surface area (cylindrical approx.)
+%   3. SA^{1/2} – square root of wetted surface area (cylindrical approx.)
 % plus a Pareto plot (CW vs surface area) and a grid scatter matrix
 % (6 sweep variables × 8 output quantities).
 %
@@ -64,7 +64,7 @@ function [fig_array,...
     charac_dim_vol = reshape((vol_f + vol_s).^(1/3), [1, size(A1)]);
     CWR_vol        = CW ./ charac_dim_vol;
 
-    % 3. charac_dim = sqrt of wetted surface area (cylindrical approximation)
+    % 3. charac_dim = SA^{1/2}: square root of wetted surface area (cylindrical approx.)
     %    Float: outer lateral cylinder + top annular cap
     %    Spar:  outer lateral cylinder + bottom disk cap
     D_f_grid = 2 * A2;
@@ -121,6 +121,7 @@ function [fig_array,...
                        A3_A1(idx), m0h_tmp(idx), result_tmp(idx)], ...
                       'GroupData', result_disc_sorted(~isundefined(result_disc_sorted)));
     pp.CoordinateTickLabels = {'h','a_1/a_2','a_2/h','d_1/h','d_2/d_1','a_3/a_1','m_0h','CW/CW_{max}'};
+    pp.LabelInterpreter = 'tex';
     pp.Color = parula(10);
 
     % ------------------------------------------------------------------
@@ -144,7 +145,7 @@ function [fig_array,...
     % ------------------------------------------------------------------
     fig4 = make_scatter_fig(m0h_stored, CWR_a2,  size_var, color, 'CW/a_2');
     fig5 = make_scatter_fig(m0h_stored, CWR_vol, size_var, color, 'CW/V^{1/3}');
-    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, 'CW/\sqrt{SA}');
+    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, 'CW/SA^{1/2}');
 
     % ------------------------------------------------------------------
     % Figures 7-9: CWR line plots
@@ -155,7 +156,7 @@ function [fig_array,...
     fig8 = make_line_fig(m0h_mat, CWR_vol_mat, 'CW/V^{1/3}',     [], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
-    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  'CW/\sqrt{SA}',   [], ...
+    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  'CW/SA^{1/2}',   [], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
@@ -193,8 +194,8 @@ function [fig_array,...
 
     y_vars   = {hydro_ratio_result(:), charac_a2_flat, charac_vol_flat, charac_sa_flat, ...
                 CW(:), CWR_a2(:), CWR_vol(:), CWR_sa(:)};
-    y_labels = {'CW/CW_{max}', 'a_2 (m)', 'V^{1/3} (m)', '\sqrt{SA} (m)', ...
-                'CW (m)', 'CW/a_2', 'CW/V^{1/3}', 'CW/\sqrt{SA}'};
+    y_labels = {'CW/CW_{max}', 'a_2 (m)', 'V^{1/3} (m)', 'SA^{1/2} (m)', ...
+                'CW (m)', 'CW/a_2', 'CW/V^{1/3}', 'CW/SA^{1/2}'};
 
     fig11 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
 
@@ -231,6 +232,7 @@ function fig = make_pareto_fig(CW_vec, SA_vec, color_pareto, size_var_pareto, si
     ylabel('Surface Area (m^2)')
     legend('Location', 'best')
     improvePlot
+    set(gca, 'XScale', 'log', 'YScale', 'log')
 end
 
 function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var)
@@ -262,6 +264,7 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
     end
 
     fig.Position(3:4) = [1400, 900];
+    set(fig, 'PaperPositionMode', 'auto');
 end
 
 function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
@@ -280,6 +283,9 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     fig = figure('Visible','off');
     ax  = gca();
 
+    % Set ColorOrder BEFORE plotting so each line gets its assigned RGB colour.
+    ax.ColorOrder = color2;
+
     num_lines = size(y_mat, 2);
     h_data    = gobjects(num_lines, 1);
 
@@ -291,37 +297,44 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
         set(h_data(i).Annotation.LegendInformation, 'IconDisplayStyle', 'off')
         hold on
     end
-    ax.ColorOrder = color2;
 
     xlabel('m_0 h')
     ylabel(ylabel_str)
     if ~isempty(ylim_vals)
         ylim(ylim_vals)
     end
-    plot(ax, m0h_minmax, [1 1], 'k--')
+    % Reference line y=1; excluded from legend.
+    plot(ax, m0h_minmax, [1 1], 'k--', 'HandleVisibility', 'off')
 
-    % Marker-type legend (encodes a_2/h)
+    % -- Legend 1: marker type encodes a_2/h (on main axes ax) --
     h_marker = gobjects(length(a2_h), 1);
     for i = 1:length(a2_h)
         h_marker(i) = plot(ax, NaN, NaN, ['k' marker_types{i}], ...
                            'DisplayName', num2str(a2_h(i)));
     end
-    h_marker_leg = legend(h_marker, 'AutoUpdate', 'off');
+    h_marker_leg = legend(ax, h_marker, 'AutoUpdate', 'off', 'Location', 'northwest');
     title(h_marker_leg, marker_var_name)
 
-    % Marker-size legend (encodes a_3/a_1)
+    % -- Legend 2: marker size encodes a_3/a_1 (on invisible overlay axes ah1) --
     ah1         = axes('position', get(ax, 'position'));
     unique_size = unique(size_var2);
     h_size      = gobjects(length(unique_size), 1);
     for i = 1:length(unique_size)
-        h_size(i) = plot(ax, NaN, NaN, 'ko', ...
+        % Plot on ah1 so this legend is associated with ah1, not ax.
+        h_size(i) = plot(ah1, NaN, NaN, 'ko', ...
                          'MarkerSize', size_mult * unique_size(i), ...
                          'DisplayName', num2str(unique_size(i)));
-        hold on
+        hold(ah1, 'on')
     end
-    h_size_leg = legend(ah1, h_size);
+    h_size_leg = legend(ah1, 'AutoUpdate', 'off', 'Location', 'northeast');
     title(h_size_leg, size_var_name)
     ah1.Visible = 'off';
+
+    % -- Annotation: explain RGB colour encoding --
+    annotation(fig, 'textbox', [0.28, 0.01, 0.55, 0.06], ...
+               'String', 'Color: R = a_1/a_2,  G = d_1/h,  B = d_2/d_1', ...
+               'EdgeColor', 'none', 'Interpreter', 'tex', 'FontSize', 9, ...
+               'HorizontalAlignment', 'center')
 
     set([h_data; h_marker], 'MarkerFaceColor', 'none')
     fig.Position(3:4) = [1000 600];
