@@ -74,7 +74,7 @@ for idLayer =1: length(svg.layers)
                 if size(lcolors,1) == 4
                     color = [color, lcolors(4,k)];
                 end
-                h = plot(ln(1,:), ln(2,:), 'Color', color);
+                h = plot(ln(1,:), ln(2,:), 'Color', color,'LineWidth',1.5);
                 handles{end+1} = h;
                 set(h, 'UserData', [idLayer, k]);
             end
