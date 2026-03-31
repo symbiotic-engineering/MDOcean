@@ -90,6 +90,17 @@ for idlayer=0:layers.getLength-1
     layer.svgids=svgids;
     layer.name=layername;
     layer.stroke_colors=stroke_colors;
+
+    allPolylines = layerXml.getElementsByTagName('polyline');
+    nlines = allPolylines.getLength;
+    lines = cell(nlines, 1);
+    line_colors = zeros(4, nlines);
+    for k = 0:nlines-1
+        [lines{k+1}, line_colors(:,k+1)] = readPolyline(allPolylines.item(k));
+    end
+    layer.lines = lines;
+    layer.line_colors = line_colors;
+
     svg.layers{idlayer+1}=layer; 
 end
 end
@@ -118,8 +129,8 @@ if (~isempty(thisItem) )
     if any(lower(polyStr)=='c')
         error('does not handle curves path yet. Edit path with id %s\n',id);
     else
-        if any(lower(polyStr)=='l')
-            warning('line %s might not work right',id)
+        if any(polyStr=='l')
+            warning('relative lineto (lowercase l) in path %s may not be handled correctly when mixed with absolute moveto (M)',id)
         end
         style=char(thisItem.getAttribute('style'));
         mapObj = containers.Map;
@@ -154,6 +165,50 @@ if (~isempty(thisItem) )
     end
 end
 
+end
+
+function [coords, stroke_color] = readPolyline(item)
+    coords = [];
+    stroke_color = [0; 0; 0; 1];
+    if isempty(item)
+        return;
+    end
+    pointsStr = strip(char(item.getAttribute('points')));
+    if isempty(pointsStr)
+        return;
+    end
+    pointsCell = strsplit(pointsStr, {' ', ',', char(9), char(10), char(13)}, ...
+                          'CollapseDelimiters', true);
+    vals = str2double(pointsCell);
+    vals = vals(~isnan(vals));
+    if length(vals) < 4
+        return;
+    end
+    nPaired = 2 * floor(length(vals) / 2); % discard any trailing unpaired value
+    coords = reshape(vals(1:nPaired), 2, []);
+
+    style = char(item.getAttribute('style'));
+    if ~isempty(style)
+        mapObj = containers.Map;
+        C = strsplit(style, {';'});
+        for i = 1:length(C)
+            D = strsplit(C{i}, {':'});
+            if length(D) >= 2
+                mapObj(strtrim(D{1})) = strtrim(D{2});
+            end
+        end
+        if mapObj.isKey('opacity')
+            opacityVal = str2double(mapObj('opacity'));
+            if ~isnan(opacityVal)
+                stroke_color(4) = opacityVal;
+            end
+        end
+        if mapObj.isKey('stroke')
+            col = mapObj('stroke');
+            [r, g, b] = get_rgb(col);
+            stroke_color(1:3) = [r; g; b];
+        end
+    end
 end
 
 function [r,g,b] = get_rgb(col)
