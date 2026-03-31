@@ -7,14 +7,16 @@ function [fig_array,...
 % post_process_fcn  Generate all geometry-sweep figures.
 %
 % Produces three original figures (parallel-coordinates, scatter,
-% line-plot) and six capture-width-ratio (CWR) figures — scatter and
+% line-plot), six capture-width-ratio (CWR) figures — scatter and
 % line variants for each of three characteristic dimensions:
 %   1. a_2      – float radius
 %   2. V^{1/3}  – cube root of displaced volume  (val.vol_f + val.vol_s)
 %   3. sqrt(SA) – square root of wetted surface area (cylindrical approx.)
+% plus a Pareto plot (CW vs surface area) and a grid scatter matrix
+% (6 sweep variables × 8 output quantities).
 %
 % :param intermed_result_struct: Output of analysis_fcn.
-% :returns: fig_array            9-element array of figure handles
+% :returns: fig_array            11-element array of figure handles
 % :returns: tab_array_display    Empty (no tables)
 % :returns: tab_array_latex      Empty (no tables)
 % :returns: end_result_struct    Struct with completion flag
@@ -69,7 +71,8 @@ function [fig_array,...
     D_s_grid = 2 * A1;
     SA_float      = pi * D_f_grid .* D2 + pi * (D_f_grid/2).^2;
     SA_spar       = pi * D_s_grid .* D1 + pi * (D_s_grid/2).^2;
-    charac_dim_sa = reshape(sqrt(SA_float + SA_spar), [1, size(A1)]);
+    SA_total      = SA_float + SA_spar;
+    charac_dim_sa = reshape(sqrt(SA_total), [1, size(A1)]);
     CWR_sa        = CW ./ charac_dim_sa;
 
     % ------------------------------------------------------------------
@@ -156,7 +159,46 @@ function [fig_array,...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
-    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9];
+    % ------------------------------------------------------------------
+    % Figure 10: Pareto plot  (CW vs Surface Area)
+    % ------------------------------------------------------------------
+    % Collapse the T dimension by taking the best CW for each geometry.
+    CW_max_T = squeeze(max(CW, [], 1));   % [size(A1)]
+
+    % Color/size convention extended to all geometry points (incl. both h
+    % levels) so every point in the 486-geometry grid is represented.
+    color_pareto    = [A1_A2(:), D1_H(:), D2_D1(:)];
+    size_var_pareto = A3_A1(:);
+
+    fig10 = make_pareto_fig(CW_max_T(:), SA_total(:), ...
+                            color_pareto, size_var_pareto, size_mult);
+
+    % ------------------------------------------------------------------
+    % Figure 11: Grid scatter matrix
+    %   Columns = 6 sweep vars (5 geometry ratios + m0h)
+    %   Rows    = 8 output quantities
+    % ------------------------------------------------------------------
+    a1_a2_flat = myresize(A1_A2, nT);
+    a2_h_flat  = myresize(A2_H,  nT);
+    d1_h_flat  = myresize(D1_H,  nT);
+    d2_d1_flat = myresize(D2_D1, nT);
+    a3_a1_flat = myresize(A3_A1, nT);
+
+    x_vars   = {a1_a2_flat, a2_h_flat, d1_h_flat, d2_d1_flat, a3_a1_flat, m0h_stored(:)};
+    x_labels = {'a_1/a_2', 'a_2/h', 'd_1/h', 'd_2/d_1', 'a_3/a_1', 'm_0h'};
+
+    charac_a2_flat  = myresize(A2,                       nT);
+    charac_vol_flat = myresize((vol_f + vol_s).^(1/3),   nT);
+    charac_sa_flat  = myresize(sqrt(SA_total),           nT);
+
+    y_vars   = {hydro_ratio_result(:), charac_a2_flat, charac_vol_flat, charac_sa_flat, ...
+                CW(:), CWR_a2(:), CWR_vol(:), CWR_sa(:)};
+    y_labels = {'CW/CW_{max}', 'a_2 (m)', 'V^{1/3} (m)', '\sqrt{SA} (m)', ...
+                'CW (m)', 'CW/a_2', 'CW/V^{1/3}', 'CW/\sqrt{SA}'};
+
+    fig11 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
+
+    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11];
 
     tab_array_display = {};
     tab_array_latex   = {};
@@ -169,6 +211,58 @@ end
 % ======================================================================
 % Local helper functions
 % ======================================================================
+
+function fig = make_pareto_fig(CW_vec, SA_vec, color_pareto, size_var_pareto, size_mult)
+%MAKE_PARETO_FIG  Pareto front: capture width (x) vs surface area (y).
+%   Reuses paretoFront() from optimization/multiobjective.  Scatter-plots
+%   all geometry configurations with the standard colour/size encoding,
+%   then overlays the Pareto front as hollow black squares (matching the
+%   style of pareto_curve_heuristics).
+    [~, idxo] = paretoFront([CW_vec(:), -SA_vec(:)]);
+
+    fig = figure('Visible', 'off');
+    scatter(CW_vec(:), SA_vec(:), size_mult * size_var_pareto(:), color_pareto, ...
+            'HandleVisibility', 'off')
+    hold on
+    plot(CW_vec(idxo), SA_vec(idxo), 'ks', ...
+         'MarkerFaceColor', 'none', 'MarkerSize', 10, 'LineWidth', 1.5, ...
+         'DisplayName', 'Pareto front')
+    xlabel('CW (m)')
+    ylabel('Surface Area (m^2)')
+    legend('Location', 'best')
+    improvePlot
+end
+
+function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var)
+%MAKE_GRID_SCATTER_FIG  Grid matrix of scatter plots.
+%   Rows correspond to y-axis output quantities; columns to x-axis sweep
+%   variables.  Uses the same colour/size encoding as the other sweep
+%   figures.
+    n_x = numel(x_vars);
+    n_y = numel(y_vars);
+
+    fig = figure('Visible', 'off');
+    t = tiledlayout(n_y, n_x, 'TileSpacing', 'compact', 'Padding', 'compact');
+
+    for iy = 1:n_y
+        for ix = 1:n_x
+            ax = nexttile(t);
+            scatter(ax, x_vars{ix}, y_vars{iy}, size_var, color)
+            if iy == n_y
+                xlabel(ax, x_labels{ix})
+            else
+                set(ax, 'XTickLabel', [])
+            end
+            if ix == 1
+                ylabel(ax, y_labels{iy})
+            else
+                set(ax, 'YTickLabel', [])
+            end
+        end
+    end
+
+    fig.Position(3:4) = [1400, 900];
+end
 
 function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
 %MAKE_SCATTER_FIG  Scatter plot of m0h vs a CWR quantity.
