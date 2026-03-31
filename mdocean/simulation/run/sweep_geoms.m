@@ -159,20 +159,21 @@ title(h_size_leg,size_var_name)
 ah1.Visible ='off';
 
 % color legend
-colorAxPos = [.5 .6];
+colorAxPos = [.67 .43];
 mini_plot_size = [.2 .22];
 colorAx = axes('Position',[colorAxPos mini_plot_size]);
 box on
 plotSVG(loadSVG('RGBCube_a.svg'));
 set(colorAx,'Ydir','reverse')
 set(colorAx,'XTickLabel',[],'YTickLabel',[],'XTick',[],'YTick',[])
-red_pos = [-sqrt(3)/2, -1/4];
-green_pos = [sqrt(3)/2, -1/4];
-blue_pos = [1/4, -1];
+red_pos = [-1.65, .75];
+green_pos = [1.18, .75];
+blue_pos = [.17, -1.2];
 text(red_pos(1),red_pos(2),red_var_name)
 text(green_pos(1),green_pos(2),green_var_name)
 text(blue_pos(1),blue_pos(2),blue_var_name)
 axis image
+axis off
 improvePlot
 
 % main plot formatting that must happen after improvePlot
