@@ -1,5 +1,5 @@
 classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')...
+        matlab.unittest.fixtures.CurrentFolderFixture('../')...
         }) test_dynamics < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
@@ -22,17 +22,18 @@ classdef (SharedTestFixtures={ ...
             if testCase.run_wecsim_tests
                 warning('off','MATLAB:contour:ConstantData')
                 t = tic;
-                [singlebody, multibody, ...
-                 report, tab, fig_sb, fig_mb] = validate_dynamics();
+                obj = Wecsim();
+                obj = obj.run_all_from_analysis();
                 wecsim_runtime = toc(t);
                 fprintf('WecSim took %g minutes',wecsim_runtime/60)
                 warning('on','MATLAB:contour:ConstantData')
 
-                testCase.errors_singlebody = singlebody;
-                testCase.errors_multibody  = multibody;
-                testCase.errors_report     = report;
-                testCase.table             = tab;
-                testCase.figs              = [fig_sb fig_mb];
+                err_structs = obj.end_result_struct.err_structs;
+                testCase.errors_singlebody = err_structs{1};
+                testCase.errors_multibody  = err_structs{2};
+                testCase.errors_report     = err_structs{3};
+                testCase.table             = obj.tab_array_display{1};
+                testCase.figs              = obj.fig_array;
             end
         end
     end
