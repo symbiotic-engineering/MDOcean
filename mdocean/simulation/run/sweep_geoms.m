@@ -109,6 +109,9 @@ red2 = A1_A2(1,:,:,:,:,:);
 green2 = D1_H(1,:,:,:,:,:);
 blue2 = D2_D1(1,:,:,:,:,:);
 color2 = [red2(:), green2(:), blue2(:)];
+red_var_name = 'a_1/a_2';
+green_var_name = 'd_1/h';
+blue_var_name = 'd_2/d_1';
 
 size_var2 = A3_A1(1,:,:,:,:,:);
 size_mult = 3;
@@ -136,7 +139,7 @@ ylim([0 1.5])
 m0h_minmax = [min(m0h_mat(:)) max(m0h_mat(:))];
 plot(ax,m0h_minmax,[1 1],'k--')
 
-% legend
+% numeric legends
 h_marker = gobjects(length(a2_h),1);
 for i=1:length(a2_h)
     h_marker(i) = plot(ax,NaN,NaN,['k' marker_types{i}],'DisplayName',num2str(a2_h(i)));
@@ -155,12 +158,24 @@ h_size_leg = legend(ah1,h_size);
 title(h_size_leg,size_var_name)
 ah1.Visible ='off';
 
-%%
-figure
+% color legend
+colorAxPos = [.5 .6];
+mini_plot_size = [.2 .22];
+colorAx = axes('Position',[colorAxPos mini_plot_size]);
+box on
 plotSVG(loadSVG('RGBCube_a.svg'));
-set(gca,'Ydir','reverse')
+set(colorAx,'Ydir','reverse')
+set(colorAx,'XTickLabel',[],'YTickLabel',[],'XTick',[],'YTick',[])
+red_pos = [-sqrt(3)/2, -1/4];
+green_pos = [sqrt(3)/2, -1/4];
+blue_pos = [1/4, -1];
+text(red_pos(1),red_pos(2),red_var_name)
+text(green_pos(1),green_pos(2),green_var_name)
+text(blue_pos(1),blue_pos(2),blue_var_name)
+axis image
 improvePlot
 
+% main plot formatting that must happen after improvePlot
 set([h_data; h_marker],'MarkerFaceColor','none')
 fig.Position(3:4)  = [1000 600];
 xlim(ax,m0h_minmax)
