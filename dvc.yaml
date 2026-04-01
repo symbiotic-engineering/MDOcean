@@ -24,11 +24,13 @@ stages:
     desc: Automatically generated from the 'mermaid-taxonomy-svg' 
       stage in calkit.yaml. Changes made here will be overwritten.
   reformat-mermaid-svg:
-    cmd: bash --noprofile --norc -c "xmllint --format 
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
+      "xmllint --format 
       mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
       mdocean/plots/non_matlab_figs/img/taxonomy.svg"
     deps:
       - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      - .calkit/env-locks/pubs
     outs:
       - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
           cache: false
