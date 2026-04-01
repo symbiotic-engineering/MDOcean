@@ -51,6 +51,7 @@ The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab
 Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2025. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/applied-ocean-research-model/main.pdf).
 
 Optimization journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation, 2026. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/renewable-energy-mdo/mdocean.pdf).
+
 Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
 *International Design Engineering Technical Conferences & Computers and 
