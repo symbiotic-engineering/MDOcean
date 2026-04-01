@@ -297,14 +297,15 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
         end
     end
 
-    fig.Position(3:4) = [1400, 900];
+    fig.Position(3:4) = [1400, 820];
     set(fig, 'PaperPositionMode', 'auto');
 end
 
 function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
-%MAKE_SCATTER_FIG  Scatter plot of m0h vs a CWR quantity.
+%MAKE_SCATTER_FIG  Semilog scatter plot of m0h vs a CWR quantity.
     fig = figure('Visible','off');
     scatter(m0h_stored(:), CWR(:), size_var, color)
+    set(gca, 'XScale', 'log')
     xlabel('m_0 h')
     ylabel(ylabel_str)
 end
@@ -393,4 +394,74 @@ function collapsed = myresize(A, len)
     repeated  = repmat(A, n_repeats);
     shifted   = shiftdim(repeated, ndims(A));
     collapsed = shifted(:);
+end
+
+function fig = make_factor_fig(Y, factor_labels)
+%MAKE_FACTOR_FIG  6×6 imagesc of η² (eta-squared) from balanced factorial ANOVA.
+%   Y is an ND array where each dimension corresponds to one factor in
+%   factor_labels (same order).  Diagonal cells show main-effect η²;
+%   off-diagonal cells show two-factor interaction η².
+%
+%   Uses the standard balanced-factorial SS decomposition:
+%     SS_i   = (N/n_i) * sum((marginal_mean_i - grand_mean).^2)
+%     SS_ij  = (N/(n_i*n_j)) * sum((cell_mean_ij - marg_i - marg_j + grand_mean).^2)
+%     eta2   = SS / SS_total
+    n_fac      = ndims(Y);
+    N          = numel(Y);
+    grand_mean = mean(Y(:));
+    SS_total   = sum((Y(:) - grand_mean).^2);
+
+    % Helper: marginal means for each factor (permute factor to dim 1, average rest)
+    marg = cell(n_fac, 1);
+    main_ss = zeros(n_fac, 1);
+    for i = 1:n_fac
+        n_i    = size(Y, i);
+        perm_i = [i, setdiff(1:n_fac, i)];
+        Yp     = permute(Y, perm_i);
+        mi     = mean(reshape(Yp, n_i, []), 2);   % [n_i x 1]
+        marg{i}    = mi;
+        main_ss(i) = (N / n_i) * sum((mi - grand_mean).^2);
+    end
+
+    eta2 = zeros(n_fac);
+    for i = 1:n_fac
+        eta2(i,i) = main_ss(i) / SS_total;
+    end
+
+    for i = 1:n_fac
+        for j = i+1:n_fac
+            n_i    = size(Y, i);
+            n_j    = size(Y, j);
+            % Permute so factors i and j are dimensions 1 and 2, then average rest.
+            other  = setdiff(1:n_fac, [i, j]);
+            perm_ij = [i, j, other];
+            Yp      = permute(Y, perm_ij);
+            cell_mn = mean(reshape(Yp, n_i, n_j, []), 3);   % [n_i x n_j]
+            % Interaction: remove main effects
+            interact = cell_mn - marg{i} - marg{j}.' + grand_mean;
+            n_rep    = N / (n_i * n_j);
+            SS_ij    = n_rep * sum(interact(:).^2);
+            eta2(i,j) = SS_ij / SS_total;
+            eta2(j,i) = eta2(i,j);
+        end
+    end
+
+    fig = figure('Visible', 'off');
+    imagesc(eta2)
+    colorbar
+    colormap(parula)
+    clim([0, max(eta2(:))])
+    set(gca, 'XTick', 1:n_fac, 'XTickLabel', factor_labels, ...
+             'YTick', 1:n_fac, 'YTickLabel', factor_labels)
+    title('\eta^2: main (diagonal) and interaction (off-diagonal) effects on CW/SA^{1/2}', ...
+          'Interpreter', 'tex')
+    axis square
+    % Annotate each cell with its η² value.
+    for i = 1:n_fac
+        for j = 1:n_fac
+            text(j, i, sprintf('%.3f', eta2(i,j)), ...
+                 'HorizontalAlignment', 'center', 'FontSize', 8, 'Color', 'white')
+        end
+    end
+    fig.Position(3:4) = [540, 480];
 end
