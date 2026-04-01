@@ -12,11 +12,12 @@ function [fig_array,...
 %   1. a_2      – float radius
 %   2. V^{1/3}  – cube root of displaced volume  (val.vol_f + val.vol_s)
 %   3. SA^{1/2} – square root of wetted surface area (cylindrical approx.)
-% plus a Pareto plot (CW vs surface area) and a grid scatter matrix
-% (6 sweep variables × 8 output quantities).
+% plus a Pareto plot (CW vs surface area), a grid scatter matrix
+% (6 sweep variables × 8 output quantities), and a 6×6 factor-analysis
+% pcolor of main and interaction η² effects on CW/SA^{1/2}.
 %
 % :param intermed_result_struct: Output of analysis_fcn.
-% :returns: fig_array            11-element array of figure handles
+% :returns: fig_array            12-element array of figure handles
 % :returns: tab_array_display    Empty (no tables)
 % :returns: tab_array_latex      Empty (no tables)
 % :returns: end_result_struct    Struct with completion flag
@@ -116,19 +117,33 @@ function [fig_array,...
     [result_disc_sorted, idx_sort] = sort(result_disc(:));
     idx = idx_sort(~isundefined(result_disc_sorted));
 
+    % Use tiledlayout(1,1) so an overlay axes can be placed on the same tile
+    % (same strategy as multistart_postpro.m lines 155-183) to apply LaTeX
+    % tick labels — parallelplot has no LabelInterpreter property.
     fig1 = figure('Visible','off');
+    t1   = tiledlayout(fig1, 1, 1, 'Padding', 'compact');
+    nexttile(t1);
     pp = parallelplot([H(idx), A1_A2(idx), A2_H(idx), D1_H(idx), D2_D1(idx), ...
                        A3_A1(idx), m0h_tmp(idx), result_tmp(idx)], ...
                       'GroupData', result_disc_sorted(~isundefined(result_disc_sorted)));
-    pp.CoordinateTickLabels = {'h','a_1/a_2','a_2/h','d_1/h','d_2/d_1','a_3/a_1','m_0h','CW/CW_{max}'};
-    pp.LabelInterpreter = 'tex';
+    pp.CoordinateTickLabels = '';   % suppress original labels; overlay supplies them
     pp.Color = parula(10);
+
+    coord_labels = {'$h$','$a_1/a_2$','$a_2/h$','$d_1/h$','$d_2/d_1$', ...
+                    '$a_3/a_1$','$m_0 h$','$CW/CW_{\max}$'};
+    nC = numel(coord_labels);
+    hOvl = axes(t1);
+    hOvl.Layout.Tile = 1;
+    set(hOvl, 'XLim', [0.5, nC+0.5], 'Color', 'none', 'XColor', 'black', ...
+              'YColor', 'none', 'XTick', 1:nC, 'XTickLabel', coord_labels, ...
+              'TickLabelInterpreter', 'latex', 'Box', 'off', 'FontSize', 9);
 
     % ------------------------------------------------------------------
     % Figure 2: Scatter plot  (m0h vs CW/CW_max)
     % ------------------------------------------------------------------
     fig2 = figure('Visible','off');
     scatter(m0h_stored(:), hydro_ratio_result(:), size_var, color)
+    set(gca, 'XScale', 'log')
     xlabel('m_0 h')
     ylabel('CW/CW_{max}')
     ylim([0 1])
@@ -199,7 +214,16 @@ function [fig_array,...
 
     fig11 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
 
-    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11];
+    % ------------------------------------------------------------------
+    % Figure 12: Factor analysis — 6×6 imagesc of η² effects on CW/SA^{1/2}
+    %   Diagonal  (i==j): main effect of input i
+    %   Off-diag  (i≠j): two-factor interaction effect between inputs i and j
+    % ------------------------------------------------------------------
+    Y_fa = CW_max_T ./ sqrt(SA_total);   % [size(A1)], per-geometry CW/SA^{1/2}
+    factor_labels = {'h', 'a_1/a_2', 'a_2/h', 'd_1/h', 'd_2/d_1', 'a_3/a_1'};
+    fig12 = make_factor_fig(Y_fa, factor_labels);
+
+    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12];
 
     tab_array_display = {};
     tab_array_latex   = {};
@@ -215,11 +239,21 @@ end
 
 function fig = make_pareto_fig(CW_vec, SA_vec, color_pareto, size_var_pareto, size_mult)
 %MAKE_PARETO_FIG  Pareto front: capture width (x) vs surface area (y).
-%   Reuses paretoFront() from optimization/multiobjective.  Scatter-plots
-%   all geometry configurations with the standard colour/size encoding,
-%   then overlays the Pareto front as hollow black squares (matching the
-%   style of pareto_curve_heuristics).
-    [~, idxo] = paretoFront([CW_vec(:), -SA_vec(:)]);
+%   Finds the max-CW / min-SA Pareto front via an inline sweep (sort by CW
+%   descending, keep any point that achieves a new minimum SA).
+    CW_v = CW_vec(:);
+    SA_v = SA_vec(:);
+    [CW_sort, sort_idx] = sort(CW_v, 'descend');
+    SA_sort = SA_v(sort_idx);
+    min_SA  = Inf;
+    pareto_mask = false(numel(CW_v), 1);
+    for k = 1:numel(CW_sort)
+        if CW_sort(k) > 0 && SA_sort(k) < min_SA
+            pareto_mask(k) = true;
+            min_SA = SA_sort(k);
+        end
+    end
+    idxo = sort_idx(pareto_mask);
 
     fig = figure('Visible', 'off');
     scatter(CW_vec(:), SA_vec(:), size_mult * size_var_pareto(:), color_pareto, ...
