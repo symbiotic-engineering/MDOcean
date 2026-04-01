@@ -77,7 +77,7 @@ If you are unfamiliar with Git and want to download the code another way, click 
 
 Please see the documentation [here](https://symbiotic-engineering.github.io/MDOcean/usage.html) for instructions on how to run the simulation, optimization, or entire paper-reproduction pipeline.
 The package [`calkit`](https://docs.calkit.org/) is used for single-button reproducibility.
-Once the installation steps are complete, the command `calkit run -pull` will reproduce all artifacts (figures, tables, papers).
+Once the installation steps are complete, the command `calkit run --pull` will reproduce all artifacts (figures, tables, papers).
 Additionally, [this page](https://symbiotic-engineering.github.io/MDOcean/modification.html) has guidance on how to modify the code to be used for other problems.
 
 
