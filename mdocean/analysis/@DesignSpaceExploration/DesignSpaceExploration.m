@@ -3,7 +3,8 @@ classdef DesignSpaceExploration < GenericAnalysis
     %   Generates design space exploration experimental figures
 
     properties
-        fig_names = {'experiments_pareto','experiments_ratios'};
+        fig_names = {...'experiments_pareto',
+                    'experiments_ratios'};
         tab_names = {'experiments_results'};
     end
 

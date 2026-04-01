@@ -1,6 +1,12 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-1
+### Fixed
+- Pipeline: remove extraneous calkit outputs that caused two postpro stages to fail
+- Pipeline: add xmllint to pubs conda env to avoid issue with mermaid reformatting stage
+- CI: avoid unnecessary double dvc pull
+
 ## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
 ### Added
 - Pipeline: python script to update calkit.yaml automatically with matlab auto deps
