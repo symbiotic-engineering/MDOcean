@@ -1,6 +1,37 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
+### Added
+- Pipeline: python script to update calkit.yaml automatically with matlab auto deps
+- CI: enforce calkit.yaml to be up to date with matlab auto deps
+
+## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-30
+### Changed
+- Plot: added frequency domain to dynamics runtime bar plot
+### Fixed
+- Analysis: add forgotten add_wecsim_path in runtime analysis class
+
+## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
+### Changed
+- Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization
+
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-29
+### Added
+- Model: drag computed via strip theory integral. Note that this increases runtime by over 40%.
+- Pipeline: stages to precompute drag lookup table and analysis for drag integral plots
+- Validation: WecSim saves fundamental of drag force and phases via FFT
+- CI: check to avoid accidental submodule downgrades 
+### Changed
+- Validation: WecSim uses Morison drag rather than quadratic drag
+- Pipeline: dvc.lock merge driver no longer requires unchanged dvc.yaml
+- Plots: runtime bar chart numbers rounded to nearest ms
+- Plots: end figures saved as .fig in addition to .pdf
+- Paper: moved meem appendix back to this repo from OpenFLASH
+### Fixed
+- Model: sign error in phase of d'alembert force
+- Pipeline: track text outputs in git for a few stages forgotten last PR
+
 ## [v1.1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.2) - 2026-3-16
 ### Added
 - Paper: mermaid diagram for modeling choice taxonomy

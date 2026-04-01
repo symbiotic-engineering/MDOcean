@@ -1,0 +1,61 @@
+name: Ready to merge
+description: Check version + changelog updated, submodules not accidentally downgraded
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            version:
+                - 'mdocean/__version__.py'
+            changelog:
+                - 'CHANGELOG.md'
+      - name: Fail if version/changelog not bumped
+        if: steps.changes.outputs.version == 'false' || steps.changes.outputs.changelog == 'false'
+        run: exit 1
+      - name: Check for accidental submodule downgrades
+        run: |
+          set +e
+          git fetch origin main
+          # get list of submodule paths from .gitmodules
+          SUBMODULES=$(git config --file .gitmodules --get-regexp path | awk '{print $2}')
+          ERROR=0
+          
+          for SUB in $SUBMODULES; do
+            echo "Checking submodule: $SUB"
+            
+            # SHA in main
+            MAIN_SHA=$(git rev-parse origin/main:$SUB)
+            # SHA in PR branch
+            HEAD_SHA=$(git rev-parse HEAD:$SUB)
+            
+            echo "  main SHA: $MAIN_SHA"
+            echo "  PR SHA:   $HEAD_SHA"
+            
+            # Check if HEAD contains MAIN_SHA as ancestor
+            git -C $SUB fetch origin main --quiet
+            git -C $SUB merge-base --is-ancestor $MAIN_SHA $HEAD_SHA
+            IS_ANCESTOR=$?
+            if [ $IS_ANCESTOR -ne 0 ]; then
+              echo "  ❌ PR submodule '$SUB' is older than main!"
+              ERROR=1
+            else
+              echo "  ✅ OK"
+            fi
+          done
+          
+          if [ $ERROR -ne 0 ]; then
+            echo "One or more submodules are older than main. Failing CI."
+            exit 1
+          fi

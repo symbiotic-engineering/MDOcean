@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 44;
+num_figs_AOR = 54;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -85,7 +85,7 @@ figs_in_AOR{24} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{25} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_AOR{26} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
-figs_in_AOR{27} = 'ReadNonMatlabFigs.meem_regions';
+figs_in_AOR{27} = 'Tikz.meem_regions';
 figs_in_AOR{28} = 'Meem.meem_sparsity';
 figs_in_AOR{29} = 'Meem.meem_validation';
 figs_in_AOR{30} = 'Meem.meem_matching';
@@ -93,20 +93,20 @@ figs_in_AOR{31} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{32} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{33} = 'ReadNonMatlabFigs.qp_circles';
-figs_in_AOR{34} = 'ReadNonMatlabFigs.drag_damping_integral';
-figs_in_AOR{34+10} = 'ReadNonMatlabFigs.drag_exc_mag_integral';
-figs_in_AOR{34+11} = 'ReadNonMatlabFigs.drag_exc_phase_integral';
+figs_in_AOR{34} = 'ReadNonMatlabFigs.drag_integral_B';
+figs_in_AOR{34+12} = 'ReadNonMatlabFigs.drag_integral_G_m';
+figs_in_AOR{34+13} = 'ReadNonMatlabFigs.drag_integral_G_p';
 figs_in_AOR{35} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{36} = 'Slamming.slamming_amplitude';
 figs_in_AOR{37} = 'RunSingleFigFunc.slamming_model_comparison_float';
 figs_in_AOR{38}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
-figs_in_AOR{38+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
-figs_in_AOR{38+9} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
-figs_in_AOR{38+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
-figs_in_AOR{39+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf';
-figs_in_AOR{39+11} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf';
-figs_in_AOR{39+12} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf';
-figs_in_AOR{39+13} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf';
+figs_in_AOR{38+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{38+11} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{38+12} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{39+12} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf';
+figs_in_AOR{39+13} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf';
+figs_in_AOR{39+14} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf';
+figs_in_AOR{39+15} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf';
 % appendix C - structures
 figs_in_AOR{40} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{41} = 'ReadNonMatlabFigs.trapezoid';
@@ -143,27 +143,32 @@ figs_classes = figs_split(:,1);
 tabs_classes = tabs_split(:,1);
 for i=1:length(figs_classes)
     class_name = figs_classes{i};
-    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
-    this_fig_name = figs_split(i,2);
-    valid = ismember(this_fig_name,all_fig_names_this_class);
-    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
-        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+        this_fig_name = figs_split(i,2);
+        valid = ismember(this_fig_name,all_fig_names_this_class);
+        msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+            class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
 end
 for i=1:length(tabs_classes)
     class_name = tabs_classes{i};
-    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
-    this_tab_name = tabs_split(i,2);
-    valid = ismember(this_tab_name,all_tab_names_this_class);
-    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
-        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+        this_tab_name = tabs_split(i,2);
+        valid = ismember(this_tab_name,all_tab_names_this_class);
+        msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+            class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
+
 end
 
 end

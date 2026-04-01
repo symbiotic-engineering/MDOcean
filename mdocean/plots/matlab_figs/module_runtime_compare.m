@@ -3,15 +3,18 @@ function [figs, ...
     pct_runtime_MEEM, ...
     pct_runtime_dynamics, ...
     pct_runtime_other] = module_runtime_compare(p, profile_multibody, profile_singlebody, ...
-                                                t_multibody_fullsim_timeit, ...
-                                                t_singlebody_fullsim_timeit, t_wecsim)
+                                                profile_freq_domain, t_multibody_fullsim_timeit, ...
+                                                t_singlebody_fullsim_timeit, ...
+                                                t_freq_domain_fullsim_timeit, t_wecsim)
 % Function module_runtime_compare
 %
 % :param p: Parameter struct
 % :param profile_multibody: profile_multibody
 % :param profile_singlebody: profile_singlebody
+% :param profile_freq_domain: profile_freq_domain
 % :param t_multibody_fullsim_timeit: t_multibody_fullsim_timeit
 % :param t_singlebody_fullsim_timeit: t_singlebody_fullsim_timeit
+% :param t_freq_domain_fullsim_timeit: t_freq_domain_fullsim_timeit
 % :param t_wecsim: t_wecsim
 % :returns: figs
 % :returns: pct_runtime_MEEM
@@ -19,23 +22,27 @@ function [figs, ...
 % :returns: pct_runtime_other
 
     % extract full sim timing and multiplier
+    t_freq_domain_fullsim_profile = extract_runtime(profile_freq_domain,'simulation');
     t_multibody_fullsim_profile  = extract_runtime(profile_multibody, 'simulation');
     t_singlebody_fullsim_profile = extract_runtime(profile_singlebody,'simulation');
    
+    time_multiplier_freq_domain = t_freq_domain_fullsim_timeit / t_freq_domain_fullsim_profile;
     time_multiplier_multibody  = t_multibody_fullsim_timeit / t_multibody_fullsim_profile;
     time_multiplier_singlebody = t_singlebody_fullsim_timeit / t_singlebody_fullsim_profile;
 
     % just dynamics
+    t_freq_domain = time_multiplier_freq_domain * extract_runtime(profile_freq_domain,'get_response_drag');
     t_multibody  = time_multiplier_multibody  * extract_runtime(profile_multibody, 'get_response_drag');
     t_singlebody = time_multiplier_singlebody * extract_runtime(profile_singlebody,'get_response_drag');
 
     f1 = figure;
-    cats = {'MDOcean Dynamics 1-DOF','MDOcean Dynamics 2-DOF','WecSim (Parallelized)'};
-    times = [t_singlebody t_multibody t_wecsim];
+    cats = {'Frequency Domain 2-DOF','MDOcean Dynamics 1-DOF','MDOcean Dynamics 2-DOF','WecSim (Parallelized)'};
+    times = [t_freq_domain t_singlebody t_multibody round(t_wecsim)];
     cats = reordercats(categorical(cats),cats);
     h = bar(cats,times);
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     title('Dynamics Runtime Comparison')
     subtitle('for all sea states')
@@ -88,7 +95,8 @@ function [figs, ...
     exponents = log10(hydro_sum);
     xlim(10.^[min(floor(exponents)),max(ceil(exponents))])
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ax = h(1).Parent;
     split_labels_by_space(ax)
@@ -107,7 +115,8 @@ function [figs, ...
     subtitle('for a single frequency')
     ylabel('Runtime (s)')
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ax = h(1).Parent;
     split_labels_by_space(ax)
@@ -127,7 +136,8 @@ function [figs, ...
     f4 = figure;
     h = bar(name_modules,t_modules);
     if ~isMATLABReleaseOlderThan('R2024b')
-        h(1).Labels = h(1).YData;
+        h(1).Labels = round(h(1).YData,3);
+        h(1).FontSize = 16;
     end
     ylabel('Runtime (s)')
     title('Module Time Breakdown')
