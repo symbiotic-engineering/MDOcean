@@ -12,6 +12,10 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Check validity of citation.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "-i ./CITATION.cff -f zenodo --validate --show-trace"
       - name: Check for changes
         uses: dorny/paths-filter@v3
         id: changes

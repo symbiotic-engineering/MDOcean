@@ -23,11 +23,7 @@ classdef (SharedTestFixtures={ ...
                 warning('off','MATLAB:contour:ConstantData')
                 t = tic;
                 obj = Wecsim();
-                try
-                    obj = obj.run_all_from_load();
-                catch
-                    obj = obj.run_all_from_analysis();
-                end
+                obj = obj.run_all_from_load_if_possible();
                 wecsim_runtime = toc(t);
                 fprintf('WecSim took %g minutes',wecsim_runtime/60)
                 warning('on','MATLAB:contour:ConstantData')

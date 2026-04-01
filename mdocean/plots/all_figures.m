@@ -83,11 +83,7 @@ for i = 1:length(fig_names)
             
             % Run the analysis if not already done
             if isempty(analysis_obj.fig_array)
-                try
-                    analysis_obj = analysis_obj.run_all_from_load();
-                catch
-                    analysis_obj = analysis_obj.run_all_from_analysis();
-                end
+                analysis_obj = analysis_obj.run_all_from_load_if_possible();
                 analysis_instances(class_name) = analysis_obj;
             end
             
@@ -147,11 +143,7 @@ for i = 1:length(tab_names)
             
             % Run the analysis if not already done
             if isempty(analysis_obj.tab_array_display)
-                try
-                    analysis_obj = analysis_obj.run_all_from_load();
-                catch
-                    analysis_obj = analysis_obj.run_all_from_analysis();
-                end
+                analysis_obj = analysis_obj.run_all_from_load_if_possible();
                 analysis_instances(class_name) = analysis_obj;
             end
             

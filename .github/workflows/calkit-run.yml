@@ -31,18 +31,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: true
           persist-credentials: false
-      - name: Checkout WEC-Sim
-        uses: actions/checkout@v4
-        if: always()
-        with:
-          repository: WEC-Sim/WEC-Sim
-          path: WEC-Sim
-          ref: dev
-      - name: Check validity of citation.cff
-        uses: citation-file-format/cffconvert-github-action@2.0.0
-        if: always()
-        with:
-          args: "-i ./CITATION.cff -f zenodo --validate --show-trace"
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
