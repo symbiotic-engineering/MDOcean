@@ -24,11 +24,13 @@ stages:
     desc: Automatically generated from the 'mermaid-taxonomy-svg' 
       stage in calkit.yaml. Changes made here will be overwritten.
   reformat-mermaid-svg:
-    cmd: bash --noprofile --norc -c "xmllint --format 
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
+      "xmllint --format 
       mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
       mdocean/plots/non_matlab_figs/img/taxonomy.svg"
     deps:
       - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      - .calkit/env-locks/pubs
     outs:
       - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
           cache: false
@@ -974,9 +976,7 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/DesignSpaceExploration/intermed.mat
     outs:
-      - results/DesignSpaceExploration/experiments_pareto.pdf
       - results/DesignSpaceExploration/experiments_ratios.pdf
-      - results/DesignSpaceExploration/experiments_pareto.fig
       - results/DesignSpaceExploration/experiments_ratios.fig
       - results/DesignSpaceExploration/experiments_results.tex:
           cache: false
@@ -2799,22 +2799,6 @@ stages:
       - results/ReadNonMatlabFigs/taxonomy.pdf
       - results/ReadNonMatlabFigs/trapezoid.pdf
       - results/ReadNonMatlabFigs/xdsm.pdf
-      - results/ReadNonMatlabFigs/control_analysis_flowcharts.fig
-      - results/ReadNonMatlabFigs/damping_plate_flowchart.fig
-      - results/ReadNonMatlabFigs/dimensions.fig
-      - results/ReadNonMatlabFigs/equivalent_stiffness.fig
-      - results/ReadNonMatlabFigs/FBD.fig
-      - results/ReadNonMatlabFigs/graphical_abstract_modeling.fig
-      - results/ReadNonMatlabFigs/MEEM_geometry.fig
-      - results/ReadNonMatlabFigs/methodology_flowchart.fig
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.fig
-      - results/ReadNonMatlabFigs/optimization_flowchart.fig
-      - results/ReadNonMatlabFigs/RM3_image.fig
-      - results/ReadNonMatlabFigs/section_flow.fig
-      - results/ReadNonMatlabFigs/sim_runtime.fig
-      - results/ReadNonMatlabFigs/taxonomy.fig
-      - results/ReadNonMatlabFigs/trapezoid.fig
-      - results/ReadNonMatlabFigs/xdsm.fig
       - results/ReadNonMatlabFigs/end.mat
       - results/ReadNonMatlabFigs/end.json:
           cache: false
