@@ -1,5 +1,5 @@
 classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../')}) ...
+        matlab.unittest.fixtures.CurrentFolderFixture('.')}) ...
         test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
@@ -229,7 +229,7 @@ classdef (SharedTestFixtures={ ...
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
-                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
+                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "test-results/");
 
             else % table
                 non_none_tabs = testCase.which_tabs(~contains(string(testCase.which_tabs), 'none'));

@@ -1,5 +1,5 @@
 classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../')...
+        matlab.unittest.fixtures.CurrentFolderFixture('.')...
         }) test_dynamics < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
@@ -23,7 +23,11 @@ classdef (SharedTestFixtures={ ...
                 warning('off','MATLAB:contour:ConstantData')
                 t = tic;
                 obj = Wecsim();
-                obj = obj.run_all_from_analysis();
+                try
+                    obj = obj.run_all_from_load();
+                catch
+                    obj = obj.run_all_from_analysis();
+                end
                 wecsim_runtime = toc(t);
                 fprintf('WecSim took %g minutes',wecsim_runtime/60)
                 warning('on','MATLAB:contour:ConstantData')
@@ -86,14 +90,14 @@ classdef (SharedTestFixtures={ ...
         function dynamicValidationTable(testCase)
             diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(testCase.table);
             testCase.log(diagnostic);
-            table2latex(testCase.table,'../test-results/table_13.tex')
+            table2latex(testCase.table,'test-results/table_13.tex')
         end
 
         function dynamicValidationFigures(testCase)
             for i = 1:length(testCase.figs)
                 fig = testCase.figs(i);
                 fig_name = ['Figure_WecSim_' num2str(i)];
-                pdf_name = ['../test-results/' fig_name];
+                pdf_name = ['test-results/' fig_name];
                 exportgraphics(fig,pdf_name)
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',[fig_name '_']);
                 testCase.log(diagnostic);
