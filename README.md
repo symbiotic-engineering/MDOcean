@@ -48,9 +48,9 @@ Running the single-objective optimization with typical parameters reduces LCOE b
 
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2025. [Link to draft paper manuscript](https://drive.google.com/file/d/1egObpiE9zCCdZb5DkxvAwoFdwA6j_a-9/view?usp=sharing).
+Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2025. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/applied-ocean-research-model/main.pdf).
 
-Optimization journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation, 2026. [Link to draft paper manuscript](https://drive.google.com/file/d/1hL8iIyhYBUG73HbeGz_ji5bXIvY4WKt0/view?usp=sharing).
+Optimization journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation, 2026. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/renewable-energy-mdo/mdocean.pdf).
 
 Conference paper citation: R. McCabe, O. Murphy, and M. N. Haji, “Multidisciplinary Optimization 
 to Reduce Cost and Power Variation of a Wave Energy Converter,” 
@@ -72,11 +72,14 @@ Clone the repository via Git. Use the `--recursive` flag to include submodules.
 git clone --recursive https://github.com/symbiotic-engineering/MDOcean.git
 ```
 
-If you are unfamiliar with Git, click "Code > Download ZIP" to get a .zip file, or try the "Open in MATLAB Online" button above to use the MATLAB Online IDE instead.
+If you are unfamiliar with Git and want to download the code another way, click "Code > Download ZIP" to get a .zip file, or try the "Open in MATLAB Online" button above to use the MATLAB Online IDE instead.
 
 ## How to Use
 
-Please see the documentation [here](https://symbiotic-engineering.github.io/MDOcean/usage.html) for instructions on how to run the simulation, optimization, or entire paper-reproduction pipeline. The package [`calkit`](https://docs.calkit.org/) is used for single-button reproducibility. Additionally, [this page](https://symbiotic-engineering.github.io/MDOcean/modification.html) has guidance on how to modify the code to be used for other problems.
+Please see the documentation [here](https://symbiotic-engineering.github.io/MDOcean/usage.html) for instructions on how to run the simulation, optimization, or entire paper-reproduction pipeline.
+The package [`calkit`](https://docs.calkit.org/) is used for single-button reproducibility.
+Once the installation steps are complete, the command `calkit run --pull` will reproduce all artifacts (figures, tables, papers).
+Additionally, [this page](https://symbiotic-engineering.github.io/MDOcean/modification.html) has guidance on how to modify the code to be used for other problems.
 
 
 ## Software Authors

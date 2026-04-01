@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
+### Changed
+- Readme: links now go to calkit draft publications rather than old google docs drafts
+
 ## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-1
 ### Fixed
 - Pipeline: remove extraneous calkit outputs that caused two postpro stages to fail
