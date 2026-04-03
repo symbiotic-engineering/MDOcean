@@ -96,7 +96,7 @@ figs_in_AOR{31} = 'Wecsim.wecsim_all_sea_states';
 figs_in_AOR{31+6} = 'Wecsim.wecsim_all_sea_states_2';
 figs_in_AOR{31+7} = 'Wecsim.wecsim_all_sea_states_3';
 % appendix C - structures
-figs_in_AOR{32} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{32} = 'QPCircles.qp_circles';
 figs_in_AOR{33} = 'ReadNonMatlabFigs.trapezoid';
 figs_in_AOR{34} = 'ReadNonMatlabFigs.damping_plate_flowchart';
 figs_in_AOR{35} = 'DampingPlateStructures.damping_plate_moment';
