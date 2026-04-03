@@ -28,14 +28,10 @@ More details on the WEC-Sim validation are described in \appendixname~\ref{sec:a
 
 \subsection{Static Validation}
 
-Figure \ref{fig:meem-hydro-coeffs} shows the hydrodynamic coefficients as a function of wave frequency $\omega$ for the nominal RM3 geometry. 
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{figs/from-matlab/hydro_coeff_err.pdf}
-\caption{Hydrodynamic coefficients vs. frequency}\label{fig:meem-hydro-coeffs}
-\end{figure}
-The MEEM results for the simplified cylindrical geometry are a close match to WAMIT BEM results for the exact RM3 geometry, except at frequencies below 0.3 rad/s.
+The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~3 of \cite{mccabe_open-source_2024}.
+The comparison is reproduced here in spirit: MEEM results for the simplified cylindrical geometry are a close match to WAMIT BEM results for the exact RM3 geometry, except at frequencies below 0.3~rad/s.
 This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
+Since that paper, excitation phase has been added to the MEEM implementation and also tracks well.
 For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
 
 
@@ -84,13 +80,8 @@ Improving the force model to align with the wave tank data is an area of future 
 
 %\hl{Explain sources of error and rough uncertainty and the implications of what we can trust}
 
-The scaling behavior of economic outputs against the number of WECs is validated in \figurename~\ref{fig:econ-nwec-validate}.
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/cost_vs_N_WEC.pdf}
-    \caption{Validation for cost scaling with number of WECs}
-    \label{fig:econ-nwec-validate}
-\end{figure}
+The scaling behavior of economic outputs against the number of WECs is validated by sweeping $N_{WEC}$ from 1 to 100 and comparing the simulated CAPEX, OPEX, and LCOE against the \cite{RM3} reference values.
+The average percent errors for these quantities are shown in Table~\ref{tab:validation}, and additional detail is provided in \figureautorefname~\ref{fig:econ-nwec-validate} in the appendix.
 
 \subsection{Runtime Benchmarking}
 \label{sec:sim-runtime}

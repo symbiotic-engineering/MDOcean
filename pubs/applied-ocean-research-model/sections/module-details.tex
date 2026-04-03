@@ -650,11 +650,20 @@ This constraint changes the optimal torque signal from a pure sinusoid to a satu
 As is, this nonlinear signal could not be handled with a frequency-domain transfer function and would require time-domain simulation.
 Conveniently, through the describing function method, the saturated signal can be represented with Fourier analysis as a superposition of harmonics.
 Furthermore, because the plant is a second order oscillator and filters out high frequency inputs, harmonics other than the fundamental contain very little energy and can be safely neglected.
-Figure \ref{fig:sat} shows this approximation graphically for a saturated-sine force signal.
+Figure \ref{fig:desc-fcns}(a) shows this approximation graphically for a saturated-sine force signal.
 \begin{figure}
 \centering
-    \includegraphics[width=.7\linewidth]{figs/from-matlab/saturation_desc_fcn.pdf}
-\caption{Saturated sin vs. time (red) and its fundamental amplitude (blue)}\label{fig:sat}
+\begin{subfigure}[t]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/saturation_desc_fcn.pdf}
+    \caption{Saturated sin vs. time (red) and its fundamental amplitude (blue).}\label{fig:sat}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/drag_desc_fcn.pdf}
+    \caption{Conceptual demonstration of the drag describing function in the time domain.
+The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}\label{fig:drag-df}
+\end{subfigure}
+\caption{Describing function approximations for force saturation (a) and drag (b).}\label{fig:desc-fcns}
 \end{figure}
 Details of the calculation are provided in \appendixname~\ref{sec:appendix-force-sat}.
 The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \cref{eq:constrained-qp-solution}.
@@ -685,15 +694,8 @@ Computation of the relative velocity uses the following expression for the incid
 \begin{equation}
 \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
 \end{equation}
-The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in Figure~\ref{fig:drag-df}.
+The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in Figure~\ref{fig:desc-fcns}(b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
-\begin{figure}
-    \centering
-     \includegraphics[width=.7\linewidth]{figs/from-matlab/drag_desc_fcn.pdf}
-    \caption{Conceptual demonstration of the drag describing function in the time domain.
-The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}
-    \label{fig:drag-df}
-\end{figure}
 
 Strip theory allows integration of the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted area $A_w$.
 For a hollow cylinder of radius $\vec{R}$ and inner radius $\vec{R}_{in}$, this is expressed: 
