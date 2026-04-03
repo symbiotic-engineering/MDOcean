@@ -83,6 +83,13 @@ function [m_f,B_h_f,K_h_f,gamma_f_mag,gamma_f_phase,...
         gamma_f_phase, gamma_s_phase] = get_hydro_coeffs(a2, k, d2, hydro);
     end
 
+    % Cap A_c and B_c to ensure positive definite mass and damping matrices,
+    % preventing violation of the energy balance condition |B_c|^2 <= B_f*B_s
+    % (and similarly for A). Applied here for both MEEM and WAMIT paths so
+    % the constraint is enforced consistently regardless of hydro coefficient source.
+    A_c_over_rho   = sign(A_c_over_rho)   .* min(abs(A_c_over_rho),   0.999 * sqrt(A_f_over_rho   .* A_s_over_rho));
+    B_c_over_rho_w = sign(B_c_over_rho_w) .* min(abs(B_c_over_rho_w), 0.999 * sqrt(B_f_over_rho_w .* B_s_over_rho_w));
+
     A_f = rho_w * A_f_over_rho;               % added mass
     A_s = rho_w * A_s_over_rho;
     A_c = rho_w * A_c_over_rho;

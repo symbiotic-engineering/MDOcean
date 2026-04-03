@@ -337,6 +337,38 @@ classdef (SharedTestFixtures={ ...
                  'sea states as unstable.'])
         end
 
+        function hydroCoeffCappingAppliedForWAMIT(testCase)
+            % Regression test: A_c/B_c capping (which enforces the energy
+            % balance condition |B_c|^2 <= B_f*B_s) was previously only
+            % applied in the MEEM path. It is now applied in get_dynamic_coeffs
+            % for both MEEM and WAMIT, ensuring consistent open-loop stability.
+            p = parameters('wecsim');
+            p.use_multibody = true;
+            p.use_MEEM = false; % WAMIT path
+
+            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M (steel=1)
+
+            [~, ~, ~, val] = simulation(X, p);
+
+            % After capping, A_c_over_rho and B_c_over_rho_w satisfy
+            % |A_c|^2 <= A_f*A_s and |B_c|^2 <= B_f*B_s (positive definite
+            % mass and damping matrices). Verify via the returned hydro coeffs.
+            A_c_over_rho   = val.A_c_over_rho;
+            A_f_over_rho   = val.A_f_over_rho;
+            A_s_over_rho   = val.A_s_over_rho;
+            B_c_over_rho_w = val.B_c_over_rho_w;
+            B_f_over_rho_w = val.B_f_over_rho_w;
+            B_s_over_rho_w = val.B_s_over_rho_w;
+
+            A_ratio = abs(A_c_over_rho) ./ sqrt(A_f_over_rho .* A_s_over_rho);
+            B_ratio = abs(B_c_over_rho_w) ./ sqrt(B_f_over_rho_w .* B_s_over_rho_w);
+
+            testCase.verifyTrue(all(A_ratio(isfinite(A_ratio)) <= 1.0), ...
+                '|A_c|^2 must not exceed A_f*A_s (WAMIT path: capping not applied)')
+            testCase.verifyTrue(all(B_ratio(isfinite(B_ratio)) <= 1.0), ...
+                '|B_c|^2 must not exceed B_f*B_s (WAMIT path: capping not applied)')
+        end
+
     end
     
 end
