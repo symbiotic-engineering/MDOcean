@@ -20,6 +20,9 @@ end
 
 function run_testcase(testcase,paper)
     % select inputs for this testcase
+    % columns correspond to: 1:typical, 2:tangent, 3:infeasible pair,
+    %                        4:infeasible triplet, 5:tangent+intersect,
+    %                        6:origin feasible, 7:redundant (opt on arc)
     x12_vec = [3 4 5 3.7  4 3 0];
     y3_vec  = [2 2 2 -1.5 1 2 2];
     y12_vec = [5 5 5 5    5 0 5];
@@ -173,8 +176,9 @@ end
 function feasible_all_circles = check_feasible(p,c,r)
 % checks if a single point p is within all circles
 % returns a scalar boolean
+    tol = 1e-4;
     dist_outside = eval_constraint(p,c,r);
-    feas_each_circle = dist_outside <= 1e-4;
+    feas_each_circle = dist_outside <= tol;
     feasible_all_circles = all(feas_each_circle);
 end
 
@@ -182,6 +186,6 @@ function constr_fcn = eval_constraint(p,c,r)
 % checks how far a single point p is in violation of the constraint
 % positive means not ok (outside circle), negative means ok (inside circle)
 % returns a scalar value
-    assert(all(size(p)==[1 2]))
+    assert(all(size(p)==[1 2]), 'Point p must be a 1x2 vector [x, y]')
     constr_fcn = vecnorm(p - c,2,2) - r;
 end
