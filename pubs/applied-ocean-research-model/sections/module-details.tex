@@ -1310,12 +1310,22 @@ The LCOE model then scales as:
     }{P_{avg,elec}}
 \end{equation}
 
+The numerator of \cref{eq:LCOE-scale} is linear with design inputs $F_{max}$ and $P_{pk,elec}$, and $V_{struct}$ is the product of the structural thicknesses with the areas, which depend quadratically on the bulk dimensions.
+From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $P_{avg,elec}$ is the weighted sea state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
+\begin{equation}
+\begin{aligned}
+    P_{avg,elec} = \eta \sum_{i=1}^{N_{sea}} p_i \cdot 
+    \frac{|\hat{V}_{s,th,i}|^2}{8\Re(Z_{s,th,i})}~ (1 - |\Gamma_i|^2)
+    s.t.
+    \quad |\hat{F}_{p,i}| \leq F_{max},
+    \quad |\hat{P}_{elec,i}| \leq P_{pk,elec},
+    \quad |\hat{\xi}_{f,i}| \leq X_{f,max},
+    \quad |\hat{\xi}_{s,i}| \leq X_{s,max}
+\end{aligned}
+\end{equation}
+
 \hl{write Fmax and Ppk and Pavg in terms of the control variables, shoing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
 
-% To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
-% \begin{equation}\label{eq:LCOE-scale}
-%     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
-% \end{equation}
 
 
 
