@@ -310,6 +310,33 @@ classdef (SharedTestFixtures={ ...
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
 
+        function multibodyWAMITDragOffPowerFinite(testCase)
+            % Regression test for PR #142 bug: the closed-loop K-matrix
+            % stability check was too conservative, incorrectly flagging
+            % high-wave-period sea states as unstable (det(K_cl)=0 is
+            % marginally stable, not unstable). This caused power to be set
+            % to Inf at high wave periods for the multibody WAMIT drag-off
+            % case, leading to hundreds/thousands of percent error vs WECSim.
+            p = parameters('wecsim');
+            p.use_multibody = true;
+            p.use_MEEM = false;
+            p.C_d_float = 0;
+            p.C_d_spar = 0;
+            p.use_force_sat = false;
+            p.use_power_sat = false;
+
+            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M
+            X(7) = 1e9; % set P_max very large so power is unsaturated
+
+            [~, ~, ~, val] = simulation(X, p);
+
+            testCase.verifyTrue(all(isfinite(val.P_mech(:)) | isnan(val.P_mech(:))), ...
+                ['Multibody WAMIT drag-off mechanical power must be finite ' ...
+                 '(not Inf) at all sea states. Inf values indicate the ' ...
+                 'stability check incorrectly flagged stable high-period ' ...
+                 'sea states as unstable.'])
+        end
+
     end
     
 end
