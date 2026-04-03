@@ -915,8 +915,11 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
     F_err_from_force_sat(force_saturated_U == 0) = mag_U(force_saturated_U == 0) / 1e6;
     X_err_from_amp_f_sat = mag_X_f ./ amp_saturated_X_f - 1;
+    X_err_from_amp_f_sat(amp_saturated_X_f == 0) = mag_X_f(amp_saturated_X_f == 0) / 1e6;
     X_err_from_amp_s_sat = mag_X_s ./ amp_saturated_X_s - 1;
+    X_err_from_amp_s_sat(amp_saturated_X_s == 0) = mag_X_s(amp_saturated_X_s == 0) / 1e6;
     X_err_from_amp_u_sat = mag_X_u ./ amp_saturated_X_u - 1;
+    X_err_from_amp_u_sat(amp_saturated_X_u == 0) = mag_X_u(amp_saturated_X_u == 0) / 1e6;
 
     constr_viol_err = Inf(size(mag_X_f));
     optimality_err  = Inf(size(mag_X_f));
