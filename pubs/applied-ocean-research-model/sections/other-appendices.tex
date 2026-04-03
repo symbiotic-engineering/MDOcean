@@ -561,8 +561,10 @@ Significant wave heights in excess of 5.5 meters have negative maximum slamming 
 \end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
-Each of the 210 sea states are simulated individually. %Table~\ref{tab:dynamic-validation} and 
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime. For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+Each of the 210 sea states are simulated individually as the equivalent regular wave.
+Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
+%Table~\ref{tab:dynamic-validation} and 
 Figure~\ref{fig:dynamic-validation} compares the results.
 \hl{Explain results.}
 % \begin{table}
@@ -598,10 +600,8 @@ Figure~\ref{fig:dynamic-validation} compares the results.
 
 Besides mechanical power, a variety of other signals including amplitudes, phases, and forces are compared between the models.
 Interestingly, large errors are observed in the drag forces, despite the low error in resulting amplitudes and power.
-The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worst at mid-range frequencies.
-Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
-The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 \Cref{fig:drag-validation} compares the drag force on the float and spar in each model using identical hydro coefficients and $C_d=1$.
+
 \begin{landscape}
 \begingroup
 \begin{figure}
@@ -622,6 +622,10 @@ The WEC-Sim simulation uses drag-only Morison elements with a maximum width of o
 \end{figure}
 \endgroup
 \end{landscape}
+The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worst at mid-range frequencies.
+Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
+The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
 
 \clearpage
 \section{Structures Module Details}
