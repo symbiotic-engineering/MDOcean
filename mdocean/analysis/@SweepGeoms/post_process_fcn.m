@@ -450,7 +450,7 @@ function fig = make_factor_fig(Y, factor_labels)
     imagesc(eta2)
     colorbar
     colormap(parula)
-    clim([0, max(eta2(:))])
+    clim([0, max(max(eta2(:)), eps)])
     set(gca, 'XTick', 1:n_fac, 'XTickLabel', factor_labels, ...
              'YTick', 1:n_fac, 'YTickLabel', factor_labels)
     title('\eta^2: main (diagonal) and interaction (off-diagonal) effects on CW/SA^{1/2}', ...
