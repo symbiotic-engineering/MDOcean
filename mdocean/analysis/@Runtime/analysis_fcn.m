@@ -5,11 +5,57 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :param p: Parameter struct
 % :param b: Design variable bounds struct
 % :returns: Intermediate results struct (cached heavy analyses)
-    % Run runtime comparison analysis
-    [f1, f2, f3] = module_runtime_compare(p,b);
+    X = [b.X_noms; 1];
+    num_outputs = 3;
+
+    % run sim with timing
+    p.use_multibody = true;
+    profile clear
+    profile on
+    simulation(X,p);
+    profile_multibody = profile('info');
+    profile off
+    t_multibody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
+
+    p.use_multibody = false;
+    profile clear
+    profile on
+    simulation(X,p);
+    profile_singlebody = profile('info');
+    profile off
+    t_singlebody_fullsim_timeit = timeit(@()simulation(X,p),num_outputs);
+
+    p_freq = p;
+    p_freq.use_multibody = true;
+    p_freq.use_force_sat = false;
+    p_freq.use_power_sat = false;
+    p_freq.C_d_float = 0;
+    p_freq.C_d_spar = 0;
+    p_freq.max_drag_iters_fxp = 1;
+    p_freq.max_drag_iters_slv = 1;
+    profile clear
+    profile on
+    simulation(X,p_freq);
+    profile_freq_domain = profile('info');
+    profile off
+    t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p_freq),num_outputs);
+
+    % save p_sim because runRM3Parallel modifies p
+    p_sim = p;
+    p.use_multibody = true;
+    gcp;
+    add_wecsim_path();
+    time = tic;
+    runRM3Parallel
+    t_wecsim = toc(time); %447
 
     % Store results for post-processing
-    intermed_result_struct.dynamics_runtime_fig = f1;
-    intermed_result_struct.hydro_runtime_fig = f2;
-    intermed_result_struct.sim_runtime_fig = f3;
+    intermed_result_struct.profile_multibody = profile_multibody;
+    intermed_result_struct.profile_singlebody = profile_singlebody;
+    intermed_result_struct.profile_freq_domain = profile_freq_domain;
+    intermed_result_struct.t_singlebody_fullsim_timeit = t_singlebody_fullsim_timeit;
+    intermed_result_struct.t_multibody_fullsim_timeit = t_multibody_fullsim_timeit;
+    intermed_result_struct.t_freq_domain_fullsim_timeit = t_freq_domain_fullsim_timeit;
+    intermed_result_struct.t_wecsim = t_wecsim;
+    intermed_result_struct.p = p_sim;
 end

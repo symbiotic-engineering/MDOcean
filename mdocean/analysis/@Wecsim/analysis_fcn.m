@@ -6,11 +6,37 @@ function intermed_result_struct = analysis_fcn(~,~)
 % :param ~: ~
 % :returns: Intermediate results struct (cached heavy analyses)
     % Run WEC-Sim dynamics validation
-    [~, ~, ~, tab, fig_singlebody, fig_multibody] = validate_dynamics();
+    runOnlyFewSeaStates = false;
+
+    add_wecsim_path()
+
+    case_cell = make_all_cases(runOnlyFewSeaStates);
+    filename_cell = run_wecsim_all_cases(case_cell);
     
     % Store results for post-processing
-    intermed_result_struct.validation_table = tab;
-    intermed_result_struct.fig_singlebody = fig_singlebody;
-    intermed_result_struct.fig_multibody = fig_multibody;
-    intermed_result_struct.all_sea_states_fig = gcf();
+    intermed_result_struct.case_cell = case_cell;
+    intermed_result_struct.filename_cell = filename_cell;
+    intermed_result_struct.runOnlyFewSeaStates = runOnlyFewSeaStates;
+
 end
+
+function out_cell = run_wecsim_all_cases(case_cell)
+    num_case_groups = size(case_cell,1);
+    out_cell = cell(num_case_groups,1);
+    for case_group_idx = 1:num_case_groups
+        X = case_cell{case_group_idx,1};
+        p_array = case_cell{case_group_idx,2};
+        out_each_case_array = cell(1,numel(p_array));
+        for p_idx = 1:numel(p_array)
+            p = p_array(p_idx);
+            out_each_case_array{p_idx} = run_wecsim_validation(X,p);
+        end
+        out_cell{case_group_idx} = out_each_case_array;
+    end
+end
+
+function output_filename = run_wecsim_validation(X,p)
+    % X and p need to be in the workspace for runRM3Parallel script to work right
+    runRM3Parallel % this script uses p and modifies it, and saves output_filename to workspace
+end
+

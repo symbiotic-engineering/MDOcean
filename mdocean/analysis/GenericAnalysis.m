@@ -15,6 +15,10 @@ classdef (Abstract) GenericAnalysis
         output_folder
         analysis_outputs
         postpro_outputs
+        extra_analysis_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit analysis stage
+        extra_analysis_outputs = {} % non-code extra outputs beyond intermed.mat for calkit analysis stage
+        extra_postpro_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit postpro stage
+        extra_postpro_outputs = {} % non-code extra outputs for calkit postpro stage
     end
     properties (Dependent)
         class_dependencies
@@ -60,8 +64,10 @@ classdef (Abstract) GenericAnalysis
 
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
+                          strcat(obj.fig_names,'.fig') ...
                           strcat(obj.tab_names,'.tex') ...
-                          'end.mat']);
+                          'end.mat' ...
+                          'end.json']);
         end
         function val = get.class_dependencies(obj)
             parent = superclasses(obj);
@@ -83,20 +89,27 @@ classdef (Abstract) GenericAnalysis
         end
         function obj = run_analysis(obj)
             cd('mdocean');
-            obj.intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            t = tic;
+            intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
+            intermed_result_struct.analysis_time = toc(t);
+            obj.intermed_result_struct = intermed_result_struct;
             cd('..');
             obj.save_intermed_results();
         end
 
         function obj = run_post_process(obj)
             cd('mdocean');
+            t = tic;
             [obj.fig_array,...
                 obj.tab_array_display,...
                 obj.tab_array_latex,...
-                obj.end_result_struct,...
+                end_result_struct,...
                 obj.tab_firstrows,...
                 obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
             cd('..');
+            end_result_struct.postpro_time = toc(t);
+            end_result_struct.analysis_time = obj.intermed_result_struct.analysis_time;
+            obj.end_result_struct = end_result_struct;
 
             obj.fig_array = obj.validate_figs(obj.fig_array);
 
@@ -110,17 +123,57 @@ classdef (Abstract) GenericAnalysis
             if ~isfile(fname)
                 error('No intermediate results file found. Run analysis first.')
             end
-            obj.intermed_result_struct = load(fname);
+            s = load(fname);
+            d = dir([obj.output_folder filesep 'intermed_*.fig']);
+            fnames = {d.name};
+            tokens = regexp(fnames, 'intermed_(.+?)_(\d+).fig', 'tokens');
+            [var_names,~,idx] = unique(cellfun(@(t) t{1}{1}, tokens, 'UniformOutput', false));
+            for i=1:length(var_names)
+                var_name = var_names{i};
+                fig_idxs = extractBetween(fnames(idx==i), ['intermed_' var_name '_'], '.fig');
+                fig_idxs = str2double(fig_idxs);
+                fig_vec = gobjects(1,length(fig_idxs));
+                for j=1:length(fig_idxs)
+                    fig_name = ['intermed_' var_name '_' num2str(fig_idxs(j)) '.fig'];
+                    fig_path = [obj.output_folder filesep fig_name];
+                    try
+                        fig_handle = openfig(fig_path, 'invisible');
+                        if isfield(fig_handle.UserData, 'Position')
+                            fig_handle.Position(3:4) = fig_handle.UserData.Position;
+                        end
+                        fig_vec(j) = fig_handle;
+                    catch
+                        warning(['Could not load figure: ' fig_path])
+                    end
+                end
+                s.(var_name) = fig_vec;
+            end
+            obj.intermed_result_struct = s;
         end
 
         function save_intermed_results(obj)
             s = obj.intermed_result_struct;
+            fn = fieldnames(s);
+            for i=1:length(fn)
+                if any(isgraphics(s.(fn{i})) & isa(s.(fn{i}),'matlab.ui.Figure'))
+                    figs = s.(fn{i});
+                        for j=1:length(figs)
+                            fig = figs(j);
+                            fig = check_fig_size(fig);
+                            savefig(fig, [obj.output_folder filesep 'intermed_', fn{i}, '_', num2str(j), '.fig'])
+                        end
+                    s = rmfield(s, fn{i});
+                end
+            end
             save([obj.output_folder filesep 'intermed'], '-struct', 's')
         end
 
         function save_end_results(obj)
             s =  obj.end_result_struct;
-            save([obj.output_folder filesep 'end'],'-struct', 's')
+            fname = [obj.output_folder filesep 'end'];
+            save(fname,'-struct', 's')
+            json = jsonencode(s,PrettyPrint=true);
+            writelines(json, [fname '.json']);
         end
 
         function save_figs(obj)
@@ -164,26 +217,50 @@ classdef (Abstract) GenericAnalysis
         end
 
         function stages = write_calkit_stage(obj)
-            cell2filelist = @(c) char(join(strcat("    - ",c),newline));
-
             analysis_stage = ['analysis-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_analysis();' newline ...
                               '  inputs: ' newline ...
-                              cell2filelist(obj.analysis_dependencies.') newline ...
+                              obj.format_inputs_list(obj.extra_analysis_inputs, obj.analysis_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.analysis_outputs.') ];
+                              obj.format_outputs([obj.analysis_outputs, obj.extra_analysis_outputs]) ];
             postpro_stage = ['postpro-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
                               '  inputs: ' newline ...
-                              cell2filelist(obj.postpro_dependencies.') newline ...
+                              '    - from_stage_outputs: analysis-' class(obj) newline ...
+                              obj.format_inputs_list(obj.extra_postpro_inputs, obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.postpro_outputs.') ];
+                              obj.format_outputs([obj.postpro_outputs, obj.extra_postpro_outputs]) ];
             stages = [analysis_stage newline postpro_stage];
         end
+
+        function list_str = format_inputs_list(~, extras, deps)
+            %FORMAT_INPUTS_LIST Format inputs as YAML list: extras first, then deps, de-duplicated.
+            combined = [string(extras), string(deps)];
+            combined_unique = unique(combined, 'stable');
+            lines = "    - " + combined_unique;
+            list_str = char(join(lines, newline));
+        end
+
+        function list_str = format_outputs(~, outputs)
+            %FORMAT_OUTPUTS Format a cell array of output paths as YAML list entries.
+            %   .tex and .json outputs include 'storage: git'; others are plain paths.
+            outputs = string(outputs);
+            if isempty(outputs)
+                list_str = '';
+                return;
+            end
+            [~, ~, exts] = fileparts(outputs);
+            is_git = ismember(exts, [".tex", ".json"]);
+            lines = strings(size(outputs));
+            lines(~is_git) = "    - " + outputs(~is_git);
+            lines(is_git) = "    - path: " + outputs(is_git) + newline + "      storage: git";
+            list_str = char(join(lines, newline));
+        end
+
         function figs_out = validate_figs(obj, figs_in)
             %VALIDATE_FIGS Return only valid MATLAB figure handles from input
             % Accepts graphics handles, cell arrays of handles, or empty.
@@ -205,7 +282,11 @@ classdef (Abstract) GenericAnalysis
             % Flatten
             figs_flat = figs_in(:).';
 
-            valid_mask = ishghandle(figs_flat) & isprop(figs_flat,'Type') & strcmp({figs_flat.Type},'figure');
+            % check if figure
+            has_type = isprop(figs_flat,'Type');
+            is_fig = false(size(figs_flat));
+            is_fig(has_type) = strcmp({figs_flat(has_type).Type},'figure');
+            valid_mask = ishghandle(figs_flat) &  is_fig;
 
             figs_flat(~valid_mask) = gobjects(1);
 

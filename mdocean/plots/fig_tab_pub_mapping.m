@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 39;
+num_figs_AOR = 54;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -19,7 +19,7 @@ figs_in_RE = cell([1,num_figs_RE]);
 figs_in_RE{1}  = 'ReadNonMatlabFigs.RM3_image';
 % 2: modeling methodology
 figs_in_RE{2}  = 'ReadNonMatlabFigs.methodology_flowchart';
-figs_in_RE{3}  = 'ReadNonMatlabFigs.N2_diagram';
+figs_in_RE{3}  = 'ReadNonMatlabFigs.xdsm';
 % archs
 figs_in_RE{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 figs_in_RE{5} = 'ReadNonMatlabFigs.optimization_flowchart';
@@ -57,55 +57,66 @@ figs_in_RE{29}  = 'ReadNonMatlabFigs.graphical_abstract_optim';
 figs_in_AOR = cell([1,num_figs_AOR]);
 % 1: introduction
 figs_in_AOR{1}  = 'ReadNonMatlabFigs.RM3_image';
-figs_in_AOR{2}  = 'ReadNonMatlabFigs.section_flow';
+figs_in_AOR{2}  = 'ReadNonMatlabFigs.taxonomy';
+figs_in_AOR{3}  = 'ReadNonMatlabFigs.section_flow';
 % 2: model structure
-figs_in_AOR{3}  = 'ReadNonMatlabFigs.N2_diagram';
-figs_in_AOR{4}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
+figs_in_AOR{4}  = 'ReadNonMatlabFigs.xdsm';
+figs_in_AOR{5}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 % 3: module details
-figs_in_AOR{5}  = 'ReadNonMatlabFigs.dimensions';
-figs_in_AOR{6}  = 'ReadNonMatlabFigs.MEEM_geometry';
-figs_in_AOR{7}  = 'SparHydro.spar_added_mass';
-figs_in_AOR{8}  = 'DescFcns.saturation_desc_fcn';
-figs_in_AOR{9}  = 'DescFcns.drag_desc_fcn';
-figs_in_AOR{10} = 'RunSingleFigFunc.nominal_power_matrix';
-figs_in_AOR{11} = 'ReadNonMatlabFigs.FBD';
+figs_in_AOR{6}  = 'ReadNonMatlabFigs.dimensions';
+figs_in_AOR{7}  = 'ReadNonMatlabFigs.MEEM_geometry';
+figs_in_AOR{8}  = 'SparHydro.spar_added_mass';
+% 9, 10, 11 are multiport circuits
+figs_in_AOR{12}  = 'DescFcns.saturation_desc_fcn';
+figs_in_AOR{13} = 'DescFcns.drag_desc_fcn';
+figs_in_AOR{14} = 'RunSingleFigFunc.nominal_power_matrix';
+figs_in_AOR{15} = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
-figs_in_AOR{12} = 'Wecsim.WECSim_error_histograms_multibody';
-figs_in_AOR{13} = 'HydroCoeffFigFunc.hydro_coeff_err';
-figs_in_AOR{14} = 'Validation.cost_vs_N_WEC';
-figs_in_AOR{15} = 'Runtime.sim_runtime';
-figs_in_AOR{16} = 'Runtime.hydro_runtime';
-figs_in_AOR{17} = 'Runtime.dynamics_runtime';
+figs_in_AOR{16} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram';
+figs_in_AOR{17} = 'HydroCoeffFigFunc.hydro_coeff_err';
+figs_in_AOR{18} = 'Validation.cost_vs_N_WEC';
+figs_in_AOR{19} = 'Runtime.sim_runtime';
+figs_in_AOR{20} = 'Runtime.hydro_runtime_logscale';
+figs_in_AOR{21} = 'Runtime.dynamics_runtime';
 % 5: insights and discussion
-figs_in_AOR{18} = 'DampingPlateStructures.damping_plate_aspect_ratio';
-figs_in_AOR{19} = 'ForceSaturationFigFunc.power_force_sensitivity';
-figs_in_AOR{20} = 'DesignSpaceExploration.experiments_ratios';
-figs_in_AOR{21} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
+figs_in_AOR{22} = 'MeemSweep.hydro_efficiency';
+figs_in_AOR{23} = 'DampingPlateStructures.damping_plate_aspect_ratio';
+figs_in_AOR{24} = 'ForceSaturationFigFunc.power_force_sensitivity';
+figs_in_AOR{25} = 'DesignSpaceExploration.experiments_ratios';
+figs_in_AOR{26} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
 % appendix A- hydro
-figs_in_AOR{22} = 'Meem.meem_regions';
-figs_in_AOR{23} = 'Meem.meem_sparsity';
-figs_in_AOR{24} = 'Meem.meem_validation';
-figs_in_AOR{25} = 'Meem.meem_matching';
-figs_in_AOR{26} = 'Meem.meem_convergence';
-figs_in_AOR{27} = 'Meem.asymptotic_b_vector';
+figs_in_AOR{27} = 'Tikz.meem_regions';
+figs_in_AOR{28} = 'Meem.meem_sparsity';
+figs_in_AOR{29} = 'Meem.meem_validation';
+figs_in_AOR{30} = 'Meem.meem_matching';
+figs_in_AOR{31} = 'Meem.meem_convergence_vs_omega';
+figs_in_AOR{32} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{28} = 'RunSingleFigFunc.drag_convergence';
-figs_in_AOR{29} = 'Slamming.slamming_amplitude';
-figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison';
-figs_in_AOR{31} = 'Wecsim.wecsim_all_sea_states';
-figs_in_AOR{31+6} = 'Wecsim.wecsim_all_sea_states_2';
-figs_in_AOR{31+7} = 'Wecsim.wecsim_all_sea_states_3';
+figs_in_AOR{33} = 'QPCircles.qp_circles';
+figs_in_AOR{34} = 'ReadNonMatlabFigs.drag_integral_B';
+figs_in_AOR{34+12} = 'ReadNonMatlabFigs.drag_integral_G_m';
+figs_in_AOR{34+13} = 'ReadNonMatlabFigs.drag_integral_G_p';
+figs_in_AOR{35} = 'RunSingleFigFunc.drag_convergence';
+figs_in_AOR{36} = 'Slamming.slamming_amplitude';
+figs_in_AOR{37} = 'RunSingleFigFunc.slamming_model_comparison_float';
+figs_in_AOR{38}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{38+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{38+11} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{38+12} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{39+12} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf';
+figs_in_AOR{39+13} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf';
+figs_in_AOR{39+14} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf';
+figs_in_AOR{39+15} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf';
 % appendix C - structures
-figs_in_AOR{32} = 'QPCircles.qp_circles';
-figs_in_AOR{33} = 'ReadNonMatlabFigs.trapezoid';
-figs_in_AOR{34} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{35} = 'DampingPlateStructures.damping_plate_moment';
-figs_in_AOR{36} = 'DampingPlateStructures.damping_plate_deflection';
-% appendix D - economics
-% appendix E - parameters
+figs_in_AOR{40} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{41} = 'ReadNonMatlabFigs.trapezoid';
+figs_in_AOR{42} = 'ReadNonMatlabFigs.damping_plate_flowchart';
+figs_in_AOR{43} = 'DampingPlateStructures.damping_plate_moment';
+figs_in_AOR{44} = 'DampingPlateStructures.damping_plate_deflection';
+% appendix D - parameters
 
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{39}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{45}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 
@@ -132,27 +143,32 @@ figs_classes = figs_split(:,1);
 tabs_classes = tabs_split(:,1);
 for i=1:length(figs_classes)
     class_name = figs_classes{i};
-    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
-    this_fig_name = figs_split(i,2);
-    valid = ismember(this_fig_name,all_fig_names_this_class);
-    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
-        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+        this_fig_name = figs_split(i,2);
+        valid = ismember(this_fig_name,all_fig_names_this_class);
+        msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+            class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
 end
 for i=1:length(tabs_classes)
     class_name = tabs_classes{i};
-    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
-    this_tab_name = tabs_split(i,2);
-    valid = ismember(this_tab_name,all_tab_names_this_class);
-    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
-        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
-    %assert(valid, msg)
-    if ~valid
-        warning(msg);
+    if ~strcmp(class_name, 'Tikz')
+        all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+        this_tab_name = tabs_split(i,2);
+        valid = ismember(this_tab_name,all_tab_names_this_class);
+        msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+            class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+        %assert(valid, msg)
+        if ~valid
+            warning(msg);
+        end
     end
+
 end
 
 end

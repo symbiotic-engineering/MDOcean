@@ -42,20 +42,27 @@ function [weighted_power_error,...
     %                 'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
     %                 'relative_amplitude', 'PTO_damping','CW','CW_to_CW_max';
     vars_to_plot = {'power_mech_unsat','power_elec_sat','CW_to_CW_max',...
-        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping','force_pto'};
+        'float_amplitude','relative_amplitude','spar_amplitude','PTO_damping',...
+        'force_pto','float_drag_force_fund','spar_drag_force_fund',...
+        'float_drag_force_phase','spar_drag_force_phase',...
+        'float_phase','spar_phase','rel_phase'};
     figs = comparison_plot(p.T, p.Hs, results_actual, results_sim, vars_to_plot, actual_str, sim_str, p);
     
-    if ~report
-        power_mech_err_matrix = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
-                                                             results_sim.power_mech_unsat);
-        float_amp_err_matrix  = compute_percent_error_matrix(results_actual.float_amplitude, ...
-                                                             results_sim.float_amplitude);
-        max_float_amp_error   = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
-                                                             max(results_sim.float_amplitude,   [],'all') );
-    else
-        power_mech_err_matrix = [];
-        float_amp_err_matrix = [];
-        max_float_amp_error = [];
+    % compare power and amplitude error over all sea states in JPD
+    weighted_power_error  = zeros([1,length(results_sim)]);
+    max_float_amp_error   = zeros([1,length(results_sim)]);
+    power_mech_err_matrix = zeros([size(p.JPD) length(results_sim)]);
+    float_amp_err_matrix  = zeros([size(p.JPD) length(results_sim)]);
+
+    for i=1:length(results_sim)
+        power_mech_err_matrix(:,:,i) = compute_percent_error_matrix(results_actual.power_mech_unsat, ...
+                                                             results_sim(i).power_mech_unsat);
+        float_amp_err_matrix(:,:,i)  = compute_percent_error_matrix(results_actual.float_amplitude, ...
+                                                             results_sim(i).float_amplitude);
+        max_float_amp_error(i)  = compute_percent_error_matrix(max(results_actual.float_amplitude,[],'all'), ...
+                                                             max(results_sim(i).float_amplitude,   [],'all') );
+        weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
+                                                          results_actual.power_mech_unsat, p.JPD);
     end
 
     % todo: use actual pretty variables titles with units
@@ -66,15 +73,6 @@ function [weighted_power_error,...
     %      'Capture Width / Max Capture Width (-)',...
     %      'Capture Width / Max Capture Width (-)',...
     %     'Unweighted Device Power Matrix per H^2 (kW/m^2)'};
-    
-    % compare average power over all sea states in JPD
-    weighted_power_error = zeros([1,length(results_sim)]);
-    for i=1:length(results_sim)
-    weighted_power_error(i) = compute_weighted_percent_error(results_sim(i).power_mech_unsat, ...
-                                                          results_actual.power_mech_unsat, p.JPD);
-    end
-
-
 
 end
 %%
@@ -91,6 +89,7 @@ end
 function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
     figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
+    
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
 
@@ -104,19 +103,20 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
 
         f = figure;
         figs(var_idx) = f;
+        t = tiledlayout(1,num_subplots,'TileSpacing','Compact');
         % actual
-        subplot(1,num_subplots,1)
+        nexttile
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
-        caxis(clims)
+        clim(clims)
 
         for i=1:length(sim)
             % sim
-            subplot(1,num_subplots,1+i)
+            nexttile
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
-            caxis(clims)
+            clim(clims)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
-            subplot(1,num_subplots,1+length(sim)+i)
+            nexttile
 
             % set contour lines to make plot more readable
             error_levels = [];
@@ -129,6 +129,14 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                     error_levels = [-25:5:0 2 5];
                 elseif p.C_d_float==1 && p.use_MEEM==true  && p.use_multibody==false
                     error_levels = [-85 -50 -20 -14 -12 -10:5:20];
+                elseif p.C_d_float==1 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = -25:5:5;
+                elseif p.C_d_float==1 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = -40:5:5;
+                elseif p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==true
+                    error_levels = [-0.2 -0.15 0:200:1000];
+                elseif p.C_d_float==0 && p.use_MEEM==true && p.use_multibody==true
+                    error_levels = [-0.2 -0.15 0:200:1000];
                 end
             elseif strcmp(var_name,'float_amplitude') || strcmp(var_name,'relative_amplitude')
                 if     p.C_d_float==0 && p.use_MEEM==false && p.use_multibody==false
@@ -147,13 +155,17 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
-        sgtitle(remove_underscores(var_name))
+        title(t,remove_underscores(var_name))
+        xlabel(t,'Wave Period T (s)','FontSize',20)
+        ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end
 end
 
 function error_plot(T, H, error, error_title, error_values)
     [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
-    clabel(c,h_fig);
+    if ~isempty(c)
+        clabel(c,h_fig);
+    end
     if ~isempty(h_fig)
         colormap(h_fig.Parent,bluewhitered)
     end
@@ -165,17 +177,21 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     end
 
     if any(isfinite(Z),'all')
-        [c,h_fig] = contourf(T,H,Z);
+        [c,h_fig] = contourx(T,H,Z);
     else
         c = []; h_fig = [];
     end
     title(Z_title)
-    xlabel('Wave Period T (s)')
-    ylabel('Wave Height Hs (m)')
     cb = colorbar;
     if ~isempty(h_fig)
-        levs = sort([cb.Ticks min(Z,[],'all') max(Z,[],'all') Z_levels]);
-        h_fig.LevelList = levs;
+        z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
+        if length(unique(z))>1
+            z = [cb.Ticks z];
+        end
+        levs = sort(z);
+        if isprop(h_fig,'LevelList')
+            h_fig.LevelList = levs;
+        end
     end
     grid on
 end
@@ -242,14 +258,21 @@ function results = compute_mdocean_results(X,p)
                                       'spar_amplitude',val.X_s, ...
                                       'relative_amplitude',val.X_u, ...
                                       'PTO_damping',val.B_p,...
-                                      'force_pto',val.mag_U);
+                                      'force_pto',val.mag_U,...
+                                      'float_drag_force_fund',val.F_drag_f,...
+                                      'spar_drag_force_fund',val.F_drag_s,...
+                                      'float_drag_force_phase',wrapTo2Pi(val.phase_F_drag_f),...
+                                      'spar_drag_force_phase',wrapTo2Pi(val.phase_F_drag_s),...
+                                      'float_phase',val.phase_X_f,...
+                                      'spar_phase',val.phase_X_s,...
+                                      'rel_phase',val.phase_X_u);
 end
 
 function results = load_wecsim_results(wecsim_filename, p)
 
     sz = size(p.JPD);
     % wecSim spar stationary
-    vars = {'P','float_amplitude','spar_amplitude','relative_amplitude','force_pto','B_p'};
+    vars = wecsim_var_names();
     file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
     old_jpd = trim_jpd(readmatrix(file,'Range','A3'));
     JPD = p.JPD; % old_jpd(2:end,2:end) - uncomment to use old wec sim results locally
@@ -261,7 +284,14 @@ function results = load_wecsim_results(wecsim_filename, p)
      spar_amplitude,...
      relative_amplitude,...
      force_pto,...
-     B_p] = deal(nan(sz));
+     B_p,...
+     float_drag_force_fund,...
+     spar_drag_force_fund,...
+     float_drag_force_phase,...
+     spar_drag_force_phase,...
+     float_phase,...
+     spar_phase,...
+     rel_phase] = deal(nan(sz));
 
     power_mech_unsat(idx) = -wecsim_raw.P / 1000;
     float_amplitude(idx) = wecsim_raw.float_amplitude;
@@ -269,6 +299,13 @@ function results = load_wecsim_results(wecsim_filename, p)
     relative_amplitude(idx) = wecsim_raw.relative_amplitude;
     force_pto(idx) = wecsim_raw.force_pto;
     B_p(idx) = wecsim_raw.B_p;
+    float_drag_force_fund(idx) = wecsim_raw.float_drag_force_fund;
+    spar_drag_force_fund(idx)  = wecsim_raw.spar_drag_force_fund;
+    float_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.float_drag_force_phase);
+    spar_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.spar_drag_force_phase);
+    float_phase(idx) = wecsim_raw.float_phase;
+    spar_phase(idx) = wecsim_raw.spar_phase;
+    rel_phase(idx) = wecsim_raw.rel_phase;
 
     %power_mech_unsat(power_mech_unsat>1e6) = NaN;
 
@@ -278,7 +315,14 @@ function results = load_wecsim_results(wecsim_filename, p)
                                           'PTO_damping', B_p,'force_pto',force_pto,...
                                          'float_amplitude', float_amplitude,...
                                          'spar_amplitude',spar_amplitude, ...
-                                         'relative_amplitude',relative_amplitude);
+                                         'relative_amplitude',relative_amplitude,...
+                                         'float_drag_force_fund',float_drag_force_fund,...
+                                          'spar_drag_force_fund',spar_drag_force_fund,...
+                                          'float_drag_force_phase',float_drag_force_phase,...
+                                          'spar_drag_force_phase',spar_drag_force_phase,...
+                                          'float_phase',float_phase,...
+                                          'spar_phase',spar_phase,...
+                                          'rel_phase',rel_phase);
 
 end
 
@@ -286,7 +330,10 @@ function results = assemble_results_struct(sz,varargin)
 
     var_names = {'power_mech_unsat', 'power_elec_unsat', 'power_elec_sat', ...
                  'T', 'H', 'JPD', 'float_amplitude', 'spar_amplitude', ...
-                 'relative_amplitude', 'PTO_damping','force_pto'};
+                 'relative_amplitude', 'PTO_damping','force_pto',...
+                 'float_drag_force_fund','spar_drag_force_fund',...
+                 'float_drag_force_phase','spar_drag_force_phase',...
+                 'float_phase','spar_phase','rel_phase'};
 
     p = inputParser;
     for var_idx = 1:length(var_names)
