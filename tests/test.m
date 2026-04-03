@@ -325,7 +325,7 @@ classdef (SharedTestFixtures={ ...
             p.use_force_sat = false;
             p.use_power_sat = false;
 
-            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M
+            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M (steel=1)
             X(7) = 1e9; % set P_max very large so power is unsaturated
 
             [~, ~, ~, val] = simulation(X, p);

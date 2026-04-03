@@ -739,9 +739,10 @@ function [idx_closed_loop_unstable,...
                                                 K_f, 0,   0,   K_s);
             % M and B_cl must be strictly PD; K_cl only needs to be PSD
             % (det_K >= 0). With PD B_cl, any zero-stiffness mode is still
-            % damped, so the closed-loop system is BIBO stable even when
-            % det(K_cl)=0. This edge case occurs for reactive control at
-            % high wave periods where K_p approaches -K_f*K_s/(K_f+K_s).
+            % damped, so the closed-loop system is BIBO (Bounded-Input
+            % Bounded-Output) stable even when det(K_cl)=0. This edge case
+            % occurs for reactive control at high wave periods where K_p
+            % approaches -K_f*K_s/(K_f+K_s).
             cl_stable = check_posdef_MB_strict_K_psd(...
                             m_f,     m_c,     m_c,     m_s, ...
                             B_f+B_p, B_c-B_p, B_c-B_p, B_s+B_p,...
