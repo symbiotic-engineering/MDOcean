@@ -273,10 +273,12 @@ In either case, the nonlinear controller is linearized via the describing functi
 In addition to the control nonlinearity, a describing function is also utilized to linearize the drag nonlinearity.
 
 If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (2).
-This requires some frequency-domain calculations for an impedance-mismatched linear system described in \cite{mccabe_force-limited_2024} and can be visualized with the Smith chart, a tool common in electrical engineering.
 This approach accurately reflects the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller. 
+This controller can be found numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain.
+The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
+The analytical approach is nonetheless derived in \cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \appendixname~\ref{sec:appendix-qp-solution} and \cite{mccabe_force-limited_2024}) and recommended for future implementation.
 
-If the implementation for the optimal constrained linear controller is also not available, then the violating portion of the time-domain signals can be saturated or zeroed (3) for the sake of power calculation.
+If neither a numerical nor an analytical implementation is available to identify the optimal constrained linear controller, then the violating portion of the time-domain signals can be saturated or zeroed for the sake of power calculation (3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 This simple approach does not require any derivations to implement.
 It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
@@ -1254,8 +1256,7 @@ Some cost components assumed constant in the model would scale with design in re
 For example, installation and decommissioning costs (categories 1.7 and 1.8) could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
 Likewise, the mooring and foundation costs (category 1.3) could scale with storm surge force, and the replacement parts and consumables costs (categories 2.5 and 2.6) could scale with the PTO power and force as the PTO capital costs do.
 
-The chosen scalings are a power law for the number of devices to reflect economies of scale, direct proportionality between structural cost and material volume, and constant plus linear for the PTO cost since the main components of the PTO (generator, drivetrain, and structural support) are generally sized linearly with power and torque.
-\footnote{
+The chosen scalings are a power law for the number of devices to reflect economies of scale, direct proportionality between structural cost and material volume, and constant plus linear for the PTO cost since the main components of the PTO (generator, drivetrain, and structural support) are generally sized linearly with power and torque.\footnote{
     Linear PTO cost scaling is common for WEC techno-economic analysis.
     The RM3 cost numbers \cite{RM3} which MDOcean uses as baseline are themselves scaled from estimates for a smaller device.
     Specifically, the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
@@ -1308,6 +1309,8 @@ The LCOE model then scales as:
     p^{'}_{F} F_{max} + p^{'}_{P}P_{pk,elec} + p^{'}_{s} V_{struct} + p^{'}_0
     }{P_{avg,elec}}
 \end{equation}
+
+\hl{write Fmax and Ppk and Pavg in terms of the control variables, shoing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
 
 % To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
 % \begin{equation}\label{eq:LCOE-scale}
