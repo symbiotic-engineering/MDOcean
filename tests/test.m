@@ -310,6 +310,65 @@ classdef (SharedTestFixtures={ ...
             testCase.verifyLessThanOrEqual( ratio, 1 );
         end
 
+        function multibodyWAMITDragOffPowerFinite(testCase)
+            % Regression test for PR #142 bug: the closed-loop K-matrix
+            % stability check was too conservative, incorrectly flagging
+            % high-wave-period sea states as unstable (det(K_cl)=0 is
+            % marginally stable, not unstable). This caused power to be set
+            % to Inf at high wave periods for the multibody WAMIT drag-off
+            % case, leading to hundreds/thousands of percent error vs WECSim.
+            p = parameters('wecsim');
+            p.use_multibody = true;
+            p.use_MEEM = false;
+            p.C_d_float = 0;
+            p.C_d_spar = 0;
+            p.use_force_sat = false;
+            p.use_power_sat = false;
+
+            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M (steel=1)
+            X(7) = 1e9; % set P_max very large so power is unsaturated
+
+            [~, ~, ~, val] = simulation(X, p);
+
+            testCase.verifyTrue(all(isfinite(val.P_mech(:)) | isnan(val.P_mech(:))), ...
+                ['Multibody WAMIT drag-off mechanical power must be finite ' ...
+                 '(not Inf) at all sea states. Inf values indicate the ' ...
+                 'stability check incorrectly flagged stable high-period ' ...
+                 'sea states as unstable.'])
+        end
+
+        function hydroCoeffCappingAppliedForWAMIT(testCase)
+            % Regression test: A_c/B_c capping (which enforces the energy
+            % balance condition |B_c|^2 <= B_f*B_s) was previously only
+            % applied in the MEEM path. It is now applied in get_dynamic_coeffs
+            % for both MEEM and WAMIT, ensuring consistent open-loop stability.
+            p = parameters('wecsim');
+            p.use_multibody = true;
+            p.use_MEEM = false; % WAMIT path
+
+            X = [var_bounds('wecsim').X_noms; 1]; % append 1 for material index M (steel=1)
+
+            [~, ~, ~, val] = simulation(X, p);
+
+            % After capping, A_c_over_rho and B_c_over_rho_w satisfy
+            % |A_c|^2 <= A_f*A_s and |B_c|^2 <= B_f*B_s (positive definite
+            % mass and damping matrices). Verify via the returned hydro coeffs.
+            A_c_over_rho   = val.A_c_over_rho;
+            A_f_over_rho   = val.A_f_over_rho;
+            A_s_over_rho   = val.A_s_over_rho;
+            B_c_over_rho_w = val.B_c_over_rho_w;
+            B_f_over_rho_w = val.B_f_over_rho_w;
+            B_s_over_rho_w = val.B_s_over_rho_w;
+
+            A_ratio = abs(A_c_over_rho) ./ sqrt(A_f_over_rho .* A_s_over_rho);
+            B_ratio = abs(B_c_over_rho_w) ./ sqrt(B_f_over_rho_w .* B_s_over_rho_w);
+
+            testCase.verifyTrue(all(A_ratio(isfinite(A_ratio)) <= 1.0), ...
+                '|A_c|^2 must not exceed A_f*A_s (WAMIT path: capping not applied)')
+            testCase.verifyTrue(all(B_ratio(isfinite(B_ratio)) <= 1.0), ...
+                '|B_c|^2 must not exceed B_f*B_s (WAMIT path: capping not applied)')
+        end
+
     end
     
 end
