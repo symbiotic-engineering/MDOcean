@@ -92,7 +92,7 @@ figs_in_AOR{30} = 'Meem.meem_matching';
 figs_in_AOR{31} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{32} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{33} = 'ReadNonMatlabFigs.qp_circles';
+figs_in_AOR{33} = 'QPCircles.qp_circles';
 figs_in_AOR{34} = 'ReadNonMatlabFigs.drag_integral_B';
 figs_in_AOR{34+12} = 'ReadNonMatlabFigs.drag_integral_G_m';
 figs_in_AOR{34+13} = 'ReadNonMatlabFigs.drag_integral_G_p';
