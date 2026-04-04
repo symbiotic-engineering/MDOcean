@@ -268,6 +268,11 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
     ylabel(y_name)
     legend('Location', 'best')
     improvePlot
+    % improvePlot fills all markers; restore Pareto-front markers to hollow.
+    ph = findobj(fig, 'DisplayName', 'Pareto front');
+    if ~isempty(ph)
+        set(ph, 'MarkerFaceColor', 'none')
+    end
     set(gca, 'XScale', 'log', 'YScale', 'log')
 end
 
@@ -408,10 +413,13 @@ function fig = make_factor_fig(Y, factor_labels)
 %     SS_i   = (N/n_i) * sum((marginal_mean_i - grand_mean).^2)
 %     SS_ij  = (N/(n_i*n_j)) * sum((cell_mean_ij - marg_i - marg_j + grand_mean).^2)
 %     eta2   = SS / SS_total
+    % Treat Inf as NaN so they are excluded from all statistics.
+    Y(~isfinite(Y)) = NaN;
+
     n_fac      = ndims(Y);
-    N          = numel(Y);
-    grand_mean = mean(Y(:));
-    SS_total   = sum((Y(:) - grand_mean).^2);
+    N          = sum(isfinite(Y(:)));
+    grand_mean = mean(Y(:), 'omitnan');
+    SS_total   = sum((Y(:) - grand_mean).^2, 'omitnan');
 
     % Helper: marginal means for each factor (permute factor to dim 1, average rest)
     marg = cell(n_fac, 1);
@@ -420,9 +428,9 @@ function fig = make_factor_fig(Y, factor_labels)
         n_i    = size(Y, i);
         perm_i = [i, setdiff(1:n_fac, i)];
         Yp     = permute(Y, perm_i);
-        mi     = mean(reshape(Yp, n_i, []), 2);   % [n_i x 1]
+        mi     = mean(reshape(Yp, n_i, []), 2, 'omitnan');   % [n_i x 1]
         marg{i}    = mi;
-        main_ss(i) = (N / n_i) * sum((mi - grand_mean).^2);
+        main_ss(i) = (N / n_i) * sum((mi - grand_mean).^2, 'omitnan');
     end
 
     eta2 = zeros(n_fac);
@@ -438,11 +446,11 @@ function fig = make_factor_fig(Y, factor_labels)
             other  = setdiff(1:n_fac, [i, j]);
             perm_ij = [i, j, other];
             Yp      = permute(Y, perm_ij);
-            cell_mn = mean(reshape(Yp, n_i, n_j, []), 3);   % [n_i x n_j]
+            cell_mn = mean(reshape(Yp, n_i, n_j, []), 3, 'omitnan');   % [n_i x n_j]
             % Interaction: remove main effects
             interact = cell_mn - marg{i} - marg{j}.' + grand_mean;
             n_rep    = N / (n_i * n_j);
-            SS_ij    = n_rep * sum(interact(:).^2);
+            SS_ij    = n_rep * sum(interact(:).^2, 'omitnan');
             eta2(i,j) = SS_ij / SS_total;
             eta2(j,i) = eta2(i,j);
         end
