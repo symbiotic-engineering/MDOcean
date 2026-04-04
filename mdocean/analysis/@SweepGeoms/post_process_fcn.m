@@ -86,7 +86,7 @@ function [fig_array,...
     CWR_vol_mat       = myreshape(CWR_vol,             num_m0h, order(:,1));
     CWR_sa_mat        = myreshape(CWR_sa,              num_m0h, order(:,1));
 
-    % Colours / sizes (encode geometry dims as RGB)
+    % Colors / sizes (encode geometry dims as RGB)
     red       = myresize(A1_A2, nT);
     green     = myresize(D1_H,  nT);
     blue      = myresize(D2_D1, nT);
@@ -120,7 +120,7 @@ function [fig_array,...
     % Use tiledlayout(1,1) so an overlay axes can be placed on the same tile
     % (same strategy as multistart_postpro.m lines 155-183) to apply LaTeX
     % tick labels — parallelplot has no LabelInterpreter property.
-    fig1 = figure('Visible','off');
+    fig1 = figure();
     t1   = tiledlayout(fig1, 1, 1, 'Padding', 'compact');
     nexttile(t1);
     pp = parallelplot([H(idx), A1_A2(idx), A2_H(idx), D1_H(idx), D2_D1(idx), ...
@@ -141,7 +141,7 @@ function [fig_array,...
     % ------------------------------------------------------------------
     % Figure 2: Scatter plot  (m0h vs CW/CW_max)
     % ------------------------------------------------------------------
-    fig2 = figure('Visible','off');
+    fig2 = figure();
     scatter(m0h_stored(:), hydro_ratio_result(:), size_var, color)
     set(gca, 'XScale', 'log')
     xlabel('m_0 h')
@@ -176,21 +176,32 @@ function [fig_array,...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
     % ------------------------------------------------------------------
-    % Figure 10: Pareto plot  (CW vs Surface Area)
+    % Figure 10: Pareto plot  (CW/CW_max vs Surface Area)
     % ------------------------------------------------------------------
-    % Collapse the T dimension by taking the best CW for each geometry.
-    CW_max_T = squeeze(max(CW, [], 1));   % [size(A1)]
+    % Collapse the T dimension by taking the best CW/CW_max for each geometry.
+    hydro_ratio_max_T = squeeze(max(hydro_ratio_result, [], 1));   % [size(A1)]
 
     % Color/size convention extended to all geometry points (incl. both h
     % levels) so every point in the 486-geometry grid is represented.
     color_pareto    = [A1_A2(:), D1_H(:), D2_D1(:)];
     size_var_pareto = A3_A1(:);
 
-    fig10 = make_pareto_fig(CW_max_T(:), SA_total(:), ...
-                            color_pareto, size_var_pareto, size_mult);
-
+    fig10 = make_pareto_fig(hydro_ratio_max_T(:), SA_total(:), ...
+                            color_pareto, size_var_pareto, size_mult, ...
+                            'Radiation Efficiency CW/CW_{max}','Surface Area');
     % ------------------------------------------------------------------
-    % Figure 11: Grid scatter matrix
+    % Figure 11: Pareto plot  (CW/CW_max vs Nondim Surface Area)
+    % ------------------------------------------------------------------
+    % Collapse the T dimension by taking the best CW/CW_max for each geometry.
+    hydro_ratio_max_T = squeeze(max(hydro_ratio_result, [], 1));   % [size(A1)]
+
+    wavelength = m0h_stored(:) ./ myresize(H,nT);
+    fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
+                            color, size_var, size_mult, ...
+                            'Radiation Efficiency CW/CW_{max}','Surface Area/Wavelength^2');
+    xlim([.05 3])
+    % ------------------------------------------------------------------
+    % Figure 12: Grid scatter matrix
     %   Columns = 6 sweep vars (5 geometry ratios + m0h)
     %   Rows    = 8 output quantities
     % ------------------------------------------------------------------
@@ -212,18 +223,18 @@ function [fig_array,...
     y_labels = {'CW/CW_{max}', 'a_2 (m)', 'V^{1/3} (m)', 'SA^{1/2} (m)', ...
                 'CW (m)', 'CW/a_2', 'CW/V^{1/3}', 'CW/SA^{1/2}'};
 
-    fig11 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
+    fig12 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
 
     % ------------------------------------------------------------------
-    % Figure 12: Factor analysis — 6×6 imagesc of η² effects on CW/SA^{1/2}
+    % Figure 13: Factor analysis — 6×6 imagesc of η² effects on CW/SA^{1/2}
     %   Diagonal  (i==j): main effect of input i
     %   Off-diag  (i≠j): two-factor interaction effect between inputs i and j
     % ------------------------------------------------------------------
-    Y_fa = CW_max_T ./ sqrt(SA_total);   % [size(A1)], per-geometry CW/SA^{1/2}
+    Y_fa = hydro_ratio_max_T ./ sqrt(SA_total);   % [size(A1)], per-geometry CW/SA^{1/2}
     factor_labels = {'h', 'a_1/a_2', 'a_2/h', 'd_1/h', 'd_2/d_1', 'a_3/a_1'};
-    fig12 = make_factor_fig(Y_fa, factor_labels);
+    fig13 = make_factor_fig(Y_fa, factor_labels);
 
-    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12];
+    fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12, fig13];
 
     tab_array_display = {};
     tab_array_latex   = {};
@@ -237,33 +248,24 @@ end
 % Local helper functions
 % ======================================================================
 
-function fig = make_pareto_fig(CW_vec, SA_vec, color_pareto, size_var_pareto, size_mult)
-%MAKE_PARETO_FIG  Pareto front: capture width (x) vs surface area (y).
-%   Finds the max-CW / min-SA Pareto front via an inline sweep (sort by CW
-%   descending, keep any point that achieves a new minimum SA).
-    CW_v = CW_vec(:);
-    SA_v = SA_vec(:);
-    [CW_sort, sort_idx] = sort(CW_v, 'descend');
-    SA_sort = SA_v(sort_idx);
-    min_SA  = Inf;
-    pareto_mask = false(numel(CW_v), 1);
-    for k = 1:numel(CW_sort)
-        if CW_sort(k) > 0 && SA_sort(k) < min_SA
-            pareto_mask(k) = true;
-            min_SA = SA_sort(k);
-        end
-    end
-    idxo = sort_idx(pareto_mask);
+function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, size_mult, x_name, y_name)
+%MAKE_PARETO_FIG  Pareto front
+%   Finds the max-x / min-y Pareto front
 
-    fig = figure('Visible', 'off');
-    scatter(CW_vec(:), SA_vec(:), size_mult * size_var_pareto(:), color_pareto, ...
+    x_clean = x_to_max(isfinite(x_to_max));
+    y_clean = y_to_min(isfinite(x_to_max));
+
+    [~, idxo] = paretoFront([x_clean, -y_clean]);
+
+    fig = figure;
+    scatter(x_to_max(:), y_to_min(:), size_mult * size_var_pareto(:), color_pareto, ...
             'HandleVisibility', 'off')
     hold on
-    plot(CW_vec(idxo), SA_vec(idxo), 'ks', ...
+    plot(x_clean(idxo), y_clean(idxo), 'ks', ...
          'MarkerFaceColor', 'none', 'MarkerSize', 10, 'LineWidth', 1.5, ...
          'DisplayName', 'Pareto front')
-    xlabel('CW (m)')
-    ylabel('Surface Area (m^2)')
+    xlabel(x_name)
+    ylabel(y_name)
     legend('Location', 'best')
     improvePlot
     set(gca, 'XScale', 'log', 'YScale', 'log')
@@ -277,7 +279,7 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
     n_x = numel(x_vars);
     n_y = numel(y_vars);
 
-    fig = figure('Visible', 'off');
+    fig = figure;
     t = tiledlayout(n_y, n_x, 'TileSpacing', 'compact', 'Padding', 'compact');
 
     for iy = 1:n_y
@@ -297,13 +299,13 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
         end
     end
 
-    fig.Position(3:4) = [1400, 820];
+    fig.Position = [0 0 1400, 820];
     set(fig, 'PaperPositionMode', 'auto');
 end
 
 function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
 %MAKE_SCATTER_FIG  Semilog scatter plot of m0h vs a CWR quantity.
-    fig = figure('Visible','off');
+    fig = figure();
     scatter(m0h_stored(:), CWR(:), size_var, color)
     set(gca, 'XScale', 'log')
     xlabel('m_0 h')
@@ -315,7 +317,7 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
                               marker_type_var, marker_var_name, marker_types, ...
                               a2_h, m0h_minmax)
 %MAKE_LINE_FIG  Semilog line plot of m0h vs y_mat with colour/marker legends.
-    fig = figure('Visible','off');
+    fig = figure();
     ax  = gca();
 
     % Set ColorOrder BEFORE plotting so each line gets its assigned RGB colour.
@@ -446,7 +448,7 @@ function fig = make_factor_fig(Y, factor_labels)
         end
     end
 
-    fig = figure('Visible', 'off');
+    fig = figure;
     imagesc(eta2)
     colorbar
     colormap(parula)
