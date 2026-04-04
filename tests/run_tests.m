@@ -51,9 +51,16 @@ end
 
 runner = testrunner('textoutput');
 
+if strcmpi(which_paper, 'all')
+    base_test_dir = 'test-results';
+    base_cov_dir = 'code-coverage';
+else
+    base_test_dir = ['test-results/' lower(which_paper)];
+    base_cov_dir = ['code-coverage/' lower(which_paper)];
+end
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-cov_dir = ['code-coverage/' date];
-test_dir = ['test-results/' date];
+cov_dir = [base_cov_dir '/' date];
+test_dir = [base_test_dir '/' date];
 mkdir(cov_dir)
 mkdir(test_dir)
 
@@ -89,7 +96,7 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
 end
 
 fig = unittest_time_bar_chart(suite,results);
-exportgraphics(fig,'test-results/Figure_30_unittest.pdf')
+exportgraphics(fig,[base_test_dir '/Figure_30_unittest.pdf'])
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)
