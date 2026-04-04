@@ -1,3 +1,15 @@
+function run_tests(which_paper)
+% run_tests  Run the MDOcean MATLAB test suite.
+%
+%   run_tests()           runs all tests (AOR + RE figures + dynamics)
+%   run_tests('AOR')      runs AOR-paper figure/table tests plus all
+%                         non-figure validation tests and test_dynamics
+%   run_tests('RE')       runs only RE-paper figure/table tests
+
+if nargin < 1
+    which_paper = 'all';
+end
+
 import matlab.unittest.plugins.CodeCoveragePlugin
 import matlab.unittest.plugins.codecoverage.CoverageReport
 import matlab.unittest.TestRunner;
@@ -17,6 +29,26 @@ end
 sourceCodeFolder = fullfile(fileparts(which('add_mdocean_path')), 'mdocean');
 
 suite = testsuite('tests');
+
+if ~strcmpi(which_paper, 'all')
+    [figs, tabs] = get_fig_tab_names(which_paper, which_paper);
+    names = [figs, tabs];
+    % Build a selector matching any allFiguresRun test for this paper
+    fig_selector = HasName(ContainsSubstring(names{1}));
+    for i = 2:length(names)
+        fig_selector = fig_selector | HasName(ContainsSubstring(names{i}));
+    end
+    if strcmpi(which_paper, 'AOR')
+        % Include AOR figure tests + all non-allFiguresRun tests
+        % (covers validateNominal* in test.m and all of test_dynamics)
+        non_fig_selector = ~HasName(ContainsSubstring('allFiguresRun'));
+        suite = suite.selectIf(fig_selector | non_fig_selector);
+    else
+        % RE: only the RE figure/table tests
+        suite = suite.selectIf(fig_selector);
+    end
+end
+
 runner = testrunner('textoutput');
 
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
