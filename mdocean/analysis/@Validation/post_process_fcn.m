@@ -33,6 +33,21 @@ function [fig_array,...
             tab_validation_latex.OriginalVariableNames = remove_underscores(modify_suffix(tab_validation_latex.OriginalVariableNames));
             new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
             tab_validation_latex = renamevars(tab_validation_latex, tab_validation_latex.Properties.VariableNames, new_names);
+
+            % Append average percent errors for economic variables (vectors over N_WEC sweep)
+            econ_display_fields = {'capex', 'opex', 'LCOE'};
+            econ_display_names  = {'CAPEX avg error', 'OPEX avg error', 'LCOE avg error'};
+            error_row_name = tab_report.Properties.RowNames{end}; % 'Error report'
+            for i_econ = 1:length(econ_display_fields)
+                field = econ_display_fields{i_econ};
+                if ismember(field, tab_report.Properties.VariableNames)
+                    err_vals = tab_report{error_row_name, field};
+                    avg_err_pct = mean(err_vals) * 100;
+                    new_row = {econ_display_names{i_econ}, '-', '-', ...
+                               sprintf('%.1f\\%%', avg_err_pct), '-', '-', '-'};
+                    tab_validation_latex = [tab_validation_latex; new_row]; %#ok<AGROW>
+                end
+            end
             
             fig_array = intermed_result_struct.fig_cost_vs_N_WEC;
             

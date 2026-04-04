@@ -155,7 +155,6 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
-        title(t,'')
         xlabel(t,'Wave Period T (s)','FontSize',20)
         ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end

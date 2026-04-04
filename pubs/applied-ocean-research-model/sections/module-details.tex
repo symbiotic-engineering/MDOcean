@@ -410,7 +410,9 @@ This bounds the maximum absorbed power for any geometry.
 
 \subsubsection{PTO Model}\label{sec:pto-dynamics-overview}
 The PTO model specifies the generic powertrain impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
+It is a linear multiport model that is valid for multiple degree of freedom devices.
 It consists of PTO kinematics (a hybrid matrix relating body degrees of freedom to the PTO port, accommodating underactuation) and PTO dynamics (cascade matrices for a mechanical drivetrain and permanent magnet generator, relating the PTO port to the generator electrical port).
+The Thévenin equivalent circuit is used to find the effective intrinsic impedance when viewed from an arbitrary port, as required for impedance matching.
 Details and circuit diagrams are provided in \appendixname~\ref{sec:pto-dynamics}.
 
 
@@ -1070,23 +1072,7 @@ Additionally, the per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$,
 \begin{equation}
 C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
 \end{equation}
-The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values}.
-\begin{table}
-    \centering
-    \begin{tabular}{
-        >{\raggedright\arraybackslash}p{0.33\linewidth}
-        >{\raggedright\arraybackslash}p{0.1\linewidth}
-        >{\raggedright\arraybackslash}p{0.25\linewidth}
-        >{\raggedright\arraybackslash}p{0.25\linewidth}}
-         CBS Category& Exponent $\beta$&Unit cost at scale $C_{\infty}$&Single-unit cost \newline $C_1$\\\hline
-         \textbf{1.1-1.3, 1.6-1.9} - Design-Independent CAPEX& 0.741& 1.24 \$M&13.92 \$M\\
-         \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N&Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
- \textbf{2.1-2.6} - OPEX&0.557& 0&1.193 \$M\\
-    \end{tabular}
-    \caption{Cost model values for each CBS category}
-    \label{tab:econ-model-values}
-\end{table}
+The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values} in \appendixname~\ref{sec:appendix-econ}.
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
 For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
 
@@ -1098,12 +1084,22 @@ The LCOE model then scales as:
     }{P_{avg,elec}}
 \end{equation}
 
+The numerator of \cref{eq:LCOE-scale} is linear with design inputs $F_{max}$ and $P_{pk,elec}$, and $V_{struct}$ is the product of the structural thicknesses with the areas, which depend quadratically on the bulk dimensions.
+From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $P_{avg,elec}$ is the weighted sea state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
+\begin{equation}
+\begin{aligned}
+    P_{avg,elec} = \eta \sum_{i=1}^{N_{sea}} p_i \cdot 
+    \frac{|\hat{V}_{s,th,i}|^2}{8\Re(Z_{s,th,i})}~ (1 - |\Gamma_i|^2)
+    s.t.
+    \quad |\hat{F}_{p,i}| \leq F_{max},
+    \quad |\hat{P}_{elec,i}| \leq P_{pk,elec},
+    \quad |\hat{\xi}_{f,i}| \leq X_{f,max},
+    \quad |\hat{\xi}_{s,i}| \leq X_{s,max}
+\end{aligned}
+\end{equation}
+
 \hl{write Fmax and Ppk and Pavg in terms of the control variables, shoing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
 
-% To see the effect of changes from some nominal design \hl{(finish this sentence, and maybe change nominal ratios to bar variables for easier readability)}
-% \begin{equation}\label{eq:LCOE-scale}
-%     \frac{LCOE}{LCOE_{nom}} = \frac{p_\tau \frac{\tau}{\tau_{nom}} + p_{P}\frac{P_{pk,elec}^{0.91}}{P_{pk,elec,nom}^{0.91}} + p_{struct} \frac{V_{struct}}{V_{struct,nom}} + 1}{\frac{P_{avg,elec}}{P_{avg,elec,nom}}}
-% \end{equation}
 
 
 

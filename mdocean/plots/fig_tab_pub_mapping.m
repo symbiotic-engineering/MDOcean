@@ -65,7 +65,7 @@ figs_in_AOR{4}  = 'ReadNonMatlabFigs.dimensions';
 figs_in_AOR{5}  = 'ReadNonMatlabFigs.MEEM_geometry';
 figs_in_AOR{6}  = 'Tikz.circuit_intrinsic';
 figs_in_AOR{7}  = 'DescFcns.saturation_desc_fcn'; % subfig (a), combined with {39}
-figs_in_AOR{8}  = 'ReadNonMatlabFigs.jpd_mult';
+figs_in_AOR{8}  = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{9}  = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
 figs_in_AOR{10} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram';
@@ -77,7 +77,7 @@ figs_in_AOR{14} = 'MeemSweep.hydro_efficiency';
 figs_in_AOR{15} = 'DampingPlateStructures.damping_plate_aspect_ratio';
 figs_in_AOR{16} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{17} = 'DesignSpaceExploration.experiments_ratios';
-figs_in_AOR{18} = 'ReadNonMatlabFigs.power_matrix_multiply';
+figs_in_AOR{18} = 'RunSingleFigFunc.nominal_power_matrix';
 % appendix A - hydro
 figs_in_AOR{19} = 'Tikz.meem_regions';
 figs_in_AOR{20} = 'Meem.meem_sparsity';
@@ -88,15 +88,15 @@ figs_in_AOR{24} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics (PTO kinematics, PTO circuit, QP, drag, slamming, WECSim)
 figs_in_AOR{25} = 'Tikz.circuit_kinematics';
 figs_in_AOR{26} = 'Tikz.circuit_pto';
-figs_in_AOR{27} = 'ReadNonMatlabFigs.qp_circles';
+figs_in_AOR{27} = 'QPCircles.qp_circles';
 figs_in_AOR{28} = 'DragIntegral.drag_integral_B';     % subfig (a), combined with {40},{41}
 figs_in_AOR{29} = 'Slamming.slamming_amplitude';
 figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison_float';
 figs_in_AOR{31} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {42},{43},{44}
 figs_in_AOR{32} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf'; % subfig, combined with {45},{46},{47}
-% appendix B - economic validation
+% appendix C - economic validation
 figs_in_AOR{33} = 'Validation.cost_vs_N_WEC';
-% appendix C - structures
+% appendix D - structures
 figs_in_AOR{34} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{35} = 'ReadNonMatlabFigs.trapezoid';
 figs_in_AOR{36} = 'ReadNonMatlabFigs.damping_plate_flowchart';
