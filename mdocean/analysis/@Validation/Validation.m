@@ -7,6 +7,15 @@ classdef Validation < GenericAnalysis
         tab_names = {'validation'};
     end
 
+    methods
+        function obj = Validation(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_analysis_outputs = { ...
+                'results/Validation/intermed_fig_cost_vs_N_WEC_1.fig' ...
+            };
+        end
+    end
+
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

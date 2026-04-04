@@ -1,6 +1,27 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
+### Changed
+- Readme: links now go to calkit draft publications rather than old google docs drafts
+
+## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-1
+### Fixed
+- Pipeline: remove extraneous calkit outputs that caused two postpro stages to fail
+- Pipeline: add xmllint to pubs conda env to avoid issue with mermaid reformatting stage
+- CI: avoid unnecessary double dvc pull
+
+## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
+### Added
+- Pipeline: python script to update calkit.yaml automatically with matlab auto deps
+- CI: enforce calkit.yaml to be up to date with matlab auto deps
+
+## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-30
+### Changed
+- Plot: added frequency domain to dynamics runtime bar plot
+### Fixed
+- Analysis: add forgotten add_wecsim_path in runtime analysis class
+
 ## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
 ### Changed
 - Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization
