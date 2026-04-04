@@ -1,10 +1,10 @@
 classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+        matlab.unittest.fixtures.CurrentFolderFixture('.')}) ...
         test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = true;
+        run_slow_tests = false;
 
         slow_analyses = {'LocationSensitivity','Multistart','ParamSensitivities',...
                         'ParetoSweep'}; %,'ParetoFigFunc',...
@@ -46,25 +46,19 @@ classdef (SharedTestFixtures={ ...
 
     % helper methods to enumerate all figures and tables
     methods (Static)
-        function which_fig_struct = enumerateFigs()
+        function which_figs_cell = enumerateFigs()
             [fig_names,tab_names] = get_fig_tab_names('all', 'all');
             num_tabs = length(tab_names);
 
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
-            fig_names_fields = matlab.lang.makeValidName([fig_names, none]);
-
             which_figs_cell = num2cell([fig_names, none]);
-            which_fig_struct = cell2struct(which_figs_cell,fig_names_fields,2);
         end
-        function which_tab_struct = enumerateTabs()
+        function which_tabs_cell = enumerateTabs()
             [fig_names,tab_names] = get_fig_tab_names('all', 'all');
             num_figs = length(fig_names);
 
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
-            tab_names_fields = matlab.lang.makeValidName([none, tab_names]);
-
             which_tabs_cell = num2cell([none, tab_names]);
-            which_tab_struct = cell2struct(which_tabs_cell,tab_names_fields,2);
         end
     end
 
@@ -225,18 +219,21 @@ classdef (SharedTestFixtures={ ...
             end
 
             if ~contains(which_figs,'none') % figure
-                valid_name = matlab.lang.makeValidName(which_figs);
-                fig_name = "Figure_" + valid_name;
+                fig_name = "Figure_" + strrep(which_figs, '.', '_');
 
-                idx = strcmp(valid_name,fields(testCase.which_figs));
+                % Use find+string() for a numeric index that is type-safe
+                % (handles char/string mix) and avoids logical-index size
+                % mismatch: testCase.which_figs has N+M entries but
+                % fig_success only has N; real figs are at positions 1..N.
+                idx = find(strcmp(string(which_figs), string(testCase.which_figs)));
                 success_criterion = testCase.fig_success(idx);
                 fig_out = testCase.fig_output(idx);
 
-                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "../test-results/");
+                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "test-results/");
 
             else % table
-                tab_names = fields(testCase.which_tabs);
-                idx = strcmp(matlab.lang.makeValidName(which_tabs), tab_names(~contains(tab_names,'none')) );
+                non_none_tabs = testCase.which_tabs(~contains(string(testCase.which_tabs), 'none'));
+                idx = find(strcmp(string(which_tabs), string(non_none_tabs)));
                 success_criterion = testCase.tab_success{idx};
                 tab_out = testCase.tab_output(idx);
                

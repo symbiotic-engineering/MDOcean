@@ -1,6 +1,9 @@
 name: Run calkit pipeline
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 # env:
@@ -81,7 +84,7 @@ jobs:
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --keep-going --log build-AOR-paper
+          run_args: --keep-going --log build-AOR-paper test-aor
           pull_dvc: false
           save: false
       - name: calkit save
@@ -116,3 +119,69 @@ jobs:
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
+
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: code-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to codecov
+        uses: codecov/test-results-action@v1
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: test-results
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish test report to GitHub UI
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: 'test-results/**/junit.xml'
+          job_name: main
+
+      - name: Upload test report PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            test-results/**/junit.xml
+            test-results/**/testreport.pdf
+            test-results/**/table_*.tex
+            code-coverage/**/coverage.xml
+            **/DynamicValidation_*.pdf
+            test-results/Figure_*.pdf
+            mdocean/optimization/multiobjective/pareto_search_results_*.mat
+            **/wecsim_*.mat
+
+      - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        if: always()
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          path: test-results-baseline
+          workflow_conclusion: completed
+          check_artifacts: true
+
+      - name: Compare test results to base branch
+        if: always()
+        run: |
+          ls test-results-baseline/test-report/test-results || echo 'No baseline test results found'
+          python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
+          cat test-results-baseline/delta-junit.xml
+        shell: bash
+
+      - name: Publish changed tests to GitHub UI
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: 'test-results-baseline/delta-junit.xml'
+          check_name: 'Changed Tests'
+          job_name: main
+          include_passed: true

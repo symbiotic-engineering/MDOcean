@@ -204,10 +204,10 @@ classdef (Abstract) GenericAnalysis
         end
 
         function obj = run_analysis_from_load_if_possible(obj)
-            if isempty(obj.intermed_result_struct)
-                obj = obj.run_analysis();
-            else
+            if isfile([obj.output_folder filesep 'intermed.mat'])
                 obj = obj.load_intermed_results();
+            else
+                obj = obj.run_analysis();
             end
         end
 

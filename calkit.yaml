@@ -57,10 +57,9 @@ pipeline:
     make-drag-integral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); drag_fcn = 
-        make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 8); 
-        save('./mdocean/inputs/drag_integral.mat','drag_fcn');
+      command: add_mdocean_path(); make_drag_integral
       inputs:
+        - ./mdocean/inputs/make_drag_integral.m
         - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
       outputs:
@@ -3938,6 +3937,59 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+    test-aor:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); addpath('tests'); run_tests('AOR')
+      inputs:
+        - from_stage_outputs: analysis-Comparison
+        - from_stage_outputs: analysis-Cost
+        - from_stage_outputs: analysis-DampingPlateStructures
+        - from_stage_outputs: analysis-DescFcns
+        - from_stage_outputs: analysis-DesignSpaceExploration
+        - from_stage_outputs: analysis-DragIntegral
+        - from_stage_outputs: analysis-ForceSaturationFigFunc
+        - from_stage_outputs: analysis-HydroCoeffFigFunc
+        - from_stage_outputs: analysis-Meem
+        - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - from_stage_outputs: analysis-RunSingleFigFunc
+        - from_stage_outputs: analysis-Runtime
+        - from_stage_outputs: analysis-Slamming
+        - from_stage_outputs: analysis-SparHydro
+        - from_stage_outputs: analysis-Validation
+        - from_stage_outputs: analysis-Wecsim
+        - tests/
+        - mdocean/
+      outputs:
+        - path: test-results/
+          storage: null
+        - path: code-coverage/
+          storage: null
+    test-re:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); addpath('tests'); run_tests('RE')
+      inputs:
+        - from_stage_outputs: analysis-AllFigCompare
+        - from_stage_outputs: analysis-Comparison
+        - from_stage_outputs: analysis-Constraints
+        - from_stage_outputs: analysis-DesignSpaceExploration
+        - from_stage_outputs: analysis-DesignVars
+        - from_stage_outputs: analysis-GradientOptimFigFunc
+        - from_stage_outputs: analysis-LocationSensitivity
+        - from_stage_outputs: analysis-Multistart
+        - from_stage_outputs: analysis-ParamSensitivities
+        - from_stage_outputs: analysis-Parameters
+        - from_stage_outputs: analysis-ParetoFigFunc
+        - from_stage_outputs: analysis-ParetoSweep
+        - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - tests/
+        - mdocean/
+      outputs:
+        - path: test-results/
+          storage: null
+        - path: code-coverage/
+          storage: null
     pyxdsm:
       kind: python-script
       environment: pubs
