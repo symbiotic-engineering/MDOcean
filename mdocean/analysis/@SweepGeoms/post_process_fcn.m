@@ -299,7 +299,7 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
         end
     end
 
-    fig.Position = [0 0 1400, 820];
+    fig.Position = [25 58 1400, 820];
     set(fig, 'PaperPositionMode', 'auto');
 end
 
