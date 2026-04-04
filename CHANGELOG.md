@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.9) - 2026-4-4
+### Changed
+- CI: upgrade GitHub Actions to Node.js 24 compatible versions (checkout v6, upload-artifact v6, setup-matlab v3, run-command v3, codecov-action v5, action-junit-report v6, action-download-artifact v20, setup-python v6)
+
 ## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
 ### Changed
 - Readme: links now go to calkit draft publications rather than old google docs drafts
