@@ -248,7 +248,15 @@ if nargout > 1
     [~,numeric_idx(use_max)] = cellfun(@max, param_table.value(use_max));
     [~,numeric_idx(use_min)] = cellfun(@min, param_table.value(use_min));
     numeric_idx(use_num) = [param_table.idx{use_num}];
-    value_normalize = cellfun(@(x,i) x(numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
+    value_normalize = cell(height(param_table), 1);
+    for ii = 1:height(param_table)
+        x = param_table.value{ii};
+        if isnumeric(x) || islogical(x)
+            value_normalize{ii} = x(numeric_idx(ii));
+        else
+            value_normalize{ii} = x;
+        end
+    end
 
     param_table.index_normalize = numeric_idx;
     param_table.value_normalize = value_normalize;
