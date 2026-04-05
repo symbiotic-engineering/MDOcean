@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-5
+## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
 ### Added
 - CI: Dependabot configuration for conda, GitHub Actions, and git submodules
 
