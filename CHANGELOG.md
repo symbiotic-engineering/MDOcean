@@ -8,12 +8,12 @@
 - Paper: spar column ζ formula fraction corrected from `A·σ_Y/F_crit` to `σ_Y/(F_crit/A)`
 - Paper: float waterplane area corrected to annular formula `π/4·(D_f²−D_s²)` instead of solid disk `π/4·D_f²`
 - Paper: structural cost price `p_s` redefined as $/m³ (was $/kg) with table values updated accordingly
+- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
 
 ## [v1.1.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.11) - 2026-4-5
 ### Changed
 - CI: pin pubs conda environment to specific package versions (python=3.14.3, libxml2=2.15.2, pip=26.0.1)
 - CI: fix Dependabot conda manifest directory to `/pubs/` and add pip updater for `/docs`
-- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
 
 ## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
 ### Added
