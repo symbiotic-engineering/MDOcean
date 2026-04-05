@@ -182,7 +182,6 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     end
     ax = gca;
     ax.FontSize = 14;
-    title(Z_title,'FontSize',14)
     cb = colorbar;
     if ~isempty(h_fig)
         z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
