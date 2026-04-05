@@ -1,5 +1,5 @@
-name: Check version, changelog, submodules
-description: Check version + changelog updated and submodules not accidentally downgraded
+name: Ready to merge
+description: Check version + changelog updated, submodules not accidentally downgraded
 on:
   pull_request:
   workflow_dispatch:
@@ -8,10 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: recursive
+          # Use submodules: false so actions/checkout does NOT run
+          # git submodule foreach --recursive (which fails on the stale
+          # sea-lab-utils nested submodule inside OpenFLASH).
+          submodules: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules without recursing into
+        # their nested submodules, avoiding the stale sea-lab-utils entry.
+        run: git submodule update --init
       - name: Check for changes
         uses: dorny/paths-filter@v3
         id: changes
