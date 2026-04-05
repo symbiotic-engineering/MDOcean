@@ -13,7 +13,7 @@
 ### Changed
 - CI: pin pubs conda environment to specific package versions (python=3.14.3, libxml2=2.15.2, pip=26.0.1)
 - CI: fix Dependabot conda manifest directory to `/pubs/` and add pip updater for `/docs`
-- CI: deinit stale submodules before checkout on self-hosted runner to fix `sea-lab-utils` nested submodule error
+- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
 
 ## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
 ### Added
