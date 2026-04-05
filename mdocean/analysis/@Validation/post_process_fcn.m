@@ -43,8 +43,8 @@ function [fig_array,...
                 if ismember(field, tab_report.Properties.VariableNames)
                     err_vals = tab_report{error_row_name, field};
                     avg_err_pct = mean(err_vals(:)) * 100;
-                    new_row = {econ_display_names{i_econ}, '-', '-', ...
-                               sprintf('%.1f\\%%', avg_err_pct), '-', '-', '-'};
+                    new_row = {econ_display_names{i_econ}, {'-'}, {'-'}, ...
+                               {sprintf('%.1f\\%%', avg_err_pct)}, {'-'}, {'-'}, {'-'}};
                     tab_validation_latex = [tab_validation_latex; new_row]; %#ok<AGROW>
                 end
             end
