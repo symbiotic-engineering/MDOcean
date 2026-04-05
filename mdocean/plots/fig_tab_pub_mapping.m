@@ -93,7 +93,7 @@ figs_in_AOR{28} = 'DragIntegral.drag_integral_B';     % subfig (a), combined wit
 figs_in_AOR{29} = 'Slamming.slamming_amplitude';
 figs_in_AOR{30} = 'RunSingleFigFunc.slamming_model_comparison_float';
 figs_in_AOR{31} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {42},{43},{44}
-figs_in_AOR{32} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf'; % subfig, combined with {45},{46},{47}
+figs_in_AOR{32} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund'; % subfig, combined with {45},{46},{47}
 % appendix C - economic validation
 figs_in_AOR{33} = 'Validation.cost_vs_N_WEC';
 % appendix D - structures
@@ -110,9 +110,9 @@ figs_in_AOR{41} = 'DragIntegral.drag_integral_G_p';                  % fig 28 su
 figs_in_AOR{42} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';  % fig 31 subfig
 figs_in_AOR{43} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';  % fig 31 subfig
 figs_in_AOR{44} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';   % fig 31 subfig
-figs_in_AOR{45} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf';  % fig 32 subfig
-figs_in_AOR{46} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf'; % fig 32 subfig
-figs_in_AOR{47} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf';  % fig 32 subfig
+figs_in_AOR{45} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund';  % fig 32 subfig
+figs_in_AOR{46} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase'; % fig 32 subfig
+figs_in_AOR{47} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase';  % fig 32 subfig
 figs_in_AOR{48} = 'DampingPlateStructures.damping_plate_deflection'; % fig 37 subfig (b)
 
 %% TABLES

@@ -42,7 +42,7 @@ function [fig_array,...
                 field = econ_display_fields{i_econ};
                 if ismember(field, tab_report.Properties.VariableNames)
                     err_vals = tab_report{error_row_name, field};
-                    avg_err_pct = mean(err_vals) * 100;
+                    avg_err_pct = mean(err_vals(:)) * 100;
                     new_row = {econ_display_names{i_econ}, '-', '-', ...
                                sprintf('%.1f\\%%', avg_err_pct), '-', '-', '-'};
                     tab_validation_latex = [tab_validation_latex; new_row]; %#ok<AGROW>
