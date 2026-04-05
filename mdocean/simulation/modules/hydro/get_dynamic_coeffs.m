@@ -107,8 +107,8 @@ function [m_f,B_h_f,K_h_f,gamma_f_mag,gamma_f_phase,...
     drag_const_f = 4/(3*pi) * rho_w * A_w_f * C_d_float;
     drag_const_s = 4/(3*pi) * rho_w * A_drag_s * C_d_spar;
     H = Hs / sqrt(2);                   % equivalent regular wave height
-    mag_v0_f = H/2 * g .* k ./ w .* exp(-k * T_f/2); % finite depth velocity of incident wave
-    mag_v0_s = H/2 * g .* k ./ w .* exp(-k * T_s/2);
+    mag_v0_f = H/2 * g .* k ./ w .* exp(-k * T_f); % finite depth velocity of incident wave
+    mag_v0_s = H/2 * g .* k ./ w .* exp(-k * T_s);
 end
 
 
