@@ -104,7 +104,7 @@ The assumed storm configuration in this study, to mirror the RM3 report \cite{RM
         K_m
     \end{bmatrix}
 \end{equation}
-The coefficients for the merged geometry are simply the sum of coefficents for the bodies moving independently.
+The coefficients for the merged geometry are simply the sum of coefficients for the bodies moving independently.
 This can be seen by first substituting operational coefficients \cref{eq:op-hydro-coeffs} into the force equation \cref{eq:hydro-forces} and then enforcing $\hat{\xi}_f =\hat{\xi}_s =\hat{\xi}_m$.
 This yields the following:
 \begin{equation}
@@ -309,7 +309,7 @@ The optimal constrained linear controller for a variety of constraints including
 
 Describing functions assume a certain time-domain nonlinear signal shape and then calculate the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
 The two signals where describing functions are used are both force signals.
-For a force signal, the fundamental amplitude is most the relevant harmonic because not only is it typically the largest amplitude, but it undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
+For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
 The former encodes the describing function formula directly into the simulation (see derivation in \cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \appendixname~\ref{sec:appendix-force-sat}).
@@ -438,7 +438,7 @@ To avoid confusion, subscript $PTO$ is used for forces in the PTO degrees of fre
 \Cref{eq:pto-kinematics-motion,eq:pto-kinematics-force} imply rigid lossless massless linkages, and any linkage deflection, dissipation, and inertia would be included in the PTO dynamics rather than kinematics.
 
 Multibody WECs are frequently underactuated, meaning that the PTO has fewer controlled degrees of freedom than the hydrodynamic bodies, and $\mathbf{T}_{kin}$ has more columns than rows.
-Underactuated sytems receive considerable attention in robotics \cite{tedrake_underactuated_2024} but have only recently been explored in the context of wave energy conversion \cite{faedo_principle_2022}.
+Underactuated systems receive considerable attention in robotics \cite{tedrake_underactuated_2024} but have only recently been explored in the context of wave energy conversion \cite{faedo_principle_2022}.
 Cascade matrices require an identical number of input and output ports and thus cannot be used to describe the unbalanced ports that underactuated kinematics create \cite{reveyrand_multiport_2018}.
 Non-square impedance matrices may be used to capture unbalanced port relations in general, but the impedance is undefined for the specific relations of \cref{eq:pto-kinematics-motion,eq:pto-kinematics-force}.
 Instead, the kinematics can be packaged into a square hybrid matrix $[\mathbf{h}]_{kin}$ which accurately represents the underactuated system:
@@ -488,7 +488,7 @@ where the vector expressions for the general case are shown first, followed by t
 Although as previously mentioned a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
 Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero, so there is no way to express $\hat{\dot{\xi}}$ as a weighted sum of $\hat{F}_{PTO}$ and $\dot{\hat{X}}_{PTO}$.
 $\hat{\dot{\xi}}$ could be expressed as a function of the PTO variables by substituting $\mathbf{Z}_p=\mathbf{T}_{kin}^T (\vec{\hat{F}}_{PTO}/\vec{\hat{\dot{X}}}_{PTO}) \mathbf{T}_{kin}$ into \cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
-Instead, we can use cascade-like matrices to solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actutal body velocities $\vec{\dot{\xi}}$ and their values if the PTO were disconnected with $F_{PTO}=0$, $\vec{\dot{\xi}}_{0}$:
+Instead, we can use cascade-like matrices to solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actual body velocities $\vec{\dot{\xi}}$ and their values if the PTO were disconnected with $F_{PTO}=0$, $\vec{\dot{\xi}}_{0}$:
 \begin{equation}\label{eq:modified-body-velocity}
     \vec{\dot{\xi}}_\Delta = \vec{\dot{\xi}} - \vec{\dot{\xi}}_{0}
     \quad \textrm{ where } \quad
@@ -962,7 +962,7 @@ The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/manual/jpd_mult.pdf}
-\caption{Power matrices multiplication}
+\caption{Power matrix multiplication}
 \label{fig:JPD-multiply}
 \end{figure}
 
@@ -1229,7 +1229,7 @@ The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
          CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
-         1.2 - Infastructure&  6\%&  4\%&No\\
+         1.2 - Infrastructure&  6\%&  4\%&No\\
          1.3 - Mooring/Foundation&  3\%&  12\%&No\\
          1.4 - Structural&  17\%&  46\%&$V_{struct}$\\
          1.5 - Power Take Off&  4\%&  11\%&$F_{max}, P_{pk,elec}$\\
