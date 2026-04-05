@@ -21,6 +21,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Deinit stale submodules
+        run: git submodule deinit --all --force 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
