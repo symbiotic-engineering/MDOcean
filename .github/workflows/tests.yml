@@ -22,6 +22,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Clear stale submodule caches
+        # actions/checkout preserves .git/ across runs on self-hosted runners.
+        # Remove the module gitdir cache so auth-removal (git submodule foreach --recursive)
+        # doesn't fail on stale entries (e.g. sea-lab-utils removed from OpenFLASH).
+        run: rm -rf MDOcean/.git/modules 2>/dev/null || true
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
         uses: actions/checkout@v6

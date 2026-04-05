@@ -21,12 +21,14 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
-      - name: Deinit stale submodules
+      - name: Clear stale submodule caches
         run: |
+          # actions/checkout preserves .git/ across runs on self-hosted runners.
+          # Remove the entire modules gitdir cache so that the auth-removal step
+          # (git submodule foreach --recursive) doesn't trip over stale entries
+          # (e.g. sea-lab-utils that was removed from OpenFLASH's .gitmodules).
           git submodule deinit --all --force 2>/dev/null || true
-          # Remove stale nested-submodule gitdir caches (e.g. sea-lab-utils inside OpenFLASH)
-          # so that actions/checkout's recursive auth-removal step doesn't fail on them
-          rm -rf .git/modules/mdocean/simulation/modules/OpenFLASH/modules 2>/dev/null || true
+          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
