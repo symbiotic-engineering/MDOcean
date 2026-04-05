@@ -11,7 +11,8 @@ function [mag_U,phase_U,...
                                         X_max,control_type,multibody,merge_bodies,...
                                         X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
                                         max_drag_iters_fixed_point,max_drag_iters_solver,...
-                                        drag_convergence_plot_on,drag_fcn,D_f,D_f_in,D_d)
+                                        drag_convergence_plot_on,drag_fcn,...
+                                        D_f,D_f_in,D_d,T_f_slam,T_s_slam)
 
     % initial guess: 2m float amplitude, 0.5m spar amplitude, unsaturated
     X_f_guess = 2 * ones(size(w));
@@ -31,7 +32,8 @@ function [mag_U,phase_U,...
                     drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
                     X_max,control_type,multibody,merge_bodies,...
                     X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
-                    drag_convergence_plot_on,drag_fcn,D_f,D_f_in,D_d};
+                    drag_convergence_plot_on,drag_fcn,...
+                    D_f,D_f_in,D_d,T_f_slam,T_s_slam};
 
     % first do fixed point iteration
     if max_drag_iters_fixed_point > 0
@@ -95,7 +97,8 @@ function [mag_U,phase_U,...
                                                 X_max,control_type,multibody,merge_bodies,...
                                                 X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
                                                 drag_convergence_plot_on,...
-                                                drag_fcn,D_f,D_f_in,D_d,max_drag_iters)
+                                                drag_fcn,D_f,D_f_in,D_d,...
+                                                T_f_slam,T_s_slam,max_drag_iters)
 
     % anonymous function to take collapsed row vector and turn into the nth sea state matrix
     sz = size(w);
@@ -129,7 +132,7 @@ function [mag_U,phase_U,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
                                     drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
                                     X_max,control_type,multibody,merge_bodies,...
-                                    drag_fcn, D_f, D_f_in, D_d);
+                                    drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam);
     
     sparsity = repmat(eye(N_ss_nz),6);
     opts = optimoptions('fsolve','JacobPattern',sparsity,...
@@ -169,7 +172,7 @@ function [mag_U,phase_U,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                     control_type,multibody,merge_bodies,F_max,X_max,...
                                     ctrl_mult_solved,phase_ctrl_mult_solved,...
-                                    drag_fcn, D_f, D_f_in, D_d);
+                                    drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam);
 
 end
 function out_flat = fun_outer(x,fun_inner,flatten)
@@ -195,7 +198,8 @@ function [mag_U,phase_U,...
                                                 X_max,control_type,multibody,merge_bodies,...
                                                 X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
                                                 drag_convergence_plot_on,drag_fcn,...
-                                                D_f, D_f_in, D_d, max_drag_iters)
+                                                D_f, D_f_in, D_d, T_f_slam, ...
+                                                T_s_slam, max_drag_iters)
 
     converged = false;
     iters = 0;
@@ -229,7 +233,8 @@ function [mag_U,phase_U,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
                                                 drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
                                                 X_max,control_type,multibody,merge_bodies,...
-                                                drag_fcn, D_f, D_f_in, D_d);
+                                                drag_fcn, D_f, D_f_in, D_d, ...
+                                                T_f_slam, T_s_slam);
 
         X_err       = max( abs([X_f_err,X_s_err]),             [], 'all');
         phase_X_err = max( abs([phase_X_f_err,phase_X_s_err]), [], 'all');
@@ -287,7 +292,8 @@ function [X_f_err,X_s_err,...
                                                 H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                                 F_max,drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
-                                                X_max,control_type,multibody,merge_bodies,drag_fcn,D_f,D_f_in,D_d)
+                                                X_max,control_type,multibody,merge_bodies,drag_fcn,...
+                                                D_f,D_f_in,D_d, T_f_slam, T_s_slam)
     [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
@@ -302,7 +308,7 @@ function [X_f_err,X_s_err,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                     control_type,multibody,merge_bodies,F_max,X_max,...
                                     ctrl_mult_guess,phase_ctrl_mult_guess,...
-                                    drag_fcn, D_f, D_f_in, D_d); % closed loop dynamics
+                                    drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam); % closed loop dynamics
     % error
     X_f_err = X_f_guess - mag_X_f;
     X_s_err = X_s_guess - mag_X_s;
@@ -337,7 +343,7 @@ function [mag_U,phase_U,...
                                         gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                         control_type,multibody,merge_bodies,F_max,X_max,...
                                         ctrl_mult_guess,phase_ctrl_mult_guess,drag_fcn,...
-                                        D_f, D_f_in, D_d)
+                                        D_f, D_f_in, D_d, T_f_slam, T_s_slam)
 
     % linear system
     [control_evaluation_fcn,...
@@ -364,10 +370,14 @@ function [mag_U,phase_U,...
     % unsaturated response (stabilized)
     stabilize_B = true;
     stabilize_K = strcmpi(control_type,'reactive');
-    [mag_U_unsat,~,P_unsat,...
-     ~,~,~,mag_X_f_unsat,~,~,~,...
+    [mag_U_unsat,~,P_unsat,~,...
+     mag_X_u_unsat,~,...
+     mag_X_f_unsat,~,...
+     mag_X_s_unsat,~,...
      B_p_stabilized,K_p_stabilized] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
+    
     Z_p = B_p_stabilized + K_p_stabilized ./ (1i * w);
+    Z_th = 1 ./ (real_G_u + 1i * imag_G_u);
 
     % saturated response and error
     [mag_U,phase_U,...
@@ -380,8 +390,14 @@ function [mag_U,phase_U,...
      amp_lim_err] = response_and_ctrl_err_from_ctrl_guess(ctrl_mult_guess,...
                                                     phase_ctrl_mult_guess,...
                                                     F_max, mag_U_unsat,...
-                                                    X_max, mag_X_f_unsat, Z_p, w,...
-                                                    control_evaluation_fcn);
+                                                    X_max, mag_X_f_unsat, ...
+                                                    mag_X_s_unsat, ...
+                                                    mag_X_u_unsat, ...
+                                                    P_unsat, Z_p, Z_th, w,...
+                                                    control_evaluation_fcn,...
+                                                    H,k_wvn,D_f,D_d,...
+                                                    T_f_slam,T_s_slam,...
+                                                    control_type);
     P_sat_ratio = real_P ./ P_unsat;
     F_drag_f = -B_drag_f .* mag_X_f .* w .* exp(1i * (phase_X_f + pi/2)) + gamma_drag_f .* H/2;
     F_drag_s = -B_drag_s .* mag_X_s .* w .* exp(1i * (phase_X_s + pi/2)) + gamma_drag_s .* H/2;
@@ -398,8 +414,13 @@ function [mag_U,phase_U,real_P,reactive_P,...
                                                     ctrl_mult_guess,...
                                                     phase_ctrl_mult_guess,...
                                                     F_max, mag_U_unsat,...
-                                                    X_max, mag_X_f_unsat, Z_p, w,...
-                                                    control_evaluation_fcn)
+                                                    X_max, mag_X_f_unsat, ...
+                                                    mag_X_s_unsat, ...
+                                                    mag_X_u_unsat, ...
+                                                    real_P_unsat,Z_p, Z_th, w,...
+                                                    control_evaluation_fcn,...
+                                                    H,k,D_f,D_d,T_f,T_s,...
+                                                    control_type)
 
     % saturated control gains from guess
     mult = ctrl_mult_guess .* exp(1i*phase_ctrl_mult_guess);
@@ -407,9 +428,9 @@ function [mag_U,phase_U,real_P,reactive_P,...
     B_p_sat =       real(Z_p_sat);
     K_p_sat = -w .* imag(Z_p_sat);
 
-    % saturated response (unstabilized)
-    stabilize_B = false;
-    stabilize_K = false;
+    % saturated response (with B stabilization, and K stabilization for reactive control)
+    stabilize_B = true;
+    stabilize_K = strcmpi(control_type,'reactive');
     [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
@@ -417,8 +438,14 @@ function [mag_U,phase_U,real_P,reactive_P,...
      mag_X_s,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat,stabilize_B,stabilize_K);
 
     % control error: uses saturated and unsaturated response
-    [force_lim_err,amp_lim_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
-                                                    X_max,mag_X_f_unsat,mag_X_f,B_p_sat);
+    [force_lim_err,...
+     amp_lim_err] = control_errors_from_sat_results(ctrl_mult_guess,phase_ctrl_mult_guess,...
+                                                    F_max,mag_U_unsat,mag_U,...
+                                                    X_max(1), mag_X_f_unsat, mag_X_f, phase_X_f,...
+                                                    X_max(2), mag_X_s_unsat, mag_X_s, phase_X_s,...
+                                                    X_max(3), mag_X_u_unsat, mag_X_u, ...
+                                                    B_p_sat, real_P, real_P_unsat, Z_th, ...
+                                                    H, k, D_f, D_d, T_f, T_s);
 end
 
 function [control_evaluation_fcn,...
@@ -817,66 +844,185 @@ function all_posdef = check_posdef_three_2x2s(a11,a12,a21,a22, b11,b12,b21,b22, 
             c11 > 0 & (c11.*c22 - c21.*c12) > 0;
 end
 
-function [F_err,X_err] = control_errors_from_sat_results(F_max,mag_U_unsat,mag_U,...
-                                                    X_max,mag_X_f_unsat,mag_X_f,B_p_sat)
+function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl_mult_mag,...
+                                                   ctrl_mult_phase, F_max, mag_U_unsat, mag_U,...
+                                                   X_f_upper_limit_static, mag_X_f_unsat, mag_X_f, phase_X_f,...
+                                                   X_s_upper_limit_static, mag_X_s_unsat, mag_X_s, phase_X_s,...
+                                                   X_u_upper_limit_static, mag_X_u_unsat, mag_X_u, ...
+                                                    B_p_sat, P_sat, P_unsat, Z_th, ...
+                                                    H, k, D_f, D_d, T_f, T_s)
+
+    [X_f_lower_limit_dynamic,...
+     X_f_upper_limit_dynamic,...
+     idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
+    X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
+    X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
+
+    [X_s_lower_limit_dynamic,...
+     X_s_upper_limit_dynamic,...
+     idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
+    X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
+    X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
+
+    X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
+    X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
+    X_u_upper_limit = X_u_upper_limit_static;
+    
+    X_f_lower_limit = X_f_lower_limit_dynamic;
+    X_s_lower_limit = X_s_lower_limit_dynamic;
+
     % what the force and amp would be if the force-sat and amp-sat
     % solutions applied - notebook p106 2/2/25
-    force_saturated_U = min(4/pi * F_max, mag_U_unsat);
-    amp_saturated_X   = min(       X_max, mag_X_f_unsat);
+    force_saturated_U = min(4/pi * F_max,      mag_U_unsat);
+
+    amp_up_saturated_X_f = min(X_f_upper_limit, mag_X_f_unsat);
+    amp_dn_saturated_X_f = max(X_f_lower_limit, mag_X_f_unsat);
+
+    amp_up_saturated_X_s = min(X_s_upper_limit, mag_X_s_unsat);
+    amp_dn_saturated_X_s = max(X_s_lower_limit, mag_X_s_unsat);
+
+    amp_saturated_X_u = min(X_u_upper_limit, mag_X_u_unsat);
 
     % indices where sat and unsat solutions violate which constraint
-%         idx_force_viol_sat   = mag_U         > force_saturated_U;
-%         idx_force_viol_unsat = mag_U_unsat   > force_saturated_U;
-%         idx_amp_viol_sat     = mag_X_f       > amp_saturated_X;
-%         idx_amp_viol_unsat   = mag_X_f_unsat > amp_saturated_X;
+    idx_force_viol_unsat    = mag_U_unsat   > force_saturated_U;
+    idx_amp_f_viol_unsat_up = mag_X_f_unsat > amp_up_saturated_X_f;
+    idx_amp_f_viol_unsat_dn = mag_X_f_unsat < amp_dn_saturated_X_f;
+    idx_amp_s_viol_unsat_up = mag_X_s_unsat > amp_up_saturated_X_s;
+    idx_amp_s_viol_unsat_dn = mag_X_s_unsat < amp_dn_saturated_X_s;
+    idx_amp_u_viol_unsat    = mag_X_u_unsat > amp_saturated_X_u;
+    
+    num_constr_viol_unsat = idx_force_viol_unsat    + idx_amp_f_viol_unsat_up ...
+                          + idx_amp_f_viol_unsat_dn + idx_amp_s_viol_unsat_up ...
+                          + idx_amp_s_viol_unsat_dn + idx_amp_u_viol_unsat;
+    all_ok_unsat       = num_constr_viol_unsat==0;
+    only_force_viol_unsat    = idx_force_viol_unsat    & num_constr_viol_unsat==1;
+    only_amp_f_viol_unsat_up = idx_amp_f_viol_unsat_up & num_constr_viol_unsat==1;
+    only_amp_f_viol_unsat_dn = idx_amp_f_viol_unsat_dn & num_constr_viol_unsat==1;
+    only_amp_s_viol_unsat_up = idx_amp_s_viol_unsat_up & num_constr_viol_unsat==1;
+    only_amp_s_viol_unsat_dn = idx_amp_s_viol_unsat_dn & num_constr_viol_unsat==1;
+    only_amp_u_viol_unsat    = idx_amp_u_viol_unsat    & num_constr_viol_unsat==1;
+    mult_const_viol_unsat = num_constr_viol_unsat >= 2;
 
-%         both_ok_unsat       = ~idx_force_viol_unsat & ~idx_amp_viol_unsat;
-%         only_force_ok_unsat = ~idx_force_viol_unsat &  idx_amp_viol_unsat;
-%         only_amp_ok_unsat   =  idx_force_viol_unsat & ~idx_amp_viol_unsat;
-
-    % indices where each solution applies. currently overriding amp
-    % constraint. commented forumlas attempt to incorporate both but
-    % should not actually be based purely on whether the 
-    % saturated and/or unsaturated solution violates, it should also
+    % indices where each solution applies. commented forumlas attempt to 
+    % incorporate both but should not actually be based purely on whether
+    % the saturated and/or unsaturated solution violates, it should also
     % depend on alpha and the limits (see notebook p142-144 9/15/25).
-    if isinf(F_max)
-        idx_force_sat_applies = false(size(mag_X_f));
-    else
-        idx_force_sat_applies = true(size(mag_X_f));
-    end
-    idx_amp_sat_applies   = false(size(mag_X_f));
+    idx_force_sat_applies    = all_ok_unsat | only_force_viol_unsat;
+    idx_amp_f_sat_applies_up = all_ok_unsat | only_amp_f_viol_unsat_up;
+    idx_amp_f_sat_applies_dn = all_ok_unsat | only_amp_f_viol_unsat_dn;
+    idx_amp_s_sat_applies_up = all_ok_unsat | only_amp_s_viol_unsat_up;
+    idx_amp_s_sat_applies_dn = all_ok_unsat | only_amp_s_viol_unsat_dn;
+    idx_amp_u_sat_applies    = all_ok_unsat | only_amp_u_viol_unsat;
+
 %         idx_force_sat_applies = both_ok_unsat | idx_force_viol_sat;   % | (idx_amp_viol_sat & idx_force_viol_sat);
 %         idx_amp_sat_applies   = both_ok_unsat | only_force_ok_unsat; % | (idx_amp_viol_sat & idx_force_viol_sat);
 
-    F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
-    X_err_from_amp_sat   = mag_X_f ./ amp_saturated_X   - 1;
+    if isinf(F_max)
+        F_err_from_force_sat = zeros(size(mag_X_f));
+    else
+        F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
+        F_err_from_force_sat(force_saturated_U == 0) = mag_U(force_saturated_U == 0) / 1e6;
+        F_err_from_force_sat(F_err_from_force_sat < -1) = -.99;
+    end
+    X_err_from_amp_f_sat_up = mag_X_f ./ amp_up_saturated_X_f - 1;
+    X_err_from_amp_f_sat_up(amp_up_saturated_X_f == 0) = mag_X_f(amp_up_saturated_X_f == 0);
+    X_err_from_amp_f_sat_up(X_err_from_amp_f_sat_up < -1) = -.99;
 
-    F_err = Inf(size(F_err_from_force_sat));
-    X_err = Inf(size(X_err_from_amp_sat));
+    X_err_from_amp_f_sat_dn = amp_dn_saturated_X_f ./ mag_X_f  - 1;
+    X_err_from_amp_f_sat_dn(mag_X_f == 0) = -amp_dn_saturated_X_f(mag_X_f == 0);
+    X_err_from_amp_f_sat_dn(X_err_from_amp_f_sat_dn < -1) = -.99;
 
-    % at sea states where the force-saturated solution applies, 
-    % set F_err as deviation from that solution. Otherwise, set F_err=0
-    % to allow any force to occur.
-    F_err(idx_force_sat_applies) = F_err_from_force_sat(idx_force_sat_applies);
-    F_err(~idx_force_sat_applies) = 0;
+    X_err_from_amp_s_sat_up = mag_X_s ./ amp_up_saturated_X_s - 1;
+    X_err_from_amp_s_sat_up(amp_up_saturated_X_s == 0) = mag_X_s(amp_up_saturated_X_s == 0);
+    X_err_from_amp_s_sat_up(X_err_from_amp_s_sat_up < -1) = -.99;
 
-    % at sea states where the amplitude-saturated solution applies, 
-    % set X_err as deviation from that solution. Otherwise, set X_err = 0
-    % to allow any amplitude to occur.
-    X_err(idx_amp_sat_applies) = X_err_from_amp_sat(idx_amp_sat_applies);
-    X_err(~idx_amp_sat_applies) = 0;
+    X_err_from_amp_s_sat_dn = amp_dn_saturated_X_s ./ mag_X_s  - 1;
+    X_err_from_amp_s_sat_dn(mag_X_s == 0) = -amp_dn_saturated_X_s(mag_X_s == 0);
+    X_err_from_amp_s_sat_dn(X_err_from_amp_s_sat_dn < -1) = -.99;
+
+    X_err_from_amp_u_sat = mag_X_u ./ amp_saturated_X_u - 1;
+    X_err_from_amp_u_sat(amp_saturated_X_u == 0) = mag_X_u(amp_saturated_X_u == 0);
+    X_err_from_amp_u_sat(X_err_from_amp_u_sat < -1) = -.99;
+
+    constr_viol_err = Inf(size(mag_X_f));
+    optimality_err  = Inf(size(mag_X_f));
+
+    % at sea states where one of the saturated solutions necessarily applies, 
+    % set constraint violation error as deviation from that solution,
+    % and optimality error as deviation from the optimal ctrl_mult_phase. 
+    constr_viol_err(idx_force_sat_applies)    = F_err_from_force_sat(idx_force_sat_applies);
+    constr_viol_err(idx_amp_f_sat_applies_up) = X_err_from_amp_f_sat_up(idx_amp_f_sat_applies_up);
+    constr_viol_err(idx_amp_f_sat_applies_dn) = X_err_from_amp_f_sat_dn(idx_amp_f_sat_applies_dn);
+    constr_viol_err(idx_amp_s_sat_applies_up) = X_err_from_amp_s_sat_up(idx_amp_s_sat_applies_up);
+    constr_viol_err(idx_amp_s_sat_applies_dn) = X_err_from_amp_s_sat_dn(idx_amp_s_sat_applies_dn);
+    constr_viol_err(idx_amp_u_sat_applies)    = X_err_from_amp_u_sat(idx_amp_u_sat_applies);
+    idx_soln_applies = idx_force_sat_applies    | idx_amp_f_sat_applies_up |...
+                       idx_amp_f_sat_applies_dn | idx_amp_s_sat_applies_up |...
+                       idx_amp_s_sat_applies_dn | idx_amp_u_sat_applies;
+    % eqns below from doi:10.1016/j.ifacol.2024.10.093
+    alpha = imag(Z_th) ./ real(Z_th); % eqn 8
+    epsilon = zeros(size(mag_X_f)); 
+    epsilon(idx_force_sat_applies) = 1; % effort limit
+    epsilon(idx_soln_applies & ~idx_force_sat_applies) = -1; % flow limit
+    sigma = sqrt( (alpha.^2 .* ctrl_mult_mag.^2 + 1).^2 + alpha.^2 .* (ctrl_mult_mag.^2 + 1).^2);
+    acos_argument = -2 * alpha .* ctrl_mult_mag ./ sigma;
+    acos_argument = max(-1, min(1, acos_argument));
+    atan_denominator = sigma + epsilon .* alpha .* (1+ctrl_mult_mag).^2;
+    small_denominator = abs(atan_denominator) < eps;
+    atan_denominator(small_denominator) = eps .* sign(atan_denominator(small_denominator));
+    atan_denominator(small_denominator & atan_denominator == 0) = eps;
+    atan_argument = (alpha.^2 .*  ctrl_mult_mag.^2 + 1) ./ atan_denominator;
+    ctrl_mult_phase_desired = 2 * atan(atan_argument) + epsilon .* acos(acos_argument); % eqn 4
+    optimality_err(idx_soln_applies) = ctrl_mult_phase(idx_soln_applies) - ctrl_mult_phase_desired(idx_soln_applies);
+
+    % at sea states where none of the solutions necessarily apply (the true 
+    % solution could be any combo of one or two of the saturated solutions but unclear which 1-2),
+    % set one error as the avg constraint violation (to penalize exceeding the constraint
+    % without penalizing going under the constraint, so does not maximize power)
+    % and the other error as the deviation from the max-power point when no
+    % constraints are active or zero when a constraint is active (so that
+    % when in the feasible region, it walks toward the max-power point
+    % until it hits a constraint). To prevent it from starting infeasible
+    % and terminating at the nearest constraint without ever going to the 
+    % interior power-maximizing part, set optimality error=10 when any constraint is
+    % violated. This will make it take larger steps when approaching from 
+    % the outside so hopefully it overshoots and re-approaches from the inside.
+
+    constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
+                        X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
+                        X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
+    constr_viol_err(mult_const_voil_unsat) = constr_violation(mult_const_voil_unsat);
+
+    P_unsat_safe = max(P_unsat, eps);
+    power_lost = (P_unsat - P_sat) ./ P_unsat_safe;
+
+    force_const_active = ismembertol(mag_U,   4/pi * F_max);
+    min_f_const_active = ismembertol(mag_X_f, X_f_lower_limit);
+    max_f_const_active = ismembertol(mag_X_f, X_f_upper_limit);
+    min_s_const_active = ismembertol(mag_X_s, X_s_lower_limit);
+    max_s_const_active = ismembertol(mag_X_s, X_s_upper_limit);
+    max_u_const_active = ismembertol(mag_X_u, X_u_upper_limit);
+
+    any_constr_active = force_const_active | min_f_const_active | max_f_const_active ...
+                      | min_s_const_active | max_s_const_active | max_u_const_active;
+    any_constr_violated = constr_violation > 0 & ~any_constr_active;
+    all_constr_inactive = ~any_constr_active & ~any_constr_violated;
+    
+    optimality_err(mult_const_voil_unsat & any_constr_active) = 0;
+    optimality_err(mult_const_voil_unsat & any_constr_violated) = 10;
+    optimality_err(mult_const_voil_unsat & all_constr_inactive) = ...
+        power_lost(mult_const_voil_unsat & all_constr_inactive);
 
     % prevent 0/0=NaN when limit of zero is set
     if F_max==0
-        F_err(mag_U==0) = 0;
-        F_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
+        constr_viol_err(mag_U==0) = 0;
+        constr_viol_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
     else
         % add penalty for B_p<0 (negative power)
         tol = 1;
         B_p_violation = max(-B_p_sat+tol,0);
-        F_err = F_err + B_p_violation;
+        constr_viol_err = constr_viol_err + B_p_violation;
     end
-    
 end
 
 function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)

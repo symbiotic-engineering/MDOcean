@@ -144,8 +144,23 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
                                             in.C_d_float, in.C_d_spar, ...
                                             in.rho_w, in.g, ...
                                             in.use_MEEM, in.harmonics, in.hydro);
+    
+    [X_u_upper_limit__float_above_spar, ...
+     X_u_upper_limit__float_below_spar, ...
+     X_u_upper_limit__tubes_hit_spar,...
+     X_f_upper_limit__linear, ...
+     X_s_upper_limit__linear]           = X_limits_static(in);
+    
+    X_u_upper_limit_static = min([X_u_upper_limit__float_above_spar,...
+                                  X_u_upper_limit__float_below_spar,...
+                                  X_u_upper_limit__tubes_hit_spar,...
+                                  X_f_upper_limit__linear + X_s_upper_limit__linear]);
+    X_f_upper_limit_static = X_f_upper_limit__linear;
+    X_s_upper_limit_static = X_s_upper_limit__linear;
 
-    X_u_max = 1e6;%min(Hs / (2*sqrt(2)), in.T_f);
+    X_upper_limits_static = [X_f_upper_limit_static, ...
+                             X_s_upper_limit_static, ...
+                             X_u_upper_limit_static];
 
     % get response: includes drag and force saturation
     [mag_U,phase_U,...
@@ -158,12 +173,12 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
      phase_F_drag_f,phase_F_drag_s] = get_response_drag(H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                             gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
                                             drag_const_f,drag_const_s,mag_v0_f,mag_v0_s, ...
-                                            X_u_max,in.control_type,...
+                                            X_upper_limits_static,in.control_type,...
                                             in.use_multibody,merge_bodies,...
                                             in.X_tol,in.phase_X_tol,in.F_lim_tol,in.X_lim_tol,...
                                             in.max_drag_iters_fxp,in.max_drag_iters_slv,...
                                             drag_convergence_plot_on,in.drag_fcn,...
-                                            in.D_f, in.D_f_in, in.D_d);
+                                            in.D_f, in.D_f_in, in.D_d, T_f_slam, in.T_s);
 
 % FIXME: check stability of closed loop multibody system
     
@@ -227,66 +242,61 @@ function [X_constraints,wave_amp] = amplitude_constraints(mag_X_u_const, mag_X_f
                                                 phase_X_s, in, Hs, T,...
                                                 k_wvn, T_f_slam, plot_slamming)
 
+    [X_u_limit_up, X_u_limit_down, X_u_limit_clear,...
+     X_f_limit_linear, X_s_limit_linear]           = X_limits_static(in);
+
     X_u_max = max(mag_X_u_const,[],'all');
     X_f_max = max(mag_X_f_const,[],'all');
     X_s_max = max(mag_X_s_const,[],'all');
 
-    % extra height on spar after accommodating relative displacement
-    h_s_extra_up = (in.h_s - in.T_s - (in.h_f - in.T_f_2) - X_u_max) / in.h_s;
-    h_s_extra_down = (in.T_s - in.T_f_2 - in.h_d - X_u_max) / in.h_s;
-
-    % sufficient length of float support tube
-    h_fs_extra = in.h_fs_clear / X_u_max - 1;
-
-    % prevent violation of linear wave theory - notebook p153 9/20/25
-    X_max_linear_f = 1/10 * (in.h - in.T_f_2);
-    X_max_linear_s = 1/10 * (in.h - in.T_s);
-    
-    X_below_linear_f = 1 - X_f_max / X_max_linear_f;
-    X_below_linear_s = 1 - X_s_max / X_max_linear_s;
+    % relative violations of static limits
+    h_s_extra_up = (X_u_limit_up - X_u_max) / in.h_s;
+    h_s_extra_down = (X_u_limit_down - X_u_max) / in.h_s;
+    h_fs_extra = X_u_limit_clear / X_u_max - 1;
+    X_below_linear_f = 1 - X_f_max / X_f_limit_linear;
+    X_below_linear_s = 1 - X_s_max / X_s_limit_linear;
 
     % prevent bottom rising out of the water and top going into water (slamming/submersion)
     wave_amp = Hs/(2*sqrt(2));
-    [X_below_wave_f,D_f_margin] = slamming(wave_amp, k_wvn, in.D_f, phase_X_f, mag_X_f_const, T_f_slam, plot_slamming, T, Hs);
-    [X_below_wave_s,D_s_margin] = slamming(wave_amp, k_wvn, in.D_d, phase_X_s, mag_X_s_const, in.T_s,   plot_slamming, T, Hs);
+    [X_below_wave_f,D_f_margin] = slamming_margin(wave_amp, k_wvn, in.D_f, phase_X_f, mag_X_f_const, T_f_slam, plot_slamming, T, Hs);
+    [X_below_wave_s,D_s_margin] = slamming_margin(wave_amp, k_wvn, in.D_d, phase_X_s, mag_X_s_const, in.T_s,   plot_slamming, T, Hs);
 
     X_below_wave = min(X_below_wave_f,X_below_wave_s); % constraint aggregation
     X_below_wave(~isfinite(X_below_wave)) = 1; % constraint always satisfied when JPD=0
 
     % all amplitude constraints together
     X_constraints = [h_s_extra_up, h_s_extra_down, h_fs_extra, ...
-        X_below_linear_f, X_below_linear_s, D_f_margin, D_s_margin, X_below_wave(:).'];
+                    X_below_linear_f, X_below_linear_s, ...
+                    D_f_margin, D_s_margin, X_below_wave(:).'];
 end
 
-function [X_below_wave,diameter_margin] = slamming(A, k, D, phase_X, mag_X, delta_z, plot_slamming, T, Hs)
-    idx_large_wave = A > delta_z;
+function [X_u_limit_up, X_u_limit_down, X_u_limit_clear,...
+            X_f_limit_linear, X_s_limit_linear]          = X_limits_static(in)
 
-    theta_small_wave = pi + max(0, -k * D / 2 + abs(pi - phase_X));
-    theta_large_wave = phase_X + k * D / 2 .* sign(pi - phase_X);
-    theta = theta_small_wave;
-    theta(idx_large_wave) = theta_large_wave(idx_large_wave);
+    % sufficient length of float support tube
+    X_u_limit_clear = in.h_fs_clear;
 
-    sqrt_term = sqrt( delta_z^2 - (A .* sin(theta)).^2 );
-    X_slam_max =  sqrt_term + A .* cos(theta);
-    X_slam_min = -sqrt_term + A .* cos(theta);
+    % extra height on spar after accommodating relative displacement
+    X_u_limit_up = in.h_s - in.T_s - (in.h_f - in.T_f_2);
+    X_u_limit_down = in.T_s - in.T_f_2 - in.h_d;
+
+    % prevent violation of linear wave theory - notebook p153 9/20/25
+    X_f_limit_linear = 1/10 * (in.h - in.T_f_2);
+    X_s_limit_linear = 1/10 * (in.h - in.T_s);
+end
+
+function [X_below_wave,diameter_margin] = slamming_margin(A, k, D, phase_X, mag_X, delta_z, plot_slamming, T, Hs)
+    [X_slam_min, X_slam_max,...
+     idx_imag, diameter_margin] = get_slamming_min_max(A, k, D, phase_X, delta_z);
 
     X_below_wave_max = X_slam_max ./ mag_X - 1;
     X_below_wave_min = 1 - X_slam_min ./ mag_X;
     X_below_wave = min(X_below_wave_max, X_below_wave_min);
 
-    idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
     X_below_wave( idx_imag ) = -abs(imag(X_below_wave(idx_imag))); % set the amount of infeasibility to be the amount of imaginary content
     X_slam_min( idx_imag ) = NaN;
     X_slam_max( idx_imag ) = NaN;
-
-    if any(idx_large_wave(:))
-        k_max_large_wave = max(k(idx_large_wave),[],'all');
-        A_max_large_wave = max(A(idx_large_wave),[],'all');
-        diameter_margin = asin(delta_z/A_max_large_wave) - k_max_large_wave * D/2;
-    else
-        diameter_margin = 1; % always ok if no large waves
-    end
-
+    
     if plot_slamming
         make_slamming_plot(T,Hs,phase_X,theta,X_slam_max,X_slam_min,mag_X);
     end
