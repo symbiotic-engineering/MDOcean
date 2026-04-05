@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+### Changed
+- CI: bump `astral-sh/setup-uv` from v5 to v7
+
 ## [v1.1.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.12) - 2026-4-5
 ### Fixed
 - Model: wave velocity depth evaluated at full draft `T` instead of half-draft `T/2` in `get_dynamic_coeffs.m`
