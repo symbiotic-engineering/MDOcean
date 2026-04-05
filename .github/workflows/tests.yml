@@ -42,7 +42,7 @@ jobs:
           submodules: false
 
       - name: Checkout WEC-Sim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         if: always()
         with:
           repository: WEC-Sim/WEC-Sim
@@ -56,7 +56,7 @@ jobs:
           args: "-i ./MDOcean/CITATION.cff -f zenodo --validate --show-trace"
 
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
         if: always()
         with:
             products: >
@@ -74,13 +74,13 @@ jobs:
         run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
 
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         if: always()
         with:
           command: cd("MDOcean"), addpath("tests"), run_tests
 
       - name: Publish code coverage to codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: always()
         with:
           fail_ci_if_error: true
@@ -96,7 +96,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to GitHub UI
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: 'MDOcean/test-results/**/junit.xml'
@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload test report PDF
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-report
           path: |
@@ -119,13 +119,14 @@ jobs:
 
       - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
         if: always()
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v20
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
           path: MDOcean/test-results-baseline
           workflow_conclusion: completed
           check_artifacts: true
+          allow_forks: true
 
       - name: Compare test results to base branch
         if: always()
@@ -137,7 +138,7 @@ jobs:
 
       - name: Publish changed tests to GitHub UI
         if: always()
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         with:
           report_paths: 'MDOcean/test-results-baseline/delta-junit.xml'
           check_name: 'Changed Tests'
