@@ -23,7 +23,7 @@ Marked points include the keel $K$, center of buoyancy $B$, center of gravity $G
 \end{figure}
 Additional dimensions representing support sizes and thicknesses will be described in the structures section \ref{sec:structures}. 
 % add still water line label in figure
-Stability requires the metacenter $M$ to be above the center of gravity G.
+Stability requires the metacenter $M$ to be above the center of gravity $G$.
 This distance $GM$ can be calculated \cite{newman}:
 \begin{equation}\label{eq:GM}
     GM = KB + BM - KG
@@ -68,7 +68,7 @@ where $\vec{\hat{\xi}}$ represents the body displacements, and hydrodynamic coef
 The origin is chosen here as the center of the float at the still waterline.
 The full equation of motion incorporating the effect of additional forces will be given in section~\ref{sec:eom}.
 
-For a two body point absorber oscillating only in heave under normal operational conditions ($op$), the hydrodynamic matrices are 2x2, representing the float $f$, spar $s$, and coupling between the two $c$:
+For a two body point absorber oscillating only in heave under normal operational conditions ($op$), the hydrodynamic matrices are $2\times 2$, representing the float $f$, spar $s$, and coupling between the two $c$:
 \begin{equation}\label{eq:op-hydro-coeffs}
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
@@ -195,7 +195,7 @@ This positive-definiteness may be violated for certain combinations of coefficie
 Even when other forces such as body inertia, drag, friction, and control stabilize the system, violation of the conditions of \cref{eq:open-loop-stabilty} can artificially inflate power production.
 These conditions must be checked for each sea state and the coefficients adjusted if needed.
 MDOcean chooses to decrease the magnitude of the coupling coefficients $|A_c|$ and $|B_c|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
-This intends to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
+This is intended to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
 
 %  \subsubsection{Spar Dynamics}
 % The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \cite{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
@@ -256,7 +256,7 @@ Otherwise, a variety of approaches are possible to address the violated constrai
 (1) Nonlinear optimal (or near-optimal) controller, linearized via describing functions& High & High \\
 (2) Linear optimal controller& High & Medium \\
 (3) Saturate or zero the
-times with constraint violations, neglecting effect on response& Medium & Medium-low\\
+times with constraint violations, neglecting the effect on the response& Medium & Medium-low\\
 (4) Saturate or zero entire sea state& Low & Low \\
 (5) Mark design as infeasible& N/A& Lowest \\
 
@@ -284,8 +284,8 @@ This simple approach does not require any derivations to implement.
 It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
 It is utilized here for the power limit.
 
-As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which \cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
-These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization though either the objective or constraints.
+As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which Reference~\cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
+These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization through either the objective or constraints.
 The latter approach (5) is actually the only option for slamming amplitude limits in the storm design load case.
 This is because the device is already in survival mode (preventing method 4), is not producing power (preventing methods 3 and 4), and is not applying a control input (preventing methods 1 and 2).
 Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
@@ -411,16 +411,16 @@ The circuit showcasing the intrinsic dynamics with two hydrodynamic degrees of f
 \label{fig:multiport-circuit-intrinsic}
 \end{figure}
 Excitation forces are represented as dependent voltage sources (diamonds) driven by a single wave elevation source (circle), and the intrinsic and powertrain dynamics are each represented as a two-port impedance matrix.
-The dependent sources and intrinsic impedance matrix are inherently linked through Haskind relation, which relates excitation coefficient magnitudes $|\gamma_i|$ with diagonal elements of the radiation damping $B_{h,ii}$.
+The dependent sources and intrinsic impedance matrix are inherently linked through the Haskind relation, which relates excitation coefficient magnitudes $|\gamma_i|$ to diagonal elements of the radiation damping $B_{h,ii}$.
 This bounds the maximum absorbed power for any geometry.
 
 \subsubsection{PTO Model}\label{sec:pto-dynamics}
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in equation~\eqref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{penalba_review_2016} reviews WEC PTO models and Reference~\cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
 Reference \cite{coe_co-design_2024} presents a PTO model in cascade matrix form for a single degree of freedom system. 
-This section will provide a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
+This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 \paragraph{PTO Kinematics and Underactuation}
 The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
@@ -483,7 +483,7 @@ Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at t
     \vec{Z}_{i,th} &= (-\mathbf{T}_{kin}\mathbf{Z}_{i}^{-1}\mathbf{T}_{kin}^T)^{-1} = -\frac{\det(\mathbf{Z}_{i})}{\Sigma \mathbf{Z}_{i}} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
 \end{aligned}
 \end{equation}
-where the vector expressions for the general case are shown first, followed by the scalar for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
+where the vector expressions for the general case are shown first, followed by the scalar result for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
 
 Although as previously mentioned a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
 Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero, so there is no way to express $\hat{\dot{\xi}}$ as a weighted sum of $\hat{F}_{PTO}$ and $\dot{\hat{X}}_{PTO}$.
@@ -550,7 +550,7 @@ The former is more convenient for hardware implementation, because modern drives
 %Here we formulate both as linear impedances with damping and stiffness terms, where 
 The mechanical control impedance $Z_u$ and electrical load impedance $Z_l$ are defined as follows:
 \begin{equation}\label{eq:controller-impedances}
-    Z_l = \frac{V}{I} = B_l + \frac{K_l}{s}
+    Z_l = \frac{V}{I} = B_l + \frac{K_l}{i\omega}
     ,  \qquad
     Z_u = \frac{\tau}{\Omega}% = B_u + \frac{K_u}{s}
 \end{equation}
@@ -654,7 +654,7 @@ The average, peak, and minimum powers over a wave period are then:
 \end{equation}
 
 To capture non-dynamic power losses such as those in an electrical drive, an additional constant efficiency $\eta$ describes the gain between the average generator electrical power and average absorbed electrical power.
-If the generator cascade matrix is not used (i.e. $[a]_{\tau\Omega\leftarrow VI} = \mathbf{I}$), this efficiency can also be used to approximate losses in the generator itself.
+If the generator cascade matrix is not used (i.e. $[\mathbf{a}]_{\tau\Omega\leftarrow VI} = \mathbf{I}$), this efficiency can also be used to approximate losses in the generator itself.
 This will be done in \cref{sec:validation-benchmarking}, setting $\eta=80\%$ to maintain consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation. 
 Note that this is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
 The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
@@ -706,7 +706,7 @@ The power-maximizing PTO damping $B_{l,damp}$ is then:
 \begin{equation}\label{eq:damping-control}
     B_{l,damp} = \sqrt{ (B_{l,reac})^2 + (K_{l,reac}/\omega)^2}
 \end{equation}
-When a port other than the electrical port must avoid reactive power, the constrained solution detailed later this section can be used to enforce $Q=0$ at that port.
+When a port other than the electrical port must avoid reactive power, the constrained solution detailed later in this section can be used to enforce $Q=0$ at that port.
 
 Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $K_l$ is far from zero. $K_{l,reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
 Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
@@ -878,7 +878,7 @@ The hydrodynamics model of \cref{sec:hydro} does not capture all fluid forces on
 More specifically, viscous shear stresses (skin friction),
 higher-order nonlinear potential flow effects, and
 steady and unsteady viscous separation phenomena are all neglected.
-In this section, we model the form drag due to viscous flow separation, including  steady wake losses, turbulence, and cycle-averaged vortex shedding.
+In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
 These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 
 Drag force $\vec{F}_d$ is proportional to the product of the relative velocity of the WEC and incident wave, $\vec{v}_{rel}(y,t)=\vec{\dot{\xi}}(t)-\vec{v}_{wave}(y,t)$, with its absolute value.
@@ -895,7 +895,7 @@ The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ 
     \end{aligned}
 \end{equation}
 where the last line of \cref{eq:drag-pressure} applies the describing function approximation. 
-Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at a depth equal to the draft $\vec{T}$: 
+Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at the body draft, with $\vec{T}=[T_{f,2},T_s]$ collecting the bottom drafts of the float and spar:
 \begin{equation}
 \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
 \end{equation}
@@ -909,7 +909,7 @@ The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}
     \label{fig:drag-df}
 \end{figure}
 
-Strip theory allows integration of the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted area $A_w$.
+Strip theory allows integration of the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted surface.
 For a hollow cylinder of radius $\vec{R}$ and inner radius $\vec{R}_{in}$, this is expressed: 
 % derived p156-159 notebook 3/10/25
 % simplified p169-173 notebook 3/12/25
@@ -929,7 +929,7 @@ Plugging the describing function \cref{eq:drag-pressure} into the drag force int
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on \cite{quartier_influence_2021} and is discussed more in \appendixname~\ref{sec:appendix-drag}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \appendixname~\ref{sec:appendix-drag}.
 The coefficients in \cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
@@ -937,7 +937,7 @@ The coefficients in \cref{eq:drag-damping-excitation} include real diagonal drag
     \vec{\gamma}_{d} &= \frac{8}{3\pi} \frac{1}{2} \rho_w \vec{C}_d \, |\vec{\hat{\xi}}| \frac{gke^{-k\vec{T}}}{\omega} \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) e^{-iky} dy 
 \end{aligned}
 \end{equation}
-where we use radii vectors $\vec{R}=[D_f/2,D_d/2]$ and $\vec{R}_{in}=[D_{f,in},0]$ to represent the float and spar.
+where we use radii vectors $\vec{R}=[D_f/2,D_d/2]$ and $\vec{R}_{in}=[D_{f,in},0]$ to represent the float and spar, where $D_{f,in}$ is the inner diameter of the hollow float.
 $\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velocity:
 \begin{equation}\label{eq:drag-alpha-definitions}
     \vec{\alpha}_v(y) = \frac{\vec{|\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} e^{-2ky} - 2 \vec{r} e^{-ky}  \sin\angle \vec{\hat{\dot{\xi}}}}
@@ -1080,7 +1080,7 @@ The permissible heights for upward and downward motion of the float relative to 
 \end{equation}
 Additionally, a limit of $h_{fs,clear}$ (see definition in \figureautorefname~\ref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
-Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \ref{sec:hydro}.
+Meanwhile, the conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of section~\ref{sec:hydro}.
 This maximum amplitude $\xi_{linear}$ for the float and spar respectively is:
 \begin{equation}
     \xi_{f,linear} = (h-T_{f,2})/10, \qquad \xi_{s,linear}  = (h-T_s)/10
@@ -1088,12 +1088,12 @@ This maximum amplitude $\xi_{linear}$ for the float and spar respectively is:
 which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
 
 In both operational and storm states, the WEC surface should not transiently pierce the wave free surface since this causes extremely high loads.
-This includes slamming, in which the bottom surface of the WEC rises out of the water and hits the free surface as it reenters, and submersion, in which the top of the WEC becoming fully submerged beneath the free surface.
+This includes slamming, in which the bottom surface of the WEC rises out of the water and hits the free surface as it reenters, and submersion, in which the top of the WEC becomes fully submerged beneath the free surface.
 The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and can be expressed in a quadratic form compatible with \cref{eq:opt-problem}: 
 \begin{equation}
     \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
 \end{equation}
-for relevant vertical body dimenson $\Delta z$ and horizontal coordinate $y$, depending on the wave parameters and body diameter and oscillation phase.
+for relevant vertical body dimension $\Delta z$ and horizontal coordinate $y$, depending on the wave parameters and body diameter and oscillation phase.
 For operational waves, $\Delta z$ for float slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
 Likewise for spar slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
 The relevant $\Delta z$ for float and spar submersion in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
