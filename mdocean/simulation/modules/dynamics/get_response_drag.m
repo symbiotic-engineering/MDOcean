@@ -428,7 +428,7 @@ function [mag_U,phase_U,real_P,reactive_P,...
     B_p_sat =       real(Z_p_sat);
     K_p_sat = -w .* imag(Z_p_sat);
 
-    % saturated response (unstabilized)
+    % saturated response (with B stabilization, and K stabilization for reactive control)
     stabilize_B = true;
     stabilize_K = strcmpi(control_type,'reactive');
     [mag_U,phase_U,...
@@ -901,7 +901,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     only_amp_s_viol_unsat_up = idx_amp_s_viol_unsat_up & num_constr_viol_unsat==1;
     only_amp_s_viol_unsat_dn = idx_amp_s_viol_unsat_dn & num_constr_viol_unsat==1;
     only_amp_u_viol_unsat    = idx_amp_u_viol_unsat    & num_constr_viol_unsat==1;
-    mult_const_voil_unsat = num_constr_viol_unsat >= 2;
+    mult_const_viol_unsat = num_constr_viol_unsat >= 2;
 
     % indices where each solution applies. commented forumlas attempt to 
     % incorporate both but should not actually be based purely on whether
@@ -966,7 +966,12 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     epsilon(idx_soln_applies & ~idx_force_sat_applies) = -1; % flow limit
     sigma = sqrt( (alpha.^2 .* ctrl_mult_mag.^2 + 1).^2 + alpha.^2 .* (ctrl_mult_mag.^2 + 1).^2);
     acos_argument = -2 * alpha .* ctrl_mult_mag ./ sigma;
-    atan_argument = (alpha.^2 .*  ctrl_mult_mag.^2 + 1) ./ (sigma + epsilon .* alpha .* (1+ctrl_mult_mag).^2);
+    acos_argument = max(-1, min(1, acos_argument));
+    atan_denominator = sigma + epsilon .* alpha .* (1+ctrl_mult_mag).^2;
+    small_denominator = abs(atan_denominator) < eps;
+    atan_denominator(small_denominator) = eps .* sign(atan_denominator(small_denominator));
+    atan_denominator(small_denominator & atan_denominator == 0) = eps;
+    atan_argument = (alpha.^2 .*  ctrl_mult_mag.^2 + 1) ./ atan_denominator;
     ctrl_mult_phase_desired = 2 * atan(atan_argument) + epsilon .* acos(acos_argument); % eqn 4
     optimality_err(idx_soln_applies) = ctrl_mult_phase(idx_soln_applies) - ctrl_mult_phase_desired(idx_soln_applies);
 
@@ -988,7 +993,8 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
                         X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
     constr_viol_err(mult_const_voil_unsat) = constr_violation(mult_const_voil_unsat);
 
-    power_lost = (P_unsat - P_sat) ./ P_unsat;
+    P_unsat_safe = max(P_unsat, eps);
+    power_lost = (P_unsat - P_sat) ./ P_unsat_safe;
 
     force_const_active = ismembertol(mag_U,   4/pi * F_max);
     min_f_const_active = ismembertol(mag_X_f, X_f_lower_limit);
