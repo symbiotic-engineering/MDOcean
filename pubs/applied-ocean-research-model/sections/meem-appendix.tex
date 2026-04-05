@@ -328,7 +328,7 @@ Other combinations of eigenfunction multiplication or integration besides those 
 \subsection{Block Matrix Structure}
 
 Once orthogonality is applied, the matching equations create a linear system $A\vec{x}=\vec{b}$ where $A$ is a complex sparse $(N+2M+K)$x$(N+2M+K)$ square matrix corresponding to the homogeneous case, $\vec{x}=[\vec{C_{1n}^{i1}}, \vec{C_{1m}^{i2}}, \vec{C_{2m}^{i2}}, \vec{B_{k}^{e}}]$ is the complex eigencoefficient vector, and $\vec{b}$ is the real boundary condition vector corresponding to the particular case.
-We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of MEEM overlooked.
+We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of MEEM overlooks.
 The A-matrix and b-vector block structures are shown in Tables~\ref{tab:MEEM-A-matrix} and \ref{tab:MEEM-b-vector} respectively.
 They are written in compact notation using row vectors of basis functions, so $\vec{R_{1n}^{i1}}=[R_{10}^{i1}, R_{11}^{i1}, ..., R_{1(N-1)}^{i1}]$ and so on.
 Each basis function is evaluated at the radius described to the left of its row in the table. $0_{ij}$ and $1_{ij}$ are the $i$ x $j$ matrices of zeros and ones respectively; diag($\cdot$) constructs a diagonal matrix from a vector; and $\odot$ is the Hadamard (element-wise) product.
@@ -560,7 +560,7 @@ The radial integrals for the c-vector do not require evaluating Bessel functions
 For $N=M=K=10$, the simulation averages \results[MEEMRuntime] on a Windows 10 laptop with a 2.5 GHz Intel i9 processor for a single frequency.
 Figure~\ref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
-Reference \cite{chau_inertia_2012} proposed using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
+Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve drives computation cost.
 On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence).
 Thus, MEEM achieves a 10x time reduction over Capytaine.
