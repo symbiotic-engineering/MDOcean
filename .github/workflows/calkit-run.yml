@@ -21,22 +21,39 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Clear stale submodule caches
+        run: |
+          # On self-hosted runners .git/ persists between runs. Remove the entire
+          # gitdir module cache so the next manual submodule init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
           persist-credentials: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
+        # without recursing into their nested submodules, avoiding the stale
+        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
+        run: git submodule update --init
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
       - name: Install Calkit
         run: uv tool install --upgrade calkit-python
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v3
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
