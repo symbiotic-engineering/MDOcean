@@ -1,6 +1,24 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-5
+### Added
+- Paper: dedicated economics appendix (split from dynamics appendix), including beta table moved from main text
+- Paper: PTO model description mentions linear multiport effort-flow model, Thévenin equivalent circuit, $Z_{s,th}$, $\hat{V}_{s,th}$, $\hat{V}$, $\hat{I}$ notation
+- Paper: sentence describing damping plate structural plots using `\cref`
+- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
+- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
+### Changed
+- Paper: updated AOR figure mapping (54 → 48 figures), restored `RunSingleFigFunc.nominal_power_matrix` entries, fixed duplicate appendix labels
+- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
+- Paper: `\label{eq:thevenin-electrical}` uses ASCII-only key (was `eq:Th\'{e}venin-electrical}`)
+- Plots: removed blank/redundant titles from `power_matrix_compare` contour and tiled-layout plots
+- CI: all three workflow files use `submodules: false` with explicit `git submodule update --init`
+- CI: added `git submodule deinit --all --force` before cache-clearing in `calkit-run.yml`
+### Fixed
+- Validation: cell-type mismatch when concatenating economics error rows into validation table
+- Paper: restored accidentally-deleted `numeric-results.tex`
+
 ## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
 ### Added
 - Pipeline: python script to update calkit.yaml automatically with matlab auto deps
