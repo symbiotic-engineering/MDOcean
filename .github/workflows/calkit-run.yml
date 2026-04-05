@@ -21,13 +21,28 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Clear stale submodule caches
+        run: |
+          # On self-hosted runners .git/ persists between runs. Remove the entire
+          # gitdir module cache so the next manual submodule init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
           persist-credentials: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
+        # without recursing into their nested submodules, avoiding the stale
+        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
+        run: git submodule update --init
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]

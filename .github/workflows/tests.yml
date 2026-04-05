@@ -22,12 +22,21 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Clear stale submodule caches
+        # On self-hosted runners .git/ persists between runs. Remove the entire
+        # gitdir module cache to prevent stale nested-submodule entries (e.g.
+        # sea-lab-utils inside OpenFLASH) from causing actions/checkout's
+        # internal `git submodule foreach --recursive` auth-removal to fail.
+        run: |
+          rm -rf MDOcean/.git/modules 2>/dev/null || true
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout branch
         uses: actions/checkout@v6
         if: always()
         with:
           path: MDOcean
+          # Leave submodules at the default disabled behavior for this checkout.
 
       - name: Checkout WEC-Sim
         uses: actions/checkout@v6
