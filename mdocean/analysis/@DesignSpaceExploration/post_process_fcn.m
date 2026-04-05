@@ -27,6 +27,7 @@ function [fig_array,...
             [fig_array,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,...
                                                         cost,power,failed);
                                                         %pareto_results_struct);
+            fig_array = fig_array(2);                                            
             
             tab_array_display = {results_tab};
             tab_array_latex = {results_tab};
