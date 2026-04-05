@@ -42,9 +42,10 @@ function [fig_array,...
                 field = econ_display_fields{i_econ};
                 if ismember(field, tab_report.Properties.VariableNames)
                     err_vals = tab_report{error_row_name, field};
-                    avg_err_pct = mean(err_vals(:)) * 100;
-                    new_row = {econ_display_names{i_econ}, {'-'}, {'-'}, ...
-                               {sprintf('%.1f\\%%', avg_err_pct)}, {'-'}, {'-'}, {'-'}};
+                    avg_err = mean(err_vals(:)); % raw fraction; table2latex multiplies by 100 for 'error' columns
+                    % Variable column is cell-of-chars (from rows2vars); numeric columns are double.
+                    % Use econ_display_names(i_econ) (cell) for Variable and NaN for unused numeric cols.
+                    new_row = {econ_display_names(i_econ), NaN, NaN, avg_err, NaN, NaN, NaN};
                     tab_validation_latex = [tab_validation_latex; new_row]; %#ok<AGROW>
                 end
             end
