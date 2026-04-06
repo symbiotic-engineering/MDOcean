@@ -326,7 +326,7 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     fig = figure();
     ax  = gca();
 
-    % Set ColorOrder BEFORE plotting so each line gets its assigned RGB colour.
+    % Set ColorOrder BEFORE plotting so each line gets its assigned RGB color.
     ax.ColorOrder = color2;
 
     num_lines = size(y_mat, 2);
@@ -382,7 +382,7 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     set(colorAx, 'Ydir', 'reverse')
     set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
     % Label positions are in the SVG coordinate system (cube vertex locations).
-    % Red vertex is bottom-left, green is bottom-right, blue is top-centre.
+    % Red vertex is bottom-left, green is bottom-right, blue is top-center.
     red_pos   = [-1.65,  .75];
     green_pos = [ 1.18,  .75];
     blue_pos  = [  .17, -1.2];
