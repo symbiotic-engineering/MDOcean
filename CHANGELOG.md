@@ -1,6 +1,59 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-5
+### Added
+- Paper: dedicated economics appendix, including beta table moved from main text
+- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
+- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
+### Changed
+- Paper: moved most of PTO section to appendix
+- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
+- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
+- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
+### Fixed
+- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
+
+## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
+### Added
+- Pipeline: stage that shows figures in jupyter notebook to facilitate code review
+ 
+## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+### Changed
+- CI: bump `astral-sh/setup-uv` from v5 to v7
+
+## [v1.1.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.12) - 2026-4-5
+### Fixed
+- Model: wave velocity depth evaluated at full draft `T` instead of half-draft `T/2` in `get_dynamic_coeffs.m`
+- Paper: drag coefficient formula corrected to use velocity amplitude `|\hat{\dot{\xi}}|` instead of displacement `|\hat{\xi}}|`
+- Paper: spar column ζ formula fraction corrected from `A·σ_Y/F_crit` to `σ_Y/(F_crit/A)`
+- Paper: float waterplane area corrected to annular formula `π/4·(D_f²−D_s²)` instead of solid disk `π/4·D_f²`
+- Paper: structural cost price `p_s` redefined as $/m³ (was $/kg) with table values updated accordingly
+- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
+
+## [v1.1.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.11) - 2026-4-5
+### Changed
+- CI: pin pubs conda environment to specific package versions (python=3.14.3, libxml2=2.15.2, pip=26.0.1)
+- CI: fix Dependabot conda manifest directory to `/pubs/` and add pip updater for `/docs`
+
+## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
+### Added
+- CI: Dependabot configuration for conda, GitHub Actions, and git submodules
+
+## [v1.1.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.9) - 2026-4-4
+### Changed
+- CI: upgrade GitHub Actions to Node.js 24 compatible versions (checkout v6, upload-artifact v6, setup-matlab v3, run-command v3, codecov-action v5, action-junit-report v6, action-download-artifact v20, setup-python v6)
+
+## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
+### Changed
+- Readme: links now go to calkit draft publications rather than old google docs drafts
+
+## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-1
+### Fixed
+- Pipeline: remove extraneous calkit outputs that caused two postpro stages to fail
+- Pipeline: add xmllint to pubs conda env to avoid issue with mermaid reformatting stage
+- CI: avoid unnecessary double dvc pull
+
 ## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
 ### Added
 - Pipeline: python script to update calkit.yaml automatically with matlab auto deps

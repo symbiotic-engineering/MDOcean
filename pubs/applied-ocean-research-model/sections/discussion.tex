@@ -40,7 +40,8 @@ This is because the same force has a lower lever arm to the column and therefore
 \begin{figure}
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/damping_plate_aspect_ratio.pdf}
-    \caption{Effect of damping plate aspect ratio on maximum stress and deflection}
+    \caption{Normalized effect of damping plate aspect ratio on maximum stress and deflection.
+The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     \label{fig:damping-plate-maxs}
 \end{figure}
 
@@ -93,27 +94,38 @@ This section leverages the analytical multidisciplinary nature of the model to d
 \paragraph{Power Matrix Drivers}
 Similar to \figureautorefname~\ref{fig:JPD-multiply} showing the multiplication of the power matrix by the JPD to obtain average power, \figureautorefname~\ref{fig:power-matrix-decomposition} further decomposes the power matrix into component matrices showing the impact of shape, drag, maximum force, and PTO losses, with the following breakdown:
 \begin{equation}
-\mathbf{P} = \mathbf{J}_{wave} ~\mathbf{CW}_{max} ~\mathbf{\eta}_{rad} ~\mathbf{\eta}_{drag} ~\mathbf{\eta}_{force} ~\mathbf{\eta}_{elec}
+\mathbf{P}^{H,T}_{elec} = \mathbf{J}^{H,T}_{wave} ~\mathbf{CW}^{H,T}_{max} ~\mathbf{\eta}^{H,T}_{rad} ~\mathbf{\eta}^{H,T}_{drag} ~\mathbf{\eta}^{H,T}_{limits} ~\mathbf{\eta}^{H,T}_{elec}
 \end{equation}
-The first two matrices in the product are independent of design, with the wave power density matrix $\mathbf{J}_{wave}$ providing the amount of energy flux per unit width of a wave with the given frequency and amplitude, and the maximum capture width matrix $\mathbf{CW}_{max}$ representing the radiation limit determined by the WEC mode of motion (heave in this case; for surge or pitch  the value would be doubled due to the asymmetry of the outgoing wave field).
+The first two matrices in the product are independent of design, with the wave power density matrix $\mathbf{J}^{H,T}_{wave}$ providing the amount of energy flux per unit width of a wave with the given frequency and amplitude, and the maximum capture width matrix $\mathbf{CW}^{H,T}_{max}$ representing the radiation limit determined by the WEC mode of motion (heave in this case; for surge or pitch  the value would be doubled due to the asymmetry of the outgoing wave field).
 \begin{equation}
-\mathbf{J}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2 \qquad
-\mathbf{CW}_{max} = \frac{g T_e^2} {4\pi^2}
+\mathbf{J}^{H,T}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2 \qquad
+\mathbf{CW}^{H,T}_{max} = \frac{g T_e^2} {4\pi^2}
 \end{equation}
-The next two matrices together represent the WEC's capture width in the absence of dynamic constraints as a fraction of the maximum capture width, and their product should never exceed 1.
-To isolate how much of the deviation from the radiation limit is due to the effect of hull geometry on the linear radiation coefficients and how much is from drag, a separate simulation is run with the drag coefficients $C_{d,f}, C_{d,s}$ set to zero to find $\mathbf{P}_{F\dot{X},no drag}$, the mechanical power at the rigid body in the absence of both drag and dynamic constraints.
-Then, $\mathbf{\eta}_{rad}$ and $\mathbf{\eta}_{drag}$ are computed as:
+The product of the next two matrices represents the WEC's ideal capture width in the absence of PTO losses and dynamic constraints as a fraction of the maximum capture width, and this product should never exceed 1.
+To isolate how much of the deviation from the radiation limit is due to the effect of hull geometry on the linear radiation coefficients and how much is from drag, a separate simulation is run with the drag coefficients $C_{d,f}, C_{d,s}$ set to zero to find $\mathbf{P}_{F\dot{X},no drag}$, the mechanical power at the rigid body in the absence of both drag and dynamic constraints and assuming an ideal PTO (lossless and capable of perfect impedance matching).
+Then, $\mathbf{\eta}^{H,T}_{rad}$ and $\mathbf{\eta}^{H,T}_{drag}$ are computed as:
 \begin{equation}
-\mathbf{\eta}_{rad} = \frac{\mathbf{P}_{F\dot{X},no drag}}{\mathbf{J}_{wave} \mathbf{CW}_{max}}, \qquad
-\mathbf{\eta}_{drag} = \frac{\mathbf{P}_{F\dot{X},no limits}}{\mathbf{P}_{F\dot{X},no drag}}
-\end{equation} and $\mathbf{\eta}_{drag}$ represents the effect of drag on the WEC's ability to capture energy.
-It is possible for $\mathbf{\eta}_{drag}$ to be greater than 1 at some frequencies, which does not imply that drag adds energy to the system.
+\mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},no drag}}{\mathbf{J}^{H,T}_{wave} \mathbf{CW}^{H,T}_{max}}, \qquad
+\mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},ideal}}{\mathbf{P}_{F\dot{X},no drag}}
+\end{equation} and $\mathbf{\eta}^{H,T}_{drag}$ represents the effect of drag on the WEC's ability to capture energy.
+It is possible for $\mathbf{\eta}^{H,T}_{drag}$ to be greater than 1 at some frequencies, which does not imply that drag adds energy to the system.
 Rather, it indicates that the drag-free system is so undamped in those sea states that the optimal controller of \cref{eq:matched-load,eq:damping-control} would cause instability, so a sub-optimal controller is used there while the optimal controller is used in the drag case.
-In other words, $\mathbf{\eta}_{drag}>1$ is due not to its numerator being higher than expected, but its denominator being lower than expected to avoid instability.
-In cases where the optimal controller is stable, $\mathbf{\eta}_{drag}<1$ is guaranteed.
+In other words, $\mathbf{\eta}^{H,T}_{drag}>1$ is due not to its numerator being higher than expected, but its denominator being lower than expected to avoid instability.
+In cases where the optimal controller is stable, $\mathbf{\eta}^{H,T}_{drag}<1$ is guaranteed.
+The product of these first four matrices represents the theoretical ideal mechanical power at the WEC:
+\begin{equation}
+    \mathbf{P}^{H,T}_{F\dot{X},ideal} = \mathbf{J}^{H,T}_{wave} ~\mathbf{CW}^{H,T}_{max} ~\mathbf{\eta}^{H,T}_{rad} ~\mathbf{\eta}^{H,T}_{drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\mathbf{Z}^{H,T}_{i,th})}
+\end{equation}
+This quantity is independent of the PTO or control design and represents the maximum mechanical power that could be captured by a WEC with the given hull geometry and drag coefficients under perfect impedance matching.
 
-The next matrix $\mathbf{\eta}_{force}$ represents the effect of the PTO force limit on power due to impedance mismatch: $\mathbf{\eta}_{force} = \mathbf{P}_{F\dot{X}}/\mathbf{P}_{F\dot{X},no limits}$.
-Finally, $\mathbf{\eta}_{elec}$ represents the effect of PTO losses and the power limit on power, $\mathbf{\eta}_{elec} = \eta\mathbf{P}_{IV}/\mathbf{P}_{F\dot{X}}$.
+The next matrix $\mathbf{\eta}^{H,T}_{limits}$ represents the effect of the dynamic constraints on mechanical power due to impedance mismatch, again assuming an ideal PTO:
+\begin{equation}
+    \mathbf{\eta}^{H,T}_{limits} = \frac{\mathbf{P}^{H,T}_{F\dot{X}}}{\mathbf{P}^{H,T}_{F\dot{X},ideal}}
+\end{equation}
+Finally, $\mathbf{\eta}^{H,T}_{elec}$ represents the ratio of electrical power to mechanical power, accounting for PTO losses and dynamics:
+\begin{equation}
+    \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}
+\end{equation}
 
 Altogether, this multiplicative decomposition of the power matrix allows for the isolation of the effect of certain design variables and parameters on power, and therefore intuitive identification of which design variables are most important for improving power.
 \Cref{tab:power-matrix-dependence} maps the dependence explicitly.
@@ -123,26 +135,60 @@ Altogether, this multiplicative decomposition of the power matrix allows for the
 \hline
  & $x_{shape}$ & $C_{d,f}$ & $C_{d,s}$ & $F_{max}$ & $P_{max}$ & $\eta$ \\
 \hline
-$\mathbf{\eta}_{rad}$   & $\checkmark$ &  &  &  &  &  \\
-$\mathbf{\eta}_{drag}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
-$\mathbf{\eta}_{force}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  \\
-$\mathbf{\eta}_{elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+$\mathbf{\eta}^{H,T}_{rad}$   & $\checkmark$ &  &  &  &  &  \\
+$\mathbf{\eta}^{H,T}_{drag}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
+$\mathbf{\eta}^{H,T}_{limits}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  \\
+$\mathbf{\eta}^{H,T}_{elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
 \hline
 \end{tabular}
 \caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
 \end{table}
 
 Importantly, the later matrices in the product depend on the design variables and parameters that affect the earlier matrices.
-This coupling means that the effect of the drag coefficients, for example, on power in a device with PTO limits and dynamics must be understood not only through $\mathbf{\eta}_{drag}$ but also through their effect on $\mathbf{\eta}_{force}$ and $\mathbf{\eta}_{elec}$.
-While it would be possible to formulate variants such as $\mathbf{\eta}_{drag,var} = \mathbf{P}_{IV}/\mathbf{P}_{IV, no drag}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to obtain the overall power matrix, which is a key advantage of the current formulation.
+This coupling means that the effect of the drag coefficients, for example, on power in a device with PTO limits and dynamics must be understood not only through $\mathbf{\eta}^{H,T}_{drag}$ but also through their effect on $\mathbf{\eta}^{H,T}_{limits}$ and $\mathbf{\eta}^{H,T}_{elec}$.
+While it would be possible to formulate variants such as $\mathbf{\eta}^{H,T}_{drag,var} = \mathbf{P}_{IV}/\mathbf{P}_{IV, no drag}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to obtain the overall power matrix, which is a key advantage of the current formulation.
 
+\Cref{fig:power-matrix-decomposition} shows the power matrix decomposition for the nominal RM3 design, with the same JPD as in \figureautorefname~\ref{fig:JPD-multiply}.
+Aligning with reference \cite{zou_practical_2023}, low-period sea states achieve mechanical powers closer to the radiation limit (higher radiation efficiency).
+High-period sea states have lower radiation efficiencies due to the amplitude limit yet still contribute significantly due to their higher energy content.
+Despite the most probable wave period being 6-8 seconds, 10 second waves contribute the most to energy production for this reason, though even longer waves contribute little due to their rarity.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/manual/power_matrix_multiply.pdf}
 \caption{Power matrix decomposition}
 \label{fig:power-matrix-decomposition}
 \end{figure}
+The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
+Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitdues at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
 
+\paragraph{LCOE Drivers}
+To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors from \cref{eq:lcoe}, leaving normalized price constants $p^{'}_{(*)}$.
+The LCOE model then scales as:
+\begin{equation}\label{eq:LCOE-scale}
+  LCOE = \frac{
+    p^{'}_{F} F_{max} + p^{'}_{P}P_{max,elec} + p^{'}_{s} V_{struct} + p^{'}_0
+    }{\overline{P}_{elec}}
+\end{equation}
+
+The numerator of \cref{eq:LCOE-scale} scales linearly with design inputs $F_{max}$ and $P_{max,elec}$, while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
+From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $p_{avg,elec}$ is the weighted sea state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with a quadratic function of the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
+\begin{equation}
+\begin{aligned}
+    p_{avg,elec} = \eta \sum_{i=1}^{N_{sea}} JPD_i \cdot 
+    \frac{|\hat{V}_{s,th,i}|^2}{8\Re(Z_{s,th,i})}~ (1 - |\Gamma_i|^2)
+    s.t.
+    \quad |\hat{F}_{p,i}| \leq F_{max},
+    \quad |\hat{p}_{pk,elec,i}| \leq P_{max,elec},
+    \quad |\hat{\xi}_{f,i}| \leq X_{f,max},
+    \quad |\hat{\xi}_{s,i}| \leq X_{s,max}
+\end{aligned}
+\end{equation}
+Recall from \cref{tab:qp-constraints} that the square of each of the constrained quantities is a quadratic function of the state variables and thus of the reflection coefficient $\Gamma_i$, except for the power constraint where $p_{max} \sim \Gamma^4$.
+The presence of the constraint limits in the numerator of the LCOE implies that whether or not the optimal solution is saturated, at least one dynamic constraint will be active in each sea state at optimality.
+This then, meaning that the reflection coefficient $\Gamma_i$ and therefore the power in each sea state is a function of the design variables $F_{max}$, $P_{pk,elec}$, and the bulk dimensions.
+
+
+\hl{write Fmax and Ppk and Pavg in terms of the control variables, shoing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
