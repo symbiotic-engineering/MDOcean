@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-5
 ### Added
 - Paper: dedicated economics appendix, including beta table moved from main text
 - Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
@@ -13,6 +13,14 @@
 - Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
 ### Fixed
 - CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
+
+## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
+### Added
+- Pipeline: stage that shows figures in jupyter notebook to facilitate code review
+ 
+## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+### Changed
+- CI: bump `astral-sh/setup-uv` from v5 to v7
 
 ## [v1.1.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.12) - 2026-4-5
 ### Fixed
