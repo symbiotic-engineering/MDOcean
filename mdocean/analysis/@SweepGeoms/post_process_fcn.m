@@ -241,7 +241,7 @@ function [fig_array,...
     tab_firstrows     = {};
     tab_colspecs      = {};
 
-    end_result_struct.sweep_geoms_complete = true;
+    end_result_struct.percent_nans = 100 * sum(~isfinite(hydro_ratio_result(:))) / numel(hydro_ratio_result);
 end
 
 % ======================================================================
