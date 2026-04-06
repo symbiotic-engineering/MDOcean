@@ -315,6 +315,7 @@ function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
     set(gca, 'XScale', 'log')
     xlabel('m_0 h')
     ylabel(ylabel_str)
+    improvePlot
 end
 
 function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
@@ -372,13 +373,31 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     title(h_size_leg, size_var_name)
     ah1.Visible = 'off';
 
-    % -- Annotation: explain RGB colour encoding --
-    annotation(fig, 'textbox', [0.28, 0.01, 0.55, 0.06], ...
-               'String', 'Color: R = a_1/a_2,  G = d_1/h,  B = d_2/d_1', ...
-               'EdgeColor', 'none', 'Interpreter', 'tex', 'FontSize', 9, ...
-               'HorizontalAlignment', 'center')
+    % -- Color legend: inset RGB cube showing R=a_1/a_2, G=d_1/h, B=d_2/d_1 --
+    colorAxPos    = [.67 .43];
+    mini_plot_size = [.2 .22];
+    colorAx = axes('Position', [colorAxPos mini_plot_size]);
+    box on
+    plotSVG(loadSVG('RGBCube_a.svg'));
+    set(colorAx, 'Ydir', 'reverse')
+    set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
+    % Label positions are in the SVG coordinate system (cube vertex locations).
+    % Red vertex is bottom-left, green is bottom-right, blue is top-centre.
+    red_pos   = [-1.65,  .75];
+    green_pos = [ 1.18,  .75];
+    blue_pos  = [  .17, -1.2];
+    text(red_pos(1),   red_pos(2),   'a_1/a_2')
+    text(green_pos(1), green_pos(2), 'd_1/h')
+    text(blue_pos(1),  blue_pos(2),  'd_2/d_1')
+    axis image
+    axis off
 
+    improvePlot
+    % improvePlot fills all markers; restore line/legend markers to hollow.
     set([h_data; h_marker], 'MarkerFaceColor', 'none')
+    % improvePlot may override legend locations; restore the intended positions.
+    h_marker_leg.Location = 'northwest';
+    h_size_leg.Location   = 'northeast';
     fig.Position(3:4) = [1000 600];
     xlim(ax, m0h_minmax)
 end
