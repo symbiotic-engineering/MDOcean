@@ -15,6 +15,10 @@ classdef (Abstract) GenericAnalysis
         output_folder
         analysis_outputs
         postpro_outputs
+        extra_analysis_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit analysis stage
+        extra_analysis_outputs = {} % non-code extra outputs beyond intermed.mat for calkit analysis stage
+        extra_postpro_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit postpro stage
+        extra_postpro_outputs = {} % non-code extra outputs for calkit postpro stage
     end
     properties (Dependent)
         class_dependencies
@@ -60,6 +64,7 @@ classdef (Abstract) GenericAnalysis
 
             obj.postpro_outputs  = strcat(obj.output_folder,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
+                          strcat(obj.fig_names,'.fig') ...
                           strcat(obj.tab_names,'.tex') ...
                           'end.mat' ...
                           'end.json']);
@@ -212,54 +217,50 @@ classdef (Abstract) GenericAnalysis
         end
 
         function stages = write_calkit_stage(obj)
-
             analysis_stage = ['analysis-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_analysis();' newline ...
                               '  inputs: ' newline ...
-                              cell2filelist(obj.analysis_dependencies.') newline ...
+                              obj.format_inputs_list(obj.extra_analysis_inputs, obj.analysis_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.analysis_outputs.') ];
+                              obj.format_outputs([obj.analysis_outputs, obj.extra_analysis_outputs]) ];
             postpro_stage = ['postpro-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
                               '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
                               '  inputs: ' newline ...
                               '    - from_stage_outputs: analysis-' class(obj) newline ...
-                              cell2filelist(obj.postpro_dependencies.') newline ...
+                              obj.format_inputs_list(obj.extra_postpro_inputs, obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
-                              cell2filelist(obj.postpro_outputs.') ];
+                              obj.format_outputs([obj.postpro_outputs, obj.extra_postpro_outputs]) ];
             stages = [analysis_stage newline postpro_stage];
-
-            function out = cell2filelist(files)
-                %   Regular files get "    - " prepended
-                %   .tex and .json files get two lines:
-                %       - path: <file>
-                %         storage: git
-
-                % Identify .tex and .json files
-                [~,~,exts] = cellfun(@fileparts, files, 'UniformOutput', false);
-                specialMask = ismember(exts,{'.tex','.json'});
-
-                % Regular files
-                regularLines = strcat("    - ", files(~specialMask));
-
-                % Special files
-                specialFiles = files(specialMask);
-                specialLines = strcat("    - path: ", specialFiles);
-                storageLines = repmat("      storage: git", size(specialLines));
-
-                % Interleave special lines
-                specialLines = reshape([specialLines.'; storageLines.'], [], 1);
-
-                % Combine all lines
-                allLines = [regularLines; specialLines];
-
-                % Output as char array with newlines
-                out = char(join(allLines,newline));
-            end
         end
+
+        function list_str = format_inputs_list(~, extras, deps)
+            %FORMAT_INPUTS_LIST Format inputs as YAML list: extras first, then deps, de-duplicated.
+            combined = [string(extras), string(deps)];
+            combined_unique = unique(combined, 'stable');
+            lines = "    - " + combined_unique;
+            list_str = char(join(lines, newline));
+        end
+
+        function list_str = format_outputs(~, outputs)
+            %FORMAT_OUTPUTS Format a cell array of output paths as YAML list entries.
+            %   .tex and .json outputs include 'storage: git'; others are plain paths.
+            outputs = string(outputs);
+            if isempty(outputs)
+                list_str = '';
+                return;
+            end
+            [~, ~, exts] = fileparts(outputs);
+            is_git = ismember(exts, [".tex", ".json"]);
+            lines = strings(size(outputs));
+            lines(~is_git) = "    - " + outputs(~is_git);
+            lines(is_git) = "    - path: " + outputs(is_git) + newline + "      storage: git";
+            list_str = char(join(lines, newline));
+        end
+
         function figs_out = validate_figs(obj, figs_in)
             %VALIDATE_FIGS Return only valid MATLAB figure handles from input
             % Accepts graphics handles, cell arrays of handles, or empty.

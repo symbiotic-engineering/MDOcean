@@ -21,22 +21,45 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Clear stale submodule caches
+        run: |
+          # On self-hosted runners .git/ persists between runs. Remove the entire
+          # gitdir module cache so the next manual submodule init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
           persist-credentials: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
+        # without recursing into their nested submodules, avoiding the stale
+        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
+        run: git submodule update --init
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
       - name: Install Calkit
         run: uv tool install --upgrade calkit-python
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v3
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install python dependencies
+        run: pip install ruamel.yaml
       # - name: Setup matlab
       #   uses: matlab-actions/setup-matlab@v2
       #   with:
@@ -60,13 +83,23 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - name: Generate calkit_stages.yaml
+        uses: calkit/run-action@v2
+        with:
+          dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
+          run_args: make-calkit-stages
+          save: false
+      - name: Use calkit_stages.yaml to update calkit.yaml
+        run: python mdocean/analysis/update_calkit.py
+
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --ignore-errors --log build-AOR-paper
+          run_args: --keep-going --log build-AOR-paper
+          pull_dvc: false
           save: false
       - name: calkit save
         run: |
@@ -88,7 +121,7 @@ jobs:
           fi
 
           calkit dvc pull
-          calkit save dvc.lock dvc.yaml .calkit/ pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
           PUSH_STATUS=$?
 
           if [ $PUSH_STATUS -ne 0 ]; then
