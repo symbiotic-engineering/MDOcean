@@ -955,7 +955,16 @@ Further derivation, convergence details, and control implications are discussed 
 %\hl{describe}
 
 \subsubsection{Energy Production}
-To find the overall average power production $P_{avg,elec}$ in a location with a given distribution of sea states, $P_{avg,elec}(H,\omega)$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix.
+The analysis thus far has either been sea-state agnostic (\cref{sec:geometry}) or applies separately to each individual sea state (\cref{sec:hydro,sec:dynamics}).
+We now combine the results across sea states to find the long-term energy statistics in a given wave environment.
+While matrices in \cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e. $\vec{\hat{\xi}}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e. $\hat{\xi}_f$) or the sum across all degrees of freedom (i.e. power in systems with multiple actuated degrees of freedom).
+These scalars are assembled into ``matrices'' (i.e. $\mathbf{\hat{\xi}}^{H,T}_f$) indexed by sea state rather than by degree of freedom, indicated by the $H,T$ superscript.
+Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
+To distinguish from the average and maximum signal values over a wave period denoted with $avg$ and $pk$ subscripts in \cref{sec:power-production}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $max$.
+This intentionally matches the $max$ subscript used in \cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
+An exception is the slamming and submergence constraints, which will be discussed separately in \cref{sec:dynamic-limits}.
+
+To find the long-term average power production $\overline{P}_{elec}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{elec}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in Figure \ref{fig:JPD-multiply}.
 The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from reference \cite{janzou_system_2020}.
 
@@ -966,11 +975,9 @@ The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and
 \label{fig:JPD-multiply}
 \end{figure}
 
-%As expected, low-frequency sea states achieve mechanical powers close to the radiation limit (device capture efficiencies near one), and high frequency sea states achieve mechanical powers equal to the amplitude limit.
-
-The annual energy production $AEP$ in kWh/year is the product of the number of devices, the average power per device, an efficiency $\eta_{array}$ representing transmission losses and array downtime, and an appropriate constant to convert from Watts to kWh/year:
+The annual energy production $AEP$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\eta_{array}$ representing transmission losses and array downtime, and an appropriate constant to convert from Watts to kWh/year:
 \begin{equation}
-    AEP = N_{WEC} ~ P_{avg,elec} ~\eta_{array} \frac{8766}{1000}
+    AEP = N_{WEC} ~ \overline{P}_{elec} ~\eta_{array} \frac{8766}{1000}
 \end{equation}
 
 %Finally, the standard deviation $\sigma$ of power across all sea states $P(\omega)$ is computed, and normalized by the average power $\mu$ to get the coefficient of variation (see equation \eqref{cv}).
@@ -1215,7 +1222,7 @@ These limits are also derived in \appendixname~\ref{sec:appendix-structures}.
 %TC:break Economics
 \subsection{Economics}\label{sec:econ}
 The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $AEP$:
-\begin{equation}
+\begin{equation}\label{eq:lcoe}
 	LCOE = \frac{CAPEX\cdot  FCR + OPEX}{AEP}
 \end{equation}
 where the numerator consists of the up-front capital expenditure $CAPEX$, annualized via a fixed charge rate $FCR$, plus an annual operational expenditure $OPEX$.
@@ -1301,32 +1308,3 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
 \end{table}
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
 For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
-
-To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors, leaving normalized price constants $p^{'}_{(*)}$.
-The LCOE model then scales as:
-\begin{equation}\label{eq:LCOE-scale}
-  LCOE = \frac{
-    p^{'}_{F} F_{max} + p^{'}_{P}P_{pk,elec} + p^{'}_{s} V_{struct} + p^{'}_0
-    }{P_{avg,elec}}
-\end{equation}
-
-The numerator of \cref{eq:LCOE-scale} is linear with design inputs $F_{max}$ and $P_{pk,elec}$, and $V_{struct}$ is the product of the structural thicknesses with the areas, which depend quadratically on the bulk dimensions.
-From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $P_{avg,elec}$ is the weighted sea state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
-\begin{equation}
-\begin{aligned}
-    P_{avg,elec} = \eta \sum_{i=1}^{N_{sea}} p_i \cdot 
-    \frac{|\hat{V}_{s,th,i}|^2}{8\Re(Z_{s,th,i})}~ (1 - |\Gamma_i|^2)
-    s.t.
-    \quad |\hat{F}_{p,i}| \leq F_{max},
-    \quad |\hat{P}_{elec,i}| \leq P_{pk,elec},
-    \quad |\hat{\xi}_{f,i}| \leq X_{f,max},
-    \quad |\hat{\xi}_{s,i}| \leq X_{s,max}
-\end{aligned}
-\end{equation}
-
-\hl{write Fmax and Ppk and Pavg in terms of the control variables, shoing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
-
-
-
-
-
