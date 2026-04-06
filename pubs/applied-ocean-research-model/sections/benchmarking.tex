@@ -20,19 +20,14 @@ The error in average power compared to the WEC-Sim power is less than \results[w
 
 Results reveal that the drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
 The extremely low errors in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively) indicate that this is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF. 
-These errors are deemeed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines and the ability to quickly evaluate a large number of design options.
+These errors are deemed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines and the ability to quickly evaluate a large number of design options.
 More details on the WEC-Sim validation are described in \appendixname~\ref{sec:appendix-dynamic-validation}.
 
 \subsection{Static Validation}
 
-Figure \ref{fig:meem-hydro-coeffs} shows the hydrodynamic coefficients as a function of wave frequency $\omega$ for the nominal RM3 geometry. 
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{figs/from-matlab/hydro_coeff_err.pdf}
-\caption{Hydrodynamic coefficients vs. frequency}\label{fig:meem-hydro-coeffs}
-\end{figure}
-The MEEM results for the simplified cylindrical geometry are a close match to WAMIT BEM results for the exact RM3 geometry, except at frequencies below 0.3 rad/s.
+The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \cite{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
 This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
+Since that paper \cite{mccabe_open-source_2024}, excitation phase has been added to the MEEM implementation and also matches WAMIT results well.
 For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
 
 
@@ -80,13 +75,8 @@ Improving the force model to align with the wave tank data is an area of future 
 
 %\hl{Explain sources of error and rough uncertainty and the implications of what we can trust}
 
-The scaling behavior of economic outputs against the number of WECs is validated in \figurename~\ref{fig:econ-nwec-validate}.
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/cost_vs_N_WEC.pdf}
-    \caption{Validation for cost scaling with number of WECs}
-    \label{fig:econ-nwec-validate}
-\end{figure}
+The scaling behavior of economic outputs against the number of WECs is validated by sweeping $N_{WEC}$ from 1 to 100 and comparing the simulated CAPEX, OPEX, and LCOE against the values in the reference model report \cite{RM3}.
+The average percent errors for these quantities are shown in Table~\ref{tab:validation}, and additional detail is provided in \figureautorefname~\ref{fig:econ-nwec-validate} in the appendix.
 
 \subsection{Runtime Benchmarking}
 \label{sec:sim-runtime}

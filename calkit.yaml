@@ -17,6 +17,9 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+dependencies:
+  - docker
+  - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
 pipeline:
@@ -42,7 +45,7 @@ pipeline:
           storage: null
     reformat-mermaid-svg:
       kind: shell-command
-      environment: _system
+      environment: pubs
       command: xmllint --format 
         mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
         mdocean/plots/non_matlab_figs/img/taxonomy.svg
@@ -974,9 +977,7 @@ pipeline:
         - results/DesignSpaceExploration/intermed.mat
       outputs:
        #- results/DesignSpaceExploration/experiments_pareto.pdf
-        - results/DesignSpaceExploration/experiments_pareto.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
-        - results/DesignSpaceExploration/experiments_pareto.fig
         - results/DesignSpaceExploration/experiments_ratios.fig
         - path: results/DesignSpaceExploration/experiments_results.tex
           storage: git
@@ -2890,22 +2891,6 @@ pipeline:
         - results/ReadNonMatlabFigs/taxonomy.pdf
         - results/ReadNonMatlabFigs/trapezoid.pdf
         - results/ReadNonMatlabFigs/xdsm.pdf
-        - results/ReadNonMatlabFigs/control_analysis_flowcharts.fig
-        - results/ReadNonMatlabFigs/damping_plate_flowchart.fig
-        - results/ReadNonMatlabFigs/dimensions.fig
-        - results/ReadNonMatlabFigs/equivalent_stiffness.fig
-        - results/ReadNonMatlabFigs/FBD.fig
-        - results/ReadNonMatlabFigs/graphical_abstract_modeling.fig
-        - results/ReadNonMatlabFigs/MEEM_geometry.fig
-        - results/ReadNonMatlabFigs/methodology_flowchart.fig
-        - results/ReadNonMatlabFigs/graphical_abstract_optim.fig
-        - results/ReadNonMatlabFigs/optimization_flowchart.fig
-        - results/ReadNonMatlabFigs/RM3_image.fig
-        - results/ReadNonMatlabFigs/section_flow.fig
-        - results/ReadNonMatlabFigs/sim_runtime.fig
-        - results/ReadNonMatlabFigs/taxonomy.fig
-        - results/ReadNonMatlabFigs/trapezoid.fig
-        - results/ReadNonMatlabFigs/xdsm.fig
         - results/ReadNonMatlabFigs/end.mat
         - path: results/ReadNonMatlabFigs/end.json
           storage: git

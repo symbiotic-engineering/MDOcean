@@ -21,13 +21,31 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Clear stale submodule caches
+        run: |
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
           persist-credentials: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
+        # without recursing into their nested submodules, avoiding the stale
+        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
+        run: git submodule update --init
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
@@ -38,7 +56,7 @@ jobs:
       - name: Install Calkit
         run: uv tool install --upgrade calkit-python
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Install python dependencies
@@ -82,6 +100,7 @@ jobs:
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: --keep-going --log build-AOR-paper
+          pull_dvc: false
           save: false
       - name: calkit save
         run: |
