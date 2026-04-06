@@ -23,8 +23,11 @@ jobs:
     steps:
       - name: Clear stale submodule caches
         run: |
-          # On self-hosted runners .git/ persists between runs. Remove the entire
-          # gitdir module cache so the next manual submodule init starts clean.
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
           rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
