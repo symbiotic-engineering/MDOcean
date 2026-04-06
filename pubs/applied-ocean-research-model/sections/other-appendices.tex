@@ -14,8 +14,8 @@ The coefficients have the following form:
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews WEC PTO models and \cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2024} presents a PTO model in cascade matrix form for a single degree of freedom system.
+Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{coe_co-design_2024} presents a PTO model in cascade matrix form for a single degree of freedom system. 
 This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 \subsubsection{PTO Kinematics and Underactuation}
@@ -70,7 +70,7 @@ In the circuit representation with two hydrodynamic and one PTO degree of freedo
 \end{figure}
 
 \subsubsection{Combining Intrinsic Dynamics with PTO Kinematics}
-Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the PTO port yields a scalar equivalent circuit for each PTO degree of freedom, with force sources $\vec{\hat{F}}_{th}$ and mechanical impedances $\vec{Z}_{i,th}$, shown in the bottom portion of \figurename~\ref{fig:multiport-circuit-kinematics} and computed with the following expressions:
+Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the PTO port yields a scalar equivalent circuit for each PTO degree of freedom, with force sources $\vec{\hat{F}}_{th}$ and mechanical impedances $\vec{Z}_{i,th}$, shown in the bottom portion of \figureautorefname~\ref{fig:multiport-circuit-kinematics} and computed with the following expressions:
 
 \begin{equation}
 \begin{aligned}
@@ -79,11 +79,12 @@ Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at t
     \vec{Z}_{i,th} &= (-\mathbf{T}_{kin}\mathbf{Z}_{i}^{-1}\mathbf{T}_{kin}^T)^{-1} = -\frac{\det(\mathbf{Z}_{i})}{\Sigma \mathbf{Z}_{i}} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
 \end{aligned}
 \end{equation}
-where the vector expressions for the general case are shown first, followed by the scalar for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
+where the vector expressions for the general case are shown first, followed by the scalar result for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
 
-Although a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
-Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero.
-Instead, cascade-like matrices solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in body velocities caused by the PTO:
+Although as previously mentioned a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
+Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero, so there is no way to express $\hat{\dot{\xi}}$ as a weighted sum of $\hat{F}_{PTO}$ and $\dot{\hat{X}}_{PTO}$.
+$\hat{\dot{\xi}}$ could be expressed as a function of the PTO variables by substituting $\mathbf{Z}_p=\mathbf{T}_{kin}^T (\vec{\hat{F}}_{PTO}/\vec{\hat{\dot{X}}}_{PTO}) \mathbf{T}_{kin}$ into \cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
+Instead, we can use cascade-like matrices to solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actual body velocities $\vec{\dot{\xi}}$ and their values if the PTO were disconnected with $F_{PTO}=0$, $\vec{\dot{\xi}}_{0}$:
 \begin{equation}\label{eq:modified-body-velocity}
     \vec{\dot{\xi}}_\Delta = \vec{\dot{\xi}} - \vec{\dot{\xi}}_{0}
     \quad \textrm{ where } \quad
@@ -101,7 +102,8 @@ The cascade-like matrix from the PTO port $\{F_{PTO}, \dot{X}_{PTO}\}$ to the mo
 1 & 0
 \end{bmatrix}
 \end{equation}
-noting that this matrix is non-square ($\in \mathbb{C}^{4\times2}$) since there are more hydrodynamic than PTO degrees of freedom.
+noting that this matrix is non-square ($\in \mathbb{C}^{4\times2}$) since there are more hydrodynamic than PTO degrees of freedom, and that the matrix label drops the $PTO$ subscripts for compactness.
+\Cref{fig:multiport-circuit-kinematics} represents this in circuit form, noting that the excitation source must be duplicated to create $\vec{\hat{\dot{\xi}}}_0$.
 
 \subsubsection{PTO Dynamics}
 In addition to the PTO port already discussed, we define two additional ports of relevance: the generator mechanical port (torque $\tau$ and rotation speed $\Omega$) and the generator electrical port (voltage $V$ and current $I$).
@@ -138,15 +140,19 @@ _{[\mathbf{a}]_{\tau \Omega \leftarrow V I}}
 \end{equation}
 with Park-transformed quadrature electrical voltage and current $V$ and $I$.
 
+The system operating point is determined by a controller that applies some electrical load to the generator.
+The controller can be formulated as an impedance at either the generator mechanical or electrical port.
+The former is more convenient for hardware implementation, because modern drives typically expect torque commands, while the latter is more convenient for electrical power calculations and optimal control.
+%Here we formulate both as linear impedances with damping and stiffness terms, where 
 The mechanical control impedance $Z_u$ and electrical load impedance $Z_l$ are defined as follows:
 \begin{equation}\label{eq:controller-impedances}
-    Z_l = \frac{V}{I} = B_l + \frac{K_l}{s}
+    Z_l = \frac{V}{I} = B_l + \frac{K_l}{i\omega}
     ,  \qquad
-    Z_u = \frac{\tau}{\Omega}
+    Z_u = \frac{\tau}{\Omega}% = B_u + \frac{K_u}{s}
 \end{equation}
 Combining \cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the following expression for $Z_u$ as a function of $Z_l$:
 \begin{equation}\label{eq:control-impedance}
-    Z_u =
+    Z_u = 
     \frac{
     \begin{bmatrix}
     1 & 0
@@ -166,8 +172,31 @@ Combining \cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the 
 }
 \end{equation}
 This equation allows the $Z_l$ identified with optimal control to be implemented as a corresponding $Z_u$ in hardware.
+%Incorporating \cref{eq:mech-transmission-matrix} yields the Th\'{e}venin equivalent scalar PTO impedance at the hydrodynamic body port:
+% \begin{equation}\label{eq:pto-impedance}
+% Z_{PTO,th} = 
+% \frac{
+%     \begin{bmatrix}
+%     1 & 0
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}
+%     [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }{
+%     \begin{bmatrix}
+%     0 & 1
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega} [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }
+% \end{equation}
+% which is useful for calculating the mechanical response of each body.
 
-The PTO dynamics can be represented as a multiport circuit, as shown in \figurename~\ref{fig:multiport-circuit-pto}.
+The PTO dynamics can be represented as a multiport circuit, as shown in \figureautorefname~\ref{fig:multiport-circuit-pto}.
 \begin{figure}
 \centering
     \input{figs/tikz/circuit_pto.tikz}
@@ -395,8 +424,8 @@ References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss t
 
 Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
-Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while \cite{bacelli_geometric_2013} covers amplitude and force limits.
-Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while \cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and \cite{bacelli_geometric_2013} in that of the PTO force.
+Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
+Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
 Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
@@ -525,7 +554,7 @@ The integrals must be evaluated numerically, except for special limit cases for 
         \caption{Phase of drag excitation integral $\angle I_G$, scaled by $\frac{1}{\pi}$.}
         \label{fig:drag-excitation-phase-integral}
     \end{subfigure}
-    \caption{Nondimensional drag integrals shown on in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
+    \caption{Nondimensional drag integrals shown in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
     \label{fig:drag-integrals}
 \end{figure}
 
@@ -581,9 +610,9 @@ This creates the possibility for negative ``damping'' coefficients that would ap
 The damping-excitation grouping chosen in \ref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
 
 Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
-\cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
-This means that \cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
-Early MDOcean simulations that used the \cite{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radation damping) at high frequencies and large wave heights in the operational regime.
+Reference \cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+Early MDOcean simulations that used the formulation of \cite{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \cref{sec:drag} avoids this issue.
 Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}.
 
@@ -710,7 +739,7 @@ If $\Delta z_{slam}<H/2|\sin\theta|$, the design is unviable and the slamming li
 %\hl{add description of similarities and differences of this to Budal's upper bound}
 
 Separately, there exists a symmetrical counterpart to the slamming condition that we will call the submersion condition. 
-While preventing slamming requires that the bottom of the WEC remains below the free surface, preventng submersion requires that the top of the WEC remains above the free surface. 
+While preventing slamming requires that the bottom of the WEC remains below the free surface, preventing submersion requires that the top of the WEC remains above the free surface. 
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
 \begin{equation}\label{eq:submersion}
     \xi(t) + \Delta z_{sub} > \zeta(y,t)
@@ -758,7 +787,7 @@ Figure~\ref{fig:dynamic-validation} compares the results.
 \begin{figure}
 \centering
 \begin{tabular}{c m{1em} | >{\centering\arraybackslash}m{.5\linewidth} | >{\centering\arraybackslash}m{.5\linewidth} }
-  && \multicolumn{2}{c}{Drag Coefficent}\\
+  && \multicolumn{2}{c}{Drag Coefficient}\\
          && $C_d=0$& $C_d=1$\\ \hline
     \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& 
     \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf} 
@@ -916,9 +945,9 @@ All edges are welded.
 Rather than model the deflections of each edge and apply compatibility, for simplicity the edges of each plate are conservatively modeled as fixed.
 The top and bottom plates are the only ones with external heave loads, arising from the float-spar tubular connection and the hydrodynamic pressure respectively.
 
-The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \figurename~\ref{fig:trapezoid}).
+The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \figureautorefname~\ref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
-For example, \cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
+For example, Ref.~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
 They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{min}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
 This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{min}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{min}^2$.
 For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{min}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{min}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{min}=b_1$, and intermediate trapezoids to have an $x_{min}$ that depends on the trapezoid slope.
@@ -1044,7 +1073,7 @@ and the hoop stress $\sigma_\theta$ is
 \begin{equation}
      \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
 \end{equation}
-$P_r$ is a constant and $q$ is the distributed hydrosatic pressure at the bottom of the spar.
+$P_r$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
 These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \cite{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
 % \begin{equation}

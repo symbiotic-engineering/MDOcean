@@ -1,5 +1,5 @@
 \section{Introduction}
-\label{intro}
+\label{sec:intro}
 \subsection{Wave Energy Overview}
 %(Why WECs, in renewable energy context):
 
@@ -20,7 +20,7 @@ Thus, performing a system-level WEC optimization that simultaneously considers t
 %Figure~\ref{fig:disciplines} is a non-exhaustive outline of the most common disciplines in a wave energy converter, and the level and direction of coupling between them.
 
 % what is RM3
-An initial attempt to consolidate a multidisiplinary WEC design process, though without optimization, was the Reference Model Project.
+An initial attempt to consolidate a multidisciplinary WEC design process, though without optimization, was the Reference Model Project.
 From 2010 to 2014, the U.S.
 Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \cite{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
 The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
@@ -63,7 +63,7 @@ After first examining the overall trends, each table entry will be described in 
 Point absorbers (PA) seem to be the most common device architecture, though most major device types are represented, and several studies optimize arrays of multiple devices.
 Nearly all model hydrodynamics and power production in some way.
 Hydrodynamic modeling is typically performed with the boundary element method (BEM), occasionally with semi-analytical models like matched eigenfunction expansion method (MEEM), and rarely with high fidelity computational fluid dynamics (CFD), fitting a model to numerical or experimental data (FIT), or algebraic approximations (ALG).
-Nonlinear forces such as drag are most often linearized and included as an additional linear damping (LD), though other methods exist including quadratic representaton (Q), describing function (DF), strip-theory integration of Morison's equation (M), and CFD.
+Nonlinear forces such as drag are most often linearized and included as an additional linear damping (LD), though other methods exist including quadratic representation (Q), describing function (DF), strip-theory integration of Morison's equation (M), and CFD.
 Dynamic modeling is frequently performed both in the frequency domain (F) and time domain (T), with a handful of studies using extensions of frequency domain techniques (F+) to handle constraints and nonlinearities that are typically only handled in the time domain, and a few using the newer pseudo-spectral method (PS).
 A range of controllers are considered, including proportional-integral / reactive (PI), proportional / pure damping (P), their extensions to incorporate constraints (P+/PI+), nonlinear structured (NL), and unstructured (UNS).
 
@@ -177,14 +177,14 @@ Fatigue modeling methods include spectral analysis, rainflow counting, damage eq
 Strength modeling methods consist primarily of various fidelities of FEA, although hand and spreadsheet calculations permit sizing to a specified stress early in the design process \cite{ove_arup__partners_ltd_structural_2016}.
 FEA of WECs is most often performed with manual design iterations, as in \cite{RM3,mi_multi-scale_2025}.
 These two studies, while not optimization, are extremely multidisciplinary, encompassing mooring design and detailed economic evaluation in addition to the more common hydrodynamics, powertrain, controls, and structures.
-Automating the design process reported there remains a long term vision for WEC multidisciplinary.
+Automating the design process reported there remains a long-term vision for WEC multidisciplinary design.
 
 Notably, one study \cite{an_optimal_2024} performs true optimization of WEC structural FEA using the commercial computer aided engineering software Altair Inspire.
 The study examines four design variables, although it keeps the power calculations entirely separate from the structural optimization, neglecting the interdisciplinary coupling.
 Another structural optimization does not consider power at all, but is able to perform a brute-force sweep of 3 design variables by using analytical equations for stress and other failure modes \cite{ambuhl_reliability-based_2014}.
 The new Project SEA Stack modeling suite adds hydrodynamics to Project Chrono, a multiphysics software with the ability to perform finite element analysis using beam, shell, or solid elements, although it appears that so far the structural modeling capabilities have only been used for offshore wind turbines rather than WECs \cite{ogden_hydrochrono_2023}.
 Finally, several studies consider structures indirectly by examining the load on the device rather than the stress, e.g. \cite{nguyen_theoretical_2024, ferri_balancing_2014}, or equivalently assuming that stress scales with load and does not depend on any other dimensional design variable, e.g. \cite{garcia-teruel_reliability-based_2021, cotten_multi-objective_2022}.
-Like the earlier MEEM study, \cite{nguyen_theoretical_2024} uses the equivalent analytical hydrodynamics in elliptical coordinates for an oscillating surge WEC.
+Like the earlier MEEM study, reference \cite{nguyen_theoretical_2024} uses the equivalent analytical hydrodynamics in elliptical coordinates for an oscillating surge WEC.
 
 \paragraph{Controls and powertrain co-design}
 The study \cite{ferri_balancing_2014} is notable because in addition to structural loads, it compares various control schemes and simulates second-order drivetrain dynamics.
@@ -197,8 +197,8 @@ Reference \cite{gaebele_tpl_2025} is relevant because it optimizes the dimension
 It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, RMS torque, and stroke) while maintaining frequency-domain hydrodynamics via the pseudo-spectral (PS) modeling method, which \cite{devin_high-dimensional_2024,grasberger_control_2024} also use.
 
 Other CCD papers optimize WEC dimensions without modeling the PTO.
-\cite{herber_dynamic_2014} performs a direct transcription co-optimization of cylinder draft and radius with control.
-\cite{lin_fast_2025} introduces a new CCD formulation for constrained control that is even faster than PS.
+Reference \cite{herber_dynamic_2014} performs a direct transcription co-optimization of cylinder draft and radius with control.
+Reference \cite{lin_fast_2025} introduces a new CCD formulation for constrained control that is even faster than PS.
 The method leverages the analytical Pontryagin Maximum Principle (PMP) and performs a case study to optimize a single geometric variable.
 A different PMP formulation \cite{abdulkadir_optimal_2024} incorporates PTO-constrained array dynamics, although it has not yet been used for design optimization. 
 
@@ -214,7 +214,7 @@ The popular time-domain hydrodynamics tool WEC-Sim \cite{ruehl_wec-simwec-sim_20
 However, as \cite{housner_numerical_2024} reveals, it is too slow to use for large-scale optimization.
 Meanwhile, the newer pseudospectral tool WecOptTool \cite{coe_initial_2020} is faster and suitable for control co-design, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like PTO and mooring as needed, and it still can take considerable time for large optimizations.
 
-A 2023 marine energy software assssment \cite{ruehl_next-generation_2023} identified that industry-wide needs broadly include using state-of-the-art computation; overcoming limitations of existing software; ensuring appropriate language, architecture, and license of new software; accessing data; and ensuring usability and accuracy of free open source software.
+A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} identified that industry-wide needs broadly include using state-of-the-art computation; overcoming limitations of existing software; ensuring appropriate language, architecture, and license of new software; accessing data; and ensuring usability and accuracy of free open source software.
 Specifically, relevant gaps include tools for powertrain and controls modeling, co-design, and optimization; high-fidelity models with faster runtime and low/mid-fidelity models with higher accuracy; inter-operabilty of models across disciplines and fidelities; and data for verification and validation \cite{ruehl_next-generation_2023}.
 This lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization helps explain why no optimization study in \cref{tab:lit} simultaneously optimizes the device geometry, structures, and powertrain.
 
@@ -252,7 +252,7 @@ As the literature review in table~\ref{tab:lit} revealed, the high computational
 Of the few studies that perform multidisciplinary optimization, those that use numerical models take many hours to run, especially when using heuristic optimizers, preventing designers from iterating quickly.
 For example, the BEM-based 4-WEC array optimization in \cite{khanal_multi-objective_2024} took 36 hours to run on a high-end workstation for only a single frequency.
 This type of model is too slow for use in realistic large-scale optimizations.
-On the other extreme, \cite{mccabe_multidisciplinary_2022} uses an algebraic hydrodynamic model that runs quickly but lacks sufficient accuracy to draw meaningful design conclusions.
+On the other extreme, reference \cite{mccabe_multidisciplinary_2022} uses an algebraic hydrodynamic model that runs quickly but lacks sufficient accuracy to draw meaningful design conclusions.
 The present paper introduces a set of interoperable semi-analytical models that are designed to have the speed and robustness required for multidisciplinary optimization.
 
 \subsection{Paper Contributions and Roadmap}
