@@ -11,6 +11,9 @@ function intermed_result_struct = analysis_fcn(p, b)
 %           m0h_stored, val (simulation outputs), all grid arrays, the
 %           sweep parameter vectors, and p.
 
+    warning('off','MATLAB:nearlySingularMatrix')
+    warning('off','MATLAB:singularMatrix')
+
     n = 3; % number of points per dimension
 
     zero_to_one   = linspace(0.01, 0.99, n);
