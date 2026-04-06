@@ -54,15 +54,9 @@ jobs:
         run: uv tool install --upgrade calkit-python
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Install python dependencies
-        run: pip install ruamel.yaml
       - name: Add docstrings to .m files
         run: |
-          python dev/docs/add_docstrings.py
+          uv run python dev/docs/add_docstrings.py
           if git diff --quiet; then
             echo "No docstring changes to commit"
           else
@@ -100,7 +94,7 @@ jobs:
           run_args: make-calkit-stages
           save: false
       - name: Use calkit_stages.yaml to update calkit.yaml
-        run: python mdocean/analysis/update_calkit.py
+        run: uv run --with ruamel.yaml python mdocean/analysis/update_calkit.py
 
       - name: Run Calkit
         id: run_calkit
