@@ -22,38 +22,39 @@ dependencies:
   - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
+parameters:
+  mermaid_name:
+    - taxonomy
+    - mod_freq_domain_ctrl_synthesis
+    - mod_freq_domain_ctrl_evaluation
 pipeline:
   stages:
-    mermaid-taxonomy-pdf:
+    mermaid-make-pdfs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+        mdocean/plots/non_matlab_figs/pdf/{name}.pdf -f
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: mermaid_name
       inputs:
-        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+        - mdocean/plots/non_matlab_figs/{name}.mmd
       outputs:
-        - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    mermaid-taxonomy-svg:
+        - mdocean/plots/non_matlab_figs/pdf/{name}.pdf
+    mermaid-make-pngs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+        mdocean/plots/non_matlab_figs/img/{name}.png
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: mermaid_name
       inputs:
-        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+        - mdocean/plots/non_matlab_figs/{name}.mmd
       outputs:
-        - path: mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-          storage: null
-    reformat-mermaid-svg:
-      kind: shell-command
-      environment: pubs
-      command: xmllint --format 
-        mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-        mdocean/plots/non_matlab_figs/img/taxonomy.svg
-      inputs:
-        - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      outputs:
-        - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
-          storage: git
+        - path: mdocean/plots/non_matlab_figs/img/{name}.png
     make-drag-integral:
       kind: matlab-command
       environment: _system

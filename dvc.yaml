@@ -1,42 +1,38 @@
 stages:
-  mermaid-taxonomy-pdf:
+  mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf -f
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    desc: Automatically generated from the 'mermaid-taxonomy-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  mermaid-taxonomy-svg:
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pdfs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  mermaid-make-pngs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/img/${item.name}.png
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg:
-          cache: false
+      - mdocean/plots/non_matlab_figs/img/${item.name}.png:
+          cache: true
           persist: false
-    desc: Automatically generated from the 'mermaid-taxonomy-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  reformat-mermaid-svg:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
-      "xmllint --format 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy.svg"
-    deps:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      - .calkit/env-locks/pubs
-    outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
-          cache: false
-          persist: false
-    desc: Automatically generated from the 'reformat-mermaid-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pngs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); drag_fcn 
       = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 8); 
