@@ -1,4 +1,4 @@
-function [LVOE_matrix,LVOE] = econ_value(force_matrix,P_elec)
+function [LVOE_matrix,LVOE] = econ_value(force_matrix,P_elec,N_WEC)
 
 % calculate capex and opex
 capex = 0;
