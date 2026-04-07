@@ -91,13 +91,24 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 
 model_grid_value = true; % override for merging
 if model_grid_value
-    [CEM_CO2, CEM_grid_cost, AEP_matrix,force_matrix] = grid_CEM(F_heave_mat, capex, opex, P_matrix_elec, LCOE);
+    [CEM_CO2, CEM_grid_cost, AEP_matrix,force_matrix] = grid_CEM(F_heave_mat, capex, opex, P_matrix_elec, LCOE, in);
     
     [env_cost_per_wec, eco_cost_total] = enviro(m_m, in.distance_from_shore, A_hull, ...
                             in.P_max, in.eco_cost_steel, in.eco_cost_fiberglass, ...
                             in.eco_cost_distance, in.eco_cost_carbon);
         
-    [net_eco_value] = net_value(CEM_CO2, eco_cost_total, in.eco_cost_carbon, env_cost_per_wec, AEP_matrix, p, force_matrix);
+    %[net_eco_value] = net_value(CEM_CO2, eco_cost_total, in.eco_cost_carbon, env_cost_per_wec, AEP_matrix, p, force_matrix);
+    [~,LCOE_econ] = econ_cost(force_matrix,P_matrix_elec,capex_design,in.N_WEC,...
+        in.FCR,in.eff_array,in.JPD);
+    %[~,LVOE_econ] = econ_value(force_matrix,P_matrix_elec,in.N_WEC);
+    [~,LCOE_env] = env_cost(force_matrix,P_matrix_elec,in.eco_cost_steel,...
+        m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,...
+        in.distance_from_shore,in.JPD,in.N_WEC,in.FCR,in.eff_array);
+    %[~,LVOE_env] = env_value(force_matrix,P_matrix_elec);
+    LVOE_econ = 0;
+    LVOE_env = 0;
+    net_econ_value = (LVOE_econ - LCOE_econ) * sum(AEP_matrix,'all','omitnan');
+    net_eco_value = (LVOE_env - LCOE_env) * sum(AEP_matrix,'all','omitnan');
 
 
 else
@@ -106,7 +117,7 @@ end
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
-J = [LCOE, J_capex_design, CEM_grid_cost, net_eco_value];
+J = [LCOE_econ, J_capex_design, CEM_grid_cost, net_eco_value];
 
 
 %% Assemble constraints g(x) >= 0
