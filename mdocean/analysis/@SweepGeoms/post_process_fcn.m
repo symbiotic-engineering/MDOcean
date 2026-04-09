@@ -100,10 +100,10 @@ function [fig_array,...
 
     size_var2     = A3_A1(1,:,:,:,:,:);
     size_mult     = 3;
-    size_var_name = 'a_3/a_1';
+    size_var_name = '$a_3/a_1$';
 
     marker_type_var = A2_H(1,:,:,:,:,:);
-    marker_var_name = 'a_2/h';
+    marker_var_name = '$a_2/h$';
     marker_types    = {'o','x','v','s','+','.'};
 
     m0h_minmax = [min(m0h_mat(:)), max(m0h_mat(:))];
@@ -144,34 +144,34 @@ function [fig_array,...
     fig2 = figure();
     scatter(m0h_stored(:), hydro_ratio_result(:), size_var, color)
     set(gca, 'XScale', 'log')
-    xlabel('m_0 h')
-    ylabel('CW/CW_{max}')
+    xlabel('$m_0 h$','Interpreter','latex')
+    ylabel('$CW/CW_{\max}$','Interpreter','latex')
     ylim([0 1])
 
     % ------------------------------------------------------------------
     % Figure 3: Line plot  (m0h vs CW/CW_max)
     % ------------------------------------------------------------------
-    fig3 = make_line_fig(m0h_mat, result_mat, 'CW/CW_{max}', [0 1.5], ...
+    fig3 = make_line_fig(m0h_mat, result_mat, '$CW/CW_{max}$', [0 1.5], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
     % ------------------------------------------------------------------
     % Figures 4-6: CWR scatter plots
     % ------------------------------------------------------------------
-    fig4 = make_scatter_fig(m0h_stored, CWR_a2,  size_var, color, 'CW/a_2');
-    fig5 = make_scatter_fig(m0h_stored, CWR_vol, size_var, color, 'CW/V^{1/3}');
-    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, 'CW/SA^{1/2}');
+    fig4 = make_scatter_fig(m0h_stored, CWR_a2,  size_var, color, '$CW/a_2$', 30);
+    fig5 = make_scatter_fig(m0h_stored, CWR_vol, size_var, color, '$CW/V^{1/3}$', 100);
+    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, '$CW/SA^{1/2}$', 30);
 
     % ------------------------------------------------------------------
     % Figures 7-9: CWR line plots
     % ------------------------------------------------------------------
-    fig7 = make_line_fig(m0h_mat, CWR_a2_mat,  'CW/a_2',         [], ...
+    fig7 = make_line_fig(m0h_mat, CWR_a2_mat,  '$CW/a_2$',         [0 30], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
-    fig8 = make_line_fig(m0h_mat, CWR_vol_mat, 'CW/V^{1/3}',     [], ...
+    fig8 = make_line_fig(m0h_mat, CWR_vol_mat, '$CW/V^{1/3}$',     [0 100], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
-    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  'CW/SA^{1/2}',   [], ...
+    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  '$CW/SA^{1/2}$',   [0 30], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
@@ -185,10 +185,16 @@ function [fig_array,...
     % levels) so every point in the 486-geometry grid is represented.
     color_pareto    = [A1_A2(:), D1_H(:), D2_D1(:)];
     size_var_pareto = A3_A1(:);
+    marker_pareto = cell(size(A2_H(:)));
+    for i = 1:length(a2_h)
+        idx_a2_h = A2_H(:) == a2_h(i);
+        marker_pareto(idx_a2_h) = marker_types(i);
+    end
 
     fig10 = make_pareto_fig(hydro_ratio_max_T(:), SA_total(:), ...
-                            color_pareto, size_var_pareto, size_mult, ...
-                            'Radiation Efficiency CW/CW_{max}','Surface Area');
+                            color_pareto, size_var_pareto, marker_pareto, size_mult, ...
+                            'Radiation Efficiency $CW/CW_{max}$','Surface Area', 1);
+
     % ------------------------------------------------------------------
     % Figure 11: Pareto plot  (CW/CW_max vs Nondim Surface Area)
     % ------------------------------------------------------------------
@@ -197,9 +203,9 @@ function [fig_array,...
 
     wavelength = m0h_stored(:) ./ myresize(H,nT);
     fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
-                            color, size_var, size_mult, ...
-                            'Radiation Efficiency CW/CW_{max}','Surface Area/Wavelength^2');
-    xlim([.05 3])
+                            color, size_var, myresize(marker_pareto,nT), size_mult*3, ...
+                            'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1);
+    xlim([.05 2])
     % ------------------------------------------------------------------
     % Figure 12: Grid scatter matrix
     %   Columns = 6 sweep vars (5 geometry ratios + m0h)
@@ -212,7 +218,7 @@ function [fig_array,...
     a3_a1_flat = myresize(A3_A1, nT);
 
     x_vars   = {a1_a2_flat, a2_h_flat, d1_h_flat, d2_d1_flat, a3_a1_flat, m0h_stored(:)};
-    x_labels = {'a_1/a_2', 'a_2/h', 'd_1/h', 'd_2/d_1', 'a_3/a_1', 'm_0h'};
+    x_labels = {'$a_1/a_2$', '$a_2/h$', '$d_1/h$', '$d_2/d_1$', '$a_3/a_1$', '$m_0h$'};
 
     charac_a2_flat  = myresize(A2,                       nT);
     charac_vol_flat = myresize((vol_f + vol_s).^(1/3),   nT);
@@ -220,8 +226,8 @@ function [fig_array,...
 
     y_vars   = {hydro_ratio_result(:), charac_a2_flat, charac_vol_flat, charac_sa_flat, ...
                 CW(:), CWR_a2(:), CWR_vol(:), CWR_sa(:)};
-    y_labels = {'CW/CW_{max}', 'a_2 (m)', 'V^{1/3} (m)', 'SA^{1/2} (m)', ...
-                'CW (m)', 'CW/a_2', 'CW/V^{1/3}', 'CW/SA^{1/2}'};
+    y_labels = {'$CW/CW_{\max}$', '$a_2$ (m)', '$V^{1/3}$ (m)', '$SA^{1/2}$ (m)', ...
+                '$CW$ (m)', '$CW/a_2$', '$CW/V^{1/3}$', '$CW/SA^{1/2}$'};
 
     fig12 = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var);
 
@@ -231,7 +237,7 @@ function [fig_array,...
     %   Off-diag  (i≠j): two-factor interaction effect between inputs i and j
     % ------------------------------------------------------------------
     Y_fa = hydro_ratio_max_T ./ sqrt(SA_total);   % [size(A1)], per-geometry CW/SA^{1/2}
-    factor_labels = {'h', 'a_1/a_2', 'a_2/h', 'd_1/h', 'd_2/d_1', 'a_3/a_1'};
+    factor_labels = {'$h$', '$a_1/a_2$', '$a_2/h$', '$d_1/h$', '$d_2/d_1$', '$a_3/a_1$'};
     fig13 = make_factor_fig(Y_fa, factor_labels);
 
     fig_array = [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12, fig13];
@@ -248,7 +254,7 @@ end
 % Local helper functions
 % ======================================================================
 
-function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, size_mult, x_name, y_name)
+function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, marker_pareto, size_mult, x_name, y_name, x_vert_line)
 %MAKE_PARETO_FIG  Pareto front
 %   Finds the max-x / min-y Pareto front
 
@@ -258,22 +264,45 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
     [~, idxo] = paretoFront([x_clean, -y_clean]);
 
     fig = figure;
-    scatter(x_to_max(:), y_to_min(:), size_mult * size_var_pareto(:), color_pareto, ...
-            'HandleVisibility', 'off')
-    hold on
-    plot(x_clean(idxo), y_clean(idxo), 'ks', ...
+    ax = gca();
+    size(marker_pareto)
+    uq_markers = unique(marker_pareto);
+    for i=1:length(uq_markers)
+        idx_marker = strcmp(marker_pareto, uq_markers{i});
+        scatter(ax, x_to_max(idx_marker), y_to_min(idx_marker), size_mult * size_var_pareto(idx_marker), ...
+                color_pareto(idx_marker,:), uq_markers{i}, 'HandleVisibility', 'off')
+        hold on
+    end
+    x_pareto = x_clean(idxo);
+    y_pareto = y_clean(idxo);
+    [x_pareto_sorted, sort_idx] = sort(x_pareto);
+    y_pareto_sorted = y_pareto(sort_idx);
+    plot(ax, x_pareto_sorted, y_pareto_sorted, 'ks--', ...
          'MarkerFaceColor', 'none', 'MarkerSize', 10, 'LineWidth', 1.5, ...
          'DisplayName', 'Pareto front')
-    xlabel(x_name)
-    ylabel(y_name)
-    legend('Location', 'best')
+    xlabel(ax, x_name,'Interpreter','latex')
+    ylabel(ax, y_name,'Interpreter','latex')
+    legend(ax, 'Location', 'best')
+    
     improvePlot
+
+    colorAxPos    = [.67 .43];
+    mini_plot_size = [.2 .22];
+    red_pos   = [-1.65,  .75];
+    green_pos = [ 1.18,  .75];
+    blue_pos  = [  .17, -1.2];
+    make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
+
     % improvePlot fills all markers; restore Pareto-front markers to hollow.
     ph = findobj(fig, 'DisplayName', 'Pareto front');
     if ~isempty(ph)
         set(ph, 'MarkerFaceColor', 'none')
     end
-    set(gca, 'XScale', 'log', 'YScale', 'log')
+    if ~isempty(x_vert_line)
+        xline(ax, x_vert_line, 'k--', 'LineWidth', 1.5, 'HandleVisibility', 'off')
+    end
+    set(ax, 'XScale', 'log', 'YScale', 'log')
+    axes(ax)
 end
 
 function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var)
@@ -292,12 +321,12 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
             ax = nexttile(t);
             scatter(ax, x_vars{ix}, y_vars{iy}, size_var, color)
             if iy == n_y
-                xlabel(ax, x_labels{ix})
+                xlabel(ax, x_labels{ix},'Interpreter','latex')
             else
                 set(ax, 'XTickLabel', [])
             end
             if ix == 1
-                ylabel(ax, y_labels{iy})
+                ylabel(ax, y_labels{iy},'Interpreter','latex')
             else
                 set(ax, 'YTickLabel', [])
             end
@@ -308,13 +337,16 @@ function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, 
     set(fig, 'PaperPositionMode', 'auto');
 end
 
-function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str)
+function fig = make_scatter_fig(m0h_stored, CWR, size_var, color, ylabel_str, ymax)
 %MAKE_SCATTER_FIG  Semilog scatter plot of m0h vs a CWR quantity.
     fig = figure();
     scatter(m0h_stored(:), CWR(:), size_var, color)
     set(gca, 'XScale', 'log')
-    xlabel('m_0 h')
-    ylabel(ylabel_str)
+    xlabel('$m_0 h$','Interpreter','latex')
+    ylabel(ylabel_str,'Interpreter','latex')
+    if ~isempty(ymax)
+        ylim([0 ymax])
+    end
     improvePlot
 end
 
@@ -325,9 +357,6 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
 %MAKE_LINE_FIG  Semilog line plot of m0h vs y_mat with colour/marker legends.
     fig = figure();
     ax  = gca();
-
-    % Set ColorOrder BEFORE plotting so each line gets its assigned RGB color.
-    ax.ColorOrder = color2;
 
     num_lines = size(y_mat, 2);
     h_data    = gobjects(num_lines, 1);
@@ -340,9 +369,10 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
         set(h_data(i).Annotation.LegendInformation, 'IconDisplayStyle', 'off')
         hold on
     end
+    ax.ColorOrder = color2;
 
-    xlabel('m_0 h')
-    ylabel(ylabel_str)
+    xlabel('$m_0 h$','Interpreter','latex')
+    ylabel(ylabel_str,'Interpreter','latex')
     if ~isempty(ylim_vals)
         ylim(ylim_vals)
     end
@@ -376,21 +406,10 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     % -- Color legend: inset RGB cube showing R=a_1/a_2, G=d_1/h, B=d_2/d_1 --
     colorAxPos    = [.67 .43];
     mini_plot_size = [.2 .22];
-    colorAx = axes('Position', [colorAxPos mini_plot_size]);
-    box on
-    plotSVG(loadSVG('RGBCube_a.svg'));
-    set(colorAx, 'Ydir', 'reverse')
-    set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
-    % Label positions are in the SVG coordinate system (cube vertex locations).
-    % Red vertex is bottom-left, green is bottom-right, blue is top-center.
     red_pos   = [-1.65,  .75];
     green_pos = [ 1.18,  .75];
     blue_pos  = [  .17, -1.2];
-    text(red_pos(1),   red_pos(2),   'a_1/a_2')
-    text(green_pos(1), green_pos(2), 'd_1/h')
-    text(blue_pos(1),  blue_pos(2),  'd_2/d_1')
-    axis image
-    axis off
+    make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
 
     improvePlot
     % improvePlot fills all markers; restore line/legend markers to hollow.
@@ -400,6 +419,22 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     h_size_leg.Location   = 'northeast';
     fig.Position(3:4) = [1000 600];
     xlim(ax, m0h_minmax)
+end
+
+function make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
+    colorAx = axes('Position', [colorAxPos mini_plot_size]);
+    box on
+    plotSVG(loadSVG('RGBCube_a.svg'));
+    set(colorAx, 'Ydir', 'reverse')
+    set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
+    % Label positions are in the SVG coordinate system (cube vertex locations).
+    % Red vertex is bottom-left, green is bottom-right, blue is top-center.
+
+    text(red_pos(1),   red_pos(2),   'a_1/a_2')
+    text(green_pos(1), green_pos(2), 'd_1/h')
+    text(blue_pos(1),  blue_pos(2),  'd_2/d_1')
+    axis image
+    axis off
 end
 
 function [byfreq, order] = myreshape(A, len, order)
@@ -481,7 +516,8 @@ function fig = make_factor_fig(Y, factor_labels)
     colormap(parula)
     clim([0, max(max(eta2(:)), eps)])
     set(gca, 'XTick', 1:n_fac, 'XTickLabel', factor_labels, ...
-             'YTick', 1:n_fac, 'YTickLabel', factor_labels)
+             'YTick', 1:n_fac, 'YTickLabel', factor_labels, ...
+             'TickLabelInterpreter','latex')
     title('\eta^2: main (diagonal) and interaction (off-diagonal) effects on CW/SA^{1/2}', ...
           'Interpreter', 'tex')
     axis square
