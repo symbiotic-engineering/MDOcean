@@ -1,6 +1,14 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
+### Changed
+- CI: bump paths-filter to v4 in merge-ready.yml workflow
+
+## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
+### Added
+- Pipeline: stage that shows figures in jupyter notebook to facilitate code review
+ 
 ## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
 ### Changed
 - CI: bump `astral-sh/setup-uv` from v5 to v7
