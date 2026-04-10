@@ -192,9 +192,8 @@ function [fig_array,...
     end
 
     fig10 = make_pareto_fig(hydro_ratio_max_T(:), SA_total(:), ...
-                            color_pareto, size_var_pareto, marker_pareto, a2_h, marker_var_name, size_mult, ...
-                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area', 1);
-    xlim([.05 2])
+                            color_pareto, size_var_pareto, marker_pareto, a2_h, marker_var_name, size_mult*6, ...
+                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area', 1, [.05 2]);
 
     % ------------------------------------------------------------------
     % Figure 11: Pareto plot  (CW/CW_max vs Nondim Surface Area)
@@ -204,9 +203,8 @@ function [fig_array,...
 
     wavelength = m0h_stored(:) ./ myresize(H,nT);
     fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
-                            color, size_var, myresize(marker_pareto,nT), a2_h, marker_var_name, size_mult*3, ...
-                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1);
-    xlim([.05 2])
+                            color, size_var, myresize(marker_pareto,nT), a2_h, marker_var_name, size_mult*6, ...
+                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1, [.05 2]);
     % ------------------------------------------------------------------
     % Figure 12: Grid scatter matrix
     %   Columns = 6 sweep vars (5 geometry ratios + m0h)
@@ -255,9 +253,9 @@ end
 % Local helper functions
 % ======================================================================
 
-function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, ...
+function [fig,ax] = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, ...
                             marker_pareto, marker_vals, marker_var_name, ...
-                            size_mult, size_var_name, x_name, y_name, x_vert_line)
+                            size_mult, size_var_name, x_name, y_name, x_vert_line, x_lims)
 %MAKE_PARETO_FIG  Pareto front
 %   Finds the max-x / min-y Pareto front
 
@@ -272,8 +270,10 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
     uq_markers = unique(marker_pareto);
     for i=1:length(uq_markers)
         idx_marker = strcmp(marker_pareto, uq_markers{i});
-        scatter(ax, x_to_max(idx_marker), y_to_min(idx_marker), size_mult * size_var_pareto(idx_marker), ...
-                color_pareto(idx_marker,:), uq_markers{i}, 'HandleVisibility', 'off')
+        scatter(ax, x_to_max(idx_marker), y_to_min(idx_marker), ...
+                size_mult * size_var_pareto(idx_marker), ...
+                color_pareto(idx_marker,:), uq_markers{i}, ...
+                'HandleVisibility', 'off')
         hold on
     end
     x_pareto = x_clean(idxo);
@@ -281,14 +281,16 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
     [x_pareto_sorted, sort_idx] = sort(x_pareto);
     y_pareto_sorted = y_pareto(sort_idx);
     plot(ax, x_pareto_sorted, y_pareto_sorted, 'ks--', ...
-         'MarkerFaceColor', 'none', 'MarkerSize', 10, 'LineWidth', 1.5, ...
+         'MarkerFaceColor', 'none', 'MarkerSize', 15, 'LineWidth', 1.5, ...
          'DisplayName', 'Pareto front')
     xlabel(ax, x_name,'Interpreter','latex')
     ylabel(ax, y_name,'Interpreter','latex')
     legend(ax, 'Location', 'best')
     
-    [h_marker, h_marker_leg, h_size_leg] = make_marker_size_legends(ax, marker_vals, uq_markers, marker_var_name, ...
-                                                                    size_mult, unique(size_var_pareto), size_var_name);
+    [h_marker, ...
+     h_marker_leg, ...
+     h_size_leg] = make_marker_size_legends(ax, marker_vals, uq_markers, marker_var_name, ...
+                                            size_mult/6, unique(size_var_pareto(:)), size_var_name);
 
     improvePlot
 
@@ -299,9 +301,9 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
 
     colorAxPos    = [.67 .43];
     mini_plot_size = [.2 .22];
-    red_pos   = [-1.65,  .75];
+    red_pos   = [-1.7,   .75];
     green_pos = [ 1.18,  .75];
-    blue_pos  = [  .17, -1.2];
+    blue_pos  = [  .2, -1.2];
     make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
 
     % improvePlot fills all markers; restore Pareto-front markers to hollow.
@@ -313,7 +315,7 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
         xline(ax, x_vert_line, 'k--', 'LineWidth', 1.5, 'HandleVisibility', 'off')
     end
     set(ax, 'XScale', 'log', 'YScale', 'log')
-    axes(ax)
+    xlim(ax,x_lims)
 end
 
 function fig = make_grid_scatter_fig(x_vars, x_labels, y_vars, y_labels, color, size_var)
@@ -395,9 +397,9 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     % -- Color legend: inset RGB cube showing R=a_1/a_2, G=d_1/h, B=d_2/d_1 --
     colorAxPos    = [.67 .43];
     mini_plot_size = [.2 .22];
-    red_pos   = [-1.65,  .75];
+    red_pos   = [-1.7,   .75];
     green_pos = [ 1.18,  .75];
-    blue_pos  = [  .17, -1.2];
+    blue_pos  = [  .2,  -1.2];
     make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
 
     improvePlot
@@ -450,9 +452,9 @@ function make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_
     set(colorAx, 'Ydir', 'reverse')
     set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
     % Label positions are in the SVG coordinate system (cube vertex locations).
-    text(red_pos(1),   red_pos(2),   'a_1/a_2', 'Parent', colorAx)
-    text(green_pos(1), green_pos(2), 'd_1/h',  'Parent', colorAx)
-    text(blue_pos(1),  blue_pos(2),  'd_2/d_1','Parent', colorAx)
+    text(red_pos(1),   red_pos(2),   'a_1/a_2', 'Parent', colorAx, 'BackgroundColor', 'white')
+    text(green_pos(1), green_pos(2), 'd_1/h',   'Parent', colorAx, 'BackgroundColor', 'white')
+    text(blue_pos(1),  blue_pos(2),  'd_2/d_1', 'Parent', colorAx, 'BackgroundColor', 'white')
     axis(colorAx, 'image')
     axis(colorAx, 'off')
     % Bring inset to front
