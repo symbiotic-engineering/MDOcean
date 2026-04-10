@@ -1009,7 +1009,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
                         X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
                         X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
-    constr_viol_err(mult_const_voil_unsat) = constr_violation(mult_const_voil_unsat);
+    constr_viol_err(mult_const_viol_unsat) = constr_violation(mult_const_viol_unsat);
 
     P_unsat_safe = max(P_unsat, eps);
     power_lost = (P_unsat - P_sat) ./ P_unsat_safe;
@@ -1026,10 +1026,10 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     any_constr_violated = constr_violation > 0 & ~any_constr_active;
     all_constr_inactive = ~any_constr_active & ~any_constr_violated;
     
-    optimality_err(mult_const_voil_unsat & any_constr_active) = 0;
-    optimality_err(mult_const_voil_unsat & any_constr_violated) = 10;
-    optimality_err(mult_const_voil_unsat & all_constr_inactive) = ...
-        power_lost(mult_const_voil_unsat & all_constr_inactive);
+    optimality_err(mult_const_viol_unsat & any_constr_active) = 0;
+    optimality_err(mult_const_viol_unsat & any_constr_violated) = 10;
+    optimality_err(mult_const_viol_unsat & all_constr_inactive) = ...
+        power_lost(mult_const_viol_unsat & all_constr_inactive);
 
     % prevent 0/0=NaN when limit of zero is set
     if F_max==0
