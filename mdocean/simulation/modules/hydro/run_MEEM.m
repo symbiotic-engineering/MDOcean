@@ -189,7 +189,7 @@ function [x_cell, m_k_cell, ...
                                                             h_num,m0_num,N_num,M_num,K_num,...
                                                             show_A,fname,m_k_h_precomputed)
 
-    if exist("m_k_precomputed",'var')
+    if ~isempty(m_k_h_precomputed)
         m_k_h_num = m_k_h_precomputed;
     else
         m_k_h_num = get_m_k_h(m0_num * h_num, K_num);

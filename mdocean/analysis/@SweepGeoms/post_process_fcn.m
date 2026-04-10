@@ -17,7 +17,7 @@ function [fig_array,...
 % pcolor of main and interaction η² effects on CW/SA^{1/2}.
 %
 % :param intermed_result_struct: Output of analysis_fcn.
-% :returns: fig_array            12-element array of figure handles
+% :returns: fig_array            13-element array of figure handles
 % :returns: tab_array_display    Empty (no tables)
 % :returns: tab_array_latex      Empty (no tables)
 % :returns: end_result_struct    Struct with completion flag
@@ -266,7 +266,6 @@ function [fig,ax] = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_p
 
     fig = figure;
     ax = gca();
-    size(marker_pareto)
     uq_markers = unique(marker_pareto);
     for i=1:length(uq_markers)
         idx_marker = strcmp(marker_pareto, uq_markers{i});
