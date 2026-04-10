@@ -53,8 +53,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     m0_h_mat = m0_mat .* h_mat;
     if exist("m_k_h_precomputed",'var')
         msg = sprintf('m_k_h_precomputed is the wrong size. Expected [%i,%i], got [%i,%i]',...
-            length(m0_h_mat), K_num, size(m_k_h_precomputed,1), size(m_k_h_precomputed,2));
-        assert(all(size(m_k_h_precomputed)==[length(m0_h_mat),K_num]),msg)
+            numel(m0_h_mat), K_num, size(m_k_h_precomputed,1), size(m_k_h_precomputed,2));
+        assert(all(size(m_k_h_precomputed)==[numel(m0_h_mat),K_num]),msg)
         m_k_h_all_m0hs = m_k_h_precomputed;
     else
         [m_0_h_unique, ~, idx_unique] = unique(m0_h_mat);

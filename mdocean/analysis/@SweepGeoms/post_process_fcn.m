@@ -259,8 +259,9 @@ function [fig,ax] = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_p
 %MAKE_PARETO_FIG  Pareto front
 %   Finds the max-x / min-y Pareto front
 
-    x_clean = x_to_max(isfinite(x_to_max));
-    y_clean = y_to_min(isfinite(x_to_max));
+    finite_mask = isfinite(x_to_max) & isfinite(y_to_min);
+    x_clean = x_to_max(finite_mask);
+    y_clean = y_to_min(finite_mask);
 
     [~, idxo] = paretoFront([x_clean, -y_clean]);
 
