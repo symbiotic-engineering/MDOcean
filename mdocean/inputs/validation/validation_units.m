@@ -2,8 +2,10 @@ function units = validation_units()
 %VALIDATION_UNITS Returns a struct with the same fieldnames as the validation
 %   output struct, where each field is a char giving the units of that field.
 %   Units use LaTeX-compatible notation for use in the validation table.
-%   Note: percent is written as \\%% so that MATLAB's fprintf correctly
-%   outputs \% in the .tex file, which LaTeX renders as the percent sign.
+%   Note: percent is written as \\%% (two backslashes + two percent signs in
+%   the MATLAB source string). MATLAB's fprintf converts each \\ to a single
+%   backslash and each %% to a single percent, writing \% to the .tex file.
+%   LaTeX then renders \% as the percent sign in text mode.
 
 units = struct(...
     'mass_f',         'kg', ...
