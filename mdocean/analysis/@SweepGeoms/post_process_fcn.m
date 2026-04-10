@@ -192,8 +192,9 @@ function [fig_array,...
     end
 
     fig10 = make_pareto_fig(hydro_ratio_max_T(:), SA_total(:), ...
-                            color_pareto, size_var_pareto, marker_pareto, size_mult, ...
-                            'Radiation Efficiency $CW/CW_{max}$','Surface Area', 1);
+                            color_pareto, size_var_pareto, marker_pareto, a2_h, marker_var_name, size_mult, ...
+                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area', 1);
+    xlim([.05 2])
 
     % ------------------------------------------------------------------
     % Figure 11: Pareto plot  (CW/CW_max vs Nondim Surface Area)
@@ -203,8 +204,8 @@ function [fig_array,...
 
     wavelength = m0h_stored(:) ./ myresize(H,nT);
     fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
-                            color, size_var, myresize(marker_pareto,nT), size_mult*3, ...
-                            'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1);
+                            color, size_var, myresize(marker_pareto,nT), a2_h, marker_var_name, size_mult*3, ...
+                            size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1);
     xlim([.05 2])
     % ------------------------------------------------------------------
     % Figure 12: Grid scatter matrix
@@ -254,7 +255,9 @@ end
 % Local helper functions
 % ======================================================================
 
-function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, marker_pareto, size_mult, x_name, y_name, x_vert_line)
+function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto, ...
+                            marker_pareto, marker_vals, marker_var_name, ...
+                            size_mult, size_var_name, x_name, y_name, x_vert_line)
 %MAKE_PARETO_FIG  Pareto front
 %   Finds the max-x / min-y Pareto front
 
@@ -284,7 +287,15 @@ function fig = make_pareto_fig(x_to_max, y_to_min, color_pareto, size_var_pareto
     ylabel(ax, y_name,'Interpreter','latex')
     legend(ax, 'Location', 'best')
     
+    [h_marker, h_marker_leg, h_size_leg] = make_marker_size_legends(ax, marker_vals, uq_markers, marker_var_name, ...
+                                                                    size_mult, unique(size_var_pareto), size_var_name);
+
     improvePlot
+
+    % undo improvePlot overrides
+    set(h_marker, 'MarkerFaceColor', 'none')
+    h_marker_leg.Location = 'northwest';
+    h_size_leg.Location   = 'northeast';
 
     colorAxPos    = [.67 .43];
     mini_plot_size = [.2 .22];
@@ -379,29 +390,7 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     % Reference line y=1; excluded from legend.
     plot(ax, m0h_minmax, [1 1], 'k--', 'HandleVisibility', 'off')
 
-    % -- Legend 1: marker type encodes a_2/h (on main axes ax) --
-    h_marker = gobjects(length(a2_h), 1);
-    for i = 1:length(a2_h)
-        h_marker(i) = plot(ax, NaN, NaN, ['k' marker_types{i}], ...
-                           'DisplayName', num2str(a2_h(i)));
-    end
-    h_marker_leg = legend(ax, h_marker, 'AutoUpdate', 'off', 'Location', 'northwest');
-    title(h_marker_leg, marker_var_name)
-
-    % -- Legend 2: marker size encodes a_3/a_1 (on invisible overlay axes ah1) --
-    ah1         = axes('position', get(ax, 'position'));
-    unique_size = unique(size_var2);
-    h_size      = gobjects(length(unique_size), 1);
-    for i = 1:length(unique_size)
-        % Plot on ah1 so this legend is associated with ah1, not ax.
-        h_size(i) = plot(ah1, NaN, NaN, 'ko', ...
-                         'MarkerSize', size_mult * unique_size(i), ...
-                         'DisplayName', num2str(unique_size(i)));
-        hold(ah1, 'on')
-    end
-    h_size_leg = legend(ah1, 'AutoUpdate', 'off', 'Location', 'northeast');
-    title(h_size_leg, size_var_name)
-    ah1.Visible = 'off';
+    [h_marker, h_marker_leg, h_size_leg] = make_marker_size_legends(ax, a2_h, marker_types, marker_var_name, size_mult, unique(size_var2), size_var_name);
 
     % -- Color legend: inset RGB cube showing R=a_1/a_2, G=d_1/h, B=d_2/d_1 --
     colorAxPos    = [.67 .43];
@@ -421,20 +410,53 @@ function fig = make_line_fig(m0h_mat, y_mat, ylabel_str, ylim_vals, ...
     xlim(ax, m0h_minmax)
 end
 
+function [h_marker, h_marker_leg, h_size_leg] = make_marker_size_legends(ax, marker_vals, marker_types, marker_var_name, ...
+                                                                        size_mult, size_vals, size_var_name)
+    % -- Legend 1: marker type encodes a_2/h (on main axes ax) --
+    h_marker = gobjects(length(marker_vals), 1);
+    for i = 1:length(marker_vals)
+        h_marker(i) = plot(ax, NaN, NaN, ['k' marker_types{i}], ...
+                           'DisplayName', num2str(marker_vals(i)));
+    end
+    h_marker_leg = legend(ax, h_marker, 'AutoUpdate', 'off', 'Location', 'northwest');
+    title(h_marker_leg, marker_var_name, 'Interpreter', 'latex')
+
+    % -- Legend 2: marker size encodes a_3/a_1 (on invisible overlay axes ah1) --
+    % Create overlay axes with same Units and Position as ax so legend places correctly.
+    axUnits = get(ax, 'Units');
+    axPos   = get(ax, 'Position');
+    ah1 = axes('Units', axUnits, 'Position', axPos, 'Color', 'none', 'Visible', 'off', 'HitTest', 'off');
+    h_size = gobjects(length(size_vals), 1);
+    for i = 1:length(size_vals)
+        % Plot on ah1 so this legend is associated with ah1, not ax.
+        h_size(i) = plot(ah1, NaN, NaN, 'ko', ...
+                         'MarkerSize', size_mult * size_vals(i), ...
+                         'DisplayName', num2str(size_vals(i)));
+        hold(ah1, 'on')
+    end
+    h_size_leg = legend(ah1, 'AutoUpdate', 'off', 'Location', 'northeast');
+    title(h_size_leg, size_var_name, 'Interpreter', 'latex')
+    % Keep ah1 invisible but ensure legend remains visible on top.
+    ah1.Visible = 'off';
+    drawnow
+    uistack(h_size_leg.BoxFace, 'top')  % best-effort to keep legend above other axes
+end
+
 function make_color_legend(colorAxPos, mini_plot_size, red_pos, green_pos, blue_pos)
-    colorAx = axes('Position', [colorAxPos mini_plot_size]);
+    % Create an inset axes in normalized units and ensure it's on top.
+    colorAx = axes('Units','normalized','Position', [colorAxPos mini_plot_size], 'Color','none', 'Parent', gcf);
     box on
     plotSVG(loadSVG('RGBCube_a.svg'));
     set(colorAx, 'Ydir', 'reverse')
     set(colorAx, 'XTickLabel', [], 'YTickLabel', [], 'XTick', [], 'YTick', [])
     % Label positions are in the SVG coordinate system (cube vertex locations).
-    % Red vertex is bottom-left, green is bottom-right, blue is top-center.
-
-    text(red_pos(1),   red_pos(2),   'a_1/a_2')
-    text(green_pos(1), green_pos(2), 'd_1/h')
-    text(blue_pos(1),  blue_pos(2),  'd_2/d_1')
-    axis image
-    axis off
+    text(red_pos(1),   red_pos(2),   'a_1/a_2', 'Parent', colorAx)
+    text(green_pos(1), green_pos(2), 'd_1/h',  'Parent', colorAx)
+    text(blue_pos(1),  blue_pos(2),  'd_2/d_1','Parent', colorAx)
+    axis(colorAx, 'image')
+    axis(colorAx, 'off')
+    % Bring inset to front
+    uistack(colorAx, 'top')
 end
 
 function [byfreq, order] = myreshape(A, len, order)
