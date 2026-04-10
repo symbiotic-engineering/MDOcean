@@ -84,6 +84,12 @@ function [F_heave_storm, F_surge_storm, ...
     
     % account for powertrain electrical losses
     P_matrix_elec = P_matrix_mech * in.eff_pto;
+
+    % clamp reported power to rating (control loop already penalises exceedance,
+    % but the solver is iterative so small residuals may remain)
+    if in.use_power_sat
+        P_matrix_elec = min(P_matrix_elec, in.P_max, 'includenan');
+    end
     
     % weight power across all sea states
     P_weighted = P_matrix_elec .* in.JPD / 100;
