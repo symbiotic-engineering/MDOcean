@@ -852,24 +852,34 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
                                                     B_p_sat, P_sat, P_unsat, Z_th, ...
                                                     H, k, D_f, D_d, T_f, T_s)
 
-    [X_f_lower_limit_dynamic,...
-     X_f_upper_limit_dynamic,...
-     idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
-    X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
-    X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
+    use_amp_sat = ~(isinf(X_f_upper_limit_static) && isinf(X_s_upper_limit_static) && isinf(X_u_upper_limit_static));
 
-    [X_s_lower_limit_dynamic,...
-     X_s_upper_limit_dynamic,...
-     idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
-    X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
-    X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
+    if use_amp_sat
+        [X_f_lower_limit_dynamic,...
+         X_f_upper_limit_dynamic,...
+         idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
+        X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
+        X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
 
-    X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
-    X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
-    X_u_upper_limit = X_u_upper_limit_static;
-    
-    X_f_lower_limit = X_f_lower_limit_dynamic;
-    X_s_lower_limit = X_s_lower_limit_dynamic;
+        [X_s_lower_limit_dynamic,...
+         X_s_upper_limit_dynamic,...
+         idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
+        X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
+        X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
+
+        X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
+        X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
+        X_u_upper_limit = X_u_upper_limit_static;
+
+        X_f_lower_limit = X_f_lower_limit_dynamic;
+        X_s_lower_limit = X_s_lower_limit_dynamic;
+    else
+        X_f_upper_limit = Inf(size(mag_X_f));
+        X_s_upper_limit = Inf(size(mag_X_s));
+        X_u_upper_limit = Inf(size(mag_X_u));
+        X_f_lower_limit = -Inf(size(mag_X_f));
+        X_s_lower_limit = -Inf(size(mag_X_s));
+    end
 
     % what the force and amp would be if the force-sat and amp-sat
     % solutions applied - notebook p106 2/2/25
@@ -944,6 +954,14 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     X_err_from_amp_u_sat(amp_saturated_X_u == 0) = mag_X_u(amp_saturated_X_u == 0);
     X_err_from_amp_u_sat(X_err_from_amp_u_sat < -1) = -.99;
 
+    if ~use_amp_sat
+        X_err_from_amp_f_sat_up = zeros(size(mag_X_f));
+        X_err_from_amp_f_sat_dn = zeros(size(mag_X_f));
+        X_err_from_amp_s_sat_up = zeros(size(mag_X_s));
+        X_err_from_amp_s_sat_dn = zeros(size(mag_X_s));
+        X_err_from_amp_u_sat    = zeros(size(mag_X_u));
+    end
+
     constr_viol_err = Inf(size(mag_X_f));
     optimality_err  = Inf(size(mag_X_f));
 
@@ -991,7 +1009,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
                         X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
                         X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
-    constr_viol_err(mult_const_voil_unsat) = constr_violation(mult_const_voil_unsat);
+    constr_viol_err(mult_const_viol_unsat) = constr_violation(mult_const_viol_unsat);
 
     P_unsat_safe = max(P_unsat, eps);
     power_lost = (P_unsat - P_sat) ./ P_unsat_safe;
@@ -1008,10 +1026,10 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     any_constr_violated = constr_violation > 0 & ~any_constr_active;
     all_constr_inactive = ~any_constr_active & ~any_constr_violated;
     
-    optimality_err(mult_const_voil_unsat & any_constr_active) = 0;
-    optimality_err(mult_const_voil_unsat & any_constr_violated) = 10;
-    optimality_err(mult_const_voil_unsat & all_constr_inactive) = ...
-        power_lost(mult_const_voil_unsat & all_constr_inactive);
+    optimality_err(mult_const_viol_unsat & any_constr_active) = 0;
+    optimality_err(mult_const_viol_unsat & any_constr_violated) = 10;
+    optimality_err(mult_const_viol_unsat & all_constr_inactive) = ...
+        power_lost(mult_const_viol_unsat & all_constr_inactive);
 
     % prevent 0/0=NaN when limit of zero is set
     if F_max==0
