@@ -51,7 +51,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
 
     % precompute m_k if not already provided
     m0_h_mat = m0_mat .* h_mat;
-    if exist("m_k_h_precomputed",'var')
+    if nargin >= 16
         msg = sprintf('m_k_h_precomputed is the wrong size. Expected [%i,%i], got [%i,%i]',...
             numel(m0_h_mat), K_num, size(m_k_h_precomputed,1), size(m_k_h_precomputed,2));
         assert(all(size(m_k_h_precomputed)==[numel(m0_h_mat),K_num]),msg)
@@ -144,7 +144,7 @@ end
 function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, N_num, M_num, K_num, show_A, plot_phi, fname, m_k_h_precomputed)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,N_num,M_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,N_num,M_num,K_num,show_A,fname,m_k_h_precomputed);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -189,7 +189,7 @@ function [x_cell, m_k_cell, ...
                                                             h_num,m0_num,N_num,M_num,K_num,...
                                                             show_A,fname,m_k_h_precomputed)
 
-    if ~isempty(m_k_h_precomputed)
+    if nargin >= 12
         m_k_h_num = m_k_h_precomputed;
     else
         m_k_h_num = get_m_k_h(m0_num * h_num, K_num);
