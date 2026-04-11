@@ -30,7 +30,17 @@ function [fig_array,...
             vector_cols = {'capex','capex_design','J_capex_design','capex_struct','capex_PTO','opex','LCOE'};
             idx_remove = ismember(tab_validation.Properties.VariableNames,vector_cols); 
             tab_validation_latex = rows2vars(tab_validation,'VariableNamingRule','preserve','DataVariables',~idx_remove);
-            tab_validation_latex.OriginalVariableNames = remove_underscores(modify_suffix(tab_validation_latex.OriginalVariableNames));
+            orig_field_names = tab_validation_latex.OriginalVariableNames;
+            display_names = remove_underscores(modify_suffix(orig_field_names));
+            units_struct = validation_units();
+            for i = 1:length(display_names)
+                field = orig_field_names{i};
+                if isfield(units_struct, field)
+                    unit = units_struct.(field);
+                    display_names{i} = [strtrim(display_names{i}) ' (' unit ')'];
+                end
+            end
+            tab_validation_latex.OriginalVariableNames = display_names;
             new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
             tab_validation_latex = renamevars(tab_validation_latex, tab_validation_latex.Properties.VariableNames, new_names);
 
