@@ -852,24 +852,34 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
                                                     B_p_sat, P_sat, P_unsat, Z_th, ...
                                                     H, k, D_f, D_d, T_f, T_s)
 
-    [X_f_lower_limit_dynamic,...
-     X_f_upper_limit_dynamic,...
-     idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
-    X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
-    X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
+    use_amp_sat = ~(isinf(X_f_upper_limit_static) && isinf(X_s_upper_limit_static) && isinf(X_u_upper_limit_static));
 
-    [X_s_lower_limit_dynamic,...
-     X_s_upper_limit_dynamic,...
-     idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
-    X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
-    X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
+    if use_amp_sat
+        [X_f_lower_limit_dynamic,...
+         X_f_upper_limit_dynamic,...
+         idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
+        X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
+        X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
 
-    X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
-    X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
-    X_u_upper_limit = X_u_upper_limit_static;
-    
-    X_f_lower_limit = X_f_lower_limit_dynamic;
-    X_s_lower_limit = X_s_lower_limit_dynamic;
+        [X_s_lower_limit_dynamic,...
+         X_s_upper_limit_dynamic,...
+         idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
+        X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
+        X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
+
+        X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
+        X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
+        X_u_upper_limit = X_u_upper_limit_static;
+
+        X_f_lower_limit = X_f_lower_limit_dynamic;
+        X_s_lower_limit = X_s_lower_limit_dynamic;
+    else
+        X_f_upper_limit = Inf(size(mag_X_f));
+        X_s_upper_limit = Inf(size(mag_X_s));
+        X_u_upper_limit = Inf(size(mag_X_u));
+        X_f_lower_limit = -Inf(size(mag_X_f));
+        X_s_lower_limit = -Inf(size(mag_X_s));
+    end
 
     % what the force, amp, and power would be if the force-sat, amp-sat,
     % and power-sat solutions applied - notebook p106 2/2/25
@@ -956,6 +966,14 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
         P_err_from_power_sat = P_sat ./ power_saturated_P - 1;
         P_err_from_power_sat(power_saturated_P == 0) = P_sat(power_saturated_P == 0) / 1e6;
         P_err_from_power_sat(P_err_from_power_sat < -1) = -.99;
+    end
+
+    if ~use_amp_sat
+        X_err_from_amp_f_sat_up = zeros(size(mag_X_f));
+        X_err_from_amp_f_sat_dn = zeros(size(mag_X_f));
+        X_err_from_amp_s_sat_up = zeros(size(mag_X_s));
+        X_err_from_amp_s_sat_dn = zeros(size(mag_X_s));
+        X_err_from_amp_u_sat    = zeros(size(mag_X_u));
     end
 
     constr_viol_err = Inf(size(mag_X_f));

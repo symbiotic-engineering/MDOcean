@@ -169,6 +169,10 @@ function [P_matrix, X_constraints, B_p, K_p, mag_U, mag_X_u, mag_X_f, mag_X_s,..
                              X_s_upper_limit_static, ...
                              X_u_upper_limit_static];
 
+    if ~in.use_amp_sat
+        X_upper_limits_static = [Inf, Inf, Inf];
+    end
+
     % get response: includes drag and force saturation
     [mag_U,phase_U,...
      real_P,reactive_P,...
