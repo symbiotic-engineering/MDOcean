@@ -79,6 +79,7 @@ def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
         with open(calkit_path) as f:
             calkit = yaml.safe_load(f) or {}
     except FileNotFoundError:
+        print(f"Warning: {calkit_path} not found; no git-tracked outputs to check out.")
         return []
 
     paths = []
@@ -95,33 +96,57 @@ def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
 
 
 def checkout_git_tracked_outputs(prefer):
-    """Run `git checkout --ours/--theirs` for each calkit.yaml output with storage: git.
+    """Write ours/theirs blob content for each calkit.yaml output with storage: git.
 
     prefer must be "O" (ours) or "T" (theirs).  Any other value is a no-op.
-    Errors for individual paths are reported but do not abort the script.
+
+    Uses `git cat-file blob :2:<path>` (ours) or `:3:<path>` (theirs) to read
+    content directly from git's object store without touching the index.  This
+    avoids the index.lock conflict that occurs when a git merge driver tries to
+    run `git checkout --ours/--theirs` while git already holds the lock.
+
+    Because the index is not updated here, the caller should print a reminder
+    for the user to `git add` the resolved files.
     """
     if prefer not in {"O", "T"}:
         return
 
-    strategy = "--ours" if prefer == "O" else "--theirs"
+    # git index stages: 1=base, 2=ours, 3=theirs
+    stage = "2" if prefer == "O" else "3"
+    strategy = "ours" if prefer == "O" else "theirs"
     paths = get_git_tracked_outputs()
 
     if not paths:
         return
 
-    print(f"\nChecking out git-tracked stage outputs with {strategy}:")
+    print(f"\nWriting {strategy} version of git-tracked stage outputs:")
+    resolved = []
     for p in paths:
         result = subprocess.run(
-            ["git", "checkout", strategy, "--", p],
+            ["git", "cat-file", "blob", f":{stage}:{p}"],
             capture_output=True,
-            text=True,
         )
         if result.returncode == 0:
-            print(f"  [OK] {p}")
+            try:
+                dest = Path(p)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(result.stdout)
+                print(f"  [OK] {p}")
+                resolved.append(p)
+            except OSError as exc:
+                print(f"  [ERROR] {p}: {exc}")
         else:
-            # Likely not in conflict / not present in the relevant stage.
-            msg = (result.stderr or result.stdout).strip()
+            # File not staged at this conflict stage (not in conflict, or
+            # missing on one side) — nothing to do.
+            msg = result.stderr.decode("utf-8", errors="replace").strip()
             print(f"  [SKIP] {p}: {msg}")
+
+    if resolved:
+        print(
+            "\nThese files were written to the working tree but not staged.\n"
+            "After the merge completes, run:\n"
+            f"  git add {' '.join(resolved)}"
+        )
 
 
 # -------------------------------
