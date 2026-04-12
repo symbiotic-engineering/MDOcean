@@ -9,6 +9,7 @@ from pathlib import Path
 
 BASE_LOCK, OURS_LOCK, THEIRS_LOCK = sys.argv[1:4]
 REPO_ROOT = Path.cwd()
+CALKIT_YAML = REPO_ROOT / "calkit.yaml"
 
 
 # -------------------------------
@@ -66,6 +67,61 @@ def _repo_dot_dvc_paths():
             p = p[:-4]
         normalized.add(p)
     return normalized
+
+
+# -------------------------------
+# calkit.yaml helpers
+# -------------------------------
+
+def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
+    """Return a list of output paths from calkit.yaml stages that have storage: git."""
+    try:
+        with open(calkit_path) as f:
+            calkit = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return []
+
+    paths = []
+    stages = (calkit.get("pipeline") or {}).get("stages", {})
+    for stage_data in stages.values():
+        if not isinstance(stage_data, dict):
+            continue
+        for out in stage_data.get("outputs", []):
+            if isinstance(out, dict) and out.get("storage") == "git":
+                p = out.get("path")
+                if p:
+                    paths.append(_norm_path(p))
+    return paths
+
+
+def checkout_git_tracked_outputs(prefer):
+    """Run `git checkout --ours/--theirs` for each calkit.yaml output with storage: git.
+
+    prefer must be "O" (ours) or "T" (theirs).  Any other value is a no-op.
+    Errors for individual paths are reported but do not abort the script.
+    """
+    if prefer not in {"O", "T"}:
+        return
+
+    strategy = "--ours" if prefer == "O" else "--theirs"
+    paths = get_git_tracked_outputs()
+
+    if not paths:
+        return
+
+    print(f"\nChecking out git-tracked stage outputs with {strategy}:")
+    for p in paths:
+        result = subprocess.run(
+            ["git", "checkout", strategy, "--", p],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            print(f"  [OK] {p}")
+        else:
+            # Likely not in conflict / not present in the relevant stage.
+            msg = (result.stderr or result.stdout).strip()
+            print(f"  [SKIP] {p}: {msg}")
 
 
 # -------------------------------
@@ -172,7 +228,7 @@ def merge_lockfiles(base, ours, theirs):
 
         conflict_blocks.append("\n".join(block_lines))
 
-    return merged_stages, conflict_stage_names, conflict_blocks
+    return merged_stages, conflict_stage_names, conflict_blocks, prefer
 
 
 # -------------------------------
@@ -198,7 +254,7 @@ def main():
     ours = load_yaml(OURS_LOCK)
     theirs = load_yaml(THEIRS_LOCK)
 
-    merged_stages, conflict_stage_names, conflict_blocks = merge_lockfiles(
+    merged_stages, conflict_stage_names, conflict_blocks, prefer = merge_lockfiles(
         base, ours, theirs
     )
 
@@ -236,12 +292,14 @@ def main():
             print(f"  - {stage}")
 
         print("\nResolve these conflicts manually in dvc.lock.")
+        checkout_git_tracked_outputs(prefer)
         sys.exit(1)
     # ---------------------------------------
     # No conflicts: safe to run global dry repro
     # ---------------------------------------
 
     print("Merged dvc.lock successfully.")
+    checkout_git_tracked_outputs(prefer)
     print("Running `dvc repro --dry` to detect stages that need recomputation...\n")
 
     result = subprocess.run(["dvc", "repro", "--dry"])
