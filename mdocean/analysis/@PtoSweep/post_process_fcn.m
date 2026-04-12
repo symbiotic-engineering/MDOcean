@@ -100,8 +100,40 @@ function [fig_array, ...
 
     legend(ax(1), 'Location', 'best');
 
+    % --- Figure 2: per-sea-state constraint activity counts ---
+    n_force_only = intermed_result_struct.n_force_only;
+    n_power_only = intermed_result_struct.n_power_only;
+    n_both       = intermed_result_struct.n_both;
+    n_neither    = intermed_result_struct.n_neither;
+
+    % transpose from ndgrid layout to contourf layout [n_P x n_F]
+    cnt_data   = {n_force_only', n_power_only', n_both', n_neither'};
+    cnt_titles = {'Force Limit Only (# sea states)', ...
+                  'Power Limit Only (# sea states)', ...
+                  'Both Limits (# sea states)', ...
+                  'Neither Limit (# sea states)'};
+
+    fig2 = figure;
+    t2 = tiledlayout(2, 2, 'TileSpacing', 'compact');
+    title(t2, 'PTO Constraint Activity for Nominal RM3 Geometry');
+
+    ax2 = gobjects(1, 4);
+    for k = 1:4
+        ax2(k) = nexttile;
+        contourf(F_max_vec, P_max_kW, cnt_data{k});
+        colorbar;
+        xlabel('F_{max} (MN)');
+        if mod(k, 2) == 1
+            ylabel('P_{max} (kW)');
+        end
+        title(cnt_titles{k});
+        hold on;
+    end
+
+    improvePlot;
+
     % --- Outputs ---
-    fig_array         = fig;
+    fig_array         = [fig, fig2];
     tab_array_display = {};
     tab_array_latex   = {};
     tab_firstrows     = {};

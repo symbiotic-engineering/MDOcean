@@ -10,7 +10,7 @@ classdef PtoSweep < GenericAnalysis
     %   minimum-LCOE operating points.
 
     properties
-        fig_names = {'pto_sweep'};
+        fig_names = {'pto_sweep', 'pto_sweep_constraint_activity'};
         tab_names = {};
     end
 
