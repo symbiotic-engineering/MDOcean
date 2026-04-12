@@ -1,5 +1,15 @@
 # Changelog
 ## Unreleased
+## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
+### Added
+- Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
+- Model: cache m_k_h to reduce compute time since it doesn't change across sims
+### Changed
+- Model: turn on stabilization within optimal control solver
+- Model: increase max kappa of drag LUT from 8 to 120
+### Fixed
+- Model: handle edge case geometries that cause finite precision errors
+- Model: fix indexing error in make_drag_integral_LUT that led to out-of-bounds queries being kept NaN instead of numerically computed
 
 ## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
 ### Changed
