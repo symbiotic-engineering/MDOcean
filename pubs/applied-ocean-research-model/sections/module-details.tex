@@ -565,7 +565,8 @@ Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no m
 
 \paragraph{Constrained}
 We first compile expressions for all metrics $M$ which must be constrained.
-To facilitate these calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\mathbf{A}_M$:
+For the time being, we keep these expressions generic so they apply to any port.
+To facilitate the calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\mathbf{A}_M$:
 \begin{equation}\label{eq:metrics}
     M = \frac{1}{4} \begin{bmatrix}
     \hat{e} \\ \hat{q}
@@ -658,7 +659,8 @@ $\vec{x}^{\,*}\mathbf{Q}_i\vec{x}
 \le b_i$
 can enforce limits on any linear or quadratic combination of the effort and flow variables at any port.
 The specific quantities constrained in this case are shown in \cref{tab:qp-constraints}.
-Specifically, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
+More precisely, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
+In addition to the amplitude limits shown in the first three rows of \cref{tab:qp-constraints}, a differently-structured quadratic amplitude constraint will be presented in \cref{sec:design-load-cases} (see \cref{eq:slam-constraint-quadratic}) representing a coupled amplitude-phase criteria for the bodies to not exit the water or be fully submerged.
 
 \begin{table}[]
 \centering
@@ -709,10 +711,20 @@ Specifically, this simulation implements constraints on the maximum allowed gene
     p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
 \end{aligned}
 \end{equation}
-where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient. The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch. Its value can be calculated semi-analytically via a process described in \cref{sec:appendix-qp-solution}.
+where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient. The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch.
 $\Gamma=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
-For (2), the maximum generator torque constraint is considered separately from the others. 
+As \cref{sec:mod-freq-domain} describes, the solution for $\Gamma$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
+Direct methods solve the optimization problem itself, while indirect methods first derive the optimality conditions and then solve those conditions.
+MDOcean currently implements the numerical indirect approach, which corresponds to the implicit architecture in \cref{fig:control-arch}.
+The explicit architecture corresponds to the analytical approach, while the nested architecture corresponds to the numerical direct approach.
+The simultaneous architecture is also a numerical direct approach, but rather than solving the quadratic program \cref{eq:opt-problem} it integrates into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation. 
+It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the present numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is recommended for future implementation.
+
+The analytical approach is described in \cref{sec:appendix-qp-solution}, and the numerical indirect approach in \cref{sec:appendix-qp-numerical}.
+
+\paragraph{Nonlinear controller}
+For the nonlinear controller, the maximum generator torque constraint is considered separately from the others. 
 This constraint changes the optimal torque signal from a pure sinusoid to a saturated waveform, approaching a square wave for sufficiently low torque limit.
 As is, this nonlinear signal could not be handled with a frequency-domain transfer function and would require time-domain simulation.
 Conveniently, through the describing function method, the saturated signal can be represented with Fourier analysis as a superposition of harmonics.
@@ -951,8 +963,10 @@ which is derived by requiring that the height of the water column below the body
 
 In both operational and storm states, the WEC surface should not transiently pierce the wave free surface since this causes extremely high loads.
 This includes slamming, in which the bottom surface of the WEC rises out of the water and hits the free surface as it reenters, and submersion, in which the top of the WEC becomes fully submerged beneath the free surface.
-The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam} and can be expressed in a quadratic form compatible with \cref{eq:opt-problem}: 
-\begin{equation}
+The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \appendixname~\ref{sec:appendix-slam}.
+These limits depend on the phase of the response, not just the magnitude.
+Therefore they do not utilize the exact quadratic coefficients of \cref{tab:qp-constraints} as the other amplitude constraints do, but can nonetheless be expressed in a quadratic form compatible with \cref{eq:opt-problem}:
+\begin{equation}\label{eq:slam-constraint-quadratic}
     \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
 \end{equation}
 for relevant vertical body dimension $\Delta z$ and horizontal coordinate $y$, depending on the wave parameters and body diameter and oscillation phase.
