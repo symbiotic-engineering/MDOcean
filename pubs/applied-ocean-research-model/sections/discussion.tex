@@ -162,66 +162,40 @@ The effect of drag is most significant in the 11-12 second range, corresponding 
 Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitdues at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
 
 \paragraph{Constraint Sensitivities}
-The structure of the constrained optimal control problem allows for the quantification of the sensitivity of the optimal solution to each constraint, formalizing the intuition behind $\eta^{H,T}_{limits}$.
-From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $\overline{P}_{elec}$ is the weighted sea-state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with a quadratic function of the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
-Using $\beta$ to index the sea states, the annual average power is:
+The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\eta^{H,T}_{limits}$.
+From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,opt}|^2)$ that captures the effect of active dynamic constraints:
 \begin{equation}\label{eq:power-elec-sum}
 \begin{aligned}
-    &\overline{P}_{elec} = \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot 
-    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_\beta|^2)
+    \overline{P}_{elec} &= \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
+    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_{\beta,opt}|^2)
     \\ s.t. \quad
-    |\hat{F}_{p,\beta}| &\leq F_{max},\\
-    |p_{pk,elec,\beta}| &\leq P_{max,elec},\\
-    |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\\
-    |\hat{\xi}_{s,\beta}| &\leq X_{s,max}\\
+    |\hat{F}_{p,\beta}| &\leq F_{max},\quad
+    |p_{pk,elec,\beta}| \leq P_{max,elec},\\
+    |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\quad
+    |\hat{\xi}_{s,\beta}| \leq X_{s,max}\\
 \end{aligned}
 \end{equation}
+Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control with no active constraints.
+When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
 
-Aggregating the reflection coefficients for all sea states into a vector $\vec{\Gamma}$, the effect of the constraints on power can be expressed as the difference between the unconstrained power and the power lost from impedance mismatch required to obey constraints:
-\begin{equation}
-\begin{aligned}
-    \overline{P}_{elec} = \overline{P}_{elec,unconstrained} (1 - \vec{\Gamma}^* \, \mathbf{I} \, \vec{\Gamma}) \\
-    s.t. \quad S_\mu (\vec{\Gamma} - \vec{\Gamma}_{c,\mu})^* \, \mathbf{I} \, (\vec{\Gamma} - \vec{\Gamma}_{c,\mu}) 
-    \leq S_\mu \vec{r}_\mu^{~2} 
-    \\ \forall \mu \in \{1,...,N_{constraints}\}
-\end{aligned}
-\end{equation}
-where $\mathbf{I}$ is the identity matrix of size $N_{sea}\times N_{sea}$.
-Assuming at least one constraint is active at the optimal solution in each sea state, the magnitude of the optimal reflection coefficient in each sea state $|\vec{\Gamma}_{opt}|$ is:
-\begin{equation}
-    |\vec{\Gamma}_{opt}| = 
+As derived in \cref{sec:appendix-constraint-sensitivity}, the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ affect only the radii $r_\mu$ of the constraint circles in the complex $\Gamma$ plane (see \cref{sec:appendix-qp-solution}), not the circle centers $\Gamma_{c,\mu}$.
+Larger constraint limits produce larger circle radii, which allow a smaller optimal $|\Gamma_{\beta,opt}|$ and thus monotonically increase power.
+The optimal reflection coefficient in each sea state takes one of the following values depending on which constraints are active (see \cref{sec:appendix-constraint-sensitivity} for the complete derivation):
+\begin{equation}\label{eq:gamma-opt-summary}
+    |\Gamma_{\beta,opt}| =
     \begin{cases}
-        0 & \text{if no constraints active} \\
-    |\vec{\Gamma}_{c,\mu^*}| - \vec{r}_{\mu^*} & \text{if constraint $\mu^*$ active, others inactive} \\
-     & \text{if constraints $\mu^*$, $\nu^*$ active, others inactive} \\
+        0 & \text{no constraints active in sea state $\beta$} \\
+        |\Gamma_{c,\mu^*}| - r_{\mu^*} & \text{one constraint $\mu^*$ active} \\
+        |\Gamma_{\mu^*,\nu^*}| & \text{constraints $\mu^*$ and $\nu^*$ both active}
     \end{cases}
 \end{equation}
-where $*$ denotes the active constraint(s) in each sea state.
+where $\Gamma_{\mu^*,\nu^*}$ is the intersection point of the two active constraint circles.
 
-Power scales with $b_\mu$ and $b_{\nu}$ as follows:
-\begin{equation}
-    P_{elec} = P_0 + p_\mu b_\mu + p_\nu b_\nu \pm p_{\mu\nu} \sqrt{ a_0 b_\mu^2 + a_1 b_\nu^2 + a_2 b_\mu b_\nu + a_3 b_\mu + a_4 b_\nu + a_5}
-\end{equation}
-
-We are interested in the sensitivity of power to the constraint limits $F_{max}$, $P_{pk,elec}$, $X_{f,max}$, and $X_{s,max}$.
-Combining the constraint coefficients of \cref{tab:qp-constraints} with \cref{eq:gamma-disc-params} reveals that the constraint limits do not affect the constraint centers $\vec{\Gamma}_{c,\mu}$ and affect the radii $\vec{r}_\mu$ with the following form:
-\begin{equation}
-    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
-\end{equation}
-where $b_\mu$ is $b$ in \cref{tab:qp-constraints}, and $c_\mu$ and $d_\mu$ are independent of the constraint limits and only functions of $Z_{s,th}$, $\hat{V}_{s,th}$, and $\mathbf{Q}$ and $\vec{a}$ in \cref{tab:qp-constraints}.
-%Recall from \cref{tab:qp-constraints} that the square of each of the constrained quantities in \cref{eq:power-elec-sum} is a quadratic function of the state variables and thus of the reflection coefficient $\Gamma_\beta$, except for the power constraint where $p_{pk,elec,\beta} \sim \Gamma_\beta^4$.
-
-We can leverage results of parametric programming to find how the optimal power changes with the constraint limits.
-According to the theory of perturbation and sensitivity analysis of convex optimization problems with generalized inequality constraints \cite[Section~5.9.3]{boyd_convex_2004}, the local sensitivity of the optimal power to each constraint limit is given by the product of the Lagrange multiplier $\lambda_\mu$ associated with that constraint, and the partial derivative of the constraint function to the constraint limit.
-Considering that the active set varies with the constraint limits, the global dependence of power on constraint limit can be found by integrating the local sensitivity across the range of constraint limits, and will be convex if the original problem is convex.
-Thus, for cases where two constraints are active and the optimal occurs at an intersection of the constraint circles, the average power is piecewise affine plus square root of quadratic in the constraint limits.
-For cases where only one constraint is active, the average power is piecewise affine plus square root of affine in the constraint limits.
-
-Plugging these optimal solutions into the power equation gives the following sensitivitiy, which applies globally as long as $\mu$ and $\nu$ are adjusted to reflect any change in active constraints that occurs as limits are varied:
-\begin{equation}
-    \overline{P}_{elec} = \overline{P}_{elec,unconstrained} - \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot 
-    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_\beta|^2)
-\end{equation}
+The sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory \cite[Section~5.9.3]{boyd_convex_2004}: the local sensitivity equals the product of the Lagrange multiplier for that constraint and the partial derivative of the constraint function with respect to the limit.
+Since the power maximization problem is convex after reduction to the $\Gamma$ parameterization (see \cref{sec:qp-convexity}), integrating these local sensitivities gives a global power--limit relationship that is also convex.
+When a single constraint is active, the average power is piecewise affine plus the square root of an affine function of the constraint limit.
+When two constraints are simultaneously active, it is piecewise affine plus the square root of a quadratic function of the two constraint limits (see \cref{sec:appendix-constraint-sensitivity}).
+In both cases the benefit of relaxing a constraint diminishes as the limit grows, quantifying the diminishing returns of oversizing the PTO.
 
 
 \paragraph{LCOE Drivers}
@@ -236,39 +210,10 @@ The LCOE model then equals:
 The numerator of \cref{eq:LCOE-scale} scales linearly with design inputs $F_{max}$ and $P_{max,elec}$, while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
 The presence of the constraint limits in the numerator of the LCOE implies that whether or not the optimal solution is saturated, at least one dynamic constraint will be active in each sea state at system optimality.
 More strongly, the presence of the PTO limits in the numerator and denominator but not elsewhere in the model implies that the system optimal will have both PTO limits active in at least one sea state.
-The numerator is affine in the PTO limits whlie the denominator is piecewise affine plus square root of quadratic or affine in the PTO limits.
+The numerator is affine in the PTO limits while the denominator is piecewise affine plus square root of quadratic or affine in the PTO limits.
 The LCOE minimization with design variables of $F_{max}$ and $P_{max,elec}$ and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
-The convexity properties of this problem can motivate a double-nested strategy for optimization: at the innermost level, the optimal control problem for fixed geometry and PTO limits can be solved as an analytical QP, then the mid-level optimization can be solved as a low-dimensional fractional quadratic program to find the optimal PTO limits, and the outer-level optimization can be solved as a general nonlinear program to find the optimal geometry.
-
-
-LCOE with gamma:
-\begin{equation}
-    LCOE \sim \frac{p'_0+p'_1x_1 + p'_2x_2 + p'_3x_3}{\bar{P}_{elec,unconstrained} - \vec{|\Gamma|} \mathbf{Q}_\Gamma \vec{|\Gamma|}}
-\end{equation}
-
-LCOE with x for x=Fmax, Ppk, thickness:
-- $p'_n$ are constant
-- $\mathbf{Q}_\Gamma$ is constant
-- $\bar{P}_{elec,unconstrained}$ is constant
-- $|\Gamma|$ is constant if the amplitude constraint is active, and the following if an effort limit is active:
-\begin{equation}
-    |\Gamma| \sim |\Gamma_{c,\mu}| - r_{\mu} \\
-\end{equation}
-plug in $|\Gamma_{c,\mu}|$ and $r_{\mu}$:
-\begin{equation}
-    |\Gamma| = \frac{a_1 e_{max}^2 + a_0 \pm 
-    \sqrt{(a_1 e_{max}^2+a_0)^2 + (a_3 e_{max}^2 + a_4)(a_5 e_{max}^2 + a_6)}}
-    {a_3 e_{max}^2 + a_4}
-\end{equation}
-a function of the design variables, with the following dependence on the design variables:
-
-LCOE with x for x=Fmax, Ppk, thickness, and bulk dimensions:
-- $p'_n$ are constant for n=0, 1, 2
-\begin{equation}
-    p'_3 \sim x_4^2, \qquad
-\end{equation}
-
-\hl{write Fmax and Ppk and Pavg in terms of the control variables, showing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
+The convexity of the denominator with respect to the PTO limits (established in the preceding paragraph) means that LCOE is quasi-convex in the PTO limits for fixed geometry, guaranteeing a unique global optimum in those variables.
+This motivates a nested optimization strategy: at the innermost level the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; at the mid-level the optimal PTO limits are found by exploiting the quasi-convex fractional structure; and at the outer level the bulk geometry is optimized with a general nonlinear program.
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
