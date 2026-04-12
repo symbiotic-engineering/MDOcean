@@ -125,7 +125,7 @@ The present section focuses instead on the high-level capabilities and limitatio
 
 The primary appeal of MEEM is its speed.
 While exact runtimes will be discussed in section~\ref{sec:sim-runtime}, timing comparisons indicate more than an order-of-magnitude speedup compared to Capytaine BEM for the same level of convergence.
-This removes a large bottleneck from design optimization.
+This removes a large bottleneck from the computational cost of multidisciplinary analysis.
 Additional advantages over BEM include lower memory requirements, lack of meshing, and avoiding numerical approximation of the Green's function.
 
 Limitations include shape restrictions and numerical overflow.
@@ -141,10 +141,7 @@ Dashed lines represent geometry that is neglected in the MEEM calculations}
 \end{figure}
 
 A second limitation of the present implementation of MEEM is numerical overflow.
-To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$:
-\begin{equation}\label{eq:delta-z-min-intro}
-    \Delta z_{min} \sim D
-\end{equation}
+To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$
 for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
 The constant of proportionality between $\Delta z_{min}$ and $D$ is discussed in \appendixname~\ref{sec:MEEM_details} and is sufficiently small that realistic geometries do not come close to numerical overflow. 
 
@@ -829,7 +826,7 @@ These scalars are assembled into ``matrices'' (i.e. $\mathbf{\hat{\xi}}^{H,T}_f$
 Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
 To distinguish from the average and maximum signal values over a wave period denoted with $avg$ and $pk$ subscripts in \cref{sec:power-production}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $max$.
 This intentionally matches the $max$ subscript used in \cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
-An exception is the slamming and submergence constraints, which will be discussed separately in \cref{sec:dynamic-limits}.
+An exception is the slamming and submergence constraints, which will be discussed separately in \cref{sec:design-load-cases}.
 
 To find the long-term average power production $\overline{P}_{elec}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{elec}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in Figure \ref{fig:JPD-multiply}.
