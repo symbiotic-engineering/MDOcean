@@ -1,45 +1,41 @@
 stages:
-  mermaid-taxonomy-pdf:
+  mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf -f
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    desc: Automatically generated from the 'mermaid-taxonomy-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  mermaid-taxonomy-svg:
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pdfs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  mermaid-make-pngs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/img/${item.name}.png
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg:
-          cache: false
+      - mdocean/plots/non_matlab_figs/img/${item.name}.png:
+          cache: true
           persist: false
-    desc: Automatically generated from the 'mermaid-taxonomy-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  reformat-mermaid-svg:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
-      "xmllint --format 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy.svg"
-    deps:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      - .calkit/env-locks/pubs
-    outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
-          cache: false
-          persist: false
-    desc: Automatically generated from the 'reformat-mermaid-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pngs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); drag_fcn 
-      = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 8); 
+      = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 120); 
       save('./mdocean/inputs/drag_integral.mat','drag_fcn');"
     deps:
       - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
@@ -114,6 +110,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -172,6 +169,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -243,6 +241,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -305,6 +304,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -381,6 +381,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -439,6 +440,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -504,6 +506,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -562,6 +565,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -629,6 +633,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -691,6 +696,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -764,6 +770,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -825,6 +832,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -896,6 +904,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -965,6 +974,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1033,6 +1043,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1091,6 +1102,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1157,6 +1169,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1215,6 +1228,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1288,6 +1302,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1349,6 +1364,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1423,6 +1439,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -1494,6 +1511,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -1573,6 +1591,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1634,6 +1653,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1708,6 +1728,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -1770,6 +1791,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1848,6 +1870,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1913,6 +1936,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1999,6 +2023,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -2066,6 +2091,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2145,6 +2171,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -2208,6 +2235,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2319,6 +2347,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2377,6 +2406,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2451,6 +2481,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -2517,6 +2548,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2589,6 +2621,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2647,6 +2680,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2835,6 +2869,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2896,6 +2931,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2982,6 +3018,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -3050,6 +3087,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3134,6 +3172,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3193,6 +3232,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3265,6 +3305,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3324,6 +3365,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3390,6 +3432,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3449,6 +3492,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3468,6 +3512,165 @@ stages:
           cache: false
           persist: false
     desc: Automatically generated from the 'postpro-SparHydro' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  analysis-SweepGeoms:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=SweepGeoms; obj.run_analysis();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
+      - ./mdocean/analysis/@SweepGeoms/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/optimization/gradient_optim.m
+      - ./mdocean/optimization/max_avg_power.m
+      - ./mdocean/optimization/run_solver.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/optim_geomviz.m
+      - ./mdocean/plots/matlab_figs/optimplotx_custom.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/matlab_figs/visualize_geometry.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/lin_ineq_constraints.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/run/check_max_CW.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/SweepGeoms/intermed.mat
+    desc: Automatically generated from the 'analysis-SweepGeoms' stage
+      in calkit.yaml. Changes made here will be overwritten.
+  postpro-SweepGeoms:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=SweepGeoms; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
+      - ./mdocean/analysis/@SweepGeoms/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/optimization/multiobjective/paretoFront.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/MatlabSVG/loadSVG.m
+      - ./mdocean/plots/util/MatlabSVG/plotSVG.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - results/SweepGeoms/intermed.mat
+    outs:
+      - results/SweepGeoms/sweep_geoms_parallel.pdf
+      - results/SweepGeoms/sweep_geoms_scatter.pdf
+      - results/SweepGeoms/sweep_geoms_line.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
+      - results/SweepGeoms/sweep_geoms_pareto.pdf
+      - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
+      - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
+      - results/SweepGeoms/factor_grid.pdf
+      - results/SweepGeoms/sweep_geoms_parallel.fig
+      - results/SweepGeoms/sweep_geoms_scatter.fig
+      - results/SweepGeoms/sweep_geoms_line.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_a2.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_vol.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_sa.fig
+      - results/SweepGeoms/sweep_geoms_pareto.fig
+      - results/SweepGeoms/sweep_geoms_pareto_nondim.fig
+      - results/SweepGeoms/sweep_geoms_grid_scatter.fig
+      - results/SweepGeoms/factor_grid.fig
+      - results/SweepGeoms/end.mat
+      - results/SweepGeoms/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-SweepGeoms' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
@@ -3516,6 +3719,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/lin_ineq_constraints.m
@@ -3580,6 +3784,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3654,6 +3859,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -3728,6 +3934,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -4187,6 +4394,7 @@ stages:
       - results/Meem/
       - results/QPCircles/
       - results/Slamming/
+      - results/SweepGeoms/
       - results/Cost/
       - mdocean/plots/fig_tab_pub_mapping.m
       - mdocean/plots/move_results_to_pubs.m
