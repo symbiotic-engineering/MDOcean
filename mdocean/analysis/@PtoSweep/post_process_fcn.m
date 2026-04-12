@@ -108,9 +108,9 @@ function [fig_array, ...
     tab_colspecs      = {};
 
     % End results at minimum-LCOE operating point (SI units for latex stage)
-    end_result_struct.ptoSweepMinLCOE_F_max  = F_max_vec(i_ml) * 1e6;    % N
-    end_result_struct.ptoSweepMinLCOE_P_max  = P_max_kW(j_ml)  * 1e3;    % W
-    end_result_struct.ptoSweepMinLCOE_power  = power_avg(i_ml, j_ml);    % W
-    end_result_struct.ptoSweepMinLCOE_cost   = cost(i_ml, j_ml);         % $
-    end_result_struct.ptoSweepMinLCOE_LCOE   = LCOE_mat(i_ml, j_ml);    % $/kWh
+    end_result_struct.ptoSweepMinLCOE_F_max  = F_ml * 1e6;             % N
+    end_result_struct.ptoSweepMinLCOE_P_max  = P_ml * 1e3;             % W
+    end_result_struct.ptoSweepMinLCOE_power  = power_avg(i_ml, j_ml);  % W
+    end_result_struct.ptoSweepMinLCOE_cost   = cost(i_ml, j_ml);       % $
+    end_result_struct.ptoSweepMinLCOE_LCOE   = LCOE_mat(i_ml, j_ml);  % $/kWh
 end
