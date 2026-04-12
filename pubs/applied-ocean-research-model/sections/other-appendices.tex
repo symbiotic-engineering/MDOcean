@@ -274,9 +274,9 @@ Using $\hat{I}_p$ for brevity to denote the current in the particular solution, 
 \end{equation}
 
 Inequality constraints 
-$\vec{x}^{\,*}\mathbf{Q}_i\vec{x} + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\} \le b_i$
+$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x} + 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\} \le b_\mu$
 further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
-While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition. 
+While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition, even if the problem is non-convex (see \cref{sec:qp-convexity} for a discussion on convexity). 
 First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
 \begin{subequations}\label{eq:obj-inequality-gamma}
 \begin{align}
@@ -284,28 +284,28 @@ P_{avg,VI}
 &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
 \label{eq:obj-gamma}
 \\[6pt]
-A_{q,i}|\Gamma|^2 +&
+A_{q,\mu}|\Gamma|^2 +&
 2\Re\!\left\{
-    B_{q,i}\Gamma
-\right\}+C_{q,i}
+    B_{q,\mu}\Gamma
+\right\}+C_{q,\mu}
 \le
 0
-\quad \forall i
+\quad \forall \mu
 \label{eq:ineq-gamma}
 \end{align}
 \end{subequations}
-where quadratic coefficients $A_{q,i}$, $B_{q,i}$, and $C_{q,i}$ from \cref{eq:ineq-gamma} are defined as:
+where quadratic coefficients $A_{q,\mu}$, $B_{q,\mu}$, and $C_{q,\mu}$ from \cref{eq:ineq-gamma} are defined as:
 \begin{equation}
 \begin{aligned}
-    A_{q,i} &= |\hat{I}_p|^{2}\,
-    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}& &\in \mathbb{R} \\
-    B_{q,i} &= -\hat{I}_p\,
-    \left(\vec{x}_p^{\,*}\mathbf{Q}_i + \vec{a}_i^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
-    C_{q,i} &= 
-        \vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+    A_{q,\mu} &= |\hat{I}_p|^{2},
+    \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}& &\in \mathbb{R} \\
+    B_{q,\mu} &= -\hat{I}_p,
+    \left(\vec{x}_p^{\,*}\mathbf{Q}_{\mu} + \vec{a}_{\mu}^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
+    C_{q,\mu} &= 
+        \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
         +
-        2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
-        -b_i&
+        2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}
+        -b_{\mu}&
     &\in \mathbb{R}
 \end{aligned}
 \end{equation}
@@ -314,89 +314,99 @@ Since \cref{eq:obj-gamma} shows that power decreases with increasing $|\Gamma|$,
 \begin{alignat}{2}
 & \min_{\Gamma \in \mathbb{C}} &  |\Gamma|& \\[3pt]
 & \text{s.t.} &
-S_i|\Gamma - \Gamma_{c,i}|^2 &\le S_i r_i^2,
-\quad \forall i \label{eq:disc-constraint}\\
+S_{\mu}|\Gamma - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
+\quad \forall \mu \label{eq:disc-constraint}\\
 & \text{where} &
-\Gamma_{c,i}  &\in \mathbb{C} \nonumber\\
-& & r_i^2 &\in \mathbb{R} \nonumber \\
-& & S_i &\in \left\{-1,1\right\} \nonumber
+\Gamma_{c,\mu}  &\in \mathbb{C} \nonumber\\
+& & r_{\mu}^2 &\in \mathbb{R} \nonumber \\
+& & S_{\mu} &\in \left\{-1,1\right\} \nonumber
 \end{alignat}
 \end{subequations}
 where the constraint \cref{eq:disc-constraint} is derived from \cref{eq:ineq-gamma} by completing the square.
-More precisely, when $A_{q,i} \neq 0$, the $i$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,i}$ with radius $r_i$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,i} > 0$ ($S_i=1$) or outside this circle when $A_{q,i} < 0$ ($S_i=-1$). Parameters $\Gamma_{c,i}$, $r_i$, and $S_i$ are defined as:
+More precisely, when $A_{q,\mu} \neq 0$, the $\mu$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,\mu}$ with radius $r_{\mu}$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,\mu} > 0$ ($S_{\mu}=1$) or outside this circle when $A_{q,\mu} < 0$ ($S_{\mu}=-1$). Parameters $\Gamma_{c,\mu}$, $r_{\mu}$, and $S_{\mu}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
-\Gamma_{c,i}
-&= \frac{-B_{q,i}^{\,*}}{A_{q,i}} = 
+\Gamma_{c,\mu}
+&= \frac{-B_{q,\mu}^{\,*}}{A_{q,\mu}} = 
 \frac{
     \hat{I}_p^{\,*}\,
     \vec{n}^{\,*}
-    \left(\mathbf{Q}_i\vec{x}_p + \vec{a}_i\right)
+    \left(\mathbf{Q}_{\mu}\vec{x}_p + \vec{a}_{\mu}\right)
 }{
     |\hat{I}_p|^{2}\,
-    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+    \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
 \\[6pt]
-r_i^2
+r_{\mu}^2
 &=
-\frac{|B_{q,i}|^2-A_{q,i}C_{q,i}}{A_{q,i}^2} = 
+\frac{|B_{q,\mu}|^2-A_{q,\mu}C_{q,\mu}}{A_{q,\mu}^2} = 
 \frac{
-b_i
+b_{\mu}
 -
-\vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+\vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
 -
-2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}
 }{
 |\hat{I}_p|^{2}\,
-\vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
 +
-|\Gamma_{c,i}|^2 \\
-S_i &= \textrm{sign}(A_{q,i}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_i\vec{n}\right)
+|\Gamma_{c,\mu}|^2 \\
+S_{\mu} &= \textrm{sign}(A_{q,\mu}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}\right)
 \end{align}
 \end{subequations}
 
 \subsubsection{Solution}
-\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_i=1$ and exterior to all circles for which $S_i=-1$.
-The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_i C_{q,i} \leq 0 \quad \forall i$.
+\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_{\mu}=1$ and exterior to all circles for which $S_{\mu}=-1$.
+The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_{\mu} C_{q,\mu} \leq 0 \quad \forall \mu$.
 If the origin is infeasible, the constrained optimal solution will lie on the boundary of one or more of the circles, specifically either at an intersection of two or more circles or at any circle's point closest to the origin.
 We analytically compute all such candidate points and select the one with the lowest $|\Gamma|$ that satisfies all constraints.
 For $N$ constraints, there are up to $N^2$ candidate points ($N^2-N$ at intersections and $N$ at closest points).
-This leads to the following expression for the constrained optimal solution (valid when $A_{q,i} \neq 0 ~\forall i$):
+This leads to the following expression for the constrained optimal solution (valid when $A_{q,\mu} \neq 0 ~\forall \mu$):
 \begin{equation}\label{eq:gamma-opt-quadratic}
 \Gamma_{opt} =
 \begin{cases}
- 0 & \textrm{if } S_i C_{q,i} \leq 0 \quad \forall i \\[3pt]
+ 0 & \textrm{if } S_{\mu} C_{q,\mu} \leq 0 \quad \forall \mu \\[3pt]
  \arg\min\limits_{\Gamma \in \mathcal{F} \bigcap \mathcal{C}} |\Gamma| 
  & \textrm{otherwise} \\[3pt]
  \textrm{infeasible} & \textrm{if } \mathcal{F} \bigcap \mathcal{C} = \emptyset
 \end{cases}
 \end{equation}
-where $\mathcal{F} = \bigcap_i \left\{\Gamma : S_i|\Gamma - \Gamma_{c,i}| \le S_i r_i \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
+where $\mathcal{F} = \bigcap_{\mu} \left\{\Gamma : S_{\mu}|\Gamma - \Gamma_{c,\mu}| \le S_{\mu} r_{\mu} \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
 \begin{equation}\label{eq:candidate-points}
 \begin{aligned}
 \mathcal{C}_{int} &= \left\{
-    \Gamma : 
-    |\Gamma - \Gamma_{c,i}| = r_i, ~|\Gamma - \Gamma_{c,j}| = r_j, \quad \forall i \neq j
+    \Gamma_{\mu,\nu}, \quad \forall \mu \neq \nu
 \right\}. \\
 \mathcal{C}_{cl} &= \left\{
-    \Gamma : 
-    \Gamma = \Gamma_{c,i} - r_i \frac{\Gamma_{c,i}}{|\Gamma_{c,i}|}, \quad \forall i
+    (|\Gamma_{c,\mu}| - r_{\mu})e^{i\angle\,\Gamma_{c,\mu}}, \quad \forall \mu
 \right\}.
 \end{aligned}
 \end{equation}
+The intersection points of the $\mu$th and $\nu$th circles are given by:
+\begin{equation}
+    \Gamma_{\mu,\nu} = 
+    \Gamma_{c,\mu} + \frac{\Gamma_{c,\nu} - \Gamma_{c,\mu}}{d_{\mu\nu}}
+    \left(
+        a_{\mu\nu}
+        \pm
+        1i \sqrt{r_{\mu}^2-a_{\mu\nu}^2}
+    \right)
+\end{equation}
+where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from the center of the $\mu$th circle to the midpoint of the two intersection points, and $1i$ is the imaginary unit.
+
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
-\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_i=4$, $S_i=1$, and various $\Gamma_{c,i}$.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_{\mu}=4$, $S_{\mu}=1$, and various $\Gamma_{c,\mu}$.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figs/manual/qp_circles.pdf}
-    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,i}$, all with radius $r_i=4$ and $S_i=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
+    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,\mu}$, all with radius $r_{\mu}=4$ and $S_{\mu}=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
-If $A_{q,i} = 0$ for any $i$, the $i$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
-This can occur when $\mathbf{Q}_i = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\,*}\mathbf{Q}_i\vec{n} = 0$ ($\mathbf{Q}_i$ is rank-deficient and $\vec{n}$ is in its nullspace).
-The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,i}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
+If $A_{q,\mu} = 0$ for any $\mu$, the $\mu$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
+This can occur when $\mathbf{Q}_{\mu} = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\, *}\mathbf{Q}_{\mu}\vec{n} = 0$ ($\mathbf{Q}_{\mu}$ is rank-deficient and $\vec{n}$ is in its nullspace).
+The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,\mu}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
 
 \subsubsection{Quartic Apparent Power Constraints}\label{sec:appendix-mag-S-constraints}
 While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{max}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
@@ -407,7 +417,7 @@ The new candidate points are:
 \begin{aligned}
 \mathcal{C}_{int,oval-circ} &= \left\{
     \Gamma : 
-    |\Gamma - \Gamma_{c,i}| = r_i, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall i,k
+    |\Gamma - \Gamma_{c,\mu}| = r_{\mu}, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall \mu,k
 \right\}. \\
 \mathcal{C}_{cl,oval} &= \left\{
     \Gamma : 
@@ -418,7 +428,7 @@ The new candidate points are:
 \right\}.
 \end{aligned}
 \end{equation}
-where $i$ indexes circle constraints and $k$ indexes oval constraints.
+where $\mu$ indexes circle constraints and $k$ indexes oval constraints.
 While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
 We currently assume there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\Gamma$.
 
