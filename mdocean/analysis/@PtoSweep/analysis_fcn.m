@@ -53,10 +53,11 @@ function intermed_result_struct = analysis_fcn(p, b)
         % --- Per-sea-state constraint activity ---
         % Force constraint active: force saturation is reducing power (P_sat_ratio < 1)
         % Power constraint active: unsaturated electrical power exceeds P_max
-        P_max_W = X_i(idx_P) * 1e5;                          % actual P_max in W
+        force_sat_tol = 1e-6;                                         % numerical tolerance for force saturation
+        P_max_W      = X_i(idx_P) * 1e5;                             % actual P_max in W
         valid_ss     = p.JPD(:) > 0;
-        force_active = val.P_sat_ratio(:) < (1 - 1e-6) & ~isnan(val.P_sat_ratio(:));
-        power_active = val.P_mech(:) * p.eff_pto > P_max_W   & ~isnan(val.P_mech(:));
+        force_active = val.P_sat_ratio(:) < (1 - force_sat_tol) & ~isnan(val.P_sat_ratio(:));
+        power_active = val.P_mech(:) * p.eff_pto > P_max_W          & ~isnan(val.P_mech(:));
 
         n_force_only(i) = sum( force_active & ~power_active & valid_ss);
         n_power_only(i) = sum(~force_active &  power_active & valid_ss);

@@ -92,15 +92,15 @@ figs_in_AOR{28} = 'Meem.meem_convergence_vs_omega';
 figs_in_AOR{29} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{30} = 'DragIntegral.drag_integral_B';
-figs_in_AOR{30+10} = 'DragIntegral.drag_integral_G_m';
-figs_in_AOR{30+11} = 'DragIntegral.drag_integral_G_p';
+figs_in_AOR{40} = 'DragIntegral.drag_integral_G_m';
+figs_in_AOR{41} = 'DragIntegral.drag_integral_G_p';
 figs_in_AOR{31} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{32} = 'Slamming.slamming_amplitude';
 figs_in_AOR{33} = 'RunSingleFigFunc.slamming_model_comparison_float';
-figs_in_AOR{34}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
-figs_in_AOR{34+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
-figs_in_AOR{34+9} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
-figs_in_AOR{34+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{34} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{42} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{43} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{44} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - structures
 figs_in_AOR{35} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{36} = 'ReadNonMatlabFigs.trapezoid';
