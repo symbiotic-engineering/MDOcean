@@ -2747,6 +2747,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2805,6 +2806,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -2951,6 +2953,8 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -4404,8 +4408,8 @@ stages:
     desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
-    cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json'
-      'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+    cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
+      'results/Runtime/end.json' 'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
       --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
       $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
       MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
@@ -4416,6 +4420,7 @@ stages:
       : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
       : \"{wecsimAvgPowerErrorWorstCase:.2f}%\"}'"
     deps:
+      - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
       - results/Wecsim/end.json
