@@ -95,15 +95,40 @@ def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
     return paths
 
 
+def _read_blob(spec):
+    """Return bytes for a git object *spec*, or None if it does not exist.
+
+    Prints a warning if the command fails for a reason other than the object
+    simply not existing (e.g. a repository error).
+    """
+    result = subprocess.run(
+        ["git", "cat-file", "blob", spec],
+        capture_output=True,
+    )
+    if result.returncode == 0:
+        return result.stdout
+    # "Not a valid object name" means the blob genuinely doesn't exist at
+    # that spec — that's expected and not worth reporting.
+    stderr = result.stderr.decode("utf-8", errors="replace").strip()
+    if "Not a valid object name" not in stderr and stderr:
+        print(f"  [WARN] git cat-file {spec}: {stderr}")
+    return None
+
+
 def checkout_git_tracked_outputs(prefer):
     """Write ours/theirs blob content for each calkit.yaml output with storage: git.
 
     prefer must be "O" (ours) or "T" (theirs).  Any other value is a no-op.
 
-    Uses `git cat-file blob :2:<path>` (ours) or `:3:<path>` (theirs) to read
-    content directly from git's object store without touching the index.  This
-    avoids the index.lock conflict that occurs when a git merge driver tries to
-    run `git checkout --ours/--theirs` while git already holds the lock.
+    Strategy (avoids touching the index, so no index.lock conflict):
+    1. Try the staged conflict blob  (:2:<path> for ours, :3:<path> for theirs).
+       These exist only when both sides modified the file.
+    2. Fall back to the commit-tree blob (HEAD:<path> for ours,
+       MERGE_HEAD:<path> for theirs).  This handles the common case where only
+       one side changed the file and git therefore never staged it at a
+       conflict stage.
+    3. If neither exists the file was deleted (or is genuinely absent) on that
+       side — skip it.
 
     Because the index is not updated here, the caller should print a reminder
     for the user to `git add` the resolved files.
@@ -113,6 +138,7 @@ def checkout_git_tracked_outputs(prefer):
 
     # git index stages: 1=base, 2=ours, 3=theirs
     stage = "2" if prefer == "O" else "3"
+    commit_ref = "HEAD" if prefer == "O" else "MERGE_HEAD"
     strategy = "ours" if prefer == "O" else "theirs"
     paths = get_git_tracked_outputs()
 
@@ -122,24 +148,20 @@ def checkout_git_tracked_outputs(prefer):
     print(f"\nWriting {strategy} version of git-tracked stage outputs:")
     resolved = []
     for p in paths:
-        result = subprocess.run(
-            ["git", "cat-file", "blob", f":{stage}:{p}"],
-            capture_output=True,
-        )
-        if result.returncode == 0:
+        # Prefer the staged conflict blob; fall back to the commit-tree blob.
+        content = _read_blob(f":{stage}:{p}") or _read_blob(f"{commit_ref}:{p}")
+        if content is not None:
             try:
                 dest = Path(p)
                 dest.parent.mkdir(parents=True, exist_ok=True)
-                dest.write_bytes(result.stdout)
+                dest.write_bytes(content)
                 print(f"  [OK] {p}")
                 resolved.append(p)
             except OSError as exc:
                 print(f"  [ERROR] {p}: {exc}")
         else:
-            # File not staged at this conflict stage (not in conflict, or
-            # missing on one side) — nothing to do.
-            msg = result.stderr.decode("utf-8", errors="replace").strip()
-            print(f"  [SKIP] {p}: {msg}")
+            # File is absent on this side (deleted or never existed).
+            print(f"  [SKIP] {p}: not present in {strategy} ({commit_ref})")
 
     if resolved:
         print(
