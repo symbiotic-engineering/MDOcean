@@ -75,7 +75,7 @@ figs_in_AOR{13} = 'Runtime.sim_runtime';
 figs_in_AOR{14} = 'Runtime.hydro_runtime_logscale';
 figs_in_AOR{15} = 'Runtime.dynamics_runtime';
 % 5: insights and discussion
-figs_in_AOR{16} = 'ReadNonMatlabFigs.hydro_efficiency';
+figs_in_AOR{16} = 'SweepGeoms.sweep_geoms_pareto_nondim';
 figs_in_AOR{17} = 'DampingPlateStructures.damping_plate_aspect_ratio';
 figs_in_AOR{18} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{19} = 'DesignSpaceExploration.experiments_ratios';
