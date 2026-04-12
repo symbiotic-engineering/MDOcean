@@ -228,6 +228,9 @@ This intends to lower the likelihood of creating saturation behavior (where a di
 \subsection{Dynamics and Control}\label{sec:dynamics}
 \subsubsection{Modified Frequency Domain Techniques}\label{sec:mod-freq-domain}
 Methods for WEC dynamics and control simulation in an optimization context were reviewed in section~\ref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
+In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
+This section describes both the technical concept and the practical rationale for the choice of a modified frequency domain method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
+
 MDOcean requires the ability to incorporate nonlinearities, at least approximately.
 Inherent nonlinearities such as drag significantly affect the amplitude and power production at resonance.
 Even with linearized intrinsic dynamics, maintaining optimality subject to dynamic constraints also requires a nonlinear controller.
@@ -238,65 +241,120 @@ PMP requires an analytically difficult derivation unique to the specific nonline
 On the other hand, modified frequency domain techniques are simple and intuitive.
 Therefore, MDOcean pursues a quasi-linear semi-analytical modified frequency domain method.
 
-When handling dynamic constraints with a modified frequency domain method, first the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
-If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state.
-Otherwise, a variety of approaches are possible to address the violated constraint, summarized in Table~\ref{tab:constraint-approaches} and described below. 
+\begin{figure}
+    \centering
+    \input{figs/tikz/control_method_venn_diagram.tikz}
+    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's modified frequency domain approach at the intersection of frequency domain, nonlinear, and constrained optimal control. See text for a description of each acronym.}
+    \label{fig:venn-diagram}
+\end{figure}
+\Cref{fig:venn-diagram} shows a Venn diagram comparing different methods for optimal control synthesis in greater detail.
+Typical frequency domain methods for control design, such as loop shaping, PID tuning, and $H_\infty$/$H_2$ control for general applications, along with complex-conjugate impedance matching for power-maximizing applications such as wave energy, cannot take into account constraints and nonlinearities.
+Meanwhile, typical methods for nonlinear control design, such as feedback linearization, sliding mode control, backstepping, and Lyapunov-based control, are performed in the time domain and do not incorporate constraints.
+Latching and declutching control are wave-energy-specific passive nonlinear bang-bang control methods that utilize the frequency-domain concept of phase-matching the fundamental harmonic of the response to the wave excitation, but they are still primarily time-domain methods and do not incorporate constraints \cite{hals_comparison_2011}.
+Methods for constrained optimal control, meanwhile, such as model predictive control (MPC), constrained linear-quadratic regulation (LQR), and trajectory optimization are likewise time-domain and were originally derived for linear control problems, although nonlinear extensions exist including nonlinear MPC (NMPC), constrained iterative LQR (iLQR), and differential dynamic programming (DP).
+Other methods for nonlinear constrained optimal control in the time domain include the already-discussed PMP and the control barrier function method.
+Methods to incorporate nonlinearities in the frequency domain include harmonic balance synthesis, which retains full nonlinearity in a sinusoidal-steady state analysis so technically falls in the spectral domain rather than the frequency domain; its linearized counterpart, describing function (DF)-based synthesis \cite{atherton_nonlinear_1982,gelb_multiple-input_1968}; and the extension of the latter to broadband inputs, spectral linearization (also called stochastic linearization, Gaussian closure, and quasi-linear control) \cite{roberts_random_2003,merkov_quasilinear_2011}.
+These methods are not optimal control methods and do not incoporate constraints, although it is possible to sub-optimally enforce constraints by applying a saturation nonlinearity to the constrained quantity.
+Finally, methods which combine frequency domain synthesis with constrained optmial control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (OC), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (IM), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (LMIs), typically in the context of robust control \cite{vanantwerp_tutorial_2000}.
+
+At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``modified frequency domain.'' 
+The pseudospectral method uses the same global basis function representation as spectral OC, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \cite{elnagar_pseudospectral_1995}.
+Pseudo-spectral methods often employ polynomial bases, although in wave energy Fourier bases are more typical.
+In this case, the method is equivalent to a nonlinear trajectory optimization problem that enforces both spectral-domain harmonic balance and time-domain constraints.
+The modified frequency domain method used in MDOcean is a linearized version of the Fourier-basis pseudo-spectral method, borrowing the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain but retaining only the fundamental harmonic to collapse to the frequency domain.
+This is exactly analogous to the way that describing functions linearize the harmonic balance method.
+It can also be thought of as the combination of describing functions with constrained impedance matching.
+
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller and/or the plant are nonlinear).
+MDOcean uses the modified frequency domain method for both synthesis and evaluation.
+Other wave energy studies (see \cref{tab:lit}) have used methods that would fall broadly in the family of modified frequency domain methods for the evaluation use case, but with questionable simplifications that MDOcean avoids by differently handling constraints.
+Meanwhile, MDOcean's use of the method for control synthesis appears novel in the wave energy space, and it is this application that really sets it apart, since other linearization methods such as stochastic linearization can facilitate the design of linear but not nonlinear controllers.
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{1.1\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}
+    \caption{Control synthesis - applies to (1.1) only.}
+    \label{fig:mod-freq-domain-synthesis}
+\end{subfigure}
+\vfill
+\begin{subfigure}[t]{1.1\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_evaluation.pdf}
+    \caption{Control evaluation - applies to both (1.1) and (1.2).}
+    \label{fig:mod-freq-domain-evaluation}
+\end{subfigure}
+\caption{Flowchart depicting the modified frequency domain method with describing function linearization (1)}
+\end{figure}
+
+When handling dynamic constraints with a modified frequency domain method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
+Then the unconstrained response is checked for constraint violations.
+This check can be performed in the frequency domain if the time-domain constraint can be adequately linearized (via describing functions) as a harmonic constraint, as shown in the top of \cref{fig:mod-freq-domain-synthesis}, or the response can be reconstructed in the time domain via the inverse describing function if the constraint is not easily representable via harmonics.
+If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state as the frequency-domain linear optimal controller.
+Otherwise, a variety of approaches are possible to address the violated constraint, summarized in Table~\ref{tab:constraint-approaches} and described below.
+Methods M1 and M2 can be used for both control synthesis and evaluation, while methods M4-M5 can only be used for evaluation since they do not attempt to find a controller that satisfies the constraint.
+Method M3 can in general only be used for evaluation, although in the special case where the only time-domain constraint is on the control force, the method can be used for control synthesis.
 
 \begin{table}
 \centering
 
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.6\linewidth}l l} 
-\textbf{Approach} & \textbf{Accuracy} & \textbf{Optimality} \\ \hline
-(1) Nonlinear optimal (or near-optimal) controller, linearized via describing functions& High & High \\
-(2) Linear optimal controller& High & Medium \\
-(3) Saturate or zero the
-times with constraint violations, neglecting the effect on the response& Medium & Medium-low\\
-(4) Saturate or zero entire sea state& Low & Low \\
-(5) Mark design as infeasible& N/A& Lowest \\
+\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \hline
+(M1) Nonlinear optimal (or near-optimal) controller, linearized via describing functions& High & High \\
+(M2) Linear optimal controller& High & Medium \\
+(M3) Saturate or zero the
+times with constraint violations, neglecting the effect on other signals& Medium & Medium-low\\
+(M4) Saturate or zero entire sea state& Low & Low \\
+(M5) Mark design as infeasible& N/A& Lowest \\
 
 \end{tabular}
 \caption{Constraint Satisfaction Approaches for Modified Frequency Domain Methods}
     \label{tab:constraint-approaches}
 \end{table}
 
-The modified frequency-domain approach with the highest accuracy and optimality (1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
-If a time-domain PMP control law is available for the constraint under consideration, it can be used as the nonlinear optimal controller directly.
-This differs from the standard PMP method in that the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in \cite{zou_optimal_2017}) or analytical time-integration (as in \cite{lin_fast_2025}).
-For situations without an explicit PMP control law, a nonlinear near-optimal controller can be constructed using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
-In either case, the nonlinear controller is linearized via the describing function method.
-In addition to the control nonlinearity, a describing function is also utilized to linearize the drag nonlinearity.
+The modified frequency-domain approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
+This synthesis can occur in a number of ways.
+If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of the modified frequency-domain linearization in the control synthesis step (\cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\cref{fig:mod-freq-domain-evaluation}).
+This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in \cite{zou_optimal_2017}) or analytical time-integration (as in \cite{lin_fast_2025}).
+This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
+For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal  linear controller via constrained optimization, and then adjusting it to be nonlinear using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
+This approach (M1.2) should be considered the primary formulation of the modified frequency domain method, and the other approaches (M2)-(M5) in Table~\ref{tab:constraint-approaches} act as approximations of this method with varying levels of accuracy and optimality.
+In either case (M1.1 and M1.2), the nonlinear controller is linearized via the describing function method.
+In addition to the control nonlinearity, a describing function is also utilized to linearize the plant drag nonlinearity.
 
-If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (2).
-This approach accurately reflects the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller. 
-This controller can be found numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain.
+If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (M2).
+This approach accurately evaluates the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller. 
+MDOcean pursues this approach for amplitude limits in the operational design load case.
+
+The constrained optimization to identify the controller in (M1.2) and (M2) can be can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \cref{sec:optimal-control}.
 The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
 The analytical approach is nonetheless derived in \cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \appendixname~\ref{sec:appendix-qp-solution} and \cite{mccabe_force-limited_2024}) and recommended for future implementation.
 
-If neither a numerical nor an analytical implementation is available to identify the optimal constrained linear controller, then the violating portion of the time-domain signals can be saturated or zeroed for the sake of power calculation (3).
+If neither a numerical nor an analytical implementation is available to identify the optimal constrained linear controller, then the violating portion of the time-domain signals can be saturated or zeroed for the sake of power calculation (M3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 This simple approach does not require any derivations to implement.
 It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
 It is utilized here for the power limit.
 
-As a last resort, the energy in that sea state can be zeroed (4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (5), which reference~\cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
+As a last resort, the energy in that sea state can be zeroed (M4), essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which reference~\cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
 These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization through either the objective or constraints.
-The latter approach (5) is actually the only option for slamming amplitude limits in the storm design load case.
-This is because the device is already in survival mode (preventing method 4), is not producing power (preventing methods 3 and 4), and is not applying a control input (preventing methods 1 and 2).
-Approach (5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
+The latter approach (M5) is actually the only option for evaluation of slamming amplitude limits in the storm design load case.
+This is because the device is already in survival mode (preventing method M4), is not producing power (preventing methods M3 and M4), and is not applying a control input (preventing methods M1 and M2).
+%Approach (M5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
 
 Table~\ref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits and the method MDOcean currently uses to handle each. 
 The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
-In future work, MDOcean could instead utilize describing functions (1) and the optimal constrained linear controller (2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
-The optimal constrained linear controller for a variety of constraints including the amplitude limit is derived in \cref{sec:optimal-control} for theoretical completeness, though we emphasize that it is not used in the current implementation of MDOcean.
+In future work, MDOcean could instead utilize describing functions (M1.2) or the optimal constrained linear controller (M2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
 
 \begin{table}
     \centering
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.7\linewidth}}
          \textbf{Dynamic nonlinearity/limit}& \parbox{\linewidth}{\centering\textbf{Method}}\\ \hline
-         Drag& Describing function (1) for $\sin(\omega t)|\sin(\omega t)|$ with iteration to find effect on response and optimal controller\\
-         Force limit& Describing function (1) for $\text{sat}(\sin(\omega t))$ with iteration to find effect on response and optimal controller\\
-         Power limit& Average value of $\text{sat}(\sin(\omega t)+C)$, neglecting any effect on response and optimal controller (3)\\
-  Amplitude limit&Optimizer considers limit violations as infeasible designs (5)\\\end{tabular}
+         Drag& Describing function (M1.2) for $\sin(\omega t)|\sin(\omega t)|$ with iteration to find effect on response and optimal controller\\
+         Force limit& Describing function (M1.2) for $\text{sat}(\sin(\omega t))$ with iteration to find effect on response and optimal controller\\
+        Operational amplitude limit& Optimal linear controller (M2)\\
+         Power limit& Average value of $\text{sat}(\sin(\omega t)+C)$, neglecting any effect on response and optimal controller (M3)\\
+        Storm amplitude limit&Optimizer considers limit violations as infeasible designs (M5)\\
+    \end{tabular}
     \caption{Dynamic nonlinearities and approach for each}
     \label{tab:nonlinearities}
 \end{table}
@@ -307,6 +365,12 @@ For a force signal, the fundamental amplitude is the most relevant harmonic beca
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
 The former encodes the describing function formula directly into the simulation (see derivation in \cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \appendixname~\ref{sec:appendix-force-sat}).
+This is possible because the describing function modified frequency domain method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal contoller that is output from the right of \cref{fig:mod-freq-domain-synthesis} is fed into the top left of \cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward contol describing function, which cancel out.
+Unless intentionally made different to study robustness, the linearized plant model is identical for the synthesis and evaluation steps.
+In this case, two workflows essentially become one, with no further computation required after optimal control step.
+Reconstruction of the nonlinear controller is not necessary for the evaluation of the power corresponding to that controller.
+The power can be calculated directly from the frequency-domain response and the describing function of the nonlinear controller.
+The time-domain representation of the nonlinear controller is only necessary for hardware implementation, or if the synthesized controller is to be evaluated with a different method such as time-stepping.
 
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
 The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
@@ -565,9 +629,10 @@ Note that the apparent power $|S|$, and therefore the peak power from \cref{eq:p
 \end{equation}
 Peak power constraints use a more complicated approach discussed in \cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
 
-To implement the constraints, two strategies are pursued at once: (1) to create an intentional linear impedance mismatch, sacrificing power to satisfy a torque limit, and (2) to use nonlinear control to enable satisfaction of the torque limit with less of a power sacrifice.
+To implement the constraints, we create an intentional linear impedance mismatch, sacrificing power to satisfy the limits (method M2 in \cref{tab:constraint-approaches}).
+For select constraints where a describing function is available (currently the torque limit), we additionally use nonlinear control to satisfy the torque limit with less of a power sacrifice (method M1.2 in \cref{tab:constraint-approaches}).
 
-For (1), the expression from \cref{eq:power-avg-peak} for average electrical power can be maximized subject to quadratic constraints on effort and flow variables.
+For the linear impedance mismatch, the expression from \cref{eq:power-avg-peak} for average electrical power can be maximized subject to quadratic constraints on effort and flow variables.
 This can be written as an optimization problem, specifically a quadratically constrained quadratic program (QCQP):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
