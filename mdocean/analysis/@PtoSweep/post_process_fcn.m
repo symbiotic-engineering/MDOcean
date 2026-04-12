@@ -1,0 +1,116 @@
+function [fig_array, ...
+          tab_array_display, ...
+          tab_array_latex, ...
+          end_result_struct, ...
+          tab_firstrows, ...
+          tab_colspecs] = post_process_fcn(intermed_result_struct)
+% post_process_fcn  Generate the F_max / P_max sweep figure.
+%
+% Produces a single figure with three contourf panels (average power,
+% design cost, LCOE) plotted as a function of F_max and P_max.  A hatched
+% region marks where any nonlinear constraint is violated.  Markers
+% indicate the maximum-power point (circle) and the minimum-LCOE point
+% (diamond), shared across all three panels.
+%
+% :param intermed_result_struct: Intermediate results struct from analysis_fcn
+% :returns: fig_array
+% :returns: tab_array_display
+% :returns: tab_array_latex
+% :returns: end_result_struct
+% :returns: tab_firstrows
+% :returns: tab_colspecs
+
+    F_max_vec = intermed_result_struct.F_max_vec;          % MN
+    P_max_vec = intermed_result_struct.P_max_vec;          % 100 kW
+    P_max_kW  = P_max_vec * 100;                           % kW
+    power_avg = intermed_result_struct.power_avg;          % W
+    cost      = intermed_result_struct.cost;               % $
+    LCOE_mat  = intermed_result_struct.LCOE;               % $/kWh
+    violated  = intermed_result_struct.violated;           % logical
+
+    % ndgrid layout: power_avg(i,j) at F_max_vec(i), P_max_vec(j).
+    % contourf(x_vec, y_vec, Z) expects Z(row=y, col=x), so transpose.
+    power_kW   = power_avg' / 1e3;    % [n_P x n_F]  kW
+    cost_M     = cost'      / 1e6;    % [n_P x n_F]  $M
+    lcoe_plot  = LCOE_mat';           % [n_P x n_F]  $/kWh
+    viol_plot  = violated';           % [n_P x n_F]
+
+    % --- Find special operating points ---
+    [~, idx_mp] = max(power_avg(:));
+    [~, idx_ml] = min(LCOE_mat(:));
+    [i_mp, j_mp] = ind2sub(size(power_avg), idx_mp);
+    [i_ml, j_ml] = ind2sub(size(LCOE_mat),  idx_ml);
+    F_mp = F_max_vec(i_mp);  P_mp = P_max_kW(j_mp);   % max-power point
+    F_ml = F_max_vec(i_ml);  P_ml = P_max_kW(j_ml);   % min-LCOE point
+
+    % --- Figure with 3 tiles ---
+    fig = figure;
+    t = tiledlayout(1, 3, 'TileSpacing', 'compact');
+    title(t, 'PTO Sweep for Nominal RM3 Geometry');
+
+    data   = {power_kW,  cost_M,     lcoe_plot};
+    titles = {'Avg Power (kW)', 'Design Cost ($M)', 'LCOE ($/kWh)'};
+    ax     = gobjects(1, 3);
+
+    for k = 1:3
+        ax(k) = nexttile;
+        contourf(F_max_vec, P_max_kW, data{k});
+        colorbar;
+        xlabel('F_{max} (MN)');
+        if k == 1
+            ylabel('P_{max} (kW)');
+        end
+        title(titles{k});
+        hold on;
+    end
+
+    improvePlot;
+
+    % --- Hatching and markers (after improvePlot) ---
+    marker_props_mp = {'ko', 'MarkerSize', 8, 'LineWidth', 2, ...
+                       'DisplayName', 'Max Power'};
+    marker_props_ml = {'kd', 'MarkerSize', 8, 'LineWidth', 2, ...
+                       'DisplayName', 'Min LCOE'};
+
+    for k = 1:3
+        nexttile(k);
+        hold on;
+
+        % Hatched infeasibility region
+        if any(viol_plot(:))
+            tmp_clim = clim;
+            [~, h_hatch] = contourf(ax(k), F_max_vec, P_max_kW, ...
+                                    double(viol_plot), [1 1], 'Fill', 'off');
+            hh = hatchfill2(h_hatch, 'cross');
+            hh.Color = [0 0 0 0.5];
+            clim(tmp_clim);
+        end
+
+        % Markers — suppress duplicate legend entries for tiles 2 and 3
+        if k == 1
+            plot(F_mp, P_mp, marker_props_mp{:});
+            plot(F_ml, P_ml, marker_props_ml{:});
+        else
+            plot(F_mp, P_mp, marker_props_mp{1:end-2}, ...
+                 'HandleVisibility', 'off');
+            plot(F_ml, P_ml, marker_props_ml{1:end-2}, ...
+                 'HandleVisibility', 'off');
+        end
+    end
+
+    legend(ax(1), 'Location', 'best');
+
+    % --- Outputs ---
+    fig_array         = fig;
+    tab_array_display = {};
+    tab_array_latex   = {};
+    tab_firstrows     = {};
+    tab_colspecs      = {};
+
+    % End results at minimum-LCOE operating point (SI units for latex stage)
+    end_result_struct.ptoSweepMinLCOE_F_max  = F_max_vec(i_ml) * 1e6;    % N
+    end_result_struct.ptoSweepMinLCOE_P_max  = P_max_kW(j_ml)  * 1e3;    % W
+    end_result_struct.ptoSweepMinLCOE_power  = power_avg(i_ml, j_ml);    % W
+    end_result_struct.ptoSweepMinLCOE_cost   = cost(i_ml, j_ml);         % $
+    end_result_struct.ptoSweepMinLCOE_LCOE   = LCOE_mat(i_ml, j_ml);    % $/kWh
+end

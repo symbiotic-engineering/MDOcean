@@ -1,5 +1,7 @@
 # Changelog
 ## Unreleased
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc

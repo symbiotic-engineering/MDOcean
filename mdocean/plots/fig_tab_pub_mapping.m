@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 44;
+num_figs_AOR = 45;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -82,34 +82,35 @@ figs_in_AOR{19} = 'DampingPlateStructures.damping_plate_aspect_ratio';
 figs_in_AOR{20} = 'ForceSaturationFigFunc.power_force_sensitivity';
 figs_in_AOR{21} = 'DesignSpaceExploration.experiments_ratios';
 figs_in_AOR{22} = 'RunSingleFigFunc.nominal_power_matrix'; % repeat of 10
+figs_in_AOR{23} = 'PtoSweep.pto_sweep';
 % appendix A- hydro
-figs_in_AOR{23} = 'Tikz.meem_regions';
-figs_in_AOR{24} = 'Meem.meem_sparsity';
-figs_in_AOR{25} = 'Meem.meem_validation';
-figs_in_AOR{26} = 'Meem.meem_matching';
-figs_in_AOR{27} = 'Meem.meem_convergence_vs_omega';
-figs_in_AOR{28} = 'Meem.asymptotic_b_vector';
+figs_in_AOR{24} = 'Tikz.meem_regions';
+figs_in_AOR{25} = 'Meem.meem_sparsity';
+figs_in_AOR{26} = 'Meem.meem_validation';
+figs_in_AOR{27} = 'Meem.meem_matching';
+figs_in_AOR{28} = 'Meem.meem_convergence_vs_omega';
+figs_in_AOR{29} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
-figs_in_AOR{29} = 'DragIntegral.drag_integral_B';
-figs_in_AOR{29+10} = 'DragIntegral.drag_integral_G_m';
-figs_in_AOR{29+11} = 'DragIntegral.drag_integral_G_p';
-figs_in_AOR{30} = 'RunSingleFigFunc.drag_convergence';
-figs_in_AOR{31} = 'Slamming.slamming_amplitude';
-figs_in_AOR{32} = 'RunSingleFigFunc.slamming_model_comparison_float';
-figs_in_AOR{33}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
-figs_in_AOR{33+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
-figs_in_AOR{33+9} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
-figs_in_AOR{33+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{30} = 'DragIntegral.drag_integral_B';
+figs_in_AOR{30+10} = 'DragIntegral.drag_integral_G_m';
+figs_in_AOR{30+11} = 'DragIntegral.drag_integral_G_p';
+figs_in_AOR{31} = 'RunSingleFigFunc.drag_convergence';
+figs_in_AOR{32} = 'Slamming.slamming_amplitude';
+figs_in_AOR{33} = 'RunSingleFigFunc.slamming_model_comparison_float';
+figs_in_AOR{34}   = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{34+8} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{34+9} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{34+10} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - structures
-figs_in_AOR{34} = 'ReadNonMatlabFigs.equivalent_stiffness';
-figs_in_AOR{35} = 'ReadNonMatlabFigs.trapezoid';
-figs_in_AOR{36} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{37} = 'DampingPlateStructures.damping_plate_moment';
-figs_in_AOR{38} = 'DampingPlateStructures.damping_plate_deflection';
+figs_in_AOR{35} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{36} = 'ReadNonMatlabFigs.trapezoid';
+figs_in_AOR{37} = 'ReadNonMatlabFigs.damping_plate_flowchart';
+figs_in_AOR{38} = 'DampingPlateStructures.damping_plate_moment';
+figs_in_AOR{39} = 'DampingPlateStructures.damping_plate_deflection';
 % appendix D - parameters
 
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{44}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{45}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 
