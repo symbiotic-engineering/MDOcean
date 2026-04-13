@@ -16,7 +16,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     n = 20;
 
     % F_max sweep vector (design-variable units: MN)
-    F_max_vec = linspace(0.1, 4, n);
+    F_max_vec = linspace(0.5, 10, n);
     % P_max sweep vector (design-variable units: 100 kW)
     P_max_vec = linspace(0.5, 10, n);
 
