@@ -432,21 +432,27 @@ where $\mu$ indexes circle constraints and $k$ indexes oval constraints.
 While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
 We currently assume there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\Gamma$.
 
-\subsubsection{Extension to Higher Dimensions and Convexity}
-Future work may desire to perform constrained optimization on the full nonlinear dynamics rather than the linearized dynamics, or for linear dynamics with irregular wave forcing as \cite{bacelli_numerical_2015} does, in what would be known as nonlinear and linear spectral optimal control respectively in the terminology of \cref{fig:venn-diagram}.
-Both of these problems solve the full harmonic-balance equation, which means that the problem is higher dimensional and may not admit a geometric analytical solution as is possible for the 2D case here.
-In such cases, the efficiency of the numerical solution strongly depends on the convexity of the problem.
+\subsubsection{Extension to Higher Dimensions and Convexity}\label{sec:qp-convexity}
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in \cite{bacelli_numerical_2015}, which would produce a higher-dimensional analog of \cref{eq:opt-problem-gamma}.
+Both of these cases solve the full harmonic-balance equation, so the problem dimension grows with the number of frequencies and the geometric analytical solution used here is no longer practical.
+Instead, a numerical solver must be used, and the computational scaling of that solver depends critically on whether the problem is \emph{convex}.
 
-A quadratic program is convex when the objective function is convex (i.e. $\mathbf{A}_P$ is positive semidefinite) and all inequality constraints are convex (i.e. $\mathbf{Q}_{\mu}$ are positive semidefinite, $S_\mu=1$), and non-convex otherwise.
-$\mathbf{A}_P$ (value given in \cref{tab:power-metrics}) is unfortunately non-convex, with eigenvalues $\{-1, 1\}$, but \cite{bacelli_numerical_2015} shows that by substituting a linear dynamics equality constraint into the objective, as \cref{eq:obj-gamma} does, the objective becomes convex, even for irregular waves.
-Nonlinear dynamics and nonlinear constraints may introduce non-convexity.
+A convex optimization problem is one in which both the feasible set and the objective function are convex---informally, the feasible region has no holes or concavities, and the objective is bowl-shaped with no local valleys.
+The key practical implication is that any locally optimal solution is also globally optimal, so gradient-based solvers converge to the true optimum without exhaustive search, and solution time scales polynomially with the number of decision variables rather than exponentially.
+For WEC optimal control, where the problem dimension equals twice the number of frequencies retained in the spectral expansion, this polynomial scaling is essential.
 
-Convex constraints can be written in terms of a linear matrix inequality.
-Specifically, in a problem with $N_{var}$ decision variables $x$, a polynomial inequality constraint of degree $d$ is convex if it can be expressed as the sum of squares of rational polynomials, or equivalently, as the positive-definiteness of a matrix $\mathbf{F} \in \mathbb{R}^{d \times d}\succ 0$, where each element of the matrix is affine in the decision variables, $\mathbf{F} = \mathbf{F}_0 + \sum_{j=1}^{N_{var}} x_j \mathbf{F}_j$.
-All linear constraints can be written in this form, as can ellipsoidal constraints, system stability and passivity constraints, algebraic Ricatti inequalities, and worst-case performance constraints such as the maximum gain over all frequencies, but not all quadratic or quartic constraints as are required for WEC optimal control.
-The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} are not positive definite, since $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are semidefinite and as already mentioned $\mathbf{A}_P$ is indefinite.
-Reference \cite{mccabe_force-limited_2024} visualizes the non-convexity of effort and flow magnitude constraints in $\Gamma$ space, showing some circles on the complex plane where the feasible region is on the outside of the circle rather than the inside.
-Future work should examine semi-definite relaxations of these constraints with the so-called s-procedure \cite{vanantwerp_tutorial_2000}.
+After reducing to the $\Gamma$ parameterization, the power objective $|\Gamma|^2$ is a sum of squares and therefore convex.
+Even though the original power matrix $\mathbf{A}_P$ (see \cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \cite{bacelli_numerical_2015} shows that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\Gamma$ in \cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
+Nonlinear dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
+
+The inequality constraints are more problematic.
+A constraint is convex if the set of points satisfying it forms a convex region.
+In the $\Gamma$ plane, a convex constraint corresponds to a circle whose feasible region is the \emph{interior} ($S_\mu=1$ in \cref{eq:disc-constraint}), while a non-convex constraint corresponds to a circle whose feasible region is the \emph{exterior} ($S_\mu=-1$).
+Effort-magnitude constraints (e.g., force limits $|\hat{F}|\leq F_{max}$) map to circles with exterior feasible regions and are therefore non-convex.
+Amplitude constraints similarly yield non-convex regions for some sea states, as visualized in \cite{mccabe_force-limited_2024}.
+The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} confirm this: $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
+For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
+Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
 
 \subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
@@ -457,6 +463,45 @@ Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but d
 Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
 Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
 Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
+
+\subsection{Constraint Sensitivity Analysis}\label{sec:appendix-constraint-sensitivity}
+This section derives the scaling of optimal average power with the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$, supporting the discussion in \cref{sec:discussion}.
+
+\subsubsection{Effect of Constraint Limits on Circle Radii}
+Recall from \cref{eq:gamma-disc-params} that each inequality constraint maps to a circle in the complex $\Gamma$ plane with center $\Gamma_{c,\mu}$ and radius $r_\mu$ given by:
+\begin{equation}\label{eq:radius-full}
+    r_\mu^2
+    = \frac{b_{\mu} - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
+            - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}}
+           {|\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}}
+    + |\Gamma_{c,\mu}|^2
+\end{equation}
+The constraint limit enters only through $b_\mu$ (the right-hand side of the quadratic inequality in \cref{tab:qp-constraints}), while $\vec{x}_p$, $\vec{n}$, $\hat{I}_p$, $\mathbf{Q}_\mu$, $\vec{a}_\mu$, and $\Gamma_{c,\mu}$ depend only on the Th\'{e}venin impedance $Z_{s,th}$ and excitation $\hat{V}_{s,th}$ for the sea state, which are independent of the constraint limits.
+Defining $d_\mu = |\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}$ and $c_\mu = d_\mu|\Gamma_{c,\mu}|^2 - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}$, both independent of the constraint limits, \cref{eq:radius-full} simplifies to:
+\begin{equation}\label{eq:radius-simplified}
+    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
+\end{equation}
+Because the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, increasing the constraint limit (increasing $b_\mu$) enlarges the circle radius while keeping the center fixed.
+
+\subsubsection{Power as a Function of Constraint Limits}
+From \cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be written as:
+\begin{equation}\label{eq:power-elec-sensitivity}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
+    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})} \cdot |\Gamma_{\beta,opt}|^2
+\end{equation}
+where $\overline{P}_{elec,0}$ is the unconstrained (impedance-matched) power.
+The second term represents power lost to constraint-induced impedance mismatch and depends on the constraint limits through \cref{eq:gamma-opt-summary,eq:radius-simplified}.
+
+When a single constraint $\mu^*$ is active in sea state $\beta$, the optimal reflection coefficient magnitude is $|\Gamma_{\beta,opt}| = |\Gamma_{c,\mu^*}| - r_{\mu^*}$.
+Substituting \cref{eq:radius-simplified} and expanding shows that $|\Gamma_{\beta,opt}|^2$ is an affine function of $\sqrt{(b_{\mu^*}+c_{\mu^*})/d_{\mu^*}}$.
+Consequently, the contribution of sea state $\beta$ to average power is piecewise affine plus the square root of an affine function of $b_{\mu^*}$, i.e., affine plus the square root of an affine function of the constraint limit squared.
+
+When two constraints $\mu^*$ and $\nu^*$ are simultaneously active, the optimal $|\Gamma_{\beta,opt}|$ is at the intersection of the two constraint circles.
+From \cref{eq:candidate-points}, the intersection point involves $r_{\mu^*}^2$ and $r_{\nu^*}^2$ quadratically (through the term $r_{\mu^*}^2 - a_{\mu^*\nu^*}^2$, where $a_{\mu^*\nu^*}$ itself depends on both radii).
+Substituting \cref{eq:radius-simplified} shows that $|\Gamma_{\beta,opt}|^2$ is piecewise affine plus the square root of a quadratic function of $b_{\mu^*}$ and $b_{\nu^*}$.
+
+In both cases the sensitivity is convex in the constraint limits (since the problem is convex after reducing to $\Gamma$), confirming that relaxing any constraint always increases or maintains power and that the marginal benefit diminishes as the limit grows.
 
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
