@@ -1,5 +1,18 @@
 # Changelog
 ## Unreleased
+### Added
+- Model: new `get_slamming_min_max` helper function that computes slamming displacement bounds (min/max) and a diameter margin metric, extracted from the former inline `slamming` sub-function in `dynamics.m`
+### Changed
+- Model: controller now enforces amplitude constraints during closed-loop drag/response solving; static displacement upper limits (float/spar linear wave theory, relative motion limits) are computed once and passed into `get_response_drag` rather than using a fixed 1e6 placeholder
+- Model: `get_response_drag` accepts slamming parameters (`T_f_slam`, `T_s_slam`) and computes dynamic slamming displacement limits inside the solver, incorporating per-sea-state constraint violation errors and phase-based optimality errors
+- Model: phase optimality error in `control_errors_from_sat_results` now wrapped with `wrapToPi` to eliminate ±π discontinuities that could confuse `fsolve`
+### Fixed
+- Model: `slamming_margin` in `dynamics.m` no longer references an undefined `theta` variable when `plot_slamming` is true; `theta` is now returned from `get_slamming_min_max`
+- Model: fixed typo in variable name `mult_const_voil_unsat` → `mult_const_viol_unsat`
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-13
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
+- 
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
