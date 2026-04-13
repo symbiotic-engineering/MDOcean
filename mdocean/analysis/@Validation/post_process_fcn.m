@@ -37,7 +37,9 @@ function [fig_array,...
                 field = orig_field_names{i};
                 if isfield(units_struct, field)
                     unit = units_struct.(field);
-                    display_names{i} = [strtrim(display_names{i}) ' (' unit ')'];
+                    display_name = char(strtrim(string(display_names{i})));
+                    unit_text = char(string(unit));
+                    display_names{i} = [display_name ' (' unit_text ')'];
                 end
             end
             tab_validation_latex.OriginalVariableNames = display_names;
