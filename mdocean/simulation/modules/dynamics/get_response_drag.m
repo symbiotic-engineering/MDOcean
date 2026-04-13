@@ -319,12 +319,14 @@ function [X_f_err,X_s_err,...
     % controller error when it's the controller's fault (system stabilizable)
     % and only zeroed when it's inevitable (system not stabilizable). 
     % For now, we zero these Infs in both cases.
-    X_f_err(mag_X_f==Inf) = 0;
-    X_s_err(mag_X_f==Inf) = 0;
-    phase_X_f_err(mag_X_f==Inf) = 0;
-    phase_X_s_err(mag_X_f==Inf) = 0;
-    force_lim_err(mag_X_f==Inf) = 0;
-    amp_lim_err(mag_X_f==Inf) = 0;
+    % Also handle finite precision errors that return nan.
+    idx_unstable_or_fp_error = mag_X_f==Inf | (isnan(mag_X_f) & ~isnan(X_f_guess));
+    X_f_err(idx_unstable_or_fp_error) = 0;
+    X_s_err(idx_unstable_or_fp_error) = 0;
+    phase_X_f_err(idx_unstable_or_fp_error) = 0;
+    phase_X_s_err(idx_unstable_or_fp_error) = 0;
+    force_lim_err(idx_unstable_or_fp_error) = 0;
+    amp_lim_err(idx_unstable_or_fp_error) = 0;
 end
 
 function [mag_U,phase_U,...
@@ -642,7 +644,27 @@ function [mag_U,phase_U,...
         need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                               + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
 
-        assert(need_more_stabilizing==0)
+
+        if need_more_stabilizing~=0 % allow double stabilizing due to finite precision
+            B_l = B_l + stabilize_B * recommended_increase_Bl;
+            K_l = K_l + stabilize_K * recommended_increase_Kl;
+
+            [idx_closed_loop_unstable,...
+             recommended_increase_Bl,...
+             recommended_increase_Kl] = check_cl_stability(B_c, B_f, B_s, K_f, K_s, ...
+                                                            m_c, m_f, m_s, w, ...
+                                                            K_l, B_l, idx_not_stabilizable, ...
+                                                            multibody, merge_bodies);
+
+            need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
+                                  + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
+            if need_more_stabilizing~=0
+                warning('Stabilizing did not work after 2 tries. This could be a finite precision issue.')
+            end
+
+        end
+
+        idx_closed_loop_unstable(recommended_increase_Kl==0 & recommended_increase_Bl==0) = 0; % required for finite precision
     end
 
     % response
@@ -823,13 +845,15 @@ function [idx_closed_loop_unstable,...
         end
 
         rec_incr_Bp = abs(det_B) ./ denom_B * 1.01;
+        %rec_incr_Bp(det_B==0) = eps;
         rec_incr_Bl = rec_incr_Bp; % fixme this should use cascade matrix
 
         rec_incr_Kp = abs(det_K) ./ denom_K * 1.01;
+        %rec_incr_Kp(det_K==0) = eps;
         rec_incr_Kl = rec_incr_Kp; % fixme this should use cascade matrix
 
-        idx_change_B = idx_ctrl_makes_closed_loop_unstable & det_B < 0;
-        idx_change_K = idx_ctrl_makes_closed_loop_unstable & det_K < 0;
+        idx_change_B = idx_ctrl_makes_closed_loop_unstable & det_B <= 0;
+        idx_change_K = idx_ctrl_makes_closed_loop_unstable & det_K <= 0;
         recommended_increase_Bl(idx_change_B) = rec_incr_Bl(idx_change_B);
         recommended_increase_Kl(idx_change_K) = rec_incr_Kl(idx_change_K);
     end
@@ -839,9 +863,9 @@ end
 
 function all_posdef = check_posdef_three_2x2s(a11,a12,a21,a22, b11,b12,b21,b22, c11,c12,c21,c22)
     all_posdef = ...
-            a11 > 0 & (a11.*a22 - a21.*a12) > 0 & ...
-            b11 > 0 & (b11.*b22 - b21.*b12) > 0 & ...
-            c11 > 0 & (c11.*c22 - c21.*c12) > 0;
+            a11 > 0 & (a11.*a22 - a21.*a12) >= 0 & ...
+            b11 > 0 & (b11.*b22 - b21.*b12) >= 0 & ...
+            c11 > 0 & (c11.*c22 - c21.*c12) >= 0;
 end
 
 function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl_mult_mag,...
