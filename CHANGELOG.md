@@ -1,5 +1,12 @@
 # Changelog
 ## Unreleased
+
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-12
+### Fixed
+- Model: phase sign error in `second_order_transfer_fcn` in `get_response_drag.m`
+- Validation: copy-paste error in `runRM3Parallel.m` where `float_pos` was used to compute spar and relative phase instead of `spar_pos` and `rel_pos`
+- Validation: mislabeled singlebody/multibody rows in WEC-Sim error table (`post_process_fcn.m`)
+
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
@@ -10,13 +17,7 @@
 ### Fixed
 - Model: handle edge case geometries that cause finite precision errors
 - Model: fix indexing error in make_drag_integral_LUT that led to out-of-bounds queries being kept NaN instead of numerically computed
-
-## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-12
-### Fixed
-- Model: phase sign error in `second_order_transfer_fcn` in `get_response_drag.m`
-- Validation: copy-paste error in `runRM3Parallel.m` where `float_pos` was used to compute spar and relative phase instead of `spar_pos` and `rel_pos`
-- Validation: mislabeled singlebody/multibody rows in WEC-Sim error table (`post_process_fcn.m`)
-
+- 
 ## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
 ### Changed
 - CI: bump paths-filter to v4 in merge-ready.yml workflow
