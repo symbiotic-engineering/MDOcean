@@ -4,12 +4,12 @@ function fig = make_slamming_plot(T,Hs,phase_X,theta_slam,X_slam_max,X_slam_min,
 %
 % :param T: wave energy period (s)
 % :param Hs: significant wave height (m)
-% :param phase_X: $\\angle$ X
+% :param phase_X: phase_X
 % :param theta_slam: $\\theta$ slam
 % :param X_slam_max: X_slam_max
 % :param X_slam_min: X_slam_min
 % :param X_mag: X_mag
-% :returns: fig
+% :returns: Figure handle
 
     fig = figure;
     t = tiledlayout(1,5,'TileSpacing','tight');
