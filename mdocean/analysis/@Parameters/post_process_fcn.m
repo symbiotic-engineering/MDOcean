@@ -16,6 +16,7 @@ function [fig_array,...
 % :returns: tab_colspecs
             
             tab = intermed_result_struct.params_table;
+            tab(strcmp(tab.name, 'drag_fcn'),{'value','value_normalize'}) = {'drag_fcn'}; % replace drag_fcn function handle with string for display purposes
             
             fig_array = [];
             
