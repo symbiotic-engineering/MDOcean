@@ -1015,7 +1015,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     atan_denominator(small_denominator & atan_denominator == 0) = eps;
     atan_argument = (alpha.^2 .*  ctrl_mult_mag.^2 + 1) ./ atan_denominator;
     ctrl_mult_phase_desired = 2 * atan(atan_argument) + epsilon .* acos(acos_argument); % eqn 4
-    optimality_err(idx_soln_applies) = ctrl_mult_phase(idx_soln_applies) - ctrl_mult_phase_desired(idx_soln_applies);
+    optimality_err(idx_soln_applies) = wrapToPi(ctrl_mult_phase(idx_soln_applies) - ctrl_mult_phase_desired(idx_soln_applies));
 
     % at sea states where none of the solutions necessarily apply (the true 
     % solution could be any combo of one or two of the saturated solutions but unclear which 1-2),
