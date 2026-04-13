@@ -1260,6 +1260,112 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-DragIntegral' 
       stage in calkit.yaml. Changes made here will be overwritten.
+  analysis-FitOlaya:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
+      obj.run_analysis();"
+    deps:
+      - ./mdocean/analysis/@FitOlaya/FitOlaya.m
+      - ./mdocean/analysis/@FitOlaya/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/save_pdf.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - ./dev/hydro_coeffs/damping_plate/
+    outs:
+      - results/FitOlaya/intermed.mat
+    desc: Automatically generated from the 'analysis-FitOlaya' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  postpro-FitOlaya:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
+      obj.run_all_from_load();"
+    deps:
+      - results/FitOlaya/intermed.mat
+      - ./mdocean/analysis/@FitOlaya/FitOlaya.m
+      - ./mdocean/analysis/@FitOlaya/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/save_pdf.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/FitOlaya/end.mat
+    desc: Automatically generated from the 'postpro-FitOlaya' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
@@ -4259,6 +4365,7 @@ stages:
       move_results_to_pubs('AOR');"
     deps:
       - results/DragIntegral/
+      - results/FitOlaya/
       - results/ReadNonMatlabFigs/
       - results/SparHydro/
       - results/DescFcns/

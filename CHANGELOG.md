@@ -1,5 +1,8 @@
 # Changelog
 ## Unreleased
+### Added
+- Dev: new `FitOlaya` analysis class that loads Olaya damping plate digitized data in `analysis_fcn` and makes fit/exploratory plots in `post_process_fcn`; added to pipeline and `move-aor-results` stage
+- Dev: refactored `fit_olaya_script.m` into helper functions (`load_raw_data`, `plot_original_signals`, `create_signals`, `plot_case_signals`, `fit_and_plot_case4`) and added `plot_fit_and_coeffs_all_alpha_beta`/`plot_fit_and_coeffs_sep_alpha_beta` helpers
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
