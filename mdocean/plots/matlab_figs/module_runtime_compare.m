@@ -48,7 +48,7 @@ function [figs, ...
     t_no_force_amp_sat   = time_multiplier_no_force_amp_sat   * extract_runtime(profile_no_force_amp_sat,  'get_response_drag');
 
     f1 = figure;
-    cats = {'Frequency Domain 2-DOF','MDOcean Dynamics 1-DOF','MDOcean Dynamics 2-DOF','No Amp Sat 2-DOF','No Amp/Force Sat 2-DOF','WecSim (Parallelized)'};
+    cats = {'Frequency Domain 2-DOF','MDOcean Dynamics 1-DOF, Force & Amp. Constrained','MDOcean Dynamics 2-DOF, Force & Amp.  Constrained','MDOcean Dynamics 2-DOF, Force Constrained','MDOcean Dynamics 2-DOF, Unconstrained','WecSim (Parallelized)'};
     times = [t_freq_domain t_singlebody t_multibody t_no_amp_sat t_no_force_amp_sat round(t_wecsim)];
     cats = reordercats(categorical(cats),cats);
     h = bar(cats,times);
