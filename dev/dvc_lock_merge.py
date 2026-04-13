@@ -153,13 +153,16 @@ def checkout_git_tracked_outputs(prefer):
     prefer must be "O" (ours) or "T" (theirs).  Any other value is a no-op.
 
     Strategy (avoids touching the index, so no index.lock conflict):
-    1. Try the staged conflict blob  (:2:<path> for ours, :3:<path> for theirs).
-       These exist only when both sides modified the file.
-    2. Fall back to the commit-tree blob using the resolved commit ref.
+    1. Try the commit-tree blob using the resolved commit ref.
        git merge      -> MERGE_HEAD
        git cherry-pick / rebase -> CHERRY_PICK_HEAD / REBASE_HEAD
-       This handles the common case where only one side changed the file and
-       git therefore never staged it at a conflict stage.
+       The commit tree is fully available as soon as the merge starts, so
+       this lookup always works regardless of which file git is currently
+       processing.
+    2. Fall back to the staged conflict blob (:2:<path> for ours, :3:<path>
+       for theirs).  Git writes these lazily — only for the specific file it
+       is currently merging — so they may not exist yet for other files when
+       this driver runs.
     3. If neither exists the file was deleted (or is genuinely absent) on that
        side — skip it.
 
@@ -187,10 +190,14 @@ def checkout_git_tracked_outputs(prefer):
         )
     resolved = []
     for p in paths:
-        # Prefer the staged conflict blob; fall back to the commit-tree blob.
-        content = _read_blob(f":{stage}:{p}")
-        if content is None and commit_ref is not None:
+        # Try the commit-tree blob first — always available during a merge.
+        # Fall back to the staged conflict blob, which git writes lazily and
+        # may not exist yet for files other than the one currently being merged.
+        content = None
+        if commit_ref is not None:
             content = _read_blob(f"{commit_ref}:{p}")
+        if content is None:
+            content = _read_blob(f":{stage}:{p}")
         if content is not None:
             try:
                 dest = Path(p)
