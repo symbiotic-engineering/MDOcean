@@ -53,6 +53,13 @@ jpd_Te = jpd_full(1,2:end);
 
 g = 9.8;
 spar_exc = get_spar_exc(g);
+harmonics = 10;
+m0_op = dispersion(2*pi./jpd_Te,h,g);
+m_k_h_op = cell2mat(arrayfun(@(m0h)get_m_k_h(m0h,harmonics),m0_op.'*h,'UniformOutput',false));
+
+T_storm = [5.57 8.76 12.18 17.26 21.09 24.92 31.70];
+m0_storm = dispersion(2*pi./T_storm,h,g);
+m_k_h_storm = cell2mat(arrayfun(@(m0h)get_m_k_h(m0h,harmonics),m0_storm.'*h,'UniformOutput',false));
 
 cols  = {'name',  'name_pretty','value','subsystem','sweep',  'description','idx'};
 types = {'string','string',     'cell', 'string',   'logical','string',     'cell'};
@@ -74,7 +81,7 @@ param_table = [param_table;
     table("T","T",{jpd_Te},"site",true,"wave energy period (s)",{'max'});
     table("Hs_struct","H_{s,struct}",{[5 7 9 11.22 9 7 5]*1.9*sqrt(2)},...
         "site",true,"100 year significant individual wave height (m)",{'max'});
-    table("T_struct","T_{struct}",{[5.57 8.76 12.18 17.26 21.09 24.92 31.70]},...
+    table("T_struct","T_{struct}",{T_storm},...
         "site",true,"100 year wave peak period (s)",{'max'});
     ...% 100 year extreme heights and periods from Berg 2011 
     ...
@@ -201,12 +208,16 @@ param_table = [param_table;
         "max number of fixed-point iterations for drag convergence (-)",{''});
     table("max_drag_iters_slv","max drag iters solver",{100},"dynamics",false,... 
         "max number of solver iterations for drag convergence (-)",{''});
-    table("harmonics","harmonics",{10},"dynamics",false,... 
+    table("harmonics","harmonics",{harmonics},"dynamics",false,... 
         "number of harmonics to use for MEEM (int)",{''});
     table("besseli_argmax","\mathrm{argmax(I}_\{nu}(z))",700.5,"dynamics",false,... 
         "max argument of besseli before Inf overflow occurs",{''});
     ...
     ...% Dynamics: hydro coefficient data for nominal design
+    table("m_k_h_precomputed_op","m_{k,op} h",{m_k_h_op},"dynamics",false,...
+        "precomputed MEEM inputs for operational waves (-)",{''})
+    table("m_k_h_precomputed_storm","m_{k,storm} h",{m_k_h_storm},"dynamics",false,...
+        "precomputed MEEM inputs for storm waves (-)",{''})
     table("spar_excitation_coeffs","spar excitation coeffs",{spar_exc},...
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3",{''});
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
@@ -248,10 +259,21 @@ if nargout > 1
     [~,numeric_idx(use_max)] = cellfun(@max, param_table.value(use_max));
     [~,numeric_idx(use_min)] = cellfun(@min, param_table.value(use_min));
     numeric_idx(use_num) = [param_table.idx{use_num}];
-    value_normalize = cellfun(@(x,i) x(numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
+    value_normalize = cellfun(@(x,i) pick_normalize_val(x,numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
 
     param_table.index_normalize = numeric_idx;
     param_table.value_normalize = value_normalize;
 end
 
+end
+
+function v = pick_normalize_val(x, idx)
+%PICK_NORMALIZE_VAL Return the element at idx for numeric/logical arrays.
+%   For non-indexable values (function handles, strings, chars) return x as-is,
+%   since these parameters cannot be meaningfully indexed for normalization.
+    if isnumeric(x) || islogical(x)
+        v = x(idx);
+    else
+        v = x;
+    end
 end
