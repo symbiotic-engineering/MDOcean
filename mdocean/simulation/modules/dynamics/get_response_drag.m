@@ -144,8 +144,15 @@ function [mag_U,phase_U,...
         opts.PlotFcn = {'optimplotx','optimplotfval'};
     end
 
+    % per-sea-state convergence masking for fsolve:
+    % containers.Map is a handle class, so updates inside the callback
+    % persist across successive fsolve function evaluations.
+    ss_conv_solver = containers.Map({'mask'}, {false(N_ss_nz, 1)});
+    tols_solver = [X_tol, X_tol, phase_X_tol, phase_X_tol, F_lim_tol, X_lim_tol];
+
     % solve
-    [x_solved,err,flag,out] = fsolve(@(x)fun_outer(x,fun_inner,flatten),x0,opts);
+    [x_solved,err,flag,out] = fsolve(@(x)fun_outer_with_mask(x,fun_inner,flatten,...
+                                          ss_conv_solver,N_ss_nz,tols_solver),x0,opts);
 
     % unpack
     [X_f_solved,X_s_solved,...
@@ -178,6 +185,27 @@ end
 function out_flat = fun_outer(x,fun_inner,flatten)
     [Y1,Y2,Y3,Y4,Y5,Y6] = fun_inner(x);
     out_flat = flatten(Y1,Y2,Y3,Y4,Y5,Y6);
+end
+
+function out_flat = fun_outer_with_mask(x,fun_inner,flatten,ss_conv,N_ss_nz,tols)
+    % evaluate residuals for all sea states (reuse fun_outer)
+    out_flat = fun_outer(x, fun_inner, flatten);
+
+    % reshape to (N_ss_nz x 6): row i = sea state i, columns = 6 error types
+    % order matches flatten: X_f_err, X_s_err, phase_X_f_err, phase_X_s_err,
+    %                        force_lim_err, amp_lim_err
+    res = reshape(out_flat, N_ss_nz, 6);
+
+    % per-sea-state convergence: retire any sea state whose max absolute
+    % residual across all 6 error types is below its respective tolerance
+    newly_converged = all(abs(res) < tols, 2);
+    mask = ss_conv('mask');
+    mask = mask | newly_converged;
+    ss_conv('mask') = mask;   % handle-class update persists across fsolve calls
+
+    % zero residuals for already-converged sea states so fsolve ignores them
+    res(mask, :) = 0;
+    out_flat = res(:);
 end
 
 function [mag_U,phase_U,...
