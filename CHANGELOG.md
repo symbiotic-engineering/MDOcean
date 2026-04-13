@@ -1,5 +1,9 @@
 # Changelog
 ## Unreleased
+## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
+### Changed
+- Analysis: `GenericAnalysis` loads `var_bounds.mat` when it exists, and falls back to calling `var_bounds()` to recompute it if the file is not present
+
 ## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
 ### Changed
 - CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
