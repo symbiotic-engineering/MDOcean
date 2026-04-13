@@ -1,5 +1,8 @@
 # Changelog
-## Unreleased
+## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
+### Added
+- Analysis: new `FitOlaya` class that loads Olaya et al. digitized damping plate data, computes derived signals, and generates fit and exploratory plots for hydrodynamic coefficient fitting
+
 ## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
 ### Changed
 - CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
