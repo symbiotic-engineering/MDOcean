@@ -65,6 +65,16 @@ pipeline:
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
       outputs:
         - ./mdocean/inputs/drag_integral.mat
+    make-var-bounds:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); b = var_bounds(); save('./mdocean/inputs/var_bounds.mat','b');
+      inputs:
+        - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/parameters.m
+        - ./mdocean/optimization/find_nominal_inputs.m
+      outputs:
+        - ./mdocean/inputs/var_bounds.mat
     make-calkit-stages:
       kind: matlab-command
       environment: _system

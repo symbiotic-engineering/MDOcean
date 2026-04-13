@@ -57,7 +57,7 @@ classdef (Abstract) GenericAnalysis
             if nargin > 1
                 obj.b = b;
             else
-                obj.b = var_bounds();
+                obj.b = load('var_bounds.mat').b;
             end
             
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
