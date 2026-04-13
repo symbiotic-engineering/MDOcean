@@ -1261,31 +1261,37 @@ stages:
     desc: Automatically generated from the 'postpro-DragIntegral' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
-      obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=FitOlaya; obj.run_analysis();"
     deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@FitOlaya/FitOlaya.m
       - ./mdocean/analysis/@FitOlaya/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
-      - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
-      - ./mdocean/plots/util/save_pdf.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1299,6 +1305,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1308,38 +1315,42 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
-      - ./dev/hydro_coeffs/damping_plate/
     outs:
       - results/FitOlaya/intermed.mat
-    desc: Automatically generated from the 'analysis-FitOlaya' stage in
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-FitOlaya' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   postpro-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
-      obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=FitOlaya; obj.run_all_from_load();"
     deps:
-      - results/FitOlaya/intermed.mat
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@FitOlaya/FitOlaya.m
       - ./mdocean/analysis/@FitOlaya/post_process_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
       - ./mdocean/inputs/get_spar_exc.m
       - ./mdocean/inputs/parameters.m
-      - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
       - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
       - ./mdocean/plots/util/hatchfill2.m
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/remove_underscores.m
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
-      - ./mdocean/plots/util/save_pdf.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
       - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
       - ./mdocean/simulation/modules/dynamics/pick_which_root.m
@@ -1353,6 +1364,7 @@ stages:
       - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
       - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
       - ./mdocean/simulation/modules/hydro/group_velocity.m
       - ./mdocean/simulation/modules/hydro/run_MEEM.m
       - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
@@ -1362,8 +1374,12 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/simulation.m
+      - results/FitOlaya/intermed.mat
     outs:
       - results/FitOlaya/end.mat
+      - results/FitOlaya/end.json:
+          cache: false
+          persist: false
     desc: Automatically generated from the 'postpro-FitOlaya' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
