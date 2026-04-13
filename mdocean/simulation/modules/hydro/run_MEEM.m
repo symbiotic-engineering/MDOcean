@@ -3,7 +3,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                                                N_num, M_num, K_num, ...
                                                a1_mat, a2_mat, d1_mat, ...
                                                d2_mat, h_mat, m0_mat, ...
-                                               spatial_res, show_A, plot_phi)
+                                               spatial_res, show_A, plot_phi, ...
+                                               m_k_h_precomputed)
 % Function run_MEEM
 %
 % :param heaving_IC: heaving_IC
@@ -48,6 +49,22 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
             'All nonscalar numeric inputs must have same number of elements');
     end
 
+    % precompute m_k if not already provided
+    m0_h_mat = m0_mat .* h_mat;
+    if nargin >= 16
+        msg = sprintf('m_k_h_precomputed is the wrong size. Expected [%i,%i], got [%i,%i]',...
+            numel(m0_h_mat), K_num, size(m_k_h_precomputed,1), size(m_k_h_precomputed,2));
+        assert(all(size(m_k_h_precomputed)==[numel(m0_h_mat),K_num]),msg)
+        m_k_h_all_m0hs = m_k_h_precomputed;
+    else
+        [m_0_h_unique, ~, idx_unique] = unique(m0_h_mat);
+        unique_m_k_h = zeros(length(m_0_h_unique), K_num);
+        for i=1:length(m_0_h_unique)
+            unique_m_k_h(i,:) = get_m_k_h(m_0_h_unique(i), K_num);
+        end
+        m_k_h_all_m0hs = unique_m_k_h(idx_unique,:);
+    end
+
     % generate filename based on setup
     if heaving_IC && heaving_OC
         heaving = 'both';
@@ -88,9 +105,19 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                          d2_num < d1_num;
         
         if valid_geometry
+            m_k_h = m_k_h_all_m0hs(i,:);
+
             [mu_nondim(i), lambda_nondim(i), exc_phases(i)] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, ...
-                                                                h_num, m0_num, spatial_res, ...
-                                                                K_num, show_A, plot_phi, fname);
+                                                                h_num, m0_num, spatial_res, N_num, M_num, ...
+                                                                K_num, show_A, plot_phi, fname, m_k_h);
+            if mu_nondim(i)<0
+                mu_nondim(i) = 1e-9;
+                warning('MEEM computed negative added mass. Setting added mass to very small value.')
+            end
+            if lambda_nondim(i)<0
+                lambda_nondim(i) = 1e-9;
+                warning('MEEM computed negative damping. Setting damping to very small value.')
+            end
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
@@ -114,10 +141,10 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
     end
 end
 
-function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, K_num, show_A, plot_phi, fname)
+function [mu_nondim, lambda_nondim, exc_phase] = compute_and_plot(a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, N_num, M_num, K_num, show_A, plot_phi, fname, m_k_h_precomputed)
     % solve for m_k from m_0 and h    
     
-    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname);
+    [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,N_num,M_num,K_num,show_A,fname,m_k_h_precomputed);
 
     hydro_fname = ['hydro_potential_velocity_fields_' fname];
     if plot_phi
@@ -157,25 +184,17 @@ function [varargout] = fix_scalars(desired_size, varargin)
     end
 end
 
-function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,h_num,m0_num,K_num,show_A,fname)
+function [x_cell, m_k_cell, ...
+    hydro_nondim_num, exc_phase] = compute_eigen_hydro_coeffs(a1_num,a2_num,d1_num,d2_num,...
+                                                            h_num,m0_num,N_num,M_num,K_num,...
+                                                            show_A,fname,m_k_h_precomputed)
 
-    m_k_num = zeros(1,K_num);
-    % using tand instead of tan because finite precision of pi means
-    % inconsistent behaviour around tan(pi/2)
-    eqn = @(m_k_h_deg) (m_k_h_deg * pi/180) .* tand(m_k_h_deg) + m0_num * h_num * tanh(m0_num * h_num);
-
-    for k_num = 1:K_num
-        bounds = 180 * [k_num-1/2, k_num];
-        % apply tweak determined experimentally to be the smallest tweak
-        % that doesn't return +-Inf - see p17 of notebook
-        expo = floor( log(bounds(1)) / log(2) );
-        bound_tweak = eps * (2^(expo - 1) + 1);
-        bounds(1) = bounds(1) + bound_tweak;
-
-        m_k_h_deg = fzero(eqn, bounds);
-        m_k_num(k_num) = m_k_h_deg * pi/180 / h_num;
-    end    
-
+    if nargin >= 12
+        m_k_h_num = m_k_h_precomputed;
+    else
+        m_k_h_num = get_m_k_h(m0_num * h_num, K_num);
+    end
+    m_k_num = m_k_h_num ./ h_num;
     m_k_cell = num2cell(m_k_num);
 
     % get A and b matrices
@@ -206,6 +225,10 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
         b_num(~isfinite(b_num)) = 0;
         warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
+    if any(~isfinite(c_num),'all')
+        c_num(~isfinite(c_num)) = 0; 
+        warning('MEEM got non-finite result for some elements in c-vector. Elements will be zeroed.')
+    end
     % show A matrix values
     if show_A
         cond(A_num)
@@ -220,6 +243,19 @@ function [x_cell, m_k_cell, hydro_nondim_num, exc_phase] = compute_eigen_hydro_c
 
         figure
         spy(A_num)
+        hold on
+        widths = [N_num+1, M_num+1, M_num+1, K_num+1];
+        bars = .5 + [widths(1), sum(widths(1:2)), sum(widths(1:3))];
+        full_line = [0,1+sum(widths)];
+     
+        plot(bars(1)*[1,1], full_line, 'k') % first vertical
+        plot(bars(2)*[1,1], full_line, 'k') % second vertical
+        plot(bars(3)*[1,1], full_line, 'k') % third vertical
+        
+        plot(full_line, bars(1)*[1,1], 'k') % first horizontal
+        plot(full_line, bars(2)*[1,1], 'k') % second horizontal
+        plot(full_line, bars(3)*[1,1], 'k') % third horizontal
+        xlabel('')
     end
 
     % solve for x
@@ -629,7 +665,7 @@ function assemble_plot_pot_vel_fields(a1_num,a2_num,d1_num,d2_num,R,Z,...
     z_cutoffs_potential = [-d1_num -d1_num -d2_num -d2_num];
     z_cutoffs_velocity = [-d1_num -d2_num -d2_num 0];
 
-    plot_matching(phi_i1_num,phi_i2_num,phi_e_num,a1_num,a2_num,R,Z,'potential',z_cutoffs_potential)
+    plot_matching(phi_i1_num,phi_i2_num,phi_e_num,a1_num,a2_num,R,Z,'Potential',z_cutoffs_potential)
 
     plot_matching(v_1_r_num,v_2_r_num,v_e_r_num,a1_num,a2_num,R,Z,'Radial Velocity',z_cutoffs_velocity)
     plot([-d1_num -d2_num],[0 0],'m','DisplayName','No flux BC at a1')
@@ -685,9 +721,10 @@ function plot_matching(phi1,phi2,phie,a1,a2,R,Z,name,z_cutoffs)
     hold on
     plot(Z(idx_a2_minus),phi2_a2,'b-', ...
          Z(idx_a2_plus), phie_a2,'c--')
-    legend([name '_1 at a_1'],[name '_2 at a_1'],[name '_2 at a_2'],[name '_e at a_2'])
+    legend({[name ' 1 at $a_1$'],[name ' 2 at $a_1$'],[name ' 2 at $a_2$'],[name ' e at $a_2$']},...
+                'interpreter','latex','location','best')
     xlabel('Z')
-    ylabel(['|' name '|'])
+    ylabel(['Magnitude of ' name])
     title([name ' Matching'])
 end
 

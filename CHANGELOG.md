@@ -1,5 +1,154 @@
 # Changelog
 ## Unreleased
+## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
+### Added
+- Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
+- Model: cache m_k_h to reduce compute time since it doesn't change across sims
+### Changed
+- Model: turn on stabilization within optimal control solver
+- Model: increase max kappa of drag LUT from 8 to 120
+### Fixed
+- Model: handle edge case geometries that cause finite precision errors
+- Model: fix indexing error in make_drag_integral_LUT that led to out-of-bounds queries being kept NaN instead of numerically computed
+
+## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
+### Changed
+- CI: bump paths-filter to v4 in merge-ready.yml workflow
+
+## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
+### Added
+- Pipeline: stage that shows figures in jupyter notebook to facilitate code review
+ 
+## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+### Changed
+- CI: bump `astral-sh/setup-uv` from v5 to v7
+
+## [v1.1.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.12) - 2026-4-5
+### Fixed
+- Model: wave velocity depth evaluated at full draft `T` instead of half-draft `T/2` in `get_dynamic_coeffs.m`
+- Paper: drag coefficient formula corrected to use velocity amplitude `|\hat{\dot{\xi}}|` instead of displacement `|\hat{\xi}}|`
+- Paper: spar column ζ formula fraction corrected from `A·σ_Y/F_crit` to `σ_Y/(F_crit/A)`
+- Paper: float waterplane area corrected to annular formula `π/4·(D_f²−D_s²)` instead of solid disk `π/4·D_f²`
+- Paper: structural cost price `p_s` redefined as $/m³ (was $/kg) with table values updated accordingly
+- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
+
+## [v1.1.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.11) - 2026-4-5
+### Changed
+- CI: pin pubs conda environment to specific package versions (python=3.14.3, libxml2=2.15.2, pip=26.0.1)
+- CI: fix Dependabot conda manifest directory to `/pubs/` and add pip updater for `/docs`
+
+## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
+### Added
+- CI: Dependabot configuration for conda, GitHub Actions, and git submodules
+
+## [v1.1.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.9) - 2026-4-4
+### Changed
+- CI: upgrade GitHub Actions to Node.js 24 compatible versions (checkout v6, upload-artifact v6, setup-matlab v3, run-command v3, codecov-action v5, action-junit-report v6, action-download-artifact v20, setup-python v6)
+
+## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
+### Changed
+- Readme: links now go to calkit draft publications rather than old google docs drafts
+
+## [v1.1.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.7) - 2026-4-1
+### Fixed
+- Pipeline: remove extraneous calkit outputs that caused two postpro stages to fail
+- Pipeline: add xmllint to pubs conda env to avoid issue with mermaid reformatting stage
+- CI: avoid unnecessary double dvc pull
+
+## [v1.1.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.6) - 2026-3-30
+### Added
+- Pipeline: python script to update calkit.yaml automatically with matlab auto deps
+- CI: enforce calkit.yaml to be up to date with matlab auto deps
+
+## [v1.1.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.5) - 2026-3-30
+### Changed
+- Plot: added frequency domain to dynamics runtime bar plot
+### Fixed
+- Analysis: add forgotten add_wecsim_path in runtime analysis class
+
+## [v1.1.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.4) - 2026-3-29
+### Changed
+- Dev: extracted WEC-Sim path setup into standalone `add_wecsim_path` function, called only when needed rather than during general path initialization
+
+## [v1.1.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.3) - 2026-3-29
+### Added
+- Model: drag computed via strip theory integral. Note that this increases runtime by over 40%.
+- Pipeline: stages to precompute drag lookup table and analysis for drag integral plots
+- Validation: WecSim saves fundamental of drag force and phases via FFT
+- CI: check to avoid accidental submodule downgrades 
+### Changed
+- Validation: WecSim uses Morison drag rather than quadratic drag
+- Pipeline: dvc.lock merge driver no longer requires unchanged dvc.yaml
+- Plots: runtime bar chart numbers rounded to nearest ms
+- Plots: end figures saved as .fig in addition to .pdf
+- Paper: moved meem appendix back to this repo from OpenFLASH
+### Fixed
+- Model: sign error in phase of d'alembert force
+- Pipeline: track text outputs in git for a few stages forgotten last PR
+
+## [v1.1.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.2) - 2026-3-16
+### Added
+- Paper: mermaid diagram for modeling choice taxonomy
+- Paper: explanation of power multiplication and drag integral implementation
+- Paper: stage for building UMERC grid paper
+### Changed
+- Paper: introduction focuses on modeling not optimization
+- Paper: updates to structures, design load cases, econ, fixed point iteration, design variable coupling sections
+- Paper: removed damping vs reactive appendix
+- Paper: moved force saturation commentary from introduction to discussion
+- Pipeline: proper storage of text file outputs in git, and dvc images stored individually instead of by folder
+- Paper: updated graphical abstract
+### Fixed
+- Paper: MEEM appendix plots no longer placeholders with improved aesthetics
+- Paper: fixed citation/reference warnings
+
+## [v1.1.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.1) - 2026-3-13
+### Added
+- Model: ability to consider float+spar as one body in storm case
+### Fixed
+- Model: Recommended change in control to ensure stability properly extended to singlebody case 
+
+## [v1.1.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.0) - 2026-3-5
+### Added
+- Model: checks for open loop and closed loop instabilities and, when the system is unstable but stabilizable, calculates the required change to the controller to maintain stability
+- Model: saturate coupling hydro coefficients to enforce positive definite radiation matrices
+- Model: new slamming diameter constraints for float and spar
+- Analysis: `contourx` function that avoids warnings for constant contours
+- Dev: small script to facilitate retuning heave force and average power
+- Dev: scraper that checks out various commits and runs MEEM to facilitate hydro debugging
+- Dev: custom merge strategy for `dvc.lock`
+### Changed
+- Model: major change to slamming model - now considers both minimum and maximum slamming amplitudes and appropriately differentiates between large and small waves
+- Model: `power_scale_multibody`, `m_scale`, and `F_heave_mult` values increased to align validation
+- Model: refactor of functions within `get_response_drag`. The new organization will make the comparison between single-loop and nested-loop solver easier, and reduces the passing of many parameters between functions by using a `control_evaluation_fcn` anonymous function.
+- Model: the dynamics code in a few places starts to differentiate between `Z_l` and `Z_p` (load on electrical vs mechanical side), but most code still neglects electrical dynamics
+- Pipeline: separate `move-results` stage to allow running stages for only one paper not both
+- CI: Calkit workflow only runs stages needed for AOR, not RE, paper
+- CI: Calkit workflow upgrades to latest calkit version
+- Analysis: removed pareto from design space exploration for time savings in AOR development
+- Analysis: figure saving in postpro uses `exportgraphics` instead of `print` to avoid cutting off title/etc in large figures
+- Analysis: figure saving in intermediate results uses `savefig` instead of storing in struct, with saved position if needed when figure is larger than the screen, to avoid figure size issues 
+- Optimization/analysis: renaming of slamming constraints for clarity
+### Fixed
+- Model: error in spar dynamics where wrong draft was used for wamit hydro coefficient interpolation. Now uses T_s 29 m instead of 35 m.
+- Analysis: `is_feasible` not respecting ignored constraints
+- Analysis/pipeline: Wecsim stages appropriately split between simulation and figures and save all 100+ figure outputs
+- Analysis: figure aesthetics for Runtime, Slamming, and Wecsim stages
+- Analysis: fix `power_matrix_compare` output sizes for `report=true` in Wecsim validation plots
+- Analysis: corrected edge case logic in figure validity for when object does not have a 'Type' property
+- CI: Calkit workflow issue where a failed dvc pull would be falsely misinterpreted as a git merge conflict
+- CI: Avoid dvc timeouts by lengthening time and retrying dvc push in workflow
+- CI: Add `numeric-results.tex` as part of the `calkit save`
+- Readme: Zenodo badge now always points to newest version instead of old version
+
+## [v1.0.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.4) - 2026-3-1
+### Added
+- Pipeline: new stage for saving end results as a json and formatting it for use in latex
+- Paper: updates numbers to read from this json
+### Changed
+- Analysis: runtimes for each analysis class are saved
+### Fixed
+- Pipeline: xdsm stage uses conda environment rather than venv to get around venv activate error
 
 ## [v1.0.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.0.3) - 2026-2-27
 ### Added

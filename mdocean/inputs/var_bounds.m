@@ -150,12 +150,18 @@ b.constraint_names = {'float_too_heavy','float_too_light','spar_too_heavy','spar
                       'pos_power','LCOE_max','irrelevant_max_force',...
                       'force_limit','power_limit',...
                       'spar_height_up','spar_height_down','float_spar_hit',...
-                      'linear_theory_float','linear_theory_spar'};
+                      'linear_theory_float','linear_theory_spar',...
+                      'slamming_diameter_float','slamming_diameter_spar'};
 i1 = length(b.constraint_names);
 JPD_size = 14*15;
 storm_size = 7;
 for i = (i1+1):(i1+JPD_size+storm_size)
-    b.constraint_names{i} = strcat('prevent_slamming',num2str(i-i1));
+    if i<=i1+JPD_size
+        sea = ['operational_' num2str(i-i1)];
+    else
+        sea = ['storm_' num2str(i-i1-JPD_size)];
+    end
+    b.constraint_names{i} = strcat('prevent_slamming_',sea);
 end
 b.constraint_names_pretty = remove_underscores(b.constraint_names);
 
