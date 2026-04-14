@@ -1,5 +1,61 @@
 # Changelog
 ## Unreleased
+### Added
+- Model: new `get_slamming_min_max` helper function that computes slamming displacement bounds (min/max) and a diameter margin metric, extracted from the former inline `slamming` sub-function in `dynamics.m`
+### Changed
+- Model: replace 1e6 placeholder with actual displacement limits: static upper limits (linear wave theory, relative motion limits) and dynamic upper and lower limits (slamming/submersion)
+- Model: `get_response_drag` enforces per-sea-state amplitude constraint violation errors and phase-based optimality errors
+- Model: phase optimality error in `control_errors_from_sat_results` now wrapped with `wrapToPi` to eliminate ±π discontinuities that could confuse `fsolve`
+## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
+### Changed
+- CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-13
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
+## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
+### Added
+- Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
+- Model: cache m_k_h to reduce compute time since it doesn't change across sims
+### Changed
+- Model: turn on stabilization within optimal control solver
+- Model: increase max kappa of drag LUT from 8 to 120
+### Fixed
+- Model: handle edge case geometries that cause finite precision errors
+- Model: fix indexing error in make_drag_integral_LUT that led to out-of-bounds queries being kept NaN instead of numerically computed
+
+## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
+### Changed
+- CI: bump paths-filter to v4 in merge-ready.yml workflow
+
+## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
+### Added
+- Pipeline: stage that shows figures in jupyter notebook to facilitate code review
+ 
+## [v1.1.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.13) - 2026-4-5
+### Changed
+- CI: bump `astral-sh/setup-uv` from v5 to v7
+
+## [v1.1.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.12) - 2026-4-5
+### Fixed
+- Model: wave velocity depth evaluated at full draft `T` instead of half-draft `T/2` in `get_dynamic_coeffs.m`
+- Paper: drag coefficient formula corrected to use velocity amplitude `|\hat{\dot{\xi}}|` instead of displacement `|\hat{\xi}}|`
+- Paper: spar column ζ formula fraction corrected from `A·σ_Y/F_crit` to `σ_Y/(F_crit/A)`
+- Paper: float waterplane area corrected to annular formula `π/4·(D_f²−D_s²)` instead of solid disk `π/4·D_f²`
+- Paper: structural cost price `p_s` redefined as $/m³ (was $/kg) with table values updated accordingly
+- CI: remove stale `sea-lab-utils` nested-submodule gitdir cache before checkout to fix `git submodule foreach --recursive` auth-removal failure on self-hosted runner
+
+## [v1.1.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.11) - 2026-4-5
+### Changed
+- CI: pin pubs conda environment to specific package versions (python=3.14.3, libxml2=2.15.2, pip=26.0.1)
+- CI: fix Dependabot conda manifest directory to `/pubs/` and add pip updater for `/docs`
+
+## [v1.1.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.10) - 2026-4-4
+### Added
+- CI: Dependabot configuration for conda, GitHub Actions, and git submodules
+
+## [v1.1.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.9) - 2026-4-4
+### Changed
+- CI: upgrade GitHub Actions to Node.js 24 compatible versions (checkout v6, upload-artifact v6, setup-matlab v3, run-command v3, codecov-action v5, action-junit-report v6, action-download-artifact v20, setup-python v6)
 
 ## [v1.1.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.8) - 2026-4-1
 ### Changed

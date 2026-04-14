@@ -1,5 +1,5 @@
 function [X_slam_min, X_slam_max,...
-          idx_imag, diameter_margin] = get_slamming_min_max(A, k, D, phase_X, delta_z)
+          idx_imag, diameter_margin, theta] = get_slamming_min_max(A, k, D, phase_X, delta_z)
 
     idx_large_wave = A > delta_z;
 
