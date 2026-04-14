@@ -37,7 +37,7 @@ else
     % 3) single-circle closest boundary
     for i = 1:N
         dist = norm(c(i,:));
-        if dist < eps
+        if dist < 1e-10
             % center at origin: any boundary point is equally close
             p = [r(i), 0];
         else

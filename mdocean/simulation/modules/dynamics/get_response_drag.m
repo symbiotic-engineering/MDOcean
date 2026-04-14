@@ -384,6 +384,10 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
     X_s_max = X_max(2);
     X_u_max = X_max(3);
     
+    % small tolerance for negligible coefficients (dimensionless and dimensional)
+    COEFF_TOL = 1e-10;
+    GAMMA_TOL = 1e-12;
+    
     B_p_sat = B_p_stabilized;
     K_p_sat = K_p_stabilized;
     
@@ -426,7 +430,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         % velocity = i*w*X_u, so I_p = i*w_i*X_u_0
         I_p = 1i * w_i * X_u_0;
         
-        if abs(I_p) < eps
+        if abs(I_p) < COEFF_TOL
             continue  % no response, nothing to constrain
         end
         
@@ -468,7 +472,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         radii = [];
         
         % force constraint: |V| <= F_max
-        if use_force_sat && abs(c_V) > eps
+        if use_force_sat && abs(c_V) > COEFF_TOL
             center_F = -U_0 / c_V;
             radius_F = F_max / abs(c_V);
             if mag_U_unsat(idx) > F_max  % only add if violated
@@ -478,7 +482,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         end
         
         % float amplitude constraint: |X_f| <= X_f_max
-        if isfinite(X_f_max) && abs(c_Xf) > eps
+        if isfinite(X_f_max) && abs(c_Xf) > COEFF_TOL
             center_Xf = -X_f_0 / c_Xf;
             radius_Xf = X_f_max / abs(c_Xf);
             if mag_X_f_unsat(idx) > X_f_max  % only add if violated
@@ -488,7 +492,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         end
         
         % spar amplitude constraint: |X_s| <= X_s_max
-        if isfinite(X_s_max) && abs(c_Xs) > eps && multibody && ~merge_bodies
+        if isfinite(X_s_max) && abs(c_Xs) > COEFF_TOL && multibody && ~merge_bodies
             center_Xs = -X_s_0 / c_Xs;
             radius_Xs = X_s_max / abs(c_Xs);
             if mag_X_s_unsat(idx) > X_s_max  % only add if violated
@@ -498,7 +502,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         end
         
         % PTO amplitude constraint: |X_u| <= X_u_max
-        if isfinite(X_u_max) && abs(c_Xu) > eps
+        if isfinite(X_u_max) && abs(c_Xu) > COEFF_TOL
             center_Xu = -X_u_0 / c_Xu;
             radius_Xu = X_u_max / abs(c_Xu);
             if mag_X_u_unsat(idx) > X_u_max  % only add if violated
@@ -520,7 +524,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         % Gamma must lie ON the Q=0 circle (equality constraint)
         % Q=0 circle: center = -i*R/X, radius = |Z_th|/|X|
         % where R = Re(Z_th), X = Im(Z_th)
-        if strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > eps
+        if strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > COEFF_TOL
             R_th = real(Z_th_i);
             X_th = imag(Z_th_i);
             center_Q0 = [0, -R_th/X_th];
@@ -543,7 +547,7 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
         end
         
         % convert Gamma to Z_l, then to B_p and K_p
-        if abs(Gamma_opt) < 1e-12
+        if abs(Gamma_opt) < GAMMA_TOL
             % no constraint active, keep unsaturated gains
             continue
         end
@@ -567,7 +571,7 @@ function Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii)
     % closest point on Q=0 circle to origin (unconstrained damping optimal)
     c_Q0 = center_Q0(1) + 1i*center_Q0(2);
     dist_to_center = abs(c_Q0);
-    if dist_to_center < eps
+    if dist_to_center < 1e-10
         % center at origin, any point on circle is equally close
         Gamma_closest = radius_Q0;
     else
