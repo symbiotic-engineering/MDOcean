@@ -463,9 +463,6 @@ function [opt_mag_U,opt_phase_U,...
     end
 
     opt_mag_U = mag_U(idx_opt);
-    if F_max==0 & opt_mag_U > 0
-        warning('F_max=0 but nonzero force found in brute force optimization')
-    end
     opt_phase_U = phase_U(idx_opt);
     opt_reactive_P = reactive_P(idx_opt);
     opt_mag_X_u = mag_X_u(idx_opt);

@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 45;
+num_figs_AOR = 46;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -109,8 +109,10 @@ figs_in_AOR{38} = 'DampingPlateStructures.damping_plate_moment';
 figs_in_AOR{39} = 'DampingPlateStructures.damping_plate_deflection';
 % appendix D - parameters
 
+% appendix B - dynamics (continued)
+figs_in_AOR{45} = 'RunSingleFigFunc.ctrl_polar_plot';
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{45}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{46}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 
 %% TABLES
 
