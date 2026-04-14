@@ -632,9 +632,9 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 
     % Re-plot case 4 data and auto fits (duplicating the v1 auto plot)
     for i_alpha = 1:length(case_4.alpha)
-        col = alpha_colors{i_alpha};
+        col = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
         for j_beta = 1:length(case_4.beta)
-            mkr = beta_markers{j_beta};
+            mkr = beta_markers{mod(j_beta-1, length(beta_markers)) + 1};
             x_f1 = x_f1_v1{i_alpha, j_beta};
             y_f1 = y_f1_v1{i_alpha, j_beta};
 
