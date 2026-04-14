@@ -1260,6 +1260,238 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-DragIntegral' 
       stage in calkit.yaml. Changes made here will be overwritten.
+  analysis-FitOlaya:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=FitOlaya; obj.run_analysis();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./dev/hydro_coeffs/damping_plate/3b_black.csv
+      - ./dev/hydro_coeffs/damping_plate/3b_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/3b_red.csv
+      - ./dev/hydro_coeffs/damping_plate/4b_black.csv
+      - ./dev/hydro_coeffs/damping_plate/4b_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/4b_red.csv
+      - ./dev/hydro_coeffs/damping_plate/12a_black.csv
+      - ./dev/hydro_coeffs/damping_plate/12a_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/12a_red.csv
+      - ./dev/hydro_coeffs/damping_plate/12b_black.csv
+      - ./dev/hydro_coeffs/damping_plate/12b_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/12b_red.csv
+      - ./dev/hydro_coeffs/damping_plate/12c_black.csv
+      - ./dev/hydro_coeffs/damping_plate/12c_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/12c_red.csv
+      - ./dev/hydro_coeffs/damping_plate/12d_black.csv
+      - ./dev/hydro_coeffs/damping_plate/12d_blue.csv
+      - ./dev/hydro_coeffs/damping_plate/12d_red.csv
+      - ./mdocean/analysis/@FitOlaya/FitOlaya.m
+      - ./mdocean/analysis/@FitOlaya/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/FitOlaya/intermed.mat
+    desc: Automatically generated from the 'analysis-FitOlaya' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  postpro-FitOlaya:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=FitOlaya; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@FitOlaya/FitOlaya.m
+      - ./mdocean/analysis/@FitOlaya/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - results/FitOlaya/intermed.mat
+    outs:
+      - results/FitOlaya/orig_3b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_4b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12a_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12c_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12d_line_kRb_fbar.pdf
+      - results/FitOlaya/case24_compare_line_kRb_fnorm.pdf
+      - results/FitOlaya/case2_line_khRxRp_fnorm.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2.pdf
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.pdf
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.pdf
+      - results/FitOlaya/case4_sub_line_kRb_fnorm.pdf
+      - results/FitOlaya/case4_sub_line_khRxRp_fnorm.pdf
+      - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.pdf
+      - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sep_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_sep_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.pdf
+      - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.pdf
+      - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v1_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v1_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.pdf
+      - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.pdf
+      - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v2_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v2_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.pdf
+      - results/FitOlaya/case4_v3_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/orig_3b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_4b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12a_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12c_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12d_line_kRb_fbar.fig
+      - results/FitOlaya/case24_compare_line_kRb_fnorm.fig
+      - results/FitOlaya/case2_line_khRxRp_fnorm.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2.fig
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.fig
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.fig
+      - results/FitOlaya/case4_sub_line_kRb_fnorm.fig
+      - results/FitOlaya/case4_sub_line_khRxRp_fnorm.fig
+      - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.fig
+      - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sep_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_sep_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.fig
+      - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.fig
+      - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v1_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v1_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.fig
+      - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.fig
+      - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v2_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v2_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.fig
+      - results/FitOlaya/case4_v3_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/end.mat
+      - results/FitOlaya/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-FitOlaya' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ForceSaturationFigFunc; obj.run_analysis();"
@@ -2704,6 +2936,132 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-ParetoSweep' stage
       in calkit.yaml. Changes made here will be overwritten.
+  analysis-PtoSweep:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=PtoSweep; obj.run_analysis();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@PtoSweep/PtoSweep.m
+      - ./mdocean/analysis/@PtoSweep/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/PtoSweep/intermed.mat
+    desc: Automatically generated from the 'analysis-PtoSweep' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  postpro-PtoSweep:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=PtoSweep; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@PtoSweep/PtoSweep.m
+      - ./mdocean/analysis/@PtoSweep/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - results/PtoSweep/intermed.mat
+    outs:
+      - results/PtoSweep/pto_sweep.pdf
+      - results/PtoSweep/pto_sweep_constraint_activity.pdf
+      - results/PtoSweep/pto_sweep.fig
+      - results/PtoSweep/pto_sweep_constraint_activity.fig
+      - results/PtoSweep/end.mat
+      - results/PtoSweep/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-PtoSweep' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ReadNonMatlabFigs:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=ReadNonMatlabFigs; obj.run_analysis();"
@@ -4259,6 +4617,7 @@ stages:
       move_results_to_pubs('AOR');"
     deps:
       - results/DragIntegral/
+      - results/FitOlaya/
       - results/ReadNonMatlabFigs/
       - results/SparHydro/
       - results/DescFcns/
@@ -4274,6 +4633,7 @@ stages:
       - results/Slamming/
       - results/SweepGeoms/
       - results/Cost/
+      - results/PtoSweep/
       - mdocean/plots/fig_tab_pub_mapping.m
       - mdocean/plots/move_results_to_pubs.m
       - mdocean/plots/non_matlab_figs/pdf/
@@ -4284,17 +4644,23 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
     cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json'
-      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
-      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
-      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
-      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
-      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+      'results/PtoSweep/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
+      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
+      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
+      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
+      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
       : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
-      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"}'"
+      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"ptoSweepMinLCOE_F_max\"\
+      : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
+      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
+      : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
+      : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
+      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
     deps:
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
+      - results/PtoSweep/end.json
     outs:
       - pubs/applied-ocean-research-model/numeric-results.tex:
           cache: false

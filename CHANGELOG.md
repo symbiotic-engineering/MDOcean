@@ -1,5 +1,16 @@
 # Changelog
-## Unreleased
+## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
+### Added
+- Analysis: new `FitOlaya` class that loads Olaya et al. digitized damping plate data, computes derived signals, and generates fit and exploratory plots for hydrodynamic coefficient fitting
+
+## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
+### Changed
+- CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
+  
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-13
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
+
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
