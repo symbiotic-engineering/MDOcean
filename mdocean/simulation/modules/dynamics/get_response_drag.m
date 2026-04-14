@@ -422,7 +422,37 @@ function [opt_mag_U,opt_phase_U,...
         warning(['no feasible controller found for %d/%d sea states, setting signals to '...
                 'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
                 sum(~each_sea_state_feasible(:)), numel(each_sea_state_feasible))
-        [~,idx_least_err] = min(constraint_err,[],ctrl_dim);
+        
+        % diagnostic: identify which constraint(s) are not satisfied
+        [min_err,idx_least_err] = min(constraint_err,[],ctrl_dim);
+        infeas_mask = ~each_sea_state_feasible;
+        fprintf('  Brute force diagnostics for infeasible sea states:\n');
+        fprintf('    min constraint_err across controllers: min=%.4g, max=%.4g\n', ...
+                min(min_err(infeas_mask)), max(min_err(infeas_mask)));
+        % evaluate per-constraint errors at the best guess for each infeasible sea state
+        best_B_p = nan(size(w));
+        best_mag_U_val = nan(size(w));
+        best_mag_X_f_val = nan(size(w));
+        best_mag_X_s_val = nan(size(w));
+        best_mag_X_u_val = nan(size(w));
+        best_real_P_val = nan(size(w));
+        for idx_flat = find(infeas_mask(:))'
+            linear_idx = idx_flat + (idx_least_err(idx_flat)-1)*numel(w);
+            best_B_p(idx_flat) = B_p_sat(linear_idx);
+            best_mag_U_val(idx_flat) = mag_U(linear_idx);
+            best_mag_X_f_val(idx_flat) = mag_X_f(linear_idx);
+            best_mag_X_s_val(idx_flat) = mag_X_s(linear_idx);
+            best_mag_X_u_val(idx_flat) = mag_X_u(linear_idx);
+            best_real_P_val(idx_flat) = real_P(linear_idx);
+        end
+        n_infeas = sum(infeas_mask(:));
+        fprintf('    B_p<0 (neg damping):   %d/%d infeasible sea states\n', sum(best_B_p(infeas_mask) < 0), n_infeas);
+        fprintf('    force exceeded F_max:  %d/%d (F_max=%.4g)\n', sum(best_mag_U_val(infeas_mask) > 4/pi*F_max), n_infeas, F_max);
+        fprintf('    power exceeded P_max:  %d/%d (P_max=%.4g)\n', sum(best_real_P_val(infeas_mask) > P_max), n_infeas, P_max);
+        fprintf('    float amp exceeded:    %d/%d (X_max(1)=%.4g)\n', sum(best_mag_X_f_val(infeas_mask) > X_max(1)), n_infeas, X_max(1));
+        fprintf('    spar amp exceeded:     %d/%d (X_max(2)=%.4g)\n', sum(best_mag_X_s_val(infeas_mask) > X_max(2)), n_infeas, X_max(2));
+        fprintf('    rel amp exceeded:      %d/%d (X_max(3)=%.4g)\n', sum(best_mag_X_u_val(infeas_mask) > X_max(3)), n_infeas, X_max(3));
+
         idx_opt(~each_sea_state_feasible) = idx_least_err(~each_sea_state_feasible);
         opt_real_P = real_P(idx_opt);
     end
@@ -1082,7 +1112,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
         constr_viol_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
     else
         % add penalty for B_p<0 (negative power)
-        tol = 1;
+        tol = 0;
         B_p_violation = max(-B_p_sat+tol,0);
         constr_viol_err = constr_viol_err + B_p_violation;
     end
