@@ -318,19 +318,17 @@ function [mag_U,phase_U,...
                                                                 gamma_s_phase, multibody, merge_bodies,...
                                                                 drag_fcn, D_f, D_f_in, D_d);
 
-    if F_max==0
-        [B_p,K_p] = deal(zeros(size(w)));
-    else
-        % unsaturated optimal control gains
-        [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type);
-    end
-    % unsaturated response (stabilized) - capture phases for QCQP
-    stabilize_B = true;
+    
+    % unsaturated optimal control gains
+    [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type);
+    stabilize_B = strcmpi(control_type,'reactive') || strcmpi(control_type,'damping');
     stabilize_K = strcmpi(control_type,'reactive');
-    [mag_U_unsat,phase_U_unsat,P_unsat,~,...
-     mag_X_u_unsat,phase_X_u_unsat,...
-     mag_X_f_unsat,phase_X_f_unsat,...
-     mag_X_s_unsat,phase_X_s_unsat,...
+
+    % unsaturated response (stabilized)
+    [mag_U_unsat,~,P_unsat,~,...
+     mag_X_u_unsat,~,...
+     mag_X_f_unsat,~,...
+     mag_X_s_unsat,~,...
      B_p_stabilized,K_p_stabilized] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
     
     Z_th = 1 ./ (real_G_u + 1i * imag_G_u);
@@ -411,8 +409,7 @@ function [opt_mag_U,opt_phase_U,...
     end
 
     % choose best controller for each sea state
-    constraint_tol = 1e-4;
-    each_controller_feasible = abs(constraint_err) < constraint_tol;
+    each_controller_feasible = constraint_err == 0;
     ctrl_dim = 3;
     each_sea_state_feasible = any(each_controller_feasible,ctrl_dim);
     real_P(each_sea_state_feasible & ~each_controller_feasible) = -1; % negative power for infeasible controllers in sea states where a feasbile controller exists, so they aren't chosen
@@ -458,6 +455,9 @@ function [opt_mag_U,opt_phase_U,...
     end
     
     opt_mag_U = mag_U(idx_opt);
+    if F_max==0 & opt_mag_U > 0
+        warning('F_max=0 but nonzero force found in brute force optimization')
+    end
     opt_phase_U = phase_U(idx_opt);
     opt_reactive_P = reactive_P(idx_opt);
     opt_mag_X_u = mag_X_u(idx_opt);
@@ -492,8 +492,8 @@ function [mag_U,phase_U,real_P,reactive_P,...
     K_p_sat = -w .* imag(Z_p_sat);
 
     % saturated response (with B stabilization, and K stabilization for reactive control)
-    stabilize_B = true;
-    stabilize_K = strcmpi(control_type,'reactive');
+    stabilize_B = false;
+    stabilize_K = false;%strcmpi(control_type,'reactive');
     [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
@@ -608,7 +608,10 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
         B_p = real_G_u ./ mag_G_u_squared;
     elseif strcmpi(control_type, 'damping')
         B_p = 1 ./ sqrt(mag_G_u_squared);
-        K_p = 1e-8; % can't be quite zero because r_k = Inf
+        K_p = 0;
+    elseif strcmpi(control_type, 'none')
+        B_p = 0;
+        K_p = 0;
     end
 
 end
