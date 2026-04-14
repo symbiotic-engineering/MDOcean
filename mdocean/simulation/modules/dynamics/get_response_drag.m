@@ -368,7 +368,7 @@ function [opt_mag_U,opt_phase_U,...
                             control_evaluation_fcn, H, k_wvn, D_f, D_d,...
                             T_f_slam,T_s_slam)
     
-    Z_p_unsat = B_p_unsat + 1i * K_p_unsat ./ w;
+    Z_p_unsat = B_p_unsat - 1i * K_p_unsat ./ w;
 
     size_opt_ctrl_mesh = 10;                        
     ctrl_mult_guess = [logspace(-1,1,size_opt_ctrl_mesh) 1];
