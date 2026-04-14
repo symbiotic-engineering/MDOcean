@@ -67,7 +67,7 @@ function [fig_array,...
             tab_array_display = {tab_validation};
             tab_array_latex = {tab_validation_latex};
             tab_firstrows = {'&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\'};
-            tab_colspecs = {'>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r'};
+            tab_colspecs = {'>{\centering\arraybackslash}p{0.26\linewidth}|c|c|r|c|c|r'};
 
             end_result_struct.validation_complete = true;
             end_result_struct.validation_table = tab_validation;
