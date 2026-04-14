@@ -104,9 +104,8 @@ if model_grid_value
     [~,LCOE_env] = env_cost(force_matrix,P_matrix_elec,in.eco_cost_steel,...
         m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,...
         in.distance_from_shore,in.JPD,in.N_WEC,in.FCR,in.eff_array);
-    %[~,LVOE_env] = env_value(force_matrix,P_matrix_elec);
+    [~,LVOE_env]=env_value(force_matrix, P_matrix_elec, in.FCR, in.eff_array, years, avoided_co2_tons, scc_case);
     LVOE_econ = 0;
-    LVOE_env = 0;
     net_econ_value = (LVOE_econ - LCOE_econ) * sum(AEP_matrix,'all','omitnan');
     net_eco_value = (LVOE_env - LCOE_env) * sum(AEP_matrix,'all','omitnan');
 
