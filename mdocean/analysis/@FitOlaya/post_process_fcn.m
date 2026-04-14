@@ -31,7 +31,7 @@ function [fig_array,...
     fo.Lower = [0 0 0 0 0 0];
     fo.StartPoint = [1.5, 1/5, 1/3, .5, 3, .5];
 
-    figs_case4 = fit_and_plot_case4(case_4, idxs_alpha_cell, idxs_beta_cell, ft, fo);
+    figs_case4 = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo);
 
     fig_array = [figs_original figs_case figs_case4];
 
@@ -333,7 +333,7 @@ function figs = plot_case_signals(case_2, case_4)
     figs = [f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 f13 f14 f15 f16 f17];
 end
 
-function figs = fit_and_plot_case4(case_4, idxs_alpha_cell, idxs_beta_cell, ft, fo)
+function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo)
     % Fit and plot case 4 data
     x_string = 'k h R_x/R_p \alpha^2 / \beta';
     y_string = '$f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}\sqrt{kh})$';
@@ -381,7 +381,7 @@ function figs = fit_and_plot_case4(case_4, idxs_alpha_cell, idxs_beta_cell, ft, 
     y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
 
     % version 1: all alpha combined (manual + auto fits with coeffs)
-    figs_v1 = plot_fit_and_coeffs_all_alpha_beta(x_f1_v1, y_f1_v1, x_f3, y_base, y_pred_base, ...
+    [figs_v1, fits_v1] = plot_fit_and_coeffs_all_alpha_beta(x_f1_v1, y_f1_v1, x_f3, y_base, y_pred_base, ...
         case_4.alpha, case_4.beta, @semilogx, x_label_v1, y_label_v1, [0 10], y_pred_f1_v1, ft, fo);
 
     % version 2: all alpha combined (manual + auto fits with coeffs)
@@ -408,7 +408,11 @@ function figs = fit_and_plot_case4(case_4, idxs_alpha_cell, idxs_beta_cell, ft, 
         '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2 x^{1.5}$ ', ...
         [], y_pred_new);
 
-    figs = [figs_sep figs_v1 figs_v2 figs_v3];
+    % Overlay plot: case 4 v1 auto + case 2 data
+    fig_overlay = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
+        fits_v1, x_label_v1, y_label_v1);
+
+    figs = [figs_sep figs_v1 figs_v2 figs_v3 fig_overlay];
 end
 
 function figs = plot_fit_and_coeffs_sep_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_string, y_string)
@@ -419,15 +423,15 @@ function figs = plot_fit_and_coeffs_sep_alpha_beta(x_cell, y_cell, alpha_vec, be
     figs = [fig_manual fig_auto figs_coeffs];
 end
 
-function figs = plot_fit_and_coeffs_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+function [figs, fits_auto] = plot_fit_and_coeffs_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
                                                     alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, ...
                                                     y_f1_label, y_f1_lim, y_f1_pred_cell, ft, fo)
     % Plots manual fit, auto fit, and fit coefficients vs alpha/beta for all-alpha combined plots.
     [~,    figs_manual] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
                     alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell);
-    [fits, figs_auto] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
+    [fits_auto, figs_auto] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell, y_cell, y_pred_cell, ...
                     alpha_vec, beta_vec, f1_plot_fcn, x_f1_label, y_f1_label, y_f1_lim, y_f1_pred_cell, ft, fo);
-    figs_coeffs = plot_fit_coeffs_vs_alpha_beta(fits, alpha_vec, beta_vec);
+    figs_coeffs = plot_fit_coeffs_vs_alpha_beta(fits_auto, alpha_vec, beta_vec);
     figs = [figs_manual figs_auto figs_coeffs];
 end
 
@@ -532,6 +536,11 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
     do_auto_fit  = nargin >= 14 && ~isempty(fo);
     fits = cell(length(alpha_vec), length(beta_vec));
 
+    % Distinct colors for alpha and markers for beta
+    alpha_colors = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+                    [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
+    beta_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+
     f1 = figure; f2 = figure; f3 = figure;
     for i_alpha = 1:length(alpha_vec)
         for j_beta = 1:length(beta_vec)
@@ -539,15 +548,20 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
             x_f1 = x_f1_cell{i_alpha, j_beta};
             y_f1 = y_f1_cell{i_alpha, j_beta};
 
+            col = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
+            mkr = beta_markers{mod(j_beta-1, length(beta_markers)) + 1};
+
             figure(f1)
             if has_f1_pred
                 % data as markers (no legend entry); manual fit as dashed (no legend entry)
-                h = f1_plot_fcn(x_f1, y_f1, '*', 'HandleVisibility', 'off');
+                f1_plot_fcn(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+                    'MarkerSize', 4, 'HandleVisibility', 'off');
                 hold on
                 f1_plot_fcn(x_f1, y_f1_pred_cell{i_alpha, j_beta}, '--', ...
-                    'Color', h.Color, 'HandleVisibility', 'off')
+                    'Color', col, 'HandleVisibility', 'off')
             else
-                f1_plot_fcn(x_f1, y_f1, 'DisplayName', alpha_beta_label)
+                f1_plot_fcn(x_f1, y_f1, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
+                    'MarkerSize', 4, 'DisplayName', alpha_beta_label)
             end
             hold on
 
@@ -557,33 +571,32 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
                 % overlay auto fit as solid line with legend label
                 x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
                 y_fit_line = exp(feval(f, log(x_fit_line)));
-                h_fit = f1_plot_fcn(x_fit_line, y_fit_line, 'DisplayName', alpha_beta_label);
-                if has_f1_pred
-                    h_fit.Color = h.Color;
-                end
+                h_fit = f1_plot_fcn(x_fit_line, y_fit_line, '-', 'Color', col, ...
+                    'DisplayName', alpha_beta_label);
                 y_pred_ij = exp(feval(f, log(x_f1)));
             else
                 y_pred_ij = y_pred_cell{i_alpha, j_beta};
             end
 
             figure(f2)
-            scatter(y_cell{i_alpha, j_beta}, y_pred_ij, 'DisplayName', alpha_beta_label)
+            scatter(y_cell{i_alpha, j_beta}, y_pred_ij, 36, col, mkr, 'DisplayName', alpha_beta_label)
             hold on
 
             figure(f3)
-            scatter(x_f3_cell{i_alpha, j_beta}, y_pred_ij ./ y_cell{i_alpha, j_beta} - 1, 'DisplayName', alpha_beta_label)
+            scatter(x_f3_cell{i_alpha, j_beta}, y_pred_ij ./ y_cell{i_alpha, j_beta} - 1, 36, col, mkr, 'DisplayName', alpha_beta_label)
             hold on
         end
     end
 
     figure(f1)
     legend('location','eastoutside')
-    xlabel(x_f1_label)
-    ylabel(y_f1_label,'Interpreter','latex')
+    xlabel(x_f1_label, 'FontSize', 14)
+    ylabel(y_f1_label, 'Interpreter', 'latex', 'FontSize', 14)
     title('All case 4 data with fits')
     if ~isempty(y_f1_lim)
         ylim(y_f1_lim)
     end
+    improvePlot
 
     figure(f2)
     plot([.001 10],[.001 10],'k','LineWidth',2,'DisplayName','Equality')
@@ -605,6 +618,77 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
     ylim([0 2.5])
 
     figs = [f1 f2 f3];
+end
+
+function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
+        fits_v1, x_label_v1, y_label_v1)
+    % Overlay plot: duplicate the case 4 v1 auto plot and add case 2 data
+
+    alpha_colors = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+                    [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
+    beta_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+
+    fig = figure;
+
+    % Re-plot case 4 data and auto fits (duplicating the v1 auto plot)
+    for i_alpha = 1:length(case_4.alpha)
+        col = alpha_colors{i_alpha};
+        for j_beta = 1:length(case_4.beta)
+            mkr = beta_markers{j_beta};
+            x_f1 = x_f1_v1{i_alpha, j_beta};
+            y_f1 = y_f1_v1{i_alpha, j_beta};
+
+            % Case 4 data as filled markers
+            semilogx(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+                'MarkerSize', 4, 'HandleVisibility', 'off');
+            hold on
+
+            % Case 4 auto fit lines
+            f = fits_v1{i_alpha, j_beta};
+            x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
+            y_fit_line = exp(feval(f, log(x_fit_line)));
+            case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
+                case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
+            semilogx(x_fit_line, y_fit_line, '-', 'Color', col, 'DisplayName', case4_label);
+        end
+    end
+
+    % Overlay case 2 data transformed to v1 space
+    % Case 2 has beta=1 effectively (normalized from fig 3b/4b)
+    beta_c2 = 1;
+    case2_marker = 'x';
+    case2_marker_size = 8;
+    for i_alpha = 1:length(case_2.alpha)
+        alpha_c2 = case_2.alpha(i_alpha);
+        kh_c2 = case_2.kh{i_alpha};
+        kRx_c2 = case_2.kRx{i_alpha};
+
+        % x_v1 = kh_Rx_over_Rp * alpha^4 / beta
+        x_base_c2 = case_2.kh_Rx_over_Rp{i_alpha} / beta_c2;
+        x_v1_c2 = x_base_c2 * alpha_c2^4;
+
+        % y_base = f / (|H0(kRx)| * exp(-kh*e1/h) * kh * alpha * max(1,alpha))
+        y_base_c2 = case_2.f{i_alpha} ./ abs(besselh(0, kRx_c2)) ...
+            ./ exp(-kh_c2 * case_2.e1_over_h) ./ kh_c2 ...
+            / (alpha_c2 * max(1, alpha_c2));
+        % y_v1 = y_base^2 * beta^2
+        y_v1_c2 = y_base_c2.^2 * beta_c2^2;
+
+        % Use a distinct color that cycles separately for case 2
+        col_c2 = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
+        case2_label = sprintf('Case 2 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
+            case_2.h_over_Rb, alpha_c2, beta_c2);
+        semilogx(x_v1_c2, y_v1_c2, case2_marker, 'Color', col_c2, ...
+            'MarkerSize', case2_marker_size, 'LineWidth', 1.5, ...
+            'DisplayName', case2_label);
+    end
+
+    legend('location', 'eastoutside')
+    xlabel(x_label_v1, 'FontSize', 14)
+    ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
+    title('Case 4 fits with Case 2 data overlay')
+    ylim([0 10])
+    improvePlot
 end
 
 function f = perform_auto_fit(x,y,ft,fo)

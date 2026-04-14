@@ -60,7 +60,9 @@ classdef FitOlaya < GenericAnalysis
             ... % figs_case4 / figs_v3: second-order fit in x^1.5 space; loglog
             'case4_v3_loglog_khRxRpa3b_fv2_x15', ...
             'case4_v3_scatter_actual_vs_pred', ...
-            'case4_v3_scatter_khRxRpa2b_frac_err'};
+            'case4_v3_scatter_khRxRpa2b_frac_err', ...
+            ... % figs_case4 / overlay: case 4 v1 auto + case 2 data
+            'case4_v1_auto_case2_overlay_semilogx_khRxRpa4b_fv1'};
         tab_names = {};
     end
 
