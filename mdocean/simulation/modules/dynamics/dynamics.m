@@ -295,7 +295,7 @@ end
 
 function [X_below_wave,diameter_margin] = slamming_margin(A, k, D, phase_X, mag_X, delta_z, plot_slamming, T, Hs)
     [X_slam_min, X_slam_max,...
-     idx_imag, diameter_margin] = get_slamming_min_max(A, k, D, phase_X, delta_z);
+     idx_imag, diameter_margin, theta] = get_slamming_min_max(A, k, D, phase_X, delta_z);
 
     X_below_wave_max = X_slam_max ./ mag_X - 1;
     X_below_wave_min = 1 - X_slam_min ./ mag_X;
