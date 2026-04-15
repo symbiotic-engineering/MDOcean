@@ -964,8 +964,8 @@ function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     X = X_over_F_mag .* F;
     if nargout > 1
-        X_over_F_phase = atan2(imag_term,real_term);
-        angle_X = X_over_F_phase + F_phase;
+        angle_F_over_X = atan2(imag_term,real_term);
+        angle_X = F_phase - angle_F_over_X;
     end
 end
 

@@ -1,5 +1,31 @@
 # Changelog
 ## Unreleased
+
+## [v1.1.21](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.21) - 2026-4-15
+### Added
+- CI: run `dev/docs/add_docstrings.py` as a workflow step to auto-stamp Sphinx-compatible docstrings onto `.m` files; include `*.m` in `calkit save` so docstring updates are committed with pipeline outputs
+### Changed
+- CI: run Python scripts via `uv run` with Python 3.12 managed by `astral-sh/setup-uv`; remove `actions/setup-python` and `pip install ruamel.yaml` steps
+- CI: add fork PR guard to `calkit save` step to skip save/push for fork PRs
+
+## [v1.1.20](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.20) - 2026-4-13
+### Fixed
+- Model: phase sign error in `second_order_transfer_fcn` in `get_response_drag.m`
+- Validation: copy-paste error in `runRM3Parallel.m` where `float_pos` was used to compute spar and relative phase instead of `spar_pos` and `rel_pos`
+- Validation: mislabeled singlebody/multibody rows in WEC-Sim error table (`post_process_fcn.m`)
+
+## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
+### Added
+- Analysis: new `FitOlaya` class that loads Olaya et al. digitized damping plate data, computes derived signals, and generates fit and exploratory plots for hydrodynamic coefficient fitting
+
+## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
+### Changed
+- CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
+
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-13
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
+
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
