@@ -43,17 +43,6 @@ else
     fprintf("Number of workers: %i",pool.NumWorkers)
 end
 
-% Load glibc patch on all workers for Simulink compatibility on Linux
-if isunix && ~ismac
-    spmd
-        try
-            load_sl_glibc_patch
-        catch ME
-            warning(ME.identifier, 'Failed to load glibc patch on worker: %s', ME.message)
-        end
-    end
-end
-
 evalc('wecSimInputFile');
 
 if isempty(simu.mcrMatFile) == 0
