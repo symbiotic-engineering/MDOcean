@@ -447,22 +447,23 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
             c_Xs = 0;
         else
             % multibody: compute transfer functions from impedance matrices
+            % All arrays indexed by (idx) to extract the scalar for this sea state
             B_f_total = B_h_f(idx) + B_drag_f(idx);
             B_s_total = B_h_s(idx) + B_drag_s(idx);
-            Z_f_i = B_f_total + 1i*(m_f*w_i - K_h_f(idx)/w_i);
-            Z_s_i = B_s_total + 1i*(m_s*w_i - K_h_s(idx)/w_i);
-            Z_c_i = B_c + 1i*(m_c*w_i);
-            det_Z_i = Z_f_i * Z_s_i - Z_c_i^2;
+            Z_f_i = B_f_total + 1i*(m_f(idx)*w_i - K_h_f(idx)/w_i);
+            Z_s_i = B_s_total + 1i*(m_s(idx)*w_i - K_h_s(idx)/w_i);
+            Z_c_i = B_c(idx) + 1i*(m_c(idx)*w_i);
+            det_Z_i = Z_f_i .* Z_s_i - Z_c_i.^2;
             
             % transfer from PTO force to body displacement
             % v_f = v_f_forced + (Z_s+Z_c)/det_Z * F_pto
             % X_f = X_f_forced + (Z_s+Z_c)/(det_Z*iw) * F_pto
             % F_pto = V = I_p*Z_th^**(1+Gamma)
             % c_Xf = (Z_s+Z_c)/(det_Z*iw) * I_p * Z_th^*
-            T_f = (Z_s_i + Z_c_i) / (det_Z_i * 1i * w_i);
-            T_s = -(Z_f_i + Z_c_i) / (det_Z_i * 1i * w_i);
-            c_Xf = T_f * I_p * conj(Z_th_i);
-            c_Xs = T_s * I_p * conj(Z_th_i);
+            T_f = (Z_s_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
+            T_s = -(Z_f_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
+            c_Xf = T_f .* I_p .* conj(Z_th_i);
+            c_Xs = T_s .* I_p .* conj(Z_th_i);
         end
         
         % build circle constraints
