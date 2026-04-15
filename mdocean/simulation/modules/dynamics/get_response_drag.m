@@ -412,7 +412,9 @@ function [opt_mag_U,opt_phase_U,...
     real_P_for_plot = real_P;
 
     % choose best controller for each sea state
-    each_controller_feasible = constraint_err == 0;
+    % use small tolerance to handle floating-point rounding in constraint_err
+    constraint_tol = 1e-6;
+    each_controller_feasible = abs(constraint_err) <= constraint_tol;
     ctrl_dim = 3;
     each_sea_state_feasible = any(each_controller_feasible,ctrl_dim);
     real_P(each_sea_state_feasible & ~each_controller_feasible) = -1; % negative power for infeasible controllers in sea states where a feasbile controller exists, so they aren't chosen
