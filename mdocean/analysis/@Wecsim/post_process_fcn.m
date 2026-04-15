@@ -28,7 +28,14 @@ function [fig_array,...
     % if histogram_separate_figures=false, 183 figures: fig_cell is 3 nested
     %    5x1 cells, cells 1-4 have 15 figures and cell 5 has 1 figure
     tmp = [fig_cell{:}]; 
-    fig_array = [tmp{:}]; 
+    existing_figs = [tmp{:}];
+
+    % create new timeseries figures using drag-on multibody wecsim case
+    % case_group 1 = wecsim multibody, p_idx 2 = drag on with wamit coefficients
+    drag_on_filename = filename_cell{1}{2};
+    ts_figs = plot_timeseries_figures(drag_on_filename);
+
+    fig_array = [existing_figs ts_figs]; 
 
     tab_array_display = {validation_table};
     tab_array_latex = {validation_table};
@@ -278,4 +285,101 @@ function make_histogram_on_axis(ax,width,...
     plot(ax,[-1 1]*max(abs(xx)),[0 0],'k-','LineWidth',.5,'HandleVisibility','off')
     xtickformat('percentage')
 
+end
+
+function figs = plot_timeseries_figures(wecsim_filename)
+    data = load(wecsim_filename, 'float_accel_ts', 'float_drag_ts', ...
+                'corner_HT', 'corner_N_per_T', 'dt_sim');
+
+    num_corners = size(data.corner_HT, 1);
+    figs = gobjects(1, 2);
+
+    %% Figure 1: Stem plot of Fourier harmonics of float acceleration + THD
+    figs(1) = figure;
+    tl1 = tiledlayout(2, 2);
+    title(tl1, 'Fourier Harmonics of Float Acceleration')
+    for ci = 1:num_corners
+        N = data.corner_N_per_T(ci);
+        dt = data.dt_sim;
+        accel = data.float_accel_ts(1:N, ci);
+        T_wave = data.corner_HT(ci, 2);
+        wave_freq = 2*pi / T_wave;
+
+        % compute FFT
+        Y = fft(accel);
+        P2 = Y / N;
+        P1 = P2(1:floor(N/2)+1);
+        P1(2:end-1) = 2 * P1(2:end-1);
+        amplitudes = abs(P1);
+
+        % frequency axis in multiples of fundamental
+        Fs = 1 / dt;
+        freqs = (0:floor(N/2)) * Fs / N;
+        harmonic_numbers = round(freqs / (wave_freq/(2*pi)));
+
+        % compute total harmonic distortion
+        idx_fund = find(harmonic_numbers == 1, 1);
+        fund_amp = amplitudes(idx_fund);
+        harmonic_amps = amplitudes;
+        harmonic_amps(1) = 0; % remove DC
+        harmonic_amps(idx_fund) = 0; % remove fundamental
+        THD = sqrt(sum(harmonic_amps.^2)) / fund_amp * 100;
+
+        % stem plot
+        nexttile(tl1)
+        max_harmonics = min(10, length(amplitudes)-1);
+        stem(harmonic_numbers(1:max_harmonics+1), amplitudes(1:max_harmonics+1), 'filled')
+        xlabel('Harmonic Number')
+        ylabel('Amplitude (m/s^2)')
+        title(sprintf('H=%.1f m, T=%.0f s, THD=%.1f%%', ...
+            data.corner_HT(ci,1), data.corner_HT(ci,2), THD))
+        grid on
+    end
+    improvePlot
+
+    %% Figure 2: Drag force timeseries with sin(wt)*|sin(wt)| approximation
+    figs(2) = figure;
+    tl2 = tiledlayout(2, 2);
+    title(tl2, 'Float Drag Force: WEC-Sim vs Describing Function Approximation')
+    for ci = 1:num_corners
+        N = data.corner_N_per_T(ci);
+        dt = data.dt_sim;
+        F_drag = data.float_drag_ts(1:N, ci);
+        T_wave = data.corner_HT(ci, 2);
+        t_vec = (0:N-1)' * dt;
+        w = 2*pi / T_wave;
+
+        % get the fundamental amplitude of drag force for this corner
+        [fund_amp_drag, ~] = get_fundamental_local(F_drag, w, dt);
+
+        % describing function approximation: y = A * sin(wt) * |sin(wt)|
+        % where A = 8/(3*pi) * fundamental_amplitude
+        A_desc = 8/(3*pi) * fund_amp_drag;
+        y_approx = A_desc * sin(w * t_vec) .* abs(sin(w * t_vec));
+
+        nexttile(tl2)
+        plot(t_vec, F_drag, 'b', 'DisplayName', 'WEC-Sim Drag Force')
+        hold on
+        plot(t_vec, y_approx, 'r--', 'DisplayName', 'sin(\omegat)|sin(\omegat)| approx')
+        xlabel('Time (s)')
+        ylabel('Force (N)')
+        title(sprintf('H=%.1f m, T=%.0f s', data.corner_HT(ci,1), data.corner_HT(ci,2)))
+        legend('Location', 'best')
+        grid on
+    end
+    improvePlot
+end
+
+function [fund, phase] = get_fundamental_local(signal, wave_freq, dt)
+    Fs = 2*pi/dt;
+    L = length(signal);
+    n = L;
+    Y = fft(signal, n);
+    P2 = Y/L;
+    P1 = P2(1:n/2+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    freqs = 0:(Fs/n):(Fs/2-Fs/n);
+    idx_wave_freq = ismembertol(freqs, wave_freq);
+    fund = abs(P1(idx_wave_freq));
+    phase = angle(P1(idx_wave_freq));
 end
