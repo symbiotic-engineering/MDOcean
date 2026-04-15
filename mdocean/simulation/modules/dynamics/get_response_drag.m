@@ -618,6 +618,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
         B_p = 0;
         K_p = 0;
     end
+    B_p = max(B_p,0); % prevent negative controller damping
 
 end
 
