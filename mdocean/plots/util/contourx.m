@@ -2,9 +2,9 @@
 function [C,h_fig] = contourx(X_data,Y_data,Z_data,varargin)
 % Function contourx
 %
-% :param X_data: X data
-% :param Y_data: Y data
-% :param Z_data: Z data
+% :param X_data: X_data
+% :param Y_data: Y_data
+% :param Z_data: Z_data
 % :param varargin: varargin
 % :returns: C
 % :returns: h_fig

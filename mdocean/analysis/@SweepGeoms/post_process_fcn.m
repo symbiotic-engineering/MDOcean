@@ -26,13 +26,6 @@ function [fig_array,...
 % (6 sweep variables × 8 output quantities), and a 6×6 factor-analysis
 % pcolor of main and interaction η² effects on CW/SA^{1/2}.
 %
-% :param intermed_result_struct: Output of analysis_fcn.
-% :returns: fig_array            13-element array of figure handles
-% :returns: tab_array_display    Empty (no tables)
-% :returns: tab_array_latex      Empty (no tables)
-% :returns: end_result_struct    Struct with completion flag
-% :returns: tab_firstrows        Empty
-% :returns: tab_colspecs         Empty
 
     % ------------------------------------------------------------------
     % Unpack intermediate results
