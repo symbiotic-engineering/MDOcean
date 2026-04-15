@@ -131,18 +131,24 @@ def find_insert_after(stages_map, new_key):
     """
     new_name = analysis_name(new_key)
     new_is_postpro = new_key.startswith("postpro-")
+    new_is_viz = new_key.startswith("viz-")
 
     insert_after = None
     for key in stages_map:
-        if not (key.startswith("analysis-") or key.startswith("postpro-")):
+        is_analysis = key.startswith("analysis-")
+        is_postpro = key.startswith("postpro-")
+        is_viz = key.startswith("viz-")
+        if not (is_analysis or is_postpro or is_viz):
             continue
         name = analysis_name(key)
-        is_postpro = key.startswith("postpro-")
 
         if name < new_name:
             insert_after = key
-        elif name == new_name and (not is_postpro) and new_is_postpro:
+        elif name == new_name and is_analysis and new_is_postpro:
             # analysis-X is the immediate predecessor of postpro-X
+            insert_after = key
+        elif name == new_name and is_postpro and new_is_viz:
+            # postpro-X is the immediate predecessor of viz-X
             insert_after = key
 
     return insert_after
@@ -258,6 +264,7 @@ def main():
         if not (
             stage_key.startswith("analysis-")
             or stage_key.startswith("postpro-")
+            or stage_key.startswith("viz-")
         ):
             print(f"Skipping non-analysis entry in generated file: {stage_key!r}")
             continue
