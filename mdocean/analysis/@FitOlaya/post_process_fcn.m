@@ -354,8 +354,8 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     fun = @(c, ia, ib) c * case_4.alpha(ia)^4;
     x_f3 = cellfun(fun, x_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
-    % version 1: semilogx with alpha^4 x-scaling
-    fun = @(c, ia, ib) c * case_4.alpha(ia)^4;
+    % version 1: semilogx with alpha^2 x-scaling
+    fun = @(c, ia, ib) c * case_4.alpha(ia)^2;
     x_f1_v1 = cellfun(fun, x_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
     fun = @(c, ia, ib) c.^2 * case_4.beta(ib)^2;
@@ -375,7 +375,7 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     fun = @(c, ia, ib) c.^2 * case_4.beta(ib) * (1 + case_4.beta(ib)/case_4.alpha(ia));
     y_pred_f1_v2 = cellfun(fun, y_pred_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
-    x_label_v1 = 'k h R_x/R_p \alpha^4 / \beta';
+    x_label_v1 = 'k h R_x/R_p \alpha^2 / \beta';
     y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
     x_label_v2 = 'k h R_x/R_p \alpha^3 / \beta';
     y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
@@ -536,10 +536,10 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
     do_auto_fit  = nargin >= 14 && ~isempty(fo);
     fits = cell(length(alpha_vec), length(beta_vec));
 
-    % Distinct colors for alpha and markers for beta
-    alpha_colors = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+    % Distinct colors for beta and markers for alpha
+    beta_colors  = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
                     [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
-    beta_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+    alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
 
     f1 = figure; f2 = figure; f3 = figure;
     for i_alpha = 1:length(alpha_vec)
@@ -548,14 +548,14 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
             x_f1 = x_f1_cell{i_alpha, j_beta};
             y_f1 = y_f1_cell{i_alpha, j_beta};
 
-            col = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
-            mkr = beta_markers{mod(j_beta-1, length(beta_markers)) + 1};
+            col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
+            mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
 
             figure(f1)
             if has_f1_pred
-                % data as markers (no legend entry); manual fit as dashed (no legend entry)
+                % data as markers WITH legend entry; manual fit as dashed (no legend entry)
                 f1_plot_fcn(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
-                    'MarkerSize', 4, 'HandleVisibility', 'off');
+                    'MarkerSize', 4, 'DisplayName', alpha_beta_label);
                 hold on
                 f1_plot_fcn(x_f1, y_f1_pred_cell{i_alpha, j_beta}, '--', ...
                     'Color', col, 'HandleVisibility', 'off')
@@ -568,11 +568,11 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
             if do_auto_fit
                 f = perform_auto_fit(x_f1, y_f1, ft, fo);
                 fits{i_alpha, j_beta} = f;
-                % overlay auto fit as solid line with legend label
+                % overlay auto fit as solid line; legend entry is the data marker above
                 x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
                 y_fit_line = exp(feval(f, log(x_fit_line)));
-                h_fit = f1_plot_fcn(x_fit_line, y_fit_line, '-', 'Color', col, ...
-                    'DisplayName', alpha_beta_label);
+                f1_plot_fcn(x_fit_line, y_fit_line, '-', 'Color', col, ...
+                    'HandleVisibility', 'off');
                 y_pred_ij = exp(feval(f, log(x_f1)));
             else
                 y_pred_ij = y_pred_cell{i_alpha, j_beta};
@@ -624,48 +624,47 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         fits_v1, x_label_v1, y_label_v1)
     % Overlay plot: duplicate the case 4 v1 auto plot and add case 2 data
 
-    alpha_colors = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+    alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+    beta_colors  = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
                     [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
-    beta_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
 
     fig = figure;
 
     % Re-plot case 4 data and auto fits (duplicating the v1 auto plot)
     for i_alpha = 1:length(case_4.alpha)
-        col = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
+        mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
         for j_beta = 1:length(case_4.beta)
-            mkr = beta_markers{mod(j_beta-1, length(beta_markers)) + 1};
+            col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
             x_f1 = x_f1_v1{i_alpha, j_beta};
             y_f1 = y_f1_v1{i_alpha, j_beta};
 
-            % Case 4 data as filled markers
+            % Case 4 data as filled markers (legend entry)
+            case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
+                case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
             semilogx(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
-                'MarkerSize', 4, 'HandleVisibility', 'off');
+                'MarkerSize', 4, 'DisplayName', case4_label);
             hold on
 
-            % Case 4 auto fit lines
+            % Case 4 auto fit lines (no legend entry)
             f = fits_v1{i_alpha, j_beta};
             x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
             y_fit_line = exp(feval(f, log(x_fit_line)));
-            case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
-                case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
-            semilogx(x_fit_line, y_fit_line, '-', 'Color', col, 'DisplayName', case4_label);
+            semilogx(x_fit_line, y_fit_line, '-', 'Color', col, 'HandleVisibility', 'off');
         end
     end
 
     % Overlay case 2 data transformed to v1 space
     % Case 2 has beta=1 effectively (normalized from fig 3b/4b)
     beta_c2 = 1;
-    case2_marker = 'x';
     case2_marker_size = 8;
     for i_alpha = 1:length(case_2.alpha)
         alpha_c2 = case_2.alpha(i_alpha);
         kh_c2 = case_2.kh{i_alpha};
         kRx_c2 = case_2.kRx{i_alpha};
 
-        % x_v1 = kh_Rx_over_Rp * alpha^4 / beta
+        % x_v1 = kh_Rx_over_Rp * alpha^2 / beta
         x_base_c2 = case_2.kh_Rx_over_Rp{i_alpha} / beta_c2;
-        x_v1_c2 = x_base_c2 * alpha_c2^4;
+        x_v1_c2 = x_base_c2 * alpha_c2^2;
 
         % y_base = f / (|H0(kRx)| * exp(-kh*e1/h) * kh * alpha * max(1,alpha))
         y_base_c2 = case_2.f{i_alpha} ./ abs(besselh(0, kRx_c2)) ...
@@ -674,12 +673,13 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         % y_v1 = y_base^2 * beta^2
         y_v1_c2 = y_base_c2.^2 * beta_c2^2;
 
-        % Use a distinct color that cycles separately for case 2
-        col_c2 = alpha_colors{mod(i_alpha-1, length(alpha_colors)) + 1};
+        % Use same alpha marker; color comes from beta (beta_c2=1, use distinct gray)
+        mkr_c2 = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
+        col_c2 = [0.5 0.5 0.5]; % gray for case 2 (beta=1, not in case 4 beta set)
         case2_label = sprintf('Case 2 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
             case_2.h_over_Rb, alpha_c2, beta_c2);
-        semilogx(x_v1_c2, y_v1_c2, case2_marker, 'Color', col_c2, ...
-            'MarkerSize', case2_marker_size, 'LineWidth', 1.5, ...
+        semilogx(x_v1_c2, y_v1_c2, mkr_c2, 'Color', col_c2, 'MarkerFaceColor', col_c2, ...
+            'MarkerSize', case2_marker_size, ...
             'DisplayName', case2_label);
     end
 
