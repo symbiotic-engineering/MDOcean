@@ -360,7 +360,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
         nexttile(tl2)
         plot(t_vec, F_drag, 'b', 'DisplayName', 'WEC-Sim Drag Force')
         hold on
-        plot(t_vec, y_approx, 'r--', 'DisplayName', 'sin(\omegat)|sin(\omegat)| approx')
+        plot(t_vec, y_approx, 'r--', 'DisplayName', 'sin(wt)|sin(wt)| approx')
         xlabel('Time (s)')
         ylabel('Force (N)')
         title(sprintf('H=%.1f m, T=%.0f s', data.corner_HT(ci,1), data.corner_HT(ci,2)))
