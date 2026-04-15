@@ -802,7 +802,7 @@ function [mag_U,phase_U,...
     
             real_P = 1/2 * B_l .* w.^2 .* mag_X_u.^2; % this is correct even if X and U are out of phase
             check_P = 1/2 * w .* mag_X_u .* mag_U .* cos(phase_U - phase_V_u); % so is this, they match
-            reactive_P = 0; % fixme this is incorrect but doesn't affect anything rn
+            reactive_P = zeros(size(real_P)); % fixme value is incorrect but output not used currently
         end
     end
 
