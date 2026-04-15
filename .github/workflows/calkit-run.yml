@@ -83,6 +83,11 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - name: Remove stale conda environments
+        run: |
+          # On self-hosted runners, conda environments persist between runs.
+          # Remove them so calkit can recreate them cleanly.
+          conda env remove -n mdocean-pubs --yes 2>/dev/null || true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
         with:
