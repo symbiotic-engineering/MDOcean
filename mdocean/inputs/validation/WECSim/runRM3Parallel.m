@@ -151,16 +151,21 @@ parfor imcr=1:length(mcr.cases(:,1))
     try
         output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
     
-        % extract signals over the last period
-        N_per_T = timesteps_per_period(imcr);
-        wave_freq  = 2*pi/mcr.cases(imcr,2);
-        power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
-        F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
-        float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
-        spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
+        % extract signals over the last full period starting at a wave node,
+        % so that the FFT phase is relative to the wave phase at t=0
+        T_wave = mcr.cases(imcr,2);
+        N_per_T = round(timesteps_per_period(imcr));
+        wave_freq  = 2*pi/T_wave;
+        k_last  = floor(simu.endTime / T_wave) - 1; % largest integer k such that k*T + T <= endTime
+        i_start = round(k_last * T_wave / simu.dt) + 1; % 1-indexed; round() safe since T_wave/dt is always an integer
+        i_end   = i_start + N_per_T - 1;
+        power = output.ptos.powerInternalMechanics(i_start:i_end,3);
+        F_PTO = output.ptos.forceInternalMechanics(i_start:i_end,3);
+        float_pos = output.bodies(1).position(i_start:i_end,3);
+        spar_pos  = output.bodies(2).position(i_start:i_end,3);
         rel_pos = float_pos - spar_pos;
-        F_drag_f = output.bodies(1).forceMorisonAndViscous((end-N_per_T+1):end,3);
-        F_drag_s = output.bodies(2).forceMorisonAndViscous((end-N_per_T+1):end,3);
+        F_drag_f = output.bodies(1).forceMorisonAndViscous(i_start:i_end,3);
+        F_drag_s = output.bodies(2).forceMorisonAndViscous(i_start:i_end,3);
 
         % save specific output variables
         P(imcr) = mean(power);
