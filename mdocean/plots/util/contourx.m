@@ -2,12 +2,12 @@
 function [C,h_fig] = contourx(X_data,Y_data,Z_data,varargin)
 % Function contourx
 %
-% :param X: Design variable vector
-% :param Y: Y
-% :param Z: Z
+% :param X_data: X data
+% :param Y_data: Y data
+% :param Z_data: Z data
 % :param varargin: varargin
 % :returns: C
-% :returns: water depth (m)
+% :returns: h_fig
 % wrapper around contourf that avoids "contour not rendered for constant
 % zdata" warning by using imagesc when Z is constant
 
