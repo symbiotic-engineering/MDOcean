@@ -31,7 +31,10 @@ function [fig_array,...
     fo.Lower = [0 0 0 0 0 0];
     fo.StartPoint = [1.5, 1/5, 1/3, .5, 3, .5];
 
-    figs_case4 = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo);
+    g = 9.81;
+    spar_exc = get_spar_exc(g);
+
+    figs_case4 = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo, spar_exc);
 
     fig_array = [figs_original figs_case figs_case4];
 
@@ -333,7 +336,7 @@ function figs = plot_case_signals(case_2, case_4)
     figs = [f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 f13 f14 f15 f16 f17];
 end
 
-function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo)
+function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_cell, ft, fo, spar_exc)
     % Fit and plot case 4 data
     x_string = 'k h R_x/R_p \alpha^2 / \beta';
     y_string = '$f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}\sqrt{kh})$';
@@ -411,9 +414,9 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     % version 4: new functional form y = |A*x1^(-m) + B*x2^m| with x2 = alpha*x1
     figs_v4 = plot_v1_newform(x_f1_v1, y_f1_v1, case_4.alpha, case_4.beta, x_label_v1, y_label_v1);
 
-    % Overlay plot: case 4 v1 auto + case 2 data
+    % Overlay plot: case 4 v1 (line-connected markers) + case 2 + WAMIT spar data
     fig_overlay = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
-        fits_v1, x_label_v1, y_label_v1);
+        spar_exc, x_label_v1, y_label_v1);
 
     figs = [figs_sep figs_v1 figs_v2 figs_v3 figs_v4 fig_overlay];
 end
@@ -556,8 +559,8 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
 
             figure(f1)
             if has_f1_pred
-                % data as markers WITH legend entry; manual fit as dashed (no legend entry)
-                f1_plot_fcn(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+                % data as line-connected markers WITH legend entry; manual fit as dashed (no legend entry)
+                f1_plot_fcn(x_f1, y_f1, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                     'MarkerSize', 4, 'DisplayName', alpha_beta_label);
                 hold on
                 f1_plot_fcn(x_f1, y_f1_pred_cell{i_alpha, j_beta}, '--', ...
@@ -571,12 +574,10 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
             if do_auto_fit
                 f = perform_auto_fit(x_f1, y_f1, ft, fo);
                 fits{i_alpha, j_beta} = f;
-                % overlay auto fit as solid line; legend entry is the data marker above
-                x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
-                y_fit_line = exp(feval(f, log(x_fit_line)));
-                f1_plot_fcn(x_fit_line, y_fit_line, '-', 'Color', col, ...
-                    'HandleVisibility', 'off');
-                y_pred_ij = exp(feval(f, log(x_f1)));
+                % compute predicted y for error plots (no fit line drawn in main figure)
+                valid = ~isnan(x_f1) & ~isnan(y_f1) & x_f1 > 0;
+                y_pred_ij = nan(size(x_f1));
+                y_pred_ij(valid) = exp(feval(f, log(x_f1(valid))));
             else
                 y_pred_ij = y_pred_cell{i_alpha, j_beta};
             end
@@ -624,8 +625,8 @@ function [fits, figs] = plot_fit_all_alpha_beta(x_f1_cell, y_f1_cell, x_f3_cell,
 end
 
 function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
-        fits_v1, x_label_v1, y_label_v1)
-    % Overlay plot: duplicate the case 4 v1 auto plot and add case 2 data
+        spar_exc, x_label_v1, y_label_v1)
+    % Overlay plot: case 4 v1 (line-connected markers) + case 2 + WAMIT RM3 spar data
 
     alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
     beta_colors  = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
@@ -633,7 +634,7 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 
     fig = figure;
 
-    % Re-plot case 4 data and auto fits (duplicating the v1 auto plot)
+    % Re-plot case 4 data using line-connected markers (matching v1 auto plot)
     for i_alpha = 1:length(case_4.alpha)
         mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
         for j_beta = 1:length(case_4.beta)
@@ -641,18 +642,11 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
             x_f1 = x_f1_v1{i_alpha, j_beta};
             y_f1 = y_f1_v1{i_alpha, j_beta};
 
-            % Case 4 data as filled markers (legend entry)
             case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
                 case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
-            semilogx(x_f1, y_f1, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+            semilogx(x_f1, y_f1, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                 'MarkerSize', 4, 'DisplayName', case4_label);
             hold on
-
-            % Case 4 auto fit lines (no legend entry)
-            f = fits_v1{i_alpha, j_beta};
-            x_fit_line = exp(linspace(log(min(x_f1(x_f1>0))), log(max(x_f1)), 100));
-            y_fit_line = exp(feval(f, log(x_fit_line)));
-            semilogx(x_fit_line, y_fit_line, '-', 'Color', col, 'HandleVisibility', 'off');
         end
     end
 
@@ -681,15 +675,52 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         col_c2 = [0.5 0.5 0.5]; % gray for case 2 (beta=1, not in case 4 beta set)
         case2_label = sprintf('Case 2 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
             case_2.h_over_Rb, alpha_c2, beta_c2);
-        semilogx(x_v1_c2, y_v1_c2, mkr_c2, 'Color', col_c2, 'MarkerFaceColor', col_c2, ...
+        semilogx(x_v1_c2, y_v1_c2, ['-' mkr_c2], 'Color', col_c2, 'MarkerFaceColor', col_c2, ...
             'MarkerSize', case2_marker_size, ...
             'DisplayName', case2_label);
     end
 
+    % Overlay WAMIT RM3 spar excitation data
+    % RM3 geometry (from hydro_coeff_err.m and WEC-Sim inputs):
+    %   Rb = a1 = 3 m (spar column outer radius)
+    %   Rx = Rp = a3 = 15 m (damping plate outer radius; alpha > 1 so Rx = Rp)
+    %   T_s = spar_exc.T_s  (spar draft = gap height h)
+    %   alpha = Rp/Rb = a3/a1 = 5
+    %   beta_rm3 = 1 (case-2-like; no beta correction)
+    %   e1_over_h = 1 (plate at bottom of gap, e1 = h = T_s)
+    %   f = gamma_over_rho_g / (pi * Rp^2)
+    Rb_rm3  = 3;    % spar column outer radius (m)
+    Rp_rm3  = 15;   % damping plate outer radius (m)  [= Rx since Rp > Rb]
+    alpha_rm3  = Rp_rm3 / Rb_rm3;  % = 5
+    beta_rm3   = 1;
+    h_rm3      = spar_exc.T_s;      % gap height = spar draft (m)
+    e1_over_h_rm3 = 1;              % plate at bottom of gap
+
+    k_rm3  = spar_exc.k(:);
+    kh_rm3 = k_rm3 * h_rm3;
+    kRx_rm3 = k_rm3 * Rp_rm3;  % kRx = k * Rx = k * Rp (since alpha > 1)
+
+    f_rm3 = spar_exc.gamma_over_rho_g(:) / (pi * Rp_rm3^2);
+
+    % Transform to v1 space (same as case 2 since alpha_rm3 > 1)
+    % x_v1 = kh * (Rx/Rp) * alpha^2 / beta  [Rx/Rp = 1 for alpha>1]
+    x_v1_rm3 = kh_rm3 .* (alpha_rm3^2) / beta_rm3;
+
+    % y_base = f / (|H0(kRx)| * exp(-kh*e1) * kh * alpha * max(1,alpha))
+    y_base_rm3 = f_rm3 ./ abs(besselh(0, kRx_rm3)) ...
+        ./ exp(-kh_rm3 * e1_over_h_rm3) ./ kh_rm3 ...
+        / (alpha_rm3 * max(1, alpha_rm3));
+    y_v1_rm3 = y_base_rm3.^2 * beta_rm3^2;
+
+    valid_rm3 = isfinite(x_v1_rm3) & isfinite(y_v1_rm3) & x_v1_rm3 > 0 & y_v1_rm3 > 0;
+    semilogx(x_v1_rm3(valid_rm3), y_v1_rm3(valid_rm3), '-k^', ...
+        'MarkerFaceColor', 'k', 'MarkerSize', 6, ...
+        'DisplayName', sprintf('WAMIT RM3 (h/R_b=%.1f, \\alpha=%.0f)', h_rm3/Rb_rm3, alpha_rm3));
+
     legend('location', 'eastoutside')
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
-    title('Case 4 fits with Case 2 data overlay')
+    title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
     ylim([0 10])
     improvePlot
 end
@@ -735,16 +766,9 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
             end
 
             figure(fig_fit)
-            semilogx(x, y, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+            semilogx(x, y, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                 'MarkerSize', 4, 'DisplayName', lbl);
             hold on
-
-            if ~isempty(fits{i_alpha, j_beta})
-                f = fits{i_alpha, j_beta};
-                xq = exp(linspace(log(min(x(x>0))), log(max(x)), 200));
-                yq = feval(f, xq);
-                semilogx(xq, yq, '-', 'Color', col, 'HandleVisibility', 'off');
-            end
         end
     end
 
