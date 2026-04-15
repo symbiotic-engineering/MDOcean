@@ -13,6 +13,7 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     warning('off','MATLAB:nearlySingularMatrix')
     warning('off','MATLAB:singularMatrix')
+    warning('off','backtrace') % disable longer warning messages
 
     n = 3; % number of points per dimension
 
@@ -68,6 +69,7 @@ function intermed_result_struct = analysis_fcn(p, b)
 
         % Run simulation (drag and force/power sat are turned off inside check_max_CW)
         [hydro_ratio, ~, ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
+        
         if i == 1
             val = out;
         else
@@ -76,6 +78,8 @@ function intermed_result_struct = analysis_fcn(p, b)
 
         hydro_ratio_result(:, subs{:}) = max(hydro_ratio);
     end
+
+    warning('on','backtrace') % re-enable longer warning messages
 
     % --- Save intermediate results ---
     % Main simulation outputs
