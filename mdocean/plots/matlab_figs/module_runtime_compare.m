@@ -16,7 +16,7 @@ function [figs, ...
 % :param t_singlebody_fullsim_timeit: t_singlebody_fullsim_timeit
 % :param t_freq_domain_fullsim_timeit: t_freq_domain_fullsim_timeit
 % :param t_wecsim: t_wecsim
-% :returns: figs
+% :returns: Figure handles
 % :returns: pct_runtime_MEEM
 % :returns: pct_runtime_dynamics
 % :returns: pct_runtime_other

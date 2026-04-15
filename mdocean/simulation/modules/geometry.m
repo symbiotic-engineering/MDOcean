@@ -64,6 +64,7 @@ function [V_d, m_m, m_f_tot, m_s_tot,...
 % :returns: mass
 % :returns: CB_f_from_waterline
 % :returns: CG_f_from_waterline
+% :returns: CG_s_from_waterline
 
 %% Variable Definitions
 % D: diameter

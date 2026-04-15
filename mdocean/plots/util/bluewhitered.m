@@ -4,6 +4,7 @@ function newmap = bluewhitered(m, white_number,lims)
 %
 % :param m: m
 % :param white_number: white_number
+% :param lims: lims
 % :returns: newmap
 %BLUEWHITERED   Blue, white, and red color map.
 %   BLUEWHITERED(M) returns an M-by-3 matrix containing a blue to white

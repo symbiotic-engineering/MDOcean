@@ -31,22 +31,24 @@ function [m_f,B_h_f,K_h_f,gamma_f_mag,gamma_f_phase,...
 % :param use_MEEM: whether to use MEEM for hydro coeffs (boolean)
 % :param harmonics: number of harmonics to use for MEEM (int)
 % :param hydro: function from WECSim
+% :param m_k_h_precomputed: m_k_h_precomputed
 % :returns: m_f
 % :returns: B_h_f
 % :returns: K_h_f
-% :returns: F_f_mag
-% :returns: F_f_phase
+% :returns: $\\gamma$ f mag
+% :returns: $\\gamma$ f phase
 % :returns: m_s
 % :returns: B_h_s
 % :returns: K_h_s
-% :returns: F_s_mag
-% :returns: F_s_phase
+% :returns: $\\gamma$ s mag
+% :returns: $\\gamma$ s phase
 % :returns: m_c
 % :returns: B_h_c
 % :returns: drag_const_f
 % :returns: drag_const_s
 % :returns: mag_v0_f
 % :returns: mag_v0_s
+% :returns: H
 % :returns: Angular wave frequency (rad/s)
 % :returns: Wavenumber (1/m)
 % :returns: A f / $\\rho$
@@ -57,8 +59,6 @@ function [m_f,B_h_f,K_h_f,gamma_f_mag,gamma_f_phase,...
 % :returns: B c / $\\rho$ w
 % :returns: $\\gamma$ f / $\\rho$ g
 % :returns: $\\gamma$ s / $\\rho$ g
-% :returns: $\\gamma$ phase f
-% :returns: $\\gamma$ phase s
     w = 2*pi./T;            % angular frequency
     k = dispersion(w,h,g);  % wave number (dispersion relation for finite depth water)
 

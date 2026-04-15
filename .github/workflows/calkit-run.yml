@@ -50,16 +50,14 @@ jobs:
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
       - name: Install Calkit
         run: uv tool install --upgrade calkit-python@0.37.3
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Install python dependencies
-        run: pip install ruamel.yaml
+      - name: Add docstrings to .m files
+        run: uv run python dev/docs/add_docstrings.py
       # - name: Setup matlab
       #   uses: matlab-actions/setup-matlab@v2
       #   with:
@@ -90,7 +88,7 @@ jobs:
           run_args: make-calkit-stages
           save: false
       - name: Use calkit_stages.yaml to update calkit.yaml
-        run: python mdocean/analysis/update_calkit.py
+        run: uv run --with ruamel.yaml python mdocean/analysis/update_calkit.py
 
       - name: Run Calkit
         id: run_calkit
@@ -103,6 +101,12 @@ jobs:
           save: false
       - name: calkit save
         run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] && \
+             [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "Fork PR detected – skipping save/push"
+            exit 0
+          fi
+
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
             exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
           fi
@@ -121,7 +125,7 @@ jobs:
           fi
 
           calkit dvc pull
-          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex '*.m' -m "Run pipeline"
           PUSH_STATUS=$?
 
           if [ $PUSH_STATUS -ne 0 ]; then

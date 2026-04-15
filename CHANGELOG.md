@@ -1,6 +1,13 @@
 # Changelog
 ## Unreleased
 
+## [v1.1.22](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.22) - 2026-4-15
+### Added
+- CI: run `dev/docs/add_docstrings.py` as a workflow step to auto-stamp Sphinx-compatible docstrings onto `.m` files; include `*.m` in `calkit save` so docstring updates are committed with pipeline outputs
+### Changed
+- CI: run Python scripts via `uv run` with Python 3.12 managed by `astral-sh/setup-uv`; remove `actions/setup-python` and `pip install ruamel.yaml` steps
+- CI: add fork PR guard to `calkit save` step to skip save/push for fork PRs
+
 ## [v1.1.21](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.21) - 2026-4-15
 ### Fixed
 - Validation: extract one wave period of WEC-Sim output starting at a wave-period boundary so that FFT phase is relative to the wave (`runRM3Parallel.m`)
