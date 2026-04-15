@@ -223,7 +223,11 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_drag_force_phase(imcr) = NaN;
         spar_drag_force_phase(imcr)  = NaN;
     end
-    try; Simulink.sdi.clear; catch; end
+    try
+        Simulink.sdi.clear
+    catch ME
+        warning(ME.identifier, 'Simulink.sdi.clear failed: %s', ME.message)
+    end
 end
 
 B_p = mcr.cases(:,3);

@@ -1,4 +1,9 @@
 # Changelog
+## Unreleased
+## [v1.1.20](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.20) - 2026-4-13
+### Changed
+- Analysis: cache `var_bounds()` struct in `var_bounds.mat` to avoid recomputation
+
 ## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
 ### Added
 - Analysis: new `FitOlaya` class that loads Olaya et al. digitized damping plate data, computes derived signals, and generates fit and exploratory plots for hydrodynamic coefficient fitting
