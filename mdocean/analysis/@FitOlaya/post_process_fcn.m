@@ -408,11 +408,14 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
         '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2 x^{1.5}$ ', ...
         [], y_pred_new);
 
+    % version 4: new functional form y = |A*x1^(-m) + B*x2^m| with x2 = alpha*x1
+    figs_v4 = plot_v1_newform(x_f1_v1, y_f1_v1, case_4.alpha, case_4.beta, x_label_v1, y_label_v1);
+
     % Overlay plot: case 4 v1 auto + case 2 data
     fig_overlay = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         fits_v1, x_label_v1, y_label_v1);
 
-    figs = [figs_sep figs_v1 figs_v2 figs_v3 fig_overlay];
+    figs = [figs_sep figs_v1 figs_v2 figs_v3 figs_v4 fig_overlay];
 end
 
 function figs = plot_fit_and_coeffs_sep_alpha_beta(x_cell, y_cell, alpha_vec, beta_vec, ft, fo, x_string, y_string)
@@ -689,6 +692,127 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     title('Case 4 fits with Case 2 data overlay')
     ylim([0 10])
     improvePlot
+end
+
+function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v1, y_label_v1)
+    % Fit and plot using new functional form: y = abs(A*x1^(-m) + B*x2^m)
+    % where x1 = x (alpha^2 x-axis), x2 = alpha*x1 (alpha^3 scaling).
+    % A is expected to be ~constant across alpha/beta; B varies and may be negative.
+
+    beta_colors   = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+                     [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
+    alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+
+    fits = cell(length(alpha_vec), length(beta_vec));
+    fig_fit = figure;
+
+    for i_alpha = 1:length(alpha_vec)
+        alpha_val = alpha_vec(i_alpha);
+        % x2 = alpha * x1, so new form in terms of x1 alone:
+        %   y = abs(A * x1^(-m) + B * (alpha * x1)^m)
+        ft_new = fittype(@(A, m, B, x) abs(A .* x .^ (-m) + B .* (alpha_val .* x) .^ m), ...
+            'dependent', 'y', 'independent', 'x', 'coefficients', {'A', 'm', 'B'});
+        fo_new = fitoptions('Method', 'NonlinearLeastSquares');
+        fo_new.Lower      = [0,   0,   -Inf];
+        fo_new.Upper      = [Inf, Inf,  Inf];
+        fo_new.StartPoint = [1.5, 0.25, -0.1];
+
+        for j_beta = 1:length(beta_vec)
+            x = x_f1_v1{i_alpha, j_beta};
+            y = y_f1_v1{i_alpha, j_beta};
+
+            col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
+            mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
+            lbl = ['\alpha=' num2str(alpha_val) ', \beta=' num2str(beta_vec(j_beta))];
+
+            valid = ~isnan(x) & ~isnan(y) & x > 0;
+            try
+                f = fit(x(valid), y(valid), ft_new, fo_new);
+                fits{i_alpha, j_beta} = f;
+            catch ME
+                warning('New-form fit failed for alpha=%g, beta=%g: %s', ...
+                    alpha_val, beta_vec(j_beta), ME.message);
+            end
+
+            figure(fig_fit)
+            semilogx(x, y, mkr, 'Color', col, 'MarkerFaceColor', col, ...
+                'MarkerSize', 4, 'DisplayName', lbl);
+            hold on
+
+            if ~isempty(fits{i_alpha, j_beta})
+                f = fits{i_alpha, j_beta};
+                xq = exp(linspace(log(min(x(x>0))), log(max(x)), 200));
+                yq = feval(f, xq);
+                semilogx(xq, yq, '-', 'Color', col, 'HandleVisibility', 'off');
+            end
+        end
+    end
+
+    figure(fig_fit)
+    legend('location', 'eastoutside')
+    xlabel(x_label_v1, 'FontSize', 14)
+    ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
+    title('v1 new-form fits: $|A x_1^{-m} + B x_2^{m}|$, $x_2 = \alpha x_1$', 'Interpreter', 'latex')
+    improvePlot
+
+    figs_coeffs = plot_newform_coeffs(fits, alpha_vec, beta_vec);
+    figs = [fig_fit figs_coeffs];
+end
+
+function figs = plot_newform_coeffs(fits, alpha_vec, beta_vec)
+    % Plot fit coefficients A, m, B vs beta (for each alpha) and vs alpha (for each beta)
+    beta_colors   = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
+                     [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
+    alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+    coeff_names   = {'A', 'm', 'B'};
+
+    % Coefficients vs beta for each alpha
+    f1 = figure;
+    for i_alpha = 1:length(alpha_vec)
+        mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
+        for i_coeff = 1:length(coeff_names)
+            subplot(1, length(coeff_names), i_coeff)
+            coeff_name  = coeff_names{i_coeff};
+            coeff_vals  = nan(1, length(beta_vec));
+            for j_beta = 1:length(beta_vec)
+                f = fits{i_alpha, j_beta};
+                if ~isempty(f)
+                    coeff_vals(j_beta) = f.(coeff_name);
+                end
+            end
+            alpha_str = ['\alpha=' num2str(alpha_vec(i_alpha))];
+            plot(beta_vec, coeff_vals, ['-' mkr], 'MarkerFaceColor', 'auto', 'DisplayName', alpha_str)
+            xlabel('\beta')
+            ylabel(coeff_name)
+            hold on
+            legend
+        end
+    end
+
+    % Coefficients vs alpha for each beta
+    f2 = figure;
+    for j_beta = 1:length(beta_vec)
+        col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
+        for i_coeff = 1:length(coeff_names)
+            subplot(1, length(coeff_names), i_coeff)
+            coeff_name  = coeff_names{i_coeff};
+            coeff_vals  = nan(1, length(alpha_vec));
+            for i_alpha = 1:length(alpha_vec)
+                f = fits{i_alpha, j_beta};
+                if ~isempty(f)
+                    coeff_vals(i_alpha) = f.(coeff_name);
+                end
+            end
+            beta_str = ['\beta=' num2str(beta_vec(j_beta))];
+            plot(alpha_vec, coeff_vals, '-o', 'Color', col, 'DisplayName', beta_str)
+            hold on
+            xlabel('\alpha')
+            ylabel(coeff_name)
+            legend
+        end
+    end
+
+    figs = [f1 f2];
 end
 
 function f = perform_auto_fit(x,y,ft,fo)
