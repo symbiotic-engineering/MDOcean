@@ -539,8 +539,32 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
             else
                 [p_star, ~, ~] = circle_intersect_optim(centers, radii);
                 if isempty(p_star)
-                    % infeasible: use Gamma=1 (zero power, survival mode)
-                    Gamma_opt = 1;
+                    % Constraint circles are mutually infeasible.
+                    % This typically happens when force (circle at Gamma=-1)
+                    % and amplitude (circle at Gamma=+1) limits are both
+                    % violated and r_F + r_Xu < 2 (they can't intersect).
+                    % Fall back: try each individual constraint circle with
+                    % the positive-power circle to find best feasible Gamma.
+                    % Power circle is always the last entry in centers/radii.
+                    Gamma_opt = 1;  % default: shutdown
+                    best_norm = Inf;
+                    n_c = size(centers, 1);
+                    c_pow = centers(n_c, :);
+                    r_pow = radii(n_c);
+                    for k = 1:n_c - 1
+                        % closest boundary point on circle k to origin
+                        dk = norm(centers(k,:));
+                        if dk < COEFF_TOL
+                            pk = [radii(k), 0];
+                        else
+                            pk = centers(k,:) - radii(k) * centers(k,:)/dk;
+                        end
+                        % accept only if inside the positive-power circle
+                        if norm(pk - c_pow) <= r_pow + 1e-4 && norm(pk) < best_norm
+                            best_norm = norm(pk);
+                            Gamma_opt = pk(1) + 1i*pk(2);
+                        end
+                    end
                 else
                     Gamma_opt = p_star(1) + 1i*p_star(2);
                 end
@@ -609,8 +633,12 @@ function Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii)
     end
     
     if isempty(feasible)
-        % infeasible: use Gamma=1 (survival mode)
-        Gamma_opt = 1;
+        % No point on the Q=0 circle satisfies all constraints simultaneously.
+        % Fall back to the unconstrained damping-optimal point (Gamma_closest),
+        % which always satisfies the positive-power constraint (the Q=0 and
+        % power circles always intersect when Im(Z_th)≠0).
+        % This may violate force/amplitude limits but avoids complete shutdown.
+        Gamma_opt = Gamma_closest;
     else
         % choose closest to origin
         dists = vecnorm(feasible, 2, 2);
@@ -1059,5 +1087,16 @@ function all_posdef = check_posdef_three_2x2s(a11,a12,a21,a22, b11,b12,b21,b22, 
             a11 > 0 & (a11.*a22 - a21.*a12) >= 0 & ...
             b11 > 0 & (b11.*b22 - b21.*b12) >= 0 & ...
             c11 > 0 & (c11.*c22 - c21.*c12) >= 0;
+end
+
+function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
+    imag_term = b .* w;
+    real_term = k - m .* w.^2;
+    X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
+    X = X_over_F_mag .* F;
+    if nargout > 1
+        X_over_F_phase = atan2(imag_term,real_term);
+        angle_X = X_over_F_phase + F_phase;
+    end
 end
 
