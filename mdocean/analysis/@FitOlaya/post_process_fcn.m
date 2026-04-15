@@ -382,7 +382,7 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
 
     % version 1: all alpha combined (manual + auto fits with coeffs)
     [figs_v1, fits_v1] = plot_fit_and_coeffs_all_alpha_beta(x_f1_v1, y_f1_v1, x_f3, y_base, y_pred_base, ...
-        case_4.alpha, case_4.beta, @semilogx, x_label_v1, y_label_v1, [0 10], y_pred_f1_v1, ft, fo);
+        case_4.alpha, case_4.beta, @loglog, x_label_v1, y_label_v1, [0 10], y_pred_f1_v1, ft, fo);
 
     % version 2: all alpha combined (manual + auto fits with coeffs)
     figs_v2 = plot_fit_and_coeffs_all_alpha_beta(x_f1_v2, y_f1_v2, x_f3, y_base, y_pred_base, ...
