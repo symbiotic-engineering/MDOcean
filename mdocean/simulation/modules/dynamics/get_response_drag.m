@@ -553,16 +553,16 @@ function [B_p_sat,K_p_sat] = solve_qcqp_control(Z_th, w, ...
                     r_pow = radii(n_c);
                     for k = 1:n_c - 1
                         % closest boundary point on circle k to origin
-                        dk = norm(centers(k,:));
-                        if dk < COEFF_TOL
-                            pk = [radii(k), 0];
+                        dist_to_center_k = norm(centers(k,:));
+                        if dist_to_center_k < COEFF_TOL
+                            boundary_point_k = [radii(k), 0];
                         else
-                            pk = centers(k,:) - radii(k) * centers(k,:)/dk;
+                            boundary_point_k = centers(k,:) - radii(k) * centers(k,:)/dist_to_center_k;
                         end
                         % accept only if inside the positive-power circle
-                        if norm(pk - c_pow) <= r_pow + 1e-4 && norm(pk) < best_norm
-                            best_norm = norm(pk);
-                            Gamma_opt = pk(1) + 1i*pk(2);
+                        if norm(boundary_point_k - c_pow) <= r_pow + 1e-4 && norm(boundary_point_k) < best_norm
+                            best_norm = norm(boundary_point_k);
+                            Gamma_opt = boundary_point_k(1) + 1i*boundary_point_k(2);
                         end
                     end
                 else
