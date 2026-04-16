@@ -722,12 +722,12 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         'MarkerFaceColor', 'none', 'MarkerSize', 6, ...
         'DisplayName', sprintf('WAMIT RM3 (h/R_b=%.1f, \\alpha=%.0f)', h_rm3/Rb_rm3, alpha_rm3));
 
-    legend('location', 'eastoutside')
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
     title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
     axis tight
     improvePlot
+    legend('location', 'eastoutside')
 end
 
 function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v1, y_label_v1)
