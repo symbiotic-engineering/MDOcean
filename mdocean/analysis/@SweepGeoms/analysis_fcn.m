@@ -22,12 +22,12 @@ function intermed_result_struct = analysis_fcn(p, b)
         'MDOcean:RunMEEM:NonFiniteC' ...
     };
 
-    warning_ids_with_state = [{'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'}, warning_ids];
-    warning_states = cell(size(warning_ids_with_state));
-    for k = 1:numel(warning_ids_with_state)
-        warning_states{k} = warning('query', warning_ids_with_state{k});
+    managed_warning_ids = [{'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'}, warning_ids];
+    warning_states = cell(size(managed_warning_ids));
+    for k = 1:numel(managed_warning_ids)
+        warning_states{k} = warning('query', managed_warning_ids{k});
     end
-    cleanup_warnings = onCleanup(@() restore_warning_states(warning_ids_with_state, warning_states));
+    cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
     warning('off','MATLAB:nearlySingularMatrix')
     warning('off','MATLAB:singularMatrix')
@@ -99,7 +99,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     m0h_stored = reshape(m0h_stored_linear, [nT, size(A1)]);
     hydro_ratio_result = reshape(hydro_ratio_result_linear, [nT, size(A1)]);
 
-    restore_warning_states(warning_ids_with_state, warning_states)
+    restore_warning_states(managed_warning_ids, warning_states)
     clear cleanup_warnings
 
     warning_counts = sum(warning_hits, 2);
@@ -143,9 +143,17 @@ end
 
 function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids)
     warning_hit = false(1, numel(warning_ids));
-    disabled_warning_ids = {};
+    disabled_warning_ids = cell(1, numel(warning_ids));
+    n_disabled_warning_ids = 0;
+    max_attempts = numel(warning_ids) + 1;
+    attempt = 0;
 
     while true
+        attempt = attempt + 1;
+        if attempt > max_attempts
+            error('MDOcean:SweepGeoms:ExceededWarningRetryLimit', ...
+                'Exceeded maximum warning-capture retries (%d).', max_attempts)
+        end
         try
             [hydro_ratio, ~, ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
             hydro_ratio_max = max(hydro_ratio);
@@ -157,15 +165,16 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
             end
             warning_hit(warning_idx) = true;
 
-            if any(strcmp(ME.identifier, disabled_warning_ids))
+            if n_disabled_warning_ids > 0 && any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
                 rethrow(ME)
             end
             warning('off', ME.identifier)
-            disabled_warning_ids{end + 1} = ME.identifier; %#ok<AGROW>
+            n_disabled_warning_ids = n_disabled_warning_ids + 1;
+            disabled_warning_ids{n_disabled_warning_ids} = ME.identifier;
         end
     end
 
-    for k = 1:numel(disabled_warning_ids)
+    for k = 1:n_disabled_warning_ids
         warning('error', disabled_warning_ids{k})
     end
 end
