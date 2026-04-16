@@ -19,6 +19,8 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 % :param idx_opt:        optimal controller index for each sea state (n_Hs x n_T)
 % :returns: Figure handle
 
+    real_P(isinf(real_P)) = NaN; % replace inf with nan (blank on plot)
+
     [sz_phase, sz_mag_full] = size(MAG_GUESS);
     n_ctrl = sz_phase * sz_mag_full;
     n_ss   = numel(real_P) / n_ctrl;
@@ -89,7 +91,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     % Use original (non-padded) grid for contourf so the hatched region matches
     X_orig = MAG_GUESS .* cos(PHASE_GUESS);
     Y_orig = MAG_GUESS .* sin(PHASE_GUESS);
-    constr_violated = double(C_ss ~= 0);
+    constr_violated = double(C_ss > 0);
     if any(constr_violated(:))
         tmp_clim = clim(ax);
         [~, h_hatch] = contourf(ax, X_orig, Y_orig, constr_violated, [0.5 0.5],'Fill','off');
