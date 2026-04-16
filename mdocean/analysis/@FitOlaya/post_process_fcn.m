@@ -629,22 +629,27 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     % Overlay plot: case 4 v1 (line-connected markers) + case 2 + WAMIT RM3 spar data
 
     alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
+    % Case 4 colored by beta (cool blues/greens); case 2 colored by alpha (warm reds)
     beta_colors  = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
                     [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
+    case2_colors = {[0.8 0 0], [1 0.4 0], [0.8 0.6 0], [0.9 0.5 0]};  % warm/red per alpha
+    case2_marker_size = 8;
+    case2_line_width  = 1.5;
 
     fig = figure;
 
-    % Re-plot case 4 data using line-connected markers (matching v1 auto plot)
+    % Re-plot case 4 data using line-connected filled markers
     for i_alpha = 1:length(case_4.alpha)
         mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
         for j_beta = 1:length(case_4.beta)
             col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
             x_f1 = x_f1_v1{i_alpha, j_beta};
             y_f1 = y_f1_v1{i_alpha, j_beta};
+            valid = x_f1 > 0 & y_f1 > 0 & isfinite(x_f1) & isfinite(y_f1);
 
             case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
                 case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
-            semilogx(x_f1, y_f1, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
+            loglog(x_f1(valid), y_f1(valid), ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                 'MarkerSize', 4, 'DisplayName', case4_label);
             hold on
         end
@@ -653,7 +658,6 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     % Overlay case 2 data transformed to v1 space
     % Case 2 has beta=1 effectively (normalized from fig 3b/4b)
     beta_c2 = 1;
-    case2_marker_size = 8;
     for i_alpha = 1:length(case_2.alpha)
         alpha_c2 = case_2.alpha(i_alpha);
         kh_c2 = case_2.kh{i_alpha};
@@ -670,14 +674,15 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         % y_v1 = y_base^2 * beta^2
         y_v1_c2 = y_base_c2.^2 * beta_c2^2;
 
-        % Use same alpha marker; color comes from beta (beta_c2=1, use distinct gray)
+        % Case 2: per-alpha warm color, open markers to distinguish from case 4
         mkr_c2 = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
-        col_c2 = [0.5 0.5 0.5]; % gray for case 2 (beta=1, not in case 4 beta set)
+        col_c2 = case2_colors{mod(i_alpha-1, length(case2_colors)) + 1};
         case2_label = sprintf('Case 2 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
             case_2.h_over_Rb, alpha_c2, beta_c2);
-        semilogx(x_v1_c2, y_v1_c2, ['-' mkr_c2], 'Color', col_c2, 'MarkerFaceColor', col_c2, ...
-            'MarkerSize', case2_marker_size, ...
-            'DisplayName', case2_label);
+        valid_c2 = x_v1_c2 > 0 & y_v1_c2 > 0 & isfinite(x_v1_c2) & isfinite(y_v1_c2);
+        loglog(x_v1_c2(valid_c2), y_v1_c2(valid_c2), ['-' mkr_c2], ...
+            'Color', col_c2, 'MarkerFaceColor', 'none', ...
+            'MarkerSize', case2_marker_size, 'LineWidth', case2_line_width, 'DisplayName', case2_label);
     end
 
     % Overlay WAMIT RM3 spar excitation data
@@ -713,15 +718,15 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     y_v1_rm3 = y_base_rm3.^2 * beta_rm3^2;
 
     valid_rm3 = isfinite(x_v1_rm3) & isfinite(y_v1_rm3) & x_v1_rm3 > 0 & y_v1_rm3 > 0;
-    semilogx(x_v1_rm3(valid_rm3), y_v1_rm3(valid_rm3), '-k^', ...
-        'MarkerFaceColor', 'k', 'MarkerSize', 6, ...
+    loglog(x_v1_rm3(valid_rm3), y_v1_rm3(valid_rm3), '-k^', ...
+        'MarkerFaceColor', 'none', 'MarkerSize', 6, ...
         'DisplayName', sprintf('WAMIT RM3 (h/R_b=%.1f, \\alpha=%.0f)', h_rm3/Rb_rm3, alpha_rm3));
 
     legend('location', 'eastoutside')
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
     title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
-    ylim([0 10])
+    axis tight
     improvePlot
 end
 
@@ -836,7 +841,53 @@ function figs = plot_newform_coeffs(fits, alpha_vec, beta_vec)
         end
     end
 
-    figs = [f1 f2];
+    % Combined figure: 3 rows (A, m, B) x 2 cols (vs alpha, vs beta) in one figure
+    f3 = figure;
+    n_coeffs = length(coeff_names);
+    for i_coeff = 1:n_coeffs
+        coeff_name = coeff_names{i_coeff};
+
+        % Left column: coeff vs alpha for each beta
+        subplot(n_coeffs, 2, 2*i_coeff - 1)
+        for j_beta = 1:length(beta_vec)
+            col = beta_colors{mod(j_beta-1, length(beta_colors)) + 1};
+            coeff_vals = nan(1, length(alpha_vec));
+            for i_alpha = 1:length(alpha_vec)
+                f = fits{i_alpha, j_beta};
+                if ~isempty(f)
+                    coeff_vals(i_alpha) = f.(coeff_name);
+                end
+            end
+            plot(alpha_vec, coeff_vals, '-o', 'Color', col, ...
+                'DisplayName', ['\beta=' num2str(beta_vec(j_beta))])
+            hold on
+        end
+        xlabel('\alpha')
+        ylabel(coeff_name)
+        legend('location', 'best')
+
+        % Right column: coeff vs beta for each alpha
+        subplot(n_coeffs, 2, 2*i_coeff)
+        for i_alpha = 1:length(alpha_vec)
+            mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
+            coeff_vals = nan(1, length(beta_vec));
+            for j_beta = 1:length(beta_vec)
+                f = fits{i_alpha, j_beta};
+                if ~isempty(f)
+                    coeff_vals(j_beta) = f.(coeff_name);
+                end
+            end
+            plot(beta_vec, coeff_vals, ['-' mkr], 'MarkerFaceColor', 'auto', ...
+                'DisplayName', ['\alpha=' num2str(alpha_vec(i_alpha))])
+            hold on
+        end
+        xlabel('\beta')
+        ylabel(coeff_name)
+        legend('location', 'best')
+    end
+    sgtitle('New-form fit coefficients A, m, B vs \alpha and \beta')
+
+    figs = [f1 f2 f3];
 end
 
 function f = perform_auto_fit(x,y,ft,fo)
