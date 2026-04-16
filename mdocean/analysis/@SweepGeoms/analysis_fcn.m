@@ -22,14 +22,14 @@ function intermed_result_struct = analysis_fcn(p, b)
         'MDOcean:RunMEEM:NonFiniteC' ...
     };
 
-    managed_warning_ids = [{'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'}, warning_ids];
+    verbosity_warning_ids = {'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'};
+    managed_warning_ids = [verbosity_warning_ids, warning_ids];
     warning_states = cell(size(managed_warning_ids));
     for k = 1:numel(managed_warning_ids)
         warning_states{k} = warning('query', managed_warning_ids{k});
     end
     cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
-    verbosity_warning_ids = managed_warning_ids(1:3); % nearly singular, singular, and backtrace
     for k = 1:numel(verbosity_warning_ids)
         warning('off', verbosity_warning_ids{k}) % disable singular/backtrace warning verbosity
     end
