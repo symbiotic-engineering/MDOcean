@@ -105,7 +105,7 @@ def create_fig_notebook(class_name, notebooks_dir="results/fig_notebooks"):
         "import fitz\n",
         "from IPython.display import Image, display\n",
         "\n",
-        f"pdf_files = sorted(glob.glob('results/{class_name}/*.pdf'))\n",
+        f"pdf_files = sorted(glob.glob('../{class_name}/*.pdf'))\n",
         "\n",
         "for pdf_path in pdf_files:\n",
         "    print(pdf_path)\n",
