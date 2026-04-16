@@ -7,14 +7,16 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 %   - power as a pcolor patch map using a log10-scaled radius:
 %       r = log10(|alpha|) - log10(min|alpha|)
 %     so that cells are spread out in the radial direction.
-%   - cross-hatching (using hatchfill2) where constraint_err ~= 0.
-%     The infeasibility matrix is zero-padded at the outer boundary so that
-%     hatching covers all cells even when every cell is infeasible.
+%   - cross-hatching where constraint_err ~= 0  (legend: 'Constraint violated')
+%   - single-line red hatching where power is Inf  (legend: 'Unstable')
 %   - star marker at the controller with maximum power
+%
+% Hatching uses per-cell quadrilateral patches (hatchfill2 on a multi-face
+% patch) so hatch boundaries follow cell edges exactly.
 %
 % Cells are centred at the true grid coordinates: corner vertices are
 % constructed as midpoints between adjacent centres in (log_r, phase) space,
-% with the inner radial edge clamped to r = 0.
+% with the inner radial edge clamped to 0.
 %
 % :param MAG_GUESS:      meshgrid of ctrl mult magnitudes  (n_phase x n_mag)
 % :param PHASE_GUESS:    meshgrid of ctrl mult phases in rad (n_phase x n_mag)
@@ -76,22 +78,27 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     hold(ax, 'on');
 
     % power colourmap via pcolor on the log10-scaled polar grid
-    pcolor(ax, X_cart, Y_cart, P_pad);
+    h_pc = pcolor(ax, X_cart, Y_cart, P_pad);
+    set(h_pc, 'HandleVisibility', 'off');
     cb = colorbar(ax);
     cb.Label.String = 'Power (W)';
+
+    % axis limits and labels reflecting the log-scaled radius
+    r_lim = r_log_corners_1d(end);
     axis(ax, 'equal');
-    xlabel(ax, 'Re(\alpha)')
-    ylabel(ax, 'Im(\alpha)')
+    xlim(ax, [-r_lim, r_lim]);
+    ylim(ax, [-r_lim, r_lim]);
+    xlabel(ax, sprintf('r_{log}\\cdotcos(\\phi_{\\alpha}),  r_{log} = log_{10}(|\\alpha|/%.3g)', min_mag))
+    ylabel(ax, 'r_{log}\cdotsin(\phi_{\alpha})')
     title(ax, sprintf('Brute-force ctrl grid | max-power sea state  (P_{opt} = %.3g W)', opt_P_best))
 
     % --- reference circles labelled by |alpha| value ---
     th_ring = linspace(0, 2*pi, 200);
-    r_max   = r_log_corners_1d(end);
     % circles at each integer decade of |alpha| from min_mag to max_mag
-    alpha_refs = min_mag * 10 .^ (0 : floor(r_max));
+    alpha_refs = min_mag * 10 .^ (0 : floor(r_lim));
     for alpha_val = alpha_refs
         r_val = log10(alpha_val / min_mag);
-        if r_val < 0 || r_val > r_max; continue; end
+        if r_val < 0 || r_val > r_lim; continue; end
         plot(ax, r_val*cos(th_ring), r_val*sin(th_ring), ...
              'k:', 'LineWidth', 0.5, 'HandleVisibility', 'off')
         text(ax, r_val*cos(pi/8), r_val*sin(pi/8), ...
@@ -99,22 +106,34 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
              'FontSize', 7, 'Color', 'k')
     end
 
-    % --- hatching where constraint is violated (constraint_err ~= 0) ---
-    % Zero-pad the infeasibility matrix at the last col and last row so that
-    % contourf always finds a 0->1 transition, even when every cell is infeasible.
-    % The corner grid (X_cart, Y_cart) is used so the hatched region aligns
-    % with the padded pcolor cells.
-    C_violated = double(C_ss ~= 0);
-    C_viol_pad = [C_violated,        zeros(sz_phase, 1); ...
-                  zeros(1, sz_mag),  0];                  % (sz_phase+1) x (sz_mag+1)
-    if any(C_viol_pad(:))
-        tmp_clim = clim(ax);
-        [~, h_hatch] = contourf(ax, X_cart, Y_cart, C_viol_pad, [0.5 0.5], 'Fill', 'off');
-        hh = hatchfill2(h_hatch, 'cross');
-        hh.Color = [0 0 0 0.5];
-        hh.DisplayName = 'Constraint violated';
-        clim(ax, tmp_clim);
+    tmp_clim = clim(ax);
+
+    % --- cell-aligned hatching ---
+    % hatchfill2 is called on a multi-face patch (4-x-N_cells), one quad per
+    % infeasible cell.  This guarantees hatch boundaries follow cell edges exactly
+    % (no diagonal contour interpolation artefacts).
+
+    % Constraint-violated cells: black cross-hatch
+    viol_list = find(C_ss(:) ~= 0);
+    if ~isempty(viol_list)
+        [xd, yd] = cell_quads(viol_list, X_cart, Y_cart, sz_phase, sz_mag);
+        hp_c = patch(ax, xd, yd, [1 1 1], 'FaceAlpha', 0, 'EdgeColor', 'none', ...
+                     'HandleVisibility', 'off');
+        hh_c = hatchfill2(hp_c, 'cross', 'HatchColor', [0 0 0], 'HatchLineWidth', 0.5);
+        hh_c.DisplayName = 'Constraint violated';
     end
+
+    % Unstable cells (Inf power): red single-diagonal hatch
+    unstab_list = find(isinf(P_ss(:)));
+    if ~isempty(unstab_list)
+        [xd_u, yd_u] = cell_quads(unstab_list, X_cart, Y_cart, sz_phase, sz_mag);
+        hp_u = patch(ax, xd_u, yd_u, [1 1 1], 'FaceAlpha', 0, 'EdgeColor', 'none', ...
+                     'HandleVisibility', 'off');
+        hh_u = hatchfill2(hp_u, 'single', 'HatchColor', [0.8 0 0], 'HatchLineWidth', 0.7);
+        hh_u.DisplayName = 'Unstable';
+    end
+
+    clim(ax, tmp_clim);
 
     % --- star marker at the max-power optimal controller ---
     opt_ctrl_idx = idx_flat(best_ss);
@@ -127,4 +146,18 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 
     legend
     improvePlot
+end
+
+function [xdata, ydata] = cell_quads(cell_list, X_cart, Y_cart, sz_phase, sz_mag)
+% Build 4-x-N vertex arrays for a multi-face patch covering the listed cells.
+% cell_list contains linear indices into an (sz_phase x sz_mag) grid.
+% Corners of cell (i,j) are X_cart([i i+1],[j j+1]).
+    n = numel(cell_list);
+    xdata = zeros(4, n);
+    ydata = zeros(4, n);
+    for k = 1:n
+        [i, j] = ind2sub([sz_phase, sz_mag], cell_list(k));
+        xdata(:,k) = [X_cart(i,j);   X_cart(i,j+1);   X_cart(i+1,j+1); X_cart(i+1,j)];
+        ydata(:,k) = [Y_cart(i,j);   Y_cart(i,j+1);   Y_cart(i+1,j+1); Y_cart(i+1,j)];
+    end
 end
