@@ -29,8 +29,9 @@ function intermed_result_struct = analysis_fcn(p, b)
     end
     cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
-    for k = 1:3
-        warning('off', managed_warning_ids{k}) % disable singular/backtrace warning verbosity
+    verbosity_warning_ids = managed_warning_ids(1:3); % nearly singular, singular, and backtrace
+    for k = 1:numel(verbosity_warning_ids)
+        warning('off', verbosity_warning_ids{k}) % disable singular/backtrace warning verbosity
     end
     for k = 1:numel(warning_ids)
         warning('error', warning_ids{k})
