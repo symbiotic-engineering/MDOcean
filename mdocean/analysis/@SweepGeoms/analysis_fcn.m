@@ -91,7 +91,13 @@ function intermed_result_struct = analysis_fcn(p, b)
 
         m0h_stored_linear(:, i) = dispersion(2*pi ./ p.T, p_i.h, p.g) * p_i.h;
 
-        [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids);
+        try
+            [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids);
+        catch
+            hydro_ratio_max = NaN;
+            out = struct('vol_f', NaN, 'vol_s', NaN);
+            warning_hit = false(1, numel(warning_ids));
+        end
         val(i) = ensure_vol_fields(out);
         warning_hits(:, i) = warning_hit(:);
         hydro_ratio_result_linear(:, i) = hydro_ratio_max;
@@ -142,12 +148,25 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.p = p;
 end
 
-function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids)
+function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids)
     worker_warning_state = warning;
     cleanup_worker_warnings = onCleanup(@() warning(worker_warning_state)); %#ok<NASGU>
+
+    % Apply warning configuration on this worker.  parfor workers do not
+    % inherit warning() state changes made in the main thread after the
+    % parallel pool was created, so we must set them explicitly here.
+    for k = 1:numel(verbosity_warning_ids)
+        warning('off', verbosity_warning_ids{k});
+    end
+    for k = 1:numel(warning_ids)
+        warning('error', warning_ids{k});
+    end
+
     warning_hit = false(1, numel(warning_ids));
     disabled_warning_ids = cell(1, numel(warning_ids));
     n_disabled_warning_ids = 0;
+    hydro_ratio_max = NaN;
+    out = struct('vol_f', NaN, 'vol_s', NaN);
 
     while true
         try
@@ -162,7 +181,7 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
             warning_hit(warning_idx) = true;
 
             if any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
-                rethrow(ME)
+                break  % Same warning fired again after disabling; return NaN for this geometry
             end
             warning('off', ME.identifier)
             n_disabled_warning_ids = n_disabled_warning_ids + 1;
