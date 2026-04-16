@@ -68,6 +68,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     m0h_stored_linear         = nan(nT, n_geoms);
     hydro_ratio_result_linear = nan(nT, n_geoms);
     warning_hits              = false(numel(warning_ids), n_geoms);
+    unknown_error_hits        = false(1, n_geoms);
     val = repmat(struct('vol_f', NaN, 'vol_s', NaN), [1, n_geoms]);
 
     parfor i = 1:n_geoms
@@ -97,6 +98,7 @@ function intermed_result_struct = analysis_fcn(p, b)
             hydro_ratio_max = NaN;
             out = struct('vol_f', NaN, 'vol_s', NaN);
             warning_hit = false(1, numel(warning_ids));
+            unknown_error_hits(i) = true;
         end
         val(i) = ensure_vol_fields(out);
         warning_hits(:, i) = warning_hit(:);
@@ -116,6 +118,12 @@ function intermed_result_struct = analysis_fcn(p, b)
                 'SweepGeoms caught %s for %.1f%% of geometries (%d/%d).', ...
                 warning_ids{k}, 100 * warning_counts(k) / n_geoms, warning_counts(k), n_geoms)
         end
+    end
+    n_unknown_errors = sum(unknown_error_hits);
+    if n_unknown_errors > 0
+        warning('MDOcean:SweepGeoms:UnknownError', ...
+            'SweepGeoms silently suppressed unknown errors for %.1f%% of geometries (%d/%d).', ...
+            100 * n_unknown_errors / n_geoms, n_unknown_errors, n_geoms);
     end
 
     % --- Save intermediate results ---
@@ -166,7 +174,7 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
     disabled_warning_ids = cell(1, numel(warning_ids));
     n_disabled_warning_ids = 0;
     hydro_ratio_max = NaN;
-    out = struct('vol_f', NaN, 'vol_s', NaN);
+    out = struct('vol_f', NaN, 'vol_s', NaN); % default for early-exit paths
 
     while true
         try
