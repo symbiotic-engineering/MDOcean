@@ -64,7 +64,7 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     nT = length(p.T);
     n_geoms = numel(A1);
-    m0h_stored_linear         = zeros(nT, n_geoms);
+    m0h_stored_linear         = nan(nT, n_geoms);
     hydro_ratio_result_linear = nan(nT, n_geoms);
     warning_hits              = false(numel(warning_ids), n_geoms);
     val = repmat(struct('vol_f', NaN, 'vol_s', NaN), [1, n_geoms]);
@@ -145,7 +145,7 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
     warning_hit = false(1, numel(warning_ids));
     disabled_warning_ids = cell(1, numel(warning_ids));
     n_disabled_warning_ids = 0;
-    max_attempts = numel(warning_ids) + 1;
+    max_attempts = numel(warning_ids) + 1; % at most one new warning id per retry, plus the initial attempt
     attempt = 0;
 
     while true
