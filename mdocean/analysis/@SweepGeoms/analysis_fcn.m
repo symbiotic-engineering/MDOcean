@@ -69,7 +69,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     warning_hits              = false(numel(warning_ids), n_geoms);
     val = repmat(struct('vol_f', NaN, 'vol_s', NaN), [1, n_geoms]);
 
-    for i = 1:n_geoms
+    parfor i = 1:n_geoms
 
         D_s   = 2 * A1(i);
         D_f   = 2 * A2(i);
