@@ -297,7 +297,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
     %% Figure 1: Stem plot of Fourier harmonics of float acceleration + THD
     figs(1) = figure;
     tl1 = tiledlayout(2, 2);
-    title(tl1, 'Fourier Harmonics of Float Acceleration')
+    title(tl1, 'Fourier Harmonics of Float Acceleration', 'Interpreter', 'latex')
     for ci = 1:num_corners
         N = data.corner_N_per_T(ci);
         dt = data.dt_sim;
@@ -329,10 +329,10 @@ function figs = plot_timeseries_figures(wecsim_filename)
         nexttile(tl1)
         max_harmonics = min(10, length(amplitudes)-1);
         stem(harmonic_numbers(1:max_harmonics+1), amplitudes(1:max_harmonics+1), 'filled')
-        xlabel('Harmonic Number')
-        ylabel('Amplitude (m/s^2)')
-        title(sprintf('H=%.1f m, T=%.0f s, THD=%.1f%%', ...
-            data.corner_HT(ci,1), data.corner_HT(ci,2), THD))
+        xlabel('Harmonic Number', 'Interpreter', 'latex')
+        ylabel('Amplitude (m/s$^2$)', 'Interpreter', 'latex')
+        title(sprintf('$H=%.1f$ m, $T=%.0f$ s, THD$=%.1f$\\%%', ...
+            data.corner_HT(ci,1), data.corner_HT(ci,2), THD), 'Interpreter', 'latex')
         grid on
     end
     improvePlot
@@ -340,7 +340,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
     %% Figure 2: Drag force timeseries with sin(wt)*|sin(wt)| approximation
     figs(2) = figure;
     tl2 = tiledlayout(2, 2);
-    title(tl2, 'Float Drag Force: WEC-Sim vs Describing Function Approximation')
+    title(tl2, 'Float Drag Force: WEC-Sim vs Describing Function Approximation', 'Interpreter', 'latex')
     for ci = 1:num_corners
         N = data.corner_N_per_T(ci);
         dt = data.dt_sim;
@@ -349,22 +349,22 @@ function figs = plot_timeseries_figures(wecsim_filename)
         t_vec = (0:N-1)' * dt;
         w = 2*pi / T_wave;
 
-        % get the fundamental amplitude of drag force for this corner
-        [fund_amp_drag, ~] = get_fundamental_local(F_drag, w, dt);
+        % get the fundamental amplitude and phase of drag force for this corner
+        [fund_amp_drag, phase_drag] = get_fundamental_local(F_drag, w, dt);
 
-        % describing function approximation: y = A * sin(wt) * |sin(wt)|
+        % describing function approximation: y = A * sin(wt+phi) * |sin(wt+phi)|
         % where A = 8/(3*pi) * fundamental_amplitude
         A_desc = 8/(3*pi) * fund_amp_drag;
-        y_approx = A_desc * sin(w * t_vec) .* abs(sin(w * t_vec));
+        y_approx = A_desc * sin(w * t_vec + phase_drag) .* abs(sin(w * t_vec + phase_drag));
 
         nexttile(tl2)
         plot(t_vec, F_drag, 'b', 'DisplayName', 'WEC-Sim Drag Force')
         hold on
-        plot(t_vec, y_approx, 'r--', 'DisplayName', 'sin(wt)|sin(wt)| approx')
-        xlabel('Time (s)')
-        ylabel('Force (N)')
-        title(sprintf('H=%.1f m, T=%.0f s', data.corner_HT(ci,1), data.corner_HT(ci,2)))
-        legend('Location', 'best')
+        plot(t_vec, y_approx, 'r--', 'DisplayName', '$\sin(\omega t + \phi)|\sin(\omega t + \phi)|$ approx')
+        xlabel('Time (s)', 'Interpreter', 'latex')
+        ylabel('Force (N)', 'Interpreter', 'latex')
+        title(sprintf('$H=%.1f$ m, $T=%.0f$ s', data.corner_HT(ci,1), data.corner_HT(ci,2)), 'Interpreter', 'latex')
+        legend('Location', 'best', 'Interpreter', 'latex')
         grid on
     end
     improvePlot

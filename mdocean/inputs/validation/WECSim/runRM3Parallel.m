@@ -137,24 +137,25 @@ spar_drag_force_fund   = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
-% identify four corner sea states (lowest/highest H and T with nonzero JPD)
+% identify four corner sea states from actual JPD entries
 H_all = mcr.cases(:,1);
 T_all = mcr.cases(:,2);
 H_vals = unique(H_all);
-T_vals = unique(T_all);
-corner_HT_desired = [H_vals(1)   T_vals(1);    % low H, low T
-                     H_vals(1)   T_vals(end);   % low H, high T
-                     H_vals(end) T_vals(1);     % high H, low T
-                     H_vals(end) T_vals(end)];  % high H, high T
-% only keep corners that actually exist in the sea state matrix
-corner_idx = [];
-corner_HT = [];
-for ci = 1:4
-    match = find(H_all == corner_HT_desired(ci,1) & T_all == corner_HT_desired(ci,2), 1);
-    if ~isempty(match)
-        corner_idx(end+1) = match; %#ok<AGROW>
-        corner_HT(end+1,:) = corner_HT_desired(ci,:); %#ok<AGROW>
-    end
+% For each extreme H, find the extreme T values that actually exist
+H_min = H_vals(1);
+H_max = H_vals(end);
+T_at_H_min = T_all(H_all == H_min);
+T_at_H_max = T_all(H_all == H_max);
+corner_HT = [H_min, min(T_at_H_min);   % low H, low T
+             H_min, max(T_at_H_min);   % low H, high T
+             H_max, min(T_at_H_max);   % high H, low T
+             H_max, max(T_at_H_max)];  % high H, high T
+% remove duplicate corners (e.g. if only one T exists for an extreme H)
+corner_HT = unique(corner_HT, 'rows', 'stable');
+% find matching indices in mcr.cases
+corner_idx = zeros(size(corner_HT, 1), 1);
+for ci = 1:size(corner_HT, 1)
+    corner_idx(ci) = find(H_all == corner_HT(ci,1) & T_all == corner_HT(ci,2), 1);
 end
 corner_idx = corner_idx(:);
 is_corner = false(length(mcr.cases(:,1)), 1);
