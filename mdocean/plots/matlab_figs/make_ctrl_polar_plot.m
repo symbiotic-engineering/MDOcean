@@ -4,16 +4,20 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 %
 % Visualisation of the brute-force controller search grid on complex axes.
 % Selects the sea state with the highest optimal power and shows:
-%   - power as a pcolor patch map on complex-plane (alpha = mag*exp(j*phase)) axes
-%   - cross-hatching (using hatchfill2) where constraint_err ~= 0
+%   - power as a pcolor patch map using a log10-scaled radius:
+%       r = log10(|alpha|) - log10(min|alpha|)
+%     so that cells are spread out in the radial direction.
+%   - cross-hatching (using hatchfill2) where constraint_err ~= 0.
+%     The infeasibility matrix is zero-padded at the outer boundary so that
+%     hatching covers all cells even when every cell is infeasible.
 %   - star marker at the controller with maximum power
 %
-% The grid is padded by one row/column before calling pcolor so that no
-% data is discarded (pcolor with shading flat would otherwise drop the last
-% row and column).
+% Cells are centred at the true grid coordinates: corner vertices are
+% constructed as midpoints between adjacent centres in (log_r, phase) space,
+% with the inner radial edge clamped to r = 0.
 %
-% :param MAG_GUESS:      meshgrid of ctrl mult magnitudes  (n_phase x n_mag_full)
-% :param PHASE_GUESS:    meshgrid of ctrl mult phases in rad (n_phase x n_mag_full)
+% :param MAG_GUESS:      meshgrid of ctrl mult magnitudes  (n_phase x n_mag)
+% :param PHASE_GUESS:    meshgrid of ctrl mult phases in rad (n_phase x n_mag)
 % :param real_P:         power in W (n_Hs x n_T x n_ctrl), unmodified raw values
 % :param constraint_err: constraint error scalar (n_Hs x n_T x n_ctrl)
 % :param idx_opt:        optimal controller index for each sea state (n_Hs x n_T)
@@ -21,12 +25,12 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 
     real_P(isinf(real_P)) = NaN; % replace inf with nan (blank on plot)
 
-    [sz_phase, sz_mag_full] = size(MAG_GUESS);
-    n_ctrl = sz_phase * sz_mag_full;
+    [sz_phase, sz_mag] = size(MAG_GUESS);
+    n_ctrl = sz_phase * sz_mag;
     n_ss   = numel(real_P) / n_ctrl;
 
     % flatten sea-state and controller dimensions
-    P_flat   = reshape(real_P,        n_ss, n_ctrl);
+    P_flat   = reshape(real_P,         n_ss, n_ctrl);
     C_flat   = reshape(constraint_err, n_ss, n_ctrl);
     idx_flat = idx_opt(:);           % (n_ss x 1), column-major
 
@@ -37,38 +41,44 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     end
     [opt_P_best, best_ss] = max(opt_P_vec, [], 'omitnan');
 
-    % 2-D controller grids for the chosen sea state (use all columns)
-    P_ss = reshape(P_flat(best_ss, :), sz_phase, sz_mag_full);
-    C_ss = reshape(C_flat(best_ss, :), sz_phase, sz_mag_full);
+    % 2-D controller grids for the chosen sea state
+    P_ss = reshape(P_flat(best_ss, :), sz_phase, sz_mag);
+    C_ss = reshape(C_flat(best_ss, :), sz_phase, sz_mag);
 
-    % Pad grid by one row/col for pcolor so no data is discarded.
-    % pcolor(X,Y,P) with shading flat renders only (M-1)x(N-1) patches of an
-    % MxN input; padding to (M+1)x(N+1) makes the full MxN grid visible.
-    mag_ratio  = MAG_GUESS(1, 2)   / MAG_GUESS(1, 1);    % logspace step ratio
-    phase_step = PHASE_GUESS(2, 1) - PHASE_GUESS(1, 1);  % phase increment
+    % ---- Log10-scaled radius: r = log10(|alpha|) - log10(min|alpha|) ----
+    % This maps min|alpha| -> r=0 and avoids negative radii for the centres.
+    min_mag          = MAG_GUESS(1, 1);
+    log_mag_centers  = log10(MAG_GUESS(1, :));           % 1 x sz_mag, uniform in log-space
+    log_step         = log_mag_centers(2) - log_mag_centers(1);
+    phase_centers    = PHASE_GUESS(:, 1);                % sz_phase x 1
+    phase_step       = phase_centers(2) - phase_centers(1);
 
-    % Vertex grid: one extra row (phase extended) and one extra col (mag extended)
-    MAG_verts  = [MAG_GUESS,   MAG_GUESS(:, end) * mag_ratio; ...
-                  MAG_GUESS(end, :), MAG_GUESS(end, end) * mag_ratio];
-    PHS_verts  = [PHASE_GUESS,   PHASE_GUESS(:, end); ...
-                  PHASE_GUESS(end, :) + phase_step, PHASE_GUESS(end, end) + phase_step];
+    % Corner log10-radii: midpoints between adjacent centres.
+    % The innermost corner is clamped to 0 so it does not go negative.
+    r_log_corners_1d = [log_mag_centers(1) - log_step/2, log_mag_centers + log_step/2] ...
+                       - log10(min_mag);                  % 1 x (sz_mag+1)
+    r_log_corners_1d(1) = max(0, r_log_corners_1d(1));
 
-    % Data padded by repeating boundary row/col (so pcolor renders all cells)
-    P_pad = [P_ss,     P_ss(:, end);     P_ss(end, :),     P_ss(end, end)];
-    C_pad = [C_ss,     C_ss(:, end);     C_ss(end, :),     C_ss(end, end)];
+    % Corner phases: midpoints between adjacent centres
+    phase_corners_1d = [phase_centers(1) - phase_step/2; ...
+                        phase_centers + phase_step/2];   % (sz_phase+1) x 1
 
-    % Convert to Cartesian (alpha = mag * exp(j*phase))
-    X_cart = MAG_verts .* cos(PHS_verts);
-    Y_cart = MAG_verts .* sin(PHS_verts);
+    % Build (sz_phase+1) x (sz_mag+1) vertex grids and convert to Cartesian
+    [R_corners, PHI_corners] = meshgrid(r_log_corners_1d, phase_corners_1d);
+    X_cart = R_corners .* cos(PHI_corners);
+    Y_cart = R_corners .* sin(PHI_corners);
+
+    % Pad data with repeated boundary row/col so pcolor (flat shading) renders
+    % all sz_phase x sz_mag cells (it drops the last row/col of an MxN input).
+    P_pad = [P_ss,     P_ss(:, end);  P_ss(end, :),  P_ss(end, end)];
 
     % --- figure setup ---
     fig = figure;
     ax  = axes(fig);
     hold(ax, 'on');
 
-    % power colourmap via pcolor on the complex-plane grid
+    % power colourmap via pcolor on the log10-scaled polar grid
     pcolor(ax, X_cart, Y_cart, P_pad);
-    %shading(ax, 'flat');
     cb = colorbar(ax);
     cb.Label.String = 'Power (W)';
     axis(ax, 'equal');
@@ -76,25 +86,32 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     ylabel(ax, 'Im(\alpha)')
     title(ax, sprintf('Brute-force ctrl grid | max-power sea state  (P_{opt} = %.3g W)', opt_P_best))
 
-    % reference circles at selected radii
+    % --- reference circles labelled by |alpha| value ---
     th_ring = linspace(0, 2*pi, 200);
-    r_refs  = [0.5, 1, 2];
-    for r_val = r_refs
+    r_max   = r_log_corners_1d(end);
+    % circles at each integer decade of |alpha| from min_mag to max_mag
+    alpha_refs = min_mag * 10 .^ (0 : floor(r_max));
+    for alpha_val = alpha_refs
+        r_val = log10(alpha_val / min_mag);
+        if r_val < 0 || r_val > r_max; continue; end
         plot(ax, r_val*cos(th_ring), r_val*sin(th_ring), ...
              'k:', 'LineWidth', 0.5, 'HandleVisibility', 'off')
         text(ax, r_val*cos(pi/8), r_val*sin(pi/8), ...
-             sprintf('|\\alpha|=%.4g', r_val), ...
+             sprintf('|\\alpha|=%.3g', alpha_val), ...
              'FontSize', 7, 'Color', 'k')
     end
 
-    % --- hatching where constraint is violated (constraint_err ~= 0) ---
-    % Use original (non-padded) grid for contourf so the hatched region matches
-    X_orig = MAG_GUESS .* cos(PHASE_GUESS);
-    Y_orig = MAG_GUESS .* sin(PHASE_GUESS);
-    constr_violated = double(C_ss > 0);
-    if any(constr_violated(:))
+    % --- hatching where constraint is violated (constraint_err > 0) ---
+    % Zero-pad the infeasibility matrix at the last col and last row so that
+    % contourf always finds a 0->1 transition, even when every cell is infeasible.
+    % The corner grid (X_cart, Y_cart) is used so the hatched region aligns
+    % with the padded pcolor cells.
+    C_violated = double(C_ss > 0);
+    C_viol_pad = [C_violated,        zeros(sz_phase, 1); ...
+                  zeros(1, sz_mag),  0];                  % (sz_phase+1) x (sz_mag+1)
+    if any(C_viol_pad(:))
         tmp_clim = clim(ax);
-        [~, h_hatch] = contourf(ax, X_orig, Y_orig, constr_violated, [0.5 0.5],'Fill','off');
+        [~, h_hatch] = contourf(ax, X_cart, Y_cart, C_viol_pad, [0.5 0.5], 'Fill', 'off');
         hh = hatchfill2(h_hatch, 'cross');
         hh.Color = [0 0 0 0.5];
         hh.DisplayName = 'Constraint violated';
@@ -103,9 +120,10 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 
     % --- star marker at the max-power optimal controller ---
     opt_ctrl_idx = idx_flat(best_ss);
-    [ir_opt, ic_opt] = ind2sub([sz_phase, sz_mag_full], opt_ctrl_idx);
-    x_opt = MAG_GUESS(ir_opt, ic_opt) * cos(PHASE_GUESS(ir_opt, ic_opt));
-    y_opt = MAG_GUESS(ir_opt, ic_opt) * sin(PHASE_GUESS(ir_opt, ic_opt));
+    [ir_opt, ic_opt] = ind2sub([sz_phase, sz_mag], opt_ctrl_idx);
+    r_opt = log10(MAG_GUESS(ir_opt, ic_opt)) - log10(min_mag);
+    x_opt = r_opt * cos(PHASE_GUESS(ir_opt, ic_opt));
+    y_opt = r_opt * sin(PHASE_GUESS(ir_opt, ic_opt));
     plot(ax, x_opt, y_opt, 'r*', 'MarkerSize', 14, 'LineWidth', 2, ...
          'DisplayName', 'Max power controller')
 
