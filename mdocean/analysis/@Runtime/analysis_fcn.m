@@ -44,7 +44,7 @@ function intermed_result_struct = analysis_fcn(p,b)
     p_sim = p;
     p.use_multibody = true;
     add_wecsim_path();
-    gcp;
+    delete(gcp('nocreate')); % close stale pool so runRM3Parallel creates a fresh one
     time = tic;
     runRM3Parallel
     t_wecsim = toc(time); %447

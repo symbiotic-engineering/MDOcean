@@ -89,7 +89,17 @@ end
 function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim_str, p)
     figs = gobjects(1,length(vars_to_plot));
     num_subplots = 2*length(sim)+1;
-    
+
+    % collect open-loop-unstable mask from any sim that has it
+    sz = size(actual.(vars_to_plot{1}));
+    ol_unstable = false(sz);
+    for i = 1:length(sim)
+        if isfield(sim(i), 'ol_unstable')
+            ol_unstable = ol_unstable | sim(i).ol_unstable;
+        end
+    end
+    has_ol_unstable = any(ol_unstable(:));
+
     for var_idx = 1:length(vars_to_plot)
         var_name = vars_to_plot{var_idx};
 
@@ -108,12 +118,14 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
         nexttile
         contour_plot(T,H, actual.(var_name), ['Actual: ',actual_str]);
         clim(clims)
+        hatch(ol_unstable,gca,T,H)
 
         for i=1:length(sim)
             % sim
             nexttile
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
             clim(clims)
+            hatch(ol_unstable,gca,T,H)
             % error
             error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
             nexttile
@@ -153,6 +165,16 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             end
             
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+            hatch(ol_unstable,gca,T,H)
+        end
+
+        % add legend entry for open-loop-unstable hatch on the first tile
+        if has_ol_unstable
+            nexttile(1)
+            hold on
+            h_leg = line(nan, nan, 'LineStyle', '-', 'Color', [0 0 0 0.5], ...
+                         'LineWidth', 1.5, 'DisplayName', 'Open loop unstable');
+            legend(h_leg, 'Open loop unstable', 'Location', 'best');
         end
 
         title(t,remove_underscores(var_name))
@@ -233,6 +255,7 @@ function results = load_RM3_report_results(eff_pto, override)
                                         'power_elec_unsat',power_elec_unsat, ...
                                         'power_elec_sat',power_elec_sat, ...
                                         'T',T, 'H',H, 'JPD',JPD);
+    results.ol_unstable = false(size(power_mech_unsat));
 end
 
 function results = compute_mdocean_results(X,p)
@@ -266,6 +289,7 @@ function results = compute_mdocean_results(X,p)
                                       'float_phase',val.phase_X_f,...
                                       'spar_phase',val.phase_X_s,...
                                       'rel_phase',val.phase_X_u);
+    results.ol_unstable = val.ol_unstable;
 end
 
 function results = load_wecsim_results(wecsim_filename, p)
@@ -323,6 +347,7 @@ function results = load_wecsim_results(wecsim_filename, p)
                                           'float_phase',float_phase,...
                                           'spar_phase',spar_phase,...
                                           'rel_phase',rel_phase);
+    results.ol_unstable = false(sz);
 
 end
 
@@ -357,4 +382,15 @@ function pct_error = compute_percent_error_matrix(actual, sim)
     pct_error = 100 * (sim - actual) ./ actual;
     pct_error(pct_error==0) = NaN;
 
+end
+
+function hatch(bool,ax,T,Hs)
+    if any(bool(:))
+        hold on
+        tmp_clim = clim;
+        [~,h2] = contourf(ax,T,Hs,bool,[1 1],'Fill','off');
+        hh = hatchfill2(h2,'cross');
+        hh.Color = [0 0 0 .5]; % black with 50% transparency
+        clim(tmp_clim)
+    end
 end

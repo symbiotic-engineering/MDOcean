@@ -43,6 +43,16 @@ else
     fprintf("Number of workers: %i",pool.NumWorkers)
 end
 
+% Load glibc patch on all workers for Simulink compatibility on Linux
+if isunix && ~ismac
+    spmd
+        try
+            load_sl_glibc_patch
+        catch
+        end
+    end
+end
+
 evalc('wecSimInputFile');
 
 if isempty(simu.mcrMatFile) == 0
@@ -218,7 +228,11 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_drag_force_phase(imcr) = NaN;
         spar_drag_force_phase(imcr)  = NaN;
     end
-    try; Simulink.sdi.clear; catch ME; warning(ME.identifier, 'Simulink.sdi.clear failed: %s', ME.message); end
+    try
+        Simulink.sdi.clear
+    catch ME
+        warning(ME.identifier, 'Simulink.sdi.clear failed: %s', ME.message)
+    end
 end
 
 B_p = mcr.cases(:,3);
