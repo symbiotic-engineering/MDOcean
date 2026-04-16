@@ -638,6 +638,8 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 
     fig = figure;
 
+    max_y_case24 = 0;
+
     % Re-plot case 4 data using line-connected filled markers
     for i_alpha = 1:length(case_4.alpha)
         mkr = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
@@ -647,10 +649,11 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
             y_f1 = y_f1_v1{i_alpha, j_beta};
             valid = x_f1 > 0 & y_f1 > 0 & isfinite(x_f1) & isfinite(y_f1);
 
-            case4_label = sprintf('Case 4 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
+            case4_label = sprintf('Case 4 ($h/R_b=%g$): $\\alpha=%g$, $\\beta=%g$', ...
                 case_4.h_over_Rb, case_4.alpha(i_alpha), case_4.beta(j_beta));
             loglog(x_f1(valid), y_f1(valid), ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                 'MarkerSize', 4, 'DisplayName', case4_label);
+            if any(valid), max_y_case24 = max(max_y_case24, max(y_f1(valid))); end
             hold on
         end
     end
@@ -677,12 +680,13 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         % Case 2: per-alpha warm color, open markers to distinguish from case 4
         mkr_c2 = alpha_markers{mod(i_alpha-1, length(alpha_markers)) + 1};
         col_c2 = case2_colors{mod(i_alpha-1, length(case2_colors)) + 1};
-        case2_label = sprintf('Case 2 (h/R_b=%g): \\alpha=%g, \\beta=%g', ...
+        case2_label = sprintf('Case 2 ($h/R_b=%g$): $\\alpha=%g$, $\\beta=%g$', ...
             case_2.h_over_Rb, alpha_c2, beta_c2);
         valid_c2 = x_v1_c2 > 0 & y_v1_c2 > 0 & isfinite(x_v1_c2) & isfinite(y_v1_c2);
         loglog(x_v1_c2(valid_c2), y_v1_c2(valid_c2), ['-' mkr_c2], ...
             'Color', col_c2, 'MarkerFaceColor', 'none', ...
             'MarkerSize', case2_marker_size, 'LineWidth', case2_line_width, 'DisplayName', case2_label);
+        if any(valid_c2), max_y_case24 = max(max_y_case24, max(y_v1_c2(valid_c2))); end
     end
 
     % Overlay WAMIT RM3 spar excitation data
@@ -720,14 +724,15 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     valid_rm3 = isfinite(x_v1_rm3) & isfinite(y_v1_rm3) & x_v1_rm3 > 0 & y_v1_rm3 > 0;
     loglog(x_v1_rm3(valid_rm3), y_v1_rm3(valid_rm3), '-k^', ...
         'MarkerFaceColor', 'none', 'MarkerSize', 6, ...
-        'DisplayName', sprintf('WAMIT RM3 (h/R_b=%.1f, \\alpha=%.0f)', h_rm3/Rb_rm3, alpha_rm3));
+        'DisplayName', sprintf('WAMIT RM3 ($h/R_b=%.1f$, $\\alpha=%.0f$, $\\beta=%g$)', h_rm3/Rb_rm3, alpha_rm3, beta_rm3));
 
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
     title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
     axis tight
+    ylim([0, max_y_case24 * 1.1])
     improvePlot
-    legend('location', 'eastoutside')
+    legend('location', 'eastoutside', 'Interpreter', 'latex')
 end
 
 function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v1, y_label_v1)
@@ -741,6 +746,7 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
 
     fits = cell(length(alpha_vec), length(beta_vec));
     fig_fit = figure;
+    fig_fit_curves = figure;
 
     for i_alpha = 1:length(alpha_vec)
         alpha_val = alpha_vec(i_alpha);
@@ -771,21 +777,37 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
             end
 
             figure(fig_fit)
-            semilogx(x, y, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
+            loglog(x, y, ['-' mkr], 'Color', col, 'MarkerFaceColor', col, ...
                 'MarkerSize', 4, 'DisplayName', lbl);
             hold on
+
+            if ~isempty(fits{i_alpha, j_beta})
+                x_range = x(valid);
+                x_pred = exp(linspace(log(min(x_range)), log(max(x_range)), 200))';
+                y_pred = fits{i_alpha, j_beta}(x_pred);
+                figure(fig_fit_curves)
+                loglog(x_pred, abs(y_pred), '-', 'Color', col, 'DisplayName', lbl)
+                hold on
+            end
         end
     end
 
     figure(fig_fit)
-    legend('location', 'eastoutside')
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
     title('v1 new-form fits: $|A x_1^{-m} + B x_2^{m}|$, $x_2 = \alpha x_1$', 'Interpreter', 'latex')
     improvePlot
+    legend('location', 'eastoutside')
+
+    figure(fig_fit_curves)
+    xlabel(x_label_v1, 'FontSize', 14)
+    ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
+    title('v1 new-form fit curves: $|A x_1^{-m} + B x_2^{m}|$, $x_2 = \alpha x_1$', 'Interpreter', 'latex')
+    improvePlot
+    legend('location', 'eastoutside')
 
     figs_coeffs = plot_newform_coeffs(fits, alpha_vec, beta_vec);
-    figs = [fig_fit figs_coeffs];
+    figs = [fig_fit fig_fit_curves figs_coeffs];
 end
 
 function figs = plot_newform_coeffs(fits, alpha_vec, beta_vec)
