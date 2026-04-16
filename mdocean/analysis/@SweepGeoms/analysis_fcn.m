@@ -142,18 +142,13 @@ function intermed_result_struct = analysis_fcn(p, b)
 end
 
 function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids)
+    worker_warning_state = warning;
+    cleanup_worker_warnings = onCleanup(@() warning(worker_warning_state)); %#ok<NASGU>
     warning_hit = false(1, numel(warning_ids));
     disabled_warning_ids = cell(1, numel(warning_ids));
     n_disabled_warning_ids = 0;
-    max_attempts = numel(warning_ids) + 1; % at most one new warning id per retry, plus the initial attempt
-    attempt = 0;
 
     while true
-        attempt = attempt + 1;
-        if attempt > max_attempts
-            error('MDOcean:SweepGeoms:ExceededWarningRetryLimit', ...
-                'Exceeded maximum warning-capture retries (%d).', max_attempts)
-        end
         try
             [hydro_ratio, ~, ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
             hydro_ratio_max = max(hydro_ratio);
@@ -165,17 +160,13 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
             end
             warning_hit(warning_idx) = true;
 
-            if n_disabled_warning_ids > 0 && any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
+            if any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
                 rethrow(ME)
             end
             warning('off', ME.identifier)
             n_disabled_warning_ids = n_disabled_warning_ids + 1;
             disabled_warning_ids{n_disabled_warning_ids} = ME.identifier;
         end
-    end
-
-    for k = 1:n_disabled_warning_ids
-        warning('error', disabled_warning_ids{k})
     end
 end
 
