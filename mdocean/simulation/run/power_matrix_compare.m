@@ -255,6 +255,7 @@ function results = load_RM3_report_results(eff_pto, override)
                                         'power_elec_unsat',power_elec_unsat, ...
                                         'power_elec_sat',power_elec_sat, ...
                                         'T',T, 'H',H, 'JPD',JPD);
+    results.ol_unstable = false(size(power_mech_unsat));
 end
 
 function results = compute_mdocean_results(X,p)
@@ -346,6 +347,7 @@ function results = load_wecsim_results(wecsim_filename, p)
                                           'float_phase',float_phase,...
                                           'spar_phase',spar_phase,...
                                           'rel_phase',rel_phase);
+    results.ol_unstable = false(sz);
 
 end
 
