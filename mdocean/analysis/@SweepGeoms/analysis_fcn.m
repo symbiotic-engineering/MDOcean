@@ -29,9 +29,9 @@ function intermed_result_struct = analysis_fcn(p, b)
     end
     cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
-    warning('off','MATLAB:nearlySingularMatrix')
-    warning('off','MATLAB:singularMatrix')
-    warning('off','backtrace') % disable longer warning messages
+    for k = 1:3
+        warning('off', managed_warning_ids{k}) % disable singular/backtrace warning verbosity
+    end
     for k = 1:numel(warning_ids)
         warning('error', warning_ids{k})
     end
