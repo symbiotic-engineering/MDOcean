@@ -730,7 +730,8 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
     title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
     axis tight
-    ylim([ylim(1), max_y_case24 * 1.1])
+    ylim_default = ylim();
+    ylim([ylim_default(1), max_y_case24 * 1.1])
     improvePlot
     legend('location', 'eastoutside', 'Interpreter', 'latex')
 end
