@@ -369,8 +369,13 @@ function [opt_mag_U,opt_phase_U,...
     Z_p_unsat = B_p_unsat - 1i * K_p_unsat ./ w;
 
     size_opt_ctrl_mesh = 10;                        
-    ctrl_mult_guess = [logspace(-1,1,size_opt_ctrl_mesh) 1];
-    phase_ctrl_mult_guess = linspace(0,2*pi,size_opt_ctrl_mesh);
+    ctrl_mult_guess = sort([logspace(-1,1,size_opt_ctrl_mesh) 1]);
+    if strcmp(control_type,'reactive')
+        phase_ctrl_mult_guess = linspace(0,2*pi,size_opt_ctrl_mesh+1);
+        phase_ctrl_mult_guess = phase_ctrl_mult_guess(1:end-1); % 2pi=0 so don't repeat it
+    else
+        phase_ctrl_mult_guess = 0;
+    end
     [MAG_GUESS,PHASE_GUESS] = meshgrid(ctrl_mult_guess,phase_ctrl_mult_guess);
 
     mag_U = nan([size(w), numel(MAG_GUESS)]);
@@ -412,8 +417,9 @@ function [opt_mag_U,opt_phase_U,...
     real_P_for_plot = real_P;
 
     % choose best controller for each sea state
-    each_controller_feasible = constraint_err == 0;
+    each_controller_feasible = constraint_err <= 0;
     ctrl_dim = 3;
+    sea_state_dim =[1 2];
     each_sea_state_feasible = any(each_controller_feasible,ctrl_dim);
     real_P(each_sea_state_feasible & ~each_controller_feasible) = -1; % negative power for infeasible controllers in sea states where a feasbile controller exists, so they aren't chosen
     [opt_real_P,idx_opt] = max(real_P,[],ctrl_dim);
@@ -423,41 +429,52 @@ function [opt_mag_U,opt_phase_U,...
                 'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
                 sum(~each_sea_state_feasible(:)), numel(each_sea_state_feasible))
         
-        % diagnostic: identify which constraint(s) are not satisfied
         [min_err,idx_least_err] = min(constraint_err,[],ctrl_dim);
-        infeas_mask = ~each_sea_state_feasible;
-        fprintf('  Brute force diagnostics for infeasible sea states:\n');
-        fprintf('    min constraint_err across controllers: min=%.4g, max=%.4g\n', ...
-                min(min_err(infeas_mask)), max(min_err(infeas_mask)));
-        % evaluate per-constraint errors at the best guess for each infeasible sea state
-        best_B_p = nan(size(w));
-        best_mag_U_val = nan(size(w));
-        best_mag_X_f_val = nan(size(w));
-        best_mag_X_s_val = nan(size(w));
-        best_mag_X_u_val = nan(size(w));
-        best_real_P_val = nan(size(w));
-        for idx_flat = find(infeas_mask(:))'
-            linear_idx = idx_flat + (idx_least_err(idx_flat)-1)*numel(w);
-            best_B_p(idx_flat) = B_p_sat(linear_idx);
-            best_mag_U_val(idx_flat) = mag_U(linear_idx);
-            best_mag_X_f_val(idx_flat) = mag_X_f(linear_idx);
-            best_mag_X_s_val(idx_flat) = mag_X_s(linear_idx);
-            best_mag_X_u_val(idx_flat) = mag_X_u(linear_idx);
-            best_real_P_val(idx_flat) = real_P(linear_idx);
-        end
-        n_infeas = sum(infeas_mask(:));
-        fprintf('    B_p<0 (neg damping):   %d/%d infeasible sea states\n', sum(best_B_p(infeas_mask) < 0), n_infeas);
-        fprintf('    force exceeded F_max:  %d/%d (F_max=%.4g)\n', sum(best_mag_U_val(infeas_mask) > 4/pi*F_max), n_infeas, F_max);
-        fprintf('    power exceeded P_max:  %d/%d (P_max=%.4g)\n', sum(best_real_P_val(infeas_mask) > P_max), n_infeas, P_max);
-        fprintf('    float amp exceeded:    %d/%d (X_max(1)=%.4g)\n', sum(best_mag_X_f_val(infeas_mask) > X_max(1)), n_infeas, X_max(1));
-        fprintf('    spar amp exceeded:     %d/%d (X_max(2)=%.4g)\n', sum(best_mag_X_s_val(infeas_mask) > X_max(2)), n_infeas, X_max(2));
-        fprintf('    rel amp exceeded:      %d/%d (X_max(3)=%.4g)\n', sum(best_mag_X_u_val(infeas_mask) > X_max(3)), n_infeas, X_max(3));
-
         idx_opt(~each_sea_state_feasible) = idx_least_err(~each_sea_state_feasible);
         opt_real_P = real_P(idx_opt);
+
+        debug_print = true;
+        if debug_print
+            % diagnostic: identify which constraint(s) are not satisfied
+            infeas_mask = ~each_sea_state_feasible;
+            fprintf('  Brute force diagnostics for infeasible sea states:\n');
+            fprintf('    min constraint_err across controllers: min=%.4g, max=%.4g\n', ...
+                    min(min_err(infeas_mask)), max(min_err(infeas_mask)));
+    
+            % diagnostic: identify the number of sea states for which each
+            % controller was able to satisfy all constraints
+            num_ss_ctrl_feasible = reshape(squeeze(sum(each_controller_feasible,sea_state_dim)),size(MAG_GUESS));
+            mag_phs_num_feasible = [MAG_GUESS(:) PHASE_GUESS(:) num_ss_ctrl_feasible(:)];
+            fprintf('   Controllers and the number of sea states they are feasible: \n[mag,phase,number]=\n[%s]\n', formattedDisplayText(mag_phs_num_feasible))
+    
+            % evaluate per-constraint errors at the best guess for each infeasible sea state
+            best_B_p = nan(size(w));
+            best_mag_U_val = nan(size(w));
+            best_mag_X_f_val = nan(size(w));
+            best_mag_X_s_val = nan(size(w));
+            best_mag_X_u_val = nan(size(w));
+            best_real_P_val = nan(size(w));
+            for idx_flat = find(infeas_mask(:))'
+                linear_idx = idx_flat + (idx_least_err(idx_flat)-1)*numel(w);
+                best_B_p(idx_flat) = B_p_sat(linear_idx);
+                best_mag_U_val(idx_flat) = mag_U(linear_idx);
+                best_mag_X_f_val(idx_flat) = mag_X_f(linear_idx);
+                best_mag_X_s_val(idx_flat) = mag_X_s(linear_idx);
+                best_mag_X_u_val(idx_flat) = mag_X_u(linear_idx);
+                best_real_P_val(idx_flat) = real_P(linear_idx);
+            end
+            n_infeas = sum(infeas_mask(:));
+            fprintf('    B_p<0 (neg damping):   %d/%d infeasible sea states\n', sum(best_B_p(infeas_mask) < 0), n_infeas);
+            fprintf('    force exceeded F_max:  %d/%d (F_max=%.4g)\n', sum(best_mag_U_val(infeas_mask) > 4/pi*F_max), n_infeas, F_max);
+            fprintf('    power exceeded P_max:  %d/%d (P_max=%.4g)\n', sum(best_real_P_val(infeas_mask) > P_max), n_infeas, P_max);
+            fprintf('    float amp exceeded:    %d/%d (X_max(1)=%.4g)\n', sum(best_mag_X_f_val(infeas_mask) > X_max(1)), n_infeas, X_max(1));
+            fprintf('    spar amp exceeded:     %d/%d (X_max(2)=%.4g)\n', sum(best_mag_X_s_val(infeas_mask) > X_max(2)), n_infeas, X_max(2));
+            fprintf('    rel amp exceeded:      %d/%d (X_max(3)=%.4g)\n', sum(best_mag_X_u_val(infeas_mask) > X_max(3)), n_infeas, X_max(3));
+        end
     end
     
     % polar plot of controller search grid (only in operational, non-mergedbodies case)
+    brute_force_plot_on = true;
     if brute_force_plot_on
         make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_for_plot, constraint_err, idx_opt);
     end
@@ -664,7 +681,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     plot_on = false;
     drag_debug = false; % set true to plot new integral drag vs old drag
     if drag_debug
-        % uncomment the following to plot once solver has converged
+        % the following code makes it plot only once solver has converged
         converged = any(strcmp({dbstack().name},'solver')   & [dbstack().line]==166);
         op_seas   = any(strcmp({dbstack().name},'dynamics') & [dbstack().line]==72);
         if converged && op_seas
@@ -1011,7 +1028,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
                           + idx_amp_f_viol_unsat_dn + idx_amp_s_viol_unsat_up ...
                           + idx_amp_s_viol_unsat_dn + idx_amp_u_viol_unsat ...
                           + idx_power_viol_unsat;
-    all_ok_unsat       = num_constr_viol_unsat==0;
+    all_ok_unsat       = num_constr_viol_unsat==0 & ~isnan(P_unsat);
     only_force_viol_unsat    = idx_force_viol_unsat    & num_constr_viol_unsat==1;
     only_amp_f_viol_unsat_up = idx_amp_f_viol_unsat_up & num_constr_viol_unsat==1;
     only_amp_f_viol_unsat_dn = idx_amp_f_viol_unsat_dn & num_constr_viol_unsat==1;
@@ -1033,6 +1050,8 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     idx_amp_u_sat_applies    = all_ok_unsat | only_amp_u_viol_unsat;
     idx_power_sat_applies    = all_ok_unsat | only_power_viol_unsat;
 
+    % errors from each solution: >0 when constr is violated, and <0
+    % when constr is not tight. 
     if isinf(F_max)
         F_err_from_force_sat = zeros(size(mag_X_f));
     else
@@ -1081,7 +1100,8 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
 
     % at sea states where one of the saturated solutions necessarily applies, 
     % set constraint violation error as deviation from that solution,
-    % and optimality error as deviation from the optimal ctrl_mult_phase. 
+    % and optimality error as deviation from the optimal ctrl_mult_phase.
+    % 
     constr_viol_err(idx_force_sat_applies)    = F_err_from_force_sat(idx_force_sat_applies);
     constr_viol_err(idx_amp_f_sat_applies_up) = X_err_from_amp_f_sat_up(idx_amp_f_sat_applies_up);
     constr_viol_err(idx_amp_f_sat_applies_dn) = X_err_from_amp_f_sat_dn(idx_amp_f_sat_applies_dn);
@@ -1104,14 +1124,14 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     % the outside so hopefully it overshoots and re-approaches from the inside.
 
     if isinf(P_max)
-        constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
-                            X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
-                            X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
+        constr_violation = (max(F_err_from_force_sat,0)    + max(X_err_from_amp_f_sat_up,0) + ...
+                            max(X_err_from_amp_f_sat_dn,0) + max(X_err_from_amp_s_sat_up,0) + ...
+                            max(X_err_from_amp_s_sat_dn,0) + max(X_err_from_amp_u_sat,0)   )  / 6;
     else
-        constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
-                            X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
-                            X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat    + ...
-                            P_err_from_power_sat   )  / 7;
+        constr_violation = (max(F_err_from_force_sat,0)    + max(X_err_from_amp_f_sat_up,0) + ...
+                            max(X_err_from_amp_f_sat_dn,0) + max(X_err_from_amp_s_sat_up,0) + ...
+                            max(X_err_from_amp_s_sat_dn,0) + max(X_err_from_amp_u_sat,0)    + ...
+                            max(P_err_from_power_sat,0)   )  / 7;
     end
     constr_viol_err(mult_const_viol_unsat) = constr_violation(mult_const_viol_unsat);
     

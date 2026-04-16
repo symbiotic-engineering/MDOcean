@@ -66,7 +66,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 
     % power colourmap via pcolor on the complex-plane grid
     pcolor(ax, X_cart, Y_cart, P_pad);
-    shading(ax, 'flat');
+    %shading(ax, 'flat');
     cb = colorbar(ax);
     cb.Label.String = 'Power (W)';
     axis(ax, 'equal');
@@ -92,9 +92,10 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     constr_violated = double(C_ss ~= 0);
     if any(constr_violated(:))
         tmp_clim = clim(ax);
-        [~, h_hatch] = contourf(ax, X_orig, Y_orig, constr_violated, [0.5 0.5]);
+        [~, h_hatch] = contourf(ax, X_orig, Y_orig, constr_violated, [0.5 0.5],'Fill','off');
         hh = hatchfill2(h_hatch, 'cross');
         hh.Color = [0 0 0 0.5];
+        hh.DisplayName = 'Constraint violated';
         clim(ax, tmp_clim);
     end
 
@@ -103,8 +104,9 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     [ir_opt, ic_opt] = ind2sub([sz_phase, sz_mag_full], opt_ctrl_idx);
     x_opt = MAG_GUESS(ir_opt, ic_opt) * cos(PHASE_GUESS(ir_opt, ic_opt));
     y_opt = MAG_GUESS(ir_opt, ic_opt) * sin(PHASE_GUESS(ir_opt, ic_opt));
-    plot(ax, x_opt, y_opt, 'k*', 'MarkerSize', 14, 'LineWidth', 2, ...
+    plot(ax, x_opt, y_opt, 'r*', 'MarkerSize', 14, 'LineWidth', 2, ...
          'DisplayName', 'Max power controller')
 
+    legend
     improvePlot
 end
