@@ -2936,6 +2936,37 @@ pipeline:
         - results/ReadNonMatlabFigs/end.mat
         - path: results/ReadNonMatlabFigs/end.json
           storage: git
+    analysis-QPCircles:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); obj=QPCircles; obj.run_analysis();
+      inputs:
+        - ./mdocean/analysis/@QPCircles/QPCircles.m
+        - ./mdocean/analysis/@QPCircles/analysis_fcn.m
+        - ./mdocean/analysis/GenericAnalysis.m
+        - ./mdocean/plots/matlab_figs/circle_intersect_script.m
+        - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      outputs:
+        - results/QPCircles/intermed.mat
+        - path: results/QPCircles/end.json
+          storage: git
+    postpro-QPCircles:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); obj=QPCircles; obj.run_all_from_load();
+      inputs:
+        - from_stage_outputs: analysis-QPCircles
+        - ./mdocean/analysis/@QPCircles/QPCircles.m
+        - ./mdocean/analysis/@QPCircles/post_process_fcn.m
+        - ./mdocean/analysis/GenericAnalysis.m
+        - ./mdocean/plots/util/save_fig_with_diagnostic.m
+        - ./mdocean/plots/util/improvePlot.m
+      outputs:
+        - results/QPCircles/qp_circles.pdf
+        - results/QPCircles/qp_circles.fig
+        - results/QPCircles/end.mat
+        - path: results/QPCircles/end.json
+          storage: git
     analysis-RunSingleFigFunc:
       kind: matlab-command
       environment: _system
@@ -3035,6 +3066,8 @@ pipeline:
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
         - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
         - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/plot_nominal_constraint_circles.m
+        - ./mdocean/plots/util/arrow.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3085,6 +3118,8 @@ pipeline:
         - results/RunSingleFigFunc/drag_convergence.fig
         - results/RunSingleFigFunc/slamming_model_comparison_float.fig
         - results/RunSingleFigFunc/slamming_model_comparison_spar.fig
+        - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
+        - results/RunSingleFigFunc/qcqp_circles_nominal.fig
         - results/RunSingleFigFunc/end.mat
         - path: results/RunSingleFigFunc/end.json
           storage: git

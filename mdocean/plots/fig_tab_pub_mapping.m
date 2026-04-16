@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 45;
+num_figs_AOR = 47;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -111,6 +111,8 @@ figs_in_AOR{39} = 'DampingPlateStructures.damping_plate_deflection';
 
 % graphical abstract (unnumbered so at the end)
 figs_in_AOR{45}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{46} = 'QPCircles.qp_circles';
+figs_in_AOR{47} = 'RunSingleFigFunc.qcqp_circles_nominal';
 
 %% TABLES
 
