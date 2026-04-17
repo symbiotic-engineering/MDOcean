@@ -110,10 +110,10 @@ def create_fig_notebook(class_name, notebooks_dir="results/fig_notebooks"):
         "for pdf_path in pdf_files:\n",
         "    print(pdf_path)\n",
         "    doc = fitz.open(pdf_path)\n",
-        "    page = doc[0]\n",
-        "    \n",
-        "    im = page.get_pixmap()\n",
-        "    display(Image(im.tobytes()))",
+        "    for page in doc:\n",
+        "        im = page.get_pixmap()\n",
+        "        display(Image(im.tobytes()))\n",
+        "    doc.close()",
     ]
 
     notebook = {
