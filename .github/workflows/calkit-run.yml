@@ -57,7 +57,40 @@ jobs:
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
       - name: Add docstrings to .m files
-        run: uv run python dev/docs/add_docstrings.py
+        run: |
+          # Snapshot which stages are already stale before touching any .m files
+          STALE_BEFORE=$(dvc status --json 2>/dev/null || echo '{}')
+          STALE_BEFORE_STAGES=$(echo "$STALE_BEFORE" | jq -r 'keys[]')
+          echo "Stages stale before docstrings:"
+          echo "${STALE_BEFORE_STAGES:-<none>}"
+
+          # Run docstring generation
+          uv run python dev/docs/add_docstrings.py
+
+          # Snapshot which stages are stale after docstring changes
+          STALE_AFTER=$(dvc status --json 2>/dev/null || echo '{}')
+          STALE_AFTER_STAGES=$(echo "$STALE_AFTER" | jq -r 'keys[]')
+          echo "Stages stale after docstrings:"
+          echo "${STALE_AFTER_STAGES:-<none>}"
+
+          # Find stages that became stale solely due to docstring changes
+          # (clean before, stale after); skip stages that were already dirty
+          NEWLY_STALE_STAGES=()
+          while IFS= read -r stage; do
+            [ -z "$stage" ] && continue
+            if ! echo "$STALE_BEFORE_STAGES" | grep -qxF "$stage"; then
+              NEWLY_STALE_STAGES+=("$stage")
+            fi
+          done <<< "$STALE_AFTER_STAGES"
+
+          if [ ${#NEWLY_STALE_STAGES[@]} -gt 0 ]; then
+            echo "Force-committing DVC stages newly dirtied by docstrings: ${NEWLY_STALE_STAGES[*]}"
+            calkit dvc commit "${NEWLY_STALE_STAGES[@]}"
+            git add dvc.lock '*.m'
+            git diff --cached --quiet || git commit -m "Update docstrings and force-commit dvc stages"
+          else
+            echo "No stages newly dirtied by docstring generation."
+          fi
       # - name: Setup matlab
       #   uses: matlab-actions/setup-matlab@v2
       #   with:
