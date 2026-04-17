@@ -140,12 +140,18 @@ spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 % identify four corner sea states from actual JPD entries
 H_all = mcr.cases(:,1);
 T_all = mcr.cases(:,2);
-H_vals = unique(H_all);
+% restrict to cases with nonzero, non-NaN JPD for corner selection
+if isfield(mcr, 'jpd')
+    valid_jpd = mcr.jpd > 0 & ~isnan(mcr.jpd);
+else
+    valid_jpd = true(size(H_all));
+end
+H_vals = unique(H_all(valid_jpd));
 % For each extreme H, find the extreme T values that actually exist
 H_min = H_vals(1);
 H_max = H_vals(end);
-T_at_H_min = T_all(H_all == H_min);
-T_at_H_max = T_all(H_all == H_max);
+T_at_H_min = T_all(H_all == H_min & valid_jpd);
+T_at_H_max = T_all(H_all == H_max & valid_jpd);
 corner_HT = [H_min, min(T_at_H_min);   % low H, low T
              H_min, max(T_at_H_min);   % low H, high T
              H_max, min(T_at_H_max);   % high H, low T
