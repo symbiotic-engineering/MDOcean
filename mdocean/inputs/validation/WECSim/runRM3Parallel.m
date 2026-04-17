@@ -280,13 +280,14 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
 end
 
 function s = infer_force_sign(force_signal, relative_velocity)
+    tol = sqrt(eps);
     denom = relative_velocity(:).' * relative_velocity(:);
-    if denom <= eps
+    if denom <= tol
         s = 1;
         return
     end
     gain = force_signal(:).' * relative_velocity(:) / denom;
-    if gain == 0
+    if abs(gain) <= tol
         s = 1;
     else
         s = sign(gain);
