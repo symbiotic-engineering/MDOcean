@@ -368,10 +368,17 @@ function [opt_mag_U,opt_phase_U,...
     
     Z_p_unsat = B_p_unsat - 1i * K_p_unsat ./ w;
 
-    size_opt_ctrl_mesh = 10;                        
-    ctrl_mult_guess = sort([logspace(-1,1,size_opt_ctrl_mesh) 1]);
+    size_opt_ctrl_mesh = 11;  
+    if rem(size_opt_ctrl_mesh,2)==0 % input is even
+        size_mult_mesh  = size_opt_ctrl_mesh + 1; % this MUST be odd so ctrl_mult_guess includes 1!
+        size_phase_mesh = size_opt_ctrl_mesh;    % this should ideally be even for symmetrical plots
+    else
+        size_mult_mesh  = size_opt_ctrl_mesh;
+        size_phase_mesh = size_opt_ctrl_mesh + 1;
+    end
+    ctrl_mult_guess = logspace(-1,1,size_mult_mesh);
     if strcmp(control_type,'reactive')
-        phase_ctrl_mult_guess = linspace(0,2*pi,size_opt_ctrl_mesh+1);
+        phase_ctrl_mult_guess = linspace(0,2*pi,size_phase_mesh+1);
         phase_ctrl_mult_guess = phase_ctrl_mult_guess(1:end-1); % 2pi=0 so don't repeat it
     else
         phase_ctrl_mult_guess = 0;
