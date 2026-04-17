@@ -482,7 +482,7 @@ function [opt_mag_U,opt_phase_U,...
     
     % polar plot of controller search grid (only in operational, non-mergedbodies case)
     if brute_force_plot_on
-        make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_for_plot, constraint_err, idx_opt);
+        make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_for_plot, constraint_err, idx_opt, H, 2*pi./w);
     end
 
     opt_mag_U = mag_U(idx_opt);
