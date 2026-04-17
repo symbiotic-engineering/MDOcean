@@ -1,5 +1,11 @@
 # Changelog
 ## Unreleased
+## [v1.1.24](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.24) - 2026-4-17
+### Fixed
+- Pipeline: include `results/RunSingleFigFunc/end.json` in `re-results-to-latex` so `nominalLCOE` formatting resolves during RE paper numeric-results generation
+### Changed
+- CI: bump project version to v1.1.24 for this PR update
+
 ## [v1.1.22](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.22) - 2026-4-15
 ### Changed
 - Analysis: cache `var_bounds()` struct in `var_bounds.mat` to avoid recomputation
