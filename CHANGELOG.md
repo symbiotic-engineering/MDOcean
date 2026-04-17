@@ -1,6 +1,6 @@
 # Changelog
 ## Unreleased
-## [v1.1.23](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.23) - 2026-4-16
+## [v1.1.23](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.23) - 2026-4-17
 ### Changed
 - Analysis: add jupyter notebooks showing figures in each stage
 
