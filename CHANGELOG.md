@@ -1,5 +1,12 @@
 # Changelog
 ## Unreleased
+## [v1.1.22](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.22) - 2026-4-15
+### Changed
+- Analysis: cache `var_bounds()` struct in `var_bounds.mat` to avoid recomputation
+
+## [v1.1.21](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.21) - 2026-4-15
+### Fixed
+- Validation: extract one wave period of WEC-Sim output starting at a wave-period boundary so that FFT phase is relative to the wave (`runRM3Parallel.m`)
 
 ## [v1.1.20](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.20) - 2026-4-13
 ### Fixed
