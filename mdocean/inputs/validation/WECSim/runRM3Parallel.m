@@ -164,13 +164,33 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_pos = output.bodies(1).position(i_start:i_end,3);
         spar_pos  = output.bodies(2).position(i_start:i_end,3);
         rel_pos = float_pos - spar_pos;
+        rel_vel = gradient(rel_pos, simu.dt);
+
+        % include stiffness contribution from the separate spring in total PTO force
+        F_spring = [];
+        if isfield(output,'springs') && ~isempty(output.springs)
+            if isfield(output.springs,'forceInternalMechanics')
+                F_spring = output.springs.forceInternalMechanics(i_start:i_end,3);
+            elseif isfield(output.springs,'forceTotal')
+                F_spring = output.springs.forceTotal(i_start:i_end,3);
+            end
+        end
+        if isempty(F_spring)
+            K_spring = 0;
+            if size(mcr.cases,2) >= 4
+                K_spring = mcr.cases(imcr,4);
+            end
+            force_sign = infer_force_sign(F_PTO, rel_vel);
+            F_spring = force_sign * K_spring * rel_pos;
+        end
+        F_total = F_PTO + F_spring;
         F_drag_f = output.bodies(1).forceMorisonAndViscous(i_start:i_end,3);
         F_drag_s = output.bodies(2).forceMorisonAndViscous(i_start:i_end,3);
 
         % save specific output variables
         P(imcr) = mean(power);
 
-        force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
+        force_pto(imcr) = 1/2 * (max(F_total) - min(F_total));
         float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
         spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
         relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
@@ -257,4 +277,18 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
     idx_wave_freq = ismembertol(freqs, wave_freq);
     fund = abs(P1(idx_wave_freq));
     phase = angle(P1(idx_wave_freq));
+end
+
+function s = infer_force_sign(force_signal, relative_velocity)
+    denom = relative_velocity(:).' * relative_velocity(:);
+    if denom <= eps
+        s = 1;
+        return
+    end
+    gain = force_signal(:).' * relative_velocity(:) / denom;
+    if gain == 0
+        s = 1;
+    else
+        s = sign(gain);
+    end
 end
