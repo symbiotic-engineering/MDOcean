@@ -65,6 +65,19 @@ pipeline:
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
       outputs:
         - ./mdocean/inputs/drag_integral.mat
+    make-var-bounds:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); b = var_bounds(); 
+        save('./mdocean/inputs/var_bounds.mat','b');
+      inputs:
+        - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/parameters.m
+        - ./mdocean/inputs/drag_integral.mat
+        - ./mdocean/optimization/find_nominal_inputs.m
+        - ./mdocean/plots/util/remove_underscores.m
+      outputs:
+        - ./mdocean/inputs/var_bounds.mat
     make-calkit-stages:
       kind: matlab-command
       environment: _system
@@ -100,6 +113,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -160,6 +174,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -223,6 +238,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/compare_run.m
         - ./mdocean/optimization/find_nominal_inputs.m
@@ -291,6 +307,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/compare.m
@@ -367,6 +384,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -427,6 +445,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -490,6 +509,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -549,6 +569,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -613,6 +634,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -678,6 +700,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -745,6 +768,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -809,6 +833,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -877,6 +902,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -942,6 +968,7 @@ pipeline:
         - ./mdocean/inputs/validation/nominal_c_v.m
         - ./mdocean/inputs/validation/validation_inputs.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
@@ -1013,6 +1040,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1073,6 +1101,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1136,6 +1165,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1197,6 +1227,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1286,6 +1317,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1346,6 +1378,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1500,6 +1533,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/force_sat_results.m
@@ -1563,6 +1597,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1629,6 +1664,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -1696,6 +1732,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -1783,6 +1820,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1845,6 +1883,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -1909,6 +1948,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -1980,6 +2020,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/sensitivities/location_post_process.m
@@ -2054,6 +2095,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/b_inf_numeric.m
@@ -2122,6 +2164,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2195,6 +2238,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -2270,6 +2314,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2341,6 +2386,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -2410,6 +2456,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/all_sens_plots.m
@@ -2522,6 +2569,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2582,6 +2630,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2646,6 +2695,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -2719,6 +2769,7 @@ pipeline:
         - ./mdocean/inputs/validation/nominal_c_v.m
         - ./mdocean/inputs/validation/validation_inputs.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
@@ -2794,6 +2845,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2854,6 +2906,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2917,6 +2970,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -2977,6 +3031,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3043,6 +3098,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3105,6 +3161,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3183,6 +3240,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -3261,6 +3319,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3338,6 +3397,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
         - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3397,6 +3457,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3467,6 +3528,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3530,6 +3592,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3593,6 +3656,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3655,6 +3719,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3718,6 +3783,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
@@ -3786,6 +3852,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
@@ -3878,6 +3945,7 @@ pipeline:
         - ./mdocean/inputs/validation/nominal_c_v.m
         - ./mdocean/inputs/validation/validation_inputs.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -3942,6 +4010,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -4014,6 +4083,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/runRM3Parallel.m
         - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -4087,6 +4157,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
           Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
@@ -4504,6 +4575,267 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+    viz-AllFigCompare:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/AllFigCompare.ipynb
+      inputs:
+        - from_stage_outputs: postpro-AllFigCompare
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Comparison:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Comparison.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Comparison
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Constraints:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Constraints.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Constraints
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Cost:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Cost.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Cost
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-DampingPlateStructures:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
+      inputs:
+        - from_stage_outputs: postpro-DampingPlateStructures
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-DescFcns:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/DescFcns.ipynb
+      inputs:
+        - from_stage_outputs: postpro-DescFcns
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-DesignSpaceExploration:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
+      inputs:
+        - from_stage_outputs: postpro-DesignSpaceExploration
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-DesignVars:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/DesignVars.ipynb
+      inputs:
+        - from_stage_outputs: postpro-DesignVars
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-DragIntegral:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/DragIntegral.ipynb
+      inputs:
+        - from_stage_outputs: postpro-DragIntegral
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-FitOlaya:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/FitOlaya.ipynb
+      inputs:
+        - from_stage_outputs: postpro-FitOlaya
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-ForceSaturationFigFunc:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      inputs:
+        - from_stage_outputs: postpro-ForceSaturationFigFunc
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-GradientOptimFigFunc:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
+      inputs:
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-HydroCoeffFigFunc:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
+      inputs:
+        - from_stage_outputs: postpro-HydroCoeffFigFunc
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-LocationSensitivity:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
+      inputs:
+        - from_stage_outputs: postpro-LocationSensitivity
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Meem:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Meem.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Meem
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Multistart:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Multistart.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Multistart
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-ParamSensitivities:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
+      inputs:
+        - from_stage_outputs: postpro-ParamSensitivities
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Parameters:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Parameters.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Parameters
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-ParetoFigFunc:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
+      inputs:
+        - from_stage_outputs: postpro-ParetoFigFunc
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-ParetoSweep:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/ParetoSweep.ipynb
+      inputs:
+        - from_stage_outputs: postpro-ParetoSweep
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-PtoSweep:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/PtoSweep.ipynb
+      inputs:
+        - from_stage_outputs: postpro-PtoSweep
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-ReadNonMatlabFigs:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
+      inputs:
+        - from_stage_outputs: postpro-ReadNonMatlabFigs
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-RunSingleFigFunc:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
+      inputs:
+        - from_stage_outputs: postpro-RunSingleFigFunc
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Runtime:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Runtime.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Runtime
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Slamming:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Slamming.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Slamming
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-SparHydro:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/SparHydro.ipynb
+      inputs:
+        - from_stage_outputs: postpro-SparHydro
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-SweepGeoms:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/SweepGeoms.ipynb
+      inputs:
+        - from_stage_outputs: postpro-SweepGeoms
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Validation:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Validation.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Validation
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
+    viz-Wecsim:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/Wecsim.ipynb
+      inputs:
+        - from_stage_outputs: postpro-Wecsim
+      html_storage: null
+      executed_ipynb_storage: git
+      outputs: []
     pyxdsm:
       kind: python-script
       environment: pubs
@@ -4735,6 +5067,39 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/
       html_storage: null
       executed_ipynb_storage: git
+    all-viz:
+      kind: shell-command
+      environment: pubs
+      command: echo "All viz stages complete"
+      inputs:
+        #- from_stage_outputs: viz-AllFigCompare
+        #- from_stage_outputs: viz-Comparison
+        #- from_stage_outputs: viz-Constraints
+        - from_stage_outputs: viz-Cost
+        - from_stage_outputs: viz-DampingPlateStructures
+        - from_stage_outputs: viz-DescFcns
+        - from_stage_outputs: viz-DesignSpaceExploration
+        #- from_stage_outputs: viz-DesignVars
+        - from_stage_outputs: viz-DragIntegral
+        - from_stage_outputs: viz-FitOlaya
+        - from_stage_outputs: viz-ForceSaturationFigFunc
+        #- from_stage_outputs: viz-GradientOptimFigFunc
+        - from_stage_outputs: viz-HydroCoeffFigFunc
+        #- from_stage_outputs: viz-LocationSensitivity
+        - from_stage_outputs: viz-Meem
+        #- from_stage_outputs: viz-Multistart
+        #- from_stage_outputs: viz-ParamSensitivities
+        #- from_stage_outputs: viz-Parameters
+        #- from_stage_outputs: viz-ParetoFigFunc
+        #- from_stage_outputs: viz-ParetoSweep
+        - from_stage_outputs: viz-ReadNonMatlabFigs
+        - from_stage_outputs: viz-RunSingleFigFunc
+        - from_stage_outputs: viz-Runtime
+        - from_stage_outputs: viz-Slamming
+        - from_stage_outputs: viz-SparHydro
+        - from_stage_outputs: viz-SweepGeoms
+        - from_stage_outputs: viz-Validation
+        - from_stage_outputs: viz-Wecsim
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
