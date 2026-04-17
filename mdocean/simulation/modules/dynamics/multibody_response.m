@@ -38,7 +38,6 @@ t3 = B_c.*w;
 t4 = B_f.*w;
 t5 = B_s.*w;
 t6 = K_f.*w;
-t7 = B_c.^2;
 t8 = m_c.^2;
 t9 = w.^2;
 t10 = w.^3;
@@ -66,8 +65,6 @@ t30 = exp(t25);
 t31 = exp(t26);
 t33 = t5.*1i;
 t37 = m_c.*t9.*2.0;
-t38 = -t25;
-t39 = -t26;
 t40 = -t27;
 t41 = -t28;
 t42 = t4.*t5;
@@ -79,12 +76,8 @@ t63 = t4.*w.*1i;
 t64 = m_c.*t9.*1i;
 t65 = m_c.*t9.*2.0i;
 t68 = B_c+t34;
-t69 = m_c.*t3.*t9.*-2.0;
 t73 = K_p.*t18.*1i;
-t89 = m_c.*t3.*t9.*-2.0i;
 t32 = m_f.*m_s.*t11;
-t35 = -t14;
-t36 = -t15;
 t43 = t4.*t24;
 t44 = t5.*t22;
 t46 = K_s.*t22;
@@ -105,7 +98,6 @@ t75 = -t65;
 t78 = t4.*t33;
 t79 = -t56;
 t80 = t3.*t65;
-t82 = t22.*t33;
 t83 = t45.*1i;
 t84 = t22.*t28;
 t87 = -t73;
@@ -116,8 +108,6 @@ t95 = t3+t64;
 t100 = t16+t17+t22+t24+t37;
 t105 = t19+t21+t23+t62+t63;
 t59 = -t32;
-t60 = -t51;
-t61 = -t52;
 t70 = -t43;
 t71 = -t44;
 t72 = t32.*1i;
@@ -149,24 +139,18 @@ if nargin < 16
     D_sys = t12+t32-t42-t48+t51+t52+t56+t80+t90+t91+t17.*t22+m_s.*t19.*w;
 end
 t111 = 1.0./t109;
-t116 = t29+t42+t45+t46+t48+t59+t60+t61+t79+t81+t82+t89;
-t125 = -1.0./(1i.*conj(D_sys));
 t108 = sqrt(t107);
-t112 = 1.0./t110;
+t112 = conj(t111);  % t110 = conj(t109)
 t113 = F_f_mag.*t30.*t103.*t111;
 t115 = t29+t42+t45+t46+t48+t51+t52+t59+t79+t80+t90+t91;
-t117 = abs(t116);
+t117 = abs(t115);  % t116 = conj(t115), so abs is equal
 t119 = -1.0./D_sys;
-t120 = 1.0./D_sys.^2;
 t122 = t14+t15+t57+t58+t70+t71+t78+t83+t84+t85+t86+t94;
-t123 = t35+t36+t43+t44+t58+t69+t78+t83+t84+t85+t86+t94;
-t138 = -1.0./((t96.*t109.*w)./D_sys-1.0);
 t114 = F_f_mag.*t49.*t104.*t112;
 t118 = 1.0./t115;
 t121 = 1.0./t117;
 t124 = 1.0./t122;
 t133 = t96.*t109.*t119.*w;
-t140 = F_s_mag.*t18.*t50.*t105.*t112.*t115.*t125;
 t142 = (F_s_mag.*t18.*t50.*t105.*t112.*t115)./(1i.*conj(D_sys));
 t126 = F_s_mag.*t9.*t31.*t68.*t124.*1i;
 t127 = F_f_mag.*t30.*t98.*t124.*w;
@@ -174,7 +158,6 @@ t128 = F_f_mag.*t30.*t95.*t124.*w.*1i;
 t131 = F_s_mag.*t31.*t99.*t124.*w.*1i;
 t132 = t92.*t110.*t118.*w;
 t135 = t133+1.0;
-t141 = -F_s_mag.*t18.*t31.*t106.*t111.*t124.*D_sys;
 t143 = F_s_mag.*t18.*t31.*t106.*t111.*t124.*D_sys;
 t145 = t114+t142;
 t129 = -t128;
@@ -186,11 +169,13 @@ t137 = 1.0./t134;
 t139 = 1.0./t136;
 mag_U = t108.*t121.*t139.*abs(t96.*t144.*w);
 if nargout > 1
-    t146 = (t9.*t96.*t103.*t109.*t119.*t144)./(((t96.*t109.*w)./D_sys-1.0).*D_sys);
-    t147 = (t9.*t96.*t102.*t109.*t124.*t144.*1i)./(((t96.*t109.*w)./D_sys-1.0).*D_sys);
+    t_denom = t135.*D_sys;              % = ((t96.*t109.*w)./D_sys-1.0).*D_sys
+    t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t147, t150
+    t146 = -t_numer.*t103.*t119./t_denom;
+    t147 = -t_numer.*t102.*t124.*1i./t_denom;
     t148 = t126+t130+t146;
     t149 = t129+t131+t147;
-    t150 = (t9.*t96.*t109.*t110.*t118.*t137.*t144.*t145)./(((t96.*t109.*w)./D_sys-1.0).*D_sys);
+    t150 = -t_numer.*t110.*t118.*t137.*t145./t_denom;
     real_P = real(t150)./2.0;
 end
 if nargout > 2
@@ -203,16 +188,16 @@ if nargout > 4
     mag_X_s = t20.*abs(t149);
 end
 if nargout > 5
-    phase_U = angle((t133.*t144)./((t96.*t109.*w)./D_sys-1.0));
+    phase_U = angle(-t133.*t144./t135);  % (t96.*t109.*w)./D_sys-1 == -t135
 end
 if nargout > 6
     imag_P = imag(t150)./2.0;
 end
 if nargout > 7
-    phase_X_u = angle((t109.*t144.*1i)./(((t96.*t109.*w)./D_sys-1.0).*D_sys));
+    phase_X_u = angle(-(t109.*t144.*1i)./t_denom);
 end
 if nargout > 8
-    phase_X_f = angle(t18.*(-t126+t127+(t9.*t96.*t103.*t109.*t120.*t144)./((t96.*t109.*w)./D_sys-1.0)).*1i);
+    phase_X_f = angle(-t18.*t148.*1i);  % equivalent: (-t126+t127+...) == -t148
 end
 if nargout > 9
     phase_X_s = angle(t18.*t149.*1i);
