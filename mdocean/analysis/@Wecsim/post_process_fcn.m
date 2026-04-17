@@ -292,7 +292,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
                 'corner_HT', 'corner_N_per_T', 'dt_sim');
 
     num_corners = size(data.corner_HT, 1);
-    figs = gobjects(1, 2);
+    figs = gobjects(1, 3);
 
     %% Figure 1: Stem plot of Fourier harmonics of float acceleration + THD
     figs(1) = figure;
@@ -367,6 +367,67 @@ function figs = plot_timeseries_figures(wecsim_filename)
         legend('Location', 'best', 'Interpreter', 'latex')
         grid on
     end
+    improvePlot
+
+    %% Figure 3: Position THD contour at corner sea states (derived from acceleration)
+    pos_THD = zeros(1, num_corners);
+    for ci = 1:num_corners
+        N = data.corner_N_per_T(ci);
+        dt = data.dt_sim;
+        accel = data.float_accel_ts(1:N, ci);
+        T_wave = data.corner_HT(ci, 2);
+        w = 2*pi / T_wave;
+
+        % compute FFT of acceleration
+        Y = fft(accel);
+        P2 = Y / N;
+        P1 = P2(1:floor(N/2)+1);
+        P1(2:end-1) = 2 * P1(2:end-1);
+        accel_amps = abs(P1);
+
+        % frequency axis
+        Fs = 1 / dt;
+        freqs_hz = (0:floor(N/2)) * Fs / N;
+        omega = 2*pi * freqs_hz;
+        harmonic_numbers = round(freqs_hz / (w/(2*pi)));
+
+        % derive position amplitudes: pos_n = accel_n / (n*w)^2
+        pos_amps = zeros(size(accel_amps));
+        valid = omega > 0;
+        pos_amps(valid) = accel_amps(valid) ./ omega(valid).^2;
+
+        % compute position THD (harmonics n>=2 relative to fundamental)
+        idx_fund = find(harmonic_numbers == 1, 1);
+        if isempty(idx_fund)
+            pos_THD(ci) = NaN;
+            continue
+        end
+        pos_fund = pos_amps(idx_fund);
+        pos_harmonics = pos_amps;
+        pos_harmonics(1) = 0;        % remove DC
+        pos_harmonics(idx_fund) = 0; % remove fundamental
+        pos_THD(ci) = sqrt(sum(pos_harmonics.^2)) / pos_fund * 100;
+    end
+
+    % assemble 2D grid from unique H and T corner values
+    H_corners = unique(data.corner_HT(:,1));
+    T_corners = unique(data.corner_HT(:,2));
+    THD_grid = NaN(length(H_corners), length(T_corners));
+    for ci = 1:num_corners
+        hi = find(H_corners == data.corner_HT(ci,1));
+        ti = find(T_corners == data.corner_HT(ci,2));
+        THD_grid(hi, ti) = pos_THD(ci);
+    end
+
+    figs(3) = figure;
+    imagesc(T_corners, H_corners, THD_grid)
+    set(gca, 'YDir', 'normal')
+    colorbar
+    xlabel('Wave Period $T$ (s)', 'Interpreter', 'latex')
+    ylabel('Wave Height $H$ (m)', 'Interpreter', 'latex')
+    title('Float Position THD (\%) at Corner Sea States', 'Interpreter', 'latex')
+    xticks(T_corners)
+    yticks(H_corners)
     improvePlot
 end
 

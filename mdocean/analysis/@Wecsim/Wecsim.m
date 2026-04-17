@@ -79,5 +79,5 @@ function fig_names = fig_names_wrapper()
     end
 
     % append timeseries figure names
-    fig_names = [fig_names, {'accel_fourier_harmonics', 'drag_force_desc_fcn'}];
+    fig_names = [fig_names, {'accel_fourier_harmonics', 'drag_force_desc_fcn', 'position_THD_contour'}];
 end

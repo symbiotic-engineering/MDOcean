@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 48;
+num_figs_AOR = 49;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -104,6 +104,7 @@ figs_in_AOR{44} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__po
 figs_in_AOR{45} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
 figs_in_AOR{47} = 'Wecsim.accel_fourier_harmonics';
 figs_in_AOR{48} = 'Wecsim.drag_force_desc_fcn';
+figs_in_AOR{49} = 'Wecsim.position_THD_contour';
 % appendix C - structures
 figs_in_AOR{36} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{37} = 'ReadNonMatlabFigs.trapezoid';
