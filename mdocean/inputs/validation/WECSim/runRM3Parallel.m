@@ -111,6 +111,7 @@ pause(1)
 delete savedLog*
 
 % variables to save
+STIFFNESS_COLUMN       = 4;
 timesteps_per_period = mcr.cases(:,2) / simu.dt; 
 P                      = zeros(length(mcr.cases(:,1)), 1);
 force_pto              = zeros(length(mcr.cases(:,1)), 1);
@@ -164,7 +165,13 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_pos = output.bodies(1).position(i_start:i_end,3);
         spar_pos  = output.bodies(2).position(i_start:i_end,3);
         rel_pos = float_pos - spar_pos;
-        rel_vel = gradient(rel_pos, simu.dt);
+        if isfield(output.bodies(1),'velocity') && isfield(output.bodies(2),'velocity')
+            rel_vel = output.bodies(1).velocity(i_start:i_end,3) - ...
+                      output.bodies(2).velocity(i_start:i_end,3);
+        else
+            % fallback when velocity is not logged; used only for sign inference
+            rel_vel = gradient(rel_pos, simu.dt);
+        end
 
         % include stiffness contribution from the separate spring in total PTO force
         F_spring = [];
@@ -177,9 +184,9 @@ parfor imcr=1:length(mcr.cases(:,1))
         end
         if isempty(F_spring)
             K_spring = 0;
-            if size(mcr.cases,2) >= 4
-                % mcr.cases(:,4) stores spring stiffness from mcr.header = ...,'stiffness'
-                K_spring = mcr.cases(imcr,4);
+            if size(mcr.cases,2) >= STIFFNESS_COLUMN
+                % mcr.cases(:,STIFFNESS_COLUMN) stores spring stiffness from mcr.header = ...,'stiffness'
+                K_spring = mcr.cases(imcr,STIFFNESS_COLUMN);
             end
             force_sign = infer_force_sign(F_PTO, rel_vel);
             F_spring = force_sign * K_spring * rel_pos;
@@ -243,7 +250,7 @@ parfor imcr=1:length(mcr.cases(:,1))
 end
 
 B_p = mcr.cases(:,3);
-K_p = mcr.cases(:,4);
+K_p = mcr.cases(:,STIFFNESS_COLUMN);
 var_names = wecsim_var_names();
 save(output_filename, var_names{:})
 
@@ -281,17 +288,21 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
 end
 
 function s = infer_force_sign(force_signal, relative_velocity)
-    % use a small tolerance for robust floating-point near-zero checks
-    tol = sqrt(eps);
+    % Infer sign convention between PTO force and relative velocity.
+    % Returns +1 for near-zero coupling so spring-force reconstruction falls
+    % back to +K*relative_displacement when damping signal is negligible.
+    rel_tol = 1e-12; % strict relative tolerance for sign-only inference
     denom = relative_velocity(:).' * relative_velocity(:);
-    if denom <= tol
+    denom_tol = max(1, abs(denom)) * rel_tol;
+    if denom <= denom_tol
         s = 1;
         return
     end
-    gain = force_signal(:).' * relative_velocity(:) / denom;
-    if abs(gain) <= tol
+    proportionality = force_signal(:).' * relative_velocity(:) / denom;
+    prop_tol = max(1, abs(proportionality)) * rel_tol;
+    if abs(proportionality) <= prop_tol
         s = 1;
     else
-        s = sign(gain);
+        s = sign(proportionality);
     end
 end
