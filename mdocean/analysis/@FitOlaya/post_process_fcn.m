@@ -691,22 +691,27 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 
     % Overlay WAMIT RM3 spar excitation data
     % RM3 geometry (from hydro_coeff_err.m and WEC-Sim inputs):
-    %   Rb = a1 = 3 m (spar column outer radius)
+    %   Rb = a2 = 10 m (spar column outer radius)
+    %   Rc = a1 = 3 m  (spar column inner radius)
     %   Rx = Rp = a3 = 15 m (damping plate outer radius; alpha > 1 so Rx = Rp)
-    %   T_s = spar_exc.T_s  (spar draft = gap height h)
-    %   alpha = Rp/Rb = a3/a1 = 5
+    %   alpha = Rp/Rb = a3/a2 = 1.5
     %   beta_rm3 = 1 (case-2-like; no beta correction)
-    %   e1_over_h = 1 (plate at bottom of gap, e1 = h = T_s)
+    %   h = water depth = Inf (deep water; h is NOT the spar draft)
+    %   e2 = spar_exc.T_s  (depth to bottom of gap = spar draft, m)
+    %   h_d = e2 - e1 = 0.1  (gap height; e1/h = 0 since h = Inf)
     %   f = gamma_over_rho_g / (pi * Rp^2)
-    Rb_rm3  = 3;    % spar column outer radius (m)
-    Rp_rm3  = 15;   % damping plate outer radius (m)  [= Rx since Rp > Rb]
-    alpha_rm3  = Rp_rm3 / Rb_rm3;  % = 5
+    Rb_rm3  = 10;   % spar column outer radius (m) [= a2]
+    Rc_rm3  = 3;    % spar column inner radius (m)  [= a1]
+    Rp_rm3  = 15;   % damping plate outer radius (m) [= Rx since Rp > Rb]
+    alpha_rm3  = Rp_rm3 / Rb_rm3;  % = 1.5
     beta_rm3   = 1;
-    h_rm3      = spar_exc.T_s;      % gap height = spar draft (m)
-    e1_over_h_rm3 = 1;              % plate at bottom of gap
+    % h (water depth) = Inf for deep-water RM3; use plate depth e2 = T_s for kh normalization
+    e2_rm3     = spar_exc.T_s;  % depth to bottom of gap = spar draft (m)
+    h_d_rm3    = 0.1;           % gap height h_d = e2 - e1 (m); e1/h_water = 0 since h = Inf
+    e1_rm3     = e2_rm3 - h_d_rm3;  % depth to top of gap (m), computed directly
 
     k_rm3  = spar_exc.k(:);
-    kh_rm3 = k_rm3 * h_rm3;
+    kh_rm3 = k_rm3 * e2_rm3;   % k * T_s used as x-axis scale (e2, not water depth h = Inf)
     kRx_rm3 = k_rm3 * Rp_rm3;  % kRx = k * Rx = k * Rp (since alpha > 1)
 
     f_rm3 = spar_exc.gamma_over_rho_g(:) / (pi * Rp_rm3^2);
@@ -715,16 +720,17 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     % x_v1 = kh * (Rx/Rp) * alpha^2 / beta  [Rx/Rp = 1 for alpha>1]
     x_v1_rm3 = kh_rm3 .* (alpha_rm3^2) / beta_rm3;
 
-    % y_base = f / (|H0(kRx)| * exp(-kh*e1) * kh * alpha * max(1,alpha))
+    % y_base = f / (|H0(kRx)| * exp(-k*e1) * kh * alpha * max(1,alpha))
+    % exp(-k*e1) is computed directly (not as exp(-kh*e1/h)) since h = Inf => e1/h = 0
     y_base_rm3 = f_rm3 ./ abs(besselh(0, kRx_rm3)) ...
-        ./ exp(-kh_rm3 * e1_over_h_rm3) ./ kh_rm3 ...
+        ./ exp(-k_rm3 .* e1_rm3) ./ kh_rm3 ...
         / (alpha_rm3 * max(1, alpha_rm3));
     y_v1_rm3 = y_base_rm3.^2 * beta_rm3^2;
 
     valid_rm3 = isfinite(x_v1_rm3) & isfinite(y_v1_rm3) & x_v1_rm3 > 0 & y_v1_rm3 > 0;
     loglog(x_v1_rm3(valid_rm3), y_v1_rm3(valid_rm3), '-k^', ...
         'MarkerFaceColor', 'none', 'MarkerSize', 6, ...
-        'DisplayName', sprintf('WAMIT RM3 ($h/R_b=%.1f$, $\\alpha=%.0f$, $\\beta=%g$)', h_rm3/Rb_rm3, alpha_rm3, beta_rm3));
+        'DisplayName', sprintf('WAMIT RM3 ($T_s/R_b=%.1f$, $\\alpha=%.1f$, $\\beta=%g$)', e2_rm3/Rb_rm3, alpha_rm3, beta_rm3));
 
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
