@@ -19,7 +19,8 @@ function intermed_result_struct = analysis_fcn(p, b)
         'MDOcean:RunMEEM:InvalidGeometry', ...
         'MDOcean:RunMEEM:NonFiniteA', ...
         'MDOcean:RunMEEM:NonFiniteB', ...
-        'MDOcean:RunMEEM:NonFiniteC' ...
+        'MDOcean:RunMEEM:NonFiniteC', ...
+        'MDOcean:DragIntegral:OutsideLUT' ...
     };
 
     verbosity_warning_ids = {'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'};
@@ -80,6 +81,8 @@ function intermed_result_struct = analysis_fcn(p, b)
     warning_hits              = false(numel(warning_ids), n_geoms);
     unknown_error_hits        = false(1, n_geoms);
     val = repmat(nan_val, [1, n_geoms]);
+    drag_lut_rp_range    = nan(2, n_geoms); % row 1 = min, row 2 = max rp per geometry
+    drag_lut_kappa_range = nan(2, n_geoms); % row 1 = min, row 2 = max kappa per geometry
 
     parfor i = 1:n_geoms
 
@@ -103,16 +106,20 @@ function intermed_result_struct = analysis_fcn(p, b)
         m0h_stored_linear(:, i) = dispersion(2*pi ./ p.T, p_i.h, p.g) * p_i.h;
 
         try
-            [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val);
+            [hydro_ratio_max, out, warning_hit, rp_range_i, kappa_range_i] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val);
         catch
-            hydro_ratio_max = NaN;
-            out = nan_val;
-            warning_hit = false(1, numel(warning_ids));
+            hydro_ratio_max  = NaN;
+            out              = nan_val;
+            warning_hit      = false(1, numel(warning_ids));
+            rp_range_i       = nan(2, 1);
+            kappa_range_i    = nan(2, 1);
             unknown_error_hits(i) = true;
         end
         val(i) = out;
         warning_hits(:, i) = warning_hit(:);
         hydro_ratio_result_linear(:, i) = hydro_ratio_max;
+        drag_lut_rp_range(:, i)    = rp_range_i;
+        drag_lut_kappa_range(:, i) = kappa_range_i;
     end
 
     m0h_stored = reshape(m0h_stored_linear, [nT, size(A1)]);
@@ -122,11 +129,26 @@ function intermed_result_struct = analysis_fcn(p, b)
     clear cleanup_warnings
 
     warning_counts = sum(warning_hits, 2);
+    drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
     for k = 1:numel(warning_ids)
         if warning_counts(k) > 0
-            warning('MDOcean:SweepGeoms:WarningSummary', ...
-                'SweepGeoms caught %s for %.1f%% of geometries (%d/%d).', ...
-                warning_ids{k}, 100 * warning_counts(k) / n_geoms, warning_counts(k), n_geoms)
+            if strcmp(warning_ids{k}, drag_lut_id)
+                valid_cols  = ~isnan(drag_lut_rp_range(1, :));
+                rp_min_all    = min(drag_lut_rp_range(1, valid_cols));
+                rp_max_all    = max(drag_lut_rp_range(2, valid_cols));
+                kappa_min_all = min(drag_lut_kappa_range(1, valid_cols));
+                kappa_max_all = max(drag_lut_kappa_range(2, valid_cols));
+                warning('MDOcean:SweepGeoms:WarningSummary', ...
+                    ['SweepGeoms caught %s for %.1f%% of geometries (%d/%d). ' ...
+                     'rp range across all geometries: [%.6g, %.6g], ' ...
+                     'kappa range: [%.6g, %.6g].'], ...
+                    warning_ids{k}, 100 * warning_counts(k) / n_geoms, warning_counts(k), n_geoms, ...
+                    rp_min_all, rp_max_all, kappa_min_all, kappa_max_all)
+            else
+                warning('MDOcean:SweepGeoms:WarningSummary', ...
+                    'SweepGeoms caught %s for %.1f%% of geometries (%d/%d).', ...
+                    warning_ids{k}, 100 * warning_counts(k) / n_geoms, warning_counts(k), n_geoms)
+            end
         end
     end
     n_unknown_errors = sum(unknown_error_hits);
@@ -166,7 +188,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.p = p;
 end
 
-function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val)
+function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val)
     worker_warning_state = warning;
     cleanup_worker_warnings = onCleanup(@() warning(worker_warning_state)); %#ok<NASGU>
 
@@ -185,6 +207,10 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
     n_disabled_warning_ids = 0;
     hydro_ratio_max = NaN;
     out = nan_val; % default for early-exit paths
+    rp_range    = nan(2, 1); % [min; max] rp seen in MDOcean:DragIntegral:OutsideLUT for this geometry
+    kappa_range = nan(2, 1); % [min; max] kappa seen
+
+    drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
 
     while true
         try
@@ -197,6 +223,22 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
                 rethrow(ME)
             end
             warning_hit(warning_idx) = true;
+
+            % For the drag-LUT warning, parse and accumulate rp/kappa min-max.
+            if strcmp(ME.identifier, drag_lut_id)
+                toks = regexp(ME.message, ...
+                    'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
+                    'tokens', 'once');
+                if ~isempty(toks)
+                    vals = cellfun(@str2double, toks);
+                    rp_min_i    = vals(1);  rp_max_i    = vals(2);
+                    kappa_min_i = vals(3);  kappa_max_i = vals(4);
+                    rp_range(1)    = min([rp_range(1);    rp_min_i],    [], 'omitnan');
+                    rp_range(2)    = max([rp_range(2);    rp_max_i],    [], 'omitnan');
+                    kappa_range(1) = min([kappa_range(1); kappa_min_i], [], 'omitnan');
+                    kappa_range(2) = max([kappa_range(2); kappa_max_i], [], 'omitnan');
+                end
+            end
 
             if any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
                 break  % Same warning fired again after disabling; return NaN for this geometry
