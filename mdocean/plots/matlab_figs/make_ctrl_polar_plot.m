@@ -216,11 +216,9 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     cb2 = colorbar(pax);
     cb2.Label.String = 'Power (W)';
 
-    gamma_reactive = (1 - 1) / (1 + 1);
-    if isfinite(gamma_reactive)
-        polarplot(pax, angle(gamma_reactive), abs(gamma_reactive), 'ko', 'MarkerSize', 10, 'LineWidth', 1.5, ...
-            'DisplayName', 'Reactive control');
-    end
+    % alpha=1 maps to gamma=0 (origin in gamma-space)
+    polarplot(pax, 0, 0, 'ko', 'MarkerSize', 10, 'LineWidth', 1.5, ...
+        'DisplayName', 'Reactive control');
 
     if ~isnan(ir_uncons_opt)
         gamma_uncons = gamma_grid(ir_uncons_opt, ic_uncons_opt);
@@ -238,6 +236,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
 
     title(pax, sprintf('Gamma polar plot for H=%.3g, T=%.3g', H_ss(idx_chosen_ss), T_ss(idx_chosen_ss)));
     legend(pax, 'Location', 'bestoutside');
+    fig.UserData.gamma_fig = fig_gamma;
 end
 
 function [xdata, ydata] = cell_quads(cell_list, X_cart, Y_cart, sz_phase, sz_mag)
