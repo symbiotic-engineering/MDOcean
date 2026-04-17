@@ -93,7 +93,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     axis(ax, 'equal');
     xlabel(ax, 'Re(\alpha)')
     ylabel(ax, 'Im(\alpha)')
-    title(ax, sprintf('Brute-force ctrl grid | max-power sea state  (P_{opt} = %.3g W)', opt_P_best))
+    title(ax, sprintf('Brute-force control grid for H=%f, T=%f',NaN,NaN))
 
     % --- reference circles labelled by |alpha| value ---
     th_ring = linspace(0, 2*pi, 200);
@@ -104,10 +104,10 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
         r_val = log10(alpha_val / min_mag);
         if r_val < 0 || r_val > r_max; continue; end
         plot(ax, r_val*cos(th_ring), r_val*sin(th_ring), ...
-             'k:', 'LineWidth', 0.5, 'HandleVisibility', 'off')
+             'k:', 'LineWidth', 1, 'HandleVisibility', 'off')
         text(ax, r_val*cos(pi/8), r_val*sin(pi/8), ...
              sprintf('|\\alpha|=%.3g', alpha_val), ...
-             'FontSize', 7, 'Color', 'k')
+             'FontSize', 12, 'Color', 'k','BackgroundColor','w')
     end
 
     % --- hatching where constraint is violated (constraint_err > 0) ---
@@ -115,7 +115,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     % contourf always finds a 0->1 transition, even when every cell is infeasible.
     % The corner grid (X_cart, Y_cart) is used so the hatched region aligns
     % with the padded pcolor cells.
-    C_violated = double(C_ss > 0);
+    C_violated = double(C_ss > 0) & ~isinf(C_ss);
     C_viol_pad = [C_violated,        zeros(sz_phase, 1); ...
                   zeros(1, sz_mag),  0];                  % (sz_phase+1) x (sz_mag+1)
     if any(C_viol_pad(:))
