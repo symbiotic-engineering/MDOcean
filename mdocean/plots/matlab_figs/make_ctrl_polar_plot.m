@@ -34,16 +34,19 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     C_flat   = reshape(constraint_err, n_ss, n_ctrl);
     idx_flat = idx_opt(:);           % (n_ss x 1), column-major
 
-    % compute optimal power per sea state
-    opt_P_vec = nan(n_ss, 1);
-    for s = 1:n_ss
-        opt_P_vec(s) = P_flat(s, idx_flat(s));
-    end
-    [opt_P_best, best_ss] = max(opt_P_vec, [], 'omitnan');
+    % choose a sea state to make the plot - we want lots of stable
+    % controllers so the plot isn't blank, and around 50% feasible controllers
+    % so it shows a power tradeoff among the stable options
+    ctrl_dim = 3;
+    num_ctrl_stable_per_ss = sum(isfinite(real_P),ctrl_dim);
+    num_ctrl_feasible_per_ss = sum(constraint_err <= 0,ctrl_dim);
+    pct_feasible_per_ss = num_ctrl_feasible_per_ss ./num_ctrl_stable_per_ss;
+    pct_off_from_half_feasible = abs(pct_feasible_per_ss - .5);
+    [~,idx_chosen_ss] = max(num_ctrl_stable_per_ss./pct_off_from_half_feasible,[],'all');
 
     % 2-D controller grids for the chosen sea state
-    P_ss = reshape(P_flat(best_ss, :), sz_phase, sz_mag);
-    C_ss = reshape(C_flat(best_ss, :), sz_phase, sz_mag);
+    P_ss = reshape(P_flat(idx_chosen_ss, :), sz_phase, sz_mag);
+    C_ss = reshape(C_flat(idx_chosen_ss, :), sz_phase, sz_mag);
 
     % ---- Log10-scaled radius: r = log10(|alpha|) - log10(min|alpha|) ----
     % This maps min|alpha| -> r=0 and avoids negative radii for the centres.
@@ -119,7 +122,7 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     end
 
     % --- star marker at the max-power optimal controller ---
-    opt_ctrl_idx = idx_flat(best_ss);
+    opt_ctrl_idx = idx_flat(idx_chosen_ss);
     [ir_opt, ic_opt] = ind2sub([sz_phase, sz_mag], opt_ctrl_idx);
     r_opt = log10(MAG_GUESS(ir_opt, ic_opt)) - log10(min_mag);
     x_opt = r_opt * cos(PHASE_GUESS(ir_opt, ic_opt));
