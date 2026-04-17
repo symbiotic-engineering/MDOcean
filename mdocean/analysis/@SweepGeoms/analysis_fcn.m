@@ -63,13 +63,23 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     X = [b.X_noms; 1];
 
+    % Run one nominal simulation to discover the full output struct layout.
+    % This must happen before warnings are promoted to errors so that any
+    % warnings fired by the nominal run do not abort this call.
+    [~, ~, ~, val_nom] = simulation(X, p);
+    fn = fieldnames(val_nom);
+    nan_val = val_nom;
+    for k = 1:numel(fn)
+        nan_val.(fn{k}) = NaN(size(val_nom.(fn{k})));
+    end
+
     nT = length(p.T);
     n_geoms = numel(A1);
     m0h_stored_linear         = nan(nT, n_geoms);
     hydro_ratio_result_linear = nan(nT, n_geoms);
     warning_hits              = false(numel(warning_ids), n_geoms);
     unknown_error_hits        = false(1, n_geoms);
-    val = repmat(struct('vol_f', NaN, 'vol_s', NaN), [1, n_geoms]);
+    val = repmat(nan_val, [1, n_geoms]);
 
     parfor i = 1:n_geoms
 
@@ -93,14 +103,14 @@ function intermed_result_struct = analysis_fcn(p, b)
         m0h_stored_linear(:, i) = dispersion(2*pi ./ p.T, p_i.h, p.g) * p_i.h;
 
         try
-            [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids);
+            [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val);
         catch
             hydro_ratio_max = NaN;
-            out = struct('vol_f', NaN, 'vol_s', NaN);
+            out = nan_val;
             warning_hit = false(1, numel(warning_ids));
             unknown_error_hits(i) = true;
         end
-        val(i) = ensure_vol_fields(out);
+        val(i) = out;
         warning_hits(:, i) = warning_hit(:);
         hydro_ratio_result_linear(:, i) = hydro_ratio_max;
     end
@@ -156,7 +166,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.p = p;
 end
 
-function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids)
+function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val)
     worker_warning_state = warning;
     cleanup_worker_warnings = onCleanup(@() warning(worker_warning_state)); %#ok<NASGU>
 
@@ -174,7 +184,7 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
     disabled_warning_ids = cell(1, numel(warning_ids));
     n_disabled_warning_ids = 0;
     hydro_ratio_max = NaN;
-    out = struct('vol_f', NaN, 'vol_s', NaN); % default for early-exit paths
+    out = nan_val; % default for early-exit paths
 
     while true
         try
@@ -195,22 +205,6 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
             n_disabled_warning_ids = n_disabled_warning_ids + 1;
             disabled_warning_ids{n_disabled_warning_ids} = ME.identifier;
         end
-    end
-end
-
-function vol_struct = ensure_vol_fields(out)
-    % Extract only the vol_f and vol_s fields so the result is always a
-    % struct with exactly those two fields, compatible with the pre-typed
-    % struct array val.
-    if isfield(out, 'vol_f')
-        vol_struct.vol_f = out.vol_f;
-    else
-        vol_struct.vol_f = NaN;
-    end
-    if isfield(out, 'vol_s')
-        vol_struct.vol_s = out.vol_s;
-    else
-        vol_struct.vol_s = NaN;
     end
 end
 
