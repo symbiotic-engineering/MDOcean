@@ -71,6 +71,12 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     X_cart = R_corners .* cos(PHI_corners);
     Y_cart = R_corners .* sin(PHI_corners);
 
+    idx_unconstrained = phase_centers==0 & log_mag_centers==0;
+    [row_uncons,col_uncons] = find(idx_unconstrained);
+
+    X_cart_unconstrained = X_cart(row_uncons+[0 1],col_uncons+[0 1]);
+    Y_cart_unconstrained = Y_cart(row_uncons+[0 1],col_uncons+[0 1]);
+
     % Pad data with repeated boundary row/col so pcolor (flat shading) renders
     % all sz_phase x sz_mag cells (it drops the last row/col of an MxN input).
     P_pad = [P_ss,     P_ss(:, end);  P_ss(end, :),  P_ss(end, end)];
@@ -129,6 +135,9 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     y_opt = r_opt * sin(PHASE_GUESS(ir_opt, ic_opt));
     plot(ax, x_opt, y_opt, 'r*', 'MarkerSize', 14, 'LineWidth', 2, ...
          'DisplayName', 'Max power controller')
+
+    % unconstrained outline
+    plot(ax,X_cart_unconstrained([1 2 4 3 1]),Y_cart_unconstrained([1 2 4 3 1]),'m','DisplayName','Unconstrained')
 
     legend
     improvePlot
