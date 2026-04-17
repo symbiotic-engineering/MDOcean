@@ -25,10 +25,11 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
 % :param idx_opt:        optimal controller index for each sea state (n_Hs x n_T)
 % :param H_ss:           wave height for each sea state (n_Hs x n_T)
 % :param T_ss:           wave period for each sea state (n_Hs x n_T)
-% :returns fig:       Cartesian alpha-space figure handle
+% :returns: fig       Cartesian alpha-space figure handle
 % :returns fig_gamma: Polar gamma-space figure handle
 
     real_P(isinf(real_P)) = NaN; % replace inf with nan (blank on plot)
+    GAMMA_SINGULARITY_THRESHOLD = 1e-10;
 
     [sz_phase, sz_mag] = size(MAG_GUESS);
     n_ctrl = sz_phase * sz_mag;
@@ -200,7 +201,7 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
     alpha_grid = MAG_GUESS .* exp(1i .* PHASE_GUESS);
     gamma_grid = NaN(size(alpha_grid));
     gamma_denom = 1 + alpha_grid;
-    gamma_valid = abs(gamma_denom) > 1e-10;
+    gamma_valid = abs(gamma_denom) > GAMMA_SINGULARITY_THRESHOLD;
     gamma_grid(gamma_valid) = (1 - alpha_grid(gamma_valid)) ./ gamma_denom(gamma_valid);
 
     fig_gamma = figure;
