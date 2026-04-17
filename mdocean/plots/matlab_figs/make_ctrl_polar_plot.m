@@ -197,8 +197,10 @@ function fig = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P, constraint_e
     % --- additional polar plot in gamma-space ---
     % gamma = (1 - alpha) / (1 + alpha)
     alpha_grid = MAG_GUESS .* exp(1i .* PHASE_GUESS);
-    gamma_grid = (1 - alpha_grid) ./ (1 + alpha_grid);
-    gamma_grid(~isfinite(gamma_grid)) = NaN;
+    gamma_grid = NaN(size(alpha_grid));
+    gamma_denom = 1 + alpha_grid;
+    gamma_valid = abs(gamma_denom) > eps;
+    gamma_grid(gamma_valid) = (1 - alpha_grid(gamma_valid)) ./ gamma_denom(gamma_valid);
 
     fig_gamma = figure;
     pax = polaraxes(fig_gamma);
