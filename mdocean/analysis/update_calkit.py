@@ -197,9 +197,11 @@ def merge_outputs(old_outputs, new_outputs):
 def analysis_name(stage_key):
     """Extract the analysis class name from a stage key.
 
-    E.g. ``'analysis-AllFigCompare'`` → ``'AllFigCompare'``.
+    E.g. ``'analysis-AllFigCompare'`` → ``'AllFigCompare'``,
+         ``'postpro-AllFigCompare'`` → ``'AllFigCompare'``,
+         ``'viz-AllFigCompare'`` → ``'AllFigCompare'``.
     """
-    for prefix in ("analysis-", "postpro-"):
+    for prefix in ("analysis-", "postpro-", "viz-"):
         if stage_key.startswith(prefix):
             return stage_key[len(prefix):]
     return stage_key
