@@ -198,12 +198,19 @@ function [hydro_ratio_max, out, warning_hit] = run_check_max_CW_with_warning_cap
     end
 end
 
-function out = ensure_vol_fields(out)
-    if ~isfield(out, 'vol_f')
-        out.vol_f = NaN;
+function vol_struct = ensure_vol_fields(out)
+    % Extract only the vol_f and vol_s fields so the result is always a
+    % struct with exactly those two fields, compatible with the pre-typed
+    % struct array val.
+    if isfield(out, 'vol_f')
+        vol_struct.vol_f = out.vol_f;
+    else
+        vol_struct.vol_f = NaN;
     end
-    if ~isfield(out, 'vol_s')
-        out.vol_s = NaN;
+    if isfield(out, 'vol_s')
+        vol_struct.vol_s = out.vol_s;
+    else
+        vol_struct.vol_s = NaN;
     end
 end
 
