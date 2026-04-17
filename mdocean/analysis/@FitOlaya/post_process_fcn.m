@@ -737,9 +737,9 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 end
 
 function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v1, y_label_v1)
-    % Fit and plot using new functional form: y = abs(A*x1^(-m) + B*x2^m)
+    % Fit and plot using new functional form: y = abs(A*x1^(-m1) + B*x2^m2 + C*x2^m3)
     % where x1 = x (alpha^2 x-axis), x2 = alpha*x1 (alpha^3 scaling).
-    % A is expected to be ~constant across alpha/beta; B varies and may be negative.
+    % A is expected to be ~constant across alpha/beta; B, C and exponents may vary.
 
     beta_colors   = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
                      [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
@@ -751,14 +751,16 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
 
     for i_alpha = 1:length(alpha_vec)
         alpha_val = alpha_vec(i_alpha);
-        % x2 = alpha * x1, so new form in terms of x1 alone:
-        %   y = abs(A * x1^(-m) + B * (alpha * x1)^m)
-        ft_new = fittype(@(A, m, B, x) abs(A .* x .^ (-m) + B .* (alpha_val .* x) .^ m), ...
-            'dependent', 'y', 'independent', 'x', 'coefficients', {'A', 'm', 'B'});
+        % x2 = alpha * x1, new form in terms of x1 alone:
+        %   y = abs(A * x1^(-m1) + B * (alpha * x1)^m2 + C * (alpha * x1)^m3)
+        ft_new = fittype(@(A, m1, B, m2, C, m3, x) abs(A .* x .^ (-m1) + ...
+                B .* (alpha_val .* x) .^ m2 + C .* (alpha_val .* x) .^ m3), ...
+            'dependent', 'y', 'independent', 'x', ...
+            'coefficients', {'A', 'm1', 'B', 'm2', 'C', 'm3'});
         fo_new = fitoptions('Method', 'NonlinearLeastSquares');
-        fo_new.Lower      = [0,   0,   -Inf];
-        fo_new.Upper      = [Inf, Inf,  Inf];
-        fo_new.StartPoint = [1.5, 0.25, -0.1];
+        fo_new.Lower      = [0,   0,   -Inf, 0,   -Inf, 0  ];
+        fo_new.Upper      = [Inf, Inf,  Inf, Inf,  Inf, Inf];
+        fo_new.StartPoint = [1.5, 0.25, -0.1, 0.3, 0.01, 1.0];
 
         for j_beta = 1:length(beta_vec)
             x = x_f1_v1{i_alpha, j_beta};
@@ -793,17 +795,18 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
         end
     end
 
+    new_form_title = '$|A x_1^{-m_1} + B x_2^{m_2} + C x_2^{m_3}|$, $x_2 = \alpha x_1$';
     figure(fig_fit)
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
-    title('v1 new-form fits: $|A x_1^{-m} + B x_2^{m}|$, $x_2 = \alpha x_1$', 'Interpreter', 'latex')
+    title(['v1 new-form data: ' new_form_title], 'Interpreter', 'latex')
     improvePlot
     legend('location', 'eastoutside')
 
     figure(fig_fit_curves)
     xlabel(x_label_v1, 'FontSize', 14)
     ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
-    title('v1 new-form fit curves: $|A x_1^{-m} + B x_2^{m}|$, $x_2 = \alpha x_1$', 'Interpreter', 'latex')
+    title(['v1 new-form fit curves: ' new_form_title], 'Interpreter', 'latex')
     improvePlot
     legend('location', 'eastoutside')
 
@@ -812,11 +815,11 @@ function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v
 end
 
 function figs = plot_newform_coeffs(fits, alpha_vec, beta_vec)
-    % Plot fit coefficients A, m, B vs beta (for each alpha) and vs alpha (for each beta)
+    % Plot fit coefficients A, m1, B, m2, C, m3 vs beta (for each alpha) and vs alpha (for each beta)
     beta_colors   = {[0 0.447 0.741], [0.85 0.325 0.098], [0.466 0.674 0.188], ...
                      [0.494 0.184 0.557], [0.929 0.694 0.125], [0.301 0.745 0.933]};
     alpha_markers = {'o', 's', 'd', '^', 'v', '>', '<', 'p'};
-    coeff_names   = {'A', 'm', 'B'};
+    coeff_names   = {'A', 'm1', 'B', 'm2', 'C', 'm3'};
 
     % Coefficients vs beta for each alpha
     f1 = figure;
@@ -908,7 +911,7 @@ function figs = plot_newform_coeffs(fits, alpha_vec, beta_vec)
         ylabel(coeff_name)
         legend('location', 'best')
     end
-    sgtitle('New-form fit coefficients A, m, B vs \alpha and \beta')
+    sgtitle('New-form fit coefficients A, m1, B, m2, C, m3 vs \alpha and \beta')
 
     figs = [f1 f2 f3];
 end
