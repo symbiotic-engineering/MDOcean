@@ -178,6 +178,7 @@ parfor imcr=1:length(mcr.cases(:,1))
         if isempty(F_spring)
             K_spring = 0;
             if size(mcr.cases,2) >= 4
+                % mcr.cases(:,4) stores spring stiffness from mcr.header = ...,'stiffness'
                 K_spring = mcr.cases(imcr,4);
             end
             force_sign = infer_force_sign(F_PTO, rel_vel);
@@ -280,6 +281,7 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
 end
 
 function s = infer_force_sign(force_signal, relative_velocity)
+    % use a small tolerance for robust floating-point near-zero checks
     tol = sqrt(eps);
     denom = relative_velocity(:).' * relative_velocity(:);
     if denom <= tol
