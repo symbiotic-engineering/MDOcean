@@ -451,13 +451,14 @@ function [opt_mag_U,opt_phase_U,...
     real_P(each_sea_state_feasible & ~each_controller_feasible) = -1; % negative power for infeasible controllers in sea states where a feasbile controller exists, so they aren't chosen
     [opt_real_P,idx_opt] = max(real_P,[],ctrl_dim);
 
-    if any(~each_sea_state_feasible)
+    sea_state_infeasible = ~each_sea_state_feasible & ~isnan(w);
+    if any(sea_state_infeasible)
         warning(['no feasible controller found for %d/%d sea states, setting signals to '...
                 'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
-                sum(~each_sea_state_feasible(:)), numel(each_sea_state_feasible))
+                sum(sea_state_infeasible(:)), sum(~isnan(w)))
         
         [min_err,idx_least_err] = min(constraint_err,[],ctrl_dim);
-        idx_opt(~each_sea_state_feasible) = idx_least_err(~each_sea_state_feasible);
+        idx_opt(sea_state_infeasible) = idx_least_err(sea_state_infeasible);
         opt_real_P = real_P(idx_opt);
 
         debug_print = true;
@@ -472,7 +473,8 @@ function [opt_mag_U,opt_phase_U,...
             % controller was able to satisfy all constraints
             num_ss_ctrl_feasible = reshape(squeeze(sum(each_controller_feasible,sea_state_dim)),size(MAG_GUESS));
             mag_phs_num_feasible = [MAG_GUESS(:) PHASE_GUESS(:) num_ss_ctrl_feasible(:)];
-            fprintf('   Controllers and the number of sea states they are feasible: \n[mag,phase,number]=\n[%s]\n', formattedDisplayText(mag_phs_num_feasible))
+            fprintf('   Controllers and the number of sea states they are feasible: \n[mag,phase,number]=\n[%s]\n', ...
+                formattedDisplayText(mag_phs_num_feasible))
     
             % evaluate per-constraint errors at the best guess for each infeasible sea state
             best_B_p = nan(size(w));
