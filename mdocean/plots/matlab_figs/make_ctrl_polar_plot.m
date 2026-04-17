@@ -26,10 +26,10 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
 % :param H_ss:           wave height for each sea state (n_Hs x n_T)
 % :param T_ss:           wave period for each sea state (n_Hs x n_T)
 % :returns: fig       Cartesian alpha-space figure handle
-% :returns fig_gamma: Polar gamma-space figure handle
+% :returns: fig_gamma Polar gamma-space figure handle
 
     real_P(isinf(real_P)) = NaN; % replace inf with nan (blank on plot)
-    GAMMA_SINGULARITY_THRESHOLD = 1e-10;
+    GAMMA_SINGULARITY_THRESHOLD = 1e-10; % guards numerical blow-up near alpha=-1 singularity
 
     [sz_phase, sz_mag] = size(MAG_GUESS);
     n_ctrl = sz_phase * sz_mag;
