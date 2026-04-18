@@ -1333,12 +1333,12 @@ pipeline:
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
+        - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
-        - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
         - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+        - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
         - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
         - ./mdocean/simulation/modules/dynamics/multibody_response.m
-        - ./mdocean/simulation/modules/dynamics/pick_which_root.m
         - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
         - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
         - ./mdocean/simulation/modules/econ/econ.m
@@ -1394,12 +1394,12 @@ pipeline:
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
+        - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
-        - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
         - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+        - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
         - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
         - ./mdocean/simulation/modules/dynamics/multibody_response.m
-        - ./mdocean/simulation/modules/dynamics/pick_which_root.m
         - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
         - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
         - ./mdocean/simulation/modules/econ/econ.m
@@ -3239,6 +3239,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/circle_intersect_script.m
@@ -3300,6 +3301,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
         - ./mdocean/inputs/var_bounds.m
+        - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
@@ -4892,6 +4894,14 @@ pipeline:
       html_storage: null
       executed_ipynb_storage: git
       outputs: []
+    viz-QPCircles:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: results/fig_notebooks/QPCircles.ipynb
+      inputs:
+        - from_stage_outputs: postpro-QPCircles
+      html_storage: null
+      executed_ipynb_storage: git
     viz-ReadNonMatlabFigs:
       kind: jupyter-notebook
       environment: pubs
