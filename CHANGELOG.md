@@ -1,5 +1,13 @@
 # Changelog
 ## Unreleased
+## [v1.1.24](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.24) - 2026-4-17
+### Fixed
+- Model: remove sign discrepancy between MEEM and WAMIT excitation phase 
+
+## [v1.1.23](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.23) - 2026-4-17
+### Changed
+- Analysis: add jupyter notebooks showing figures in each stage
+
 ## [v1.1.22](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.22) - 2026-4-15
 ### Changed
 - Analysis: cache `var_bounds()` struct in `var_bounds.mat` to avoid recomputation
