@@ -14,15 +14,6 @@ function [fig_array,...
 % :returns: end_result_struct
 % :returns: tab_firstrows
 % :returns: tab_colspecs
-% Function post_process_fcn
-%
-% :param intermed_result_struct: Intermediate results struct with raw data and derived signals
-% :returns: fig_array
-% :returns: tab_array_display
-% :returns: tab_array_latex
-% :returns: end_result_struct
-% :returns: tab_firstrows
-% :returns: tab_colspecs
 
     raw             = intermed_result_struct.raw;
     case_2          = intermed_result_struct.case_2;

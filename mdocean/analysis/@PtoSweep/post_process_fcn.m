@@ -22,13 +22,6 @@ function [fig_array, ...
 % indicate the maximum-power point (circle) and the minimum-LCOE point
 % (diamond), shared across all three panels.
 %
-% :param intermed_result_struct: Intermediate results struct from analysis_fcn
-% :returns: fig_array
-% :returns: tab_array_display
-% :returns: tab_array_latex
-% :returns: end_result_struct
-% :returns: tab_firstrows
-% :returns: tab_colspecs
 
     F_max_vec = intermed_result_struct.F_max_vec;          % MN
     P_max_vec = intermed_result_struct.P_max_vec;          % 100 kW
