@@ -378,10 +378,10 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     fun = @(c, ia, ib) c.^2 * case_4.beta(ib) * (1 + case_4.beta(ib)/case_4.alpha(ia));
     y_pred_f1_v2 = cellfun(fun, y_pred_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
-    x_label_v1 = 'k h R_x/R_p \alpha^2 / \beta';
-    y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
-    x_label_v2 = 'k h R_x/R_p \alpha^3 / \beta';
-    y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1}kh R_x/R_b \alpha)\right]^2$ ';
+    x_label_v1 = 'k R_b R_x/R_p \alpha^2 / \beta';
+    y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_b R_x/R_b \alpha)\right]^2$ ';
+    x_label_v2 = 'k R_b R_x/R_p \alpha^3 / \beta';
+    y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_b R_x/R_b \alpha)\right]^2$ ';
 
     % version 1: all alpha combined (manual + auto fits with coeffs)
     [figs_v1, fits_v1] = plot_fit_and_coeffs_all_alpha_beta(x_f1_v1, y_f1_v1, x_f3, y_base, y_pred_base, ...
@@ -659,15 +659,16 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     end
 
     % Overlay case 2 data transformed to v1 space
-    % Case 2 has beta=1 effectively (normalized from fig 3b/4b)
-    beta_c2 = 1;
+    % Case 2 has beta=0.5 (Rc/Rb = 0.5 for fig 3b geometry)
+    beta_c2 = 0.5;
     for i_alpha = 1:length(case_2.alpha)
         alpha_c2 = case_2.alpha(i_alpha);
         kh_c2 = case_2.kh{i_alpha};
         kRx_c2 = case_2.kRx{i_alpha};
 
-        % x_v1 = kh_Rx_over_Rp * alpha^2 / beta
-        x_base_c2 = case_2.kh_Rx_over_Rp{i_alpha} / beta_c2;
+        % x_v1 = kRb * Rx_over_Rp * alpha^2 / beta  (use k*Rb not kh so RM3 is consistent)
+        % kh_Rx_over_Rp = kRb * h/Rb * Rx/Rp, so divide by h_over_Rb to get kRb * Rx/Rp
+        x_base_c2 = case_2.kh_Rx_over_Rp{i_alpha} / case_2.h_over_Rb / beta_c2;
         x_v1_c2 = x_base_c2 * alpha_c2^2;
 
         % y_base = f / (|H0(kRx)| * exp(-kh*e1/h) * kh * alpha * max(1,alpha))
@@ -695,35 +696,36 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     %   Rc = a1 = 3 m  (spar column inner radius)
     %   Rx = Rp = a3 = 15 m (damping plate outer radius; alpha > 1 so Rx = Rp)
     %   alpha = Rp/Rb = a3/a2 = 1.5
-    %   beta_rm3 = 1 (case-2-like; no beta correction)
+    %   beta = Rc/Rb = 3/10 = 0.3
     %   h = water depth = Inf (deep water; h is NOT the spar draft)
     %   e2 = spar_exc.T_s  (depth to bottom of gap = spar draft, m)
     %   h_d = e2 - e1 = 0.1  (gap height; e1/h = 0 since h = Inf)
-    %   f = gamma_over_rho_g / (pi * Rp^2)
+    %   f = gamma_over_rho_g / (pi * Rc^2)  [f is normalized by Rc, not Rp]
     Rb_rm3  = 10;   % spar column outer radius (m) [= a2]
     Rc_rm3  = 3;    % spar column inner radius (m)  [= a1]
     Rp_rm3  = 15;   % damping plate outer radius (m) [= Rx since Rp > Rb]
     alpha_rm3  = Rp_rm3 / Rb_rm3;  % = 1.5
-    beta_rm3   = 1;
-    % h (water depth) = Inf for deep-water RM3; use plate depth e2 = T_s for kh normalization
+    beta_rm3   = Rc_rm3 / Rb_rm3;  % = 0.3  (beta = Rc/Rb)
+    % h (water depth) = Inf for deep-water RM3; use plate depth e2 = T_s for exp(-k*e1)
     e2_rm3     = spar_exc.T_s;  % depth to bottom of gap = spar draft (m)
     h_d_rm3    = 0.1;           % gap height h_d = e2 - e1 (m); e1/h_water = 0 since h = Inf
     e1_rm3     = e2_rm3 - h_d_rm3;  % depth to top of gap (m), computed directly
 
-    k_rm3  = spar_exc.k(:);
-    kh_rm3 = k_rm3 * e2_rm3;   % k * T_s used as x-axis scale (e2, not water depth h = Inf)
+    k_rm3   = spar_exc.k(:);
+    kRb_rm3 = k_rm3 * Rb_rm3;  % k*Rb used as x-axis (finite for deep water; kh = k*Inf = Inf)
     kRx_rm3 = k_rm3 * Rp_rm3;  % kRx = k * Rx = k * Rp (since alpha > 1)
 
-    f_rm3 = spar_exc.gamma_over_rho_g(:) / (pi * Rp_rm3^2);
+    % case_x.f is in units of gamma / (rho g pi Rc^2), so use Rc_rm3 for normalization
+    f_rm3 = spar_exc.gamma_over_rho_g(:) / (pi * Rc_rm3^2);
 
-    % Transform to v1 space (same as case 2 since alpha_rm3 > 1)
-    % x_v1 = kh * (Rx/Rp) * alpha^2 / beta  [Rx/Rp = 1 for alpha>1]
-    x_v1_rm3 = kh_rm3 .* (alpha_rm3^2) / beta_rm3;
+    % Transform to v1 space using k*Rb as x-axis (consistent with case 4 where h/Rb=1, kh=kRb)
+    % x_v1 = kRb * (Rx/Rp) * alpha^2 / beta  [Rx/Rp = 1 for alpha>1]
+    x_v1_rm3 = kRb_rm3 .* (alpha_rm3^2) / beta_rm3;
 
-    % y_base = f / (|H0(kRx)| * exp(-k*e1) * kh * alpha * max(1,alpha))
-    % exp(-k*e1) is computed directly (not as exp(-kh*e1/h)) since h = Inf => e1/h = 0
+    % y_base = f / (|H0(kRx)| * exp(-k*e1) * kRb * alpha * max(1,alpha))
+    % Use k*Rb in denominator (analogous to kh for finite-h cases; h=Inf so kh is not usable)
     y_base_rm3 = f_rm3 ./ abs(besselh(0, kRx_rm3)) ...
-        ./ exp(-k_rm3 .* e1_rm3) ./ kh_rm3 ...
+        ./ exp(-k_rm3 .* e1_rm3) ./ kRb_rm3 ...
         / (alpha_rm3 * max(1, alpha_rm3));
     y_v1_rm3 = y_base_rm3.^2 * beta_rm3^2;
 
