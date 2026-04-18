@@ -914,7 +914,7 @@ function [mag_U,phase_U,...
             need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                                   + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
             if need_more_stabilizing~=0
-                warning('Stabilizing did not work after 2 tries. This could be a finite precision issue.')
+                warning('MDOcean:GetResponseDrag:StabilizingFailed', 'Stabilizing did not work after 2 tries. This could be a finite precision issue.')
             end
 
         end
@@ -1069,7 +1069,8 @@ function [idx_closed_loop_unstable,...
                 det_k_ol = K_f;
             end
         end
-        warning(['Open loop dynamics are unstable for idx_H=[%s], ' ...
+        warning('MDOcean:GetResponseDrag:OpenLoopUnstable', ...
+            ['Open loop dynamics are unstable for idx_H=[%s], ' ...
                'idx_T=[%s]. det(M)=[%s], det(B)=[%s], det(K)=[%s].'], ...
             num2str(idx_H.'), ...
             num2str(idx_T.'), ...
@@ -1129,8 +1130,8 @@ function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     X = X_over_F_mag .* F;
     if nargout > 1
-        X_over_F_phase = atan2(imag_term,real_term);
-        angle_X = X_over_F_phase + F_phase;
+        angle_F_over_X = atan2(imag_term,real_term);
+        angle_X = F_phase - angle_F_over_X;
     end
 end
 

@@ -111,6 +111,7 @@ pause(1)
 delete savedLog*
 
 % variables to save
+STIFFNESS_COLUMN       = 4;
 timesteps_per_period = mcr.cases(:,2) / simu.dt; 
 P                      = zeros(length(mcr.cases(:,1)), 1);
 force_pto              = zeros(length(mcr.cases(:,1)), 1);
@@ -151,21 +152,53 @@ parfor imcr=1:length(mcr.cases(:,1))
     try
         output = myWecSimFcn(imcr,mcr,pctDir,totalNumOfWorkers,X,p);   
     
-        % extract signals over the last period
-        N_per_T = timesteps_per_period(imcr);
-        wave_freq  = 2*pi/mcr.cases(imcr,2);
-        power = output.ptos.powerInternalMechanics((end-N_per_T+1):end,3);
-        F_PTO = output.ptos.forceInternalMechanics((end-N_per_T+1):end,3);
-        float_pos = output.bodies(1).position((end-N_per_T+1):end,3);
-        spar_pos  = output.bodies(2).position((end-N_per_T+1):end,3);
+        % extract signals over the last full period starting at a wave node,
+        % so that the FFT phase is relative to the wave phase at t=0
+        T_wave = mcr.cases(imcr,2);
+        N_per_T = round(timesteps_per_period(imcr));
+        wave_freq  = 2*pi/T_wave;
+        k_last  = floor(simu.endTime / T_wave) - 1; % largest integer k such that k*T + T <= endTime
+        i_start = round(k_last * T_wave / simu.dt) + 1; % 1-indexed; round() safe since T_wave/dt is always an integer
+        i_end   = i_start + N_per_T - 1;
+        power = output.ptos.powerInternalMechanics(i_start:i_end,3);
+        F_PTO = output.ptos.forceInternalMechanics(i_start:i_end,3);
+        float_pos = output.bodies(1).position(i_start:i_end,3);
+        spar_pos  = output.bodies(2).position(i_start:i_end,3);
         rel_pos = float_pos - spar_pos;
-        F_drag_f = output.bodies(1).forceMorisonAndViscous((end-N_per_T+1):end,3);
-        F_drag_s = output.bodies(2).forceMorisonAndViscous((end-N_per_T+1):end,3);
+        if isfield(output.bodies(1),'velocity') && isfield(output.bodies(2),'velocity')
+            rel_vel = output.bodies(1).velocity(i_start:i_end,3) - ...
+                      output.bodies(2).velocity(i_start:i_end,3);
+        else
+            % fallback when velocity is not logged; used only for sign inference
+            rel_vel = gradient(rel_pos, simu.dt);
+        end
+
+        % include stiffness contribution from the separate spring in total PTO force
+        F_spring = [];
+        if isfield(output,'springs') && ~isempty(output.springs)
+            if isfield(output.springs,'forceInternalMechanics')
+                F_spring = output.springs.forceInternalMechanics(i_start:i_end,3);
+            elseif isfield(output.springs,'forceTotal')
+                F_spring = output.springs.forceTotal(i_start:i_end,3);
+            end
+        end
+        if isempty(F_spring)
+            K_spring = 0;
+            if size(mcr.cases,2) >= STIFFNESS_COLUMN
+                % mcr.cases(:,STIFFNESS_COLUMN) stores spring stiffness from mcr.header = ...,'stiffness'
+                K_spring = mcr.cases(imcr,STIFFNESS_COLUMN);
+            end
+            force_sign = infer_force_sign(F_PTO, rel_vel);
+            F_spring = force_sign * K_spring * rel_pos;
+        end
+        F_total = F_PTO + F_spring;
+        F_drag_f = output.bodies(1).forceMorisonAndViscous(i_start:i_end,3);
+        F_drag_s = output.bodies(2).forceMorisonAndViscous(i_start:i_end,3);
 
         % save specific output variables
         P(imcr) = mean(power);
 
-        force_pto(imcr) = 1/2 * (max(F_PTO) - min(F_PTO));
+        force_pto(imcr) = 1/2 * (max(F_total) - min(F_total));
         float_amplitude(imcr) = 1/2 * (max(float_pos) - min(float_pos));
         spar_amplitude(imcr)  = 1/2 * (max(spar_pos)  - min(spar_pos));
         relative_amplitude(imcr) = 1/2 * (max(rel_pos) - min(rel_pos));
@@ -177,9 +210,9 @@ parfor imcr=1:length(mcr.cases(:,1))
         [float_amplitude_fund(imcr),...
          float_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
         [spar_amplitude_fund(imcr),...
-         spar_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
+         spar_phase(imcr)] = get_fundamental(spar_pos, wave_freq, simu.dt);
         [rel_amplitude_fund(imcr),...
-         rel_phase(imcr)] = get_fundamental(float_pos, wave_freq, simu.dt);
+         rel_phase(imcr)] = get_fundamental(rel_pos, wave_freq, simu.dt);
 
         [float_drag_force_fund(imcr), ...
          float_drag_force_phase(imcr)] = get_fundamental(F_drag_f, wave_freq, simu.dt);
@@ -213,11 +246,11 @@ parfor imcr=1:length(mcr.cases(:,1))
         float_drag_force_phase(imcr) = NaN;
         spar_drag_force_phase(imcr)  = NaN;
     end
-    Simulink.sdi.clear
+    try; Simulink.sdi.clear; catch ME; warning(ME.identifier, 'Simulink.sdi.clear failed: %s', ME.message); end
 end
 
 B_p = mcr.cases(:,3);
-K_p = mcr.cases(:,4);
+K_p = mcr.cases(:,STIFFNESS_COLUMN);
 var_names = wecsim_var_names();
 save(output_filename, var_names{:})
 
@@ -252,4 +285,24 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
     idx_wave_freq = ismembertol(freqs, wave_freq);
     fund = abs(P1(idx_wave_freq));
     phase = angle(P1(idx_wave_freq));
+end
+
+function s = infer_force_sign(force_signal, relative_velocity)
+    % Infer sign convention between PTO force and relative velocity.
+    % Returns +1 for near-zero coupling so spring-force reconstruction falls
+    % back to +K*relative_displacement when damping signal is negligible.
+    rel_tol = 1e-12; % strict relative tolerance for sign-only inference
+    denom = relative_velocity(:).' * relative_velocity(:);
+    denom_tol = max(1, abs(denom)) * rel_tol;
+    if denom <= denom_tol
+        s = 1;
+        return
+    end
+    proportionality = force_signal(:).' * relative_velocity(:) / denom;
+    prop_tol = max(1, abs(proportionality)) * rel_tol;
+    if abs(proportionality) <= prop_tol
+        s = 1;
+    else
+        s = sign(proportionality);
+    end
 end
