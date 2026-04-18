@@ -387,7 +387,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
 
         % frequency axis
         Fs = 1 / dt;
-        freqs_hz = (0:floor(N/2)) * Fs / N;
+        freqs_hz = (0:floor(N/2))' * Fs / N;
         omega = 2*pi * freqs_hz;
         harmonic_numbers = round(freqs_hz / (w/(2*pi)));
 
