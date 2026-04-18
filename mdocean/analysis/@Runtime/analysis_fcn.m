@@ -64,8 +64,8 @@ function intermed_result_struct = analysis_fcn(p,b)
     % save p_sim because runRM3Parallel modifies p
     p_sim = p;
     p.use_multibody = true;
-    gcp;
     add_wecsim_path();
+    gcp;
     time = tic;
     runRM3Parallel
     t_wecsim = toc(time); %447

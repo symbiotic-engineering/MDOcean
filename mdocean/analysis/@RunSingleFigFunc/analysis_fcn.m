@@ -13,4 +13,6 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.created_figs = figs;
     intermed_result_struct.LCOE = LCOE;
     intermed_result_struct.val = val;
+    intermed_result_struct.p = p;
+    intermed_result_struct.b = b;
 end

@@ -4,6 +4,7 @@ function [mag_U,phase_U,...
          mag_X_f,phase_X_f,...
          mag_X_s,phase_X_s,...
          B_p,K_p,P_sat_ratio,...
+         qcqp_debug,...
          F_drag_f,F_drag_s,...
     phase_F_drag_f,phase_F_drag_s] = get_response_drag(H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                         gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
@@ -14,17 +15,15 @@ function [mag_U,phase_U,...
                                         drag_convergence_plot_on,drag_fcn,...
                                         D_f,D_f_in,D_d,T_f_slam,T_s_slam)
 
-    % initial guess: 2m float amplitude, 0.5m spar amplitude, unsaturated
+    % initial guess: 2m float amplitude, 0.5m spar amplitude
     X_f_guess = 2 * ones(size(w));
     phase_X_f_guess = zeros(size(w));
     X_s_guess = .5 * ones(size(w));
     phase_X_s_guess = zeros(size(w));
-    if F_max == 0
-        ctrl_mult_guess = zeros(size(w));
-    else
-        ctrl_mult_guess = ones(size(w));
-    end
-    phase_ctrl_mult_guess = zeros(size(w));
+
+    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
 
     % package inputs
     dynam_inputs = {H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
@@ -43,22 +42,18 @@ function [mag_U,phase_U,...
          mag_X_f,phase_X_f,...
          mag_X_s,phase_X_s,...
          B_p,K_p,P_sat_ratio,...
-         ctrl_mult,phase_ctrl_mult,...
          F_drag_f,F_drag_s,...
          phase_F_drag_f,phase_F_drag_s] = fixed_point_iteration(X_f_guess,X_s_guess,...
                                                     phase_X_f_guess,phase_X_s_guess,...
-                                                    ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                     dynam_inputs{:}, ...
                                                     max_drag_iters_fixed_point);
 
-        idx_use = ((ctrl_mult >= 0 & ctrl_mult < 1e4) & isfinite(mag_X_f)) | isnan(B_h_f);
+        idx_use = isfinite(mag_X_f) | isnan(B_h_f);
 
         % update guesses
         [X_f_guess(idx_use),phase_X_f_guess(idx_use),...
-         X_s_guess(idx_use),phase_X_s_guess(idx_use),...
-         ctrl_mult_guess(idx_use),phase_ctrl_mult_guess(idx_use)] = deal(mag_X_f(idx_use),phase_X_f(idx_use),...
-                                                       mag_X_s(idx_use),phase_X_s(idx_use),...
-                                                       ctrl_mult(idx_use),phase_ctrl_mult(idx_use));
+         X_s_guess(idx_use),phase_X_s_guess(idx_use)] = deal(mag_X_f(idx_use),phase_X_f(idx_use),...
+                                                       mag_X_s(idx_use),phase_X_s(idx_use));
 
     end
     % then do nonlinear solver to finish
@@ -70,10 +65,10 @@ function [mag_U,phase_U,...
          mag_X_f,phase_X_f,...
          mag_X_s,phase_X_s,...
          B_p,K_p,P_sat_ratio,...
+         qcqp_debug,...
          F_drag_f,F_drag_s,...
          phase_F_drag_f,phase_F_drag_s] = solver(X_f_guess,X_s_guess,...
                                         phase_X_f_guess,phase_X_s_guess,...
-                                        ctrl_mult_guess,phase_ctrl_mult_guess,...
                                         dynam_inputs{:},max_drag_iters_solver);
     end
 
@@ -87,10 +82,10 @@ function [mag_U,phase_U,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p,P_sat_ratio,...
+     qcqp_debug,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,...
      phase_F_drag_s] = solver(X_f_guess,X_s_guess,phase_X_f_guess,phase_X_s_guess,...
-                                    ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                 H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                                 F_max,drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
@@ -112,29 +107,25 @@ function [mag_U,phase_U,...
     fill_nan_matrix = @(x) accumarray([row col], x, sz, [], NaN) ; 
     unflatten = @(x,n) fill_nan_matrix( x( (1:N_ss_nz) + (n-1)*N_ss_nz ) );
 
-    % anonymous function to take 6 sea state matrices and turn into collapsed row vector
-    flatten = @(X1,X2,X3,X4,X5,X6) [reshape(X1(idx_not_nan),[],1);...
-                                    reshape(X2(idx_not_nan),[],1);...
-                                    reshape(X3(idx_not_nan),[],1);...
-                                    reshape(X4(idx_not_nan),[],1);...
-                                    reshape(X5(idx_not_nan),[],1);...
-                                    reshape(X6(idx_not_nan),[],1)    ];
+    % anonymous function to take 4 sea state matrices and turn into collapsed row vector
+    flatten = @(X1,X2,X3,X4) [reshape(X1(idx_not_nan),[],1);...
+                               reshape(X2(idx_not_nan),[],1);...
+                               reshape(X3(idx_not_nan),[],1);...
+                               reshape(X4(idx_not_nan),[],1)];
 
     % prepare inputs for solver
-    x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess,...
-                ctrl_mult_guess, phase_ctrl_mult_guess);
+    x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess);
 
-    % fun_inner takes 1 input and returns the 6+ outputs of dynamics_error_wrapper
+    % fun_inner takes 1 input and returns the 4+ outputs of dynamics_error_wrapper
     fun_inner = @(x) dynamics_error_wrapper(unflatten(x,1),unflatten(x,2),...
                                     unflatten(x,3),unflatten(x,4),...
-                                    unflatten(x,5),unflatten(x,6),...
                                     H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
                                     drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
                                     X_max,control_type,multibody,merge_bodies,...
                                     drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam);
     
-    sparsity = repmat(eye(N_ss_nz),6);
+    sparsity = repmat(eye(N_ss_nz),4);
     opts = optimoptions('fsolve','JacobPattern',sparsity,...
                                  'MaxIterations',max_drag_iters,...
                                  'Algorithm','trust-region',...
@@ -145,17 +136,14 @@ function [mag_U,phase_U,...
     end
 
     % solve
-    [x_solved,err,flag,out] = fsolve(@(x)fun_outer(x,fun_inner,flatten),x0,opts);
+    [x_solved,~,~,~] = fsolve(@(x)fun_outer(x,fun_inner,flatten),x0,opts);
 
     % unpack
     [X_f_solved,X_s_solved,...
-     phase_X_f_solved,phase_X_s_solved,...
-     ctrl_mult_solved,phase_ctrl_mult_solved] = deal(unflatten(x_solved,1),...
-                                                     unflatten(x_solved,2),...
-                                                     unflatten(x_solved,3),...
-                                                     unflatten(x_solved,4),...
-                                                     unflatten(x_solved,5),...
-                                                     unflatten(x_solved,6));
+     phase_X_f_solved,phase_X_s_solved] = deal(unflatten(x_solved,1),...
+                                               unflatten(x_solved,2),...
+                                               unflatten(x_solved,3),...
+                                               unflatten(x_solved,4));
 
     [mag_U,phase_U,...
      real_P,reactive_P,...
@@ -163,7 +151,7 @@ function [mag_U,phase_U,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p,P_sat_ratio,...
-     ~,~,...
+     qcqp_debug,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,...
      phase_F_drag_s] = dynamics_from_guess(X_f_solved, phase_X_f_solved, mag_v0_f, drag_const_f, ...
@@ -171,13 +159,12 @@ function [mag_U,phase_U,...
                                     B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,H,w,k_wvn,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                     control_type,multibody,merge_bodies,F_max,X_max,...
-                                    ctrl_mult_solved,phase_ctrl_mult_solved,...
                                     drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam);
 
 end
 function out_flat = fun_outer(x,fun_inner,flatten)
-    [Y1,Y2,Y3,Y4,Y5,Y6] = fun_inner(x);
-    out_flat = flatten(Y1,Y2,Y3,Y4,Y5,Y6);
+    [Y1,Y2,Y3,Y4] = fun_inner(x);
+    out_flat = flatten(Y1,Y2,Y3,Y4);
 end
 
 function [mag_U,phase_U,...
@@ -186,12 +173,9 @@ function [mag_U,phase_U,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p,P_sat_ratio,...
-     ctrl_mult_guess,...
-     phase_ctrl_mult_guess,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,...
      phase_F_drag_s] = fixed_point_iteration(X_f_guess,X_s_guess,phase_X_f_guess,phase_X_s_guess,...
-                                                ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                 H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                                 F_max,drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
@@ -218,7 +202,6 @@ function [mag_U,phase_U,...
 
         [X_f_err,X_s_err,...
          phase_X_f_err,phase_X_s_err,...
-         force_lim_err,amp_lim_err,...
          mag_U,phase_U,...
          real_P,reactive_P,...
          mag_X_u,phase_X_u,...
@@ -228,7 +211,6 @@ function [mag_U,phase_U,...
          F_drag_f,F_drag_s,...
          phase_F_drag_f,phase_F_drag_s] = dynamics_error_wrapper(X_f_guess,X_s_guess,...
                                                        phase_X_f_guess,phase_X_s_guess,...
-                                                       ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                 H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,F_max,...
                                                 drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
@@ -238,25 +220,17 @@ function [mag_U,phase_U,...
 
         X_err       = max( abs([X_f_err,X_s_err]),             [], 'all');
         phase_X_err = max( abs([phase_X_f_err,phase_X_s_err]), [], 'all');
-        F_lim_err   = max( abs(force_lim_err),                 [], 'all');
-        X_lim_err   = max( abs(amp_lim_err),                   [], 'all');
 
         % new guesses
         X_f_guess = mag_X_f;
         X_s_guess = mag_X_s;
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
-        ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
-        phase_ctrl_mult_guess = eps + zeros(size(ctrl_mult_guess)); % fixme: If reactive control, phase should be nonzero, based on eq4 of IFAC paper.
 
-        % check convergence
+        % check convergence (only drag convergence; QCQP is solved analytically)
         X_converged = X_err < X_tol;
         phase_X_converged = phase_X_err < phase_X_tol;
-
-        F_lim_converged = F_lim_err < F_lim_tol;
-        X_lim_converged = X_lim_err < X_lim_tol;
-        converged = X_converged && phase_X_converged && ...
-                    F_lim_converged && X_lim_converged;
+        converged = X_converged && phase_X_converged;
 
         if all(isnan(X_f_guess))
             error('all nan')
@@ -278,7 +252,6 @@ end
 
 function [X_f_err,X_s_err,...
           phase_X_f_err,phase_X_s_err,...
-          force_lim_err,amp_lim_err,...
           mag_U,phase_U,...
           real_P,reactive_P,...
           mag_X_u,phase_X_u,...
@@ -288,7 +261,6 @@ function [X_f_err,X_s_err,...
           F_drag_f,F_drag_s,...
      phase_F_drag_f,phase_F_drag_s] = dynamics_error_wrapper(X_f_guess,X_s_guess,...
                                                         phase_X_f_guess,phase_X_s_guess,...
-                                                        ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                 H,w,k_wvn,m_f,m_s,m_c,B_h_f,B_h_s,B_c,K_h_f,K_h_s,...
                                                 gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                                 F_max,drag_const_f,drag_const_s,mag_v0_f,mag_v0_s,...
@@ -300,14 +272,13 @@ function [X_f_err,X_s_err,...
      mag_X_f,phase_X_f,...
      mag_X_s,phase_X_s,...
      B_p,K_p,P_sat_ratio,...
-     force_lim_err,amp_lim_err,...
+     ~,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,phase_F_drag_s] = dynamics_from_guess(X_f_guess, phase_X_f_guess, mag_v0_f, drag_const_f, ...
                                     X_s_guess, phase_X_s_guess, mag_v0_s, drag_const_s, ...
                                     B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,H,w,k_wvn,...
                                     gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                     control_type,multibody,merge_bodies,F_max,X_max,...
-                                    ctrl_mult_guess,phase_ctrl_mult_guess,...
                                     drag_fcn, D_f, D_f_in, D_d, T_f_slam, T_s_slam); % closed loop dynamics
     % error
     X_f_err = X_f_guess - mag_X_f;
@@ -325,8 +296,6 @@ function [X_f_err,X_s_err,...
     X_s_err(idx_unstable_or_fp_error) = 0;
     phase_X_f_err(idx_unstable_or_fp_error) = 0;
     phase_X_s_err(idx_unstable_or_fp_error) = 0;
-    force_lim_err(idx_unstable_or_fp_error) = 0;
-    amp_lim_err(idx_unstable_or_fp_error) = 0;
 end
 
 function [mag_U,phase_U,...
@@ -336,15 +305,14 @@ function [mag_U,phase_U,...
          mag_X_s,phase_X_s,...
          B_p_sat,K_p_sat,...
          P_sat_ratio,...
-         force_lim_err,...
-         amp_lim_err,...
+         qcqp_debug,...
      mag_F_drag_f,mag_F_drag_s,...
      phase_F_drag_f,phase_F_drag_s] = dynamics_from_guess(X_f_guess, phase_X_f_guess, mag_v0_f, drag_const_f, ...
                                         X_s_guess, phase_X_s_guess, mag_v0_s, drag_const_s, ...
                                         B_c,B_h_f,B_h_s,K_h_f,K_h_s,m_c,m_f,m_s,H,w,k_wvn,...
                                         gamma_f_mag,gamma_f_phase,gamma_s_mag,gamma_s_phase,...
                                         control_type,multibody,merge_bodies,F_max,X_max,...
-                                        ctrl_mult_guess,phase_ctrl_mult_guess,drag_fcn,...
+                                        drag_fcn,...
                                         D_f, D_f_in, D_d, T_f_slam, T_s_slam)
 
     % linear system
@@ -369,37 +337,36 @@ function [mag_U,phase_U,...
         % unsaturated optimal control gains
         [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type);
     end
-    % unsaturated response (stabilized)
+    % unsaturated response (stabilized) - capture phases for QCQP
     stabilize_B = true;
     stabilize_K = strcmpi(control_type,'reactive');
-    [mag_U_unsat,~,P_unsat,~,...
-     mag_X_u_unsat,~,...
-     mag_X_f_unsat,~,...
-     mag_X_s_unsat,~,...
+    [mag_U_unsat,phase_U_unsat,P_unsat,~,...
+     mag_X_u_unsat,phase_X_u_unsat,...
+     mag_X_f_unsat,phase_X_f_unsat,...
+     mag_X_s_unsat,phase_X_s_unsat,...
      B_p_stabilized,K_p_stabilized] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
     
-    Z_p = B_p_stabilized + K_p_stabilized ./ (1i * w);
     Z_th = 1 ./ (real_G_u + 1i * imag_G_u);
 
-    % saturated response and error
+    % solve constrained optimal control via QCQP (circle intersection)
+    [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
+                            mag_X_u_unsat, phase_X_u_unsat, ...
+                            mag_X_f_unsat, phase_X_f_unsat, ...
+                            mag_X_s_unsat, phase_X_s_unsat, ...
+                            mag_U_unsat, phase_U_unsat, ...
+                            B_p_stabilized, K_p_stabilized, ...
+                            F_max, X_max, ...
+                            B_h_f, B_h_s, B_c, K_h_f, K_h_s, ...
+                            B_drag_f, B_drag_s, m_c, m_f, m_s, ...
+                            control_type, multibody, merge_bodies);
+
+    % evaluate final response with constrained optimal controller
     [mag_U,phase_U,...
      real_P,reactive_P,...
      mag_X_u,phase_X_u,...
      mag_X_f,phase_X_f,...
-     mag_X_s,phase_X_s,...
-     B_p_sat,K_p_sat,...
-     force_lim_err,...
-     amp_lim_err] = response_and_ctrl_err_from_ctrl_guess(ctrl_mult_guess,...
-                                                    phase_ctrl_mult_guess,...
-                                                    F_max, mag_U_unsat,...
-                                                    X_max, mag_X_f_unsat, ...
-                                                    mag_X_s_unsat, ...
-                                                    mag_X_u_unsat, ...
-                                                    P_unsat, Z_p, Z_th, w,...
-                                                    control_evaluation_fcn,...
-                                                    H,k_wvn,D_f,D_d,...
-                                                    T_f_slam,T_s_slam,...
-                                                    control_type);
+     mag_X_s,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat,stabilize_B,stabilize_K);
+
     P_sat_ratio = real_P ./ P_unsat;
     F_drag_f = -B_drag_f .* mag_X_f .* w .* exp(1i * (phase_X_f + pi/2)) + gamma_drag_f .* H/2;
     F_drag_s = -B_drag_s .* mag_X_s .* w .* exp(1i * (phase_X_s + pi/2)) + gamma_drag_s .* H/2;
@@ -409,45 +376,333 @@ function [mag_U,phase_U,...
     phase_F_drag_s = angle(F_drag_s);
 end
 
-function [mag_U,phase_U,real_P,reactive_P,...
-        mag_X_u,phase_X_u,mag_X_f,phase_X_f,...
-        mag_X_s,phase_X_s,B_p_sat,K_p_sat,...
-        force_lim_err,amp_lim_err] = response_and_ctrl_err_from_ctrl_guess(...
-                                                    ctrl_mult_guess,...
-                                                    phase_ctrl_mult_guess,...
-                                                    F_max, mag_U_unsat,...
-                                                    X_max, mag_X_f_unsat, ...
-                                                    mag_X_s_unsat, ...
-                                                    mag_X_u_unsat, ...
-                                                    real_P_unsat,Z_p, Z_th, w,...
-                                                    control_evaluation_fcn,...
-                                                    H,k,D_f,D_d,T_f,T_s,...
-                                                    control_type)
+function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
+                            mag_X_u_unsat, phase_X_u_unsat, ...
+                            mag_X_f_unsat, phase_X_f_unsat, ...
+                            mag_X_s_unsat, phase_X_s_unsat, ...
+                            mag_U_unsat, phase_U_unsat, ...
+                            B_p_stabilized, K_p_stabilized, ...
+                            F_max, X_max, ...
+                            B_h_f, B_h_s, B_c, K_h_f, K_h_s, ...
+                            B_drag_f, B_drag_s, m_c, m_f, m_s, ...
+                            control_type, multibody, merge_bodies)
+% Solve the constrained optimal control problem analytically using
+% the QCQP circle intersection method from the paper.
+% Returns the constrained optimal B_p_sat and K_p_sat.
 
-    % saturated control gains from guess
-    mult = ctrl_mult_guess .* exp(1i*phase_ctrl_mult_guess);
-    Z_p_sat = Z_p .* mult;
-    B_p_sat =       real(Z_p_sat);
-    K_p_sat = -w .* imag(Z_p_sat);
+    X_f_max = X_max(1);
+    X_s_max = X_max(2);
+    X_u_max = X_max(3);
+    
+    % small tolerance for negligible coefficients (dimensionless and dimensional)
+    COEFF_TOL = 1e-10;
+    GAMMA_TOL = 1e-12;
+    
+    B_p_sat = B_p_stabilized;
+    K_p_sat = K_p_stabilized;
+    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
+    
+    % skip QCQP if no constraints or no PTO
+    use_force_sat = isfinite(F_max) && F_max > 0;
+    use_amp_sat = any(isfinite(X_max));
+    if ~use_force_sat && ~use_amp_sat
+        return
+    end
+    if F_max == 0
+        return
+    end
+    
+    % compute complex phasors for the unsaturated (Gamma=0) response
+    % and the derivative coefficients c_Y for each quantity Y
+    % Y(Gamma) = Y_0 + c_Y * Gamma, where Y_0 is the unsaturated value
+    
+    sz = size(w);
+    
+    for idx = 1:numel(w)
+        if isnan(B_h_f(idx))
+            continue  % skip NaN sea states
+        end
+        
+        Z_th_i = Z_th(idx);
+        w_i = w(idx);
+        
+        if ~isfinite(Z_th_i) || real(Z_th_i) <= 0
+            continue  % skip unstabilizable sea states
+        end
+        
+        % complex phasors at Gamma=0
+        X_u_0 = mag_X_u_unsat(idx) * exp(1i * phase_X_u_unsat(idx));
+        X_f_0 = mag_X_f_unsat(idx) * exp(1i * phase_X_f_unsat(idx));
+        X_s_0 = mag_X_s_unsat(idx) * exp(1i * phase_X_s_unsat(idx));
+        U_0   = mag_U_unsat(idx)   * exp(1i * phase_U_unsat(idx));
+        
+        % I_p = complex current phasor at Gamma=0
+        % I = I_p*(1-Gamma), so at Gamma=0: I_0 = I_p
+        % velocity = i*w*X_u, so I_p = i*w_i*X_u_0
+        I_p = 1i * w_i * X_u_0;
+        
+        if abs(I_p) < COEFF_TOL
+            continue  % no response, nothing to constrain
+        end
+        
+        % derivative coefficients: Y(Gamma) = Y_0 + c_Y * Gamma
+        % From the paper: V = I_p*Z_th^**(1+Gamma), I = I_p*(1-Gamma)
+        c_V = I_p * conj(Z_th_i);   % force derivative: dV/dGamma
+        c_I = -I_p;                   % velocity derivative: dI/dGamma
+        c_Xu = -X_u_0;               % PTO displacement: X_u = I/(iw)
+        
+        % float and spar displacement derivatives depend on topology
+        if ~multibody || merge_bodies
+            % single body: X_f = X_u, X_s = 0
+            c_Xf = c_Xu;
+            c_Xs = 0;
+        else
+            % multibody: compute transfer functions from impedance matrices
+            % All arrays indexed by (idx) to extract the scalar for this sea state
+            B_f_total = B_h_f(idx) + B_drag_f(idx);
+            B_s_total = B_h_s(idx) + B_drag_s(idx);
+            Z_f_i = B_f_total + 1i*(m_f(idx)*w_i - K_h_f(idx)/w_i);
+            Z_s_i = B_s_total + 1i*(m_s(idx)*w_i - K_h_s(idx)/w_i);
+            Z_c_i = B_c(idx) + 1i*(m_c(idx)*w_i);
+            det_Z_i = Z_f_i .* Z_s_i - Z_c_i.^2;
+            
+            % transfer from PTO force to body displacement
+            % v_f = v_f_forced + (Z_s+Z_c)/det_Z * F_pto
+            % X_f = X_f_forced + (Z_s+Z_c)/(det_Z*iw) * F_pto
+            % F_pto = V = I_p*Z_th^**(1+Gamma)
+            % c_Xf = (Z_s+Z_c)/(det_Z*iw) * I_p * Z_th^*
+            T_f = (Z_s_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
+            T_s = -(Z_f_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
+            c_Xf = T_f .* I_p .* conj(Z_th_i);
+            c_Xs = T_s .* I_p .* conj(Z_th_i);
+        end
+        
+        % build circle constraints
+        % For constraint |Y| <= Y_max where Y = Y_0 + c_Y * Gamma:
+        % circle center = -Y_0/c_Y, radius = Y_max/|c_Y|, S=+1 (inside)
+        centers = [];
+        radii = [];
+        current_labels = {};
+        
+        % force constraint: |V| <= F_max
+        if use_force_sat && abs(c_V) > COEFF_TOL
+            center_F = -U_0 / c_V;
+            radius_F = F_max / abs(c_V);
+            if mag_U_unsat(idx) > F_max  % only add if violated
+                centers = [centers; real(center_F), imag(center_F)];
+                radii = [radii; radius_F];
+                current_labels{end+1} = 'Force limit';
+            end
+        end
+        
+        % float amplitude constraint: |X_f| <= X_f_max
+        if isfinite(X_f_max) && abs(c_Xf) > COEFF_TOL
+            center_Xf = -X_f_0 / c_Xf;
+            radius_Xf = X_f_max / abs(c_Xf);
+            if mag_X_f_unsat(idx) > X_f_max  % only add if violated
+                centers = [centers; real(center_Xf), imag(center_Xf)];
+                radii = [radii; radius_Xf];
+                current_labels{end+1} = 'Float amplitude';
+            end
+        end
+        
+        % spar amplitude constraint: |X_s| <= X_s_max
+        if isfinite(X_s_max) && abs(c_Xs) > COEFF_TOL && multibody && ~merge_bodies
+            center_Xs = -X_s_0 / c_Xs;
+            radius_Xs = X_s_max / abs(c_Xs);
+            if mag_X_s_unsat(idx) > X_s_max  % only add if violated
+                centers = [centers; real(center_Xs), imag(center_Xs)];
+                radii = [radii; radius_Xs];
+                current_labels{end+1} = 'Spar amplitude';
+            end
+        end
+        
+        % PTO amplitude constraint: |X_u| <= X_u_max
+        if isfinite(X_u_max) && abs(c_Xu) > COEFF_TOL
+            center_Xu = -X_u_0 / c_Xu;
+            radius_Xu = X_u_max / abs(c_Xu);
+            if mag_X_u_unsat(idx) > X_u_max  % only add if violated
+                centers = [centers; real(center_Xu), imag(center_Xu)];
+                radii = [radii; radius_Xu];
+                current_labels{end+1} = 'PTO amplitude';
+            end
+        end
+        
+        % positive power constraint: |Gamma - i*alpha|^2 <= 1 + alpha^2
+        % where alpha = Im(Z_th)/Re(Z_th)
+        alpha = imag(Z_th_i) / real(Z_th_i);
+        center_P = [0, alpha];
+        radius_P = sqrt(1 + alpha^2);
+        % always include positive power constraint (it's cheap and prevents P<0)
+        centers = [centers; center_P];
+        radii = [radii; radius_P];
+        current_labels{end+1} = 'Positive power';
+        
+        % damping control: add Q=0 constraint circle
+        % Gamma must lie ON the Q=0 circle (equality constraint)
+        % Q=0 circle: center = -i*R/X, radius = |Z_th|/|X|
+        % where R = Re(Z_th), X = Im(Z_th)
+        p_star = [];
+        if strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > COEFF_TOL
+            R_th = real(Z_th_i);
+            X_th = imag(Z_th_i);
+            center_Q0 = [0, -R_th/X_th];
+            radius_Q0 = abs(Z_th_i) / abs(X_th);
+            % for damping, find optimal on Q=0 circle subject to other constraints
+            Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii);
+        else
+            % reactive control or no reactance: use standard circle intersection
+            if isempty(centers)
+                Gamma_opt = 0;  % no constraints active
+            else
+                [p_star, ~, ~] = circle_intersect_optim(centers, radii);
+                if isempty(p_star)
+                    % Constraint circles are mutually infeasible.
+                    % This typically happens when force (circle at Gamma=-1)
+                    % and amplitude (circle at Gamma=+1) limits are both
+                    % violated and r_F + r_Xu < 2 (they can't intersect).
+                    % Fall back: try each individual constraint circle with
+                    % the positive-power circle to find best feasible Gamma.
+                    % Power circle is always the last entry in centers/radii.
+                    Gamma_opt = 1;  % default: shutdown
+                    best_norm = Inf;
+                    n_c = size(centers, 1);
+                    c_pow = centers(n_c, :);
+                    r_pow = radii(n_c);
+                    for k = 1:n_c - 1
+                        % closest boundary point on circle k to origin
+                        dist_to_center_k = norm(centers(k,:));
+                        if dist_to_center_k < COEFF_TOL
+                            boundary_point_k = [radii(k), 0];
+                        else
+                            boundary_point_k = centers(k,:) - radii(k) * centers(k,:)/dist_to_center_k;
+                        end
+                        % accept only if inside the positive-power circle
+                        if norm(boundary_point_k - c_pow) <= r_pow + 1e-4 && norm(boundary_point_k) < best_norm
+                            best_norm = norm(boundary_point_k);
+                            Gamma_opt = boundary_point_k(1) + 1i*boundary_point_k(2);
+                        end
+                    end
+                else
+                    Gamma_opt = p_star(1) + 1i*p_star(2);
+                end
+            end
+        end
+        
+        % update debug struct if this is the most constrained feasible sea state
+        n_non_power = size(centers, 1) - 1;  % last circle is always the power circle
+        if n_non_power > qcqp_debug.n_active_constraints && ~isempty(centers) && isfinite(Gamma_opt)
+            qcqp_debug.centers = centers;
+            qcqp_debug.radii = radii;
+            qcqp_debug.labels = current_labels;
+            qcqp_debug.Gamma_opt = Gamma_opt;
+            qcqp_debug.alpha = imag(Z_th_i) / real(Z_th_i);
+            qcqp_debug.Z_th = Z_th_i;
+            qcqp_debug.w = w_i;
+            qcqp_debug.n_active_constraints = n_non_power;
+            qcqp_debug.feasible = ~isempty(p_star);
+        end
 
-    % saturated response (with B stabilization, and K stabilization for reactive control)
-    stabilize_B = true;
-    stabilize_K = strcmpi(control_type,'reactive');
-    [mag_U,phase_U,...
-     real_P,reactive_P,...
-     mag_X_u,phase_X_u,...
-     mag_X_f,phase_X_f,...
-     mag_X_s,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat,stabilize_B,stabilize_K);
+        % convert Gamma to Z_l, then to B_p and K_p
+        if abs(Gamma_opt) < GAMMA_TOL
+            % no constraint active, keep unsaturated gains
+            continue
+        end
+        
+        Z_l = conj(Z_th_i) * (1 + Gamma_opt) / (1 - Gamma_opt);
+        B_p_sat(idx) = real(Z_l);
+        K_p_sat(idx) = -w_i * imag(Z_l);
+        
+        % ensure B_p >= 0 (stabilize)
+        if B_p_sat(idx) < 0
+            B_p_sat(idx) = 0;
+        end
+    end
+end
 
-    % control error: uses saturated and unsaturated response
-    [force_lim_err,...
-     amp_lim_err] = control_errors_from_sat_results(ctrl_mult_guess,phase_ctrl_mult_guess,...
-                                                    F_max,mag_U_unsat,mag_U,...
-                                                    X_max(1), mag_X_f_unsat, mag_X_f, phase_X_f,...
-                                                    X_max(2), mag_X_s_unsat, mag_X_s, phase_X_s,...
-                                                    X_max(3), mag_X_u_unsat, mag_X_u, ...
-                                                    B_p_sat, real_P, real_P_unsat, Z_th, ...
-                                                    H, k, D_f, D_d, T_f, T_s);
+function Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii)
+% For damping control, find the point on the Q=0 circle closest to the 
+% origin that satisfies all other constraint circles.
+% The Q=0 circle parametrically: Gamma(t) = center + radius * exp(i*t)
+
+    % closest point on Q=0 circle to origin (unconstrained damping optimal)
+    c_Q0 = center_Q0(1) + 1i*center_Q0(2);
+    dist_to_center = abs(c_Q0);
+    if dist_to_center < 1e-10
+        % center at origin, any point on circle is equally close
+        Gamma_closest = radius_Q0;
+    else
+        Gamma_closest = c_Q0 - radius_Q0 * c_Q0 / dist_to_center;
+    end
+    
+    % check if the closest point is feasible
+    p_closest = [real(Gamma_closest), imag(Gamma_closest)];
+    if isempty(centers) || check_inside_circles(p_closest, centers, radii)
+        Gamma_opt = Gamma_closest;
+        return
+    end
+    
+    % find intersections of Q=0 circle with each constraint circle
+    candidates = [];
+    for i = 1:length(radii)
+        [xs, ys] = circle_circle_intersect_inline(...
+            center_Q0(1), center_Q0(2), radius_Q0, ...
+            centers(i,1), centers(i,2), radii(i));
+        if ~isnan(xs(1))
+            candidates = [candidates; xs(1), ys(1); xs(2), ys(2)]; %#ok<AGROW>
+        end
+    end
+    
+    % filter feasible candidates
+    feasible = [];
+    for i = 1:size(candidates,1)
+        p = candidates(i,:);
+        % check on Q=0 circle and inside all other constraint circles
+        on_Q0 = abs(norm(p - center_Q0) - radius_Q0) < 1e-4;
+        if on_Q0 && check_inside_circles(p, centers, radii)
+            feasible = [feasible; p]; %#ok<AGROW>
+        end
+    end
+    
+    if isempty(feasible)
+        % No point on the Q=0 circle satisfies all constraints simultaneously.
+        % Fall back to the unconstrained damping-optimal point (Gamma_closest),
+        % which always satisfies the positive-power constraint (the Q=0 and
+        % power circles always intersect when Im(Z_th)≠0).
+        % This may violate force/amplitude limits but avoids complete shutdown.
+        Gamma_opt = Gamma_closest;
+    else
+        % choose closest to origin
+        dists = vecnorm(feasible, 2, 2);
+        [~, best] = min(dists);
+        Gamma_opt = feasible(best,1) + 1i*feasible(best,2);
+    end
+end
+
+function inside = check_inside_circles(p, centers, radii)
+% Check if point p=[x,y] is inside all circles
+    dists = vecnorm(p - centers, 2, 2);
+    inside = all(dists <= radii + 1e-4);
+end
+
+function [xs, ys] = circle_circle_intersect_inline(x1,y1,r1,x2,y2,r2)
+% Inline circle-circle intersection (same as in circle_intersect_optim)
+    d = sqrt((x2-x1)^2 + (y2-y1)^2);
+    if d > r1+r2 || d < abs(r1-r2) || d == 0
+        xs = [NaN, NaN];
+        ys = [NaN, NaN];
+        return
+    end
+    a = (r1^2 - r2^2 + d^2) / (2*d);
+    h = sqrt(max(r1^2 - a^2, 0));
+    mx = x1 + a*(x2-x1)/d;
+    my = y1 + a*(y2-y1)/d;
+    dx = h*(y2-y1)/d;
+    dy = h*(x2-x1)/d;
+    xs = [mx+dx, mx-dx];
+    ys = [my-dy, my+dy];
 end
 
 function [control_evaluation_fcn,...
@@ -659,7 +914,7 @@ function [mag_U,phase_U,...
             need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                                   + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
             if need_more_stabilizing~=0
-                warning('Stabilizing did not work after 2 tries. This could be a finite precision issue.')
+                warning('MDOcean:GetResponseDrag:StabilizingFailed', 'Stabilizing did not work after 2 tries. This could be a finite precision issue.')
             end
 
         end
@@ -814,7 +1069,8 @@ function [idx_closed_loop_unstable,...
                 det_k_ol = K_f;
             end
         end
-        warning(['Open loop dynamics are unstable for idx_H=[%s], ' ...
+        warning('MDOcean:GetResponseDrag:OpenLoopUnstable', ...
+            ['Open loop dynamics are unstable for idx_H=[%s], ' ...
                'idx_T=[%s]. det(M)=[%s], det(B)=[%s], det(K)=[%s].'], ...
             num2str(idx_H.'), ...
             num2str(idx_T.'), ...
@@ -868,240 +1124,14 @@ function all_posdef = check_posdef_three_2x2s(a11,a12,a21,a22, b11,b12,b21,b22, 
             c11 > 0 & (c11.*c22 - c21.*c12) >= 0;
 end
 
-function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl_mult_mag,...
-                                                   ctrl_mult_phase, F_max, mag_U_unsat, mag_U,...
-                                                   X_f_upper_limit_static, mag_X_f_unsat, mag_X_f, phase_X_f,...
-                                                   X_s_upper_limit_static, mag_X_s_unsat, mag_X_s, phase_X_s,...
-                                                   X_u_upper_limit_static, mag_X_u_unsat, mag_X_u, ...
-                                                    B_p_sat, P_sat, P_unsat, Z_th, ...
-                                                    H, k, D_f, D_d, T_f, T_s)
-
-    use_amp_sat = ~(isinf(X_f_upper_limit_static) && isinf(X_s_upper_limit_static) && isinf(X_u_upper_limit_static));
-
-    if use_amp_sat
-        [X_f_lower_limit_dynamic,...
-         X_f_upper_limit_dynamic,...
-         idx_f_imag] = get_slamming_min_max(H/2, k, D_f, phase_X_f, T_f);
-        X_f_lower_limit_dynamic(idx_f_imag) = -abs(imag(X_f_lower_limit_dynamic(idx_f_imag)));
-        X_f_upper_limit_dynamic(idx_f_imag) = -abs(imag(X_f_upper_limit_dynamic(idx_f_imag)));
-
-        [X_s_lower_limit_dynamic,...
-         X_s_upper_limit_dynamic,...
-         idx_s_imag] = get_slamming_min_max(H/2, k, D_d, phase_X_s, T_s);
-        X_s_upper_limit_dynamic(idx_s_imag) = -abs(imag(X_s_upper_limit_dynamic(idx_s_imag)));
-        X_s_lower_limit_dynamic(idx_s_imag) = -abs(imag(X_s_lower_limit_dynamic(idx_s_imag)));
-
-        X_f_upper_limit = min(X_f_upper_limit_dynamic, X_f_upper_limit_static);
-        X_s_upper_limit = min(X_s_upper_limit_dynamic, X_s_upper_limit_static);
-        X_u_upper_limit = X_u_upper_limit_static;
-
-        X_f_lower_limit = X_f_lower_limit_dynamic;
-        X_s_lower_limit = X_s_lower_limit_dynamic;
-    else
-        X_f_upper_limit = Inf(size(mag_X_f));
-        X_s_upper_limit = Inf(size(mag_X_s));
-        X_u_upper_limit = Inf(size(mag_X_u));
-        X_f_lower_limit = -Inf(size(mag_X_f));
-        X_s_lower_limit = -Inf(size(mag_X_s));
-    end
-
-    % what the force and amp would be if the force-sat and amp-sat
-    % solutions applied - notebook p106 2/2/25
-    force_saturated_U = min(4/pi * F_max,      mag_U_unsat);
-
-    amp_up_saturated_X_f = min(X_f_upper_limit, mag_X_f_unsat);
-    amp_dn_saturated_X_f = max(X_f_lower_limit, mag_X_f_unsat);
-
-    amp_up_saturated_X_s = min(X_s_upper_limit, mag_X_s_unsat);
-    amp_dn_saturated_X_s = max(X_s_lower_limit, mag_X_s_unsat);
-
-    amp_saturated_X_u = min(X_u_upper_limit, mag_X_u_unsat);
-
-    % indices where sat and unsat solutions violate which constraint
-    idx_force_viol_unsat    = mag_U_unsat   > force_saturated_U;
-    idx_amp_f_viol_unsat_up = mag_X_f_unsat > amp_up_saturated_X_f;
-    idx_amp_f_viol_unsat_dn = mag_X_f_unsat < amp_dn_saturated_X_f;
-    idx_amp_s_viol_unsat_up = mag_X_s_unsat > amp_up_saturated_X_s;
-    idx_amp_s_viol_unsat_dn = mag_X_s_unsat < amp_dn_saturated_X_s;
-    idx_amp_u_viol_unsat    = mag_X_u_unsat > amp_saturated_X_u;
-    
-    num_constr_viol_unsat = idx_force_viol_unsat    + idx_amp_f_viol_unsat_up ...
-                          + idx_amp_f_viol_unsat_dn + idx_amp_s_viol_unsat_up ...
-                          + idx_amp_s_viol_unsat_dn + idx_amp_u_viol_unsat;
-    all_ok_unsat       = num_constr_viol_unsat==0;
-    only_force_viol_unsat    = idx_force_viol_unsat    & num_constr_viol_unsat==1;
-    only_amp_f_viol_unsat_up = idx_amp_f_viol_unsat_up & num_constr_viol_unsat==1;
-    only_amp_f_viol_unsat_dn = idx_amp_f_viol_unsat_dn & num_constr_viol_unsat==1;
-    only_amp_s_viol_unsat_up = idx_amp_s_viol_unsat_up & num_constr_viol_unsat==1;
-    only_amp_s_viol_unsat_dn = idx_amp_s_viol_unsat_dn & num_constr_viol_unsat==1;
-    only_amp_u_viol_unsat    = idx_amp_u_viol_unsat    & num_constr_viol_unsat==1;
-    mult_const_viol_unsat = num_constr_viol_unsat >= 2;
-
-    % indices where each solution applies. commented forumlas attempt to 
-    % incorporate both but should not actually be based purely on whether
-    % the saturated and/or unsaturated solution violates, it should also
-    % depend on alpha and the limits (see notebook p142-144 9/15/25).
-    idx_force_sat_applies    = all_ok_unsat | only_force_viol_unsat;
-    idx_amp_f_sat_applies_up = all_ok_unsat | only_amp_f_viol_unsat_up;
-    idx_amp_f_sat_applies_dn = all_ok_unsat | only_amp_f_viol_unsat_dn;
-    idx_amp_s_sat_applies_up = all_ok_unsat | only_amp_s_viol_unsat_up;
-    idx_amp_s_sat_applies_dn = all_ok_unsat | only_amp_s_viol_unsat_dn;
-    idx_amp_u_sat_applies    = all_ok_unsat | only_amp_u_viol_unsat;
-
-%         idx_force_sat_applies = both_ok_unsat | idx_force_viol_sat;   % | (idx_amp_viol_sat & idx_force_viol_sat);
-%         idx_amp_sat_applies   = both_ok_unsat | only_force_ok_unsat; % | (idx_amp_viol_sat & idx_force_viol_sat);
-
-    if isinf(F_max)
-        F_err_from_force_sat = zeros(size(mag_X_f));
-    else
-        F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
-        F_err_from_force_sat(force_saturated_U == 0) = mag_U(force_saturated_U == 0) / 1e6;
-        F_err_from_force_sat(F_err_from_force_sat < -1) = -.99;
-    end
-    X_err_from_amp_f_sat_up = mag_X_f ./ amp_up_saturated_X_f - 1;
-    X_err_from_amp_f_sat_up(amp_up_saturated_X_f == 0) = mag_X_f(amp_up_saturated_X_f == 0);
-    X_err_from_amp_f_sat_up(X_err_from_amp_f_sat_up < -1) = -.99;
-
-    X_err_from_amp_f_sat_dn = amp_dn_saturated_X_f ./ mag_X_f  - 1;
-    X_err_from_amp_f_sat_dn(mag_X_f == 0) = -amp_dn_saturated_X_f(mag_X_f == 0);
-    X_err_from_amp_f_sat_dn(X_err_from_amp_f_sat_dn < -1) = -.99;
-
-    X_err_from_amp_s_sat_up = mag_X_s ./ amp_up_saturated_X_s - 1;
-    X_err_from_amp_s_sat_up(amp_up_saturated_X_s == 0) = mag_X_s(amp_up_saturated_X_s == 0);
-    X_err_from_amp_s_sat_up(X_err_from_amp_s_sat_up < -1) = -.99;
-
-    X_err_from_amp_s_sat_dn = amp_dn_saturated_X_s ./ mag_X_s  - 1;
-    X_err_from_amp_s_sat_dn(mag_X_s == 0) = -amp_dn_saturated_X_s(mag_X_s == 0);
-    X_err_from_amp_s_sat_dn(X_err_from_amp_s_sat_dn < -1) = -.99;
-
-    X_err_from_amp_u_sat = mag_X_u ./ amp_saturated_X_u - 1;
-    X_err_from_amp_u_sat(amp_saturated_X_u == 0) = mag_X_u(amp_saturated_X_u == 0);
-    X_err_from_amp_u_sat(X_err_from_amp_u_sat < -1) = -.99;
-
-    if ~use_amp_sat
-        X_err_from_amp_f_sat_up = zeros(size(mag_X_f));
-        X_err_from_amp_f_sat_dn = zeros(size(mag_X_f));
-        X_err_from_amp_s_sat_up = zeros(size(mag_X_s));
-        X_err_from_amp_s_sat_dn = zeros(size(mag_X_s));
-        X_err_from_amp_u_sat    = zeros(size(mag_X_u));
-    end
-
-    constr_viol_err = Inf(size(mag_X_f));
-    optimality_err  = Inf(size(mag_X_f));
-
-    % at sea states where one of the saturated solutions necessarily applies, 
-    % set constraint violation error as deviation from that solution,
-    % and optimality error as deviation from the optimal ctrl_mult_phase. 
-    constr_viol_err(idx_force_sat_applies)    = F_err_from_force_sat(idx_force_sat_applies);
-    constr_viol_err(idx_amp_f_sat_applies_up) = X_err_from_amp_f_sat_up(idx_amp_f_sat_applies_up);
-    constr_viol_err(idx_amp_f_sat_applies_dn) = X_err_from_amp_f_sat_dn(idx_amp_f_sat_applies_dn);
-    constr_viol_err(idx_amp_s_sat_applies_up) = X_err_from_amp_s_sat_up(idx_amp_s_sat_applies_up);
-    constr_viol_err(idx_amp_s_sat_applies_dn) = X_err_from_amp_s_sat_dn(idx_amp_s_sat_applies_dn);
-    constr_viol_err(idx_amp_u_sat_applies)    = X_err_from_amp_u_sat(idx_amp_u_sat_applies);
-    idx_soln_applies = idx_force_sat_applies    | idx_amp_f_sat_applies_up |...
-                       idx_amp_f_sat_applies_dn | idx_amp_s_sat_applies_up |...
-                       idx_amp_s_sat_applies_dn | idx_amp_u_sat_applies;
-    % eqns below from doi:10.1016/j.ifacol.2024.10.093
-    alpha = imag(Z_th) ./ real(Z_th); % eqn 8
-    epsilon = zeros(size(mag_X_f)); 
-    epsilon(idx_force_sat_applies) = 1; % effort limit
-    epsilon(idx_soln_applies & ~idx_force_sat_applies) = -1; % flow limit
-    sigma = sqrt( (alpha.^2 .* ctrl_mult_mag.^2 + 1).^2 + alpha.^2 .* (ctrl_mult_mag.^2 + 1).^2);
-    acos_argument = -2 * alpha .* ctrl_mult_mag ./ sigma;
-    acos_argument = max(-1, min(1, acos_argument));
-    atan_denominator = sigma + epsilon .* alpha .* (1+ctrl_mult_mag).^2;
-    small_denominator = abs(atan_denominator) < eps;
-    atan_denominator(small_denominator) = eps .* sign(atan_denominator(small_denominator));
-    atan_denominator(small_denominator & atan_denominator == 0) = eps;
-    atan_argument = (alpha.^2 .*  ctrl_mult_mag.^2 + 1) ./ atan_denominator;
-    ctrl_mult_phase_desired = 2 * atan(atan_argument) + epsilon .* acos(acos_argument); % eqn 4
-    optimality_err(idx_soln_applies) = wrapToPi(ctrl_mult_phase(idx_soln_applies) - ctrl_mult_phase_desired(idx_soln_applies));
-
-    % at sea states where none of the solutions necessarily apply (the true 
-    % solution could be any combo of one or two of the saturated solutions but unclear which 1-2),
-    % set one error as the avg constraint violation (to penalize exceeding the constraint
-    % without penalizing going under the constraint, so does not maximize power)
-    % and the other error as the deviation from the max-power point when no
-    % constraints are active or zero when a constraint is active (so that
-    % when in the feasible region, it walks toward the max-power point
-    % until it hits a constraint). To prevent it from starting infeasible
-    % and terminating at the nearest constraint without ever going to the 
-    % interior power-maximizing part, set optimality error=10 when any constraint is
-    % violated. This will make it take larger steps when approaching from 
-    % the outside so hopefully it overshoots and re-approaches from the inside.
-
-    constr_violation = (F_err_from_force_sat    + X_err_from_amp_f_sat_up + ...
-                        X_err_from_amp_f_sat_dn + X_err_from_amp_s_sat_up + ...
-                        X_err_from_amp_s_sat_dn + X_err_from_amp_u_sat   )  / 6;
-    constr_viol_err(mult_const_viol_unsat) = constr_violation(mult_const_viol_unsat);
-
-    P_unsat_safe = max(P_unsat, eps);
-    power_lost = (P_unsat - P_sat) ./ P_unsat_safe;
-
-    force_const_active = ismembertol(mag_U,   4/pi * F_max);
-    min_f_const_active = ismembertol(mag_X_f, X_f_lower_limit);
-    max_f_const_active = ismembertol(mag_X_f, X_f_upper_limit);
-    min_s_const_active = ismembertol(mag_X_s, X_s_lower_limit);
-    max_s_const_active = ismembertol(mag_X_s, X_s_upper_limit);
-    max_u_const_active = ismembertol(mag_X_u, X_u_upper_limit);
-
-    any_constr_active = force_const_active | min_f_const_active | max_f_const_active ...
-                      | min_s_const_active | max_s_const_active | max_u_const_active;
-    any_constr_violated = constr_violation > 0 & ~any_constr_active;
-    all_constr_inactive = ~any_constr_active & ~any_constr_violated;
-    
-    optimality_err(mult_const_viol_unsat & any_constr_active) = 0;
-    optimality_err(mult_const_viol_unsat & any_constr_violated) = 10;
-    optimality_err(mult_const_viol_unsat & all_constr_inactive) = ...
-        power_lost(mult_const_viol_unsat & all_constr_inactive);
-
-    % prevent 0/0=NaN when limit of zero is set
-    if F_max==0
-        constr_viol_err(mag_U==0) = 0;
-        constr_viol_err(mag_U~=0) = mag_U(mag_U~=0) ./ mag_U_unsat(mag_U~=0);
-    else
-        % add penalty for B_p<0 (negative power)
-        tol = 1;
-        B_p_violation = max(-B_p_sat+tol,0);
-        constr_viol_err = constr_viol_err + B_p_violation;
-    end
-end
-
 function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
     imag_term = b .* w;
     real_term = k - m .* w.^2;
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     X = X_over_F_mag .* F;
     if nargout > 1
-        X_over_F_phase = atan2(imag_term,real_term);
-        angle_X = X_over_F_phase + F_phase;
+        angle_F_over_X = atan2(imag_term,real_term);
+        angle_X = F_phase - angle_F_over_X;
     end
 end
 
-function mult = get_multiplier(f_sat,m,b,k,w,r_b,r_k)
-    % m, k, and r_k are scalars.
-    % All other inputs are 2D arrays, the dimension of the sea state matrix.
-
-    % speedup: only do math for saturated sea states, since unsat will = 1
-    % likewise, don't do math for uncontrolled sea states (f_sat=0)
-    idx_no_sat = f_sat == 1;
-    idx_zero = f_sat == 0;
-    idx_nan = idx_no_sat | idx_zero;
-    f_sat(idx_nan) = NaN;
-    b(idx_nan) = NaN;
-    w(idx_nan) = NaN;
-    r_b(idx_nan) = NaN;
-
-    [a_quad, b_quad, c_quad]  = get_abc_symbolic(f_sat,m,b,k,w,r_b,r_k);
-
-    % solve the quadratic formula
-    determinant = sqrt(b_quad .^ 2 - 4 * a_quad .* c_quad);
-    num = -b_quad + determinant;
-    num(:,:,2) = -b_quad - determinant;
-    den = 2 * a_quad;
-    roots = num ./ den;
-
-    % choose which of the two roots to use
-    mult = pick_which_root(roots, idx_no_sat, idx_zero, a_quad, b_quad, c_quad);
-    assert(all(~isnan(mult),'all'))
-end

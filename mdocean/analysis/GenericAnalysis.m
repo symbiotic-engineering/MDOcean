@@ -57,7 +57,11 @@ classdef (Abstract) GenericAnalysis
             if nargin > 1
                 obj.b = b;
             else
-                obj.b = var_bounds();
+                if isfile('var_bounds.mat')
+                    obj.b = load('var_bounds.mat').b;
+                else
+                    obj.b = var_bounds();
+                end
             end
             
             obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
@@ -234,7 +238,15 @@ classdef (Abstract) GenericAnalysis
                               obj.format_inputs_list(obj.extra_postpro_inputs, obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
                               obj.format_outputs([obj.postpro_outputs, obj.extra_postpro_outputs]) ];
-            stages = [analysis_stage newline postpro_stage];
+            viz_stage = ['viz-' class(obj) ':' newline ...
+                          '  kind: jupyter-notebook' newline ...
+                          '  environment: pubs' newline ...
+                          '  notebook_path: results/fig_notebooks/' class(obj) '.ipynb' newline ...
+                          '  inputs:' newline ...
+                          '    - from_stage_outputs: postpro-' class(obj) newline ...
+                          '  html_storage: null' newline ...
+                          '  executed_ipynb_storage: git'];
+            stages = [analysis_stage newline postpro_stage newline viz_stage];
         end
 
         function list_str = format_inputs_list(~, extras, deps)
