@@ -101,3 +101,4 @@ exportgraphics(fig,[base_test_dir '/Figure_30_unittest.pdf'])
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)
 assertSuccess(results);
+end
