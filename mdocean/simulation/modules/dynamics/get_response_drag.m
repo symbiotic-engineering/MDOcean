@@ -632,7 +632,7 @@ function [mag_U,phase_U,...
             need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                                   + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
             if need_more_stabilizing~=0
-                warning('Stabilizing did not work after 2 tries. This could be a finite precision issue.')
+                warning('MDOcean:GetResponseDrag:StabilizingFailed', 'Stabilizing did not work after 2 tries. This could be a finite precision issue.')
             end
 
         end
