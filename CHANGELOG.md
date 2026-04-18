@@ -1,5 +1,9 @@
 # Changelog
 ## Unreleased
+## [v1.1.25](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.25) - 2026-4-17
+### Fixed
+- Validation: fix PTO force extraction from WEC-Sim so it includes stiffness (previously only included damping component)
+
 ## [v1.1.24](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.24) - 2026-4-17
 ### Fixed
 - Model: remove sign discrepancy between MEEM and WAMIT excitation phase 
