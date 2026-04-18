@@ -507,7 +507,7 @@ function [opt_mag_U,opt_phase_U,...
     if brute_force_plot_on
         make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_for_plot, ...
                                 constraint_err, idx_opt, ...
-                                mag_ctrl_mult_stabilized, phs_stabilized);
+                                mag_ctrl_mult_stabilized, phase_ctrl_mult_stabilized);
     end
 
     opt_mag_U = mag_U(idx_opt);
@@ -1237,7 +1237,7 @@ function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
     X_over_F_mag = ((real_term).^2 + (imag_term).^2).^(-1/2);
     X = X_over_F_mag .* F;
     if nargout > 1
-        X_over_F_phase = atan2(imag_term,real_term);
-        angle_X = X_over_F_phase + F_phase;
+        angle_F_over_X = atan2(imag_term,real_term);
+        angle_X = F_phase - angle_F_over_X;
     end
 end
