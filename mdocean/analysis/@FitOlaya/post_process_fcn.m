@@ -379,9 +379,9 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     y_pred_f1_v2 = cellfun(fun, y_pred_base, idxs_alpha_cell, idxs_beta_cell, 'UniformOutput', false);
 
     x_label_v1 = 'k R_b R_x/R_p \alpha^2 / \beta';
-    y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_b R_x/R_b \alpha)\right]^2$ ';
+    y_label_v1 = '$\beta^2 \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_x \alpha)\right]^2$ ';
     x_label_v2 = 'k R_b R_x/R_p \alpha^3 / \beta';
-    y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_b R_x/R_b \alpha)\right]^2$ ';
+    y_label_v2 = '$\beta(1+\beta/\alpha) \left[f/(\rho g \pi R_c^2  H_0(k R_x) e^{-k e_1} k R_x \alpha)\right]^2$ ';
 
     % version 1: all alpha combined (manual + auto fits with coeffs)
     [figs_v1, fits_v1] = plot_fit_and_coeffs_all_alpha_beta(x_f1_v1, y_f1_v1, x_f3, y_base, y_pred_base, ...
