@@ -453,7 +453,7 @@ function [opt_mag_U,opt_phase_U,...
     [opt_real_P,idx_opt] = max(real_P,[],ctrl_dim);
 
     sea_state_infeasible = ~each_sea_state_feasible & ~isnan(w);
-    if any(sea_state_infeasible)
+    if any(sea_state_infeasible(:))
         warning(['no feasible controller found for %d/%d sea states, setting signals to '...
                 'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
                 sum(sea_state_infeasible(:)), sum(~isnan(w)))
@@ -1202,6 +1202,9 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
         constr_viol_err = constr_viol_err + B_p_violation;
     end
 
+    if any(~isfinite(constr_viol_err(~isnan(mag_X_f))),'all')
+        warning('error is non finite for non-nan sea state')
+    end
     if nargout > 1
         optimality_err  = Inf(size(mag_X_f));
 
