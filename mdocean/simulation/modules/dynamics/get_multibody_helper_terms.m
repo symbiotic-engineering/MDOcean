@@ -1,22 +1,28 @@
-function h = get_multibody_helper_terms(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, ...
-                                         F_f_mag,F_f_phase,F_s_mag,F_s_phase,D_sys)
+function [t18,t9,t108,t121,t_110_118,t144,t109,t119,h_D_sys,t145,t103,t126,t130,t129,t131,t102,t124] = ...
+    get_multibody_helper_terms(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, ...
+                               F_f_mag,F_f_phase,F_s_mag,F_s_phase,D_sys)
 % GET_MULTIBODY_HELPER_TERMS  Pre-compute all controller-independent
 % intermediate variables for MULTIBODY_RESPONSE.
 %
-% The returned struct h may be passed as the optional 17th argument to
-% MULTIBODY_RESPONSE so that these quantities are not recomputed on every
-% controller evaluation in the brute-force optimisation loop.  K_p and B_p
-% are the only inputs of MULTIBODY_RESPONSE that are absent here; all
-% calculations below are therefore independent of the controller.
+% The 17 return values may be passed as args 17–33 of MULTIBODY_RESPONSE so
+% that these quantities are not recomputed on every controller evaluation in
+% the brute-force optimisation loop.  K_p and B_p are the only inputs of
+% MULTIBODY_RESPONSE that are absent here; all calculations below are
+% therefore independent of the controller.
 %
-% D_sys is optional: when omitted it is computed internally.
+% D_sys is optional: when omitted it is computed internally and returned as
+% h_D_sys (the 9th output).
 %
 % Usage:
-%   h = get_multibody_helper_terms(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, ...
-%                                   F_f_mag,F_f_phase,F_s_mag,F_s_phase);
+%   [t18,t9,t108,t121,t_110_118,t144,t109,t119,h_D_sys, ...
+%    t145,t103,t126,t130,t129,t131,t102,t124] = ...
+%       get_multibody_helper_terms(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, ...
+%                                  F_f_mag,F_f_phase,F_s_mag,F_s_phase);
 %   [mag_U,real_P,mag_X_u] = multibody_response(B_c,B_f,B_s,K_f,K_s, ...
 %                               m_c,m_f,m_s,w,K_p,B_p, ...
-%                               F_f_mag,F_f_phase,F_s_mag,F_s_phase,[],h);
+%                               F_f_mag,F_f_phase,F_s_mag,F_s_phase,[], ...
+%                               t18,t9,t108,t121,t_110_118,t144,t109,t119, ...
+%                               h_D_sys,t145,t103,t126,t130,t129,t131,t102,t124);
 
 % ---- variables that appear before K_p is first used in multibody_response ----
 s = w*1i;
@@ -150,21 +156,4 @@ t129      = -t128;
 t130      = -t127;
 t144      = t113+t143;
 
-% Pack into output struct
-h.t18       = t18;
-h.t9        = t9;
-h.t108      = t108;
-h.t121      = t121;
-h.t_110_118 = t_110_118;
-h.t144      = t144;
-h.t109      = t109;
-h.t119      = t119;
-h.D_sys     = D_sys;
-h.t145      = t145;
-h.t103      = t103;
-h.t126      = t126;
-h.t130      = t130;
-h.t129      = t129;
-h.t131      = t131;
-h.t102      = t102;
-h.t124      = t124;
+h_D_sys = D_sys;
