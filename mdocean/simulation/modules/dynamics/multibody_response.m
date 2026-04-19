@@ -193,10 +193,12 @@ if nargout > 4
     mag_X_s = t20.*abs(t149);
 end
 if nargout > 5
-    phase_X_f = angle(-t18.*t148.*1i);  % equivalent: (-t126+t127+...) == -t148
+    % angle(-1i*z) = atan2(-real(z), imag(z))  (t18>0 so does not affect angle)
+    phase_X_f = atan2(-real(t148), imag(t148));
 end
 if nargout > 6
-    phase_X_s = angle(t18.*t149.*1i);
+    % angle(1i*z) = atan2(real(z), -imag(z))
+    phase_X_s = atan2(real(t149), -imag(t149));
 end
 if nargout > 7
     phase_U = angle(-t133.*t144./t135);  % (t96.*t109.*w)./D_sys-1 == -t135
@@ -205,5 +207,7 @@ if nargout > 8
     imag_P = imag(t150)./2.0;
 end
 if nargout > 9
-    phase_X_u = angle(-(t109.*t144.*1i)./t_denom);
+    % angle(-1i*z) = atan2(-real(z), imag(z))
+    t_tu = t109.*t144./t_denom;
+    phase_X_u = atan2(-real(t_tu), imag(t_tu));
 end
