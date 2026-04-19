@@ -438,7 +438,7 @@ function [opt_mag_U,opt_phase_U,...
     end
 
     % save unmodified power for polar plot before infeasible controllers are set to -1
-    real_P_for_plot = real_P;
+    real_P_unmodified = real_P;
 
     % choose best controller for each sea state
     each_controller_feasible = constraint_err <= 0;
@@ -451,9 +451,12 @@ function [opt_mag_U,opt_phase_U,...
     sea_state_infeasible = ~each_sea_state_feasible & ~isnan(w);
     if any(sea_state_infeasible(:))
         
-        [min_err,idx_least_err] = min(constraint_err,[],ctrl_dim);
+        constraint_err_pos_pwr = constraint_err;
+        constraint_err_pos_pwr(real_P_unmodified<0) = Inf;
+        
+        [min_err,idx_least_err] = min(constraint_err_pos_pwr,[],ctrl_dim);
         idx_opt(sea_state_infeasible) = idx_least_err(sea_state_infeasible);
-        opt_real_P = real_P(idx_opt);
+        opt_real_P = real_P_unmodified(idx_opt);
 
         debug_print = brute_force_plot_on;
         if debug_print
@@ -501,7 +504,7 @@ function [opt_mag_U,opt_phase_U,...
 
     % polar plot of controller search grid (only in operational, non-mergedbodies case)
     if brute_force_plot_on
-        make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_for_plot, ...
+        make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P_unmodified, ...
                                 constraint_err, idx_opt, ...
                                 mag_ctrl_mult_stabilized, phase_ctrl_mult_stabilized);
     end
