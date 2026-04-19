@@ -45,8 +45,10 @@ t12 = K_f.*K_s;
 t16 = -K_f;
 t17 = -K_s;
 t18 = 1.0./w;
-t25 = F_f_phase.*1i;
-t26 = F_s_phase.*1i;
+% exp(1i*x) = cos(x) + 1i*sin(x); using real trig avoids complex exp and
+% the intermediate 1i-multiply that would be needed to form the argument.
+t30 = complex(cos(F_f_phase), sin(F_f_phase));
+t31 = complex(cos(F_s_phase), sin(F_s_phase));
 t27 = K_f.*1i;
 t28 = K_s.*1i;
 t34 = m_c.*w.*1i;
@@ -61,8 +63,6 @@ t22 = m_f.*t9;
 t23 = m_f.*t10;
 t24 = m_s.*t9;
 t29 = -t12;
-t30 = exp(t25);
-t31 = exp(t26);
 t33 = t5.*1i;
 t37 = m_c.*t9.*2.0;
 t40 = -t27;
@@ -155,11 +155,19 @@ t_110_118 = t110.*t118;
 t_Fs31_124 = F_s_mag.*t31.*t124;
 t_Ff30_124w = t_Ff30.*t124.*w;
 t133 = t96.*t109.*t119.*w;
-t142 = (F_s_mag.*t18.*t50.*t105.*t112.*t115)./(1i.*conj(D_sys));
-t126 = t_Fs31_124.*t9.*t68.*1i;
+% Denominator 1i.*conj(D_sys) = complex(imag(D_sys),real(D_sys)); avoids
+% a complex multiply by 1i in the denominator.
+t142 = (F_s_mag.*t18.*t50.*t105.*t112.*t115)./complex(imag(D_sys),real(D_sys));
+% z.*1i = complex(-imag(z),real(z)): multiplication by i is a 90° rotation,
+% handled with a swap+negate rather than a full complex multiply.  Applies
+% to t126, t128, and t131 below.
+t_Fs31_t9_t68 = t_Fs31_124.*t9.*t68;
+t126 = complex(-imag(t_Fs31_t9_t68), real(t_Fs31_t9_t68));
 t127 = t_Ff30_124w.*t98;
-t128 = t_Ff30_124w.*t95.*1i;
-t131 = t_Fs31_124.*t99.*w.*1i;
+t_Ff30w_t95 = t_Ff30_124w.*t95;
+t128 = complex(-imag(t_Ff30w_t95), real(t_Ff30w_t95));
+t_Fs31_t99w = t_Fs31_124.*t99.*w;
+t131 = complex(-imag(t_Fs31_t99w), real(t_Fs31_t99w));
 t132 = t92.*t_110_118.*w;
 t135 = t133+1.0;
 t143 = t_Fs31_124.*t18.*t106.*t111.*D_sys;
@@ -177,7 +185,9 @@ if nargout > 1
     t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t147, t150
     t_n_d = t_numer./t_denom;
     t146 = -t_n_d.*t103.*t119;
-    t147 = -t_n_d.*t102.*t124.*1i;
+    % -z.*1i = complex(imag(z),-real(z)): same 90° rotation pattern.
+    t_nd_t102_t124 = t_n_d.*t102.*t124;
+    t147 = complex(imag(t_nd_t102_t124), -real(t_nd_t102_t124));
     t148 = t126+t130+t146;
     t149 = t129+t131+t147;
     t150 = -t_n_d.*t_110_118.*t137.*t145;
@@ -193,10 +203,14 @@ if nargout > 4
     mag_X_s = t20.*abs(t149);
 end
 if nargout > 5
-    phase_X_f = angle(-t18.*t148.*1i);  % equivalent: (-t126+t127+...) == -t148
+    % angle(-t18*t148*1i): avoid complex *1i by using real/imag directly.
+    % angle(-1i*z) = atan2(-re(z), im(z)); multiply both atan2 args by t18>0 (=1/w).
+    phase_X_f = atan2(-t18.*real(t148), t18.*imag(t148));
 end
 if nargout > 6
-    phase_X_s = angle(t18.*t149.*1i);
+    % angle(t18*t149*1i): avoid complex *1i by using real/imag directly.
+    % angle(1i*z) = atan2(re(z), -im(z)); multiply both atan2 args by t18>0.
+    phase_X_s = atan2(t18.*real(t149), -t18.*imag(t149));
 end
 if nargout > 7
     phase_U = angle(-t133.*t144./t135);  % (t96.*t109.*w)./D_sys-1 == -t135
@@ -205,5 +219,7 @@ if nargout > 8
     imag_P = imag(t150)./2.0;
 end
 if nargout > 9
-    phase_X_u = angle(-(t109.*t144.*1i)./t_denom);
+    % angle(-1i*z) = atan2(-real(z), imag(z))
+    t_tu = t109.*t144./t_denom;
+    phase_X_u = atan2(-real(t_tu), imag(t_tu));
 end
