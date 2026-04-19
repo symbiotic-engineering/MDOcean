@@ -776,7 +776,8 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
 
     % excitation only when mag_v = 0
     mag_v_or_v0 = mag_v;
-    mag_v_or_v0(mag_v == 0) = mag_v0(mag_v == 0);
+    idx_v_0 = mag_v == 0;
+    mag_v_or_v0(idx_v_0) = mag_v0(idx_v_0);
 
     % derived p141 of notebook 9 3/5/26
     mag_v_constant_term = drag_const / (pi*(1-alpha^2)) * 2 * mag_v_or_v0;
@@ -1210,39 +1211,47 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
         F_err_from_force_sat = zeros(size(mag_X_f));
     else
         F_err_from_force_sat = mag_U   ./ force_saturated_U - 1;
-        F_err_from_force_sat(force_saturated_U == 0) = mag_U(force_saturated_U == 0) / 1e6;
+        idx_U_0 = force_saturated_U == 0;
+        F_err_from_force_sat(idx_U_0) = mag_U(idx_U_0) / 1e6;
         F_err_from_force_sat(F_err_from_force_sat < -1) = -.99;
     end
     X_err_from_amp_f_sat_up = mag_X_f ./ amp_up_saturated_X_f - 1;
-    X_err_from_amp_f_sat_up(amp_up_saturated_X_f == 0) = mag_X_f(amp_up_saturated_X_f == 0);
+    idx_amp_f_0 = amp_up_saturated_X_f == 0;
+    X_err_from_amp_f_sat_up(idx_amp_f_0) = mag_X_f(idx_amp_f_0);
     X_err_from_amp_f_sat_up(X_err_from_amp_f_sat_up < -1) = -.99;
 
     X_err_from_amp_f_sat_dn = amp_dn_saturated_X_f ./ mag_X_f  - 1;
-    X_err_from_amp_f_sat_dn(mag_X_f == 0) = -amp_dn_saturated_X_f(mag_X_f == 0);
+    idx_X_f_0 = mag_X_f == 0;
+    X_err_from_amp_f_sat_dn(idx_X_f_0) = -amp_dn_saturated_X_f(idx_X_f_0);
     X_err_from_amp_f_sat_dn(X_err_from_amp_f_sat_dn < -1) = -.99;
 
     X_err_from_amp_s_sat_up = mag_X_s ./ amp_up_saturated_X_s - 1;
-    X_err_from_amp_s_sat_up(amp_up_saturated_X_s == 0) = mag_X_s(amp_up_saturated_X_s == 0);
+    idx_amp_s_0 = amp_up_saturated_X_s == 0;
+    X_err_from_amp_s_sat_up(idx_amp_s_0) = mag_X_s(idx_amp_s_0);
     X_err_from_amp_s_sat_up(X_err_from_amp_s_sat_up < -1) = -.99;
 
     X_err_from_amp_s_sat_dn = amp_dn_saturated_X_s ./ mag_X_s  - 1;
-    X_err_from_amp_s_sat_dn(mag_X_s == 0) = -amp_dn_saturated_X_s(mag_X_s == 0);
+    idx_X_s_0 = mag_X_s == 0;
+    X_err_from_amp_s_sat_dn(idx_X_s_0) = -amp_dn_saturated_X_s(idx_X_s_0);
     X_err_from_amp_s_sat_dn(X_err_from_amp_s_sat_dn < -1) = -.99;
 
     X_err_from_amp_u_sat = mag_X_u ./ amp_saturated_X_u - 1;
-    X_err_from_amp_u_sat(amp_saturated_X_u == 0) = mag_X_u(amp_saturated_X_u == 0);
+    idx_amp_u_0 = amp_saturated_X_u == 0;
+    X_err_from_amp_u_sat(idx_amp_u_0) = mag_X_u(idx_amp_u_0);
     X_err_from_amp_u_sat(X_err_from_amp_u_sat < -1) = -.99;
 
     if isinf(P_max)
         P_err_from_power_sat_up = zeros(size(mag_X_f));
     else
         P_err_from_power_sat_up = P_sat ./ power_up_saturated_P - 1;
-        P_err_from_power_sat_up(power_up_saturated_P == 0) = P_sat(power_up_saturated_P == 0) / 1e6;
+        idx_P_up_0 = power_up_saturated_P == 0;
+        P_err_from_power_sat_up(idx_P_up_0) = P_sat(idx_P_up_0) / 1e6;
         P_err_from_power_sat_up(P_err_from_power_sat_up < -1) = -.99;
     end
 
     P_err_from_power_sat_dn = power_dn_saturated_P ./ P_sat - 1;
-    P_err_from_power_sat_dn(P_sat == 0) = -power_dn_saturated_P(P_sat == 0) / 1e6;
+    idx_P_dn_0 = P_sat == 0;
+    P_err_from_power_sat_dn(idx_P_dn_0) = -power_dn_saturated_P(idx_P_dn_0) / 1e6;
     P_err_from_power_sat_dn(P_err_from_power_sat_dn < -1) = -.99;
 
     if ~use_amp_sat
