@@ -34,13 +34,6 @@ function intermed_result_struct = analysis_fcn(p, b)
     end
     cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
-    for k = 1:numel(verbosity_warning_ids)
-        warning('off', verbosity_warning_ids{k}) % disable singular/backtrace warning verbosity
-    end
-    for k = 1:numel(warning_ids)
-        warning('error', warning_ids{k})
-    end
-
     n = 3; % number of points per dimension
 
     zero_to_one   = linspace(0.01, 0.99, n);
@@ -75,6 +68,13 @@ function intermed_result_struct = analysis_fcn(p, b)
     nan_val = val_nom;
     for k = 1:numel(fn)
         nan_val.(fn{k}) = NaN(size(val_nom.(fn{k})));
+    end
+
+    for k = 1:numel(verbosity_warning_ids)
+        warning('off', verbosity_warning_ids{k}) % disable singular/backtrace warning verbosity
+    end
+    for k = 1:numel(warning_ids)
+        warning('error', warning_ids{k})
     end
 
     nT = length(p.T);
