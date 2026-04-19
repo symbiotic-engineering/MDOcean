@@ -289,6 +289,10 @@ function [X_f_err,X_s_err,...
     if any(idx_unstable_or_fp_error(:))
         warning('unstable')
     end
+    idx_nan_power = isnan(real_P) & ~isnan(w);
+    if any(idx_nan_power(:))
+        warning('nan power for non-nan sea state')
+    end
     X_f_err(idx_unstable_or_fp_error) = 0;
     X_s_err(idx_unstable_or_fp_error) = 0;
     phase_X_f_err(idx_unstable_or_fp_error) = 0;
@@ -459,7 +463,13 @@ function [opt_mag_U,opt_phase_U,...
         
         [min_err,idx_least_err] = min(constraint_err_pos_pwr,[],ctrl_dim);
         idx_opt(sea_state_infeasible) = idx_least_err(sea_state_infeasible);
-        opt_real_P = real_P_unmodified(idx_opt);
+        % Use sub2ind for correct 3D indexing: idx_opt gives ctrl-dim index for
+        % each (Hs,T) sea state, so plain linear indexing real_P_unmodified(idx_opt)
+        % would silently access the wrong elements of the [Nh x NT x N_ctrl] array.
+        sz = size(real_P_unmodified);
+        [r,c] = ndgrid(1:sz(1), 1:sz(2));
+        lin_idx = sub2ind(sz, r, c, idx_opt);
+        opt_real_P = real_P_unmodified(lin_idx);
 
         debug_print = brute_force_plot_on;
         if debug_print
@@ -524,6 +534,16 @@ function [opt_mag_U,opt_phase_U,...
                                               P_unsat, Z_p_unsat, Z_th, w, ...
                                               control_evaluation_fcn, H, k_wvn, D_f, D_d, ...
                                               T_f_slam, T_s_slam, control_type);
+
+    % Warn if the final optimal response contains NaN for valid sea states.
+    % This path is not covered by the warning in dynamics_error_wrapper because
+    % that function is only called during the iterative drag-convergence loop.
+    if any(isnan(opt_mag_X_f(~isnan(w))),'all')
+        warning('NaN in opt_mag_X_f after brute-force re-evaluation for non-NaN sea states')
+    end
+    if any(isnan(opt_real_P(~isnan(w))),'all')
+        warning('NaN in opt_real_P after brute-force re-evaluation for non-NaN sea states')
+    end
 end
 
 function [mag_U,real_P,...
@@ -1178,7 +1198,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
 
     P_err_from_power_sat_dn = power_dn_saturated_P ./ P_sat - 1;
     P_err_from_power_sat_dn(P_sat == 0) = -power_dn_saturated_P(P_sat == 0) / 1e6;
-    P_err_from_power_sat_dn(X_err_from_amp_f_sat_dn < -1) = -.99;
+    P_err_from_power_sat_dn(P_err_from_power_sat_dn < -1) = -.99;
 
     if ~use_amp_sat
         X_err_from_amp_f_sat_up = zeros(size(mag_X_f));

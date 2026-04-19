@@ -184,6 +184,13 @@ if nargout > 1
     t_denom = t135.*D_sys;              % = ((t96.*t109.*w)./D_sys-1.0).*D_sys
     t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t147, t150
     t_n_d = t_numer./t_denom;
+    % Guard against 0/0 = NaN: can occur when the excitation force vanishes at
+    % the system resonant frequency (wave-cancellation + resonance coincidence).
+    % The physical response in this degenerate case is zero (no drive → no motion).
+    if any(isnan(t_n_d),'all')
+        warning('0/0 in multibody_response: setting degenerate t_n_d to 0')
+        t_n_d(isnan(t_n_d)) = 0;
+    end
     t146 = -t_n_d.*t103.*t119;
     % -z.*1i = complex(imag(z),-real(z)): same 90° rotation pattern.
     t_nd_t102_t124 = t_n_d.*t102.*t124;
