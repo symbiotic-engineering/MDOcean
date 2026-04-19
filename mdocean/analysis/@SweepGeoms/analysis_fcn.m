@@ -80,7 +80,8 @@ function intermed_result_struct = analysis_fcn(p, b)
     m0h_stored_linear         = nan(nT, n_geoms);
     hydro_ratio_result_linear = nan(nT, n_geoms);
     warning_hits              = zeros(numel(warning_ids), n_geoms);
-    unknown_error_hits        = false(1, n_geoms);
+    unknown_error_ids         = cell(1, n_geoms);
+    unknown_error_msgs        = cell(1, n_geoms);
     val = repmat(nan_val, [1, n_geoms]);
     drag_lut_rp_range    = nan(2, n_geoms); % row 1 = min, row 2 = max rp per geometry
     drag_lut_kappa_range = nan(2, n_geoms); % row 1 = min, row 2 = max kappa per geometry
@@ -108,13 +109,14 @@ function intermed_result_struct = analysis_fcn(p, b)
 
         try
             [hydro_ratio_max, out, warning_hit, rp_range_i, kappa_range_i] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, nan_val);
-        catch
-            hydro_ratio_max  = NaN;
-            out              = nan_val;
-            warning_hit      = zeros(1, numel(warning_ids));
-            rp_range_i       = nan(2, 1);
-            kappa_range_i    = nan(2, 1);
-            unknown_error_hits(i) = true;
+        catch ME
+            hydro_ratio_max          = NaN;
+            out                      = nan_val;
+            warning_hit              = zeros(1, numel(warning_ids));
+            rp_range_i               = nan(2, 1);
+            kappa_range_i            = nan(2, 1);
+            unknown_error_ids{i}  = ME.identifier;
+            unknown_error_msgs{i} = ME.message;
         end
         val(i) = out;
         warning_hits(:, i) = warning_hit(:);
@@ -149,11 +151,19 @@ function intermed_result_struct = analysis_fcn(p, b)
             end
         end
     end
-    n_unknown_errors = sum(unknown_error_hits);
+    nonempty_mask = ~cellfun(@isempty, unknown_error_ids);
+    n_unknown_errors = sum(nonempty_mask);
     if n_unknown_errors > 0
-        warning('MDOcean:SweepGeoms:UnknownError', ...
-            'SweepGeoms silently suppressed unknown errors for %.1f%% of geometries (%d/%d).', ...
-            100 * n_unknown_errors / n_geoms, n_unknown_errors, n_geoms);
+        unique_ids = unique(unknown_error_ids(nonempty_mask));
+        for k = 1:numel(unique_ids)
+            id_k = unique_ids{k};
+            id_mask = strcmp(unknown_error_ids, id_k);
+            count_k = sum(id_mask);
+            example_msg = unknown_error_msgs{find(id_mask, 1)};
+            warning('MDOcean:SweepGeoms:UnknownError', ...
+                'SweepGeoms caught ''%s'' for %.1f%% of geometries (%d/%d). Example message: %s', ...
+                id_k, 100 * count_k / n_geoms, count_k, n_geoms, example_msg);
+        end
     end
 
     % --- Save intermediate results ---
