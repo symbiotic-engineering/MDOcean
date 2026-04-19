@@ -46,7 +46,7 @@ t16 = -K_f;
 t17 = -K_s;
 t18 = 1.0./w;
 % exp(1i*x) = cos(x) + 1i*sin(x); using real trig avoids complex exp and
-% eliminates the intermediate 1i-multiply for t25/t26.
+% the intermediate 1i-multiply that would be needed to form the argument.
 t30 = complex(cos(F_f_phase), sin(F_f_phase));
 t31 = complex(cos(F_s_phase), sin(F_s_phase));
 t27 = K_f.*1i;
@@ -158,7 +158,9 @@ t133 = t96.*t109.*t119.*w;
 % Denominator 1i.*conj(D_sys) = complex(imag(D_sys),real(D_sys)); avoids
 % a complex multiply by 1i in the denominator.
 t142 = (F_s_mag.*t18.*t50.*t105.*t112.*t115)./complex(imag(D_sys),real(D_sys));
-% z.*1i = complex(-imag(z),real(z)): replace complex multiply by 90° rotation.
+% z.*1i = complex(-imag(z),real(z)): multiplication by i is a 90° rotation,
+% handled with a swap+negate rather than a full complex multiply.  Applies
+% to t126, t128, and t131 below.
 t_Fs31_t9_t68 = t_Fs31_124.*t9.*t68;
 t126 = complex(-imag(t_Fs31_t9_t68), real(t_Fs31_t9_t68));
 t127 = t_Ff30_124w.*t98;
@@ -183,7 +185,7 @@ if nargout > 1
     t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t147, t150
     t_n_d = t_numer./t_denom;
     t146 = -t_n_d.*t103.*t119;
-    % -z.*1i = complex(imag(z),-real(z)): replace complex multiply by 90° rotation.
+    % -z.*1i = complex(imag(z),-real(z)): same 90° rotation pattern.
     t_nd_t102_t124 = t_n_d.*t102.*t124;
     t147 = complex(imag(t_nd_t102_t124), -real(t_nd_t102_t124));
     t148 = t126+t130+t146;
