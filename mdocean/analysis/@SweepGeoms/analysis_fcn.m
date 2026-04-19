@@ -244,9 +244,8 @@ function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_
             end
 
             if any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
-                break  % Same warning fired again after disabling; return NaN for this geometry
+                break  % Same warning fired a second time; return NaN for this geometry
             end
-            warning('off', ME.identifier)
             n_disabled_warning_ids = n_disabled_warning_ids + 1;
             disabled_warning_ids{n_disabled_warning_ids} = ME.identifier;
         end
