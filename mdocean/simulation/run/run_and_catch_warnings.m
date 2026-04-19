@@ -46,8 +46,12 @@ function [outputs, warning_hit, captured_text] = run_and_catch_warnings(fcn, war
     captured_text = evalc('[outputs{1:nout}] = fcn();');
 
     % Identify which managed warning IDs appeared in the captured output.
+    % Match against the verbose-mode hint text "warning off <id>" so we
+    % detect only actual triggered warnings, not unrelated occurrences of
+    % the identifier string in other output.
     warning_hit = false(1, numel(warning_ids));
     for k = 1:numel(warning_ids)
-        warning_hit(k) = contains(captured_text, warning_ids{k});
+        pat = ['warning off ' regexptranslate('literalstr', warning_ids{k})];
+        warning_hit(k) = ~isempty(regexp(captured_text, pat, 'once'));
     end
 end

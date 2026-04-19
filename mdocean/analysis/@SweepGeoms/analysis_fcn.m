@@ -202,19 +202,20 @@ function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_
     hydro_ratio_max = max(hydro_ratio);
 
     % Parse rp/kappa ranges from the captured warning text for the drag-LUT
-    % warning.  The verbose warning format includes the identifier, and the
-    % warning message itself includes the rp/kappa values.
+    % warning.  The drag-LUT warning may fire multiple times within a single
+    % check_max_CW call (for different rp/kappa values), so collect all
+    % occurrences and aggregate min/max.
     drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
     if contains(captured_text, drag_lut_id)
-        toks = regexp(captured_text, ...
+        all_toks = regexp(captured_text, ...
             'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
-            'tokens', 'once');
-        if ~isempty(toks)
-            vals = cellfun(@str2double, toks);
-            rp_range(1)    = vals(1);
-            rp_range(2)    = vals(2);
-            kappa_range(1) = vals(3);
-            kappa_range(2) = vals(4);
+            'tokens');
+        for m = 1:numel(all_toks)
+            vals = cellfun(@str2double, all_toks{m});
+            rp_range(1)    = min([rp_range(1);    vals(1)], [], 'omitnan');
+            rp_range(2)    = max([rp_range(2);    vals(2)], [], 'omitnan');
+            kappa_range(1) = min([kappa_range(1); vals(3)], [], 'omitnan');
+            kappa_range(2) = max([kappa_range(2); vals(4)], [], 'omitnan');
         end
     end
 end
