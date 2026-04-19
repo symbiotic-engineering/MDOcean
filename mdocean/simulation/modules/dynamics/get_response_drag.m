@@ -285,7 +285,10 @@ function [X_f_err,X_s_err,...
     % and only zeroed when it's inevitable (system not stabilizable). 
     % For now, we zero these Infs in both cases.
     % Also handle finite precision errors that return nan.
-    idx_unstable_or_fp_error = mag_X_f==Inf | (isnan(mag_X_f) & ~isnan(X_f_guess));
+    idx_unstable_or_fp_error = mag_X_f==Inf | (isnan(mag_X_f) & ~isnan(w));
+    if any(idx_unstable_or_fp_error(:))
+        warning('unstable')
+    end
     X_f_err(idx_unstable_or_fp_error) = 0;
     X_s_err(idx_unstable_or_fp_error) = 0;
     phase_X_f_err(idx_unstable_or_fp_error) = 0;
