@@ -27,12 +27,18 @@ function intermed_result_struct = analysis_fcn(p, b)
     };
 
     verbosity_warning_ids = {'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'};
-    managed_warning_ids = [verbosity_warning_ids, warning_ids];
-    warning_states = cell(size(managed_warning_ids));
-    for k = 1:numel(managed_warning_ids)
-        warning_states{k} = warning('query', managed_warning_ids{k});
+
+    % Save all current warning states and restore on function exit.
+    prev_warning_states = warning;
+    cleanup_warnings = onCleanup(@() warning(prev_warning_states)); %#ok<NASGU>
+
+    % Suppress noisy verbosity warnings in the outer scope (nominal simulation
+    % and post-loop code).  Per-geometry warnings inside the parfor are handled
+    % silently by run_and_catch_warnings via evalc and do not need to be set
+    % here.
+    for k = 1:numel(verbosity_warning_ids)
+        warning('off', verbosity_warning_ids{k});
     end
-    cleanup_warnings = onCleanup(@() restore_warning_states(managed_warning_ids, warning_states));
 
     n = 3; % number of points per dimension
 
@@ -60,21 +66,13 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     X = [b.X_noms; 1];
 
-    % Run one nominal simulation to discover the full output struct layout.
-    % This must happen before warnings are promoted to errors so that any
-    % warnings fired by the nominal run do not abort this call.
+    % Run one nominal simulation to discover the full output struct layout
+    % for pre-allocating the val array before the parfor loop.
     [~, ~, ~, val_nom] = simulation(X, p);
     fn = fieldnames(val_nom);
     nan_val = val_nom;
     for k = 1:numel(fn)
         nan_val.(fn{k}) = NaN(size(val_nom.(fn{k})));
-    end
-
-    for k = 1:numel(verbosity_warning_ids)
-        warning('off', verbosity_warning_ids{k}) % disable singular/backtrace warning verbosity
-    end
-    for k = 1:numel(warning_ids)
-        warning('error', warning_ids{k})
     end
 
     nT = length(p.T);
@@ -109,7 +107,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         m0h_stored_linear(:, i) = dispersion(2*pi ./ p.T, p_i.h, p.g) * p_i.h;
 
         try
-            [hydro_ratio_max, out, warning_hit, rp_range_i, kappa_range_i] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val);
+            [hydro_ratio_max, out, warning_hit, rp_range_i, kappa_range_i] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, nan_val);
         catch
             hydro_ratio_max  = NaN;
             out              = nan_val;
@@ -127,9 +125,6 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     m0h_stored = reshape(m0h_stored_linear, [nT, size(A1)]);
     hydro_ratio_result = reshape(hydro_ratio_result_linear, [nT, size(A1)]);
-
-    restore_warning_states(managed_warning_ids, warning_states)
-    clear cleanup_warnings
 
     warning_counts = sum(warning_hits, 2);
     drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
@@ -191,55 +186,35 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.p = p;
 end
 
-function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, verbosity_warning_ids, nan_val)
-    worker_warning_state = warning;
-    cleanup_worker_warnings = onCleanup(@() warning(worker_warning_state)); %#ok<NASGU>
-
-    % Apply warning configuration on this worker.  parfor workers do not
-    % inherit warning() state changes made in the main thread after the
-    % parallel pool was created, so we must set them explicitly here.
-    for k = 1:numel(verbosity_warning_ids)
-        warning('off', verbosity_warning_ids{k});
-    end
-    for k = 1:numel(warning_ids)
-        warning('error', warning_ids{k});
-    end
-
+function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_max_CW_with_warning_capture(p_i, X_i, warning_ids, nan_val)
     hydro_ratio_max = NaN;
-    out = nan_val; % default for early-exit paths
-    rp_range    = nan(2, 1); % [min; max] rp seen in MDOcean:DragIntegral:OutsideLUT for this geometry
+    out = nan_val; % default for early-exit paths (genuine non-warning errors)
+    rp_range    = nan(2, 1); % [min; max] rp  seen in MDOcean:DragIntegral:OutsideLUT
     kappa_range = nan(2, 1); % [min; max] kappa seen
 
-    % run_and_catch_warnings retries check_max_CW after each managed warning,
-    % turning that warning off so execution can proceed past it.  A boolean
-    % flag per warning ID records whether it fired at least once for this
-    % geometry (regardless of how many retries were needed).
-    [check_outputs, warning_hit, caught_MEs] = run_and_catch_warnings( ...
+    % run_and_catch_warnings runs check_max_CW exactly once inside evalc,
+    % capturing all Command-Window output (including warning messages) so
+    % nothing reaches the terminal.  Warning states are managed internally.
+    [check_outputs, warning_hit, captured_text] = run_and_catch_warnings( ...
         @() check_max_CW('', p_i, X_i, false), warning_ids, 8);
     hydro_ratio     = check_outputs{1};
     out             = check_outputs{8};
     hydro_ratio_max = max(hydro_ratio);
 
-    % Parse drag-LUT-specific rp/kappa ranges from any caught exceptions.
+    % Parse rp/kappa ranges from the captured warning text for the drag-LUT
+    % warning.  The verbose warning format includes the identifier, and the
+    % warning message itself includes the rp/kappa values.
     drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
-    for m = 1:numel(caught_MEs)
-        if strcmp(caught_MEs{m}.identifier, drag_lut_id)
-            toks = regexp(caught_MEs{m}.message, ...
-                'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
-                'tokens', 'once');
-            if ~isempty(toks)
-                vals = cellfun(@str2double, toks);
-                rp_range(1)    = min([rp_range(1);    vals(1)], [], 'omitnan');
-                rp_range(2)    = max([rp_range(2);    vals(2)], [], 'omitnan');
-                kappa_range(1) = min([kappa_range(1); vals(3)], [], 'omitnan');
-                kappa_range(2) = max([kappa_range(2); vals(4)], [], 'omitnan');
-            end
+    if contains(captured_text, drag_lut_id)
+        toks = regexp(captured_text, ...
+            'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
+            'tokens', 'once');
+        if ~isempty(toks)
+            vals = cellfun(@str2double, toks);
+            rp_range(1)    = vals(1);
+            rp_range(2)    = vals(2);
+            kappa_range(1) = vals(3);
+            kappa_range(2) = vals(4);
         end
-    end
-end
-
-function restore_warning_states(warning_ids, warning_states)
-    for k = 1:numel(warning_ids)
-        warning(warning_states{k}.state, warning_ids{k})
     end
 end
