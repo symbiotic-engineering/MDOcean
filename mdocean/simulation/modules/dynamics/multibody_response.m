@@ -182,7 +182,7 @@ t139 = 1.0./t136;
 mag_U = t108.*t121.*t139.*abs(t96.*t144.*w);
 if nargout > 1
     t_denom = t135.*D_sys;              % = ((t96.*t109.*w)./D_sys-1.0).*D_sys
-    t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t147, t150
+    t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t150
     t_n_d = t_numer./t_denom;
     % Guard against 0/0 = NaN: can occur when the excitation force vanishes at
     % the system resonant frequency (wave-cancellation + resonance coincidence).
@@ -191,12 +191,8 @@ if nargout > 1
         warning('0/0 in multibody_response: setting degenerate t_n_d to 0')
         t_n_d(isnan(t_n_d)) = 0;
     end
-    t146 = -t_n_d.*t103.*t119;
-    % -z.*1i = complex(imag(z),-real(z)): same 90° rotation pattern.
-    t_nd_t102_t124 = t_n_d.*t102.*t124;
-    t147 = complex(imag(t_nd_t102_t124), -real(t_nd_t102_t124));
-    t148 = t126+t130+t146;
-    t149 = t129+t131+t147;
+    % t146–t149 are only needed for mag/phase of X_f and X_s (nargout>3/4/5/6),
+    % not for real_P, so their computation is deferred to those blocks below.
     t150 = -t_n_d.*t_110_118.*t137.*t145;
     real_P = real(t150)./2.0;
 end
@@ -204,9 +200,15 @@ if nargout > 2
     mag_X_u = t108.*t121.*t139.*abs(t144);
 end
 if nargout > 3
+    t146 = -t_n_d.*t103.*t119;
+    t148 = t126+t130+t146;
     mag_X_f = t20.*abs(t148);
 end
 if nargout > 4
+    % -z.*1i = complex(imag(z),-real(z)): same 90° rotation pattern.
+    t_nd_t102_t124 = t_n_d.*t102.*t124;
+    t147 = complex(imag(t_nd_t102_t124), -real(t_nd_t102_t124));
+    t149 = t129+t131+t147;
     mag_X_s = t20.*abs(t149);
 end
 if nargout > 5
