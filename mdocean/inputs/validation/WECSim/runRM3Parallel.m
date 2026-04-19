@@ -137,6 +137,8 @@ spar_drag_force_fund   = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
+float_pos_THD = NaN(length(mcr.cases(:,1)), 1);
+
 % identify four corner sea states from actual JPD entries
 H_all = mcr.cases(:,1);
 T_all = mcr.cases(:,2);
@@ -226,6 +228,9 @@ parfor imcr=1:length(mcr.cases(:,1))
         [spar_drag_force_fund(imcr), ...
          spar_drag_force_phase(imcr)]  = get_fundamental(F_drag_s, wave_freq, simu.dt);
 
+        % compute float position THD for all sea states
+        float_pos_THD(imcr) = compute_pos_thd(float_pos, wave_freq, simu.dt);
+
         % save timeseries for four corner sea states
         if is_corner(imcr)
             float_accel = output.bodies(1).acceleration(i_start:i_end,3);
@@ -266,6 +271,8 @@ end
 B_p = mcr.cases(:,3);
 K_p = mcr.cases(:,4);
 dt_sim = simu.dt;
+case_H = mcr.cases(:,1);
+case_T = mcr.cases(:,2);
 
 % assemble corner timeseries into matrices
 max_N = max(corner_N_per_T);
@@ -317,4 +324,26 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
     idx_wave_freq = ismembertol(freqs, wave_freq);
     fund = abs(P1(idx_wave_freq));
     phase = angle(P1(idx_wave_freq));
+end
+
+function thd = compute_pos_thd(pos, wave_freq, dt)
+    N = length(pos);
+    Fs = 2*pi/dt;
+    Y = fft(pos, N);
+    P2 = Y/N;
+    P1 = P2(1:floor(N/2)+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    freqs = (0:floor(N/2)) * (Fs/N);
+    harmonic_numbers = round(freqs / wave_freq);
+    amplitudes = abs(P1(1:length(freqs)));
+    idx_fund = find(harmonic_numbers == 1, 1);
+    if isempty(idx_fund) || amplitudes(idx_fund) == 0
+        thd = NaN;
+        return
+    end
+    fund = amplitudes(idx_fund);
+    harmonics = amplitudes;
+    harmonics(1) = 0;           % remove DC
+    harmonics(idx_fund) = 0;    % remove fundamental
+    thd = sqrt(sum(harmonics.^2)) / fund * 100;
 end

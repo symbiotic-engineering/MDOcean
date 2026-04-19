@@ -289,7 +289,8 @@ end
 
 function figs = plot_timeseries_figures(wecsim_filename)
     data = load(wecsim_filename, 'float_accel_ts', 'float_drag_ts', ...
-                'corner_HT', 'corner_N_per_T', 'dt_sim');
+                'corner_HT', 'corner_N_per_T', 'dt_sim', ...
+                'float_pos_THD', 'case_H', 'case_T');
 
     num_corners = size(data.corner_HT, 1);
     figs = gobjects(1, 3);
@@ -336,8 +337,12 @@ function figs = plot_timeseries_figures(wecsim_filename)
         grid on
     end
     improvePlot
+    % reduce per-tile title font by ~20% so it fits within each tile
+    for ax = findobj(figs(1), 'type', 'axes')'
+        ax.Title.FontSize = ax.Title.FontSize * 0.8;
+    end
 
-    %% Figure 2: Drag force timeseries with sin(wt)*|sin(wt)| approximation
+    %% Figure 2: Drag force timeseries with cos(wt+phi)*|cos(wt+phi)| approximation
     figs(2) = figure;
     tl2 = tiledlayout(2, 2);
     title(tl2, 'Float Drag Force: WEC-Sim vs Describing Function Approximation', 'Interpreter', 'latex')
@@ -352,15 +357,16 @@ function figs = plot_timeseries_figures(wecsim_filename)
         % get the fundamental amplitude and phase of drag force for this corner
         [fund_amp_drag, phase_drag] = get_fundamental_local(F_drag, w, dt);
 
-        % describing function approximation: y = A * sin(wt+phi) * |sin(wt+phi)|
-        % where A = 8/(3*pi) * fundamental_amplitude
-        A_desc = 8/(3*pi) * fund_amp_drag;
-        y_approx = A_desc * sin(w * t_vec + phase_drag) .* abs(sin(w * t_vec + phase_drag));
+        % describing function approximation: F ≈ A * cos(wt+phi) * |cos(wt+phi)|
+        % where A = (3*pi/8) * fund_amp_drag ensures the fundamental matches
+        % (FFT angle() returns cosine-basis phase, so cos matches the signal)
+        A_desc = (3*pi/8) * fund_amp_drag;
+        y_approx = A_desc * cos(w * t_vec + phase_drag) .* abs(cos(w * t_vec + phase_drag));
 
         nexttile(tl2)
         plot(t_vec, F_drag, 'b', 'DisplayName', 'WEC-Sim Drag Force')
         hold on
-        plot(t_vec, y_approx, 'r--', 'DisplayName', '$\sin(\omega t + \phi)|\sin(\omega t + \phi)|$ approx')
+        plot(t_vec, y_approx, 'r--', 'DisplayName', '$\cos(\omega t + \phi)|\cos(\omega t + \phi)|$ approx')
         xlabel('Time (s)', 'Interpreter', 'latex')
         ylabel('Force (N)', 'Interpreter', 'latex')
         title(sprintf('$H=%.1f$ m, $T=%.0f$ s', data.corner_HT(ci,1), data.corner_HT(ci,2)), 'Interpreter', 'latex')
@@ -369,65 +375,29 @@ function figs = plot_timeseries_figures(wecsim_filename)
     end
     improvePlot
 
-    %% Figure 3: Position THD contour at corner sea states (derived from acceleration)
-    pos_THD = zeros(1, num_corners);
-    for ci = 1:num_corners
-        N = data.corner_N_per_T(ci);
-        dt = data.dt_sim;
-        accel = data.float_accel_ts(1:N, ci);
-        T_wave = data.corner_HT(ci, 2);
-        w = 2*pi / T_wave;
-
-        % compute FFT of acceleration
-        Y = fft(accel);
-        P2 = Y / N;
-        P1 = P2(1:floor(N/2)+1);
-        P1(2:end-1) = 2 * P1(2:end-1);
-        accel_amps = abs(P1);
-
-        % frequency axis
-        Fs = 1 / dt;
-        freqs_hz = (0:floor(N/2))' * Fs / N;
-        omega = 2*pi * freqs_hz;
-        harmonic_numbers = round(freqs_hz / (w/(2*pi)));
-
-        % derive position amplitudes: pos_n = accel_n / (n*w)^2
-        pos_amps = zeros(size(accel_amps));
-        valid = omega > 0;
-        pos_amps(valid) = accel_amps(valid) ./ omega(valid).^2;
-
-        % compute position THD (harmonics n>=2 relative to fundamental)
-        idx_fund = find(harmonic_numbers == 1, 1);
-        if isempty(idx_fund)
-            pos_THD(ci) = NaN;
-            continue
+    %% Figure 3: Position THD contour over all sea states (pre-computed in runRM3Parallel)
+    H_all  = data.case_H;
+    T_all  = data.case_T;
+    H_uniq = unique(H_all);
+    T_uniq = unique(T_all);
+    THD_grid = NaN(length(H_uniq), length(T_uniq));
+    for si = 1:length(H_all)
+        hi = find(H_uniq == H_all(si));
+        ti = find(T_uniq == T_all(si));
+        if ~isempty(hi) && ~isempty(ti)
+            THD_grid(hi, ti) = data.float_pos_THD(si);
         end
-        pos_fund = pos_amps(idx_fund);
-        pos_harmonics = pos_amps;
-        pos_harmonics(1) = 0;        % remove DC
-        pos_harmonics(idx_fund) = 0; % remove fundamental
-        pos_THD(ci) = sqrt(sum(pos_harmonics.^2)) / pos_fund * 100;
-    end
-
-    % assemble 2D grid from unique H and T corner values
-    H_corners = unique(data.corner_HT(:,1));
-    T_corners = unique(data.corner_HT(:,2));
-    THD_grid = NaN(length(H_corners), length(T_corners));
-    for ci = 1:num_corners
-        hi = find(H_corners == data.corner_HT(ci,1));
-        ti = find(T_corners == data.corner_HT(ci,2));
-        THD_grid(hi, ti) = pos_THD(ci);
     end
 
     figs(3) = figure;
-    imagesc(T_corners, H_corners, THD_grid)
+    imagesc(T_uniq, H_uniq, THD_grid)
     set(gca, 'YDir', 'normal')
     colorbar
     xlabel('Wave Period $T$ (s)', 'Interpreter', 'latex')
     ylabel('Wave Height $H$ (m)', 'Interpreter', 'latex')
-    title('Float Position THD (\%) at Corner Sea States', 'Interpreter', 'latex')
-    xticks(T_corners)
-    yticks(H_corners)
+    title('Float Position THD (\%) at All Sea States', 'Interpreter', 'latex')
+    xticks(T_uniq)
+    yticks(H_uniq)
     improvePlot
 end
 
