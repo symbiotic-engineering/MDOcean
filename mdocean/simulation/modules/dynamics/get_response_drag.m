@@ -213,6 +213,9 @@ function [mag_U,phase_U,...
         X_err       = max( abs([X_f_err,X_s_err]),             [], 'all');
         phase_X_err = max( abs([phase_X_f_err,phase_X_s_err]), [], 'all');
 
+        if any(~isfinite(mag_X_f(:)) & isfinite(w(:)))
+            warning('inf/nan in results but not in guess')
+        end
         % new guesses
         X_f_guess = mag_X_f;
         X_s_guess = mag_X_s;
@@ -447,16 +450,16 @@ function [opt_mag_U,opt_phase_U,...
 
     sea_state_infeasible = ~each_sea_state_feasible & ~isnan(w);
     if any(sea_state_infeasible(:))
-        warning(['no feasible controller found for %d/%d sea states, setting signals to '...
-                'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
-                sum(sea_state_infeasible(:)), sum(~isnan(w(:))))
         
         [min_err,idx_least_err] = min(constraint_err,[],ctrl_dim);
         idx_opt(sea_state_infeasible) = idx_least_err(sea_state_infeasible);
         opt_real_P = real_P(idx_opt);
 
-        debug_print = true;
+        debug_print = brute_force_plot_on;
         if debug_print
+            warning(['no feasible controller found for %d/%d sea states, setting signals to '...
+                'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
+                sum(sea_state_infeasible(:)), sum(~isnan(w(:))))
             % diagnostic: identify which constraint(s) are not satisfied
             infeas_mask = ~each_sea_state_feasible;
             fprintf('  Brute force diagnostics for infeasible sea states:\n');
