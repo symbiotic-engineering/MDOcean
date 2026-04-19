@@ -35,9 +35,9 @@ F_s_phase = rand(sz);
 % =========================================================================
 % Reference: standard call (all 10 outputs, no helper terms)
 % =========================================================================
-[mag_U_ref, real_P_ref, mag_X_u_ref, mag_X_f_ref, mag_X_s_ref, ...
- phase_X_f_ref, phase_X_s_ref, phase_U_ref, imag_P_ref, phase_X_u_ref] = ...
-    multibody_response(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
+ [mag_U_ref, phase_U_ref, real_P_ref, imag_P_ref, mag_X_u_ref, phase_X_u_ref, ...
+  mag_X_f_ref, phase_X_f_ref, mag_X_s_ref, phase_X_s_ref] = ...
+    multibody_response_slow(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
                        K_p, B_p, F_f_mag, F_f_phase, F_s_mag, F_s_phase);
 
 % 3-output reference (tests the nargout guard)
@@ -96,20 +96,30 @@ fprintf('All checks passed.\n\n');
 % =========================================================================
 % Benchmarks
 % =========================================================================
-slow_fn = @() multibody_response(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
+slow = @() multibody_response_slow(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
+                       K_p, B_p, F_f_mag, F_f_phase, F_s_mag, F_s_phase);
+
+fast_no_helpers = @() multibody_response(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
                                   K_p, B_p, F_f_mag, F_f_phase, F_s_mag, F_s_phase);
 
-fast_fn = @() multibody_response(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
+fast_with_helpers = @() multibody_response(B_c, B_f, B_s, K_f, K_s, m_c, m_f, m_s, w, ...
                                   K_p, B_p, F_f_mag, F_f_phase, F_s_mag, F_s_phase, [], ...
                                   h_t18,h_t9,h_t108,h_t121,h_t_110_118,h_t144,h_t109,h_t119, ...
                                   h_D_sys,h_t145,h_t103,h_t126,h_t130,h_t129,h_t131,h_t102,h_t124);
 
-t_slow = timeit(slow_fn);
-t_fast = timeit(fast_fn);
+t_slow = timeit(slow,10);
+t_fast_no_helpers_3    = timeit(fast_no_helpers,3);
+t_fast_with_helpers_3  = timeit(fast_with_helpers,3);
+t_fast_no_helpers_10   = timeit(fast_no_helpers,10);
+t_fast_with_helpers_10 = timeit(fast_with_helpers,10);
 
-fprintf('multibody_response (slow path, no helper): %.3f ms\n', t_slow*1e3);
-fprintf('multibody_response (fast path, with h):    %.3f ms\n', t_fast*1e3);
-fprintf('Speedup: %.1fx\n', t_slow/t_fast);
+fprintf('multibody_response (slow):                       %.3f ms\n', t_slow*1e3);
+fprintf('multibody_response (fast, no helper,  10 outs):  %.3f ms\n', t_fast_no_helpers_10*1e3);
+fprintf('multibody_response (fast, no helper,  3 outs):   %.3f ms\n', t_fast_no_helpers_3*1e3);
+fprintf('multibody_response (fast, yes helper, 10 outs):  %.3f ms\n', t_fast_with_helpers_10*1e3);
+fprintf('multibody_response (fast, yes helper, 3 outs):   %.3f ms\n', t_fast_with_helpers_3*1e3);
+
+fprintf('Speedup: %.1fx\n', t_slow/t_fast_with_helpers_3);
 
 end
 
