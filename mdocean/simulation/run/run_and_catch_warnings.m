@@ -81,7 +81,7 @@ function [outputs, warning_hit, captured_text] = run_and_catch_warnings(fcn, war
         % The trailing " anchors the match to MATLAB's exact verbose format.
         warning_hit = zeros(1, numel(warning_ids));
         for k = 1:numel(warning_ids)
-            pat = ['warning off ' regexptranslate('literalstr', warning_ids{k}) '"'];
+            pat = ['warning off ' regexptranslate('escape', warning_ids{k}) '"'];
             warning_hit(k) = numel(regexp(captured_text, pat));
         end
     end
