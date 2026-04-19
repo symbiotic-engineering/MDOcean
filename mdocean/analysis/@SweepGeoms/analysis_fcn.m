@@ -205,49 +205,35 @@ function [hydro_ratio_max, out, warning_hit, rp_range, kappa_range] = run_check_
         warning('error', warning_ids{k});
     end
 
-    warning_hit = false(1, numel(warning_ids));
-    disabled_warning_ids = cell(1, numel(warning_ids));
-    n_disabled_warning_ids = 0;
     hydro_ratio_max = NaN;
     out = nan_val; % default for early-exit paths
     rp_range    = nan(2, 1); % [min; max] rp seen in MDOcean:DragIntegral:OutsideLUT for this geometry
     kappa_range = nan(2, 1); % [min; max] kappa seen
 
+    % run_and_catch_warnings retries check_max_CW after each managed warning,
+    % turning that warning off so execution can proceed past it.  A boolean
+    % flag per warning ID records whether it fired at least once for this
+    % geometry (regardless of how many retries were needed).
+    [check_outputs, warning_hit, caught_MEs] = run_and_catch_warnings( ...
+        @() check_max_CW('', p_i, X_i, false), warning_ids, 8);
+    hydro_ratio     = check_outputs{1};
+    out             = check_outputs{8};
+    hydro_ratio_max = max(hydro_ratio);
+
+    % Parse drag-LUT-specific rp/kappa ranges from any caught exceptions.
     drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
-
-    while true
-        try
-            [hydro_ratio, ~, ~, ~, ~, ~, ~, out] = check_max_CW('', p_i, X_i, false);
-            hydro_ratio_max = max(hydro_ratio);
-            break
-        catch ME
-            warning_idx = find(strcmp(ME.identifier, warning_ids), 1);
-            if isempty(warning_idx)
-                rethrow(ME)
+    for m = 1:numel(caught_MEs)
+        if strcmp(caught_MEs{m}.identifier, drag_lut_id)
+            toks = regexp(caught_MEs{m}.message, ...
+                'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
+                'tokens', 'once');
+            if ~isempty(toks)
+                vals = cellfun(@str2double, toks);
+                rp_range(1)    = min([rp_range(1);    vals(1)], [], 'omitnan');
+                rp_range(2)    = max([rp_range(2);    vals(2)], [], 'omitnan');
+                kappa_range(1) = min([kappa_range(1); vals(3)], [], 'omitnan');
+                kappa_range(2) = max([kappa_range(2); vals(4)], [], 'omitnan');
             end
-            warning_hit(warning_idx) = true;
-
-            % For the drag-LUT warning, parse and accumulate rp/kappa min-max.
-            if strcmp(ME.identifier, drag_lut_id)
-                toks = regexp(ME.message, ...
-                    'rp_min=([\d.e+\-]+),\s*rp_max=([\d.e+\-]+),\s*kappa_min=([\d.e+\-]+),\s*kappa_max=([\d.e+\-]+)', ...
-                    'tokens', 'once');
-                if ~isempty(toks)
-                    vals = cellfun(@str2double, toks);
-                    rp_min_i    = vals(1);  rp_max_i    = vals(2);
-                    kappa_min_i = vals(3);  kappa_max_i = vals(4);
-                    rp_range(1)    = min([rp_range(1);    rp_min_i],    [], 'omitnan');
-                    rp_range(2)    = max([rp_range(2);    rp_max_i],    [], 'omitnan');
-                    kappa_range(1) = min([kappa_range(1); kappa_min_i], [], 'omitnan');
-                    kappa_range(2) = max([kappa_range(2); kappa_max_i], [], 'omitnan');
-                end
-            end
-
-            if any(strcmp(ME.identifier, disabled_warning_ids(1:n_disabled_warning_ids)))
-                break  % Same warning fired a second time; return NaN for this geometry
-            end
-            n_disabled_warning_ids = n_disabled_warning_ids + 1;
-            disabled_warning_ids{n_disabled_warning_ids} = ME.identifier;
         end
     end
 end
