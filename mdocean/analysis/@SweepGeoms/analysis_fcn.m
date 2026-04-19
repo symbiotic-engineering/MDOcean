@@ -26,7 +26,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         'MATLAB:integral:NonFiniteValue' ...
     };
 
-    verbosity_warning_ids = {'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix', 'backtrace'};
+    verbosity_warning_ids = {'MATLAB:nearlySingularMatrix', 'MATLAB:singularMatrix'};
 
     % Save all current warning states and restore on function exit.
     prev_warning_states = warning;
@@ -79,7 +79,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     n_geoms = numel(A1);
     m0h_stored_linear         = nan(nT, n_geoms);
     hydro_ratio_result_linear = nan(nT, n_geoms);
-    warning_hits              = false(numel(warning_ids), n_geoms);
+    warning_hits              = zeros(numel(warning_ids), n_geoms);
     unknown_error_hits        = false(1, n_geoms);
     val = repmat(nan_val, [1, n_geoms]);
     drag_lut_rp_range    = nan(2, n_geoms); % row 1 = min, row 2 = max rp per geometry
@@ -111,7 +111,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         catch
             hydro_ratio_max  = NaN;
             out              = nan_val;
-            warning_hit      = false(1, numel(warning_ids));
+            warning_hit      = zeros(1, numel(warning_ids));
             rp_range_i       = nan(2, 1);
             kappa_range_i    = nan(2, 1);
             unknown_error_hits(i) = true;
@@ -126,7 +126,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     m0h_stored = reshape(m0h_stored_linear, [nT, size(A1)]);
     hydro_ratio_result = reshape(hydro_ratio_result_linear, [nT, size(A1)]);
 
-    warning_counts = sum(warning_hits, 2);
+    warning_counts = sum(warning_hits >= 1, 2);
     drag_lut_id = 'MDOcean:DragIntegral:OutsideLUT';
     for k = 1:numel(warning_ids)
         if warning_counts(k) > 0
