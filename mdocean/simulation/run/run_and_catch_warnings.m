@@ -62,7 +62,9 @@ function [outputs, warning_hit, captured_text] = run_and_catch_warnings(fcn, war
         % Extract all unique warning identifiers and their occurrence counts.
         % The verbose pattern is: (Type "warning off <identifier>" ...)
         % Identifiers consist of word characters and colons (e.g. A:B:C).
-        toks = regexp(captured_text, 'warning off ([\w:]+)', 'tokens');
+        % The trailing " anchors the match to the end of the identifier in
+        % MATLAB's verbose hint, preventing false matches from function output.
+        toks = regexp(captured_text, 'warning off ([\w:]+)"', 'tokens');
         warning_hit = containers.Map('KeyType', 'char', 'ValueType', 'double');
         for m = 1:numel(toks)
             id = toks{m}{1};
@@ -74,11 +76,12 @@ function [outputs, warning_hit, captured_text] = run_and_catch_warnings(fcn, war
         end
     else
         % Count occurrences of each managed warning ID in the captured output.
-        % Match against the verbose-mode hint text "warning off <id>" so we
+        % Match against the verbose-mode hint text 'warning off <id>"' so we
         % detect only actual triggered warnings, not unrelated string matches.
+        % The trailing " anchors the match to MATLAB's exact verbose format.
         warning_hit = zeros(1, numel(warning_ids));
         for k = 1:numel(warning_ids)
-            pat = ['warning off ' regexptranslate('literalstr', warning_ids{k})];
+            pat = ['warning off ' regexptranslate('literalstr', warning_ids{k}) '"'];
             warning_hit(k) = numel(regexp(captured_text, pat));
         end
     end
