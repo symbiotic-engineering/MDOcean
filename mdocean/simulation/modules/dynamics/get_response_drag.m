@@ -1315,7 +1315,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
         constr_viol_err = constr_viol_err + B_p_violation;
     end
 
-    if any(~isfinite(constr_viol_err(~isnan(mag_X_f))),'all')
+    if any(~isfinite(constr_viol_err(~isnan(H))),'all')
         warning('error is non finite for non-nan sea state')
     end
     if nargout > 1
