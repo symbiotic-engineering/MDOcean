@@ -8,9 +8,11 @@ function [X_slam_min, X_slam_max,...
     theta = theta_small_wave;
     theta(idx_large_wave) = theta_large_wave(idx_large_wave);
 
-    sqrt_term = sqrt( delta_z^2 - (A .* sin(theta)).^2 );
-    X_slam_max =  sqrt_term + A .* cos(theta);
-    X_slam_min = -sqrt_term + A .* cos(theta);
+    A_term = A .* cos(theta);
+    sqrt_term = sqrt( delta_z^2 + A_term.^2 - A.^2 );
+    
+    X_slam_max =  sqrt_term + A_term;
+    X_slam_min = -sqrt_term + A_term;
 
     idx_imag = imag(sqrt_term)~=0; % case where slamming occurs even for stationary body
     

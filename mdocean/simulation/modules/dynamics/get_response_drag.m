@@ -337,7 +337,7 @@ function [mag_U,phase_U,...
      mag_X_s_unsat,...
      B_p_stabilized,K_p_stabilized] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
     
-    Z_th = 1 ./ (real_G_u + 1i * imag_G_u);
+    Z_th = 1 ./ complex(real_G_u, imag_G_u);
 
     if strcmpi(control_type,'none')
         % if no control, no control authority to enforce constraints
@@ -373,8 +373,8 @@ function [mag_U,phase_U,...
     F_drag_s = -B_drag_s .* mag_X_s .* w .* exp(1i * (phase_X_s + pi/2)) + gamma_drag_s .* H/2;
     mag_F_drag_f = abs(F_drag_f);
     mag_F_drag_s = abs(F_drag_s);
-    phase_F_drag_f = angle(F_drag_f);
-    phase_F_drag_s = angle(F_drag_s);
+    phase_F_drag_f = my_angle(F_drag_f);
+    phase_F_drag_s = my_angle(F_drag_s);
 end
 
 function [opt_mag_U,opt_phase_U,...
@@ -389,7 +389,7 @@ function [opt_mag_U,opt_phase_U,...
                             control_evaluation_fcn, H, k_wvn, D_f, D_d,...
                             T_f_slam,T_s_slam, brute_force_plot_on)
     
-    Z_p_unsat = B_p_unsat - 1i * K_p_unsat ./ w;
+    Z_p_unsat = complex(B_p_unsat, - K_p_unsat ./ w);
 
     size_opt_ctrl_mesh = 11;  
     if rem(size_opt_ctrl_mesh,2)==0 % input is even
@@ -570,12 +570,12 @@ function [mag_U,real_P,...
          B_stabilized,K_stabilized,...
          phase_X_f,phase_X_s] = control_evaluation_fcn(K_p_sat,B_p_sat,stabilize_B,stabilize_K);
     end
-    Z_p_stabilized = B_stabilized - 1i * K_stabilized ./ w;
+    Z_p_stabilized = complex(B_stabilized, -K_stabilized ./ w);
 
     stabilization_mult = Z_p_stabilized ./ Z_p_sat;
     ctrl_mult_stabilized = mult .* stabilization_mult;
     mag_ctrl_mult_stabilized = abs(ctrl_mult_stabilized);
-    phase_ctrl_mult_stabilized = angle(ctrl_mult_stabilized);
+    phase_ctrl_mult_stabilized = my_angle(ctrl_mult_stabilized);
 
     % control error: uses saturated and unsaturated response
     if nargout > 12
@@ -628,8 +628,8 @@ function [control_evaluation_fcn,...
 
     F_f_mag   = abs(F_f);
     F_s_mag   = abs(F_s);
-    F_f_phase = angle(F_f);
-    F_s_phase = angle(F_s);
+    F_f_phase = my_angle(F_f);
+    F_s_phase = my_angle(F_s);
 
     % thevenin admittance of the controlled DOF as seen from load
     if multibody
@@ -722,7 +722,7 @@ function [B_drag_2, gamma_drag] = get_drag_dynamic_coeffs(X_guess, phase_X_guess
     B_integral_weighted      = B_int_1      - alpha.^2 .* B_int_2;
     G_integral_real_weighted = G_int_real_1 - alpha.^2 .* G_int_real_2;
     G_integral_imag_weighted = G_int_imag_1 - alpha.^2 .* G_int_imag_2;
-    G_integral_weighted = G_integral_real_weighted + 1i*G_integral_imag_weighted;
+    G_integral_weighted = complex(G_integral_real_weighted, G_integral_imag_weighted);
 
     % excitation only when mag_v = 0
     mag_v_or_v0 = mag_v;
@@ -834,7 +834,7 @@ function [mag_U,real_P,...
         
         F_exc = F_f_mag .* exp(1i*F_f_phase) + F_s_mag .* exp(1i*F_s_phase);
         F_m_mag = abs(F_exc);
-        F_m_phase = angle(F_exc);
+        F_m_phase = my_angle(F_exc);
 
         [mag_X_f,phase_X_f] = second_order_transfer_fcn(w, m_m, B_m, K_m, F_m_mag, F_m_phase);
         mag_X_s = mag_X_f;
@@ -847,9 +847,9 @@ function [mag_U,real_P,...
         F_brake_f = 1i*w .* (Z_f + Z_c) .* mag_X_f .* exp(1i*phase_X_f) - F_f_mag .* exp(1i*F_f_phase);
         F_brake_s = 1i*w .* (Z_s + Z_c) .* mag_X_f .* exp(1i*phase_X_f) - F_s_mag .* exp(1i*F_s_phase);
         mag_U_f = abs(F_brake_f);
-        phase_U_f = angle(F_brake_f);
+        phase_U_f = my_angle(F_brake_f);
         mag_U_s = abs(F_brake_s);
-        phase_U_s = angle(F_brake_s);
+        phase_U_s = my_angle(F_brake_s);
         % fixme it should be mag_U = mag_U_s and phase_U = pi+phase_U_s,
         % take the max and use float phase for now
         mag_U = max(mag_U_f,mag_U_s);
@@ -941,7 +941,7 @@ function [idx_closed_loop_unstable,...
     recommended_increase_Bl = zeros(size(B_f));
     recommended_increase_Kl = zeros(size(B_f));
 
-    Z_l = B_l_sat - 1i*K_l_sat./w;
+    Z_l = complex(B_l_sat, -K_l_sat ./ w);
     Z_p = Z_l; % fixme apply cascase here
     % uncomment and vectorize these once PTO dynamics are added
 %     if multibody
@@ -1303,4 +1303,8 @@ function [X,angle_X] = second_order_transfer_fcn(w,m,b,k,F,F_phase)
         angle_F_over_X = atan2(imag_term,real_term);
         angle_X = F_phase - angle_F_over_X;
     end
+end
+
+function ang = my_angle(complex_term)
+    ang = atan2(imag(complex_term),real(complex_term));
 end
