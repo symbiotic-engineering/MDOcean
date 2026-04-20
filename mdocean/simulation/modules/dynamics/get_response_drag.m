@@ -294,6 +294,8 @@ function [mag_U,phase_U,...
         if strcmpi(control_solve_type,'solver')
             % Heuristic update from prior solver-based flow: scale multiplier by
             % normalized constraint residual to improve next iterate.
+            % The +1 regularization is historical behavior that prevents
+            % divide-by-zero when the residual approaches zero.
             ctrl_update_denom = max(force_lim_err + 1, ctrl_mult_update_min_denom);
             ctrl_mult_guess = ctrl_mult_guess ./ ctrl_update_denom;
             phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));
@@ -454,6 +456,7 @@ function [mag_U,phase_U,...
          phase_U,reactive_P,phase_X_u] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
         force_lim_err = zeros(size(w));
         amp_lim_err = zeros(size(w));
+        % no-control case uses identity multiplier on Z_p (mag=1, phase=0)
         ctrl_mult_best = ones(size(w));
         phase_ctrl_mult_best = zeros(size(w));
     elseif strcmpi(control_solve_type,'solver')
