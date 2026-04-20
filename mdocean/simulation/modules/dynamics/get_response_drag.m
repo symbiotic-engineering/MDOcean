@@ -680,8 +680,10 @@ function [mag_U,phase_U,...
                                                         K_l, B_l, ...
                                                         F_f_mag, F_f_phase, ...
                                                         F_s_mag, F_s_phase);
-                 phase_X_s = wrapTo2Pi(phase_X_s + pi);
-                 phase_X_u = wrapTo2Pi(phase_X_u + pi); % phase adjustment needed to validate vs wecsim, prob indicates a sign error in multibody response
+                 
+            phase_X_f = wrapTo2Pi(phase_X_f + pi);
+            phase_X_s = wrapTo2Pi(phase_X_s + pi);
+            phase_X_u = wrapTo2Pi(phase_X_u + pi); % phase adjustment needed to validate vs wecsim, prob indicates a sign error in multibody response
         else
             b_sat = B_f + B_l;
             k_sat = K_f + K_l;
