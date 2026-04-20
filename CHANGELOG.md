@@ -1,5 +1,12 @@
 # Changelog
 ## Unreleased
+## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
+### Added
+- Simulation: create `run_and_catch_warnings.m` to capture output and count warnings
+### Changed
+- Model: include identifiers on warnings in `get_response_drag.m`, `make_drag_integral.m`, `run_MEEM.m`, and `simulation.m`
+- Analysis: SweepGeoms analysis uses warning suppression and counting
+
 ## [v1.1.25](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.25) - 2026-4-17
 ### Fixed
 - Validation: fix PTO force extraction from WEC-Sim so it includes stiffness (previously only included damping component)
