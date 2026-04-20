@@ -118,7 +118,7 @@ end
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
-J = [LCOE_econ, J_capex_design, CEM_grid_cost, net_eco_value];
+J = [LCOE_econ, J_capex_design, net_econ_value, net_eco_value];
 
 
 %% Assemble constraints g(x) >= 0
