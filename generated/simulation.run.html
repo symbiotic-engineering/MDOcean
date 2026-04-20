@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>simulation.run &mdash; MDOcean v1.1.25 documentation</title>
+  <title>simulation.run &mdash; MDOcean v1.1.26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=7bcb2d6e"></script>
+      <script src="../_static/documentation_options.js?v=4c33a704"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -176,6 +176,49 @@
 <dt class="sig sig-object mat" id="simulation.run.convergence_study">
 <span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">convergence_study</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.convergence_study" title="Link to this definition"></a></dt>
 <dd><p>settings</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="simulation.run.run_and_catch_warnings">
+<span class="sig-prename descclassname"><span class="pre">simulation.run.</span></span><span class="sig-name descname"><span class="pre">run_and_catch_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fcn</span></em>, <em class="sig-param"><span class="pre">warning_ids</span></em>, <em class="sig-param"><span class="pre">nout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.run.run_and_catch_warnings" title="Link to this definition"></a></dt>
+<dd><p>RUN_AND_CATCH_WARNINGS  Call a function once, silently capturing warnings.</p>
+<p>This function saves the current warning state (restoring it via onCleanup),
+configures warning display so that each warning’s printed text contains its
+identifier string, then runs FCN exactly once inside evalc so that all
+Command-Window output — including warning messages — is captured rather than
+printed to the terminal.  After the call it counts occurrences of each
+identifier in WARNING_IDS in the captured text.</p>
+<p>Warning states do NOT need to be in any particular state before this call;
+this function handles all promotion and restoration internally.</p>
+<dl class="simple">
+<dt>Implementation detail: MATLAB’s verbose warning mode adds the line</dt><dd><p>(Type “warning off &lt;identifier&gt;” …)</p>
+</dd>
+</dl>
+<p>to every warning printout.  This makes the identifier searchable in the
+evalc-captured text without requiring warnings to be elevated to errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fcn</strong> – Zero-argument function handle, e.g. &#64;() myfun(a, b).</p></li>
+<li><p><strong>warning_ids</strong> – 1×M cell array of warning identifier strings to detect,
+OR the string ‘all’ to detect all warnings of any
+identifier that fire during fcn.</p></li>
+<li><p><strong>nout</strong> – Number of output arguments to request from fcn.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>outputs       – 1×nout cell array of outputs from fcn.
+warning_hit   – When warning_ids is a cell: 1×M integer array counting</p>
+<blockquote>
+<div><p>how many times each warning fired.
+When warning_ids is ‘all’: containers.Map from warning
+identifier string to integer count (only IDs that fired
+are present as keys).</p>
+</div></blockquote>
+<p>captured_text – char vector of all text captured by evalc.</p>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="mat function">
