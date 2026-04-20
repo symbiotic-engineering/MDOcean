@@ -17,6 +17,12 @@ function [fig_array,...
 
     fig_array = intermed_result_struct.created_figs;
     
+    p = intermed_result_struct.p;
+    b = intermed_result_struct.b;
+    X = [b.X_noms; 1];
+    fig_circles = plot_nominal_constraint_circles(intermed_result_struct.val, p, X);
+    fig_array = [intermed_result_struct.created_figs, fig_circles];
+    
     tab_array_display = {};
     tab_array_latex = {};
     
