@@ -1866,6 +1866,8 @@ stages:
       - results/Meem/intermed_figSparsity_1.fig
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
+      - results/Meem/intermed_fig_convergence_vs_omega_1.fig
+      - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
     desc: Automatically generated from the 'analysis-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-Meem:
@@ -1928,6 +1930,8 @@ stages:
       - results/Meem/intermed_figSparsity_1.fig
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
+      - results/Meem/intermed_fig_convergence_vs_omega_1.fig
+      - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
     outs:
       - results/Meem/meem_sparsity.pdf
       - results/Meem/meem_validation.pdf
@@ -4002,15 +4006,13 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
-  test:
+  test-aor:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      addpath('tests'); run_tests"
+      addpath('tests'); run_tests('AOR')"
     deps:
       - tests/
       - mdocean/
-      - results/AllFigCompare/intermed.mat
       - results/Comparison/intermed.mat
-      - results/Constraints/intermed.mat
       - results/Cost/intermed.mat
       - results/DampingPlateStructures/intermed.mat
       - results/DampingPlateStructures/intermed_figs_1.fig
@@ -4021,27 +4023,20 @@ stages:
       - results/DescFcns/intermed_created_figs_3.fig
       - results/DescFcns/intermed_created_figs_2.fig
       - results/DesignSpaceExploration/intermed.mat
-      - results/DesignVars/intermed.mat
       - results/DragIntegral/intermed.mat
       - results/ForceSaturationFigFunc/intermed.mat
       - results/ForceSaturationFigFunc/intermed_fig2_1.fig
       - results/ForceSaturationFigFunc/intermed_fig1_1.fig
-      - results/GradientOptimFigFunc/intermed.mat
-      - results/GradientOptimFigFunc/intermed_convergence_plot_1.fig
       - results/HydroCoeffFigFunc/intermed.mat
       - results/HydroCoeffFigFunc/intermed_created_figs_1.fig
-      - results/LocationSensitivity/intermed.mat
       - results/Meem/intermed.mat
       - results/Meem/intermed_b_vector_fig_1.fig
       - results/Meem/intermed_figHydroCoeff_1.fig
       - results/Meem/intermed_figSparsity_1.fig
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
-      - results/Multistart/intermed.mat
-      - results/ParamSensitivities/intermed.mat
-      - results/Parameters/intermed.mat
-      - results/ParetoFigFunc/intermed.mat
-      - results/ParetoSweep/intermed.mat
+      - results/Meem/intermed_fig_convergence_vs_omega_1.fig
+      - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
       - results/ReadNonMatlabFigs/intermed.mat
       - results/RunSingleFigFunc/intermed.mat
       - results/RunSingleFigFunc/intermed_created_figs_1.fig
@@ -4071,13 +4066,42 @@ stages:
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.mat
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.mat
     outs:
-      - test-results/:
+      - test-results/aor/:
           cache: false
           persist: false
-      - code-coverage/:
+      - code-coverage/aor/:
           cache: false
           persist: false
-    desc: Automatically generated from the 'test' stage in 
+    desc: Automatically generated from the 'test-aor' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  test-re:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      addpath('tests'); run_tests('RE')"
+    deps:
+      - tests/
+      - mdocean/
+      - results/AllFigCompare/intermed.mat
+      - results/Comparison/intermed.mat
+      - results/Constraints/intermed.mat
+      - results/DesignSpaceExploration/intermed.mat
+      - results/DesignVars/intermed.mat
+      - results/GradientOptimFigFunc/intermed.mat
+      - results/GradientOptimFigFunc/intermed_convergence_plot_1.fig
+      - results/LocationSensitivity/intermed.mat
+      - results/Multistart/intermed.mat
+      - results/ParamSensitivities/intermed.mat
+      - results/Parameters/intermed.mat
+      - results/ParetoFigFunc/intermed.mat
+      - results/ParetoSweep/intermed.mat
+      - results/ReadNonMatlabFigs/intermed.mat
+    outs:
+      - test-results/re/:
+          cache: false
+          persist: false
+      - code-coverage/re/:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'test-re' stage in 
       calkit.yaml. Changes made here will be overwritten.
   pyxdsm:
     cmd: calkit xenv -n pubs --no-check -- python 

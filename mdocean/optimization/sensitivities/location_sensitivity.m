@@ -114,7 +114,7 @@ function delta_w = find_BW(Hs,Te,JPD,plotOn)
 end
 
 function b = fix_constraints(p,b)
-    num_non_sea_state_constraints = sum(~contains(b.constraint_names,'slamming'));
+    num_non_sea_state_constraints = sum(~contains(b.constraint_names,'prevent_slamming'));
     desired_length = num_non_sea_state_constraints + numel(p.JPD) + length(p.T_struct);
     len = length(b.constraint_names);
     if len < desired_length
