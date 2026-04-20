@@ -159,7 +159,7 @@ criteria = no_inf && no_nan && no_imag;
 if ~criteria
     disp(['g: ' num2str(g_vec)])
     disp(['LCOE: ' num2str(LCOE) ', P_var: ' num2str(P_var)])
-    warning('Inf, NaN, or imaginary constraint or objective detected')
+    warning('MDOcean:Simulation:InfNanImaginary', 'Inf, NaN, or imaginary constraint or objective detected')
 end
 
 if nargout > 3 % if returning extra struct output for validation

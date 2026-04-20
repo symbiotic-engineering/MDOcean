@@ -52,8 +52,8 @@ function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename
     fig_mats   = err_struct_figs_cell(:,2);
     
     % extract actual structs
-    errors_wecsim_sb = err_structs{1};
-    errors_wecsim_mb = err_structs{2};
+    errors_wecsim_mb = err_structs{1};
+    errors_wecsim_sb = err_structs{2};
     errors_report_mb = err_structs{3}; % first index is wecsim to report error, second index is mdocean to report error
 
     %% make table comparing error of mdocean to various ground truths
