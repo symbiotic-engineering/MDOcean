@@ -390,15 +390,16 @@ function figs = plot_timeseries_figures(wecsim_filename)
     end
 
     figs(3) = figure;
-    imagesc(T_uniq, H_uniq, THD_grid)
+    h = imagesc(T_uniq, H_uniq*sqrt(2), THD_grid);
     set(gca, 'YDir', 'normal')
     colorbar
-    xlabel('Wave Period $T$ (s)', 'Interpreter', 'latex')
-    ylabel('Wave Height $H$ (m)', 'Interpreter', 'latex')
+    xlabel('Wave Energy Period $T_e$ (s)', 'Interpreter', 'latex')
+    ylabel('Significant Wave Height $H_s$ (m)', 'Interpreter', 'latex')
     title('Float Position THD (\%) at All Sea States', 'Interpreter', 'latex')
     xticks(T_uniq)
     yticks(H_uniq)
     improvePlot
+    set(h, 'AlphaData', ~isnan(THD_grid))
 end
 
 function [fund, phase] = get_fundamental_local(signal, wave_freq, dt)
