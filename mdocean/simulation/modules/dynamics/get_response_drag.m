@@ -203,10 +203,10 @@ function out_flat = fun_outer(x,fun_inner,flatten,num_solver_vars)
     out_flat = flatten(Y{:});
 end
 
-function out_flat = flatten_solver_vars(varargs, idx_not_nan, num_solver_vars)
+function out_flat = flatten_solver_vars(var_cell, idx_not_nan, num_solver_vars)
     chunks = cell(1,num_solver_vars);
     for i = 1:num_solver_vars
-        chunks{i} = reshape(varargs{i}(idx_not_nan),[],1);
+        chunks{i} = reshape(var_cell{i}(idx_not_nan),[],1);
     end
     out_flat = vertcat(chunks{:});
 end
@@ -281,6 +281,8 @@ function [mag_U,phase_U,...
         phase_X_f_guess = phase_X_f;
         phase_X_s_guess = phase_X_s;
         if strcmpi(control_solve_type,'solver')
+            % Heuristic update from prior solver-based flow: scale multiplier by
+            % normalized constraint residual to improve next iterate.
             ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
             phase_ctrl_mult_guess = eps + zeros(size(ctrl_mult_guess));
         end
