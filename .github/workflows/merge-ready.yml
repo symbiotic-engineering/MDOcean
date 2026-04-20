@@ -8,16 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: recursive
+          # Use submodules: false so actions/checkout does NOT run
+          # git submodule foreach --recursive (which fails on the stale
+          # sea-lab-utils nested submodule inside OpenFLASH).
+          submodules: false
       - name: Check validity of citation.cff
         uses: citation-file-format/cffconvert-github-action@2.0.0
         with:
           args: "-i ./CITATION.cff -f zenodo --validate --show-trace"
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules without recursing into
+        # their nested submodules, avoiding the stale sea-lab-utils entry.
+        run: git submodule update --init
       - name: Check for changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |

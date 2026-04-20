@@ -53,7 +53,7 @@ in.D_f_b = p.D_f_b_over_D_f * in.D_f;
 
 % Space between float and spar
 D_f_in = p.D_f_in_over_D_s * in.D_s;
-in.D_f_in = min(D_f_in, in.D_f - 1e-6); % ensure positive area to avoid sim breaking for infeasible inputs
+in.D_f_in = min(D_f_in, in.D_f - 1e-4); % ensure positive area to avoid sim breaking for infeasible inputs
 
 %% Run modules
 [V_d, m_m, m_f_tot, m_s_tot, ...
@@ -159,7 +159,7 @@ criteria = no_inf && no_nan && no_imag;
 if ~criteria
     disp(['g: ' num2str(g_vec)])
     disp(['LCOE: ' num2str(LCOE) ', P_var: ' num2str(P_var)])
-    warning('Inf, NaN, or imaginary constraint or objective detected')
+    warning('MDOcean:Simulation:InfNanImaginary', 'Inf, NaN, or imaginary constraint or objective detected')
 end
 
 if nargout > 3 % if returning extra struct output for validation
