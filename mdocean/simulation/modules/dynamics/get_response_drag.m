@@ -130,12 +130,8 @@ function [mag_U,phase_U,...
     flatten = @(varargin) flatten_solver_vars(varargin, idx_not_nan, num_solver_vars);
 
     % prepare inputs for solver
-    if num_solver_vars == 6
-        x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess,...
-                     ctrl_mult_guess, phase_ctrl_mult_guess);
-    else
-        x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess);
-    end
+    x0 = flatten(X_f_guess, X_s_guess, phase_X_f_guess, phase_X_s_guess,...
+                 ctrl_mult_guess, phase_ctrl_mult_guess);
 
     % fun_inner takes 1 input and returns the num_solver_vars+ outputs of dynamics_error_wrapper
     if num_solver_vars == 6
@@ -202,12 +198,15 @@ function [mag_U,phase_U,...
 
 end
 function out_flat = fun_outer(x,fun_inner,flatten,num_solver_vars)
+    assert(any(num_solver_vars == [4,6]), 'num_solver_vars must be 4 or 6');
     Y = cell(1,num_solver_vars);
     [Y{:}] = fun_inner(x);
     out_flat = flatten(Y{:});
 end
 
 function out_flat = flatten_solver_vars(var_cell, idx_not_nan, num_solver_vars)
+    % Keep flattening in one helper so solver setup can pass a single superset
+    % argument list while this helper slices to 4 or 6 variables as needed.
     chunks = cell(1,num_solver_vars);
     for i = 1:num_solver_vars
         chunks{i} = reshape(var_cell{i}(idx_not_nan),[],1);
@@ -236,6 +235,7 @@ function [mag_U,phase_U,...
                                                 D_f, D_f_in, D_d, T_f_slam, ...
                                                 T_s_slam, max_drag_iters, ctrl_err_regularization)
 
+    assert(ctrl_err_regularization > 0, 'ctrl_err_regularization must be positive');
     converged = false;
     iters = 0;
 
