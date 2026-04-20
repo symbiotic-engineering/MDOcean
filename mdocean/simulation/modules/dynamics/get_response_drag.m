@@ -14,8 +14,8 @@ function [mag_U,phase_U,...
                                         drag_convergence_plot_on,drag_fcn,...
                                         D_f,D_f_in,D_d,T_f_slam,T_s_slam)
 
-    CTRL_MULT_MAX = 1e4;
-    CTRL_ERR_REGULARIZATION = 1;
+    CTRL_MULT_MAX = 1e4;          % historical guard to reject runaway multiplier iterates
+    CTRL_ERR_REGULARIZATION = 1;  % keeps multiplier update denominator away from zero
 
     % initial guess: 2m float amplitude, 0.5m spar amplitude
     X_f_guess = 2 * ones(size(w));
@@ -236,6 +236,7 @@ function [mag_U,phase_U,...
                                                 T_s_slam, max_drag_iters, ctrl_err_regularization)
 
     assert(ctrl_err_regularization > 0, 'ctrl_err_regularization must be positive');
+    ctrl_mult_update_min_denom = 1e-6;
     converged = false;
     iters = 0;
 
@@ -287,7 +288,8 @@ function [mag_U,phase_U,...
         if strcmpi(control_solve_type,'solver')
             % Heuristic update from prior solver-based flow: scale multiplier by
             % normalized constraint residual to improve next iterate.
-            ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err + ctrl_err_regularization);
+            ctrl_update_denom = max(force_lim_err + ctrl_err_regularization, ctrl_mult_update_min_denom);
+            ctrl_mult_guess = ctrl_mult_guess ./ ctrl_update_denom;
             phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));
         end
 
