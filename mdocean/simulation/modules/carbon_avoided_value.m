@@ -33,7 +33,8 @@ function [avoided_dollars, scc_per_year, avoided_dollars_per_year] = carbon_avoi
     % error if past 2050
 
     % 1) interpolate SCC for each year
-    scc_per_year = interp1(scc_years, scc_vals, years_clamped, "linear");
+    %scc_per_year = interp1(scc_years, scc_vals, years_clamped, "linear");
+    scc_per_year = interp1(scc_years, scc_vals, years, "linear");
 
     % 2) multiply by avoided CO2 each year
     avoided_dollars_per_year = scc_per_year .* avoided_co2_tons;
