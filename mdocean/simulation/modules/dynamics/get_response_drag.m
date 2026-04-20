@@ -14,6 +14,9 @@ function [mag_U,phase_U,...
                                         drag_convergence_plot_on,drag_fcn,...
                                         D_f,D_f_in,D_d,T_f_slam,T_s_slam)
 
+    CTRL_MULT_MAX = 1e4;
+    CTRL_ERR_REGULARIZATION = 1;
+
     % initial guess: 2m float amplitude, 0.5m spar amplitude
     X_f_guess = 2 * ones(size(w));
     phase_X_f_guess = zeros(size(w));
@@ -49,10 +52,11 @@ function [mag_U,phase_U,...
                                                     phase_X_f_guess,phase_X_s_guess,...
                                                     ctrl_mult_guess,phase_ctrl_mult_guess,...
                                                     dynam_inputs{:}, ...
-                                                    max_drag_iters_fixed_point);
+                                                    max_drag_iters_fixed_point,...
+                                                    CTRL_ERR_REGULARIZATION);
 
         if strcmpi(control_solve_type,'solver')
-            idx_use = ((ctrl_mult >= 0 & ctrl_mult < 1e4) & isfinite(mag_X_f)) | isnan(B_h_f);
+            idx_use = ((ctrl_mult >= 0 & ctrl_mult < CTRL_MULT_MAX) & isfinite(mag_X_f)) | isnan(B_h_f);
         else
             idx_use = isfinite(mag_X_f) | isnan(B_h_f);
         end
@@ -230,7 +234,7 @@ function [mag_U,phase_U,...
                                                 X_tol,phase_X_tol,F_lim_tol,X_lim_tol,...
                                                 drag_convergence_plot_on,drag_fcn,...
                                                 D_f, D_f_in, D_d, T_f_slam, ...
-                                                T_s_slam, max_drag_iters)
+                                                T_s_slam, max_drag_iters, ctrl_err_regularization)
 
     converged = false;
     iters = 0;
@@ -283,8 +287,8 @@ function [mag_U,phase_U,...
         if strcmpi(control_solve_type,'solver')
             % Heuristic update from prior solver-based flow: scale multiplier by
             % normalized constraint residual to improve next iterate.
-            ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err+1);
-            phase_ctrl_mult_guess = eps + zeros(size(ctrl_mult_guess));
+            ctrl_mult_guess = ctrl_mult_guess ./ (force_lim_err + ctrl_err_regularization);
+            phase_ctrl_mult_guess = zeros(size(ctrl_mult_guess));
         end
 
         % check convergence
