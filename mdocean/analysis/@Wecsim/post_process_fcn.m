@@ -370,7 +370,9 @@ function figs = plot_timeseries_figures(wecsim_filename)
         xlabel('Time (s)', 'Interpreter', 'latex')
         ylabel('Force (N)', 'Interpreter', 'latex')
         title(sprintf('$H=%.1f$ m, $T=%.0f$ s', data.corner_HT(ci,1), data.corner_HT(ci,2)), 'Interpreter', 'latex')
-        legend('Location', 'best', 'Interpreter', 'latex')
+        if ci == 1
+            legend('Location', 'best', 'Interpreter', 'latex')
+        end
         grid on
     end
     improvePlot

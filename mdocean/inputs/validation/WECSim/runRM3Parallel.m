@@ -140,31 +140,17 @@ spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
 float_pos_THD = NaN(length(mcr.cases(:,1)), 1);
 
-% identify four corner sea states from actual JPD entries
+% hardcoded corner sea states: [H, T] where H = Hs/sqrt(2)
 H_all = mcr.cases(:,1);
 T_all = mcr.cases(:,2);
-% restrict to cases with nonzero, non-NaN JPD for corner selection
-if isfield(mcr, 'jpd')
-    valid_jpd = mcr.jpd > 0 & ~isnan(mcr.jpd);
-else
-    valid_jpd = true(size(H_all));
-end
-H_vals = unique(H_all(valid_jpd));
-% For each extreme H, find the extreme T values that actually exist
-H_min = H_vals(1);
-H_max = H_vals(end);
-T_at_H_min = T_all(H_all == H_min & valid_jpd);
-T_at_H_max = T_all(H_all == H_max & valid_jpd);
-corner_HT = [H_min, min(T_at_H_min);   % low H, low T
-             H_min, max(T_at_H_min);   % low H, high T
-             H_max, min(T_at_H_max);   % high H, low T
-             H_max, max(T_at_H_max)];  % high H, high T
-% remove duplicate corners (e.g. if only one T exists for an extreme H)
-corner_HT = unique(corner_HT, 'rows', 'stable');
+corner_HT = [0.75/sqrt(2), 5.5;   % low Hs (0.75 m), low T
+             0.75/sqrt(2), 11.5;  % low Hs (0.75 m), high T
+             6.75/sqrt(2), 12.5;  % high Hs (6.75 m), low T
+             6.75/sqrt(2), 15.5]; % high Hs (6.75 m), high T
 % find matching indices in mcr.cases
 corner_idx = zeros(size(corner_HT, 1), 1);
 for ci = 1:size(corner_HT, 1)
-    corner_idx(ci) = find(H_all == corner_HT(ci,1) & T_all == corner_HT(ci,2), 1);
+    corner_idx(ci) = find(ismembertol(H_all, corner_HT(ci,1)) & ismembertol(T_all, corner_HT(ci,2)), 1);
 end
 corner_idx = corner_idx(:);
 is_corner = false(length(mcr.cases(:,1)), 1);
