@@ -1,5 +1,25 @@
 # Changelog
 ## Unreleased
+## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-21
+Major new functionality: brute force constrained optimal control
+### Added
+- Model: controller can now obey amplitude and power constraints, not just force limits, via revamped `control_errors_from_sat_results()`
+- Model: control determined via nested brute force sweep instead of simultaneously with the drag solver
+- Plots: two new plots in `RunSingleFigFunc` class for optimal control sweep (multiplier and reflection coefficient space)
+- Validation: create test case for verifying/benchmarking `multibody_response.m`
+- Model: `control_type='none'` option for storm case
+### Changed
+- Speedup: change dynamics argument output order to avoid unnecessary recomputation of phase
+- Speedup: reuse shared helper terms within and across controllers in `multibody_response.m`
+- Speedup: reuse `D_sys` determinant from `multibody_impedance.m` in `multibody_response.m`
+- Speedup: compute angles via `atan2()` rather than `angle()`, and use `complex()` or identities in place of some complex operations
+- Speedup: `response_and_ctrl_err_from_ctrl_guess()` uses guessed phase to avoid computing resultant phase
+- Analysis: runtime analysis bar chart includes combinations of various constraints on/off
+- Model: retune report power and heave force multiplier
+### Fixed:
+- Model: output stabilized PTO coefficients from `control_evaluation_fcn` to avoid inconsistencies in downstream calculations
+- Model: prevent negative PTO damping
+
 ## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
 ### Added
 - Validation: plots showing acceleration harmonics, position THD, and drag force waveform to validate describing function
