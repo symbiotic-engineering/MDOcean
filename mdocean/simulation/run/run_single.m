@@ -26,7 +26,7 @@ function [figs,LCOE,val] = run_single(p,b,X)
 
     if p.operational_dynamics_debug_plots_on
         n = gcf().Number;
-        figs_dynamics = [figure(n-3), figure(n-2), figure(n-1), figure(n)];
+        figs_dynamics = [figure(n-4), figure(n-3), figure(n-2), figure(n-1), figure(n)];
         p.operational_dynamics_debug_plots_on = false;
     else
         figs_dynamics = [];
