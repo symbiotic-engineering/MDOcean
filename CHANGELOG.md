@@ -3,6 +3,8 @@
 ## [v1.1.27](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.27) - 2026-4-20
 ### Fixed
 - Model: add pi to multibody phases to make wecsim phase validation match
+- Pipeline: add forgotten meem intermediate results figure outputs
+- Validation: show all phases between -pi and pi
 
 ## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
 ### Added
