@@ -959,6 +959,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
         B_p = 1 ./ sqrt(mag_G_u_squared);
         K_p = 1e-8; % can't be quite zero because r_k = Inf
     end
+    B_p(B_p < 0) = 0; % prevent negative controller damping; use indexed assignment to preserve NaN sea states
 
 end
 
@@ -1092,7 +1093,7 @@ function [mag_U,real_P,...
             need_more_stabilizing = stabilize_K * max(abs(recommended_increase_Kl),[],'all') ...
                                   + stabilize_B * max(abs(recommended_increase_Bl),[],'all');
             if need_more_stabilizing~=0
-                warning('Stabilizing did not work after 2 tries. This could be a finite precision issue.')
+                warning('MDOcean:GetResponseDrag:StabilizingFailed', 'Stabilizing did not work after 2 tries. This could be a finite precision issue.')
             end
 
         end
@@ -1141,6 +1142,12 @@ function [mag_U,real_P,...
                                                  K_l, B_l, ...
                                                  F_f_mag, F_f_phase, ...
                                                  F_s_mag, F_s_phase, D_sys, helper_terms{:});
+
+                % phase adjustment needed to validate vs wecsim, prob indicates a sign error in multibody response
+                phase_X_f = wrapTo2Pi(phase_X_f + pi);
+                phase_X_s = wrapTo2Pi(phase_X_s + pi);
+                phase_X_u = wrapTo2Pi(phase_X_u + pi);
+
             elseif nargout > 7
                 [mag_U,real_P,...
                  mag_X_u,mag_X_f,mag_X_s,...
@@ -1149,6 +1156,9 @@ function [mag_U,real_P,...
                                                            K_l, B_l, ...
                                                            F_f_mag, F_f_phase, ...
                                                            F_s_mag, F_s_phase, D_sys, helper_terms{:});
+                phase_X_f = wrapTo2Pi(phase_X_f + pi);
+                phase_X_s = wrapTo2Pi(phase_X_s + pi);
+                
             elseif nargout > 5
                 % caller needs mag_X_f/mag_X_s (positions 6/7) but not phases
                 [mag_U,real_P,...
