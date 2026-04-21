@@ -48,6 +48,8 @@ function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
     lambda_lin = lambda.ineqlin;
     lambda_lb = lambda.lower;
     lambda_ub = lambda.upper;
+    % x0 includes a trailing fixed material selector term that is not a
+    % design variable for gradient/bound sensitivity calculations.
     num_design_vars = length(x0)-1;
     lambda_lb = lambda_lb(1:num_design_vars);
     lambda_ub = lambda_ub(1:num_design_vars);
