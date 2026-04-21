@@ -48,6 +48,9 @@ function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
     lambda_lin = lambda.ineqlin;
     lambda_lb = lambda.lower;
     lambda_ub = lambda.upper;
+    num_design_vars = length(x0)-1;
+    lambda_lb = lambda_lb(1:num_design_vars);
+    lambda_ub = lambda_ub(1:num_design_vars);
 
     % active constraints
     active     = lambda_nl ~= 0;
@@ -333,4 +336,3 @@ function deriv = finite_difference_scalar_x(f_handle,x_1,idx)
     deriv = delta_y / delta_x;
     % deriv is size(y)
 end
-

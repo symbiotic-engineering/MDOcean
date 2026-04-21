@@ -92,17 +92,22 @@ classdef (Abstract) GenericAnalysis
             val = sorted(~contains(sorted, to_remove));
         end
         function obj = run_analysis(obj)
-            cd('mdocean');
+            original_folder = pwd;
+            mdocean_folder = fileparts(fileparts(mfilename('fullpath')));
+            cleanup_obj = onCleanup(@() cd(original_folder)); %#ok<NASGU>
+            cd(mdocean_folder);
             t = tic;
             intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
             intermed_result_struct.analysis_time = toc(t);
             obj.intermed_result_struct = intermed_result_struct;
-            cd('..');
             obj.save_intermed_results();
         end
 
         function obj = run_post_process(obj)
-            cd('mdocean');
+            original_folder = pwd;
+            mdocean_folder = fileparts(fileparts(mfilename('fullpath')));
+            cleanup_obj = onCleanup(@() cd(original_folder)); %#ok<NASGU>
+            cd(mdocean_folder);
             t = tic;
             [obj.fig_array,...
                 obj.tab_array_display,...
@@ -110,7 +115,6 @@ classdef (Abstract) GenericAnalysis
                 end_result_struct,...
                 obj.tab_firstrows,...
                 obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
-            cd('..');
             end_result_struct.postpro_time = toc(t);
             end_result_struct.analysis_time = obj.intermed_result_struct.analysis_time;
             obj.end_result_struct = end_result_struct;
