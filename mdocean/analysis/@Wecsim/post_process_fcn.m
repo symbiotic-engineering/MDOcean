@@ -399,7 +399,7 @@ function figs = plot_timeseries_figures(wecsim_filename)
     ylabel('Significant Wave Height $H_s$ (m)', 'Interpreter', 'latex')
     title('Float Position THD (\%) at All Sea States', 'Interpreter', 'latex')
     xticks(T_uniq)
-    yticks(H_uniq)
+    yticks(round(H_uniq*sqrt(2), 2))
     improvePlot
     set(h, 'AlphaData', ~isnan(THD_grid))
 end
