@@ -1,5 +1,21 @@
 # Changelog
 ## Unreleased
+## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
+### Added
+- Validation: plots showing acceleration harmonics, position THD, and drag force waveform to validate describing function
+
+## [v1.1.27](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.27) - 2026-4-20
+### Fixed
+- Model: add pi to multibody phases to make wecsim phase validation match
+- Pipeline: add forgotten meem intermediate results figure outputs
+- Validation: show all phases between -pi and pi
+
+## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
+### Added
+- Simulation: create `run_and_catch_warnings.m` to capture output and count warnings
+### Changed
+- Model: include identifiers on warnings in `get_response_drag.m`, `make_drag_integral.m`, `run_MEEM.m`, and `simulation.m`
+- Analysis: SweepGeoms analysis uses warning suppression and counting
 
 ## [v1.1.25](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.25) - 2026-4-17
 ### Fixed
