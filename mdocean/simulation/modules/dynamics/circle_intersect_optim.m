@@ -36,7 +36,12 @@ else
     
     % 3) single-circle closest boundary
     for i = 1:N
-        p = c(i,:) - r(i) * (c(i,:) / norm(c(i,:)));
+        c_norm = norm(c(i,:));
+        if c_norm == 0
+            p = [r(i), 0];
+        else
+            p = c(i,:) - r(i) * (c(i,:) / c_norm);
+        end
         candidates(count+i,:) = p;
         circle_indices(count+i,:) = [i,i];
     end

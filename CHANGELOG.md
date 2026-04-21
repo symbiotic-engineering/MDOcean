@@ -1,11 +1,18 @@
 # Changelog
 ## Unreleased
-## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
+## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-20
 ### Added
 - Simulation: create `run_and_catch_warnings.m` to capture output and count warnings
+- Analysis: new `QPCircles` class for QP circles analysis
 ### Changed
 - Model: include identifiers on warnings in `get_response_drag.m`, `make_drag_integral.m`, `run_MEEM.m`, and `simulation.m`
 - Analysis: SweepGeoms analysis uses warning suppression and counting
+- Paper: modified frequency-domain flowcharts and explanations
+- Validation: include units in the validation table
+- Pipeline: Mermaid outputs switched from SVG to PNG and calkit iteration is used for multiple diagrams
+### Fixed
+- Analysis: `Parameters` class normalization now handles function handles
+- Analysis: add forgotten intermediate outputs to `MEEM` class
 
 ## [v1.1.25](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.25) - 2026-4-17
 ### Fixed
