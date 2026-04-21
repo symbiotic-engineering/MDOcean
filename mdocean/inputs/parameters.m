@@ -39,7 +39,7 @@ else
     D_f_in_over_D_s = 6.5/6;
     h = 85;
     power_coeffs = [22.4,1,-15,86]; % only used when use_multibody=false
-    power_scale_multibody = 0.54;
+    power_scale_multibody = 0.5;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -224,7 +224,7 @@ param_table = [param_table;
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3",{''});
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
         false,"function from WECSim",{''});
-    table("F_heave_mult","F_{heave,mult}",{3.81},"dynamics",true,... 
+    table("F_heave_mult","F_{heave,mult}",{0.28},"dynamics",true,... 
         "multiplier to make heave force match with validation (-)",{''});
     % 1.925 is required to make WAMIT match tank test, and 0.857 is
     % required to make MEEM match WAMIT
