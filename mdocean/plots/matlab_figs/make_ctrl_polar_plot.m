@@ -209,9 +209,9 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
     % constrained optimal controller (already computed with constraints)
     idx_constrained_opt = idx_flat(idx_chosen_ss);
     [ir_cons, ic_cons] = ind2sub([sz_phase, sz_mag], idx_constrained_opt);
-    r_cons = log10(MAG_GUESS(ir_cons, ic_cons)) - log10(min_mag);
-    x_cons = r_cons * cos(PHASE_GUESS(ir_cons, ic_cons));
-    y_cons = r_cons * sin(PHASE_GUESS(ir_cons, ic_cons));
+    r_cons = log10(MAG_STAB_ss(ir_cons, ic_cons)) - log10(min_mag);
+    x_cons = r_cons * cos(PHASE_STAB_ss(ir_cons, ic_cons));
+    y_cons = r_cons * sin(PHASE_STAB_ss(ir_cons, ic_cons));
 
     % unconstrained optimal controller (max power on this sea-state grid)
     valid_unconstrained = isfinite(P_ss);
@@ -261,12 +261,17 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
     end
 
     % --- additional polar plot in gamma-space ---
-    % gamma = (1 - alpha) / (1 + alpha)
+    % gamma = (alpha - 1) / (1 + alpha)
     alpha_grid = MAG_GUESS .* exp(1i .* PHASE_GUESS);
+    alpha_grid_stab = MAG_STAB_ss .* exp(1i .* PHASE_STAB_ss);
     gamma_grid = NaN(size(alpha_grid));
+    gamma_grid_stab = NaN(size(alpha_grid_stab));
     gamma_denom = 1 + alpha_grid;
+    gamma_denom_stab = 1 + alpha_grid_stab;
     gamma_valid = abs(gamma_denom) > GAMMA_SINGULARITY_THRESHOLD;
-    gamma_grid(gamma_valid) = (1 - alpha_grid(gamma_valid)) ./ gamma_denom(gamma_valid);
+    gamma_valid_stab = abs(gamma_denom_stab) > GAMMA_SINGULARITY_THRESHOLD;
+    gamma_grid(gamma_valid) = (alpha_grid(gamma_valid) - 1) ./ gamma_denom(gamma_valid);
+    gamma_grid_stab(gamma_valid_stab) = (alpha_grid_stab(gamma_valid_stab) - 1) ./ gamma_denom_stab(gamma_valid_stab);
 
     fig_gamma = figure;
     pax = polaraxes(fig_gamma);
@@ -290,7 +295,7 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
         denom_stab = 1 + alpha_stab_pts;
         gamma_stab = NaN(size(alpha_stab_pts));
         valid_stab = abs(denom_stab) > GAMMA_SINGULARITY_THRESHOLD;
-        gamma_stab(valid_stab) = (1 - alpha_stab_pts(valid_stab)) ./ denom_stab(valid_stab);
+        gamma_stab(valid_stab) = (alpha_stab_pts(valid_stab) - 1) ./ denom_stab(valid_stab);
         gamma_stab_ok = isfinite(gamma_stab);
         if any(gamma_stab_ok)
             polarscatter(pax, angle(gamma_stab(gamma_stab_ok)), abs(gamma_stab(gamma_stab_ok)), ...
@@ -313,7 +318,7 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
         end
     end
 
-    gamma_cons = gamma_grid(ir_cons, ic_cons);
+    gamma_cons = gamma_grid_stab(ir_cons, ic_cons);
     if isfinite(gamma_cons)
         polarplot(pax, angle(gamma_cons), abs(gamma_cons), '^', 'Color', COLOR_CONS, ...
             'MarkerSize', 9, 'LineWidth', 1.5, ...
