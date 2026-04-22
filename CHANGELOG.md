@@ -1,15 +1,23 @@
 # Changelog
 ## Unreleased
-## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-20
+## [v1.2.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.2) - 2026-4-22
 ### Added
 - Analysis: new `QPCircles` class for QP circles analysis
+- Paper: dedicated economics appendix, including beta table moved from main text
+- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
+- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
 ### Changed
 - Paper: modified frequency-domain flowcharts and explanations
 - Validation: include units in the validation table
 - Pipeline: Mermaid outputs switched from SVG to PNG and calkit iteration is used for multiple diagrams
+- Paper: moved most of PTO section to appendix
+- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
+- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
+- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
 ### Fixed
 - Analysis: `Parameters` class normalization now handles function handles
 - Analysis: add forgotten intermediate outputs to `MEEM` class
+- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
 
 ## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
 ### Added
@@ -70,19 +78,6 @@
 ## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
 ### Changed
 - CI: bump paths-filter to v4 in merge-ready.yml workflow
-
-## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-5
-### Added
-- Paper: dedicated economics appendix, including beta table moved from main text
-- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
-- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
-### Changed
-- Paper: moved most of PTO section to appendix
-- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
-- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
-- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
-### Fixed
-- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
 
 ## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
 ### Added
