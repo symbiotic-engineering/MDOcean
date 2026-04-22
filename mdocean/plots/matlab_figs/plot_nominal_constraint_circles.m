@@ -1,4 +1,4 @@
-function fig = plot_nominal_constraint_circles(val, p, X)
+function fig = plot_nominal_constraint_circles(val, existing_axes)
 % PLOT_NOMINAL_CONSTRAINT_CIRCLES  Visualize QCQP constraint circles in Gamma
 %   plane for the nominal design at the most constrained sea state.
 %   Shows the force, amplitude, and positive-power constraint circles with
@@ -6,13 +6,17 @@ function fig = plot_nominal_constraint_circles(val, p, X)
 %
 %   Inputs:
 %     val  - simulation output struct (must contain val.qcqp_debug)
-%     p    - parameter struct
-%     X    - design variable vector (nominal)
 %
 %   Output:
 %     fig  - figure handle
 
 fig = figure;
+if nargin>1
+    existing_handles = existing_axes.Children;
+    ax = axes;
+    new_handles = copyobj(existing_handles,ax);
+    hold on
+end
 
 if ~isfield(val, 'qcqp_debug') || isempty(val.qcqp_debug.centers)
     title('No constrained sea state found');
