@@ -5,7 +5,7 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :param p: Parameter struct
 % :param b: Design variable bounds struct
 % :returns: Intermediate results struct (cached heavy analyses)
-    % Run single analysis with drag convergence plotting
+    % Run single analysis with dynamics plotting
     p.operational_dynamics_debug_plots_on = true;
     [figs, LCOE, val] = run_single(p,b);
 
