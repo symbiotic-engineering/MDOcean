@@ -14,6 +14,7 @@ max_num_intersects = N * (N-1);
 max_num_candidates = max_num_intersects + N;
 candidates = NaN(max_num_candidates,2);
 circle_indices = zeros(max_num_candidates,2);
+too_far_check = false(max_num_candidates,1);
 
 % 1) check if origin feasible
 origin = [0,0];
@@ -27,8 +28,9 @@ else
     count = 0;
     for i = 1:N
         for j = i+1:N
-            [xs, ys] = circle_circle_intersect(c(i,1),c(i,2),r(i),c(j,1),c(j,2),r(j));
+            [xs, ys, too_far] = circle_circle_intersect(c(i,1),c(i,2),r(i),c(j,1),c(j,2),r(j));
             circle_indices(count+(1:2),:) = [i,j;i,j];
+            too_far_check(count+(1:2)) = too_far;
             candidates(count+(1:2),:) = [xs.', ys.']; 
             count = count + 2;
         end
@@ -63,10 +65,11 @@ else
         constraints_active = true(size(r));
         if any(isnan(candidates(:)))
             idx_nan = any(isnan(candidates),2);
-            circles_no_intersect = unique(circle_indices(idx_nan,:),'rows');
+            idx_infeasible = idx_nan & too_far_check; % this assumes all circles are feasible inside, infeasible outside
+            circles_no_intersect = unique(circle_indices(idx_infeasible,:),'rows');
             for i = 1:size(circles_no_intersect,1)
-                warning('circle_intersect_optim:infeasible',...
-                    'infeasible: circle %i and %i do not intersect',...
+                warning('MDOcean:circle_intersect_optim:infeasible',...
+                    'infeasible: circle %i and %i do not intersect and are not contained/coincident',...
                     circles_no_intersect(i,1),circles_no_intersect(i,2))
             end
         else
@@ -93,12 +96,14 @@ function constr_fcn = eval_constraint(p,c,r)
     constr_fcn = vecnorm(p - c,2,2) - r;
 end
 
-function [xs, ys] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
+function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
 % Finds the intersection points of two circles.
 % Returns NaN if circles don't intersect or are coincident.
     d = sqrt((x2-x1)^2 + (y2-y1)^2);
     
-    if d > r1+r2 || d < abs(r1-r2) || d == 0
+    too_far = d > r1 + r2;
+    contained_or_coincident = d < abs(r1-r2) || d == 0;
+    if too_far || contained_or_coincident
         % no intersection (too far, contained, or coincident)
         xs = [NaN, NaN];
         ys = [NaN, NaN];
