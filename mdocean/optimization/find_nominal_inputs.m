@@ -12,6 +12,6 @@ function F_max_nom = find_nominal_inputs(b, p)
     X = [b.X_noms; 1];
     p.use_force_sat = false;
     [~, ~, ~, val] = simulation(X, p);
-    F_max_nom = val.force_ptrain;
+    F_max_nom = val.force_ptrain / 1e6; % N to MN unit conversion
 
 end
