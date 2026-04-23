@@ -176,7 +176,7 @@ classdef (Abstract) GenericAnalysis
                     s = rmfield(s, fn{i});
                 end
             end
-            save([obj.outut_folder_abs filesep 'intermed'], '-struct', 's')
+            save([obj.output_folder filesep 'intermed'], '-struct', 's')
         end
 
         function save_end_results(obj)
