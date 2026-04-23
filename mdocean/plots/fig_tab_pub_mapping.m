@@ -9,11 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-<<<<<<< HEAD
-num_figs_AOR = 48;
-=======
-num_figs_AOR = 49;
->>>>>>> origin/copilot/reorder-function-arguments-for-efficiency
+num_figs_AOR = 52;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
