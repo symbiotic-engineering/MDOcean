@@ -418,6 +418,7 @@ function figs = fit_and_plot_case4(case_4, case_2, idxs_alpha_cell, idxs_beta_ce
     fig_overlay = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         spar_exc, x_label_v1, y_label_v1);
 
+
     figs = [figs_sep figs_v1 figs_v2 figs_v3 figs_v4 fig_overlay];
 end
 
@@ -742,6 +743,8 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
     ylim([ylim_default(1), max_y_case24 * 1.1])
     improvePlot
     legend('location', 'eastoutside', 'Interpreter', 'latex')
+
+    fig.Position(3) = fig.Position(3) * 2;  % widen figure for legend
 end
 
 function figs = plot_v1_newform(x_f1_v1, y_f1_v1, alpha_vec, beta_vec, x_label_v1, y_label_v1)
