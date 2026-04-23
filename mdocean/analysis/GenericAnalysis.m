@@ -45,7 +45,9 @@ classdef (Abstract) GenericAnalysis
 
     methods
         function obj = GenericAnalysis(p,b)
-            obj.output_folder = ['results' filesep class(obj)];
+            output_folder_rel = ['results' filesep class(obj)]; % relative to MDOcean folder
+            MDOcean_folder = fileparts(fileparts(fileparts(mfilename('fullpath')))); % absolute path
+            obj.output_folder = fullfile(MDOcean_folder, output_folder_rel); % absolute path
             if ~isfolder(obj.output_folder)
                 mkdir(obj.output_folder)
             end
@@ -64,9 +66,9 @@ classdef (Abstract) GenericAnalysis
                 end
             end
             
-            obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
+            obj.analysis_outputs = {[output_folder_rel, filesep, 'intermed.mat']};
 
-            obj.postpro_outputs  = strcat(obj.output_folder,...
+            obj.postpro_outputs  = strcat(output_folder_rel,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.fig_names,'.fig') ...
                           strcat(obj.tab_names,'.tex') ...
@@ -162,6 +164,7 @@ classdef (Abstract) GenericAnalysis
         function save_intermed_results(obj)
             s = obj.intermed_result_struct;
             fn = fieldnames(s);
+            
             for i=1:length(fn)
                 if any(isgraphics(s.(fn{i})) & isa(s.(fn{i}),'matlab.ui.Figure'))
                     figs = s.(fn{i});
@@ -173,7 +176,7 @@ classdef (Abstract) GenericAnalysis
                     s = rmfield(s, fn{i});
                 end
             end
-            save([obj.output_folder filesep 'intermed'], '-struct', 's')
+            save([obj.outut_folder_abs filesep 'intermed'], '-struct', 's')
         end
 
         function save_end_results(obj)
