@@ -1,4 +1,4 @@
-function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r)
+function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r,warn_if_infeasible)
 % Finds the point p_star=[x,y] closest to the origin that is 
 % within the intersection of circular discs with centers c and radii r.
 % This is equivalent to the following optimization problem: 
@@ -67,14 +67,19 @@ else
             idx_nan = any(isnan(candidates),2);
             idx_infeasible = idx_nan & too_far_check; % this assumes all circles are feasible inside, infeasible outside
             circles_no_intersect = unique(circle_indices(idx_infeasible,:),'rows');
-            for i = 1:size(circles_no_intersect,1)
-                warning('MDOcean:circle_intersect_optim:infeasible',...
-                    'infeasible: circle %i and %i do not intersect and are not contained/coincident',...
-                    circles_no_intersect(i,1),circles_no_intersect(i,2))
+            if warn_if_infeasible
+                for i = 1:size(circles_no_intersect,1)
+                    warning('MDOcean:circle_intersect_optim:infeasible',...
+                        'infeasible: circle %i and %i do not intersect and are not contained/coincident',...
+                        circles_no_intersect(i,1),circles_no_intersect(i,2))
+                end
             end
         else
-            warning('circle_intersect_optim:infeasible',...
-                'each constraint pair is individually feasible, but all constraints together are infeasible')
+            if warn_if_infeasible
+                warning('MDOcean:circle_intersect_optim:infeasible',...
+                    ['Each constraint pair is individually feasible, '...
+                    'but all constraints together are infeasible'])
+            end
         end
     else
         constraints_active = abs(eval_constraint(p_star,c,r)) < 1e-4;
