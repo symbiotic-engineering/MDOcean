@@ -48,11 +48,6 @@ function [par_x_star_par_p_all_params, dJstar_dp_all_params, ...
     lambda_lin = lambda.ineqlin;
     lambda_lb = lambda.lower;
     lambda_ub = lambda.upper;
-    % x0 includes a trailing fixed material selector term that is not a
-    % design variable for gradient/bound sensitivity calculations.
-    num_design_vars = length(x0)-1;
-    lambda_lb = lambda_lb(1:num_design_vars);
-    lambda_ub = lambda_ub(1:num_design_vars);
 
     % active constraints
     active     = lambda_nl ~= 0;
@@ -233,6 +228,7 @@ function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,ac
 
     % obtain B from constraint A_ineq matrix for linear constraints
     A_ineq_lin_part = lin_ineq_constraints(p);
+    A_ineq_lin_part = A_ineq_lin_part(:, 1:end-1); % remove material column (consistent with get_partials)
     A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
     A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
     B_lin = A_ineq_lin(active_lin,:).';
