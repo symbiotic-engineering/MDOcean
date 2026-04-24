@@ -6,7 +6,13 @@ classdef QPCircles < GenericAnalysis
         fig_names = {'qp_circles'};
         tab_names = {};
     end
-
+    methods
+        function obj = QPCircles(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_analysis_outputs = { ...
+                'results/QPCircles/figure_handle.fig'};
+        end
+    end
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 
