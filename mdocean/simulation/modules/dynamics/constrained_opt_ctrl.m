@@ -79,7 +79,7 @@ function [mag_U,phase_U,...
         %Z_f =, Z_s, Z_c to avoid repeat calcs in loop and fewer params passed
 
         warn_if_infeasible = opt_ctrl_plot_debug_on;
-        [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th_complex, w, ...
+        [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th_complex, w, ...
                                 mag_X_u_unsat, phase_X_u_unsat, ...
                                 mag_X_f_unsat, phase_X_f_unsat, ...
                                 mag_X_s_unsat, phase_X_s_unsat, ...
@@ -102,8 +102,8 @@ function [mag_U,phase_U,...
 
         force_lim_err = zeros(size(w));
         amp_lim_err = zeros(size(w));
-        ctrl_mult_best = ones(size(w));
-        phase_ctrl_mult_best = zeros(size(w));
+        ctrl_mult_best = abs(mult);
+        phase_ctrl_mult_best = my_angle(mult);
 
     elseif strcmpi(control_solve_type,'solver')
         [mag_U,real_P,...
@@ -170,7 +170,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
 
 end
 
-function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
+function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
                             mag_X_u_unsat, phase_X_u_unsat, ...
                             mag_X_f_unsat, phase_X_f_unsat, ...
                             mag_X_s_unsat, phase_X_s_unsat, ...
@@ -195,6 +195,7 @@ function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     
     B_p_sat = B_p_stabilized;
     K_p_sat = K_p_stabilized;
+    mult = NaN(size(B_p_sat));
     qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
                         'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
                         'w', NaN, 'n_active_constraints', 0, 'feasible', false);
@@ -378,8 +379,8 @@ function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         end
         
         % update debug struct if this is the most constrained feasible sea state
-        n_non_power = size(centers, 1) - 1;  % last circle is always the power circle
-        if n_non_power > qcqp_debug.n_active_constraints && ~isempty(centers) && isfinite(Gamma_opt)
+        most_constr_so_far = abs(Gamma_opt) > abs(qcqp_debug.Gamma_opt) || isnan(qcqp_debug.Gamma_opt);
+        if most_constr_so_far && ~isempty(centers) && isfinite(Gamma_opt)
             qcqp_debug.centers = centers;
             qcqp_debug.radii = radii;
             qcqp_debug.labels = current_labels;
@@ -387,9 +388,11 @@ function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             qcqp_debug.alpha = imag(Z_th_i) / real(Z_th_i);
             qcqp_debug.Z_th = Z_th_i;
             qcqp_debug.w = w_i;
-            qcqp_debug.n_active_constraints = n_non_power;
+            qcqp_debug.n_active_constraints = size(centers,1);
             qcqp_debug.feasible = ~isempty(p_star);
         end
+
+        mult(idx) = (1 + Gamma_opt) / (1 - Gamma_opt);
 
         % convert Gamma to Z_l, then to B_p and K_p
         if abs(Gamma_opt) < GAMMA_TOL
@@ -397,13 +400,14 @@ function [B_p_sat,K_p_sat,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             continue
         end
         
-        Z_l = conj(Z_th_i) * (1 + Gamma_opt) / (Gamma_opt - 1);
+        Z_l = conj(Z_th_i) * mult(idx);
         B_p_sat(idx) = real(Z_l);
         K_p_sat(idx) = -w_i * imag(Z_l);
         
-        % ensure B_p >= 0 (stabilize)
+        % ensure B_p >= 0
         if B_p_sat(idx) < 0
             B_p_sat(idx) = 0;
+            mult(idx) = 1i * K_p_sat(idx);
         end
     end
 end
