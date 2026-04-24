@@ -200,17 +200,20 @@ if nargout > 1
     t_denom = t135.*D_sys;              % = ((t96.*t109.*w)./D_sys-1.0).*D_sys
     t_numer = t9.*t96.*t109.*t144;      % shared factor in t146, t150
     t_n_d = t_numer./t_denom;
+
     % Guard against 0/0 = NaN: can occur when the excitation force vanishes at
     % the system resonant frequency (wave-cancellation + resonance coincidence).
     % The physical response in this degenerate case is zero (no drive → no motion).
-%     if any(isnan(t_n_d),'all')
-%         warning('0/0 in multibody_response: setting degenerate t_n_d to 0')
-%         t_n_d(isnan(t_n_d)) = 0;
-%     end
+    zero_over_zero = t_numer==0 & t_denom==0;
+    if any(zero_over_zero,'all')
+        warning('0/0 in multibody_response: setting degenerate t_n_d to 0')
+        t_n_d(zero_over_zero) = 0;
+    end
+
     % t146–t149 are only needed for mag/phase of X_f and X_s (nargout>3/4/5/6),
     % not for real_P, so their computation is deferred to those blocks below.
-    t150 = -t_n_d.*t_110_118.*t137.*t145;
-    real_P = real(t150)./2.0;
+    t150 = -t_n_d.*t_110_118.*t137.*t145 / 2;
+    real_P = real(t150);
 end
 if nargout > 3
     t146 = -t_n_d.*t103.*t119;
@@ -238,7 +241,7 @@ if nargout > 7
     phase_U = angle(-t133.*t144./t135);  % (t96.*t109.*w)./D_sys-1 == -t135
 end
 if nargout > 8
-    imag_P = imag(t150)./2.0;
+    imag_P = imag(t150);
 end
 if nargout > 9
     % angle(-1i*z) = atan2(-real(z), imag(z))
