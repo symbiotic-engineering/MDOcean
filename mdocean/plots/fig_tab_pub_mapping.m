@@ -94,7 +94,7 @@ figs_in_AOR{30} = 'Meem.asymptotic_b_vector';
 % appendix B - dynamics
 figs_in_AOR{31} = 'QPCircles.qp_circles';
 figs_in_AOR{32} = 'RunSingleFigFunc.qcqp_circles_nominal';
-figs_in_AOR{33} = 'RunSingleFigFunc.ctrl_polar_plot';
+figs_in_AOR{33} = 'RunSingleFigFunc.ctrl_polar_plot_mult';
 figs_in_AOR{34} = 'DragIntegral.drag_integral_B';
 figs_in_AOR{35} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{36} = 'Slamming.slamming_amplitude';
