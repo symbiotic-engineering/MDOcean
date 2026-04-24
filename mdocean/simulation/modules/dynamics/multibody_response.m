@@ -60,8 +60,6 @@ t12 = K_f.*K_s;
 t16 = -K_f;
 t17 = -K_s;
 t18 = 1.0./w;
-% exp(1i*x) = cos(x) + 1i*sin(x); using real trig avoids complex exp and
-% the intermediate 1i-multiply that would be needed to form the argument.
 t30 = complex(cos(F_f_phase), sin(F_f_phase));
 t31 = complex(cos(F_s_phase), sin(F_s_phase));
 t27 = K_f.*1i;

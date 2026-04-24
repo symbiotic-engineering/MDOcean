@@ -587,9 +587,7 @@ function [opt_mag_U,opt_phase_U,...
         
         [min_err,idx_least_err] = min(constraint_err_pos_pwr,[],ctrl_dim);
         idx_opt(sea_state_infeasible) = idx_least_err(sea_state_infeasible);
-        % Use sub2ind for correct 3D indexing: idx_opt gives ctrl-dim index for
-        % each (Hs,T) sea state, so plain linear indexing real_P_unmodified(idx_opt)
-        % would silently access the wrong elements of the [Nh x NT x N_ctrl] array.
+        
         sz = size(real_P_unmodified);
         [r,c] = ndgrid(1:sz(1), 1:sz(2));
         lin_idx = sub2ind(sz, r, c, idx_opt);

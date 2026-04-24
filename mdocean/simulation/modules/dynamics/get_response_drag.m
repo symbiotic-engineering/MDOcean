@@ -177,7 +177,7 @@ function [mag_U,phase_U,...
     end
 
     % solve
-    [x_solved,~,~,~] = fsolve(@(x)fun_outer(x,fun_inner,flatten,num_solver_vars),x0,opts);
+    x_solved = fsolve(@(x)fun_outer(x,fun_inner,flatten,num_solver_vars),x0,opts);
 
     % unpack
     X_f_solved = unflatten(x_solved,1);

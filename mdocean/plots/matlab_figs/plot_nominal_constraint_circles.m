@@ -36,8 +36,6 @@ w_i     = d.w;              % angular frequency of this sea state
 N = size(centers, 1);
 
 hold on;
-%axis equal;
-%pbaspect([1 1 1]);
 
 % Draw circles and shade feasible interiors
 colors = lines(N);
@@ -96,8 +94,6 @@ function cartesianAx = fillcircles(centers,radii,polarAx,colors,transparency,lab
 
     % Overlay a new Cartesian axes on the given polar axes
     cartesianAx = axes('Position', polarAx.Position, 'Color', 'none');
-%     cartesianAx.XAxis.Visible = 'off';
-%     cartesianAx.YAxis.Visible = 'off';
     hold(cartesianAx,'on')
 
     radiusLimit = max(get(polarAx, 'RLim'));
@@ -118,23 +114,9 @@ function cartesianAx = fillcircles(centers,radii,polarAx,colors,transparency,lab
     end
 
     % Adjust limits of Cartesian axes to match polar plot and hide them
-
     legend(cartesianAx,'Location','best')
 
     xlim(cartesianAx, [-radiusLimit, radiusLimit]);
     ylim(cartesianAx, [-radiusLimit, radiusLimit]);
     axis(cartesianAx, 'square', 'off');
-end
-
-
-function cartesianAx = fillpolar(polarAx, cartesianAx, thetaLower, thetaUpper, radiusLower, radiusUpper,...
-                    fillColor, transparency, label)
-
-    % Transform polar coordinates to Cartesian for filling
-    [xLower, yLower] = pol2cart(thetaLower, radiusLower);
-    [xUpper, yUpper] = pol2cart(fliplr(thetaUpper), fliplr(radiusUpper));
-    
-    % Draw filled area between the curves using Cartesian coordinates
-    
-    
 end
