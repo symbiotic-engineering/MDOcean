@@ -39,7 +39,7 @@ else
     D_f_in_over_D_s = 6.5/6;
     h = 85;
     power_coeffs = [22.4,1,-15,86]; % only used when use_multibody=false
-    power_scale_multibody = 0.5;
+    power_scale_multibody = 0.58;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
