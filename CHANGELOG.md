@@ -1,5 +1,11 @@
 # Changelog
 ## Unreleased
+## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-23
+### Changed
+- Speedup: `find_nominal_inputs` uses unsaturated simulation to calculate `F_max_nom` instead of optimization
+- Validation: suppress warnings in Meem validation
+- Analysis: parallelize and remove print statements in `PtoSweep` analysis
+
 ## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
 ### Added
 - Validation: plots showing acceleration harmonics, position THD, and drag force waveform to validate describing function
