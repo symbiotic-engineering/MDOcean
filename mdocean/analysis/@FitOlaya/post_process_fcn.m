@@ -693,15 +693,15 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
 
     % Overlay WAMIT RM3 spar excitation data
     % RM3 geometry (from hydro_coeff_err.m and WEC-Sim inputs):
-    %   Rb = a2 = 10 m (spar column outer radius)
-    %   Rc = a1 = 3 m  (spar column inner radius)
+    %   Rb = a2 = 10 m (buoy radius)
+    %   Rc = a1 = 3 m  (spar column radius)
     %   Rx = Rp = a3 = 15 m (damping plate outer radius; alpha > 1 so Rx = Rp)
     %   alpha = Rp/Rb = a3/a2 = 1.5
     %   beta = Rc/Rb = 3/10 = 0.3
-    %   h = water depth = Inf (deep water; h is NOT the spar draft)
+    %   h = water depth = Inf (deep water)
     %   e2 = spar_exc.T_s  (depth to bottom of gap = spar draft, m)
     %   h_d = e2 - e1 = 0.1  (gap height; e1/h = 0 since h = Inf)
-    %   f = gamma_over_rho_g / (pi * Rc^2)  [f is normalized by Rc, not Rp]
+    %   f = gamma_over_rho_g / (pi * Rc^2)
     Rb_rm3  = 10;   % spar column outer radius (m) [= a2]
     Rc_rm3  = 3;    % spar column inner radius (m)  [= a1]
     Rp_rm3  = 15;   % damping plate outer radius (m) [= Rx since Rp > Rb]
