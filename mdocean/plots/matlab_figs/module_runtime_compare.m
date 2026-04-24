@@ -28,28 +28,36 @@ function [figs, ...
 % :returns: pct_runtime_other
 
     % extract full sim timing and multiplier
-    t_freq_domain_fullsim_profile = extract_runtime(profile_freq_domain,'simulation');
-    t_multibody_fullsim_profile  = extract_runtime(profile_multibody, 'simulation');
-    t_singlebody_fullsim_profile = extract_runtime(profile_singlebody,'simulation');
-    t_no_amp_sat_fullsim_profile      = extract_runtime(profile_no_amp_sat,      'simulation');
+    t_freq_domain_fullsim_profile      = extract_runtime(profile_freq_domain,     'simulation');
+    t_multibody_fullsim_profile        = extract_runtime(profile_multibody,       'simulation');
+    t_singlebody_fullsim_profile       = extract_runtime(profile_singlebody,      'simulation');
+    t_no_amp_sat_fullsim_profile       = extract_runtime(profile_no_amp_sat,      'simulation');
     t_no_force_amp_sat_fullsim_profile = extract_runtime(profile_no_force_amp_sat, 'simulation');
    
-    time_multiplier_freq_domain        = t_freq_domain_fullsim_timeit        / t_freq_domain_fullsim_profile;
-    time_multiplier_multibody          = t_multibody_fullsim_timeit          / t_multibody_fullsim_profile;
-    time_multiplier_singlebody         = t_singlebody_fullsim_timeit         / t_singlebody_fullsim_profile;
-    time_multiplier_no_amp_sat         = t_no_amp_sat_timeit                 / t_no_amp_sat_fullsim_profile;
-    time_multiplier_no_force_amp_sat   = t_no_force_amp_sat_timeit           / t_no_force_amp_sat_fullsim_profile;
+    time_multiplier_freq_domain        = t_freq_domain_fullsim_timeit / t_freq_domain_fullsim_profile;
+    time_multiplier_multibody          = t_multibody_fullsim_timeit   / t_multibody_fullsim_profile;
+    time_multiplier_singlebody         = t_singlebody_fullsim_timeit  / t_singlebody_fullsim_profile;
+    time_multiplier_no_amp_sat         = t_no_amp_sat_timeit          / t_no_amp_sat_fullsim_profile;
+    time_multiplier_no_force_amp_sat   = t_no_force_amp_sat_timeit    / t_no_force_amp_sat_fullsim_profile;
 
     % just dynamics
-    t_freq_domain        = time_multiplier_freq_domain        * extract_runtime(profile_freq_domain,       'get_response_drag');
-    t_multibody          = time_multiplier_multibody          * extract_runtime(profile_multibody,         'get_response_drag');
-    t_singlebody         = time_multiplier_singlebody         * extract_runtime(profile_singlebody,        'get_response_drag');
-    t_no_amp_sat         = time_multiplier_no_amp_sat         * extract_runtime(profile_no_amp_sat,        'get_response_drag');
-    t_no_force_amp_sat   = time_multiplier_no_force_amp_sat   * extract_runtime(profile_no_force_amp_sat,  'get_response_drag');
+    t_freq_domain      = time_multiplier_freq_domain      * extract_runtime(profile_freq_domain,      'get_response_drag');
+    t_multibody        = time_multiplier_multibody        * extract_runtime(profile_multibody,        'get_response_drag');
+    t_singlebody       = time_multiplier_singlebody       * extract_runtime(profile_singlebody,       'get_response_drag');
+    t_no_amp_sat       = time_multiplier_no_amp_sat       * extract_runtime(profile_no_amp_sat,       'get_response_drag');
+    t_no_force_amp_sat = time_multiplier_no_force_amp_sat * extract_runtime(profile_no_force_amp_sat, 'get_response_drag');
 
     f1 = figure;
-    cats = {'Frequency Domain 2-DOF','MDOcean Dynamics 1-DOF, Force & Amp. Constrained','MDOcean Dynamics 2-DOF, Force & Amp.  Constrained','MDOcean Dynamics 2-DOF, Force Constrained','MDOcean Dynamics 2-DOF, Unconstrained','WecSim (Parallelized)'};
-    times = [t_freq_domain t_singlebody t_multibody t_no_amp_sat t_no_force_amp_sat round(t_wecsim)];
+    cats = {'Freq. Domain, Unconstrained',...
+            'MDOcean, Unconstrained',...
+            'MDOcean, Force Constrained',...
+            'MDOcean, Fully Constrained',...
+            'WecSim (Parallel), Unconstrained'};
+    times = [t_freq_domain ...
+             t_no_force_amp_sat ...
+             t_no_amp_sat ...
+             t_multibody ...
+             round(t_wecsim)];
     cats = reordercats(categorical(cats),cats);
     h = bar(cats,times);
     if ~isMATLABReleaseOlderThan('R2024b')
