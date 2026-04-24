@@ -161,7 +161,7 @@ function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
         B_p = real_G_u ./ mag_G_u_squared;
     elseif strcmpi(control_type, 'damping')
         B_p = 1 ./ sqrt(mag_G_u_squared);
-        K_p = 1e-8; % can't be quite zero because r_k = Inf
+        K_p = 0;
     elseif strcmpi(control_type, 'none')
         B_p = zeros(size(w));
         K_p = zeros(size(w));
