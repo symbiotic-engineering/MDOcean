@@ -29,6 +29,7 @@ function intermed_result_struct = analysis_fcn(p,b)
     p_freq.use_multibody = true;
     p_freq.use_force_sat = false;
     p_freq.use_power_sat = false;
+    p_freq.use_amp_sat   = false;
     p_freq.C_d_float = 0;
     p_freq.C_d_spar = 0;
     p_freq.max_drag_iters_fxp = 1;
@@ -39,6 +40,27 @@ function intermed_result_struct = analysis_fcn(p,b)
     profile_freq_domain = profile('info');
     profile off
     t_freq_domain_fullsim_timeit = timeit(@()simulation(X,p_freq),num_outputs);
+
+    p_no_amp_sat = p;
+    p_no_amp_sat.use_multibody = true;
+    p_no_amp_sat.use_amp_sat = false;
+    profile clear
+    profile on
+    simulation(X,p_no_amp_sat);
+    profile_no_amp_sat = profile('info');
+    profile off
+    t_no_amp_sat_timeit = timeit(@()simulation(X,p_no_amp_sat),num_outputs);
+
+    p_no_force_amp_sat = p;
+    p_no_force_amp_sat.use_multibody = true;
+    p_no_force_amp_sat.use_amp_sat = false;
+    p_no_force_amp_sat.use_force_sat = false;
+    profile clear
+    profile on
+    simulation(X,p_no_force_amp_sat);
+    profile_no_force_amp_sat = profile('info');
+    profile off
+    t_no_force_amp_sat_timeit = timeit(@()simulation(X,p_no_force_amp_sat),num_outputs);
 
     % save p_sim because runRM3Parallel modifies p
     p_sim = p;
@@ -53,9 +75,13 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.profile_multibody = profile_multibody;
     intermed_result_struct.profile_singlebody = profile_singlebody;
     intermed_result_struct.profile_freq_domain = profile_freq_domain;
+    intermed_result_struct.profile_no_amp_sat = profile_no_amp_sat;
+    intermed_result_struct.profile_no_force_amp_sat = profile_no_force_amp_sat;
     intermed_result_struct.t_singlebody_fullsim_timeit = t_singlebody_fullsim_timeit;
     intermed_result_struct.t_multibody_fullsim_timeit = t_multibody_fullsim_timeit;
     intermed_result_struct.t_freq_domain_fullsim_timeit = t_freq_domain_fullsim_timeit;
+    intermed_result_struct.t_no_amp_sat_timeit = t_no_amp_sat_timeit;
+    intermed_result_struct.t_no_force_amp_sat_timeit = t_no_force_amp_sat_timeit;
     intermed_result_struct.t_wecsim = t_wecsim;
     intermed_result_struct.p = p_sim;
 end

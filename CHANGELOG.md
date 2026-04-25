@@ -1,5 +1,31 @@
 # Changelog
 ## Unreleased
+## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-25
+Major new functionality: constrained optimal control via brute force search, solver, and analytical QP
+### Added
+- Model: solver-based controller can now obey amplitude and power constraints, not just force limits, via revamped `control_errors_from_sat_results()`
+- Model: ability to determine control via nested brute force sweep instead of simultaneously with the drag solver
+- Model: ability to determine control via quadratically-constrained quadradratic program (QCQP) implemented via analytical circle intersections
+- Model: parameter `control_solve_type` to change betweeen solver, brute force, and analytical optimal control formulations
+- Plots: four new plots in `RunSingleFigFunc` class for optimal control sweep (multiplier and reflection coefficient space) and QCQP (circles and circles with brute-force overlay in reflection coefficient space)
+- Validation: create test case for verifying/benchmarking `multibody_response.m`
+- Model: `control_type='none'` option for storm case
+### Changed
+- Speedup: change dynamics argument output order to avoid unnecessary recomputation of phase
+- Speedup: reuse shared helper terms within and across controllers in `multibody_response.m`
+- Speedup: reuse `D_sys` determinant from `multibody_impedance.m` in `multibody_response.m`
+- Speedup: compute angles via `atan2()` rather than `angle()`, and use `complex()` or identities in place of some complex operations
+- Speedup: `response_and_ctrl_err_from_ctrl_guess()` uses guessed phase to avoid computing resultant phase
+- Analysis: runtime analysis bar chart includes combinations of various constraints on/off
+- Analysis: change `GenericAnalysis` to handle class
+- Analysis/Speedup: `GenericAnalysis` caches computation of dependencies between analysis and postpro stages
+- Model: retune report power and heave force multiplier
+- Plots: `improvePlot.m` now detects polar axes, not just Cartesian
+- File structure: split control functions out into new `constrained_opt_ctrl.m` file
+### Fixed:
+- Model: output the stabilized PTO coefficients from `control_evaluation_fcn()` to avoid inconsistencies in downstream calculations
+- Model: prevent negative PTO damping
+
 ## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-24
 ### Changed
 - Validation: plots for damping plate hydro fit now overlay case 2, 4, and WAMIT data in log space and with improved aesthetics
