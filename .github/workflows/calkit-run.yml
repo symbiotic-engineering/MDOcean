@@ -83,6 +83,9 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - name: pull
+        run: calkit pull
+        continue-on-error: true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
         with:
@@ -90,9 +93,11 @@ jobs:
           run_args: make-calkit-stages --pull --allow-missing
           save: false
           pull_dvc: false
+          cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
-
+      - name: add any newly generated .ipynb files to git
+        run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
@@ -102,6 +107,7 @@ jobs:
           run_args: --keep-going --log --pull --allow-missing build-AOR-paper view-aor-figs all-viz
           pull_dvc: false
           save: false
+          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then

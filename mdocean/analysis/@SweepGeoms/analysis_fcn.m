@@ -30,7 +30,7 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     % Save all current warning states and restore on function exit.
     prev_warning_states = warning;
-    cleanup_warnings = onCleanup(@() warning(prev_warning_states)); %#ok<NASGU>
+    cleanup_warnings = onCleanup(@() warning(prev_warning_states));
 
     % Suppress noisy verbosity warnings in the outer scope (nominal simulation
     % and post-loop code).  Per-geometry warnings inside the parfor are handled
