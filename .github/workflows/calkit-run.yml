@@ -92,6 +92,7 @@ jobs:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
           save: false
+          cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
@@ -106,6 +107,7 @@ jobs:
           run_args: --keep-going --log build-AOR-paper view-aor-figs all-viz
           pull_dvc: false
           save: false
+          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
