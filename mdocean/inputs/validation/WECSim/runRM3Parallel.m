@@ -138,6 +138,29 @@ spar_drag_force_fund   = zeros(length(mcr.cases(:,1)), 1);
 float_drag_force_phase = zeros(length(mcr.cases(:,1)), 1);
 spar_drag_force_phase  = zeros(length(mcr.cases(:,1)), 1);
 
+float_pos_THD = NaN(length(mcr.cases(:,1)), 1);
+
+% hardcoded corner sea states: [H, T] where H = Hs/sqrt(2)
+H_all = mcr.cases(:,1);
+T_all = mcr.cases(:,2);
+corner_HT = [0.75/sqrt(2), 5.5;   % low Hs (0.75 m), low T
+             0.75/sqrt(2), 11.5;  % low Hs (0.75 m), high T
+             6.75/sqrt(2), 12.5;  % high Hs (6.75 m), low T
+             6.75/sqrt(2), 15.5]; % high Hs (6.75 m), high T
+% find matching indices in mcr.cases
+corner_idx = zeros(size(corner_HT, 1), 1);
+for ci = 1:size(corner_HT, 1)
+    corner_idx(ci) = find(ismembertol(H_all, corner_HT(ci,1)) & ismembertol(T_all, corner_HT(ci,2)), 1);
+end
+corner_idx = corner_idx(:);
+is_corner = false(length(mcr.cases(:,1)), 1);
+is_corner(corner_idx) = true;
+
+% preallocate cell arrays for timeseries at four corners
+num_cases = length(mcr.cases(:,1));
+float_accel_ts_cell = cell(num_cases, 1);
+float_drag_ts_cell  = cell(num_cases, 1);
+corner_N_per_T = round(timesteps_per_period(corner_idx));
 
 parfor imcr=1:length(mcr.cases(:,1))
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
@@ -218,6 +241,16 @@ parfor imcr=1:length(mcr.cases(:,1))
          float_drag_force_phase(imcr)] = get_fundamental(F_drag_f, wave_freq, simu.dt);
         [spar_drag_force_fund(imcr), ...
          spar_drag_force_phase(imcr)]  = get_fundamental(F_drag_s, wave_freq, simu.dt);
+
+        % compute float position THD for all sea states
+        float_pos_THD(imcr) = compute_pos_thd(float_pos, wave_freq, simu.dt);
+
+        % save timeseries for four corner sea states
+        if is_corner(imcr)
+            float_accel = output.bodies(1).acceleration(i_start:i_end,3);
+            float_accel_ts_cell{imcr} = float_accel;
+            float_drag_ts_cell{imcr} = F_drag_f;
+        end
         
     catch ME
         warning(ME.identifier,'WecSim errored for sea state H=%.2f, T=%.1f: %s',...
@@ -251,6 +284,26 @@ end
 
 B_p = mcr.cases(:,3);
 K_p = mcr.cases(:,STIFFNESS_COLUMN);
+dt_sim = simu.dt;
+case_H = mcr.cases(:,1);
+case_T = mcr.cases(:,2);
+
+% assemble corner timeseries into matrices
+max_N = max(corner_N_per_T);
+num_corners = length(corner_idx);
+float_accel_ts = zeros(max_N, num_corners);
+float_drag_ts  = zeros(max_N, num_corners);
+for ci = 1:num_corners
+    ts_accel = float_accel_ts_cell{corner_idx(ci)};
+    ts_drag  = float_drag_ts_cell{corner_idx(ci)};
+    if ~isempty(ts_accel)
+        float_accel_ts(1:length(ts_accel), ci) = ts_accel;
+    end
+    if ~isempty(ts_drag)
+        float_drag_ts(1:length(ts_drag), ci) = ts_drag;
+    end
+end
+
 var_names = wecsim_var_names();
 save(output_filename, var_names{:})
 
@@ -285,6 +338,28 @@ function [fund,phase] = get_fundamental(signal,wave_freq,dt)
     idx_wave_freq = ismembertol(freqs, wave_freq);
     fund = abs(P1(idx_wave_freq));
     phase = angle(P1(idx_wave_freq));
+end
+
+function thd = compute_pos_thd(pos, wave_freq, dt)
+    N = length(pos);
+    Fs = 2*pi/dt;
+    Y = fft(pos, N);
+    P2 = Y/N;
+    P1 = P2(1:floor(N/2)+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    freqs = (0:floor(N/2)) * (Fs/N);
+    harmonic_numbers = round(freqs / wave_freq);
+    amplitudes = abs(P1(1:length(freqs)));
+    idx_fund = find(harmonic_numbers == 1, 1);
+    if isempty(idx_fund) || amplitudes(idx_fund) == 0
+        thd = NaN;
+        return
+    end
+    fund = amplitudes(idx_fund);
+    harmonics = amplitudes;
+    harmonics(1) = 0;           % remove DC
+    harmonics(idx_fund) = 0;    % remove fundamental
+    thd = sqrt(sum(harmonics.^2)) / fund * 100;
 end
 
 function s = infer_force_sign(force_signal, relative_velocity)

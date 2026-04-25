@@ -7,10 +7,18 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :returns: Intermediate results struct (cached heavy analyses)
     % Run single analysis with drag convergence plotting
     p.operational_dynamics_debug_plots_on = true;
-    [figs, LCOE, val] = run_single(p,b);
+    [figs_analytical, LCOE, val] = run_single(p,b);
+
+    p_bf = p;
+    p_bf.control_solve_type = 'brute_force';
+    figs_brute_force = run_single(p_bf,b);
+
+    figs = [figs_analytical(1:4) figs_brute_force(5:6) figs_analytical(7:8)];
 
     % Store figure numbers for post-processing
     intermed_result_struct.created_figs = figs;
     intermed_result_struct.LCOE = LCOE;
     intermed_result_struct.val = val;
+    intermed_result_struct.p = p;
+    intermed_result_struct.b = b;
 end

@@ -1,5 +1,5 @@
-function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r)
-% finds the point p_star=[x,y] closest to the origin that is 
+function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r,warn_if_infeasible)
+% Finds the point p_star=[x,y] closest to the origin that is 
 % within the intersection of circular discs with centers c and radii r.
 % This is equivalent to the following optimization problem: 
 % p_star = argmin_p |p| s.t. |p-c_i|-r_i <= 0 for all i.
@@ -14,6 +14,7 @@ max_num_intersects = N * (N-1);
 max_num_candidates = max_num_intersects + N;
 candidates = NaN(max_num_candidates,2);
 circle_indices = zeros(max_num_candidates,2);
+too_far_check = false(max_num_candidates,1);
 
 % 1) check if origin feasible
 origin = [0,0];
@@ -27,8 +28,9 @@ else
     count = 0;
     for i = 1:N
         for j = i+1:N
-            [xs, ys] = circcirc(c(i,1),c(i,2),r(i),c(j,1),c(j,2),r(j));
+            [xs, ys, too_far] = circle_circle_intersect(c(i,1),c(i,2),r(i),c(j,1),c(j,2),r(j));
             circle_indices(count+(1:2),:) = [i,j;i,j];
+            too_far_check(count+(1:2)) = too_far;
             candidates(count+(1:2),:) = [xs.', ys.']; 
             count = count + 2;
         end
@@ -36,11 +38,12 @@ else
     
     % 3) single-circle closest boundary
     for i = 1:N
-        c_norm = norm(c(i,:));
-        if c_norm == 0
+        dist = norm(c(i,:));
+        if dist < 1e-10
+            % center at origin: any boundary point is equally close
             p = [r(i), 0];
         else
-            p = c(i,:) - r(i) * (c(i,:) / c_norm);
+            p = c(i,:) - r(i) * (c(i,:) / dist);
         end
         candidates(count+i,:) = p;
         circle_indices(count+i,:) = [i,i];
@@ -60,14 +63,23 @@ else
     
     if isempty(p_star)
         constraints_active = true(size(r));
-        if any(isnan(candidates))
+        if any(isnan(candidates(:)))
             idx_nan = any(isnan(candidates),2);
-            circles_no_intersect = unique(circle_indices(idx_nan,:),'rows');
-            for i = 1:size(circles_no_intersect,1)
-                warning('infeasible: circle %i and %i do not intersect',circles_no_intersect(i,1),circles_no_intersect(i,2))
+            idx_infeasible = idx_nan & too_far_check; % this assumes all circles are feasible inside, infeasible outside
+            circles_no_intersect = unique(circle_indices(idx_infeasible,:),'rows');
+            if warn_if_infeasible
+                for i = 1:size(circles_no_intersect,1)
+                    warning('MDOcean:circle_intersect_optim:infeasible',...
+                        'infeasible: circle %i and %i do not intersect and are not contained/coincident',...
+                        circles_no_intersect(i,1),circles_no_intersect(i,2))
+                end
             end
         else
-            warning('each constraint pair is individually feasible, but all constraints together are infeasible')
+            if warn_if_infeasible
+                warning('MDOcean:circle_intersect_optim:infeasible',...
+                    ['Each constraint pair is individually feasible, '...
+                    'but all constraints together are infeasible'])
+            end
         end
     else
         constraints_active = abs(eval_constraint(p_star,c,r)) < 1e-4;
@@ -89,4 +101,33 @@ function constr_fcn = eval_constraint(p,c,r)
 % returns a scalar value
     assert(all(size(p)==[1 2]))
     constr_fcn = vecnorm(p - c,2,2) - r;
+end
+
+function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
+% Finds the intersection points of two circles.
+% Returns NaN if circles don't intersect or are coincident.
+    d = sqrt((x2-x1)^2 + (y2-y1)^2);
+    
+    too_far = d > r1 + r2;
+    contained_or_coincident = d < abs(r1-r2) || d == 0;
+    if too_far || contained_or_coincident
+        % no intersection (too far, contained, or coincident)
+        xs = [NaN, NaN];
+        ys = [NaN, NaN];
+        return
+    end
+    
+    a = (r1^2 - r2^2 + d^2) / (2*d);
+    h = sqrt(max(r1^2 - a^2, 0));  % max with 0 for numerical safety
+    
+    % midpoint
+    mx = x1 + a*(x2-x1)/d;
+    my = y1 + a*(y2-y1)/d;
+    
+    % offset
+    dx = h*(y2-y1)/d;
+    dy = h*(x2-x1)/d;
+    
+    xs = [mx+dx, mx-dx];
+    ys = [my-dy, my+dy];
 end

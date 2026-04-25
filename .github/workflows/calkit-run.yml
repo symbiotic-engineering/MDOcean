@@ -94,7 +94,7 @@ jobs:
           save: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
-      - name: git add any new ipynbs
+      - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
         id: run_calkit
@@ -102,6 +102,7 @@ jobs:
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
+          # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
           run_args: --keep-going --log build-AOR-paper view-aor-figs all-viz
           pull_dvc: false
           save: false
