@@ -1,6 +1,6 @@
 # Changelog
 ## Unreleased
-## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-24
+## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-25
 Major new functionality: constrained optimal control via brute force search, solver, and analytical QP
 ### Added
 - Model: solver-based controller can now obey amplitude and power constraints, not just force limits, via revamped `control_errors_from_sat_results()`
@@ -25,6 +25,10 @@ Major new functionality: constrained optimal control via brute force search, sol
 ### Fixed:
 - Model: output the stabilized PTO coefficients from `control_evaluation_fcn()` to avoid inconsistencies in downstream calculations
 - Model: prevent negative PTO damping
+
+## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-24
+### Changed
+- Validation: plots for damping plate hydro fit now overlay case 2, 4, and WAMIT data in log space and with improved aesthetics
 
 ## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
 ### Added
