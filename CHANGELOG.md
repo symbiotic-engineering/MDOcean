@@ -1,5 +1,9 @@
 # Changelog
 ## Unreleased
+## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-24
+### Changed
+- Validation: plots for damping plate hydro fit now overlay case 2, 4, and WAMIT data in log space and with improved aesthetics
+
 ## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
 ### Added
 - Validation: plots showing acceleration harmonics, position THD, and drag force waveform to validate describing function
