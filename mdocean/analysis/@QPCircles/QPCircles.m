@@ -10,7 +10,7 @@ classdef QPCircles < GenericAnalysis
         function obj = QPCircles(varargin)
             obj = obj@GenericAnalysis(varargin{:});
             obj.extra_analysis_outputs = { ...
-                'results/QPCircles/figure_handle.fig'};
+                'results/QPCircles/intermed_figure_handle_1.fig'};
         end
     end
     methods (Static)
