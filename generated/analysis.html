@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>analysis &mdash; MDOcean v1.1.29 documentation</title>
+  <title>analysis &mdash; MDOcean v1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a42904c6"></script>
+      <script src="../_static/documentation_options.js?v=95484ca5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -124,7 +124,8 @@
 <dl class="mat class">
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">analysis.</span></span><span class="sig-name descname"><span class="pre">GenericAnalysis</span></span><a class="headerlink" href="#analysis.GenericAnalysis" title="Link to this definition"></a></dt>
-<dd><p>GENERICANALYSIS Abstract class for MDOcean analyses
+<dd><p>Bases: <code class="xref mat mat-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>GENERICANALYSIS Abstract class for MDOcean analyses
 Handles saving and loading of intermediate results, figures, and tables.</p>
 <div class="members docutils container">
 <dl>
@@ -152,7 +153,14 @@ Handles saving and loading of intermediate results, figures, and tables.</p>
 <dl class="mat attribute">
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis.class_dependencies">
 <span class="sig-name descname"><span class="pre">class_dependencies</span></span><a class="headerlink" href="#analysis.GenericAnalysis.class_dependencies" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>dependent so they are computed only on demand, not on object instantiation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.class_dependencies_cached">
+<span class="sig-name descname"><span class="pre">class_dependencies_cached</span></span><a class="headerlink" href="#analysis.GenericAnalysis.class_dependencies_cached" title="Link to this definition"></a></dt>
+<dd><p>cache to avoid recomputing when used separately for analysis and postpro</p>
+</dd></dl>
 
 <dl class="mat attribute">
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis.end_result_struct">
@@ -247,6 +255,11 @@ Handles saving and loading of intermediate results, figures, and tables.</p>
 
 </dd>
 <dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="analysis.GenericAnalysis.compute_and_cache_class_dependencies">
+<span class="sig-name descname"><span class="pre">compute_and_cache_class_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#analysis.GenericAnalysis.compute_and_cache_class_dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
 <dt class="sig sig-object mat" id="analysis.GenericAnalysis.format_inputs_list">
 <span class="sig-name descname"><span class="pre">format_inputs_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em>, <em class="sig-param"><span class="pre">extras</span></em>, <em class="sig-param"><span class="pre">deps</span></em><span class="sig-paren">)</span><a class="headerlink" href="#analysis.GenericAnalysis.format_inputs_list" title="Link to this definition"></a></dt>
 <dd><p>FORMAT_INPUTS_LIST Format inputs as YAML list: extras first, then deps, de-duplicated.</p>

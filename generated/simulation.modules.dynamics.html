@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>simulation.modules.dynamics &mdash; MDOcean v1.1.29 documentation</title>
+  <title>simulation.modules.dynamics &mdash; MDOcean v1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a42904c6"></script>
+      <script src="../_static/documentation_options.js?v=95484ca5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -197,8 +197,22 @@
 </dd></dl>
 
 <dl class="mat function">
+<dt class="sig sig-object mat" id="simulation.modules.dynamics.circle_intersect_optim">
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">circle_intersect_optim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">c</span></em>, <em class="sig-param"><span class="pre">r</span></em>, <em class="sig-param"><span class="pre">warn_if_infeasible</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.circle_intersect_optim" title="Link to this definition"></a></dt>
+<dd><p>Finds the point p_star=[x,y] closest to the origin that is 
+within the intersection of circular discs with centers c and radii r.
+This is equivalent to the following optimization problem: 
+p_star = argmin_p <a href="#id5"><span class="problematic" id="id6">|p|</span></a> s.t. <a href="#id7"><span class="problematic" id="id8">|p-c_i|</span></a>-r_i &lt;= 0 for all i.
+If the origin is feasible, p_star is the origin.
+If not, p_star will either be on the intersections of the circles,
+or on the point on each circle closest to the origin - these points
+are returned as candidates. If the problem is infeasible, 
+p_star is returned empty, constraints_active is all true, and a warning is issued.</p>
+</dd></dl>
+
+<dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.modules.dynamics.multibody_response">
-<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">multibody_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">B_f</span></em>, <em class="sig-param"><span class="pre">B_s</span></em>, <em class="sig-param"><span class="pre">K_f</span></em>, <em class="sig-param"><span class="pre">K_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">K_p</span></em>, <em class="sig-param"><span class="pre">B_p</span></em>, <em class="sig-param"><span class="pre">F_f_mag</span></em>, <em class="sig-param"><span class="pre">F_f_phase</span></em>, <em class="sig-param"><span class="pre">F_s_mag</span></em>, <em class="sig-param"><span class="pre">F_s_phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.multibody_response" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">multibody_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">B_f</span></em>, <em class="sig-param"><span class="pre">B_s</span></em>, <em class="sig-param"><span class="pre">K_f</span></em>, <em class="sig-param"><span class="pre">K_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">K_p</span></em>, <em class="sig-param"><span class="pre">B_p</span></em>, <em class="sig-param"><span class="pre">F_f_mag</span></em>, <em class="sig-param"><span class="pre">F_f_phase</span></em>, <em class="sig-param"><span class="pre">F_s_mag</span></em>, <em class="sig-param"><span class="pre">F_s_phase</span></em>, <em class="sig-param"><span class="pre">D_sys</span></em>, <em class="sig-param"><span class="pre">t18</span></em>, <em class="sig-param"><span class="pre">t9</span></em>, <em class="sig-param"><span class="pre">t108</span></em>, <em class="sig-param"><span class="pre">t121</span></em>, <em class="sig-param"><span class="pre">t_110_118</span></em>, <em class="sig-param"><span class="pre">t144</span></em>, <em class="sig-param"><span class="pre">t109</span></em>, <em class="sig-param"><span class="pre">t119</span></em>, <em class="sig-param"><span class="pre">h_D_sys</span></em>, <em class="sig-param"><span class="pre">t145</span></em>, <em class="sig-param"><span class="pre">t103</span></em>, <em class="sig-param"><span class="pre">t126</span></em>, <em class="sig-param"><span class="pre">t130</span></em>, <em class="sig-param"><span class="pre">t129</span></em>, <em class="sig-param"><span class="pre">t131</span></em>, <em class="sig-param"><span class="pre">t102</span></em>, <em class="sig-param"><span class="pre">t124</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.multibody_response" title="Link to this definition"></a></dt>
 <dd><p>Function <a class="reference internal" href="#simulation.modules.dynamics.multibody_response" title="simulation.modules.dynamics.multibody_response"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">multibody_response()</span></code></a></p>
 <blockquote>
 <div><dl class="field-list simple">
@@ -251,36 +265,36 @@
 <dd class="field-even"><p>mag_U</p>
 </dd>
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>phase_U</p>
-</dd>
-<dt class="field-even">returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>real_P</p>
-</dd>
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>imag_P</p>
+<dd class="field-odd"><p>real_P</p>
 </dd>
 <dt class="field-even">returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>mag_X_u</p>
 </dd>
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>phase_X_u</p>
-</dd>
-<dt class="field-even">returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>mag_X_f</p>
-</dd>
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>phase_X_f</p>
+<dd class="field-odd"><p>mag_X_f</p>
 </dd>
 <dt class="field-even">returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>mag_X_s</p>
 </dd>
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>phase_X_s</p>
+<dd class="field-odd"><p>phase_X_f</p>
+</dd>
+<dt class="field-even">returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>phase_X_s</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>phase_U</p>
+</dd>
+<dt class="field-even">returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>imag_P</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>phase_X_u</p>
 </dd>
 </dl>
 </div></blockquote>
 <dl class="simple">
-<dt>MULTIBODY_RESPONSE</dt><dd><p>[mag_U,phase_U,real_P,imag_P,mag_X_u,phase_X_u,mag_X_f,phase_X_f,mag_X_s,phase_X_s] = MULTIBODY_RESPONSE(B_c,B_f,B_s,K_f,K_s,M_C,M_F,M_S,W,K_p,B_p,F_f_mag,F_f_phase,F_s_mag,F_s_phase)</p>
+<dt>MULTIBODY_RESPONSE</dt><dd><p>[mag_U,real_P,mag_X_u,mag_X_f,mag_X_s,phase_X_f,phase_X_s,phase_U,imag_P,phase_X_u] = MULTIBODY_RESPONSE(B_c,B_f,B_s,K_f,K_s,M_C,M_F,M_S,W,K_p,B_p,F_f_mag,F_f_phase,F_s_mag,F_s_phase)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -394,9 +408,46 @@
 </dd></dl>
 
 <dl class="mat function">
+<dt class="sig sig-object mat" id="simulation.modules.dynamics.get_multibody_helper_terms">
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">get_multibody_helper_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">B_f</span></em>, <em class="sig-param"><span class="pre">B_s</span></em>, <em class="sig-param"><span class="pre">K_f</span></em>, <em class="sig-param"><span class="pre">K_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">F_f_mag</span></em>, <em class="sig-param"><span class="pre">F_f_phase</span></em>, <em class="sig-param"><span class="pre">F_s_mag</span></em>, <em class="sig-param"><span class="pre">F_s_phase</span></em>, <em class="sig-param"><span class="pre">D_sys</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.get_multibody_helper_terms" title="Link to this definition"></a></dt>
+<dd><p>GET_MULTIBODY_HELPER_TERMS  Pre-compute all controller-independent
+intermediate variables for MULTIBODY_RESPONSE.</p>
+<p>The 17 return values may be passed as args 17–33 of MULTIBODY_RESPONSE so
+that these quantities are not recomputed on every controller evaluation in
+the brute-force optimisation loop.  K_p and B_p are the only inputs of
+MULTIBODY_RESPONSE that are absent here; all calculations below are
+therefore independent of the controller.</p>
+<p>D_sys is optional: when omitted it is computed internally and returned as
+h_D_sys (the 9th output).</p>
+<dl class="simple">
+<dt>Usage:</dt><dd><dl class="simple">
+<dt>[t18,t9,t108,t121,t_110_118,t144,t109,t119,h_D_sys, …</dt><dd><dl class="simple">
+<dt>t145,t103,t126,t130,t129,t131,t102,t124] = …</dt><dd><dl class="simple">
+<dt>:func:<a href="#id1"><span class="problematic" id="id2">`</span></a>get_multibody_helper_terms`(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w, …</dt><dd><p>F_f_mag,F_f_phase,F_s_mag,F_s_phase);</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>[mag_U,real_P,mag_X_u] = :func:<a href="#id3"><span class="problematic" id="id4">`</span></a>multibody_response`(B_c,B_f,B_s,K_f,K_s, …</dt><dd><p>m_c,m_f,m_s,w,K_p,B_p, …
+F_f_mag,F_f_phase,F_s_mag,F_s_phase,[], …
+t18,t9,t108,t121,t_110_118,t144,t109,t119, …
+h_D_sys,t145,t103,t126,t130,t129,t131,t102,t124);</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
 <dt class="sig sig-object mat" id="simulation.modules.dynamics.get_response_drag">
-<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">get_response_drag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">H</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">k_wvn</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">B_h_f</span></em>, <em class="sig-param"><span class="pre">B_h_s</span></em>, <em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">K_h_f</span></em>, <em class="sig-param"><span class="pre">K_h_s</span></em>, <em class="sig-param"><span class="pre">gamma_f_mag</span></em>, <em class="sig-param"><span class="pre">gamma_f_phase</span></em>, <em class="sig-param"><span class="pre">gamma_s_mag</span></em>, <em class="sig-param"><span class="pre">gamma_s_phase</span></em>, <em class="sig-param"><span class="pre">F_max</span></em>, <em class="sig-param"><span class="pre">drag_const_f</span></em>, <em class="sig-param"><span class="pre">drag_const_s</span></em>, <em class="sig-param"><span class="pre">mag_v0_f</span></em>, <em class="sig-param"><span class="pre">mag_v0_s</span></em>, <em class="sig-param"><span class="pre">X_max</span></em>, <em class="sig-param"><span class="pre">control_type</span></em>, <em class="sig-param"><span class="pre">multibody</span></em>, <em class="sig-param"><span class="pre">merge_bodies</span></em>, <em class="sig-param"><span class="pre">X_tol</span></em>, <em class="sig-param"><span class="pre">phase_X_tol</span></em>, <em class="sig-param"><span class="pre">F_lim_tol</span></em>, <em class="sig-param"><span class="pre">X_lim_tol</span></em>, <em class="sig-param"><span class="pre">max_drag_iters_fixed_point</span></em>, <em class="sig-param"><span class="pre">max_drag_iters_solver</span></em>, <em class="sig-param"><span class="pre">drag_convergence_plot_on</span></em>, <em class="sig-param"><span class="pre">drag_fcn</span></em>, <em class="sig-param"><span class="pre">D_f</span></em>, <em class="sig-param"><span class="pre">D_f_in</span></em>, <em class="sig-param"><span class="pre">D_d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.get_response_drag" title="Link to this definition"></a></dt>
-<dd><p>initial guess: 2m float amplitude, 0.5m spar amplitude, unsaturated</p>
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">get_response_drag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">H</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">k_wvn</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">B_h_f</span></em>, <em class="sig-param"><span class="pre">B_h_s</span></em>, <em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">K_h_f</span></em>, <em class="sig-param"><span class="pre">K_h_s</span></em>, <em class="sig-param"><span class="pre">gamma_f_mag</span></em>, <em class="sig-param"><span class="pre">gamma_f_phase</span></em>, <em class="sig-param"><span class="pre">gamma_s_mag</span></em>, <em class="sig-param"><span class="pre">gamma_s_phase</span></em>, <em class="sig-param"><span class="pre">F_max</span></em>, <em class="sig-param"><span class="pre">P_max</span></em>, <em class="sig-param"><span class="pre">drag_const_f</span></em>, <em class="sig-param"><span class="pre">drag_const_s</span></em>, <em class="sig-param"><span class="pre">mag_v0_f</span></em>, <em class="sig-param"><span class="pre">mag_v0_s</span></em>, <em class="sig-param"><span class="pre">X_max</span></em>, <em class="sig-param"><span class="pre">control_type</span></em>, <em class="sig-param"><span class="pre">control_solve_type</span></em>, <em class="sig-param"><span class="pre">multibody</span></em>, <em class="sig-param"><span class="pre">merge_bodies</span></em>, <em class="sig-param"><span class="pre">X_tol</span></em>, <em class="sig-param"><span class="pre">phase_X_tol</span></em>, <em class="sig-param"><span class="pre">F_lim_tol</span></em>, <em class="sig-param"><span class="pre">X_lim_tol</span></em>, <em class="sig-param"><span class="pre">max_drag_iters_fixed_point</span></em>, <em class="sig-param"><span class="pre">max_drag_iters_solver</span></em>, <em class="sig-param"><span class="pre">drag_ctrl_plots_on</span></em>, <em class="sig-param"><span class="pre">drag_fcn</span></em>, <em class="sig-param"><span class="pre">D_f</span></em>, <em class="sig-param"><span class="pre">D_f_in</span></em>, <em class="sig-param"><span class="pre">D_d</span></em>, <em class="sig-param"><span class="pre">T_f_slam</span></em>, <em class="sig-param"><span class="pre">T_s_slam</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.get_response_drag" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="simulation.modules.dynamics.constrained_opt_ctrl">
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">constrained_opt_ctrl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">real_G_u</span></em>, <em class="sig-param"><span class="pre">imag_G_u</span></em>, <em class="sig-param"><span class="pre">w</span></em>, <em class="sig-param"><span class="pre">control_type</span></em>, <em class="sig-param"><span class="pre">control_evaluation_fcn</span></em>, <em class="sig-param"><span class="pre">F_max</span></em>, <em class="sig-param"><span class="pre">P_max</span></em>, <em class="sig-param"><span class="pre">X_max</span></em>, <em class="sig-param"><span class="pre">control_solve_type</span></em>, <em class="sig-param"><span class="pre">ctrl_mult_guess</span></em>, <em class="sig-param"><span class="pre">phase_ctrl_mult_guess</span></em>, <em class="sig-param"><span class="pre">T_f_slam</span></em>, <em class="sig-param"><span class="pre">T_s_slam</span></em>, <em class="sig-param"><span class="pre">opt_ctrl_plot_debug_on</span></em>, <em class="sig-param"><span class="pre">B_h_f</span></em>, <em class="sig-param"><span class="pre">B_h_s</span></em>, <em class="sig-param"><span class="pre">B_c</span></em>, <em class="sig-param"><span class="pre">K_h_f</span></em>, <em class="sig-param"><span class="pre">K_h_s</span></em>, <em class="sig-param"><span class="pre">B_drag_f</span></em>, <em class="sig-param"><span class="pre">B_drag_s</span></em>, <em class="sig-param"><span class="pre">m_c</span></em>, <em class="sig-param"><span class="pre">m_f</span></em>, <em class="sig-param"><span class="pre">m_s</span></em>, <em class="sig-param"><span class="pre">multibody</span></em>, <em class="sig-param"><span class="pre">merge_bodies</span></em>, <em class="sig-param"><span class="pre">X_f_guess</span></em>, <em class="sig-param"><span class="pre">X_s_guess</span></em>, <em class="sig-param"><span class="pre">phase_X_f_guess</span></em>, <em class="sig-param"><span class="pre">phase_X_s_guess</span></em>, <em class="sig-param"><span class="pre">H</span></em>, <em class="sig-param"><span class="pre">k_wvn</span></em>, <em class="sig-param"><span class="pre">D_f</span></em>, <em class="sig-param"><span class="pre">D_d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.constrained_opt_ctrl" title="Link to this definition"></a></dt>
+<dd><p>unsaturated optimal control gains</p>
 </dd></dl>
 
 <dl class="mat function">
@@ -445,6 +496,11 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="simulation.modules.dynamics.get_slamming_min_max">
+<span class="sig-prename descclassname"><span class="pre">simulation.modules.dynamics.</span></span><span class="sig-name descname"><span class="pre">get_slamming_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">A</span></em>, <em class="sig-param"><span class="pre">k</span></em>, <em class="sig-param"><span class="pre">D</span></em>, <em class="sig-param"><span class="pre">phase_X</span></em>, <em class="sig-param"><span class="pre">delta_z</span></em><span class="sig-paren">)</span><a class="headerlink" href="#simulation.modules.dynamics.get_slamming_min_max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 
