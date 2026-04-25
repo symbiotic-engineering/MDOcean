@@ -18,7 +18,7 @@ jobs:
       - name: Init top-level submodules
         # Initialize only the three top-level submodules without recursing into
         # their nested submodules, avoiding the stale sea-lab-utils entry.
-        run: git submodule update --init
+        run: GIT_LFS_SKIP_SMUDGE=1 git submodule update --init
       - name: Check for changes
         uses: dorny/paths-filter@v4
         id: changes
