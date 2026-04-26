@@ -71,7 +71,7 @@ function [figs, ...
     h.Parent.YGrid  = 'on';
     improvePlot
     h.Parent.YMinorGrid = 'off';
-    f1.Position = [100 100 900 400];
+    f1.Position = [100 100 700 400];
     exponents = log10(times);
     ylim(10.^[min(floor(exponents)),max(ceil(exponents))]) % one order of magnitude above max and below min
 

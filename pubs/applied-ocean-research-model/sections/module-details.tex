@@ -254,17 +254,17 @@ Methods to incorporate nonlinearities in the frequency domain include harmonic b
 These methods are not optimal control methods and do not incoporate constraints, although it is possible to sub-optimally enforce constraints by applying a saturation nonlinearity to the constrained quantity.
 Finally, methods which combine frequency domain synthesis with constrained optmial control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (OC), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (IM), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (LMIs), typically in the context of robust control \cite{vanantwerp_tutorial_2000}.
 
-At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``modified frequency domain.'' 
+At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``linearized pseudo-spectral OC.'' 
 The pseudospectral method uses the same global basis function representation as spectral OC, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \cite{elnagar_pseudospectral_1995}.
-Pseudo-spectral methods often employ polynomial bases, although in wave energy Fourier bases are more typical.
+Pseudo-spectral methods often employ Legendre or Chebyshev polynomial bases, although in wave energy Fourier bases are more typical.
 In this case, the method is equivalent to a nonlinear trajectory optimization problem that enforces both spectral-domain harmonic balance and time-domain constraints.
-The modified frequency domain method used in MDOcean is a linearized version of the Fourier-basis pseudo-spectral method, borrowing the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain but retaining only the fundamental harmonic to collapse to the frequency domain.
+The linearized pseudo-spectral method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
 This is exactly analogous to the way that describing functions linearize the harmonic balance method.
 It can also be thought of as the combination of describing functions with constrained impedance matching.
 
 \Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller and/or the plant are nonlinear).
-MDOcean uses the modified frequency domain method for both synthesis and evaluation.
-Other wave energy studies (see \cref{tab:lit}) have used methods that would fall broadly in the family of modified frequency domain methods for the evaluation use case, but with questionable simplifications that MDOcean avoids by differently handling constraints.
+MDOcean uses the linearized pseudo-spectral method for both synthesis and evaluation.
+Other wave energy studies (see \cref{tab:lit}) have used methods that would fall broadly in the family of linearized pseudo-spectral methods for the evaluation use case, but with questionable simplifications that MDOcean avoids by differently handling constraints.
 Meanwhile, MDOcean's use of the method for control synthesis appears novel in the wave energy space, and it is this application that really sets it apart, since other linearization methods such as stochastic linearization can facilitate the design of linear but not nonlinear controllers.
 
 \begin{figure}
@@ -280,10 +280,10 @@ Meanwhile, MDOcean's use of the method for control synthesis appears novel in th
     \caption{Control evaluation - applies to both (1.1) and (1.2).}
     \label{fig:mod-freq-domain-evaluation}
 \end{subfigure}
-\caption{Flowchart depicting the modified frequency domain method with describing function linearization (1)}
+\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
 \end{figure}
 
-When handling dynamic constraints with a modified frequency domain method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
+When handling dynamic constraints with a linearized pseudo-spectral method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
 Then the unconstrained response is checked for constraint violations.
 This check can be performed in the frequency domain if the time-domain constraint can be adequately linearized (via describing functions) as a harmonic constraint, as shown in the top of \cref{fig:mod-freq-domain-synthesis}, or the response can be reconstructed in the time domain via the inverse describing function if the constraint is not easily representable via harmonics.
 If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state as the frequency-domain linear optimal controller.
