@@ -30,16 +30,44 @@ function [fig_array,...
             vector_cols = {'capex','capex_design','J_capex_design','capex_struct','capex_PTO','opex','LCOE'};
             idx_remove = ismember(tab_validation.Properties.VariableNames,vector_cols); 
             tab_validation_latex = rows2vars(tab_validation,'VariableNamingRule','preserve','DataVariables',~idx_remove);
-            tab_validation_latex.OriginalVariableNames = remove_underscores(modify_suffix(tab_validation_latex.OriginalVariableNames));
+            orig_field_names = tab_validation_latex.OriginalVariableNames;
+            display_names = remove_underscores(modify_suffix(orig_field_names));
+            units_struct = validation_units();
+            for i = 1:length(display_names)
+                field = orig_field_names{i};
+                if isfield(units_struct, field)
+                    unit = units_struct.(field);
+                    display_name = char(strtrim(string(display_names{i})));
+                    unit_text = char(string(unit));
+                    display_names{i} = [display_name ' (' unit_text ')'];
+                end
+            end
+            tab_validation_latex.OriginalVariableNames = display_names;
             new_names = {'Variable','MDOcean','Actual','Error','MDOcean ','Actual ','Error '};
             tab_validation_latex = renamevars(tab_validation_latex, tab_validation_latex.Properties.VariableNames, new_names);
+
+            % Append average percent errors for economic variables (vectors over N_WEC sweep)
+            econ_display_fields = {'capex', 'opex', 'LCOE'};
+            econ_display_names  = {'CAPEX avg error', 'OPEX avg error', 'LCOE avg error'};
+            error_row_name = tab_report.Properties.RowNames{end}; % 'Error report'
+            for i_econ = 1:length(econ_display_fields)
+                field = econ_display_fields{i_econ};
+                if ismember(field, tab_report.Properties.VariableNames)
+                    err_vals = tab_report{error_row_name, field};
+                    avg_err = mean(err_vals(:)); % raw fraction; table2latex multiplies by 100 for 'error' columns
+                    % Variable column is cell-of-chars (from rows2vars); numeric columns are double.
+                    % Use econ_display_names(i_econ) (cell) for Variable and NaN for unused numeric cols.
+                    new_row = {econ_display_names(i_econ), NaN, NaN, avg_err, NaN, NaN, NaN};
+                    tab_validation_latex = [tab_validation_latex; new_row]; %#ok<AGROW>
+                end
+            end
             
             fig_array = intermed_result_struct.fig_cost_vs_N_WEC;
             
             tab_array_display = {tab_validation};
             tab_array_latex = {tab_validation_latex};
             tab_firstrows = {'&\multicolumn{3}{c|}{DOE Report RM3 Design \cite{RM3}} & \multicolumn{3}{c}{WEC-Sim RM3 Design} \\'};
-            tab_colspecs = {'>{\centering\arraybackslash}p{0.2\linewidth}|c|c|r|c|c|r'};
+            tab_colspecs = {'>{\centering\arraybackslash}p{0.26\linewidth}|c|c|r|c|c|r'};
 
             end_result_struct.validation_complete = true;
             end_result_struct.validation_table = tab_validation;

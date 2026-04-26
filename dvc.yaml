@@ -1,42 +1,38 @@
 stages:
-  mermaid-taxonomy-pdf:
+  mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf -f
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    desc: Automatically generated from the 'mermaid-taxonomy-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  mermaid-taxonomy-svg:
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pdfs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  mermaid-make-pngs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/img/${item.name}.png
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg:
-          cache: false
+      - mdocean/plots/non_matlab_figs/img/${item.name}.png:
+          cache: true
           persist: false
-    desc: Automatically generated from the 'mermaid-taxonomy-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  reformat-mermaid-svg:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
-      "xmllint --format 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy.svg"
-    deps:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      - .calkit/env-locks/pubs
-    outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
-          cache: false
-          persist: false
-    desc: Automatically generated from the 'reformat-mermaid-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pngs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); drag_fcn 
       = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 120); 
@@ -3350,6 +3346,8 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -4329,6 +4327,7 @@ stages:
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/validation/validation_units.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
@@ -5488,6 +5487,8 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -6087,6 +6088,7 @@ stages:
       - results/ForceSaturationFigFunc/
       - results/DesignSpaceExploration/
       - results/Meem/
+      - results/QPCircles/
       - results/Slamming/
       - results/SweepGeoms/
       - results/Cost/
@@ -6100,24 +6102,29 @@ stages:
     desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
-    cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json'
-      'results/PtoSweep/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
-      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
-      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
-      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+    cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
+      'results/Runtime/end.json' 'results/PtoSweep/end.json' 'results/Wecsim/end.json'
+      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
+      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
+      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
+      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
+      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
       : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
-      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"ptoSweepMinLCOE_F_max\"\
+      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
+      : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
+      : \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"ptoSweepMinLCOE_F_max\"\
       : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
       : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
       : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
       : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
       : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
     deps:
+      - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
       - results/PtoSweep/end.json
+      - results/Wecsim/end.json
     outs:
       - pubs/applied-ocean-research-model/numeric-results.tex:
           cache: false

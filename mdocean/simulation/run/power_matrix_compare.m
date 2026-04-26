@@ -155,7 +155,6 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
         end
 
-        title(t,remove_underscores(var_name))
         xlabel(t,'Wave Period T (s)','FontSize',20)
         ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end
@@ -181,7 +180,8 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     else
         c = []; h_fig = [];
     end
-    title(Z_title)
+    ax = gca;
+    ax.FontSize = 14;
     cb = colorbar;
     if ~isempty(h_fig)
         z = [min(Z,[],'all') max(Z,[],'all') Z_levels];

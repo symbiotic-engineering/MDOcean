@@ -36,7 +36,10 @@ jobs:
         if: always()
         with:
           path: MDOcean
-          # Leave submodules at the default disabled behavior for this checkout.
+          # Use submodules: false so actions/checkout does NOT run
+          # git submodule foreach --recursive (which would fail on the stale
+          # sea-lab-utils nested submodule inside OpenFLASH).
+          submodules: false
 
       - name: Checkout WEC-Sim
         uses: actions/checkout@v6

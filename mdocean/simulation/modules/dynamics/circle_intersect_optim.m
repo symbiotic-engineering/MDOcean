@@ -89,6 +89,7 @@ end
 
 function feasible_all_circles = check_feasible(p,c,r)
 % checks if a single point p is within all circles
+% returns a scalar boolean
     dist_outside = eval_constraint(p,c,r);
     feas_each_circle = dist_outside <= 1e-4;
     feasible_all_circles = all(feas_each_circle);
@@ -97,6 +98,7 @@ end
 function constr_fcn = eval_constraint(p,c,r)
 % checks how far a single point p is in violation of the constraint
 % positive means not ok (outside circle), negative means ok (inside circle)
+% returns a scalar value
     assert(all(size(p)==[1 2]))
     constr_fcn = vecnorm(p - c,2,2) - r;
 end
