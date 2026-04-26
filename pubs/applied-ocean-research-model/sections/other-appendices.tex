@@ -663,7 +663,7 @@ It is therefore guaranteed to converge as long as the dynamics are contracting a
 
 Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees. % from summer research slide 44 5/30/24
 %In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
-At present (since MDOcean v1.0.0), the solver used for drag iteration is simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}.
+At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since 1.2.0 the solver by default is used only for drag convergence.
 Combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
 However, it has the disadvantage that the error signal now couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 Earlier versions of MDOcean performed the drag solve in an outer loop around the control solve, which would again be the preferred structure if the analytical constrained optimal control solve of \cref{sec:appendix-qp-solution} is implemented in future versions.
