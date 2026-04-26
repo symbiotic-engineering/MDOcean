@@ -84,7 +84,7 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: Generate calkit_stages.yaml
-        uses: rebeccamccabe/run-action@v2
+        uses: rebeccamccabe/run-action@main
         with:
         # dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages --pull --allow-missing
@@ -97,7 +97,7 @@ jobs:
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
-        uses: rebeccamccabe/run-action@v2
+        uses: rebeccamccabe/run-action@main
         with:
         # dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: --keep-going --log --pull --allow-missing build-AOR-paper view-aor-figs all-viz
