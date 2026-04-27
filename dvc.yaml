@@ -6225,6 +6225,31 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-AOR-paper' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  ezra-figs-to-svg:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      mdocean/plots/util/pdf_to_svg.py 
+      pubs/ezra_seminar_slides/figs/pdf/ 
+      pubs/ezra_seminar_slides/figs/svg/
+    deps:
+      - mdocean/plots/util/pdf_to_svg.py
+      - pubs/ezra_seminar_slides/figs/pdf/
+      - .calkit/env-locks/pubs
+    outs:
+      - pubs/ezra_seminar_slides/figs/svg/
+    desc: Automatically generated from the 'ezra-figs-to-svg' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  ezra-slides-to-pdf:
+    cmd: calkit xenv -n pubs --no-check -- python pubs/pptx_to_pdf.py 
+      pubs/ezra_seminar_slides/
+    deps:
+      - pubs/pptx_to_pdf.py
+      - pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pptx
+      - pubs/ezra_seminar_slides/figs/
+      - .calkit/env-locks/pubs
+    outs:
+      - pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pdf
+    desc: Automatically generated from the 'ezra-slides-to-pdf' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
     cmd: calkit latex build -e tex --no-check 
       pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
