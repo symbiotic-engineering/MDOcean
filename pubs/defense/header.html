@@ -14,10 +14,18 @@ document.addEventListener("DOMContentLoaded", function () {
   let groups = [];
   let currentGroup = null;
   let inAppendix = false;
+  let seenFirstSlide = false;
 
   allSlides.forEach((slide) => {
     // ignore vertical stack containers
+    // ignore vertical stack containers
     if (slide.classList.contains("stack")) return;
+
+    // skip the very first slide (title slide)
+    if (!seenFirstSlide) {
+      seenFirstSlide = true;
+      return;
+    }
 
     // detect appendix start
     if (slide.getAttribute("data-appendix") === "true") {
