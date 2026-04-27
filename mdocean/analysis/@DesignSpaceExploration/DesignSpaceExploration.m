@@ -3,7 +3,8 @@ classdef DesignSpaceExploration < GenericAnalysis
     %   Generates design space exploration experimental figures
 
     properties
-        fig_names = {'experiments_pareto','experiments_ratios'};
+        fig_names = {...'experiments_pareto',
+                    'experiments_ratios'};
         tab_names = {'experiments_results'};
     end
 
@@ -13,6 +14,8 @@ classdef DesignSpaceExploration < GenericAnalysis
         [fig_array,...
                  tab_array_display,...
                  tab_array_latex,...
-                 end_result_struct] = post_process_fcn(intermed_result_struct)
+                 end_result_struct,...
+                 tab_firstrows,...
+                 tab_colspecs] = post_process_fcn(intermed_result_struct)
     end
 end
