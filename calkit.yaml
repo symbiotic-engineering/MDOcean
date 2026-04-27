@@ -7,11 +7,6 @@ environments:
     kind: docker
     image: texlive/texlive:latest-full
     description: TeXlive via Docker.
-  py-convert:
-    path: requirements.txt
-    kind: uv-venv
-    prefix: .venv
-    python: '3.13'
   pubs:
     kind: conda
     path: pubs/environment.yaml
@@ -5345,7 +5340,7 @@ pipeline:
     ezra-figs-to-svg:
       kind: python-script
       script_path: mdocean/plots/util/pdf_to_svg.py
-      environment: py-convert
+      environment: pubs
       args: [pubs/ezra_seminar_slides/figs/pdf/ 
             pubs/ezra_seminar_slides/figs/svg/]
       inputs:
@@ -5355,7 +5350,7 @@ pipeline:
     ezra-slides-to-pdf:
       kind: python-script
       script_path: pubs/pptx_to_pdf.py
-      environment: py-convert
+      environment: pubs
       args: [pubs/ezra_seminar_slides/]
       inputs:
         - pubs/ezra_seminar_slides/ezra_emerging_scholar_seminar.pptx
