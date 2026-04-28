@@ -85,33 +85,14 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
             in.M, in.rho_w, in.g, in.sigma_y, in.sigma_e, in.E, in.nu, ... % constants
             in.num_terms_plate, in.radial_mesh_plate, in.num_stiff_d);
 
-[LCOE,capex_design,capex,opex] = econ(m_m, in.M, in.cost_perkg_mult, in.N_WEC, P_avg_elec, ...
-                            in.FCR, in.cost_perN_mult, in.cost_perW_mult, ...
-                            in.F_max, in.P_max, in.eff_array);
-
 model_grid_value = true; % override for merging
 if model_grid_value
-    [CEM_CO2, CEM_grid_cost, AEP_matrix,force_matrix] = grid_CEM(F_heave_mat, capex, opex, P_matrix_elec, LCOE, in);
-    
-    [env_cost_per_wec, eco_cost_total] = enviro(m_m, in.distance_from_shore, A_hull, ...
-                            in.P_max, in.eco_cost_steel, in.eco_cost_fiberglass, ...
-                            in.eco_cost_distance, in.eco_cost_carbon);
-    [~,LCOE_econ] = econ_cost(force_matrix,P_matrix_elec,capex_design,in.N_WEC,...
-        in.FCR,in.eff_array,in.JPD);
-    [~, LVOE_econ] = econ_value(force_matrix, P_matrix_elec, in.FCR, in.eff_array, in.JPD, in.N_WEC, in.marginal_price);
-    [~,LCOE_env] = env_cost(force_matrix,P_matrix_elec,in.eco_cost_steel,...
-        m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,...
-        in.distance_from_shore,in.JPD,in.N_WEC,in.FCR,in.eff_array);
-    years = 2010 + (0:20);
-    avoided_co2_tons = p.marginal_carbon .* AEP_matrix / 907.2; %kgCO2 to tonsCO2
-    avoided_co2_tons = sum(avoided_co2_tons,'all','omitnan');
-    scc_case = '3pct';
-    [~, LVOE_env] = env_value(force_matrix, P_matrix_elec, in.FCR, in.eff_array, years, avoided_co2_tons, scc_case, in.JPD, in.N_WEC);
-   
-    net_econ_value = (LVOE_econ - LCOE_econ) * sum(AEP_matrix,'all','omitnan');
-    net_eco_value = (LVOE_env - LCOE_env) * sum(AEP_matrix,'all','omitnan');
-
-
+    [net_econ_value,net_eco_value,env_cost_per_wec,LCOE_econ,capex_design] = net_value(F_heave_mat,P_matrix_elec, ...
+        in.N_WEC,in.FCR,in.eff_array,in.JPD,in.marginal_price,in.eco_cost_steel, ...
+        m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,in.distance_from_shore,...
+        in.marginal_carbon,in.M,in.cost_perkg_mult,in.cost_perN_mult,in.cost_perW_mult,...
+        in.F_max,in.P_max);
+    LCOE = LCOE_econ;
 else
     [CEM_CO2, CEM_wec_capacity, CEM_grid_cost, net_eco_value] = deal(0);
 end

@@ -1,4 +1,4 @@
-function [LCOE_matrix,LCOE] = env_cost(force_matrix,P_elec,eco_cost_steel,...
+function [LCOE_matrix,LCOE,eco_cost_per_wec] = env_cost(force_matrix,P_elec,eco_cost_steel,...
     steel_mass,eco_cost_fiberglass,fiberglass_area,eco_cost_distance,...
     distance_from_shore,JPD,N_WEC,FCR,efficiency)
 
@@ -15,3 +15,6 @@ opex = opex * maintenances_per_year;
 %calculate the levelized cost matrix
 levelized_cost_matrix = matrix_levelization(capex, opex, FCR, force_matrix);
 [LCOE_matrix,LCOE] = LXOE_func(levelized_cost_matrix,P_elec,efficiency,JPD,N_WEC);
+
+%calculate the eco cost per wec
+eco_cost_per_wec = capex_per_wec+opex_per_wec;

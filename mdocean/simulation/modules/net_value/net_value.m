@@ -1,59 +1,60 @@
-function [net_eco_value] = net_value(CEM_CO2,eco_cost_total,social_cost_carbon,env_cost_per_wec,AEP_matrix,p, force_matrix)
+function [net_econ_value,net_eco_value,eco_cost_per_wec,LCOE_econ,capex_design] = net_value(F_heave_mat,P_matrix_elec,...
+    N_WEC,FCR,eff_array,JPD,marginal_price,eco_cost_steel,m_m, ...
+    eco_cost_fiberglass,A_hull,eco_cost_distance,distance_from_shore, ...
+    marginal_carbon,M,cost_perkg_mult,cost_perN_mult,cost_perW_mult,F_max,P_max)
 
-%enviro
-CEM_CO2_kg = CEM_CO2 * 1e3; % ton to kg annually
-eco_value_total = CEM_CO2_kg * social_cost_carbon; %$ annually
-net_eco_value = (eco_value_total - eco_cost_total); %fix this: levelize eco_value_total
+%scale force
+factor = 1./sum(F_heave_mat,'all','omitnan');
+force_matrix = F_heave_mat.*factor;
 
-%grid cem
-levelized_eco_value_matrix = AEP_matrix .* p.marginal_carbon * p.eco_cost_carbon; % kWh/year * kgCO2/kWh * $/kgCO2 = $/year
-levelized_eco_cost = env_cost_per_wec * p.N_WEC; % fixme this isn't levelized
-levelized_eco_cost_matrix = levelized_eco_cost * force_matrix;
+%assemble the inputs for environmental value
+years = 2010 + (0:20);
+P_weighted = P_matrix_elec .* JPD / 100 * eff_array; % taken from dynamics.m and LCOE_from_capex_design_power.m
+hr_per_yr = 8766;
+AEP_matrix = P_weighted * N_WEC * hr_per_yr / 1000; % W to kWh per year, all wecs
+avoided_co2_tons = marginal_carbon .* AEP_matrix / 1000; %kgCO2 to tonsCO2
+avoided_co2_tons = sum(avoided_co2_tons,'all','omitnan');
+scc_case = '3pct';
 
-[LCOE_matrix_eco,LCOE_eco,...
- LVOE_matrix_eco,LVOE_eco,...
- NVOE_matrix_eco,NVOE_eco,...
- net_value_matrix_eco,net_value_eco,...
- VCR_matrix_eco, VCR_eco] = get_LXOE_NVOE_VCR(levelized_eco_cost_matrix, ...
-                                              levelized_eco_value_matrix, ...
-                                              AEP_matrix);
-net_eco_value = mysum(net_value_matrix_eco);
+%calculate capex_design_dep for econ cost
+[capex_design,~, ~] = design_cost_model(m_m, M, cost_perkg_mult, N_WEC, ...
+                                      cost_perN_mult, cost_perW_mult, F_max, P_max);
 
-function [LCOE_matrix,LCOE,...
-          LVOE_matrix,LVOE,...
-          NVOE_matrix,NVOE,...
-          net_value_matrix,net_value,...
-          VCR_matrix, VCR] = get_LXOE_NVOE_VCR(levelized_cost_matrix, ...
-                                               levelized_value_matrix, ...
-                                               AEP_matrix)
+%call the cost and value wrappers
+[~,LCOE_econ] = econ_cost(force_matrix,P_matrix_elec,capex_design,N_WEC,...
+    FCR,eff_array,JPD);
+[~, LVOE_econ] = econ_value(force_matrix, P_matrix_elec, FCR, eff_array,...
+    JPD, N_WEC, marginal_price);
+[~,LCOE_env,eco_cost_per_wec] = env_cost(force_matrix,P_matrix_elec,eco_cost_steel,...
+    m_m,eco_cost_fiberglass,A_hull,eco_cost_distance,...
+    distance_from_shore,JPD,N_WEC,FCR,eff_array);
+[~, LVOE_env] = env_value(force_matrix, P_matrix_elec, FCR, eff_array, years,...
+    avoided_co2_tons, scc_case, JPD, N_WEC);
+   
+net_econ_value = (LVOE_econ - LCOE_econ) * sum(AEP_matrix,'all','omitnan');
+net_eco_value = (LVOE_env - LCOE_env) * sum(AEP_matrix,'all','omitnan');
+end
+
+
+function [capex_design_dep, ...
+          pto, devicestructure] = design_cost_model(mass_material, M, cost_perkg_mult, N_WEC, ...
+                                  cost_perN_mult, cost_perW_mult, F_max, P_max)
+
+    % from RM3 CBS 1.4 and 1.5, with curve fits done in dev/design_cost_scaling.m
     
-    % lcoe = levelized cost / annual energy production
-    [LCOE_matrix, LCOE] = LXOE(levelized_cost_matrix,  AEP_matrix);
-
-    % lvoe = levelized value / annual energy production
-    [LVOE_matrix, LVOE] = LXOE(levelized_value_matrix, AEP_matrix);
-
-    % net value, NVOE, and value cost ratio matrices
-    net_value_matrix = levelized_value_matrix - levelized_cost_matrix;
-    NVOE_matrix      = LVOE_matrix            -  LCOE_matrix;
-    VCR_matrix       = LVOE_matrix           ./  LCOE_matrix;
-
-    % net value, NVOE, and value cost ratio scalars
-    net_value = mysum(net_value_matrix);
-    NVOE = LVOE - LCOE;
-    VCR  = LVOE / LCOE;
+    % structural cost per wec
+    alpha_struct = 0.481;
+    cost_per_kg = ( 1.64e6 + 1.31e6 * N_WEC^(-alpha_struct) ) / 687000 * cost_perkg_mult(M);
+    devicestructure = cost_per_kg * mass_material;
     
-end
+    % PTO cost per wec
+    alpha_pto = 0.206;
+    pto_const =    92593 + 1051  *N_WEC^(-alpha_pto);
+    pto_power = ( 0.4454 + 0.9099*N_WEC^(-alpha_pto) ) * P_max * cost_perW_mult;
+    pto_force = ( 0.0086 + 0.0118*N_WEC^(-alpha_pto) ) * F_max * cost_perN_mult;
+    pto = pto_const + pto_power + pto_force;
+    
+    % sum design-dependent cost per wec
+    capex_design_dep = devicestructure + pto; 
 
-function [LXOE_matrix,LXOE] = LXOE(levelized_X_matrix,AEP_matrix)
-    % lxoe = levelized X (where X = cost or value) / annual energy production
-    LXOE_matrix = levelized_X_matrix ./ AEP_matrix; % from LCOE_from_capex_design_power.m: $/year / kWh/year = $/kWh
-    levelized_X = mysum(levelized_X_matrix);
-    AEP = mysum(AEP_matrix);
-    LXOE = levelized_X ./ AEP;
-end
-
-function out = mysum(in)
-    out = sum(in,'all','omitnan');
-end
 end
