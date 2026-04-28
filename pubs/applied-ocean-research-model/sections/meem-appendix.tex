@@ -125,7 +125,7 @@ In Table~\ref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\
     $\displaystyle 
         \frac
             {a_{out} \mathrm{I}_1(\vec{\lambda}_j a_{out}) - a_{in}\mathrm{I}_1(\vec{\lambda}_j a_{in})}
-            {\vec{\lambda}_j \mathrm{I}_0(\vec{\lambda}_j a_{scale})}
+            {\vec{\lambda}_j \mathrm{I}_0(\vec{\lambda}_j a_2)}
     $
 }
 
@@ -153,7 +153,7 @@ In Table~\ref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\
     }
     {
         \vec{\lambda}_m \,{\mathrm{K}}_0 (
-                \vec{\lambda}_m a_{scale} )
+                \vec{\lambda}_m a_2 )
     }
     $
 }
@@ -267,7 +267,7 @@ $
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% end equation helper functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Table~\ref{tab:meem-integrals} lists several integrals of the radial and vertical eigenfunctions, $\boldsymbol{\mathcal{R}}$ and $\boldsymbol{\mathcal{Z}}$ respectively, that will be needed in the calculations to follow. %\hl{Todo: need to define} $a_{scale}$.
+Table~\ref{tab:meem-integrals} lists several integrals of the radial and vertical eigenfunctions, $\boldsymbol{\mathcal{R}}$ and $\boldsymbol{\mathcal{Z}}$ respectively, that will be needed in the calculations to follow.
 
 \begin{landscape}
 \begin{table}
@@ -502,13 +502,13 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 
 \subsection{Numerical Notes}\label{sec:meem-numerics}
-Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(b)$, which diverges for $b\rightarrow \infty$.
+Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$.
 This is the cause of the numeric overflow discussed in \ref{sec:hydro-meem}, where it was asserted that overflow occurs when the fluid region height to diameter ratio $\Delta z / D$ falls below some threshold.
-The threshold is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $b_{max}$:
+The threshold is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{max}$:
 \begin{equation}\label{eq:delta-z-min}
-    \frac{\Delta z_{min}}{D} = \frac{\pi N_{harmonics}}{2b_{max}} \approx \frac{N_{harmonics}}{446}.
+    \frac{\Delta z_{min}}{D} = \frac{\pi N_{harmonics}}{2\chi_{max}} \approx \frac{N_{harmonics}}{446}.
 \end{equation}
-By trial, $b_{max}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
+By trial, $\chi_{max}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
 Since $N_{harmonics}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
 In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
 
@@ -518,7 +518,7 @@ Therefore, the limit is derived analytically. %\hl{This formula hasn't been nume
 \begin{equation}
     \lim_{m_0h\rightarrow\infty} Z_0^e(z)= \frac{\cosh^2(m_0h)}{\sqrt{2m_0h}}\exp\left(1+\frac{z}{h}\right)
 \end{equation}
-Plugging this into the first element of the bottom block of the b-vector results in 
+Plugging this into the first element of the bottom block of the b-vector (position $N+2M+1$) results in 
 \begin{equation}
     \lim_{m_0h\rightarrow\infty}b_{N+2M+1}=\frac{-a_2}{h-d_2} \sqrt{\frac{h}{2m_0}}\exp(-d_2m_0)
 \end{equation}
@@ -529,9 +529,14 @@ Plugging this into the first element of the bottom block of the b-vector results
     \label{fig:meem-b-limit}
 \end{figure}
 
-\Cref{fig:meem-b-limit}shows the asymptotic approximation as well as the standard expression for the relevant b-vector entry as a function of nondimensional ratio $m_0h/\textrm{acosh(realmax})$. With the standard expression, values for inputs above $\frac{1}{2}$ become NaN, which poses problems in deep water. With the asymptotic approximation, we are able to avoid NaNs for the zone $\frac{1}{2}<m_0h/\textrm{acosh(realmax})<\frac{h}{d_2}$. Above this threshold, NaNs occur even with the approximation, and the value in the b-vector is set to zero. This introduces negligible error because in this range, the magnitude of the true value is less than $10^{-300}$ for the nominal RM3 geometry. The asymptotic approximation is valid for values of $m_0h/\textrm{acosh(realmax})$ as low as $10^{-2}$, though it is only applied for values above $\frac{1}{2}$.
+\Cref{fig:meem-b-limit}shows the asymptotic approximation as well as the standard expression for the relevant b-vector entry as a function of nondimensional ratio $m_0h/\textrm{acosh(realmax})$.
+With the standard expression, values for inputs above $\frac{1}{2}$ become \texttt{NaN}, which poses problems in deep water.
+With the asymptotic approximation, we are able to avoid \texttt{NaN}s for the zone $\frac{1}{2}<m_0h/\textrm{acosh(realmax})<\frac{h}{d_2}$.
+Above this threshold, \texttt{NaN}s occur even with the approximation, and the value in the b-vector is set to zero.
+This introduces negligible error because in this range, the magnitude of the true value is less than $10^{-300}$ for the nominal RM3 geometry.
+The asymptotic approximation is accurate for values of $m_0h/\textrm{acosh(realmax})$ as low as $10^{-2}$, though it is only applied for values above $\frac{1}{2}$.
 
-And the corresponding limit for the vertical coupling integral:
+The corresponding limit for the vertical coupling integral is:
 \begin{equation}
 \begin{aligned}
     \lim_{m_0h\rightarrow\infty}\boldsymbol{\mathcal{Z}}_{m,k=0} &
@@ -547,21 +552,24 @@ And the corresponding limit for the vertical coupling integral:
 
 A final numerical subtlety worth discussing is finite precision effects in calculating $m_k$.
 Bounds of $180^\textrm{o}\cdot[k-\frac{1}{2}, k]$ are placed on $m_kh$ in a root-finding algorithm to ensure the $k$th root is identified.
+Without these bounds, sometimes the \texttt{fsolve} solver would wrongly converge to values where the residual approaches $+\infty$ from one side and $-\infty$ from the other (asymptotes of $\tan()$) rather than true zeroes.
 Degrees are used instead of radians so asymptotes occur at rational values.
 
 \subsection{Runtime and Computational Cost Scaling}
 
 The runtime of the MEEM method is the time required to find the eigencoefficients, then obtain the hydrodynamic coefficients from eigencoefficients.
 First, a nonlinear root-finding algorithm runs $K-1$ times to generate the $m_k$ inputs used in the A-matrix and b-vector.
-Then $3N+8M+2K-11$ Bessel functions must be evaluated for the radial terms of the A-matrix. % if I change scaling of i1 from a2 to a1, it reduces by N-1. if I change scaling of i2 from a2 to (a1+a2)/2, it increases by 2*(M-1). So total would be 2N+10M+2K-12. see notebook p51.
+Then $3N+8M+2K-11$ Bessel functions must be evaluated for the radial terms of the A-matrix. 
+(Note that this would reduce to $2N+8M+2K-10$ evaluations if the definition of the $R^{i1}_{1n}(r)$ eigenfunction were modified to use a scale factor based on $a_1$ rather than $a_2$, although this enhancement is not pursued here to maintain consistency with previous work).
+% if I change scaling of i2 from a2 to (a1+a2)/2, it increases by 2*(M-1). So total would be 2N+10M+2K-12. see notebook p51.
 The cost of evaluating vertical coupling integrals (\tableautorefname~\ref{tab:meem-integrals}) is negligible since they are trigonometric.
 Linear solves scale almost cubically with matrix size, so this step scales with $(N+2M+K)^3$.
 The radial integrals for the c-vector do not require evaluating Bessel functions with any arguments that were not already evaluated for the A-matrix.
-For $N=M=K=10$, the simulation averages \results[MEEMRuntime] on a Windows 10 laptop with a 2.5 GHz Intel i9 processor for a single frequency.
+For $N=M=K=10$, the simulation of a single frequency averages \results[MEEMRuntime] on the hardware described in \cref{sec:benchmarking}.
 Figure~\ref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
-Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
-On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve drives computation cost.
-On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence).
+Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
+On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve can drive computation cost.
+On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer}
 Thus, MEEM achieves a 10x time reduction over Capytaine.
 
