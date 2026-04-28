@@ -263,10 +263,21 @@ if nargout > 1
     [~,numeric_idx(use_max)] = cellfun(@max, param_table.value(use_max));
     [~,numeric_idx(use_min)] = cellfun(@min, param_table.value(use_min));
     numeric_idx(use_num) = [param_table.idx{use_num}];
-    value_normalize = cellfun(@(x,i) x(numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
+    value_normalize = cellfun(@(x,i) pick_normalize_val(x,numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
 
     param_table.index_normalize = numeric_idx;
     param_table.value_normalize = value_normalize;
 end
 
+end
+
+function v = pick_normalize_val(x, idx)
+%PICK_NORMALIZE_VAL Return the element at idx for numeric/logical arrays.
+%   For non-indexable values (function handles, strings, chars) return x as-is,
+%   since these parameters cannot be meaningfully indexed for normalization.
+    if isnumeric(x) || islogical(x)
+        v = x(idx);
+    else
+        v = x;
+    end
 end

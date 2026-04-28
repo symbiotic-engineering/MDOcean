@@ -13,7 +13,7 @@ This theory states that the fluid velocity field  is the gradient of some comple
 Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
 When boundary conditions correspond to the heave radiation problem (body moving vertically, no incident waves), solving for the potential $\phi(r,\theta,z)$ determines the heave added mass and damping $A_h$ and $B_h$, hereafter ``hydro coefficients.”
 
-For appropriate geometries, the partial differental equation is separable and $\phi$ can be expressed as the product of radial, vertical, and circumferential basis functions called eigenfunctions.
+For appropriate geometries, the partial differential equation is separable and $\phi$ can be expressed as the product of radial, vertical, and circumferential basis functions called eigenfunctions.
 In cylindrically symmetric problems, the radial eigenfunctions are a family of transcendental functions called Bessel functions.
 The fluid is then divided into cylindrical regions.
 Arbitrarily many fluid regions can exist, so the method applies to any axisymmetric geometry, including multiple concentric bodies that oscillate independently.
@@ -73,7 +73,7 @@ The unknown coefficients must be computed to enforce this final condition as wel
 \end{table}
 \end{landscape}
 
-In Table~\ref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\textrm{H}_0^1$ are different Bessel functions of order zero; and 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $N_k$ expression is defined as:
+In Table~\ref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\textrm{H}_0^1$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $N_k$ expression is defined as:
 
 \begin{equation}
     N_k = \frac{1}{2}\left(1+\frac{f_k}{2m_kh}  \right)~
@@ -560,7 +560,7 @@ The radial integrals for the c-vector do not require evaluating Bessel functions
 For $N=M=K=10$, the simulation averages \results[MEEMRuntime] on a Windows 10 laptop with a 2.5 GHz Intel i9 processor for a single frequency.
 Figure~\ref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
-\cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
+Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve drives computation cost.
 On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence).
 Thus, MEEM achieves a 10x time reduction over Capytaine.

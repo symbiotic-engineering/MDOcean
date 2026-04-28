@@ -22,38 +22,39 @@ dependencies:
   - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
+parameters:
+  mermaid_name:
+    - taxonomy
+    - mod_freq_domain_ctrl_synthesis
+    - mod_freq_domain_ctrl_evaluation
 pipeline:
   stages:
-    mermaid-taxonomy-pdf:
+    mermaid-make-pdfs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+        mdocean/plots/non_matlab_figs/pdf/{name}.pdf -f
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: mermaid_name
       inputs:
-        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+        - mdocean/plots/non_matlab_figs/{name}.mmd
       outputs:
-        - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    mermaid-taxonomy-svg:
+        - mdocean/plots/non_matlab_figs/pdf/{name}.pdf
+    mermaid-make-pngs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-        mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+        mdocean/plots/non_matlab_figs/img/{name}.png
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: mermaid_name
       inputs:
-        - mdocean/plots/non_matlab_figs/taxonomy.mmd
+        - mdocean/plots/non_matlab_figs/{name}.mmd
       outputs:
-        - path: mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-          storage: null
-    reformat-mermaid-svg:
-      kind: shell-command
-      environment: pubs
-      command: xmllint --format 
-        mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-        mdocean/plots/non_matlab_figs/img/taxonomy.svg
-      inputs:
-        - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      outputs:
-        - path: mdocean/plots/non_matlab_figs/img/taxonomy.svg
-          storage: git
+        - path: mdocean/plots/non_matlab_figs/img/{name}.png
     make-drag-integral:
       kind: matlab-command
       environment: _system
@@ -3315,6 +3316,8 @@ pipeline:
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+        - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+        - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -4276,6 +4279,7 @@ pipeline:
         - ./mdocean/inputs/parameters.m
         - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
         - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+        - ./mdocean/inputs/validation/validation_units.m
         - ./mdocean/inputs/var_bounds.m
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
@@ -5176,6 +5180,7 @@ pipeline:
         - results/ForceSaturationFigFunc/
         - results/DesignSpaceExploration/
         - results/Meem/
+        - results/QPCircles/
         - results/Slamming/
         - results/SweepGeoms/
         - results/Cost/
@@ -5198,6 +5203,7 @@ pipeline:
         # - results/ForceSaturationFigFunc/end.json
         # - results/HydroCoeffFigFunc/end.json
         # - results/Meem/end.json
+        - results/Parameters/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
@@ -5205,7 +5211,7 @@ pipeline:
         # - results/Slamming/end.json
         # - results/SparHydro/end.json
         # - results/Validation/end.json
-        # - results/Wecsim/end.json
+        - results/Wecsim/end.json
       outputs:
         - path: pubs/applied-ocean-research-model/numeric-results.tex
           storage: git
@@ -5223,6 +5229,8 @@ pipeline:
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
         pctRuntimeOther: "{pctRuntimeOther:.0f}%"
+        wecsimAvgPowerErrorBestCase: "{wecsimAvgPowerErrorBestCase:.2f}%"
+        wecsimAvgPowerErrorWorstCase: "{wecsimAvgPowerErrorWorstCase:.2f}%"
         # PTO sweep min-LCOE point
         ptoSweepMinLCOE_F_max: "{ptoSweepMinLCOE_F_max/1e6:.2f} MN"
         ptoSweepMinLCOE_P_max: "{ptoSweepMinLCOE_P_max/1e3:.0f} kW"
@@ -5411,17 +5419,17 @@ publications:
     stage: build-pubs-umerc-2025-grid-value
 overleaf_sync:
   pubs/applied-ocean-research-model:
-    url: https://www.overleaf.com/project/
+    url: https://www.overleaf.com/project/69ecde8851d14790c59f03d5
     sync_paths:
       - main.tex
       - sections/
-      - figs/
-      - tables/
-      - numbers.tex
       - references.bib
+      - numbers.tex
       - ../elsarticle-num-names.bst
     push_paths:
       - figs/
+      - tables/
+      - numeric-results.tex
   pubs/renewable-energy-mdo:
     url: https://www.overleaf.com/project/6753a38b61276b931380c29c
     sync_paths:

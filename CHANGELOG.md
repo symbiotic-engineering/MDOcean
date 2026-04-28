@@ -1,5 +1,23 @@
 # Changelog
 ## Unreleased
+## [v1.2.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.1) - 2026-4-25
+### Added
+- Paper: dedicated economics appendix, including beta table moved from main text
+- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
+- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
+- Paper: create flowcharts and explanations for modified-frequency-domain method
+### Changed
+- Validation: include units in the validation table
+- Pipeline: Mermaid outputs switched from SVG to PNG and calkit iteration is used for multiple diagrams
+- Paper: moved most of PTO section to appendix
+- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
+- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
+- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
+### Fixed
+- Analysis: `Parameters` class normalization now handles function handles
+- Analysis: add forgotten intermediate outputs to `MEEM` class
+- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
+
 ## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-25
 Major new functionality: constrained optimal control via brute force search, solver, and analytical QP
 ### Added
