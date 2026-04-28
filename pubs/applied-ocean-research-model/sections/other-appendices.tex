@@ -802,6 +802,13 @@ Each of the 210 sea states are simulated individually as the equivalent regular 
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
 %Table~\ref{tab:dynamic-validation} and 
 Figure~\ref{fig:dynamic-validation} compares the results.
+The $C_d=0$ simulation with identical hydrodynamic coefficients (top left of \cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions. 
+The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power. An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+Turning on drag ($C_d=1$, top right of \cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
+While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
+
 \hl{Explain results.}
 % \begin{table}
 %     \centering
@@ -827,7 +834,7 @@ Figure~\ref{fig:dynamic-validation} compares the results.
     \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf} 
   & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
-\caption{Dynamic validation showing error in a variety of modeling assumptions}
+\caption{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
 \label{fig:dynamic-validation}
 \fillandplacepagenumber
 \end{figure}
