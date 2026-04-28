@@ -6285,31 +6285,31 @@ stages:
     desc: Automatically generated from the 'all-viz' stage in 
       calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
-    cmd: quarto render pubs/defense/slides.qmd
+    cmd: quarto render pubs/defense/quarto/slides.qmd
     deps:
       - pubs/defense/figs/
-      - pubs/defense/slides.qmd
+      - pubs/defense/quarto/slides.qmd
       - pubs/defense/references.bib
-      - pubs/defense/asme.csl
-      - pubs/defense/dots.css
-      - pubs/defense/header.html
-      - pubs/defense/styles.css
+      - pubs/defense/quarto/asme.csl
+      - pubs/defense/quarto/dots.css
+      - pubs/defense/quarto/header.html
+      - pubs/defense/quarto/styles.css
       - .calkit/env-locks/quarto
     outs:
-      - pubs/defense/slides.html:
+      - pubs/defense/quarto/slides.html:
           cache: false
           persist: false
     desc: Automatically generated from the 'render-quarto-html' stage 
       in calkit.yaml. Changes made here will be overwritten.
   render-quarto-pdf:
     cmd: calkit xenv -n playwright --no-check -- bash --noprofile 
-      --norc -c "python pubs/defense/html_to_pdf.py --to html"
+      --norc -c "python pubs/defense/quarto/html_to_pdf.py --to html"
     deps:
-      - pubs/defense/slides.html
-      - pubs/defense/html_to_pdf.py
+      - pubs/defense/quarto/slides.html
+      - pubs/defense/quarto/html_to_pdf.py
       - .calkit/env-locks/playwright
     outs:
-      - pubs/defense/slides.pdf:
+      - pubs/defense/quarto/slides.pdf:
           cache: true
           persist: false
     desc: Automatically generated from the 'render-quarto-pdf' stage 

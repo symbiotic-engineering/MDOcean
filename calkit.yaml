@@ -24,7 +24,7 @@ environments:
     wdir: /data
   playwright:
     kind: docker
-    path: pubs/defense/Dockerfile
+    path: pubs/defense/quarto/Dockerfile
     description: Playwright via Docker.
     image: playwright
 dependencies:
@@ -5420,27 +5420,27 @@ pipeline:
     render-quarto-html:
       kind: docker-command
       environment: quarto
-      command: quarto render pubs/defense/slides.qmd
+      command: quarto render pubs/defense/quarto/slides.qmd
       inputs:
         - pubs/defense/figs/
-        - pubs/defense/slides.qmd
+        - pubs/defense/quarto/slides.qmd
         - pubs/defense/references.bib
-        - pubs/defense/asme.csl
-        - pubs/defense/dots.css
-        - pubs/defense/header.html
-        - pubs/defense/styles.css
+        - pubs/defense/quarto/asme.csl
+        - pubs/defense/quarto/dots.css
+        - pubs/defense/quarto/header.html
+        - pubs/defense/quarto/styles.css
       outputs:
-        - path: pubs/defense/slides.html
+        - path: pubs/defense/quarto/slides.html
           storage: git
     render-quarto-pdf:
       kind: shell-command
       environment: playwright
-      command: python pubs/defense/html_to_pdf.py --to html
+      command: python pubs/defense/quarto/html_to_pdf.py --to html
       inputs:
-        - pubs/defense/slides.html
-        - pubs/defense/html_to_pdf.py
+        - pubs/defense/quarto/slides.html
+        - pubs/defense/quarto/html_to_pdf.py
       outputs:
-        - path: pubs/defense/slides.pdf
+        - path: pubs/defense/quarto/slides.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
@@ -5496,16 +5496,16 @@ overleaf_sync:
   pubs/defense:
     url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
     sync_paths:
-      - backup.tex
+      - beamer/backup.tex
       - references.bib
-      - conclusion.tex
-      - content_cost.tex
-      - content_model.tex
-      - content_value.tex
+      - beamer/conclusion.tex
+      - beamer/content_cost.tex
+      - beamer/content_model.tex
+      - beamer/content_value.tex
       - Cornell.pdf
-      - main.tex
-      - motivation.tex
-      - setup.tex
+      - beamer/main.tex
+      - beamer/motivation.tex
+      - beamer/setup.tex
       - figs/
     #push_paths:
     # - figs
