@@ -146,7 +146,11 @@
     }
   </style>
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
+    Reveal.on('ready', () => {
+    Reveal.layout();
+    Reveal.sync();
+
+    requestAnimationFrame(() => {
 
     function isAppendixSlide(slide) {
       return slide.hasAttribute("data-appendix") ||
@@ -155,24 +159,26 @@
     }
 
     // Reveal slide list (includes verticals)
-    const allSlides = Reveal.getSlides();
-
+    const allSlides = Array.from(
+      document.querySelectorAll(".reveal .slides section")
+    );
+    const filtered = allSlides.filter(s =>
+      !s.classList.contains("stack")
+    );
     // Build section groups
     let groups = [];
     let currentGroup = null;
     let inAppendix = false;
     let seenFirstSlide = false;
 
-    allSlides.forEach((slide) => {
+
+    filtered.forEach((slide) => {
       // ignore vertical stack containers
       // ignore vertical stack containers
       if (slide.classList.contains("stack")) return;
 
       // skip the very first slide (title slide)
-      if (!seenFirstSlide) {
-        seenFirstSlide = true;
-        return;
-      }
+      if (slide.id === "title-slide") return;
 
       // detect appendix start
       if (slide.getAttribute("data-appendix") === "true") {
@@ -277,6 +283,7 @@
     updateActive();
 
   });
+    });
   </script>
 </head>
 <body class="quarto-light">

@@ -17,6 +17,16 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  quarto:
+    kind: docker
+    image: ghcr.io/quarto-dev/quarto:latest
+    description: Quarto via Docker.
+    wdir: /data
+  playwright:
+    kind: docker
+    path: pubs/defense/Dockerfile
+    description: Playwright via Docker.
+    image: playwright
 dependencies:
   - docker
   - matlab
@@ -5407,6 +5417,30 @@ pipeline:
         - from_stage_outputs: viz-SweepGeoms
         - from_stage_outputs: viz-Validation
         - from_stage_outputs: viz-Wecsim
+    render-quarto-html:
+      kind: docker-command
+      environment: quarto
+      command: quarto render pubs/defense/slides.qmd
+      inputs:
+        - pubs/defense/figs/
+        - pubs/defense/slides.qmd
+        - pubs/defense/references.bib
+        - pubs/defense/asme.csl
+        - pubs/defense/dots.css
+        - pubs/defense/header.html
+        - pubs/defense/styles.css
+      outputs:
+        - path: pubs/defense/slides.html
+          storage: git
+    render-quarto-pdf:
+      kind: shell-command
+      environment: playwright
+      command: python pubs/defense/html_to_pdf.py
+      inputs:
+        - pubs/defense/slides.html
+        - pubs/defense/html_to_pdf.py
+      outputs:
+        - path: pubs/defense/slides.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
