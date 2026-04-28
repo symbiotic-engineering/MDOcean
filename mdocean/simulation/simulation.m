@@ -102,7 +102,7 @@ if model_grid_value
     [~,LCOE_env] = env_cost(force_matrix,P_matrix_elec,in.eco_cost_steel,...
         m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,...
         in.distance_from_shore,in.JPD,in.N_WEC,in.FCR,in.eff_array);
-    years = 2010;
+    years = 2010 + (0:20);
     avoided_co2_tons = p.marginal_carbon .* AEP_matrix / 907.2; %kgCO2 to tonsCO2
     avoided_co2_tons = sum(avoided_co2_tons,'all','omitnan');
     scc_case = '3pct';
@@ -118,7 +118,7 @@ end
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
-J = [LCOE_econ, J_capex_design, CEM_grid_cost, net_econ_value];
+J = [LCOE_econ, J_capex_design, net_econ_value, net_eco_value];
 
 
 %% Assemble constraints g(x) >= 0
