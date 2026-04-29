@@ -322,7 +322,7 @@ function make_histogram_on_axis(ax,width,...
         tick_slog = slog(tick_orig);
         in_range = tick_slog >= xx_now(1) & tick_slog <= xx_now(2);
         xticks(tick_slog(in_range));
-        xticklabels(arrayfun(@(v) sprintf('%.4g', v), tick_orig(in_range), 'UniformOutput', false));
+        xticklabels(arrayfun(@(v) sprintf('%.4g%%', v), tick_orig(in_range), 'UniformOutput', false));
     else
         xtickformat('percentage')
     end
