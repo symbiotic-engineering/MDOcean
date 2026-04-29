@@ -5424,11 +5424,11 @@ pipeline:
         - path: pubs/defense/quarto/slides.html
           storage: git
         - pubs/defense/quarto/slides_files/
-    render-quarto-pdf:
+    render-quarto-pdf-latexmk:
       kind: docker-command
       environment: quarto
       command: quarto render pubs/defense/quarto/slides.qmd --to pdf 
-        --pdf-engine chromium
+        --pdf-engine latexmk
       inputs:
         - pubs/defense/figs/
         - pubs/defense/quarto/slides.qmd
@@ -5438,8 +5438,8 @@ pipeline:
         - pubs/defense/quarto/header.html
         - pubs/defense/quarto/styles.css
       outputs:
-        - path: pubs/defense/quarto/slides.pdf
-    render-quarto-pdf-playwright:
+        - path: pubs/defense/quarto/slides-latex.pdf
+    render-quarto-pdf:
       kind: shell-command
       environment: playwright
       command: python pubs/defense/quarto/html_to_pdf.py
@@ -5447,7 +5447,7 @@ pipeline:
         - pubs/defense/quarto/slides.html
         - pubs/defense/quarto/html_to_pdf.py
       outputs:
-        - path: pubs/defense/quarto/slides-playwright.pdf
+        - path: pubs/defense/quarto/slides.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
