@@ -24,8 +24,8 @@ function intermed_result_struct = analysis_fcn(p, b)
 
     % Nominal design vector (geometry and structural DVs fixed)
     X_nom = [b.X_noms; 1];
-    idx_F = find(strcmp(b.var_names, 'F_max'));
-    idx_P = find(strcmp(b.var_names, 'P_max'));
+    idx_F = strcmp(b.var_names, 'F_max');
+    idx_P = strcmp(b.var_names, 'P_max');
 
     power_avg    = zeros(size(F_MAX));
     cost         = zeros(size(F_MAX));
@@ -36,8 +36,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     n_both       = zeros(size(F_MAX));
     n_neither    = zeros(size(F_MAX));
 
-    for i = 1:numel(F_MAX)
-        disp(['Running ' num2str(i) ' of ' num2str(numel(F_MAX))])
+    parfor i = 1:numel(F_MAX)
 
         X_i        = X_nom;
         X_i(idx_F) = F_MAX(i);

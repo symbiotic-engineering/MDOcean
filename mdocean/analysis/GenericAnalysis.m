@@ -1,4 +1,4 @@
-classdef (Abstract) GenericAnalysis
+classdef (Abstract) GenericAnalysis < handle
     %GENERICANALYSIS Abstract class for MDOcean analyses
     %   Handles saving and loading of intermediate results, figures, and tables.
 
@@ -19,8 +19,9 @@ classdef (Abstract) GenericAnalysis
         extra_analysis_outputs = {} % non-code extra outputs beyond intermed.mat for calkit analysis stage
         extra_postpro_inputs = {'./mdocean/inputs/validation/RM3-CBS.xlsx'} % non-code data inputs for calkit postpro stage
         extra_postpro_outputs = {} % non-code extra outputs for calkit postpro stage
+        class_dependencies_cached % cache to avoid recomputing when used separately for analysis and postpro
     end
-    properties (Dependent)
+    properties (Dependent) % dependent so they are computed only on demand, not on object instantiation
         class_dependencies
         analysis_dependencies
         postpro_dependencies
@@ -74,8 +75,15 @@ classdef (Abstract) GenericAnalysis
                           'end.json']);
         end
         function val = get.class_dependencies(obj)
+            if isempty(obj.class_dependencies_cached)
+                obj = compute_and_cache_class_dependencies(obj);
+            end
+            val = obj.class_dependencies_cached;
+        end
+        function obj = compute_and_cache_class_dependencies(obj)
             parent = superclasses(obj);
-            val = obj.get_dependencies(parent{:});
+            val = obj.get_dependencies(parent{1});
+            obj.class_dependencies_cached = val;
         end
         function val = get.analysis_dependencies(obj)
             analysis_deps = obj.get_dependencies(['@' class(obj) filesep 'analysis_fcn']);
@@ -238,7 +246,15 @@ classdef (Abstract) GenericAnalysis
                               obj.format_inputs_list(obj.extra_postpro_inputs, obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
                               obj.format_outputs([obj.postpro_outputs, obj.extra_postpro_outputs]) ];
-            stages = [analysis_stage newline postpro_stage];
+            viz_stage = ['viz-' class(obj) ':' newline ...
+                          '  kind: jupyter-notebook' newline ...
+                          '  environment: pubs' newline ...
+                          '  notebook_path: results/fig_notebooks/' class(obj) '.ipynb' newline ...
+                          '  inputs:' newline ...
+                          '    - from_stage_outputs: postpro-' class(obj) newline ...
+                          '  html_storage: null' newline ...
+                          '  executed_ipynb_storage: git'];
+            stages = [analysis_stage newline postpro_stage newline viz_stage];
         end
 
         function list_str = format_inputs_list(~, extras, deps)
