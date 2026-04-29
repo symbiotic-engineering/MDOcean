@@ -877,6 +877,27 @@ Evidently, amplitude and power results are quite sensitive to the presence of dr
 The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
 
+We also validate the describing function approximation for the drag force.
+The general application of the describing function technique requires that the fundamental frequency $\omega$ contains the vast majority of the energy, resulting in body displacements of the form $\xi(t) \sim \cos(\omega t+\phi)$.
+\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $C_d=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
+This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
+The paricular describing function relation used for drag assumes that the drag force has the form $F_d(t) \sim |\cos(\omega t+\phi)|\cos(\omega t+\phi)$.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresonding to the four corners of the JPD.
+The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/position_THD_contour.pdf}
+    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \label{fig:wecsim-thd}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/drag_force_desc_fcn.pdf}
+    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \label{fig:wecsim-drag-waveform}
+\end{figure}
+
 \clearpage
 \section{Economics Module Details}
 \label{sec:appendix-econ}
