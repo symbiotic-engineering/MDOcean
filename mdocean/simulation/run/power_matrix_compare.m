@@ -152,7 +152,11 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                 end
             end
             
-            error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+            if p.C_d_float==0 && ~p.use_MEEM && p.use_multibody
+                signed_log(error, 0.1, [], T, H);
+            else
+                error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+            end
         end
 
         xlabel(t,'Wave Period T (s)','FontSize',20)

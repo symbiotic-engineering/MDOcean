@@ -173,9 +173,10 @@ function [weighted_pwr_err,...
 
     make_report(figs,wecsim_filename,p)
 
+    use_log_x = (p.C_d_float == 0 && p.C_d_spar == 0 && ~p.use_MEEM && p.use_multibody);
     make_histogram_on_axis(ax,width,...
                             pwr_err,amp_err,...
-                            weighted_pwr_err,max_amp_err,xlim_thresh)
+                            weighted_pwr_err,max_amp_err,xlim_thresh,use_log_x)
 
 end
 
@@ -219,7 +220,10 @@ end
 
 function make_histogram_on_axis(ax,width,...
                                 pwr_err,amp_err,...
-                                weighted_pwr_err,max_amp_err,xlim_thresh)
+                                weighted_pwr_err,max_amp_err,xlim_thresh,use_log_x)
+    if nargin < 8
+        use_log_x = false;
+    end
     % ensure scalar values for plotting vertical lines/text
     if isempty(weighted_pwr_err)
         wp = NaN;
@@ -241,19 +245,29 @@ function make_histogram_on_axis(ax,width,...
     min_num_bars = 10;
     max_num_bars = 30;
 
-    expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
-    width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
-    
-    pwr_err_capped = pwr_err;
-    pwr_err_capped(abs(pwr_err_capped)>xlim_thresh)=Inf;
-    amp_err_capped = amp_err;
-    amp_err_capped(abs(amp_err_capped)>xlim_thresh)=Inf;
+    if use_log_x
+        C_log = 0.1;
+        slog = @(x) sign(x) .* log10(1 + abs(x) ./ (10^C_log));
+        pwr_plot = slog(pwr_err(:));
+        amp_plot = slog(amp_err(:));
+        all_finite = [pwr_plot(isfinite(pwr_plot)); amp_plot(isfinite(amp_plot))];
+        expected_x_width = 2 * max(abs(all_finite));
+        width = expected_x_width / 20;
+    else
+        expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
+        width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
+
+        pwr_plot = pwr_err;
+        pwr_plot(abs(pwr_plot)>xlim_thresh)=Inf;
+        amp_plot = amp_err;
+        amp_plot(abs(amp_plot)>xlim_thresh)=Inf;
+    end
 
     % histogram
     axes(ax)
-    histogram(ax,pwr_err_capped(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
+    histogram(ax,pwr_plot(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
     hold(ax,'on')
-    h = histogram(ax,amp_err_capped(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
+    h = histogram(ax,amp_plot(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
     hb = bar(ax,h.BinEdges(1:end-1),-h.Values,'histc');
     hb.FaceColor = [0.8500 0.3250 0.0980];
     hb.FaceAlpha = 0.6; 
@@ -263,22 +277,33 @@ function make_histogram_on_axis(ax,width,...
 
     ylim([-.57 .57])
     xx = xlim;
-    if any(abs(xx) > xlim_thresh)
-        warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
+    if ~use_log_x
+        if any(abs(xx) > xlim_thresh)
+            warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
+        end
+        xlim([-1 1]*min(max(abs(xx)),xlim_thresh)) % zero centered on x, don't allow outliers > xlim_thresh%
     end
-    xlim([-1 1]*min(max(abs(xx)),xlim_thresh)) % zero centered on x, don't allow outliers > xlim_thresh%
     yy = ylim;
 
-    plot(ax,[1 1]*wp,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
+    if use_log_x
+        wp_x = slog(wp);
+        ma_x = slog(ma);
+    else
+        wp_x = wp;
+        ma_x = ma;
+    end
+
+    plot(ax,[1 1]*wp_x,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
         'DisplayName','JPD-Weighted Average Power')
-    plot(ax,[1 1]*ma,     [yy(1) 0],'Color',[0.8500 0.3250 0.0980], ...
+    plot(ax,[1 1]*ma_x,     [yy(1) 0],'Color',[0.8500 0.3250 0.0980], ...
         'DisplayName','Maximum Float Amplitude')
 
+    xx = xlim;
     text_offset_if_neg = -max(abs(xx))/3.7;
     text_offset_if_pos =  max(abs(xx))/18;
-    x_text_pwr = wp + text_offset_if_neg*logical(wp<0) ...
+    x_text_pwr = wp_x + text_offset_if_neg*logical(wp<0) ...
                 + text_offset_if_pos*logical(wp>0);
-    x_text_amp = ma + text_offset_if_neg*logical(ma<0) ...
+    x_text_amp = ma_x + text_offset_if_neg*logical(ma<0) ...
                 + text_offset_if_pos*logical(ma>0);
 
     text(x_text_pwr, yy(2)*.9, sprintf('%+0.1f%%',wp), ...
@@ -288,7 +313,19 @@ function make_histogram_on_axis(ax,width,...
 
     plot(ax,[0 0],                  yy, 'k--','HandleVisibility','off')
     plot(ax,[-1 1]*max(abs(xx)),[0 0],'k-','LineWidth',.5,'HandleVisibility','off')
-    xtickformat('percentage')
+
+    if use_log_x
+        xx_now = xlim;
+        pos_ticks_orig = [0.1 0.2 0.5 1 2 5 10 50 100];
+        pos_ticks_orig = pos_ticks_orig(slog(pos_ticks_orig) <= max(abs(xx_now)));
+        tick_orig = [-flip(pos_ticks_orig) 0 pos_ticks_orig];
+        tick_slog = slog(tick_orig);
+        in_range = tick_slog >= xx_now(1) & tick_slog <= xx_now(2);
+        xticks(tick_slog(in_range));
+        xticklabels(arrayfun(@(v) sprintf('%.4g', v), tick_orig(in_range), 'UniformOutput', false));
+    else
+        xtickformat('percentage')
+    end
 
 end
 
