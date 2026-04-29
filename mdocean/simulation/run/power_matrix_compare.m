@@ -152,7 +152,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                 end
             end
             
-            if p.C_d_float==0 && p.C_d_spar==0 && ~p.use_MEEM && p.use_multibody
+            is_wecsim_geom = p.T_s_over_D_s == 29/6;
+            if p.C_d_float==0 && p.C_d_spar==0 && is_wecsim_geom && p.use_multibody
                 signed_log(error, 0.1, [], T, H);
             else
                 error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);

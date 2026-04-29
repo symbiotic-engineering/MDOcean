@@ -173,7 +173,8 @@ function [weighted_pwr_err,...
 
     make_report(figs,wecsim_filename,p)
 
-    use_log_x = (p.C_d_float == 0 && p.C_d_spar == 0 && ~p.use_MEEM && p.use_multibody);
+    is_wecsim_geom = contains(wecsim_filename, 'geom_wecsim');
+    use_log_x = (p.C_d_float == 0 && p.C_d_spar == 0 && is_wecsim_geom && p.use_multibody);
     make_histogram_on_axis(ax,width,...
                             pwr_err,amp_err,...
                             weighted_pwr_err,max_amp_err,xlim_thresh,use_log_x)
