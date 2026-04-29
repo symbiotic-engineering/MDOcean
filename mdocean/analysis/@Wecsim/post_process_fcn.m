@@ -317,8 +317,10 @@ function make_histogram_on_axis(ax,width,...
 
     if use_log_x
         xx_now = xlim;
-        pos_ticks_orig = [0.1 0.2 0.5 1 2 5 10 50 100];
-        pos_ticks_orig = pos_ticks_orig(slog(pos_ticks_orig) <= max(abs(xx_now)));
+        ticks_base = [1 2 5];
+        ticks_expo_min = floor(-C_log);
+        ticks_expo_max = ceil(log10(max(abs(xx_now))));
+        pos_ticks_orig = ticks_base .* (10 .^ (ticks_expo_min:ticks_expo_max));
         tick_orig = [-flip(pos_ticks_orig) 0 pos_ticks_orig];
         tick_slog = slog(tick_orig);
         in_range = tick_slog >= xx_now(1) & tick_slog <= xx_now(2);
