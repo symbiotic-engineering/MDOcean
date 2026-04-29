@@ -44,6 +44,11 @@ function [fig_array,...
     tab_colspecs = {[]};
      
     end_result_struct.err_structs = err_structs;
+    % Scalar power errors used in the paper text
+    % Best case: single-body, baseline (no drag, identical hydro coefficients)
+    % Worst case: multi-body, total (drag on, MEEM hydro coefficients)
+    end_result_struct.wecsimAvgPowerErrorBestCase = abs(err_structs{2}.pct_error_baseline(1));
+    end_result_struct.wecsimAvgPowerErrorWorstCase = abs(err_structs{1}.pct_error_total(1));
 end
 
 function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename_cell,runOnlyFewSeaStates)
