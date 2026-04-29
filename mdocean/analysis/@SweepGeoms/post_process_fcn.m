@@ -205,7 +205,8 @@ function [fig_array,...
     % Collapse the T dimension by taking the best CW/CW_max for each geometry.
     hydro_ratio_max_T = squeeze(max(hydro_ratio_result, [], 1));   % [size(A1)]
 
-    wavelength = m0h_stored(:) ./ myresize(H,nT);
+    wavenumber = m0h_stored(:) ./ myresize(H,nT);
+    wavelength = 2*pi ./ wavenumber;
     fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
                             color, size_var, myresize(marker_pareto,nT), a2_h, marker_var_name, size_mult*6, ...
                             size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1, [.05 2]);
