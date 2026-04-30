@@ -4,7 +4,7 @@ Create/activate environment:
 ```
 conda create -n sphinxenv3 -c conda-forge pip sphinxcontrib-matlabdomain myst-parser sphinx sphinx-rtd-theme sphinx-copybutton sphinx-last-updated-by-git
 pip install sphinx_design
-conda activate sphinxenv2
+conda activate sphinxenv3
 ```
 Build:
 ```
