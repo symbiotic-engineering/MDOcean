@@ -177,7 +177,6 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             legend(h_leg, 'Open loop unstable', 'Location', 'best');
         end
 
-        title(t,remove_underscores(var_name))
         xlabel(t,'Wave Period T (s)','FontSize',20)
         ylabel(t,'Wave Height Hs (m)','FontSize',20)
     end
@@ -203,7 +202,8 @@ function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
     else
         c = []; h_fig = [];
     end
-    title(Z_title)
+    ax = gca;
+    ax.FontSize = 14;
     cb = colorbar;
     if ~isempty(h_fig)
         z = [min(Z,[],'all') max(Z,[],'all') Z_levels];
@@ -284,8 +284,8 @@ function results = compute_mdocean_results(X,p)
                                       'force_pto',val.mag_U,...
                                       'float_drag_force_fund',val.F_drag_f,...
                                       'spar_drag_force_fund',val.F_drag_s,...
-                                      'float_drag_force_phase',wrapTo2Pi(val.phase_F_drag_f),...
-                                      'spar_drag_force_phase',wrapTo2Pi(val.phase_F_drag_s),...
+                                      'float_drag_force_phase',val.phase_F_drag_f,...
+                                      'spar_drag_force_phase',val.phase_F_drag_s,...
                                       'float_phase',val.phase_X_f,...
                                       'spar_phase',val.phase_X_s,...
                                       'rel_phase',val.phase_X_u);
@@ -325,8 +325,8 @@ function results = load_wecsim_results(wecsim_filename, p)
     B_p(idx) = wecsim_raw.B_p;
     float_drag_force_fund(idx) = wecsim_raw.float_drag_force_fund;
     spar_drag_force_fund(idx)  = wecsim_raw.spar_drag_force_fund;
-    float_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.float_drag_force_phase);
-    spar_drag_force_phase(idx) = wrapTo2Pi(wecsim_raw.spar_drag_force_phase);
+    float_drag_force_phase(idx) = wecsim_raw.float_drag_force_phase;
+    spar_drag_force_phase(idx) = wecsim_raw.spar_drag_force_phase;
     float_phase(idx) = wecsim_raw.float_phase;
     spar_phase(idx) = wecsim_raw.spar_phase;
     rel_phase(idx) = wecsim_raw.rel_phase;
@@ -366,6 +366,13 @@ function results = assemble_results_struct(sz,varargin)
     end
     parse(p,varargin{:})
     results = p.Results;
+
+    % normalize all phases to be between -pi and pi
+    phase_vars = contains(var_names,'phase');
+    for var_idx = find(phase_vars)
+        var_name = var_names{var_idx};
+        results.(var_name) = wrapToPi(results.(var_name));
+    end
 
     % calculated variables
     wave_resource_raw = 1030 * 9.8^2 / (64*pi) * results.T .* results.H.^2 / 1000;

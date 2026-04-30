@@ -23,8 +23,11 @@ jobs:
     steps:
       - name: Clear stale submodule caches
         run: |
-          # On self-hosted runners .git/ persists between runs. Remove the entire
-          # gitdir module cache so the next manual submodule init starts clean.
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
           rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
@@ -83,24 +86,31 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - name: pull
+        run: calkit pull
+        continue-on-error: true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
           save: false
+          cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
-
+      - name: add any newly generated .ipynb files to git
+        run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --keep-going --log build-AOR-paper view-aor-figs
+          # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
+          run_args: --keep-going --log build-AOR-paper view-aor-figs all-viz
           pull_dvc: false
           save: false
+          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then

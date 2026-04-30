@@ -39,7 +39,7 @@ else
     D_f_in_over_D_s = 6.5/6;
     h = 85;
     power_coeffs = [22.4,1,-15,86]; % only used when use_multibody=false
-    power_scale_multibody = 0.54;
+    power_scale_multibody = 0.49;
 end
 
 % file = 'Humboldt_California_Wave Resource _SAM CSV.csv';
@@ -181,12 +181,16 @@ param_table = [param_table;
     ...% Dynamics: simulation type
     table("control_type","control type",{'reactive'},"dynamics",false,... 
         "reactive or damping",{''});
+    table("control_solve_type","control solve type",{'analytical'},"dynamics",false,... 
+        "method for constrained control solve: analytical (QCQP circle intersection), solver (multiplier-based fsolve), or brute_force (grid search)",{''});
     table("use_MEEM","use_MEEM",{true},"dynamics",false,... 
         "whether to use MEEM for hydro coeffs (boolean)",{''});
     table("use_multibody","use_multibody",{true},"dynamics",false,... 
         "whether to use multibody dynamics (boolean)",{''});
     table("use_force_sat","use_force_sat",{true},"dynamics",false,... 
         "whether to use force saturation (boolean)",{''});
+    table("use_amp_sat","use_amp_sat",{true},"dynamics",false,... 
+        "whether to use amplitude saturation (boolean)",{''});
     table("use_power_sat","use_power_sat",{true},"dynamics",false,... 
         "whether to use power saturation (boolean)",{''});
     table("lock_in_storm","lock_in_storm",{true},"dynamics",false,... 
@@ -222,7 +226,7 @@ param_table = [param_table;
         "dynamics",false,"spar excitation hydro coeffs from WAMIT for nominal RM3",{''});
     table("hydro","hydro",{readWAMIT(struct(),"rm3.out",[])},"dynamics",...
         false,"function from WECSim",{''});
-    table("F_heave_mult","F_{heave,mult}",{3.54},"dynamics",true,... 
+    table("F_heave_mult","F_{heave,mult}",{0.28},"dynamics",true,... 
         "multiplier to make heave force match with validation (-)",{''});
     % 1.925 is required to make WAMIT match tank test, and 0.857 is
     % required to make MEEM match WAMIT
@@ -259,10 +263,21 @@ if nargout > 1
     [~,numeric_idx(use_max)] = cellfun(@max, param_table.value(use_max));
     [~,numeric_idx(use_min)] = cellfun(@min, param_table.value(use_min));
     numeric_idx(use_num) = [param_table.idx{use_num}];
-    value_normalize = cellfun(@(x,i) x(numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
+    value_normalize = cellfun(@(x,i) pick_normalize_val(x,numeric_idx(i)), param_table.value, num2cell(1:height(param_table)).','UniformOutput',false);
 
     param_table.index_normalize = numeric_idx;
     param_table.value_normalize = value_normalize;
 end
 
+end
+
+function v = pick_normalize_val(x, idx)
+%PICK_NORMALIZE_VAL Return the element at idx for numeric/logical arrays.
+%   For non-indexable values (function handles, strings, chars) return x as-is,
+%   since these parameters cannot be meaningfully indexed for normalization.
+    if isnumeric(x) || islogical(x)
+        v = x(idx);
+    else
+        v = x;
+    end
 end

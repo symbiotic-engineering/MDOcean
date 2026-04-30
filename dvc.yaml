@@ -1,42 +1,38 @@
 stages:
-  mermaid-taxonomy-pdf:
+  mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf -f
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf -f
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/pdf/taxonomy.pdf
-    desc: Automatically generated from the 'mermaid-taxonomy-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  mermaid-taxonomy-svg:
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pdfs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  mermaid-make-pngs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/taxonomy.mmd -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+      mdocean/plots/non_matlab_figs/img/${item.name}.png
     deps:
-      - mdocean/plots/non_matlab_figs/taxonomy.mmd
+      - mdocean/plots/non_matlab_figs/${item.name}.mmd
       - .calkit/env-locks/mermaid
     outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg:
-          cache: false
+      - mdocean/plots/non_matlab_figs/img/${item.name}.png:
+          cache: true
           persist: false
-    desc: Automatically generated from the 'mermaid-taxonomy-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  reformat-mermaid-svg:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
-      "xmllint --format 
-      mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg -o 
-      mdocean/plots/non_matlab_figs/img/taxonomy.svg"
-    deps:
-      - mdocean/plots/non_matlab_figs/img/taxonomy_tmp.svg
-      - .calkit/env-locks/pubs
-    outs:
-      - mdocean/plots/non_matlab_figs/img/taxonomy.svg:
-          cache: false
-          persist: false
-    desc: Automatically generated from the 'reformat-mermaid-svg' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    matrix:
+      name:
+        - taxonomy
+        - mod_freq_domain_ctrl_synthesis
+        - mod_freq_domain_ctrl_evaluation
+    desc: Automatically generated from the 'mermaid-make-pngs' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); drag_fcn 
       = make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 120); 
@@ -99,6 +95,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -112,12 +109,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -159,6 +157,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -172,12 +171,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -229,6 +229,7 @@ stages:
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -245,12 +246,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -294,6 +296,7 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/compare.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -309,12 +312,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -374,6 +378,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -387,12 +392,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -434,6 +440,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -447,12 +454,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -501,6 +509,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -514,12 +523,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -561,6 +571,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -574,12 +585,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -628,6 +640,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -643,12 +656,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -694,6 +708,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -707,12 +722,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -768,6 +784,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -782,12 +799,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -832,6 +850,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -845,12 +864,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -905,6 +925,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -918,12 +939,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -975,6 +997,7 @@ stages:
       - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
       - ./mdocean/plots/matlab_figs/experiments_plot.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -989,12 +1012,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1046,6 +1070,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1059,12 +1084,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1106,6 +1132,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1119,12 +1146,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1173,6 +1201,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1186,13 +1215,14 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
       - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1234,6 +1264,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1247,12 +1278,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1326,6 +1358,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1339,12 +1372,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1386,6 +1420,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1399,12 +1434,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1473,6 +1509,12 @@ stages:
       - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.pdf
       - results/FitOlaya/case4_v3_scatter_actual_vs_pred.pdf
       - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.pdf
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.pdf
+      - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf
       - results/FitOlaya/orig_3b_line_kRb_fbar.fig
       - results/FitOlaya/orig_4b_line_kRb_fbar.fig
       - results/FitOlaya/orig_12a_line_kRb_fbar.fig
@@ -1519,6 +1561,12 @@ stages:
       - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.fig
       - results/FitOlaya/case4_v3_scatter_actual_vs_pred.fig
       - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.fig
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.fig
+      - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.fig
       - results/FitOlaya/end.mat
       - results/FitOlaya/end.json:
           cache: false
@@ -1543,6 +1591,7 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/force_sat_results.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1556,12 +1605,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1606,6 +1656,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1619,12 +1670,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1679,6 +1731,7 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/run_solver.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -1695,12 +1748,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1751,6 +1805,7 @@ stages:
       - ./mdocean/optimization/sensitivities/delta_x.m
       - ./mdocean/plots/matlab_figs/SOO_result_plots.m
       - ./mdocean/plots/matlab_figs/lagrange_multiplier_bar_chart.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -1768,12 +1823,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1836,6 +1892,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1849,12 +1906,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1899,6 +1957,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -1912,12 +1971,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -1970,6 +2030,7 @@ stages:
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/optimization/sensitivities/location_sensitivity.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -1988,12 +2049,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2039,6 +2101,7 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/sensitivities/location_post_process.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2052,12 +2115,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2118,6 +2182,7 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/b_inf_numeric.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2131,12 +2196,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2167,6 +2233,8 @@ stages:
       - results/Meem/intermed_figSparsity_1.fig
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
+      - results/Meem/intermed_fig_convergence_vs_omega_1.fig
+      - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
     desc: Automatically generated from the 'analysis-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-Meem:
@@ -2186,6 +2254,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2199,12 +2268,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2231,6 +2301,8 @@ stages:
       - results/Meem/intermed_figSparsity_1.fig
       - results/Meem/intermed_figVelMatch_1.fig
       - results/Meem/intermed_figPotMatch_1.fig
+      - results/Meem/intermed_fig_convergence_vs_omega_1.fig
+      - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
     outs:
       - results/Meem/meem_sparsity.pdf
       - results/Meem/meem_validation.pdf
@@ -2271,6 +2343,7 @@ stages:
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/optimization/sensitivities/gradient_mult_x0.m
       - ./mdocean/optimization/sensitivities/random_x0.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -2287,12 +2360,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2342,6 +2416,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/multistart_postpro.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
@@ -2356,12 +2431,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2420,6 +2496,7 @@ stages:
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/optimization/sensitivities/local_sens_both_obj_all_param.m
       - ./mdocean/optimization/sensitivities/param_sweep.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -2437,12 +2514,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2488,6 +2566,7 @@ stages:
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/all_sens_plots.m
       - ./mdocean/plots/matlab_figs/global_sens_plots.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2502,12 +2581,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2602,6 +2682,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2615,12 +2696,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2662,6 +2744,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2675,12 +2758,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2735,6 +2819,7 @@ stages:
       - ./mdocean/optimization/multiobjective/pareto_search.m
       - ./mdocean/optimization/run_solver.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -2751,12 +2836,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2805,6 +2891,7 @@ stages:
       - ./mdocean/optimization/multiobjective/paretoFront.m
       - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
       - ./mdocean/plots/matlab_figs/constraint_active_plot.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2819,12 +2906,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2880,6 +2968,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2893,12 +2982,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -2940,6 +3030,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -2953,12 +3044,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3006,6 +3098,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3019,12 +3112,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3066,6 +3160,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3079,12 +3174,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3134,6 +3230,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3147,12 +3244,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3197,6 +3295,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3210,12 +3309,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3246,6 +3346,8 @@ stages:
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
@@ -3260,6 +3362,139 @@ stages:
           persist: false
     desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
       stage in calkit.yaml. Changes made here will be overwritten.
+  analysis-QPCircles:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=QPCircles; obj.run_analysis();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@QPCircles/QPCircles.m
+      - ./mdocean/analysis/@QPCircles/analysis_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/var_bounds.mat
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/circle_intersect_script.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+    outs:
+      - results/QPCircles/intermed.mat
+      - results/QPCircles/intermed_figure_handle_1.fig
+    desc: Automatically generated from the 'analysis-QPCircles' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  postpro-QPCircles:
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+      obj=QPCircles; obj.run_all_from_load();"
+    deps:
+      - ./mdocean/inputs/validation/RM3-CBS.xlsx
+      - ./mdocean/analysis/@QPCircles/QPCircles.m
+      - ./mdocean/analysis/@QPCircles/post_process_fcn.m
+      - ./mdocean/analysis/GenericAnalysis.m
+      - ./mdocean/inputs/drag_integral.mat
+      - ./mdocean/inputs/get_spar_exc.m
+      - ./mdocean/inputs/parameters.m
+      - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
+      - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/var_bounds.m
+      - ./mdocean/inputs/var_bounds.mat
+      - ./mdocean/inputs/wave_conditions/trim_jpd.m
+      - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
+      - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+      - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+      - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/util/bluewhitered.m
+      - ./mdocean/plots/util/check_fig_size.m
+      - ./mdocean/plots/util/contourx.m
+      - ./mdocean/plots/util/hatchfill2.m
+      - ./mdocean/plots/util/improvePlot.m
+      - ./mdocean/plots/util/imrange.m
+      - ./mdocean/plots/util/remove_underscores.m
+      - ./mdocean/plots/util/save_fig_with_diagnostic.m
+      - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
+      - ./mdocean/simulation/modules/dynamics/dynamics.m
+      - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
+      - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
+      - ./mdocean/simulation/modules/dynamics/multibody_response.m
+      - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
+      - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
+      - ./mdocean/simulation/modules/econ/econ.m
+      - ./mdocean/simulation/modules/enviro.m
+      - ./mdocean/simulation/modules/geometry.m
+      - ./mdocean/simulation/modules/grid_CEM.m
+      - ./mdocean/simulation/modules/hydro/dispersion.m
+      - ./mdocean/simulation/modules/hydro/get_dynamic_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs.m
+      - ./mdocean/simulation/modules/hydro/get_hydro_coeffs_MEEM.m
+      - ./mdocean/simulation/modules/hydro/get_m_k_h.m
+      - ./mdocean/simulation/modules/hydro/group_velocity.m
+      - ./mdocean/simulation/modules/hydro/run_MEEM.m
+      - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
+      - ./mdocean/simulation/modules/structures/float_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_plate_stress.m
+      - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
+      - ./mdocean/simulation/modules/structures/structures.m
+      - ./mdocean/simulation/simulation.m
+      - results/QPCircles/intermed.mat
+      - results/QPCircles/intermed_figure_handle_1.fig
+    outs:
+      - results/QPCircles/qp_circles.pdf
+      - results/QPCircles/qp_circles.fig
+      - results/QPCircles/end.mat
+      - results/QPCircles/end.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'postpro-QPCircles' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   analysis-RunSingleFigFunc:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
       obj=RunSingleFigFunc; obj.run_analysis();"
@@ -3280,6 +3515,7 @@ stages:
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -3298,12 +3534,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3331,11 +3568,13 @@ stages:
     outs:
       - results/RunSingleFigFunc/intermed.mat
       - results/RunSingleFigFunc/intermed_created_figs_1.fig
-      - results/RunSingleFigFunc/intermed_created_figs_4.fig
-      - results/RunSingleFigFunc/intermed_created_figs_6.fig
-      - results/RunSingleFigFunc/intermed_created_figs_3.fig
-      - results/RunSingleFigFunc/intermed_created_figs_5.fig
       - results/RunSingleFigFunc/intermed_created_figs_2.fig
+      - results/RunSingleFigFunc/intermed_created_figs_3.fig
+      - results/RunSingleFigFunc/intermed_created_figs_4.fig
+      - results/RunSingleFigFunc/intermed_created_figs_5.fig
+      - results/RunSingleFigFunc/intermed_created_figs_6.fig
+      - results/RunSingleFigFunc/intermed_created_figs_7.fig
+      - results/RunSingleFigFunc/intermed_created_figs_8.fig
     desc: Automatically generated from the 'analysis-RunSingleFigFunc'
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-RunSingleFigFunc:
@@ -3355,9 +3594,11 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+      - ./mdocean/plots/matlab_figs/plot_nominal_constraint_circles.m
       - ./mdocean/plots/util/bluewhitered.m
       - ./mdocean/plots/util/check_fig_size.m
       - ./mdocean/plots/util/contourx.m
@@ -3368,12 +3609,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3396,24 +3638,34 @@ stages:
       - ./mdocean/simulation/simulation.m
       - results/RunSingleFigFunc/intermed.mat
       - results/RunSingleFigFunc/intermed_created_figs_1.fig
-      - results/RunSingleFigFunc/intermed_created_figs_4.fig
-      - results/RunSingleFigFunc/intermed_created_figs_6.fig
-      - results/RunSingleFigFunc/intermed_created_figs_3.fig
-      - results/RunSingleFigFunc/intermed_created_figs_5.fig
       - results/RunSingleFigFunc/intermed_created_figs_2.fig
+      - results/RunSingleFigFunc/intermed_created_figs_3.fig
+      - results/RunSingleFigFunc/intermed_created_figs_4.fig
+      - results/RunSingleFigFunc/intermed_created_figs_5.fig
+      - results/RunSingleFigFunc/intermed_created_figs_6.fig
+      - results/RunSingleFigFunc/intermed_created_figs_7.fig
+      - results/RunSingleFigFunc/intermed_created_figs_8.fig
     outs:
       - results/RunSingleFigFunc/nominal_geometry_viz.pdf
       - results/RunSingleFigFunc/nominal_power_pdf.pdf
       - results/RunSingleFigFunc/nominal_power_matrix.pdf
       - results/RunSingleFigFunc/drag_convergence.pdf
+      - results/RunSingleFigFunc/ctrl_polar_plot_mult.pdf
+      - results/RunSingleFigFunc/ctrl_polar_plot_gamma.pdf
       - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
       - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
+      - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
+      - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
       - results/RunSingleFigFunc/nominal_geometry_viz.fig
       - results/RunSingleFigFunc/nominal_power_pdf.fig
       - results/RunSingleFigFunc/nominal_power_matrix.fig
       - results/RunSingleFigFunc/drag_convergence.fig
+      - results/RunSingleFigFunc/ctrl_polar_plot_mult.fig
+      - results/RunSingleFigFunc/ctrl_polar_plot_gamma.fig
       - results/RunSingleFigFunc/slamming_model_comparison_float.fig
       - results/RunSingleFigFunc/slamming_model_comparison_spar.fig
+      - results/RunSingleFigFunc/qcqp_circles_nominal.fig
+      - results/RunSingleFigFunc/qcqp_circles_overlay.fig
       - results/RunSingleFigFunc/end.mat
       - results/RunSingleFigFunc/end.json:
           cache: false
@@ -3441,6 +3693,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3454,12 +3707,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3501,6 +3755,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/module_runtime_compare.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
@@ -3515,12 +3770,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3574,6 +3830,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3589,12 +3846,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3637,6 +3895,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3650,12 +3909,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3704,6 +3964,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3718,12 +3979,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3766,6 +4028,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3779,12 +4042,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3836,6 +4100,7 @@ stages:
       - ./mdocean/optimization/gradient_optim.m
       - ./mdocean/optimization/max_avg_power.m
       - ./mdocean/optimization/run_solver.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/optim_geomviz.m
       - ./mdocean/plots/matlab_figs/optimplotx_custom.m
@@ -3852,12 +4117,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3879,6 +4145,7 @@ stages:
       - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
       - ./mdocean/simulation/modules/structures/structures.m
       - ./mdocean/simulation/run/check_max_CW.m
+      - ./mdocean/simulation/run/run_and_catch_warnings.m
       - ./mdocean/simulation/simulation.m
     outs:
       - results/SweepGeoms/intermed.mat
@@ -3902,6 +4169,7 @@ stages:
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/optimization/multiobjective/paretoFront.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -3917,12 +4185,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -3996,6 +4265,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -4009,12 +4279,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -4056,10 +4327,12 @@ stages:
       - ./mdocean/inputs/parameters.m
       - ./mdocean/inputs/validation/WECSim/normalizeBEM.m
       - ./mdocean/inputs/validation/WECSim/readWAMIT.m
+      - ./mdocean/inputs/validation/validation_units.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -4074,12 +4347,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -4137,6 +4411,7 @@ stages:
       - ./mdocean/inputs/var_bounds.mat
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -4150,12 +4425,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -4213,6 +4489,7 @@ stages:
         Resource _SAM CSV.csv
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
+      - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
       - ./mdocean/plots/matlab_figs/make_slamming_plot.m
       - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
       - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
@@ -4226,12 +4503,13 @@ stages:
       - ./mdocean/plots/util/save_fig_with_diagnostic.m
       - ./mdocean/plots/util/signed_log.m
       - ./mdocean/plots/util/table2latex.m
+      - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
+      - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
-      - ./mdocean/simulation/modules/dynamics/get_abc_symbolic.m
       - ./mdocean/simulation/modules/dynamics/get_response_drag.m
+      - ./mdocean/simulation/modules/dynamics/get_slamming_min_max.m
       - ./mdocean/simulation/modules/dynamics/multibody_impedance.m
       - ./mdocean/simulation/modules/dynamics/multibody_response.m
-      - ./mdocean/simulation/modules/dynamics/pick_which_root.m
       - ./mdocean/simulation/modules/dynamics/spar_dynamics.m
       - ./mdocean/simulation/modules/econ/LCOE_from_capex_design_power.m
       - ./mdocean/simulation/modules/econ/econ.m
@@ -4450,6 +4728,9 @@ stages:
       - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.pdf
       - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.pdf
       - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+      - results/Wecsim/accel_fourier_harmonics.pdf
+      - results/Wecsim/drag_force_desc_fcn.pdf
+      - results/Wecsim/position_THD_contour.pdf
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.fig
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.fig
       - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
@@ -4633,6 +4914,9 @@ stages:
       - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.fig
       - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.fig
       - results/Wecsim/wecsim_geom_report_multibody_true__histogram.fig
+      - results/Wecsim/accel_fourier_harmonics.fig
+      - results/Wecsim/drag_force_desc_fcn.fig
+      - results/Wecsim/position_THD_contour.fig
       - results/Wecsim/WECSim_errors.tex:
           cache: false
           persist: false
@@ -4641,6 +4925,1109 @@ stages:
           cache: false
           persist: false
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-AllFigCompare:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/AllFigCompare.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/AllFigCompare.ipynb
+      - .calkit/env-locks/pubs
+      - results/AllFigCompare/runtime_bar_chart.pdf
+      - results/AllFigCompare/runtime_bar_chart.fig
+      - results/AllFigCompare/end.mat
+      - results/AllFigCompare/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/AllFigCompare.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-AllFigCompare' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  viz-Comparison:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Comparison.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Comparison.ipynb
+      - .calkit/env-locks/pubs
+      - results/Comparison/overlaid_geometry.pdf
+      - results/Comparison/overlaid_hydro_coeffs.pdf
+      - results/Comparison/probability_CDF.pdf
+      - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/overlaid_geometry.fig
+      - results/Comparison/overlaid_hydro_coeffs.fig
+      - results/Comparison/probability_CDF.fig
+      - results/Comparison/comparison_power_matrix.fig
+      - results/Comparison/optimal_design_vars.tex
+      - results/Comparison/optimal_outputs.tex
+      - results/Comparison/end.mat
+      - results/Comparison/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Comparison.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Comparison' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Constraints:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Constraints.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Constraints.ipynb
+      - .calkit/env-locks/pubs
+      - results/Constraints/constraints.tex
+      - results/Constraints/end.mat
+      - results/Constraints/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Constraints.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Constraints' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Cost:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Cost.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Cost.ipynb
+      - .calkit/env-locks/pubs
+      - results/Cost/cost_parameters.tex
+      - results/Cost/end.mat
+      - results/Cost/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Cost.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Cost' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-DampingPlateStructures:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/DampingPlateStructures.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/DampingPlateStructures.ipynb
+      - .calkit/env-locks/pubs
+      - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
+      - results/DampingPlateStructures/damping_plate_deflection.pdf
+      - results/DampingPlateStructures/damping_plate_moment.pdf
+      - results/DampingPlateStructures/damping_plate_aspect_ratio.fig
+      - results/DampingPlateStructures/damping_plate_deflection.fig
+      - results/DampingPlateStructures/damping_plate_moment.fig
+      - results/DampingPlateStructures/end.mat
+      - results/DampingPlateStructures/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/DampingPlateStructures.ipynb:
+          cache: false
+    desc: Automatically generated from the 
+      'viz-DampingPlateStructures' stage in calkit.yaml. Changes made 
+      here will be overwritten.
+  viz-DescFcns:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/DescFcns.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/DescFcns.ipynb
+      - .calkit/env-locks/pubs
+      - results/DescFcns/saturation_desc_fcn.pdf
+      - results/DescFcns/saturation_desc_fcn_alpha.pdf
+      - results/DescFcns/drag_desc_fcn.pdf
+      - results/DescFcns/saturation_desc_fcn.fig
+      - results/DescFcns/saturation_desc_fcn_alpha.fig
+      - results/DescFcns/drag_desc_fcn.fig
+      - results/DescFcns/end.mat
+      - results/DescFcns/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/DescFcns.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-DescFcns' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-DesignSpaceExploration:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/DesignSpaceExploration.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/DesignSpaceExploration.ipynb
+      - .calkit/env-locks/pubs
+      - results/DesignSpaceExploration/experiments_ratios.pdf
+      - results/DesignSpaceExploration/experiments_ratios.fig
+      - results/DesignSpaceExploration/experiments_results.tex
+      - results/DesignSpaceExploration/end.mat
+      - results/DesignSpaceExploration/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/DesignSpaceExploration.ipynb:
+          cache: false
+    desc: Automatically generated from the 
+      'viz-DesignSpaceExploration' stage in calkit.yaml. Changes made 
+      here will be overwritten.
+  viz-DesignVars:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/DesignVars.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/DesignVars.ipynb
+      - .calkit/env-locks/pubs
+      - results/DesignVars/design_vars.tex
+      - results/DesignVars/end.mat
+      - results/DesignVars/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/DesignVars.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-DesignVars' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-DragIntegral:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/DragIntegral.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/DragIntegral.ipynb
+      - .calkit/env-locks/pubs
+      - results/DragIntegral/drag_integral_B.pdf
+      - results/DragIntegral/drag_integral_G_r.pdf
+      - results/DragIntegral/drag_integral_G_i.pdf
+      - results/DragIntegral/drag_integral_G_m.pdf
+      - results/DragIntegral/drag_integral_G_p.pdf
+      - results/DragIntegral/drag_integral_B.fig
+      - results/DragIntegral/drag_integral_G_r.fig
+      - results/DragIntegral/drag_integral_G_i.fig
+      - results/DragIntegral/drag_integral_G_m.fig
+      - results/DragIntegral/drag_integral_G_p.fig
+      - results/DragIntegral/end.mat
+      - results/DragIntegral/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/DragIntegral.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-DragIntegral' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  viz-FitOlaya:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/FitOlaya.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/FitOlaya.ipynb
+      - .calkit/env-locks/pubs
+      - results/FitOlaya/orig_3b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_4b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12a_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12b_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12c_line_kRb_fbar.pdf
+      - results/FitOlaya/orig_12d_line_kRb_fbar.pdf
+      - results/FitOlaya/case24_compare_line_kRb_fnorm.pdf
+      - results/FitOlaya/case2_line_khRxRp_fnorm.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2.pdf
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.pdf
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.pdf
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.pdf
+      - results/FitOlaya/case4_sub_line_kRb_fnorm.pdf
+      - results/FitOlaya/case4_sub_line_khRxRp_fnorm.pdf
+      - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.pdf
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.pdf
+      - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.pdf
+      - results/FitOlaya/case4_sep_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_sep_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.pdf
+      - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.pdf
+      - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v1_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v1_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.pdf
+      - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.pdf
+      - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v2_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v2_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.pdf
+      - results/FitOlaya/case4_v3_scatter_actual_vs_pred.pdf
+      - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.pdf
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.pdf
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_beta.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha.pdf
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.pdf
+      - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf
+      - results/FitOlaya/orig_3b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_4b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12a_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12b_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12c_line_kRb_fbar.fig
+      - results/FitOlaya/orig_12d_line_kRb_fbar.fig
+      - results/FitOlaya/case24_compare_line_kRb_fnorm.fig
+      - results/FitOlaya/case2_line_khRxRp_fnorm.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2.fig
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.fig
+      - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.fig
+      - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.fig
+      - results/FitOlaya/case4_sub_line_kRb_fnorm.fig
+      - results/FitOlaya/case4_sub_line_khRxRp_fnorm.fig
+      - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.fig
+      - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.fig
+      - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.fig
+      - results/FitOlaya/case4_sep_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_sep_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.fig
+      - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.fig
+      - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v1_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v1_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.fig
+      - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.fig
+      - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v2_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v2_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.fig
+      - results/FitOlaya/case4_v3_scatter_actual_vs_pred.fig
+      - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.fig
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.fig
+      - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_beta.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha.fig
+      - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.fig
+      - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.fig
+      - results/FitOlaya/end.mat
+      - results/FitOlaya/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/FitOlaya.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-FitOlaya' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-ForceSaturationFigFunc:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/ForceSaturationFigFunc.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      - .calkit/env-locks/pubs
+      - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
+      - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
+      - results/ForceSaturationFigFunc/power_force_sensitivity.fig
+      - results/ForceSaturationFigFunc/runtime_sensitivity.fig
+      - results/ForceSaturationFigFunc/end.mat
+      - results/ForceSaturationFigFunc/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/ForceSaturationFigFunc.ipynb:
+          cache: false
+    desc: Automatically generated from the 
+      'viz-ForceSaturationFigFunc' stage in calkit.yaml. Changes made 
+      here will be overwritten.
+  viz-GradientOptimFigFunc:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/GradientOptimFigFunc.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/GradientOptimFigFunc.ipynb
+      - .calkit/env-locks/pubs
+      - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
+      - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
+      - results/GradientOptimFigFunc/lagrange_multipliers.pdf
+      - results/GradientOptimFigFunc/delta_x.pdf
+      - results/GradientOptimFigFunc/single_obj_convergence.pdf
+      - results/GradientOptimFigFunc/single_obj_opt_power_matrix.fig
+      - results/GradientOptimFigFunc/single_obj_opt_geometry.fig
+      - results/GradientOptimFigFunc/lagrange_multipliers.fig
+      - results/GradientOptimFigFunc/delta_x.fig
+      - results/GradientOptimFigFunc/single_obj_convergence.fig
+      - results/GradientOptimFigFunc/single_obj_optim_results.tex
+      - results/GradientOptimFigFunc/end.mat
+      - results/GradientOptimFigFunc/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/GradientOptimFigFunc.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-GradientOptimFigFunc' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-HydroCoeffFigFunc:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/HydroCoeffFigFunc.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/HydroCoeffFigFunc.ipynb
+      - .calkit/env-locks/pubs
+      - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
+      - results/HydroCoeffFigFunc/hydro_coeff_err.fig
+      - results/HydroCoeffFigFunc/end.mat
+      - results/HydroCoeffFigFunc/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/HydroCoeffFigFunc.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-HydroCoeffFigFunc' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-LocationSensitivity:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/LocationSensitivity.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/LocationSensitivity.ipynb
+      - .calkit/env-locks/pubs
+      - results/LocationSensitivity/location_1_power_matrix.pdf
+      - results/LocationSensitivity/location_2_power_matrix.pdf
+      - results/LocationSensitivity/location_3_power_matrix.pdf
+      - results/LocationSensitivity/location_4_power_matrix.pdf
+      - results/LocationSensitivity/location_probability_PDF.pdf
+      - results/LocationSensitivity/location_1_power_matrix.fig
+      - results/LocationSensitivity/location_2_power_matrix.fig
+      - results/LocationSensitivity/location_3_power_matrix.fig
+      - results/LocationSensitivity/location_4_power_matrix.fig
+      - results/LocationSensitivity/location_probability_PDF.fig
+      - results/LocationSensitivity/location_sensitivity.tex
+      - results/LocationSensitivity/end.mat
+      - results/LocationSensitivity/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/LocationSensitivity.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-LocationSensitivity' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-Meem:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Meem.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Meem.ipynb
+      - .calkit/env-locks/pubs
+      - results/Meem/meem_sparsity.pdf
+      - results/Meem/meem_validation.pdf
+      - results/Meem/meem_matching.pdf
+      - results/Meem/meem_convergence_vs_omega.pdf
+      - results/Meem/meem_convergence_vs_NMK.pdf
+      - results/Meem/asymptotic_b_vector.pdf
+      - results/Meem/meem_sparsity.fig
+      - results/Meem/meem_validation.fig
+      - results/Meem/meem_matching.fig
+      - results/Meem/meem_convergence_vs_omega.fig
+      - results/Meem/meem_convergence_vs_NMK.fig
+      - results/Meem/asymptotic_b_vector.fig
+      - results/Meem/end.mat
+      - results/Meem/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Meem.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Meem' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Multistart:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Multistart.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Multistart.ipynb
+      - .calkit/env-locks/pubs
+      - results/Multistart/multistart_convergence_tree.pdf
+      - results/Multistart/multistart_parallel_coordinates.pdf
+      - results/Multistart/multistart_bar_chart.pdf
+      - results/Multistart/multistart_convergence_tree.fig
+      - results/Multistart/multistart_parallel_coordinates.fig
+      - results/Multistart/multistart_bar_chart.fig
+      - results/Multistart/multistart_results.tex
+      - results/Multistart/end.mat
+      - results/Multistart/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Multistart.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Multistart' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-ParamSensitivities:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/ParamSensitivities.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/ParamSensitivities.ipynb
+      - .calkit/env-locks/pubs
+      - results/ParamSensitivities/re_optim_constraint_grid.pdf
+      - results/ParamSensitivities/post_optim_constraint_grid.pdf
+      - results/ParamSensitivities/re_optim_design_grid.pdf
+      - results/ParamSensitivities/post_optim_design_grid.pdf
+      - results/ParamSensitivities/re_optim_objective_grid.pdf
+      - results/ParamSensitivities/post_optim_re_optim_objective_grid.pdf
+      - results/ParamSensitivities/nonlinear_objectives.pdf
+      - results/ParamSensitivities/nonlinear_design_J1.pdf
+      - results/ParamSensitivities/nonlinear_design_J2.pdf
+      - results/ParamSensitivities/re_optim_objective_tornado.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x1.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x2.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x3.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x4.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x5.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x6.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x7.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x8.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x9.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x10.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x11.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_x12.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_J1.pdf
+      - results/ParamSensitivities/re_optim_design_tornado_J2.pdf
+      - results/ParamSensitivities/re_optim_constraint_grid.fig
+      - results/ParamSensitivities/post_optim_constraint_grid.fig
+      - results/ParamSensitivities/re_optim_design_grid.fig
+      - results/ParamSensitivities/post_optim_design_grid.fig
+      - results/ParamSensitivities/re_optim_objective_grid.fig
+      - results/ParamSensitivities/post_optim_re_optim_objective_grid.fig
+      - results/ParamSensitivities/nonlinear_objectives.fig
+      - results/ParamSensitivities/nonlinear_design_J1.fig
+      - results/ParamSensitivities/nonlinear_design_J2.fig
+      - results/ParamSensitivities/re_optim_objective_tornado.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x1.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x2.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x3.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x4.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x5.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x6.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x7.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x8.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x9.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x10.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x11.fig
+      - results/ParamSensitivities/re_optim_design_tornado_x12.fig
+      - results/ParamSensitivities/re_optim_design_tornado_J1.fig
+      - results/ParamSensitivities/re_optim_design_tornado_J2.fig
+      - results/ParamSensitivities/end.mat
+      - results/ParamSensitivities/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/ParamSensitivities.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-ParamSensitivities' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-Parameters:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Parameters.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Parameters.ipynb
+      - .calkit/env-locks/pubs
+      - results/Parameters/parameters.tex
+      - results/Parameters/end.mat
+      - results/Parameters/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Parameters.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Parameters' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-ParetoFigFunc:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/ParetoFigFunc.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/ParetoFigFunc.ipynb
+      - .calkit/env-locks/pubs
+      - results/ParetoFigFunc/pareto_front_with_design_images.pdf
+      - results/ParetoFigFunc/pareto_front_LCOE_contours.pdf
+      - results/ParetoFigFunc/pareto_heuristics.pdf
+      - results/ParetoFigFunc/pareto_constraint_activity_damping.pdf
+      - results/ParetoFigFunc/pareto_constraint_activity_reactive.pdf
+      - results/ParetoFigFunc/pareto_front_with_design_images.fig
+      - results/ParetoFigFunc/pareto_front_LCOE_contours.fig
+      - results/ParetoFigFunc/pareto_heuristics.fig
+      - results/ParetoFigFunc/pareto_constraint_activity_damping.fig
+      - results/ParetoFigFunc/pareto_constraint_activity_reactive.fig
+      - results/ParetoFigFunc/end.mat
+      - results/ParetoFigFunc/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/ParetoFigFunc.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-ParetoFigFunc' stage 
+      in calkit.yaml. Changes made here will be overwritten.
+  viz-ParetoSweep:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/ParetoSweep.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/ParetoSweep.ipynb
+      - .calkit/env-locks/pubs
+      - results/ParetoSweep/sweep_num_seeds.pdf
+      - results/ParetoSweep/sweep_num_seeds.fig
+      - results/ParetoSweep/end.mat
+      - results/ParetoSweep/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/ParetoSweep.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-ParetoSweep' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-PtoSweep:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/PtoSweep.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/PtoSweep.ipynb
+      - .calkit/env-locks/pubs
+      - results/PtoSweep/pto_sweep.pdf
+      - results/PtoSweep/pto_sweep_constraint_activity.pdf
+      - results/PtoSweep/pto_sweep.fig
+      - results/PtoSweep/pto_sweep_constraint_activity.fig
+      - results/PtoSweep/end.mat
+      - results/PtoSweep/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/PtoSweep.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-PtoSweep' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-QPCircles:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/QPCircles.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/QPCircles.ipynb
+      - .calkit/env-locks/pubs
+      - results/QPCircles/qp_circles.pdf
+      - results/QPCircles/qp_circles.fig
+      - results/QPCircles/end.mat
+      - results/QPCircles/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/QPCircles.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-QPCircles' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-ReadNonMatlabFigs:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/ReadNonMatlabFigs.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/ReadNonMatlabFigs.ipynb
+      - .calkit/env-locks/pubs
+      - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
+      - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
+      - results/ReadNonMatlabFigs/dimensions.pdf
+      - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
+      - results/ReadNonMatlabFigs/FBD.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/MEEM_geometry.pdf
+      - results/ReadNonMatlabFigs/methodology_flowchart.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/optimization_flowchart.pdf
+      - results/ReadNonMatlabFigs/RM3_image.pdf
+      - results/ReadNonMatlabFigs/section_flow.pdf
+      - results/ReadNonMatlabFigs/sim_runtime.pdf
+      - results/ReadNonMatlabFigs/taxonomy.pdf
+      - results/ReadNonMatlabFigs/trapezoid.pdf
+      - results/ReadNonMatlabFigs/xdsm.pdf
+      - results/ReadNonMatlabFigs/end.mat
+      - results/ReadNonMatlabFigs/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/ReadNonMatlabFigs.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-ReadNonMatlabFigs' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-RunSingleFigFunc:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/RunSingleFigFunc.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/RunSingleFigFunc.ipynb
+      - .calkit/env-locks/pubs
+      - results/RunSingleFigFunc/nominal_geometry_viz.pdf
+      - results/RunSingleFigFunc/nominal_power_pdf.pdf
+      - results/RunSingleFigFunc/nominal_power_matrix.pdf
+      - results/RunSingleFigFunc/drag_convergence.pdf
+      - results/RunSingleFigFunc/ctrl_polar_plot_mult.pdf
+      - results/RunSingleFigFunc/ctrl_polar_plot_gamma.pdf
+      - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
+      - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
+      - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
+      - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
+      - results/RunSingleFigFunc/nominal_geometry_viz.fig
+      - results/RunSingleFigFunc/nominal_power_pdf.fig
+      - results/RunSingleFigFunc/nominal_power_matrix.fig
+      - results/RunSingleFigFunc/drag_convergence.fig
+      - results/RunSingleFigFunc/ctrl_polar_plot_mult.fig
+      - results/RunSingleFigFunc/ctrl_polar_plot_gamma.fig
+      - results/RunSingleFigFunc/slamming_model_comparison_float.fig
+      - results/RunSingleFigFunc/slamming_model_comparison_spar.fig
+      - results/RunSingleFigFunc/qcqp_circles_nominal.fig
+      - results/RunSingleFigFunc/qcqp_circles_overlay.fig
+      - results/RunSingleFigFunc/end.mat
+      - results/RunSingleFigFunc/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/RunSingleFigFunc.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-RunSingleFigFunc' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  viz-Runtime:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Runtime.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Runtime.ipynb
+      - .calkit/env-locks/pubs
+      - results/Runtime/dynamics_runtime.pdf
+      - results/Runtime/hydro_runtime_logscale.pdf
+      - results/Runtime/hydro_runtime_breakdown.pdf
+      - results/Runtime/sim_runtime.pdf
+      - results/Runtime/dynamics_runtime.fig
+      - results/Runtime/hydro_runtime_logscale.fig
+      - results/Runtime/hydro_runtime_breakdown.fig
+      - results/Runtime/sim_runtime.fig
+      - results/Runtime/end.mat
+      - results/Runtime/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Runtime.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Runtime' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Slamming:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Slamming.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Slamming.ipynb
+      - .calkit/env-locks/pubs
+      - results/Slamming/slamming_amplitude.pdf
+      - results/Slamming/slamming_amplitude.fig
+      - results/Slamming/end.mat
+      - results/Slamming/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Slamming.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Slamming' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-SparHydro:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/SparHydro.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/SparHydro.ipynb
+      - .calkit/env-locks/pubs
+      - results/SparHydro/spar_added_mass.pdf
+      - results/SparHydro/spar_added_mass.fig
+      - results/SparHydro/end.mat
+      - results/SparHydro/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/SparHydro.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-SparHydro' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-SweepGeoms:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/SweepGeoms.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/SweepGeoms.ipynb
+      - .calkit/env-locks/pubs
+      - results/SweepGeoms/sweep_geoms_parallel.pdf
+      - results/SweepGeoms/sweep_geoms_scatter.pdf
+      - results/SweepGeoms/sweep_geoms_line.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
+      - results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
+      - results/SweepGeoms/sweep_geoms_pareto.pdf
+      - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
+      - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
+      - results/SweepGeoms/factor_grid.pdf
+      - results/SweepGeoms/sweep_geoms_parallel.fig
+      - results/SweepGeoms/sweep_geoms_scatter.fig
+      - results/SweepGeoms/sweep_geoms_line.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.fig
+      - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_a2.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_vol.fig
+      - results/SweepGeoms/sweep_geoms_line_cwr_sa.fig
+      - results/SweepGeoms/sweep_geoms_pareto.fig
+      - results/SweepGeoms/sweep_geoms_pareto_nondim.fig
+      - results/SweepGeoms/sweep_geoms_grid_scatter.fig
+      - results/SweepGeoms/factor_grid.fig
+      - results/SweepGeoms/end.mat
+      - results/SweepGeoms/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/SweepGeoms.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-SweepGeoms' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Validation:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Validation.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Validation.ipynb
+      - .calkit/env-locks/pubs
+      - results/Validation/cost_vs_N_WEC.pdf
+      - results/Validation/cost_vs_N_WEC.fig
+      - results/Validation/validation.tex
+      - results/Validation/end.mat
+      - results/Validation/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Validation.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Validation' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  viz-Wecsim:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "results/fig_notebooks/Wecsim.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/results/fig_notebooks/Wecsim.ipynb
+      - .calkit/env-locks/pubs
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.pdf
+      - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+      - results/Wecsim/accel_fourier_harmonics.pdf
+      - results/Wecsim/drag_force_desc_fcn.pdf
+      - results/Wecsim/position_THD_contour.pdf
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.fig
+      - results/Wecsim/wecsim_geom_report_multibody_true__histogram.fig
+      - results/Wecsim/accel_fourier_harmonics.fig
+      - results/Wecsim/drag_force_desc_fcn.fig
+      - results/Wecsim/position_THD_contour.fig
+      - results/Wecsim/WECSim_errors.tex
+      - results/Wecsim/end.mat
+      - results/Wecsim/end.json
+    outs:
+      - .calkit/notebooks/executed/results/fig_notebooks/Wecsim.ipynb:
+          cache: false
+    desc: Automatically generated from the 'viz-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
   pyxdsm:
     cmd: calkit xenv -n pubs --no-check -- python 
@@ -4701,6 +6088,7 @@ stages:
       - results/ForceSaturationFigFunc/
       - results/DesignSpaceExploration/
       - results/Meem/
+      - results/QPCircles/
       - results/Slamming/
       - results/SweepGeoms/
       - results/Cost/
@@ -4714,24 +6102,29 @@ stages:
     desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
-    cmd: "calkit latex from-json 'results/RunSingleFigFunc/end.json' 'results/Runtime/end.json'
-      'results/PtoSweep/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
-      --command results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
-      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
-      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+    cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
+      'results/Runtime/end.json' 'results/PtoSweep/end.json' 'results/Wecsim/end.json'
+      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
+      results --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
+      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
+      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
+      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
       : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
-      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"ptoSweepMinLCOE_F_max\"\
+      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
+      : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
+      : \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"ptoSweepMinLCOE_F_max\"\
       : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
       : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
       : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
       : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
       : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
     deps:
+      - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
       - results/PtoSweep/end.json
+      - results/Wecsim/end.json
     outs:
       - pubs/applied-ocean-research-model/numeric-results.tex:
           cache: false
@@ -4863,4 +6256,31 @@ stages:
       - .calkit/notebooks/executed/pubs/applied-ocean-research-model/view_figs.ipynb:
           cache: false
     desc: Automatically generated from the 'view-aor-figs' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  all-viz:
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
+      "echo \"All viz stages complete\""
+    deps:
+      - .calkit/env-locks/pubs
+      - .calkit/notebooks/executed/results/fig_notebooks/Cost.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/DampingPlateStructures.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/DescFcns.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/DesignSpaceExploration.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/DragIntegral.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/FitOlaya.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/HydroCoeffFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Meem.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/PtoSweep.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/QPCircles.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/ReadNonMatlabFigs.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/RunSingleFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Runtime.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Slamming.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/SparHydro.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/SweepGeoms.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Validation.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Wecsim.ipynb
+    outs: []
+    desc: Automatically generated from the 'all-viz' stage in 
       calkit.yaml. Changes made here will be overwritten.
