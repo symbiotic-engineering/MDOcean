@@ -115,7 +115,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
             clim(clims)
             % error
-            error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
+            is_phase = contains(var_name,'phase');
+            error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name), is_phase);
             nexttile
 
             % set contour lines to make plot more readable
@@ -360,8 +361,13 @@ function results = assemble_results_struct(sz,varargin)
 
 end
 
-function pct_error = compute_percent_error_matrix(actual, sim)
+function pct_error = compute_percent_error_matrix(actual, sim, wrap_phase)
+    if nargin<3
+        wrap_phase = false;
+    end
     pct_error = 100 * (sim - actual) ./ actual;
     pct_error(pct_error==0) = NaN;
-
+    if wrap_phase
+        pct_error = wrapToPi(pct_error);
+    end
 end
