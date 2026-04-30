@@ -187,7 +187,7 @@ if nargout > 3 % if returning extra struct output for validation
      phase_X_f,phase_X_s,phase_X_u,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,phase_F_drag_s,...
-     qcqp_debug] = dynamics(in, m_f_tot, m_s_tot);
+     qcqp_debug,ol_unstable] = dynamics(in, m_f_tot, m_s_tot);
 
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
@@ -239,6 +239,7 @@ if nargout > 3 % if returning extra struct output for validation
     val.F_drag_s = F_drag_s;
     val.phase_F_drag_f = phase_F_drag_f;
     val.phase_F_drag_s = phase_F_drag_s;
+    val.ol_unstable = ol_unstable;
     val.qcqp_debug = qcqp_debug;
 end
 
