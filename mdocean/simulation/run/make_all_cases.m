@@ -22,7 +22,11 @@ end
 function p_array = make_case_group(geometry, multibody, runOnlyFewSeaStates)
     p = parameters(geometry);
     p.use_force_sat = false;
-    p.use_amp_sat = false;
+    if strcmpi(geometry,'wecsim')
+        p.use_amp_sat = false;
+    else
+        p.use_amp_sat = 'true';
+    end
     p.use_power_sat = false;
     p.use_multibody = multibody;
 
