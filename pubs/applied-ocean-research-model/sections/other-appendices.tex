@@ -797,6 +797,7 @@ Significant wave heights in excess of 5.5 meters have negative maximum slamming 
 \end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
+\subsubsection{WEC-Sim}
 A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime. For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
@@ -862,6 +863,21 @@ The reason for this discrepancy remains unclear, since the expected error of the
 Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
 The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
+
+\subsubsection{Reference Model Report}
+While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, it does record the mechanical power for each sea state.
+\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf}
+    \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
+    \label{fig:report-power-validation}
+\end{figure}
+Note that the data is independent of \cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
+and that the power multiplier mentioned in \cref{sec:dynamic-validation} has not been applied in the figure.
+We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
+The discrepancy is of minimal concern for the reasons described in \cref{sec:dynamic-validation}.
+Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
 
 \clearpage
 \section{Economics Module Details}
