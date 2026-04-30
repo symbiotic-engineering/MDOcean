@@ -12,24 +12,52 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
     if nargin<3
         pdf_prefix = '';
     end
-    pdf_name = [fullfile(pdf_prefix, fig_name) '.pdf'];
+    % Coerce inputs to single string/char to avoid passing string arrays
+    fig_name = char(string(fig_name));
+    pdf_prefix = char(string(pdf_prefix));
+    pdf_name = char([fullfile(pdf_prefix, fig_name) '.pdf']);
     
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
-        if ~isempty(fig.UserData) && ischar(fig.UserData)
+        if ~isempty(fig.UserData) && (ischar(fig.UserData) || isstring(fig.UserData))
             % pdf already exists in files, just copy to folder
+            src = char(string(fig.UserData));
             try
-                copyfile(fig.UserData, pdf_name)
+                copyfile(src, pdf_name);
             catch
-                warning([fig.UserData ' does not exist, saving image to results folder.'])
-                exportgraphics(fig,pdf_name) % if pdf does not exist, save the image
+                warning([src ' does not exist, saving image to results folder.']);
+                % Try export with sanitized filename; if it fails, retry minimal call and report
+                try
+                    exportgraphics(fig, pdf_name);
+                catch ex
+                    % Retry with char coercion and minimal args
+                    try
+                        exportgraphics(fig, char(string(pdf_name)));
+                    catch
+                        rethrow(ex)
+                    end
+                end
             end
         else
             fig = check_fig_size(fig);
             % save .fig for later editing
-            savefig(fig, [fullfile(pdf_prefix, fig_name) '.fig'])
-            
-            % save pdf from matlab figure output
-            exportgraphics(fig,pdf_name)
+            try
+                savefig(fig, [fullfile(pdf_prefix, fig_name) '.fig']);
+            catch
+                % if savefig fails for unexpected input types, coerce and retry
+                savefig(fig, char(string(fullfile(pdf_prefix, fig_name) + '.fig')));
+            end
+
+            % save pdf from matlab figure output; guard against passing string arrays
+            try
+                exportgraphics(fig, pdf_name);
+            catch ex
+                % Retry with coerced char filename
+                try
+                    exportgraphics(fig, char(string(pdf_name)));
+                catch
+                    rethrow(ex)
+                end
+            end
         end
 
         if nargout>0
