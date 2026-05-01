@@ -6303,24 +6303,6 @@ stages:
       - pubs/defense/quarto/slides_files/
     desc: Automatically generated from the 'render-quarto-html' stage 
       in calkit.yaml. Changes made here will be overwritten.
-  render-quarto-pdf-latexmk:
-    cmd: quarto render pubs/defense/quarto/slides.qmd --to pdf 
-      --pdf-engine latexmk
-    deps:
-      - pubs/defense/figs/
-      - pubs/defense/quarto/slides.qmd
-      - pubs/defense/references.bib
-      - pubs/defense/quarto/asme.csl
-      - pubs/defense/quarto/dots.css
-      - pubs/defense/quarto/header.html
-      - pubs/defense/quarto/styles.css
-      - .calkit/env-locks/quarto
-    outs:
-      - pubs/defense/quarto/slides-latex.pdf:
-          cache: true
-          persist: false
-    desc: Automatically generated from the 'render-quarto-pdf-latexmk'
-      stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-pdf:
     cmd: calkit xenv -n playwright --no-check -- bash --noprofile 
       --norc -c "python pubs/defense/quarto/html_to_pdf.py"
