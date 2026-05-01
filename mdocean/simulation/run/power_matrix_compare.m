@@ -153,11 +153,14 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             end
             
             is_wecsim_geom = p.T_s_over_D_s == 29/6;
-            if p.C_d_float==0 && p.C_d_spar==0 && is_wecsim_geom && p.use_multibody
-                signed_log(error, 0.1, [], T, H);
+            if p.C_d_float==0 && p.C_d_spar==0 && is_wecsim_geom && p.use_multibody && any(isfinite(error),'all')
+                cb = signed_log(error, [], [], T, H, true);
+                cb.TickLabels = strcat(cb.TickLabels, '%');
             else
-                error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+                cb = error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+                cb.Ruler.TickLabelFormat = '%.0f%%';
             end
+            
         end
 
         xlabel(t,'Wave Period T (s)','FontSize',20)
@@ -165,8 +168,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
     end
 end
 
-function error_plot(T, H, error, error_title, error_values)
-    [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
+function cb = error_plot(T, H, error, error_title, error_values)
+    [c,h_fig,cb] = contour_plot(T, H, error, error_title, error_values);
     if ~isempty(c)
         clabel(c,h_fig);
     end
@@ -175,7 +178,7 @@ function error_plot(T, H, error, error_title, error_values)
     end
 end
 
-function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
+function [c,h_fig,cb] = contour_plot(T, H, Z, Z_title, Z_levels)
     if nargin<5
         Z_levels = [];
     end
