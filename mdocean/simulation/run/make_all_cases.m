@@ -22,10 +22,10 @@ end
 function p_array = make_case_group(geometry, multibody, runOnlyFewSeaStates)
     p = parameters(geometry);
     p.use_force_sat = false;
-    if strcmpi(geometry,'report')
-        p.use_amp_sat = false;
+    if multibody
+        p.use_amp_sat = true;
     else
-        p.use_amp_sat = 'true';
+        p.use_amp_sat = false;
     end
     p.use_power_sat = false;
     p.use_multibody = multibody;
