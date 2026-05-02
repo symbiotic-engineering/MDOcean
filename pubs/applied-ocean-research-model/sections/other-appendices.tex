@@ -434,12 +434,12 @@ We currently assume there is only one apparent power constraint, so oval-oval in
 
 \subsubsection{Extension to Higher Dimensions and Convexity}\label{sec:qp-convexity}
 Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in \cite{bacelli_numerical_2015}, which would produce a higher-dimensional analog of \cref{eq:opt-problem-gamma}.
-Both of these cases solve the full harmonic-balance equation, so the problem dimension grows with the number of frequencies and the geometric analytical solution used here is no longer practical.
+Both of these cases solve the full harmonic-balance equation, so the problem dimension grows with the number of frequencies and the geometric analytical solution used here is no longer possible.
 Instead, a numerical solver must be used, and the computational scaling of that solver depends critically on whether the problem is \emph{convex}.
 
 A convex optimization problem is one in which both the feasible set and the objective function are convex---informally, the feasible region has no holes or concavities, and the objective is bowl-shaped with no local valleys.
 The key practical implication is that any locally optimal solution is also globally optimal, so gradient-based solvers converge to the true optimum without exhaustive search, and solution time scales polynomially with the number of decision variables rather than exponentially.
-For WEC optimal control, where the problem dimension equals twice the number of frequencies retained in the spectral expansion, this polynomial scaling is essential.
+For WEC optimal control across frequencies, where the problem dimension equals twice the number of frequencies retained in the spectral expansion, this computational efficiency is highly advantageous.
 
 After reducing to the $\Gamma$ parameterization, the power objective $|\Gamma|^2$ is a sum of squares and therefore convex.
 Even though the original power matrix $\mathbf{A}_P$ (see \cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \cite{bacelli_numerical_2015} shows that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\Gamma$ in \cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.

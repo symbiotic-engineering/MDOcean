@@ -175,7 +175,7 @@ From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
     |\hat{\xi}_{s,\beta}| \leq X_{s,max}\\
 \end{aligned}
 \end{equation}
-Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control with no active constraints.
+Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
 When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
 
 As derived in \cref{sec:appendix-constraint-sensitivity}, the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ affect only the radii $r_\mu$ of the constraint circles in the complex $\Gamma$ plane (see \cref{sec:appendix-qp-solution}), not the circle centers $\Gamma_{c,\mu}$.
@@ -192,7 +192,7 @@ The optimal reflection coefficient in each sea state takes one of the following 
 where $\Gamma_{\mu^*,\nu^*}$ is the intersection point of the two active constraint circles.
 
 The sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory \cite[Section~5.9.3]{boyd_convex_2004}: the local sensitivity equals the product of the Lagrange multiplier for that constraint and the partial derivative of the constraint function with respect to the limit.
-Since the power maximization problem is convex after reduction to the $\Gamma$ parameterization (see \cref{sec:qp-convexity}), integrating these local sensitivities gives a global power--limit relationship that is also convex.
+Since the unconstrained power maximization problem is convex after reduction to the $\Gamma$ parameterization (see \cref{sec:qp-convexity}), integrating these local sensitivities gives a global relationship between power and constraint limits that is also convex.
 When a single constraint is active, the average power is piecewise affine plus the square root of an affine function of the constraint limit.
 When two constraints are simultaneously active, it is piecewise affine plus the square root of a quadratic function of the two constraint limits (see \cref{sec:appendix-constraint-sensitivity}).
 In both cases the benefit of relaxing a constraint diminishes as the limit grows, quantifying the diminishing returns of oversizing the PTO.
@@ -213,7 +213,7 @@ More strongly, the presence of the PTO limits in the numerator and denominator b
 The numerator is affine in the PTO limits while the denominator is piecewise affine plus square root of quadratic or affine in the PTO limits.
 The LCOE minimization with design variables of $F_{max}$ and $P_{max,elec}$ and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
 The convexity of the denominator with respect to the PTO limits (established in the preceding paragraph) means that LCOE is quasi-convex in the PTO limits for fixed geometry, guaranteeing a unique global optimum in those variables.
-This motivates a nested optimization strategy: at the innermost level the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; at the mid-level the optimal PTO limits are found by exploiting the quasi-convex fractional structure; and at the outer level the bulk geometry is optimized with a general nonlinear program.
+This motivates a three-level nested optimization strategy: at the innermost level the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; at the mid-level the optimal PTO limits are found by exploiting the quasi-convex fractional structure; and at the outer level the bulk geometry is optimized with a general nonlinear program.
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
