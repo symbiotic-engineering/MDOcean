@@ -71,7 +71,7 @@ figs_in_AOR{10} = 'DescFcns.drag_desc_fcn';
 figs_in_AOR{11} = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{12} = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
-figs_in_AOR{13} = 'Wecsim.wecsim_geom_wecsim_multibody_true__histogram';
+figs_in_AOR{13} = 'Wecsim.wecsim_wcsm_multi_true__histogram';
 figs_in_AOR{14} = 'HydroCoeffFigFunc.hydro_coeff_err';
 figs_in_AOR{15} = 'FitOlaya.case4_v1_auto_semilogx_khRxRpa4b_fv1';
 figs_in_AOR{16} = 'Validation.cost_vs_N_WEC';
@@ -98,10 +98,10 @@ figs_in_AOR{42} = 'DragIntegral.drag_integral_G_p';
 figs_in_AOR{32} = 'RunSingleFigFunc.drag_convergence';
 figs_in_AOR{33} = 'Slamming.slamming_amplitude';
 figs_in_AOR{34} = 'RunSingleFigFunc.slamming_model_comparison_float';
-figs_in_AOR{35} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat';
-figs_in_AOR{43} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';
-figs_in_AOR{44} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';
-figs_in_AOR{45} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{35} = 'Wecsim.wecsim_wcsm_multi_true_drag_off_meem_off__power_mech_unsat';
+figs_in_AOR{43} = 'Wecsim.wecsim_wcsm_multi_true_drag_on_meem_off__power_mech_unsat';
+figs_in_AOR{44} = 'Wecsim.wecsim_wcsm_multi_true_drag_off_meem_on__power_mech_unsat';
+figs_in_AOR{45} = 'Wecsim.wecsim_wcsm_multi_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - structures
 figs_in_AOR{36} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{37} = 'ReadNonMatlabFigs.trapezoid';
