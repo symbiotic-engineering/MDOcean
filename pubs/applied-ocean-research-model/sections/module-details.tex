@@ -713,12 +713,13 @@ $\Gamma=0$ corresponds to the impedance-matched solution (no active inequality c
 
 As \cref{sec:mod-freq-domain} describes, the solution for $\Gamma$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
 Direct methods solve the optimization problem itself, while indirect methods first derive the optimality conditions and then solve those conditions.
-MDOcean currently implements the numerical indirect approach, which corresponds to the implicit architecture in \cref{fig:control-arch}.
-The explicit architecture corresponds to the analytical approach, while the nested architecture corresponds to the numerical direct approach.
-The simultaneous architecture is also a numerical direct approach, but rather than solving the quadratic program \cref{eq:opt-problem} it integrates into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation. 
-It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the present numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is recommended for future implementation.
-
+MDOcean currently implements both the analytical approach, which corresponds to the explicit architecture in \cref{fig:control-arch}, and the
+numerical indirect approach, which corresponds to the implicit architecture in \cref{fig:control-arch}.
 The analytical approach is described in \cref{sec:appendix-qp-solution}, and the numerical indirect approach in \cref{sec:appendix-qp-numerical}.
+
+The numerical direct approach can correspond to either the nested architecture or the simultaneous architecture of \cref{fig:control-arch}.
+While the nested architecture solves the quadratic program \cref{eq:opt-problem}, the simultaneous architecture integrates the QCQP into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation. 
+It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is used for all results and benchmarks presented here.
 
 \paragraph{Nonlinear controller}
 For the nonlinear controller, the maximum generator torque constraint is considered separately from the others. 

@@ -237,8 +237,23 @@ Once all the port variables have been calculated, power at each port can be calc
 This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
 
 \subsection{Indirect Optimal Control Solution Procedure}\label{sec:appendix-qp-numerical}
+The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
+The optimality conditions depend on the active set of constraints.
+In the most straightforward case where just one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint. 
+For example, if only a maximum force constraint exists, the constrained solution has a force $\hat{F}_{p,constr}$ is the minimum of the unconstrained force $\hat{F}_{p,unconstrained}$ and the maximum allowed force fundamental $F_{max}$:
+\begin{equation}
+\hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
+\end{equation}
+The solver guesses a value of $\Gamma$, calculates the resulting force $\hat{F}_{p,guess}$, and then uses $\hat{F}_{p,guess}-\hat{F}_{p,constr}$ as an error signal to adjust its next guess of $\Gamma$, iterating until the error converges to zero.
+This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\hat{F}_{p,unconstrained}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\hat{F}_{p,unconstrained}$ and the system linearization are updated each control iteration).
+MDOcean implements the latter, which simplifies the setup by requiring only one solver.
+Comparing the efficiency of the two approaches is left for future work.
 
-\hl{todo}
+When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
+In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
+When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of possibilities instead of a continuous domain. 
+The main advantage of the indirect approach is its ability to handle nonlinear constraints, although for the quadratic constraints considered here, the analytical approach described in \cref{sec:appendix-qp-solution} is more efficient.
 
 \subsection{Analytical Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
 This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
@@ -393,7 +408,8 @@ The intersection points of the $\mu$th and $\nu$th circles are given by:
         1i \sqrt{r_{\mu}^2-a_{\mu\nu}^2}
     \right)
 \end{equation}
-where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from the center of the $\mu$th circle to the midpoint of the two intersection points, and $1i$ is the imaginary unit.
+where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nv}^2)/d_{\mu\nu}$ is the distance from the center of the $\mu$th circle to the midpoint of the two intersection points, and $1i$ is the imaginary unit.
+The closest-point candidates $\mathcal{C}_{cl}$ match eq. 4 of \cite{mccabe_force-limited_2024}, which provides the solution for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
 \Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_{\mu}=4$, $S_{\mu}=1$, and various $\Gamma_{c,\mu}$.
@@ -466,7 +482,7 @@ This coincides with the fundamental to peak ratio of a square wave, which is the
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
 For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}. 
 
-The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found with numerical iteration, and will be real for the damping control case and follows eq. 4 of \cite{mccabe_force-limited_2024} in the reactive control case. 
+The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \cref{sec:appendix-qp-numerical,sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
 %Mathematically, a saturation factor $0< f_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
 %\begin{equation}
@@ -663,10 +679,9 @@ It is therefore guaranteed to converge as long as the dynamics are contracting a
 
 Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees. % from summer research slide 44 5/30/24
 %In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
-At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since 1.2.0 the solver by default is used only for drag convergence.
-Combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
-However, it has the disadvantage that the error signal now couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
-Earlier versions of MDOcean performed the drag solve in an outer loop around the control solve, which would again be the preferred structure if the analytical constrained optimal control solve of \cref{sec:appendix-qp-solution} is implemented in future versions.
+At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since v1.2.0 by default the solver is used only for drag convergence and optimal control is done analytically.
+Compared to numerical optimal control nested inside the drag solve, combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
+However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 
 \subsubsection{Optimal Control Condition}
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
