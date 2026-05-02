@@ -108,7 +108,7 @@ function table2latex(tab, filename, special_col_spec, special_first_row)
     table_string = append(table_string,'\\end{tabular}');
 
     fileID = fopen(filename, 'w');
-    fprintf(fileID, '%s', table_string);
+    fprintf(fileID, table_string);
 
     % Closing the file
     fclose(fileID);
