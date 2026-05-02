@@ -1,0 +1,183 @@
+% --- LaTeX Presentation Template - S. Venkatraman ---
+
+% --- Set document class ---
+
+% Remove "handout" when presenting to include pauses
+\documentclass[dvipsnames, handout]{beamer}
+\usetheme{default}
+\useoutertheme[subsection=false]{miniframes}  
+
+% Make content that is hidden by pauses "transparent"
+\setbeamercovered{transparent}
+
+% --- Slide layout settings ---
+
+% Set line spacing
+\renewcommand{\baselinestretch}{1.15}
+
+% Set left and right text margins
+\setbeamersize{text margin left=12mm, text margin right=12mm}
+
+% Add slide numbers in bottom right corner
+\setbeamertemplate{footline}[frame number]
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Allow local line spacing changes
+\usepackage{setspace}
+\usepackage{etoolbox}
+
+% last slide does not include backup slides
+\usepackage{appendixnumberbeamer}
+
+% --- Agenda slide helpers ---
+\newcommand{\AgendaItem}[2]{%
+  \ifstrequal{#1}{*}{%
+    \color{black}#2%
+  }{%
+    \ifstrequal{#1}{#2}{%
+      \textbf{\color{black}#2}%
+    }{%
+      \color{gray}#2%
+    }%
+  }%
+}
+
+\newcommand{\AgendaSlide}[1]{%
+\begin{itemize}
+  \item \AgendaItem{#1}{Motivation}
+  \item \AgendaItem{#1}{Modeling}
+  \begin{itemize}
+    \item \AgendaItem{#1}{Theory and Implementation}
+    \item \AgendaItem{#1}{Validation and Benchmarking}
+  \end{itemize}
+  \item \AgendaItem{#1}{Design Optimization: Cost}
+  \begin{itemize}
+    \item \AgendaItem{#1}{Systems Formulation}
+    \item \AgendaItem{#1}{Results}
+  \end{itemize}
+  \item \AgendaItem{#1}{Design Optimization: Economic and Environmental Value}
+  \begin{itemize}
+    \item \AgendaItem{#1}{Metrics and Formulation}
+    \item \AgendaItem{#1}{Preliminary Results}
+  \end{itemize}
+  \item \AgendaItem{#1}{Conclusion}
+\end{itemize}
+}
+
+
+% Change itemized list bullets to circles
+\setbeamertemplate{itemize item}{$\bullet$}
+\setbeamertemplate{itemize subitem}{$\circ$}
+
+% --- Color and font settings ---
+
+\usepackage{xcolor}
+
+% Slide title background color
+\definecolor{background}{HTML}{ede6d8}
+
+% Slide title text color
+\definecolor{titleText}{HTML}{B40404}
+
+% Other possible color schemes
+
+% - Light green/dark green -
+%\definecolor{background}{HTML}{e4ede4}
+%\definecolor{titleText}{HTML}{2e592f}
+
+% - Light blue/dark blue -
+%\definecolor{background}{HTML}{d5d9e8}
+%\definecolor{titleText}{HTML}{2d375e}
+
+% - Beige/dark blue -
+%\definecolor{background}{HTML}{e8e2d5}
+%\definecolor{titleText}{HTML}{2d3375}
+
+% Set colors
+\setbeamercolor{frametitle}{bg=background, fg=titleText}
+\setbeamercolor{subtitle}{fg=titleText}
+
+% Set font sizes for frame title and subtitle
+\setbeamerfont{frametitle}{size=\fontsize{15}{16}}
+\setbeamerfont{framesubtitle}{size=\small}
+
+% --- Math/Statistics commands ---
+
+% Add a reference number to a single line of a multi-line equation
+% Usage: "\numberthis\label{labelNameHere}" in an align or gather environment
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% Shortcut for bold text in math mode, e.g. $\b{X}$
+\let\b\mathbf
+
+% Shortcut for bold Greek letters, e.g. $\bg{\beta}$
+\let\bg\boldsymbol
+
+% Shortcut for calligraphic script, e.g. \%\mc{M}$
+\let\mc\mathcal
+
+% \mathscr{(letter here)} is sometimes used to denote vector spaces
+\usepackage[mathscr]{euscript}
+
+% Convergence: right arrow with optional text on top
+% E.g. $\converge[p]$ for converges in probability
+\newcommand{\converge}[1][]{\xrightarrow{#1}}
+
+% Weak convergence: harpoon symbol with optional text on top
+% E.g. $\wconverge[n\to\infty]$
+\newcommand{\wconverge}[1][]{\stackrel{#1}{\rightharpoonup}}
+
+% Equality: equals sign with optional text on top
+% E.g. $X \equals[d] Y$ for equality in distribution
+\newcommand{\equals}[1][]{\stackrel{\smash{#1}}{=}}
+
+% Normal distribution: arguments are the mean and variance
+% E.g. $\normal{\mu}{\sigma}$
+\newcommand{\normal}[2]{\mathcal{N}\left(#1,#2\right)}
+
+% Uniform distribution: arguments are the left and right endpoints
+% E.g. $\unif{0}{1}$
+\newcommand{\unif}[2]{\text{Uniform}(#1,#2)}
+
+% Independent and identically distributed random variables
+% E.g. $ X_1,...,X_n \iid \normal{0}{1}$
+\newcommand{\iid}{\stackrel{\smash{\text{iid}}}{\sim}}
+
+% Sequences (this shortcut is mostly to reduce finger strain for small hands)
+% E.g. to write $\{A_n\}_{n\geq 1}$, do $\bk{A_n}{n\geq 1}$
+\newcommand{\bk}[2]{\{#1\}_{#2}}
+
+% Math mode symbols for common sets and spaces. Example usage: $\R$
+\newcommand{\R}{\mathbb{R}}	% Real numbers
+\newcommand{\C}{\mathbb{C}}	% Complex numbers
+\newcommand{\Q}{\mathbb{Q}}	% Rational numbers
+\newcommand{\Z}{\mathbb{Z}}	% Integers
+\newcommand{\N}{\mathbb{N}}	% Natural numbers
+\newcommand{\F}{\mathcal{F}}	% Calligraphic F for a sigma algebra
+\newcommand{\El}{\mathcal{L}}	% Calligraphic L, e.g. for L^p spaces
+
+% Math mode symbols for probability
+\newcommand{\pr}{\mathbb{P}}	% Probability measure
+\newcommand{\E}{\mathbb{E}}	% Expectation, e.g. $\E(X)$
+\newcommand{\var}{\text{Var}}	% Variance, e.g. $\var(X)$
+\newcommand{\cov}{\text{Cov}}	% Covariance, e.g. $\cov(X,Y)$
+\newcommand{\corr}{\text{Corr}}	% Correlation, e.g. $\corr(X,Y)$
+\newcommand{\B}{\mathcal{B}}	% Borel sigma-algebra
+
+% Other miscellaneous symbols
+\newcommand{\tth}{\text{th}}	% Non-italicized 'th', e.g. $n^\tth$
+\newcommand{\Oh}{\mathcal{O}}	% Big-O notation, e.g. $\O(n)$
+\newcommand{\1}{\mathds{1}}	% Indicator function, e.g. $\1_A$
+
+% Additional commands for math mode
+\DeclareMathOperator*{\argmax}{argmax}	% Argmax, e.g. $\argmax_{x\in[0,1]} f(x)$
+\DeclareMathOperator*{\argmin}{argmin}	% Argmin, e.g. $\argmin_{x\in[0,1]} f(x)$
+\DeclareMathOperator*{\spann}{Span}	% Span, e.g. $\spann\{X_1,...,X_n\}$
+\DeclareMathOperator*{\bias}{Bias}	% Bias, e.g. $\bias(\hat\theta)$
+\DeclareMathOperator*{\ran}{ran}		% Range of an operator, e.g. $\ran(T) 
+\DeclareMathOperator*{\dv}{d\!}		% Non-italicized 'with respect to', e.g. $\int f(x) \dv x$
+\DeclareMathOperator*{\diag}{diag}	% Diagonal of a matrix, e.g. $\diag(M)$
+\DeclareMathOperator*{\trace}{trace}	% Trace of a matrix, e.g. $\trace(M)$
+\DeclareMathOperator*{\supp}{supp}	% Support of a function, e.g., $\supp(f)$
