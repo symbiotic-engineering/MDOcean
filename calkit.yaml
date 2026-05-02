@@ -17,6 +17,16 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  quarto:
+    kind: docker
+    image: ghcr.io/quarto-dev/quarto:latest
+    description: Quarto via Docker.
+    wdir: /data
+  playwright:
+    kind: docker
+    path: pubs/defense/quarto/Dockerfile
+    description: Playwright via Docker.
+    image: playwright
 dependencies:
   - docker
   - matlab
@@ -5398,6 +5408,31 @@ pipeline:
         - from_stage_outputs: viz-SweepGeoms
         - from_stage_outputs: viz-Validation
         - from_stage_outputs: viz-Wecsim
+    render-quarto-html:
+      kind: docker-command
+      environment: quarto
+      command: quarto render pubs/defense/quarto/slides.qmd
+      inputs:
+        - pubs/defense/figs/
+        - pubs/defense/quarto/slides.qmd
+        - pubs/defense/references.bib
+        - pubs/defense/quarto/asme.csl
+        - pubs/defense/quarto/dots.css
+        - pubs/defense/quarto/header.html
+        - pubs/defense/quarto/styles.css
+      outputs:
+        - path: pubs/defense/quarto/slides.html
+          storage: git
+        - pubs/defense/quarto/slides_files/
+    render-quarto-pdf:
+      kind: shell-command
+      environment: playwright
+      command: python pubs/defense/quarto/html_to_pdf.py
+      inputs:
+        - pubs/defense/quarto/slides.html
+        - pubs/defense/quarto/html_to_pdf.py
+      outputs:
+        - path: pubs/defense/quarto/slides.pdf
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
@@ -5417,6 +5452,11 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
+  - path: pubs/defense/quarto/slides.pdf
+    title: PhD Defense Slides
+    description: Slides for PhD defense presentation
+    kind: presentation
+    stage: render-quarto-pdf
 overleaf_sync:
   pubs/applied-ocean-research-model:
     url: https://www.overleaf.com/project/69ecde8851d14790c59f03d5
@@ -5449,3 +5489,19 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
+  pubs/defense:
+    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
+    sync_paths:
+      - beamer/backup.tex
+      - references.bib
+      - beamer/conclusion.tex
+      - beamer/content_cost.tex
+      - beamer/content_model.tex
+      - beamer/content_value.tex
+      - Cornell.pdf
+      - beamer/main.tex
+      - beamer/motivation.tex
+      - beamer/setup.tex
+      - figs/
+    #push_paths:
+    # - figs

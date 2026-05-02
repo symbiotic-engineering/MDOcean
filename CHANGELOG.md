@@ -1,5 +1,17 @@
 # Changelog
 ## Unreleased
+
+## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
+## Added
+- Slides: create first draft defense slides in both quarto and beamer
+- Pipeline: stages for rendering quarto slides in html and pdf using quarto and playwright chromium docker containers respectively
+
+## [v1.2.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.2) - 2026-4-29
+### Changed
+- Speedup: `find_nominal_inputs` uses unsaturated simulation to calculate `F_max_nom` instead of optimization
+- Validation: suppress warnings in Meem validation
+- Analysis: parallelize and remove print statements in `PtoSweep` analysis
+
 ## [v1.2.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.1) - 2026-4-25
 ### Added
 - Paper: dedicated economics appendix, including beta table moved from main text
