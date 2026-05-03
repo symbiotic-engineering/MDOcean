@@ -1,6 +1,12 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.4) - 2026-4-29
+### Fixed
+- Pipeline: add RunSingleFigFunc and Runtime as deps of `re-results-to-latex` so `nominalLCOE` and `simRuntime` format resolves
+### Changed
+- CI: use latest version of calkit again
+
 ## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
 ## Added
 - Slides: create first draft defense slides in both quarto and beamer
