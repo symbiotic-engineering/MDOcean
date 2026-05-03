@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.4) - 2026-5-3
+## Fixed
+- setup: `add_mdocean_path.m` ensures local parallel pool is used to avoid interference between runners
+- CI: use runner-specific temp directory and add cleanup function to avoid orphaned processes 
+
 ## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
 ## Added
 - Slides: create first draft defense slides in both quarto and beamer
