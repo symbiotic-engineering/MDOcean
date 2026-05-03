@@ -41,6 +41,8 @@ parfor i=1:length(files)
     new_p.Hs = jpd(2:end,1);
     new_p.T = jpd(1,2:end);
     new_p.h = depths(i);
+    m0_op = dispersion(2*pi./new_p.T, new_p.h, p.g);
+    new_p.m_k_h_precomputed_op = cell2mat(arrayfun(@(m0h)get_m_k_h(m0h, p.harmonics), m0_op.'*new_p.h, 'UniformOutput',false));
 
     new_b = fix_constraints(new_p,b);
 
