@@ -21,6 +21,26 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Setup temp environment + cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
+
+          cleanup() {
+            echo "Cleaning up job..."
+
+            pkill -P $$ || true
+            pkill -f matlab-batch || true
+            pkill -f run_matlab_command || true
+
+            rm -rf "$TMPDIR" || true
+          }
+
+          trap cleanup EXIT INT TERM
       - name: Clear stale submodule caches
         run: |
           # Deinit any previously-initialized submodules first (while their gitdirs
@@ -54,7 +74,7 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
       - name: Install Calkit
-        run: uv tool install --upgrade calkit-python@0.37.3
+        run: uv tool install --upgrade calkit-python
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
       - name: Set up Python
@@ -107,7 +127,7 @@ jobs:
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
-          run_args: --keep-going --log build-AOR-paper view-aor-figs all-viz render-quarto-pdf
+          run_args: --keep-going --log build-AOR-paper view-aor-figs build-RE-paper all-viz render-quarto-pdf
           pull_dvc: false
           save: false
           cache_dvc: false
