@@ -21,6 +21,26 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Setup temp environment + cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
+
+          cleanup() {
+            echo "Cleaning up job..."
+
+            pkill -P $$ || true
+            pkill -f matlab-batch || true
+            pkill -f run_matlab_command || true
+
+            rm -rf "$TMPDIR" || true
+          }
+
+          trap cleanup EXIT INT TERM
       - name: Clear stale submodule caches
         run: |
           # Deinit any previously-initialized submodules first (while their gitdirs
