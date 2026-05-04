@@ -67,8 +67,6 @@ grid_energy_timeseries = readtable("power.csv").Total(3:end); %MWh
 grid_energy_timeseries = grid_energy_timeseries * 1000; %convert to kWh
 carbon_intensity = carbon ./ grid_energy_timeseries; %kg/kWh
 
-%make sure to add timeseries_to_sea_state_matrix to path
-%\WEC-DECIDER\modules\CEM\timeseries_to_sea_state_matrix.m
 ploton = false;
 [carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs_hourly,T_hourly,jpd_Hs,jpd_Te,carbon_intensity,price,ploton);
 % placeholder_emissions = false;
