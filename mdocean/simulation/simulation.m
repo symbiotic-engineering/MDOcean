@@ -87,7 +87,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 
 model_grid_value = true; % override for merging
 if model_grid_value
-    [net_econ_value,net_eco_value,env_cost_per_wec,LCOE_econ,capex_design] = net_value(F_heave_mat,P_matrix_elec, ...
+    [NVOE_econ,NVOE_env,env_cost_per_wec,LCOE_econ,capex_design] = net_value(F_heave_mat,P_matrix_elec, ...
         in.N_WEC,in.FCR,in.eff_array,in.JPD,in.marginal_price,in.eco_cost_steel, ...
         m_m,in.eco_cost_fiberglass,A_hull,in.eco_cost_distance,in.distance_from_shore,...
         in.marginal_carbon,in.M,in.cost_perkg_mult,in.cost_perN_mult,in.cost_perW_mult,...
@@ -99,7 +99,7 @@ end
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
 
-J = [LCOE_econ, J_capex_design, net_econ_value, net_eco_value];
+J = [LCOE_econ, J_capex_design, NVOE_econ, NVOE_env];
 
 
 %% Assemble constraints g(x) >= 0
