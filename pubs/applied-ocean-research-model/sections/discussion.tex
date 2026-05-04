@@ -177,22 +177,10 @@ From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 \end{equation}
 Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
 When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
+ 
+As derived in \cref{sec:appendix-constraint-sensitivity}, the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ affect the constrained optimal value of $|\Gamma_{\beta,opt}|$ with the following form:
 
-As derived in \cref{sec:appendix-constraint-sensitivity}, the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ affect only the radii $r_\mu$ of the constraint circles in the complex $\Gamma$ plane (see \cref{sec:appendix-qp-solution}), not the circle centers $\Gamma_{c,\mu}$.
-Larger constraint limits produce larger circle radii, which allow a smaller optimal $|\Gamma_{\beta,opt}|$ and thus monotonically increase power.
-The optimal reflection coefficient in each sea state takes one of the following values depending on which constraints are active (see \cref{sec:appendix-constraint-sensitivity} for the complete derivation):
-\begin{equation}\label{eq:gamma-opt-summary}
-    |\Gamma_{\beta,opt}| =
-    \begin{cases}
-        0 & \text{no constraints active in sea state $\beta$} \\
-        |\Gamma_{c,\mu^*}| - r_{\mu^*} & \text{one constraint $\mu^*$ active} \\
-        |\Gamma_{\mu^*,\nu^*}| & \text{constraints $\mu^*$ and $\nu^*$ both active}
-    \end{cases}
-\end{equation}
-where $\Gamma_{\mu^*,\nu^*}$ is the intersection point of the two active constraint circles.
 
-The sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory \cite[Section~5.9.3]{boyd_convex_2004}: the local sensitivity equals the product of the Lagrange multiplier for that constraint and the partial derivative of the constraint function with respect to the limit.
-Since the unconstrained power maximization problem is convex after reduction to the $\Gamma$ parameterization (see \cref{sec:qp-convexity}), integrating these local sensitivities gives a global relationship between power and constraint limits that is also convex.
 When a single constraint is active, the average power is piecewise affine plus the square root of an affine function of the constraint limit.
 When two constraints are simultaneously active, it is piecewise affine plus the square root of a quadratic function of the two constraint limits (see \cref{sec:appendix-constraint-sensitivity}).
 In both cases the benefit of relaxing a constraint diminishes as the limit grows, quantifying the diminishing returns of oversizing the PTO.
