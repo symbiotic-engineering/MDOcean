@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-3
+## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-4
 ## Added
 - Add report wecsim validation figure to AOR paper appendix
 ## Changed
