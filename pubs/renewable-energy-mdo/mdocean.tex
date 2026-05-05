@@ -38,61 +38,7 @@
 %% elsarticle.cls. If you prefer to use the old commands
 %% please give \usepackage{epsfig}
 
-%% The amssymb package provides various useful mathematical symbols
-\usepackage{amssymb}
-%% The amsmath package provides various useful equation environments.
-\usepackage{amsmath}
-\usepackage{hyperref}
-\usepackage{array} % required for text wrapping in tables
-\usepackage{pdflscape} % for landscape table
-\usepackage{longtable} % for table going multiple pages
-\usepackage{rotating} % for rotated table headers
-\usepackage{multirow} % for multi row/col tables
-\usepackage{soul} % for highlighting text with \hl 
-\usepackage{color} % also required for highlighting 
-\usepackage{bibcop} % warnings for incorrect citations
-\usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
-\usepackage{stmaryrd} % element wise division symbol used in hessian scaling
-\usepackage{verbatim} %word counts
-\usepackage{textcomp} % cent symbol
-\usepackage{cleveref}
-%\usepackage{graphicx}
-%\usepackage{float}
-%\usepackage{placeins}
-
-%% The amsthm package provides extended theorem environments
-%% \usepackage{amsthm}
-
-%% The lineno packages adds line numbers. Start line numbering with
-%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
-%% for the whole article with \linenumbers.
-%% \usepackage{lineno}
-
-\newcommand*\rot{\rotatebox{90}} % for rotated table headers
-\newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
-\newcommand{\matlabFilepath}[1]{figs/2025-04-11_10.21.55/Figure_#1.pdf}
-\newcommand{\tableFilepath}[1]{tables/2025-04-11_04.04.45/table_#1.tex}
-
-\newcommand{\requirement}[1]{\refstepcounter{reqnumber}\label{req:#1}R\arabic{reqnumber}}
-\newcommand{\reqref}[1]{R\ref{req:#1}}
-
-\newcommand{\summarytexcount}[1]{\textbf{Word Count}
-  \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
-  \verbatiminput{#1.wcsum}%
-}
-\newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
-  \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
-  \verbatiminput{#1.wcdetail}
-}%
-
-\def\fillandplacepagenumber{% for landscape page numbers
- \par\thispagestyle{empty}%
- \vbox to 0pt{\vss}\vfill
- \vbox to 0pt{\baselineskip0pt
-   \hbox to\linewidth{\hss}%
-   \baselineskip\footskip
-   \hbox to\linewidth{%
-     \hfil\thepage\hfil}\vss}}
+\input{commands-re}
 
 \journal{Renewable Energy}
 
