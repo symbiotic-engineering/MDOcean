@@ -1,5 +1,9 @@
 # Changelog
 ## Unreleased
+## [v1.2.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.7) - 2026-5-5
+### Added
+- Paper: discussion on scaling and convexity of power and LCOE with respect to dynamic constraint limits
+
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
