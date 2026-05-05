@@ -45,7 +45,7 @@ The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     \label{fig:damping-plate-maxs}
 \end{figure}
 
-\subsubsection{Effect of PTO Force Limit}
+\subsubsection{Effect of PTO Force and Power Limits}
 Previous work has shown that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power.
 Reference \cite{devin_high-dimensional_2024} finds that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
 This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
@@ -54,18 +54,38 @@ The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\%
 The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the model.
 Reference \cite{mccabe_force-limited_2024} shows analytically that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
 Intuitively, the sensitivity of annual average power to force limit should be even lower when considering a range of realistic sea states, because large sea states that require higher forces are comparatively rare.
-Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-power-limit}.
+Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-limit}.
 
 \begin{figure}
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/power_force_sensitivity.pdf}
-\caption{Effect of Force and Power Limit}
-\label{fig:force-power-limit}
+\caption{Effect of Force Limit on Annual Average Power and Peak Structural Load}
+\label{fig:force-limit}
 \end{figure}
 
-Decreasing the force limit has nearly no effect until the force limit is around 50\% of the nominal value, after which power falls off steeply.
-On the other hand, after a brief region of insensitivity, the structural load for the operational design load case scales nearly linearly with the force limit.
-The insensitive region exists because at high force limits, the hydrodynamic force rather than the PTO force dominates the overall load, although at force limits below a threshold, PTO load dominates.
+Decreasing the force limit has nearly no effect on power until the force limit is around 50\% of the nominal value, after which power falls off steeply.
+From theory (see \cref{sec:appendix-constraint-sensitivity}), we expect a smooth nonlinear relationship between power and force limit when considering a single sea state, and a piecewise continuous nonlinear relationship when considering multiple sea states as in \cref{fig:force-limit}.
+On the other hand, the structural load for the operational design load case scales nearly linearly with the force limit.
+For structural load, we expect a linear relationship when considering a single sea state and a piecewise linear relationship expected when considering multiple sea states.
+The fact that the linear relationship holds when considering multiple sea states implies that both the worst-case sea state and its quasilinearized drag coefficients hardly change as the force limit is swept.
+If this trend holds true for other designs, it could suggest a more efficient analysis strategy where the worst-case sea state is identified at the nominal design and then maintained (or only infrequently updated) throughout a design optimization, rather than performing a full multi-sea-state structural analysis for each design being considered.
+
+We next move to a simultaneous sweep of both the force limit and the power limit, which is more relevant for PTO design optimization since generator selection dictates both limits.
+Here we hold structural thicknesses constant, so any cost savings only reflect reduced direct cost of the PTO and not the cost savings from the reduced structural material that would be possible with lower loads.
+\Cref{fig:force-power-limit-sweep} shows the results for both power and LCOE, with hatched shading to indicate regions that are infeasible.
+The unsaturated solution is in the top right corner, past which power is constant because the unconstrained reactive controller satisfies the limit in all sea states.
+\begin{figure}
+\centering
+\includegraphics[width=.8\linewidth]{figs/from-matlab/power_force_sensitivity.pdf}
+\caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and LCOE}
+\label{fig:force-power-limit-sweep}
+\end{figure}
+Notably, the minimum LCOE point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller PTO outweigh the loss in power.
+If a full design optimization were performed to adjust the structural thicknesses to take advantage of the reduced structural loads, we expect an even lower force limit to be optimal.
+This illustrates the importance of including the force-cost tradeoff in an optimization model rather than assuming an unconstrained solution.
+We also observe that power and LCOE both appear to be convex with respect to the force and power limits, and that the feasible region is convex as well.
+The theoretical analysis in \cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
+Convexity suggests that local optimization methods should be effective for finding the optimal PTO design.
 
 \subsubsection{Design Space Exploration}
 The OAT design sweep, shown in \figureautorefname~\ref{fig:experiments}, immediately draws attention to the float diameter $D_f$, shown with a red dashed line, as the variable with the strongest effect on the objectives.
