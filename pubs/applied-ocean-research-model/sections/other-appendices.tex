@@ -453,11 +453,13 @@ Nonlinear dynamics can reintroduce non-convexity and should be checked on a case
 The inequality constraints are more problematic.
 A constraint is convex if the set of points satisfying it forms a convex region.
 In the $\Gamma$ plane, a convex constraint corresponds to a circle whose feasible region is the \emph{interior} ($S_\mu=1$ in \cref{eq:disc-constraint}), while a non-convex constraint corresponds to a circle whose feasible region is the \emph{exterior} ($S_\mu=-1$).
-Effort-magnitude constraints (e.g., force limits $|\hat{F}|\leq F_{max}$) map to circles with exterior feasible regions and are therefore non-convex.
-Amplitude constraints similarly yield non-convex regions for some sea states, as visualized in \cite{mccabe_force-limited_2024}.
+Constraints on the effort and flow magnitude (e.g., force limits $|\hat{F}|\leq F_{max}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent impedance of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
+Reference \cite{mccabe_force-limited_2024} visualizes the feasible regions for families of such constraints on the complex $\Gamma$ plane. 
+It shows that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
 The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} confirm this: $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
 For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
 Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
+It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
 
 \subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
@@ -471,7 +473,7 @@ Reference \cite{bacelli_geometric_2013} also extends the formulation to capture 
 
 \subsection{Constraint Sensitivity Analysis via Parametric Programming}
 \label{sec:appendix-constraint-sensitivity}
-To support the discussion in \cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its convexity.
+To support the discussion in \cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its conditions for convexity.
 
 The constraint limits are 
 $\tau_{max}$, $P_{\tau\Omega,max}$, $\xi_{f,max}$, $\xi_{s,max}$, and $X_{PTO,max}$, which we collectively denote as $L_\mu$.
