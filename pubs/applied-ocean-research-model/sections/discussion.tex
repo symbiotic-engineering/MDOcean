@@ -45,7 +45,7 @@ The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     \label{fig:damping-plate-maxs}
 \end{figure}
 
-\subsubsection{Effect of PTO Force Limit}
+\subsubsection{Effect of PTO Force and Power Limits}
 Previous work has shown that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power.
 Reference \cite{devin_high-dimensional_2024} finds that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
 This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
@@ -54,18 +54,38 @@ The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\%
 The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the model.
 Reference \cite{mccabe_force-limited_2024} shows analytically that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
 Intuitively, the sensitivity of annual average power to force limit should be even lower when considering a range of realistic sea states, because large sea states that require higher forces are comparatively rare.
-Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-power-limit}.
+Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-limit}.
 
 \begin{figure}
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/power_force_sensitivity.pdf}
-\caption{Effect of Force and Power Limit}
-\label{fig:force-power-limit}
+\caption{Effect of Force Limit on Annual Average Power and Peak Structural Load}
+\label{fig:force-limit}
 \end{figure}
 
-Decreasing the force limit has nearly no effect until the force limit is around 50\% of the nominal value, after which power falls off steeply.
-On the other hand, after a brief region of insensitivity, the structural load for the operational design load case scales nearly linearly with the force limit.
-The insensitive region exists because at high force limits, the hydrodynamic force rather than the PTO force dominates the overall load, although at force limits below a threshold, PTO load dominates.
+Decreasing the force limit has nearly no effect on power until the force limit is around 50\% of the nominal value, after which power falls off steeply.
+From theory (see \cref{sec:appendix-constraint-sensitivity}), we expect a smooth nonlinear relationship between power and force limit when considering a single sea state, and a piecewise continuous nonlinear relationship when considering multiple sea states as in \cref{fig:force-limit}.
+On the other hand, the structural load for the operational design load case scales nearly linearly with the force limit.
+For structural load, we expect a linear relationship when considering a single sea state and a piecewise linear relationship expected when considering multiple sea states.
+The fact that the linear relationship holds when considering multiple sea states implies that both the worst-case sea state and its quasilinearized drag coefficients hardly change as the force limit is swept.
+If this trend holds true for other designs, it could suggest a more efficient analysis strategy where the worst-case sea state is identified at the nominal design and then maintained (or only infrequently updated) throughout a design optimization, rather than performing a full multi-sea-state structural analysis for each design being considered.
+
+We next move to a simultaneous sweep of both the force limit and the power limit, which is more relevant for PTO design optimization since generator selection dictates both limits.
+Here we hold structural thicknesses constant, so any cost savings only reflect reduced direct cost of the PTO and not the cost savings from the reduced structural material that would be possible with lower loads.
+\Cref{fig:force-power-limit-sweep} shows the results for both power and LCOE, with hatched shading to indicate regions that are infeasible.
+The unsaturated solution is in the top right corner, past which power is constant because the unconstrained reactive controller satisfies the limit in all sea states.
+\begin{figure}
+\centering
+\includegraphics[width=.8\linewidth]{figs/from-matlab/power_force_sensitivity.pdf}
+\caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and LCOE}
+\label{fig:force-power-limit-sweep}
+\end{figure}
+Notably, the minimum LCOE point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller PTO outweigh the loss in power.
+If a full design optimization were performed to adjust the structural thicknesses to take advantage of the reduced structural loads, we expect an even lower force limit to be optimal.
+This illustrates the importance of including the force-cost tradeoff in an optimization model rather than assuming an unconstrained solution.
+We also observe that power and LCOE both appear to be convex with respect to the force and power limits, and that the feasible region is convex as well.
+The theoretical analysis in \cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
+Convexity suggests that local optimization methods should be effective for finding the optimal PTO design.
 
 \subsubsection{Design Space Exploration}
 The OAT design sweep, shown in \figureautorefname~\ref{fig:experiments}, immediately draws attention to the float diameter $D_f$, shown with a red dashed line, as the variable with the strongest effect on the objectives.
@@ -159,70 +179,51 @@ Despite the most probable wave period being 6-8 seconds, 10 second waves contrib
 \label{fig:power-matrix-decomposition}
 \end{figure}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
-Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitdues at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
+Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
 
 \paragraph{Constraint Sensitivities}
-The structure of the constrained optimal control problem allows for the quantification of the sensitivity of the optimal solution to each constraint, formalizing the intuition behind $\eta^{H,T}_{limits}$.
-From \cref{eq:constrained-qp-solution,eq:power-elec}, the denominator $\overline{P}_{elec}$ is the weighted sea-state sum of the product of the impedance-matched power in that sea state, which depends only on the bulk dimensions, with a quadratic function of the reflection coefficient magnitude, which is determined via constrained optimal control for each sea state to obey the dynamic constraints.
-Using $\beta$ to index the sea states, the annual average power is:
+The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\eta^{H,T}_{limits}$.
+From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,opt}|^2)$ that captures the effect of active dynamic constraints:
 \begin{equation}\label{eq:power-elec-sum}
 \begin{aligned}
-    &\overline{P}_{elec} = \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot 
-    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_\beta|^2)
+    \overline{P}_{elec} &= \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
+    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_{\beta,opt}|^2)
     \\ s.t. \quad
-    |\hat{F}_{p,\beta}| &\leq F_{max},\\
-    |p_{pk,elec,\beta}| &\leq P_{max,elec},\\
-    |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\\
-    |\hat{\xi}_{s,\beta}| &\leq X_{s,max}\\
+    |\hat{F}_{p,\beta}| &\leq F_{max},\quad
+    |p_{pk,elec,\beta}| \leq P_{max,elec},\\
+    |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\quad
+    |\hat{\xi}_{s,\beta}| \leq X_{s,max}\\
 \end{aligned}
 \end{equation}
-
-Aggregating the reflection coefficients for all sea states into a vector $\vec{\Gamma}$, the effect of the constraints on power can be expressed as the difference between the unconstrained power and the power lost from impedance mismatch required to obey constraints:
-\begin{equation}
+Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
+When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, 
+and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
+ 
+\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive the scaling law between the optimal annual average power $\overline{P}_{elec}$ and the constraint coefficients $b_\mu$:
+\begin{equation}\label{eq:power-double-sum-main}
 \begin{aligned}
-    \overline{P}_{elec} = \overline{P}_{elec,unconstrained} (1 - \vec{\Gamma}^* \, \mathbf{I} \, \vec{\Gamma}) \\
-    s.t. \quad S_\mu (\vec{\Gamma} - \vec{\Gamma}_{c,\mu})^* \, \mathbf{I} \, (\vec{\Gamma} - \vec{\Gamma}_{c,\mu}) 
-    \leq S_\mu \vec{r}_\mu^{~2} 
-    \\ \forall \mu \in \{1,...,N_{constraints}\}
-\end{aligned}
-\end{equation}
-where $\mathbf{I}$ is the identity matrix of size $N_{sea}\times N_{sea}$.
-Assuming at least one constraint is active at the optimal solution in each sea state, the magnitude of the optimal reflection coefficient in each sea state $|\vec{\Gamma}_{opt}|$ is:
-\begin{equation}
-    |\vec{\Gamma}_{opt}| = 
-    \begin{cases}
-        0 & \text{if no constraints active} \\
-    |\vec{\Gamma}_{c,\mu^*}| - \vec{r}_{\mu^*} & \text{if constraint $\mu^*$ active, others inactive} \\
-     & \text{if constraints $\mu^*$, $\nu^*$ active, others inactive} \\
-    \end{cases}
-\end{equation}
-where $*$ denotes the active constraint(s) in each sea state.
-
-Power scales with $b_\mu$ and $b_{\nu}$ as follows:
-\begin{equation}
-    P_{elec} = P_0 + p_\mu b_\mu + p_\nu b_\nu \pm p_{\mu\nu} \sqrt{ a_0 b_\mu^2 + a_1 b_\nu^2 + a_2 b_\mu b_\nu + a_3 b_\mu + a_4 b_\nu + a_5}
-\end{equation}
-
-We are interested in the sensitivity of power to the constraint limits $F_{max}$, $P_{pk,elec}$, $X_{f,max}$, and $X_{s,max}$.
-Combining the constraint coefficients of \cref{tab:qp-constraints} with \cref{eq:gamma-disc-params} reveals that the constraint limits do not affect the constraint centers $\vec{\Gamma}_{c,\mu}$ and affect the radii $\vec{r}_\mu$ with the following form:
-\begin{equation}
-    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
-\end{equation}
-where $b_\mu$ is $b$ in \cref{tab:qp-constraints}, and $c_\mu$ and $d_\mu$ are independent of the constraint limits and only functions of $Z_{s,th}$, $\hat{V}_{s,th}$, and $\mathbf{Q}$ and $\vec{a}$ in \cref{tab:qp-constraints}.
-%Recall from \cref{tab:qp-constraints} that the square of each of the constrained quantities in \cref{eq:power-elec-sum} is a quadratic function of the state variables and thus of the reflection coefficient $\Gamma_\beta$, except for the power constraint where $p_{pk,elec,\beta} \sim \Gamma_\beta^4$.
-
-We can leverage results of parametric programming to find how the optimal power changes with the constraint limits.
-According to the theory of perturbation and sensitivity analysis of convex optimization problems with generalized inequality constraints \cite[Section~5.9.3]{boyd_convex_2004}, the local sensitivity of the optimal power to each constraint limit is given by the product of the Lagrange multiplier $\lambda_\mu$ associated with that constraint, and the partial derivative of the constraint function to the constraint limit.
-Considering that the active set varies with the constraint limits, the global dependence of power on constraint limit can be found by integrating the local sensitivity across the range of constraint limits, and will be convex if the original problem is convex.
-Thus, for cases where two constraints are active and the optimal occurs at an intersection of the constraint circles, the average power is piecewise affine plus square root of quadratic in the constraint limits.
-For cases where only one constraint is active, the average power is piecewise affine plus square root of affine in the constraint limits.
-
-Plugging these optimal solutions into the power equation gives the following sensitivitiy, which applies globally as long as $\mu$ and $\nu$ are adjusted to reflect any change in active constraints that occurs as limits are varied:
-\begin{equation}
-    \overline{P}_{elec} = \overline{P}_{elec,unconstrained} - \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot 
-    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_\beta|^2)
-\end{equation}
-
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\mu\nu\beta}
+    &\left[
+        \sqrt{\textrm{aff}_{\mu\nu\beta}(b_{\mu})}
+        + \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu}) 
+    \right.+ 
+     \\
+    &\left.
+        \left(\textrm{aff}_{\mu\nu\beta}(b_{\mu}) + \textrm{aff}_{\mu\nu\beta}(b_{\nu})\right)
+        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}
+    \right]
+\end{aligned}\end{equation}
+where $b_\mu$ and $b_\nu$ are simple (affine or square) functions of the constraint limits
+$\tau_{max}$, $P_{\tau\Omega,max}$, $\xi_{f,max}$, $\xi_{s,max}$, and $X_{PTO,max}$ defined in \cref{tab:qp-constraints}; 
+$\overline{P}_{elec,0}$ is the unconstrained power;
+and $\textrm{aff}_{\mu\nu\beta}$ and $\textrm{quad}_{\mu\nu\beta}$ are affine and quadratic functions of $b_\mu$ and $b_\nu$, respectively.
+Under certain conditions which we derive in \cref{sec:appendix-constraint-sensitivity}, 
+the relationship \cref{eq:power-double-sum-main} is convex in the constraint coefficients $b_\mu$.
+While satisfaction of these conditions is not guaranteed, 
+convexity is observed to hold in the sweep of the PTO design variables for the nominal hydrodynamic design (see \cref{fig:pto-sweep}).
+We also note that \cref{eq:power-double-sum-main} displays coupling in the constraint variables, such that the effect of one constraint limit depends on the values of the other constraint limits.
+This illustrates the importance of a multidisciplinary optimization considering all interactions, rather than a sequential optimization that optimizes one subsystem at a time holding the others fixed.
 
 \paragraph{LCOE Drivers}
 To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors from \cref{eq:lcoe}, leaving normalized price constants $p^{'}_{(*)}$.
@@ -233,42 +234,19 @@ The LCOE model then equals:
     }{\overline{P}_{elec}}
 \end{equation}
 
-The numerator of \cref{eq:LCOE-scale} scales linearly with design inputs $F_{max}$ and $P_{max,elec}$, while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
-The presence of the constraint limits in the numerator of the LCOE implies that whether or not the optimal solution is saturated, at least one dynamic constraint will be active in each sea state at system optimality.
-More strongly, the presence of the PTO limits in the numerator and denominator but not elsewhere in the model implies that the system optimal will have both PTO limits active in at least one sea state.
-The numerator is affine in the PTO limits whlie the denominator is piecewise affine plus square root of quadratic or affine in the PTO limits.
-The LCOE minimization with design variables of $F_{max}$ and $P_{max,elec}$ and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
-The convexity properties of this problem can motivate a double-nested strategy for optimization: at the innermost level, the optimal control problem for fixed geometry and PTO limits can be solved as an analytical QP, then the mid-level optimization can be solved as a low-dimensional fractional quadratic program to find the optimal PTO limits, and the outer-level optimization can be solved as a general nonlinear program to find the optimal geometry.
-
-
-LCOE with gamma:
-\begin{equation}
-    LCOE \sim \frac{p'_0+p'_1x_1 + p'_2x_2 + p'_3x_3}{\bar{P}_{elec,unconstrained} - \vec{|\Gamma|} \mathbf{Q}_\Gamma \vec{|\Gamma|}}
-\end{equation}
-
-LCOE with x for x=Fmax, Ppk, thickness:
-- $p'_n$ are constant
-- $\mathbf{Q}_\Gamma$ is constant
-- $\bar{P}_{elec,unconstrained}$ is constant
-- $|\Gamma|$ is constant if the amplitude constraint is active, and the following if an effort limit is active:
-\begin{equation}
-    |\Gamma| \sim |\Gamma_{c,\mu}| - r_{\mu} \\
-\end{equation}
-plug in $|\Gamma_{c,\mu}|$ and $r_{\mu}$:
-\begin{equation}
-    |\Gamma| = \frac{a_1 e_{max}^2 + a_0 \pm 
-    \sqrt{(a_1 e_{max}^2+a_0)^2 + (a_3 e_{max}^2 + a_4)(a_5 e_{max}^2 + a_6)}}
-    {a_3 e_{max}^2 + a_4}
-\end{equation}
-a function of the design variables, with the following dependence on the design variables:
-
-LCOE with x for x=Fmax, Ppk, thickness, and bulk dimensions:
-- $p'_n$ are constant for n=0, 1, 2
-\begin{equation}
-    p'_3 \sim x_4^2, \qquad
-\end{equation}
-
-\hl{write Fmax and Ppk and Pavg in terms of the control variables, showing the lcoe tradeoff of the optimal control problem / pto sizing problem for a given mechanical design.}
+The numerator of \cref{eq:LCOE-scale} is affine in the design inputs $F_{max}$ and $P_{max,elec}$, 
+while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, 
+which depend quadratically on the bulk dimensions.
+The fact that decreasing a constraint limit causes the numerator of the LCOE to monotonically increase 
+and the denominator to monotonically decrease implies that at system optimality, 
+and each constraint will be active in at least one sea state.
+The LCOE minimization with design variables of $F_{max}$, $P_{max,elec}$, and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
+When the denominator is convex with respect to the PTO limits, this means that LCOE is ``quasi-convex'' in the PTO limits for fixed geometry \cite{agrawal_disciplined_2020}.
+This quasi-convexity can be leveraged by using a subgradient method or by solving a small sequence of convex problems, which simplifies the optimization process significantly compared to a general nonlinear solver.
+This motivates a three-level nested optimization strategy: 
+at the innermost level, the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; 
+at the mid-level, the optimal PTO limits are found by exploiting the quasi-convex fractional structure when possible; 
+and at the outer level, the bulk geometry is optimized with a general nonlinear program.
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
