@@ -9,7 +9,7 @@ Notably, the RM3 geometry provided in WEC-Sim differs slightly from the publishe
 WEC-Sim runs utilize hydrodynamic coefficients obtained with the WAMIT BEM for dynamics, and control coefficients calculated with MDOcean for consistency.
 MDOcean is run with MEEM as usual, and separately also run with the WAMIT coefficients to distinguish differences caused by disparate hydrodynamic coefficients from those caused by the underlying dynamics. 
 
-The absolute error in average power compared to the WEC-Sim power is less than \results[wecsimAvgPowerErrorBestCase] in the best case and \results[wecsimAvgPowerErrorWorstCase] in the worst case, with an error breakdown for all simulation scenarios and sea states shown in Figure~\ref{fig:error-histogram}.
+The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case, with an error breakdown for all simulation scenarios and sea states shown in Figure~\ref{fig:error-histogram}.
 
 \begin{figure}
     \centering
@@ -43,7 +43,7 @@ Unlike the force, the power discrepancy is not attributed to a modeling error be
 Rather, the discrepancy is attributed to the fact that the reference model report uses a different dynamic model that is not described in detail, and does not document the hydrodynamic coefficients, water depth, drag coefficient, and other necessary input parameters that would be required to obtain a close match.
 A final tuned scale factor is applied to the structural mass to account for the fact that not all structural components are modeled, including spar stiffeners, damping plate circumferential stiffeners, and miscellaneous features like flanges, enclosures, and access mounts.
 
-After applying a structural force scale factor of \results[forceScaleFactor], a power scale factor of \results[powerScaleFactor], and a mass scale factor of \results[massScaleFactor], the scaled quantities match within 1\% of the reference model report.
+After applying a structural force scale factor of \resultsAOR[forceScaleFactor], a power scale factor of \resultsAOR[powerScaleFactor], and a mass scale factor of \resultsAOR[massScaleFactor], the scaled quantities match within 1\% of the reference model report.
 
 %\hl{Describe the radiation and amplitude limit and show they aren't violated} \cite{zou_practical_2023}.
 
@@ -88,11 +88,11 @@ The average percent errors for these quantities are shown in Table~\ref{tab:vali
 \label{sec:sim-runtime}
 Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
 An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
-Ultimately, each simulation run takes around \results[simRuntime], solidly meeting the goal.
+Ultimately, each simulation run takes around \resultsAOR[simRuntime], solidly meeting the goal.
 The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
 
 Figure~\ref{fig:runtime-modules} visualizes the breakdown of runtime between modules.
-The MEEM hydrodynamics module takes the majority (\results[pctRuntimeMEEM]) of the time and is broken down in \figureautorefname~\ref{fig:runtime-hydro}.
+The MEEM hydrodynamics module takes the majority (\resultsAOR[pctRuntimeMEEM]) of the time and is broken down in \figureautorefname~\ref{fig:runtime-hydro}.
 The biggest portion is dedicated to evaluating Bessel functions in the semi-analytical solution, another large portion to unpacking variables from the cell data structure, and a smaller portion to solving the imaginary modes of the dispersion relation and the linear matrix equation.
 The simulation is an order of magnitude faster than the Capytaine boundary element method solver for similar convergence levels.
 
@@ -108,7 +108,7 @@ The simulation is an order of magnitude faster than the Capytaine boundary eleme
 \caption{Bar chart demonstrating the speed improvement of MDOcean's hydro module over baseline solver Capytaine}\label{fig:runtime-hydro}
 \end{figure}
 
-The dynamics and controls module takes the next longest (\results[pctRuntimeDynamics], enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
+The dynamics and controls module takes the next longest (\resultsAOR[pctRuntimeDynamics], enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
 This represents a three-order-of-magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
 Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-DOF model.
 
@@ -118,7 +118,7 @@ Simplifying the dynamics to a single degree of freedom (DOF) achieves another or
 \caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver WEC-Sim}\label{fig:runtime-dynamics}
 \end{figure}
 
-The structures, geometry, and economics modules are not computationally expensive and together compose the remaining \results[pctRuntimeOther]~of the total runtime. 
+The structures, geometry, and economics modules are not computationally expensive and together compose the remaining \resultsAOR[pctRuntimeOther]~of the total runtime. 
 
 % say that it's 210 sea states, that wecsim is parallelized across X cores, that MEEM is using N=M=K=10
 \subsection{Discussion}
