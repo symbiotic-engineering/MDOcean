@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 57;
+num_figs_AOR = 58;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -103,26 +103,27 @@ figs_in_AOR{38} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__fl
 figs_in_AOR{39} = 'Wecsim.accel_fourier_harmonics';
 figs_in_AOR{40} = 'Wecsim.drag_force_desc_fcn';
 figs_in_AOR{41} = 'Wecsim.position_THD_contour';
+figs_in_AOR{42} = 'Wecsim.wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat';
 % appendix C - economic validation
-figs_in_AOR{42} = 'Validation.cost_vs_N_WEC';
+figs_in_AOR{43} = 'Validation.cost_vs_N_WEC';
 % appendix D - structures
-figs_in_AOR{43} = 'ReadNonMatlabFigs.equivalent_stiffness';
-figs_in_AOR{44} = 'ReadNonMatlabFigs.trapezoid';
-figs_in_AOR{45} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{46} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {57}
+figs_in_AOR{44} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{45} = 'ReadNonMatlabFigs.trapezoid';
+figs_in_AOR{46} = 'ReadNonMatlabFigs.damping_plate_flowchart';
+figs_in_AOR{47} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {58}
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{47}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{48}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 % extra subplot entries (additional MATLAB outputs for multi-panel figures)
-figs_in_AOR{48} = 'DescFcns.drag_desc_fcn';                         % fig 9 subfig (b)
-figs_in_AOR{49} = 'DragIntegral.drag_integral_G_m';                  % fig 34 subfig (b)
-figs_in_AOR{50} = 'DragIntegral.drag_integral_G_p';                  % fig 34 subfig (c)
-figs_in_AOR{51} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';  % fig 37 subfig
-figs_in_AOR{52} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';  % fig 37 subfig
-figs_in_AOR{53} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';   % fig 37 subfig
-figs_in_AOR{54} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund';  % fig 38 subfig
-figs_in_AOR{55} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase'; % fig 38 subfig
-figs_in_AOR{56} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase';  % fig 38 subfig
-figs_in_AOR{57} = 'DampingPlateStructures.damping_plate_deflection'; % fig 46 subfig (b)
+figs_in_AOR{49} = 'DescFcns.drag_desc_fcn';                         % fig 9 subfig (b)
+figs_in_AOR{50} = 'DragIntegral.drag_integral_G_m';                  % fig 34 subfig (b)
+figs_in_AOR{51} = 'DragIntegral.drag_integral_G_p';                  % fig 34 subfig (c)
+figs_in_AOR{52} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat';  % fig 37 subfig
+figs_in_AOR{53} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat';  % fig 37 subfig
+figs_in_AOR{54} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat';   % fig 37 subfig
+figs_in_AOR{55} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund';  % fig 38 subfig
+figs_in_AOR{56} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase'; % fig 38 subfig
+figs_in_AOR{57} = 'Wecsim.wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase';  % fig 38 subfig
+figs_in_AOR{58} = 'DampingPlateStructures.damping_plate_deflection'; % fig 47 subfig (b)
 
 %% TABLES
 

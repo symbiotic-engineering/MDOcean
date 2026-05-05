@@ -1,6 +1,31 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-4
+## Added
+- Add report wecsim validation figure to AOR paper appendix
+## Changed
+- Phase error validation plots now wrap from -pi to pi for better readability
+- Wecsim validation plots use log scale x-axis for wecsim geometry, no drag, multibody
+- Wecsim validation plots label colorbar axis with % symbol
+- Wecsim visualization notebook only shows first page of pdf to reduce filesize
+- Wecsim validation cases only turn amplitude saturation on for multibody cases
+- Better aesthetics on signed log plot: tick label format, level selection, show contours
+## Fixed
+- CI: prevent dvc pull issues by retrying up to 10x
+
+
+## [v1.2.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.5) - 2026-5-3
+## Fixed
+- setup: `add_mdocean_path.m` ensures local parallel pool is used to avoid interference between runners
+- CI: use runner-specific temp directory and add cleanup function to avoid orphaned processes 
+
+## [v1.2.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.4) - 2026-5-3
+### Fixed
+- Pipeline: add RunSingleFigFunc and Runtime as deps of `re-results-to-latex` so `nominalLCOE` and `simRuntime` format resolves
+### Changed
+- CI: use latest version of calkit again
+
 ## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
 ## Added
 - Slides: create first draft defense slides in both quarto and beamer
