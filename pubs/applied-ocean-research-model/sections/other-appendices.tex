@@ -336,6 +336,7 @@ More precisely, when $A_{q,\mu} \neq 0$, the $\mu$th inequality constraint defin
     |\hat{I}_p|^{2}\,
     \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
+\label{eq:gamma-disc-center}
 \\[6pt]
 r_{\mu}^2
 &=
@@ -351,8 +352,11 @@ b_{\mu}
 \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
 +
-|\Gamma_{c,\mu}|^2 \\
+|\Gamma_{c,\mu}|^2 
+\label{eq:gamma-disc-radius}
+\\
 S_{\mu} &= \textrm{sign}(A_{q,\mu}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}\right)
+\label{eq:gamma-disc-sign}
 \end{align}
 \end{subequations}
 
@@ -384,7 +388,7 @@ where $\mathcal{F} = \bigcap_{\mu} \left\{\Gamma : S_{\mu}|\Gamma - \Gamma_{c,\m
 \end{aligned}
 \end{equation}
 The intersection points of the $\mu$th and $\nu$th circles are given by:
-\begin{equation}
+\begin{equation}\label{eq:circle-intersection}
     \Gamma_{\mu,\nu} = 
     \Gamma_{c,\mu} + \frac{\Gamma_{c,\nu} - \Gamma_{c,\mu}}{d_{\mu\nu}}
     \left(
@@ -432,21 +436,30 @@ where $\mu$ indexes circle constraints and $k$ indexes oval constraints.
 While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
 We currently assume there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\Gamma$.
 
-\subsubsection{Extension to Higher Dimensions and Convexity}
-Future work may desire to perform constrained optimization on the full nonlinear dynamics rather than the linearized dynamics, or for linear dynamics with irregular wave forcing as \cite{bacelli_numerical_2015} does, in what would be known as nonlinear and linear spectral optimal control respectively in the terminology of \cref{fig:venn-diagram}.
-Both of these problems solve the full harmonic-balance equation, which means that the problem is higher dimensional and may not admit a geometric analytical solution as is possible for the 2D case here.
-In such cases, the efficiency of the numerical solution strongly depends on the convexity of the problem.
+\subsubsection{Extension to Higher Dimensions and Convexity}\label{sec:qp-convexity}
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in \cite{bacelli_numerical_2015}.
+In the terminology of \cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
+Both of these cases solve the full harmonic-balance equation, producing a higher-dimensional analog of \cref{eq:opt-problem-gamma}.
+The problem dimension equals twice the number of frequencies retained in the spectral expansion, preventing the use of the geometric analytical solution used in the monochromatic case.
+Instead, a numerical solver must be used, and the computational scaling of that solver depends critically on whether the problem is \emph{convex}.
 
-A quadratic program is convex when the objective function is convex (i.e. $\mathbf{A}_P$ is positive semidefinite) and all inequality constraints are convex (i.e. $\mathbf{Q}_{\mu}$ are positive semidefinite, $S_\mu=1$), and non-convex otherwise.
-$\mathbf{A}_P$ (value given in \cref{tab:power-metrics}) is unfortunately non-convex, with eigenvalues $\{-1, 1\}$, but \cite{bacelli_numerical_2015} shows that by substituting a linear dynamics equality constraint into the objective, as \cref{eq:obj-gamma} does, the objective becomes convex, even for irregular waves.
-Nonlinear dynamics and nonlinear constraints may introduce non-convexity.
+A convex optimization problem is one in which both the feasible set and the objective function are convex---informally, the feasible region has no holes or concavities, and the objective is bowl-shaped with no local valleys.
+The key practical implication is that any locally optimal solution is also globally optimal, so gradient-based solvers converge to the true optimum without exhaustive search, and solution time scales polynomially with the number of decision variables rather than exponentially.
 
-Convex constraints can be written in terms of a linear matrix inequality.
-Specifically, in a problem with $N_{var}$ decision variables $x$, a polynomial inequality constraint of degree $d$ is convex if it can be expressed as the sum of squares of rational polynomials, or equivalently, as the positive-definiteness of a matrix $\mathbf{F} \in \mathbb{R}^{d \times d}\succ 0$, where each element of the matrix is affine in the decision variables, $\mathbf{F} = \mathbf{F}_0 + \sum_{j=1}^{N_{var}} x_j \mathbf{F}_j$.
-All linear constraints can be written in this form, as can ellipsoidal constraints, system stability and passivity constraints, algebraic Ricatti inequalities, and worst-case performance constraints such as the maximum gain over all frequencies, but not all quadratic or quartic constraints as are required for WEC optimal control.
-The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} are not positive definite, since $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are semidefinite and as already mentioned $\mathbf{A}_P$ is indefinite.
-Reference \cite{mccabe_force-limited_2024} visualizes the non-convexity of effort and flow magnitude constraints in $\Gamma$ space, showing some circles on the complex plane where the feasible region is on the outside of the circle rather than the inside.
-Future work should examine semi-definite relaxations of these constraints with the so-called s-procedure \cite{vanantwerp_tutorial_2000}.
+After reducing to the $\Gamma$ parameterization, the power objective $|\Gamma|^2$ is a sum of squares and therefore convex.
+Even though the original power matrix $\mathbf{A}_P$ (see \cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \cite{bacelli_numerical_2015} shows that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\Gamma$ in \cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
+Nonlinear dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
+
+The inequality constraints are more problematic.
+A constraint is convex if the set of points satisfying it forms a convex region.
+In the $\Gamma$ plane, a convex constraint corresponds to a circle whose feasible region is the \emph{interior} ($S_\mu=1$ in \cref{eq:disc-constraint}), while a non-convex constraint corresponds to a circle whose feasible region is the \emph{exterior} ($S_\mu=-1$).
+Constraints on the effort and flow magnitude (e.g., force limits $|\hat{F}|\leq F_{max}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent impedance of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
+Reference \cite{mccabe_force-limited_2024} visualizes the feasible regions for families of such constraints on the complex $\Gamma$ plane. 
+It shows that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
+The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} confirm this: $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
+For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
+Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
+It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
 
 \subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
@@ -457,6 +470,324 @@ Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but d
 Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
 Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
 Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
+
+\subsection{Constraint Sensitivity Analysis via Parametric Programming}
+\label{sec:appendix-constraint-sensitivity}
+To support the discussion in \cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its conditions for convexity.
+
+The constraint limits are 
+$\tau_{max}$, $P_{\tau\Omega,max}$, $\xi_{f,max}$, $\xi_{s,max}$, and $X_{PTO,max}$, which we collectively denote as $L_\mu$.
+The dependence of power on the first two limits (PTO sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through PTO design, while the latter can only be manipulated by changing the bulk dimensions.
+The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons disussed in \cref{sec:appendix-dimension-sensitivity}, so we focus on the PTO sizing sensitivities here.
+
+In a given sea state, the global sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory, where a local sensitivity is found parametrically and then integrated over the parameter space to find the global parameter  relationship.
+The local sensitivity of power to a constraint parameter 
+$\frac{\partial p_{avg,VI,opt}}{\partial L_\mu}$
+equals the product of the Lagrange multiplier for that constraint, $\lambda_\mu$,
+and the partial derivative of the constraint function with respect to the parameter,
+$\frac{\partial g_\mu}{\partial L_\mu}$ \cite[Section~5.9.3]{boyd_convex_2004}.
+Since the constraint function is defined as 
+$g_\mu(\vec{x}) = \vec{x}^{\,*}\mathbf{Q}_\mu\vec{x} 
+                 + 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\} - b_\mu\leq 0$,
+and \cref{tab:qp-constraints} shows that each constraint limit $L_\mu$ enters $g_\mu$ only through $b_\mu$, we have
+$\frac{\partial g_\mu}{\partial L_\mu} = -\frac{\partial b_\mu}{\partial L_\mu}$.
+This derivative can be trivially computed for all constraints in \cref{tab:qp-constraints}.
+The power sensitivity simplifies to:
+\begin{equation}
+    \frac{\partial p_{avg,VI,opt}}{\partial L_\mu} = -\lambda_\mu \frac{\partial b_\mu}{\partial L_\mu}
+\end{equation}
+If the optimization problem were sovled with a numerical solver,
+the Lagrange multipliers would be directly available as part of the solution.
+In our case, we have a semi-analytical solution for the optimal reflection coefficient at each sea state in terms of the constraint centers and radii at that sea state,
+$\Gamma_{opt}(r_{\mu}, \Gamma_{c,\mu})$,
+so we can compute the Lagrange multipliers as follows:
+\begin{equation}
+\begin{aligned}
+   \lambda_\mu 
+    &\equiv 
+    \frac{\partial p_{avg,VI,opt}}{\partial g_\mu}
+    \\
+    &= - \frac{\partial p_{avg,VI,opt}}{\partial b_\mu}
+    \\
+    &= -
+    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
+    \frac{\partial |\Gamma_{opt}|}{\partial b_\mu}
+    \\
+    &= -
+    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
+    \left(
+        \frac{\partial |\Gamma_{opt}|}{\partial r_{\mu}}
+        \frac{\partial r_{\mu}}{\partial b_\mu}
+        +
+        \frac{\partial |\Gamma_{opt}|}{\partial \Gamma_{c,\mu}}
+        \frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}
+    \right) 
+\end{aligned}
+\end{equation}
+
+\subsubsection{Effect of Constraint Limits on Circle Radii}
+Recall from \cref{eq:gamma-disc-radius} that each inequality constraint maps to a circle in the complex $\Gamma$ plane 
+with center $\Gamma_{c,\mu}$ and radius $r_\mu$ given by:
+\begin{equation}\label{eq:radius-full}
+    r_\mu^2
+    = \frac{b_{\mu} - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
+            - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}}
+           {|\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}}
+    + |\Gamma_{c,\mu}|^2
+\end{equation}
+The constraint limit $L_\mu$ enters $r_\mu$ only through $b_\mu$ 
+(the right-hand side of the quadratic inequality in \cref{tab:qp-constraints}),
+while $\vec{x}_p$, $\vec{n}$, $\hat{I}_p$, $\mathbf{Q}_\mu$, $\vec{a}_\mu$, and $\Gamma_{c,\mu}$ depend only on the Th\'{e}venin impedance $Z_{s,th}$ and excitation $\hat{V}_{s,th}$ for the sea state,
+which are independent of the constraint limits.
+Defining $d_\mu = |\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}$ 
+and $c_\mu = d_\mu|\Gamma_{c,\mu}|^2 - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}$, 
+both independent of the constraint limits, \cref{eq:radius-full} and its derivative simplify to:
+\begin{equation}\label{eq:radius-simplified}
+    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
+    , \quad
+    \frac{\partial r_\mu}{\partial b_\mu} = \frac{1}{2\sqrt{d_\mu(b_\mu + c_\mu)}}
+\end{equation}
+Since $r_\mu\in\mathbb{R}$, then $b_\mu + c_\mu$ and $d_\mu$ must have the same sign, so $\frac{\partial r_\mu}{\partial b_\mu}$ is always positive.
+In other words, increasing $b_\mu$ always enlarges the circle radius, regardless of whether the constraint represents the interior or exterior of the circle.
+Meanwhile, \cref{eq:gamma-disc-center} shows that the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, so $\frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}=0$. Thus, the constraint limit $L_\mu$ does not affect the circle center.
+
+\subsubsection{Optimal Reflection Coefficient as a Function of Constraint Limits}
+Now we combine the relationship between circle radius and optimal reflection coefficient $\Gamma_{opt}(r_\mu)$, with the relationship between circle radius and constraint limit $r_\mu(b_\mu)$ derived above
+to obtain a relationship between reflection coefficient magnitude and constraint limit in a given sea state, $|\Gamma_{opt}|(b_\mu)$.
+Substituting \cref{eq:radius-simplified} into \cref{eq:candidate-points} shows that
+the squared optimal reflection coefficient magnitude in each sea state takes one of the following values depending on the number of active constraints:
+\begin{equation}\label{eq:gamma-opt-summary}
+    |\Gamma_{opt}|^2 =
+    \begin{cases}
+        0 
+    & \text{none active} \\
+        |\Gamma_{c,\mu^*}|^2 
+        - 2|\Gamma_{c,\mu^*}|\sqrt{\frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}}} 
+        + \frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}} 
+    & \text{only $\mu^*$ active} \\
+        \left|
+            \Gamma_{c,\mu^*} + \frac{\Gamma_{c,\nu^*} - \Gamma_{c,\mu^*}}{d_{\mu^*\nu^*}}
+            \left(
+                a_{\mu^*\nu^*}
+                \pm
+                1i \sqrt{\frac{b_{\mu^*} + c_{\mu^*}}{d_{\mu^*}}-a_{\mu^*\nu^*}^2}
+            \right)
+        \right|^2 
+    & \text{$\mu^*$ \& $\nu^*$ active}
+    \end{cases}
+\end{equation}
+where $\mu^*,\nu^*$ refer to the indices of the active constraint(s) for a given sea state,
+and $a_{\mu^*,\nu^*}$ and $d_{\mu^*,\nu^*}$ are real numbers defined in the discussion following \cref{eq:circle-intersection}.
+$d_{\mu^*,\nu^*}$ is independent of the constraint limits, while $a_{\mu^*,\nu^*}$ is affine in $b_{\mu^*}$ and $b_{\nu^*}$.
+Thus, using aff() and quad() to denote affine and quadratic functions of the arguments, we have the following scale behavior:
+\begin{equation}\label{eq:gamma-opt-scale}
+    |\Gamma_{opt}|^2 =
+    \begin{cases}
+        0 
+    & \text{none active} \\
+        \textrm{aff}(b_{\mu^*}) + \sqrt{\textrm{aff}(b_{\mu^*})} 
+    & \text{only $\mu^*$ active} \\
+        \left|
+            \textrm{aff}(b_{\mu^*})+\textrm{aff}(b_{\nu^*})
+            \pm
+            1i \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})}
+        \right|^2 
+    & \text{$\mu^*$ \& $\nu^*$ active} \\
+    = \textrm{quad}(b_{\mu^*}, b_{\nu^*}) + 
+    (\textrm{aff}(b_{\mu^*}) + \textrm{aff}(b_{\nu^*}))
+    \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})} & 
+    \end{cases}
+\end{equation}
+Constraint activity indices $\mu^*,\nu^*$ depend on the constraint limits,
+and this dependence must be accounted for before the curvature of $|\Gamma_{opt}|^2$ can be analyzed.
+From \cref{eq:gamma-opt-quadratic}, we can define $\mu^*$ and $\nu^*$ more explicitly as functions of $b_\mu$ by defining a penalty function $f(\Gamma)$ that returns $\Gamma$ if $\Gamma$ is feasible and $\infty$ otherwise.
+This function can be constructed as $f(\Gamma) = \Gamma + \sum_\mu \mathbb{I}_\mu(\Gamma)$,
+where $\mathbb{I}_\mu(\Gamma)$ is an indicator function that returns $0$ if $\Gamma$ satisfies the $\mu$th constraint and $\infty$ otherwise.
+The penalty function is convex in $\Gamma$ if and only if all constraints are convex, i.e., if $S_\mu=1 ~\forall \mu$.
+Then, the optimal reflection coefficient of each candidate type can be written as the minimum of the candidate points passed through the penalty function, and the overall optimal reflection coefficient is the minimum of those:
+\begin{equation}\label{eq:gamma-opt-min}
+\begin{aligned}
+   |\Gamma_{cl,\mu^*}| &= 
+    \min_\mu \left\{
+        | f\left(\Gamma_{cl,\mu}(b_\mu)\right) |
+    \right\}, \quad
+    |\Gamma_{int,\mu^*,\nu^*}| =
+    \min_{\mu,\nu} \left\{
+        | f\left(\Gamma_{\mu,\nu}(b_\mu, b_\nu)\right) |
+    \right\} \\
+    |\Gamma_{opt}| &=
+    \min \left\{
+        |\Gamma_{cl,\mu^*}(b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*}(b_\mu, b_\nu)|
+    \right\} 
+\end{aligned}
+\end{equation}
+
+Working from the inside out, we now analyze the convexity of $|\Gamma_{opt}|^2$ with respect to $b_\mu$.
+Starting with the candidates at closest points, the square root is a concave increasing function, 
+and a concave increasing function of an affine function is concave, 
+so $\sqrt{\textrm{aff}(b_{\mu})}$ is concave.
+The sum of a concave function and an affine function is concave, 
+so $|\Gamma_{cl}|=\textrm{aff}(b_{\mu}) + \sqrt{\textrm{aff}(b_{\mu})}$ is concave.
+The penalty function is convex if and only if all constraints are convex, 
+so $-|f(\Gamma_{cl})|$ is concave if and only if $S_\mu=1 ~\forall \mu$.
+The minimum of a set of concave functions is a concave increasing function,
+% or the maximum of a set of convex functions is a convex increasing function
+and $|\Gamma_{cl,\mu^*}|$ is the minimum of a set of concave functions if and only if all constraints are concave, 
+so $|\Gamma_{cl,\mu^*}|$ is concave if and only if $S_\mu=1 ~\forall \mu$.
+
+Moving onto the candidates at intersection points, a quadratic function is concave if its leading order term is negative, and the leading order term of $\textrm{quad}(b_{\mu}, b_{\nu})$ is negative (arising from the subtraction of squared-affine term $a_{\mu\nu}^2$).
+%Square root is a concave function, and a concave function of a concave function is concave, so $\sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ is concave.
+The geometric mean of two positive values is a concave function, so the geometric mean of two positive concave functions is concave.
+The term $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$
+is the geometric mean of $(\textrm{aff}(b_{\mu})+\textrm{aff}(b_{\nu}))^2$ and $\textrm{quad}(b_{\mu}, b_{\nu})$.
+The $(\textrm{aff}(b_{\mu})+\textrm{aff}(b_{\nu}))^2$ is positive but is convex rather than concave.
+This means the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ cannot be established with the present analysis.
+If the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ could be established as concave, 
+then the sum of two concave functions is concave, so the candidate points $|\Gamma_{int}|$ would be concave.
+If that were the case, then by the same argument as for the closest points, the minimum of feasible $|\Gamma_{int}|$ would be concave if and only if all constraints are concave.
+The optimum $|\Gamma_{opt}|$ is the minimum of the feasible $|\Gamma_{cl}|$ and $|\Gamma_{int}|$, so if both of those are concave, then it is also concave.
+Therefore, the criteria for the concavity of $|\Gamma_{opt}|$ with respect to $b_\mu$ is that all constraints are convex (interior of circles), and the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ is concave.
+
+As future work, the above curvature analysis should be verified with a disciplined convex programming package such as CVXPY.
+
+To facilitate the analysis of the next section, we observe that although the squared optimal reflection coefficient magnitude, $|\Gamma_{opt}|^2$,
+has so far been expressed as a function only of the active constraints $(\mu^*,\nu^*)$,
+it can be written as a sum over all constraint pairs $(\mu,\nu)$ multiplied by an appropriate Kronecker delta function:
+\begin{equation} 
+\label{eq:gamma-opt-scale-sum}
+\begin{aligned}
+    |\Gamma_{opt}|^2 
+    = &\sum_\mu \sum_{\nu > \mu}
+    \left[
+        \delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})
+        \left(
+            \textrm{aff}(b_{\mu})
+            + \sqrt{\textrm{aff}(b_{\mu})}
+        \right)
+     + \delta_{\mu,\mu^*}\delta_{\nu,\nu^*}
+    \right. \\
+    &\left.
+        \left(
+            \textrm{quad}(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right)
+            \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation}
+where $\delta_{\mu,\mu^*}\delta_{\nu,\nu^*}$ is non-zero when both $\mu$ and $\nu$ are active in that sea state, 
+and $\delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})$ is non-zero when $\mu$ is active and $\nu$ is inactive in the sea state.
+Both Kronecker delta functions are implicitly functions of the constraint limit $b_\mu$, as seen in \cref{eq:gamma-opt-min}.  
+% delta mu mu* is monotonially decreasing (negative step) with $b_\mu$ when $S_\mu=1$ (enlarging the mu-th circle when the mu-th constraint is feasible-inside will make more candidate points mu-feasible, so the mu-th constraint would transition from active to inactive) 
+% and monotonically increasing with $b_\mu$ when $S_\mu=-1$ (enlarging the mu-th circle when the mu-th constraint is feasible-outside will make fewer candidate points mu-feasible, so the mu-th constraint would transition from inactive to active).
+% $\delta_{\nu,\nu^*}$ is monotonially decreasing with $b_\mu$.
+
+\subsubsection{Average Power as a Function of Constraint Limits}
+The results just obtained establish conditions for the convexity of power in a single sea state to the constraint limit in that sea state, which we now make explicit by adding a $\beta$ subscript to all sea state dependent quantities.
+For LCOE, we are interested in the weighted average power across sea states as a function of the constraint limits.
+All constraint limits are independent of the sea state ($L_{\mu\beta}=L_\mu$), with the exception of the amplitude limits due to slamming.
+\Cref{sec:appendix-slam} will show that the slamming limits are a function of $\Delta z_{slam}/H$, which depends explicitly on the wave height, and $\theta$, which depends implicitly on both the wave period and wave height through the guessed phase $\angle\xi$.
+Since the PTO sizing limits are of primary relevance, the following derivation assumes that the constraint limits are independent of the sea state to simplify the expression, although sea-state-dependent limits can easily be accommodated by adding a $\beta$ index on $b_\mu$ and carrying it through the derivation.
+
+From \cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be written as:
+\begin{equation}\label{eq:power-elec-sensitivity}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\beta=1}^{N_{sea}} w_\beta
+    \cdot |\Gamma_{\beta,opt}|^2
+\end{equation}
+where $\overline{P}_{elec,0}$ is the power available if all sea states were unconstrained (impedance-matched) and 
+$w_\beta=JPD_\beta \cdot
+    \frac{|\hat{V}_{s,th,\beta}|^2}
+         {8\Re(Z_{s,th,\beta})}$ is a constant weight for each sea state.
+The second term represents power lost to constraint-induced impedance mismatch and depends on the constraint limits through \cref{eq:gamma-opt-summary}.
+
+Substituting \cref{eq:gamma-opt-scale-sum} into \cref{eq:power-elec-sensitivity} requires a $\beta$ subscript on the starred index to the Kronecker delta functions since constraint activity varies by sea state, as well as a $\beta$ subscript on the affine and quadratic functions to capture sea-state dependence of the Th\'{e}venin parameters:
+\begin{equation}
+\begin{aligned}
+    \overline{P}_{elec} = &\overline{P}_{elec,0}
+    - \eta \sum_\mu \sum_{\nu > \mu}
+    \sum_{\beta=1}^{N_{sea}} w_\beta
+    \left[
+        \delta_{\mu,\mu^*_\beta}(1-\delta_{\nu,\nu^*_\beta})
+        \left(
+            \textrm{aff}_\beta(b_{\mu})
+            + \sqrt{\textrm{aff}_\beta(b_{\mu})}
+        \right)
+    \right. \\
+    &\left.
+        + \delta_{\mu,\mu^*_\beta}\delta_{\nu,\nu^*_\beta}
+        \left(
+            \textrm{quad}_\beta(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}_\beta(b_{\mu}) + \textrm{aff}_\beta(b_{\nu})\right)
+            \sqrt{\textrm{quad}_\beta(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation} 
+Expanding under the assumption that each constraint is sometimes active by itself and sometimes active with another constraint, 
+we find that $\overline{P}_{elec}$ is a piecewise function of each constraint limit $b_\mu$, with a quadratic leading order term as well as affine, square root of affine, and affine times square root of quadratic terms.
+The two Kronecker delta terms are combined with the weighting term $w_\beta$ to create revised weighting terms $\tilde{w}_{1\mu\nu\beta}$ and $\tilde{w}_{2\mu\nu\beta}$ that are non-zero only when the corresponding constraint(s) are active in that sea state:
+\begin{equation}\label{eq:power-triple-sum}
+\begin{aligned}
+    \overline{P}_{elec} &= \overline{P}_{elec,0}
+    - \eta \sum_\mu \sum_{\nu > \mu}
+    \left[
+        \sum_{\beta=1}^{N_{sea}} \tilde{w}_{1\mu\nu\beta}
+        \left(
+            \textrm{aff}_\beta(b_{\mu})
+            + \sqrt{\textrm{aff}_\beta(b_{\mu})}
+        \right)
+    \right. + \\
+    &\left.
+     \sum_{\beta=1}^{N_{sea}} \tilde{w}_{2\mu\nu\beta}
+        \left(
+            \textrm{quad}_\beta(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}_\beta(b_{\mu}) + \textrm{aff}_\beta(b_{\nu})\right)
+            \sqrt{\textrm{quad}_\beta(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation}
+so the power-constraint relationship is a sum over sea states of piecewise functions of the constraint limit $b_\mu$.
+Recognizing that the sea state sum in \eqref{eq:power-triple-sum} essentially just scales the individual piecewise functions, the expression can be simplified by absorbing the weights into the subscripts of the affine and quadratic terms, and combining the sum of an affine and quadratic term into a single quadratic term:
+\begin{equation}\label{eq:power-double-sum}
+\begin{aligned}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\mu\nu\beta}
+    &\left[
+        \sqrt{\textrm{aff}_{\mu\nu\beta}(b_{\mu})}
+        + \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu}) 
+    \right.+ 
+     \\
+    &\left.
+        \left(\textrm{aff}_{\mu\nu\beta}(b_{\mu}) + \textrm{aff}_{\mu\nu\beta}(b_{\nu})\right)
+        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}
+    \right]
+\end{aligned}\end{equation}
+We can then use a simliar analysis as before to obtain conditions for the convexity of the overall power-constraint relationship.
+
+% \subsubsection{Convexity of the Power-Constraint Relationship}
+% To illustrate convexity, we use an intuitive geometric argument, leaving formal proof to future work.
+% In a constraint that has $S_\mu=1$ in a given sea state, the feasible region is the interior of a circle, so increasing the constraint limit $b_\mu$ enlarges the circle radius and therefore enlarges the feasible region, which can only decrease or maintain the optimal $|\Gamma_{\beta,opt}|$ and therefore increase or maintain power.
+% In a constraint with $S_\mu=-1$, the feasible region is the exterior of a circle, so increasing the constraint limit $b_\mu$ enlarges the circle radius and therefore shrinks the feasible region, which can only increase or maintain the optimal $|\Gamma_{\beta,opt}|$ and therefore decrease or maintain power.
+% This corresonds to the sign of the leading order term of a given piecewise segment in the power-constraint relationship, which is negative for $S_\mu=1$ and positive for $S_\mu=-1$.
+% Furthermore, the number of sea states in which a particular constraint is singularly or pairwise active ($\sum_{\beta}\mathbb{I}_\beta$) is monotonically non-decreasing with the constraint limit, so the leading order term in the overall power-constraint relationship (all piecewise segments together) is positive if the constraint has $S_\mu=1$ at all sea states, or negative if $S_\mu=-1$ at all sea states.
+% This means that as long as the sign of $S_\mu$ is consistent across sea states, the power-constraint relationship is globally convex.
+% Relaxing any constraint thus always increases or maintains power, and the marginal power benefit diminishes as the constraint limit grows.
+
+\subsubsection{Extension to Dimension Sensitivity}\label{sec:appendix-dimension-sensitivity}
+In principle, the same parametric programming approach can be used to semi-analytically compute the derivatives of the constrained optimal power with respect to bulk dimensions, 
+though the implementation remains out of reach.
+These derivatives would be highly valuable, and indeed would enable the full wave-to-wire control co-design optimization problem to be solved semi-analytically, rather than the present approach which requires a numerical bulk-dimension optimization to be wrapped around the semi-analytical control optimization and simulation.
+Computing bulk-dimension derivatives would require not only $\partial \Gamma_{opt}/\partial b_\mu$ as we derive here,
+but also the derivatives of Th\'{e}venin parameters with respect to bulk dimensions, 
+because bulk dimensions affect $\mathbf{Q}_\mu, \vec{a}_\mu$, and the unconstrained power through the Th\'{e}venin parameters.
+The sensitivity formula would become significantly more complex and less intuitive with these additional terms, 
+and more importantly, the Th\'{e}venin-to-dimension derivatives are not currently available in MDOcean because they depend on the hydrodynamic coefficient-to-dimension derivatives.
+Application of the adjoint method has recently enabled efficient computation of hydrodynamic coefficient derivatives in the context of a numerical boundary element method solver \cite{khanal_fully_2025}, 
+but the adjoint method has not yet been implemented for the semi-analytical MEEM model used here.
+Implementing the adjoint for a linear solve is relatively straightforward in a multidisciplinary design optimization package like OpenMDAO, 
+and would unlock a fully semi-analytical differentiation workflow.
 
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
