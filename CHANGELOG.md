@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.7) - 2026-5-5
+### Added
+- Paper: discussion on scaling and convexity of power and LCOE with respect to dynamic constraint limits
+
 ## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-4
 ## Added
 - Add report wecsim validation figure to AOR paper appendix
@@ -13,7 +17,6 @@
 - Better aesthetics on signed log plot: tick label format, level selection, show contours
 ## Fixed
 - CI: prevent dvc pull issues by retrying up to 10x
-
 
 ## [v1.2.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.5) - 2026-5-3
 ## Fixed
