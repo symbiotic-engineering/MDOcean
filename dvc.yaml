@@ -6245,6 +6245,28 @@ stages:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
     desc: Automatically generated from the 'build-UMERC-paper' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  build-dissertation:
+    cmd: calkit latex build -e tex --no-check -r 
+      pubs/dissertation/.latexmkrc pubs/dissertation/sampleThesis.tex
+    deps:
+      - pubs/dissertation/sampleThesis.tex
+      - pubs/dissertation/cornell.cls
+      - pubs/dissertation/hangcaption.sty
+      - pubs/dissertation/.latexmkrc
+      - pubs/UMERC-2025-grid-value/
+      - pubs/dissertation/references.bib
+      - .calkit/env-locks/tex
+      - pubs/dissertation/.latexmkrc
+    outs:
+      - pubs/dissertation/sampleThesis.pdf
+      - pubs/dissertation/sampleThesis.synctex.gz:
+          cache: false
+          persist: false
+      - pubs/dissertation/aux/:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 'build-dissertation' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   view-aor-figs:
     cmd: calkit nb execute --environment pubs --no-check 
       "pubs/applied-ocean-research-model/view_figs.ipynb"
