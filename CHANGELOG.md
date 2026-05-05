@@ -1,5 +1,145 @@
 # Changelog
 ## Unreleased
+
+## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-4
+## Added
+- Add report wecsim validation figure to AOR paper appendix
+## Changed
+- Phase error validation plots now wrap from -pi to pi for better readability
+- Wecsim validation plots use log scale x-axis for wecsim geometry, no drag, multibody
+- Wecsim validation plots label colorbar axis with % symbol
+- Wecsim visualization notebook only shows first page of pdf to reduce filesize
+- Wecsim validation cases only turn amplitude saturation on for multibody cases
+- Better aesthetics on signed log plot: tick label format, level selection, show contours
+## Fixed
+- CI: prevent dvc pull issues by retrying up to 10x
+
+
+## [v1.2.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.5) - 2026-5-3
+## Fixed
+- setup: `add_mdocean_path.m` ensures local parallel pool is used to avoid interference between runners
+- CI: use runner-specific temp directory and add cleanup function to avoid orphaned processes 
+
+## [v1.2.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.4) - 2026-5-3
+### Fixed
+- Pipeline: add RunSingleFigFunc and Runtime as deps of `re-results-to-latex` so `nominalLCOE` and `simRuntime` format resolves
+### Changed
+- CI: use latest version of calkit again
+
+## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
+## Added
+- Slides: create first draft defense slides in both quarto and beamer
+- Pipeline: stages for rendering quarto slides in html and pdf using quarto and playwright chromium docker containers respectively
+
+## [v1.2.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.2) - 2026-4-29
+### Changed
+- Speedup: `find_nominal_inputs` uses unsaturated simulation to calculate `F_max_nom` instead of optimization
+- Validation: suppress warnings in Meem validation
+- Analysis: parallelize and remove print statements in `PtoSweep` analysis
+
+## [v1.2.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.1) - 2026-4-25
+### Added
+- Paper: dedicated economics appendix, including beta table moved from main text
+- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
+- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
+- Paper: create flowcharts and explanations for modified-frequency-domain method
+### Changed
+- Validation: include units in the validation table
+- Pipeline: Mermaid outputs switched from SVG to PNG and calkit iteration is used for multiple diagrams
+- Paper: moved most of PTO section to appendix
+- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
+- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
+- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
+### Fixed
+- Analysis: `Parameters` class normalization now handles function handles
+- Analysis: add forgotten intermediate outputs to `MEEM` class
+- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
+
+## [v1.2.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.0) - 2026-4-25
+Major new functionality: constrained optimal control via brute force search, solver, and analytical QP
+### Added
+- Model: solver-based controller can now obey amplitude and power constraints, not just force limits, via revamped `control_errors_from_sat_results()`
+- Model: ability to determine control via nested brute force sweep instead of simultaneously with the drag solver
+- Model: ability to determine control via quadratically-constrained quadradratic program (QCQP) implemented via analytical circle intersections
+- Model: parameter `control_solve_type` to change betweeen solver, brute force, and analytical optimal control formulations
+- Plots: four new plots in `RunSingleFigFunc` class for optimal control sweep (multiplier and reflection coefficient space) and QCQP (circles and circles with brute-force overlay in reflection coefficient space)
+- Validation: create test case for verifying/benchmarking `multibody_response.m`
+- Model: `control_type='none'` option for storm case
+### Changed
+- Speedup: change dynamics argument output order to avoid unnecessary recomputation of phase
+- Speedup: reuse shared helper terms within and across controllers in `multibody_response.m`
+- Speedup: reuse `D_sys` determinant from `multibody_impedance.m` in `multibody_response.m`
+- Speedup: compute angles via `atan2()` rather than `angle()`, and use `complex()` or identities in place of some complex operations
+- Speedup: `response_and_ctrl_err_from_ctrl_guess()` uses guessed phase to avoid computing resultant phase
+- Analysis: runtime analysis bar chart includes combinations of various constraints on/off
+- Analysis: change `GenericAnalysis` to handle class
+- Analysis/Speedup: `GenericAnalysis` caches computation of dependencies between analysis and postpro stages
+- Model: retune report power and heave force multiplier
+- Plots: `improvePlot.m` now detects polar axes, not just Cartesian
+- File structure: split control functions out into new `constrained_opt_ctrl.m` file
+### Fixed:
+- Model: output the stabilized PTO coefficients from `control_evaluation_fcn()` to avoid inconsistencies in downstream calculations
+- Model: prevent negative PTO damping
+
+## [v1.1.29](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.29) - 2026-4-24
+### Changed
+- Validation: plots for damping plate hydro fit now overlay case 2, 4, and WAMIT data in log space and with improved aesthetics
+
+## [v1.1.28](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.28) - 2026-4-20
+### Added
+- Validation: plots showing acceleration harmonics, position THD, and drag force waveform to validate describing function
+
+## [v1.1.27](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.27) - 2026-4-20
+### Fixed
+- Model: add pi to multibody phases to make wecsim phase validation match
+- Pipeline: add forgotten meem intermediate results figure outputs
+- Validation: show all phases between -pi and pi
+
+## [v1.1.26](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.26) - 2026-4-20
+### Added
+- Simulation: create `run_and_catch_warnings.m` to capture output and count warnings
+### Changed
+- Model: include identifiers on warnings in `get_response_drag.m`, `make_drag_integral.m`, `run_MEEM.m`, and `simulation.m`
+- Analysis: SweepGeoms analysis uses warning suppression and counting
+
+## [v1.1.25](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.25) - 2026-4-17
+### Fixed
+- Validation: fix PTO force extraction from WEC-Sim so it includes stiffness (previously only included damping component)
+
+## [v1.1.24](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.24) - 2026-4-17
+### Fixed
+- Model: remove sign discrepancy between MEEM and WAMIT excitation phase 
+
+## [v1.1.23](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.23) - 2026-4-17
+### Changed
+- Analysis: add jupyter notebooks showing figures in each stage
+
+## [v1.1.22](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.22) - 2026-4-15
+### Changed
+- Analysis: cache `var_bounds()` struct in `var_bounds.mat` to avoid recomputation
+
+## [v1.1.21](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.21) - 2026-4-15
+### Fixed
+- Validation: extract one wave period of WEC-Sim output starting at a wave-period boundary so that FFT phase is relative to the wave (`runRM3Parallel.m`)
+
+## [v1.1.20](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.20) - 2026-4-13
+### Fixed
+- Model: phase sign error in `second_order_transfer_fcn` in `get_response_drag.m`
+- Validation: copy-paste error in `runRM3Parallel.m` where `float_pos` was used to compute spar and relative phase instead of `spar_pos` and `rel_pos`
+- Validation: mislabeled singlebody/multibody rows in WEC-Sim error table (`post_process_fcn.m`)
+
+## [v1.1.19](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.19) - 2026-4-13
+### Added
+- Analysis: new `FitOlaya` class that loads Olaya et al. digitized damping plate data, computes derived signals, and generates fit and exploratory plots for hydrodynamic coefficient fitting
+
+## [v1.1.18](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.18) - 2026-4-13
+### Changed
+- CI: pin calkit to v0.37.3 to avoid corrupted mat files in 0.37.4
+
+## [v1.1.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.17) - 2026-4-13
+### Added
+- Analysis: new `PtoSweep` class that performs a 2-D sweep of F_max and P_max for the nominal RM3 geometry, producing contourf plots of average power, design cost, and LCOE with a hatched infeasibility region and markers for the maximum-power and minimum-LCOE operating points
+
 ## [v1.1.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.16) - 2026-4-10
 ### Added
 - Analysis: new class for sweeping geometries and plotting radiation eff, surface area, CWR, etc
@@ -14,19 +154,6 @@
 ## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-6
 ### Changed
 - CI: bump paths-filter to v4 in merge-ready.yml workflow
-
-## [v1.1.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.15) - 2026-4-5
-### Added
-- Paper: dedicated economics appendix, including beta table moved from main text
-- Validation: average percent error rows for CAPEX, OPEX, and LCOE added to validation LaTeX table
-- Wecsim: `wecsimAvgPowerErrorBestCase` and `wecsimAvgPowerErrorWorstCase` exported to `end.json`
-### Changed
-- Paper: moved most of PTO section to appendix
-- Paper: removed various less-important figures, combined related figures to subfigures, and updated AOR figure mapping
-- Paper: various wording fixes in benchmarking.tex, discussion.tex, module-details.tex
-- Plots: removed titles from `power_matrix_compare` contour and tiled-layout plots
-### Fixed
-- CI: more comprehensive fix to stale submodules: deinit all before clearing, checkout submodules false, and update submodules separately
 
 ## [v1.1.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.1.14) - 2026-4-5
 ### Added

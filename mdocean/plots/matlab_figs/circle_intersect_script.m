@@ -38,7 +38,7 @@ function run_testcase(testcase,paper)
          4];
 
     % run optimization
-    [p_star,candidates,constraints_active] = circle_intersect_optim(c,r);
+    [p_star,candidates,constraints_active] = circle_intersect_optim(c,r,true);
 
     % check testcases match desired outcomes
     should_be_feasible = [true true false false true true true];

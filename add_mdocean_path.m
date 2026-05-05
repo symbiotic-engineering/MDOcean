@@ -12,4 +12,6 @@ addpath(genpath(mdocean_folder))
 
 rmpath(genpath([mdocean_folder '/simulation/modules/OpenFLASH'])) % prevent using OpenFLASH run_MEEM since it's not integrated yet
 
+parallel.defaultClusterProfile('local'); % use local instead of global to avoid interference between multiple CI runners
+
 clear path s MDOcean_folder mdocean_folder

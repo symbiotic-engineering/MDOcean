@@ -21,6 +21,26 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Setup temp environment + cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
+
+          cleanup() {
+            echo "Cleaning up job..."
+
+            pkill -P $$ || true
+            pkill -f matlab-batch || true
+            pkill -f run_matlab_command || true
+
+            rm -rf "$TMPDIR" || true
+          }
+
+          trap cleanup EXIT INT TERM
       - name: Clear stale submodule caches
         run: |
           # Deinit any previously-initialized submodules first (while their gitdirs
@@ -86,24 +106,31 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - name: pull with retries
+        run: bash .github/workflows/calkit_pull_with_retries.sh
+        continue-on-error: true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
           save: false
+          cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
-
+      - name: add any newly generated .ipynb files to git
+        run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --keep-going --log build-AOR-paper view-aor-figs
+          # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
+          run_args: --keep-going --log build-AOR-paper view-aor-figs build-RE-paper all-viz render-quarto-pdf
           pull_dvc: false
           save: false
+          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then

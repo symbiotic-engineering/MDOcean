@@ -16,7 +16,10 @@ function [fig_array,...
 % :returns: tab_colspecs
             
             tab = intermed_result_struct.params_table;
-            
+
+            % replace drag_fcn function handle with string for display purposes
+            tab(strcmp(tab.name, 'drag_fcn'),{'value','value_normalize'}) = {'drag_fcn'};
+
             fig_array = [];
             
             tab_array_display = {tab};
@@ -25,7 +28,6 @@ function [fig_array,...
             tab_firstrows = {[]};
             tab_colspecs = {[]};
             
-            end_result_struct.parameters_table = tab;
             end_result_struct.forceScaleFactor = tab.value(strcmp(tab.name, 'F_heave_mult'));
             end_result_struct.powerScaleFactor = tab.value(strcmp(tab.name, 'power_scale_multibody'));
             end_result_struct.massScaleFactor  = tab.value(strcmp(tab.name, 'm_scale'));
