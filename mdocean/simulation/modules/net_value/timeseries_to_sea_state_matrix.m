@@ -1,8 +1,8 @@
 function [carbon_contour,price_contour] = timeseries_to_sea_state_matrix(Hs,T,jpd_Hs,jpd_T,carbon_interpolated,price_interpolated,ploton)
 
 %make the boundary for the first bucket 0
-p.Hs = [0; jpd_Hs];
-p.T = [0, jpd_T];
+p.Hs = [0, jpd_Hs];
+p.T = [0; jpd_T];
 
 
 %find the average price or carbon value for each bin
