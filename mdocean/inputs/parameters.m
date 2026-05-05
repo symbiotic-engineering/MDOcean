@@ -77,8 +77,8 @@ if placeholder_emissions
     grid_energy_timeseries = grid_energy_timeseries * 1000; % MWh to kWh
     carbon_intensity = carbon_interpolated_temp ./ grid_energy_timeseries; % kg/kWh - typical value is 0.5 kg/kWh for natural gas, 1 kg/kWh for coal
 else
-    carbon_data = readmatrix('emissions_per_power.csv','NumHeaderLines',3,'VariableNamesLine',1);
-    marginal_data = readtable('thermal_marginal.csv');
+    carbon_data = readmatrix('emissions_plant.csv','NumHeaderLines',3,'VariableNamesLine',1);
+    marginal_data = readtable('thermal_duals_marginal.csv');
     carbon_intensity = NaN([480 1]);
     for t=1:480
         marg_gens_this_t = marginal_data.gen(marginal_data.time==t);
