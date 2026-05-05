@@ -176,15 +176,34 @@ From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 \end{aligned}
 \end{equation}
 Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
-When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
+When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, 
+and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
  
-As derived in \cref{sec:appendix-constraint-sensitivity}, the constraint limits $F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ affect the constrained optimal value of $|\Gamma_{\beta,opt}|$ with the following form:
-
-
-When a single constraint is active, the average power is piecewise affine plus the square root of an affine function of the constraint limit.
-When two constraints are simultaneously active, it is piecewise affine plus the square root of a quadratic function of the two constraint limits (see \cref{sec:appendix-constraint-sensitivity}).
-In both cases the benefit of relaxing a constraint diminishes as the limit grows, quantifying the diminishing returns of oversizing the PTO.
-
+\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive the scaling law between the optimal annual average power $\overline{P}_{elec}$ and the constraint coefficients $b_\mu$:
+\begin{equation}\label{eq:power-double-sum-main}
+\begin{aligned}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\mu\nu\beta}
+    &\left[
+        \sqrt{\textrm{aff}_{\mu\nu\beta}(b_{\mu})}
+        + \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu}) 
+    \right.+ 
+     \\
+    &\left.
+        \left(\textrm{aff}_{\mu\nu\beta}(b_{\mu}) + \textrm{aff}_{\mu\nu\beta}(b_{\nu})\right)
+        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}
+    \right]
+\end{aligned}\end{equation}
+where $b_\mu$ and $b_\nu$ are simple (affine or square) functions of the constraint limits
+$F_{max}$, $P_{max,elec}$, $X_{f,max}$, and $X_{s,max}$ defined in \cref{tab:qp-constraints}; 
+$\overline{P}_{elec,0}$ is the unconstrained power;
+and $\textrm{aff}_{\mu\nu\beta}$ and $\textrm{quad}_{\mu\nu\beta}$ are affine and quadratic functions of $b_\mu$ and $b_\nu$, respectively.
+Under certain conditions which we derive in \cref{sec:appendix-constraint-sensitivity}, 
+the relationship \cref{eq:power-double-sum-main} is convex in the constraint coefficients $b_\mu$.
+While satisfaction of these conditions is not guaranteed, 
+convexity is observed to hold in the sweep of the PTO design variables for the nominal hydrodynamic design (see \cref{fig:pto-sweep}).
+We also note that \cref{eq:power-double-sum-main} displays coupling in the constraint variables, such that the effect of one constraint limit depends on the values of the other constraint limits.
+This illustrates the importance of a multidisciplinary optimization considering all interactions, rather than a sequential optimization that optimizes one subsystem at a time holding the others fixed.
 
 \paragraph{LCOE Drivers}
 To better see the dependence of LCOE on design for a fixed $N_{WEC}$ and $FCR$, one can divide out the constant factors from \cref{eq:lcoe}, leaving normalized price constants $p^{'}_{(*)}$.
@@ -195,13 +214,19 @@ The LCOE model then equals:
     }{\overline{P}_{elec}}
 \end{equation}
 
-The numerator of \cref{eq:LCOE-scale} scales linearly with design inputs $F_{max}$ and $P_{max,elec}$, while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
-The presence of the constraint limits in the numerator of the LCOE implies that whether or not the optimal solution is saturated, at least one dynamic constraint will be active in each sea state at system optimality.
-More strongly, the presence of the PTO limits in the numerator and denominator but not elsewhere in the model implies that the system optimal will have both PTO limits active in at least one sea state.
-The numerator is affine in the PTO limits while the denominator is piecewise affine plus square root of quadratic or affine in the PTO limits.
-The LCOE minimization with design variables of $F_{max}$ and $P_{max,elec}$ and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
-The convexity of the denominator with respect to the PTO limits (established in the preceding paragraph) means that LCOE is quasi-convex in the PTO limits for fixed geometry, guaranteeing a unique global optimum in those variables.
-This motivates a three-level nested optimization strategy: at the innermost level the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; at the mid-level the optimal PTO limits are found by exploiting the quasi-convex fractional structure; and at the outer level the bulk geometry is optimized with a general nonlinear program.
+The numerator of \cref{eq:LCOE-scale} is affine in the design inputs $F_{max}$ and $P_{max,elec}$, 
+while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, 
+which depend quadratically on the bulk dimensions.
+The fact that decreasing a constraint limit causes the numerator of the LCOE to monotonically increase 
+and the denominator to monotonically decrease implies that at system optimality, 
+and each constraint will be active in at least one sea state.
+The LCOE minimization with design variables of $F_{max}$, $P_{max,elec}$, and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
+When the denominator is convex with respect to the PTO limits, this means that LCOE is ``quasi-convex'' in the PTO limits for fixed geometry \cite{agrawal_disciplined_2020}.
+This quasi-convexity can be leveraged by using a subgradient method or by solving a simple sequence of convex problems, which simplifies the optimization process significantly compared to a general nonlinear solver.
+This motivates a three-level nested optimization strategy: 
+at the innermost level, the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; 
+at the mid-level, the optimal PTO limits are found by exploiting the quasi-convex fractional structure when possible; 
+and at the outer level, the bulk geometry is optimized with a general nonlinear program.
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
