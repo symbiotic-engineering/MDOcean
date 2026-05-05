@@ -258,42 +258,7 @@ benchmarking
 %% Use \section commands to start a section
 %% Labels are used to cross-reference an item using \ref command.
 
-\include{sections/model-intro}
-\clearpage
-\include{sections/model-overview}
-\clearpage
-\include{sections/module-details}
-\clearpage
-\include{sections/benchmarking}
-\clearpage
-\include{sections/discussion}
-
-\section{Conclusion}
-% Summary:
-In summary, this paper develops fast and accurate semi-analytical models for WEC geometry, hydrodynamics, dynamics, structures, and economics and subsequently applies the Multidisciplinary Design Optimization (MDO) framework to maximize power and minimize cost of the RM3 point absorber. 
-
-% Model
-The geometry module calculates volumes, areas, and the pitch stability margin with simple algebraic relations.
-The hydrodynamics module implements the matched eigenfunction expansion method for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing BEM solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current MEEM model.
-This achieves an order of magnitude speedup compared to the popular BEM solver Capytaine.
-The dynamics module employs describing functions to extend beyond the typical frequency domain formulation to capture nonlinearities and dynamic constraints such as drag and force saturation.
-This achieves a three order of magnitude computational speedup over the common dynamics solver WEC-Sim.
-The structures module uses an equivalent-thickness model of stiffened plates and a library of canonical solutions to structural boundary value problems to assess the factor of safety of the float bottom plate, spar shell, and damping plate in cyclic fatigue and storm load cases.
-This represents, to the authors' knowledge, the only public WEC structural simulation regardless of modeling technique.
-Finally, the economics module calculates the design-dependent cost based on structural material volume and powertrain force and power rating, performing a straightforward LCOE calculation.
-Comparison of the dynamics and float hydrodynamics models against WEC-Sim and BEM respectively across multiple cases serves to comprehensively validate the models, with errors generally less than 1\% for test cases with identical assumptions and around 10\% for more realistic cases with diverging assumptions.
-The geometry, economics, structures, and spar hydrodynamics are compared against the RM3 report, serving as a less comprehensive yet sufficient validation.
-Good agreement is observed for all but the spar added mass, storm loads, and structural margins, necessitating the use of a tuning factor for these quantities.
-All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \results[simRuntime].
-
-% Discussion
-A key feature of this study that other WEC models lack is the inclusion of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
-Nonetheless, the structural loads and stresses have high uncertainty, the impact of PTO dynamics and irregular waves is not included, and only a single WEC type (two-body axisymmetric point absorber) is considered.
-Future modeling work should pursue model enhancements to correct these limitations.
-Additionally, the next iteration should consider enhancing the model by adding mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
-
-% Impact of findings:
-The results of this study will inform future WEC design optimization, the necessity of accounting for multidisciplinary coupling, and the power of semi-analytical modeling to reduce simulation runtime and provide design insight.
+\include{content}
 
 \section*{Acknowledgements}
 The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
