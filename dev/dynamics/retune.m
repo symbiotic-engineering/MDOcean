@@ -1,6 +1,10 @@
 % retune heave force and power multiplier to RM3 report
 p = parameters('report');
+p.control_type = 'damping';
 b = var_bounds('report');
+b.F_max_nom = find_nominal_inputs(b,p);
+b.X_noms(strcmp(b.var_names,'F_max')) = b.F_max_nom;
+
 [~,~,val] = run_single(p,b);
 actual = validation_inputs('report');
 

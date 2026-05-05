@@ -26,7 +26,15 @@ function [figs,LCOE,val] = run_single(p,b,X)
 
     if p.operational_dynamics_debug_plots_on
         n = gcf().Number;
-        figs_dynamics = [figure(n-2), figure(n-1), figure(n)];
+        figs_slam = [figure(n-1), figure(n)];
+        if strcmpi(p.control_solve_type, 'brute_force')
+            fig_drag = figure(n-4);
+            figs_controls = [figure(n-3), figure(n-2)];
+        else
+            fig_drag = figure(n-2);
+            figs_controls = gobjects(1,2);
+        end
+        figs_dynamics = [fig_drag figs_controls figs_slam];
         p.operational_dynamics_debug_plots_on = false;
     else
         figs_dynamics = [];

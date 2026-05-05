@@ -28,7 +28,14 @@ function [fig_array,...
     % if histogram_separate_figures=false, 183 figures: fig_cell is 3 nested
     %    5x1 cells, cells 1-4 have 15 figures and cell 5 has 1 figure
     tmp = [fig_cell{:}]; 
-    fig_array = [tmp{:}]; 
+    existing_figs = [tmp{:}];
+
+    % create new timeseries figures using drag-on multibody wecsim case
+    % case_group 1 = wecsim multibody, p_idx 2 = drag on with wamit coefficients
+    drag_on_filename = filename_cell{1}{2};
+    ts_figs = plot_timeseries_figures(drag_on_filename);
+
+    fig_array = [existing_figs ts_figs]; 
 
     tab_array_display = {validation_table};
     tab_array_latex = {validation_table};
@@ -37,6 +44,11 @@ function [fig_array,...
     tab_colspecs = {[]};
      
     end_result_struct.err_structs = err_structs;
+    % Scalar power errors used in the paper text
+    % Best case: single-body, baseline (no drag, identical hydro coefficients)
+    % Worst case: multi-body, total (drag on, MEEM hydro coefficients)
+    end_result_struct.wecsimAvgPowerErrorBestCase = abs(err_structs{2}.pct_error_baseline(1));
+    end_result_struct.wecsimAvgPowerErrorWorstCase = abs(err_structs{1}.pct_error_total(1));
 end
 
 function [err_structs, fig_mats, T] = validate_dynamics_plots(case_cell,filename_cell,runOnlyFewSeaStates)
@@ -161,9 +173,11 @@ function [weighted_pwr_err,...
 
     make_report(figs,wecsim_filename,p)
 
+    is_wecsim_geom = contains(wecsim_filename, 'geom_wecsim');
+    use_log_x = (p.C_d_float == 0 && p.C_d_spar == 0 && is_wecsim_geom && p.use_multibody);
     make_histogram_on_axis(ax,width,...
                             pwr_err,amp_err,...
-                            weighted_pwr_err,max_amp_err,xlim_thresh)
+                            weighted_pwr_err,max_amp_err,xlim_thresh,use_log_x)
 
 end
 
@@ -207,7 +221,10 @@ end
 
 function make_histogram_on_axis(ax,width,...
                                 pwr_err,amp_err,...
-                                weighted_pwr_err,max_amp_err,xlim_thresh)
+                                weighted_pwr_err,max_amp_err,xlim_thresh,use_log_x)
+    if nargin < 8
+        use_log_x = false;
+    end
     % ensure scalar values for plotting vertical lines/text
     if isempty(weighted_pwr_err)
         wp = NaN;
@@ -229,19 +246,29 @@ function make_histogram_on_axis(ax,width,...
     min_num_bars = 10;
     max_num_bars = 30;
 
-    expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
-    width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
-    
-    pwr_err_capped = pwr_err;
-    pwr_err_capped(abs(pwr_err_capped)>xlim_thresh)=Inf;
-    amp_err_capped = amp_err;
-    amp_err_capped(abs(amp_err_capped)>xlim_thresh)=Inf;
+    if use_log_x
+        C_log = -2; % smallest relevant value is 10^-C_log = 0.01% error - used as zero point on colorbar
+        slog = @(x) sign(x) .* log10(1 + abs(x) ./ (10^C_log));
+        pwr_plot = slog(pwr_err(:));
+        amp_plot = slog(amp_err(:));
+        all_finite = [pwr_plot(isfinite(pwr_plot)); amp_plot(isfinite(amp_plot))];
+        expected_x_width = 2 * max(abs(all_finite));
+        width = expected_x_width / 20;
+    else
+        expected_x_width = 2 * min( max(abs([pwr_err(:);amp_err(:)])), xlim_thresh);
+        width = max( min(width, expected_x_width/min_num_bars), expected_x_width/max_num_bars);
+
+        pwr_plot = pwr_err;
+        pwr_plot(abs(pwr_plot)>xlim_thresh)=Inf;
+        amp_plot = amp_err;
+        amp_plot(abs(amp_plot)>xlim_thresh)=Inf;
+    end
 
     % histogram
     axes(ax)
-    histogram(ax,pwr_err_capped(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
+    histogram(ax,pwr_plot(:),'Normalization','probability','BinWidth',width,'DisplayName','Mechanical Power')
     hold(ax,'on')
-    h = histogram(ax,amp_err_capped(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
+    h = histogram(ax,amp_plot(:),'Normalization','probability','BinWidth',width,'HandleVisibility','off');
     hb = bar(ax,h.BinEdges(1:end-1),-h.Values,'histc');
     hb.FaceColor = [0.8500 0.3250 0.0980];
     hb.FaceAlpha = 0.6; 
@@ -251,22 +278,34 @@ function make_histogram_on_axis(ax,width,...
 
     ylim([-.57 .57])
     xx = xlim;
-    if any(abs(xx) > xlim_thresh)
-        warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
+    xval = max(abs(xx));
+    if ~use_log_x
+        if any(abs(xx) > xlim_thresh)
+            warning('Outliers > %0.1f%% error are not shown on the histogram.', xlim_thresh)
+        end
+        xval = min(xval,xlim_thresh); % don't allow outliers > xlim_thresh%
     end
-    xlim([-1 1]*min(max(abs(xx)),xlim_thresh)) % zero centered on x, don't allow outliers > xlim_thresh%
+    xlim([-1 1]*xval) % zero centered on x
     yy = ylim;
 
-    plot(ax,[1 1]*wp,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
+    if use_log_x
+        wp_x = slog(wp);
+        ma_x = slog(ma);
+    else
+        wp_x = wp;
+        ma_x = ma;
+    end
+
+    plot(ax,[1 1]*wp_x,[0 yy(2)],'Color',[0 0.4470 0.7410], ...
         'DisplayName','JPD-Weighted Average Power')
-    plot(ax,[1 1]*ma,     [yy(1) 0],'Color',[0.8500 0.3250 0.0980], ...
+    plot(ax,[1 1]*ma_x,     [yy(1) 0],'Color',[0.8500 0.3250 0.0980], ...
         'DisplayName','Maximum Float Amplitude')
 
-    text_offset_if_neg = -max(abs(xx))/3.7;
-    text_offset_if_pos =  max(abs(xx))/18;
-    x_text_pwr = wp + text_offset_if_neg*logical(wp<0) ...
+    text_offset_if_neg = -xval/3.7;
+    text_offset_if_pos =  xval/18;
+    x_text_pwr = wp_x + text_offset_if_neg*logical(wp<0) ...
                 + text_offset_if_pos*logical(wp>0);
-    x_text_amp = ma + text_offset_if_neg*logical(ma<0) ...
+    x_text_amp = ma_x + text_offset_if_neg*logical(ma<0) ...
                 + text_offset_if_pos*logical(ma>0);
 
     text(x_text_pwr, yy(2)*.9, sprintf('%+0.1f%%',wp), ...
@@ -274,8 +313,155 @@ function make_histogram_on_axis(ax,width,...
     text(x_text_amp, yy(1)*.9, sprintf('%+0.1f%%',ma), ...
         "Color",[0.8500 0.3250 0.0980],'FontSize',12)
 
-    plot(ax,[0 0],                  yy, 'k--','HandleVisibility','off')
-    plot(ax,[-1 1]*max(abs(xx)),[0 0],'k-','LineWidth',.5,'HandleVisibility','off')
-    xtickformat('percentage')
+    plot(ax,[0 0],        yy, 'k--','HandleVisibility','off')
+    plot(ax,[-1 1]*xval,[0 0],'k-','LineWidth',.5,'HandleVisibility','off')
 
+    if use_log_x
+        ticks_base = 1;
+        ticks_expo_min = floor(C_log)+1;
+        ticks_expo_max = ceil(xval);
+        expos = ticks_expo_min:ticks_expo_max;
+        pos_ticks_matrix = ticks_base * (10 .^ expos);
+        pos_ticks_orig = sort(pos_ticks_matrix(:).');
+        tick_orig = [-flip(pos_ticks_orig) 0 pos_ticks_orig];
+        tick_slog = slog(tick_orig);
+        xticks(tick_slog);
+        jf = java.text.DecimalFormat;
+        format_tick_fcn = @(v) [char(jf.format(v)) '%'];
+        xticklabels(arrayfun(format_tick_fcn, tick_orig, 'UniformOutput', false));
+    else
+        xtickformat('percentage')
+    end
+
+end
+
+function figs = plot_timeseries_figures(wecsim_filename)
+    data = load(wecsim_filename, 'float_accel_ts', 'float_drag_ts', ...
+                'corner_HT', 'corner_N_per_T', 'dt_sim', ...
+                'float_pos_THD', 'case_H', 'case_T');
+
+    num_corners = size(data.corner_HT, 1);
+    figs = gobjects(1, 3);
+
+    %% Figure 1: Stem plot of Fourier harmonics of float acceleration + THD
+    figs(1) = figure;
+    tl1 = tiledlayout(2, 2);
+    title(tl1, 'Fourier Harmonics of Float Acceleration', 'Interpreter', 'latex')
+    for ci = 1:num_corners
+        N = data.corner_N_per_T(ci);
+        dt = data.dt_sim;
+        accel = data.float_accel_ts(1:N, ci);
+        T_wave = data.corner_HT(ci, 2);
+        wave_freq = 2*pi / T_wave;
+
+        % compute FFT
+        Y = fft(accel);
+        P2 = Y / N;
+        P1 = P2(1:floor(N/2)+1);
+        P1(2:end-1) = 2 * P1(2:end-1);
+        amplitudes = abs(P1);
+
+        % frequency axis in multiples of fundamental
+        Fs = 1 / dt;
+        freqs = (0:floor(N/2)) * Fs / N;
+        harmonic_numbers = round(freqs / (wave_freq/(2*pi)));
+
+        % compute total harmonic distortion
+        idx_fund = find(harmonic_numbers == 1, 1);
+        fund_amp = amplitudes(idx_fund);
+        harmonic_amps = amplitudes;
+        harmonic_amps(1) = 0; % remove DC
+        harmonic_amps(idx_fund) = 0; % remove fundamental
+        THD = sqrt(sum(harmonic_amps.^2)) / fund_amp * 100;
+
+        % stem plot
+        nexttile(tl1)
+        max_harmonics = min(10, length(amplitudes)-1);
+        stem(harmonic_numbers(1:max_harmonics+1), amplitudes(1:max_harmonics+1), 'filled')
+        xlabel('Harmonic Number', 'Interpreter', 'latex')
+        ylabel('Amplitude (m/s$^2$)', 'Interpreter', 'latex')
+        title(sprintf('$H=%.1f$ m, $T=%.0f$ s, THD$=%.1f$\\%%', ...
+            data.corner_HT(ci,1), data.corner_HT(ci,2), THD), 'Interpreter', 'latex')
+        grid on
+    end
+    improvePlot
+    % reduce per-tile title font by ~20% so it fits within each tile
+    for ax = findobj(figs(1), 'type', 'axes')'
+        ax.Title.FontSize = ax.Title.FontSize * 0.8;
+    end
+
+    %% Figure 2: Drag force timeseries with cos(wt+phi)*|cos(wt+phi)| approximation
+    figs(2) = figure;
+    tl2 = tiledlayout(2, 2);
+    title(tl2, 'Float Drag Force: WEC-Sim vs Describing Function Approximation', 'Interpreter', 'latex')
+    for ci = 1:num_corners
+        N = data.corner_N_per_T(ci);
+        dt = data.dt_sim;
+        F_drag = data.float_drag_ts(1:N, ci);
+        T_wave = data.corner_HT(ci, 2);
+        t_vec = (0:N-1)' * dt;
+        w = 2*pi / T_wave;
+
+        % get the fundamental amplitude and phase of drag force for this corner
+        [fund_amp_drag, phase_drag] = get_fundamental_local(F_drag, w, dt);
+
+        % describing function approximation: F ≈ A * cos(wt+phi) * |cos(wt+phi)|
+        % where A = (3*pi/8) * fund_amp_drag ensures the fundamental matches
+        % (FFT angle() returns cosine-basis phase, so cos matches the signal)
+        A_desc = (3*pi/8) * fund_amp_drag;
+        y_approx = A_desc * cos(w * t_vec + phase_drag) .* abs(cos(w * t_vec + phase_drag));
+
+        nexttile(tl2)
+        plot(t_vec, F_drag, 'b', 'DisplayName', 'WEC-Sim Drag Force')
+        hold on
+        plot(t_vec, y_approx, 'r--', 'DisplayName', '$\cos(\omega t + \phi)|\cos(\omega t + \phi)|$ approx')
+        xlabel('Time (s)', 'Interpreter', 'latex')
+        ylabel('Force (N)', 'Interpreter', 'latex')
+        title(sprintf('$H=%.1f$ m, $T=%.0f$ s', data.corner_HT(ci,1), data.corner_HT(ci,2)), 'Interpreter', 'latex')
+        if ci == 1
+            legend('Location', 'best', 'Interpreter', 'latex')
+        end
+        grid on
+    end
+    improvePlot
+
+    %% Figure 3: Position THD contour over all sea states (pre-computed in runRM3Parallel)
+    H_all  = data.case_H;
+    T_all  = data.case_T;
+    H_uniq = unique(H_all);
+    T_uniq = unique(T_all);
+    THD_grid = NaN(length(H_uniq), length(T_uniq));
+    for si = 1:length(H_all)
+        hi = find(H_uniq == H_all(si));
+        ti = find(T_uniq == T_all(si));
+        if ~isempty(hi) && ~isempty(ti)
+            THD_grid(hi, ti) = data.float_pos_THD(si);
+        end
+    end
+
+    figs(3) = figure;
+    h = imagesc(T_uniq, H_uniq*sqrt(2), THD_grid);
+    set(gca, 'YDir', 'normal')
+    colorbar
+    xlabel('Wave Energy Period $T_e$ (s)', 'Interpreter', 'latex')
+    ylabel('Significant Wave Height $H_s$ (m)', 'Interpreter', 'latex')
+    title('Float Position THD (\%) at All Sea States', 'Interpreter', 'latex')
+    xticks(T_uniq)
+    yticks(round(H_uniq*sqrt(2), 2))
+    improvePlot
+    set(h, 'AlphaData', ~isnan(THD_grid))
+end
+
+function [fund, phase] = get_fundamental_local(signal, wave_freq, dt)
+    Fs = 2*pi/dt;
+    L = length(signal);
+    n = L;
+    Y = fft(signal, n);
+    P2 = Y/L;
+    P1 = P2(1:n/2+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    freqs = 0:(Fs/n):(Fs/2-Fs/n);
+    idx_wave_freq = ismembertol(freqs, wave_freq);
+    fund = abs(P1(idx_wave_freq));
+    phase = angle(P1(idx_wave_freq));
 end
