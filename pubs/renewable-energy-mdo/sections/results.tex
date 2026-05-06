@@ -332,8 +332,8 @@ First examining the optimal LCOE design presented in \sectionautorefname~\ref{se
 %\end{equation}
 % see notebook p46 5/16/25
 % fixme: what about the factor of 4/pi in the force ratio? Then the quadratic equation wouldn't apply, it would be more complicated (alpha non zero case) which casts doubt on my conclusion that alpha=0 emerges as optimal. Would need to compute alpha directly I think? I also think that the assumption of damping control means my Im(Gamma)=0 assumption in the notebook is false. Also Psat/Punsat is the the same as Psat/Pmax. So leaving this sentence out.
-Considering all sea states, the optimal force-saturated design sacrifices only \powerLossForceSatMinLCOE~Watts of average power (around \pctPowerLossForceSatMinLCOE) and reduces its PTO cost by \pctPTOSavingsForceSatMinLCOE, leading to an LCOE reduction of \pctImproveLCOEForceSatMinLCOE~compared to the same design with no force saturation, although the unsaturated design violates structural constraints due to the higher force.
-If the optimization is instead re-run to ensure constraint satisfaction while not allowing force saturation, the result has a \pctPowerLossForceSatOptMinLCOE~power gain, \pctPTOSavingsForceSatOptMinLCOE~higher PTO cost, \pctStructSavingsForceSatOptMinLCOE~higher structural cost, and \pctImproveLCOEForceSatOptMinLCOE~higher LCOE compared to the optimization with saturation.
+Considering all sea states, the optimal force-saturated design sacrifices only \resultsRE[powerLossForceSatMinLCOE]~of average power (around \resultsRE[pctPowerLossForceSatMinLCOE]) and reduces its PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE], leading to an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~compared to the same design with no force saturation, although the unsaturated design violates structural constraints due to the higher force.
+If the optimization is instead re-run to ensure constraint satisfaction while not allowing force saturation, the result has a \resultsRE[pctPowerGainForceSatOptMinLCOE]~power gain, \resultsRE[pctPTOCostIncreaseForceSatOptMinLCOE]~higher PTO cost, \resultsRE[pctStructCostIncreaseForceSatOptMinLCOE]~higher structural cost, and \resultsRE[pctLCOEIncreaseForceSatOptMinLCOE]~higher LCOE compared to the optimization with saturation.
 
 \paragraph{Drag}
 As section~\ref{sec:sensitivities-local} alludes to, the low sensitivity to drag coefficient suggests that modeling the drag nonlinearity is perhaps not essential.
@@ -365,8 +365,8 @@ The minimum LCOE design occurs at the point of tangency between the pareto front
 \label{fig:pareto-lcoe}
 \end{figure}
 
-There exists a cusp in the pareto front at the point where the average electrical power is around \powerWhereCusp~kW.
-As a result of this cusp, the bulk of the pareto front (extending from the least-cost design at \powerAvgAtMinCapex~kW to around \powerWhereNonconvexEnds~kW) is non-convex.
+There exists a cusp in the pareto front at the point where the average electrical power is around \resultsRE[powerWhereCusp].
+As a result of this cusp, the bulk of the pareto front (extending from the least-cost design at \resultsRE[powerAvgAtMinCapex] to around \resultsRE[powerWhereNonconvexEnds]) is non-convex.
 This region would have been missed with a convex multi-objective optimization procedure that optimizes weighted sums of the objectives, affirming the necessity of the epsilon-constraint plus pattern search procedure used here.
 
 Figure~\ref{fig:pareto} inlays geometry visualizations for a few designs highlighted in light blue.
@@ -424,7 +424,7 @@ Aside from the irrelevant maximum force constraint, which is always active by de
 \subsection{Multi-Objective Sensitivity Analysis}
 \paragraph{Control Scheme}
 Figure~\ref{fig:pareto-lcoe} compares the pareto front for the damping control scheme to the reactive control scheme.
-While reactive control achieves higher power ultimately the lowest LCOE as expected, at lower power levels ($<$\dampingReactivePowerIntersect kW) damping control is actually more cost effective.
+While reactive control achieves higher power ultimately the lowest LCOE as expected, at lower power levels ($<$\resultsRE[dampingReactivePowerIntersect]) damping control is actually more cost effective.
 This is because the reactive control scheme requires a larger PTO rating to achieve the same power at low power levels, as well as larger structures to withstand the higher forces.
 Incorporating the unmodeled effect that PTOs with both motoring and generation capability can be more expensive than those with only generation capability would further increase the appeal of damping control at low power levels.
 This trend also suggests the possibility that the optimal controller for a given power level may be an alternative controller (neither damping nor reactive control).
@@ -447,9 +447,9 @@ The optimization also runs without issue, albeit more slowly, on unspecialized m
 \label{fig:optim-runtimes}
 \end{figure}
 %the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
-Each single-objective optimization takes just \singleObjRuntime, converging in \resultsRE[singleObjIters]~iterations and requiring \resultsRE[singleObjFcnEvals]~function evaluations including both objective and gradient evaluation. 
-Generating the pareto front takes \paretoRuntime, of which \resultsRE[paretoPctTimeSeeds]~is spent generating seeds via epsilon-constraint and the remaining \resultsRE[paretoPctTimePatternSearch]~on the pattern search. 
-Gradient-based post-optimality sensitivities run rapidly in just \gradientSensRuntime, while sensitivities obtained via re-optimization take \reoptimSensRuntime.
+Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and requiring \resultsRE[singleObjFcnEvals]~function evaluations including both objective and gradient evaluation. 
+Generating the pareto front takes \resultsRE[paretoRuntime], of which \resultsRE[paretoPctTimeSeeds]~is spent generating seeds via epsilon-constraint and the remaining \resultsRE[paretoPctTimePatternSearch]~on the pattern search. 
+Gradient-based post-optimality sensitivities run rapidly in just \resultsRE[gradientSensRuntime], while sensitivities obtained via re-optimization take \resultsRE[reoptimSensRuntime].
 
 \figurename~\ref{fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on the number of function evaluations and hypervolume. (\hl{Analysis is left for during scrutineering.})
 

@@ -71,6 +71,19 @@ function [fig_array,...
         end_result_struct.singleObjIters = NaN;
         end_result_struct.singleObjFcnEvals = NaN;
     end
+    end_result_struct.singleObjRuntime = intermed_result_struct.singleObjRuntime;
+
+    % Force saturation: compare optimal design with and without force saturation applied
+    X_opt_LCOE = Xs_opt(:, which_objs==1);
+    p_nosat = p;
+    p_nosat.use_force_sat = false;
+    [J_nosat, ~, ~, val_nosat] = simulation(X_opt_LCOE, p_nosat);
+    LCOE_nosat = J_nosat(1);
+    % power lost due to force saturation (val = with sat, val_nosat = without sat)
+    end_result_struct.powerLossForceSatMinLCOE = val_nosat.power_avg - val.power_avg;
+    end_result_struct.pctPowerLossForceSatMinLCOE = (val_nosat.power_avg - val.power_avg) / val_nosat.power_avg * 100;
+    end_result_struct.pctPTOSavingsForceSatMinLCOE = (val_nosat.capex_PTO - val.capex_PTO) / val_nosat.capex_PTO * 100;
+    end_result_struct.pctImproveLCOEForceSatMinLCOE = (LCOE_nosat - val.LCOE) / LCOE_nosat * 100;
 
     % Generate qualitative description of optimal design compared to nominal
     bulk_dims = ["D_s","D_f","T_f_2","h_s","h_fs_clear"];

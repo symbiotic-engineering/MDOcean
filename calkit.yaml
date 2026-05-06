@@ -5313,6 +5313,7 @@ pipeline:
         # - results/Constraints/end.json
         # - results/DesignSpaceExploration/end.json
         # - results/DesignVars/end.json
+        - results/ForceSaturationFigFunc/end.json
         # - results/GradientOptimFigFunc/end.json
         # - results/LocationSensitivity/end.json
         # - results/Multistart/end.json
@@ -5338,6 +5339,9 @@ pipeline:
         powerAvgAtMinCapex: "{powerAvgAtMinCapex/1000:.0f} kW"
         powerAvgMaxPower: "{powerAvgMaxPower/1000:.0f} kW"
         powerBalanced: "{powerBalanced/1000:.0f} kW"
+        powerWhereCusp: "{powerWhereCusp/1000:.0f} kW"
+        powerWhereNonconvexEnds: "{powerWhereNonconvexEnds/1000:.0f} kW"
+        dampingReactivePowerIntersect: "{dampingReactivePowerIntersect/1000:.0f} kW"
         # masses
         structMassAtMinLCOE: "{structMassAtMinLCOE/1000:.0f} Mg"
         # dimensions
@@ -5354,8 +5358,12 @@ pipeline:
         capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
         capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
-        # runtimes
+        # runtimes (stored in seconds, formatted as minutes)
         simRuntime: "{simRuntime*1000:.0f} ms"
+        singleObjRuntime: "{singleObjRuntime/60:.1f} min"
+        paretoRuntime: "{paretoRuntime/60:.0f} min"
+        gradientSensRuntime: "{runtime_post_optim/60:.1f} min"
+        reoptimSensRuntime: "{runtime_re_optim/60:.0f} min"
         # percent changes
         pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
         pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
@@ -5367,10 +5375,21 @@ pipeline:
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
         lowestFmaxFactorMinLCOE: "{lowestFmaxFactorMinLCOE*100:.0f}%"
+        # force saturation comparison (non-reoptimized) - values from GradientOptimFigFunc
+        powerLossForceSatMinLCOE: "{powerLossForceSatMinLCOE:.1f} W"
+        pctPowerLossForceSatMinLCOE: "{pctPowerLossForceSatMinLCOE:.3f}%"
+        pctPTOSavingsForceSatMinLCOE: "{pctPTOSavingsForceSatMinLCOE:.0f}%"
+        pctImproveLCOEForceSatMinLCOE: "{pctImproveLCOEForceSatMinLCOE:.0f}%"
+        # force saturation comparison (re-optimized) - values from ForceSaturationFigFunc
+        pctPowerGainForceSatOptMinLCOE: "{pctPowerGainForceSatOptMinLCOE:.1f}%"
+        pctPTOCostIncreaseForceSatOptMinLCOE: "{pctPTOCostIncreaseForceSatOptMinLCOE:.0f}%"
+        pctStructCostIncreaseForceSatOptMinLCOE: "{pctStructCostIncreaseForceSatOptMinLCOE:.0f}%"
+        pctLCOEIncreaseForceSatOptMinLCOE: "{pctLCOEIncreaseForceSatOptMinLCOE:.0f}%"
         # optimization counts
         singleObjIters: "{singleObjIters:.0f}"
         singleObjFcnEvals: "{singleObjFcnEvals:,.0f}"
         numReoptims: "{numReoptims:.0f}"
+        paretoFcnEvals: "{paretoFcnEvals:,.0f}"
         # pareto timing percentages
         paretoPctTimeSeeds: "{paretoPctTimeSeeds*100:.0f}%"
         paretoPctTimePatternSearch: "{paretoPctTimePatternSearch*100:.0f}%"
