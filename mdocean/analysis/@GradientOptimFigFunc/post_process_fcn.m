@@ -24,6 +24,7 @@ function [fig_array,...
     lambdas = intermed_result_struct.lambdas;
     grads = intermed_result_struct.grads;
     hesses = intermed_result_struct.hesses;
+    fmincon_outputs = intermed_result_struct.fmincon_outputs;
 
     [fig_array,tab] = SOO_result_plots(Xs_opt,lambdas,grads,hesses,objs_opt,which_objs,p,b);
     
@@ -48,8 +49,27 @@ function [fig_array,...
     end_result_struct.DfoptMinLCOE = Xs_opt(b.var_names=="D_f",which_objs==1);
     end_result_struct.surgeForceFloatAtMinLCOE = val.force_surge(1);
     end_result_struct.surgeForceSparAtMinLCOE = val.force_surge(2);
-    end_result_struct.lowestFmaxFactorMinLCOE = NaN; % fixme
-    end_result_struct.lowestFsatMinLCOE = NaN; % fixme
+
+    % Compute minimum power saturation ratio across operating sea states
+    P_sat_ratio = val.P_sat_ratio;
+    operating_mask = p.JPD > 0 & isfinite(P_sat_ratio) & P_sat_ratio > 0;
+    if any(operating_mask, 'all')
+        end_result_struct.lowestFmaxFactorMinLCOE = min(P_sat_ratio(operating_mask));
+    else
+        end_result_struct.lowestFmaxFactorMinLCOE = NaN;
+    end
+    end_result_struct.lowestFsatMinLCOE = NaN; % requires unsaturated force per sea state, not yet computed
+
+    % Extract total iterations and function evaluations from fmincon output for LCOE objective
+    lcoe_obj_idx = find(which_objs == 1, 1);
+    if ~isempty(lcoe_obj_idx) && ~isempty(fmincon_outputs{lcoe_obj_idx})
+        out_lcoe = fmincon_outputs{lcoe_obj_idx};
+        end_result_struct.singleObjIters = out_lcoe.total_iterations;
+        end_result_struct.singleObjFcnEvals = out_lcoe.total_funcCount;
+    else
+        end_result_struct.singleObjIters = NaN;
+        end_result_struct.singleObjFcnEvals = NaN;
+    end
 
     % Generate qualitative description of optimal design compared to nominal
     bulk_dims = ["D_s","D_f","T_f_2","h_s","h_fs_clear"];

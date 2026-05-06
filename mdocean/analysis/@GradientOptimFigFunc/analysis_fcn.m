@@ -9,7 +9,7 @@ function intermed_result_struct = analysis_fcn(p,b)
 
     % Run gradient optimization
     [Xs_opt, objs_opt, flags, probs, ...
-     lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct,p,b,which_objs,...
+     lambdas, grads, hesses, vals, fmincon_outputs] = gradient_optim(b.X_start_struct,p,b,which_objs,...
                                                        {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true);
     
     intermed_result_struct.p = p;
@@ -23,5 +23,6 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.grads = grads;
     intermed_result_struct.hesses = hesses;
     intermed_result_struct.vals = vals;
+    intermed_result_struct.fmincon_outputs = fmincon_outputs;
     intermed_result_struct.convergence_plot = gcf();
 end

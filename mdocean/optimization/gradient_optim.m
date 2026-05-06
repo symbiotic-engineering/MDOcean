@@ -85,7 +85,7 @@ opts = optimoptions('fmincon',	'Display',display,...
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
     [Xs_opt, objs_opt, flags, probs, ...
-    lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs);
+    lambdas, grads, hesses, vals, fmincon_outputs] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs);
 
 end
 
@@ -93,7 +93,7 @@ end
 
 %%
 function [Xs_opt, objs_opt, flags, probs, ...
-          lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs)
+          lambdas, grads, hesses, vals, fmincon_outputs] = optimize_both_objectives(X,p,b,x0_input,opts,disp_on,which_objs)
 
     num_constraints = length(b.constraint_names);
     num_objectives_total = length(b.obj_names);
@@ -111,6 +111,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
     flags = zeros(1,num_objectives_to_run);
     grads = zeros(length(X)-1,num_objectives_to_run);
     hesses = zeros(length(X)-1,length(X)-1,num_objectives_to_run);
+    fmincon_outputs = cell(1,num_objectives_to_run);
 
     % add nonlinear constraints
     prob = optimproblem();
@@ -163,6 +164,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
         Xs_opt(:,i) = X_opt;
         objs_opt(i) = obj_opt;
         flags(i) = flag;
+        fmincon_outputs{i} = output;
         if i==1
             vals = val;
             lambdas = lambda;

@@ -41,5 +41,6 @@ function [fig_array,...
             tab_firstrows = {};
             tab_colspecs = {};
             
-            end_result_struct = struct();
+            end_result_struct.paretoPctTimeSeeds = intermed_result_struct.paretoPctTimeSeeds;
+            end_result_struct.paretoPctTimePatternSearch = intermed_result_struct.paretoPctTimePatternSearch;
 end

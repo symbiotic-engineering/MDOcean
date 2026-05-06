@@ -8,7 +8,7 @@ function [r1,r2] = damping_vs_reactive(p,b)
 % :returns: r2
 
     p.control_type = 'damping';
-    [x, fval, residuals, tol, p] = pareto_search(p, b, b.filename_uuid);
+    [x, fval, residuals, tol, p, paretoPctTimeSeeds, paretoPctTimePatternSearch] = pareto_search(p, b, b.filename_uuid);
     
     p2 = p;
     p2.control_type = 'reactive';
@@ -20,6 +20,8 @@ function [r1,r2] = damping_vs_reactive(p,b)
     r1.residuals = residuals;
     r1.tol = tol;
     r1.p = p;
+    r1.paretoPctTimeSeeds = paretoPctTimeSeeds;
+    r1.paretoPctTimePatternSearch = paretoPctTimePatternSearch;
 
     r2.x = x2;
     r2.fval = fval2;
