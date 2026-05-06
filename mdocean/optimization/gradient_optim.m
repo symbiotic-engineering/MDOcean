@@ -99,7 +99,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
     num_objectives_total = length(b.obj_names);
     num_objectives_to_run = length(which_objs);
 
-    [objs, ~, g] = fcn2optimexpr(@simulation,X,p,...
+    [objs, ~, g] = fcn2optimexpr(@sim_catch_warning,X,p,...
                                             'OutputSize',{[1,num_objectives_total],size(p.JPD),[1, num_constraints]},...
                                             'ReuseEvaluation',true,'Analysis','off');%simulation(X, p);
     
@@ -157,7 +157,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
         end
 
         X_opt = [X_opt_raw; evaluate(X(end),struct())];   % add material back onto design vector
-        [out,~,~,val] = simulation(X_opt,p);          % rerun sim
+        [out,~,~,val] = sim_catch_warning(X_opt,p);          % rerun sim
         assert(out(which_obj) == obj_opt)               % check correct reordering of X_opt elements
         
         Xs_opt(:,i) = X_opt;
