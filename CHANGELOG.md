@@ -1,6 +1,20 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.8) - 2026-5-5
+### Added
+- Pipeline: create `test-aor` and `test-re` stages
+### Changed
+- CI: combine calkit and test workflow, triggers on push to main
+- Inputs: break out `make_drag_integral()` into its own function
+- Pipeline: more string/char filename sanity checks in `save_fig_with_diagnostic()`
+### Fixed
+- Analysis: make `LocationSensitivity` run by adding forgotten analysis outputs, fixing figure concatenation,  
+- Analysis: make `ParameterSensitivity` run by removing material column from linear constraint A-matrix
+- Analysis: fix relative path issue in `GenericAnalysis`
+- Tests: fixed `Wecsim` tests by ensuring filenames are within character limit for struct fields
+- Tests: fixed relative path of `save_folder` in `all_figures()`
+
 ## [v1.2.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.7) - 2026-5-5
 ### Added
 - Paper: discussion on scaling and convexity of power and LCOE with respect to dynamic constraint limits
