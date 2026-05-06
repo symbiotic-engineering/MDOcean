@@ -126,7 +126,9 @@ function value = format_value(value, use_percent)
     end
     if ~isempty(value) && (ischar(value) || isstring(value))
         value = char(value);
-        if isstrprop(value(1), 'digit')
+        if contains(value, '_')
+            value = ['$' value '$']; 
+        elseif isstrprop(value(1), 'digit')
             value = str2double(value);
         end
     end

@@ -1,5 +1,4 @@
 \section{Results}\label{sec:results}
-\input{numeric-results.tex}
 
 \hl{Note to scrutineers: all results shown are for pure-damping control, except} figure \ref{fig:pareto-control-compare}.
 \hl{I am still generating the results for reactive control and will include them when they are ready.}
@@ -15,23 +14,23 @@ The SQP algorithm is executed starting with an initial condition corresponding t
 For this $\vec{x_0}$, the optimizations all converge successfully.
 Optimal designs ($\vec{x}^*=\text{argmin } J(\vec{x})$) are shown visually in \figureautorefname~\ref{fig:overlaid-geometry} and numerically in \tablename~\ref{tab:opt-dv-values}.
 Also shown for comparison is the nominal design and a balanced design.
-The latter is a $CAPEX$ minimization run with an additional constraint that the average power must exceed \powerBalanced~kW, a number chosen based on the shape of the multi-objective pareto front that will be presented in section \ref{sec:results-multi} with the intent of obtaining a cost reduction at the expense of a small power reduction compared to the minimum LCOE design.
+The latter is a $CAPEX$ minimization run with an additional constraint that the average power must exceed \resultsRE[powerBalanced]~kW, a number chosen based on the shape of the multi-objective pareto front that will be presented in section \ref{sec:results-multi} with the intent of obtaining a cost reduction at the expense of a small power reduction compared to the minimum LCOE design.
 This would be preferred whenever design-dependent capital expenditures carry greater importance than modeled here, such as with shorter-duration projects, higher discount rates, lower operational cost, and lower design-independent capital cost.
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/experiments_ratios.pdf}
 \caption{Geometries overlaid}
 \label{fig:overlaid-geometry}
 \end{figure}
 
 \begin{table}
-\input{  \tableFilepath{19} }
+\input{ ../renewable-energy-mdo/tables/from-matlab/optimal_design_vars.tex }
 \caption{Optimal design variables}\label{tab:opt-dv-values}
 \end{table}
 
 The optimal designs are generally larger than the nominal design.
-The minimum LCOE design is larger in all bulk dimensions, with a particularly large increase in the float diameter, nearly doubling from 20~m to \DfoptMinLCOE~m.
+The minimum LCOE design is larger in all bulk dimensions, with a particularly large increase in the float diameter, nearly doubling from 20~m to \resultsRE[DfoptMinLCOE]~m.
 It has a similarly sized PTO with a slightly lower maximum force rating and slightly higher maximum power rating.
 Each of the other optimization objectives tested maintain this lower maximum force, while the maximum power rating is less consistent, with optimal values both higher and lower than the nominal.
 
@@ -56,13 +55,13 @@ The numerical results are shown in \tablename~\ref{tab:opt-output}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/overlaid_hydro_coeffs.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/overlaid_hydro_coeffs.pdf}
 \caption{Hydrodynamic coefficients overlaid}
 \label{fig:overlaid-hydro}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/probability_CDF.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/probability_CDF.pdf}
 \caption{Cumulative distribution function of average power over time}
 \label{fig:overlaid-power-dist}
 \end{figure}
@@ -76,7 +75,7 @@ The numerical results are shown in \tablename~\ref{tab:opt-output}.
 %Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in Figure \ref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
 
 \begin{table}
-\input{  \tableFilepath{20} }
+\input{ ../renewable-energy-mdo/tables/from-matlab/optimal_outputs.tex }
 \caption{Optimal outputs}\label{tab:opt-output}
 \end{table}
 
@@ -96,7 +95,7 @@ Finally, the electrical efficiency describes the impact of the generator efficie
 Multiplying by the hours per year in each sea state expressed as a percentage yields the annual energy production.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/single_obj_opt_power_matrix.pdf}
     \caption{Power matrix multiplicative breakdown for minimum LCOE design}
     \label{fig:power-matrix-opt}
 \end{figure}
@@ -107,7 +106,7 @@ Values of the nonzero Lagrange multipliers $\vec{\lambda}$ are reported in \figu
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/lagrange_multipliers.pdf}
+\includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/lagrange_multipliers.pdf}
 \caption{Lagrange multipliers for LCOE-minimization}\label{fig:lagrange-multiplier}
 \end{figure}
 
@@ -128,7 +127,7 @@ The utility of the gradient and Hessian are in their ability to calculate other 
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/delta_x.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/delta_x.pdf}
 \caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{fig:delta-J}
 \end{figure}
 
@@ -152,13 +151,13 @@ On the other hand, more points (12 and 5 respectively) converge to a less optima
 Of the optimizations that fail to converge, only one arrives at the same global minimum in each case.
 \figureautorefname~\ref{fig:multistart-tree} shows this behavior on a probability tree.
 Overall, around one fifth of the optimizations converge to the presumed global minimum.
-Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with at least $\textrm{ceil}\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\numMultistartRequired$ linear feasible starting points is required.
+Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with at least $\textrm{ceil}\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\resultsRE[numMultistartRequired]$ linear feasible starting points is required.
 %\hl{XX}\% converged to the same point as the initial optimization did and none converged to a more optimal solution. While this does not guarantee a global optimum, the insensitivity to initial guess increases our confidence in the optimization results. 
 \hl{Note to scrutineers: due to the high amount of linear infeasibility, I am going to try this again but generate points that are linear feasible from the start.}
 
 \begin{figure}
     \centering
-    \includegraphics[width=1.2\linewidth]{figs/from-matlab/multistart_convergence_tree.pdf}
+    \includegraphics[width=1.2\linewidth]{../renewable-energy-mdo/figs/from-matlab/multistart_convergence_tree.pdf}
     \caption{Probability tree for convergence of multi-start}\label{fig:multistart-tree}
 \end{figure}
 
@@ -198,7 +197,7 @@ The re-optimization accounts for nonlinearities and is thus more accurate but re
 Results are normalized such that a value of 1 means that a given percent increase in the parameter from its nominal value causes the same percent increase in  $J^*$ or $x^*$.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/re_optim_objective_tornado.pdf}
     \caption{Tornado chart showing highest objective sensitivities}
     \label{fig:param-sens-J-star-tornado}
 \end{figure}
@@ -229,7 +228,7 @@ The two sensitivities are expected to be equal due to the mass-based material co
 \begin{landscape}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J1.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/re_optim_design_tornado_J1.pdf}
 
     \caption{Tornado chart showing highest design variable sensitivities at minimum LCOE}
     \label{fig:param-sens-x-star-tornado}
@@ -239,7 +238,7 @@ The two sensitivities are expected to be equal due to the mass-based material co
 \begin{landscape}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J2.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/re_optim_design_tornado_J2.pdf}
     \caption{Tornado chart showing highest design variable sensitivities at minimum design cost}
     \label{fig:param-sens-x-star-tornado-2}
 \fillandplacepagenumber
@@ -299,14 +298,14 @@ All economic assumptions are held fixed for consistency, which neglects the effe
 The optimal design variables and LCOE corresponding to each of the four locations are shown in Table~\ref{tab:location}.
 
 \begin{table}\label{tab:location}\setlength\arraycolsep{1pt}
-\input{tables/location_table.tex}
+\input{../renewable-energy-mdo/tables/location_table.tex}
 \caption{Results for Re-Optimization in Four Distinct Locations}
 \end{table}
 
 All optimized LCOE values are less expensive than the RM3 baseline.
-The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\LCOEPacWaveNorth/kWh, which makes sense because the incident wave energy flux is highest there.
-The WEC located in WETS, HI has the highest LCOE, \$\LCOEHawaii/kWh, aligning with its low incident energy.
-The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \HawaiiDesignCharacteristics.
+The WEC located in Pac-Wave South, OR results in the lowest LCOE, \$\resultsRE[LCOEPacWaveNorth]/kWh, which makes sense because the incident wave energy flux is highest there.
+The WEC located in WETS, HI has the highest LCOE, \$\resultsRE[LCOEHawaii]/kWh, aligning with its low incident energy.
+The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \resultsRE[HawaiiDesignCharacteristics].
 This is surprising: using the simple scaling argument $\omega_n = \sqrt{\frac{k}{m}}=\sqrt{\frac{\rho g A}{\rho A T_f C_m}}\sim T_f^{-\frac{1}{2}}$ a WEC's uncontrolled natural frequency scales with its draft to the $\frac{-1}{2}$ power, so a smaller draft would be expected in sites with higher-frequency waves like Hawaii.
 One hypothesis for this reversal is that Hawaii's lower incident energy and thus lower wave excitation force requires a higher oscillation amplitude to achieve comparable energy production, which in turn necessitates a higher draft to avoid slamming.
 \hl{(I'm not sure if this is the true explanation, need to inspect intermediate results to confirm.)}
@@ -355,13 +354,13 @@ Figure~\ref{fig:pareto-lcoe} provides a zoomed-in version with superimposed cont
 The minimum LCOE design occurs at the point of tangency between the pareto front and the LCOE contours and very nearly coincides with the maximum power design. %\hl{analyze more: how are the max power and min LCOE designs different? talk about the multiple apparent points of tangency (ie at 50 cents/kWh) and whether those are local minimums in LCOE.}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_front_with_design_images.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/pareto_front_with_design_images.pdf}
     \caption{Pareto Front}
     \label{fig:pareto}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=.8\linewidth]{figs/from-matlab/pareto_front_LCOE_contours.pdf}
+\includegraphics[width=.8\linewidth]{../renewable-energy-mdo/figs/from-matlab/pareto_front_LCOE_contours.pdf}
 \caption{Pareto front with different LCOE contours overlaid }
 \label{fig:pareto-lcoe}
 \end{figure}
@@ -382,7 +381,7 @@ To facilitate comparison against the pareto front in Figure~\ref{fig:pareto} and
 Structural design variables are green, powertrain ratings are blue, and bulk geometry dimensions are red. 
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_heuristics.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/pareto_heuristics.pdf}
     \caption{Design and objective heuristics plot}
     \label{fig:design-heuristics}
 \end{figure}
@@ -415,7 +414,7 @@ Since this constraint was marked as priority two (required for modeling accuracy
 Aside from the irrelevant maximum force constraint, which is always active by design, active nonlinear constraints include the float, column, and damping plate structural factors of safety, and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing slamming of the float.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_constraint_activity_reactive.pdf}
+    \includegraphics[width=1\linewidth]{../renewable-energy-mdo/figs/from-matlab/pareto_constraint_activity_reactive.pdf}
     \caption{Constraint Activity}
     \label{fig:constraint-activity}
 \end{figure}
@@ -443,7 +442,7 @@ The optimization also runs without issue, albeit more slowly, on unspecialized m
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/runtime_bar_chart.pdf}
 \caption{Bar chart of optimization and analysis runtimes}
 \label{fig:optim-runtimes}
 \end{figure}
