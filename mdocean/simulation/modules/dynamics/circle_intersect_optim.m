@@ -40,7 +40,7 @@ else
     dist = sqrt(sum(c.^2,2)); % distance of circle center from origin
     ctr_origin = dist < 1e-10;
     p = c - (r .* c ./ dist);
-    p(ctr_origin) = [r(ctr_origin); zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
+    p(ctr_origin,:) = [r(ctr_origin); zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
     candidates(count+(1:N),:) = p;
     circle_indices(count+(1:N),:) = [1:N; 1:N].';
     
