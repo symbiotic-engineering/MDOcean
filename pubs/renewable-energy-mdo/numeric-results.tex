@@ -32,21 +32,25 @@
       "pctWorseDesignCostMaxPower": "100\%", %
       "powerBalanced": "0 kW", %
       "pctCostSavingsFromPTO": "18\%", %
-      "powerWhereCusp": 60, %
-      "powerWhereNonconvexEnds": 120, %
-      "dampingReactivePowerIntersect": 60, %
+      "powerWhereCusp": "0 kW", %
+      "powerWhereNonconvexEnds": "0 kW", %
+      "dampingReactivePowerIntersect": "0 kW", %
       "sensitiveParamCategoriesMinLCOE": "operational wave characteristics, efficiency, and fixed charge rate", %
       "sensitiveDesignCategoriesMinLCOE": "site and geometric", %
       "insensitiveParamCategoriesMinLCOE": "structural, drag, and PTO cost", %
       "sensitiveParamCategoriesMinCapex": "damping plate dimensions, power price, site characteristics, and material properties", %
-      "powerLossForceSatMinLCOE": 2.6, %
-      "pctPowerLossForceSatMinLCOE": 0.002, %
-      "pctPTOSavingsForceSatMinLCOE": 19, %
-      "pctImproveLCOEForceSatMinLCOE": 2, %
+      "powerLossForceSatMinLCOE": "2.6 W", %
+      "pctPowerLossForceSatMinLCOE": "0.002\%", %
+      "pctPTOSavingsForceSatMinLCOE": "19\%", %
+      "pctImproveLCOEForceSatMinLCOE": "2\%", %
       "pctPowerLossForceSatOptMinLCOE": 0.6, %
       "pctPTOSavingsForceSatOptMinLCOE": 9, %
       "pctStructSavingsForceSatOptMinLCOE": 12, %
       "pctImproveLCOEForceSatOptMinLCOE": 5, %
+      "pctPowerGainForceSatOptMinLCOE": "0.0\%", %
+      "pctPTOCostIncreaseForceSatOptMinLCOE": "0\%", %
+      "pctStructCostIncreaseForceSatOptMinLCOE": "0\%", %
+      "pctLCOEIncreaseForceSatOptMinLCOE": "0\%", %
       "simRuntime": "210 ms", %
       "pctRuntimeMEEM": 60.9829327761355, %
       "MEEMRuntime": 30, %
@@ -62,20 +66,23 @@
       "HawaiiDesignCharacteristics": "larger diameter and draft and thinner structural thicknesses", %
       "LCOEHawaii": 0.579, %
       "LCOEPacWaveNorth": 0.328, %
-      "singleObjRuntime": "one minute", %
+      "singleObjRuntime": "1.0 min", %
       "singleObjFcnEvals": "1,410", %
       "singleObjIters": "103", %
-      "paretoFcnEvals": 26000, %
-      "paretoRuntime": "seven minutes", %
+      "paretoFcnEvals": "26,000", %
+      "paretoRuntime": "7 min", %
       "paretoPctTimeSeeds": "7400\%", %
       "paretoPctTimePatternSearch": "2600\%", %
-      "gradientSensRuntime": "under a minute", %
-      "reoptimSensRuntime": "seventeen minutes", %
+      "runtime\_post\_optim": 60, %
+      "runtime\_re\_optim": 1020, %
       "numReoptims": "172", %
+      "force\_saturation\_analysis\_complete": true, %
       "postpro\_time": 0.704139, %
       "analysis\_time": 78.542302, %
       "capexDesignNominal": "2.19 \$M", %
-      "powerAvgNominal": "73 kW"%
+      "powerAvgNominal": "73 kW", %
+      "gradientSensRuntime": "1.0 min", %
+      "reoptimSensRuntime": "17 min"%
     \}}%
   \else%
     \ifnum\pdfstrcmp{#1}{nominalLCOE}=0%
@@ -196,15 +203,15 @@
     \else%
       \ifnum\pdfstrcmp{#1}{powerWhereCusp}=0%
       \def\resultsRE@out{%
-    60}%
+    0 kW}%
     \else%
       \ifnum\pdfstrcmp{#1}{powerWhereNonconvexEnds}=0%
       \def\resultsRE@out{%
-    120}%
+    0 kW}%
     \else%
       \ifnum\pdfstrcmp{#1}{dampingReactivePowerIntersect}=0%
       \def\resultsRE@out{%
-    60}%
+    0 kW}%
     \else%
       \ifnum\pdfstrcmp{#1}{sensitiveParamCategoriesMinLCOE}=0%
       \def\resultsRE@out{%
@@ -224,19 +231,19 @@
     \else%
       \ifnum\pdfstrcmp{#1}{powerLossForceSatMinLCOE}=0%
       \def\resultsRE@out{%
-    2.6}%
+    2.6 W}%
     \else%
       \ifnum\pdfstrcmp{#1}{pctPowerLossForceSatMinLCOE}=0%
       \def\resultsRE@out{%
-    0.002}%
+    0.002\%}%
     \else%
       \ifnum\pdfstrcmp{#1}{pctPTOSavingsForceSatMinLCOE}=0%
       \def\resultsRE@out{%
-    19}%
+    19\%}%
     \else%
       \ifnum\pdfstrcmp{#1}{pctImproveLCOEForceSatMinLCOE}=0%
       \def\resultsRE@out{%
-    2}%
+    2\%}%
     \else%
       \ifnum\pdfstrcmp{#1}{pctPowerLossForceSatOptMinLCOE}=0%
       \def\resultsRE@out{%
@@ -253,6 +260,22 @@
       \ifnum\pdfstrcmp{#1}{pctImproveLCOEForceSatOptMinLCOE}=0%
       \def\resultsRE@out{%
     5}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{pctPowerGainForceSatOptMinLCOE}=0%
+      \def\resultsRE@out{%
+    0.0\%}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{pctPTOCostIncreaseForceSatOptMinLCOE}=0%
+      \def\resultsRE@out{%
+    0\%}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{pctStructCostIncreaseForceSatOptMinLCOE}=0%
+      \def\resultsRE@out{%
+    0\%}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{pctLCOEIncreaseForceSatOptMinLCOE}=0%
+      \def\resultsRE@out{%
+    0\%}%
     \else%
       \ifnum\pdfstrcmp{#1}{simRuntime}=0%
       \def\resultsRE@out{%
@@ -316,7 +339,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{singleObjRuntime}=0%
       \def\resultsRE@out{%
-    one minute}%
+    1.0 min}%
     \else%
       \ifnum\pdfstrcmp{#1}{singleObjFcnEvals}=0%
       \def\resultsRE@out{%
@@ -328,11 +351,11 @@
     \else%
       \ifnum\pdfstrcmp{#1}{paretoFcnEvals}=0%
       \def\resultsRE@out{%
-    26000}%
+    26,000}%
     \else%
       \ifnum\pdfstrcmp{#1}{paretoRuntime}=0%
       \def\resultsRE@out{%
-    seven minutes}%
+    7 min}%
     \else%
       \ifnum\pdfstrcmp{#1}{paretoPctTimeSeeds}=0%
       \def\resultsRE@out{%
@@ -342,17 +365,21 @@
       \def\resultsRE@out{%
     2600\%}%
     \else%
-      \ifnum\pdfstrcmp{#1}{gradientSensRuntime}=0%
+      \ifnum\pdfstrcmp{#1}{runtime_post_optim}=0%
       \def\resultsRE@out{%
-    under a minute}%
+    60}%
     \else%
-      \ifnum\pdfstrcmp{#1}{reoptimSensRuntime}=0%
+      \ifnum\pdfstrcmp{#1}{runtime_re_optim}=0%
       \def\resultsRE@out{%
-    seventeen minutes}%
+    1020}%
     \else%
       \ifnum\pdfstrcmp{#1}{numReoptims}=0%
       \def\resultsRE@out{%
     172}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{force_saturation_analysis_complete}=0%
+      \def\resultsRE@out{%
+    True}%
     \else%
       \ifnum\pdfstrcmp{#1}{postpro_time}=0%
       \def\resultsRE@out{%
@@ -370,9 +397,17 @@
       \def\resultsRE@out{%
     73 kW}%
     \else%
+      \ifnum\pdfstrcmp{#1}{gradientSensRuntime}=0%
+      \def\resultsRE@out{%
+    1.0 min}%
+    \else%
+      \ifnum\pdfstrcmp{#1}{reoptimSensRuntime}=0%
+      \def\resultsRE@out{%
+    17 min}%
+    \else%
       \def\resultsRE@out{%
     ??}%
-    \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
+    \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
   \fi
   \resultsRE@out
 }%

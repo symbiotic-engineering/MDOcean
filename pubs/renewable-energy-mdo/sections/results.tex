@@ -1,8 +1,4 @@
 \section{Results}\label{sec:results}
-
-\hl{Note to scrutineers: all results shown are for pure-damping control, except} figure \ref{fig:pareto-control-compare}.
-\hl{I am still generating the results for reactive control and will include them when they are ready.}
-
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
 
 \subsection{Single Objective Optimization}
@@ -153,7 +149,7 @@ Of the optimizations that fail to converge, only one arrives at the same global 
 Overall, around one fifth of the optimizations converge to the presumed global minimum.
 Therefore, for a 95\% chance of obtaining the global optimum, a multi-start with at least $\textrm{ceil}\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\resultsRE[numMultistartRequired]$ linear feasible starting points is required.
 %\hl{XX}\% converged to the same point as the initial optimization did and none converged to a more optimal solution. While this does not guarantee a global optimum, the insensitivity to initial guess increases our confidence in the optimization results. 
-\hl{Note to scrutineers: due to the high amount of linear infeasibility, I am going to try this again but generate points that are linear feasible from the start.}
+%\hl{Note to scrutineers: due to the high amount of linear infeasibility, I am going to try this again but generate points that are linear feasible from the start.}
 
 \begin{figure}
     \centering
@@ -308,9 +304,9 @@ The WEC located in WETS, HI has the highest LCOE, \$\resultsRE[LCOEHawaii]/kWh, 
 The values of the optimal design are similar for the California and Oregon locations, but quite different for Hawaii, with the latter having a \resultsRE[HawaiiDesignCharacteristics].
 This is surprising: using the simple scaling argument $\omega_n = \sqrt{\frac{k}{m}}=\sqrt{\frac{\rho g A}{\rho A T_f C_m}}\sim T_f^{-\frac{1}{2}}$ a WEC's uncontrolled natural frequency scales with its draft to the $\frac{-1}{2}$ power, so a smaller draft would be expected in sites with higher-frequency waves like Hawaii.
 One hypothesis for this reversal is that Hawaii's lower incident energy and thus lower wave excitation force requires a higher oscillation amplitude to achieve comparable energy production, which in turn necessitates a higher draft to avoid slamming.
-\hl{(I'm not sure if this is the true explanation, need to inspect intermediate results to confirm.)}
+%\hl{(I'm not sure if this is the true explanation, need to inspect intermediate results to confirm.)}
 This result demonstrates the importance of using a full coupled model to optimize WEC design, as the simple scaling heuristic produces an inaccurate conclusion.
-\hl{(Note: I may replace one of the PacWaves with North Carolina so I have a result from the East coast.
+%\hl{(Note: I may replace one of the PacWaves with North Carolina so I have a result from the East coast.
 I would also like to include the results of holding design constant, ie with each output row having another row below it showing the ratio from using} $x^*_{California}$ at that location).
 
 %\subsubsection{Price Global Sensitivity}
@@ -321,8 +317,8 @@ I would also like to include the results of holding design constant, ie with eac
 In addition to continuous parameters, the simulation depends on discrete options that dictate model behavior.
 These settings include the control scheme (damping or reactive), the presence of generator force saturation, the presence of drag, and the number of dynamic degrees of freedom (float heave motion only or float and spar heave motion).
 
-\paragraph{Control Scheme}
-\hl{This analysis is left for during scrutineering.}
+%\paragraph{Control Scheme}
+%\hl{This analysis is left for during scrutineering.}
 
 \paragraph{Force Saturation}
 First examining the optimal LCOE design presented in \sectionautorefname~\ref{sec:results-single}, the lowest force saturation power factor across all sea states in \figureautorefname~\ref{fig:power-matrix-opt} is $\frac{P_{sat}}{P_{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, with a corresponding force limit of $\frac{F_{max}}{F_{unsat}}=\lowestFsatMinLCOE$~in that sea state. 
@@ -339,10 +335,10 @@ If the optimization is instead re-run to ensure constraint satisfaction while no
 As section~\ref{sec:sensitivities-local} alludes to, the low sensitivity to drag coefficient suggests that modeling the drag nonlinearity is perhaps not essential.
 This is surprising, because without drag the resonant amplitude is significantly higher, which should affect the results due to the active slamming constraint.
 One reason for this discrepancy is that the drag sensitivity was local only, and a re-optimization at $C_d=0$ would likely yield different results.
-\hl{Performing this re-optimization is left for during scrutineering.}
+%\hl{Performing this re-optimization is left for during scrutineering.}
 
-\paragraph{Degrees of Freedom}
-\hl{This analysis is left for during scrutineering.}
+%\paragraph{Degrees of Freedom}
+%\hl{This analysis is left for during scrutineering.}
 
 \clearpage
 \subsection{Multi-Objective Optimization}\label{sec:results-multi}
