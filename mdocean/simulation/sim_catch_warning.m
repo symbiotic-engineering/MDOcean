@@ -35,9 +35,9 @@ function varargout = sim_catch_warning(X, p)
         'MATLAB:integral:NonFiniteValue' ...
     };
 
-    [check_outputs, ~, ~] = run_and_catch_warnings( ...
+    [sim_outputs, ~, ~] = run_and_catch_warnings( ...
         @() simulation(X, p), warning_ids, nargout);
 
-    varargout = check_outputs;
+    varargout = sim_outputs;
 
 end
