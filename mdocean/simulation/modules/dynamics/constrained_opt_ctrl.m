@@ -317,11 +317,9 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             current_labels{end+1} = 'PTO amplitude';
         end
         
-        % positive power constraint: |Gamma - i*alpha|^2 <= 1 + alpha^2
-        % where alpha = Im(Z_th)/Re(Z_th)
-        alpha = imag(Z_th_i) / real(Z_th_i);
-        center_P = [0, alpha];
-        radius_P = sqrt(1 + alpha^2);
+        % positive power constraint: |Gamma|^2 <= 1
+        center_P = [0, 0];
+        radius_P = 1;
         % always include positive power constraint (it's cheap and prevents P<0)
         centers = [centers; center_P];
         radii = [radii; radius_P];

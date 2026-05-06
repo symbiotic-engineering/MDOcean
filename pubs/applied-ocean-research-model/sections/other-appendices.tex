@@ -237,8 +237,23 @@ Once all the port variables have been calculated, power at each port can be calc
 This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
 
 \subsection{Indirect Optimal Control Solution Procedure}\label{sec:appendix-qp-numerical}
+The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
+The optimality conditions depend on the active set of constraints.
+In the most straightforward case where just one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint. 
+For example, if only a maximum force constraint exists, the constrained solution has a force $\hat{F}_{p,constr}$ is the minimum of the unconstrained force $\hat{F}_{p,unconstrained}$ and the maximum allowed force fundamental $F_{max}$:
+\begin{equation}
+\hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
+\end{equation}
+The solver guesses a value of $\Gamma$, calculates the resulting force $\hat{F}_{p,guess}$, and then uses $\hat{F}_{p,guess}-\hat{F}_{p,constr}$ as an error signal to adjust its next guess of $\Gamma$, iterating until the error converges to zero.
+This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\hat{F}_{p,unconstrained}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\hat{F}_{p,unconstrained}$ and the system linearization are updated each control iteration).
+MDOcean implements the latter, which simplifies the setup by requiring only one solver.
+Comparing the efficiency of the two approaches is left for future work.
 
-\hl{todo}
+When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
+In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
+When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of possibilities instead of a continuous domain. 
+The main advantage of the indirect approach is its ability to handle nonlinear constraints, although for the quadratic constraints considered here, the analytical approach described in \cref{sec:appendix-qp-solution} is more efficient.
 
 \subsection{Analytical Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
 This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
@@ -397,7 +412,8 @@ The intersection points of the $\mu$th and $\nu$th circles are given by:
         1i \sqrt{r_{\mu}^2-a_{\mu\nu}^2}
     \right)
 \end{equation}
-where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from the center of the $\mu$th circle to the midpoint of the two intersection points, and $1i$ is the imaginary unit.
+where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nv}^2)/d_{\mu\nu}$ is the distance from the center of the $\mu$th circle to the midpoint of the two intersection points, and $1i$ is the imaginary unit.
+The closest-point candidates $\mathcal{C}_{cl}$ match eq. 4 of \cite{mccabe_force-limited_2024}, which provides the solution for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
 \Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_{\mu}=4$, $S_{\mu}=1$, and various $\Gamma_{c,\mu}$.
@@ -797,7 +813,7 @@ This coincides with the fundamental to peak ratio of a square wave, which is the
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
 For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}. 
 
-The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found with numerical iteration, and will be real for the damping control case and follows eq. 4 of \cite{mccabe_force-limited_2024} in the reactive control case. 
+The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \cref{sec:appendix-qp-numerical,sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
 %Mathematically, a saturation factor $0< f_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
 %\begin{equation}
@@ -994,10 +1010,9 @@ It is therefore guaranteed to converge as long as the dynamics are contracting a
 
 Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees. % from summer research slide 44 5/30/24
 %In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
-At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since 1.2.0 the solver by default is used only for drag convergence.
-Combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
-However, it has the disadvantage that the error signal now couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
-Earlier versions of MDOcean performed the drag solve in an outer loop around the control solve, which would again be the preferred structure if the analytical constrained optimal control solve of \cref{sec:appendix-qp-solution} is implemented in future versions.
+At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since v1.2.0 by default the solver is used only for drag convergence and optimal control is done analytically.
+Compared to numerical optimal control nested inside the drag solve, combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
+However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 
 \subsubsection{Optimal Control Condition}
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
@@ -1134,7 +1149,21 @@ Each of the 210 sea states are simulated individually as the equivalent regular 
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
 %Table~\ref{tab:dynamic-validation} and 
 Figure~\ref{fig:dynamic-validation} compares the results.
-\hl{Explain results.}
+The $C_d=0$ simulation with identical hydrodynamic coefficients (top left of \cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions. 
+The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power. An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+Turning on drag ($C_d=1$, top right of \cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
+While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
+
+Moving to the bottom left corner of \cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's MEEM hydrodynamic coefficients on its dynamic power production.
+The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the MEEM hydro coefficients has minimal effect on the overall dynamic response.
+Finally, the bottom right corner of \cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
+Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \cref{sec:validation}.
+Meanwhile, MDOcean underpredicts the peak power by around 25\%.
+Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
+
 % \begin{table}
 %     \centering
 %     \begin{tabular}{|c|c|c|} \hline 
@@ -1159,7 +1188,7 @@ Figure~\ref{fig:dynamic-validation} compares the results.
     \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf} 
   & \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
-\caption{Dynamic validation showing error in a variety of modeling assumptions}
+\caption{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
 \label{fig:dynamic-validation}
 \fillandplacepagenumber
 \end{figure}
@@ -1194,6 +1223,27 @@ The reason for this discrepancy remains unclear, since the expected error of the
 Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
 The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
+
+We also validate the describing function approximation for the drag force.
+The general application of the describing function technique requires that the fundamental frequency $\omega$ contains the vast majority of the energy, resulting in body displacements of the form $\xi(t) \sim \cos(\omega t+\phi)$.
+\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $C_d=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
+This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
+The paricular describing function relation used for drag assumes that the drag force has the form $F_d(t) \sim |\cos(\omega t+\phi)|\cos(\omega t+\phi)$.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresonding to the four corners of the JPD.
+The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/position_THD_contour.pdf}
+    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \label{fig:wecsim-thd}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/drag_force_desc_fcn.pdf}
+    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \label{fig:wecsim-drag-waveform}
+\end{figure}
 
 \subsubsection{Reference Model Report}
 While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, it does record the mechanical power for each sea state.
