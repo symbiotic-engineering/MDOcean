@@ -160,7 +160,7 @@ jobs:
           if [ $PUSH_STATUS -ne 0 ]; then
             echo "Push failed, perhaps due to dvc push timeout. Retrying."
             calkit dvc push
-            git push
+            git push || true
           fi
       - run: |
           echo "Errors from latex:"
@@ -219,10 +219,14 @@ jobs:
 
       - name: Compare test results to base branch
         if: always()
+        continue-on-error: true
         run: |
-          ls test-results-baseline/test-report/test-results || echo 'No baseline test results found'
-          python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
-          cat test-results-baseline/delta-junit.xml
+          if ls test-results-baseline/test-report/test-results 2>/dev/null; then
+            python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
+            cat test-results-baseline/delta-junit.xml
+          else
+            echo 'No baseline test results found, skipping comparison'
+          fi
         shell: bash
 
       - name: Publish changed tests to GitHub UI

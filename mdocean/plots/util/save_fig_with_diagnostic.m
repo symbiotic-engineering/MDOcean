@@ -34,21 +34,7 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
                 copyfile(src, pdf_name);
             catch
                 warning([src ' does not exist, saving image to results folder.']);
-                % Try export with sanitized filename; if it fails, retry minimal call and report
-                try
-                    exportgraphics(fig, char(string(pdf_name)));
-                catch ex
-                    % If exportgraphics reports extra inputs, fallback to print
-                    if contains(ex.identifier, 'ExtraInputs') || contains(ex.message, 'Additional, unrecognized inputs')
-                        try
-                            print(fig, '-dpdf', char(string(pdf_name)));
-                        catch
-                            rethrow(ex)
-                        end
-                    else
-                        rethrow(ex)
-                    end
-                end
+                exportgraphics(fig, char(string(pdf_name)));
             end
         else
             fig = check_fig_size(fig);
@@ -58,29 +44,6 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
             try
                 savefig(fig, char(string(fig_file)));
             catch
-                % if savefig fails for unexpected input types, coerce and retry
-                savefig(fig, char(string(fig_file)));
-            end
-
-            % save pdf from matlab figure output; guard against passing string arrays
-            try
-                exportgraphics(fig, char(string(pdf_name)));
-            catch ex
-                % If exportgraphics complains about extra inputs, fallback to print
-                if contains(ex.identifier, 'ExtraInputs') || contains(ex.message, 'Additional, unrecognized inputs')
-                    try
-                        print(fig, '-dpdf', char(string(pdf_name)));
-                    catch
-                        rethrow(ex)
-                    end
-                else
-                    % Retry with coerced char filename once more, then rethrow
-                    try
-                        exportgraphics(fig, char(string(pdf_name)));
-                    catch
-                        rethrow(ex)
-                    end
-                end
             end
         end
 

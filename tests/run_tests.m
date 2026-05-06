@@ -96,7 +96,7 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
 end
 
 fig = unittest_time_bar_chart(suite,results);
-exportgraphics(fig,[base_test_dir '/Figure_30_unittest.pdf'])
+exportgraphics(fig,'results/Figure_30_unittest.pdf')
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)
