@@ -325,7 +325,7 @@ These settings include the control scheme (damping or reactive), the presence of
 \hl{This analysis is left for during scrutineering.}
 
 \paragraph{Force Saturation}
-First examining the optimal LCOE design presented in \sectionautorefname~\ref{sec:results-single}, the lowest force saturation power factor across all sea states in \figureautorefname~\ref{fig:power-matrix-opt} is $\frac{P_{sat}}{P_{unsat}}=\lowestFmaxFactorMinLCOE$, with a corresponding force limit of $\frac{F_{max}}{F_{unsat}}=\lowestFsatMinLCOE$~in that sea state. 
+First examining the optimal LCOE design presented in \sectionautorefname~\ref{sec:results-single}, the lowest force saturation power factor across all sea states in \figureautorefname~\ref{fig:power-matrix-opt} is $\frac{P_{sat}}{P_{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, with a corresponding force limit of $\frac{F_{max}}{F_{unsat}}=\lowestFsatMinLCOE$~in that sea state. 
 %This corresponds almost exactly with the relationship expected in the purely resistive Thevenin impedance case in \cite{mccabe_force-limited_2024}:
 %\begin{equation}
 %   \frac{ P_{sat}}{P_{unsat}}=1-\left(\frac{F_{max}}{F_{unsat}}-1\right)^2
@@ -447,8 +447,8 @@ The optimization also runs without issue, albeit more slowly, on unspecialized m
 \label{fig:optim-runtimes}
 \end{figure}
 %the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
-Each single-objective optimization takes just \singleObjRuntime, converging in \singleObjIters~iterations and requiring \singleObjFcnEvals~function evaluations including both objective and gradient evaluation. 
-Generating the pareto front takes \paretoRuntime, of which \paretoPctTimeSeeds~is spent generating seeds via epsilon-constraint and the remaining \paretoPctTimePatternSearch~on the pattern search. 
+Each single-objective optimization takes just \singleObjRuntime, converging in \resultsRE[singleObjIters]~iterations and requiring \resultsRE[singleObjFcnEvals]~function evaluations including both objective and gradient evaluation. 
+Generating the pareto front takes \paretoRuntime, of which \resultsRE[paretoPctTimeSeeds]~is spent generating seeds via epsilon-constraint and the remaining \resultsRE[paretoPctTimePatternSearch]~on the pattern search. 
 Gradient-based post-optimality sensitivities run rapidly in just \gradientSensRuntime, while sensitivities obtained via re-optimization take \reoptimSensRuntime.
 
 \figurename~\ref{fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on the number of function evaluations and hypervolume. (\hl{Analysis is left for during scrutineering.})
