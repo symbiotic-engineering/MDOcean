@@ -50,7 +50,8 @@ function [fig_array,...
     end_result_struct.surgeForceFloatAtMinLCOE = val.force_surge(1);
     end_result_struct.surgeForceSparAtMinLCOE = val.force_surge(2);
 
-    % Compute minimum power saturation ratio across operating sea states
+    % Compute minimum power saturation ratio (P_sat/P_unsat) across operating sea states.
+    % Named lowestFmaxFactorMinLCOE because it is the power factor attributable to the F_max force limit.
     P_sat_ratio = val.P_sat_ratio;
     operating_mask = p.JPD > 0 & isfinite(P_sat_ratio) & P_sat_ratio > 0;
     if any(operating_mask, 'all')
