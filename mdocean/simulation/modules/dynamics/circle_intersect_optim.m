@@ -26,35 +26,42 @@ else
 
     % 2) pairwise intersections
     count = 0;
-    for i = 1:N
-        for j = i+1:N
-            [xs, ys, too_far] = circle_circle_intersect(c(i,1),c(i,2),r(i),c(j,1),c(j,2),r(j));
-            circle_indices(count+(1:2),:) = [i,j;i,j];
-            too_far_check(count+(1:2)) = too_far;
-            candidates(count+(1:2),:) = [xs.', ys.']; 
-            count = count + 2;
-        end
+    if N > 1
+        pair_idx = nchoosek(1:N,2);
+        c1 = c(pair_idx(:,1),:);
+        c2 = c(pair_idx(:,2),:);
+        r1 = r(pair_idx(:,1));
+        r2 = r(pair_idx(:,2));
+        [xs, ys, too_far] = circle_circle_intersect_batch(c1,r1,c2,r2);
+        pair_candidates = [xs(:,1), ys(:,1); xs(:,2), ys(:,2)];
+        n_pair_candidates = size(pair_candidates,1);
+        candidates(1:n_pair_candidates,:) = pair_candidates;
+        circle_indices(1:n_pair_candidates,:) = [pair_idx; pair_idx];
+        too_far_check(1:n_pair_candidates) = repelem(too_far,2,1);
+        count = n_pair_candidates;
     end
     
     % 3) single-circle closest boundary
-    dist = sqrt(sum(c.^2,2)); % distance of circle center from origin
+    dist = hypot(c(:,1), c(:,2)); % distance of circle center from origin
     ctr_origin = dist < 1e-10;
-    p = c - (r .* c ./ dist);
-    p(ctr_origin,:) = [r(ctr_origin); zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
+    p = zeros(N,2);
+    nonzero_ctr = ~ctr_origin;
+    p(nonzero_ctr,:) = c(nonzero_ctr,:) - (r(nonzero_ctr) ./ dist(nonzero_ctr)) .* c(nonzero_ctr,:);
+    p(ctr_origin,:) = [r(ctr_origin), zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
     candidates(count+(1:N),:) = p;
     circle_indices(count+(1:N),:) = [1:N; 1:N].';
     
     % 4) filter feasible
-    feasible_all_circles = false(length(candidates),1);
-    for i=1:length(candidates)
-        p = candidates(i,:);
-        feasible_all_circles(i) = check_feasible(p,c,r);
-    end
+    feasible_all_circles = check_feasible(candidates,c,r);
     feasible_p = candidates(feasible_all_circles,:);
     
     % 5) choose closest
-    [~,idx] = min(vecnorm(feasible_p,2,2));
-    p_star = feasible_p(idx,:);
+    if isempty(feasible_p)
+        p_star = [];
+    else
+        [~,idx] = min(hypot(feasible_p(:,1), feasible_p(:,2)));
+        p_star = feasible_p(idx,:);
+    end
     
     if isempty(p_star)
         constraints_active = true(size(r));
@@ -83,18 +90,35 @@ end
 end
 
 function feasible_all_circles = check_feasible(p,c,r)
-% checks if a single point p is within all circles
-% returns a scalar boolean
+% checks if point(s) p are within all circles
+% returns scalar boolean for 1x2 p, vector for Nx2 p
     dist_outside = eval_constraint(p,c,r);
     feas_each_circle = dist_outside <= 1e-4;
-    feasible_all_circles = all(feas_each_circle);
+    feasible_all_circles = all(feas_each_circle,2);
+    if isvector(p) && numel(p) == 2
+        feasible_all_circles = feasible_all_circles(1);
+    end
 end
 
 function constr_fcn = eval_constraint(p,c,r)
-% checks how far a single point p is in violation of the constraint
+% checks how far point(s) p are in violation of the constraints
 % positive means not ok (outside circle), negative means ok (inside circle)
-% returns a scalar value
-    constr_fcn = sqrt( sum((p - c).^2,2) ) - r;
+% returns Nx1 for single p, MxN for M points
+    if isempty(p)
+        constr_fcn = zeros(0,length(r));
+        return
+    end
+    if isvector(p) && numel(p) == 2
+        p = reshape(p,1,2);
+    end
+    dx = bsxfun(@minus, p(:,1), c(:,1).');
+    dy = bsxfun(@minus, p(:,2), c(:,2).');
+    constr = hypot(dx,dy) - r(:).';
+    if size(p,1) == 1
+        constr_fcn = constr.';
+    else
+        constr_fcn = constr;
+    end
 end
 
 function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
@@ -124,4 +148,34 @@ function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
     
     xs = [mx+dx, mx-dx];
     ys = [my-dy, my+dy];
+end
+
+function [xs, ys, too_far] = circle_circle_intersect_batch(c1,r1,c2,r2)
+% Vectorized circle-circle intersections.
+% c1,c2 are Nx2 and r1,r2 are Nx1; xs,ys are Nx2.
+    dx_c = c2(:,1) - c1(:,1);
+    dy_c = c2(:,2) - c1(:,2);
+    d = hypot(dx_c, dy_c);
+
+    too_far = d > (r1 + r2);
+    contained_or_coincident = d < abs(r1-r2) | d == 0;
+    invalid = too_far | contained_or_coincident;
+
+    d_safe = d;
+    d_safe(invalid) = 1;
+
+    a = (r1.^2 - r2.^2 + d.^2) ./ (2 .* d_safe);
+    h = sqrt(max(r1.^2 - a.^2, 0));
+    mx = c1(:,1) + a .* dx_c ./ d_safe;
+    my = c1(:,2) + a .* dy_c ./ d_safe;
+    dx = h .* dy_c ./ d_safe;
+    dy = h .* dx_c ./ d_safe;
+
+    xs = NaN(length(r1),2);
+    ys = NaN(length(r1),2);
+    valid = ~invalid;
+    xs(valid,1) = mx(valid) + dx(valid);
+    xs(valid,2) = mx(valid) - dx(valid);
+    ys(valid,1) = my(valid) - dy(valid);
+    ys(valid,2) = my(valid) + dy(valid);
 end

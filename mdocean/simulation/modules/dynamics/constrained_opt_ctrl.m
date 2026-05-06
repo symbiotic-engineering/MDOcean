@@ -213,34 +213,29 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     % compute complex phasors for the unsaturated (Gamma=0) response
     % and the derivative coefficients c_Y for each quantity Y
     % Y(Gamma) = Y_0 + c_Y * Gamma, where Y_0 is the unsaturated value
+    X_u_0_all = mag_X_u_unsat .* exp(1i * phase_X_u_unsat);
+    X_f_0_all = mag_X_f_unsat .* exp(1i * phase_X_f_unsat);
+    X_s_0_all = mag_X_s_unsat .* exp(1i * phase_X_s_unsat);
+    U_0_all   = mag_U_unsat   .* exp(1i * phase_U_unsat);
+    I_p_all = 1i .* w .* X_u_0_all;
+    valid_idx = find(~isnan(B_h_f) & isfinite(Z_th) & real(Z_th) > 0 & abs(I_p_all) >= COEFF_TOL);
     
     all_labels = {'Force limit','Float amplitude','Spar amplitude','PTO amplitude','Positive power'};
-    for idx = 1:numel(w)
-        if isnan(B_h_f(idx))
-            continue  % skip NaN sea states
-        end
-        
+    for k_idx = 1:numel(valid_idx)
+        idx = valid_idx(k_idx);
         Z_th_i = Z_th(idx);
         w_i = w(idx);
-        
-        if ~isfinite(Z_th_i) || real(Z_th_i) <= 0
-            continue  % skip unstabilizable sea states
-        end
-        
+
         % complex phasors at Gamma=0
-        X_u_0 = mag_X_u_unsat(idx) * exp(1i * phase_X_u_unsat(idx));
-        X_f_0 = mag_X_f_unsat(idx) * exp(1i * phase_X_f_unsat(idx));
-        X_s_0 = mag_X_s_unsat(idx) * exp(1i * phase_X_s_unsat(idx));
-        U_0   = mag_U_unsat(idx)   * exp(1i * phase_U_unsat(idx));
+        X_u_0 = X_u_0_all(idx);
+        X_f_0 = X_f_0_all(idx);
+        X_s_0 = X_s_0_all(idx);
+        U_0   = U_0_all(idx);
         
         % I_p = complex current phasor at Gamma=0
         % I = I_p*(1-Gamma), so at Gamma=0: I_0 = I_p
         % velocity = i*w*X_u, so I_p = i*w_i*X_u_0
-        I_p = 1i * w_i * X_u_0;
-        
-        if abs(I_p) < COEFF_TOL
-            continue  % no response, nothing to constrain
-        end
+        I_p = I_p_all(idx);
         
         % derivative coefficients: Y(Gamma) = Y_0 + c_Y * Gamma
         % From the paper: V = I_p*Z_th^**(1+Gamma), I = I_p*(1-Gamma)
@@ -366,22 +361,23 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
                     % the positive-power circle to find best feasible Gamma.
                     % Power circle is always the last entry in centers/radii.
                     Gamma_opt = 1;  % default: shutdown
-                    best_norm = Inf;
                     n_c = size(centers, 1);
                     c_pow = centers(n_c, :);
                     r_pow = radii(n_c);
-                    for k = 1:n_c - 1
-                        % closest boundary point on circle k to origin
-                        dist_to_center_k = norm(centers(k,:));
-                        if dist_to_center_k < COEFF_TOL
-                            boundary_point_k = [radii(k), 0];
-                        else
-                            boundary_point_k = centers(k,:) - radii(k) * centers(k,:)/dist_to_center_k;
-                        end
-                        % accept only if inside the positive-power circle
-                        if norm(boundary_point_k - c_pow) <= r_pow + 1e-4 && norm(boundary_point_k) < best_norm
-                            best_norm = norm(boundary_point_k);
-                            Gamma_opt = boundary_point_k(1) + 1i*boundary_point_k(2);
+                    if n_c > 1
+                        centers_k = centers(1:n_c-1,:);
+                        radii_k = radii(1:n_c-1);
+                        dist_to_center_k = hypot(centers_k(:,1), centers_k(:,2));
+                        boundary_points_k = centers_k - (radii_k ./ max(dist_to_center_k, COEFF_TOL)) .* centers_k;
+                        ctr_origin_k = dist_to_center_k < COEFF_TOL;
+                        boundary_points_k(ctr_origin_k,:) = [radii_k(ctr_origin_k), zeros(sum(ctr_origin_k),1)];
+
+                        inside_pow = hypot(boundary_points_k(:,1) - c_pow(1), boundary_points_k(:,2) - c_pow(2)) <= r_pow + 1e-4;
+                        d_boundary = hypot(boundary_points_k(:,1), boundary_points_k(:,2));
+                        d_boundary(~inside_pow) = Inf;
+                        [best_norm, best_idx] = min(d_boundary);
+                        if isfinite(best_norm)
+                            Gamma_opt = boundary_points_k(best_idx,1) + 1i*boundary_points_k(best_idx,2);
                         end
                     end
                 else
@@ -447,25 +443,23 @@ function Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii)
     end
     
     % find intersections of Q=0 circle with each constraint circle
-    candidates = [];
-    for i = 1:length(radii)
-        [xs, ys] = circle_circle_intersect_inline(...
-            center_Q0(1), center_Q0(2), radius_Q0, ...
-            centers(i,1), centers(i,2), radii(i));
-        if ~isnan(xs(1))
-            candidates = [candidates; xs(1), ys(1); xs(2), ys(2)]; %#ok<AGROW>
+    candidates = zeros(0,2);
+    if ~isempty(radii)
+        [xs, ys] = circle_circle_intersect_inline_batch(center_Q0, radius_Q0, centers, radii);
+        has_intersection = ~isnan(xs(:,1));
+        if any(has_intersection)
+            candidates = [xs(has_intersection,1), ys(has_intersection,1); ...
+                          xs(has_intersection,2), ys(has_intersection,2)];
         end
     end
     
     % filter feasible candidates
-    feasible = [];
-    for i = 1:size(candidates,1)
-        p = candidates(i,:);
-        % check on Q=0 circle and inside all other constraint circles
-        on_Q0 = abs(norm(p - center_Q0) - radius_Q0) < 1e-4;
-        if on_Q0 && check_inside_circles(p, centers, radii)
-            feasible = [feasible; p]; %#ok<AGROW>
-        end
+    if isempty(candidates)
+        feasible = zeros(0,2);
+    else
+        on_Q0 = abs(hypot(candidates(:,1) - center_Q0(1), candidates(:,2) - center_Q0(2)) - radius_Q0) < 1e-4;
+        inside_all = check_inside_circles(candidates, centers, radii);
+        feasible = candidates(on_Q0 & inside_all,:);
     end
     
     if isempty(feasible)
@@ -484,9 +478,24 @@ function Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii)
 end
 
 function inside = check_inside_circles(p, centers, radii)
-% Check if point p=[x,y] is inside all circles
-    dists = vecnorm(p - centers, 2, 2);
-    inside = all(dists <= radii + 1e-4);
+% Check if point(s) p=[x,y] are inside all circles
+    if isempty(centers)
+        if isvector(p) && numel(p) == 2
+            inside = true;
+        else
+            inside = true(size(p,1),1);
+        end
+        return
+    end
+    if isvector(p) && numel(p) == 2
+        p = reshape(p,1,2);
+    end
+    dists = hypot(bsxfun(@minus, p(:,1), centers(:,1).'), ...
+                  bsxfun(@minus, p(:,2), centers(:,2).'));
+    inside = all(dists <= (radii(:).' + 1e-4), 2);
+    if size(p,1) == 1
+        inside = inside(1);
+    end
 end
 
 function [xs, ys] = circle_circle_intersect_inline(x1,y1,r1,x2,y2,r2)
@@ -505,6 +514,38 @@ function [xs, ys] = circle_circle_intersect_inline(x1,y1,r1,x2,y2,r2)
     dy = h*(x2-x1)/d;
     xs = [mx+dx, mx-dx];
     ys = [my-dy, my+dy];
+end
+
+function [xs, ys] = circle_circle_intersect_inline_batch(center1,r1,centers2,r2)
+% Vectorized intersection of one circle with many circles.
+    x1 = center1(1);
+    y1 = center1(2);
+    x2 = centers2(:,1);
+    y2 = centers2(:,2);
+
+    dx_c = x2 - x1;
+    dy_c = y2 - y1;
+    d = hypot(dx_c, dy_c);
+    invalid = d > (r1 + r2) | d < abs(r1-r2) | d == 0;
+
+    d_safe = d;
+    d_safe(invalid) = 1;
+
+    a = (r1.^2 - r2.^2 + d.^2) ./ (2 .* d_safe);
+    h = sqrt(max(r1.^2 - a.^2, 0));
+    mx = x1 + a .* dx_c ./ d_safe;
+    my = y1 + a .* dy_c ./ d_safe;
+    dx = h .* dy_c ./ d_safe;
+    dy = h .* dx_c ./ d_safe;
+
+    n = length(r2);
+    xs = NaN(n,2);
+    ys = NaN(n,2);
+    valid = ~invalid;
+    xs(valid,1) = mx(valid) + dx(valid);
+    xs(valid,2) = mx(valid) - dx(valid);
+    ys(valid,1) = my(valid) - dy(valid);
+    ys(valid,2) = my(valid) + dy(valid);
 end
 
 function [opt_mag_U,opt_phase_U,...
