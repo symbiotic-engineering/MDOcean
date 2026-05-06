@@ -12,4 +12,6 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.r2 = r2_reactive;
     intermed_result_struct.paretoPctTimeSeeds = r1_damping.paretoPctTimeSeeds;
     intermed_result_struct.paretoPctTimePatternSearch = r1_damping.paretoPctTimePatternSearch;
+    intermed_result_struct.paretoTotalRuntime = r1_damping.paretoTotalRuntime;
+    intermed_result_struct.paretoFcnEvals = r1_damping.paretoFcnEvals;
 end
