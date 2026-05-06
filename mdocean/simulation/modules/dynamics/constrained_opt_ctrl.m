@@ -214,6 +214,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     % and the derivative coefficients c_Y for each quantity Y
     % Y(Gamma) = Y_0 + c_Y * Gamma, where Y_0 is the unsaturated value
     
+    all_labels = {'Force limit','Float amplitude','Spar amplitude','PTO amplitude','Positive power'};
     for idx = 1:numel(w)
         if isnan(B_h_f(idx))
             continue  % skip NaN sea states
@@ -244,7 +245,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         % derivative coefficients: Y(Gamma) = Y_0 + c_Y * Gamma
         % From the paper: V = I_p*Z_th^**(1+Gamma), I = I_p*(1-Gamma)
         c_V = I_p * conj(Z_th_i);   % force derivative: dV/dGamma
-        c_I = -I_p;                   % velocity derivative: dI/dGamma
+        %c_I = -I_p;                   % velocity derivative: dI/dGamma
         c_Xu = -X_u_0;               % PTO displacement: X_u = I/(iw)
         
         % float and spar displacement derivatives depend on topology
@@ -273,71 +274,84 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             c_Xs = T_s .* I_p .* conj(Z_th_i);
         end
         
+        % determine what constraints to enforce
+        enforce_force = use_force_sat && abs(c_V) > COEFF_TOL;
+        enforce_X_f   = isfinite(X_f_max) && abs(c_Xf) > COEFF_TOL;
+        enforce_X_s   = isfinite(X_s_max) && abs(c_Xs) > COEFF_TOL && multibody && ~merge_bodies;
+        enforce_X_u   = isfinite(X_u_max) && abs(c_Xu) > COEFF_TOL;
+        enforce_P     = true;
+        enforce_damp  = strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > COEFF_TOL;
+        logical_enforce = [enforce_force enforce_X_f enforce_X_s enforce_X_u enforce_P]; % damping intentionally not included here
+        num_enforce = sum(logical_enforce);
+
+        centers = zeros(num_enforce, 2);
+        radii   = zeros(num_enforce, 1);
+        curr_idx = 1;
+
         % build circle constraints
         % For constraint |Y| <= Y_max where Y = Y_0 + c_Y * Gamma:
         % circle center = -Y_0/c_Y, radius = Y_max/|c_Y|, S=+1 (inside)
-        centers = [];
-        radii = [];
-        current_labels = {};
         
         % force constraint: |V| <= F_max
-        if use_force_sat && abs(c_V) > COEFF_TOL
+        if enforce_force
             center_F = -U_0 / c_V;
             radius_F = F_max / abs(c_V);
-            centers = [centers; real(center_F), imag(center_F)];
-            radii = [radii; radius_F];
-            current_labels{end+1} = 'Force limit';
+            centers(curr_idx,:) = [real(center_F), imag(center_F)];
+            radii(curr_idx) = radius_F;
+            curr_idx = curr_idx + 1;
         end
         
         % float amplitude constraint: |X_f| <= X_f_max
-        if isfinite(X_f_max) && abs(c_Xf) > COEFF_TOL
+        if enforce_X_f
             center_Xf = -X_f_0 / c_Xf;
             radius_Xf = X_f_max / abs(c_Xf);
-            centers = [centers; real(center_Xf), imag(center_Xf)];
-            radii = [radii; radius_Xf];
-            current_labels{end+1} = 'Float amplitude';
+            centers(curr_idx,:) = [real(center_Xf), imag(center_Xf)];
+            radii(curr_idx) = radius_Xf;
+            curr_idx = curr_idx + 1;
         end
         
         % spar amplitude constraint: |X_s| <= X_s_max
-        if isfinite(X_s_max) && abs(c_Xs) > COEFF_TOL && multibody && ~merge_bodies
+        if enforce_X_s
             center_Xs = -X_s_0 / c_Xs;
             radius_Xs = X_s_max / abs(c_Xs);
-            centers = [centers; real(center_Xs), imag(center_Xs)];
-            radii = [radii; radius_Xs];
-            current_labels{end+1} = 'Spar amplitude';
+            centers(curr_idx,:) = [real(center_Xs), imag(center_Xs)];
+            radii(curr_idx) = radius_Xs;
+            curr_idx = curr_idx + 1;
         end
         
         % PTO amplitude constraint: |X_u| <= X_u_max
-        if isfinite(X_u_max) && abs(c_Xu) > COEFF_TOL
+        if enforce_X_u
             center_Xu = -X_u_0 / c_Xu;
             radius_Xu = X_u_max / abs(c_Xu);
-            
-            centers = [centers; real(center_Xu), imag(center_Xu)];
-            radii = [radii; radius_Xu];
-            current_labels{end+1} = 'PTO amplitude';
+            centers(curr_idx,:) = [real(center_Xu), imag(center_Xu)];
+            radii(curr_idx) = radius_Xu;
+            curr_idx = curr_idx + 1;
         end
         
         % positive power constraint: |Gamma|^2 <= 1
         center_P = [0, 0];
         radius_P = 1;
         % always include positive power constraint (it's cheap and prevents P<0)
-        centers = [centers; center_P];
-        radii = [radii; radius_P];
-        current_labels{end+1} = 'Positive power';
+        centers(curr_idx,:) = center_P;
+        radii(curr_idx) = radius_P;
         
+        assert(curr_idx==num_enforce)
+
         % damping control: add Q=0 constraint circle
         % Gamma must lie ON the Q=0 circle (equality constraint)
         % Q=0 circle: center = -i*R/X, radius = |Z_th|/|X|
         % where R = Re(Z_th), X = Im(Z_th)
         p_star = [];
-        if strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > COEFF_TOL
+        if enforce_damp
             R_th = real(Z_th_i);
             X_th = imag(Z_th_i);
             center_Q0 = [0, -R_th/X_th];
             radius_Q0 = abs(Z_th_i) / abs(X_th);
+            
             % for damping, find optimal on Q=0 circle subject to other constraints
             Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii);
         else
+            
             % reactive control or no reactance: use standard circle intersection
             if isempty(centers)
                 Gamma_opt = 0;  % no constraints active
@@ -381,12 +395,12 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         if most_constr_so_far && ~isempty(centers) && isfinite(Gamma_opt)
             qcqp_debug.centers = centers;
             qcqp_debug.radii = radii;
-            qcqp_debug.labels = current_labels;
+            qcqp_debug.labels = all_labels(logical_enforce);
             qcqp_debug.Gamma_opt = Gamma_opt;
             qcqp_debug.alpha = imag(Z_th_i) / real(Z_th_i);
             qcqp_debug.Z_th = Z_th_i;
             qcqp_debug.w = w_i;
-            qcqp_debug.n_active_constraints = size(centers,1);
+            qcqp_debug.n_active_constraints = num_enforce;
             qcqp_debug.feasible = ~isempty(p_star);
         end
 

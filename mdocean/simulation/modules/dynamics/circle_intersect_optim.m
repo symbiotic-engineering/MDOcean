@@ -37,17 +37,12 @@ else
     end
     
     % 3) single-circle closest boundary
-    for i = 1:N
-        dist = norm(c(i,:));
-        if dist < 1e-10
-            % center at origin: any boundary point is equally close
-            p = [r(i), 0];
-        else
-            p = c(i,:) - r(i) * (c(i,:) / dist);
-        end
-        candidates(count+i,:) = p;
-        circle_indices(count+i,:) = [i,i];
-    end
+    dist = sqrt(sum(c.^2,2)); % distance of circle center from origin
+    ctr_origin = dist < 1e-10;
+    p = c - (r .* c ./ dist);
+    p(ctr_origin) = [r(ctr_origin); zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
+    candidates(count+(1:N),:) = p;
+    circle_indices(count+(1:N),:) = [1:N; 1:N].';
     
     % 4) filter feasible
     feasible_all_circles = false(length(candidates),1);
@@ -99,8 +94,7 @@ function constr_fcn = eval_constraint(p,c,r)
 % checks how far a single point p is in violation of the constraint
 % positive means not ok (outside circle), negative means ok (inside circle)
 % returns a scalar value
-    assert(all(size(p)==[1 2]))
-    constr_fcn = vecnorm(p - c,2,2) - r;
+    constr_fcn = sqrt( sum((p - c).^2,2) ) - r;
 end
 
 function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
