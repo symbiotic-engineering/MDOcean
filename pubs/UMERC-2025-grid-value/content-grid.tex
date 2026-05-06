@@ -192,8 +192,10 @@ Although the present study holds distance from shore constant, the environmental
 MDOcean's geometry module calculates WEC material masses and the environment module multiplies by appropriate weighting coefficients from the Idemat LCA dataset \cite{van_den_herik_idemat_2024}. These are scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express diverse lifetime environmental impacts (i.e. water, emissions, pollution) of various materials and processes in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
 We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon. Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
-\begin{minipage}[m]{0.34\textwidth}
+
+\newcommand{\ecoCostTable}{
     \begin{table}[H]
+    \centering
     \begin{tabular}{ ll } 
         \hline
         Component & Value \\ 
@@ -206,11 +208,9 @@ MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissio
     \caption{Eco-cost coefficients}
     \label{tab:lca-weights}
     \end{table}
-\end{minipage}
-\hfill
-\begin{minipage}[m]{0.65\textwidth}
-    \vspace{.2\baselineskip}
-    \setlength{\parindent}{1.5em}
+}
+
+\newcommand{\ecoCostParagraph}{
     The nominal RM3
     %, which uses 667 tonnes of steel, has a hull area of 924 m\textsuperscript{2}, and is 3.4 miles from shore, 
     eco-cost is \$134,800 per WEC.
@@ -225,8 +225,27 @@ MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissio
 %     Second, eco-cost coefficients for steel and fiberglass are similar to their economic prices, so the least-cost and least-eco-cost designs should be similar.
 %     % show this with numbers
 %     Both of these observations imply that design-for-environment techniques have limited utility at the early design stage, although multi-objective optimization is still performed to confirm this conclusion.
-\end{minipage}
-\vspace{-\baselineskip}
+}
+
+\ifdefined\DISSERTATION
+  % included in dissertation
+    \ecoCostTable 
+    \ecoCostParagraph
+\else
+  % standalone
+    \begin{minipage}[m]{0.34\textwidth}
+        \ecoCostTable
+    \end{minipage}
+    \hfill
+    \begin{minipage}[m]{0.65\textwidth}
+        \vspace{.2\baselineskip}
+        \setlength{\parindent}{1.5em}
+        \ecoCostParagraph
+    \end{minipage}
+    \vspace{-\baselineskip}
+\fi
+
+
 \section{Results and conclusions}
 It took 20 minutes to run the 15 CEM optimizations on an Ubuntu 20.04 server with Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz, using up to 28 threads for each optimization and executing successive optimizations in series. Of this time, only around half is spent in GenX, since PowerGenome takes 35 seconds per case. %, downloading MHKit data takes 17 seconds, 
 %It took \hl{XX} minutes to run the design optimization, with each simulation taking \hl{XX} ms and each single-objective optimization taking \hl{XX} iterations.
