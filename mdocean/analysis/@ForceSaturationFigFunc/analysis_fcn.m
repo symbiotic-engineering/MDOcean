@@ -12,11 +12,12 @@ function intermed_result_struct = analysis_fcn(p,b)
     p_nosat = p;
     p_nosat.use_force_sat = false;
     which_obj = 1;
-    [Xs_nosat, objs_nosat, ~, ~, ~, ~, ~, ~, ~] = gradient_optim(b.X_start_struct, p_nosat, b, which_obj, {}, false);
+    % Only capture needed outputs; remaining outputs (lambdas, grads, hesses, fmincon_outputs) are not needed here
+    [Xs_nosat, objs_nosat, ~] = gradient_optim(b.X_start_struct, p_nosat, b, which_obj, {}, false);
     [~, ~, ~, val_nosat] = simulation(Xs_nosat, p_nosat);
 
     % Also run the default (with force saturation) optimization for comparison
-    [Xs_sat, objs_sat, ~, ~, ~, ~, ~, ~, ~] = gradient_optim(b.X_start_struct, p, b, which_obj, {}, false);
+    [Xs_sat, objs_sat, ~] = gradient_optim(b.X_start_struct, p, b, which_obj, {}, false);
     [~, ~, ~, val_sat] = simulation(Xs_sat, p);
 
     % Store figures and comparison results for post-processing
