@@ -134,7 +134,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
 
     % get pareto front endpoints by running optimization
     [X_opt,objs_opt,flag_opt,probs] = gradient_optim(x0,p,b);
-    J_min_LCOE = simulation(X_opt(:,1),p);
+    J_min_LCOE = sim_catch_warning(X_opt(:,1),p);
     P_var_min_LCOE = J_min_LCOE(2);
 
     LCOE_max = p.LCOE_max;
@@ -156,7 +156,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
     fvals_opt(single_obj_failed,:) = [];
 
     % use x0 start as seed, if x0 is feasible
-    [J_x0,~,g_0] = simulation([b.X_starts; 1],p);
+    [J_x0,~,g_0] = sim_catch_warning([b.X_starts; 1],p);
     x0_feasible = is_feasible(g_0, [b.X_starts; 1], p, b);
     if x0_feasible
         fvals_0 = J_x0;
@@ -199,7 +199,7 @@ function [X0,fvals,probs] = get_seeds_epsilon_constraint(p,b,num_DVs,objFcn2,tur
             % debugging checks on optimization convergence and objective values
             obj_check = objFcn2(X_opt_tmp(idxs)',{new_p});
             assert(obj_tmp == obj_check)
-            J_seeds = simulation(X_opt_tmp, new_p);
+            J_seeds = sim_catch_warning(X_opt_tmp, new_p);
             P_var_seeds(i) = J_seeds(2);
             assert(obj_tmp == P_var_seeds(i))
         end
@@ -223,6 +223,6 @@ function neg_pwr_per_cost = objFcn1new(x,oldFcnLCOE,p_zero_design_cost)
    pwr_per_cost0 = 1/cost0_per_power;
    neg_pwr_per_cost = -pwr_per_cost0;
 
-   clear generatedFunction_simulation1_withReuse % required since using different parameters for the two objs
+   clear generatedFunction_sim_catch_warning1_withReuse % required since using different parameters for the two objs
    
 end

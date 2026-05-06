@@ -595,7 +595,7 @@ function [opt_mag_U,opt_phase_U,...
 
         debug_print = brute_force_plot_on;
         if debug_print
-            warning(['no feasible controller found for %d/%d sea states, setting signals to '...
+            warning('MDOcean:ConstrainedOptCtrl:InfeasibleController', ['no feasible controller found for %d/%d sea states, setting signals to '...
                 'least error solution. You may want to adjust the ctrl_mult_guess to be wider'], ...
                 sum(sea_state_infeasible(:)), sum(~isnan(w(:))))
             % diagnostic: identify which constraint(s) are not satisfied
@@ -662,10 +662,10 @@ function [opt_mag_U,opt_phase_U,...
     % This path is not covered by the warning in dynamics_error_wrapper because
     % that function is only called during the iterative drag-convergence loop.
     if any(isnan(opt_mag_X_f(~isnan(w))),'all')
-        warning('NaN in opt_mag_X_f after brute-force re-evaluation for non-NaN sea states')
+        warning('MDOcean:ConstrainedOptCtrl:NaNInMagXf', 'NaN in opt_mag_X_f after brute-force re-evaluation for non-NaN sea states')
     end
     if any(isnan(opt_real_P(~isnan(w))),'all')
-        warning('NaN in opt_real_P after brute-force re-evaluation for non-NaN sea states')
+        warning('MDOcean:ConstrainedOptCtrl:NaNInRealP', 'NaN in opt_real_P after brute-force re-evaluation for non-NaN sea states')
     end
 end
 
@@ -970,7 +970,7 @@ function [constr_viol_err,optimality_err] = control_errors_from_sat_results(ctrl
     end
 
     if any(~isfinite(constr_viol_err(~isnan(H))),'all')
-        warning('error is non finite for non-nan sea state')
+        warning('MDOcean:ConstrainedOptCtrl:NonFiniteError', 'error is non finite for non-nan sea state')
     end
     if nargout > 1
         optimality_err  = Inf(size(mag_X_f));
