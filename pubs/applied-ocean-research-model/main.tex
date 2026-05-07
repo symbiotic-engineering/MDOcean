@@ -34,80 +34,8 @@
 %% \documentclass[final,5p,times]{elsarticle}
 %% \documentclass[final,5p,times,twocolumn]{elsarticle}
 
-%% For including figures, graphicx.sty has been loaded in
-%% elsarticle.cls. If you prefer to use the old commands
-%% please give \usepackage{epsfig}
-
-%% The amssymb package provides various useful mathematical symbols
-\usepackage{amssymb}
-%% The amsmath package provides various useful equation environments.
-\usepackage{amsmath}
-\usepackage{microtype}
-\usepackage[unicode,hypertexnames=false]{hyperref}
-\usepackage{cleveref}
-\usepackage{array} % required for text wrapping in tables
-\usepackage{pdflscape} % for landscape table
-\usepackage{longtable} % for table going multiple pages
-\usepackage{rotating} % for rotated table headers
-\usepackage{multirow} % for multi row/col tables
-\usepackage{soul} % for highlighting text with \hl 
-\usepackage{color} % also required for highlighting 
-\usepackage{bibcop} % warnings for incorrect citations
-\usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
-\usepackage{stmaryrd} % element wise division symbol used in hessian scaling
-\usepackage{verbatim} %word counts
-\usepackage{textcomp} % cent symbol
-\usepackage{tikz}
-\usepackage{circuitikz} % circuit figures
-\usepackage{subcaption} % for subfigures
-
-% set tikz to compile externally to work with latexmk
-\usetikzlibrary{external,positioning,calc}
-\tikzset{
-    external/system call={
-      pdflatex \tikzexternalcheckshellescape 
-      -halt-on-error 
-      -interaction=batchmode 
-      -output-directory=aux/
-      -jobname "\image" "\texsource"
-    }
-}
-\tikzexternalize
-
-%\usepackage{graphicx}
-%\usepackage{float}
-%\usepackage{placeins}
-
-%% The amsthm package provides extended theorem environments
-%% \usepackage{amsthm}
-
-%% The lineno packages adds line numbers. Start line numbering with
-%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
-%% for the whole article with \linenumbers.
-%% \usepackage{lineno}
-
-\newcommand*\rot{\rotatebox{90}} % for rotated table headers
-\newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
-\newcommand{\requirement}[1]{\refstepcounter{reqnumber}\label{req:#1}R\arabic{reqnumber}}
-\newcommand{\reqref}[1]{R\ref{req:#1}}
-
-\newcommand{\summarytexcount}[1]{\textbf{Word Count}
-  \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
-  \verbatiminput{#1.wcsum}%
-}
-\newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
-  \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
-  \verbatiminput{#1.wcdetail}
-}%
-
-\def\fillandplacepagenumber{% for landscape page numbers
- \par\thispagestyle{empty}%
- \vbox to 0pt{\vss}\vfill
- \vbox to 0pt{\baselineskip0pt
-   \hbox to\linewidth{\hss}%
-   \baselineskip\footskip
-   \hbox to\linewidth{%
-     \hfil\thepage\hfil}\vss}}
+\input{../shared-pkg}
+\input{../applied-ocean-research-model/commands-aor}
 
 \journal{Applied Ocean Research}
 
@@ -128,7 +56,6 @@
 }
 \makeatother
 
-\input{numeric-results.tex}
 \begin{frontmatter}
 
 %% Title, authors and addresses
@@ -190,7 +117,7 @@ The simulation's comprehensive yet efficient nature is uniquely possible due to 
 The model incorporates a mesh-free eigenfunction-based linear hydrodynamic solver, a quasi-linearized dynamics engine that handles drag and saturation nonlinearities in the frequency-domain, a structural sizing module with realistic yield/ultimate/buckling failure criteria for storm and fatigue design load cases, and a simple cost estimator to assess techno-economic viability.
 The present paper documents the derivation and assumptions of the model, which is called MDOcean and released open-source.
 Particular emphasis is placed on the modified frequency-domain dynamics formulation, which contextualizes and improves on frequency-domain constraint handling methods in prior literature.
-Validation and computational benchmarking demonstrate that MDOcean's \results[simRuntime] runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
+Validation and computational benchmarking demonstrate that MDOcean's \resultsAOR[simRuntime] runtime outperforms leading WEC simulation software by orders of magnitude, while maintaining accuracy within a few percent of the baseline in most cases. 
 Finally, the authors highlight the insights that the model provides on limit cases, scaling laws, and tradeoffs in WEC design.
 
 
@@ -204,7 +131,7 @@ Finally, the authors highlight the insights that the model provides on limit cas
 
 %%Research highlights
 \begin{highlights}
-\item Develop and validate a rapid (\results[simRuntime]) open-source wave energy techno-economic simulation called MDOcean
+\item Develop and validate a rapid (\resultsAOR[simRuntime]) open-source wave energy techno-economic simulation called MDOcean
 \item Quasi-linear frequency domain dynamics model captures nonlinearities such as generator force saturation and drag while running 3 orders of magnitude faster than benchmark time-stepping model
 \item Derive analytical constrained optimal control solution for underactuated wave-to-wire multi-port model respecting effort, flow, and power limits
 \item Eigenfunction-based model computes hydrodynamic coefficients 10x faster than benchmark boundary element method (BEM) solver
@@ -258,42 +185,7 @@ benchmarking
 %% Use \section commands to start a section
 %% Labels are used to cross-reference an item using \ref command.
 
-\include{sections/model-intro}
-\clearpage
-\include{sections/model-overview}
-\clearpage
-\include{sections/module-details}
-\clearpage
-\include{sections/benchmarking}
-\clearpage
-\include{sections/discussion}
-
-\section{Conclusion}
-% Summary:
-In summary, this paper develops fast and accurate semi-analytical models for WEC geometry, hydrodynamics, dynamics, structures, and economics and subsequently applies the Multidisciplinary Design Optimization (MDO) framework to maximize power and minimize cost of the RM3 point absorber. 
-
-% Model
-The geometry module calculates volumes, areas, and the pitch stability margin with simple algebraic relations.
-The hydrodynamics module implements the matched eigenfunction expansion method for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing BEM solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current MEEM model.
-This achieves an order of magnitude speedup compared to the popular BEM solver Capytaine.
-The dynamics module employs describing functions to extend beyond the typical frequency domain formulation to capture nonlinearities and dynamic constraints such as drag and force saturation.
-This achieves a three order of magnitude computational speedup over the common dynamics solver WEC-Sim.
-The structures module uses an equivalent-thickness model of stiffened plates and a library of canonical solutions to structural boundary value problems to assess the factor of safety of the float bottom plate, spar shell, and damping plate in cyclic fatigue and storm load cases.
-This represents, to the authors' knowledge, the only public WEC structural simulation regardless of modeling technique.
-Finally, the economics module calculates the design-dependent cost based on structural material volume and powertrain force and power rating, performing a straightforward LCOE calculation.
-Comparison of the dynamics and float hydrodynamics models against WEC-Sim and BEM respectively across multiple cases serves to comprehensively validate the models, with errors generally less than 1\% for test cases with identical assumptions and around 10\% for more realistic cases with diverging assumptions.
-The geometry, economics, structures, and spar hydrodynamics are compared against the RM3 report, serving as a less comprehensive yet sufficient validation.
-Good agreement is observed for all but the spar added mass, storm loads, and structural margins, necessitating the use of a tuning factor for these quantities.
-All modules integrate into a new open-source package called MDOcean, with a total simulation runtime of \results[simRuntime].
-
-% Discussion
-A key feature of this study that other WEC models lack is the inclusion of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
-Nonetheless, the structural loads and stresses have high uncertainty, the impact of PTO dynamics and irregular waves is not included, and only a single WEC type (two-body axisymmetric point absorber) is considered.
-Future modeling work should pursue model enhancements to correct these limitations.
-Additionally, the next iteration should consider enhancing the model by adding mooring loads, structural resonance, installation, manufacturing, reliability, and regulatory compliance. 
-
-% Impact of findings:
-The results of this study will inform future WEC design optimization, the necessity of accounting for multidisciplinary coupling, and the power of semi-analytical modeling to reduce simulation runtime and provide design insight.
+\include{content}
 
 \section*{Acknowledgements}
 The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
@@ -311,8 +203,9 @@ The MATLAB code for all simulation, analysis, and visualization to fully reprodu
 Questions and contributions via GitHub issues and pull requests are welcomed.
 A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
 
-\input{sections/meem-appendix.tex}
-\include{sections/other-appendices}
+\begin{appendices}
+\include{appendices}
+\end{appendices}
 
 %% Displayed equations can be tagged using various environments. 
 %% Single line equations can be tagged using the equation environment.

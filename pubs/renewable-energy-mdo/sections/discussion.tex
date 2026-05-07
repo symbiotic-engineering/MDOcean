@@ -43,7 +43,7 @@ Recalling the discussion of prior WEC optimization studies in section~\ref{sec:l
 Based on the generation count and population sizes stated in references \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, 12,000, 2,200, 6,100, and 2,400 function evaluations are required for convergence respectively.
 The the present study is the first to perform large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer function evaluations to converge.
 Generating the pareto seeds in this study, however, entails performing 20 single-objective optimizations at around 100 iterations each, using finite difference on the 12 design variables.
-This requires an estimated $20\cdot100\cdot(12+1)=\paretoFcnEvals$ function evaluations, which dwarfs the function evaluations required by the genetic algorithm in other studies.
+This requires an estimated $20\cdot100\cdot(12+1)=\resultsRE[paretoFcnEvals]$ function evaluations, which dwarfs the function evaluations required by the genetic algorithm in other studies.
 This result is surprising and can be attributed to the use of finite difference.
 Despite the greater function evaluations, MDOcean's semi-analytical model means that the optimization likely runs faster than the other BEM-based optimizations, although the relevant papers do not include any runtime information that could verify or deny this claim.
 Because of the fast runtime, effort was not invested to decrease the number of iterations, although moderate reductions should be possible by tuning convergence criteria, utilizing a gradient sparsity pattern to reduce the number of finite difference evaluations needed, and tuning the ratio of the number of seeds to the pattern search set size.
@@ -105,7 +105,7 @@ Additional sensitivity and post-optimality analysis work that could produce usef
 A global parameter sensitivity analysis is also suggested, taking into account both nonlinearites in the effect of one parameter across operating points and interaction effects between multiple uncertain parameters.
 
 \subsubsection{Constraint and Requirement Suitability}
-By including \numLinConstraints~linear and \numNonlinConstraints~nonlinear constraints, this optimization captures more realistic design, model, and operational requirements than any other WEC optimization study known to the authors.
+By including \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear constraints, this optimization captures more realistic design, model, and operational requirements than any other WEC optimization study known to the authors.
 The active constraints highlighted in \figureautorefname~\ref{fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming). 
 Constraints related to ballast and pitch stability are inactive, confirming that these design considerations are not primary avenues for innovation.
 While survivability is known to be a critical design requirement for WECs, it is rarely incorporated into optimization studies, and the results of this study demonstrate and quantify the effect of survivability considerations. 
@@ -142,13 +142,13 @@ In future work, running the MDOcean optimization using those simplified metrics 
 %use \url{https://tpl.nrel.gov/assessment} and \url{https://www.osti.gov/biblio/1825239} for RM3 TPL.
 
 %% table contents helpers
-\newcommand{\speedups}{
+\newcommand{\speedupsRE}{
     Examples of changes that would make it even faster: 
     1) use gradient sparsity pattern to get rid of FD evaluations, or get rid of FD altogether by using matlab automatic differentiation 
     2) make multi body code simpler more like single body
 }
 
-\newcommand{\achievableDesignStudies}{
+\newcommand{\achievableDesignStudiesRE}{
     Example design studies that could be done with the model more-or-less as it is now:
 
 	1) more rigorously determine the effect of subsystem coupling - compare to sequential optimization of hydro then PTO sizing then structural - would let you know the benefit of coupled optimization for each subsystem, if it is large enough to justify the extra computational cost
@@ -166,7 +166,7 @@ In future work, running the MDOcean optimization using those simplified metrics 
     5) How do my results compare to optimizing for easier cost proxies (ie structural cost as surface area vs actual force-informed thicknesses)
 }
 
-\newcommand{\modelTrustBuilders}{
+\newcommand{\modelTrustBuildersRE}{
     Examples of model enhancements that would not really unlock new types of design studies on their own, but would make this and any other design study more accurate and trustworthy/realistic:
 
 	1) getting force with different nonlinear method: would make storm force more accurate, important since that is probably the least-theortically-defensible assumption of MDOcean
@@ -180,7 +180,7 @@ In future work, running the MDOcean optimization using those simplified metrics 
     5) use extreme statistics to assess amplitude constraints, instead of max nonzero jpd
 }
 
-\newcommand{\modelStudyEnablers}{
+\newcommand{\modelStudyEnablersRE}{
     Example model additions and the types of design studies they would unlock:
 
 	1) Multibody: would let me actually optimize the spar dimensions, which is important since I'm up against that constraint of min damping plate diameter
@@ -211,8 +211,8 @@ Would require integration with WDRT or similar to get the environmental contour 
         >{\centering\arraybackslash}p{0.3\linewidth}
         >{\centering\arraybackslash}p{0.6\linewidth}}
                                 &  Existing optimization formulation & New optimization formulation \\ \hline
-         Existing model features& \speedups                          & \achievableDesignStudies     \\
-         New model features     & \modelTrustBuilders                & \modelStudyEnablers          \\
+         Existing model features& \speedupsRE                        & \achievableDesignStudiesRE     \\
+         New model features     & \modelTrustBuildersRE              & \modelStudyEnablersRE        \\
     %\end{tabular}
     \caption{Future model and optimization improvements}
     \label{tab:future-studies}

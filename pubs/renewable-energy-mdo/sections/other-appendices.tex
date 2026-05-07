@@ -1,5 +1,4 @@
 \clearpage
-\begin{appendices}
 \section{Optimization Process Details}
 
 \subsection{Hessian Scaling Procedure}\label{sec:appendix-scaling}
@@ -54,7 +53,7 @@ Table~\ref{tab:hyperparams} documents the hyper-parameters used to control conve
 \figureautorefname~\ref{fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/single_obj_convergence.pdf}
 \caption{Single objective convergence plots}\label{fig:single-objective-convergence}
 \end{figure}
 
@@ -66,7 +65,7 @@ On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less o
 This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
 Figure~\ref{fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
 Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
-\hl{This requires further investigation to explain and will be done during re-scrutineering.}
+%\hl{This requires further investigation to explain and will be done during re-scrutineering.}
 
 \begin{landscape}
 \begingroup
@@ -74,7 +73,7 @@ Surprisingly, the optimal values take on many different continuous values, as op
 
 \begin{figure}
 \centering
-\includegraphics[width=1.2\linewidth]{figs/from-matlab/multistart_parallel_coordinates.pdf}
+\includegraphics[width=1.2\linewidth]{../renewable-energy-mdo/figs/from-matlab/multistart_parallel_coordinates.pdf}
 \caption{Parallel axis plot for effect of starting point on convergence}\label{fig:multistart-parallel-axis}
 \fillandplacepagenumber
 \end{figure}
@@ -85,7 +84,7 @@ Surprisingly, the optimal values take on many different continuous values, as op
 \subsection{Local Sensitivities}\label{sec:appendix-sensitivties}
 Figure~\ref{fig:param-sens-local-global-J-star}, \ref{fig:param-sens-local-x-star}, and \ref{fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
 \caption{Local parameter sensitivity analysis to optimal objective $J^*$}
 \label{fig:param-sens-local-global-J-star}
 \end{figure}
@@ -121,15 +120,16 @@ where additional sensitivity quantities introduced are matrix $C_{sens}$, scalar
 
 The fourth method requires significantly more computational expense than the first three methods, since rather than using post-optimality derivatives, it repeats the optimization with the changed parameter.
 This method is the ``ground truth'' local sensitivity against which the other methods can be compared.
-While the first three methods take \gradientSensRuntime~to run, the fourth method takes \reoptimSensRuntime, since \numReoptims~separate optimizations are performed.
+While the first three methods take \resultsRE[gradientSensRuntime]~to run, the fourth method takes \resultsRE[reoptimSensRuntime], since \resultsRE[numReoptims]~separate optimizations are performed.
 
 While the sensitivities computed with post-optimality derivatives enjoy a significant advantage in computational speed over the re-optimization sensitivity, their accuracy is unfortunately low.
-The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \hl{XX}\%.
+The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[meanAbsErrorParamSens]\%.
 For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,spar}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
-For some such as \hl{XX}, the values are opposite signs.
+For others, %some such as \hl{XX}, 
+the values are opposite signs.
 This could indicate the presence of discontinuities, strong nonlinearities, or the interference of finite precision effects when computing the partial derivatives.
 
-On the bright side, for the majority (\hl{XX}\%) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
+On the bright side, for the majority (\resultsRE[percentParamsRightSign]\%) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
 For example, this occurs for $h$, $H_{s,struct}$, $FOS_{min}$, $D_{d,tu}$, $FOS_{mult,d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{heave,mult}$, but not for $T_{struct}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
@@ -138,13 +138,13 @@ Figures~\ref{fig:param-sens-local-x-star} and \ref{fig:param-sens-global-x-star}
 Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
 This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
 \begin{figure}
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_design_grid.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/post_optim_design_grid.pdf}
 \caption{Quadratic parameter sensitivity analysis to optimal design $x^*$}
 \label{fig:param-sens-local-x-star}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=\linewidth]{figs/from-matlab/re_optim_design_grid.pdf}
+\includegraphics[width=\linewidth]{../renewable-energy-mdo/figs/from-matlab/re_optim_design_grid.pdf}
 \caption{Re-optimization parameter sensitivity analysis to optimal design $x^*$}
 \label{fig:param-sens-global-x-star}
 \end{figure}
@@ -153,6 +153,3 @@ Finally, the authors note that while the re-optimization method is valid even wh
 The global sensitivities of section \ref{sec:sensitivities} only investigate a few select parameters.
 Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
 This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.
-
-
-\end{appendices}

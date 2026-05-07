@@ -1,0 +1,40 @@
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{soul}      % for highlighting text with \hl 
+\usepackage{multirow}  % for multi row/col tables
+\usepackage{tikz}
+\usepackage{array}     % required for text wrapping in tables
+\usepackage{pdflscape} % for landscape table
+\usepackage{longtable} % for table going multiple pages
+\usepackage{rotating}  % for rotated table headers
+\usepackage{color}     % also required for highlighting 
+\usepackage{bibcop}    % warnings for incorrect citations
+\usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
+\usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
+\usepackage{verbatim}  % word counts
+\usepackage{textcomp}  % cent symbol
+\usepackage{natbib}    % citep command
+\usepackage[unicode,hypertexnames=false]{hyperref}
+\usepackage{cleveref}
+
+\newcommand*\rot{\rotatebox{90}} % for rotated table headers
+\newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
+
+\newcommand{\summarytexcount}[1]{\textbf{Word Count}
+  \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
+  \verbatiminput{#1.wcsum}%
+}
+
+\newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
+  \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
+  \verbatiminput{#1.wcdetail}
+}%
+
+\def\fillandplacepagenumber{% for landscape page numbers
+ \par\thispagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
