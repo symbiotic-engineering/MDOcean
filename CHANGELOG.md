@@ -1,6 +1,14 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.9) - 2026-5-7
+### Added
+- Paper: dissertation writeup
+### Changed
+- Submodules: update OpenFLASH submodule to include jfm paper in thesis
+### Fixed
+- Fix error in circle constraint center/radius for positve power
+
 ## [v1.2.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.8) - 2026-5-5
 ### Added
 - Pipeline: create `test-aor` and `test-re` stages
