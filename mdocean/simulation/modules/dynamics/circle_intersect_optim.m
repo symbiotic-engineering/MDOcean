@@ -103,7 +103,7 @@ end
 function constr_fcn = eval_constraint(p,c,r)
 % checks how far point(s) p are in violation of the constraints
 % positive means not ok (outside circle), negative means ok (inside circle)
-% returns Nx1 for single p, MxN for M points
+% returns 1xN for single p, MxN for M points
     if isempty(p)
         constr_fcn = zeros(0,length(r));
         return
@@ -114,11 +114,7 @@ function constr_fcn = eval_constraint(p,c,r)
     dx = bsxfun(@minus, p(:,1), c(:,1).');
     dy = bsxfun(@minus, p(:,2), c(:,2).');
     constr = hypot(dx,dy) - r(:).';
-    if size(p,1) == 1
-        constr_fcn = constr.';
-    else
-        constr_fcn = constr;
-    end
+    constr_fcn = constr;
 end
 
 function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
