@@ -47,7 +47,8 @@ else
     p = zeros(N,2);
     nonzero_ctr = ~ctr_origin;
     p(nonzero_ctr,:) = c(nonzero_ctr,:) - (r(nonzero_ctr) ./ dist(nonzero_ctr)) .* c(nonzero_ctr,:);
-    p(ctr_origin,:) = [r(ctr_origin), zeros(sum(ctr_origin),1)]; % center at origin: any boundary point is equally close
+    r_origin = r(ctr_origin);
+    p(ctr_origin,:) = [r_origin(:), zeros(numel(r_origin),1)]; % center at origin: any boundary point is equally close
     candidates(count+(1:N),:) = p;
     circle_indices(count+(1:N),:) = [1:N; 1:N].';
     
