@@ -12,44 +12,29 @@ function [diagnostic] = save_fig_with_diagnostic(fig, fig_name, pdf_prefix)
     if nargin<3
         pdf_prefix = '';
     end
-    % Coerce inputs to single string/char to avoid passing string arrays
-    fig_name = char(string(fig_name));
-    pdf_prefix = char(string(pdf_prefix));
-    if isempty(fig_name)
-        fig_name = 'unnamed_figure';
-    end
-    pdf_name = char([fullfile(pdf_prefix, fig_name) '.pdf']);
+    pdf_name = [fullfile(pdf_prefix, fig_name) '.pdf'];
     
     if isgraphics(fig) % if figure exists (didn't error first and wasn't deleted)
-        % Ensure we operate on a single, valid figure handle
-        if numel(fig) > 1
-            warning('MDOcean:save_fig_with_diagnostic:MultipleFigures','Multiple figure handles provided; using the first one.');
-            fig = fig(1);
-        end
-
-        if ~isempty(fig.UserData) && (ischar(fig.UserData) || isstring(fig.UserData))
+        if ~isempty(fig.UserData) && ischar(fig.UserData)
             % pdf already exists in files, just copy to folder
-            src = char(string(fig.UserData));
             try
-                copyfile(src, pdf_name);
+                copyfile(fig.UserData, pdf_name)
             catch
-                warning([src ' does not exist, saving image to results folder.']);
-                exportgraphics(fig, char(string(pdf_name)));
+                warning([fig.UserData ' does not exist, saving image to results folder.'])
+                exportgraphics(fig,pdf_name) % if pdf does not exist, save the image
             end
         else
             fig = check_fig_size(fig);
             % save .fig for later editing
-            fig_file = fullfile(pdf_prefix, fig_name);
-            fig_file = [fig_file '.fig'];
-            try
-                savefig(fig, char(string(fig_file)));
-            catch
-            end
+            savefig(fig, [fullfile(pdf_prefix, fig_name) '.fig'])
+            
+            % save pdf from matlab figure output
+            exportgraphics(fig,pdf_name)
         end
 
         if nargout>0
             % in either case, use figure itself, not pdf, for printing the diagnostic
-            diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',[fig_name '_']);
+            diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',fig_name + '_');
         end
 
     elseif ~isvalid(fig)
