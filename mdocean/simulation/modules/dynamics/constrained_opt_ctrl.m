@@ -491,8 +491,8 @@ function inside = check_inside_circles(p, centers, radii)
     if isvector(p) && numel(p) == 2
         p = reshape(p,1,2);
     end
-    dists = hypot(bsxfun(@minus, p(:,1), centers(:,1).'), ...
-                  bsxfun(@minus, p(:,2), centers(:,2).'));
+    dists = hypot(p(:,1) - centers(:,1).', ...
+                  p(:,2) - centers(:,2).');
     inside = all(dists <= (radii(:).' + 1e-4), 2);
     if size(p,1) == 1
         inside = inside(1);

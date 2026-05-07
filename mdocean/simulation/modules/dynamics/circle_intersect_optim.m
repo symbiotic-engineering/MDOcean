@@ -27,7 +27,7 @@ else
     % 2) pairwise intersections
     count = 0;
     if N > 1
-        pair_idx = nchoosek(1:N,2);
+        pair_idx = pair_indices_2comb(N);
         c1 = c(pair_idx(:,1),:);
         c2 = c(pair_idx(:,2),:);
         r1 = r(pair_idx(:,1));
@@ -112,10 +112,24 @@ function constr_fcn = eval_constraint(p,c,r)
     if isvector(p) && numel(p) == 2
         p = reshape(p,1,2);
     end
-    dx = bsxfun(@minus, p(:,1), c(:,1).');
-    dy = bsxfun(@minus, p(:,2), c(:,2).');
+    dx = p(:,1) - c(:,1).';
+    dy = p(:,2) - c(:,2).';
     constr = hypot(dx,dy) - r(:).';
     constr_fcn = constr;
+end
+
+function pair_idx = pair_indices_2comb(N)
+% Faster pair indexing alternative to nchoosek(1:N,2)
+    n_pairs = N * (N - 1) / 2;
+    pair_idx = zeros(n_pairs,2);
+    pos = 1;
+    for i = 1:(N-1)
+        n_j = N - i;
+        idx = pos:(pos + n_j - 1);
+        pair_idx(idx,1) = i;
+        pair_idx(idx,2) = (i+1:N).';
+        pos = pos + n_j;
+    end
 end
 
 function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
