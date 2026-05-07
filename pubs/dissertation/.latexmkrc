@@ -11,7 +11,7 @@ print "BSTINPUTS after: @BSTINPUTS\n";
 
 # Ensure TeX inputs are found too
 print "TEXINPUTS before: @TEXINPUTS\n";
-push @TEXINPUTS, "$root/..";
+push @TEXINPUTS, "$root/..", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
 print "TEXINPUTS after: @TEXINPUTS\n";
 
 $out_dir = '.';
