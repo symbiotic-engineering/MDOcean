@@ -110,7 +110,10 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: pull with retries
-        run: bash .github/workflows/calkit_pull_with_retries.sh
+        run: |
+          bash .github/workflows/calkit_pull_with_retries.sh
+          cd mdocean/simulation/modules/OpenFLASH
+          bash .github/workflows/calkit_pull_with_retries.sh
         continue-on-error: true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
