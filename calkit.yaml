@@ -5419,11 +5419,30 @@ pipeline:
         # pareto timing percentages
         paretoPctTimeSeeds: "{paretoPctTimeSeeds*100:.0f}%"
         paretoPctTimePatternSearch: "{paretoPctTimePatternSearch*100:.0f}%"
-    copy-bib:
+    copy-shared-latex:
       kind: map-paths
       paths:
-        - src: pubs/renewable-energy-mdo/references.bib
+        - src: pubs/shared/references.bib
           dest: pubs/applied-ocean-research-model/references.bib
+          kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/renewable-energy-mdo/references.bib
+          kind: file-to-file
+        - src: pubs/shared/elsarticle-num-names.bst
+          dest: 
+            pubs/applied-ocean-research-model/elsarticle-num-names.bst
+          kind: file-to-file
+        - src: pubs/shared/elsarticle-num-names.bst
+          dest: pubs/renewable-energy-mdo/elsarticle-num-names.bst
+          kind: file-to-file
+        - src: pubs/shared/shared-pkg.tex
+          dest: pubs/applied-ocean-research-model/shared-pkg.tex
+          kind: file-to-file
+        - src: pubs/shared/shared-pkg.tex
+          dest: pubs/renewable-energy-mdo/shared-pkg.tex
+          kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/dissertation/references.bib
           kind: file-to-file
     build-RE-paper:
       kind: latex
@@ -5437,7 +5456,7 @@ pipeline:
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/numbers.tex
         - pubs/renewable-energy-mdo/numeric-results.tex
-        - pubs/elsarticle-num-names.bst
+        - pubs/renewable-energy-mdo/elsarticle-num-names.bst
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
@@ -5459,7 +5478,7 @@ pipeline:
         - pubs/applied-ocean-research-model/main.tex
         - pubs/applied-ocean-research-model/numbers.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
-        - pubs/elsarticle-num-names.bst
+        - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
@@ -5621,8 +5640,10 @@ overleaf_sync:
       - sections/
       - references.bib
       - numbers.tex
-      - ../elsarticle-num-names.bst
-      - ../shared-pkg.tex
+      - elsarticle-num-names.bst
+      - appendies.tex
+      - commands-aor.tex
+      - content.tex
     push_paths:
       - figs/
       - tables/
@@ -5635,14 +5656,17 @@ overleaf_sync:
       - tables/
       - references.bib
       - numbers.tex
-      - ../elsarticle-num-names.bst
-      - ../shared-pkg.tex
+      - commands-re.tex
     push_paths:
       - figs
+      - numeric-results.tex
+      - tables/from-matlab/
   pubs/UMERC-2025-grid-value:
     url: https://www.overleaf.com/project/68516ba5bc36663bb61711a6
     sync_paths:
       - UMERC_2025_grid_value.tex
+      - appendix-grid.tex
+      - content-grid.tex
       - references.bib
       - logo.jpg
     push_paths:
