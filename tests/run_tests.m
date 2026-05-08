@@ -9,17 +9,7 @@ import matlab.unittest.plugins.LoggingPlugin
 import matlab.unittest.selectors.HasName
 import matlab.unittest.constraints.ContainsSubstring
 
-load_sl_glibc_patch % for linux, see https://www.mathworks.com/support/bugreports/2632298
-
-sourceCodeFolder = 'mdocean';
-addpath(genpath(sourceCodeFolder))
-
-if exist('../WEC-Sim','dir')    
-    wecSimFolder = '../WEC-Sim/source';
-    set_param(0, 'ErrorIfLoadNewModel', 'off')
-    addpath(genpath(wecSimFolder))
-    rmpath('../WEC_Sim/source/functions/BEMIO/readWAMIT.m')
-end
+add_mdocean_path();
 
 suite = testsuite('tests');
 runner = testrunner('textoutput');
@@ -62,7 +52,7 @@ if ~batchStartupOptionUsed % don't open reports when running on CI server
 end
 
 fig = unittest_time_bar_chart(suite,results);
-save_pdf(fig,'test-results/Figure_30_unittest.pdf')
+exportgraphics(fig,'test-results/Figure_30_unittest.pdf')
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)

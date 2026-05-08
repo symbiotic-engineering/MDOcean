@@ -1,11 +1,11 @@
 name: Run calkit pipeline
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-
+  workflow_dispatch:
+# env:
+  # MLM_LICENSE_TOKEN: ${{ secrets.MatlabBatchToken }}
+  # MLM_LICENSE_FILE: ${{ secrets.MATLAB_LICENSE_FILE }}:27000
 permissions:
   contents: write
 
@@ -18,24 +18,148 @@ concurrency:
 jobs:
   main:
     name: Run
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    timeout-minutes: 1440 # 24 hours
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup temp environment + cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
+
+          cleanup() {
+            echo "Cleaning up job..."
+
+            pkill -P $$ || true
+            pkill -f matlab-batch || true
+            pkill -f run_matlab_command || true
+
+            rm -rf "$TMPDIR" || true
+          }
+
+          trap cleanup EXIT INT TERM
+      - name: Clear stale submodule caches
+        run: |
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
+      - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
+          persist-credentials: false
+      - name: Init top-level submodules
+        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
+        # without recursing into their nested submodules, avoiding the stale
+        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
+        run: git submodule update --init
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
       - name: Install Calkit
-        run: uv tool install calkit-python
-      - name: Run Calkit
-        uses: calkit/run-action@v1
+        run: uv tool install --upgrade calkit-python
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v3
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install python dependencies
+        run: pip install ruamel.yaml
+      # - name: Setup matlab
+      #   uses: matlab-actions/setup-matlab@v2
+      #   with:
+      #     cache: true
+      #     release: R2024b
+      #     products: >
+      #       Parallel_Computing_Toolbox
+      #       Global_Optimization_Toolbox
+      #       Optimization_Toolbox
+      #       Statistics_and_Machine_Learning_Toolbox
+      #       MATLAB_Report_Generator
+      #       Simulink
+      #       Simscape
+      #       Simscape_Multibody
+      - name: Add MATLAB to PATH
+        run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+      # - name: test matlab can run
+      #   run: matlab -batch "disp('Matlab is working')"
+      # - name: test matlab license server
+      #   run: | # Mask the license server IP address in logs
+      #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
+      #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
+      #   if: always()
+      - name: pull
+        run: calkit pull
+        continue-on-error: true
+      - name: Generate calkit_stages.yaml
+        uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          
+          run_args: make-calkit-stages
+          save: false
+          cache_dvc: false
+      - name: Use calkit_stages.yaml to update calkit.yaml
+        run: python mdocean/analysis/update_calkit.py
+      - name: add any newly generated .ipynb files to git
+        run: git add results/fig_notebooks/*.ipynb
+      - name: Run Calkit
+        id: run_calkit
+        continue-on-error: true
+        uses: calkit/run-action@v2
+        with:
+          dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
+          # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
+          run_args: --keep-going --log build-AOR-paper view-aor-figs build-RE-paper all-viz render-quarto-pdf
+          pull_dvc: false
+          save: false
+          cache_dvc: false
+      - name: calkit save
+        run: |
+          if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
+            exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
+          fi
+  
+          set +e # Continue even if pull fails
+          git pull --recurse-submodules
+          PULL_STATUS=$?
+
+          if [ $PULL_STATUS -ne 0 ]; then
+            BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
+            echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
+            git checkout -b "$BRANCH"
+            # git config below does the equivalent of the --set-upstream option of git push
+            git config branch."$BRANCH".remote origin
+            git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+          fi
+
+          calkit dvc pull
+          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+          PUSH_STATUS=$?
+
+          if [ $PUSH_STATUS -ne 0 ]; then
+            echo "Push failed, perhaps due to dvc push timeout. Retrying."
+            calkit dvc push
+            git push
+          fi
+      - run: |
+          echo "Errors from latex:"
+          grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
+          grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true

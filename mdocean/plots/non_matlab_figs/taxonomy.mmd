@@ -1,0 +1,150 @@
+%%{init: {
+  "flowchart": {
+    "curve": "linear"
+    },
+  "themeVariables": {
+    "fontSize": "48px"
+  }
+}}%%
+flowchart TB
+    Parent["WEC Modeling Choices"]
+
+    SpacerL[" "] --- Parent --- SpacerR[" "]
+
+%% connections to parent
+    ChildA --> Parent
+    Device --> Parent
+    ChildC --> Parent
+
+    Parent --> PTO
+    Parent --> ChildB
+    Parent --> Controls
+    Parent --> ChildD
+    Parent --> ChildE
+    Parent --> Mooring
+
+%% device typeset
+subgraph device[" "]
+    Device["Device type"]
+
+    PA["N-PA: N-body point absorber"] --> Device
+    ATN["ATN: Attenuator"] --> Device
+    TRM["TRM: Terminator"] --> Device
+    OSW["OSW: Oscillating surge WEC"] --> Device
+    OTP["OTP: Overtopping"] --> Device
+    OWC["OWC: Oscillating  water column"] --> Device
+end
+
+%% mooring
+subgraph mooring[" "]
+    Mooring["Mooring"]
+
+    Mooring --> DYN["DY: mooring dynamics"]
+    Mooring --> DES["DE: mooring physical design"]
+end
+
+%% powertrain
+subgraph pto[" "]
+    PTO["Power take-off"]
+
+    PTO --> EFF["EF: efficiency only"]
+    PTO --> PTODYN["DY: dynamics"]
+end
+
+%% HYDRODYNAMICS (top subgraph, arrows corrected upward)
+subgraph H[" "]
+    ChildA["Hydrodynamics"]
+
+    B1["Linear potential flow"] --> ChildA
+    B3["Nonlinear forces"] --> ChildA
+
+    BEM["BEM: Boundary element method"] --> B1
+    MEEM["MEEM: Matched eigenfunction expansion method"] --> B1
+    ALG["ALG: Algebraic approximation"] --> B1
+    FIT["FIT: Fit to data"] --> B1
+
+    CFD["CFD: Computational fluid dynamics"] --> B3
+    M["M: Morison strip theory"] --> B3
+    Q["Q: Quadratic drag"] --> B3
+    LD["LD: Linear drag"] --> B3
+    DF["DF: Describing function drag"] --> B3
+    NPF["NPF: Nonlinear potential flow"] --> B3
+end
+
+%% DYNAMICS (top subgraph, arrows corrected upward)
+subgraph DY[" "]
+    ChildB["Dynamics"]
+
+    ChildB --> A1["F: Frequency domain"]
+    ChildB --> A2["T: Time domain"]
+    ChildB --> Fplus["F+: Frequency domain extension"]
+    ChildB --> A4["PS: Pseudo-spectral"]
+end
+
+%% CONTROLS (top subgraph, arrows corrected upward)
+subgraph C[" "]
+    Controls["Controls"]
+    
+    Controls --> CPI["P/PI: Proportional Integral"] 
+    Controls --> Pplus["P/PI+: P/PI with constraints"]
+    Controls --> NL["NL: Nonlinear structured"]
+    Controls --> US["US: Nonlinear unstructured"]
+end
+
+%% STRUCTURES (bottom subgraph, flow top-to-bottom)
+subgraph S[" "]
+    ChildC["Structures"]
+
+    AN["AN: Analytical stress"] --> ChildC
+    LO["LO: Load only"] --> ChildC
+    FEA["FEA: Finite element analysis"] --> ChildC
+end
+
+%% ECONOMICS (bottom subgraph, flow top-to-bottom)
+subgraph E[" "]
+    ChildD["Economics"]
+
+    ChildD --> STR["STR: Structural cost"]
+    ChildD --> PTOecon["PTO: Power take-off cost"]
+    ChildD --> GEO["GEO: Geometric proxy"]
+    ChildD --> D4["FULL: Full cost model"]
+end
+
+%% SEA STATE (bottom subgraph, flow top-to-bottom)
+subgraph SS[" "]
+    ChildE["Sea state"]
+
+    ChildE --> REG["REG: Regular waves"]
+    ChildE --> IRR["IRR: Irregular spectrum"]
+    ChildE --> JOINT["REG+/IRR+: wave probabilities"]
+    ChildE --> STO["STO: Storm"]
+end
+
+linkStyle 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51 stroke-width:4px
+
+linkStyle 0,1 stroke-width:0px
+
+%% Define a "thick" class
+    classDef thick stroke-width:8px,stroke:#000
+
+    class MEEM thick
+    class DF thick
+    class Pplus thick
+    class REG thick
+    class JOINT thick
+    class STR thick
+    class AN thick
+    class M thick
+    class PTOecon thick
+    class STO thick
+    class Fplus thick
+    class ALG thick
+    class FIT thick
+    class PTODYN thick
+    class PA thick
+
+    classDef bigFont font-size:60px
+    class Parent bigFont
+
+    classDef hidden fill:none,stroke:none;
+    class SpacerL,SpacerR hidden

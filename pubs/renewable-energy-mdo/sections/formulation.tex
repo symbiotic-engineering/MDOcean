@@ -1,4 +1,4 @@
-\section{Optimization Methodology}\label{sec:optim-methods}
+
 \subsection{Problem Formulation}\label{sec:formulation}
 The standard optimization problem formulation is expressed \cite{martins_engineering_2022,papalambros_principles_2017}:
 \begin{equation}
@@ -27,7 +27,7 @@ A second limitation of LCOE is its high uncertainty for devices in the early des
 The economic model of section~\ref{sec:econ} only assumes a few cost components (structures and PTO) to scale with design.
 If fixed cost components or the $FCR$ were to change, it could influence the optimal design.
 The third limitation is that $LCOE$ has limited relevance in off-grid or micro-grid use cases.
-These applications include offshore aquaculture, autonomous underwater vehicle charging, and oceanic data collection, and have grown increasingly popular since the 2019 launch of the DOE's ``Powering the Blue Economy" initiative \cite{livecchi_powering_2019}.
+These applications include offshore aquaculture, autonomous underwater vehicle charging, and oceanic data collection, and have grown increasingly popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \cite{livecchi_powering_2019}.
 For instance, while both energy production increase and cost decrease can drive LCOE reduction, only the latter is relevant for applications with a fixed power requirement.
 Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}. 
 
@@ -55,7 +55,7 @@ This section describes requirements that the optimization formulation must enfor
 Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions).
 Constraints are the most common but not the only way to implement these requirements.
 Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
-(2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever" formulation that overcomes common difficulties in large-scale optimization. 
+(2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization. 
 
 \tablename~\ref{tab:requirements} shows each requirement along with an indication of its priority in an optimization formulation context and a reference to the section, equation, or figure where it is explained.
 \newcounter{reqnumber}
@@ -146,9 +146,9 @@ Referring back to the state-of-the-art literature in \tablename~\ref{tab:lit}, t
  $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\ 
  $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\ 
  $x_3$&$T_{f,2}$ & Float draft& 0.5& See sec.
-\ref{sec:validation}&100& m\\ 
+\ref{sec:validation-benchmarking}&100& m\\ 
  $x_4$&$h_s$& Spar height  & 5& See sec.
-\ref{sec:validation}& 100& m\\ 
+\ref{sec:validation-benchmarking}& 100& m\\ 
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\ 
  $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\ 
@@ -243,6 +243,11 @@ The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert f
 %\hl{second row is wrong, need to use} $D_{f,in}$ not $D_s$.
 
 %It maybe would have been possible to have all sim-breaking constraints enforced via bounds if I allowed the spar geometry to change aspect ratio (which requires multibody dynamics), but without multibody, the DVs are such that they can't all be bounds.
+
+Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters. Rather than perform PTO co-design, which a number of recent papers (e.g. \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in section \ref{sec:lit}) have already proven the value of, this study chooses to keep the PTO design fixed at representative values.
+While impedance matching considerations can and should be used to design the device's actual PTO hardware, this decision adds simplicity and illustrative value at the system level.
+It highlights the effect of the novel non-PTO (e.g. structural) aspects of WEC co-design that this study introduces while still capturing the effect of PTO rating on system performance and maintaining sufficient model generality to incorporate PTO optimization in the future.
+The development of a more detailed PTO cost model that scales with these characteristics would be a necessary next step to enable PTO co-design in future work.
 
 %\subsubsection{Model Checking}
 %\hl{todo: check for redundant constraints, monotonicity, etc} \cite{papalambros_principles_2017}.
