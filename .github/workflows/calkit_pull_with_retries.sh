@@ -12,7 +12,7 @@ while (( try <= max_tries )); do
   echo "$out"
 
   # Check for the specific retry-able error pattern
-  if echo "$out" | grep -Eq 'ERROR: failed to pull data from the cloud - [0-9]+ files failed to download'; then
+  if echo "$out" | grep -Eq 'ERROR: failed to pull data from the cloud - [0-9]+ files failed to download|ERROR: unexpected error'; then
     echo "Retryable error detected. Retrying..."
     ((try++))
     sleep 2
