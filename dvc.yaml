@@ -6070,17 +6070,53 @@ stages:
           persist: false
     desc: Automatically generated from the 're-results-to-latex' stage
       in calkit.yaml. Changes made here will be overwritten.
-  copy-bib:
+  copy-shared-latex:
     cmd: calkit map-paths --file-to-file 
-      'pubs/renewable-energy-mdo/references.bib->pubs/applied-ocean-research-model/references.bib'
+      'pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib'
+      --file-to-file 
+      'pubs/shared/references.bib->pubs/renewable-energy-mdo/references.bib'
+      --file-to-file 
+      'pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst'
+      --file-to-file 
+      'pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst'
+      --file-to-file 
+      'pubs/shared/shared-pkg.tex->pubs/applied-ocean-research-model/shared-pkg.tex'
+      --file-to-file 
+      'pubs/shared/shared-pkg.tex->pubs/renewable-energy-mdo/shared-pkg.tex'
+      --file-to-file 
+      'pubs/shared/references.bib->pubs/dissertation/references.bib'
     deps:
-      - pubs/renewable-energy-mdo/references.bib
+      - pubs/shared/references.bib
+      - pubs/shared/references.bib
+      - pubs/shared/elsarticle-num-names.bst
+      - pubs/shared/elsarticle-num-names.bst
+      - pubs/shared/shared-pkg.tex
+      - pubs/shared/shared-pkg.tex
+      - pubs/shared/references.bib
     outs:
       - pubs/applied-ocean-research-model/references.bib:
           cache: false
           persist: true
-    desc: Automatically generated from the 'copy-bib' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+      - pubs/renewable-energy-mdo/references.bib:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/elsarticle-num-names.bst:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/shared-pkg.tex:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/shared-pkg.tex:
+          cache: false
+          persist: true
+      - pubs/dissertation/references.bib:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 'copy-shared-latex' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc 
@@ -6093,7 +6129,7 @@ stages:
       - pubs/renewable-energy-mdo/references.bib
       - pubs/renewable-energy-mdo/numbers.tex
       - pubs/renewable-energy-mdo/numeric-results.tex
-      - pubs/elsarticle-num-names.bst
+      - pubs/renewable-energy-mdo/elsarticle-num-names.bst
       - .calkit/env-locks/tex
       - pubs/renewable-energy-mdo/.latexmkrc
     outs:
@@ -6120,7 +6156,7 @@ stages:
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numbers.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
-      - pubs/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
