@@ -8,6 +8,7 @@
 - Submodules: update OpenFLASH submodule to include jfm paper in thesis
 ### Fixed
 - Fix error in circle constraint center/radius for positve power
+- Location sensitivity wrong class name in analysis outputs
 
 ## [v1.2.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.8) - 2026-5-5
 ### Added
