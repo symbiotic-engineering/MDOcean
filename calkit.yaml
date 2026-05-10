@@ -5549,6 +5549,20 @@ pipeline:
         - from_stage_outputs: viz-SweepGeoms
         - from_stage_outputs: viz-Validation
         - from_stage_outputs: viz-Wecsim
+    make-quarto-yaml:
+      kind: python-script
+      environment: pubs
+      script_path: pubs/defense/quarto/make_quarto_yaml.py
+      inputs:
+        - results/DesignSpaceExploration/end.json
+        - results/ForceSaturationFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
+        - results/Parameters/end.json
+        - results/Runtime/end.json
+        - results/Validation/end.json
+        - results/Wecsim/end.json
+      outputs:
+        - pubs/defense/quarto/_variables.yml
     render-quarto-html:
       kind: docker-command
       environment: quarto
@@ -5556,6 +5570,7 @@ pipeline:
       inputs:
         - pubs/defense/figs/
         - pubs/defense/quarto/slides.qmd
+        - pubs/defense/quarto/_variables.yml
         - pubs/defense/references.bib
         - pubs/defense/quarto/asme.csl
         - pubs/defense/quarto/dots.css
