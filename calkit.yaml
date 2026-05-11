@@ -5392,6 +5392,18 @@ pipeline:
         - pubs/defense/latex-standalone/standalone_{name}.pdf
       outputs:
         - pubs/defense/figs/standalone_{name}.svg
+    figure-pdf-to-svg:
+      kind: shell-command
+      environment: pdf2svg
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: figs_in_defense
+      command: pdf2svg pubs/defense/figs/{name}.pdf pubs/defense/figs/{name}.svg
+      inputs:
+        - pubs/defense/figs/{name}.pdf
+      outputs:
+        - pubs/defense/figs/{name}.svg
     render-quarto-html:
       kind: docker-command
       environment: quarto
