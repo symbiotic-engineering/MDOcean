@@ -6250,6 +6250,7 @@ stages:
       - pubs/applied-ocean-research-model/figs/manual/
       - pubs/applied-ocean-research-model/figs/tikz/
       - pubs/applied-ocean-research-model/tables/
+      - pubs/shared/equations/
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numbers.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
@@ -6293,6 +6294,7 @@ stages:
       - pubs/applied-ocean-research-model/sections/
       - pubs/applied-ocean-research-model/figs/
       - pubs/applied-ocean-research-model/tables/
+      - pubs/shared/equations/
       - pubs/applied-ocean-research-model/appendices.tex
       - pubs/applied-ocean-research-model/commands-aor.tex
       - pubs/applied-ocean-research-model/numbers.tex
@@ -6379,10 +6381,41 @@ stages:
           persist: false
     desc: Automatically generated from the 'make-quarto-yaml' stage in
       calkit.yaml. Changes made here will be overwritten.
+  make-standalone-tex-pdf:
+    cmd: calkit latex build -e tex --no-check 
+      pubs/defense/latex-standalone/standalone_${item.name}.tex
+    deps:
+      - pubs/defense/latex-standalone/standalone_${item.name}.tex
+      - pubs/shared/equations/
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/defense/latex-standalone/standalone_${item.name}.pdf
+    matrix:
+      name:
+        - eigenfunctions
+        - A_matrix
+    desc: Automatically generated from the 'make-standalone-tex-pdf' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  make-standalone-tex-svg:
+    cmd: pdf2svg 
+      pubs/defense/latex-standalone/standalone_${item.name}.pdf 
+      pubs/defense/figs/standalone_${item.name}.svg
+    deps:
+      - pubs/defense/latex-standalone/standalone_${item.name}.pdf
+      - .calkit/env-locks/pdf2svg
+    outs:
+      - pubs/defense/figs/standalone_${item.name}.svg
+    matrix:
+      name:
+        - eigenfunctions
+        - A_matrix
+    desc: Automatically generated from the 'make-standalone-tex-svg' 
+      stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd
     deps:
       - pubs/defense/figs/
+      - pubs/shared/equations/
       - pubs/defense/quarto/slides.qmd
       - pubs/defense/quarto/_variables.yml
       - pubs/defense/references.bib

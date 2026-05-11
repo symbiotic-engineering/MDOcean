@@ -35,42 +35,7 @@ By construction, this potential obeys all boundary conditions except for zero ra
 The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of section \ref{sec:meem-matching}.
 
 \begin{landscape}
-\begin{table}
-    \centering
-    \begin{tabular}{|>{\centering\arraybackslash}p{0.085\linewidth}|>{\centering\arraybackslash}p{0.26\linewidth}|>{\centering\arraybackslash}p{0.34\linewidth}|>{\centering\arraybackslash}p{0.32\linewidth}|} \hline 
-         Region&  $i1$&  $i2$& $e$\\ \hline 
-         Homog. potential $\phi_h(r,z)$&  $\displaystyle\sum_n C_{1n}^{i1} R_{1n}^{i1}(r) Z_n^{i1}(z)$&  $\displaystyle\sum_m \left(C_{1m}^{i2} R_{1m}^{i2}(r) + C_{2m}^{i2} R_{2m}^{i2}(r) \right) Z_m^{i2}(z)$& $\displaystyle\sum_k B_k^e \Lambda_k(r) Z_k^e(z)$\\ \hline 
-         Partic. potential $\phi_p(r,z)$&  $\displaystyle\frac{1}{2(h-d_1)}\left[ (z+h)^2 - \frac{r^2}{2}\right] $&  $\displaystyle\frac{1}{2(h-d_2)}\left[ (z+h)^2 - \frac{r^2}{2}\right]$& $0$\\ \hline 
-         Radial eigen-function $R(r)$&  $R_{1n}^{i1}(r) = \begin{cases}
-            \frac{1}{2} &  n=0 \\[1em]   %%% <--- here
-            \frac{\mathrm{I}_0(\lambda_{n}^{i1}r)}{\mathrm{I}_0(\lambda_{n}^{i1}a_{2})} & n \ge 1
-        \end{cases} $&  \shortstack{$R_{1m}^{i2}(r) = \begin{cases}
-            \frac{1}{2} &  m=0 \\[1em]   %%% <--- here
-            \frac{\mathrm{I}_0(\lambda_{m}^{i2}r)}{\mathrm{I}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
-        \end{cases}$   \\ $R_{2m}^{i2}(r) = \begin{cases}
-           \frac{1}{2}\ln(\frac{r}{a_2}) &  m = 0 \\
-        \frac{\mathrm{K}_0(\lambda_{m}^{i2}r)}{\mathrm{K}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
-        \end{cases}$}& $\Lambda_k(r) = \begin{cases}
-           \frac{\mathrm{H}_0^{1}(m_0r)}{\mathrm{H}_0^{1}(m_0a_2)} & k = 0 \\[1em] 
-          \frac{\mathrm{K}_0(m_kr)}{\mathrm{K}_0(m_ka_2)} &  k \ge 1
-        \end{cases}$\\ \hline 
- Vertical eigen-function $Z(z)$& $Z_n^{i1}(z) = \begin{cases}
-           1 & n=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\lambda_{n}^{i1}(z+h)) & n \ge 1
-        \end{cases}$& $Z_m^{i2}(z) = \begin{cases}
-           1 & m=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\lambda_{m}^{i2}(z+h)) & m \ge 1
-        \end{cases}$&$    Z^{e}_{k}(z) = \begin{cases}
-           N_0^{-\frac{1}{2}}\cosh( m_0(z+h)) &  k=0 \\[1em]   %%% <--- here
-           N_k^{-\frac{1}{2}}\cos( m_k(z+h)) &  k \ge 1
-        \end{cases}$\\ \hline
- Eigen-value& $\displaystyle \lambda_{n}^{i1} = \frac{n\pi}{h-d_{1}},  n \geq 1$& $\displaystyle \lambda_{m}^{i2} = \frac{m\pi}{h-d_{2}}, m \geq 1$&
- $\displaystyle \begin{cases} m_0 \tanh(m_0h)= \omega^2/g, & k=0 \\ m_k \tan(m_kh) = -\omega^2/g, & k \geq 1\\ \end{cases} $\\\hline
-    \end{tabular}
-    \caption{Equations for potential (homogeneous and particular) and eigenfunctions (radial and vertical) for each region.}
-    \label{tab:MEEM-eigenfunctions}
-  \fillandplacepagenumber
-\end{table}
+\input{../../shared/equations/meem_eigenfunctions.tex}
 \end{landscape}
 
 In Table~\ref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\textrm{H}_0^1$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $N_k$ expression is defined as:
@@ -334,20 +299,7 @@ They are written in compact notation using row vectors of basis functions, so $\
 Each basis function is evaluated at the radius described to the left of its row in the table. $0_{ij}$ and $1_{ij}$ are the $i$ x $j$ matrices of zeros and ones respectively; diag($\cdot$) constructs a diagonal matrix from a vector; and $\odot$ is the Hadamard (element-wise) product.
 
 \begin{landscape}
-\begin{table}
-    \centering
-    \begin{tabular}{|>{\centering\arraybackslash}p{0.18\linewidth}|c||c|c|c|c|}\hline
- & & $\vec{C}_{1n}^{i1}$& $\vec{C}_{1m}^{i2}$& $\vec{C}_{2m}^{i2}$&$\vec{B}_k^e$\\\hline 
-          &size&  N&  M&  M& K\\ \hline \hline 
-          \shortstack{$\phi^{i1}=\phi^{i2}$ \\ at $r=a_1$}&N&  $(h-d_1)~\mathrm{diag}(\vec{R}_{1n}^{i1})$&  $-\boldsymbol{\mathcal{Z}}_{nm}\odot 1_{N1}\vec{R}_{1m}^{i2}$&  $-\boldsymbol{\mathcal{Z}}_{nm}\odot 1_{N1}\vec{R}_{2m}^{i2}$& $0_{NK}$\\ \hline 
-          \shortstack{$\phi^{i2}=\phi^{e}$ \\ at $r=a_2$}&M&  $0_{MN}$&  $(h-d_2)~\mathrm{diag}(\vec{R}_{1m}^{i2})$&  $(h-d_2)~\mathrm{diag}(\vec{R}_{2m}^{i2})$& $-\boldsymbol{\mathcal{Z}}_{mk}\odot 1_{M1}\vec{\Lambda}_{k}$\\ \hline 
-          \shortstack{$\frac{\partial}{\partial r}\phi^{i1}=\frac{\partial}{\partial r}\phi^{i2}$ \\ at $r=a_1$}&M&  $- \boldsymbol{\mathcal{Z}}_{mn} \odot 1_{M1} \frac{\partial}{\partial r}\vec{R}_{1n}^{i1}$&  $(h-d_2)~\mathrm{diag}(\frac{\partial}{\partial r}\vec{R}_{1m}^{i2})$&  $(h-d_2)~\mathrm{diag}(\frac{\partial}{\partial r}\vec{R}_{2m}^{i2})$& $0_{MK}$\\ \hline 
-          \shortstack{$\frac{\partial}{\partial r}\phi^{i2}=\frac{\partial}{\partial r}\phi^{e}$ \\ at $r=a_2$}&K&  $0_{KN}$&  $-\boldsymbol{\mathcal{Z}}_{km} \odot 1_{K1}\frac{\partial}{\partial r}\vec{R}_{1m}^{i2}$&  $-\boldsymbol{\mathcal{Z}}_{km}\odot 1_{K1}\frac{\partial}{\partial r}\vec{R}_{2m}^{i2}$& $h~\mathrm{diag}(\frac{\partial}{\partial r}\vec{\Lambda}_k)$\\ \hline
-    \end{tabular}
-    \caption{MEEM A-matrix}
-    \label{tab:MEEM-A-matrix}
-      \fillandplacepagenumber
-\end{table}
+\input{../../shared/equations/meem_a_matrix.tex}
 \end{landscape}
 \begin{table}
     \centering

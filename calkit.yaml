@@ -17,6 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  pdf2svg:
+    kind: docker
+    path: pubs/defense/latex-standalone/Dockerfile
+    description: pdf2svg via Docker.
+    image: pdf2svg
   quarto:
     kind: docker
     image: ghcr.io/quarto-dev/quarto:latest
@@ -37,6 +42,9 @@ parameters:
     - taxonomy
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
+  latex_standalone_name:
+    - eigenfunctions
+    - A_matrix
 subprojects:
   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
@@ -5477,6 +5485,7 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/manual/
         - pubs/applied-ocean-research-model/figs/tikz/
         - pubs/applied-ocean-research-model/tables/
+        - pubs/shared/equations/
         - pubs/applied-ocean-research-model/main.tex
         - pubs/applied-ocean-research-model/numbers.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
@@ -5514,6 +5523,7 @@ pipeline:
         - pubs/applied-ocean-research-model/sections/
         - pubs/applied-ocean-research-model/figs/
         - pubs/applied-ocean-research-model/tables/
+        - pubs/shared/equations/
         - pubs/applied-ocean-research-model/appendices.tex
         - pubs/applied-ocean-research-model/commands-aor.tex
         - pubs/applied-ocean-research-model/numbers.tex
@@ -5595,12 +5605,37 @@ pipeline:
       outputs:
         - path: pubs/defense/quarto/_variables.yml
           storage: git
+    make-standalone-tex-pdf:
+      kind: latex
+      target_path: pubs/defense/latex-standalone/standalone_{name}.tex
+      environment: tex
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
+      inputs:
+        - pubs/shared/equations/
+      outputs:
+        - pubs/defense/latex-standalone/standalone_{name}.pdf
+    make-standalone-tex-svg:
+      kind: docker-command
+      environment: pdf2svg
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
+      command: pdf2svg pubs/defense/latex-standalone/standalone_{name}.pdf pubs/defense/figs/standalone_{name}.svg
+      inputs: 
+        - pubs/defense/latex-standalone/standalone_{name}.pdf
+      outputs:
+        - pubs/defense/figs/standalone_{name}.svg
     render-quarto-html:
       kind: docker-command
       environment: quarto
       command: quarto render pubs/defense/quarto/slides.qmd
       inputs:
         - pubs/defense/figs/
+        - pubs/shared/equations/
         - pubs/defense/quarto/slides.qmd
         - pubs/defense/quarto/_variables.yml
         - pubs/defense/references.bib
