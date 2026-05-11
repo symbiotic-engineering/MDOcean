@@ -14,5 +14,5 @@ for json_file in json_files:
             if key not in all_data:
                 all_data[key] = value
 
-with open('_variables.yaml', 'w') as yaml_file:
+with open('pubs/defense/quarto/_variables.yml', 'w') as yaml_file:
     yaml.dump(all_data, yaml_file, default_flow_style=False)

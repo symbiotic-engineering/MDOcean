@@ -6227,11 +6227,31 @@ stages:
     outs: []
     desc: Automatically generated from the 'all-viz' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  make-quarto-yaml:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      pubs/defense/quarto/make_quarto_yaml.py
+    deps:
+      - pubs/defense/quarto/make_quarto_yaml.py
+      - results/DesignSpaceExploration/end.json
+      - results/ForceSaturationFigFunc/end.json
+      - results/GradientOptimFigFunc/end.json
+      - results/Parameters/end.json
+      - results/Runtime/end.json
+      - results/Validation/end.json
+      - results/Wecsim/end.json
+      - .calkit/env-locks/pubs
+    outs:
+      - pubs/defense/quarto/_variables.yml:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'make-quarto-yaml' stage in
+      calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd
     deps:
       - pubs/defense/figs/
       - pubs/defense/quarto/slides.qmd
+      - pubs/defense/quarto/_variables.yml
       - pubs/defense/references.bib
       - pubs/defense/quarto/asme.csl
       - pubs/defense/quarto/dots.css
