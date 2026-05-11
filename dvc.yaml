@@ -6390,6 +6390,9 @@ stages:
       - .calkit/env-locks/tex
     outs:
       - pubs/defense/latex-standalone/standalone_${item.name}.pdf
+      - pubs/defense/latex-standalone/standalone_${item.name}.log:
+          cache: true
+          persist: true
     matrix:
       name:
         - eigenfunctions
@@ -6397,9 +6400,10 @@ stages:
     desc: Automatically generated from the 'make-standalone-tex-pdf' 
       stage in calkit.yaml. Changes made here will be overwritten.
   make-standalone-tex-svg:
-    cmd: pdf2svg 
+    cmd: calkit xenv -n pdf2svg --no-check -- bash --noprofile --norc 
+      -c "pdf2svg 
       pubs/defense/latex-standalone/standalone_${item.name}.pdf 
-      pubs/defense/figs/standalone_${item.name}.svg
+      pubs/defense/figs/standalone_${item.name}.svg"
     deps:
       - pubs/defense/latex-standalone/standalone_${item.name}.pdf
       - .calkit/env-locks/pdf2svg

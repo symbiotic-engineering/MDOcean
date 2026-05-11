@@ -5617,8 +5617,10 @@ pipeline:
         - pubs/shared/equations/
       outputs:
         - pubs/defense/latex-standalone/standalone_{name}.pdf
+        - path: pubs/defense/latex-standalone/standalone_{name}.log
+          delete_before_run: false
     make-standalone-tex-svg:
-      kind: docker-command
+      kind: shell-command
       environment: pdf2svg
       iterate_over:
         - arg_name: name
