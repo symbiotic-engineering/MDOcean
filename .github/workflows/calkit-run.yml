@@ -64,11 +64,8 @@ jobs:
           # then fail with "No url found" for that nested submodule).
           submodules: false
           persist-credentials: false
-      - name: Init top-level submodules
-        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
-        # without recursing into their nested submodules, avoiding the stale
-        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
-        run: git submodule update --init
+      - name: Init submodules
+        run: git submodule update --init --recursive
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
