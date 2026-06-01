@@ -1,6 +1,99 @@
 \clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Literature Review Column Legends}
+\label{sec:appendix-lit-legend}
+
+The following tables define column-abbreviation legends for the optimization-study comparison in \cref{tab:lit}.
+
+\begin{landscape}
+\begingroup
+\begin{table}
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}}
+         \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
+         N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
+         ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
+         TRM&  Terminator&  CFD&  Computational fluid dynamics&  Q& Quadratic & T&Time domain & P+, PI+&P/PI control with extension to incorporate constraints \\
+         OSW&  Oscillating surge WEC&  FIT&  Fit of model to numerical or experimental data&  CFD& Computational fluid dynamics & PS&Pseudo-spectral& NL&Nonlinear structured \\
+         OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
+        OWC& Oscillating water column& & & & & & & & \\
+    \end{tabular}
+    \caption{Legend keys for the dynamics and controls columns of \cref{tab:lit}}
+    \label{tab:lit-review-legend-dynam}
+\end{table}
+\endgroup
+\end{landscape}
+
+\begin{landscape}
+\begingroup
+\begin{table}
+    \begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
+         \multicolumn{2}{c|}{Mooring}& \multicolumn{2}{c|}{Structures} &  \multicolumn{2}{c|}{Economics}&  \multicolumn{2}{c}{Sea state}\\ \hline
+         DYN&  Model incorporates mooring dynamics &  AN&  Models stress analytically as a function of dimensions&  STR&  Models structural cost &  REG& Regular waves\\
+         DES&  Study considers mooring physical design &  LO&  Models load without dimension-dependent stress &  PTO&  Models power take-off cost &  IRR& Irregular wave spectrum\\
+         &  &  FEA&  Models stress using finite element analysis &  GEO&  Geometric cost proxy (i.e.\ hull volume, surface area)&  REG+, IRR+& Joint probabilities of wave heights and periods for multiple sea states\\
+         &  &  &  &  FULL&  Full cost model &  STO& Storm condition\\
+    \end{tabular}
+    \caption{Legend keys for other modeling columns of \cref{tab:lit}}
+    \label{tab:lit-review-legend-other}
+\end{table}
+
+\bigskip
+
+\begin{table}
+    \begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
+         \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
+         LOC&  Local optimizer (gradient-based, derivative-free)&  ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
+         GA&  Genetic algorithm&  PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
+         DOE&  Design of experiments (Monte Carlo, Taguchi)&  VAR&  Power variability (peak/average, std.\ dev., capacity factor)&  PTO&  PTO force, power, or electromagnetic feasibility& PTO&Power takeoff\\
+         IT&  Iterated by hand&  ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
+         ALT& Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
+         BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
+    \end{tabular}
+    \caption{Legend keys for the optimization columns of \cref{tab:lit}}
+    \label{tab:lit-review-legend-optim}
+\end{table}
+\endgroup
+\end{landscape}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Inequality Constraints}
+\label{sec:appendix-linear-constraints}
+
+The eight linear inequality constraints of the optimization formulation (\cref{sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $g_{L,*}$ given in parentheses:
+% notebook p137 11/16/25
+% TODO: verify row 2 ($g_{L,2}$) coefficient — should the leading entry use D_{f,in}/D_s or D_{f,in} directly? See formulation note, unresolved against MATLAB source.
+\begin{equation}
+    \begin{bmatrix}
+    -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\
+    \frac{h_d}{D_s}-\frac{T_s}{D_s} & 0 & 1 & ~~~0& 0  & 0\\
+    \frac{T_s}{D_s} & 0 & ~-1+\frac{1}{T_{f,2}/h_f} & ~~-1 & 0 & 0\\
+    0 & \frac{N}{2\cdot223} & 1 & ~~~0& 0  & 0\\
+    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    -\frac{h_d}{D_s} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
+    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & ~~~0 & 0 & 1 \\
+    \end{bmatrix}
+    \begin{bmatrix} D_s \\ D_f \\ T_{f,2} \\ h_s \\ t_d \\ h_{stiff,f}
+    \end{bmatrix}
+    \leq
+    \begin{bmatrix}
+    -D_{d,min} \\ -0.01 \\ -0.01 \\ -0.01 \\ h \\ h \\ -0.01 \\ -0.01
+    \end{bmatrix}~
+    \begin{pmatrix}
+    g_{L,1} \\ g_{L,2} \\ g_{L,3} \\g_{L,4} \\ g_{L,5} \\ g_{L,6} \\ g_{L,7} \\ g_{L,8}
+    \end{pmatrix}
+\end{equation}
+The $-0.01$ values on the right-hand side provide a small numerical buffer against the constraints to avoid model limits. The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Optimization Process Details}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hessian Scaling Procedure}\label{sec:appendix-scaling}
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
 Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
@@ -20,6 +113,7 @@ A new scaled optimization problem is solved using the scaled design variables $\
 \end{equation}
 where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ element-wise matrix division.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hyper-parameters}\label{sec:appendix-extra-param}
 Table~\ref{tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation and optimization.
 \begin{table}
@@ -44,10 +138,12 @@ Table~\ref{tab:hyperparams} documents the hyper-parameters used to control conve
     \label{tab:hyperparams}
 \end{table}
 
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Supplementary Results}
 \label{sec:appendix-supplemental-results}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization Results}
 
 \figureautorefname~\ref{fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
@@ -81,6 +177,7 @@ Surprisingly, the optimal values take on many different continuous values, as op
 \endgroup
 \end{landscape}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Local Sensitivities}\label{sec:appendix-sensitivties}
 Figure~\ref{fig:param-sens-local-global-J-star}, \ref{fig:param-sens-local-x-star}, and \ref{fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}
