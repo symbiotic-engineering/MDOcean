@@ -74,8 +74,8 @@ and you want the most updated version on Overleaf, use the following commands:
 
   # The following steps are only required if you made any changes to references.bib, shared-pkg.tex, 
   # or elsarticle-num-names.bst in overleaf, since they are outputs of a map-paths calkit stage.
-  cp mdocean/pubs/<paper-folder>/<filename> mdocean/pubs/shared/<filename> # replace <filename> with whichever file edited
-  git add mdocean/pubs/shared/<filename>
+  cp pubs/<paper-folder>/<filename> pubs/shared/<filename> # replace <filename> with whichever file edited
+  git add pubs/shared/<filename>
   git commit -m 'update shared <filename> from overleaf'
 
   # The following steps are only required if you changed the order of any figures in overleaf
