@@ -1,5 +1,5 @@
 \section{Introduction}
-\label{intro}
+\label{remdo:intro}
 \subsection{Wave Energy Overview}
 %(Why WECs, in renewable energy context):
 
@@ -24,12 +24,12 @@ An initial attempt to consolidate a multidisiplinary WEC design process, though 
 From 2010 to 2014, the U.S.
 Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \cite{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
 The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
-The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, shown in Figure \ref{fig:rm3-parts}.
+The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, shown in Figure \ref{remdo:fig:rm3-parts}.
 The float oscillates up and down with oncoming incident waves while the spar stays mostly stationary, and electrical power is produced from this relative heave motion.
 \begin{figure}[!ht]%% placement specifier
 \centering%% For centre alignment of image.
 \includegraphics[width=1\linewidth]{figs/from-matlab/RM3_image.pdf}
-\caption{RM3 geometry visualized}\label{fig:rm3-parts}
+\caption{RM3 geometry visualized}\label{remdo:fig:rm3-parts}
 \end{figure}
 RM3 has received considerable research attention in the decade since the original report was published.
 The present study builds on that work and presents a multidisciplinary techno-economic optimization of the RM3.
@@ -37,7 +37,7 @@ The present study builds on that work and presents a multidisciplinary techno-ec
 The remainder of the introduction will review WEC optimization literature, articulate the appeal of multidisciplinary design optimization to address gaps in the field, and identify the paper's key contributions and structure.
 
 \subsection{WEC Design Optimization: State of the Art and Gaps}
-\label{sec:lit}
+\label{remdo:sec:lit}
 
 % design optim / concurrent design in industry
 Before reviewing the academic state of the art in WEC optimization, it is worth evaluating the popularity of optimization and concurrent design practices in the wave energy industry.
@@ -56,7 +56,7 @@ These two sources \cite{ambuhl_reliability-based_2014, ferri_balancing_2014} wil
 Other references outline relevant guidelines for WEC survivability design without a formal optimization procedure \cite{coe_survey_2018, ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022}.
 
 % table summary
-Moving on to specific optimization studies, table~\ref{tab:lit} compares the modeling and optimization formulations of a variety of the most relevant examples.
+Moving on to specific optimization studies, table~\ref{remdo:tab:lit} compares the modeling and optimization formulations of a variety of the most relevant examples.
 A wide variety of WEC optimizations have been conducted.
 After first examining the overall trends, each table entry will be described in more detail.
 Point absorbers (PA) seem to be the most common device architecture, though most major device types are represented, and several studies optimize arrays of multiple devices.
@@ -172,7 +172,7 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
 \hline 
 %\end{tabular}
 \caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation}
-\label{tab:lit}
+\label{remdo:tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
 \endgroup
@@ -191,8 +191,8 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
          OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
         OWC& Oscillating water column& & & & & & & & \\
     \end{tabular}
-    \caption{Legend keys for the dynamics and controls columns of table~\ref{tab:lit}}
-    \label{tab:lit-review-legend-dynam}
+    \caption{Legend keys for the dynamics and controls columns of table~\ref{remdo:tab:lit}}
+    \label{remdo:tab:lit-review-legend-dynam}
 \end{table}
 \endgroup
 \end{landscape}
@@ -210,8 +210,8 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
          &  &  FEA&  Models stress using finite element analysis &  GEO&  Geometric cost proxy (i.e. hull volume, surface area)&  REG+, IRR+& Joint probabilities of wave heights and periods for multiple sea states\\
          &  &  &  &  FULL&  Full cost model &  STO& Storm condition\\
     \end{tabular}
-    \caption{Legend keys for other modeling columns of table~\ref{tab:lit}}
-    \label{tab:lit-review-legend-other}
+    \caption{Legend keys for other modeling columns of table~\ref{remdo:tab:lit}}
+    \label{remdo:tab:lit-review-legend-other}
 %\end{table}
 \bigskip
 %\begin{table}
@@ -230,8 +230,8 @@ ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
 & Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
  BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
     \end{tabular}
-    \caption{Legend keys for the optimization columns of table~\ref{tab:lit}}
-    \label{tab:lit-review-legend-optim}
+    \caption{Legend keys for the optimization columns of table~\ref{remdo:tab:lit}}
+    \label{remdo:tab:lit-review-legend-optim}
 \end{table}
 
 \endgroup
@@ -333,7 +333,7 @@ This sub-optimal approach fails to account for the tradeoff between power and co
 % This makes it more clear why I'm citing papers that are all over the place: some just-hydro and some just-controls and some multidisciplinary-but-no-optimization.
 
 MDO can use any kind of simulation model to assess the design's performance, including simple algebraic models, theory-intensive semi-analytical models, and standard numerical models.
-Table~\ref{tab:model-types} summarizes the tradeoffs.
+Table~\ref{remdo:tab:model-types} summarizes the tradeoffs.
 \begin{table}
     \centering
     \begin{tabular}{c>{\centering\arraybackslash}p{0.25\linewidth}c>{\centering\arraybackslash}p{0.2\linewidth}} 
@@ -343,7 +343,7 @@ Table~\ref{tab:model-types} summarizes the tradeoffs.
          \textbf{Numerical}&  Med&  Med/High&  High\\ 
     \end{tabular}
     \caption{Comparison of model types}
-    \label{tab:model-types}
+    \label{remdo:tab:model-types}
 \end{table}
 The authors propose that for early-stage WEC design, MDO with a semi-analytical model is the most beneficial.
 Semi-analytical models can be orders of magnitude faster than numerical models, often with minimal sacrifices in accuracy.
@@ -356,7 +356,7 @@ Often, semi-analytical models remain in the realm of theoretical academics, and 
 This is especially true if the models are closed-source, preventing others besides the model authors from using them.
 In the context of WECs, low practical realism usually means studies are limited to mechanical power production, without considering cost and realistic constraints, or perhaps using volume or surface area as a cost proxy.
 The design studies with high practical realism tend to use numerical models instead.
-As the literature review in table~\ref{tab:lit} revealed, the high computational cost of the numerical models means that often a study is either multidisciplinary without optimization \cite{RM3,mi_multi-scale_2025}, or performs optimization for a single discipline, such as controls, powertrain, or structures, not all at once. 
+As the literature review in table~\ref{remdo:tab:lit} revealed, the high computational cost of the numerical models means that often a study is either multidisciplinary without optimization \cite{RM3,mi_multi-scale_2025}, or performs optimization for a single discipline, such as controls, powertrain, or structures, not all at once. 
 
 Of the few studies that perform multidisciplinary optimization, those that use numerical models take many hours to run, especially when using heuristic optimizers, preventing designers from iterating quickly.
 For example, the BEM-based 4-WEC array optimization in \cite{khanal_multi-objective_2024} took 36 hours to run on a high-end workstation for only a single frequency.
@@ -371,6 +371,6 @@ The multi-objective optimization simultaneously varies dimensional, structural, 
 A local and partial global sensitivity analysis facilitates understanding of the results' uncertainty and applicability to different scenarios.
 In addition to the results' own merit, the framework articulated here is scalable to more design variables and disciplines, and could ultimately enable systematic design optimization of many WEC architectures.
 
-In the following sections, first the methodology for modeling and optimization setup is described in section~\ref{sec:optim-methods}.
-Next, the results of single-objective optimization, sensitivity analysis, and multi-objective optimization are shown in section~\ref{sec:results}.
-Finally, the authors discuss trends and implications, present three representative optimal designs, and recommend future work in section~\ref{sec:discussion}.
+In the following sections, first the methodology for modeling and optimization setup is described in section~\ref{remdo:sec:optim-methods}.
+Next, the results of single-objective optimization, sensitivity analysis, and multi-objective optimization are shown in section~\ref{remdo:sec:results}.
+Finally, the authors discuss trends and implications, present three representative optimal designs, and recommend future work in section~\ref{remdo:sec:discussion}.

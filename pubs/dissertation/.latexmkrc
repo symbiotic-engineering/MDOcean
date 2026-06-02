@@ -14,6 +14,11 @@ print "TEXINPUTS before: @TEXINPUTS\n";
 push @TEXINPUTS, "$root/..", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
 print "TEXINPUTS after: @TEXINPUTS\n";
 
+# Ensure bib files are found too
+print "BIBINPUTS before: @BIBINPUTS\n";
+push @BIBINPUTS, "$root/", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
+print "BIBINPUTS after: @BIBINPUTS\n";
+
 $out_dir = '.';
 $aux_dir = 'aux';
 

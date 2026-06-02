@@ -1,7 +1,7 @@
 \clearpage
 \section{Optimization Process Details}
 
-\subsection{Hessian Scaling Procedure}\label{sec:appendix-scaling}
+\subsection{Hessian Scaling Procedure}\label{remdo:sec:appendix-scaling}
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
 Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
 \begin{equation}
@@ -15,13 +15,13 @@ A new scaled optimization problem is solved using the scaled design variables $\
     \text{subject to}~~ &\textbf{x}_{LB}\varoslash \textbf{s} \leq \textbf{x}_s \leq \textbf{x}_{UB} \varoslash \textbf{s}\\
     &\textbf{g}_{NL}(\textbf{x}_s\odot\textbf{s},~\textbf{p}) \geq 0\\
     & (A_{ineq} \odot \textbf{s}^T)\textbf{x}_s \leq b_{ineq}
-\label{standard}
+\label{remdo:scaled-standard}
 \end{aligned}
 \end{equation}
 where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ element-wise matrix division.
 
-\subsection{Hyper-parameters}\label{sec:appendix-extra-param}
-Table~\ref{tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation and optimization.
+\subsection{Hyper-parameters}\label{remdo:sec:appendix-extra-param}
+Table~\ref{remdo:tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation and optimization.
 \begin{table}
     \centering
     \begin{tabular}{|l|c|c|c|} \hline 
@@ -41,29 +41,29 @@ Table~\ref{tab:hyperparams} documents the hyper-parameters used to control conve
  & Maximum pattern search iterations& 100&\\\hline
     \end{tabular}
     \caption{Hyper-parameters used to control numerics}
-    \label{tab:hyperparams}
+    \label{remdo:tab:hyperparams}
 \end{table}
 
 \clearpage
 \section{Supplementary Results}
-\label{sec:appendix-supplemental-results}
+\label{remdo:sec:appendix-supplemental-results}
 
 \subsection{Single Objective Optimization Results}
 
-\figureautorefname~\ref{fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
+\figureautorefname~\ref{remdo:fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
-\caption{Single objective convergence plots}\label{fig:single-objective-convergence}
+\caption{Single objective convergence plots}\label{remdo:fig:single-objective-convergence}
 \end{figure}
 
-Figure~\ref{fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
+Figure~\ref{remdo:fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
 The meaning of $x$ in each subplot is indicated by the subplot title.
 The two starting points that achieve global optima, denoted in green and orange, both have low inital values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
 The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
 On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
 This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
-Figure~\ref{fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
+Figure~\ref{remdo:fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
 Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
 %\hl{This requires further investigation to explain and will be done during re-scrutineering.}
 
@@ -74,22 +74,22 @@ Surprisingly, the optimal values take on many different continuous values, as op
 \begin{figure}
 \centering
 \includegraphics[width=1.2\linewidth]{figs/from-matlab/multistart_parallel_coordinates.pdf}
-\caption{Parallel axis plot for effect of starting point on convergence}\label{fig:multistart-parallel-axis}
+\caption{Parallel axis plot for effect of starting point on convergence}\label{remdo:fig:multistart-parallel-axis}
 \fillandplacepagenumber
 \end{figure}
 
 \endgroup
 \end{landscape}
 
-\subsection{Local Sensitivities}\label{sec:appendix-sensitivties}
-Figure~\ref{fig:param-sens-local-global-J-star}, \ref{fig:param-sens-local-x-star}, and \ref{fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
+\subsection{Local Sensitivities}\label{remdo:sec:appendix-sensitivties}
+Figure~\ref{remdo:fig:param-sens-local-global-J-star}, \ref{remdo:fig:param-sens-local-x-star}, and \ref{remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}
 \includegraphics[width=\linewidth]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
 \caption{Local parameter sensitivity analysis to optimal objective $J^*$}
-\label{fig:param-sens-local-global-J-star}
+\label{remdo:fig:param-sens-local-global-J-star}
 \end{figure}
 
-\figureautorefname~\ref{fig:param-sens-local-global-J-star} compares four ways of computing the objective total derivative local sensitivity, $\frac{dJ^*}{dp}$.
+\figureautorefname~\ref{remdo:fig:param-sens-local-global-J-star} compares four ways of computing the objective total derivative local sensitivity, $\frac{dJ^*}{dp}$.
 The first and simplest method uses only the partial derivative, $\frac{dJ^*}{dp}\approx \frac{\partial J}{\partial p}$.
 This partial derivative is found via finite difference around the optimal point and does not attempt to take into account the effect of the parameter change on the optimal design $x^*$.
 The second method, suggested in \cite{martins_engineering_2022}, uses a linear model to account for the change in $x^*$ due to parameter-dependent constraints.
@@ -134,22 +134,22 @@ Likewise, the quadratic sensitivity typically outperforms the partial and linear
 For example, this occurs for $h$, $H_{s,struct}$, $FOS_{min}$, $D_{d,tu}$, $FOS_{mult,d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{heave,mult}$, but not for $T_{struct}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
 
-Figures~\ref{fig:param-sens-local-x-star} and \ref{fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.
+Figures~\ref{remdo:fig:param-sens-local-x-star} and \ref{remdo:fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.
 Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
 This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
 \begin{figure}
 \includegraphics[width=\linewidth]{figs/from-matlab/post_optim_design_grid.pdf}
 \caption{Quadratic parameter sensitivity analysis to optimal design $x^*$}
-\label{fig:param-sens-local-x-star}
+\label{remdo:fig:param-sens-local-x-star}
 \end{figure}
 
 \begin{figure}
 \includegraphics[width=\linewidth]{figs/from-matlab/re_optim_design_grid.pdf}
 \caption{Re-optimization parameter sensitivity analysis to optimal design $x^*$}
-\label{fig:param-sens-global-x-star}
+\label{remdo:fig:param-sens-global-x-star}
 \end{figure}
 
 Finally, the authors note that while the re-optimization method is valid even when the parameters are far from their nominal values and can be considered a global sensitivity analysis method, it has here only been performed for parameters perturbed in a OAT fashion very close to the nominal and is therefore used as a local sensitivity analysis method.
-The global sensitivities of section \ref{sec:sensitivities} only investigate a few select parameters.
+The global sensitivities of section \ref{remdo:sec:sensitivities} only investigate a few select parameters.
 Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
 This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.
