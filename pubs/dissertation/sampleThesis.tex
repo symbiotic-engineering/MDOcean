@@ -90,14 +90,21 @@
 
 \begin{abstract}
 Wave energy converters (WECs) can advance the global energy transition by harnessing ocean waves to produce clean power for utility grids and offshore activities.
-This dissertation describes (1) the development of a fast and accurate computational model to simulate the WEC including hydrodynamics, constrained optimal control, and structural survival; 
-(2) a systems optimization framework to determine the ideal WEC design considering techno-economic viability and environmental impacts at the grid level; and 
-(3) an implementation of this optimization for one WEC concept.
+This dissertation describes (1) the development of a fast and accurate computational model to simulate the WEC including hydrodynamics, constrained optimal control, and structural survival;
+(2) the application of the model in a systems optimization framework to understand how WEC shape and size mediate the tradeoff between cost and power;
+and (3) the extension of this framework to holistically incorporate techno-economic viability and environmental impacts at the grid level.
 
-The framework combines aspects of multidisciplinary design optimization, control co-design, life cycle analysis, techno-economic analysis, and systems engineering 
-to suggest value metrics, modeling procedure, and an integrated methodology for WEC design optimization. 
-The process articulated here can generalize to other emerging energy technologies, 
-ultimately advancing the decarbonization of the electricity sector.
+Guided by a first-principles understanding of frequency-domain dynamics and a geometric interpretation of the constrained optimal control problem, we quasi-linearize the drag and force saturation nonlinearities and solve the resulting low-order quadratic program analytically.
+The simplified dynamics model achieves runtimes 10-1000x faster than prior state-of-the-art with acceptable accuracy (errors of 1-10\%).
+We combine this quasi-linearized dynamics model with mathematical models for concentric-cylinder hydrodynamics, stiffened-plate structural stress, hydrostatic stability, allowable oscillation amplitude, and material and component cost to form a multidisciplinary WEC simulation.
+We release the software and corresponding numerical benchmarks open source as MDOcean and OpenFLASH.
+
+The subsequent design study leverages the model's efficiency and structure to enable a more comprehensive and thoughtful search of the design space.
+We synthesize aspects of multidisciplinary design optimization, control co-design, techno-economic analysis, and systems engineering to create an integrated methodology for WEC design optimization that incorporates necessary coupling while remaining computationally efficient and robust to uncertainty.
+We demonstrate ~50\% reduction in the levelized cost of energy, outline the dominant role of powertrain constraints in the power-cost balance, derive sensitivities, and discuss implications for WEC design and future model development.
+Finally, we revise the framework by integrating life cycle analysis and capacity expansion modeling to maximize more meaningful net value metrics including profitability and avoided carbon emissions.
+Preliminary results suggest that while seasonal grid variation complicates the power-cost tradeoff, carbon emissions can be considered more simply.
+The system design process articulated here can generalize to other emerging energy technologies, ultimately advancing the decarbonization of the electricity sector.
 \end{abstract}
 
 \begin{biosketch}
@@ -173,7 +180,7 @@ Next, I thank my academic and extracurricular peers at Cornell:
 
 Next, I thank my friends and housemates outside of the academic environment, including:
 \begin{itemize}
-  \item the cgsu graduate union for their energy to stand up to injustices 
+  \item the CGSU graduate union for their energy to stand up to injustices 
   that are startlingly common in academia and beyond,
   and willingness to fight for me and my fellow graduate students
   \item Meghana for being the best friend I could ask for and always being a phone call away 
@@ -234,7 +241,7 @@ The fundamental question of this dissertation is how energy from ocean waves can
 
 This work is motivated by two complementary gaps in the literature. First, within the wave energy converter (WEC) community, there remains an incomplete understanding of the fundamental barriers that prevent WEC technologies from achieving large-scale viability. Second, within the broader climate and energy systems literature, there is a lack of clarity regarding how WECs can be meaningfully integrated as a solution to climate change. This dissertation seeks to address both gaps simultaneously.
 
-The overarching goal is to perform a design optimization study that is not only methodologically rigorous, but also meaningful in its outcomes. In this context, “meaningful” is defined by three criteria. First, the analysis must be comprehensive, meaning that it spans a sufficiently expansive design space and captures the relevant multidisciplinary couplings inherent in wave energy systems. Second, it must be decision-relevant, in the sense that it yields actionable insights that inform design direction, rather than merely demonstrating a sophisticated numerical method or producing isolated computational results. Third, it must be aligned with climate objectives, such that the optimization targets metrics that are directly relevant to economic feasibility and environmental impact.
+The overarching goal is to perform a design optimization study that is not only methodologically rigorous, but also meaningful in its outcomes. In this context, ``meaningful'' is defined by three criteria. First, the analysis must be comprehensive, meaning that it spans a sufficiently expansive design space and captures the relevant multidisciplinary couplings inherent in wave energy systems. Second, it must be decision-relevant, in the sense that it yields actionable insights that inform design direction, rather than merely demonstrating a sophisticated numerical method or producing isolated computational results. Third, it must be aligned with climate objectives, such that the optimization targets metrics that are directly relevant to economic feasibility and environmental impact.
 
 Achieving comprehensiveness requires the development of a modeling and optimization framework that is both highly integrated and computationally efficient. Accordingly, the first part of this dissertation focuses on the development, validation, and benchmarking of such a framework, which is referred to as MDOcean. To obtain decision-relevant insights, this framework is then applied in a design optimization study, which constitutes the second part of the dissertation. Finally, to ensure relevance to climate goals, the framework is extended to incorporate performance metrics that better reflect economic and environmental viability.
 
@@ -243,36 +250,36 @@ The following publications have resulted from the work in this dissertation.
 
 Journal articles:
 \begin{itemize}
-    \item McCabe, Dietrich, and Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation to submit to Applied Ocean Research in January 2026.
-    \item McCabe, Khanal, Bimali, Lo, Treacy, and Haji. “Numerics of the matched eigenfunction method for computing wave forces on concentric bodies,” in preparation to submit to Journal of Fluid Mechanics in 2026.
-    \item McCabe, Dietrich, and Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation to submit to Renewable Energy in 2026.
+    \item McCabe, Dietrich, and Haji, ``Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,'' in preparation to submit to Applied Ocean Research in January 2026.
+    \item McCabe, Khanal, Bimali, Lo, Treacy, and Haji. ``Numerics of the matched eigenfunction method for computing wave forces on concentric bodies,'' in preparation to submit to Journal of Fluid Mechanics in 2026.
+    \item McCabe, Dietrich, and Haji, ``Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,'' in preparation to submit to Renewable Energy in 2026.
 \end{itemize}
 
 Peer-reviewed conference papers:
 \begin{itemize}
-    \item McCabe, Murphy, and Haji, 2022, “Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,” ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2022-90227.
-    \item McCabe, Dietrich, Yang, Long, Kuan, Buccino, Liu, and Haji, 2025. “WEC Optimization to Maximize Grid Economic Value and Avoided Emissions,” University Marine Energy Research Community Conference.
-    \item McCabe, Dietrich, Liu, and Haji, 2023. “System Level Techno-Economic and Environmental Design Optimization for Ocean Wave Energy.” ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2023-114607.
-    \item McCabe and Haji, 2024. “Force-Limited Control of Wave Energy Converters using a Describing Function Linearization.” Int. Federation of Automatic Control: Control Applications in Marine Systems, Robotics,\& Vehicles. https://doi.org/10.1016/j.ifacol.2024.10.093.
-    \item McCabe, Khanal, and Haji, 2024. “Open-Source Toolbox for Semi-Analytical Hydrodynamic Coefficients via the Matched Eigenfunction Expansion Method,” University Marine Energy Research Community Conference. Award for best communication of complex mathematics. https://doi.org/10.5281/zenodo.14504016
+    \item McCabe, Murphy, and Haji, 2022, ``Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,'' ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2022-90227.
+    \item McCabe, Dietrich, Yang, Long, Kuan, Buccino, Liu, and Haji, 2025. ``WEC Optimization to Maximize Grid Economic Value and Avoided Emissions,'' University Marine Energy Research Community Conference.
+    \item McCabe, Dietrich, Liu, and Haji, 2023. ``System Level Techno-Economic and Environmental Design Optimization for Ocean Wave Energy.'' ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2023-114607.
+    \item McCabe and Haji, 2024. ``Force-Limited Control of Wave Energy Converters using a Describing Function Linearization.'' Int. Federation of Automatic Control: Control Applications in Marine Systems, Robotics,\& Vehicles. https://doi.org/10.1016/j.ifacol.2024.10.093.
+    \item McCabe, Khanal, and Haji, 2024. ``Open-Source Toolbox for Semi-Analytical Hydrodynamic Coefficients via the Matched Eigenfunction Expansion Method,'' University Marine Energy Research Community Conference. Award for best communication of complex mathematics. https://doi.org/10.5281/zenodo.14504016
 \end{itemize}
 
 Presentations:
 \begin{itemize}
-    \item McCabe, “System Optimization of Ocean Wave Energy Converters,” Cornell Systems Engineering Ezra Emerging Scholar Seminar, December 2025.
-    \item McCabe and Haji, “Value Metrics and Global Impact Potential of Wave Energy,” University Marine Energy Research Community Conference, September 2022.
-    \item McCabe, Dietrich, and Haji, “MDOcean: an Open-Source Software for Efficient Simulation and Multidisciplinary Design Optimization of WECs,” University Marine Energy Research Community Conference, August 2025. Best presentation award.
-    \item Khanal, McCabe, and Haji, “Gradient-based Design Optimization of Concentric Cylindrical Offshore Structures,” SIAM Conference on Optimization, June 2023.
+    \item McCabe, ``System Optimization of Ocean Wave Energy Converters,'' Cornell Systems Engineering Ezra Emerging Scholar Seminar, December 2025.
+    \item McCabe and Haji, ``Value Metrics and Global Impact Potential of Wave Energy,'' University Marine Energy Research Community Conference, September 2022.
+    \item McCabe, Dietrich, and Haji, ``MDOcean: an Open-Source Software for Efficient Simulation and Multidisciplinary Design Optimization of WECs,'' University Marine Energy Research Community Conference, August 2025. Best presentation award.
+    \item Khanal, McCabe, and Haji, ``Gradient-based Design Optimization of Concentric Cylindrical Offshore Structures,'' SIAM Conference on Optimization, June 2023.
 \end{itemize}
 
 The author has also contributed to the following collaborative publications and projects that are not included in this dissertation:
 \begin{itemize}
-    \item Hasankhani, McCabe, Ewig, Won, and Haji, 2023. “Conceptual Design and Optimization of a Wave-Powered Offshore Aquaculture Farm,” International Ocean and Polar Engineering Conference.
-    \item Hasankhani, Ewig, McCabe, Won, and Haji, 2023. “Marine Spatial Planning of a Wave-Powered Offshore Aquaculture Farm in the Northeast U.S.” IEEE Oceans – Limerick. https://doi.org/10.1109/OCEANSLimerick52467.2023.10244332.
-    \item DeGeode, McCabe, Vitale, Pokigo, Srivastava, Edwards, and Haji, “Offshore Carbon Sequestration Using Direct Mechanical Wave Energy,” University Marine Energy Research Community Conference, August 2024. https://doi.org/10.5281/zenodo.15168281.
-    \item Vitale, McCabe, Brundan, Mandalam, Alonso Munera, and Haji, 2026. “Design, build, and analysis of small-scale wave energy converter prototypes.” ASME Journal of Mechanical Design. http://doi.org/10.1115/1.4070757.
-    \item Vitale, Brundan, Mandalam, McCabe, and Haji, “Experimental Investigation of Heterogeneous Wave Energy Converter Arrays: Open-Source Data and Performance Comparisons,” University Marine Energy Research Community Conference, August 2025.
-    \item Best, Khanal, McCabe, Jiang, Treacy, and Haji, “OpenFLASH: An open-source flexible library for analytical and semi-analytical hydrodynamics calculations.” In review for the Journal of Open Source Software.
+    \item Hasankhani, McCabe, Ewig, Won, and Haji, 2023. ``Conceptual Design and Optimization of a Wave-Powered Offshore Aquaculture Farm,'' International Ocean and Polar Engineering Conference.
+    \item Hasankhani, Ewig, McCabe, Won, and Haji, 2023. ``Marine Spatial Planning of a Wave-Powered Offshore Aquaculture Farm in the Northeast U.S.'' IEEE Oceans – Limerick. https://doi.org/10.1109/OCEANSLimerick52467.2023.10244332.
+    \item DeGeode, McCabe, Vitale, Pokigo, Srivastava, Edwards, and Haji, ``Offshore Carbon Sequestration Using Direct Mechanical Wave Energy,'' University Marine Energy Research Community Conference, August 2024. https://doi.org/10.5281/zenodo.15168281.
+    \item Vitale, McCabe, Brundan, Mandalam, Alonso Munera, and Haji, 2026. ``Design, build, and analysis of small-scale wave energy converter prototypes.'' ASME Journal of Mechanical Design. http://doi.org/10.1115/1.4070757.
+    \item Vitale, Brundan, Mandalam, McCabe, and Haji, ``Experimental Investigation of Heterogeneous Wave Energy Converter Arrays: Open-Source Data and Performance Comparisons,'' University Marine Energy Research Community Conference, August 2025.
+    \item Best, Khanal, McCabe, Jiang, Treacy, and Haji, ``OpenFLASH: An open-source flexible library for analytical and semi-analytical hydrodynamics calculations.'' In review for the Journal of Open Source Software.
 \end{itemize}
 
 \chapter{Modeling}
