@@ -8,7 +8,13 @@
 \usepackage{longtable} % for table going multiple pages
 \usepackage{rotating}  % for rotated table headers
 \usepackage{color}     % also required for highlighting 
+
+% save bibliography command before bibcop modifies it
+\makeatletter
+\let\bibcop@truebibliography\bibliography
+\makeatother
 \usepackage{bibcop}    % warnings for incorrect citations
+
 \usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
 \usepackage{verbatim}  % word counts
@@ -38,3 +44,66 @@
    \baselineskip\footskip
    \hbox to\linewidth{%
      \hfil\thepage\hfil}\vss}}
+
+% allows bibcop to be used when bibliography includes multiple arguments
+\makeatletter
+\AtBeginDocument{%
+\ifdefined\bibliography
+
+  \RequirePackage{etoolbox}
+
+  \renewcommand{\bibliography}[1]{%
+    \def\bibcop@list{#1}%
+    \@for\bibcop@file:=\bibcop@list\do{%
+      \edef\bibcop@file{\bibcop@file}%
+      \ifx\bibcop@file\@empty\else
+        \expandafter\bibcop@processbib\expandafter{\bibcop@file}%
+      \fi
+    }%
+    \bibcop@truebibliography{#1}%
+  }
+
+  \newcommand{\bibcop@processbib}[1]{%
+    % trim spaces
+    \edef\bibcop@file{\zap@space#1 \@empty}%
+
+    % skip empty entries
+    \ifx\bibcop@file\@empty
+      \relax
+    \else
+
+      % build .bib filename
+      \edef\bibcop@bibfile{\bibcop@file.bib}%
+
+      % use kpsewhich to resolve path using BIBINPUTS
+      \immediate\write18{kpsewhich \bibcop@bibfile > aux/\jobname.bibcop.tmp}%
+
+      % read result
+      \begingroup
+        \endlinechar=-1
+        \newread\bibcop@in
+        \openin\bibcop@in=aux/\jobname.bibcop.tmp
+        \read\bibcop@in to \bibcop@resolved
+        \closein\bibcop@in
+        \xdef\bibcop@resolved{\bibcop@resolved}%
+      \endgroup
+
+      % fallback if kpsewhich fails
+      \ifx\bibcop@resolved\@empty
+        \edef\bibcop@resolved{\bibcop@bibfile}%
+      \fi
+
+      % call original bibcop
+      \begingroup
+        \edef\x{\endgroup
+          \noexpand\bibcop@exec{\bibcop@resolved}%
+        }%
+      \x
+
+    \fi
+  }
+
+\fi
+}
+
+\makeatother
