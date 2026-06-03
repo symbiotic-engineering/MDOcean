@@ -1,6 +1,6 @@
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Unit Tests](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml/badge.svg)](https://github.com/symbiotic-engineering/MDOcean/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
+[![Code coverage with codecov](https://codecov.io/gh/symbiotic-engineering/MDOcean/graph/badge.svg?token=PQNFQ72IC8)](https://codecov.io/gh/symbiotic-engineering/MDOcean)
 [![GitHub](https://img.shields.io/github/license/symbiotic-engineering/MDOcean)](https://github.com/symbiotic-engineering/MDOcean/blob/main/LICENSE.md)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13997243.svg)](https://doi.org/10.5281/zenodo.13997243)
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=symbiotic-engineering/MDOcean)
@@ -48,7 +48,18 @@ Running the single-objective optimization with typical parameters reduces LCOE b
 
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
-Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2025. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/applied-ocean-research-model/main.pdf).
+Dissertation (in prep): R. McCabe, "Leveraging Semi-Analytical Modeling, Multidisciplinary Design Optimization, 
+        and System Value Metrics to Advance Wave Energy Converter Viability", 2026. [Link to draft dissertation manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdissertation%2FsampleThesis.pdf)
+
+A video recording of the dissertation defense is available [here](https://vod.video.cornell.edu/media/t/1_d7sd33c2). [Link to slides](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdefense%2Fppt%2FMcCabe_Dissertation_Defense.pdf).
+<div style="max-width:608px">
+<div style="position:relative;padding-bottom:66.118421052632%">
+<iframe id="kaltura_player" src='https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/54758402?iframeembed=true&amp;entry_id=1_d7sd33c2&amp;config%5Bprovider%5D=%7B%22widgetId%22%3A%221_m16jkedl%22%7D&amp;config%5Bplayback%5D=%7B%22startTime%22%3A0%7D'  allowfullscreen webkitallowfullscreen mozAllowFullScreen allow="autoplay *; fullscreen *; encrypted-media *" sandbox="allow-downloads allow-forms allow-same-origin allow-scripts allow-top-navigation allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation-by-user-activation" title="Rebecca McCabe B Exam - Leveraging Semi-Analytical Modeling, Multidisciplinary Design Optimization, and System Value Metrics to Advance Wave Energy Converter Viability" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0">
+</iframe>
+</div>
+</div>
+
+Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2026. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/applied-ocean-research-model/main.pdf).
 
 Optimization journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,” in preparation, 2026. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/renewable-energy-mdo/mdocean.pdf).
 
