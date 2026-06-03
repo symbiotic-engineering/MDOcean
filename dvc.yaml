@@ -1,4 +1,101 @@
 stages:
+  OpenFLASH:
+    cmd: calkit dvc repro
+    wdir: mdocean/simulation/modules/OpenFLASH
+    always_changed: true
+    deps:
+      - .calkit/env-locks/openflash-on-branch
+      - .calkit/env-locks/openflash-on-main
+      - .calkit/env-locks/tex
+      - .calkit/notebooks/cleaned/analysis/low_m0_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/slant_data_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/sparsity_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/timing_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/validation_with_capytaine_plots.ipynb
+      - analysis/data/potential-slants.pkl
+      - analysis/data/slants.pkl
+      - analysis/data/slope-slants.pkl
+      - analysis/data/timing.pkl
+      - calkit.yaml
+      - dev/python/limiting-cases/low_m0.py
+      - package/src
+      - pubs/JFM/FLMguide.tex
+      - pubs/JFM/JFM-FLM_Au.cls
+      - pubs/JFM/jfm.bib
+      - pubs/JFM/jfm.bst
+      - pubs/JFM/lineno-FLM.sty
+      - pubs/JFM/zotero-meem-refs.bib
+      - sea-lab-utils
+    outs:
+      - .calkit/notebooks/executed/analysis/low_m0_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/slant_data_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/sparsity_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/timing_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/validation_with_capytaine_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/low_m0_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/slant_data_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/sparsity_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/timing_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/validation_with_capytaine_plots.html:
+          cache: false
+          persist: true
+      - pubs/JFM/FLMguide.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/A_sparsity_plot.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Along-Outline.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/B_sparsity_plot.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Cross-Section-Potential-Slant.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Slant-Freq.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Speed-Comparison.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Time-Matrix-Comparison.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-Comp-Distribution.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-Low-Freq.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM_vs_Capytaine_Nonslant_Validation.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Vary-Slopes.pdf:
+          cache: false
+          persist: true
+    desc: Automatically generated wrapper for subproject 
+      'mdocean/simulation/modules/OpenFLASH'. Changes made here will 
+      be overwritten.
   mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
       mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
@@ -6387,7 +6484,11 @@ stages:
       --file-to-file 
       'pubs/shared/shared-pkg.tex->pubs/renewable-energy-mdo/shared-pkg.tex'
       --file-to-file 
-      'pubs/shared/references.bib->pubs/dissertation/references.bib'
+      'pubs/shared/references.bib->pubs/dissertation/references.bib' 
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib'
     deps:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
@@ -6396,6 +6497,8 @@ stages:
       - pubs/shared/shared-pkg.tex
       - pubs/shared/shared-pkg.tex
       - pubs/shared/references.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
     outs:
       - pubs/applied-ocean-research-model/references.bib:
           cache: false
@@ -6416,6 +6519,12 @@ stages:
           cache: false
           persist: true
       - pubs/dissertation/references.bib:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/zotero-meem-refs.bib:
           cache: false
           persist: true
     desc: Automatically generated from the 'copy-shared-latex' stage 
@@ -6461,6 +6570,7 @@ stages:
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
