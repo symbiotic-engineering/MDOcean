@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-\label{intro}
+\label{remdo:intro}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Wave Energy Overview}
@@ -21,28 +21,28 @@ Automating concurrent decision-making allows WEC designers to systematically exp
 
 A landmark step toward a multidisciplinary WEC design baseline was the U.S.\ Department of Energy's Reference Model Project (2010--2014), which produced six benchmark designs along with design artifacts and a comprehensive report \cite{RM3}.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}}
 The third reference model (RM3), a two-body point-absorber WEC sited for Humboldt Bay, California, has received considerable research attention.
-Its surface float oscillates against a spar consisting of a vertical column and a subsurface damping plate (\cref{fig:rm3-parts}), with electrical power produced from the relative heave motion.
+Its surface float oscillates against a spar consisting of a vertical column and a subsurface damping plate (\cref{remdo:fig:rm3-parts}), with electrical power produced from the relative heave motion.
 The present study builds on that work, presenting a multidisciplinary techno-economic optimization of RM3.
 \else
 Wave energy converters (WECs) can deliver both utility-scale electricity and power for offshore applications such as aquaculture, desalination, and marine sensing \cite{livecchi_powering_2019,akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, but large-scale deployment requires substantial cost reduction.
 Achieving that reduction is complicated by strong interdisciplinary coupling: the powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses jointly determine performance, cost, and survivability.
 Sequential single-discipline design cannot exploit this coupling, motivating system-level concurrent optimization.
 
-This paper presents a multidisciplinary techno-economic optimization of the Reference Model 3 (RM3) WEC \cite{RM3}: a two-body point absorber sited for Humboldt Bay, California, in which a surface float oscillates against a spar with a subsurface damping plate (\cref{fig:rm3-parts}), with electrical power produced from the relative heave motion.
+This paper presents a multidisciplinary techno-economic optimization of the Reference Model 3 (RM3) WEC \cite{RM3}: a two-body point absorber sited for Humboldt Bay, California, in which a surface float oscillates against a spar with a subsurface damping plate (\cref{remdo:fig:rm3-parts}), with electrical power produced from the relative heave motion.
 \fi
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=1\linewidth]{figs/from-matlab/RM3_image.pdf}
 \caption{RM3 geometry visualized}
-\label{fig:rm3-parts}
+\label{remdo:fig:rm3-parts}
 \end{figure}
 
 The remainder of the introduction reviews WEC optimization literature, articulates the case for multidisciplinary design optimization as a framing of the gap, and identifies the contributions and structure of this paper.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{WEC Design Optimization: State of the Art and Gaps}
-\label{sec:lit}
+\label{remdo:sec:lit}
 
 \ifdefined\DISSERTATION
     Before reviewing the academic state of the art, it is worth assessing how optimization and concurrent design are practiced in the wave energy industry.
@@ -52,14 +52,14 @@ The remainder of the introduction reviews WEC optimization literature, articulat
     The same study concludes that concurrent design is promising but under-utilized, and emphasizes the importance of incorporating all design requirements at an early stage.
     
     Several review papers describe the state of the art in WEC design optimization.
-    \Cref{tab:lit} draws on these and the underlying primary literature \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018,coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} to compare the most relevant studies along modeling and optimization axes.
+    \Cref{remdo:tab:lit} draws on these and the underlying primary literature \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018,coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} to compare the most relevant studies along modeling and optimization axes.
 \else
     A survey of 25 WEC designers \cite{trueworthy_wave_2020} reports that only 48\% and 40\% of developers use optimization for controls and hydrodynamic shape respectively, and only 50\% design all subsystems concurrently --- attributed to the time, expertise, and computational resources optimization demands, and concluding that concurrent design is a promising but under-utilized technique.
-    Review papers \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018} and primary literature on WEC survivability guidelines \cite{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} together motivate the comparison in \cref{tab:lit}.
+    Review papers \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018} and primary literature on WEC survivability guidelines \cite{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} together motivate the comparison in \cref{remdo:tab:lit}.
 \fi
 
-\Cref{tab:lit} compares previous WEC optimization studies along modeling fidelity (hydrodynamics, drag, degrees of freedom, domain, controls, mooring, powertrain, structures, economics, sea states) and optimization formulation (optimizer, objectives, constraints, design variables).
-Column-abbreviation legends are provided in \cref{sec:appendix-lit-legend}.
+\Cref{remdo:tab:lit} compares previous WEC optimization studies along modeling fidelity (hydrodynamics, drag, degrees of freedom, domain, controls, mooring, powertrain, structures, economics, sea states) and optimization formulation (optimizer, objectives, constraints, design variables).
+Column-abbreviation legends are provided in \cref{remdo:sec:appendix-lit-legend}.
 
 \ifdefined\DISSERTATION
     Point absorbers dominate as the most common architecture, though all major device types are represented and several studies optimize arrays.
@@ -72,7 +72,11 @@ Column-abbreviation legends are provided in \cref{sec:appendix-lit-legend}.
     The design-variable count includes only true design parameters, not state variables internal to direct-transcription or pseudo-spectral formulations.
     Bulk dimensions (DIM), hull shape (SHP), and control parameters (CTL) are common; structural (STR) variables are rare; and most studies have fewer than five design variables, with the three largest at 14, 15, and 66.
 \else
-    Point absorbers dominate the literature, and BEM hydrodynamics is the most commonly used method, with occasional semi-analytical (MEEM) approaches. Dynamic modeling is typically performed in either the frequency or time domain, sometimes with constraint-handling extensions (F+) or pseudo-spectral (PS) variants. Mooring, powertrain, structural, and economic disciplines are included inconsistently across studies. Common optimization methods include genetic algorithms (GA), local optimizers (LOC), Pontryagin’s maximum principle (PMP), and design-of-experiment or brute-force approaches. Most studies consider fewer than five design variables, although the three largest cases include 14, 15, and 66 variables.
+    Point absorbers dominate the literature, and BEM hydrodynamics is the most commonly used method, with occasional semi-analytical (MEEM) approaches.
+    Dynamic modeling is typically performed in either the frequency or time domain, sometimes with constraint-handling extensions (F+) or pseudo-spectral (PS) variants.
+    Mooring, powertrain, structural, and economic disciplines are included inconsistently across studies.
+    Common optimization methods include genetic algorithms (GA), local optimizers (LOC), Pontryagin’s maximum principle (PMP), and design-of-experiment or brute-force approaches.
+    Most studies consider fewer than five design variables, although the three largest cases include 14, 15, and 66 variables.
 \fi
 
 
@@ -169,8 +173,8 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
 
 \hline 
 %\end{tabular}
-\caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation. See \cref{sec:appendix-lit-legend} for legend definitions.}
-\label{tab:lit}
+\caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation. See \cref{remdo:sec:appendix-lit-legend} for legend definitions.}
+\label{remdo:tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
 \endgroup
@@ -258,21 +262,28 @@ This study uses the MDOcean framework \cite{mccabe_development_2025}, which inte
 \subsection{Paper Contributions and Roadmap}
 \ifdefined\DISSERTATION
 This paper applies the MDOcean framework \cite{mccabe_development_2025} to what is believed to be the most comprehensive WEC techno-economic design optimization to date.
-The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings, subject to static, dynamic, structural, and operational constraints; a solution methodology combining sequential quadratic programming with multistart for single-objective optimization and the epsilon-constraint method seeded with pattern search for multi-objective optimization; single-objective optimization results with local and global sensitivity analysis identifying drivers of LCOE, cost, and power; multi-objective optimization results revealing a non-convex Pareto front with a cusp corresponding to a force-saturation to power-saturation strategy shift, and quantitative design heuristics across the front; and design recommendations distinguishing utility-scale from Powering-the-Blue-Economy applications.
+The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings, subject to static, dynamic, structural, and operational constraints;
+a solution methodology combining sequential quadratic programming with multistart for single-objective optimization and the epsilon-constraint method seeded with pattern search for multi-objective optimization;
+single-objective optimization results with local and global sensitivity analysis identifying drivers of LCOE, cost, and power;
+multi-objective optimization results revealing a non-convex Pareto front with a cusp corresponding to a force-saturation to power-saturation strategy shift, and quantitative design heuristics across the front;
+and design recommendations distinguishing utility-scale from Powering-the-Blue-Economy applications.
 The framework is scalable to additional disciplines and design variables and is ultimately intended to enable systematic comparison across WEC architectures.
 
 The remainder of the paper is organized as follows.
-\Cref{sec:optim-methods} describes the optimization methodology, including the underlying model overview and references to \cite{mccabe_development_2025} for modeling details.
-\Cref{sec:formulation} develops the optimization problem formulation.
-\Cref{sec:optim-process} details the solution procedure.
-\Cref{sec:results} presents single-objective optimization, sensitivity analysis, and multi-objective optimization results.
-\Cref{sec:discussion} interprets the trends, presents three representative optimal designs, and outlines future work.
+\Cref{remdo:sec:optim-methods} describes the optimization methodology, including the underlying model overview and references to \cite{mccabe_development_2025} for modeling details.
+\Cref{remdo:sec:formulation} develops the optimization problem formulation.
+\Cref{remdo:sec:optim-process} details the solution procedure.
+\Cref{remdo:sec:results} presents single-objective optimization, sensitivity analysis, and multi-objective optimization results.
+\Cref{remdo:sec:discussion} interprets the trends, presents three representative optimal designs, and outlines future work.
 \else
 This paper applies the MDOcean framework \cite{mccabe_development_2025} to what is believed to be the most comprehensive WEC techno-economic design optimization to date.
-The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings subject to static, dynamic, structural, and operational constraints; a solution methodology combining sequential quadratic programming with multistart and an epsilon-constraint-plus-pattern-search procedure for multi-objective optimization; single- and multi-objective results with sensitivity analysis revealing drivers of LCOE, cost, and power, and identifying a non-convex Pareto cusp tied to a force-saturation to power-saturation strategy shift; and design recommendations distinguishing utility-scale from Powering-the-Blue-Economy applications.
+The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings subject to static, dynamic, structural, and operational constraints;
+a solution methodology combining sequential quadratic programming with multistart and an epsilon-constraint-plus-pattern-search procedure for multi-objective optimization;
+single- and multi-objective results with sensitivity analysis revealing drivers of LCOE, cost, and power, and identifying a non-convex Pareto cusp tied to a force-saturation to power-saturation strategy shift;
+and design recommendations distinguishing utility-scale from Powering-the-Blue-Economy applications.
 
 The remainder of the paper is organized as follows.
-\Cref{sec:optim-methods} describes the optimization methodology and references \cite{mccabe_development_2025} for the underlying simulation model.
-\Cref{sec:formulation} develops the problem formulation and \cref{sec:optim-process} the solution procedure.
-\Cref{sec:results} presents results; \cref{sec:discussion} interprets them and outlines future work.
+\Cref{remdo:sec:optim-methods} describes the optimization methodology and references \cite{mccabe_development_2025} for the underlying simulation model.
+\Cref{remdo:sec:formulation} develops the problem formulation and \cref{remdo:sec:optim-process} the solution procedure.
+\Cref{remdo:sec:results} presents results; \cref{remdo:sec:discussion} interprets them and outlines future work.
 \fi

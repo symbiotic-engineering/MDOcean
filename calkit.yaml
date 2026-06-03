@@ -27,6 +27,9 @@ environments:
     path: pubs/defense/quarto/Dockerfile
     description: Playwright via Docker.
     image: playwright
+  bibtex-conda:
+    path: dev/latex/environment.yml
+    kind: conda
 dependencies:
   - docker
   - matlab
@@ -235,6 +238,7 @@ pipeline:
         - results/AllFigCompare/intermed.mat
       outputs:
         # - results/AllFigCompare/runtime_bar_chart.pdf
+        - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/runtime_bar_chart.fig
         - results/AllFigCompare/end.mat
         - path: results/AllFigCompare/end.json
@@ -380,6 +384,10 @@ pipeline:
         # - results/Comparison/overlaid_hydro_coeffs.pdf
         # - results/Comparison/probability_CDF.pdf
         # - results/Comparison/comparison_power_matrix.pdf
+        - results/Comparison/overlaid_geometry.pdf
+        - results/Comparison/overlaid_hydro_coeffs.pdf
+        - results/Comparison/probability_CDF.pdf
+        - results/Comparison/comparison_power_matrix.pdf
         - results/Comparison/overlaid_geometry.fig
         - results/Comparison/overlaid_hydro_coeffs.fig
         - results/Comparison/probability_CDF.fig
@@ -782,6 +790,9 @@ pipeline:
         # - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
         # - results/DampingPlateStructures/damping_plate_deflection.pdf
         # - results/DampingPlateStructures/damping_plate_moment.pdf
+        - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
+        - results/DampingPlateStructures/damping_plate_deflection.pdf
+        - results/DampingPlateStructures/damping_plate_moment.pdf
         - results/DampingPlateStructures/damping_plate_aspect_ratio.fig
         - results/DampingPlateStructures/damping_plate_deflection.fig
         - results/DampingPlateStructures/damping_plate_moment.fig
@@ -919,6 +930,9 @@ pipeline:
         # - results/DescFcns/saturation_desc_fcn.pdf
         # - results/DescFcns/saturation_desc_fcn_alpha.pdf
         # - results/DescFcns/drag_desc_fcn.pdf
+        - results/DescFcns/saturation_desc_fcn.pdf
+        - results/DescFcns/saturation_desc_fcn_alpha.pdf
+        - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/saturation_desc_fcn.fig
         - results/DescFcns/saturation_desc_fcn_alpha.fig
         - results/DescFcns/drag_desc_fcn.fig
@@ -1062,6 +1076,7 @@ pipeline:
       outputs:
        #- results/DesignSpaceExploration/experiments_pareto.pdf
         # - results/DesignSpaceExploration/experiments_ratios.pdf
+        - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_ratios.fig
         - path: results/DesignSpaceExploration/experiments_results.tex
           storage: git
@@ -1328,6 +1343,11 @@ pipeline:
         # - results/DragIntegral/drag_integral_G_i.pdf
         # - results/DragIntegral/drag_integral_G_m.pdf
         # - results/DragIntegral/drag_integral_G_p.pdf
+        - results/DragIntegral/drag_integral_B.pdf
+        - results/DragIntegral/drag_integral_G_r.pdf
+        - results/DragIntegral/drag_integral_G_i.pdf
+        - results/DragIntegral/drag_integral_G_m.pdf
+        - results/DragIntegral/drag_integral_G_p.pdf
         - results/DragIntegral/drag_integral_B.fig
         - results/DragIntegral/drag_integral_G_r.fig
         - results/DragIntegral/drag_integral_G_i.fig
@@ -1530,6 +1550,58 @@ pipeline:
         # - results/FitOlaya/case4_v4_coeffs_vs_alpha.pdf
         # - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.pdf
         # - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf
+        - results/FitOlaya/orig_3b_line_kRb_fbar.pdf
+        - results/FitOlaya/orig_4b_line_kRb_fbar.pdf
+        - results/FitOlaya/orig_12a_line_kRb_fbar.pdf
+        - results/FitOlaya/orig_12b_line_kRb_fbar.pdf
+        - results/FitOlaya/orig_12c_line_kRb_fbar.pdf
+        - results/FitOlaya/orig_12d_line_kRb_fbar.pdf
+        - results/FitOlaya/case24_compare_line_kRb_fnorm.pdf
+        - results/FitOlaya/case2_line_khRxRp_fnorm.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_a2.pdf
+        - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.pdf
+        - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.pdf
+        - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.pdf
+        - results/FitOlaya/case4_sub_line_kRb_fnorm.pdf
+        - results/FitOlaya/case4_sub_line_khRxRp_fnorm.pdf
+        - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.pdf
+        - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.pdf
+        - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.pdf
+        - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.pdf
+        - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.pdf
+        - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.pdf
+        - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.pdf
+        - results/FitOlaya/case4_sep_coeffs_vs_beta.pdf
+        - results/FitOlaya/case4_sep_coeffs_vs_alpha.pdf
+        - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.pdf
+        - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.pdf
+        - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.pdf
+        - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.pdf
+        - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.pdf
+        - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.pdf
+        - results/FitOlaya/case4_v1_coeffs_vs_beta.pdf
+        - results/FitOlaya/case4_v1_coeffs_vs_alpha.pdf
+        - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.pdf
+        - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.pdf
+        - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.pdf
+        - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.pdf
+        - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.pdf
+        - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.pdf
+        - results/FitOlaya/case4_v2_coeffs_vs_beta.pdf
+        - results/FitOlaya/case4_v2_coeffs_vs_alpha.pdf
+        - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.pdf
+        - results/FitOlaya/case4_v3_scatter_actual_vs_pred.pdf
+        - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.pdf
+        - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.pdf
+        - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.pdf
+        - results/FitOlaya/case4_v4_coeffs_vs_beta.pdf
+        - results/FitOlaya/case4_v4_coeffs_vs_alpha.pdf
+        - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.pdf
+        - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf
         - results/FitOlaya/orig_3b_line_kRb_fbar.fig
         - results/FitOlaya/orig_4b_line_kRb_fbar.fig
         - results/FitOlaya/orig_12a_line_kRb_fbar.fig
@@ -1604,11 +1676,16 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
+        - ./mdocean/optimization/gradient_optim.m
+        - ./mdocean/optimization/run_solver.m
         - ./mdocean/plots/matlab_figs/force_sat_results.m
         - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
         - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
         - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
         - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/visualize_geometry.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1639,12 +1716,15 @@ pipeline:
         - ./mdocean/simulation/modules/hydro/get_m_k_h.m
         - ./mdocean/simulation/modules/hydro/group_velocity.m
         - ./mdocean/simulation/modules/hydro/run_MEEM.m
+        - ./mdocean/simulation/modules/lin_ineq_constraints.m
         - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
         - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
         - ./mdocean/simulation/modules/structures/float_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/ForceSaturationFigFunc/intermed.mat
@@ -1715,6 +1795,8 @@ pipeline:
       outputs:
         # - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         # - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
+        - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
+        - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/power_force_sensitivity.fig
         - results/ForceSaturationFigFunc/runtime_sensitivity.fig
         - results/ForceSaturationFigFunc/end.mat
@@ -1873,6 +1955,11 @@ pipeline:
         # - results/GradientOptimFigFunc/lagrange_multipliers.pdf
         # - results/GradientOptimFigFunc/delta_x.pdf
         # - results/GradientOptimFigFunc/single_obj_convergence.pdf
+        - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
+        - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
+        - results/GradientOptimFigFunc/lagrange_multipliers.pdf
+        - results/GradientOptimFigFunc/delta_x.pdf
+        - results/GradientOptimFigFunc/single_obj_convergence.pdf
         - results/GradientOptimFigFunc/single_obj_opt_power_matrix.fig
         - results/GradientOptimFigFunc/single_obj_opt_geometry.fig
         - results/GradientOptimFigFunc/lagrange_multipliers.fig
@@ -2012,6 +2099,7 @@ pipeline:
         - results/HydroCoeffFigFunc/intermed.mat
       outputs:
         # - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
+        - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/hydro_coeff_err.fig
         - results/HydroCoeffFigFunc/end.mat
         - path: results/HydroCoeffFigFunc/end.json
@@ -2165,6 +2253,11 @@ pipeline:
         # - results/LocationSensitivity/location_3_power_matrix.pdf
         # - results/LocationSensitivity/location_4_power_matrix.pdf
         # - results/LocationSensitivity/location_probability_PDF.pdf
+        - results/LocationSensitivity/location_1_power_matrix.pdf
+        - results/LocationSensitivity/location_2_power_matrix.pdf
+        - results/LocationSensitivity/location_3_power_matrix.pdf
+        - results/LocationSensitivity/location_4_power_matrix.pdf
+        - results/LocationSensitivity/location_probability_PDF.pdf
         - results/LocationSensitivity/location_1_power_matrix.fig
         - results/LocationSensitivity/location_2_power_matrix.fig
         - results/LocationSensitivity/location_3_power_matrix.fig
@@ -2315,6 +2408,12 @@ pipeline:
         # - results/Meem/meem_convergence_vs_omega.pdf
         # - results/Meem/meem_convergence_vs_NMK.pdf
         # - results/Meem/asymptotic_b_vector.pdf
+        - results/Meem/meem_sparsity.pdf
+        - results/Meem/meem_validation.pdf
+        - results/Meem/meem_matching.pdf
+        - results/Meem/meem_convergence_vs_omega.pdf
+        - results/Meem/meem_convergence_vs_NMK.pdf
+        - results/Meem/asymptotic_b_vector.pdf
         - results/Meem/meem_sparsity.fig
         - results/Meem/meem_validation.fig
         - results/Meem/meem_matching.fig
@@ -2433,10 +2532,12 @@ pipeline:
         - ./mdocean/plots/util/hatchfill2.m
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
+        - ./mdocean/plots/util/raster_text.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
+        - ./mdocean/plots/util/unicode.m
         - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2469,6 +2570,9 @@ pipeline:
         # - results/Multistart/multistart_convergence_tree.pdf
         # - results/Multistart/multistart_parallel_coordinates.pdf
         # - results/Multistart/multistart_bar_chart.pdf
+        - results/Multistart/multistart_convergence_tree.pdf
+        - results/Multistart/multistart_parallel_coordinates.pdf
+        - results/Multistart/multistart_bar_chart.pdf
         - results/Multistart/multistart_convergence_tree.fig
         - results/Multistart/multistart_parallel_coordinates.fig
         - results/Multistart/multistart_bar_chart.fig
@@ -2893,6 +2997,7 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
+        - ./mdocean/optimization/multiobjective/compute_pareto_shape_heuristics.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
         - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
         - ./mdocean/plots/matlab_figs/constraint_active_plot.m
@@ -3079,6 +3184,7 @@ pipeline:
         - results/ParetoSweep/intermed.mat
       outputs:
         # - results/ParetoSweep/sweep_num_seeds.pdf
+        - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/sweep_num_seeds.fig
         - results/ParetoSweep/end.mat
         - path: results/ParetoSweep/end.json
@@ -3209,6 +3315,8 @@ pipeline:
       outputs:
         # - results/PtoSweep/pto_sweep.pdf
         # - results/PtoSweep/pto_sweep_constraint_activity.pdf
+        - results/PtoSweep/pto_sweep.pdf
+        - results/PtoSweep/pto_sweep_constraint_activity.pdf
         - results/PtoSweep/pto_sweep.fig
         - results/PtoSweep/pto_sweep_constraint_activity.fig
         - results/PtoSweep/end.mat
@@ -3489,6 +3597,7 @@ pipeline:
         - results/QPCircles/intermed.mat
       outputs:
         # - results/QPCircles/qp_circles.pdf
+        - results/QPCircles/qp_circles.pdf
         - results/QPCircles/qp_circles.fig
         - results/QPCircles/end.mat
         - path: results/QPCircles/end.json
@@ -3651,6 +3760,16 @@ pipeline:
         # - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
         # - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
         # - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
+        - results/RunSingleFigFunc/nominal_geometry_viz.pdf
+        - results/RunSingleFigFunc/nominal_power_pdf.pdf
+        - results/RunSingleFigFunc/nominal_power_matrix.pdf
+        - results/RunSingleFigFunc/drag_convergence.pdf
+        - results/RunSingleFigFunc/ctrl_polar_plot_mult.pdf
+        - results/RunSingleFigFunc/ctrl_polar_plot_gamma.pdf
+        - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
+        - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
+        - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
+        - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
         - results/RunSingleFigFunc/nominal_geometry_viz.fig
         - results/RunSingleFigFunc/nominal_power_pdf.fig
         - results/RunSingleFigFunc/nominal_power_matrix.fig
@@ -3797,6 +3916,10 @@ pipeline:
         # - results/Runtime/hydro_runtime_logscale.pdf
         # - results/Runtime/hydro_runtime_breakdown.pdf
         # - results/Runtime/sim_runtime.pdf
+        - results/Runtime/dynamics_runtime.pdf
+        - results/Runtime/hydro_runtime_logscale.pdf
+        - results/Runtime/hydro_runtime_breakdown.pdf
+        - results/Runtime/sim_runtime.pdf
         - results/Runtime/dynamics_runtime.fig
         - results/Runtime/hydro_runtime_logscale.fig
         - results/Runtime/hydro_runtime_breakdown.fig
@@ -3932,6 +4055,7 @@ pipeline:
         - results/Slamming/intermed.mat
       outputs:
         # - results/Slamming/slamming_amplitude.pdf
+        - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/slamming_amplitude.fig
         - results/Slamming/end.mat
         - path: results/Slamming/end.json
@@ -4063,6 +4187,7 @@ pipeline:
         - results/SparHydro/intermed.mat
       outputs:
         # - results/SparHydro/spar_added_mass.pdf
+        - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/spar_added_mass.fig
         - results/SparHydro/end.mat
         - path: results/SparHydro/end.json
@@ -4217,6 +4342,19 @@ pipeline:
         # - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
         # - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
         # - results/SweepGeoms/factor_grid.pdf
+        - results/SweepGeoms/sweep_geoms_parallel.pdf
+        - results/SweepGeoms/sweep_geoms_scatter.pdf
+        - results/SweepGeoms/sweep_geoms_line.pdf
+        - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
+        - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
+        - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
+        - results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
+        - results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
+        - results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
+        - results/SweepGeoms/sweep_geoms_pareto.pdf
+        - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
+        - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
+        - results/SweepGeoms/factor_grid.pdf
         - results/SweepGeoms/sweep_geoms_parallel.fig
         - results/SweepGeoms/sweep_geoms_scatter.fig
         - results/SweepGeoms/sweep_geoms_line.fig
@@ -4366,6 +4504,7 @@ pipeline:
         - results/Validation/intermed.mat
       outputs:
         # - results/Validation/cost_vs_N_WEC.pdf
+        - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
         - path: results/Validation/validation.tex
           storage: git
@@ -5526,6 +5665,7 @@ pipeline:
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/references.bib
+        - pubs/shared/shared-pkg.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
@@ -5580,6 +5720,21 @@ pipeline:
         - from_stage_outputs: viz-SweepGeoms
         - from_stage_outputs: viz-Validation
         - from_stage_outputs: viz-Wecsim
+    make-quarto-yaml:
+      kind: python-script
+      environment: pubs
+      script_path: pubs/defense/quarto/make_quarto_yaml.py
+      inputs:
+        - results/DesignSpaceExploration/end.json
+        - results/ForceSaturationFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
+        - results/Parameters/end.json
+        - results/Runtime/end.json
+        - results/Validation/end.json
+        - results/Wecsim/end.json
+      outputs:
+        - path: pubs/defense/quarto/_variables.yml
+          storage: git
     render-quarto-html:
       kind: docker-command
       environment: quarto
@@ -5587,6 +5742,7 @@ pipeline:
       inputs:
         - pubs/defense/figs/
         - pubs/defense/quarto/slides.qmd
+        - pubs/defense/quarto/_variables.yml
         - pubs/defense/references.bib
         - pubs/defense/quarto/asme.csl
         - pubs/defense/quarto/dots.css
@@ -5625,11 +5781,10 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-  - path: pubs/defense/quarto/slides.pdf
+  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
     title: PhD Defense Slides
     description: Slides for PhD defense presentation
     kind: presentation
-    stage: render-quarto-pdf
   - path: pubs/dissertation/sampleThesis.pdf
     title: PhD Dissertation
     stage: build-dissertation
@@ -5673,19 +5828,3 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
-  pubs/defense:
-    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
-    sync_paths:
-      - beamer/backup.tex
-      - references.bib
-      - beamer/conclusion.tex
-      - beamer/content_cost.tex
-      - beamer/content_model.tex
-      - beamer/content_value.tex
-      - Cornell.pdf
-      - beamer/main.tex
-      - beamer/motivation.tex
-      - beamer/setup.tex
-      - figs/
-    #push_paths:
-    # - figs

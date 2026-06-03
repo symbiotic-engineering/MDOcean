@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Problem Formulation}\label{sec:formulation}
+\subsection{Problem Formulation}\label{remdo:sec:formulation}
 The standard optimization problem is expressed \cite{martins_engineering_2022,papalambros_principles_2017}:
 \begin{equation}
 \begin{aligned}
@@ -8,13 +8,13 @@ The standard optimization problem is expressed \cite{martins_engineering_2022,pa
     \text{subject to}~~ &\vec{x}_{LB} \leq \vec{x} \leq \vec{x}_{UB} \\
     &\vec{g}(\vec{x},~\vec{p}) \geq 0\\
     &\vec{h}(\vec{x},~\vec{p})= 0\\
-\label{standard}
+\label{remdo:standard}
 \end{aligned}
 \end{equation}
 An optimization algorithm adjusts the design variable vector $\vec{x}$ within lower and upper bounds $\vec{x}_{LB}$, $\vec{x}_{UB}$ to minimize the objective(s) $\vec{J}$, subject to inequality and equality constraints $\vec{g}$ and $\vec{h}$. Parameters $\vec{p}$ are constant inputs required to compute the objective or constraints.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Objective Function}\label{sec:obj}
+\subsubsection{Objective Function}\label{remdo:sec:obj}
 For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \cite{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2025}.
 
 \ifdefined\DISSERTATION
@@ -37,7 +37,7 @@ The objective function is expressed:
 \vec{J}(\vec{x}, \vec{p}) = \begin{cases} LCOE\ (\vec{x}, \vec{p}), & \text{Single objective} \\
 [C_{design} (\vec{x}, \vec{p}),\ P_{avg,elec} (\vec{x}, \vec{p})]^T, & \text{Multi-objective}
 \end{cases}
-\label{obj}
+\label{remdo:obj}
 \end{equation}
 
 %The objectives of this optimization problem are to minimize the LCOE and the power coefficient of variation of the RM3 WEC. LCOE, the cost per unit energy over the lifetime of the device, was chosen as an objective function because it is often the metric used to assess and compare energy production methods. A low LCOE indicates the project is competitive with conventional energy production processes and better able to generate affordable energy for consumers. The second objective, power coefficient of variation, is a measure of the fluctuation in power output. Minimizing power variation provides more consistent output and reduces the amount of energy storage required.
@@ -45,21 +45,24 @@ The objective function is expressed:
 %The coefficient of variation of power $c_v$ normalizes the the standard deviation of power across different sea states $\sigma$ by the average power across those sea states $\mu$:
 % \begin{equation}
 %     c_v = \frac{\sigma}{\mu}.
-%     \label{cv}
+%     \label{remdo:cv}
 % \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Requirements}\label{sec:requirements}
+\subsubsection{Requirements}\label{remdo:sec:requirements}
 This section describes the requirements that the optimization must enforce and how they shape the formulation.
 Here, requirements refer both to traditional design requirements (model-agnostic criteria ensuring the design meets stakeholder needs and is physically realizable) and to criteria needed to facilitate the optimization itself (such as keeping intermediate designs within the model's range of validity).
 Constraints are the most common but not the only enforcement mechanism.
 \ifdefined\DISSERTATION
-    Explicitly outlining the requirements and resulting formulation logic serves three purposes: (1) to ground the optimization within the engineering design process, where requirements drive decisions; (2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate how the MDO mindset systematically yields a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
+    Explicitly outlining the requirements and resulting formulation logic serves three purposes:
+    (1) to ground the optimization within the engineering design process, where requirements drive decisions;
+    (2) to clarify a part of the optimization process that is critical to result quality yet often omitted;
+    and (3) to illustrate how the MDO mindset systematically yields a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
 \else
     Outlining the requirements and the resulting formulation logic grounds the optimization within the engineering design process, clarifies a step critical to result quality yet often omitted, and illustrates how the MDO mindset yields a formulation that overcomes common large-scale optimization difficulties.
 \fi
 
-\Cref{tab:requirements} lists each requirement with its priority and enforcement mechanism. The physical and modeling basis for each requirement such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations, is developed in \cite{mccabe_development_2025}.
+\Cref{remdo:tab:requirements} lists each requirement with its priority and enforcement mechanism. The physical and modeling basis for each requirement such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations, is developed in \cite{mccabe_development_2025}.
 
 \newcounter{reqnumber}
     \begin{longtable}{c>{\centering\arraybackslash}p{0.25\linewidth}>{\centering\arraybackslash}p{0.27\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}}
@@ -95,7 +98,7 @@ Constraints are the most common but not the only enforcement mechanism.
   \requirement{LCOE}&$LCOE<LCOE_{max}$& Maximum LCOE& 3&Nonlin. ineq. constraint $g_{NL,15}$\\
 
     \caption{Requirements}
-    \label{tab:requirements}
+    \label{remdo:tab:requirements}
 \end{longtable}
 
 \ifdefined\DISSERTATION
@@ -112,7 +115,7 @@ Constraints are the most common but not the only enforcement mechanism.
 \fi
 
 \ifdefined\DISSERTATION
-    Requirements are ordered by priority in \cref{tab:requirements}, and within priority grouped by enforcement mechanism.
+    Requirements are ordered by priority in \cref{remdo:tab:requirements}, and within priority grouped by enforcement mechanism.
     They include direct geometric relations among float, column, plate, and seafloor dimensions to prevent overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated-cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_similarity}, \reqref{spar_damping_ratio});
     a power criterion ensuring net energy generation (\reqref{positive_net_power});
     height conditions for valid float-spar positioning in the static case (\reqref{clearance_static}, \reqref{tops_static}, \reqref{base_static}) and in operational seas (\reqref{tops_dynamic}, \reqref{base_dynamic}, \reqref{clearance_dynamic});
@@ -123,7 +126,14 @@ Constraints are the most common but not the only enforcement mechanism.
     and a maximum LCOE constraint required for the epsilon-constraint procedure of \cref{sec:multi-obj-process} (\reqref{LCOE}).
     Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 \else
-    The requirements span geometric relations preventing overlap, numerical overflow, shape deviation, submersion, and dynamic-assumption violation (\reqref{float_spar_diam}--\reqref{spar_similarity}); net power generation (\reqref{positive_net_power}); static and dynamic float-spar positioning (\reqref{clearance_static}--\reqref{clearance_dynamic}); amplitude limits from linearity and slamming (\reqref{linear_amplitude}, \reqref{slam_amplitude}); buoyancy and ballast feasibility (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics}); eight structural factors of safety (\reqref{FOS}); pitch stability (\reqref{GM}); powertrain rating equality to avoid oversizing (\reqref{force_max}, \reqref{P_max}); and a maximum-LCOE constraint for the epsilon-constraint procedure of \cref{sec:multi-obj-process} (\reqref{LCOE}). \reqref{base_static} dominates \reqref{float_spar_draft}, so the latter need not be implemented independently.
+    The requirements span geometric relations preventing overlap, numerical overflow, shape deviation, submersion, and dynamic-assumption violation (\reqref{float_spar_diam}--\reqref{spar_similarity});
+    net power generation (\reqref{positive_net_power}); static and dynamic float-spar positioning (\reqref{clearance_static}--\reqref{clearance_dynamic});
+    amplitude limits from linearity and slamming (\reqref{linear_amplitude}, \reqref{slam_amplitude});
+    buoyancy and ballast feasibility (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics});
+    eight structural factors of safety (\reqref{FOS}); pitch stability (\reqref{GM});
+    powertrain rating equality to avoid oversizing (\reqref{force_max}, \reqref{P_max});
+    and a maximum-LCOE constraint for the epsilon-constraint procedure of \cref{remdo:sec:multi-obj-process} (\reqref{LCOE}). 
+    \reqref{base_static} dominates \reqref{float_spar_draft}, so the latter need not be implemented independently.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,9 +155,9 @@ The encoding of a physical design space into optimization design variables is no
 \fi
 
 This logic is repeated for the remaining design variables and requirements.
-After several formulation iterations, the design variable and parameter definitions in \cref{tab:design-vars,tab:parameters} emerged as effective.
+After several formulation iterations, the design variable and parameter definitions in \cref{remdo:tab:design-vars,remdo:tab:parameters} emerged as effective.
 The 12 design variables represent 5 bulk dimensions, 2 generator ratings, and 5 structural dimensions (3 thicknesses and 2 stiffener heights).
-Referring back to \cref{tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
+Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
 
 \begin{table}[ht]
 \setlength\tabcolsep{1.5pt}
@@ -169,11 +179,11 @@ Referring back to \cref{tab:lit}, this study is the most comprehensive WEC optim
  $x_{11}$&$h_{stiff,f}$& Float stiffener height& 0& 0.406& 2& m\\
  $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
-} \caption{Design Variables}\label{tab:design-vars}
+} \caption{Design Variables}\label{remdo:tab:design-vars}
 \end{center}
 \end{table}
 
-The parameters in \cref{tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+The parameters in \cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
 \ifdefined\DISSERTATION
     Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
     Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2025}.
@@ -211,19 +221,20 @@ $h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\
 $T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\
 $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 \end{tabular}
- \caption{Selected Parameters}\label{tab:parameters}
+ \caption{Selected Parameters}\label{remdo:tab:parameters}
 \end{table}
 
-Returning to \cref{tab:requirements}, the enforcement column shows that this encoding successfully avoids nonlinear constraints for all priority 1 requirements and all but one priority 2 requirement, helping prevent model errors while facilitating convergence.
-A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints; the eight linear inequality constraints are given in matrix form in \cref{sec:appendix-linear-constraints}.
+Returning to \cref{remdo:tab:requirements}, the enforcement column shows that this encoding successfully avoids nonlinear constraints for all priority 1 requirements and all but one priority 2 requirement, helping prevent model errors while facilitating convergence.
+A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints; the eight linear inequality constraints are given in matrix form in \cref{remdo:sec:appendix-linear-constraints}.
 
 \ifdefined\DISSERTATION
     Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters.
-    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \cref{sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
+    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \cref{remdo:sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
     While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else
-    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed, a choice that adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. Recent papers have demonstrated the value of full PTO co-design \cite{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
+    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed, a choice that adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
+    Recent papers have demonstrated the value of full PTO co-design \cite{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
 \fi
 
 %\subsubsection{Model Checking}

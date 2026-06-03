@@ -14,6 +14,19 @@ print "TEXINPUTS before: @TEXINPUTS\n";
 push @TEXINPUTS, "$root/..", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
 print "TEXINPUTS after: @TEXINPUTS\n";
 
+# Ensure bib files are found by latexmk
+print "BIBINPUTS before: @BIBINPUTS\n";
+push @BIBINPUTS, "$root/", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
+print "BIBINPUTS after: @BIBINPUTS\n";
+
+# Ensure bib files are found by BibTeX
+$ENV{'BIBINPUTS'} = join(
+    ':',
+    "$root",
+    "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM",
+    $ENV{'BIBINPUTS'} // ''
+);
+
 $out_dir = '.';
 $aux_dir = 'aux';
 

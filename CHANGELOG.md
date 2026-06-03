@@ -1,6 +1,23 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-3
+### Added
+- Pipeline: OpenFLASH subproject
+- Presentation: upload pptx and pdf of dissertation slides
+- Plots: `raster_text()` matlab utility required for displaying text with certain fonts
+- Plots: `unicode()` utility for handling supplementary plane unicode codepoints
+### Changed
+- Paper: Use subimport for Overleaf-friendly path inclusion
+- CI: Initialize submodules recursively
+### Fixed
+- Test: fix wecsim filenames being inconsistent after previous shortening for struct fieldnames
+- Plots: fix filename in `ReadNonMatlabFigs` that caused raster instead of vector images to be used in paper
+- Tables: fix first column formatting in matlab latex table generation
+- Paper: fixing citations, including making bibcop compatible with multiple .bib files
+- Paper: fix references, including prefacing labels with paper name to avoid collisions
+- Plot: fix multistart parallel axis plot visibility, including latex font
+
 ## [v1.2.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.9) - 2026-5-7
 ### Added
 - Paper: dissertation writeup
@@ -8,6 +25,7 @@
 - Submodules: update OpenFLASH submodule to include jfm paper in thesis
 ### Fixed
 - Fix error in circle constraint center/radius for positve power
+- Location sensitivity wrong class name in analysis outputs
 
 ## [v1.2.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.8) - 2026-5-5
 ### Added

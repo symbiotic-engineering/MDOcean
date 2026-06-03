@@ -91,7 +91,7 @@ function table2latex(tab, filename, special_col_spec, special_first_row)
                 row_data{1,col} = char(value);
             end
             if ~isempty(row_names)
-                row_data = [row_names{row}, row_data];
+                row_data = [format_value(row_names{row}, false), row_data];
             end
             row_string = append(strjoin(row_data, ' & '), ' \\\\ \n'); % need 4 \ in row_string and 2 \ in file
             table_string = append(table_string, row_string);
