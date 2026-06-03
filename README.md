@@ -49,15 +49,10 @@ Running the single-objective optimization with typical parameters reduces LCOE b
 The project is part of research in the [Symbiotic Engineering Analysis (SEA) Lab](https://sea.mae.cornell.edu/).
 
 Dissertation (in prep): R. McCabe, "Leveraging Semi-Analytical Modeling, Multidisciplinary Design Optimization, 
-        and System Value Metrics to Advance Wave Energy Converter Viability", 2026. [Link to draft dissertation manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdissertation%2FsampleThesis.pdf)
+        and System Value Metrics to Advance Wave Energy Converter Viability," 2026. [Link to draft dissertation manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdissertation%2FsampleThesis.pdf)
 
-A video recording of the dissertation defense is available [here](https://vod.video.cornell.edu/media/t/1_d7sd33c2). [Link to slides](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdefense%2Fppt%2FMcCabe_Dissertation_Defense.pdf).
-<div style="max-width:608px">
-<div style="position:relative;padding-bottom:66.118421052632%">
-<iframe id="kaltura_player" src='https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/54758402?iframeembed=true&amp;entry_id=1_d7sd33c2&amp;config%5Bprovider%5D=%7B%22widgetId%22%3A%221_m16jkedl%22%7D&amp;config%5Bplayback%5D=%7B%22startTime%22%3A0%7D'  allowfullscreen webkitallowfullscreen mozAllowFullScreen allow="autoplay *; fullscreen *; encrypted-media *" sandbox="allow-downloads allow-forms allow-same-origin allow-scripts allow-top-navigation allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation-by-user-activation" title="Rebecca McCabe B Exam - Leveraging Semi-Analytical Modeling, Multidisciplinary Design Optimization, and System Value Metrics to Advance Wave Energy Converter Viability" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0">
-</iframe>
-</div>
-</div>
+A video recording of the dissertation defense is available below. [Link to slides](https://calkit.io/symbiotic-engineering/mdocean/publications?ref=thesis-update&path=pubs%2Fdefense%2Fppt%2FMcCabe_Dissertation_Defense.pdf).
+[<img width="618" height="318" alt="image" src="https://github.com/user-attachments/assets/30ce6df6-a7f8-4ed6-bd16-48fd492e7036" />](https://vod.video.cornell.edu/media/t/1_d7sd33c2)
 
 Model journal paper citation (in prep): R. McCabe, M. Dietrich, and M. N. Haji, “Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,” in preparation, 2026. [Link to draft paper manuscript](https://calkit.io/symbiotic-engineering/mdocean/publications#pubs/applied-ocean-research-model/main.pdf).
 
@@ -69,7 +64,10 @@ to Reduce Cost and Power Variation of a Wave Energy Converter,”
 Information in Engineering Conference*, St. Louis, MO, August 14-17, 2022.
 [https://doi.org/10.1115/DETC2022-90227](https://doi.org/10.1115/DETC2022-90227).
 
-A video recording of the conference presentation is available [here](https://www.youtube.com/watch?v=LjpfXvujUGY).
+A video recording of the conference presentation is available below.
+
+[<img width="528" height="297" alt="image" src="https://github.com/user-attachments/assets/81934806-9870-44bf-96a6-da8eb279a491" />](https://www.youtube.com/watch?v=LjpfXvujUGY)
+
 
 ## Code Documentation
 
@@ -104,8 +102,15 @@ Additionally, [this page](https://symbiotic-engineering.github.io/MDOcean/modifi
 
 ## License
 
-This project is released open-source under the MIT License. The validation folder contains code taken from NREL's WEC-Sim. 
-The Apache 2.0 license for this open source WEC-Sim code is included.
+This project is released open-source under the MIT License. 
+
+As exceptions, the following files have been adapted from other code and have different licenses, reproduced in the relevant folders:
+- `mdocean/inputs/validation/WECSim/`: Apache 2.0
+- `mdocean/plots/util/MatlabSVG/`: BSD-2-Clause
+- `mdocean/plots/util/RBGCube_a.svg`: CC BY-SA 3.0
+- `mdocean/plots/util/bluewhitered.m`: BSD-2-Clause
+- `mdocean/plots/util/hatchfill2.m` and `hatchfill2_demo.m`: BSD-2-Clause
+- `mdocean/plots/util/table2latex.m`: BSD-2-Clause
 
 ## Dependencies
 
