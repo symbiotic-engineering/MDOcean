@@ -19,7 +19,7 @@ Conference presentation (August 2022)
 .. raw:: html
 
    <div style="max-width:608px">
-   <a href="https://www.youtube.com/watch?v=LjpfXvujUGY" target="_blank" rel="noopener noreferrer">
+   <a href="https://www.youtube.com/watch?v=LjpfXvujUGY" target="_blank" rel="noopener noreferrer" aria-label="Watch conference presentation on YouTube">
    <img src="https://img.youtube.com/vi/LjpfXvujUGY/hqdefault.jpg" alt="Conference presentation (August 2022) video thumbnail" style="width:100%;height:auto;display:block;border:0">
    </a>
    </div>
