@@ -19,8 +19,7 @@ Conference presentation (August 2022)
 .. raw:: html
 
    <div style="max-width:608px">
-   <div style="position:relative;padding-bottom:66.118421052632%">
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/LjpfXvujUGY?si=xidAtRY-s74mvTWA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy='strict-origin-when-cross-origin' allowfullscreen>
-   </iframe>
-   </div>
+   <a href="https://www.youtube.com/watch?v=LjpfXvujUGY" target="_blank" rel="noopener noreferrer">
+   <img src="https://img.youtube.com/vi/LjpfXvujUGY/hqdefault.jpg" alt="Conference presentation (August 2022) video thumbnail" style="width:100%;height:auto;display:block;border:0">
+   </a>
    </div>
