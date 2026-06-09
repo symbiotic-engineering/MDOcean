@@ -41,6 +41,14 @@
 \usepackage{wrapfig}
 \usepackage{caption}
 
+% for subtitles
+\usepackage{titlesec}
+
+\makeatletter
+\titleformat{\chapter}[display]
+{\normalfont\bfseries}{\Large\centering\MakeUppercase{\@chapapp\space \thechapter}}{0pt}{\LARGE\center}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
 \graphicspath{
   {../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}
   {../applied-ocean-research-model/}
@@ -59,7 +67,7 @@
 %the tolerance to 9999
 \tolerance=9999
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 %\bibliographystyle{IEEEbib}
 
 \newcommand{\DISSERTATION}{} % used for dissertation-specific formatting in shared files
@@ -218,8 +226,11 @@ Finally, I thank my family, including:
   you keep a watchful eye on the Cornell red-tailed hawk cam, 
   and the annual excitement of the fledging of the hawks has marked the milestones of my PhD journey.
   I hope that with this thesis, I have likewise taken flight.
-  Your support and encouragement throughout the process is constant. I love you.
 \end{itemize}
+
+
+To everyone who has supported and encouraged me throughout this journey, thank you.
+I love you all.
 
 \end{acknowledgements}
 
@@ -230,75 +241,66 @@ Finally, I thank my family, including:
 \normalspacing \setcounter{page}{1} \pagenumbering{arabic}
 \pagestyle{cornell} \addtolength{\parskip}{0.5\baselineskip}
 
-\chapter{Introduction}
+\chapter{Introduction}\label{ch:intro}
+\input{intro-contrib}
 
-\section{Motivation}
-The fundamental question of this dissertation is how energy from ocean waves can be most effectively harnessed to contribute to global decarbonization efforts.
+\chapter[System Modeling]{System Modeling\\
+\large Development, Validation, and Benchmarking of a \\[-4ex]
+Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
+\label{ch:modeling}
 
-This work is motivated by two complementary gaps in the literature. First, within the wave energy converter (WEC) community, there remains an incomplete understanding of the fundamental barriers that prevent WEC technologies from achieving large-scale viability. Second, within the broader climate and energy systems literature, there is a lack of clarity regarding how WECs can be meaningfully integrated as a solution to climate change. This dissertation seeks to address both gaps simultaneously.
+\emph{All models are wrong, but some are useful.}
 
-The overarching goal is to perform a design optimization study that is not only methodologically rigorous, but also meaningful in its outcomes. In this context, ``meaningful'' is defined by three criteria. First, the analysis must be comprehensive, meaning that it spans a sufficiently expansive design space and captures the relevant multidisciplinary couplings inherent in wave energy systems. Second, it must be decision-relevant, in the sense that it yields actionable insights that inform design direction, rather than merely demonstrating a sophisticated numerical method or producing isolated computational results. Third, it must be aligned with climate objectives, such that the optimization targets metrics that are directly relevant to economic feasibility and environmental impact.
+- George Box, 1987
 
-Achieving comprehensiveness requires the development of a modeling and optimization framework that is both highly integrated and computationally efficient. Accordingly, the first part of this dissertation focuses on the development, validation, and benchmarking of such a framework, which is referred to as MDOcean. To obtain decision-relevant insights, this framework is then applied in a design optimization study, which constitutes the second part of the dissertation. Finally, to ensure relevance to climate goals, the framework is extended to incorporate performance metrics that better reflect economic and environmental viability.
-
-\section{List of Publications}
-The following publications have resulted from the work in this dissertation.
-
-Journal articles:
-\begin{itemize}
-    \item McCabe, Dietrich, and Haji, ``Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters,'' in preparation to submit to Applied Ocean Research in January 2026.
-    \item McCabe, Khanal, Bimali, Lo, Treacy, and Haji. ``Numerics of the matched eigenfunction method for computing wave forces on concentric bodies,'' in preparation to submit to Journal of Fluid Mechanics in 2026.
-    \item McCabe, Dietrich, and Haji, ``Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability,'' in preparation to submit to Renewable Energy in 2026.
-\end{itemize}
-
-Peer-reviewed conference papers:
-\begin{itemize}
-    \item McCabe, Murphy, and Haji, 2022, ``Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,'' ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2022-90227.
-    \item McCabe, Dietrich, Yang, Long, Kuan, Buccino, Liu, and Haji, 2025. ``WEC Optimization to Maximize Grid Economic Value and Avoided Emissions,'' University Marine Energy Research Community Conference.
-    \item McCabe, Dietrich, Liu, and Haji, 2023. ``System Level Techno-Economic and Environmental Design Optimization for Ocean Wave Energy.'' ASME IDETC-CIE: Design Automation Conference. https://doi.org/10.1115/DETC2023-114607.
-    \item McCabe and Haji, 2024. ``Force-Limited Control of Wave Energy Converters using a Describing Function Linearization.'' Int. Federation of Automatic Control: Control Applications in Marine Systems, Robotics,\& Vehicles. https://doi.org/10.1016/j.ifacol.2024.10.093.
-    \item McCabe, Khanal, and Haji, 2024. ``Open-Source Toolbox for Semi-Analytical Hydrodynamic Coefficients via the Matched Eigenfunction Expansion Method,'' University Marine Energy Research Community Conference. Award for best communication of complex mathematics. https://doi.org/10.5281/zenodo.14504016
-\end{itemize}
-
-Presentations:
-\begin{itemize}
-    \item McCabe, ``System Optimization of Ocean Wave Energy Converters,'' Cornell Systems Engineering Ezra Emerging Scholar Seminar, December 2025.
-    \item McCabe and Haji, ``Value Metrics and Global Impact Potential of Wave Energy,'' University Marine Energy Research Community Conference, September 2022.
-    \item McCabe, Dietrich, and Haji, ``MDOcean: an Open-Source Software for Efficient Simulation and Multidisciplinary Design Optimization of WECs,'' University Marine Energy Research Community Conference, August 2025. Best presentation award.
-    \item Khanal, McCabe, and Haji, ``Gradient-based Design Optimization of Concentric Cylindrical Offshore Structures,'' SIAM Conference on Optimization, June 2023.
-\end{itemize}
-
-The author has also contributed to the following collaborative publications and projects that are not included in this dissertation:
-\begin{itemize}
-    \item Hasankhani, McCabe, Ewig, Won, and Haji, 2023. ``Conceptual Design and Optimization of a Wave-Powered Offshore Aquaculture Farm,'' International Ocean and Polar Engineering Conference.
-    \item Hasankhani, Ewig, McCabe, Won, and Haji, 2023. ``Marine Spatial Planning of a Wave-Powered Offshore Aquaculture Farm in the Northeast U.S.'' IEEE Oceans – Limerick. https://doi.org/10.1109/OCEANSLimerick52467.2023.10244332.
-    \item DeGeode, McCabe, Vitale, Pokigo, Srivastava, Edwards, and Haji, ``Offshore Carbon Sequestration Using Direct Mechanical Wave Energy,'' University Marine Energy Research Community Conference, August 2024. https://doi.org/10.5281/zenodo.15168281.
-    \item Vitale, McCabe, Brundan, Mandalam, Alonso Munera, and Haji, 2026. ``Design, build, and analysis of small-scale wave energy converter prototypes.'' ASME Journal of Mechanical Design. http://doi.org/10.1115/1.4070757.
-    \item Vitale, Brundan, Mandalam, McCabe, and Haji, ``Experimental Investigation of Heterogeneous Wave Energy Converter Arrays: Open-Source Data and Performance Comparisons,'' University Marine Energy Research Community Conference, August 2025.
-    \item Best, Khanal, McCabe, Jiang, Treacy, and Haji, ``OpenFLASH: An open-source flexible library for analytical and semi-analytical hydrodynamics calculations.'' In review for the Journal of Open Source Software.
-\end{itemize}
-
-\chapter{Modeling}
-This chapter will be submitted to Applied Ocean Research as a journal article.
-Early versions of the work were presented as ASME IDETC and UMERC.
+This chapter is adapted from \cite{mccabe_development_2026}, \hl{(pending submission)} [currently under review] for publication in Applied Ocean Research.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
 \subimport{../applied-ocean-research-model/}{content}
 
-\chapter{Hydrodynamics Model: Matched Eigenfunction Expansion Method}
-This chapter will be submitted to Journal of Fluid Mechanics as a journal article.
-Early versions of the work were presented at SIAM and UMERC.
-The software package developed for this chapter has been submitted to the Journal of Open Source Software.
+\chapter[Hydrodynamic Modeling]{Hydrodynamic Modeling\\
+\large Matrix Structure and Convergence Behavior of the\\[-4ex] 
+Matched Eigenfunction Method for Generalized Concentric Bodies}
+\label{ch:hydrodynamic}
+
+\emph{The purpose of computing is insight, not numbers.}
+
+- Richard Hamming, 1962
+
+This chapter is adapted from \cite{bimali_matrix_2026}, currently under review for publication in the Journal of Fluid Mechanics (submission number JFM-2026-1453).
+See \cref{sec:research-outputs} for other research outputs associated with this work.
 
 \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{FLMguide}
 
-\chapter{Optimization}
-This chapter will be submitted to Renewable Energy as a journal article.
+\chapter[Design Optimization]{Design Optimization\\
+\large Leveraging Multidisciplinary Design Optimization to \\[-4ex]
+Advance Wave Energy Converter Viability
+}
+\label{ch:optimization}
+
+\emph{The performance of a system doesn't depend on how the parts perform taken separately, it depends on how they perform together. [...] When you improve the performance of a part of a system taken separately, you can destroy the system.}
+
+- Russell Ackoff, 2003 \cite{ackoff_video_2003}
+
+This chapter is adapted from \cite{mccabe_leveraging_2026}, \hl{(pending submission)} [currently under review] for publication in Renewable Energy.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
 \subimport{../renewable-energy-mdo/}{content-re}
 
-\chapter{System Value Metrics}
-This chapter will be submitted to Applied Energy as a journal article.
-Early versions of the work were presented at ASME IDETC and UMERC.
+\chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
+\large
+A Paradigm for Grid-Informed Design Optimization\\[-4ex] 
+to Maximize System Economic and Environmental Value}
+\label{ch:grid-value}
+
+\emph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
+
+- Greta Thunberg, 2019 \cite{thunberg_speech_2019}
+
+This chapter is currently unpublished.
+See \cref{sec:research-outputs} for research outputs associated with this work.
 \subimport{../UMERC-2025-grid-value/}{content-grid}
 
+\chapter{Conclusion}
+\hl{A conclusion will be written here}.
 % \chapter{Vision for the Future of Wave Energy Optimization}
 % - extend to other architectures and more complex models (already written in modeling paper)
 % - integrate with wecopttool and wecsim
@@ -307,16 +309,16 @@ Early versions of the work were presented at ASME IDETC and UMERC.
 \appendix
 \begin{appendices}
 
-\chapter{Modeling Appendices}
+\chapter{System Modeling Appendices}
 \subimport{../applied-ocean-research-model/}{appendices}
 
-\chapter{Matched Eigenfunction Expansion Method Appendices}
+\chapter{Hydrodynamic Modeling Appendices}
 \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{jfm-appendix}
 
-\chapter{Optimization Appendices}
+\chapter{Design Optimization Appendices}
 \subimport{../renewable-energy-mdo/sections/}{other-appendices}
 
-\chapter{System Value Metrics Appendices}
+\chapter{Grid Impact Synthesis Appendices}
 \section{Reduced order model details}
 \subimport{../UMERC-2025-grid-value/}{appendix-grid}
 
