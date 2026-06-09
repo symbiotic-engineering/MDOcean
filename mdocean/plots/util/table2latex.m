@@ -31,9 +31,10 @@ function table2latex(tab, filename, special_col_spec, special_first_row)
     if nargin < 2
         filename = 'table.tex';
         fprintf('Output path is not defined. The table will be written in %s.\n', filename); 
-    elseif ~ischar(filename)
+    elseif ~(ischar(filename) || (isstring(filename) && isscalar(filename)))
         error('The output file name must be a string.');
     else
+        filename = char(filename);
         if ~strcmp(filename(end-3:end), '.tex')
             filename = [filename '.tex'];
         end
@@ -107,11 +108,17 @@ function table2latex(tab, filename, special_col_spec, special_first_row)
     
     table_string = append(table_string,'\\end{tabular}');
 
-    fileID = fopen(filename, 'w');
-    fprintf(fileID, table_string);
+    [filepath, ~, ~] = fileparts(filename);
+    if ~isempty(filepath) && ~exist(filepath, 'dir')
+        mkdir(filepath);
+    end
 
-    % Closing the file
-    fclose(fileID);
+    fileID = fopen(filename, 'w');
+    if fileID == -1
+        error('MDOcean:table2latex:InvalidFid', 'Could not open file for writing: %s', filename);
+    end
+    cleanup = onCleanup(@() fclose(fileID)); %#ok<NASGU>
+    fprintf(fileID, '%s', table_string);
 end
 
 function value = format_value(value, use_percent)
