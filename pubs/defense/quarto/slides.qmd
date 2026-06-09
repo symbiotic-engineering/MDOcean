@@ -28,62 +28,22 @@ title-slide-attributes:
   data-background-opacity: "1"
   data-background-position: "25% 98%"
 ---
-
-const logs = await FileAttachment("weekend-logs.json").json();
-
-## Agenda
-
-- Motivation
-
-- Modeling
-
-  - Theory and Implementation
-
-  - Validation and Benchmarking
-
-- Design Optimization: Cost
-
-  - Systems Formulation
-
-  - Results
-
-- Design Optimization: Economic and Environmental Value
-
-  - Metrics and Formulation
-
-  - Preliminary Results
-
-- Conclusion
-
 # Motivation
 
-::: frame
-## Agenda
+Leveraging Semi-Analytical Modeling, 
+Multidisciplinary Design Optimization, and 
+System Value Metrics to 
+Advance Wave Energy Converter Viability
 
-- **Motivation**
+---
 
-- Modeling
+Leveraging Semi-Analytical Modeling, 
+Multidisciplinary Design Optimization, and 
+System Value Metrics to 
+[Advance Wave Energy Converter Viability]{style="color:blue;"}
 
-  - Theory and Implementation
+---
 
-  - Validation and Benchmarking
-
-- Design Optimization: Cost
-
-  - Systems Formulation
-
-  - Results
-
-- Design Optimization: Economic and Environmental Value
-
-  - Metrics and Formulation
-
-  - Preliminary Results
-
-- Conclusion
-:::
-
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: frame
 ## Wave Energy Converters (WECs)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: {=html}
@@ -91,7 +51,7 @@ const logs = await FileAttachment("weekend-logs.json").json();
 
 <source src="../figs/wec-animation.mp4" type="video/mp4">
 
-Your browser does not support the video tag. </video>
+</video>
 
 :::
 
@@ -99,7 +59,7 @@ PRIMRE - National Renewable Energy Laboratory
 
 :::
 
-::: frame
+
 ## Motivation: Wave Energy
 
 Relevance to the grid:
@@ -146,7 +106,7 @@ U.S. Department of Energy
 
 - Optimization
 
-- Adapted from Caio et al. 2019
+Adapted from Caio et al. 2019
 :::
 
 ::: frame
@@ -163,6 +123,57 @@ We want a simulation and optimization framework that is:
 - reproducible
 
 - informative
+:::
+
+
+## Agenda
+
+- Motivation
+
+- Modeling
+
+  - Theory and Implementation
+
+  - Validation and Benchmarking
+
+- Design Optimization: Cost
+
+  - Systems Formulation
+
+  - Results
+
+- Design Optimization: Economic and Environmental Value
+
+  - Metrics and Formulation
+
+  - Preliminary Results
+
+- Conclusion
+
+::: frame
+## Agenda
+
+- **Motivation**
+
+- Modeling
+
+  - Theory and Implementation
+
+  - Validation and Benchmarking
+
+- Design Optimization: Cost
+
+  - Systems Formulation
+
+  - Results
+
+- Design Optimization: Economic and Environmental Value
+
+  - Metrics and Formulation
+
+  - Preliminary Results
+
+- Conclusion
 :::
 
 # Modeling
@@ -517,8 +528,7 @@ Annual mean power across all sea states \\ \hline \\end{tabular}
     
     
 \end{frame}
-
-\\begin{frame}
+\begin{frame}
 
 \frametitle{Problem Formulation: g}
 
@@ -1107,7 +1117,7 @@ Image: FERC no capacity markets
 ![image](../figs/img0040.png){width="90%"}
 
 | Study | 1 - Coe et al. | 2 - EVOLVE | 3 - de Faria et al. |
-|:---|:---|:---|:---|
+|:-----------------|:-----------------|:-----------------|:-----------------|
 | Geographic Scope | California | UK (Ireland, Portugal) | North Carolina |
 | Model | Simplified Capacity Expansion | Economic Dispatch | Capacity Expansion |
 | Parameters | LCOE, CF | Capacity | σCF |
@@ -1130,7 +1140,7 @@ McCabe, Dietrich, Liu, and Haji, 2023.
 ## Loop Structures
 
 |   | LP Computational Cost | NLP Computational Cost |
-|----|:---|:---|
+|------------------------|:-----------------------|:-----------------------|
 | Current: Reduced order model + lookup table | 4D sweep: 104 combos 1 min each Total: 7 days | 100 iterations 13 function calls per iteration 50 ms per function call Total: 1 minute |
 | Possible: price taker assumption | 1 min | 1 min |
 | Possible: CEM in the loop | None | 100 iterations 13 function calls per iteration 1 minute per function call Total: 20 hours |
@@ -1159,7 +1169,7 @@ McCabe, Dietrich, Liu, and Haji, 2023.
 ## Journal Summary
 
 | \# | Title | Target Journal | Target submission | Status |
-|:---|:---|:---|:---|:---|
+|:--------------|:--------------|:--------------|:--------------|:--------------|
 | J1 MDOcean modeling | Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters | Applied Ocean Research | October 2025 | Editing (101p) |
 | J2 MDOcean optimization | Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability | Renewable Energy | December 2025 | Editing (128p) |
 | J3 MEEM | Numerics of the matched eigenfunction method for computing wave forces on concentric bodies | Journal of Fluid Mechanics | December 2025 | Drafting |
@@ -1361,7 +1371,7 @@ McCabe and Haji, "Force-Limited Control of Wave Energy Converters using a Descri
 ## Future Design Optimization Features
 
 | Version | Hydro Coefficients | Controls | Storage | Objective | Architecture |
-|:---|:---|:---|:---|:---|:---|
+|:-----------|:-----------|:-----------|:-----------|:-----------|:-----------|
 | V1 | Long wave approximation | Same for all sea states, linear with saturation | No | LCOE and cv | RM3 only |
 | V2 | Analytical PDE solution | Different for each sea state, linear with saturation | Yes | LCOE and cv | RM3 only |
 | V3 | Boundary element method solver | WecOptTool, nonlinear | Yes | NVOE and net eco-value | Various |
@@ -1487,7 +1497,7 @@ Chau and Yeung, 2010.
 ## Metric Selection
 
 | Temporal value | Consistency | Technical | Economic | Environmental | Operational |
-|:---|:---|:---|:---|:---|:---|
+|:-----------|:-----------|:-----------|:-----------|:-----------|:-----------|
 | Availability | Coefficient of variation of power | Capture width (ratio) | Levelized cost (value) of energy | Net EcoCosts | Manufacturability |
 | Persistence | Capacity factor | Technology readiness (performance) level | Payback period | Global warming potential | Deployability and maintainability |
 | Versatility | Force peak to average ratio | Hydrodynamic performance quality | Internal rate of return | Energy return on investment | Robustness to uncertainty |
@@ -1607,7 +1617,7 @@ Chau and Yeung, 2010.
 ## Metric Selection
 
 | Temporal value | Consistency | Technical | Economic | Environmental | Operational |
-|:---|:---|:---|:---|:---|:---|
+|:-----------|:-----------|:-----------|:-----------|:-----------|:-----------|
 | Availability | Coefficient of variation of power | Capture width (ratio) | Levelized cost (value) of energy | Net EcoCosts | Manufacturability |
 | Persistence | Capacity factor | Technology readiness (performance) level | Payback period | Global warming potential | Deployability and maintainability |
 | Versatility | Force peak to average ratio | Hydrodynamic performance quality | Internal rate of return | Energy return on investment | Robustness to uncertainty |
@@ -1694,5 +1704,13 @@ McCabe, Rebecca, Olivia Murphy, and Maha Haji. 2022. "Multidisciplinary Optimiza
 :::::
 ::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
