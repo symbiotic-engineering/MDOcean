@@ -15,3 +15,6 @@ push @TEXINPUTS, $root;
 
 $out_dir = '.';
 $aux_dir = 'aux';
+
+# Enable -shell-escape for pdflatex (required for bibcop patch)
+set_tex_cmds( '--shell-escape %O %S' );
