@@ -19,7 +19,9 @@
     If wavelength were used as the characteristic length scale, the resulting capture width ratio would be a constant multiple of the radiation efficiency).
     For the final output, to nondimensionalize the wetted surface area, we divide it by the wavelength squared.
 \else
-    A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $m_0h$ identifies design trends. MDOcean performs the six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in \resultsAOR[meemSweepTime] seconds. We examine three nondimensional outputs: radiation efficiency (proxy for power), capture width ratio (proxy for power per unit cost, normalized by $\sqrt{A_{wet}}$), and nondimensional wetted surface area (proxy for cost).
+    A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $m_0h$ identifies design trends.
+MDOcean performs the six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in \resultsAOR[meemSweepTime] seconds.
+We examine three nondimensional outputs: radiation efficiency (proxy for power), capture width ratio (proxy for power per unit cost, normalized by $\sqrt{A_{wet}}$), and nondimensional wetted surface area (proxy for cost).
 \fi
 
 \ifdefined\DISSERTATION
@@ -58,7 +60,10 @@
     At this moderate $m_0h$ regime, the most efficient designs that stay within the radiation limit are green/blue, generally indicating a low $a_1/a_2$ (small spar).
     At high $m_0h$ (deep water, fast waves), the most efficient designs (pink/red) have
 \else
-    The most efficient design depends on the frequency-depth regime $m_0h$. Low $m_0h$ (shallow water, slow waves) favors a pure cylinder geometry with small radius. Moderate $m_0h$ favors low $a_1/a_2$ (a small spar relative to the float). High $m_0h$ favors qualitatively different geometries.
+    The most efficient design depends on the frequency-depth regime $m_0h$.
+Low $m_0h$ (shallow water, slow waves) favors a pure cylinder geometry with small radius.
+Moderate $m_0h$ favors low $a_1/a_2$ (a small spar relative to the float).
+High $m_0h$ favors qualitatively different geometries.
 \fi
 
 \paragraph{Design Cost-Power Tradeoffs}
@@ -83,7 +88,8 @@ This is because the same force has a lower lever arm to the column and therefore
 \begin{figure}
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/damping_plate_aspect_ratio.pdf}
-    \caption{Normalized effect of damping plate aspect ratio on maximum stress and deflection. The dashed lines indicate the nominal design point at $b/a = 0.2$.}
+    \caption{Normalized effect of damping plate aspect ratio on maximum stress and deflection.
+The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     \label{fig:damping-plate-maxs}
 \end{figure}
 
@@ -161,7 +167,8 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15\textcent/kWh reduction in LCOE, representing the best design of the OAT sweep.
     The results also point to the possibility of an even lower LCOE design with float diameter perhaps $\sim20\%$ larger than nominal, if the damping plate can be made feasible by increasing $t_d$ or $h_{1,stiff,d}$ without a major cost penalty.
 \else
-    The one-at-a-time (OAT) design sweep (\cref{fig:experiments}) reveals that float diameter $D_f$ has the strongest effect on objectives. The feasible design space is highly fragmented: an ``island'' of low-LCOE designs at $1.3 < D_f/D_{f,nom} < 2.1$ is separated from the nominal design by the damping plate fatigue constraint.
+    The one-at-a-time (OAT) design sweep (\cref{fig:experiments}) reveals that float diameter $D_f$ has the strongest effect on objectives.
+The feasible design space is highly fragmented: an ``island'' of low-LCOE designs at $1.3 < D_f/D_{f,nom} < 2.1$ is separated from the nominal design by the damping plate fatigue constraint.
 \fi
 
 \begin{figure}
@@ -178,7 +185,8 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     In particular, the feasible region $1.3<D_f/D_{f,nom}<2.1$ is an ``island'' in the feasible design space, separated from the other feasible points at $D_f/D_{f,nom}<1 $ by the damping plate fatigue constraint.
     Thus even without objective multimodality, multimodality exists in the Lagrangian (objective plus weighted active constraints), indicating the need for a multi-start optimization procedure as planned.
 \else
-    Force limit $F_{max}$ also shows non-monotonic LCOE dependence, with an optimum near half the nominal limit. Although no objective multimodality is observed within the swept region, the fragmented feasible space introduces multimodality in the Lagrangian, indicating the need for a multi-start optimization procedure \cite{mccabe_leveraging_2026}.
+    Force limit $F_{max}$ also shows non-monotonic LCOE dependence, with an optimum near half the nominal limit.
+Although no objective multimodality is observed within the swept region, the fragmented feasible space introduces multimodality in the Lagrangian, indicating the need for a multi-start optimization procedure \cite{mccabe_leveraging_2026}.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,14 +199,19 @@ Similar to \cref{fig:JPD-multiply} showing the multiplication of the power matri
 \mathbf{P}^{H,T}_{elec} = \mathbf{J}^{H,T}_{wave} ~\mathbf{CW}^{H,T}_{max} ~\mathbf{\eta}^{H,T}_{rad} ~\mathbf{\eta}^{H,T}_{drag} ~\mathbf{\eta}^{H,T}_{limits} ~\mathbf{\eta}^{H,T}_{elec}
 \end{equation}
 
-Here $\mathbf{J}^{H,T}_{wave}$ is the wave power density (design-independent) and $\mathbf{CW}^{H,T}_{max}$ is the radiation-limit capture width (depends only on the mode of motion). The four efficiency matrices isolate the design dependencies: $\mathbf{\eta}^{H,T}_{rad}$ for hull-shape radiation efficiency, $\mathbf{\eta}^{H,T}_{drag}$ for drag, $\mathbf{\eta}^{H,T}_{limits}$ for dynamic constraints, and $\mathbf{\eta}^{H,T}_{elec}$ for PTO losses and dynamics. Explicit definitions are given in \appendixname~\ref{sec:appendix-power-decomposition}.
+Here $\mathbf{J}^{H,T}_{wave}$ is the wave power density (design-independent) and $\mathbf{CW}^{H,T}_{max}$ is the radiation-limit capture width (depends only on the mode of motion).
+The four efficiency matrices isolate the design dependencies: $\mathbf{\eta}^{H,T}_{rad}$ for hull-shape radiation efficiency, $\mathbf{\eta}^{H,T}_{drag}$ for drag, $\mathbf{\eta}^{H,T}_{limits}$ for dynamic constraints, and $\mathbf{\eta}^{H,T}_{elec}$ for PTO losses and dynamics.
+Explicit definitions are given in \appendixname~\ref{sec:appendix-power-decomposition}.
 
 \ifdefined\DISSERTATION
-    Two features of this decomposition deserve emphasis. First, $\mathbf{\eta}^{H,T}_{drag}$ may exceed 1 in sea states where the drag-free system is so undamped that the unconstrained optimal controller would induce instability and a sub-optimal controller is used instead --- this reflects a denominator artifact, not an actual energy gain from drag. Second, the multiplicative structure depends on the order chosen: alternative factorizations (e.g., defining drag effect relative to the saturated rather than the ideal system) would represent independent sensitivities and could not be multiplied to recover the overall power matrix.
+    Two features of this decomposition deserve emphasis.
+First, $\mathbf{\eta}^{H,T}_{drag}$ may exceed 1 in sea states where the drag-free system is so undamped that the unconstrained optimal controller would induce instability and a sub-optimal controller is used instead --- this reflects a denominator artifact, not an actual energy gain from drag.
+Second, the multiplicative structure depends on the order chosen: alternative factorizations (e.g., defining drag effect relative to the saturated rather than the ideal system) would represent independent sensitivities and could not be multiplied to recover the overall power matrix.
 \fi
 
 
-This multiplicative decomposition allows isolation of the effect of each design variable and parameter on power, intuitively identifying which design variables are most important for improving power. \Cref{tab:power-matrix-dependence} maps the dependence explicitly.
+This multiplicative decomposition allows isolation of the effect of each design variable and parameter on power, intuitively identifying which design variables are most important for improving power.
+\Cref{tab:power-matrix-dependence} maps the dependence explicitly.
 \begin{table}[h]
 \centering
 \begin{tabular}{lcccccc}
@@ -249,7 +262,8 @@ From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 \begin{aligned}
     \overline{P}_{elec} &= \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
     \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_{\beta,opt}|^2)
-    \\ s.t. \quad
+    \\ s.t.
+\quad
     |\hat{F}_{p,\beta}| &\leq F_{max},\quad
     |p_{pk,elec,\beta}| \leq P_{max,elec},\\
     |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\quad
@@ -315,7 +329,8 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
     Table~\ref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
     This section describes the relevance and possible implementation paths for each development area.
 \else
-    \Cref{tab:future-work} summarizes principal limitations and future work, distinguishing model improvements that would enhance the accuracy of currently-achievable studies from extensions that would unlock new design questions. MDOcean is open-source \cite{mccabe_mdocean_2024}; community contributions are welcome, and the authors are pursuing the multi-objective RM3 optimization in the companion paper \cite{mccabe_leveraging_2026}.
+    \Cref{tab:future-work} summarizes principal limitations and future work, distinguishing model improvements that would enhance the accuracy of currently-achievable studies from extensions that would unlock new design questions.
+MDOcean is open-source \cite{mccabe_mdocean_2024}; community contributions are welcome, and the authors are pursuing the multi-objective RM3 optimization in the companion paper \cite{mccabe_leveraging_2026}.
 \fi
 
 \newcommand{\modelTrustBuilders}{
@@ -444,5 +459,6 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     \item \textbf{Single WEC archetype.} Extending MEEM to handle the damping plate or 3+ concentric cylinders \cite{best_openflash_2026,bimali_numerics_2026} would broaden applicability, as would generalizing the framework to non-point-absorber archetypes.
 \end{itemize}
     
-    Additional model refinements that would build trust without unlocking new study types include local buckling and effective-breadth criteria in the structures module, FEA-based validation of the structural model, additional PTO nonlinearities (drivetrain friction, check-valve rectification, power saturation), and Miner's-law fatigue analysis coupled with storm-sea-state contour modeling for finite-lifetime designs. Per-item rationale and implementation paths are in [dissertation chapter X].
+    Additional model refinements that would build trust without unlocking new study types include local buckling and effective-breadth criteria in the structures module, FEA-based validation of the structural model, additional PTO nonlinearities (drivetrain friction, check-valve rectification, power saturation), and Miner's-law fatigue analysis coupled with storm-sea-state contour modeling for finite-lifetime designs.
+Per-item rationale and implementation paths are in [dissertation chapter X].
 \fi

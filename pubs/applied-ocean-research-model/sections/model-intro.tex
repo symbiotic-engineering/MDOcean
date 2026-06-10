@@ -58,7 +58,8 @@ Wave energy converters (WECs), the devices that harness and convert this energy,
     The others tend to start with the WEC shape and PTO, then move to the controller and moorings, and finish with the power transportation system.
     Reference \cite{trueworthy_wave_2020} concludes that concurrent design has promise to take advantage of subsystem interactions and is an under-utilized technique worthy of further study, emphasizing the importance of incorporating all design requirements at an early stage.
 \else
-    Existing WEC models vary widely in disciplinary scope, fidelity, and suitability for optimization. In industry, multidisciplinary modeling is common but typically sequential rather than concurrent; a survey of 25 WEC designers \cite{trueworthy_wave_2020} found that only 50\% design all subsystems concurrently, and identified concurrent design as an under-utilized technique worthy of further study.
+    Existing WEC models vary widely in disciplinary scope, fidelity, and suitability for optimization.
+In industry, multidisciplinary modeling is common but typically sequential rather than concurrent; a survey of 25 WEC designers \cite{trueworthy_wave_2020} found that only 50\% design all subsystems concurrently, and identified concurrent design as an under-utilized technique worthy of further study.
 \fi
 
 The academic state of the art typically focuses on modeling and optimizing one or a few disciplines at a time, with the most common being hydrodynamics, dynamics, and controls.
@@ -176,7 +177,8 @@ This work & 2-PA & MEEM & DF & F+ & PI+ & - & DY & AN & STR, PTO & REG+, STO \\
 %& DOE, LOC & PWR & STA & DIM, SHP & 3 \\
 
 \hline 
-\caption{Comparison of the disciplinary scope and fidelity of optimization-relevant WEC models. See \cref{fig:model-taxonomy} for abbreviations. * in type column means array effects from multiple interacting devices are modeled.}
+\caption{Comparison of the disciplinary scope and fidelity of optimization-relevant WEC models.
+See \cref{fig:model-taxonomy} for abbreviations. * in type column means array effects from multiple interacting devices are modeled.}
 \label{tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
@@ -245,9 +247,13 @@ This work & 2-PA & MEEM & DF & F+ & PI+ & - & DY & AN & STR, PTO & REG+, STO \\
     Specifically, relevant gaps include tools for powertrain and controls modeling, co-design, and optimization; high-fidelity models with faster runtime and low/mid-fidelity models with higher accuracy; inter-operabilty of models across disciplines and fidelities; and data for verification and validation \cite{ruehl_next-generation_2023}.
     This lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization helps explain why no optimization study in \cref{tab:lit} simultaneously optimizes the device geometry, structures, and powertrain.
 \else
-    The two leading open-source WEC simulation tools illustrate the gap. WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations (NEMOH/Capytaine for hydrodynamics, PTO-Sim for powertrain, MoorDyn for mooring), but is too slow for large-scale optimization \cite{housner_numerical_2024}. WecOptTool \cite{coe_initial_2020} is a faster pseudospectral tool suitable for control co-design but currently limited to hydrodynamics and control. A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
+    The two leading open-source WEC simulation tools illustrate the gap.
+WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations (NEMOH/Capytaine for hydrodynamics, PTO-Sim for powertrain, MoorDyn for mooring), but is too slow for large-scale optimization \cite{housner_numerical_2024}.
+WecOptTool \cite{coe_initial_2020} is a faster pseudospectral tool suitable for control co-design but currently limited to hydrodynamics and control.
+A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
     
-    Existing studies therefore tend to sacrifice either disciplinary breadth or computational tractability: high-fidelity multidisciplinary models are generally too expensive for large-scale optimization, while optimization-oriented models often omit structures, powertrain dynamics, or economic assessment. This tradeoff motivates the development of a computationally efficient framework capable of concurrently capturing the major techno-economic couplings governing WEC performance.
+    Existing studies therefore tend to sacrifice either disciplinary breadth or computational tractability: high-fidelity multidisciplinary models are generally too expensive for large-scale optimization, while optimization-oriented models often omit structures, powertrain dynamics, or economic assessment.
+This tradeoff motivates the development of a computationally efficient framework capable of concurrently capturing the major techno-economic couplings governing WEC performance.
 \fi
 
 \subsection{Relevance of Semi-Analytical Modeling}   
@@ -286,7 +292,8 @@ For early-stage WEC design optimization, where the model must be run many thousa
     On the other extreme, reference \cite{mccabe_multidisciplinary_2022} uses an algebraic hydrodynamic model that runs quickly but lacks sufficient accuracy to draw meaningful design conclusions.
     The present paper introduces a set of interoperable semi-analytical models that are designed to have the speed and robustness required for multidisciplinary optimization.
 \else
-    The directly comparable studies above either use slow numerical models that limit optimization scope (e.g.\ a BEM-based 4-WEC array optimization that took 36 hours per frequency on a high-end workstation \cite{khanal_multi-objective_2024}) or fast algebraic models that lack accuracy for meaningful design conclusions (e.g.\ \cite{mccabe_multidisciplinary_2022}). Semi-analytical models offer a useful intermediate that has not yet been combined with multidisciplinary scope in an open-source WEC tool, which is the gap MDOcean addresses.
+    The directly comparable studies above either use slow numerical models that limit optimization scope (e.g.\ a BEM-based 4-WEC array optimization that took 36 hours per frequency on a high-end workstation \cite{khanal_multi-objective_2024}) or fast algebraic models that lack accuracy for meaningful design conclusions (e.g.\ \cite{mccabe_multidisciplinary_2022}).
+Semi-analytical models offer a useful intermediate that has not yet been combined with multidisciplinary scope in an open-source WEC tool, which is the gap MDOcean addresses.
 \fi
 
 \subsection{Paper Contributions and Roadmap}
@@ -295,7 +302,8 @@ For early-stage WEC design optimization, where the model must be run many thousa
     The developed software, called MDOcean \cite{mccabe_mdocean_2024}, implements relevant semi-analytical models from various fields, integrates them in a scalable framework for WEC simulation and concurrent optimization, and validates them in a WEC system context.
     The modeling framework articulated here is scalable to more disciplines, and enables systematic WEC design optimization.
 \else
-    This paper presents MDOcean \cite{mccabe_mdocean_2024}, an open-source semi-analytical WEC simulation framework addressing the gap identified above. The contributions are:
+    This paper presents MDOcean \cite{mccabe_mdocean_2024}, an open-source semi-analytical WEC simulation framework addressing the gap identified above.
+The contributions are:
     \begin{itemize}
         \item integration of semi-analytical models from hydrodynamics, dynamics, control, structures, and economics in a single framework suitable for optimization;
         \item a modified frequency-domain dynamics formulation that extends prior describing-function and constrained-control approaches with an analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller, with a geometric interpretation on the complex reflection-coefficient plane;
@@ -315,6 +323,7 @@ For early-stage WEC design optimization, where the model must be run many thousa
     \Cref{sec:model-structure} introduces MDOcean's modular structure and the rationale behind its analysis architecture.
     \Cref{sec:modules} develops each module --- geometry, hydrodynamics, dynamics and control, structures, and economics --- documenting the assumptions, analysis methods, and implementation choices.
     \Cref{sec:validation-benchmarking} compares MDOcean against WEC-Sim and the RM3 reference design, demonstrates the runtime gain over established tools, and discusses where the model is reliable.
-    \Cref{sec:discussion} presents results from variable sweeps and model-derived insights, along with limitations and future work. Extended derivations, validation studies, and implementation details are provided in the appendices to preserve readability of the primary narrative while maintaining reproducibility.
+    \Cref{sec:discussion} presents results from variable sweeps and model-derived insights, along with limitations and future work.
+Extended derivations, validation studies, and implementation details are provided in the appendices to preserve readability of the primary narrative while maintaining reproducibility.
     The companion paper \cite{mccabe_leveraging_2026} applies MDOcean to a multidisciplinary techno-economic optimization of the RM3.
 \fi

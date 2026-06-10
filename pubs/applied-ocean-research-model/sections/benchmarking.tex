@@ -39,7 +39,8 @@ These errors are deemed acceptable for the purposes of this study, since the goa
     The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \cite{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
     This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
     For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
-    After the publication of reference~\cite{mccabe_open-source_2024}, excitation phase was added to the MEEM implementation. It also matches WAMIT results well.
+    After the publication of reference~\cite{mccabe_open-source_2024}, excitation phase was added to the MEEM implementation.
+It also matches WAMIT results well.
 \else
     The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely for $\omega \geq 0.3$~rad/s (Fig.~5 of \cite{mccabe_open-source_2024}); the divergence at lower frequencies arises from differing finite-depth versus infinite-depth assumptions \cite{mciver_added_1991} and is not a concern for the site considered (minimum sea-state frequency 0.4~rad/s).
 \fi
@@ -64,7 +65,8 @@ The mass, power, and cost track well, but the structural force in storm waves ha
     Rather, the discrepancy is attributed to the fact that the reference model report uses a different dynamic model that is not described in detail, and does not document the hydrodynamic coefficients, water depth, drag coefficient, and other necessary input parameters that would be required to obtain a close match.
     A final tuned scale factor is applied to the structural mass to account for the fact that not all structural components are modeled, including spar stiffeners, damping plate circumferential stiffeners, and miscellaneous features like flanges, enclosures, and access mounts.
 \else
-    A power scale factor is similarly applied to match the reference report's 86~kW average power; the discrepancy is attributed to the reference report's use of an undocumented dynamic model rather than to a modeling error in MDOcean (the WEC-Sim validation of \cref{sec:dynamic-validation} tracks closely). A structural-mass scale factor accounts for unmodeled subcomponents (spar stiffeners, damping plate circumferential stiffeners, flanges, enclosures, access mounts).
+    A power scale factor is similarly applied to match the reference report's 86~kW average power; the discrepancy is attributed to the reference report's use of an undocumented dynamic model rather than to a modeling error in MDOcean (the WEC-Sim validation of \cref{sec:dynamic-validation} tracks closely).
+A structural-mass scale factor accounts for unmodeled subcomponents (spar stiffeners, damping plate circumferential stiffeners, flanges, enclosures, access mounts).
 \fi
 
 After applying a structural force scale factor of \resultsAOR[forceScaleFactor], a power scale factor of \resultsAOR[powerScaleFactor], and a mass scale factor of \resultsAOR[massScaleFactor], the scaled quantities match within 1\% of the reference model report.
@@ -161,5 +163,9 @@ The structures, geometry, and economics modules are not computationally expensiv
     We emphasize that the model is not intended to replace detailed models for final design and analysis, but rather to enable rapid design space exploration and optimization in the early stages of design.
     Since the values without scale factors are of the correct order of magnitude and the trends are reasonable, the use of scale factors to resolve discrepancies in the force, power, and mass models is deemed acceptable for the purposes of this study.
 \else
-    MDOcean reproduces the dynamics of an established time-domain solver within a few percent under matched modeling assumptions and within single-digit-percent JPD-weighted annual average power under realistic conditions, despite worst-case per-sea-state errors that can be larger due to drag and inter-body phase sensitivity in the 2-DOF model. Three scale factors are used to tune force, power, and mass outputs across disciplines for consistency with the reference model report. The \resultsAOR[simRuntime] runtime is 1-3 orders of magnitude faster than established software, enabling multidisciplinary optimization workflows that would otherwise be prohibitive. The model is intended to support rapid design-space exploration in early design, not to replace detailed FEM or BEM simulations for final analysis. Accuracy may degrade for geometries far from the reference design; users should validate against detailed models before drawing conclusions about previously-unexplored regions of the design space.
+    MDOcean reproduces the dynamics of an established time-domain solver within a few percent under matched modeling assumptions and within single-digit-percent JPD-weighted annual average power under realistic conditions, despite worst-case per-sea-state errors that can be larger due to drag and inter-body phase sensitivity in the 2-DOF model.
+Three scale factors are used to tune force, power, and mass outputs across disciplines for consistency with the reference model report.
+The \resultsAOR[simRuntime] runtime is 1-3 orders of magnitude faster than established software, enabling multidisciplinary optimization workflows that would otherwise be prohibitive.
+The model is intended to support rapid design-space exploration in early design, not to replace detailed FEM or BEM simulations for final analysis.
+Accuracy may degrade for geometries far from the reference design; users should validate against detailed models before drawing conclusions about previously-unexplored regions of the design space.
 \fi

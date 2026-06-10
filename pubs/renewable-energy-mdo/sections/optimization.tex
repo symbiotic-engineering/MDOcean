@@ -13,7 +13,8 @@ The optimization solution and post-optimality analysis process is shown in \cref
     This provides an initial understanding of the problem behavior, can reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
     OAT does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \cite{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
 \else
-    First, design space exploration uses a one-at-a-time (OAT) sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality. OAT does not capture inter-variable coupling \cite{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
+    First, design space exploration uses a one-at-a-time (OAT) sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
+OAT does not capture inter-variable coupling \cite{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,7 +61,8 @@ As a gradient-based optimizer, SQP requires derivatives of the objective and con
     Initial concerns that the oscillatory hydrodynamics would degrade the gradients \cite{mccabe_open-source_2024} proved unfounded, likely because the overall hydrodynamic coefficients are far less oscillatory than their individual subfunctions, keeping gradients accurate even at larger step sizes.
 \else
     Obtaining gradients for WEC simulations is difficult: existing automatic and analytical differentiation methods cover pseudo-spectral dynamics \cite{bradbury_jax_2018} or BEM and semi-analytical hydrodynamics \cite{rohrer_analytical_2024,khanal_fully_2025,gambarini_gradient_2024} but none supply the body-dimension derivatives of the MEEM hydrodynamics used here, and symbolic differentiation exhausts memory.
-    This study therefore uses finite difference, viable given the cheap simulation; initial concerns about oscillatory hydrodynamics \cite{mccabe_open-source_2024} proved unfounded, as the overall coefficients are far less oscillatory than their subfunctions. Deriving MEEM gradients via adjoints or algorithmic differentiation remains future work.
+    This study therefore uses finite difference, viable given the cheap simulation; initial concerns about oscillatory hydrodynamics \cite{mccabe_open-source_2024} proved unfounded, as the overall coefficients are far less oscillatory than their subfunctions.
+Deriving MEEM gradients via adjoints or algorithmic differentiation remains future work.
 \fi
 
 %%%

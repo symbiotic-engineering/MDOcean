@@ -1,9 +1,17 @@
 \section{Model Structure}
 \label{sec:model-structure}
 
-The simulation is composed of five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics. The geometry module computes derived properties such as areas, volumes, masses, centers of gravity, hydrostatics, and stability margins from bulk dimensions and structural thicknesses. The hydrodynamics module evaluates frequency-domain hydrodynamic coefficients using a semi-analytical formulation based on the device geometry. The dynamics and control module combines hydrodynamic coefficients, mass properties, and generator ratings to compute system response, loads, and power production using a quasi-linear frequency-domain model with nonlinear corrections for drag and powertrain saturation. Both operational and extreme (storm) conditions are considered. The structures module evaluates stress and factor-of-safety constraints under yield, ultimate, buckling, and fatigue criteria. Finally, the economics module estimates capital cost (PTO and structure) and levelized cost of energy using power production and material usage.
+The simulation is composed of five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics.
+The geometry module computes derived properties such as areas, volumes, masses, centers of gravity, hydrostatics, and stability margins from bulk dimensions and structural thicknesses.
+The hydrodynamics module evaluates frequency-domain hydrodynamic coefficients using a semi-analytical formulation based on the device geometry.
+The dynamics and control module combines hydrodynamic coefficients, mass properties, and generator ratings to compute system response, loads, and power production using a quasi-linear frequency-domain model with nonlinear corrections for drag and powertrain saturation.
+Both operational and extreme (storm) conditions are considered.
+The structures module evaluates stress and factor-of-safety constraints under yield, ultimate, buckling, and fatigue criteria.
+Finally, the economics module estimates capital cost (PTO and structure) and levelized cost of energy using power production and material usage.
 
-Although this work does not perform optimization, the model is developed to support system-level design optimization. The module coupling structure is illustrated in the XDSM diagram in Figure~\ref{fig:n2}. Inputs and outputs are organized according to standard MDO conventions \cite{lambe_extensions_2012}, and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
+Although this work does not perform optimization, the model is developed to support system-level design optimization.
+The module coupling structure is illustrated in the XDSM diagram in Figure~\ref{fig:n2}.
+Inputs and outputs are organized according to standard MDO conventions \cite{lambe_extensions_2012}, and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
 
 \begin{figure}
 \centering
@@ -64,23 +72,37 @@ Although this work does not perform optimization, the model is developed to supp
     In WecOptTool, the pseudo-spectral optimizer determines the state and control variables for a fixed design without using previously-known optimality conditions.
     Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \cite{coe_initial_2020}.
     
-    For MDOcean, we choose the implicit-MDF architecture. Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+    For MDOcean, we choose the implicit-MDF architecture.
+Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
     This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
     Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{sec:mod-freq-domain} will detail.
 \else
-    The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration. This improves computational efficiency and is advantageous for optimization. Coupling occurs primarily through shared design variables, particularly bulk dimensions, which affect geometry, hydrodynamics, and structures, as well as generator ratings and structural thicknesses, which couple multiple subsystems. Feed-forward coupling is also present through inter-module dependencies.
+    The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
+This improves computational efficiency and is advantageous for optimization.
+Coupling occurs primarily through shared design variables, particularly bulk dimensions, which affect geometry, hydrodynamics, and structures, as well as generator ratings and structural thicknesses, which couple multiple subsystems.
+Feed-forward coupling is also present through inter-module dependencies.
     
     This coupling is both non-convex (e.g., larger bulk dimensions raise power but also raise structural loads and material requirements) and non-monotonic, motivating concurrent rather than sequential optimization.
     
     \paragraph{MDO Architecture}
-    All modules except dynamics are explicit. The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation. This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
+    All modules except dynamics are explicit.
+The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
+This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
     
-    An alternative simultaneous analysis and design (SAND) formulation \cite{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity. However, since hydrodynamics dominates computational cost in this framework (Section~\ref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited. For this reason, MDF is adopted.
+    An alternative simultaneous analysis and design (SAND) formulation \cite{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
+However, since hydrodynamics dominates computational cost in this framework (Section~\ref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
+For this reason, MDF is adopted.
     
     \paragraph{Control Co-Design Architecture}
-    Control co-design problems are commonly classified into nested and simultaneous formulations \cite{sundarrajan_towards_2021,herber_nested_2018}. In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together. In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
+    Control co-design problems are commonly classified into nested and simultaneous formulations \cite{sundarrajan_towards_2021,herber_nested_2018}.
+In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together.
+In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
     
-    These control formulations can be combined with both MDF and SAND analysis architectures. MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit. The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (Section~\ref{sec:mod-freq-domain}). It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (section \ref{sec:sim-runtime}). Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in [dissertation chapter].
+    These control formulations can be combined with both MDF and SAND analysis architectures.
+MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
+The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (Section~\ref{sec:mod-freq-domain}).
+It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (section \ref{sec:sim-runtime}).
+Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in [dissertation chapter].
     
     Figure~\ref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the implicit-MDF formulation used in this study highlighted.
 \fi
