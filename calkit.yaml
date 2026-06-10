@@ -5424,13 +5424,13 @@ pipeline:
         - results/GradientOptimFigFunc/
         - results/Multistart/
         - results/ParamSensitivities/
-        #- results/ParetoFigFunc/
+        - results/ParetoFigFunc/
         - results/AllFigCompare/
         - results/ParetoSweep/
         - results/Constraints/
         - results/DesignVars/
         - results/Parameters/
-        #- results/LocationSensitivity/
+        - results/LocationSensitivity/
         - mdocean/plots/fig_tab_pub_mapping.m
         - mdocean/plots/move_results_to_pubs.m
         - mdocean/plots/non_matlab_figs/pdf/
@@ -5720,6 +5720,15 @@ pipeline:
         - path: pubs/dissertation/aux/
           storage: null
           delete_before_run: false
+    all-writing:
+      kind: shell-command
+      environment: _system
+      command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+        -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    all-latex:
+      kind: shell-command
+      environment: _system
+      command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     view-aor-figs:
       kind: jupyter-notebook
       environment: pubs
