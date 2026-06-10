@@ -118,7 +118,7 @@ function table2latex(tab, filename, special_col_spec, special_first_row)
         error('MDOcean:table2latex:InvalidFid', 'Could not open file for writing: %s', filename);
     end
     cleanup = onCleanup(@() fclose(fileID)); %#ok<NASGU>
-    fprintf(fileID, '%s', table_string);
+    fprintf(fileID, table_string);
 end
 
 function value = format_value(value, use_percent)

@@ -5030,6 +5030,57 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+    postpro-WithTables:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages with tables."
+      inputs:
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
+    all-postpro:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages."
+      inputs:
+        - from_stage_outputs: postpro-AllFigCompare
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DampingPlateStructures
+        - from_stage_outputs: postpro-DescFcns
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-DragIntegral
+        - from_stage_outputs: postpro-FitOlaya
+        - from_stage_outputs: postpro-ForceSaturationFigFunc
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-HydroCoeffFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Meem
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-ParamSensitivities
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-ParetoFigFunc
+        - from_stage_outputs: postpro-ParetoSweep
+        - from_stage_outputs: postpro-PtoSweep
+        - from_stage_outputs: postpro-QPCircles
+        - from_stage_outputs: postpro-ReadNonMatlabFigs
+        - from_stage_outputs: postpro-RunSingleFigFunc
+        - from_stage_outputs: postpro-Runtime
+        - from_stage_outputs: postpro-Slamming
+        - from_stage_outputs: postpro-SparHydro
+        - from_stage_outputs: postpro-SweepGeoms
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
     test-aor:
       kind: matlab-command
       environment: _system
@@ -5373,13 +5424,13 @@ pipeline:
         - results/GradientOptimFigFunc/
         - results/Multistart/
         - results/ParamSensitivities/
-        #- results/ParetoFigFunc/
+        - results/ParetoFigFunc/
         - results/AllFigCompare/
         - results/ParetoSweep/
         - results/Constraints/
         - results/DesignVars/
         - results/Parameters/
-        #- results/LocationSensitivity/
+        - results/LocationSensitivity/
         - mdocean/plots/fig_tab_pub_mapping.m
         - mdocean/plots/move_results_to_pubs.m
         - mdocean/plots/non_matlab_figs/pdf/
@@ -5669,6 +5720,15 @@ pipeline:
         - path: pubs/dissertation/aux/
           storage: null
           delete_before_run: false
+    all-writing:
+      kind: shell-command
+      environment: _system
+      command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+        -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    all-latex:
+      kind: shell-command
+      environment: _system
+      command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     view-aor-figs:
       kind: jupyter-notebook
       environment: pubs
