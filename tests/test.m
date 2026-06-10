@@ -7,8 +7,8 @@ classdef (SharedTestFixtures={ ...
         run_slow_tests = false;
 
         slow_analyses = {'LocationSensitivity','Multistart','ParamSensitivities',...
-                        'ParetoSweep'}; %,'ParetoFigFunc',...
-                        %'Comparison','GradientOptimFigFunc'};
+                        'ParetoSweep','ParetoFigFunc',...
+                        'Comparison','GradientOptimFigFunc'};
     end
 
     properties
@@ -105,7 +105,7 @@ classdef (SharedTestFixtures={ ...
             run_figs = all_figs(idx_run_fig);
             run_tabs = all_tabs(idx_run_tab);
 
-            dry_run = false;
+            dry_run = true;
             if dry_run
                 f_success_run = cell([1,length(run_figs)]);
                 t_success_run = cell([1,length(run_tabs)]);

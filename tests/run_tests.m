@@ -90,13 +90,13 @@ results = runner.run(suite);    % parallel would make it slower because it
                                 % would run the test class setup on every worker
 clockTime = toc(t);
 
-if ~batchStartupOptionUsed % don't open reports when running on CI server 
-    open([cov_dir '/coverageReport/index.html'])
-    open([test_dir '/testreport.pdf'])
-end
+% if ~batchStartupOptionUsed % don't open reports when running on CI server 
+%     open([cov_dir '/coverageReport/index.html'])
+%     open([test_dir '/testreport.pdf'])
+% end
 
-fig = unittest_time_bar_chart(suite,results);
-exportgraphics(fig,'results/Figure_30_unittest.pdf')
+% fig = unittest_time_bar_chart(suite,results);
+% exportgraphics(fig,'results/Figure_30_unittest.pdf')
 
 display(results);
 fprintf('Testing took %g minutes',clockTime/60)
