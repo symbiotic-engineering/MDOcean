@@ -5720,15 +5720,15 @@ pipeline:
         - path: pubs/dissertation/aux/
           storage: null
           delete_before_run: false
-    all-writing:
-      kind: shell-command
-      environment: _system
-      command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
-        -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
-    all-latex:
-      kind: shell-command
-      environment: _system
-      command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    # all-writing:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+    #     -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    # all-latex:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     view-aor-figs:
       kind: jupyter-notebook
       environment: pubs
@@ -5737,31 +5737,39 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/
       html_storage: null
       executed_ipynb_storage: git
+    view-re-figs:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
+      inputs:
+        - pubs/renewable-energy-mdo/figs/
+      html_storage: null
+      executed_ipynb_storage: git
     all-viz:
       kind: shell-command
       environment: pubs
       command: echo "All viz stages complete"
       inputs:
-        #- from_stage_outputs: viz-AllFigCompare
-        #- from_stage_outputs: viz-Comparison
-        #- from_stage_outputs: viz-Constraints
+        - from_stage_outputs: viz-AllFigCompare
+        - from_stage_outputs: viz-Comparison
+        - from_stage_outputs: viz-Constraints
         - from_stage_outputs: viz-Cost
         - from_stage_outputs: viz-DampingPlateStructures
         - from_stage_outputs: viz-DescFcns
         - from_stage_outputs: viz-DesignSpaceExploration
-        #- from_stage_outputs: viz-DesignVars
+        - from_stage_outputs: viz-DesignVars
         - from_stage_outputs: viz-DragIntegral
         - from_stage_outputs: viz-FitOlaya
         - from_stage_outputs: viz-ForceSaturationFigFunc
-        #- from_stage_outputs: viz-GradientOptimFigFunc
+        - from_stage_outputs: viz-GradientOptimFigFunc
         - from_stage_outputs: viz-HydroCoeffFigFunc
-        #- from_stage_outputs: viz-LocationSensitivity
+        - from_stage_outputs: viz-LocationSensitivity
         - from_stage_outputs: viz-Meem
-        #- from_stage_outputs: viz-Multistart
-        #- from_stage_outputs: viz-ParamSensitivities
-        #- from_stage_outputs: viz-Parameters
-        #- from_stage_outputs: viz-ParetoFigFunc
-        #- from_stage_outputs: viz-ParetoSweep
+        - from_stage_outputs: viz-Multistart
+        - from_stage_outputs: viz-ParamSensitivities
+        - from_stage_outputs: viz-Parameters
+        - from_stage_outputs: viz-ParetoFigFunc
+        - from_stage_outputs: viz-ParetoSweep
         - from_stage_outputs: viz-PtoSweep
         - from_stage_outputs: viz-QPCircles
         - from_stage_outputs: viz-ReadNonMatlabFigs

@@ -7884,22 +7884,6 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-dissertation' stage 
       in calkit.yaml. Changes made here will be overwritten.
-  all-writing:
-    cmd: bash --noprofile --norc -c "calkit run -s move-aor-results -s
-      move-re-results -s aor-results-to-latex -s re-results-to-latex 
-      -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s 
-      build-UMERC-paper -s build-dissertation"
-    deps: []
-    outs: []
-    desc: Automatically generated from the 'all-writing' stage in 
-      calkit.yaml. Changes made here will be overwritten.
-  all-latex:
-    cmd: bash --noprofile --norc -c "calkit run -s build-AOR-paper -s 
-      build-RE-paper -s build-UMERC-paper -s build-dissertation"
-    deps: []
-    outs: []
-    desc: Automatically generated from the 'all-latex' stage in 
-      calkit.yaml. Changes made here will be overwritten.
   view-aor-figs:
     cmd: calkit nb execute --environment pubs --no-check 
       "pubs/applied-ocean-research-model/view_figs.ipynb"
@@ -7912,20 +7896,43 @@ stages:
           cache: false
     desc: Automatically generated from the 'view-aor-figs' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  view-re-figs:
+    cmd: calkit nb execute --environment pubs --no-check 
+      "pubs/renewable-energy-mdo/view_figs.ipynb"
+    deps:
+      - .calkit/notebooks/cleaned/pubs/renewable-energy-mdo/view_figs.ipynb
+      - pubs/renewable-energy-mdo/figs/
+      - .calkit/env-locks/pubs
+    outs:
+      - .calkit/notebooks/executed/pubs/renewable-energy-mdo/view_figs.ipynb:
+          cache: false
+    desc: Automatically generated from the 'view-re-figs' stage in 
+      calkit.yaml. Changes made here will be overwritten.
   all-viz:
     cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
       "echo \"All viz stages complete\""
     deps:
       - .calkit/env-locks/pubs
+      - .calkit/notebooks/executed/results/fig_notebooks/AllFigCompare.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Comparison.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Constraints.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/Cost.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/DampingPlateStructures.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/DescFcns.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/DesignSpaceExploration.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/DesignVars.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/DragIntegral.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/FitOlaya.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/GradientOptimFigFunc.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/HydroCoeffFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/LocationSensitivity.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/Meem.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Multistart.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/ParamSensitivities.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/Parameters.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/ParetoFigFunc.ipynb
+      - .calkit/notebooks/executed/results/fig_notebooks/ParetoSweep.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/PtoSweep.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/QPCircles.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/ReadNonMatlabFigs.ipynb
