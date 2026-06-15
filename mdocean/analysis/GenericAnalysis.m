@@ -243,10 +243,10 @@ classdef (Abstract) GenericAnalysis < handle
             fig_paths = {};
             tab_paths = {};
             if ~isempty(obj.fig_names)
-                fig_paths = cellstr(fullfile(obj.output_folder, strcat(obj.fig_names, '.fig')));
+                fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.fig'));
             end
             if ~isempty(obj.tab_names)
-                tab_paths = cellstr(fullfile(obj.output_folder, strcat(obj.tab_names, '.tex')));
+                tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
             end
             required = [{fullfile(obj.output_folder, 'intermed.mat')}, ...
                         {fullfile(obj.output_folder, 'end.mat')}, ...
@@ -275,7 +275,7 @@ classdef (Abstract) GenericAnalysis < handle
                     end
                     fig_array(i) = fig_handle;
                 catch err
-                    warning('Cached figure load failed; continuing with remaining outputs: %s%s%s', fig_path, newline, err.message)
+                    warning('Failed to load cached figure from %s: %s', fig_path, err.message)
                 end
             end
             obj.fig_array = fig_array;
@@ -287,7 +287,7 @@ classdef (Abstract) GenericAnalysis < handle
                 try
                     tab_array{i} = fileread(tab_path);
                 catch err
-                    warning('Cached table load failed; continuing with remaining outputs: %s%s%s', tab_path, newline, err.message)
+                    warning('Failed to load cached table from %s: %s', tab_path, err.message)
                 end
             end
             obj.tab_array_display = tab_array;
