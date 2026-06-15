@@ -141,7 +141,7 @@ jobs:
           fi
   
           set +e # Continue even if pull fails
-          git pull --recurse-submodules
+          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
           PULL_STATUS=$?
 
           if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
