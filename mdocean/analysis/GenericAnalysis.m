@@ -258,7 +258,7 @@ classdef (Abstract) GenericAnalysis < handle
         function obj = load_postpro_results(obj)
             obj = obj.load_intermed_results();
 
-            s = load([obj.output_folder filesep 'end.mat']);
+            s = load(fullfile(obj.output_folder, 'end.mat'));
             obj.end_result_struct = s;
 
             num_figs = length(obj.fig_names);
@@ -275,7 +275,7 @@ classdef (Abstract) GenericAnalysis < handle
                     end
                     fig_array(i) = fig_handle;
                 catch err
-                    warning('Could not load figure: %s%s%s', fig_path, newline, err.message)
+                    warning('Cached figure load failed; continuing with remaining outputs: %s%s%s', fig_path, newline, err.message)
                 end
             end
             obj.fig_array = fig_array;
@@ -287,7 +287,7 @@ classdef (Abstract) GenericAnalysis < handle
                 try
                     tab_array{i} = fileread(tab_path);
                 catch err
-                    warning('Could not load table: %s%s%s', tab_path, newline, err.message)
+                    warning('Cached table load failed; continuing with remaining outputs: %s%s%s', tab_path, newline, err.message)
                 end
             end
             obj.tab_array_display = tab_array;
