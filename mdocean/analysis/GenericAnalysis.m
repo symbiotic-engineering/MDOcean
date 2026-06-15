@@ -275,7 +275,7 @@ classdef (Abstract) GenericAnalysis < handle
                     end
                     fig_array(i) = fig_handle;
                 catch err
-                    warning('Could not load figure: %s\n%s', fig_path, err.message)
+                    warning('Could not load figure: %s%s%s', fig_path, newline, err.message)
                 end
             end
             obj.fig_array = fig_array;
@@ -287,7 +287,7 @@ classdef (Abstract) GenericAnalysis < handle
                 try
                     tab_array{i} = fileread(tab_path);
                 catch err
-                    warning('Could not load table: %s\n%s', tab_path, err.message)
+                    warning('Could not load table: %s%s%s', tab_path, newline, err.message)
                 end
             end
             obj.tab_array_display = tab_array;
