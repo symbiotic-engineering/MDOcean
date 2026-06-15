@@ -49,6 +49,11 @@ if ~strcmpi(which_paper, 'all')
     end
 end
 
+getenv("TMPDIR")
+getenv("RUNNER_TEMP")
+getenv("MATLAB_TEST_ARTIFACTS")
+tempdir
+
 runner = testrunner('textoutput');
 
 if strcmpi(which_paper, 'all')
