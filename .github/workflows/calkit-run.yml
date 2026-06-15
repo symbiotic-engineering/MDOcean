@@ -145,12 +145,17 @@ jobs:
           PULL_STATUS=$?
 
           if [ $PULL_STATUS -ne 0 ]; then
-            BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
-            echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
-            git checkout -b "$BRANCH"
-            # git config below does the equivalent of the --set-upstream option of git push
-            git config branch."$BRANCH".remote origin
-            git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+            if echo "$PULL_OUTPUT" | grep -qE \
+              'fatal: remote error: upload-pack: not our ref [0-9a-f]{40}'; then
+              echo "Ignoring missing submodule ref error"
+            else
+              BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
+              echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
+              git checkout -b "$BRANCH"
+              # git config below does the equivalent of the --set-upstream option of git push
+              git config branch."$BRANCH".remote origin
+              git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+            fi
           fi
 
           calkit dvc pull
