@@ -231,8 +231,58 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function obj = run_all_from_load_if_possible(obj)
-            obj = obj.run_analysis_from_load_if_possible();
-            obj = obj.run_post_process();
+            if obj.postpro_outputs_exist()
+                obj = obj.load_postpro_results();
+            else
+                obj = obj.run_analysis_from_load_if_possible();
+                obj = obj.run_post_process();
+            end
+        end
+
+        function tf = postpro_outputs_exist(obj)
+            fig_paths = strcat(obj.output_folder, filesep, strcat(obj.fig_names, '.fig'));
+            tab_paths = strcat(obj.output_folder, filesep, strcat(obj.tab_names, '.tex'));
+            required = [{[obj.output_folder filesep 'intermed.mat']}, ...
+                        {[obj.output_folder filesep 'end.mat']}, ...
+                        cellstr(fig_paths), ...
+                        cellstr(tab_paths)];
+            tf = all(cellfun(@isfile, required));
+        end
+
+        function obj = load_postpro_results(obj)
+            obj = obj.load_intermed_results();
+
+            s = load([obj.output_folder filesep 'end.mat']);
+            obj.end_result_struct = s;
+
+            num_figs = length(obj.fig_names);
+            fig_array = gobjects(1, num_figs);
+            for i = 1:num_figs
+                fig_path = [obj.output_folder filesep obj.fig_names{i} '.fig'];
+                try
+                    fig_handle = openfig(fig_path, 'invisible');
+                    if isfield(fig_handle.UserData, 'Position')
+                        fig_handle.Position(3:4) = fig_handle.UserData.Position;
+                    end
+                    fig_array(i) = fig_handle;
+                catch
+                    warning(['Could not load figure: ' fig_path])
+                end
+            end
+            obj.fig_array = fig_array;
+
+            num_tabs = length(obj.tab_names);
+            tab_array = cell(1, num_tabs);
+            for i = 1:num_tabs
+                tab_path = [obj.output_folder filesep obj.tab_names{i} '.tex'];
+                try
+                    tab_array{i} = fileread(tab_path);
+                catch
+                    warning(['Could not load table: ' tab_path])
+                end
+            end
+            obj.tab_array_display = tab_array;
+            obj.tab_array_latex = tab_array;
         end
 
         function stages = write_calkit_stage(obj)
