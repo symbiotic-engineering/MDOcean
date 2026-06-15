@@ -240,12 +240,18 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function tf = postpro_outputs_exist(obj)
-            fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.fig'));
-            tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
+            fig_paths = {};
+            tab_paths = {};
+            if ~isempty(obj.fig_names)
+                fig_paths = cellstr(fullfile(obj.output_folder, strcat(obj.fig_names, '.fig')));
+            end
+            if ~isempty(obj.tab_names)
+                tab_paths = cellstr(fullfile(obj.output_folder, strcat(obj.tab_names, '.tex')));
+            end
             required = [{fullfile(obj.output_folder, 'intermed.mat')}, ...
                         {fullfile(obj.output_folder, 'end.mat')}, ...
-                        cellstr(fig_paths), ...
-                        cellstr(tab_paths)];
+                        fig_paths, ...
+                        tab_paths];
             tf = all(cellfun(@isfile, required));
         end
 
@@ -261,12 +267,15 @@ classdef (Abstract) GenericAnalysis < handle
                 fig_path = fullfile(obj.output_folder, [obj.fig_names{i} '.fig']);
                 try
                     fig_handle = openfig(fig_path, 'invisible');
-                    if isfield(fig_handle.UserData, 'Position')
+                    if ishghandle(fig_handle) ...
+                            && isstruct(fig_handle.UserData) ...
+                            && isfield(fig_handle.UserData, 'Position') ...
+                            && numel(fig_handle.UserData.Position) == 2
                         fig_handle.Position(3:4) = fig_handle.UserData.Position;
                     end
                     fig_array(i) = fig_handle;
                 catch err
-                    warning(['Could not load figure: ' fig_path newline err.message])
+                    warning('Could not load figure: %s\n%s', fig_path, err.message)
                 end
             end
             obj.fig_array = fig_array;
@@ -278,7 +287,7 @@ classdef (Abstract) GenericAnalysis < handle
                 try
                     tab_array{i} = fileread(tab_path);
                 catch err
-                    warning(['Could not load table: ' tab_path newline err.message])
+                    warning('Could not load table: %s\n%s', tab_path, err.message)
                 end
             end
             obj.tab_array_display = tab_array;
