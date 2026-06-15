@@ -275,7 +275,7 @@ classdef (Abstract) GenericAnalysis < handle
                     end
                     fig_array(i) = fig_handle;
                 catch err
-                    warning('Failed to load cached figure from %s: %s', fig_path, err.message)
+                    warning('Failed to load cached figure from %s: %s.', fig_path, err.message)
                 end
             end
             obj.fig_array = fig_array;
@@ -287,7 +287,7 @@ classdef (Abstract) GenericAnalysis < handle
                 try
                     tab_array{i} = fileread(tab_path);
                 catch err
-                    warning('Failed to load cached table from %s: %s', tab_path, err.message)
+                    warning('Failed to load cached table from %s: %s.', tab_path, err.message)
                 end
             end
             obj.tab_array_display = tab_array;
