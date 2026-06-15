@@ -5,7 +5,7 @@
   next if /^\s*%/;  # Skip full-line comments
   my ($code, $comment) = split(/(?<!\\)%/, $_, 2);  # Split code and comment (handle escaped %)
   $code =~ s{
-    (?<!\b(?:e\.g|i\.e|etc|vs|Mr|Ms|Dr|Prof|Fig|Eq|Tab|Int|cf|et\ al|U\.S))  # avoid common abbreviations
+    (?<!\b(?:e\.g|i\.e|etc|vs|Mr|Ms|Dr|Prof|Fig|Eq|Tab|Int|cf|et\ al|U\.S|No|\\left|\\right|[A-Z]))  # avoid common abbreviations and initials
     ([.!?])                           # sentence-ending punctuation
     (\s+)(?=[A-Z\\])                  # followed by space + capital or command
   }{$1\n}gx;

@@ -93,7 +93,7 @@ classdef (SharedTestFixtures={ ...
             for i = 1:length(testCase.figs)
                 fig = testCase.figs(i);
                 fig_name = ['Figure_WecSim_' num2str(i)];
-                pdf_name = ['test-results/' fig_name];
+                pdf_name = ['test-results/' fig_name '.pdf'];
                 exportgraphics(fig,pdf_name)
                 diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig,'Prefix',[fig_name '_']);
                 testCase.log(diagnostic);

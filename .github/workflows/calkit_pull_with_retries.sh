@@ -7,6 +7,11 @@ try=1
 while (( try <= max_tries )); do
   echo "=== Attempt $try / $max_tries ==="
 
+  git rev-parse HEAD
+  git submodule status --recursive
+  git ls-files --stage | grep 160000 || true
+  git config --get-regexp submodule || true
+
   # Run pull and capture ALL output (stdout+stderr)
   out="$(calkit pull 2>&1)"
   echo "$out"

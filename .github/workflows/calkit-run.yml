@@ -11,6 +11,7 @@ on:
   # MLM_LICENSE_FILE: ${{ secrets.MATLAB_LICENSE_FILE }}:27000
 permissions:
   contents: write
+  checks: write
 
 # Make sure we only ever run one per branch so we don't have issues pushing
 # after running the pipeline
@@ -24,7 +25,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
-      - name: Setup temp environment + cleanup
+      - name: Setup temp environment
         shell: bash
         run: |
           set -euo pipefail
@@ -32,18 +33,6 @@ jobs:
           export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
           mkdir -p "$TMPDIR"
           echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
-
-          cleanup() {
-            echo "Cleaning up job..."
-
-            pkill -P $$ || true
-            pkill -f matlab-batch || true
-            pkill -f run_matlab_command || true
-
-            rm -rf "$TMPDIR" || true
-          }
-
-          trap cleanup EXIT INT TERM
       - name: Clear stale submodule caches
         run: |
           # Deinit any previously-initialized submodules first (while their gitdirs
@@ -106,12 +95,12 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
-      - name: pull with retries
-        run: |
-          bash .github/workflows/calkit_pull_with_retries.sh
-          cd mdocean/simulation/modules/OpenFLASH
-          bash .github/workflows/calkit_pull_with_retries.sh
-        continue-on-error: true
+      # - name: pull with retries
+      #   run: |
+      #     bash .github/workflows/calkit_pull_with_retries.sh
+      #     cd mdocean/simulation/modules/OpenFLASH
+      #     bash .github/workflows/calkit_pull_with_retries.sh
+      #   continue-on-error: true
       - name: Generate calkit_stages.yaml
         uses: calkit/run-action@v2
         with:
@@ -129,8 +118,8 @@ jobs:
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          # viz-PtoSweep viz-QPCircles viz-RunSingleFigFunc
-          run_args: --keep-going --log build-AOR-paper test-aor test-re view-aor-figs build-RE-paper all-viz render-quarto-pdf
+          # render-quarto-pdf
+          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz test-aor test-re
           pull_dvc: false
           save: false
           cache_dvc: false
@@ -141,10 +130,10 @@ jobs:
           fi
   
           set +e # Continue even if pull fails
-          git pull --recurse-submodules
+          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
           PULL_STATUS=$?
 
-          if [ $PULL_STATUS -ne 0 ]; then
+          if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
             BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
             echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
             git checkout -b "$BRANCH"
@@ -176,11 +165,12 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to codecov
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         if: always()
         with:
           fail_ci_if_error: true
           directory: test-results
+          report_type: test_results
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish test report to GitHub UI
@@ -237,3 +227,10 @@ jobs:
           check_name: 'Changed Tests'
           job_name: main
           include_passed: true
+
+      - name: Clean up temp environment
+        if: always()
+        shell: bash
+        run: |
+          echo "Cleaning up temp environment..."
+          rm -rf "$TMPDIR" || true
