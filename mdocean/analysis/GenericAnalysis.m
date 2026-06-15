@@ -240,10 +240,10 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function tf = postpro_outputs_exist(obj)
-            fig_paths = strcat(obj.output_folder, filesep, strcat(obj.fig_names, '.fig'));
-            tab_paths = strcat(obj.output_folder, filesep, strcat(obj.tab_names, '.tex'));
-            required = [{[obj.output_folder filesep 'intermed.mat']}, ...
-                        {[obj.output_folder filesep 'end.mat']}, ...
+            fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.fig'));
+            tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
+            required = [{fullfile(obj.output_folder, 'intermed.mat')}, ...
+                        {fullfile(obj.output_folder, 'end.mat')}, ...
                         cellstr(fig_paths), ...
                         cellstr(tab_paths)];
             tf = all(cellfun(@isfile, required));
@@ -258,15 +258,15 @@ classdef (Abstract) GenericAnalysis < handle
             num_figs = length(obj.fig_names);
             fig_array = gobjects(1, num_figs);
             for i = 1:num_figs
-                fig_path = [obj.output_folder filesep obj.fig_names{i} '.fig'];
+                fig_path = fullfile(obj.output_folder, [obj.fig_names{i} '.fig']);
                 try
                     fig_handle = openfig(fig_path, 'invisible');
                     if isfield(fig_handle.UserData, 'Position')
                         fig_handle.Position(3:4) = fig_handle.UserData.Position;
                     end
                     fig_array(i) = fig_handle;
-                catch
-                    warning(['Could not load figure: ' fig_path])
+                catch err
+                    warning(['Could not load figure: ' fig_path newline err.message])
                 end
             end
             obj.fig_array = fig_array;
@@ -274,11 +274,11 @@ classdef (Abstract) GenericAnalysis < handle
             num_tabs = length(obj.tab_names);
             tab_array = cell(1, num_tabs);
             for i = 1:num_tabs
-                tab_path = [obj.output_folder filesep obj.tab_names{i} '.tex'];
+                tab_path = fullfile(obj.output_folder, [obj.tab_names{i} '.tex']);
                 try
                     tab_array{i} = fileread(tab_path);
-                catch
-                    warning(['Could not load table: ' tab_path])
+                catch err
+                    warning(['Could not load table: ' tab_path newline err.message])
                 end
             end
             obj.tab_array_display = tab_array;
