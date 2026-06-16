@@ -1214,7 +1214,9 @@ The relevant limits are then:
 \end{aligned}
 \end{equation}
 
+%%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
+\label{subsec:appendix-drag-others}
 The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
@@ -1229,6 +1231,7 @@ Early MDOcean simulations that used the formulation of \cite{quartier_influence_
 The strip-theory approach presented in \cref{sec:drag} avoids this issue.
 Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
 With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
 The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
@@ -1252,6 +1255,7 @@ At present (since MDOcean v1.0.0), the solver used for drag iteration can be sim
 Compared to numerical optimal control nested inside the drag solve, combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
 However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Optimal Control Condition}
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
 The optimal load damping $B_l$ is derived by setting
@@ -1265,8 +1269,10 @@ The optimal load damping $B_l$ is derived by setting
 and the typical simplification $\frac{\partial \hat{V}_{s,th}}{\partial B_l}=\frac{\partial Z_{s,th}}{\partial B_l}=0$ must be replaced with the implicit dependence of the Th\'{e}venin equivalent parameters on $B_l$ because $B_l$ affects $\hat{\dot\xi}$ and therefore $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ via \eqref{eq:drag-coeffs}.
 In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
 
-\clearpage
-\subsection{Slamming and Submersion Amplitude}\label{sec:appendix-slam}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slamming and Submersion Amplitude}
+\label{sec:appendix-slam}
+
 In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{slam}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
@@ -1298,6 +1304,7 @@ This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{
 where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
 The relevant value of $\theta$ differs depending on the wave amplitude.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Case 1: Small Wave Amplitudes}
 For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$.
 This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
@@ -1312,6 +1319,7 @@ These limits are also the minimum and maximum values of $\xi_{max,slam}$ for any
 For intermediate wavelengths, the variable $\theta$ accurately accounts for the effect of body diameter and the phase offset of body motion from the waves.
 Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=0$ allowing the body to get all the way to the wave crest (top) and $\theta=\pi$ requiring the float to remain fully below the wave trough (bottom).
 
+%%%%%%%%%%%%%%%
 \subsubsection{Case 2: Large Wave Amplitudes}
 In sufficiently large waves ($H/2>\Delta z_{slam}$), \cref{eq:slamming-limit-small-waves} does not apply.
 Intuitively, when the wave amplitude exceeds the draft, a minimum amplitude of motion in-phase with the incident wave is required to prevent the wave trough from going below the body surface.
@@ -1343,6 +1351,7 @@ At any lower amplitude, the WEC would exit the water at the wave trough, and any
 The permissible amplitude range can be widened by decreasing $D$ or moving $\angle\hat{\xi}$ towards the closer of $0$ and $2\pi$.
 The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam} < |\hat{\xi}| < H/2+\Delta z_{slam}$.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Implementation}
 Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam}/(H/2)$.
 This reveals that besides increasing the draft, decreasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
@@ -1664,6 +1673,7 @@ Second, it relates applied loads to stresses and deflection using analytical sol
 Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case.
 For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Equivalent Section Properties for Stiffened Plates}\label{sec:equivalent-thickness}
 Stiffeners are structural elements, frequently with I or T profiles, that can be welded or riveted to flat plates to provide additional load-carrying capacity and prevent buckling.
 Stiffened plates are common in marine and aerospace structural design because they are an efficient way to carry spatially distributed fluid loads.
@@ -1729,6 +1739,7 @@ That model has other complexities such as the shear lag phenomenon so is left to
 
 %\hl{Describe how this informs the lower design variable bounds on the structural stiffnesses.}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Float}
 The float is composed of 12 watertight stiffened shells in the shape of trapezoidal prisms.
 Each shell consists of a top and a bottom trapezoidal plate, and an inner, an outer, and two side rectangular plates.
@@ -1796,6 +1807,7 @@ The other float plates besides the top and bottom ones experience only the edge 
 Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design.
 This prevents the need for a separate structural analysis of the side plates.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
 For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{plate}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{heave}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{tube}$.
@@ -1841,6 +1853,7 @@ The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
 \end{figure}
 In Figure~\ref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Column}
 As stated in \ref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
 Meanwhile, the hydrostatic pressure at the bottom creates a substantial compressive hoop stress.
@@ -1885,7 +1898,8 @@ These equations assume that the spar is compact, meaning that local buckling of 
 % \end{equation}
 
 
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Parameters}
 \label{sec:appendix-parameters}
 \begin{table}[ht]
