@@ -1,5 +1,7 @@
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Additional Hydrodynamics Details}
+\label{sec:additional_hydro}
 The hydrodynamic coefficients for the spar are calculated by fitting and interpolating data from WAMIT and reference \cite{olaya_hydrodynamic_2015}.
 The data show the excitation and damping coefficients experiencing ``rebound'' effects where rather than slowly asymptoting to zero like those of a single cylinder, they go quickly to zero, increase to a peak, then slowly asymptote down to zero again.
 The coefficients have the following form:
@@ -9,6 +11,20 @@ The coefficients have the following form:
            {\beta(1+\frac{\beta}{\alpha})}}
 \end{equation}
 
+Computing the float coefficients in a different way than the spar and coupling coefficients introduces the possibility of violating physical requirements of the solution.
+In particular, the damping matrix must be positive definite because it represents a dissipative force where outgoing waves remove energy from the system, and the added mass matrix must be positive definite because it represents the kinetic energy of the fluid which must be non-negative.
+\begin{equation}\label{eq:open-loop-stabilty}
+    \det(\mathbf{A_{h,op}})=A_f A_s - A_c^2>0 \,, \quad
+    \det(\mathbf{B_{h,op}})=B_f B_s - B_c^2>0
+\end{equation}
+This positive-definiteness may be violated for certain combinations of coefficients and can cause the system dynamics to become unstable.
+Even when other forces such as body inertia, drag, friction, and control stabilize the system, violation of the conditions of \cref{eq:open-loop-stabilty} can artificially inflate power production.
+These conditions must be checked for each sea state and the coefficients adjusted if needed.
+MDOcean chooses to decrease the magnitude of the coupling coefficients $|A_c|$ and $|B_c|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
+This intends to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dynamics and Control Module Details}
 \subsection{PTO Model Details}\label{sec:pto-dynamics}
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
