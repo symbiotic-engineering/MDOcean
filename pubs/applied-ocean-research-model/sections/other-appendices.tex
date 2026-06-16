@@ -1363,15 +1363,15 @@ While this logic works for submersion, it does not apply for slamming because th
 The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
+For operational waves, the vertical dimension $\Delta z$ in \cref{eq:slam-constraint-quadratic} is set as follows.
+For float slamming, $\Delta z = T_{f,1}$ (rather than $T_{f,2}$): this prevents slamming on the slanted underside of the float and additionally maintains constant waterplane area, avoiding unmodeled nonlinearities in the hydrostatic stiffness and Froude–Krylov excitation force.
+For spar slamming, $\Delta z = T_s - h_d$ prevents both slamming on the bottom of the spar and surfacing of the damping plate.
+For float and spar submersion, $\Delta z$ is set to the above-water heights $h_f - T_{f,2}$ and $h_s - T_s$ respectively.
 
-For operational waves, $\Delta z$ for float slamming is taken as $T_{f,1}$ rather than $T_{f,2}$ since in addition to preventing slamming on the slanted surface of the float, this maintains constant waterplane area and thereby avoids unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
-Likewise for spar slamming, setting $\Delta z$ to $T_s-h_d$ not only avoids slamming on the bottom of the spar but also prevents the damping plate from surfacing.
-The relevant $\Delta z$ for float and spar submersion in operational waves are the above-water heights $h_f-T_{f,2}$ and $h_s-T_s$ respectively.
-For storm waves, currently the slamming limit is not applied.
-%since calculation of the amplitude requires hydrodynamic coefficents for the float and spar acting as a single merged body, which the hydrodynamics module does not currently calculate. 
-In future work, the storm $\Delta z$ should be set to $T_{f,2}$ to avoid slamming only on the bottom surface of the float.
+The storm case slamming constraint is not currently applied.
+A future extension should set $\Delta z = T_{f,2}$ in the storm case to prevent slamming on the (now-merged) bottom surface of the float-spar system.
 
-The values $h_{fs,clear}$, $h_{fs,up}$, $h_{fs,down}$, $\xi_{f,linear}$, and $\xi_{s,linear}$ are all upper limits and are independent of sea state, while $\xi_{slam}$ depends on the sea state and can separately  act as both an upper and lower limit on the oscillation magnitude.
+The amplitude limits $h_{fs,clear}$, $h_{fs,up}$, $h_{fs,down}$, $\xi_{f,linear}$, and $\xi_{s,linear}$ are sea-state-independent upper limits, while $\xi_{slam}$ depends on the sea state and can act as both an upper and lower limit on oscillation magnitude.
 
 Relevant model values for the nominal float design under reactive optimal control are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
 Comparing the first two subplots for the phase of the float motion $\angle\hat{\xi}_f$ and the slamming angle $\theta$ shows that the slamming angle roughly ``wraps'' the motion angle around a value of $\pi/2$, colored white in the figure.
