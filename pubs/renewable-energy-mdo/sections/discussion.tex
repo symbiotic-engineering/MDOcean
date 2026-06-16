@@ -1,15 +1,20 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}\label{remdo:sec:discussion}
 
 \ifdefined\DISSERTATION
-Beyond the analysis of individual results offered in section~\ref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
-It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
+    Beyond the analysis of individual results in \cref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
+    It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
 \else
 Beyond the analysis of individual results offered in section~\ref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
 It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Result Comparison to Other Studies }
 % (and comparison to commercial WECs)
+
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Force Saturation}
 \ifdefined\DISSERTATION
 Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} suggest capping the maximum force significantly below the unsaturated point based on findings that doing so sacrifices only minimal power, but none perform full economic analysis to confirm that the cost savings outweigh the power decrease.
@@ -26,6 +31,7 @@ Future studies could quantify the threshold of the lowest marginal price of PTO 
 \fi
 % \hl{add similar analysis for power saturation}
 
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Global Deployability}
 \ifdefined\DISSERTATION
 A survey indicates that 40\% of WEC developers design their WEC to be deployment-site agnostic, so design for global deployability is of interest in industry \cite{trueworthy_wave_2020}.
@@ -51,15 +57,14 @@ This again departs from the results of \cite{de_andres_adaptability_2015}, which
 This demonstrates that the use of a more thorough multidisciplinary model like MDOcean is essential to draw accurate design conclusions.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Structural Efficiency}
-A previous study compares the structural mass per unit hull volume for marine structures including WECs and ship hulls, finding a value of $278.76 $~kg/m\textsuperscript{3} for steel structures \cite{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
+A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \cite{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
 \ifdefined\DISSERTATION
-This trendline would predict the nominal float structural mass to be 72-632 metric tons and the minimum LCOE structural mass to be 1814-2374 metric tons.
-MDOcean calculates structural masses of 213 and 80 metric tons respectively.
-The nominal design lies within the confidence interval, but the optimized design lies far below it.
-Even though the hull volume of the optimal design exceeds the hull volume of any data points used to create the fit, the large departure from existing data warrants concern.
-In fact, the only data points with structural mass comparable to the optimized 80 ton float have a hull volume that is an order of magnitude lower than the optimized float, indicating that MDOcean may vastly underestimate the required thickness.
-This requires further investigation and may be due to underestimation of loads in the dynamics module or overestimation of the factor of safety in the structures module.
+    This trendline predicts a nominal float structural mass of 72-632 metric tons and a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 213 and 80 metric tons respectively.
+    The nominal design lies within the confidence interval, but the optimized design lies far below it.
+    Even though the optimal design's hull volume exceeds that of any data point used in the fit, the large departure warrants concern: the only data points with structural mass comparable to the optimized 80-ton float have an order-of-magnitude lower hull volume, indicating that MDOcean may vastly underestimate the required thickness.
+    This requires further investigation and may stem from underestimating loads in the dynamics module or overestimating the factor of safety in the structures module.
 \else
 This trendline would predict the nominal float structural mass to be 72-632 metric tons and the minimum LCOE structural mass to be 1814-2374 metric tons.
 MDOcean calculates structural masses of 213 and 80 metric tons respectively.
@@ -71,6 +76,7 @@ This requires further investigation and may be due to underestimation of loads i
 
 % compare to the Sandia RM3 optimization results
 
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Optimization Procedure}
 \label{remdo:sec:discussion-optimization}
 \ifdefined\DISSERTATION
@@ -101,6 +107,7 @@ For example, the adjoint method would additionally require constraint aggregatio
 Finally, even with the increased function evaluations, the gradient-based algorithm retains its advantage of providing certainty that the solution has converged to a local optimum, and with a systematic multistart, there is reasonable confidence that the solution is a global optimum, which is not the case in a heuristic optimization.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model Realism}
 \ifdefined\DISSERTATION
 Circling back to the modeling assumptions introduced in section~\ref{remdo:sec:model}, one can now use the optimization and sensitivity results to determine whether the assumptions are reasonable.
@@ -112,6 +119,7 @@ We assess model complexities that MDOcean adequately captures to confirm whether
 Previous studies such as \cite{garcia-teruel_reliability-based_2021} have called for this kind of systematic model fidelity assessment to enhance designers' confidence on the most relevant effects and their impact on computation time.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Observed Impact of Modeled Effects}
 \ifdefined\DISSERTATION
 A few of the areas of developed model complexity, such as force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the final results, as seen in the constraint activity and difference in results obtained if 1-DOF dynamics corresponding to a stationary spar are used.
@@ -149,12 +157,14 @@ Finally, even though it is observed that the drag and intermediate wavelength sl
 Therefore, users should exercise caution if choosing to simplify the model.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Potential Impact of Unmodeled Effects}
 \ifdefined\DISSERTATION
-No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}, 
-a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
-Likewise, the inactivity of the pitch stability constraint mitigates the impact of any error in the metacentric height due to the geometry module's assumption of an even mass distribution when calculating the center of gravity (see section~\ref{sec:geom}).
-On the other hand, the active slamming constraints for operational sea states mean that some assumptions are worth revisiting, particularly the use of an optimization constraint rather than enforcing amplitude limits with the constrained optimal linear controller (see tables \ref{tab:constraint-approaches} and \ref{tab:nonlinearities}), and the assumption that the WEC must operate in all sea states with nonzero probability in the JPD without going into survival mode (see ``Dynamic Limits and Design Load Cases'' in section~\ref{sec:dynamics}).
+    No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}  % TODO (scrutineering)
+    a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
+    Likewise, the inactivity of the pitch stability constraint mitigates the impact of any metacentric-height error arising from the geometry module's even-mass-distribution assumption for the center of gravity \cite{mccabe_development_2025}.
+    On the other hand, the active operational-sea-state slamming constraints mean some assumptions are worth revisiting.
+    In particular, MDOcean enforces the float amplitude limits as optimization constraints rather than through the constrained optimal linear controller \cite{mccabe_development_2025}, and assumes the WEC must operate in every sea state with nonzero probability in the joint probability distribution rather than entering a survival mode \cite{mccabe_development_2025}; both assumptions interact with the active amplitude constraints and merit future reconsideration.
 \else
 No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}, 
 a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
@@ -162,7 +172,10 @@ Likewise, the inactivity of the pitch stability constraint mitigates the impact 
 On the other hand, the active slamming constraints for operational sea states mean that some assumptions are worth revisiting, particularly the use of an optimization constraint rather than enforcing amplitude limits with the constrained optimal linear controller (see tables \ref{tab:constraint-approaches} and \ref{tab:nonlinearities}), and the assumption that the WEC must operate in all sea states with nonzero probability in the JPD without going into survival mode (see ``Dynamic Limits and Design Load Cases'' in section~\ref{sec:dynamics}).
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Formulation Realism}
+
+%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Design Variable Suitability}
 \ifdefined\DISSERTATION
 Section~\ref{remdo:sec:formulation} outlined this study's careful choice of design variables to facilitate satisfaction of high-priority requirements to maintain model validity and facilitate optimization convergence while balancing the computational challenges of a large design space.
@@ -256,11 +269,15 @@ In future work, running the MDOcean optimization using those simplified metrics 
 %\paragraph{Does this design have high TPL? What are the risks and uncertainties?}
 %use \url{https://tpl.nrel.gov/assessment} and \url{https://www.osti.gov/biblio/1825239} for RM3 TPL.
 
+\subsection{Future Work}
 \ifdefined\DISSERTATION
+    Future improvements span two axes: enhancements to the model and enhancements to the optimization formulation, each applicable to either the existing setup or a new one.
+    \Cref{tab:future-studies} organizes the most promising directions along these axes.
+
 %% table contents helpers
 \newcommand{\speedupsRE}{
-    Examples of changes that would make it even faster: 
-    1) use gradient sparsity pattern to get rid of FD evaluations, or get rid of FD altogether by using matlab automatic differentiation 
+    Examples of changes that would make it even faster:
+    1) use gradient sparsity pattern to get rid of FD evaluations, or get rid of FD altogether by using matlab automatic differentiation
     2) make multi body code simpler more like single body
 }
 
@@ -269,7 +286,7 @@ In future work, running the MDOcean optimization using those simplified metrics 
 
 	1) more rigorously determine the effect of subsystem coupling - compare to sequential optimization of hydro then PTO sizing then structural - would let you know the benefit of coupled optimization for each subsystem, if it is large enough to justify the extra computational cost
 
-	2) survivability - compare PTO-free vs PTO-braked in storm, to answer question of which type of survival mode is preferable; excitation loads using MEEM when float is sunk (for now could approximate as float with larger draft, once weird-region MEEM exists use that); allow decision on which sea states are operational vs survival could answer the question of whether it makes economic sense to go into survival mode more often. 
+	2) survivability - compare PTO-free vs PTO-braked in storm, to answer question of which type of survival mode is preferable; excitation loads using MEEM when float is sunk (for now could approximate as float with larger draft, once weird-region MEEM exists use that); allow decision on which sea states are operational vs survival could answer the question of whether it makes economic sense to go into survival mode more often.
 
 	3) more detailed PTO study: include a drivetrain with linear dynamics reflecting spring, flywheel, gear ratio, etc. -  If you assume the flywheel inertia and spring stiffness aren't controllable per sea state, would be useful as-is for finding the best inertia/stiffness across sea states to pair with the controller that can adjust per sea state.
     But if you assume adjustable drivetrain, as has been achieved with magnetic spring (cite), this would either need to introduce constraints or a cost term related to these drivetrain parameters, since otherwise the solution should go to zero damping and stiffness equal to what the unconstrained optimal control stiffness is.
@@ -277,8 +294,8 @@ In future work, running the MDOcean optimization using those simplified metrics 
     Could also provide a preliminary answer to the question of optimum gear ratio (low GR means high generator torque so more force saturation for a given generator, but less friction.
     Vs high gear ratio has less force saturation but higher friction), although a generator model would be needed to more conclusively answer the question (discussed below).
 
-    4) Add $N_{WEC}$ as a design variable and see when it's preferable to do many smaller WECs vs one bigger WEC 
-    
+    4) Add $N_{WEC}$ as a design variable and see when it's preferable to do many smaller WECs vs one bigger WEC
+
     5) How do my results compare to optimizing for easier cost proxies (ie structural cost as surface area vs actual force-informed thicknesses)
 }
 
@@ -310,7 +327,7 @@ Would require not only MEEM for the different WEC types, but also semi-analytica
 	4) make lifetime a design variable, and adjust size of storm-wave accordingly. could address the question of what opex cost threshold would make it useful to intentionally design 'single-use' WECs, which might be considered in PBE applications.
 Would require integration with WDRT or similar to get the environmental contour for a given lifetime.
 
-	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different 
+	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different
 
 	6) generator physics and model - building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example whether a high-torque (expensive) generator is worth it compared to a low torque generator.
     The torque limit would essentially impose a constraint on the $F_{max}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
