@@ -42,95 +42,80 @@ This section provides a general structure in effort-flow form applicable across 
 \subsubsection{Multiport Circuit Conventions}
 \label{sec:appendix-multiport}
 
-Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} can be represented as a multiport circuit.
-Multiport circuit models often use impedance (Z), cascade (a/ABCD), and hybrid (h) matrices to describe the relationship between ports, with the following conventions:
+The intrinsic, powertrain, and Th\'evenin-equivalent representations used throughout \cref{sec:dynamics} are all instances of multiport circuit models, with effort variables $\vec{e}$ and flow variables $\vec{q}$ at each port.
+Following \cite{reveyrand_multiport_2018}, three matrix forms describe the relationships between port variables: impedance ($\mathbf{Z}$), cascade ($\mathbf{a}$, also called ABCD), and hybrid ($\mathbf{h}$):
 \begin{equation}\label{eq:multiport-matrix-definitions}
-\vec{e} =
-\mathbf{Z}
-\vec{q},
-%
+\vec{e} = \mathbf{Z}\,\vec{q},
 \qquad
-%
-\begin{bmatrix}
-\vec{e}_2 \\ \vec{q}_2
-\end{bmatrix} =
-[\mathbf{a}]_{2\leftarrow1}
-\begin{bmatrix}
-\vec{e}_1 \\ \vec{q}_1
-\end{bmatrix},
-%
+\begin{bmatrix} \vec{e}_2 \\ \vec{q}_2 \end{bmatrix}
+= [\mathbf{a}]_{2\leftarrow 1}
+\begin{bmatrix} \vec{e}_1 \\ \vec{q}_1 \end{bmatrix},
 \qquad
-%
-\begin{bmatrix}
-\vec{e}_1 \\ \vec{q}_2
-\end{bmatrix} =
-[\mathbf{h}]_{1,2}
-\begin{bmatrix}
-\vec{q}_1 \\ \vec{e}_2
-\end{bmatrix}
+\begin{bmatrix} \vec{e}_1 \\ \vec{q}_2 \end{bmatrix}
+= [\mathbf{h}]_{1,2}
+\begin{bmatrix} \vec{q}_1 \\ \vec{e}_2 \end{bmatrix}.
 \end{equation}
-for effort variables $\vec{e}$ and flow variables $\vec{q}$.
-The impedance formulation groups all ports together, while the cascade and hybrid formulations divide the ports into two sets.
-%\hl{Todo: Ryan's paper uses the sign convention where q1 is negative, need to go through and make signs consistent and add arrows for the flow direction at each port.}
-The multiport matrix equations apply to both the time-domain and phasor representations of each port.
-Impedances describe the effort required to produce a unit of flow, and have already been shown to arise in the intrinsic dynamics. 
-Cascade parameters describe how effort and flow are transmitted from port group 1 to port group 2, hence the leftward direction of the arrow in the subscript in \cref{eq:multiport-matrix-definitions}.
-For transmission in the other direction, simply invert: $[\mathbf{a}]_{1\leftarrow2} = [\mathbf{a}]_{2\leftarrow1}^{-1}$.
-Cascade matrices uniquely allow sequential multiplication of port variables and will be used for the PTO dynamics.
-Finally, hybrid parameters mix the two, allowing effort (or flow) at one port group to depend on the flow (or effort) at that port group, impedance-style, as well as the corresponding variable at the other port group, cascade-style.
-They will be used for the PTO kinematics.
-Converting between the three multiport conventions is accomplished using the formulas in \cite{reveyrand_multiport_2018}, although some port relationships require a particular convention to capture the physics and are undefined in other conventions.
+These equations apply to both time-domain and phasor representations of each port.
+The three forms differ in how the ports are grouped:
+\begin{itemize}
+    \item \textbf{Impedance} ($\mathbf{Z}$) groups all ports together, describing the effort required to produce a unit of flow.
+The intrinsic dynamics matrix $\mathbf{Z}_i$ and the PTO impedance $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain,eq:intrinsic-impedance} both use this form.
+    \item \textbf{Cascade} ($\mathbf{a}$) divides the ports into two groups and describes how effort and flow transmit from one group to the other.
+The arrow subscript indicates direction: $[\mathbf{a}]_{2\leftarrow 1}$ maps port group 1 to port group 2.
+Reversing direction inverts the matrix,
+    \begin{equation}\label{eq:cascade-inverse}
+        [\mathbf{a}]_{1\leftarrow 2} = [\mathbf{a}]_{2\leftarrow 1}^{-1},
+    \end{equation}
+    and sequential multiplication represents serial composition of two-port elements.
+This form is used for the PTO dynamics (drivetrain followed by generator).
+    \item \textbf{Hybrid} ($\mathbf{h}$) mixes the two conventions, expressing one effort and one flow at the two port groups as functions of the complementary variables.
+This form is used for the PTO kinematics, where it naturally accommodates underactuation.
+\end{itemize}
+
+Conversion between the three forms is accomplished using the formulas in \cite{reveyrand_multiport_2018}.
+Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
+
+% Verify against \cite{coe_co-design_2025} before submission and edit
+% if the convention differs.
+The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Time-Domain Expansion of Instantaneous Power}
 \label{sec:appendix-power-time}
 
-\Cref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ as \cite{saadat_power_1999}:
+Equation~\eqref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ at any port as \cite{saadat_power_1999}
 \begin{equation}\label{eq:power-time-PQS}
-    p(t) = P + |S| \cos\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\left(\frac{Q}{P}\right)\right)
+    p(t) = P + |S|\cos\!\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\!\left(\frac{Q}{P}\right)\right),
 \end{equation}
-The average, peak, and minimum powers over a wave period are then:
-\begin{equation}\label{eq:power-avg-peak}
-    p_{avg} = P, \quad p_{pk} = P + |S|, \quad p_{min} = P - |S|
-\end{equation}
+a DC offset of $P$ plus an oscillation at $2\omega$ with amplitude $|S|$.
+The average and peak powers in \cref{eq:power-avg-peak} follow directly: $p_{avg} = P$ since the oscillation averages to zero, and $p_{pk} = P + |S|$ at the cosine maximum.
+The minimum $p_{min} = P - |S|$ is negative when $|S|>P$, corresponding to instants when energy flows from the load back into the source under reactive control.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Electrical-Port Power in Optimal-Control Variables}
 \label{sec:appendix-power-elec}
 
-The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
+Expressing the average and peak powers at the electrical port in terms of the constrained-control parameters introduced in \cref{sec:optimal-control} (control damping $B_l$, control stiffness $K_l$, and current phasor $\hat{I}$), and applying the constant electrical efficiency $\eta$,
 \begin{equation}\label{eq:power-elec}
 \begin{bmatrix}
 p_{avg,elec} \\
 p_{pk,elec}
 \end{bmatrix}
-= 
+=
 \eta
 \begin{bmatrix}
 p_{avg,VI} \\
 p_{pk,VI}
 \end{bmatrix}
-= 
-\eta \frac{1}{2} B_l |\hat{I}|^2
+=
+\eta \tfrac{1}{2} B_l |\hat{I}|^2
 \begin{bmatrix}
 1 \\
- 1 + \sqrt{1 + \left(\frac{K_l}{B_l \omega }\right) ^2  }
-\end{bmatrix}
+1 + \sqrt{1 + \left(\tfrac{K_l}{B_l\omega}\right)^2}
+\end{bmatrix}.
 \end{equation}
-% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
-% \begin{equation}
-% [a]_m = \begin{bmatrix}
-% 1/R &~ 0 \\
-% 0 &~ R
-% \end{bmatrix} = \begin{bmatrix}
-% 1 &~ 0 \\
-% 0 &~ 1
-% \end{bmatrix}
-% \end{equation}
-% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
-% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
+The peak-power form is used as the apparent-power constraint in the QCQP of \cref{sec:optimal-control}.
 
-%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
 %%%%%%%%%%%%%%%
 \subsubsection{PTO Kinematics and Underactuation}
 The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
