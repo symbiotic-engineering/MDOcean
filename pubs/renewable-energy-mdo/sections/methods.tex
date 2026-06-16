@@ -37,6 +37,15 @@ This study uses the MDOcean framework \cite{mccabe_development_2025}, an open-so
     MDOcean comprises five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics.
 These together compute the system-level quantities the optimization acts on: power production, capital and operational cost, levelized cost of energy (LCOE), and structural factors of safety under operational and storm design load cases.
 \fi
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
+    \caption{Simplified extended design structure matrix (XDSM) diagram of the MDOcean modules, adapted from \cite{mccabe_development_2025}.
+Inputs enter at the top, data passes forward between modules left to right along the diagonal, and outputs exit at the left; the orange block denotes the internally iterated dynamics module.}
+    \label{remdo:fig:n2}
+\end{figure}
+
 \ifdefined\DISSERTATION
     The module structure is shown in the XDSM diagram of \cref{remdo:fig:n2}, a standard MDO representation \cite{lambe_extensions_2012} in which modules lie on the diagonal, inter-module data dependencies occupy the off-diagonal, and design-variable inputs and objective and constraint outputs enter and exit at the edges.
     The disciplines are coupled in two ways: through shared design variables (most prominently the bulk dimensions, which feed the geometry, hydrodynamics, and structures modules) and through the feed-forward passing of each module's outputs to those downstream.
