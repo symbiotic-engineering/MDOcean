@@ -224,6 +224,7 @@ For $|\gamma_s|$, an additional multiplicative factor of $e^{-k (T_s - T_{s,nom}
 
 
 %TC:break Dynamics and Control
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Dynamics and Control}\label{sec:dynamics}
 \subsubsection{Modified Frequency Domain Techniques}\label{sec:mod-freq-domain}
 Methods for WEC dynamics and control simulation in an optimization context were reviewed in section~\ref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
@@ -306,7 +307,7 @@ Meanwhile, MDOcean's use of the method for control synthesis appears novel in th
 
 When handling dynamic constraints with a linearized pseudo-spectral method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
 Then the unconstrained response is checked for constraint violations.
-This check can be performed in the frequency domain if the time-domain constraint can be adequately linearized (via describing functions) as a harmonic constraint, as shown in the top of \cref{fig:mod-freq-domain-synthesis}, or the response can be reconstructed in the time domain via the inverse describing function if the constraint is not easily representable via harmonics.
+This check can be performed in the frequency domain if the time-domain constraint can be adequately linearized (via describing functions) as a harmonic constraint, as shown in the top of \Cref{fig:mod-freq-domain-synthesis}, or the response can be reconstructed in the time domain via the inverse describing function if the constraint is not easily representable via harmonics.
 If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state as the frequency-domain linear optimal controller.
 Otherwise, a variety of approaches are possible to address the violated constraint, summarized in \Cref{tab:constraint-approaches} and described below.
 Methods M1 and M2 can be used for both control synthesis and evaluation, while methods M4--M5 can only be used for evaluation since they do not attempt to find a controller that satisfies the constraint.
@@ -1100,19 +1101,19 @@ Thicknesses of other subcomponents are either held constant or scaled with the d
     \label{tab:struct}
 \end{table}
 
-Figure \ref{fig:FBDs} shows a free body diagram of the applied load on each of the three structural units and the locations where they are modeled as structurally fixed.
+\Cref{fig:FBDs} shows a free body diagram of the applied load on each of the three structural units and the locations where they are modeled as structurally fixed.
 
-\begin{figure}
+\begin{figure}[t!]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/FBD.pdf}
 \caption{Applied loads and fixed points of each structure}\label{fig:FBDs}
 \end{figure}
 Each of the twelve sections of the float are modeled as a welded shell structure subject to a bottom distributed load and a top fixity at the weld joint to the tube support.
 \ifdefined\DISSERTATION
-To simplify the representation of load transfer between plate elements, the bottom %and top 
-float plate is analyzed individually, assuming fixed edges and solving for the reaction loads at these edges.
-This means that the %top and bottom plate are each 
-plate is conservatively sized assuming the other plate elements are perfectly rigid. %The fixed-edge reaction loads from these top and bottom solutions are then applied to the central shell element modeled as a cross section subject to bending.
+    To simplify the representation of load transfer between plate elements, the bottom %and top 
+    float plate is analyzed individually, assuming fixed edges and solving for the reaction loads at these edges.
+    This means that the %top and bottom plate are each 
+    plate is conservatively sized assuming the other plate elements are perfectly rigid. %The fixed-edge reaction loads from these top and bottom solutions are then applied to the central shell element modeled as a cross section subject to bending.
 \else
 To simplify the representation of load transfer between plate elements, the bottom %and top 
 float plate is analyzed individually, assuming fixed edges and solving for the reaction loads at these edges.
@@ -1132,7 +1133,7 @@ The force is reacted by the welded connection to the column along the column's c
 Two analytical solutions for a thin annular (cylindrical with central hole) plate fixed at its inner radius are superimposed: a distributed pressure and four point loads at the edge, with appropriate modifications to account for the stiffeners. 
 \fi
 
-Further details of all structural calculations performed in the simulation are provided in \appendixname~\ref{sec:appendix-structures}. 
+Further details of all structural calculations performed in the simulation are provided in \appendixname~\ref{sec:appendix-structures}.
 For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
 \begin{equation}\label{eq:struct-scaling}
 \begin{aligned}
