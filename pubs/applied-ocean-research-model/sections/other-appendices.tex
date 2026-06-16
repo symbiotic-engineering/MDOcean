@@ -1550,7 +1550,48 @@ Finally, $\mathbf{\eta}^{H,T}_{elec}$ represents the ratio of electrical power t
 \section{Economics Module Details}
 \label{sec:appendix-econ}
 
-The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ from the power-law cost scaling model (described in \sectionautorefname~\ref{sec:econ}) are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{RM3 Cost Breakdown Structure}
+\label{sec:appendix-econ-cbs}
+
+The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014}, shown in \cref{tab:CBS}.
+MDOcean captures the scaling of all cost categories with the number of devices $N_{WEC}$ to match the provided estimates for $N_{WEC}=(1,10,50,100)$ \cite{neary_reference_2014}. 
+\begin{table}
+    \centering
+
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
+         CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
+         1.1 - Development&  26\%&  3\%&No\\
+         1.2 - Infrastructure&  6\%&  4\%&No\\
+         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
+         1.4 - Structural&  17\%&  46\%&$V_{struct}$\\
+         1.5 - Power Take Off&  4\%&  11\%&$F_{max}, P_{pk,elec}$\\
+         1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
+         1.7 - Installation&  34\%&  10\%&No\\
+         1.8 - Decommissioning&  9\%&  9\%&No\\
+         1.9 - Contingency&  9\%&  9\%&No\\
+ \textbf{Total 1.1-1.9 (CAPEX)}& 93.3\%& 97.6\%&-\\\hline
+ 2.1 - Insurance& 1.3\%& 0.4\%&No\\
+ 2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
+ 2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
+ 2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
+ 2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
+ 2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
+ \textbf{Total 2.1-2.6 (OPEX)}& 6.7\%& 2.4\%&-\\
+    \end{tabular}
+    \caption{Cost Breakdown Structure}
+    \label{tab:CBS}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power-Law Scaling with Number of Devices}
+\label{sec:appendix-econ-power-law}
+
+Additionally, the per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ according to the following power law:
+\begin{equation}
+C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
+\end{equation}
+The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values} in \appendixname~\ref{sec:appendix-econ}.
 \begin{table}[h]
     \centering
     \begin{tabular}{

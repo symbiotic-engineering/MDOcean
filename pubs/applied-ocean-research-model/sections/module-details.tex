@@ -1160,39 +1160,11 @@ The fixed charge rate incorporates the effect of device lifetime as well as a va
 \ifdefined\DISSERTATION
 The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
 With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
-The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014}, shown in \cref{tab:CBS}.
 \else
 The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
 With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
-The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014}, shown in \cref{tab:CBS}.
 \fi
-\begin{table}
-    \centering
 
-    \begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
-         CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
-         1.1 - Development&  26\%&  3\%&No\\
-         1.2 - Infrastructure&  6\%&  4\%&No\\
-         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
-         1.4 - Structural&  17\%&  46\%&$V_{struct}$\\
-         1.5 - Power Take Off&  4\%&  11\%&$F_{max}, P_{pk,elec}$\\
-         1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
-         1.7 - Installation&  34\%&  10\%&No\\
-         1.8 - Decommissioning&  9\%&  9\%&No\\
-         1.9 - Contingency&  9\%&  9\%&No\\
- \textbf{Total 1.1-1.9 (CAPEX)}& 93.3\%& 97.6\%&-\\\hline
- 2.1 - Insurance& 1.3\%& 0.4\%&No\\
- 2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
- 2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
- 2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
- 2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
- 2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
- \textbf{Total 2.1-2.6 (OPEX)}& 6.7\%& 2.4\%&-\\
-    \end{tabular}
-    \caption{Cost Breakdown Structure}
-    \label{tab:CBS}
-\end{table}
-MDOcean captures the scaling of all cost categories with the number of devices $N_{WEC}$ to match the provided estimates for $N_{WEC}=(1,10,50,100)$ \cite{neary_reference_2014}. 
 Since the RM3 CBS only applies to a single WEC design, MDOcean extends its scope to capture the scaling of structural cost (category 1.4) with the volume of structural material $V_{struct}$, and the power take off (PTO) cost (category 1.5) with the peak electrical power $P_{pk,elec}$ and force $F_{max}$.
 
 Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
@@ -1245,10 +1217,6 @@ This yields:
 \end{aligned}
 \end{equation}
 where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
-Additionally, the per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ according to the following power law:
-\begin{equation}
-C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
-\end{equation}
-The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values} in \appendixname~\ref{sec:appendix-econ}.
+
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
 For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
