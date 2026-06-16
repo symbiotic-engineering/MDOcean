@@ -689,45 +689,6 @@ The specific quantities constrained in this case are shown in \cref{tab:qp-const
 More precisely, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
 In addition to the amplitude limits shown in the first three rows of \cref{tab:qp-constraints}, a differently-structured quadratic amplitude constraint will be presented in \cref{sec:design-load-cases} (see \cref{eq:slam-constraint-quadratic}) representing a coupled amplitude-phase criteria for the bodies to not exit the water or be fully submerged.
 \fi
-\begin{table}[]
-\centering
-\begin{tabular}{lccc}
-    Constraint & $\mathbf{Q}$ & $\vec{a}$ & $b$ \\ \hline
-    $|\hat{\xi}_f| \leq \hat{\xi}_{f,max}$ &
-        $\frac{1}{\omega^2}
-        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]^* 
-        \mathbf{A}_{|\hat{q}|^2}
-        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]$ & 
-        $[0,~ \hat{\xi}_{f,0}]^T$ & $\hat{\xi}_{f,max} - |\hat{\xi}_{f,0}|$ \\
-    $|\hat{\xi}_s| \leq \hat{\xi}_{s,max}$ & 
-        $\frac{1}{\omega^2}
-        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]^* 
-        \mathbf{A}_{|\hat{q}|^2}
-        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]$ & 
-        $[0,~ \hat{\xi}_{s,0}]^T$ & $\hat{\xi}_{s,max} - |\hat{\xi}_{s,0}|$ \\
-    $|\hat{X}_{PTO}| \leq \hat{X}_{PTO,max}$ & 
-        $\frac{1}{\omega^2}
-        [\mathbf{a}_{F\dot{X}\leftarrow VI}]^* 
-        \mathbf{A}_{|\hat{q}|^2}
-        [\mathbf{a}_{F\dot{X}\leftarrow VI}]$ & 
-        $\vec{0}$ & $\hat{X}_{PTO,max}^2$ \\
-    $|\hat{\tau}| \leq \hat{\tau}_{max}$ & 
-        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
-        \mathbf{A}_{|\hat{e}|^2}
-        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
-        $\vec{0}$ & $\hat{\tau}_{max}^2$ \\
-    $P_{\tau\Omega} \leq P_{\tau\Omega,max}$ & 
-        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
-        \mathbf{A}_{P}
-        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
-        $\vec{0}$ & $P_{\tau\Omega,max}$ \\
-    $P_{VI} \geq 0$ & 
-        $-\mathbf{A}_{P}$ & 
-        $\vec{0}$ & $0$ \\
-\end{tabular}
-\caption{Quadratic constraint coefficients}
-\label{tab:qp-constraints}
-\end{table}
 
 \Cref{eq:opt-problem} has the following solution:
 \begin{equation}\label{eq:constrained-qp-solution}

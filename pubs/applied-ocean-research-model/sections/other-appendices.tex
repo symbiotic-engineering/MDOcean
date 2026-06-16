@@ -371,8 +371,57 @@ When the unconstrained solution violates multiple constraints, the solver must t
 Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of possibilities instead of a continuous domain. 
 The main advantage of the indirect approach is its ability to handle nonlinear constraints, although for the quadratic constraints considered here, the analytical approach described in \cref{sec:appendix-qp-solution} is more efficient.
 
-\subsection{Analytical Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analytical Quadratic Program for Constrained Power Maximization}
+\label{sec:appendix-qp-solution}
 This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Quadratic Constraint Coefficients}
+\label{sec:appendix-qp-constraints-table}
+
+The quadratic coefficients $\{\mathbf{Q}_i, \vec{a}_i, b_i\}$ in \cref{eq:opt-problem} for each constraint implemented in MDOcean are given in \cref{tab:qp-constraints}.
+\begin{table}[]
+\centering
+\begin{tabular}{lccc}
+    Constraint & $\mathbf{Q}$ & $\vec{a}$ & $b$ \\ \hline
+    $|\hat{\xi}_f| \leq \hat{\xi}_{f,max}$ &
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{f,0}]^T$ & $\hat{\xi}_{f,max} - |\hat{\xi}_{f,0}|$ \\
+    $|\hat{\xi}_s| \leq \hat{\xi}_{s,max}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{s,0}]^T$ & $\hat{\xi}_{s,max} - |\hat{\xi}_{s,0}|$ \\
+    $|\hat{X}_{PTO}| \leq \hat{X}_{PTO,max}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{X}_{PTO,max}^2$ \\
+    $|\hat{\tau}| \leq \hat{\tau}_{max}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{e}|^2}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{\tau}_{max}^2$ \\
+    $P_{\tau\Omega} \leq P_{\tau\Omega,max}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{P}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $P_{\tau\Omega,max}$ \\
+    $P_{VI} \geq 0$ & 
+        $-\mathbf{A}_{P}$ & 
+        $\vec{0}$ & $0$ \\
+\end{tabular}
+\caption{Quadratic constraint coefficients}
+\label{tab:qp-constraints}
+\end{table}
+
+%%%%%%%%%%%%%%%
 \subsubsection{Reduced Dimension Formulation}
 The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem dimension from $\vec{x} \in \mathbb{C}^2$ to $\mathbb{C}^1$.
 Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\vec{n}$, the null space vector of $\vec{c}^{\,*}$:
