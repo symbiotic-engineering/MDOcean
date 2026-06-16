@@ -501,45 +501,6 @@ where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damp
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\mathbf{Z}_p = \mathbf{B}_p+\frac{\mathbf{K}_p}{i\omega}$.
 
-Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} can be represented as a multiport circuit.
-Multiport circuit models often use impedance (Z), cascade (a/ABCD), and hybrid (h) matrices to describe the relationship between ports, with the following conventions:
-\begin{equation}\label{eq:multiport-matrix-definitions}
-\vec{e} =
-\mathbf{Z}
-\vec{q},
-%
-\qquad
-%
-\begin{bmatrix}
-\vec{e}_2 \\ \vec{q}_2
-\end{bmatrix} =
-[\mathbf{a}]_{2\leftarrow1}
-\begin{bmatrix}
-\vec{e}_1 \\ \vec{q}_1
-\end{bmatrix},
-%
-\qquad
-%
-\begin{bmatrix}
-\vec{e}_1 \\ \vec{q}_2
-\end{bmatrix} =
-[\mathbf{h}]_{1,2}
-\begin{bmatrix}
-\vec{q}_1 \\ \vec{e}_2
-\end{bmatrix}
-\end{equation}
-for effort variables $\vec{e}$ and flow variables $\vec{q}$.
-The impedance formulation groups all ports together, while the cascade and hybrid formulations divide the ports into two sets.
-%\hl{Todo: Ryan's paper uses the sign convention where q1 is negative, need to go through and make signs consistent and add arrows for the flow direction at each port.}
-The multiport matrix equations apply to both the time-domain and phasor representations of each port.
-Impedances describe the effort required to produce a unit of flow, and have already been shown to arise in the intrinsic dynamics. 
-Cascade parameters describe how effort and flow are transmitted from port group 1 to port group 2, hence the leftward direction of the arrow in the subscript in \cref{eq:multiport-matrix-definitions}.
-For transmission in the other direction, simply invert: $[\mathbf{a}]_{1\leftarrow2} = [\mathbf{a}]_{2\leftarrow1}^{-1}$.
-Cascade matrices uniquely allow sequential multiplication of port variables and will be used for the PTO dynamics.
-Finally, hybrid parameters mix the two, allowing effort (or flow) at one port group to depend on the flow (or effort) at that port group, impedance-style, as well as the corresponding variable at the other port group, cascade-style.
-They will be used for the PTO kinematics.
-Converting between the three multiport conventions is accomplished using the formulas in \cite{reveyrand_multiport_2018}, although some port relationships require a particular convention to capture the physics and are undefined in other conventions.
-
 The circuit showcasing the intrinsic dynamics with two hydrodynamic degrees of freedom is visualized in \figurename~\ref{fig:multiport-circuit-intrinsic}.
 \begin{figure}
 \centering
