@@ -15,7 +15,7 @@
 ### Changed
 - Paper: Use subimport for Overleaf-friendly path inclusion
 - CI: Initialize submodules recursively
-- CI: Turn off tests (since they broke) and quarto (since no longer used)
+- CI: Turn off quarto stage (since no longer used)
 - CI: stop using retry script for calkit pull
 - Docs: update repo status badge from in progress to active
 - Docs: better details on licensing of external code
