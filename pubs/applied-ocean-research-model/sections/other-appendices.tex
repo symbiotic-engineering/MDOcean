@@ -1511,7 +1511,42 @@ We observe a rather poor match, with MDOcean underestimating power in the low-pe
 The discrepancy is of minimal concern for the reasons described in \cref{sec:dynamic-validation}.
 Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
 
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power Matrix Decomposition}
+\label{sec:appendix-power-decomposition}
+the maximum capture width matrix $\mathbf{CW}^{H,T}_{max}$ representing the radiation limit determined by the WEC mode of motion (heave in this case; for surge or pitch  the value would be doubled due to the asymmetry of the outgoing wave field).
+\begin{equation}
+\mathbf{J}^{H,T}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2 \qquad
+\mathbf{CW}^{H,T}_{max} = \frac{g T_e^2} {4\pi^2}
+\end{equation}
+The product of the next two matrices represents the WEC's ideal capture width in the absence of PTO losses and dynamic constraints as a fraction of the maximum capture width, and this product should never exceed 1.
+To isolate how much of the deviation from the radiation limit is due to the effect of hull geometry on the linear radiation coefficients and how much is from drag, a separate simulation is run with the drag coefficients $C_{d,f}, C_{d,s}$ set to zero to find $\mathbf{P}_{F\dot{X},no drag}$, the mechanical power at the rigid body in the absence of both drag and dynamic constraints and assuming an ideal PTO (lossless and capable of perfect impedance matching).
+Then, $\mathbf{\eta}^{H,T}_{rad}$ and $\mathbf{\eta}^{H,T}_{drag}$ are computed as:
+\begin{equation}
+\mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},no drag}}{\mathbf{J}^{H,T}_{wave} \mathbf{CW}^{H,T}_{max}}, \qquad
+\mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},ideal}}{\mathbf{P}_{F\dot{X},no drag}}
+\end{equation} and $\mathbf{\eta}^{H,T}_{drag}$ represents the effect of drag on the WEC's ability to capture energy.
+It is possible for $\mathbf{\eta}^{H,T}_{drag}$ to be greater than 1 at some frequencies, which does not imply that drag adds energy to the system.
+Rather, it indicates that the drag-free system is so undamped in those sea states that the optimal controller of \cref{eq:matched-load,eq:damping-control} would cause instability, so a sub-optimal controller is used there while the optimal controller is used in the drag case.
+In other words, $\mathbf{\eta}^{H,T}_{drag}>1$ is due not to its numerator being higher than expected, but its denominator being lower than expected to avoid instability.
+In cases where the optimal controller is stable, $\mathbf{\eta}^{H,T}_{drag}<1$ is guaranteed.
+The product of these first four matrices represents the theoretical ideal mechanical power at the WEC:
+\begin{equation}
+    \mathbf{P}^{H,T}_{F\dot{X},ideal} = \mathbf{J}^{H,T}_{wave} ~\mathbf{CW}^{H,T}_{max} ~\mathbf{\eta}^{H,T}_{rad} ~\mathbf{\eta}^{H,T}_{drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\mathbf{Z}^{H,T}_{i,th})}
+\end{equation}
+This quantity is independent of the PTO or control design and represents the maximum mechanical power that could be captured by a WEC with the given hull geometry and drag coefficients under perfect impedance matching.
+
+The next matrix $\mathbf{\eta}^{H,T}_{limits}$ represents the effect of the dynamic constraints on mechanical power due to impedance mismatch, again assuming an ideal PTO:
+\begin{equation}
+    \mathbf{\eta}^{H,T}_{limits} = \frac{\mathbf{P}^{H,T}_{F\dot{X}}}{\mathbf{P}^{H,T}_{F\dot{X},ideal}}
+\end{equation}
+Finally, $\mathbf{\eta}^{H,T}_{elec}$ represents the ratio of electrical power to mechanical power, accounting for PTO losses and dynamics:
+\begin{equation}
+    \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Economics Module Details}
 \label{sec:appendix-econ}
 
