@@ -387,7 +387,8 @@ This section describes the solution process for the constrained optimal control 
 \label{sec:appendix-qp-constraints-table}
 
 The quadratic coefficients $\{\mathbf{Q}_i, \vec{a}_i, b_i\}$ in \cref{eq:opt-problem} for each constraint implemented in MDOcean are given in \cref{tab:qp-constraints}.
-\begin{table}[]
+
+\begin{table}[b!]
 \centering
 \begin{tabular}{lccc}
     Constraint & $\mathbf{Q}$ & $\vec{a}$ & $b$ \\ \hline
@@ -548,6 +549,7 @@ S_{\mu} &= \textrm{sign}(A_{q,\mu}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}
 \end{align}
 \end{subequations}
 
+%%%%%%%%%%%%%%%
 \subsubsection{Solution}
 \Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_{\mu}=1$ and exterior to all circles for which $S_{\mu}=-1$.
 The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_{\mu} C_{q,\mu} \leq 0 \quad \forall \mu$.
@@ -607,6 +609,7 @@ If $A_{q,\mu} = 0$ for any $\mu$, the $\mu$th inequality constraint defines a li
 This can occur when $\mathbf{Q}_{\mu} = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\, *}\mathbf{Q}_{\mu}\vec{n} = 0$ ($\mathbf{Q}_{\mu}$ is rank-deficient and $\vec{n}$ is in its nullspace).
 The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,\mu}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Quartic Apparent Power Constraints}\label{sec:appendix-mag-S-constraints}
 While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{max}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
 This results in a ``Cassini oval'' curve on the complex plane of $\Gamma$, which consists of two closed curves when $|S_{max}|<|S_0|$ and one curve when $|S_{max}|\geq|S_0|$, where $|S_0|$ is the apparent power of the unconstrained optimum \cite{weisstein_cassini_2026}.
@@ -632,6 +635,7 @@ where $\mu$ indexes circle constraints and $k$ indexes oval constraints.
 While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
 We currently assume there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\Gamma$.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Extension to Higher Dimensions and Convexity}\label{sec:qp-convexity}
 Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in \cite{bacelli_numerical_2015}.
 In the terminology of \cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
@@ -657,6 +661,7 @@ For the 2D problem studied here, non-convexity is handled by the exhaustive enum
 Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
 It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
 References \cite{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
@@ -666,6 +671,8 @@ Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but d
 Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
 Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
 Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Constraint Sensitivity Analysis via Parametric Programming}
 \label{sec:appendix-constraint-sensitivity}
@@ -692,7 +699,7 @@ The power sensitivity simplifies to:
 \begin{equation}
     \frac{\partial p_{avg,VI,opt}}{\partial L_\mu} = -\lambda_\mu \frac{\partial b_\mu}{\partial L_\mu}
 \end{equation}
-If the optimization problem were sovled with a numerical solver,
+If the optimization problem were solved with a numerical solver,
 the Lagrange multipliers would be directly available as part of the solution.
 In our case, we have a semi-analytical solution for the optimal reflection coefficient at each sea state in terms of the constraint centers and radii at that sea state,
 $\Gamma_{opt}(r_{\mu}, \Gamma_{c,\mu})$,
@@ -721,6 +728,7 @@ so we can compute the Lagrange multipliers as follows:
 \end{aligned}
 \end{equation}
 
+%%%%%%%%%%%%%%%
 \subsubsection{Effect of Constraint Limits on Circle Radii}
 Recall from \cref{eq:gamma-disc-radius} that each inequality constraint maps to a circle in the complex $\Gamma$ plane 
 with center $\Gamma_{c,\mu}$ and radius $r_\mu$ given by:
@@ -748,6 +756,7 @@ In other words, increasing $b_\mu$ always enlarges the circle radius, regardless
 Meanwhile, \cref{eq:gamma-disc-center} shows that the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, so $\frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}=0$.
 Thus, the constraint limit $L_\mu$ does not affect the circle center.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Optimal Reflection Coefficient as a Function of Constraint Limits}
 Now we combine the relationship between circle radius and optimal reflection coefficient $\Gamma_{opt}(r_\mu)$, with the relationship between circle radius and constraint limit $r_\mu(b_\mu)$ derived above
 to obtain a relationship between reflection coefficient magnitude and constraint limit in a given sea state, $|\Gamma_{opt}|(b_\mu)$.
@@ -880,6 +889,7 @@ Both Kronecker delta functions are implicitly functions of the constraint limit 
 % and monotonically increasing with $b_\mu$ when $S_\mu=-1$ (enlarging the mu-th circle when the mu-th constraint is feasible-outside will make fewer candidate points mu-feasible, so the mu-th constraint would transition from inactive to active).
 % $\delta_{\nu,\nu^*}$ is monotonially decreasing with $b_\mu$.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Average Power as a Function of Constraint Limits}
 The results just obtained establish conditions for the convexity of power in a single sea state to the constraint limit in that sea state, which we now make explicit by adding a $\beta$ subscript to all sea state dependent quantities.
 For LCOE, we are interested in the weighted average power across sea states as a function of the constraint limits.
@@ -976,6 +986,7 @@ We can then use a similar analysis as before to obtain conditions for the convex
 % This means that as long as the sign of $S_\mu$ is consistent across sea states, the power-constraint relationship is globally convex.
 % Relaxing any constraint thus always increases or maintains power, and the marginal power benefit diminishes as the constraint limit grows.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Extension to Dimension Sensitivity}\label{sec:appendix-dimension-sensitivity}
 In principle, the same parametric programming approach can be used to semi-analytically compute the derivatives of the constrained optimal power with respect to bulk dimensions, 
 though the implementation remains out of reach.
@@ -990,6 +1001,7 @@ but the adjoint method has not yet been implemented for the semi-analytical MEEM
 Implementing the adjoint for a linear solve is relatively straightforward in a multidisciplinary design optimization package like OpenMDAO, 
 and would unlock a fully semi-analytical differentiation workflow.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Force Saturation}\label{sec:appendix-force-sat}
 Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
 
