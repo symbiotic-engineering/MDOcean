@@ -2,6 +2,7 @@
 \label{sec:discussion}
 \subsection{Variable Sweeps}
 \subsubsection{Effect of Bulk Dimensions on Hydrodynamic Efficiency}
+\ifdefined\DISSERTATION
 A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $m_0h$ allows for the identification of design trends.
 MDOcean performs a six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in only \resultsAOR[meemSweepTime] seconds, an average of \resultsAOR[meemSweepTimePerCombo] per combination.
 Using only the hydrodynamics and dynamics modules for the present, we examine nondimensional outputs including radiation efficiency, capture width ratio, and nondimensionalized surface area.
@@ -11,12 +12,16 @@ Capture width ratio is the ratio of capture width to a characteristic length sca
 (The cube root of submerged volume was also considered as a characteristic length scale; results were qualitatively similar to the square root of surface area and are not shown here.
 If wavelength were used as the characteristic length scale, the resulting capture width ratio would be a constant multiple of the radiation efficiency).
 For the final output, to nondimensionalize the wetted surface area, we divide it by the wavelength squared.
+\else
+\fi
 
+\ifdefined\DISSERTATION
 Visualizing this many-dimensional dataset (six inputs, three outputs) can pose a challenge.
 \Cref{fig:meem-sweep-m0h} will provide a view of all six input dimensions simultaneously, focusing centrally on the nondimensional wavenumber $m_0h$, and examine two outputs of radiation efficiency and capture width ratio.
 Meanwhile, \figureautorefname~\ref{fig:meem-sweep-pareto} will show the tradeoff of radiation efficiency with nondimensionalized surface area and denote five of the six input dimensions, excluding only $m_0h$.
 In both figures, marker size and shape represent $a_2/h$ and $a_3/a_1$, which are swept over a range of 0-3 and 1-4 respectively.
 Ratios $a_1/a_2$, $d_1/h$, and $d_2/d_1$ must fall between zero and one and are represented as the red, blue, and green decimal values of the RGB color space, respectively.
+\fi
 
 \paragraph{Best Design as a function of Wave Environment}
 \begin{figure}
@@ -39,16 +44,21 @@ Starting with \figureautorefname~\ref{fig:meem-sweep-eff}, we observe that the m
 At low $m_0h$ (shallow water, slow waves), the designs with the highest radiation efficiency are those with $a_1/a_2 \approx 1$, $a_2/h \ll 1$, and $a_3/a_1\approx 1$ with any value of $d_1/h$ (the blue/green/purple curves on the left).
 This represents a pure cylinder (float, spar, and damping plate all equal in diameter) with a small radius and any draft.
 
+\ifdefined\DISSERTATION
 The radiation limit is marked with a horizontal dashed line, and efficiencies above the limit are obtained around $m_0h\approx 1, a_1/a_2\approx 1, a_2/h\approx 3, a_3/a_1\approx 1$ (the pink/orange/yellow curves in the center of the figure).
 This indicates an issue with the simulation and data over the limit is disregarded.
 At this moderate $m_0h$ regime, the most efficient designs that stay within the radiation limit are green/blue, generally indicating a low $a_1/a_2$ (small spar).
 At high $m_0h$ (deep water, fast waves), the most efficient designs (pink/red) have  
+\else
+\fi
 
 \paragraph{Design Cost-Power Tradeoffs}
 \Cref{fig:meem-sweep-pareto} shows a Pareto front for the tradeoff of radiation efficiency (power proxy) and normalized surface area (cost proxy) across the six geometric design variables.
+\ifdefined\DISSERTATION
 The normalized surface area does not depend on the seventh input variable $m_0h$, and the largest radiation efficiency for that geometry across all $m_0h$ is plotted, essentially showing the best possible radiation efficiency for each geometry across all wave environments.
 Black squares denote the non-dominated Pareto-optimal points: the geometries that achieve the highest radiation efficiency for a given normalized surface area.
 %Designs with \hl{some quality} tend to perform well, with \hl{some quality} being optimal for the high-efficiency, high-cost end of the Pareto front and \hl{some quality} being optimal for the low-efficiency, low-cost end of the Pareto front.
+\fi
 
 \begin{figure}
     \centering
@@ -69,6 +79,7 @@ The dashed lines indicate the nominal design point at $b/a = 0.2$.}
 \end{figure}
 
 \subsubsection{Effect of PTO Force and Power Limits}
+\ifdefined\DISSERTATION
 Previous work has shown that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power.
 Reference \cite{devin_high-dimensional_2024} finds that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
 This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
@@ -77,7 +88,9 @@ The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\%
 The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the model.
 Reference \cite{mccabe_force-limited_2024} shows analytically that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
 Intuitively, the sensitivity of annual average power to force limit should be even lower when considering a range of realistic sea states, because large sea states that require higher forces are comparatively rare.
+\else
 Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-limit}.
+\fi
 
 \begin{figure}
 \centering
@@ -87,16 +100,24 @@ Using MDOcean, we investigate the effect of PTO force limit on average power and
 \end{figure}
 
 Decreasing the force limit has nearly no effect on power until the force limit is around 50\% of the nominal value, after which power falls off steeply.
+\ifdefined\DISSERTATION
 From theory (see \cref{sec:appendix-constraint-sensitivity}), we expect a smooth nonlinear relationship between power and force limit when considering a single sea state, and a piecewise continuous nonlinear relationship when considering multiple sea states as in \cref{fig:force-limit}.
+\fi
 On the other hand, the structural load for the operational design load case scales nearly linearly with the force limit.
+\ifdefined\DISSERTATION
 For structural load, we expect a linear relationship when considering a single sea state and a piecewise linear relationship expected when considering multiple sea states.
 The fact that the linear relationship holds when considering multiple sea states implies that both the worst-case sea state and its quasilinearized drag coefficients hardly change as the force limit is swept.
 If this trend holds true for other designs, it could suggest a more efficient analysis strategy where the worst-case sea state is identified at the nominal design and then maintained (or only infrequently updated) throughout a design optimization, rather than performing a full multi-sea-state structural analysis for each design being considered.
+\fi
 
 We next move to a simultaneous sweep of both the force limit and the power limit, which is more relevant for PTO design optimization since generator selection dictates both limits.
+\ifdefined\DISSERTATION
 Here we hold structural thicknesses constant, so any cost savings only reflect reduced direct cost of the PTO and not the cost savings from the reduced structural material that would be possible with lower loads.
+\fi
 \Cref{fig:force-power-limit-sweep} shows the results for both power and LCOE, with hatched shading to indicate regions that are infeasible.
+\ifdefined\DISSERTATION
 The unsaturated solution is in the top right corner, past which power is constant because the unconstrained reactive controller satisfies the limit in all sea states.
+\fi
 \begin{figure}
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/pto_sweep.pdf}
@@ -105,18 +126,26 @@ The unsaturated solution is in the top right corner, past which power is constan
 \end{figure}
 Notably, the minimum LCOE point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller PTO outweigh the loss in power.
 If a full design optimization were performed to adjust the structural thicknesses to take advantage of the reduced structural loads, we expect an even lower force limit to be optimal.
+\ifdefined\DISSERTATION
+\fi
 This illustrates the importance of including the force-cost tradeoff in an optimization model rather than assuming an unconstrained solution.
+\ifdefined\DISSERTATION
 We also observe that power and LCOE both appear to be convex with respect to the force and power limits, and that the feasible region is convex as well.
 The theoretical analysis in \cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
 Convexity suggests that local optimization methods should be effective for finding the optimal PTO design.
+\else
+\fi
 
 \subsubsection{Design Space Exploration}
+\ifdefined\DISSERTATION
 The OAT design sweep, shown in \figureautorefname~\ref{fig:experiments}, immediately draws attention to the float diameter $D_f$, shown with a red dashed line, as the variable with the strongest effect on the objectives.
 A slight reduction in the diameter from its nominal value causes the cost to decrease close to linearly but the LCOE to skyrocket due to a substantial reduction in power generation.
 Meanwhile, slightly increasing the diameter causes the power production to grow significantly but increases loads, leading to fatigue failure of the damping plate.
 This is shown as blank on the diagram to indicate infeasibility.
 A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15\textcent/kWh reduction in LCOE, representing the best design of the OAT sweep.
 The results also point to the possibility of an even lower LCOE design with float diameter perhaps $\sim20\%$ larger than nominal, if the damping plate can be made feasible by increasing $t_d$ or $h_{1,stiff,d}$ without a major cost penalty. 
+\else
+\fi
 
 \begin{figure}
 \centering
@@ -124,12 +153,15 @@ The results also point to the possibility of an even lower LCOE design with floa
 \caption{Design of experiments}\label{fig:experiments}
 \end{figure}
 
+\ifdefined\DISSERTATION
 Besides $D_f$, the other design variable displaying a non-monotonic relationship with $LCOE$ is the force limit $F_{max}$, with an optimal at around half the nominal force limit.
 Together, these insights inform the selection of the starting design for optimization, $\vec{x}_o$.
 The OAT sweep also does not reveal any multimodality in the objectives, a promising sign that only a limited number of multi-starts may be necessary, although objective multimodality could still exist in other parts of the design space.
 Finally, the OAT design sweep shows the highly constrained nature of the problem, with large regions of the design space infeasible.
 In particular, the feasible region $1.3<D_f/D_{f,nom}<2.1$ is an ``island'' in the feasible design space, separated from the other feasible points at $D_f/D_{f,nom}<1 $ by the damping plate fatigue constraint.
 Thus even without objective multimodality, multimodality exists in the Lagrangian (objective plus weighted active constraints), indicating the need for a multi-start optimization procedure as planned.
+\else
+\fi
 
 \subsection{Multidisciplinary Insights}
 This section leverages the analytical multidisciplinary nature of the model to draw intuitive insights on limit cases and tradeoffs, and observe nondimensional relationships and scaling laws that would not be readily apparent in a purely numerical or single-discipline model.
@@ -170,7 +202,9 @@ Finally, $\mathbf{\eta}^{H,T}_{elec}$ represents the ratio of electrical power t
     \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}
 \end{equation}
 
+\ifdefined\DISSERTATION
 Altogether, this multiplicative decomposition of the power matrix allows for the isolation of the effect of certain design variables and parameters on power, and therefore intuitive identification of which design variables are most important for improving power.
+\fi
 \Cref{tab:power-matrix-dependence} maps the dependence explicitly.
 \begin{table}[h]
 \centering
@@ -187,14 +221,20 @@ $\mathbf{\eta}^{H,T}_{elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\c
 \caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
 \end{table}
 
+\ifdefined\DISSERTATION
 Importantly, the later matrices in the product depend on the design variables and parameters that affect the earlier matrices.
 This coupling means that the effect of the drag coefficients, for example, on power in a device with PTO limits and dynamics must be understood not only through $\mathbf{\eta}^{H,T}_{drag}$ but also through their effect on $\mathbf{\eta}^{H,T}_{limits}$ and $\mathbf{\eta}^{H,T}_{elec}$.
 While it would be possible to formulate variants such as $\mathbf{\eta}^{H,T}_{drag,var} = \mathbf{P}_{IV}/\mathbf{P}_{IV, no drag}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to obtain the overall power matrix, which is a key advantage of the current formulation.
+\else
+\fi
 
 \Cref{fig:power-matrix-decomposition} shows the power matrix decomposition for the nominal RM3 design, with the same JPD as in \figureautorefname~\ref{fig:JPD-multiply}.
+\ifdefined\DISSERTATION
 Aligning with reference \cite{zou_practical_2023}, low-period sea states achieve mechanical powers closer to the radiation limit (higher radiation efficiency).
 High-period sea states have lower radiation efficiencies due to the amplitude limit yet still contribute significantly due to their higher energy content.
 Despite the most probable wave period being 6-8 seconds, 10 second waves contribute the most to energy production for this reason, though even longer waves contribute little due to their rarity.
+\else
+\fi
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{figs/manual/power_matrix_multiply.pdf}
@@ -202,7 +242,9 @@ Despite the most probable wave period being 6-8 seconds, 10 second waves contrib
 \label{fig:power-matrix-decomposition}
 \end{figure}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
+\ifdefined\DISSERTATION
 Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
+\fi
 
 \paragraph{Constraint Sensitivities}
 The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\eta^{H,T}_{limits}$.
@@ -258,6 +300,7 @@ The LCOE model then equals:
     }{\overline{P}_{elec}}
 \end{equation}
 
+\ifdefined\DISSERTATION
 The numerator of \cref{eq:LCOE-scale} is affine in the design inputs $F_{max}$ and $P_{max,elec}$, 
 while $V_{struct}$ is the product of structural thicknesses with their corresponding areas, 
 which depend quadratically on the bulk dimensions.
@@ -265,7 +308,9 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
 and the denominator to monotonically decrease implies that at system optimality, 
 and each constraint will be active in at least one sea state.
 The LCOE minimization with design variables of $F_{max}$, $P_{max,elec}$, and thicknesses is considered a fractional quadratic program, a structure common in resource allocation problems.
+\else
 When the denominator is convex with respect to the PTO limits, this means that LCOE is ``quasi-convex'' in the PTO limits for fixed geometry \cite{agrawal_disciplined_2020}.
+\fi
 This quasi-convexity can be leveraged by using a subgradient method or by solving a small sequence of convex problems, which simplifies the optimization process significantly compared to a general nonlinear solver.
 This motivates a three-level nested optimization strategy: 
 at the innermost level, the optimal control problem for fixed geometry and PTO limits is solved as an analytical QP; 
@@ -273,10 +318,13 @@ at the mid-level, the optimal PTO limits are found by exploiting the quasi-conve
 and at the outer level, the bulk geometry is optimized with a general nonlinear program.
 
 \subsection{Limitations and Future Work}\label{sec:unmodeled-effects}
+\ifdefined\DISSERTATION
 Broadly, future work must both address limitations of the model and apply it to answer design questions.
 As MDOcean is open source, the authors encourage the wave energy community to contribute to both areas, and are themselves actively pursuing the latter with a multi-objective optimization of the RM3 WEC \cite{mccabe_leveraging_2026}.
 Table~\ref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
 This section describes the relevance and possible implementation paths for each development area.
+\else
+\fi
 
 \newcommand{\modelTrustBuilders}{
     \begin{enumerate}
@@ -310,6 +358,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     \label{tab:future-work}
 \end{table}
 
+\ifdefined\DISSERTATION
 \paragraph{Neglect of Surge Force and Mooring Cost}
 Section~\ref{sec:design-load-cases} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
 The neglect of surge force means that geometries with significant lateral areas that would experience high surge force appear to perform better than they should.
@@ -394,3 +443,5 @@ Before initiating such an undertaking, it would be important to confirm that num
 Since development of MDOcean began in 2021, new numerical tools have emerged that could potentially reduce the computational cost of mesh-based geometry-agnostic computations.
 For example, a differentiable BEM solver in Julia \texttt{MarineHydro.jl} was released in 2025 and is in its infancy \cite{khanal_fully_2025}, while a lightweight FEA tool with plate/shell elements \texttt{pynite} was released in 2021 and has seen widespread adoption.
 Whether semi-analytical or numerical, extension to other archetypes would require significant development effort but unlock new comparative insights.
+\else
+\fi

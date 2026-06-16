@@ -23,6 +23,7 @@ First, because LCOE balances the device's lifetime cost with its lifetime energy
 On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}.
 Thus, capturing nonuniform sources of WEC value like consistency or complementarity would require modifications (e.g. those outlined in \cite{mccabe_system_2023}) outside the scope of the present model.
 
+\ifdefined\DISSERTATION
 A second limitation of LCOE is its high uncertainty for devices in the early design stage.
 The economic model of section~\ref{sec:econ} only assumes a few cost components (structures and PTO) to scale with design.
 If fixed cost components or the $FCR$ were to change, it could influence the optimal design.
@@ -32,8 +33,10 @@ For instance, while both energy production increase and cost decrease can drive 
 Meanwhile, some blue economy applications such as ocean observation are typically not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}. 
 
 In the multi-objective formulation, instead of $LCOE$, the two objectives optimized are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$.
+\else
 This directly addresses the second and third limitations of LCOE just described.
 Under this formulation, the fixed charge rate and cost components without accurate design scalings can no longer influence the optimal design, and the minimum-capital design for a given power requirement can be easily identified.
+\fi
 
 The objective function is expressed:
 \begin{equation}
@@ -54,8 +57,11 @@ The objective function is expressed:
 This section describes requirements that the optimization formulation must enforce and narrates how the requirements influence the optimization problem formulation.
 Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions).
 Constraints are the most common but not the only way to implement these requirements.
+\ifdefined\DISSERTATION
 Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
 (2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization. 
+\else
+\fi
 
 \tablename~\ref{remdo:tab:requirements} shows each requirement along with an indication of its priority in an optimization formulation context and a reference to the section, equation, or figure where it is explained.
 \newcounter{reqnumber}
@@ -98,15 +104,19 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
 %\end{table}
 \end{longtable}
 
+\ifdefined\DISSERTATION
 In this work, priority 1 requirements are model requirements that should not be violated at any time during the optimization because they will cause the simulation to throw an error or return an invalid solution such as \texttt{Inf}, \texttt{NaN}, or imaginary numbers.
 Some optimization algorithms will fail outright at such invalid solutions, and even robust algorithms can struggle to converge without a valid objective value to determine the next step in the design space.
 Meanwhile, violation of priority 2 model requirements entails an inaccurate yet still computationally valid objective.
 Violation during the optimization is still undesirable because the model inaccuracy at those points may lead the optimizer astray, especially for gradient-based optimization, but is not as detrimental as the violation of priority 1 requirements.
 If implemented with constraints, activity of priority 2 constraints in the final solution is typically undesired, indicating that the optimum point may lie in a region of the design space that cannot be accurately modeled with the given assumptions.
+\else
 Finally, priority 3 requirements return an accurate objective value even when violated, marking a design as undesirable for a reason related to its practical viability or functionality rather than its model validity.
 The presence of active priority 3 constraints in the end design is acceptable, even expected.
 Ultimately, this three-level requirement prioritization will inform the selection of design variables and parameters.
+\fi
 
+\ifdefined\DISSERTATION
 Requirements are ordered by priority in \tablename~\ref{remdo:tab:requirements}, and within priority grouped by the way the requirement is enforced.
 Requirements include direct geometric relations between float, column, plate, and sea floor dimensions to prevent geometric overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_similarity}, \reqref{spar_damping_ratio});
 a power criteria to ensure the WEC generates net energy (\reqref{positive_net_power});
@@ -117,15 +127,20 @@ eight structural factors of safety (FOS) to avoid structural failure (\reqref{FO
 a measure of stability to ensure the WEC does not tip (\reqref{GM}); 
 equality of the maximum torque and power experienced with the powertrain's maximum capability, to avoid unnecessarily oversized PTO components (\reqref{force_max}, \reqref{P_max}); 
 a maximum LCOE constraint required for the epsilon-constraint procedure that will be described in section~\ref{remdo:sec:multi-obj-process} (\reqref{LCOE}).
+\else
 Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
+\fi
 
 \subsubsection{Design Variables, Parameters, and Constraints}
 The selection of optimization design variables to encode a given physical design space is non-unique.
+\ifdefined\DISSERTATION
 For example, the float and spar drafts could be encoded directly with dimensions $T_{f,2}$ and $T_s$, or nondimensionally with dimension $T_s$ and ratio $T_{f,2}/T_s$.
 A certain encoding may be selected because it more directly controls the objective value, makes the problem convex, or helps maintain feasibility and facilitate convergence during optimization.
 The latter is pursued here.
 Depending on the choice of design variables and parameters, each requirement could be enforced via parameters, design variable bounds, linear inequality constraints, linear equality constraints, nonlinear inequality constraints, or nonlinear equality constraints, listed in order from least to most difficult for the optimizer to handle.
 It is desirable, then, to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements to ensure they are satisfied even at intermediate points in the optimization process. 
+\else
+\fi
 
 Continuing with the illustrative example of choosing how to encode the drafts, observe that two of the priority 1 requirements, \reqref{float_spar_draft} and \reqref{spar_seafloor_overflow}, contain $T_{f,2}$, while $T_s$ appears in \reqref{float_spar_draft} and \reqref{float_seafloor_overflow}.
 Assuming for the moment that other variables appearing in those requirements (e.g. $T_{f,1}$ and $h$) are parameters or design variables, then the first (dimensional) encoding would make all three relevant requirements achievable via linear constraint, while the second (nondimensional) encoding would make \reqref{float_spar_draft} achievable via bound (preferable) but \reqref{spar_seafloor_overflow} would require a nonlinear constraint (undesired).
@@ -164,12 +179,15 @@ Referring back to the state-of-the-art literature in \tablename~\ref{remdo:tab:l
 \end{table}
 
 The parameters in \tablename~\ref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+\ifdefined\DISSERTATION
 Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$.
 They hold the geometric proportions of the spar geometry constant, which is required to maintain a sufficiently large damping ratio, requirement \reqref{spar_damping_ratio} (see equation~\eqref{eq:spar}).
 Together with requirement \reqref{spar_similarity}, which enforces geometric similarity on damping plate dimensions%sets an upper bound on the spar natural frequency
 , this means that the spar dynamics are identical to those of the nominal RM3 to maintain the dynamics assumptions described in section~\ref{sec:dynamics}.
+\else
 Essentially, the spar dimensional design space has been restricted in order to comply with the model assumptions.
 This unfortunately prevents determination of the true optimal spar dimensions under multibody dynamics, but suffices for an initial study with emphasis on float design.
+\fi
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
 
 \begin{table}[ht]
@@ -212,12 +230,15 @@ $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 \end{table}
 
 
+\ifdefined\DISSERTATION
 Looking back to \tablename~\ref{remdo:tab:requirements}, the final column demonstrates that this encoding of design variables and parameters successfully avoids nonlinear constraints in all priority 1 requirements and all but one of the priority 2 requirements.
 This clever formulation helps avoid model errors while facilitating convergence of the optimization.
 A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints necessary.
 The linear constraints are shown in matrix form:
+\else
 % notebook p137 11/16/25
 \begin{equation}
+\fi
     \begin{bmatrix}
     -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
     \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\

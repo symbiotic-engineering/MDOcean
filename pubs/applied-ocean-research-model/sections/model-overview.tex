@@ -40,6 +40,7 @@ Furthermore, while even in a unified optimization it may be tempting to calculat
 If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
 Using a single optimizer to drive the design of all modules and consider all constraints addresses this non-monotonic coupling. 
 
+\ifdefined\DISSERTATION
 \paragraph{Multiple-Discipline-Feasible Analysis Architecture}
 All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
 The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
@@ -48,6 +49,8 @@ This structure is known as the multiple discipline feasible (MDF) architecture.
 In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
 SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
 The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
+\else
+\fi
 
 Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
 In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
