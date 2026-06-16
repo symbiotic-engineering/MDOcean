@@ -1065,32 +1065,33 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Drag Model\label{sec:appendix-drag}}
 As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
-Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at the body draft, with $\vec{T}=[T_{f,2},T_s]$ collecting the bottom draft of the float and spar:
-\begin{equation}
-\vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
+The relative-velocity computation in \cref{eq:drag-pressure} uses the standard finite-depth linear-wave velocity phasor evaluated at body draft, with $\vec{T} = [T_{f,2}, T_s]$ collecting the bottom drafts of the float and spar:
+\begin{equation}\label{eq:wave-velocity-phasor}
+    \vec{\hat{V}}_{wave}(y) = \frac{H}{2}\,\frac{gk}{\omega}\, e^{-k\vec{T}}\, e^{-iky}.
 \end{equation}
 
-Strip theory allows integration of the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted surface area $A_{wet}$.
-For a hollow cylinder of radius $\vec{R}$ and inner radius $\vec{R}_{in}$, this is expressed: 
+Strip theory integrates the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted surface area $A_{wet}$.
+For a hollow cylinder of outer radius $\vec{R}$ and inner radius $\vec{R}_{in}$,
 % derived p156-159 notebook 3/10/25
 % simplified p169-173 notebook 3/12/25
 \begin{equation}\label{eq:drag-force-integral}
-    \vec{\hat{F}}_d = \int_{A_{wet}} d\vec{\hat{F}}_d(y) = -\int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\hat{p}}_d(y)dy
+    \vec{\hat{F}}_d = \int_{A_{wet}} d\vec{\hat{F}}_d(y) = -\int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y)\, \vec{\hat{p}}_d(y)\, dy,
 \end{equation}
-where $\vec{w}(y)$ is the local width of the WEC perpendicular to the direction of wave propagation $y$:
+where $\vec{w}(y)$ is the local body width perpendicular to wave propagation:
 \begin{equation}\label{eq:drag-width}
     \vec{w}(y) = \begin{cases}
         2\sqrt{\vec{R}^2-y^2}, & \vec{R}_{in}<|y|<\vec{R} \\
-         2\sqrt{\vec{R}^2-y^2}-2\sqrt{\vec{R}_{in}^2-y^2}, &0<|y|< \vec{R}_{in} \\
+        2\sqrt{\vec{R}^2-y^2} - 2\sqrt{\vec{R}_{in}^2-y^2}, & 0<|y|<\vec{R}_{in}.
     \end{cases}
 \end{equation}
+
 Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
-\begin{equation}\label{eq:drag-damping-excitation}
+\begin{equation}\label{eq:drag-damping-excitation-2}
     \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \appendixname~\ref{sec:appendix-drag}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \appendixname~\ref{subsec:appendix-drag-others}.
 The coefficients in \cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
