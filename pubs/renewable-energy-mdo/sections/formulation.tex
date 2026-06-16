@@ -1,6 +1,6 @@
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Problem Formulation}\label{remdo:sec:formulation}
-The standard optimization problem formulation is expressed \cite{martins_engineering_2022,papalambros_principles_2017}:
+The standard optimization problem is expressed \cite{martins_engineering_2022,papalambros_principles_2017}:
 \begin{equation}
 \begin{aligned}
     \text{min}~~& \vec{J}(\vec{x},~\vec{p}) \\
@@ -64,13 +64,16 @@ The objective function is expressed:
 %     \label{remdo:cv}
 % \end{equation}
 
+%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Requirements}\label{remdo:sec:requirements}
-This section describes requirements that the optimization formulation must enforce and narrates how the requirements influence the optimization problem formulation.
-Here, requirements broadly refer to both traditional design requirements (model-agnostic criteria to ensure that the end design addresses stakeholder needs and can be physically realized), as well as to criteria necessary to facilitate the optimization process itself (such as keeping intermediate designs within the bounds of model capabilities and assumptions).
-Constraints are the most common but not the only way to implement these requirements.
+This section describes the requirements that the optimization must enforce and how they shape the formulation.
+Here, requirements refer both to traditional design requirements (model-agnostic criteria ensuring the design meets stakeholder needs and is physically realizable) and to criteria needed to facilitate the optimization itself (such as keeping intermediate designs within the model's range of validity).
+Constraints are the most common but not the only enforcement mechanism.
 \ifdefined\DISSERTATION
-Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
-(2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization. 
+    Explicitly outlining the requirements and resulting formulation logic serves three purposes:
+    (1) to ground the optimization within the engineering design process, where requirements drive decisions;
+    (2) to clarify a part of the optimization process that is critical to result quality yet often omitted;
+    and (3) to illustrate how the MDO mindset systematically yields a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
 \else
 Explicitly outlining the requirements and resulting formulation logic serves (1) to ground the optimization process as part of the engineering design process, where requirements drive decisions; 
 (2) to clarify a part of the optimization process that is critical to result quality yet often omitted; and (3) to illustrate the utility of the MDO mindset to systematically obtain a ``clever'' formulation that overcomes common difficulties in large-scale optimization. 
@@ -163,6 +166,7 @@ a maximum LCOE constraint required for the epsilon-constraint procedure that wil
 Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Design Variables, Parameters, and Constraints}
 The selection of optimization design variables to encode a given physical design space is non-unique.
 \ifdefined\DISSERTATION
@@ -194,28 +198,25 @@ Referring back to the state-of-the-art literature in \tablename~\ref{remdo:tab:l
 \begin{center}
 {
 \begin{tabular}{c>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.3\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}c}
-
  \textbf{\#}&\textbf{Design Variable}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
- $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\ 
- $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\ 
- $x_3$&$T_{f,2}$ & Float draft& 0.5& See sec.
-\ref{sec:validation-benchmarking}&100& m\\ 
- $x_4$&$h_s$& Spar height  & 5& See sec.
-\ref{sec:validation-benchmarking}& 100& m\\ 
+ $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
+ $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\
+ $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\cite{mccabe_development_2025}&100& m\\
+ $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\cite{mccabe_development_2025}& 100& m\\
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
- $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\ 
- $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\ 
- $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\ 
- $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\ 
- $x_{10}$&$t_{d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\ 
+ $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
+ $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\
+ $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\
+ $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\
+ $x_{10}$&$t_{d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\
  $x_{11}$&$h_{stiff,f}$& Float stiffener height& 0& 0.406& 2& m\\
- $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\ 
+ $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
 } \caption{Design Variables}\label{remdo:tab:design-vars}
 \end{center}
 \end{table}
 
-The parameters in \tablename~\ref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+The parameters in \cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
 \ifdefined\DISSERTATION
 Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$.
 They hold the geometric proportions of the spar geometry constant, which is required to maintain a sufficiently large damping ratio, requirement \reqref{spar_damping_ratio} (see equation~\eqref{eq:spar}).
@@ -235,10 +236,7 @@ This unfortunately prevents determination of the true optimal spar dimensions un
 
 \begin{table}[ht]
 \centering
-
-%\setlength{\tabrowsep}{} % default value:
 \renewcommand{\arraystretch}{1.4}
-
 \begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
