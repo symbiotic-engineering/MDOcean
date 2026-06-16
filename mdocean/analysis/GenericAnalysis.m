@@ -243,7 +243,7 @@ classdef (Abstract) GenericAnalysis < handle
             fig_paths = {};
             tab_paths = {};
             if ~isempty(obj.fig_names)
-                fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.fig'));
+                fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.pdf'));
             end
             if ~isempty(obj.tab_names)
                 tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
@@ -280,18 +280,8 @@ classdef (Abstract) GenericAnalysis < handle
             end
             obj.fig_array = fig_array;
 
-            num_tabs = length(obj.tab_names);
-            tab_array = cell(1, num_tabs);
-            for i = 1:num_tabs
-                tab_path = fullfile(obj.output_folder, [obj.tab_names{i} '.tex']);
-                try
-                    tab_array{i} = fileread(tab_path);
-                catch err
-                    warning('Failed to load cached table from %s: %s.', tab_path, err.message)
-                end
-            end
-            obj.tab_array_display = tab_array;
-            obj.tab_array_latex = tab_array;
+            % don't attempt to fill tab_array_latex or tab_array_display, since the
+            % matlab table object can't easily be reconstructed from the exported tex.
         end
 
         function stages = write_calkit_stage(obj)
