@@ -541,14 +541,6 @@ In the frequency domain assuming sinusoidal waveforms, we introduce the active p
 \end{aligned}
 \end{equation}
 where the port is terminated with complex impedance $Z$, and ${}^*$ refers to the conjugate transpose.
-\Cref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ as \cite{saadat_power_1999}:
-\begin{equation}\label{eq:power-time-PQS}
-    p(t) = P + |S| \cos\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\left(\frac{Q}{P}\right)\right)
-\end{equation}
-The average, peak, and minimum powers over a wave period are then:
-\begin{equation}\label{eq:power-avg-peak}
-    p_{avg} = P, \quad p_{pk} = P + |S|, \quad p_{min} = P - |S|
-\end{equation}
 
 To capture non-dynamic power losses such as those in an electrical drive, an additional constant efficiency $\eta$ describes the gain between the average generator electrical power and average absorbed electrical power.
 \ifdefined\DISSERTATION
@@ -560,39 +552,6 @@ If the generator cascade matrix is not used (i.e. $[\mathbf{a}]_{\tau\Omega\left
 This will be done in \cref{sec:validation-benchmarking}, setting $\eta=80\%$ to maintain consistency with the RM3 design assumption of \cite{RM3} to facilitate comparison and validation. 
 Note that this is not necessarily equivalent to an assumption that the generator itself has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
 \fi
-The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
-\begin{equation}\label{eq:power-elec}
-\begin{bmatrix}
-p_{avg,elec} \\
-p_{pk,elec}
-\end{bmatrix}
-= 
-\eta
-\begin{bmatrix}
-p_{avg,VI} \\
-p_{pk,VI}
-\end{bmatrix}
-= 
-\eta \frac{1}{2} B_l |\hat{I}|^2
-\begin{bmatrix}
-1 \\
- 1 + \sqrt{1 + \left(\frac{K_l}{B_l \omega }\right) ^2  }
-\end{bmatrix}
-\end{equation}
-% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
-% \begin{equation}
-% [a]_m = \begin{bmatrix}
-% 1/R &~ 0 \\
-% 0 &~ R
-% \end{bmatrix} = \begin{bmatrix}
-% 1 &~ 0 \\
-% 0 &~ 1
-% \end{bmatrix}
-% \end{equation}
-% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
-% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
-
-%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
 
 \subsubsection{Optimal Control}\label{sec:optimal-control}
 \paragraph{Unconstrained}
