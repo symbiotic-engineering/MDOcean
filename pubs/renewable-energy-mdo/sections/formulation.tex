@@ -272,39 +272,11 @@ $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\
 Looking back to \tablename~\ref{remdo:tab:requirements}, the final column demonstrates that this encoding of design variables and parameters successfully avoids nonlinear constraints in all priority 1 requirements and all but one of the priority 2 requirements.
 This clever formulation helps avoid model errors while facilitating convergence of the optimization.
 A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints necessary.
-The linear constraints are shown in matrix form:
 \else
 Looking back to \tablename~\ref{remdo:tab:requirements}, the final column demonstrates that this encoding of design variables and parameters successfully avoids nonlinear constraints in all priority 1 requirements and all but one of the priority 2 requirements.
 This clever formulation helps avoid model errors while facilitating convergence of the optimization.
 A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints necessary.
-The linear constraints are shown in matrix form:
 \fi
-% notebook p137 11/16/25
-\begin{equation}
-    \begin{bmatrix}
-    -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
-    \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\
-    \frac{h_d}{D_s}-\frac{T_s}{D_s} & 0 & 1 & ~~~0& 0  & 0\\
-    \frac{T_s}{D_s} & 0 & ~-1+\frac{1}{T_{f,2}/h_f} & ~~-1 & 0 & 0\\
-    0 & \frac{N}{2\cdot223} & 1 & ~~~0& 0  & 0\\
-    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
-    -\frac{h_d}{D_s} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
-    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & ~~~0 & 0 & 1 \\
-    \end{bmatrix}
-    \begin{bmatrix} D_s \\ D_f \\ T_{f,2} \\ h_s \\ t_d \\ h_{stiff,f}
-    \end{bmatrix}
-    \leq
-    \begin{bmatrix}
-    -D_{d,min} \\ -0.01 \\ -0.01 \\ -0.01 \\ h \\ h \\ -0.01 \\ -0.01
-    \end{bmatrix}~
-    \begin{pmatrix}
-    g_{L,1} \\ g_{L,2} \\ g_{L,3} \\g_{L,4} \\ g_{L,5} \\ g_{L,6} \\ g_{L,7} \\ g_{L,8}
-    \end{pmatrix}
-\end{equation}
-where the values of -0.01 on the right hand side provide a small amount of numerical buffer against the constraints to avoid running into model limits, and the constraint identifier $g_{L*}$ is given in parentheses for each row.
-The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
-
-%\hl{second row is wrong, need to use} $D_{f,in}$ not $D_s$.
 
 %It maybe would have been possible to have all sim-breaking constraints enforced via bounds if I allowed the spar geometry to change aspect ratio (which requires multibody dynamics), but without multibody, the DVs are such that they can't all be bounds.
 
