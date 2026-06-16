@@ -1566,8 +1566,9 @@ The current decomposition preserves multiplicativity, which is the key advantage
 \subsection{RM3 Cost Breakdown Structure}
 \label{sec:appendix-econ-cbs}
 
-The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014}, shown in \cref{tab:CBS}.
-MDOcean captures the scaling of all cost categories with the number of devices $N_{WEC}$ to match the provided estimates for $N_{WEC}=(1,10,50,100)$ \cite{neary_reference_2014}. 
+The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \cite{neary_reference_2014}, reproduced in \cref{tab:CBS}.
+Percentages are shown for both single-device ($N_{WEC}=1$) and array ($N_{WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \cref{eq:cost-power-law}.
+
 \begin{table}
     \centering
 
@@ -1599,11 +1600,14 @@ MDOcean captures the scaling of all cost categories with the number of devices $
 \subsection{Power-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
-Additionally, the per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ according to the following power law:
-\begin{equation}
-C =C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta}
+The per-WEC unit costs and prices in \cref{eq:unit-cost} ($C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, $p_{s}$) each decrease with the number of devices $N_{WEC}$ according to
+\begin{equation}\label{eq:cost-power-law}
+    C = C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta},
 \end{equation}
-The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\beta$ are found with curve fits to the RM3 CBS data and shown in \tablename~\ref{tab:econ-model-values} in \appendixname~\ref{sec:appendix-econ}.
+where $C_\infty$ is the asymptotic large-scale unit cost, $C_1$ is the single-unit cost, and $\beta$ is the rate of decrease.
+
+The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained by curve-fitting \cref{eq:cost-power-law} to the CBS estimates for $N_{WEC} \in \{1, 10, 50, 100\}$ \cite{neary_reference_2014}, and are tabulated in \cref{tab:econ-model-values}.
+
 \begin{table}[h]
     \centering
     \begin{tabular}{
