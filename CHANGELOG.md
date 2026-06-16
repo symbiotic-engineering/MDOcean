@@ -39,7 +39,7 @@
 - CI: ignore `not our ref` error in calkit save branching logic
 - CI: turn on write permission for checks
 - Plot: fix multistart parallel axis plot visibility, including latex font
-
+- Fix string vs char handling in `save_fig_with_diagnostic.m`
 ## [v1.2.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.9) - 2026-5-7
 ### Added
 - Paper: dissertation writeup
