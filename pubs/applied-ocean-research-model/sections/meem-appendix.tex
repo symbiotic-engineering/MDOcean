@@ -502,9 +502,9 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 
 \subsection{Numerical Notes}\label{sec:meem-numerics}
-Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$.
-This is the cause of the numeric overflow discussed in \ref{sec:hydro-meem}, where it was asserted that overflow occurs when the fluid region height to diameter ratio $\Delta z / D$ falls below some threshold.
-The threshold is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{max}$:
+Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$, resulting in numeric overflow 
+To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \figurename~\ref{fig:meem-geom}.
+The constant of proportionality between $\Delta z_{min}$ and $D$ is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{max}$:
 \begin{equation}\label{eq:delta-z-min}
     \frac{\Delta z_{min}}{D} = \frac{\pi N_{harmonics}}{2\chi_{max}} \approx \frac{N_{harmonics}}{446}.
 \end{equation}
@@ -529,12 +529,13 @@ Plugging this into the first element of the bottom block of the b-vector (positi
     \label{fig:meem-b-limit}
 \end{figure}
 
-\Cref{fig:meem-b-limit}shows the asymptotic approximation as well as the standard expression for the relevant b-vector entry as a function of nondimensional ratio $m_0h/\textrm{acosh(realmax})$.
+\Cref{fig:meem-b-limit} shows the asymptotic approximation as well as the standard expression for the relevant b-vector entry as a function of nondimensional ratio $m_0h/\textrm{acosh(realmax})$.
 With the standard expression, values for inputs above $\frac{1}{2}$ become \texttt{NaN}, which poses problems in deep water.
 With the asymptotic approximation, we are able to avoid \texttt{NaN}s for the zone $\frac{1}{2}<m_0h/\textrm{acosh(realmax})<\frac{h}{d_2}$.
 Above this threshold, \texttt{NaN}s occur even with the approximation, and the value in the b-vector is set to zero.
 This introduces negligible error because in this range, the magnitude of the true value is less than $10^{-300}$ for the nominal RM3 geometry.
 The asymptotic approximation is accurate for values of $m_0h/\textrm{acosh(realmax})$ as low as $10^{-2}$, though it is only applied for values above $\frac{1}{2}$.
+
 
 The corresponding limit for the vertical coupling integral is:
 \begin{equation}
