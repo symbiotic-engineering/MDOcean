@@ -81,43 +81,40 @@ Explicitly outlining the requirements and resulting formulation logic serves (1)
 
 \tablename~\ref{remdo:tab:requirements} shows each requirement along with an indication of its priority in an optimization formulation context and a reference to the section, equation, or figure where it is explained.
 \newcounter{reqnumber}
-%\begin{table}
-%    \centering
-    \begin{longtable}{c>{\centering\arraybackslash}p{0.23\linewidth}>{\centering\arraybackslash}p{0.25\linewidth}>{\centering\arraybackslash}p{0.07\linewidth}>{\centering\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}}
-          \textbf{\#}&\textbf{Requirement}&  \textbf{Description}& \textbf{Priority}&\textbf{Ref.}&\textbf{Enforcement}\\
+    \begin{longtable}{c>{\centering\arraybackslash}p{0.25\linewidth}>{\centering\arraybackslash}p{0.27\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}}
+          \textbf{\#}&\textbf{Requirement}&  \textbf{Description}& \textbf{Priority}&\textbf{Enforcement}\\
          \hline
-  \requirement{float_spar_diam}&$D_s < D_{f,in}$&  Float spar diameter& 1&Fig. \ref{fig:dims}&Parameter $D_{f,in}/D_s$\\
-  \requirement{float_in_out_diam}&$D_{f,in}<D_{f}$& Float outer/inner diameter& 1& Fig. \ref{fig:dims}&Lin. ineq. constraint $g_{L,2}$\\
-  \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Fig. \ref{fig:dims}&Lin. ineq. constraint $g_{L,3}$\\
-  \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,min}$&  Float seafloor + numerical overflow& 1& Eq. \eqref{eq:delta-z-min-intro}, \eqref{eq:delta-z-min}&Lin. ineq. constraint $g_{L,5}$\\
-  \requirement{spar_seafloor_overflow}&$h-T_{f,2}>\Delta z_{f,min}$&  Spar seafloor + numerical overflow& 1& Eq. \eqref{eq:delta-z-min-intro}, \eqref{eq:delta-z-min}&Lin. ineq. constraint $g_{L,6}$\\
-  \requirement{float_base_diameter}& $D_{f,in} <D_{f,b} < D_f$& Float base diameter& 2& Fig. \ref{fig:dims}&Parameter $D_{f,b}/D_f$ \\
-  \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Fig. \ref{fig:dims} & Parameter $T_{f,1}/T_{f,2}$ \\
-  \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2& Fig. \ref{fig:dims}&Parameter $T_{f,2}/h_f$\\
-  \requirement{spar_damping_ratio}& $\zeta > \zeta_{min}$& Spar damping ratio& 2&Eq. \eqref{eq:spar} &Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
-  \requirement{spar_similarity}&$\omega_n<\omega_{n,max}$& Spar similarity& 2& Eq. \eqref{eq:spar}&Lin. ineq. constraint $g_{L,1}$\\
-  \requirement{positive_net_power}&$P_{avg}>0$& Positive net power& 2& -&Nonlin. ineq. constraint $g_{NL,14}$\\
-  \requirement{clearance_static}& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3& Tab. \ref{tab:DLCs}&Design variable bound\\
-  \requirement{tops_static}&$h_{fs,up}>0$& Float spar tops (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint $g_{L,4}$\\
-  \requirement{base_static}& $h_{fs,down}>0$& Float spar base (static)& 3& Eq. \eqref{eq:h-fs-up-down}&Lin. ineq. constraint $g_{L,3}$\\
-  \requirement{damping_plate_thickness}& $t_d < h_d$& Maximum damping plate thickness & 3 & & Lin. ineq. constraint $g_{L,7}$\\
-  \requirement{float_stiffener_height}& $h_{stiff,f} < h_f / 2$& Maximum float stiffener height& 3 & &Lin. ineq. constraint $g_{L,8}$\\
-  \requirement{tops_dynamic}&$h_{fs,up}>|X_f-X_s|$& Float spar tops (dynamics)& 3& Eq. \eqref{eq:h-fs-up-down}&Nonlin. ineq. constraint $g_{NL,19}$\\
-  \requirement{base_dynamic}& $h_{fs,down}>|X_f-X_s|$& Float spar base (dynamic)& 3& Eq. \eqref{eq:h-fs-up-down}&Nonlin. ineq. constraint $g_{NL,20}$\\
-  \requirement{clearance_dynamic}& $h_{fs,clear}>|X_f-X_s|$& Float spar tube clearance (dynamic)& 3& Tab. \ref{tab:DLCs}&Nonlin. ineq. constraint $g_{NL,21}$\\
-  \requirement{linear_amplitude}& $X_{lin}>|X_f|$& Float amplitude (linearity)& 3& Tab. \ref{tab:DLCs}&Nonlin. ineq. constraint $g_{NL,22}$\\
-  \requirement{slam_amplitude}& $X_{slam}>|X_f|$& Float amplitude (slamming)& 3& Tab. \ref{tab:DLCs}&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
-  \requirement{float_hydrostatics}&$V_{f,struct,min} < V_{f,struct} < V_{f,struct,max}$& Float hydrostatics& 3& Eq. \eqref{eq:vol-constraint}&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
-  \requirement{spar_hydrostatics}&$V_{s,struct,min} < V_{s,struct} < V_{s,struct,max}$& Spar hydrostatics& 3& Eq. \eqref{eq:vol-constraint}&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
-  \requirement{FOS}&$FOS > FOS_{min}$& Structural factors of safety& 3& Tab. \ref{tab:struct}&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
-  \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3& Eq. \eqref{eq:GM}&Nonlin. ineq. constraint $g_{NL,5}$\\
-  \requirement{force_max}&$F_p = F_{max}$& Maximum powertrain force& 3& &Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
-  \requirement{P_max}&$P_{pk,elec} = P_{max}$& Maximum powertrain power& 3& &Nonlin. ineq. constraint $g_{NL,18}$\\
-  \requirement{LCOE}&$LCOE<LCOE_{max}$& Maximum LCOE& 3& \ref{remdo:sec:multi-obj-process}&Nonlin. ineq. constraint $g_{NL,15}$\\
+  \requirement{float_spar_diam}&$D_s < D_{f,in}$&  Float spar diameter& 1&Parameter $D_{f,in}/D_s$\\
+  \requirement{float_in_out_diam}&$D_{f,in}<D_{f}$& Float outer/inner diameter& 1&Lin. ineq. constraint $g_{L,2}$\\
+  \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Lin. ineq. constraint $g_{L,3}$\\
+  \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,min}$&  Float seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,5}$\\
+  \requirement{spar_seafloor_overflow}&$h-T_{f,2}>\Delta z_{f,min}$&  Spar seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,6}$\\
+  \requirement{float_base_diameter}& $D_{f,in} <D_{f,b} < D_f$& Float base diameter& 2&Parameter $D_{f,b}/D_f$ \\
+  \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Parameter $T_{f,1}/T_{f,2}$ \\
+  \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2&Parameter $T_{f,2}/h_f$\\
+  \requirement{spar_damping_ratio}& $\zeta > \zeta_{min}$& Spar damping ratio& 2&Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
+  \requirement{spar_similarity}&$\omega_n<\omega_{n,max}$& Spar similarity& 2&Lin. ineq. constraint $g_{L,1}$\\
+  \requirement{positive_net_power}&$P_{avg}>0$& Positive net power& 2&Nonlin. ineq. constraint $g_{NL,14}$\\
+  \requirement{clearance_static}& $h_{fs,clear}>0$& Float spar tube clearance (static)& 3&Design variable bound\\
+  \requirement{tops_static}&$h_{fs,up}>0$& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
+  \requirement{base_static}& $h_{fs,down}>0$& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
+  \requirement{damping_plate_thickness}& $t_d < h_d$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
+  \requirement{float_stiffener_height}& $h_{stiff,f} < h_f / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
+  \requirement{tops_dynamic}&$h_{fs,up}>|X_f-X_s|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
+  \requirement{base_dynamic}& $h_{fs,down}>|X_f-X_s|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
+  \requirement{clearance_dynamic}& $h_{fs,clear}>|X_f-X_s|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
+  \requirement{linear_amplitude}& $X_{lin}>|X_f|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
+  \requirement{slam_amplitude}& $X_{slam}>|X_f|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
+  \requirement{float_hydrostatics}&$V_{f,struct,min} < V_{f,struct} < V_{f,struct,max}$& Float hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
+  \requirement{spar_hydrostatics}&$V_{s,struct,min} < V_{s,struct} < V_{s,struct,max}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
+  \requirement{FOS}&$FOS > FOS_{min}$& Structural factors of safety& 3&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
+  \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3&Nonlin. ineq. constraint $g_{NL,5}$\\
+  \requirement{force_max}&$F_p = F_{max}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
+  \requirement{P_max}&$P_{pk,elec} = P_{max}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
+  \requirement{LCOE}&$LCOE<LCOE_{max}$& Maximum LCOE& 3&Nonlin. ineq. constraint $g_{NL,15}$\\
 
     \caption{Requirements}
     \label{remdo:tab:requirements}
-%\end{table}
 \end{longtable}
 
 \ifdefined\DISSERTATION
