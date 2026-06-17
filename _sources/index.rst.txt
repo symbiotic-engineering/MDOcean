@@ -18,3 +18,4 @@ MDOcean documentation
    usage
    modification
    api
+   videos
