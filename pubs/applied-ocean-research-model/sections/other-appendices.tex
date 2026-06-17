@@ -1,6 +1,6 @@
 \clearpage
 \section{Additional Hydrodynamics Details}
-The hydrodynamic coefficients for the spar are calculated by fitting and interpolating data from WAMIT and reference \cite{olaya_hydrodynamic_2016}.
+The hydrodynamic coefficients for the spar are calculated by fitting and interpolating data from WAMIT and reference \cite{olaya_hydrodynamic_2015}.
 The data show the excitation and damping coefficients experiencing ``rebound'' effects where rather than slowly asymptoting to zero like those of a single cylinder, they go quickly to zero, increase to a peak, then slowly asymptote down to zero again.
 The coefficients have the following form:
 \begin{equation}
@@ -14,8 +14,8 @@ The coefficients have the following form:
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2024} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2024} presents a PTO model in cascade matrix form for a single degree of freedom system. 
+Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
 This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 \subsubsection{PTO Kinematics and Underactuation}
@@ -64,7 +64,7 @@ Thus, even absent any mechanism with ``kinematics'' in the traditional sense, th
 In the circuit representation with two hydrodynamic and one PTO degree of freedom, the hybrid matrix \cref{eq:h-matrix-kinematics} can be represented as a three-port element, as shown in \cref{fig:multiport-circuit-kinematics}.
 \begin{figure}
 \centering
-    \input{../applied-ocean-research-model/figs/tikz/circuit_kinematics.tikz}
+    \input{figs/tikz/circuit_kinematics.tikz}
 \caption{Multiport circuit with powertrain kinematics represented as a hybrid matrix, followed by the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics}
 \label{fig:multiport-circuit-kinematics}
 \end{figure}
@@ -199,7 +199,7 @@ This equation allows the $Z_l$ identified with optimal control to be implemented
 The PTO dynamics can be represented as a multiport circuit, as shown in \figureautorefname~\ref{fig:multiport-circuit-pto}.
 \begin{figure}
 \centering
-    \input{../applied-ocean-research-model/figs/tikz/circuit_pto.tikz}
+    \input{figs/tikz/circuit_pto.tikz}
 \caption{PTO dynamics represented as a multiport circuit and electrical Th\'{e}venin equivalent}
 \label{fig:multiport-circuit-pto}
 \end{figure}
@@ -228,7 +228,9 @@ The load voltage and current can then be found as:
 Here we unify the formulation and present a clear system-level solution procedure for all port variables:
 \begin{enumerate}
 \item Use \cref{eq:thevenin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
-\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
+\item Set the load impedance $Z_l$.
+Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports.
+\Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
 \item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
 \item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
 \item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
@@ -338,7 +340,9 @@ S_{\mu}|\Gamma - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
 \end{alignat}
 \end{subequations}
 where the constraint \cref{eq:disc-constraint} is derived from \cref{eq:ineq-gamma} by completing the square.
-More precisely, when $A_{q,\mu} \neq 0$, the $\mu$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,\mu}$ with radius $r_{\mu}$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,\mu} > 0$ ($S_{\mu}=1$) or outside this circle when $A_{q,\mu} < 0$ ($S_{\mu}=-1$). Parameters $\Gamma_{c,\mu}$, $r_{\mu}$, and $S_{\mu}$ are defined as:
+More precisely, when $A_{q,\mu} \neq 0$, the $\mu$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,\mu}$ with radius $r_{\mu}$.
+The constraint requires that $\Gamma$ lie within this circle when $A_{q,\mu} > 0$ ($S_{\mu}=1$) or outside this circle when $A_{q,\mu} < 0$ ($S_{\mu}=-1$).
+Parameters $\Gamma_{c,\mu}$, $r_{\mu}$, and $S_{\mu}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
 \Gamma_{c,\mu}
@@ -396,7 +400,8 @@ where $\mathcal{F} = \bigcap_{\mu} \left\{\Gamma : S_{\mu}|\Gamma - \Gamma_{c,\m
 \begin{aligned}
 \mathcal{C}_{int} &= \left\{
     \Gamma_{\mu,\nu}, \quad \forall \mu \neq \nu
-\right\}. \\
+\right\}.
+\\
 \mathcal{C}_{cl} &= \left\{
     (|\Gamma_{c,\mu}| - r_{\mu})e^{i\angle\,\Gamma_{c,\mu}}, \quad \forall \mu
 \right\}.
@@ -423,8 +428,9 @@ Importantly, we need not compute the entire feasible space $\mathcal{F}$, only c
 \Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_{\mu}=4$, $S_{\mu}=1$, and various $\Gamma_{c,\mu}$.
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../applied-ocean-research-model/figs/manual/qp_circles.pdf}
-    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,\mu}$, all with radius $r_{\mu}=4$ and $S_{\mu}=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
+    \includegraphics[width=\textwidth]{figs/manual/qp_circles.pdf}
+    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$.
+Toy problems with various constraint circle centers $\Gamma_{c,\mu}$, all with radius $r_{\mu}=4$ and $S_{\mu}=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
@@ -442,7 +448,8 @@ The new candidate points are:
 \mathcal{C}_{int,oval-circ} &= \left\{
     \Gamma : 
     |\Gamma - \Gamma_{c,\mu}| = r_{\mu}, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall \mu,k
-\right\}. \\
+\right\}.
+\\
 \mathcal{C}_{cl,oval} &= \left\{
     \Gamma : 
     \Gamma = \begin{cases}
@@ -483,7 +490,7 @@ It is expected that the optimal design will have low reactivity because reactivi
 
 \subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
-References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss the reflection coefficient for WECs.
+References \cite{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
 
 Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
@@ -569,7 +576,8 @@ both independent of the constraint limits, \cref{eq:radius-full} and its derivat
 \end{equation}
 Since $r_\mu\in\mathbb{R}$, then $b_\mu + c_\mu$ and $d_\mu$ must have the same sign, so $\frac{\partial r_\mu}{\partial b_\mu}$ is always positive.
 In other words, increasing $b_\mu$ always enlarges the circle radius, regardless of whether the constraint represents the interior or exterior of the circle.
-Meanwhile, \cref{eq:gamma-disc-center} shows that the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, so $\frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}=0$. Thus, the constraint limit $L_\mu$ does not affect the circle center.
+Meanwhile, \cref{eq:gamma-disc-center} shows that the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, so $\frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}=0$.
+Thus, the constraint limit $L_\mu$ does not affect the circle center.
 
 \subsubsection{Optimal Reflection Coefficient as a Function of Constraint Limits}
 Now we combine the relationship between circle radius and optimal reflection coefficient $\Gamma_{opt}(r_\mu)$, with the relationship between circle radius and constraint limit $r_\mu(b_\mu)$ derived above
@@ -685,7 +693,8 @@ it can be written as a sum over all constraint pairs $(\mu,\nu)$ multiplied by a
             + \sqrt{\textrm{aff}(b_{\mu})}
         \right)
      + \delta_{\mu,\mu^*}\delta_{\nu,\nu^*}
-    \right. \\
+    \right.
+\\
     &\left.
         \left(
             \textrm{quad}(b_{\mu}, b_{\nu}) + 
@@ -733,7 +742,8 @@ Substituting \cref{eq:gamma-opt-scale-sum} into \cref{eq:power-elec-sensitivity}
             \textrm{aff}_\beta(b_{\mu})
             + \sqrt{\textrm{aff}_\beta(b_{\mu})}
         \right)
-    \right. \\
+    \right.
+\\
     &\left.
         + \delta_{\mu,\mu^*_\beta}\delta_{\nu,\nu^*_\beta}
         \left(
@@ -917,19 +927,19 @@ The integrals must be evaluated numerically, except for special limit cases for 
 \begin{figure}[h!]
     \centering
     \begin{subfigure}[t]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../applied-ocean-research-model/figs/from-matlab/drag_integral_B.pdf}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_integral_B.pdf}
         \caption{Drag damping integral $I_B$, scaled by $\frac{2}{\pi}$.}
         \label{fig:drag-damping-integral}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../applied-ocean-research-model/figs/from-matlab/drag_integral_G_m.pdf}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_integral_G_m.pdf}
         \caption{Magnitude of drag excitation integral $|I_G|$, scaled by $\frac{2}{\pi}$.}
         \label{fig:drag-excitation-magnitude-integral}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../applied-ocean-research-model/figs/from-matlab/drag_integral_G_p.pdf}
+        \includegraphics[width=\textwidth]{figs/from-matlab/drag_integral_G_p.pdf}
         \caption{Phase of drag excitation integral $\angle I_G$, scaled by $\frac{1}{\pi}$.}
         \label{fig:drag-excitation-phase-integral}
     \end{subfigure}
@@ -1065,7 +1075,8 @@ where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that
 The relevant value of $\theta$ differs depending on the wave amplitude.
 
 \subsubsection{Case 1: Small Wave Amplitudes}
-For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$. This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
+For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$.
+This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
 The value of $\theta$ that minimizes $\xi_{max,slam}$ over the relevant range is 
 \begin{equation}\label{eq:slamming-limit-small-waves}
 \theta = \pi - \max\left(0,~ \frac{-kD}{2}+|\pi-\angle \xi|\right)
@@ -1114,7 +1125,7 @@ This reveals that besides increasing the draft, decreasing $\theta$ can prevent 
 If $\Delta z_{slam}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{../applied-ocean-research-model/figs/from-matlab/slamming_amplitude.pdf}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/slamming_amplitude.pdf}
     \caption{Nondimensional critical slamming amplitude}
     \label{fig:slam}
 \end{figure}
@@ -1141,14 +1152,15 @@ A significant fraction of sea states violate the limit and will require adjusted
 Significant wave heights in excess of 5.5 meters have negative maximum slamming amplitudes (colored blue), indicating that control adjustments in those waves must not only decrease $|\hat{\xi}_f|$ but also adjust $\angle\hat{\xi}_f$ to reduce $\theta$.
 \begin{figure}
     \centering
-    \includegraphics[width=1.1\linewidth]{../applied-ocean-research-model/figs/from-matlab/slamming_model_comparison_float.pdf}
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison_float.pdf}
     \caption{Slamming Model Results for Nominal RM3 Float Design in Operational Sea States}
     \label{fig:slamming-validation}
 \end{figure}
 
 \subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
 \subsubsection{WEC-Sim}
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime. For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
 %Table~\ref{tab:dynamic-validation} and 
@@ -1156,7 +1168,8 @@ Figure~\ref{fig:dynamic-validation} compares the results.
 The $C_d=0$ simulation with identical hydrodynamic coefficients (top left of \cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions. 
 The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
 This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
-For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power. An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
+An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
 Turning on drag ($C_d=1$, top right of \cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
 While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
 
@@ -1164,7 +1177,7 @@ Moving to the bottom left corner of \cref{fig:dynamic-validation}, we examine th
 The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the MEEM hydro coefficients has minimal effect on the overall dynamic response.
 Finally, the bottom right corner of \cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
 Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
-This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \cref{sec:validation}.
+This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \cref{sec:dynamic-validation}.
 Meanwhile, MDOcean underpredicts the peak power by around 25\%.
 Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
 
@@ -1186,11 +1199,11 @@ Error scales more closely with wave period than wave height for periods under 12
   && \multicolumn{2}{c}{Drag Coefficient}\\
          && $C_d=0$& $C_d=1$\\ \hline
     \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& 
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf} 
-  & \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}
 \\ &\rot{Different} & 
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf} 
-  & \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf} \\
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
 \caption{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
 \label{fig:dynamic-validation}
@@ -1211,11 +1224,11 @@ While most signals show good agreement between the models, interestingly, large 
   && \multicolumn{2}{c}{Drag Force}\\
          && Magnitude& Phase\\ \hline
     \multirow{2}{*}[-3em]{\rot{Body}} &\rot{Float}& 
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf} 
-  & \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}
 \\ &\rot{Spar} & 
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf} 
-  & \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf} \\
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf} \\
 \end{tabular}
 \caption{Drag force comparison showing large errors in drag force, despite low errors in amplitude and power}
 \label{fig:drag-validation}
@@ -1250,11 +1263,12 @@ The match is excellent in all four cases, confirming that the drag force is inde
 \end{figure}
 
 \subsubsection{Reference Model Report}
-While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, it does record the mechanical power for each sea state.
+While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, 
+it does record the mechanical power for each sea state.
 \Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
 \begin{figure}
     \centering
-    \includegraphics[width=1.1\linewidth]{../applied-ocean-research-model/figs/from-matlab/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf}
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
     \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
     \label{fig:report-power-validation}
 \end{figure}
@@ -1290,7 +1304,7 @@ The large-scale unit costs $C_\infty$, single-unit costs $C_1$, and exponents $\
 \figureautorefname~\ref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \cite{RM3} reference values.
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/cost_vs_N_WEC.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/cost_vs_N_WEC.pdf}
     \caption{Validation for cost scaling with number of WECs}
     \label{fig:econ-nwec-validate}
 \end{figure}
@@ -1312,7 +1326,7 @@ To analyze these compound sections, equivalent properties can be established tha
 Figure~\ref{fig:stiffened-plate} illustrates the concept of equivalent thickness for a stiffened plate.
 \begin{figure}[hbtp]
     \centering
-    \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/equivalent_stiffness.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/equivalent_stiffness.pdf}
     \caption{Equivalent thickness for a stiffened plate}
     \label{fig:stiffened-plate}
 \end{figure}
@@ -1388,7 +1402,7 @@ These dimensions are shown in figure~\ref{fig:trapezoid}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/trapezoid.pdf}
+    \includegraphics[width=0.75\linewidth]{figs/from-matlab/trapezoid.pdf}
     \caption{Trapezoidal float plate with inscribed circle used to determine $x_{min}$}
     \label{fig:trapezoid}
 \end{figure}
@@ -1434,7 +1448,8 @@ In the meantime, the top plate thickness is set by scaling the bottom plate thic
 
 \subsubsection{Other Float Plates}
 The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave. 
-Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design. This prevents the need for a separate structural analysis of the side plates.
+Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design.
+This prevents the need for a separate structural analysis of the side plates.
 
 \subsection{Damping Plate}
 For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{plate}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
@@ -1455,7 +1470,7 @@ The factor of safety is then the ratio of the maximum (ultimate or endurance, de
 The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{../applied-ocean-research-model/figs/from-matlab/damping_plate_flowchart.pdf}
+    \includegraphics[width=1\linewidth]{figs/from-matlab/damping_plate_flowchart.pdf}
     \caption{Calculation process flowchart for the damping plate structural assessment}
     \label{fig:damping-plate-flowchart}
 \end{figure}
@@ -1466,13 +1481,13 @@ The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
 \begin{figure}
     \centering
     \begin{subfigure}[t]{0.48\linewidth}
-        \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/damping_plate_moment.pdf}
+        \includegraphics[width=\linewidth]{figs/from-matlab/damping_plate_moment.pdf}
         \caption{Damping plate moment}
         \label{fig:damping-plate-moment}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\linewidth}
-        \includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/damping_plate_deflection.pdf}
+        \includegraphics[width=\linewidth]{figs/from-matlab/damping_plate_deflection.pdf}
         \caption{Damping plate deflection}
         \label{fig:damping-plate-deflection}
     \end{subfigure}

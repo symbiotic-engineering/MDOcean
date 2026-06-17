@@ -1,14 +1,14 @@
-\section{Discussion}\label{sec:discussion}
+\section{Discussion}\label{remdo:sec:discussion}
 
-Beyond the analysis of individual results offered in section~\ref{sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
+Beyond the analysis of individual results offered in section~\ref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
 It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
 
 \subsection{Result Comparison to Other Studies }
 % (and comparison to commercial WECs)
 \subsubsection{Force Saturation}
 Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} suggest capping the maximum force significantly below the unsaturated point based on findings that doing so sacrifices only minimal power, but none perform full economic analysis to confirm that the cost savings outweigh the power decrease.
-The results presented in section~\ref{sec:results-single} verify the conclusion with an appropriate cost analysis, since the optimal design sizes its powertrain small enough to necessitate force saturation.
-The follow-on analysis in \sectionautorefname~\ref{sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
+The results presented in section~\ref{remdo:sec:results-single} verify the conclusion with an appropriate cost analysis, since the optimal design sizes its powertrain small enough to necessitate force saturation.
+The follow-on analysis in \sectionautorefname~\ref{remdo:sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
 Thus, force saturation as a control technique is highly valuable, capable of tangible LCOE reductions when considering the tradeoff of power and cost.
 Future studies could quantify the threshold of the lowest marginal price of PTO force (\$/N) for which this conclusion still holds.
 
@@ -21,8 +21,8 @@ The study finds that tuning the resonant period to match the dominant ocean peri
 Importantly, however, the devices have equal diameter and height, use only damping control, and are tuned to maximize power without regard for mass or cost.
 In MDOcean, on the other hand, tuning can not only be accomplished by changing diameter and height independently, but also with reactive control.
 Moreover, devices are tuned not to maximize power but to minimize LCOE.
-The single-objective results in \tableautorefname~\ref{tab:opt-dv-values} and \ref{tab:opt-output} show agreement with the overall conclusion of \cite{de_andres_adaptability_2015} that power maximization does not align with LCOE minimization, but in the present study the additional cost of maximum power comes in the form of PTO cost rather than structural cost as it does in \cite{de_andres_adaptability_2015}.
-Meanwhile, MDOcean's location global sensitivity (\tableautorefname~\ref{tab:location}) shows a significantly larger optimal float size in Hawaii, the location with the lowest value of the most common wave period.
+The single-objective results in \tableautorefname~\ref{remdo:tab:opt-dv-values} and \ref{remdo:tab:opt-output} show agreement with the overall conclusion of \cite{de_andres_adaptability_2015} that power maximization does not align with LCOE minimization, but in the present study the additional cost of maximum power comes in the form of PTO cost rather than structural cost as it does in \cite{de_andres_adaptability_2015}.
+Meanwhile, MDOcean's location global sensitivity (\tableautorefname~\ref{remdo:tab:location}) shows a significantly larger optimal float size in Hawaii, the location with the lowest value of the most common wave period.
 This again departs from the results of \cite{de_andres_adaptability_2015}, which finds that small (4~m diameter) WECs optimize their LCOE proxy regardless of the dominant period at the location.
 This demonstrates that the use of a more thorough multidisciplinary model like MDOcean is essential to draw accurate design conclusions.
 
@@ -38,8 +38,8 @@ This requires further investigation and may be due to underestimation of loads i
 % compare to the Sandia RM3 optimization results
 
 \subsubsection{Optimization Procedure}
-\label{sec:discussion-optimization}
-Recalling the discussion of prior WEC optimization studies in section~\ref{sec:lit}, all prior large-scale ($\geq8$ design variables) WEC optimizations utilize the genetic algorithm, a population-based heuristic algorithm.
+\label{remdo:sec:discussion-optimization}
+Recalling the discussion of prior WEC optimization studies in section~\ref{remdo:sec:lit}, all prior large-scale ($\geq8$ design variables) WEC optimizations utilize the genetic algorithm, a population-based heuristic algorithm.
 Based on the generation count and population sizes stated in references \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, 12,000, 2,200, 6,100, and 2,400 function evaluations are required for convergence respectively.
 The the present study is the first to perform large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer function evaluations to converge.
 Generating the pareto seeds in this study, however, entails performing 20 single-objective optimizations at around 100 iterations each, using finite difference on the 12 design variables.
@@ -53,20 +53,20 @@ For example, the adjoint method would additionally require constraint aggregatio
 Finally, even with the increased function evaluations, the gradient-based algorithm retains its advantage of providing certainty that the solution has converged to a local optimum, and with a systematic multistart, there is reasonable confidence that the solution is a global optimum, which is not the case in a heuristic optimization.
 
 \subsection{Model Realism}
-Circling back to the modeling assumptions introduced in section~\ref{sec:model}, one can now use the optimization and sensitivity results to determine whether the assumptions are reasonable.
+Circling back to the modeling assumptions introduced in section~\ref{remdo:sec:model}, one can now use the optimization and sensitivity results to determine whether the assumptions are reasonable.
 We assess model complexities that MDOcean adequately captures to confirm whether those effects were worth including, as well as model shortcomings that MDOcean cannot adequately capture to examine whether those effects must be added in future versions.
 Previous studies such as \cite{garcia-teruel_reliability-based_2021} have called for this kind of systematic model fidelity assessment to enhance designers' confidence on the most relevant effects and their impact on computation time.
 
 \subsubsection{Observed Impact of Modeled Effects}
 A few of the areas of developed model complexity, such as force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the final results, as seen in the constraint activity and difference in results obtained if 1-DOF dynamics corresponding to a stationary spar are used.
-Section~\ref{sec:sensitivity-model-assumptions} analyzed these effects in detail.
+Section~\ref{remdo:sec:sensitivity-model-assumptions} analyzed these effects in detail.
 Earlier in \sectionautorefname~\ref{sec:sim-runtime}, \figureautorefname~\ref{fig:runtime-dynamics} reveals that MDOcean's 2-DOF dynamics take an order of magnitude longer to run than 1-DOF dynamics, indicating an area where code enhancements to make the 2-DOF runtime more comparable with the 1-DOF model may be worthwhile given the dynamic importance of including the second degree of freedom. 
 Meanwhile, force saturation is seen to be especially relevant since it not only directly reduces the powertrain cost, but also indirectly reduces the structural cost by reducing the operational heave loading.
 This allows for a reduction in spar thickness due to the activity of the column fatigue factor of safety constraint. 
 The observed impact of these effects on the overall optimization justifies the model complexity in those areas, suggesting that other optimization frameworks should include these complexities for realistic results.
 
 On the other hand, a few other modeling complexities appear perhaps unnecessary in hindsight because they have little effect on the results.
-Section~\ref{sec:sensitivities-local} finds a low sensitivity to drag coefficient, and the re-optimization without drag in \sectionautorefname~\ref{sec:sensitivity-model-assumptions} confirms this result.%\hl{confirms this result}.
+Section~\ref{remdo:sec:sensitivities-local} finds a low sensitivity to drag coefficient, and the re-optimization without drag in \sectionautorefname~\ref{remdo:sec:sensitivity-model-assumptions} confirms this result.%\hl{confirms this result}.
 This suggests that modeling the drag nonlinearity is not essential, and future optimizations may wish to turn off drag to reduce the computation time associated with iterating the drag damping coefficient.
 Likewise, the slamming model is derived to be valid not just in the simple case of long waves but also in intermediate wavelengths, where the maximum amplitude depends on additional values including the phase of the dynamic response.
 \appendixautorefname~\ref{sec:appendix-slam} shows that the simple slamming model is reasonably accurate at sea states with active slamming constraint, suggesting that the intermediate wavelength model may be unnecessary.
@@ -82,39 +82,39 @@ On the other hand, the active slamming constraints for operational sea states me
 
 \subsection{Formulation Realism}
 \subsubsection{Design Variable Suitability}
-Section~\ref{sec:formulation} outlined this study's careful choice of design variables to facilitate satisfaction of high-priority requirements to maintain model validity and facilitate optimization convergence while balancing the computational challenges of a large design space.
-The analysis in \sectionautorefname~\ref{sec:sensitivities-local} reveals that the following variables chosen as parameters may be worthy of including as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
+Section~\ref{remdo:sec:formulation} outlined this study's careful choice of design variables to facilitate satisfaction of high-priority requirements to maintain model validity and facilitate optimization convergence while balancing the computational challenges of a large design space.
+The analysis in \sectionautorefname~\ref{remdo:sec:sensitivities-local} reveals that the following variables chosen as parameters may be worthy of including as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
 In addition, the addition of $N_{WEC}$ as a design variable carries little importance in an LCOE minimization, where larger $N_{WEC}$ should always be preferred due to economies of scale, but can offer especially useful insight in a modified multi-objective analysis where the first objective is changed from per-WEC average power to array average power.
 This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether it preferable to meet that requirement using multiple smaller WECs or one larger WEC.
 
 Additionally, a sensitivity analysis of design variables perturbed as if they are parameters would help to analyze the extent of coupling between disciplines and potentially inform future formulation simplifications.
-For example, the expected high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ aligns with the choice made in this study to conduct fully coupled MDO, as outlined in section~\ref{sec:model-overview}, but a low value would support the potential disciplinary decoupling.
+For example, the expected high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ aligns with the choice made in this study to conduct fully coupled MDO, as outlined in section~\ref{remdo:sec:model}, but a low value would support the potential disciplinary decoupling.
 This type of analysis may be necessary if a proposed future optimization with significantly more design variables is too computationally intensive to perform fully coupled optimization and requires splitting up into a set of sequential optimizations, such as bulk geometry power maximization followed by powertrain sizing followed by structural sizing).
 Performing this sequential optimization for the current formulation and assessing the degree of suboptimality could quantify the importance of a coupled optimization.
 The authors predict, however, that the significant computational speedup of the semi-analytical models introduced in this paper and the extensions discussed herein will be sufficient to allow full coupling even for substantially larger scale WEC optimizations, including the ambitious target of a study comparing multiple hydrodynamic architectures with realistic powertrain models.
 
 \subsubsection{Parameter Suitability}
-The local parameter sensitivity analysis of \sectionautorefname~\ref{sec:sensitivities-local} already yields significant insight on the impact of the choice of parameters in this problem.
+The local parameter sensitivity analysis of \sectionautorefname~\ref{remdo:sec:sensitivities-local} already yields significant insight on the impact of the choice of parameters in this problem.
 Interpreting those results more broadly, parameters with a high design sensitivity $\left(\frac{dx^*}{dp}\right)$, such as dimensional aspect ratios, wave conditions, and material properties, are especially important for engineers to determine early in the design cycle because they affect the optimal design. 
 Where relevant, designers should consider holding the nondimensional versions of these parameters constant across prototype scales, extending the common practice of Froude scaling for wave conditions.
 On the other hand, parameters with a high objective sensitivity $\left(\frac{dJ^*}{dp}\right)$, such as operational wave conditions, PTO efficiency, and financing rates in the LCOE minimization, are most important for funders to determine early in the project implementation cycle and for research funding agencies to incentivize innovation through R\&D proposals because they affect the WEC's economic viability.
 Notably, other parameters such as PTO price, storm wave conditions, and dimensional variables are more relevant for design cost minimization, highlighting that incentives and innovation strategies for Powering the Blue Economy applications may need to be distinct from those for utility-scale energy.
 Meanwhile, the larger number of parameters with high sensitivity in the cost minimization implies that there are more diverse avenues for impactful innovation in PBE applications than in utility-scale energy.
 
-Additional sensitivity and post-optimality analysis work that could produce useful insights includes a sensitivity analysis of hyperparameters, following the same procedure as section~\ref{sec:sensitivities-local}, to ensure numerical convergence and adequate tuning of optimization settings.
+Additional sensitivity and post-optimality analysis work that could produce useful insights includes a sensitivity analysis of hyperparameters, following the same procedure as section~\ref{remdo:sec:sensitivities-local}, to ensure numerical convergence and adequate tuning of optimization settings.
 A global parameter sensitivity analysis is also suggested, taking into account both nonlinearites in the effect of one parameter across operating points and interaction effects between multiple uncertain parameters.
 
 \subsubsection{Constraint and Requirement Suitability}
 By including \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear constraints, this optimization captures more realistic design, model, and operational requirements than any other WEC optimization study known to the authors.
-The active constraints highlighted in \figureautorefname~\ref{fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming). 
+The active constraints highlighted in \figureautorefname~\ref{remdo:fig:constraint-activity} fall broadly into the class of survivability, including both structural (design variable lower bounds and factors of safety in each of the float, column, and damping plate) and amplitude-based (float rising above spar, linear theory, and float slamming). 
 Constraints related to ballast and pitch stability are inactive, confirming that these design considerations are not primary avenues for innovation.
 While survivability is known to be a critical design requirement for WECs, it is rarely incorporated into optimization studies, and the results of this study demonstrate and quantify the effect of survivability considerations. 
-For example, the Lagrange multipliers of \figureautorefname~\ref{fig:lagrange-multiplier} suggest that improvements to the structural design of the damping plate are worth around 5 times more than equivalent structural improvements to the column and 10 times more than those to the float.
+For example, the Lagrange multipliers of \figureautorefname~\ref{remdo:fig:lagrange-multiplier} suggest that improvements to the structural design of the damping plate are worth around 5 times more than equivalent structural improvements to the column and 10 times more than those to the float.
 
 Further innovation in WEC survivability is warranted, both in the incremental and transformative sense.
 Incremental improvements include developing more structurally and hydrodynamically performant detail designs that obey these constraints while reducing material use and sustaining energy production (for example, performing FEA or adding additional stiffeners to justify the removal of more material, replacing welded connections with pins to reduce moment transfer, or modifying the float-spar attachment geometry to allow for more travel with the same bulk body dimensions).
 Transformative improvements include creative design concepts that avoid the need for these constraints altogether or substantially modify their formulation.
-For example, storm survival strategies that involve submerging the WEC, changing the shape using control surfaces, or changing the PTO control strategy to reduce force and amplitude have all been suggested, and the viability of such design changes can be readily estimated by comparing the additional costs (for example, of additional actuator and control hardware and software) against the performance gains again using the Lagrange multipliers of \figureautorefname~\ref{fig:lagrange-multiplier}.
+For example, storm survival strategies that involve submerging the WEC, changing the shape using control surfaces, or changing the PTO control strategy to reduce force and amplitude have all been suggested, and the viability of such design changes can be readily estimated by comparing the additional costs (for example, of additional actuator and control hardware and software) against the performance gains again using the Lagrange multipliers of \figureautorefname~\ref{remdo:fig:lagrange-multiplier}.
 
 That said, there still exist many considerations that the formulation fails to capture, requiring caution before asserting that the industry should pursue the optimal design found here.
 For one, design variables are assumed continuous, whereas in reality the sizing of structural thicknesses and, to a lesser extent, generator specifications, are constrained based on the discrete sizes available commercially.
@@ -129,7 +129,8 @@ Due to the high uncertainty inherent in LCOE, this study performs multi-objectiv
 While this overcomes many concerns in optimizing LCOE, there are still limitations.
 For example, prices for steel, powertrain force, and powertrain power must still be assumed, which could be overcome by increasing the number of objectives to consider each cost separately.
 However, moving beyond two objectives limits the intuition and visualization power of results, and the authors believe that the two objectives chosen here represent a good balance.
-Alternatively, a global parameter sensitivity analysis of the price parameters could address this uncertainty. Pairing this with uncertainty quantification and robustness analysis would complete the picture.
+Alternatively, a global parameter sensitivity analysis of the price parameters could address this uncertainty.
+Pairing this with uncertainty quantification and robustness analysis would complete the picture.
 
 Although the cost formulation used here is uncertain, it still represents a significant improvement over cost proxies typically used in WEC optimization such as wetted surface area and hull volume.
 In future work, running the MDOcean optimization using those simplified metrics instead of the structural and powertrain cost model used here would be useful for comparison and to assess the suitability of various proxy metrics. 
@@ -206,17 +207,17 @@ Would require integration with WDRT or similar to get the environmental contour 
 
 %\begin{longtable}
 %    \centering
-    \begin{longtable}{
-        >{\centering\arraybackslash}p{0.1\linewidth}|
-        >{\centering\arraybackslash}p{0.3\linewidth}
-        >{\centering\arraybackslash}p{0.6\linewidth}}
-                                &  Existing optimization formulation & New optimization formulation \\ \hline
-         Existing model features& \speedupsRE                        & \achievableDesignStudiesRE     \\
-         New model features     & \modelTrustBuildersRE              & \modelStudyEnablersRE        \\
-    %\end{tabular}
-    \caption{Future model and optimization improvements}
-    \label{tab:future-studies}
-\end{longtable}
+%     \begin{longtable}{
+%         >{\centering\arraybackslash}p{0.1\linewidth}|
+%         >{\centering\arraybackslash}p{0.3\linewidth}
+%         >{\centering\arraybackslash}p{0.6\linewidth}}
+%                                 &  Existing optimization formulation & New optimization formulation \\ \hline
+%          Existing model features& \speedupsRE                        & \achievableDesignStudiesRE     \\
+%          New model features     & \modelTrustBuildersRE              & \modelStudyEnablersRE        \\
+%     %\end{tabular}
+%     \caption{Future model and optimization improvements}
+%     \label{remdo:tab:future-studies}
+% \end{longtable}
 
 
 

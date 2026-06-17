@@ -48,10 +48,10 @@ function [fig_array,...
 
             % Compute pareto shape heuristics
             b = var_bounds();
-            [powerWhereCusp, powerWhereNonconvexEnds, dampingReactivePowerIntersect] = ...
-                compute_pareto_shape_heuristics(intermed_result_struct.r1, intermed_result_struct.r2, ...
-                                                intermed_result_struct.r1.p, b);
-            end_result_struct.powerWhereCusp = powerWhereCusp;
-            end_result_struct.powerWhereNonconvexEnds = powerWhereNonconvexEnds;
-            end_result_struct.dampingReactivePowerIntersect = dampingReactivePowerIntersect;
+            % [powerWhereCusp, powerWhereNonconvexEnds, dampingReactivePowerIntersect] = ...
+            %     compute_pareto_shape_heuristics(intermed_result_struct.r1, intermed_result_struct.r2, ...
+            %                                     intermed_result_struct.r1.p, b);
+            % end_result_struct.powerWhereCusp = powerWhereCusp;
+            % end_result_struct.powerWhereNonconvexEnds = powerWhereNonconvexEnds;
+            % end_result_struct.dampingReactivePowerIntersect = dampingReactivePowerIntersect;
 end

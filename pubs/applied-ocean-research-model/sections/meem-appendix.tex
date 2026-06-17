@@ -4,7 +4,7 @@
 \label{sec:MEEM_details}
 As introduced in section~\ref{sec:hydro-meem}, the hydrodynamic coefficients are computed semi-analytically using MEEM.
 This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented in \cite{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution \cite{yeung_added_1981}.
-Further numeric and realization details of the authors' implementation may be found in \cite{bimali_numerics_2026,best_openflash_2026,mccabe_open-source_2024}.
+Further numeric and realization details of the authors' implementation may be found in \cite{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
 The computation involves splitting the fluid domain into regions, approximating an infinite series by truncation, and solving a matrix equation to enforce the continuity of potential and velocity across regions. 
 
 \subsection{Linear Hydrodynamics and Eigenfunctions}
@@ -23,7 +23,7 @@ Figure~\ref{fig:meem-regions} illustrates the regions and dimensions: two intern
 
 \begin{figure}[htbp]
 \centering
-\input{../applied-ocean-research-model/figs/tikz/meem_dims.tikz}
+\input{figs/tikz/meem_dims.tikz}
 \caption{Fluid regions and dimensions used in the dual concentric cylinder MEEM}
 \label{fig:meem-regions}
 \end{figure}
@@ -375,7 +375,7 @@ Of the sixteen blocks that make up the matrix, six are diagonal, four are zero, 
 An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in \cite{chau_inertia_2012}. 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/meem_sparsity.pdf}
+    \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_sparsity.pdf}
     \caption{A-matrix sparsity pattern, shown for $N=M=K=4$}
     \label{fig:sparsity}
 \end{figure}
@@ -473,7 +473,7 @@ Previously in section~\ref{sec:dynamic-validation}, the N=M=K=11 case was compar
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/meem_validation.pdf}
+    \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_validation.pdf}
     \caption{Nondimensional added mass and damping coefficient validation against \cite{chau_inertia_2012}}
     \label{fig:meem-yeung-validation}
 \end{figure}
@@ -486,7 +486,7 @@ We observe that potential matching converges faster than velocity matching.
 Figure~\ref{fig:meem-matching} shows the matching behavior for $N=M=K=11$, where potential matches well but velocity still has noticeable mismatch. 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/meem_matching.pdf}
+    \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_matching.pdf}
     \caption{Matching for $N=M=K=11$ for benchmark geometry}
     \label{fig:meem-matching}
 \end{figure}
@@ -495,7 +495,7 @@ Hydro coefficient convergence depends on the geometry: the benchmark shallow-wat
 There, damping converges well at low frequencies but requires more harmonics at higher frequencies, while added mass has similar convergence across frequencies. 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/meem_convergence_vs_omega.pdf}
+    \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_convergence_vs_omega.pdf}
     \caption{Convergence for $N=M=K=(5,10,20,30)$ for RM3}
     \label{fig:meem-convergence}
 \end{figure}
@@ -524,7 +524,7 @@ Plugging this into the first element of the bottom block of the b-vector (positi
 \end{equation}
 \begin{figure}
     \centering
-    \includegraphics[width=.75\linewidth]{../applied-ocean-research-model/figs/from-matlab/asymptotic_b_vector.pdf}
+    \includegraphics[width=.75\linewidth]{figs/from-matlab/asymptotic_b_vector.pdf}
     \caption{Asymptotic b-vector for large $m_0h$}
     \label{fig:meem-b-limit}
 \end{figure}
@@ -565,7 +565,7 @@ Then $3N+8M+2K-11$ Bessel functions must be evaluated for the radial terms of th
 The cost of evaluating vertical coupling integrals (\tableautorefname~\ref{tab:meem-integrals}) is negligible since they are trigonometric.
 Linear solves scale almost cubically with matrix size, so this step scales with $(N+2M+K)^3$.
 The radial integrals for the c-vector do not require evaluating Bessel functions with any arguments that were not already evaluated for the A-matrix.
-For $N=M=K=10$, the simulation of a single frequency averages \resultsAOR[MEEMRuntime] on the hardware described in \cref{sec:benchmarking}.
+For $N=M=K=10$, the simulation of a single frequency averages \resultsAOR[MEEMRuntime] on the hardware described in \cref{sec:sim-runtime}.
 Figure~\ref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
 Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
