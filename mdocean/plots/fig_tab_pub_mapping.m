@@ -66,7 +66,7 @@ figs_in_AOR{5}  = 'ReadNonMatlabFigs.MEEM_geometry';
 figs_in_AOR{6}  = 'Tikz.circuit_intrinsic';
 figs_in_AOR{7}  = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_synthesis';
 figs_in_AOR{8}  = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_evaluation';
-figs_in_AOR{9}  = 'DescFcns.saturation_desc_fcn'; % subfig (a), combined with {48}
+figs_in_AOR{9}  = 'DescFcns.saturation_desc_fcn'; % subfig (a), combined with {51}
 figs_in_AOR{10}  = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{11}  = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
@@ -97,11 +97,11 @@ figs_in_AOR{32} = 'Tikz.circuit_pto';
 figs_in_AOR{33} = 'QPCircles.qp_circles';
 figs_in_AOR{34} = 'RunSingleFigFunc.qcqp_circles_nominal';
 figs_in_AOR{35} = 'RunSingleFigFunc.ctrl_polar_plot_mult';
-figs_in_AOR{36} = 'DragIntegral.drag_integral_B';     % subfig (a), combined with {50},{51}
+figs_in_AOR{36} = 'DragIntegral.drag_integral_B';     % subfig (a), combined with {52},{53}
 figs_in_AOR{37} = 'Slamming.slamming_amplitude';
 figs_in_AOR{38} = 'RunSingleFigFunc.slamming_model_comparison_float';
-figs_in_AOR{39} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {52},{53},{54}
-figs_in_AOR{40} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund'; % subfig, combined with {55},{56},{57}
+figs_in_AOR{39} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {54},{55},{56}
+figs_in_AOR{40} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund'; % subfig, combined with {57},{58},{59}
 figs_in_AOR{41} = 'Wecsim.accel_fourier_harmonics';
 figs_in_AOR{42} = 'Wecsim.drag_force_desc_fcn';
 figs_in_AOR{43} = 'Wecsim.position_THD_contour';
@@ -112,20 +112,20 @@ figs_in_AOR{45} = 'Validation.cost_vs_N_WEC';
 figs_in_AOR{46} = 'ReadNonMatlabFigs.equivalent_stiffness';
 figs_in_AOR{47} = 'ReadNonMatlabFigs.trapezoid';
 figs_in_AOR{48} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{49} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {58}
+figs_in_AOR{49} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {60}
 % graphical abstract (unnumbered so at the end)
 figs_in_AOR{50}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 % extra subplot entries (additional MATLAB outputs for multi-panel figures)
 figs_in_AOR{51} = 'DescFcns.drag_desc_fcn';                         % fig 9 subfig (b)
-figs_in_AOR{52} = 'DragIntegral.drag_integral_G_m';                  % fig 34 subfig (b)
-figs_in_AOR{53} = 'DragIntegral.drag_integral_G_p';                  % fig 34 subfig (c)
-figs_in_AOR{54} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat';  % fig 37 subfig
-figs_in_AOR{55} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat';  % fig 37 subfig
-figs_in_AOR{56} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat';   % fig 37 subfig
-figs_in_AOR{57} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund';  % fig 38 subfig
-figs_in_AOR{58} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase'; % fig 38 subfig
-figs_in_AOR{59} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase';  % fig 38 subfig
-figs_in_AOR{60} = 'DampingPlateStructures.damping_plate_deflection'; % fig 47 subfig (b)
+figs_in_AOR{52} = 'DragIntegral.drag_integral_G_m';                  % fig 36 subfig (b)
+figs_in_AOR{53} = 'DragIntegral.drag_integral_G_p';                  % fig 36 subfig (c)
+figs_in_AOR{54} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat';  % fig 39 subfig
+figs_in_AOR{55} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat';  % fig 39 subfig
+figs_in_AOR{56} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat';   % fig 39 subfig
+figs_in_AOR{57} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund';  % fig 40 subfig
+figs_in_AOR{58} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase'; % fig 40 subfig
+figs_in_AOR{59} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase';  % fig 40 subfig
+figs_in_AOR{60} = 'DampingPlateStructures.damping_plate_deflection'; % fig 49 subfig (b)
 
 %% TABLES
 

@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-15
+## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-17
 ### Added
 - Pipeline: OpenFLASH subproject
 - Docs: add defense video to readme and sphinx site
@@ -15,7 +15,7 @@
 ### Changed
 - Paper: Use subimport for Overleaf-friendly path inclusion
 - CI: Initialize submodules recursively
-- CI: Turn off tests (since they broke) and quarto (since no longer used)
+- CI: Turn off quarto stage (since no longer used)
 - CI: stop using retry script for calkit pull
 - Docs: update repo status badge from in progress to active
 - Docs: better details on licensing of external code
@@ -29,16 +29,18 @@
 - Analysis: comment out broken AI-generated `compute_pareto_shape_heuristics()` in `ParetoFigFunc`
 - Test: fix wecsim filenames being inconsistent after previous shortening for struct fieldnames
 - Test: further shorten wecsim filenames (multibody)
+- Test: fix string vs char handling in `save_fig_with_diagnostic.m`
+- Test: avoid rerunning postprocessing in tests (but this introduces test errors in stages that have tables) 
 - Plots: fix filename in `ReadNonMatlabFigs` that caused raster instead of vector images to be used in paper
+- Plot: fix multistart parallel axis plot visibility, including latex font
 - Tables: fix first column formatting in matlab latex table generation
 - Tables: introduce, and then fix, an issue with string escape parsing in `table2latex()`
-- Tables: fix multi-character underscores in `Comparison` table
+- Tables: fix multi-character underscores in `Comparison`, `DesignVars`, and `GradientOptimFigFunc` tables
 - Paper: fixing citations, including making bibcop compatible with multiple .bib files
 - Paper: fix references, including prefacing labels with paper name to avoid collisions
 - Citations: fix JFM citations, title of JFM paper in self-citation, and RE bibcop
 - CI: ignore `not our ref` error in calkit save branching logic
 - CI: turn on write permission for checks
-- Plot: fix multistart parallel axis plot visibility, including latex font
 
 ## [v1.2.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.9) - 2026-5-7
 ### Added
