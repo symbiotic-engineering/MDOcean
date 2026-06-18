@@ -12,6 +12,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Result Comparison to Other Studies }
 % (and comparison to commercial WECs)
+This subsection compares the key findings to prior studies and highlights where the present results align or differ.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Force Saturation}
@@ -35,7 +36,7 @@
     Importantly, however, those devices have equal diameter and height, use only damping control, and are tuned to maximize power without regard for mass or cost.
     In MDOcean, tuning can be accomplished by varying diameter and height independently and with reactive control, and devices are tuned to minimize LCOE rather than maximize power.
     The single-objective results in \cref{remdo:tab:opt-dv-values,remdo:tab:opt-output} agree with the overall conclusion of \cite{de_andres_adaptability_2015} that power maximization does not align with LCOE minimization, though here the additional cost of maximum power appears as PTO cost rather than structural cost.
-    Meanwhile, the location sensitivity (\cref{remdo:tab:location}) shows a significantly larger optimal float in Hawaii, the site with the lowest common wave period, which departs from \cite{de_andres_adaptability_2015}, which finds small (4~m diameter) WECs optimize their LCOE proxy regardless of dominant period.
+    Meanwhile, the location sensitivity (\cref{remdo:tab:location}) shows a significantly larger optimal float in Hawaii, the site with the lowest common wave period, which departs from the study \cite{de_andres_adaptability_2015}, which finds small (4~m diameter) WECs optimize their LCOE proxy regardless of dominant period.
     This demonstrates that a more thorough multidisciplinary model is essential to draw accurate design conclusions.
 \else
     A survey finds 40\% of WEC developers design for site-agnostic deployment \cite{trueworthy_wave_2020}.
@@ -84,7 +85,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     We examine both the model complexities MDOcean captures, to confirm they were worth including, and the shortcomings it cannot capture, to judge whether they must be added in future versions.
     Previous studies such as \cite{garcia-teruel_reliability-based_2021} have called for this kind of systematic model-fidelity assessment to build designer confidence in the most relevant effects and their computational cost.
 \else
-    The optimization and sensitivity results allow the modeling assumptions \cite{mccabe_development_2026} to be assessed, both the complexities worth including and the shortcomings that may need adding, which is the kind of systematic fidelity assessment called for by \cite{garcia-teruel_reliability-based_2021}.
+    The optimization and sensitivity results allow the modeling assumptions from reference \cite{mccabe_development_2026} to be assessed, both the complexities worth including and the shortcomings that may need adding, which is the kind of systematic fidelity assessment called for by the study \cite{garcia-teruel_reliability-based_2021}.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -127,6 +128,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Formulation Realism}
+This subsection evaluates how realistic the optimization formulation choices are and what refinements are most impactful.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Design Variable Suitability}
@@ -137,7 +139,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether multiple smaller WECs or one larger WEC is preferable.
     
     Additionally, a sensitivity analysis of design variables perturbed as if they were parameters would help quantify inter-disciplinary coupling and potentially inform formulation simplifications.
-    For example, a high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ would support this study's choice of fully coupled MDO \cite{mccabe_development_2026}, while a low value would support disciplinary decoupling.
+    For example, a high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{\text{struct}}}{dx_{pto}}\right)$ would support this study's choice of fully coupled MDO \cite{mccabe_development_2026}, while a low value would support disciplinary decoupling.
     Such analysis may be necessary if a future optimization with many more design variables is too costly to perform fully coupled and must be split into sequential optimizations (e.g.\ bulk-geometry power maximization, then powertrain sizing, then structural sizing).
     Performing this sequential optimization for the current formulation and assessing the suboptimality would quantify the value of coupling.
     The authors predict, however, that the speed of the semi-analytical models and the extensions discussed here will permit full coupling even for substantially larger WEC optimizations, including the ambitious target of comparing multiple hydrodynamic architectures with realistic powertrain models.
@@ -234,7 +236,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 	2) survivability - compare PTO-free vs PTO-braked in storm, to answer question of which type of survival mode is preferable; excitation loads using MEEM when float is sunk (for now could approximate as float with larger draft, once weird-region MEEM exists use that); allow decision on which sea states are operational vs survival could answer the question of whether it makes economic sense to go into survival mode more often.
 
-	3) more detailed PTO study: include a drivetrain with linear dynamics reflecting spring, flywheel, gear ratio, etc. -  If you assume the flywheel inertia and spring stiffness aren't controllable per sea state, would be useful as-is for finding the best inertia/stiffness across sea states to pair with the controller that can adjust per sea state.
+	3) more detailed PTO study: include a drivetrain with linear dynamics reflecting spring, flywheel, gear ratio, and related effects. -  If you assume the flywheel inertia and spring stiffness are not controllable per sea state, would be useful as-is for finding the best inertia/stiffness across sea states to pair with the controller that can adjust per sea state.
     But if you assume adjustable drivetrain, as has been achieved with magnetic spring (cite), this would either need to introduce constraints or a cost term related to these drivetrain parameters, since otherwise the solution should go to zero damping and stiffness equal to what the unconstrained optimal control stiffness is.
     Could answer the interesting question of how much an adjustable PTO is worth over a non-adjustable one.
     Could also provide a preliminary answer to the question of optimum gear ratio (low GR means high generator torque so more force saturation for a given generator, but less friction.
@@ -262,21 +264,21 @@ A previous study compares structural mass per unit hull volume for marine struct
 \newcommand{\modelStudyEnablersRE}{
     Example model additions and the types of design studies they would unlock:
 
-	1) Multibody: would let me actually optimize the spar dimensions, which is important since I'm up against that constraint of min damping plate diameter
+	1) Multibody: would enable explicit optimization of spar dimensions, which is important because the minimum damping plate diameter constraint is frequently active.
 
-	2) Irregular waves: would let you have more realistic fatigue (ie Miner's rule), and assess power variability (ie with energy storage), which would let you see if variability reductions achieved via design are more preferable than variability reductions achieved via more batteries.
-Would also give more complete results for PTO impedance matching bandwidth, ie are some PTO types or WEC shapes better Z(omega) shape matches with each other or with the sea state.
+	2) Irregular waves: would enable more realistic fatigue estimation (i.e.\ Miner's rule) and power-variability assessment (i.e.\ with energy storage), allowing comparison of variability reduction from design changes versus added batteries.
+This would also provide more complete results for PTO impedance-matching bandwidth, including whether some PTO types or WEC shapes yield better $Z(\omega)$ matching with each other or with the sea state.
 
-	3) model different WEC archetypes: would let you compare different WEC archetypes in a consistent way in the early concept design phase and start to address the design convergence problem.
+	3) model different WEC archetypes: would allow consistent comparison of WEC archetypes in early concept design and start to address the design convergence problem.
 Would require not only MEEM for the different WEC types, but also semi-analytical structural models for each one, or the decision to integrate a lightweight FEA with plate/shell element capabilities (ie pynite).
 
-	4) make lifetime a design variable, and adjust size of storm-wave accordingly. could address the question of what opex cost threshold would make it useful to intentionally design 'single-use' WECs, which might be considered in PBE applications.
+	4) make lifetime a design variable, and adjust storm-wave size accordingly. This could address what OPEX cost threshold would justify intentionally designing ``single-use'' WECs, which might be considered in PBE applications.
 Would require integration with WDRT or similar to get the environmental contour for a given lifetime.
 
 	5) multi region MEEM: could not only make hydro coeffs more accurate representing the truncated cone shape, but would allow qualitatively different hydro coeff vs frequency shapes, which would unlock different
 
 	6) generator physics and model - building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example whether a high-torque (expensive) generator is worth it compared to a low torque generator.
-    The torque limit would essentially impose a constraint on the $F_{max}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
+    The torque limit would essentially impose a constraint on the $F_{\text{max}}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
     A simplified generator model is explored in the RM3 CCD study \cite{anderson_re-imagining_2024}, or a full generator model as in the offshore wind MDO study \cite{barter_beyond_2023}.
 
     7) structures constraint that accounts for other types of materials (ie brittle fracture (Mohr's circle) for concrete, however inflatables are modeled, composites, inflatable polyurethane coated nylon fabric, which \cite{roberts_bringing_2021} found to be more optimal than steel/reinforced concrete/fiberglass/rubber).
@@ -300,6 +302,3 @@ Would require integration with WDRT or similar to get the environmental contour 
     The most transformative additions, such as multibody dynamics (enabling true spar optimization), irregular waves (enabling realistic fatigue and power-variability studies), additional WEC archetypes (addressing design convergence), multi-region MEEM hydrodynamics, and a generator physics model (enabling generator control co-design \cite{anderson_re-imagining_2024,barter_beyond_2023}), would unlock qualitatively new design studies.
     The authors expect the speed of the semi-analytical models to permit full coupling even at substantially larger scale, including the ambitious target of comparing multiple hydrodynamic architectures with realistic powertrain models.
 \fi
-
-
-

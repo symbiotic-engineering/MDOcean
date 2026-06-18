@@ -3,14 +3,14 @@
 \section{Matched Eigenfunction Expansion Method}
 \label{sec:appendix-meem-details}
 As introduced in \cref{sec:hydro-meem}, the hydrodynamic coefficients are computed semi-analytically using MEEM.
-This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented in \cite{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution \cite{yeung_added_1981}.
-Further numeric and realization details of the authors' implementation may be found in \cite{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
+This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented in the studies \cite{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution in the study \cite{yeung_added_1981}.
+Further numeric and realization details of the authors' implementation may be found in references \cite{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
 The computation involves splitting the fluid domain into regions, approximating an infinite series by truncation, and solving a matrix equation to enforce the continuity of potential and velocity across regions. 
 
 \subsection{Linear Hydrodynamics and Eigenfunctions}
 The dynamics of a floating body in water waves are well-described by linear potential flow theory, a simplification of the Navier-Stokes equation.
 This theory states that the fluid velocity field  is the gradient of some complex potential $\phi$, $\vec{v}=\nabla\phi$, and $\phi$ satisfies the Laplace equation, $\nabla^2\phi=0$.
-Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
+Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in reference \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
 When boundary conditions correspond to the heave radiation problem (body moving vertically, no incident waves), solving for the potential $\phi(r,\theta,z)$ determines the heave added mass and damping $A_h$ and $B_h$, hereafter ``hydro coefficients.”
 
 For appropriate geometries, the partial differential equation is separable and $\phi$ can be expressed as the product of radial, vertical, and circumferential basis functions called eigenfunctions.
@@ -30,12 +30,12 @@ Extension to many regions is discussed in section 3.4.
 
  The potential in each region is split into a homogeneous part for the unforced solution and a particular part due to body motion: $\phi=\phi_h+\phi_p$.
 Boundary conditions dictate $\phi_p$ and the eigenfunctions for $\phi_h$ in each region, which the textbook \cite{chatjigeorgiou_analytical_2018} describes in detail.
-\Cref{tab:MEEM-eigenfunctions} shows the equations originally presented in \cite{chau_inertia_2010,chau_inertia_2012} for the potential and eigenfunctions in each region, which include infinitely many unknown eigencoefficients $C_{1n}^{i1}$, $C_{1m}^{i2}$, $C_{2m}^{i2}$ and $B_{k}^{e}$.
+\Cref{tab:MEEM-eigenfunctions} shows the equations originally presented in the studies \cite{chau_inertia_2010,chau_inertia_2012} for the potential and eigenfunctions in each region, which include infinitely many unknown eigencoefficients $C_{1n}^{i1}$, $C_{1m}^{i2}$, $C_{2m}^{i2}$ and $B_{k}^{e}$.
 By construction, this potential obeys all boundary conditions except for zero radial velocity on radial body surfaces.
 The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of \cref{sec:appendix-meem-matching}.
 
 \begin{landscape}
-\begin{table}
+\begin{table}[htbp]
     \centering
     \begin{tabular}{|>{\centering\arraybackslash}p{0.085\linewidth}|>{\centering\arraybackslash}p{0.26\linewidth}|>{\centering\arraybackslash}p{0.34\linewidth}|>{\centering\arraybackslash}p{0.32\linewidth}|} \hline 
          Region&  $i1$&  $i2$& $e$\\ \hline 
@@ -270,8 +270,10 @@ $
 \Cref{tab:meem-integrals} lists several integrals of the radial and vertical eigenfunctions, $\boldsymbol{\mathcal{R}}$ and $\boldsymbol{\mathcal{Z}}$ respectively, that will be needed in the calculations to follow.
 
 \begin{landscape}
-\begin{table}
+\begin{table}[htbp]
     \centering
+    \caption{Eigenfunction integrals}
+    \label{tab:meem-integrals}
     \begin{tabular}{|c|c|>{\centering\arraybackslash}p{0.25\linewidth}|c|} \hline 
         \multicolumn{2}{|c|}{Integral}          & $m,j=0$           & $m,j\geq1$            \\ \hline 
         \multicolumn{2}{|c|}{\RintOneDefn}      & \RintOneJzero     & \RintOneJOne          \\ \hline 
@@ -281,8 +283,6 @@ $
         \multirow{2}{*}{\ZmkDefn}   & $k=0$     & \ZmZeroKZero      & \ZmOneKZero           \\ \cline{2-4}
                                     & $k\geq1$  & \ZkOneMZero       & \ZkOneMOne            \\ \hline
     \end{tabular}
-    \caption{Eigenfunction integrals}
-    \label{tab:meem-integrals}
     \fillandplacepagenumber
 \end{table}
 \end{landscape}
@@ -334,8 +334,10 @@ They are written in compact notation using row vectors of basis functions, so $\
 Each basis function is evaluated at the radius described to the left of its row in the table. $0_{ij}$ and $1_{ij}$ are the $i$ x $j$ matrices of zeros and ones respectively; diag($\cdot$) constructs a diagonal matrix from a vector; and $\odot$ is the Hadamard (element-wise) product.
 
 \begin{landscape}
-\begin{table}
+\begin{table}[htbp]
     \centering
+    \caption{MEEM A-matrix}
+    \label{tab:MEEM-A-matrix}
     \begin{tabular}{|>{\centering\arraybackslash}p{0.18\linewidth}|c||c|c|c|c|}\hline
  & & $\vec{C}_{1n}^{i1}$& $\vec{C}_{1m}^{i2}$& $\vec{C}_{2m}^{i2}$&$\vec{B}_k^e$\\\hline 
           &size&  N&  M&  M& K\\ \hline \hline 
@@ -344,13 +346,13 @@ Each basis function is evaluated at the radius described to the left of its row 
           \shortstack{$\frac{\partial}{\partial r}\phi^{i1}=\frac{\partial}{\partial r}\phi^{i2}$ \\ at $r=a_1$}&M&  $- \boldsymbol{\mathcal{Z}}_{mn} \odot 1_{M1} \frac{\partial}{\partial r}\vec{R}_{1n}^{i1}$&  $(h-d_2)~\mathrm{diag}(\frac{\partial}{\partial r}\vec{R}_{1m}^{i2})$&  $(h-d_2)~\mathrm{diag}(\frac{\partial}{\partial r}\vec{R}_{2m}^{i2})$& $0_{MK}$\\ \hline 
           \shortstack{$\frac{\partial}{\partial r}\phi^{i2}=\frac{\partial}{\partial r}\phi^{e}$ \\ at $r=a_2$}&K&  $0_{KN}$&  $-\boldsymbol{\mathcal{Z}}_{km} \odot 1_{K1}\frac{\partial}{\partial r}\vec{R}_{1m}^{i2}$&  $-\boldsymbol{\mathcal{Z}}_{km}\odot 1_{K1}\frac{\partial}{\partial r}\vec{R}_{2m}^{i2}$& $h~\mathrm{diag}(\frac{\partial}{\partial r}\vec{\Lambda}_k)$\\ \hline
     \end{tabular}
-    \caption{MEEM A-matrix}
-    \label{tab:MEEM-A-matrix}
       \fillandplacepagenumber
 \end{table}
 \end{landscape}
-\begin{table}
+\begin{table}[htbp]
     \centering
+    \caption{MEEM b-vector}
+    \label{tab:MEEM-b-vector}
     \begin{tabular}{|c|c|} \hline 
          N& $\displaystyle
 \int_{-h}^{-d_1} (\phi_p^{i2} - \phi_p^{i1})\vec{Z}_n^{i1~T} dz
@@ -372,8 +374,8 @@ $\\ \hline
 The dense blocks contain coupling integrals $\boldsymbol{\mathcal{Z}}$ of the vertical eigenfunctions.
 
 Of the sixteen blocks that make up the matrix, six are diagonal, four are zero, and six are dense, resulting in the sparsity pattern shown in \Cref{fig:sparsity}.
-An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in \cite{chau_inertia_2012}. 
-\begin{figure}
+An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in reference \cite{chau_inertia_2012}. 
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_sparsity.pdf}
     \caption{A-matrix sparsity pattern, shown for $N=M=K=4$}
@@ -420,20 +422,20 @@ The radiation coefficients are thus computed as
 \begin{equation}
     A_h + \frac{iB_h}{\omega}=2\pi \rho h^3(c_0 + \vec{c}\cdot\vec{x}) =2\pi \rho h^3(c_0 + \vec{c} \cdot A^{-1} \vec{b})
 \end{equation}
-with output constant $c_0$ and output row vector $\vec{c}$ defined as follows:
-\begin{equation}
+with output constant $c_0$ and output row vector $\vec{c}$ defined in \cref{eq:c0,tab:MEEM-c-vector} respectively:
+\begin{equation}\label{eq:c0}
     c_0 =  \frac{\left({a^2_{out}}-{a^2_{in}}\right)\,\left(-{a^2_{in}}-{a^2_{out}}+4(h-d)^2\right)}{16\,\left(h - d\right)}
 \end{equation}
 \begin{table}[h]
     \centering
-    \begin{tabular}{|l|c|c|c|c|} \hline 
+    \caption{Output vector $\vec{c}$}
+    \label{tab:MEEM-c-vector}
+\begin{tabular}{|l|c|c|c|c|} \hline 
           Body&N&  M&  M& K\\ \hline 
           Float&$0_{1N}$&  $\vec{Z}_m(z=-d) \odot\boldsymbol{\mathcal{R}}_{1m}$&  $\vec{Z}_m(z=-d) \odot\boldsymbol{\mathcal{R}}_{2m}$& $0_{1K}$\\ \hline
  Spar& $\vec{Z}_n(z=-d) \odot\boldsymbol{\mathcal{R}}_{1n}$& $0_{1M}$& $0_{1M}$&$0_{1K}$\\\hline
     \end{tabular}
-    \caption{Output vector $\vec{c}$}
-    \label{tab:MEEM-c-vector}
-\end{table}
+    \end{table}
 The appropriate dimensions are
 \begin{equation}
     a_{out} = \begin{cases}
@@ -466,12 +468,12 @@ Note that while the excitation magnitude $|\gamma|$ depends on the radiation dam
 
 \subsection{Validation}
 
-Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in \cite{chau_inertia_2012}.
+Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in reference \cite{chau_inertia_2012}.
 Excellent agreement is observed, shown in \Cref{fig:meem-yeung-validation}.
-Authors of \cite{chau_inertia_2012} also experimentally validate their results in \cite{son_performance_2016}.
+The results are also experimentally validated in the studies \cite{chau_inertia_2012,son_performance_2016}.
 Previously in \cref{sec:dynamic-validation}, the N=M=K=11 case was compared to WAMIT results for RM3 in deep water.
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_validation.pdf}
     \caption{Nondimensional added mass and damping coefficient validation against \cite{chau_inertia_2012}}
@@ -484,7 +486,7 @@ As $N,M,K\rightarrow\infty$, matching quality improves, and hydro coefficients c
 Previous MEEM papers use $N=M=K=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \cite{chau_inertia_2012}.
 We observe that potential matching converges faster than velocity matching.
 \Cref{fig:meem-matching} shows the matching behavior for $N=M=K=11$, where potential matches well but velocity still has noticeable mismatch. 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_matching.pdf}
     \caption{Matching for $N=M=K=11$ for benchmark geometry}
@@ -493,7 +495,7 @@ We observe that potential matching converges faster than velocity matching.
 
 Hydro coefficient convergence depends on the geometry: the benchmark shallow-water geometry of \cite{chau_inertia_2012} converges to within 0.25\% with only $N=M=K=4$, but RM3 requires $N=M=K>10$, shown in \cref{fig:meem-convergence}.
 There, damping converges well at low frequencies but requires more harmonics at higher frequencies, while added mass has similar convergence across frequencies. 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_convergence_vs_omega.pdf}
     \caption{Convergence for $N=M=K=(5,10,20,30)$ for RM3}
@@ -503,13 +505,13 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 \subsection{Numerical Notes}\label{sec:appendix-meem-numerics}
 Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$, resulting in numeric overflow 
-To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \cref{fig:meem-geom}.
-The constant of proportionality between $\Delta z_{min}$ and $D$ is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{max}$:
+To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{\text{min}}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \cref{fig:meem-geom}.
+The constant of proportionality between $\Delta z_{\text{min}}$ and $D$ is a function of the number of harmonics $N_{\text{harmonics}}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{\text{max}}$:
 \begin{equation}\label{eq:delta-z-min}
     \frac{\Delta z_{min}}{D} = \frac{\pi N_{harmonics}}{2\chi_{max}} \approx \frac{N_{harmonics}}{446}.
 \end{equation}
-By trial, $\chi_{max}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
-Since $N_{harmonics}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
+By trial, $\chi_{\text{max}}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
+Since $N_{\text{harmonics}}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
 In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
 
 Likewise, the vertical eigenfunction $Z_k^e$ for $k=0$ contains the $\cosh$ and $\sinh$ functions, which diverge for large values of $m_0h$ (high frequencies or deep water).
@@ -522,7 +524,7 @@ Plugging this into the first element of the bottom block of the b-vector (positi
 \begin{equation}
     \lim_{m_0h\rightarrow\infty}b_{N+2M+1}=\frac{-a_2}{h-d_2} \sqrt{\frac{h}{2m_0}}\exp(-d_2m_0)
 \end{equation}
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=.75\linewidth]{figs/from-matlab/asymptotic_b_vector.pdf}
     \caption{Asymptotic b-vector for large $m_0h$}
@@ -573,4 +575,3 @@ Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve can drive computation cost.
 On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer}
 Thus, MEEM achieves a 10x time reduction over Capytaine.
-

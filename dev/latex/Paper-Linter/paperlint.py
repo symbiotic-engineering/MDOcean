@@ -188,6 +188,7 @@ tex_lines_math_texttt_masked = None
 in_env = None
 envs = None
 is_document_root = False
+math_text_mix_strings = set()
 
 FLOAT_ENVS = ["figure", "listing", "table"]
 CODE_WARNING_EXCEPTIONS = {
@@ -199,6 +200,15 @@ CODE_WARNING_EXCEPTIONS = {
 }
 SECTION_COMMAND_RE = re.compile("\\\\(section|subsection|subsubsection|paragraph)\\*?\\{([^\\}]+)\\}")
 SENTENCE_END_RE = re.compile(r"(?<!\\)[.!?](?=(?:['\")\]}]*)(?:\s|$))")
+COMMON_SENTENCE_ABBREVIATIONS = ("lin", "nonlin", "ineq", "homog", "partic")
+
+
+def mask_false_sentence_ends(text):
+    masked = text
+    for abbreviation in COMMON_SENTENCE_ABBREVIATIONS:
+        masked = re.sub(r"\b%s\.(?=\s|$)" % re.escape(abbreviation), abbreviation + "§", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"(?<!\w)[A-Za-z]\.(?=\s|$)", lambda match: match.group(0)[:-1] + "§", masked)
+    return masked
     
 def next_file(file):
     global tex, tex_lines, tex_lines_clean, tex_lines_math_masked, tex_lines_math_texttt_masked, in_env, envs, is_document_root
@@ -271,6 +281,14 @@ def in_any_float(line):
         if f in in_env and in_env[f][line]:
             return True
     return False
+
+
+def in_table(line):
+    return (
+        ("table" in in_env and in_env["table"][line])
+        or ("tabular" in in_env and in_env["tabular"][line])
+        or ("longtable" in in_env and in_env["longtable"][line])
+    )
 
 def in_code(line):
     if "lstlisting" in in_env:
@@ -354,6 +372,7 @@ def count_sentences(text):
     if not stripped:
         return 0
     cleaned = re.sub(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?(?:\{[^{}]*\})?", " ", stripped)
+    cleaned = mask_false_sentence_ends(cleaned)
     return len(SENTENCE_END_RE.findall(cleaned))
 
 
@@ -840,18 +859,22 @@ def check_math_numbers():
 
 
 def check_math_text_mix():
+    global math_text_mix_strings
     warns = []
     for i, l in enumerate(tex_lines_clean):
         if in_code(i):
             continue
         for start, end, content in get_math_spans(l):
             normalized = strip_explicit_math_text(content)
+            normalized = re.sub(r"\\(?:begin|end)\*?\{[^{}]*\}", " ", normalized)
             normalized = re.sub("\\\\[A-Za-z]+", " ", normalized)
             normalized = re.sub("[\\^_{}&=+\\-*/(),.;:0-9\\s]", " ", normalized)
             words = re.findall("[A-Za-z]{2,}", normalized)
             prose_words = [word for word in words if word.islower()]
             prose_like_words = [word for word in prose_words if len(word) >= 4]
             if prose_like_words:
+                for word in prose_like_words:
+                    math_text_mix_strings.add(word.lower())
                 warns.append((i, "Text-like content in math mode, mark it explicitly with \\text{...}", (start, end)))
                 break
     return warns
@@ -1097,6 +1120,8 @@ def check_percent_without_siunix():
 def check_short_form():
     warns = []
     for i, l in enumerate(tex_lines_clean):
+        if in_comment(i) or l.strip().startswith("%"):
+            continue
         n = re.search("[^`%]\\w+'[a-rt-z]", l)
         if n:
             warns.append((i, "Contracted form used", n.span()))
@@ -1110,15 +1135,56 @@ def check_labels_referenced():
         lab = re.search(r"\\label\{([^\}]+)\}", l)
         if lab:
             labels.append((lab.group(1), i, lab.span()))
+
+    referenced_labels = set()
+    reference_pattern = re.compile(
+        r"\\(?:[cC]ref|[vV]ref|ref|eqref|autoref|nameref|labelcref|namecref|lcnamecref|fref|Fref|fullref)\*?\{([^\}]*)\}"
+    )
+    range_pattern = re.compile(
+        r"\\(?:[cC]refrange|[cC]labelcrefrange)\*?\{([^\}]*)\}\{([^\}]*)\}"
+    )
+
+    for line in tex_lines_clean:
+        for match in reference_pattern.finditer(line):
+            for ref_label in match.group(1).split(","):
+                ref_label = ref_label.strip()
+                if ref_label:
+                    referenced_labels.add(ref_label)
+        for match in range_pattern.finditer(line):
+            start_label = match.group(1).strip()
+            end_label = match.group(2).strip()
+            if start_label:
+                referenced_labels.add(start_label)
+            if end_label:
+                referenced_labels.add(end_label)
+
+    def subfigure_parent_referenced(label_line):
+        if "subfigure" not in in_env or not in_env["subfigure"][label_line]:
+            return False
+        if "figure" not in envs:
+            return False
+        parent_range = None
+        for fig_range in envs["figure"]:
+            if fig_range[0] <= label_line <= fig_range[1]:
+                parent_range = fig_range
+                break
+        if parent_range is None:
+            return False
+        for label_name, other_line, _ in labels:
+            if other_line < parent_range[0] or other_line > parent_range[1]:
+                continue
+            if "subfigure" in in_env and in_env["subfigure"][other_line]:
+                continue
+            if label_name in referenced_labels:
+                return True
+        return False
+
     for lab in labels:
         if "sec:" in lab[0] or "eq:" in lab[0]:
             continue
-        found = False
-        for i, l in enumerate(tex_lines):
-            if ("ref{%s}" % lab[0]) in l:
-                found = True
-                break
-        if not found:
+        if lab[0] not in referenced_labels:
+            if subfigure_parent_referenced(lab[1]):
+                continue
             if not (lab[0].startswith("sec") or lab[0].startswith("subsec")):
                 warns.append((lab[1], "Label %s is not referenced" % lab[0], lab[2]))
     return warns
@@ -1129,6 +1195,8 @@ def check_section_capitalization():
     for i, l in enumerate(tex_lines):
         n = re.search("(section|paragraph)\\{([^\\}]+)\\}", l)
         if n:
+            if n.group(1) == "paragraph":
+                continue
             try:
                 words = n.group(2).split(" ")
                 for w in words:
@@ -1214,9 +1282,14 @@ def check_one_sentence_paragraphs():
 def check_multiple_sentences_per_line():
     warns = []
     for i, l in enumerate(tex_lines_clean):
-        p = re.search("[\\.!?]\\s+\\w+", l.rstrip())
-        if p and "vs." not in l.rstrip():
-            warns.append((i, "Multiple sentences in one line", p.span()))
+        if in_code(i) or in_comment(i) or l.strip().startswith("%"):
+            continue
+        if "vs." in l.rstrip():
+            continue
+        masked = mask_false_sentence_ends(l.rstrip())
+        if count_sentences(masked) > 1:
+            p = SENTENCE_END_RE.search(masked)
+            warns.append((i, "Multiple sentences in one line", p.span() if p else (0, len(l))))
     return warns
 
 
@@ -1419,11 +1492,13 @@ def check_acm_pc():
 def check_cite_noun():
     warns = []
     for i, l in enumerate(tex_lines):
+        if re.search(r"\\citet\*?\{", l):
+            continue
         ap = re.search("\\b(in|from|by|and|or)[\\s~]\\\\cite", l.lower())
         if ap:
             warns.append((i, "Citation is used as noun", ap.span()))
         ap = re.search("^\\s*\\\\cite", l)
-        if ap:
+        if ap and not in_table(i):
             warns.append((i, "Citation at the beginning of a sentence (probably as noun)", ap.span()))
     return warns
 
@@ -1476,6 +1551,8 @@ def check_brackets_space():
     for i, l in enumerate(tex_lines_clean):
         if in_code(i) or in_equation(i) or (len(l.strip()) > 0 and l.strip()[0] in ["\\", "%"]): continue
         if re.search(r"\(\s*(?<!\\)\$", l) or re.search(r"(?<!\\)\$\s*\)", l):
+            continue
+        if re.search(r"\(\s*\\[A-Za-z@]+", l) or re.search(r"\\[A-Za-z@]+\*?\s*\)", l):
             continue
         masked = tex_lines_math_texttt_masked[i].rstrip()
         p = re.search("[^\\s\\{~\\\\]\\([^(s\\))]", masked)
@@ -1807,10 +1884,11 @@ def remove_categories(cat, rem_cat):
 
 def main():
 
-    global output_file, output_handle, use_color
+    global output_file, output_handle, use_color, math_text_mix_strings
 
     nr_warnings = 0
     nr_suppressed = 0
+    math_text_mix_strings = set()
 
     idx = 1
     has_rules = False
@@ -1914,6 +1992,11 @@ def main():
 
         write_output("")
         write_output("%d warnings printed; %d suppressed warnings" % (nr_warnings, nr_suppressed))
+        if "math-text-mix" in used_categories and len(math_text_mix_strings) > 0:
+            write_output("")
+            write_output("Unique text strings in math environments [math-text-mix]:")
+            for text_string in sorted(math_text_mix_strings):
+                write_output("- %s" % text_string)
     finally:
         if output_handle is not sys.stdout:
             output_handle.close()
