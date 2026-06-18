@@ -257,7 +257,7 @@ See text for a description of each acronym.}
     It can also be thought of as the combination of describing functions with constrained impedance matching.
 \fi 
 
-\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller and/or the plant are nonlinear).
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, the plant, or both are nonlinear).
 
 MDOcean uses the linearized pseudo-spectral method for both control synthesis and evaluation.
 In prior wave energy studies (see \Cref{tab:lit}), related linearized pseudo-spectral approaches have primarily been used for evaluation, often with simplified treatments of constraints.
@@ -266,6 +266,7 @@ This differs from linearization approaches such as stochastic linearization, whi
 
 \begin{figure}[htbp]
 \centering
+\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
 \begin{subfigure}[t]{1.1\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}
     \caption{Control synthesis - applies to (1.1) only.}
@@ -277,7 +278,6 @@ This differs from linearization approaches such as stochastic linearization, whi
     \caption{Control evaluation - applies to both (1.1) and (1.2).}
     \label{fig:mod-freq-domain-evaluation}
 \end{subfigure}
-\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
 \end{figure}
 
 When handling dynamic constraints with a linearized pseudo-spectral method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
@@ -972,7 +972,7 @@ These limits depend on the phase of the response, not just the magnitude, so the
     \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
 \end{equation}
 for relevant vertical body dimension $\Delta z$ and horizontal coordinate $y$.
-The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, etc.) are given in \cref{sec:appendix-slam}.
+The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \cref{sec:appendix-slam}.
 
 \ifdefined\DISSERTATION
     The values $h_{fs,clear}$, $h_{fs,up}$, $h_{fs,down}$, $\xi_{f,linear}$, and $\xi_{s,linear}$ are all upper limits and are independent of sea state, while $\xi_{slam}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \cref{sec:appendix-slam}.
