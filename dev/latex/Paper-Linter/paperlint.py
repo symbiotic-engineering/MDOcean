@@ -1366,6 +1366,8 @@ def check_acm_pc():
 def check_cite_noun():
     warns = []
     for i, l in enumerate(tex_lines):
+        if re.search(r"\\citet\*?\{", l):
+            continue
         ap = re.search("\\b(in|from|by|and|or)[\\s~]\\\\cite", l.lower())
         if ap:
             warns.append((i, "Citation is used as noun", ap.span()))
