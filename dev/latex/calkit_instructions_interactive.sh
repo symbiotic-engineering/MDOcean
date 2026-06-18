@@ -299,10 +299,11 @@ main() {
   echo "Choose workflow:"
   echo "  1) Getting GitHub changes into Overleaf"
   echo "  2) Making changes on Overleaf and getting them onto GitHub"
+  echo "  q) Quit"
 
   local workflow
   while true; do
-    read -r -p "Choice [1/2]: " workflow
+    read -r -p "Choice [1/2/q]: " workflow
     case "$workflow" in
       1)
         workflow_github_to_overleaf
@@ -312,8 +313,12 @@ main() {
         workflow_overleaf_to_github
         return 0
         ;;
+      q|Q)
+        echo "Stopped by user."
+        return 0
+        ;;
       *)
-        echo "Please enter 1 or 2."
+        echo "Please enter 1, 2, or q."
         ;;
     esac
   done
