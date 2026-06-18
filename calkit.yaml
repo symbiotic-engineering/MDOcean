@@ -5470,6 +5470,13 @@ pipeline:
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+    check-dup-json-keys:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/duplicate_json_key.py
+      inputs:
+        - results/
+        - pubs/renewable-energy-mdo/numbers.json
     re-results-to-latex:
       kind: json-to-latex
       inputs:

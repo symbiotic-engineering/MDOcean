@@ -6272,6 +6272,17 @@ stages:
           persist: false
     desc: Automatically generated from the 'aor-results-to-latex' 
       stage in calkit.yaml. Changes made here will be overwritten.
+  check-dup-json-keys:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/duplicate_json_key.py
+    deps:
+      - dev/latex/duplicate_json_key.py
+      - results/
+      - pubs/renewable-energy-mdo/numbers.json
+      - .calkit/env-locks/pubs
+    outs: []
+    desc: Automatically generated from the 'check-dup-json-keys' stage
+      in calkit.yaml. Changes made here will be overwritten.
   re-results-to-latex:
     cmd: "calkit latex from-json 'pubs/renewable-energy-mdo/numbers.json'
       'results/ForceSaturationFigFunc/end.json' 'results/Runtime/end.json'

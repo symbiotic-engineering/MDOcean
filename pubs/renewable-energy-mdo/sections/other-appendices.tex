@@ -128,8 +128,8 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
           Simulation&$X_{tol}$&  0.01 & m \\ \hline 
           &$\angle X_{tol}$& 3 & degrees\\ \hline 
           &Maximum drag iterations& 100 & -\\ \hline 
-          &$N_{harmonics}$& 10 & - \\ \hline
-          &$b_{max}$ & 700.5 & - \\ \hline
+          &$N_{\text{harmonics}}$& 10 & - \\ \hline
+          &$b_{\text{max}}$ & 700.5 & - \\ \hline
           SQP Optimization&Constraint tolerance& 1e-5 & - \\ \hline
           &Iterations before Hessian scaling& 8 & - \\ \hline
   &Maximum iterations after Hessian scaling& 150&-\\\hline
@@ -199,15 +199,15 @@ The change in $x^*$ is not calculated directly and is instead incorporated throu
 \frac{dJ^*}{dp} \approx \frac{\partial J}{\partial p} -  \lambda^T \frac{\partial g}{\partial p}
 \end{equation}
 The third method, proposed by \citet{sobieszczanski-sobieski_sensitivity_1982}, uses a quadratic model that not only takes into account the change of $x^*$ through the parameter-dependent constraints, but also the change of $x^*$ due to the second-order curvature of the objective.
-This method involves setting up a simple linear system for each parameter $p_i$ and solving it for the sensitivity vector $\vec{x}_{sens}$:
+This method involves setting up a simple linear system for each parameter $p_i$ and solving it for the sensitivity vector $\vec{x}_{\text{sens}}$:
 \begin{equation}
     A_{sens} \vec{x}_{sens}(p_i) = \vec{b}_{sens}(p_i)
 \end{equation}
-The forms of the parameter-agnostic $A_{sens}$ matrix and the parameter-specific $b_{sens}$ vector are given in reference \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
+The forms of the parameter-agnostic $A_{\text{sens}}$ matrix and the parameter-specific $b_{\text{sens}}$ vector are given in reference \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
 They are computed from solver outputs like the Lagrange multipliers $\vec{\lambda}$, Hessian $\mathbf{H}$, and gradient $\vec{\nabla} J$, as well as other derivatives %\hl{(specify which)} 
 obtained here via finite difference simulation evaluations % \hl{(specify how many)} 
 without re-optimizing.
-The sensitivity vector $\vec{x}_{sens}$ is then used to solve for a number of quantities of interest including the objective parameter sensitivity $dJ^*/dp$ and the optimal design parameter sensitivity $\partial x^*/\partial p$: %, and the parameter change constraint activity threshold $\Delta p_{ij}$ associated with constraint $g_j$:
+The sensitivity vector $\vec{x}_{\text{sens}}$ is then used to solve for a number of quantities of interest including the objective parameter sensitivity $dJ^*/dp$ and the optimal design parameter sensitivity $\partial x^*/\partial p$: %, and the parameter change constraint activity threshold $\Delta p_{ij}$ associated with constraint $g_j$:
 \begin{equation}
 \begin{aligned}
     \frac{dJ^*}{dp_i} &=  \frac{\partial J}{\partial p_i} + C_{sens}\vec{x}_{sens}(p_i) \\
@@ -215,7 +215,7 @@ The sensitivity vector $\vec{x}_{sens}$ is then used to solve for a number of qu
     %\Delta p_{ij} &= \frac{d_{sens,j}}{\vec{e}_{sens,j}^{~T}\vec{x}_{sens}(p_i)}
 \end{aligned}
 \end{equation}
-where additional sensitivity quantities introduced are matrix $C_{sens}$, scalar $d_{sens,j}$, and vector $\vec{e}_{sens,j}$ assembled from the same inputs as $A_{sens}$ and $b_{sens}$ \cite{sobieszczanski-sobieski_sensitivity_1982}.
+where additional sensitivity quantities introduced are matrix $C_{\text{sens}}$, scalar $d_{\text{sens},j}$, and vector $\vec{e}_{\text{sens},j}$ assembled from the same inputs as $A_{\text{sens}}$ and $b_{\text{sens}}$ \cite{sobieszczanski-sobieski_sensitivity_1982}.
 
 %\hl{This formula could be cleaned up by making it vectorized.}
 
@@ -225,14 +225,14 @@ While the first three methods take \resultsRE[gradientSensRuntime]~to run, the f
 
 While the sensitivities computed with post-optimality derivatives enjoy a significant advantage in computational speed over the re-optimization sensitivity, their accuracy is unfortunately low.
 The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
-For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,spar}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
+For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
 For others, %some such as \hl{XX}, 
 the values are opposite signs.
 This could indicate the presence of discontinuities, strong nonlinearities, or the interference of finite precision effects when computing the partial derivatives.
 
 On the bright side, for the majority (\resultsRE[percentParamsRightSign]) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
-For example, this occurs for $h$, $H_{s,struct}$, $FOS_{min}$, $D_{d,tu}$, $FOS_{mult,d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{heave,mult}$, but not for $T_{struct}$ or $\eta_{pto}$.
+For example, this occurs for $h$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, $D_{d,tu}$, $FOS_{\text{mult},d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
 
 \Cref{remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.

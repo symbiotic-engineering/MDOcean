@@ -505,13 +505,13 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 \subsection{Numerical Notes}\label{sec:appendix-meem-numerics}
 Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$, resulting in numeric overflow 
-To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{min}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \cref{fig:meem-geom}.
-The constant of proportionality between $\Delta z_{min}$ and $D$ is a function of the number of harmonics $N_{harmonics}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{max}$:
+To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{\text{min}}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \cref{fig:meem-geom}.
+The constant of proportionality between $\Delta z_{\text{min}}$ and $D$ is a function of the number of harmonics $N_{\text{harmonics}}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{\text{max}}$:
 \begin{equation}\label{eq:delta-z-min}
     \frac{\Delta z_{min}}{D} = \frac{\pi N_{harmonics}}{2\chi_{max}} \approx \frac{N_{harmonics}}{446}.
 \end{equation}
-By trial, $\chi_{max}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
-Since $N_{harmonics}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
+By trial, $\chi_{\text{max}}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
+Since $N_{\text{harmonics}}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
 In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
 
 Likewise, the vertical eigenfunction $Z_k^e$ for $k=0$ contains the $\cosh$ and $\sinh$ functions, which diverge for large values of $m_0h$ (high frequencies or deep water).

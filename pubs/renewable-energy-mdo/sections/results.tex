@@ -11,7 +11,7 @@ This section presents optimization outcomes and targeted sensitivity analyses fo
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Optimal Design}
 
-In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{elec,avg}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
+In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
 The optimal designs $\vec{x}^*$ are shown visually in \cref{remdo:fig:overlaid-geometry} and numerically in \cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
 \ifdefined\DISSERTATION
     The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced]~kW, a value chosen from the shape of the multi-objective Pareto front (\cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
@@ -108,11 +108,11 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
     The radiation efficiency is the ratio of the maximum lossless power for the given shape to the maximum radiation-limited power, the former computed with the design's hydrodynamic coefficients, no drag, and an unsaturated controller of the specified type (damping or reactive).
     The drag efficiency captures the effect of enabling drag and increases with wave height as expected.
-    The $F_{max}$ factor captures the force limit, departing from unity only at high wave heights near the resonant period of about 10~s.
+    The $F_{\text{max}}$ factor captures the force limit, departing from unity only at high wave heights near the resonant period of about 10~s.
     The electrical efficiency captures generator efficiency and the power limit.
     Multiplying by the annual hours in each sea state yields the annual energy production.
 \else
-    \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{max}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency; their product with the annual hours per sea state yields annual energy production.
+    \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency; their product with the annual hours per sea state yields annual energy production.
 \fi
 
 \begin{figure}[htbp]
@@ -176,13 +176,13 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \ifdefined\DISSERTATION
     The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\Delta J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
     Here all values are nonzero, indicating that every design variable affects the active constraints of \cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{stiff,f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
     The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
-    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{max}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
+    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
     More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
 \else
     The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \cref{remdo:fig:lagrange-multiplier}.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{stiff,f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
     Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
 
@@ -279,13 +279,13 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     
     On the right side, the sensitivities are higher overall:
     minimum LCOE has 5 parameters with normalized magnitude above 0.5, whereas minimum design cost has sixteen.
-    The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $h_{stiff,d}/h_{1,stiff,d}$,
+    The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $h_{\text{stiff},d}/h_{1,\text{stiff},d}$,
     suggesting it be added as a design variable.
     Other high sensitivities such as
     $D_d/D_s$ ($+1.7$),
     $D_{d,tu}$ ($-1.6$),
-    $D_{d,min}$ ($-1.1$),
-    $w_{stiff,d}/h_{1,stiff,d}$ ($-1.0$),
+    $D_{d,\text{min}}$ ($-1.1$),
+    $w_{\text{stiff},d}/h_{1,\text{stiff},d}$ ($-1.0$),
     also relate to the damping plate, while no float or spar geometric parameter is highly sensitive,
     indicating the damping plate drives the minimum achievable cost.
     This raises the question whether the damping plate is worth having at all,
@@ -293,8 +293,8 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     a comparison worth quantifying in future work.
     
     The price of power $\$/W$ also has a high sensitivity ($-2.1$), though the price of force $\$/N$ is too low to appear.
-    Site parameters ($h$, $-1.8$; $H_s$, $-1.6$; $T_{struct}$, $+1.4$; $H_{s,struct}$, $+1.1$) are also influential;
-    notably the sign of $T_{struct}$ flips relative to the minimum-LCOE point, so a larger structural period decreases minimum LCOE but increases minimum design cost.
+    Site parameters ($h$, $-1.8$; $H_s$, $-1.6$; $T_{\text{struct}}$, $+1.4$; $H_{s,\text{struct}}$, $+1.1$) are also influential;
+    notably the sign of $T_{\text{struct}}$ flips relative to the minimum-LCOE point, so a larger structural period decreases minimum LCOE but increases minimum design cost.
     Per the $N_{WEC}$ sensitivity, adding a WEC to the 100-unit array decreases per-WEC design cost by 1.1\% through the economic model's economies of scale, an effect absent from the LCOE minimization.
     Unintuitively, the sensitivity to material yield strength is positive ($+1.0$):
     a stronger material yields a more expensive design, because with several thicknesses already at their lower bound,
@@ -312,7 +312,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     sixteen parameters exceed magnitude 0.5 versus five for LCOE,
     and is dominated by damping plate geometry (the nondimensional stiffener height at $+2.1$, $D_d/D_s$ at $+1.7$, and related terms),
     with no float or spar geometric parameter influential, indicating the damping plate sets the minimum achievable cost.
-    Two counterintuitive findings stand out: the sign of the structural-period sensitivity $T_{struct}$ flips between the two objectives,
+    Two counterintuitive findings stand out: the sign of the structural-period sensitivity $T_{\text{struct}}$ flips between the two objectives,
     and material yield strength has a \emph{positive} cost sensitivity ($+1.0$), that is a stronger material yields a costlier design,
     because with thicknesses already at their lower bounds the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
 \fi
@@ -343,16 +343,16 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     For uncontrollable external inputs such as many site parameters, high values indicate a need to pin down the parameter early in the design cycle so the final design suits the real values.
     For controllable choices held fixed for simplicity, such as many geometric parameters, high values indicate the value should become a design variable in future studies.
     
-    The LCOE-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{stiff,f}$, $h_{1,stiff,d}$) also sensitive to structural (yellow) parameters.
+    The LCOE-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) also sensitive to structural (yellow) parameters.
     In \cref{remdo:fig:param-sens-x-star-tornado-2}, the cost-minimizing design variables add sensitivity to economic parameters.
     Dynamic parameters (blue), including the float and spar drag coefficients and PTO efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
     Some structural thicknesses ($t_{fb}$ and $t_d$ in both, $t_{sr}$ in cost minimization) are insensitive to all parameters because the optimum sits consistently at the lower bound, reinforcing the need to improve the structures model for thin-skinned stiffened shells.
     
     Examining geometric parameters for promotion to design variables:
-    $D_d/D_s$ strongly affects four design variables ($D_s$, $t_{sr}$, $h_s$, $h_{stiff,f}$), indicating $D_d$ should be a design variable;
+    $D_d/D_s$ strongly affects four design variables ($D_s$, $t_{sr}$, $h_s$, $h_{\text{stiff},f}$), indicating $D_d$ should be a design variable;
     $T_{f,1}/T_{f,2}$ strongly affects the overall draft $T_{f,2}$, indicating $T_{f,1}$ should be one too;
-    $T_s/D_s$ affects $h_s$ and $h_{fs,clear}$, indicating $T_s$ should be added alongside $h_s$;
-    and $D_{f,in}/D_s$ strongly affects $h_{stiff,f}$, suggesting $D_{f,in}$,
+    $T_s/D_s$ affects $h_s$ and $h_{fs,\text{clear}}$, indicating $T_s$ should be added alongside $h_s$;
+    and $D_{f,in}/D_s$ strongly affects $h_{\text{stiff},f}$, suggesting $D_{f,in}$,
     though a larger float-spar gap would introduce unmodeled moonpool resonance effects, making this addition less straightforward.
     %\hl{Any other params that could have been design variables...}  % TODO (scrutineering)
     In summary, the parameters that should become design variables in future optimizations are $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
@@ -433,7 +433,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 
 
 %\subsubsection{Price Global Sensitivity}
-%We also perform a global sensitivity analysis for price parameters $p_\tau$, $p_P$, $p_M$, and $p_0$ from equation~\eqref{remdo:eq:LCOE-scale}. For $p_0$, if the design-independent (unmodeled) cost goes to zero, \hl{(and maybe change 80\% efficiency into 100\%)}, that's essentially the best LCOE that a WEC of these technical assumptions (steel point absorber with given operational conditions) can get. We can think of the rest as a cost gap \hl{(explain)}. Meanwhile, the global sensitivity analysis for $p_\tau$ gives preliminary insight into the multi-objective problem, recovering a portion of the pareto front between the four variables that influence $LCOE$: $\tau$, $P_{pk,elec}$, $V_{struct}$, and $P_{avg,elec}$. This shows \hl{XXX conclusion}, to be clarified further in the multi-objective optimization.
+%We also perform a global sensitivity analysis for price parameters $p_\tau$, $p_P$, $p_M$, and $p_0$ from equation~\eqref{remdo:eq:LCOE-scale}. For $p_0$, if the design-independent (unmodeled) cost goes to zero, \hl{(and maybe change 80\% efficiency into 100\%)}, that's essentially the best LCOE that a WEC of these technical assumptions (steel point absorber with given operational conditions) can get. We can think of the rest as a cost gap \hl{(explain)}. Meanwhile, the global sensitivity analysis for $p_\tau$ gives preliminary insight into the multi-objective problem, recovering a portion of the pareto front between the four variables that influence $LCOE$: $\tau$, $P_{pk,\text{elec}}$, $V_{\text{struct}}$, and $P_{\text{avg},\text{elec}}$. This shows \hl{XXX conclusion}, to be clarified further in the multi-objective optimization.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Global Sensitivity to Modeling Assumptions}
@@ -447,7 +447,7 @@ Beyond continuous parameters, the simulation depends on discrete options governi
 \paragraph{Force Saturation}
 \ifdefined\DISSERTATION
     For the minimum-LCOE design of \cref{remdo:sec:results-single}, the lowest force-saturation power factor across all sea states in \cref{remdo:fig:power-matrix-opt} is 
-    $P_{sat}/P_{unsat}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{max}/F_{unsat}=\lowestFsatMinLCOE$ in that sea state.
+    $P_{sat}/P_{\text{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{\text{max}}/F_{\text{unsat}}=\lowestFsatMinLCOE$ in that sea state.
     Across all sea states, the optimal force-saturated design sacrifices only 
     \resultsRE[powerLossForceSatMinLCOE]~of average power (about \resultsRE[pctPowerLossForceSatMinLCOE]) while cutting PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE],
     for an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~versus the same design without saturation, which in any case violates structural constraints due to the higher force.
@@ -463,7 +463,7 @@ Beyond continuous parameters, the simulation depends on discrete options governi
 \fi
 %This corresponds almost exactly with the relationship expected in the purely resistive Thevenin impedance case in \cite{mccabe_force-limited_2024}:
 %\begin{equation}
-%   \frac{ P_{sat}}{P_{unsat}}=1-\left(\frac{F_{max}}{F_{unsat}}-1\right)^2
+%   \frac{ P_{sat}}{P_{\text{unsat}}}=1-\left(\frac{F_{\text{max}}}{F_{\text{unsat}}}-1\right)^2
 %\end{equation}
 % see notebook p46 5/16/25
 % fixme: what about the factor of 4/pi in the force ratio? Then the quadratic equation wouldn't apply, it would be more complicated (alpha non zero case) which casts doubt on my conclusion that alpha=0 emerges as optimal. Would need to compute alpha directly I think? I also think that the assumption of damping control means my Im(Gamma)=0 assumption in the notebook is false. Also Psat/Punsat is the the same as Psat/Pmax. So leaving this sentence out.
@@ -486,14 +486,14 @@ Beyond continuous parameters, the simulation depends on discrete options governi
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Multi-Objective Optimization}\label{remdo:sec:results-multi}
 \ifdefined\DISSERTATION
-    In the multi-objective optimization, the design-dependent capital cost $C_{design}$ and average electrical power $P_{avg,elec}$ are optimized simultaneously to expose the trade-off between them.
+    In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
     As described in \cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
     The Pareto front is shown in \cref{remdo:fig:pareto}, with the utopia point marked by a green star, simulated designs by squares, and the actual nominal performance reported in the RM3 reference \cite{RM3} by a diamond.
     All Pareto-front designs cost significantly less than the nominal RM3, spanning powers both below and above it.
     \Cref{remdo:fig:pareto-lcoe} provides a zoomed view with superimposed constant-$LCOE$ contours; the minimum-LCOE design lies at the tangency between the Pareto front and the contours and very nearly coincides with the maximum-power design.
     %\hl{analyze more: how are the max power and min LCOE designs different? ... multiple apparent points of tangency ...}  % TODO (scrutineering)
 \else
-    The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{design}$ against average electrical power $P_{avg,elec}$ (\cref{remdo:sec:multi-obj-process}),
+    The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{\text{design}}$ against average electrical power $P_{\text{avg},\text{elec}}$ (\cref{remdo:sec:multi-obj-process}),
     giving insight where LCOE is inapplicable or uncertain in its constant-modeled cost terms ($OPEX$, $FCR$, $p_0$).
     The Pareto front (\cref{remdo:fig:pareto}) shows all designs costing significantly less than the nominal RM3 \cite{RM3} across a range of powers;
     the zoomed view with constant-$LCOE$ contours (\cref{remdo:fig:pareto-lcoe}) places the minimum-LCOE design at the front's tangency with the contours, nearly coincident with the maximum-power design.
@@ -542,16 +542,16 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
 \end{figure}
 
 \ifdefined\DISSERTATION
-    Examining the direction of change, with increasing cost and power (left to right) most design variables either increase monotonically ($P_{max}$, $D_s$, $t_{s,r}$) or nearly so with one brief decline ($F_{max}$, $D_f$, $h_{1,stiff,d}$, $h_s$).
-    Only two mainly decrease: $T_{f,2}$ and $h_{fs,clear}$, both involved in the float amplitude constraints.
-    Of the remaining three, $t_d$ and $t_{f,b}$ (structural thicknesses at their lower bound) stay essentially constant apart from small upward excursions in $t_d$ near 2\%, 23\%, and 60\% along, while $h_{stiff,f}$ shows several small oscillations.
+    Examining the direction of change, with increasing cost and power (left to right) most design variables either increase monotonically ($P_{\text{max}}$, $D_s$, $t_{s,r}$) or nearly so with one brief decline ($F_{\text{max}}$, $D_f$, $h_{1,\text{stiff},d}$, $h_s$).
+    Only two mainly decrease: $T_{f,2}$ and $h_{fs,\text{clear}}$, both involved in the float amplitude constraints.
+    Of the remaining three, $t_d$ and $t_{f,b}$ (structural thicknesses at their lower bound) stay essentially constant apart from small upward excursions in $t_d$ near 2\%, 23\%, and 60\% along, while $h_{\text{stiff},f}$ shows several small oscillations.
     
     Examining the magnitude of change, the powertrain ratings vary most dramatically across the front while geometric and structural variables need only moderate adjustment.
     This raises the question of how much the cost savings at lower power come from smaller PTO versus smaller material cost: if PTO cost dominated, companies selling devices at multiple power levels could keep one geometric and structural design and vary only the PTO, easing design effort and economies of scale.
     Using the costs in \cref{remdo:tab:opt-dv-values}, however, only \resultsRE[pctCostSavingsFromPTO]~of the savings come from the smaller PTO, so for a lower-power WEC under these price assumptions the slightly smaller hydrodynamic design matters far more than the substantially smaller PTO, making design reuse across power levels unlikely.
     This differs from preliminary work \cite{mccabe_multidisciplinary_2022}, which wrongly examined only the change in optimal design without weighting the relative cost impact of PTO and dimensions.
 \else
-    With increasing cost and power (left to right), most design variables increase monotonically or nearly so; only $T_{f,2}$ and $h_{fs,clear}$ (both in the amplitude constraints) decrease, while the lower-bound thicknesses $t_d$ and $t_{f,b}$ stay essentially constant.
+    With increasing cost and power (left to right), most design variables increase monotonically or nearly so; only $T_{f,2}$ and $h_{fs,\text{clear}}$ (both in the amplitude constraints) decrease, while the lower-bound thicknesses $t_d$ and $t_{f,b}$ stay essentially constant.
     The powertrain ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO]~comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \cite{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
 \fi
 
@@ -570,7 +570,7 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
 
 \ifdefined\DISSERTATION
     \Cref{remdo:fig:constraint-activity} shows which constraints are active along the front.
-    Three structural design variables ($t_d$, $h_{stiff,f}$, $h_{1,stiff,d}$) reach their lower bound and none their upper bound.
+    Three structural design variables ($t_d$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) reach their lower bound and none their upper bound.
     The only active linear constraint is the spar natural frequency constraint; since it is priority 2 (required for modeling accuracy under the assumptions), its activity is significant and discussed further in \cref{remdo:sec:discussion}.
     Aside from the maximum force constraint (always active by design), the active nonlinear constraints are the float, column, and damping plate factors of safety and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing float slamming.
 \else
