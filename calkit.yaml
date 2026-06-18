@@ -5512,22 +5512,29 @@ pipeline:
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+    check-dup-json-keys:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/duplicate_json_key.py
+      inputs:
+        - results/
+        - pubs/renewable-energy-mdo/numbers.json
     re-results-to-latex:
       kind: json-to-latex
       inputs:
         - pubs/renewable-energy-mdo/numbers.json
         # - results/AllFigCompare/end.json
-        # - results/Comparison/end.json
-        # - results/Constraints/end.json
+        - results/Comparison/end.json
+        - results/Constraints/end.json
         # - results/DesignSpaceExploration/end.json
         # - results/DesignVars/end.json
         - results/ForceSaturationFigFunc/end.json
-        # - results/GradientOptimFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
         # - results/LocationSensitivity/end.json
         # - results/Multistart/end.json
-        # - results/ParamSensitivities/end.json
+        - results/ParamSensitivities/end.json
         # - results/Parameters/end.json
-        # - results/ParetoFigFunc/end.json
+        - results/ParetoFigFunc/end.json
         # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/Runtime/end.json
@@ -5567,8 +5574,9 @@ pipeline:
         capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
         capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
-        # runtimes (stored in seconds, formatted as minutes)
+        # runtimes (stored in seconds, formatted as ms or minutes)
         simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         singleObjRuntime: "{singleObjRuntime/60:.1f} min"
         paretoRuntime: "{paretoRuntime/60:.0f} min"
         gradientSensRuntime: "{runtime_post_optim/60:.1f} min"
@@ -5584,6 +5592,8 @@ pipeline:
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
         lowestFmaxFactorMinLCOE: "{lowestFmaxFactorMinLCOE*100:.0f}%"
+        percentParamsRightSign: "{percentParamsRightSign:.0f}%"
+        percentMeanAbsErrorParamSens: "{percentMeanAbsErrorParamSens:.0f}%"
         # force saturation comparison (non-reoptimized) - values from GradientOptimFigFunc
         powerLossForceSatMinLCOE: "{powerLossForceSatMinLCOE:.1f} W"
         pctPowerLossForceSatMinLCOE: "{pctPowerLossForceSatMinLCOE:.3f}%"
@@ -5645,7 +5655,6 @@ pipeline:
         - pubs/renewable-energy-mdo/sections/
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
-        - pubs/renewable-energy-mdo/numbers.tex
         - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/renewable-energy-mdo/elsarticle-num-names.bst
         - pubs/renewable-energy-mdo/zotero-meem-refs.bib

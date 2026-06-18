@@ -7500,18 +7500,31 @@ stages:
           persist: false
     desc: Automatically generated from the 'aor-results-to-latex' 
       stage in calkit.yaml. Changes made here will be overwritten.
+  check-dup-json-keys:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/duplicate_json_key.py
+    deps:
+      - dev/latex/duplicate_json_key.py
+      - results/
+      - pubs/renewable-energy-mdo/numbers.json
+      - .calkit/env-locks/pubs
+    outs: []
+    desc: Automatically generated from the 'check-dup-json-keys' stage
+      in calkit.yaml. Changes made here will be overwritten.
   re-results-to-latex:
     cmd: "calkit latex from-json 'pubs/renewable-energy-mdo/numbers.json'
-      'results/ForceSaturationFigFunc/end.json' 'results/Runtime/end.json'
-      'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
-      --command resultsRE --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\"\
-      : \"{powerAvgNominal/1000:.0f} kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f}
-      kW\", \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\",
-      \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\"\
-      : \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f}
-      kW\", \"powerWhereCusp\": \"{powerWhereCusp/1000:.0f} kW\", \"powerWhereNonconvexEnds\"\
-      : \"{powerWhereNonconvexEnds/1000:.0f} kW\", \"dampingReactivePowerIntersect\"\
+      'results/Comparison/end.json' 'results/Constraints/end.json' 'results/ForceSaturationFigFunc/end.json'
+      'results/GradientOptimFigFunc/end.json' 'results/ParamSensitivities/end.json'
+      'results/ParetoFigFunc/end.json' 'results/Runtime/end.json' 'results/RunSingleFigFunc/end.json'
+      --output 'pubs/renewable-energy-mdo/numeric-results.tex' --command
+      resultsRE --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\": \"{powerAvgNominal/1000:.0f}
+      kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f} kW\",
+      \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\", \"powerAvgAtMinCapex\"\
+      : \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\": \"{powerAvgMaxPower/1000:.0f}
+      kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f} kW\", \"powerWhereCusp\"\
+      : \"{powerWhereCusp/1000:.0f} kW\", \"powerWhereNonconvexEnds\": \"\
+      {powerWhereNonconvexEnds/1000:.0f} kW\", \"dampingReactivePowerIntersect\"\
       : \"{dampingReactivePowerIntersect/1000:.0f} kW\", \"structMassAtMinLCOE\"\
       : \"{structMassAtMinLCOE/1000:.0f} Mg\", \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f}
       m\", \"forceMaxAtMinLCOE\": \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"\
@@ -7523,7 +7536,8 @@ stages:
       : \"{capexDesignAtMinLCOE/1e6:.2f} $M\", \"capexDesignNominal\": \"\
       {capexDesignNominal/1e6:.2f} $M\", \"capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f}
       $M\", \"capexDesignMaxPower\": \"{capexDesignMaxPower/1e6:.2f} $M\"\
-      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"singleObjRuntime\"\
+      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
+      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"singleObjRuntime\"\
       : \"{singleObjRuntime/60:.1f} min\", \"paretoRuntime\": \"{paretoRuntime/60:.0f}
       min\", \"gradientSensRuntime\": \"{runtime_post_optim/60:.1f} min\"\
       , \"reoptimSensRuntime\": \"{runtime_re_optim/60:.0f} min\", \"pctImproveLCOEMinLCOE\"\
@@ -7536,6 +7550,8 @@ stages:
       , \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%\"\
       , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"\
       lowestFmaxFactorMinLCOE\": \"{lowestFmaxFactorMinLCOE*100:.0f}%\"\
+      , \"percentParamsRightSign\": \"{percentParamsRightSign:.0f}%\", \"\
+      percentMeanAbsErrorParamSens\": \"{percentMeanAbsErrorParamSens:.0f}%\"\
       , \"powerLossForceSatMinLCOE\": \"{powerLossForceSatMinLCOE:.1f} W\"\
       , \"pctPowerLossForceSatMinLCOE\": \"{pctPowerLossForceSatMinLCOE:.3f}%\"\
       , \"pctPTOSavingsForceSatMinLCOE\": \"{pctPTOSavingsForceSatMinLCOE:.0f}%\"\
@@ -7551,7 +7567,12 @@ stages:
       : \"{paretoPctTimePatternSearch*100:.0f}%\"}'"
     deps:
       - pubs/renewable-energy-mdo/numbers.json
+      - results/Comparison/end.json
+      - results/Constraints/end.json
       - results/ForceSaturationFigFunc/end.json
+      - results/GradientOptimFigFunc/end.json
+      - results/ParamSensitivities/end.json
+      - results/ParetoFigFunc/end.json
       - results/Runtime/end.json
       - results/RunSingleFigFunc/end.json
     outs:
@@ -7629,7 +7650,6 @@ stages:
       - pubs/renewable-energy-mdo/sections/
       - pubs/renewable-energy-mdo/tables/
       - pubs/renewable-energy-mdo/references.bib
-      - pubs/renewable-energy-mdo/numbers.tex
       - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/renewable-energy-mdo/elsarticle-num-names.bst
       - pubs/renewable-energy-mdo/zotero-meem-refs.bib

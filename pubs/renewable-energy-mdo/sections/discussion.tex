@@ -40,7 +40,7 @@
 \else
     A survey finds 40\% of WEC developers design for site-agnostic deployment \cite{trueworthy_wave_2020}.
     A prior study \cite{de_andres_adaptability_2015} concludes that geometric tuning to the dominant wave period is unfavorable, but its devices have coupled diameter and height, use only damping control, and tune for power rather than cost.
-    MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\cref{tab:opt-dv-values,tab:opt-output,tab:location}), which contradicts \cite{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
+    MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\cref{remdo:tab:opt-dv-values,remdo:tab:opt-output,remdo:tab:location}), which contradicts \cite{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -80,35 +80,35 @@ A previous study compares structural mass per unit hull volume for marine struct
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model Realism}
 \ifdefined\DISSERTATION
-    Using the optimization and sensitivity results, the modeling assumptions of \cref{sec:model} can now be assessed for reasonableness.
+    Using the optimization and sensitivity results, the modeling assumptions of \cref{remdo:sec:model} can now be assessed for reasonableness.
     We examine both the model complexities MDOcean captures, to confirm they were worth including, and the shortcomings it cannot capture, to judge whether they must be added in future versions.
     Previous studies such as \cite{garcia-teruel_reliability-based_2021} have called for this kind of systematic model-fidelity assessment to build designer confidence in the most relevant effects and their computational cost.
 \else
-    The optimization and sensitivity results allow the modeling assumptions \cite{mccabe_development_2025} to be assessed, both the complexities worth including and the shortcomings that may need adding, which is the kind of systematic fidelity assessment called for by \cite{garcia-teruel_reliability-based_2021}.
+    The optimization and sensitivity results allow the modeling assumptions \cite{mccabe_development_2026} to be assessed, both the complexities worth including and the shortcomings that may need adding, which is the kind of systematic fidelity assessment called for by \cite{garcia-teruel_reliability-based_2021}.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Observed Impact of Modeled Effects}
 \ifdefined\DISSERTATION
     Several areas of model complexity, force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the results, evident in the constraint activity and in the differences from using 1-DOF (stationary-spar) dynamics; \cref{remdo:sec:sensitivity-model-assumptions} analyzed these in detail.
-    MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \cite{mccabe_development_2025}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
+    MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \cite{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
     Force saturation is especially relevant: it directly reduces powertrain cost and indirectly reduces structural cost by lowering operational heave loading, which permits a thinner spar given the active column fatigue factor-of-safety constraint.
     The observed impact of these effects justifies the corresponding model complexity and suggests other optimization frameworks should include them for realistic results.
 \else
     Force saturation, slamming amplitude limits, and 2-DOF dynamics all contribute significantly to the results (\cref{remdo:sec:sensitivity-model-assumptions}).
-    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \cite{mccabe_development_2025}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
+    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \cite{mccabe_development_2026}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
     The impact of these effects justifies their model complexity and argues for their inclusion in other frameworks.
 \fi
 
 \ifdefined\DISSERTATION
     Conversely, a few modeling complexities appear unnecessary in hindsight because they have little effect.
     \Cref{remdo:sec:sensitivities-local} finds low sensitivity to drag coefficient, and the re-optimization without drag in \cref{remdo:sec:sensitivity-model-assumptions} confirms it, suggesting that modeling the drag nonlinearity is inessential and that future optimizations may disable drag to avoid iterating the drag damping coefficient.
-    Likewise, the slamming model is derived to be valid not only for long waves but also intermediate wavelengths, where the maximum amplitude depends on the phase of the dynamic response; the simple long-wave slamming model is reasonably accurate at sea states with an active slamming constraint \cite{mccabe_development_2025}, suggesting the intermediate-wavelength model may be unnecessary.
+    Likewise, the slamming model is derived to be valid not only for long waves but also intermediate wavelengths, where the maximum amplitude depends on the phase of the dynamic response; the simple long-wave slamming model is reasonably accurate at sea states with an active slamming constraint \cite{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Confirming this would require checking all points during the optimization, not just the optimum, since the slamming model fidelity is not currently a model setting and the long-wave condition is verified manually at the optimum. %\hl{I should actually check this.}  % TODO (scrutineering)
     Finally, although drag and intermediate-wavelength slamming each have little individual effect, the problem's nonlinearity admits a possible coupling effect were both disabled simultaneously, or an emergent effect under a changed formulation (a different objective or added constraints), so users should exercise caution when simplifying the model.
 \else
     Conversely, the low sensitivity to drag coefficient (\cref{remdo:sec:sensitivities-local}), confirmed by re-optimization without drag (\cref{remdo:sec:sensitivity-model-assumptions}), suggests the drag nonlinearity is inessential.
-    Similarly, the simple long-wave slamming model is reasonably accurate where the slamming constraint is active \cite{mccabe_development_2025}, suggesting the intermediate-wavelength model may be unnecessary.
+    Similarly, the simple long-wave slamming model is reasonably accurate where the slamming constraint is active \cite{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Because the problem is nonlinear, however, disabling both simultaneously or changing the formulation could produce coupling effects, so model simplification warrants caution.
 \fi
 
@@ -117,12 +117,12 @@ A previous study compares structural mass per unit hull volume for marine struct
 \ifdefined\DISSERTATION
     No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}  % TODO (scrutineering)
     a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
-    Likewise, the inactivity of the pitch stability constraint mitigates the impact of any metacentric-height error arising from the geometry module's even-mass-distribution assumption for the center of gravity \cite{mccabe_development_2025}.
+    Likewise, the inactivity of the pitch stability constraint mitigates the impact of any metacentric-height error arising from the geometry module's even-mass-distribution assumption for the center of gravity \cite{mccabe_development_2026}.
     On the other hand, the active operational-sea-state slamming constraints mean some assumptions are worth revisiting.
-    In particular, MDOcean enforces the float amplitude limits as optimization constraints rather than through the constrained optimal linear controller \cite{mccabe_development_2025}, and assumes the WEC must operate in every sea state with nonzero probability in the joint probability distribution rather than entering a survival mode \cite{mccabe_development_2025}; both assumptions interact with the active amplitude constraints and merit future reconsideration.
+    In particular, MDOcean enforces the float amplitude limits as optimization constraints rather than through the constrained optimal linear controller \cite{mccabe_development_2026}, and assumes the WEC must operate in every sea state with nonzero probability in the joint probability distribution rather than entering a survival mode \cite{mccabe_development_2026}; both assumptions interact with the active amplitude constraints and merit future reconsideration.
 \else
-    No priority 1 or 2 constraints are active at the optimum, suggesting the true optimum is unlikely to lie in a region of model inaccuracy, and the inactive pitch stability constraint mitigates any metacentric-height error from the geometry module \cite{mccabe_development_2025}.
-    However, the active operational slamming constraints invite revisiting two assumptions \cite{mccabe_development_2025}: enforcing amplitude limits as optimization constraints rather than via the constrained optimal controller, and requiring operation in all nonzero-probability sea states rather than allowing a survival mode.
+    No priority 1 or 2 constraints are active at the optimum, suggesting the true optimum is unlikely to lie in a region of model inaccuracy, and the inactive pitch stability constraint mitigates any metacentric-height error from the geometry module \cite{mccabe_development_2026}.
+    However, the active operational slamming constraints invite revisiting two assumptions \cite{mccabe_development_2026}: enforcing amplitude limits as optimization constraints rather than via the constrained optimal controller, and requiring operation in all nonzero-probability sea states rather than allowing a survival mode.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -137,7 +137,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether multiple smaller WECs or one larger WEC is preferable.
     
     Additionally, a sensitivity analysis of design variables perturbed as if they were parameters would help quantify inter-disciplinary coupling and potentially inform formulation simplifications.
-    For example, a high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ would support this study's choice of fully coupled MDO \cite{mccabe_development_2025}, while a low value would support disciplinary decoupling.
+    For example, a high sensitivity of the optimal structural design variables to the powertrain design variables $\left(\frac{dx^*_{struct}}{dx_{pto}}\right)$ would support this study's choice of fully coupled MDO \cite{mccabe_development_2026}, while a low value would support disciplinary decoupling.
     Such analysis may be necessary if a future optimization with many more design variables is too costly to perform fully coupled and must be split into sequential optimizations (e.g.\ bulk-geometry power maximization, then powertrain sizing, then structural sizing).
     Performing this sequential optimization for the current formulation and assessing the suboptimality would quantify the value of coupling.
     The authors predict, however, that the speed of the semi-analytical models and the extensions discussed here will permit full coupling even for substantially larger WEC optimizations, including the ambitious target of comparing multiple hydrodynamic architectures with realistic powertrain models.
@@ -145,7 +145,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     \Cref{remdo:sec:formulation} described the careful choice of design variables to maintain model validity and aid convergence.
     The sensitivity analysis (\cref{remdo:sec:sensitivities-local}) suggests $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ merit inclusion as design variables in future studies.
     Adding $N_{WEC}$ matters little for LCOE minimization but is valuable in a modified multi-objective analysis using array power, relevant to fixed-requirement Powering the Blue Economy applications weighing many small WECs against one large one.
-    A sensitivity analysis of design variables perturbed as parameters would further quantify inter-disciplinary coupling, supporting either the fully coupled approach used here \cite{mccabe_development_2025} or a future decoupled formulation should the design space grow too large for full coupling.
+    A sensitivity analysis of design variables perturbed as parameters would further quantify inter-disciplinary coupling, supporting either the fully coupled approach used here \cite{mccabe_development_2026} or a future decoupled formulation should the design space grow too large for full coupling.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -177,7 +177,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     
     Further survivability innovation is warranted, both incremental and transformative.
     Incremental improvements include more structurally and hydrodynamically performant detail designs that obey these constraints while reducing material and sustaining energy production, for example, performing FEA or adding stiffeners to justify removing more material, replacing welded connections with pins to reduce moment transfer, or modifying the float--spar attachment geometry to allow more travel at the same bulk dimensions.
-    Transformative improvements include creative concepts that avoid these constraints altogether, storm-survival strategies such as submerging the WEC, changing shape with control surfaces, or altering the PTO control strategy to reduce force and amplitude, whose viability can be readily estimated by weighing the additional costs (e.g.\ actuator and control hardware and software) against the performance gains, again using the Lagrange multipliers of \cref{fig:lagrange-multiplier}.
+    Transformative improvements include creative concepts that avoid these constraints altogether, storm-survival strategies such as submerging the WEC, changing shape with control surfaces, or altering the PTO control strategy to reduce force and amplitude, whose viability can be readily estimated by weighing the additional costs (e.g.\ actuator and control hardware and software) against the performance gains, again using the Lagrange multipliers of \cref{remdo:fig:lagrange-multiplier}.
     
     That said, many considerations remain uncaptured, requiring caution before asserting that industry should pursue the optimal design found here.
     Design variables are assumed continuous, whereas structural thicknesses and, to a lesser extent, generator specifications are constrained to discrete commercially available sizes.
@@ -218,7 +218,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 \subsection{Future Work}
 \ifdefined\DISSERTATION
     Future improvements span two axes: enhancements to the model and enhancements to the optimization formulation, each applicable to either the existing setup or a new one.
-    \Cref{tab:future-studies} organizes the most promising directions along these axes.
+    \Cref{remdo:tab:future-studies} organizes the most promising directions along these axes.
 
 %% table contents helpers
 \newcommand{\speedupsRE}{

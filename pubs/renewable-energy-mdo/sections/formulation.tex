@@ -16,20 +16,20 @@ Parameters $\vec{p}$ are constant inputs required to compute the objective or co
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Objective Function}\label{remdo:sec:obj}
-For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \cite{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2025}.
+For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \cite{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2026}.
 
 \ifdefined\DISSERTATION
     LCOE is adopted for its simplicity, although this choice brings three major limitations.
     First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
     On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, so capturing nonuniform sources of WEC value such as consistency or complementarity would require modifications (e.g.\ \cite{mccabe_system_2023}) outside the scope of the present model.
-    Second, LCOE has high uncertainty for early-stage designs: the economic model assumes only structural and PTO costs scale with design \cite{mccabe_development_2025}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
+    Second, LCOE has high uncertainty for early-stage designs: the economic model assumes only structural and PTO costs scale with design \cite{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
     Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \cite{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}.
     
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2025}; and it is less relevant for the off-grid ``Powering the Blue Economy'' applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid ``Powering the Blue Economy'' applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
     The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
 \fi
 
@@ -63,7 +63,7 @@ Constraints are the most common but not the only enforcement mechanism.
 \fi
 
 \Cref{remdo:tab:requirements} lists each requirement with its priority and enforcement mechanism.
-The physical and modeling basis for each requirement such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations, is developed in \cite{mccabe_development_2025}.
+The physical and modeling basis for each requirement such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations, is developed in \cite{mccabe_development_2026}.
 
 \newcounter{reqnumber}
     \begin{longtable}{c>{\centering\arraybackslash}p{0.25\linewidth}>{\centering\arraybackslash}p{0.27\linewidth}>{\centering\arraybackslash}p{0.08\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}}
@@ -124,7 +124,7 @@ The physical and modeling basis for each requirement such as the underlying geom
     buoyancy measures ensuring the float and spar float and can be ballasted (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics});
     eight structural factors of safety (\reqref{FOS}); a stability measure preventing tipping (\reqref{GM});
     equality of maximum experienced and rated powertrain force and power to avoid oversized PTO components (\reqref{force_max}, \reqref{P_max});
-    and a maximum LCOE constraint required for the epsilon-constraint procedure of \cref{sec:multi-obj-process} (\reqref{LCOE}).
+    and a maximum LCOE constraint required for the epsilon-constraint procedure of \cref{remdo:sec:multi-obj-process} (\reqref{LCOE}).
     Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 \else
     The requirements span geometric relations preventing overlap, numerical overflow, shape deviation, submersion, and dynamic-assumption violation (\reqref{float_spar_diam}--\reqref{spar_similarity});
@@ -169,8 +169,8 @@ Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC
  \textbf{\#}&\textbf{Design Variable}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
  $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
  $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\
- $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\cite{mccabe_development_2025}&100& m\\
- $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\cite{mccabe_development_2025}& 100& m\\
+ $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\cite{mccabe_development_2026}&100& m\\
+ $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\cite{mccabe_development_2026}& 100& m\\
  $x_5$&$h_{fs,clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $F_{max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
  $x_{7}$&$P_{pk,elec}$& Generator peak power rating & 50& 286& 1000& kW\\
@@ -187,11 +187,11 @@ Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC
 The parameters in \cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
 \ifdefined\DISSERTATION
     Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
-    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2025}.
+    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2026}.
     In effect, the spar dimensional design space is restricted to comply with the model assumptions.
     This prevents determining the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \else
-    Three parameters of note, the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2025}.
+    Three parameters of note, the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2026}.
     This restricts the spar design space to remain model-valid; it precludes finding the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \fi
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
