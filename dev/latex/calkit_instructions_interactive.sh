@@ -31,6 +31,32 @@ prompt_nonempty() {
   done
 }
 
+prompt_valid_branch_name() {
+  local message="$1"
+  local value
+  while true; do
+    value="$(prompt_nonempty "$message")"
+    if git check-ref-format --branch "$value" >/dev/null 2>&1; then
+      printf '%s\n' "$value"
+      return 0
+    fi
+    echo "Invalid branch name. Use a valid git branch name."
+  done
+}
+
+prompt_valid_folder_name() {
+  local message="$1"
+  local value
+  while true; do
+    value="$(prompt_nonempty "$message")"
+    if [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]]; then
+      printf '%s\n' "$value"
+      return 0
+    fi
+    echo "Invalid folder name. Use letters, numbers, dot, underscore, or hyphen only (no slashes)."
+  done
+}
+
 run_step() {
   local description="$1"
   local cmd="$2"
@@ -171,6 +197,26 @@ run_up_to_date_check() {
   done
 }
 
+stage_paper_tex_updates() {
+  local tex_found=0
+  local tex_file
+
+  while IFS= read -r -d '' tex_file; do
+    git add "$tex_file" || return 1
+    tex_found=1
+  done < <(find "pubs/$PAPER_FOLDER" -maxdepth 1 -type f -name "*.tex" -print0)
+
+  if [ "$tex_found" -eq 0 ]; then
+    echo "No top-level .tex files found in pubs/$PAPER_FOLDER."
+  fi
+
+  if [ -d "pubs/$PAPER_FOLDER/sections" ]; then
+    git add "pubs/$PAPER_FOLDER/sections/" || return 1
+  else
+    echo "No sections directory in pubs/$PAPER_FOLDER; skipping sections staging."
+  fi
+}
+
 choose_stage_and_folder() {
   echo
   echo "Select paper target:"
@@ -194,7 +240,7 @@ choose_stage_and_folder() {
         ;;
       3)
         PAPER_STAGE="$(prompt_nonempty 'Enter <paper-stage>: ')"
-        PAPER_FOLDER="$(prompt_nonempty 'Enter <paper-folder> (no slashes): ')"
+        PAPER_FOLDER="$(prompt_valid_folder_name 'Enter <paper-folder> (no slashes): ')"
         return 0
         ;;
       *)
@@ -208,7 +254,7 @@ workflow_github_to_overleaf() {
   local branch_name
 
   choose_stage_and_folder
-  branch_name="$(prompt_nonempty 'Enter branch name to create (e.g., overleaf-my-update): ')"
+  branch_name="$(prompt_valid_branch_name 'Enter branch name to create (e.g., overleaf-my-update): ')"
 
   run_step "Checkout main" "git checkout main"
   run_step "Pull latest main" "git pull"
@@ -249,7 +295,7 @@ workflow_overleaf_to_github() {
     exit 1
   fi
 
-  branch_name="$(prompt_nonempty 'Enter branch to work on (new or existing): ')"
+  branch_name="$(prompt_valid_branch_name 'Enter branch to work on (new or existing): ')"
   if prompt_yes_no "Create this branch with -b now?"; then
     run_step "Create and checkout branch" "git checkout -b '$branch_name'"
     run_step "Push branch with upstream" "git push -u origin HEAD"
@@ -259,7 +305,15 @@ workflow_overleaf_to_github() {
 
   if prompt_yes_no "Did Overleaf change references.bib/shared-pkg.tex/elsarticle-num-names.bst?"; then
     while true; do
-      shared_file="$(prompt_nonempty 'Enter one changed filename (e.g., references.bib): ')"
+      shared_file="$(prompt_valid_folder_name 'Enter one changed filename (e.g., references.bib): ')"
+      if [ ! -f "pubs/$PAPER_FOLDER/$shared_file" ]; then
+        echo "File not found: pubs/$PAPER_FOLDER/$shared_file"
+        if prompt_yes_no "Try a different filename?"; then
+          continue
+        fi
+        echo "Stopped by user."
+        exit 1
+      fi
       run_step "Copy shared file" "cp 'pubs/$PAPER_FOLDER/$shared_file' 'pubs/shared/$shared_file'"
       run_step "Stage shared file" "git add 'pubs/shared/$shared_file'"
       run_step "Commit shared file update" "git commit -m 'update shared $shared_file from overleaf'"
@@ -289,7 +343,7 @@ workflow_overleaf_to_github() {
     fi
   fi
 
-  run_step "Stage paper tex updates" "find 'pubs/$PAPER_FOLDER' -maxdepth 1 -type f -name '*.tex' -print0 | xargs -0 -r git add; if [ -d 'pubs/$PAPER_FOLDER/sections' ]; then git add 'pubs/$PAPER_FOLDER/sections/'; else echo 'No sections directory in pubs/$PAPER_FOLDER; skipping sections staging.'; fi"
+  run_step "Stage paper tex updates" "stage_paper_tex_updates"
   run_step "Commit paper sync" "git commit -m 'Update paper from Overleaf sync'"
   run_step "Push branch" "git push"
 
