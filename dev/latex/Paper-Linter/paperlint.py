@@ -5,7 +5,7 @@ import os
 
 
 def usage():
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
     sys.exit(1)
 
 if len(sys.argv) < 2:
@@ -13,14 +13,172 @@ if len(sys.argv) < 2:
     
 
 tex_files = []
+ignored_files = []
+settings_files = []
+output_file = None
+output_handle = sys.stdout
+use_color = True
 
-if(not sys.argv[1].endswith(".tex")):
-    for path, subdirs, files in os.walk(sys.argv[1]):
-        for f in files:
-            if f.endswith(".tex"):
-                tex_files.append(os.path.join(path,f))
-else:
-    tex_files = [sys.argv[1]]
+
+def write_output(text="", end="\n"):
+    print(text, end=end, file=output_handle)
+
+
+def write_error(text):
+    print(text, file=sys.stderr)
+
+
+def file_has_document_environment(path):
+    try:
+        with open(path) as handle:
+            content = handle.read()
+        return re.search(r"\\begin\{document\}", content) is not None
+    except Exception:
+        return False
+
+
+def strip_tex_comments(text):
+    lines = []
+    for line in text.split("\n"):
+        match = re.search(r"(?<!\\)%", line)
+        if match:
+            lines.append(line[:match.start()])
+        else:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def resolve_included_file(base_file, target):
+    target = target.strip().strip('"').strip("'")
+    if not target:
+        return None
+
+    base_dir = os.path.dirname(base_file)
+    candidates = []
+
+    if os.path.isabs(target):
+        candidates.append(target)
+    else:
+        candidates.append(os.path.join(base_dir, target))
+
+    if not os.path.splitext(target)[1]:
+        extensions = [".tex", ".tikz", ".ltx"]
+        for candidate in list(candidates):
+            for extension in extensions:
+                candidates.append(candidate + extension)
+
+    for candidate in candidates:
+        if os.path.isfile(candidate):
+            return os.path.normpath(candidate)
+    return None
+
+
+def should_ignore_file(file_path, ignore_specs):
+    normalized_path = os.path.normpath(file_path)
+    file_name = os.path.basename(normalized_path)
+    for spec in ignore_specs:
+        normalized_spec = os.path.normpath(spec)
+        if normalized_path == normalized_spec:
+            return True
+        if file_name == os.path.basename(normalized_spec):
+            return True
+        if normalized_path.endswith(normalized_spec):
+            return True
+        if normalized_path.endswith(spec):
+            return True
+    return False
+
+
+def collect_tex_files(root_path, ignore_specs=None):
+    if ignore_specs is None:
+        ignore_specs = []
+
+    if root_path.endswith(".tex"):
+        initial_files = [os.path.normpath(root_path)]
+    else:
+        all_tex_files = []
+        root_tex_files = []
+        for path, subdirs, files in os.walk(root_path):
+            for f in files:
+                if f.endswith(".tex"):
+                    file_path = os.path.join(path, f)
+                    file_path = os.path.normpath(file_path)
+                    all_tex_files.append(file_path)
+                    if file_has_document_environment(file_path):
+                        root_tex_files.append(file_path)
+        initial_files = root_tex_files if len(root_tex_files) > 0 else all_tex_files
+
+    initial_files = [file_path for file_path in initial_files if not should_ignore_file(file_path, ignore_specs)]
+
+    included_pattern = re.compile(r"\\(?:input|include)\*?\{([^\}]+)\}")
+    collected = []
+    seen = set()
+
+    def visit(file_path):
+        file_path = os.path.normpath(file_path)
+        if should_ignore_file(file_path, ignore_specs):
+            return
+        if file_path in seen:
+            return
+        seen.add(file_path)
+        collected.append(file_path)
+
+        try:
+            with open(file_path) as handle:
+                content = handle.read()
+        except Exception:
+            return
+
+        content = strip_tex_comments(content)
+        for match in included_pattern.finditer(content):
+            included_file = resolve_included_file(file_path, match.group(1))
+            if included_file is not None:
+                visit(included_file)
+
+    for file_path in initial_files:
+        visit(file_path)
+
+    return collected
+
+
+def strip_comment_from_line(line):
+    match = re.search(r"(?<!\\)%", line)
+    if match:
+        return line[:match.start()]
+    return line
+
+
+def apply_settings_file(settings_file, used_categories):
+    try:
+        with open(settings_file) as handle:
+            lines = handle.readlines()
+    except Exception:
+        print("Could not open settings file '%s'" % settings_file)
+        sys.exit(1)
+
+    for line_no, raw_line in enumerate(lines, start=1):
+        line = strip_comment_from_line(raw_line).strip()
+        if not line:
+            continue
+
+        parts = line.split()
+        if len(parts) < 2:
+            print("Malformed settings line %d in '%s': expected '0|1 check-name'" % (line_no, settings_file))
+            sys.exit(1)
+
+        state, check_name = parts[0], parts[1]
+        if state not in ["0", "1"]:
+            print("Malformed settings line %d in '%s': expected 0 or 1, got '%s'" % (line_no, settings_file, state))
+            sys.exit(1)
+
+        if not switch_exists(check_name):
+            print("Unknown switch '%s' in settings file '%s' on line %d" % (check_name, settings_file, line_no))
+            sys.exit(1)
+
+        if state == "1":
+            add_categories(used_categories, check_name)
+        else:
+            remove_categories(used_categories, check_name)
 
 tex = None
 tex_lines = None
@@ -29,6 +187,7 @@ tex_lines_math_masked = None
 tex_lines_math_texttt_masked = None
 in_env = None
 envs = None
+is_document_root = False
 
 FLOAT_ENVS = ["figure", "listing", "table"]
 CODE_WARNING_EXCEPTIONS = {
@@ -42,12 +201,14 @@ SECTION_COMMAND_RE = re.compile("\\\\(section|subsection|subsubsection|paragraph
 SENTENCE_END_RE = re.compile(r"(?<!\\)[.!?](?=(?:['\")\]}]*)(?:\s|$))")
     
 def next_file(file):
-    global tex, tex_lines, tex_lines_clean, tex_lines_math_masked, tex_lines_math_texttt_masked, in_env, envs
+    global tex, tex_lines, tex_lines_clean, tex_lines_math_masked, tex_lines_math_texttt_masked, in_env, envs, is_document_root
     try:
         tex = open(file).read()
     except:
         print("Could not open '%s'" % sys.argv[1])
         sys.exit(1)
+
+    is_document_root = re.search(r"\\begin\{document\}", tex) is not None
 
     tex_lines = tex.split("\n")
     tex_lines_clean = tex.split("\n")
@@ -250,7 +411,7 @@ def get_paragraphs(start=0, end=None):
 
 def get_math_spans(line):
     spans = []
-    for pattern in [r"(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)", r"\\\((.+?)\\\)"]:
+    for pattern in [r"(?<!\\)(?<!\$)\$(?!\$)(.+?)(?<!\\)(?<!\$)\$(?!\$)", r"\\\((.+?)\\\)"]:
         for match in re.finditer(pattern, line):
             spans.append((match.start(), match.end(), match.group(1)))
     return spans
@@ -631,6 +792,8 @@ def check_unused_macro():
 
 def check_required_sections():
     warns = []
+    if not is_document_root:
+        return warns
     sections = {normalize_title(section["title"]) for section in extract_section_ranges()}
     if "\\begin{abstract}" in tex:
         sections.add("abstract")
@@ -786,6 +949,10 @@ def check_comment_has_space():
     for i, l in enumerate(tex_lines):
         ls = l.strip()
         if "%" in ls:
+            # In TeX, a trailing '%' is often used for whitespace suppression,
+            # not as a human comment.
+            if ls.endswith("%"):
+                continue
             if ls[0] != "%":
                 c = re.search("[^\\s\\\\\\}\\{%]+%", l)
                 if c and not in_code(i):
@@ -819,6 +986,8 @@ def check_labels_referenced():
         if lab:
             labels.append((lab.group(1), i, lab.span()))
     for lab in labels:
+        if "sec:" in lab[0] or "eq:" in lab[0]:
+            continue
         found = False
         for i, l in enumerate(tex_lines):
             if ("ref{%s}" % lab[0]) in l:
@@ -849,9 +1018,23 @@ def check_section_capitalization():
 def check_quotation():
     warns = []
     for i, l in enumerate(tex_lines_clean):
-        ws = re.search("[^\\\\]\"\\w+", l)
-        we = re.search("\\w+\"", l)
-        if (ws or we) and not in_code(i):
+        if in_code(i):
+            continue
+
+        masked = l
+        comment = re.search(r"(?<!\\)%", masked)
+        if comment:
+            masked = masked[:comment.start()]
+
+        if re.search(r"^\s*\\(?:g|e)?def\b", masked):
+            continue
+
+        for span in get_command_brace_spans(masked, "write18"):
+            masked = mask_spans(masked, [span])
+
+        ws = re.search("[^\\\\]\"\\w+", masked)
+        we = re.search("\\w+\"", masked)
+        if ws or we:
             warns.append((i, "Wrong quotation, use `` and '' instead of \"", ws.span() if ws else we.span()))
     return warns
 
@@ -1167,6 +1350,8 @@ def check_brackets_space():
     warns = []
     for i, l in enumerate(tex_lines_clean):
         if in_code(i) or in_equation(i) or (len(l.strip()) > 0 and l.strip()[0] in ["\\", "%"]): continue
+        if re.search(r"\(\s*(?<!\\)\$", l) or re.search(r"(?<!\\)\$\s*\)", l):
+            continue
         masked = tex_lines_math_texttt_masked[i].rstrip()
         p = re.search("[^\\s\\{~\\\\]\\([^(s\\))]", masked)
         if p:
@@ -1340,21 +1525,31 @@ def print_warnings(warn, output = True):
         if w[0] != -1 and in_code(w[0]) and cw[1] not in CODE_WARNING_EXCEPTIONS:
             continue
 
-        if output: 
-            print("\033[33mWarning %d\033[0m: " % (warnings + 1), end = "")
+        if output:
+            if use_color:
+                write_output("\033[33mWarning %d\033[0m: " % (warnings + 1), end = "")
+            else:
+                write_output("Warning %d: " % (warnings + 1), end = "")
         warnings += 1
         if w[0] != -1:
-            if output: print("Line %d: %s" % (w[0] + 1, w[1]), end = "")
+            if output: write_output("Line %d: %s" % (w[0] + 1, w[1]), end = "")
         else:
-            if output: print(w[1], end = "")
+            if output: write_output(w[1], end = "")
         
         if output:
-            print("  \033[90m[%s]\033[0m" % cw[1], end = "")
-            print("")
+            if use_color:
+                write_output("  \033[90m[%s]\033[0m" % cw[1], end = "")
+            else:
+                write_output("  [%s]" % cw[1], end = "")
+            write_output("")
 
         if len(w) > 2:
-            if output: print("    %s" % tex_lines[w[0]].replace("\t", " "))
-            if output: print("    %s\033[33m%s\033[0m" % (" " * w[2][0], "^" * (w[2][1] - w[2][0])))
+            if output: write_output("    %s" % tex_lines[w[0]].replace("\t", " "))
+            if output:
+                if use_color:
+                    write_output("    %s\033[33m%s\033[0m" % (" " * w[2][0], "^" * (w[2][1] - w[2][0])))
+                else:
+                    write_output("    %s%s" % (" " * w[2][0], "^" * (w[2][1] - w[2][0])))
     return warnings
 
 
@@ -1486,6 +1681,8 @@ def remove_categories(cat, rem_cat):
 
 def main():
 
+    global output_file, output_handle, use_color
+
     nr_warnings = 0
     nr_suppressed = 0
 
@@ -1500,7 +1697,7 @@ def main():
     while idx < len(sys.argv):
         arg = sys.argv[idx]
         if arg == "-x":
-            if idx < len(sys.argv):
+            if idx + 1 < len(sys.argv):
                 if switch_exists(sys.argv[idx + 1]):
                     remove_categories(used_categories, sys.argv[idx + 1])
                     idx += 1
@@ -1513,7 +1710,7 @@ def main():
                 usage()
 
         if arg == "-i":
-            if idx < len(sys.argv):
+            if idx + 1 < len(sys.argv):
                 if switch_exists(sys.argv[idx + 1]):
                     add_categories(used_categories, sys.argv[idx + 1])
                     idx += 1
@@ -1524,6 +1721,32 @@ def main():
             else:
                 print("Missing switch after -i")
                 usage()
+
+        if arg == "--settings":
+            if idx + 1 < len(sys.argv):
+                apply_settings_file(sys.argv[idx + 1], used_categories)
+                idx += 1
+                has_rules = True
+            else:
+                print("Missing file after --settings")
+                usage()
+
+        if arg == "--ignore":
+            if idx + 1 < len(sys.argv):
+                ignored_files.append(sys.argv[idx + 1])
+                idx += 1
+                has_rules = True
+            else:
+                print("Missing file after --ignore")
+                usage()
+
+        if arg == "--output":
+            if idx + 1 < len(sys.argv):
+                output_file = sys.argv[idx + 1]
+                idx += 1
+            else:
+                print("Missing file after --output")
+                usage()
         
         if arg == "--error":
             exit_code = True
@@ -1532,26 +1755,42 @@ def main():
     if not has_rules:
         add_categories(used_categories, "all")
 
-    for file in tex_files:
-        next_file(file)
-        print("Inspecting file \033[94m'%s'\033[0m" % file)
-        
-        preprocess()
+    if output_file is not None:
+        output_handle = open(output_file, "w")
+        use_color = False
+    else:
+        output_handle = sys.stdout
+        use_color = output_handle.isatty()
 
-        warnings = []
-        suppressed = []
-        for c in checks:
-            add_warn = c[0]()
-            if c[2] in used_categories:
-                warnings += [(x, c[2]) for x in add_warn]
+    tex_files = collect_tex_files(sys.argv[1], ignored_files)
+
+    try:
+        for file in tex_files:
+            next_file(file)
+            if use_color:
+                write_output("Inspecting file \033[94m'%s'\033[0m" % file)
             else:
-                suppressed += [(x, c[2]) for x in add_warn]
+                write_output("Inspecting file '%s'" % file)
+            
+            preprocess()
 
-        nr_warnings += print_warnings(warnings)
-        nr_suppressed += print_warnings(suppressed, output = False)
+            warnings = []
+            suppressed = []
+            for c in checks:
+                add_warn = c[0]()
+                if c[2] in used_categories:
+                    warnings += [(x, c[2]) for x in add_warn]
+                else:
+                    suppressed += [(x, c[2]) for x in add_warn]
 
-    print("")
-    print("%d warnings printed; %d suppressed warnings" % (nr_warnings, nr_suppressed))
+            nr_warnings += print_warnings(warnings)
+            nr_suppressed += print_warnings(suppressed, output = False)
+
+        write_output("")
+        write_output("%d warnings printed; %d suppressed warnings" % (nr_warnings, nr_suppressed))
+    finally:
+        if output_handle is not sys.stdout:
+            output_handle.close()
     if exit_code:
         sys.exit(1 if nr_warnings > 0 else 0)
 
