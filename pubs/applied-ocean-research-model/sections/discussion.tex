@@ -5,6 +5,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Variable Sweeps}
+This subsection summarizes insights from variable-sweep analyses before presenting specific trend breakdowns.
 
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Effect of Bulk Dimensions on Hydrodynamic Efficiency}
@@ -33,7 +34,7 @@
 \fi
 
 \paragraph{Best Design as a function of Wave Environment}
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \begin{subfigure}[t]{0.48\linewidth}
         \includegraphics[width=\linewidth]{figs/from-matlab/sweep_geoms_line.pdf}
@@ -74,7 +75,7 @@
     %Designs with \hl{some quality} tend to perform well, with \hl{some quality} being optimal for the high-efficiency, high-cost end of the Pareto front and \hl{some quality} being optimal for the low-efficiency, low-cost end of the Pareto front.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/sweep_geoms_pareto_nondim.pdf}
     \caption{Effect of hydrodynamic design variables on radiation efficiency and power per unit surface area}
@@ -85,7 +86,7 @@
 \subsubsection{Damping Plate Size}
 \Cref{fig:damping-plate-maxs} shows that damping plate stress can be reduced substantially by increasing the plate inner radius.
 This is because the same force has a lower lever arm to the column and therefore creates less bending moment.
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/damping_plate_aspect_ratio.pdf}
     \caption{Normalized effect of damping plate aspect ratio on maximum stress and deflection.
@@ -109,7 +110,7 @@ The dashed lines indicate the nominal design point at $b/a = 0.2$.}
 \fi
 Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \cref{fig:force-limit}.
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/power_force_sensitivity.pdf}
 \caption{Effect of Force Limit on Annual Average Power and Peak Structural Load}
@@ -136,7 +137,7 @@ We next move to a simultaneous sweep of both the force limit and the power limit
     The unsaturated solution is in the top right corner, past which power is constant because the unconstrained reactive controller satisfies the limit in all sea states.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/pto_sweep.pdf}
 \caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and LCOE}
@@ -169,7 +170,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     The feasible design space is highly fragmented: an ``island'' of low-LCOE designs at $1.3 < D_f/D_{f,nom} < 2.1$ is separated from the nominal design by the damping plate fatigue constraint.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
 \caption{Design of experiments}\label{fig:experiments}
@@ -212,6 +213,7 @@ This multiplicative decomposition allows isolation of the effect of each design 
 \Cref{tab:power-matrix-dependence} maps the dependence explicitly.
 \begin{table}[h]
 \centering
+\caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
 \begin{tabular}{lcccccc}
 \hline
  & $x_{shape}$ & $C_{d,f}$ & $C_{d,s}$ & $F_{max}$ & $P_{max}$ & $\eta$ \\
@@ -222,7 +224,6 @@ $\mathbf{\eta}^{H,T}_{limits}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\
 $\mathbf{\eta}^{H,T}_{elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
 \hline
 \end{tabular}
-\caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
 \end{table}
 
 \ifdefined\DISSERTATION
@@ -242,7 +243,7 @@ $\mathbf{\eta}^{H,T}_{elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\c
     Low-period sea states achieve higher radiation efficiency, while high-period sea states have lower radiation efficiency but contribute significantly to total production due to their higher energy content; despite the most probable period being 6--8~s, 10~s waves contribute the most to annual energy production \cite{zou_practical_2023}.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/manual/power_matrix_multiply.pdf}
 \caption{Power matrix decomposition}
@@ -352,16 +353,16 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
     \end{enumerate}
 }
 
-\begin{table}
+\begin{table}[htbp]
+\caption{Future model improvements}
+    \label{tab:future-work}
 \begin{tabular}{
         >{\centering\arraybackslash}p{0.5\linewidth}
         >{\centering\arraybackslash}p{0.5\linewidth}}
 Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
 \modelTrustBuilders                & \modelStudyEnablers \\
     \end{tabular}
-    \caption{Future model improvements}
-    \label{tab:future-work}
-\end{table}
+    \end{table}
 
 \ifdefined\DISSERTATION
     \paragraph{Neglect of Surge Force and Mooring Cost}

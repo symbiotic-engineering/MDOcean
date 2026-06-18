@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Solution Methodology}\label{remdo:sec:optim-process}
 The optimization solution and post-optimality analysis process is shown in \cref{remdo:fig:optim-process}, consisting of design space exploration, single-objective optimization, and multi-objective optimization.
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/optimization_flowchart.pdf}
     \caption{Optimization process flowchart}
@@ -20,11 +20,14 @@ The optimization solution and post-optimality analysis process is shown in \cref
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Single Objective Optimization}\label{remdo:sec:single-obj-process}
 %%%
+This subsection defines the single-objective optimization setup, including algorithm choice, derivatives, and scaling.
 \paragraph{Algorithm}
 The single-objective algorithm is selected by characterizing the problem following \cite[Ch.~1.5]{martins_engineering_2022}, as summarized in \cref{remdo:tab:characterization}.
-\begin{table}
+\begin{table}[htbp]
     \centering
-    \begin{tabular}{cc}
+    \caption{Problem characterization to inform algorithm choice}
+    \label{remdo:tab:characterization}
+\begin{tabular}{cc}
  Characteristic&Presence\\\hline
          Convex?& No\\
          Discrete design variables?& No\\
@@ -32,9 +35,7 @@ The single-objective algorithm is selected by characterizing the problem followi
          Unconstrained?& No\\
          Multimodal?& Potentially\\
     \end{tabular}
-    \caption{Problem characterization to inform algorithm choice}
-    \label{remdo:tab:characterization}
-\end{table}
+    \end{table}
 
 This motivates sequential quadratic programming (SQP) with multistart.
 \ifdefined\DISSERTATION

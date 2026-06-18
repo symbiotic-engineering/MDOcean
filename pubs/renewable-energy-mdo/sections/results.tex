@@ -2,6 +2,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}\label{remdo:sec:results}
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
+This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization}
@@ -19,14 +20,14 @@ The optimal designs $\vec{x}^*$ are shown visually in \cref{remdo:fig:overlaid-g
     The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced]~kW average power (chosen from the Pareto front of \cref{remdo:sec:results-multi}), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
 \caption{Geometries overlaid}
 \label{remdo:fig:overlaid-geometry}
 \end{figure}
 
-\begin{table}
+\begin{table}[htbp]
 \input{tables/from-matlab/optimal_design_vars.tex}
 \caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
 \end{table}
@@ -61,15 +62,15 @@ The optimal designs are generally larger than the nominal.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Optimal Performance Outputs}
-The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist}, with numerical results in \cref{remdo:tab:opt-output}.
+The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \cref{remdo:fig:overlaid-hydro} and \cref{remdo:fig:overlaid-power-dist}, with numerical results in \cref{remdo:tab:opt-output}.
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/overlaid_hydro_coeffs.pdf}
 \caption{Hydrodynamic coefficients overlaid}
 \label{remdo:fig:overlaid-hydro}
 \end{figure}
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/probability_CDF.pdf}
 \caption{Cumulative distribution function of average power over time}
@@ -84,7 +85,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 %Finally, we recommend the balanced design for intermediate applications, where energy storage is available but not abundant, and cost is important but not the bottom line. An example is a grid-connected application for island communities. This balanced design has an LCOE of \$0.18/kWh and a power coefficient of variation equal to 100\%. 
 %Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in \cref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
 
-\begin{table}
+\begin{table}[htbp]
 \input{tables/from-matlab/optimal_outputs.tex}
 \caption{Optimal outputs}\label{remdo:tab:opt-output}
 \end{table}
@@ -114,7 +115,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{max}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency; their product with the annual hours per sea state yields annual energy production.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
     \caption{Power matrix multiplicative breakdown for minimum LCOE design}
@@ -130,7 +131,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\cref{remdo:sec:single-obj-process}), reported in \cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=1\linewidth]{figs/from-matlab/lagrange_multipliers.pdf}
 \caption{Lagrange multipliers for LCOE-minimization}\label{remdo:fig:lagrange-multiplier}
@@ -166,7 +167,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     \Delta J \approx \vec{\nabla} J^T \Delta \vec{x}% + \frac{1}{2} \Delta \vec{x}^T H \Delta \vec{x}
 \end{equation}
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/delta_x.pdf}
 \caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{remdo:fig:delta-J}
@@ -208,7 +209,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 %\hl{XX}\% converged to the same point as the initial optimization did and none converged to a more optimal solution. While this does not guarantee a global optimum, the insensitivity to initial guess increases our confidence in the optimization results. 
 %\hl{Note to scrutineers: due to the high amount of linear infeasibility, I am going to try this again but generate points that are linear feasible from the start.}
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/multistart_convergence_tree.pdf}
     \caption{Probability tree for convergence of multi-start}\label{remdo:fig:multistart-tree}
@@ -228,13 +229,13 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \fi
 More complete multistart results appear in \cref{remdo:sec:appendix-supplemental-results}.
 
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{example-image-a}  % TODO (scrutineering): replace placeholder with real multistart bar chart
 \caption{Bar chart showing impact of starting point on convergence behavior}\label{remdo:fig:multistart-bar}
 \end{figure}
 
-% \begin{table}
+% \begin{table}[htbp]
 % \begin{tabular}{c|c|c}
 %    Objective & Cost & Power \\ \hline
 %    Converged to any solution & XX & XX \\
@@ -246,6 +247,7 @@ More complete multistart results appear in \cref{remdo:sec:appendix-supplemental
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Sensitivity Analysis}\label{remdo:sec:sensitivities}
+This subsection quantifies how parameter and model-assumption changes affect the optimized designs and objective values.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Local Sensitivity to Parameters}\label{remdo:sec:sensitivities-local}
@@ -259,7 +261,7 @@ More complete multistart results appear in \cref{remdo:sec:appendix-supplemental
 \Cref{remdo:fig:param-sens-J-star-tornado,remdo:fig:param-sens-x-star-tornado,remdo:fig:param-sens-x-star-tornado-2}
 show tornado charts of the highest normalized sensitivities for the objective and design respectively,
 normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in $J^*$ or $x^*$.
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
     \caption{Tornado chart showing highest objective sensitivities}
@@ -316,7 +318,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 \fi
 
 \begin{landscape}
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J1.pdf}
     \caption{Tornado chart showing highest design variable sensitivities at minimum LCOE}
@@ -325,7 +327,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 \end{figure}
 \end{landscape}
 \begin{landscape}
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_design_tornado_J2.pdf}
     \caption{Tornado chart showing highest design variable sensitivities at minimum design cost}
@@ -495,13 +497,13 @@ Beyond continuous parameters, the simulation depends on discrete options governi
     The Pareto front (\cref{remdo:fig:pareto}) shows all designs costing significantly less than the nominal RM3 \cite{RM3} across a range of powers;
     the zoomed view with constant-$LCOE$ contours (\cref{remdo:fig:pareto-lcoe}) places the minimum-LCOE design at the front's tangency with the contours, nearly coincident with the maximum-power design.
 \fi
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_front_with_design_images.pdf}
     \caption{Pareto Front}
     \label{remdo:fig:pareto}
 \end{figure}
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\linewidth]{figs/from-matlab/pareto_front_LCOE_contours.pdf}
 \caption{Pareto front with different LCOE contours overlaid}
@@ -531,7 +533,7 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
 \else
     The x-axis gives percent along the Pareto front and y-values are lightly smoothed; structural variables are green, powertrain ratings blue, and bulk dimensions red.
 \fi
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_heuristics.pdf}
     \caption{Design and objective heuristics plot}
@@ -573,7 +575,7 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
 \else
     \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: three structural variables at their lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \cref{remdo:sec:discussion}), and the structural factor-of-safety and float-amplitude constraints.
 \fi
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_constraint_activity_reactive.pdf}
     \caption{Constraint Activity}
@@ -611,7 +613,7 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
     \Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
 \fi
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
     \caption{Bar chart of optimization and analysis runtimes}
@@ -630,7 +632,7 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
 \Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
 %\hl{Analysis is left for during scrutineering.}
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{example-image-a}
     \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}

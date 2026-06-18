@@ -26,17 +26,17 @@ For the single-objective formulation, the optimization minimizes the levelized c
     Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \cite{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}.
     
-    In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$.
+    In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
     LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid ``Powering the Blue Economy'' applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
-    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{avg,elec}$ and design-dependent capital cost $C_{design}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
+    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
 \fi
 
 The objective function is expressed:
 \begin{equation}
 \vec{J}(\vec{x}, \vec{p}) = \begin{cases} LCOE\ (\vec{x}, \vec{p}), & \text{Single objective} \\
-[C_{design} (\vec{x}, \vec{p}),\ P_{avg,elec} (\vec{x}, \vec{p})]^T, & \text{Multi-objective}
+[C_{\text{design}} (\vec{x}, \vec{p}),\ P_{\text{avg,elec}} (\vec{x}, \vec{p})]^T, & \text{Multi-objective}
 \end{cases}
 \label{remdo:obj}
 \end{equation}
@@ -165,6 +165,7 @@ Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC
 \renewcommand{\arraystretch}{1.1} % make taller
 \begin{center}
 {
+\caption{Design Variables}\label{remdo:tab:design-vars}
 \begin{tabular}{c>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.3\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}>{\centering\arraybackslash}m{0.15\linewidth}c}
  \textbf{\#}&\textbf{Design Variable}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
  $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
@@ -180,7 +181,7 @@ Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC
  $x_{11}$&$h_{stiff,f}$& Float stiffener height& 0& 0.406& 2& m\\
  $x_{12}$& $h_{stiff,d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
-} \caption{Design Variables}\label{remdo:tab:design-vars}
+}
 \end{center}
 \end{table}
 
@@ -199,6 +200,7 @@ The parameters in \cref{remdo:tab:parameters} assume operation in the seas of Hu
 \begin{table}[ht]
 \centering
 \renewcommand{\arraystretch}{1.4}
+\caption{Selected Parameters}\label{remdo:tab:parameters}
 \begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
@@ -229,7 +231,6 @@ $h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\
 $T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
 $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
- \caption{Selected Parameters}\label{remdo:tab:parameters}
 \end{table}
 
 Returning to \cref{remdo:tab:requirements}, the enforcement column shows that this encoding successfully avoids nonlinear constraints for all priority 1 requirements and all but one priority 2 requirement, helping prevent model errors while facilitating convergence.
@@ -248,4 +249,3 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 %\subsubsection{Model Checking}
 %\hl{todo: check for redundant constraints, monotonicity, etc} \cite{papalambros_principles_2017}.
 %It was initially speculated that the structural constraints would always be active, 
-
