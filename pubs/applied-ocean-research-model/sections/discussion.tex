@@ -118,7 +118,7 @@ Using MDOcean, we investigate the effect of PTO force limit on average power and
 
 Decreasing the force limit has nearly no effect on power until the force limit is around 50\% of the nominal value, after which power falls off steeply.
 \ifdefined\DISSERTATION
-    From theory (see \appendixname~\ref{sec:appendix-constraint-sensitivity}), we expect a smooth nonlinear relationship between power and force limit when considering a single sea state, and a piecewise continuous nonlinear relationship when considering multiple sea states as in \cref{fig:force-limit}.
+    From theory (see \cref{sec:appendix-constraint-sensitivity}), we expect a smooth nonlinear relationship between power and force limit when considering a single sea state, and a piecewise continuous nonlinear relationship when considering multiple sea states as in \cref{fig:force-limit}.
 \fi
 On the other hand, the structural load for the operational design load case scales nearly linearly with the force limit.
 \ifdefined\DISSERTATION
@@ -149,7 +149,7 @@ Notably, the minimum LCOE point occurs at a force limit far below the unsaturate
 This illustrates the importance of including the force-cost tradeoff in an optimization model rather than assuming an unconstrained solution.
 \ifdefined\DISSERTATION
     We also observe that power and LCOE both appear to be convex with respect to the force and power limits, and that the feasible region is convex as well.
-    The theoretical analysis in \appendixname~\ref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
+    The theoretical analysis in \cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
     Convexity suggests that local optimization methods should be effective for finding the optimal PTO design.
 \else
     Power and LCOE both appear to be convex with respect to the force and power limits across the feasible region, a structural property exploited by the optimization strategy in the companion paper \cite{mccabe_leveraging_2026}.
@@ -199,7 +199,7 @@ Similar to \cref{fig:JPD-multiply} showing the multiplication of the power matri
 
 Here $\mathbf{J}^{H,T}_{wave}$ is the wave power density (design-independent) and $\mathbf{CW}^{H,T}_{max}$ is the radiation-limit capture width (depends only on the mode of motion).
 The four efficiency matrices isolate the design dependencies: $\mathbf{\eta}^{H,T}_{rad}$ for hull-shape radiation efficiency, $\mathbf{\eta}^{H,T}_{drag}$ for drag, $\mathbf{\eta}^{H,T}_{limits}$ for dynamic constraints, and $\mathbf{\eta}^{H,T}_{elec}$ for PTO losses and dynamics.
-Explicit definitions are given in \appendixname~\ref{sec:appendix-power-decomposition}.
+Explicit definitions are given in \cref{sec:appendix-power-decomposition}.
 
 \ifdefined\DISSERTATION
     Two features of this decomposition deserve emphasis.
@@ -272,7 +272,7 @@ From \cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
 When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
 
-\appendixname~\ref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\overline{P}_{elec}$ as a function of the constraint coefficients $b_\mu$ (which are affine or square functions of the constraint limits $\tau_{max}$, $P_{\tau\Omega,max}$, $\xi_{f,max}$, $\xi_{s,max}$, and $X_{PTO,max}$ defined in \cref{tab:qp-constraints}).
+\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\overline{P}_{elec}$ as a function of the constraint coefficients $b_\mu$ (which are affine or square functions of the constraint limits $\tau_{max}$, $P_{\tau\Omega,max}$, $\xi_{f,max}$, $\xi_{s,max}$, and $X_{PTO,max}$ defined in \cref{tab:qp-constraints}).
 
 The result is:
 \begin{equation}\label{eq:power-double-sum-main}
@@ -291,7 +291,7 @@ The result is:
 \end{aligned}\end{equation}
 where $\overline{P}_{elec,0}$ is the unconstrained power and $\textrm{aff}_{\mu\nu\beta}$, $\textrm{quad}_{\mu\nu\beta}$ are affine and quadratic functions of $b_\mu$ and $b_\nu$, respectively.
 
-Under conditions derived in \appendixname~\ref{sec:appendix-constraint-sensitivity}, this scaling law is convex in the constraint coefficients $b_\mu$.
+Under conditions derived in \cref{sec:appendix-constraint-sensitivity}, this scaling law is convex in the constraint coefficients $b_\mu$.
 While satisfaction of these conditions is not guaranteed, convexity is observed to hold across the PTO sweep of \cref{fig:force-power-limit-sweep}.
 
 The scaling law also displays coupling in the constraint variables: the effect of one constraint limit depends on the values of the other constraint limits.
@@ -324,7 +324,7 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
 \ifdefined\DISSERTATION
     Broadly, future work must both address limitations of the model and apply it to answer design questions.
     As MDOcean is open source, the authors encourage the wave energy community to contribute to both areas, and are themselves actively pursuing the latter with a multi-objective optimization of the RM3 WEC \cite{mccabe_leveraging_2026}.
-    Table~\ref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
+    \cref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
     This section describes the relevance and possible implementation paths for each development area.
 \else
     \Cref{tab:future-work} summarizes principal limitations and future work, distinguishing model improvements that would enhance the accuracy of currently-achievable studies from extensions that would unlock new design questions.
@@ -365,7 +365,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
 
 \ifdefined\DISSERTATION
     \paragraph{Neglect of Surge Force and Mooring Cost}
-    Section~\ref{sec:design-load-cases} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
+    \Cref{sec:design-load-cases} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
     The neglect of surge force means that geometries with significant lateral areas that would experience high surge force appear to perform better than they should.
     This is not only because of the impact on the structures module, but also because the surge force drives mooring cost, an effect which is not modeled in this study.
     The model predicts that the nominal RM3 design experiences a storm surge force of \resultsAOR[surgeForceFloatNominal] on the float and \resultsAOR[surgeForceSparNominal] on the spar, compared to the \resultsAOR[heaveForceNominal] heave force.
@@ -374,7 +374,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     If these effects are implemented and confirmed to be important, then it may also be desired to obtain a more accurate estimate of the surge force across frequencies by utilizing the surge hydrodynamic coefficients instead of the long-wavelength approximation in \cref{eq:surge-force}. 
     
     \paragraph{Nonlinear Storm Loads}
-    As section~\ref{sec:irregular-waves} describes, MDOcean uses standard linear wave theory with equivalent regular waves, even for the storm condition.
+    As \cref{sec:irregular-waves} describes, MDOcean uses standard linear wave theory with equivalent regular waves, even for the storm condition.
     However, storm waves are nonlinear, and it is generally recommended to utilize higher order potential flow, CFD simulations, or wave tank tests to obtain storm loads \cite{coe_survey_2018}.
     Additionally, even when storm wave analysis uses linear or quasi-linear hydrodynamics, other design procedures typically utilize a time-domain ``design wave elevation'' signal to capture transient peaks.
     The regular wave analysis used in MDOcean cannot capture nonsinusoidal peaks.
