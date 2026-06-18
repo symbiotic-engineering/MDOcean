@@ -73,7 +73,7 @@ This form is used for the PTO dynamics (drivetrain followed by generator).
 This form is used for the PTO kinematics, where it naturally accommodates underactuation.
 \end{itemize}
 
-Conversion between the three forms is accomplished using the formulas in \cite{reveyrand_multiport_2018}.
+Conversion between the three forms is accomplished using the formulas in reference \cite{reveyrand_multiport_2018}.
 Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
 
 % Verify against \cite{coe_co-design_2025} before submission and edit
@@ -579,7 +579,7 @@ where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between t
 $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from 
 the center of the $\mu$th circle to the midpoint of the two intersection points, 
 and $1i$ is the imaginary unit.
-The closest-point candidates $\mathcal{C}_{cl}$ match eq. 4 of \cite{mccabe_force-limited_2024}, 
+The closest-point candidates $\mathcal{C}_{cl}$ match \equationname~4 of \cite{mccabe_force-limited_2024},
 which provides the solution for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
@@ -626,7 +626,7 @@ We currently assume there is only one apparent power constraint, so oval-oval in
 %%%%%%%%%%%%%%%
 \subsubsection{Extension to Higher Dimensions and Convexity}
 \label{sec:appendix-qp-convexity}
-Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in \cite{bacelli_numerical_2015}.
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study \cite{bacelli_numerical_2015}.
 In the terminology of \cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
 Both of these cases solve the full harmonic-balance equation, producing a higher-dimensional analog of \cref{eq:opt-problem-gamma}.
 The problem dimension equals twice the number of frequencies retained in the spectral expansion, preventing the use of the geometric analytical solution used in the monochromatic case.
@@ -655,7 +655,7 @@ It is expected that the optimal design will have low reactivity because reactivi
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
 References \cite{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
 
-Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
+Similar graphical interpretations of constraints for wave energy converters are presented in the studies \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
 Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
 Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
@@ -999,7 +999,7 @@ and would unlock a fully semi-analytical differentiation workflow.
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
 This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \cite{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \cite{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}. 
+For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
 
 The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \cref{sec:appendix-qp-numerical,sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
@@ -1210,7 +1210,7 @@ The relevant limits are then:
 %%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
 \label{subsec:appendix-drag-others}
-The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+The WEC drag model in the study \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
 Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
@@ -1222,7 +1222,7 @@ Reference \cite{quartier_influence_2021} more simplistically assumes that the wa
 This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
 Early MDOcean simulations that used the formulation of \cite{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in the study \cite{quartier_influence_2021}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
@@ -1793,9 +1793,9 @@ Under these conditions, either the stress at the center $\sigma_{cent}$ or along
         \sigma_{cent}&=-\beta_2 W/t_{f,top,eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in \cite{young_roarks_2001}.
+using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$.
-However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in \cite{RM3,previsic_reference_2011}.
+However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in references \cite{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue and remains future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \cref{tab:struct-calc-vs-scale}.
 
@@ -1808,7 +1808,7 @@ This prevents the need for a separate structural analysis of the side plates.
 \subsection{Damping Plate}
 For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{plate}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{heave}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{tube}$.
-Formulas for the concentrated loading are given in \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in \cite{young_roarks_2001}.
+Formulas for the concentrated loading are given in reference \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in reference \cite{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
 The tube force $F_{tube}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{plate}=\delta_{tube}$, where the tube displacement is expressed in terms of its bending stiffness $K_{tube}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
@@ -1901,6 +1901,7 @@ These equations assume that the spar is compact, meaning that local buckling of 
 \label{sec:appendix-parameters}
 \begin{table}[ht]
 \centering
+\caption{Selected Parameters}
 
 %\setlength{\tabrowsep}{} % default value:
 \renewcommand{\arraystretch}{1.4}
@@ -1935,6 +1936,5 @@ $h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\
 $T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
 $F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
- \caption{Selected Parameters}\label{tab:parameters}
-\end{table}
+ \end{table}
 \clearpage

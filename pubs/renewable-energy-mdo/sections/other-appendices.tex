@@ -193,17 +193,17 @@ Surprisingly, the optimal values take on many different continuous values, as op
 \Cref{remdo:fig:param-sens-local-global-J-star} compares four ways of computing the objective total derivative local sensitivity, $\frac{dJ^*}{dp}$.
 The first and simplest method uses only the partial derivative, $\frac{dJ^*}{dp}\approx \frac{\partial J}{\partial p}$.
 This partial derivative is found via finite difference around the optimal point and does not attempt to take into account the effect of the parameter change on the optimal design $x^*$.
-The second method, suggested in \cite{martins_engineering_2022}, uses a linear model to account for the change in $x^*$ due to parameter-dependent constraints.
+The second method, suggested by \citet{martins_engineering_2022}, uses a linear model to account for the change in $x^*$ due to parameter-dependent constraints.
 The change in $x^*$ is not calculated directly and is instead incorporated through the Lagrange multipliers $\lambda$:
 \begin{equation}
 \frac{dJ^*}{dp} \approx \frac{\partial J}{\partial p} -  \lambda^T \frac{\partial g}{\partial p}
 \end{equation}
-The third method, proposed in \cite{sobieszczanski-sobieski_sensitivity_1982}, uses a quadratic model that not only takes into account the change of $x^*$ through the parameter-dependent constraints, but also the change of $x^*$ due to the second-order curvature of the objective.
+The third method, proposed by \citet{sobieszczanski-sobieski_sensitivity_1982}, uses a quadratic model that not only takes into account the change of $x^*$ through the parameter-dependent constraints, but also the change of $x^*$ due to the second-order curvature of the objective.
 This method involves setting up a simple linear system for each parameter $p_i$ and solving it for the sensitivity vector $\vec{x}_{sens}$:
 \begin{equation}
     A_{sens} \vec{x}_{sens}(p_i) = \vec{b}_{sens}(p_i)
 \end{equation}
-The forms of the parameter-agnostic $A_{sens}$ matrix and the parameter-specific $b_{sens}$ vector are given in \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
+The forms of the parameter-agnostic $A_{sens}$ matrix and the parameter-specific $b_{sens}$ vector are given in reference \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
 They are computed from solver outputs like the Lagrange multipliers $\vec{\lambda}$, Hessian $\mathbf{H}$, and gradient $\vec{\nabla} J$, as well as other derivatives %\hl{(specify which)} 
 obtained here via finite difference simulation evaluations % \hl{(specify how many)} 
 without re-optimizing.

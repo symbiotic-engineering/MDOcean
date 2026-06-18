@@ -102,9 +102,9 @@ Spar and coupling terms are obtained via algebraic approximations and interpolat
 %%%%%%%%%%%%%%%
 \subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}\label{sec:hydro-meem}
 MEEM solves the radiation and excitation problems by expanding the velocity potential in eigenfunctions within each fluid region and enforcing matching across region boundaries.
-The MEEM radiation solution for two concentric heaving cylinders was first presented in \cite{mavrakos_hydrodynamic_2004} and detailed in \cite{chau_inertia_2012}.
+The MEEM radiation solution for two concentric heaving cylinders was first presented in the studies \cite{mavrakos_hydrodynamic_2004} and detailed in reference \cite{chau_inertia_2012}.
 In this approach, the fluid domain is partitioned into regions with separable analytical solutions, and continuity conditions are enforced at region interfaces to determine the unknown expansion coefficients.
-The open-source implementation used here, summarized in \cref{sec:appendix-meem-details}, follows the formulation derived in \cite{mccabe_open-source_2024}, with numerical properties detailed in the forthcoming companion paper \cite{bimali_matrix_2026,best_openflash_2026}. 
+The open-source implementation used here, summarized in \cref{sec:appendix-meem-details}, follows the formulation derived in the study \cite{mccabe_open-source_2024}, with numerical properties detailed in the forthcoming companion paper \cite{bimali_matrix_2026,best_openflash_2026}. 
 
 The primary advantage of MEEM is computational efficiency.
 Timing comparisons (\Cref{sec:sim-runtime}) show more than an order-of-magnitude speedup over Capytaine BEM at comparable convergence, significantly reducing the cost of multidisciplinary analysis.
@@ -203,7 +203,7 @@ This subsection introduces the dynamics and control modeling assumptions before 
 
 \ifdefined\DISSERTATION
     Methods for WEC dynamics and control simulation in an optimization context were reviewed in \cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
-    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
+    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
     This section describes both the technical concept and the practical rationale for the choice of a modified frequency domain method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
@@ -257,7 +257,7 @@ See text for a description of each acronym.}
     It can also be thought of as the combination of describing functions with constrained impedance matching.
 \fi 
 
-\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller and/or the plant are nonlinear).
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, the plant, or both are nonlinear).
 
 MDOcean uses the linearized pseudo-spectral method for both control synthesis and evaluation.
 In prior wave energy studies (see \Cref{tab:lit}), related linearized pseudo-spectral approaches have primarily been used for evaluation, often with simplified treatments of constraints.
@@ -266,6 +266,7 @@ This differs from linearization approaches such as stochastic linearization, whi
 
 \begin{figure}[htbp]
 \centering
+\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
 \begin{subfigure}[t]{1.1\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}
     \caption{Control synthesis - applies to (1.1) only.}
@@ -277,7 +278,6 @@ This differs from linearization approaches such as stochastic linearization, whi
     \caption{Control evaluation - applies to both (1.1) and (1.2).}
     \label{fig:mod-freq-domain-evaluation}
 \end{subfigure}
-\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
 \end{figure}
 
 When handling dynamic constraints with a linearized pseudo-spectral method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
@@ -307,7 +307,7 @@ The modified frequency-domain approach with the highest accuracy and optimality 
 This synthesis can occur in a number of ways.
 \ifdefined\DISSERTATION
     If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of the modified frequency-domain linearization in the control synthesis step (\cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\cref{fig:mod-freq-domain-evaluation}).
-    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in \cite{zou_optimal_2017}) or analytical time-integration (as in \cite{lin_fast_2025}).
+    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \cite{zou_optimal_2017}) or analytical time-integration (as in the method of \cite{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
     For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization, and then adjusting it to be nonlinear using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
     This approach (M1.2) should be considered the primary formulation of the modified frequency domain method, and the other approaches (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of this method with varying levels of accuracy and optimality.
@@ -328,7 +328,7 @@ MDOcean pursues this approach for amplitude limits in the operational design loa
 \ifdefined\DISSERTATION
     The constrained optimization to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \cref{sec:optimal-control}.
     The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
-    The analytical approach is nonetheless derived in \cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \cref{sec:appendix-qp-solution} and \cite{mccabe_force-limited_2024}) and recommended for future implementation.
+    The analytical approach is nonetheless derived in \cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \cref{sec:appendix-qp-solution} and reference \cite{mccabe_force-limited_2024}) and recommended for future implementation.
 \else
     The constrained optimization used to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain;
     the analytical derivation is provided in \cref{sec:optimal-control}, with additional details in \cref{sec:appendix-qp-solution}.
@@ -341,8 +341,7 @@ This approach neglects the corresponding effect of the saturation/zeroing on oth
     This simple approach does not require any derivations to implement.
     It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
 \else
-    This simple approach has been used in several previous WEC optimization studies for various constraints
-    \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
+    This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
     and is the most common modified frequency-domain method in the marine energy field.
 \fi
 It is utilized here for the power limit.
@@ -813,7 +812,7 @@ We now combine the results across sea states to find the long-term energy statis
 
 To find the long-term average power production $\overline{P}_{elec}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{elec}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in \cref{fig:JPD-multiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from \cite{janzou_system_2020}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study \cite{janzou_system_2020}.
 
 \begin{figure}[b!]
 \centering
@@ -972,7 +971,7 @@ These limits depend on the phase of the response, not just the magnitude, so the
     \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
 \end{equation}
 for relevant vertical body dimension $\Delta z$ and horizontal coordinate $y$.
-The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, etc.) are given in \cref{sec:appendix-slam}.
+The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \cref{sec:appendix-slam}.
 
 \ifdefined\DISSERTATION
     The values $h_{fs,clear}$, $h_{fs,up}$, $h_{fs,down}$, $\xi_{f,linear}$, and $\xi_{s,linear}$ are all upper limits and are independent of sea state, while $\xi_{slam}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \cref{sec:appendix-slam}.
@@ -1177,4 +1176,4 @@ where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structur
 The per-WEC unit costs and prices $C_{fixed}$, $C_{pto,constant}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via a power law (\cref{eq:cost-power-law} in \cref{sec:appendix-econ}), with curve-fit parameters given in \cref{tab:econ-model-values}.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
-For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
+For consistency with prior references \cite{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
