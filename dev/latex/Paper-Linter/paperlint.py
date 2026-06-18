@@ -741,6 +741,7 @@ def check_math_text_mix():
             continue
         for start, end, content in get_math_spans(l):
             normalized = strip_explicit_math_text(content)
+            normalized = re.sub(r"\\(?:begin|end)\*?\{[^{}]*\}", " ", normalized)
             normalized = re.sub("\\\\[A-Za-z]+", " ", normalized)
             normalized = re.sub("[\\^_{}&=+\\-*/(),.;:0-9\\s]", " ", normalized)
             words = re.findall("[A-Za-z]{2,}", normalized)
