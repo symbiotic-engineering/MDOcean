@@ -57,6 +57,19 @@ prompt_valid_folder_name() {
   done
 }
 
+prompt_valid_filename() {
+  local message="$1"
+  local value
+  while true; do
+    value="$(prompt_nonempty "$message")"
+    if [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]]; then
+      printf '%s\n' "$value"
+      return 0
+    fi
+    echo "Invalid filename. Use letters, numbers, dot, underscore, or hyphen only (no slashes)."
+  done
+}
+
 run_step() {
   local description="$1"
   local cmd="$2"
@@ -202,7 +215,10 @@ stage_paper_tex_updates() {
   local tex_file
 
   while IFS= read -r -d '' tex_file; do
-    git add "$tex_file" || return 1
+    git add "$tex_file" || {
+      echo "Failed to stage file: $tex_file"
+      return 1
+    }
     tex_found=1
   done < <(find "pubs/$PAPER_FOLDER" -maxdepth 1 -type f -name "*.tex" -print0)
 
@@ -211,7 +227,10 @@ stage_paper_tex_updates() {
   fi
 
   if [ -d "pubs/$PAPER_FOLDER/sections" ]; then
-    git add "pubs/$PAPER_FOLDER/sections/" || return 1
+    git add "pubs/$PAPER_FOLDER/sections/" || {
+      echo "Failed to stage directory: pubs/$PAPER_FOLDER/sections/"
+      return 1
+    }
   else
     echo "No sections directory in pubs/$PAPER_FOLDER; skipping sections staging."
   fi
@@ -272,6 +291,7 @@ workflow_github_to_overleaf() {
 workflow_overleaf_to_github() {
   local branch_name
   local shared_file
+  local save_cmd
 
   choose_stage_and_folder
 
@@ -305,7 +325,7 @@ workflow_overleaf_to_github() {
 
   if prompt_yes_no "Did Overleaf change references.bib/shared-pkg.tex/elsarticle-num-names.bst?"; then
     while true; do
-      shared_file="$(prompt_valid_folder_name 'Enter one changed filename (e.g., references.bib): ')"
+      shared_file="$(prompt_valid_filename 'Enter one changed filename (e.g., references.bib): ')"
       if [ ! -f "pubs/$PAPER_FOLDER/$shared_file" ]; then
         echo "File not found: pubs/$PAPER_FOLDER/$shared_file"
         if prompt_yes_no "Try a different filename?"; then
@@ -337,7 +357,10 @@ workflow_overleaf_to_github() {
       run_step "Generate calkit stages" "calkit run make-calkit-stages"
       run_step "Update calkit config" "python mdocean/analysis/update_calkit.py"
       run_step "Run paper stage" "calkit run --log '$PAPER_STAGE'"
-      run_step "Save pipeline outputs" "calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml 'pubs/$PAPER_FOLDER/numeric-results.tex' results/**/end.json results/**/*.tex -m 'Run pipeline with updated fig order'"
+      save_cmd="calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml \
+        'pubs/$PAPER_FOLDER/numeric-results.tex' results/**/end.json results/**/*.tex \
+        -m 'Run pipeline with updated fig order'"
+      run_step "Save pipeline outputs" "$save_cmd"
     else
       echo "Skipping local pipeline run; remember to verify CI for your branch."
     fi
