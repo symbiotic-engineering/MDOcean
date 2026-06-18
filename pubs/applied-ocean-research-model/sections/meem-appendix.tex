@@ -3,14 +3,14 @@
 \section{Matched Eigenfunction Expansion Method}
 \label{sec:appendix-meem-details}
 As introduced in \cref{sec:hydro-meem}, the hydrodynamic coefficients are computed semi-analytically using MEEM.
-This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented in \cite{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution \cite{yeung_added_1981}.
-Further numeric and realization details of the authors' implementation may be found in \cite{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
+This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented in the studies \cite{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution in the study \cite{yeung_added_1981}.
+Further numeric and realization details of the authors' implementation may be found in references \cite{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
 The computation involves splitting the fluid domain into regions, approximating an infinite series by truncation, and solving a matrix equation to enforce the continuity of potential and velocity across regions. 
 
 \subsection{Linear Hydrodynamics and Eigenfunctions}
 The dynamics of a floating body in water waves are well-described by linear potential flow theory, a simplification of the Navier-Stokes equation.
 This theory states that the fluid velocity field  is the gradient of some complex potential $\phi$, $\vec{v}=\nabla\phi$, and $\phi$ satisfies the Laplace equation, $\nabla^2\phi=0$.
-Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
+Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in reference \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
 When boundary conditions correspond to the heave radiation problem (body moving vertically, no incident waves), solving for the potential $\phi(r,\theta,z)$ determines the heave added mass and damping $A_h$ and $B_h$, hereafter ``hydro coefficients.”
 
 For appropriate geometries, the partial differential equation is separable and $\phi$ can be expressed as the product of radial, vertical, and circumferential basis functions called eigenfunctions.
@@ -30,7 +30,7 @@ Extension to many regions is discussed in section 3.4.
 
  The potential in each region is split into a homogeneous part for the unforced solution and a particular part due to body motion: $\phi=\phi_h+\phi_p$.
 Boundary conditions dictate $\phi_p$ and the eigenfunctions for $\phi_h$ in each region, which the textbook \cite{chatjigeorgiou_analytical_2018} describes in detail.
-\Cref{tab:MEEM-eigenfunctions} shows the equations originally presented in \cite{chau_inertia_2010,chau_inertia_2012} for the potential and eigenfunctions in each region, which include infinitely many unknown eigencoefficients $C_{1n}^{i1}$, $C_{1m}^{i2}$, $C_{2m}^{i2}$ and $B_{k}^{e}$.
+\Cref{tab:MEEM-eigenfunctions} shows the equations originally presented in the studies \cite{chau_inertia_2010,chau_inertia_2012} for the potential and eigenfunctions in each region, which include infinitely many unknown eigencoefficients $C_{1n}^{i1}$, $C_{1m}^{i2}$, $C_{2m}^{i2}$ and $B_{k}^{e}$.
 By construction, this potential obeys all boundary conditions except for zero radial velocity on radial body surfaces.
 The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of \cref{sec:appendix-meem-matching}.
 
@@ -369,7 +369,7 @@ $\\ \hline
 The dense blocks contain coupling integrals $\boldsymbol{\mathcal{Z}}$ of the vertical eigenfunctions.
 
 Of the sixteen blocks that make up the matrix, six are diagonal, four are zero, and six are dense, resulting in the sparsity pattern shown in \Cref{fig:sparsity}.
-An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in \cite{chau_inertia_2012}. 
+An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in reference \cite{chau_inertia_2012}. 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_sparsity.pdf}
@@ -424,7 +424,6 @@ with output constant $c_0$ and output row vector $\vec{c}$ defined as follows:
 \begin{table}[h]
     \centering
     \caption{Output vector $\vec{c}$}
-    \label{tab:MEEM-c-vector}
 \begin{tabular}{|l|c|c|c|c|} \hline 
           Body&N&  M&  M& K\\ \hline 
           Float&$0_{1N}$&  $\vec{Z}_m(z=-d) \odot\boldsymbol{\mathcal{R}}_{1m}$&  $\vec{Z}_m(z=-d) \odot\boldsymbol{\mathcal{R}}_{2m}$& $0_{1K}$\\ \hline
@@ -463,9 +462,9 @@ Note that while the excitation magnitude $|\gamma|$ depends on the radiation dam
 
 \subsection{Validation}
 
-Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in \cite{chau_inertia_2012}.
+Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in reference \cite{chau_inertia_2012}.
 Excellent agreement is observed, shown in \Cref{fig:meem-yeung-validation}.
-Authors of \cite{chau_inertia_2012} also experimentally validate their results in \cite{son_performance_2016}.
+The results are also experimentally validated in the studies \cite{chau_inertia_2012,son_performance_2016}.
 Previously in \cref{sec:dynamic-validation}, the N=M=K=11 case was compared to WAMIT results for RM3 in deep water.
 
 \begin{figure}[htbp]
