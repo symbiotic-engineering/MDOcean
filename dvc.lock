@@ -8135,15 +8135,17 @@ stages:
       : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
       , \"wecsimAvgPowerErrorBestCase\": \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"\
       wecsimAvgPowerErrorWorstCase\": \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"\
-      ptoSweepMinLCOE_F_max\": \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
-      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f}
-      kW\", \"ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
+      powerScaleFactor\": \"{powerScaleFactor:.2f}\", \"forceScaleFactor\": \"{forceScaleFactor:.2f}\"\
+      , \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"ptoSweepMinLCOE_F_max\"\
+      : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\": \"{ptoSweepMinLCOE_P_max/1e3:.0f}
+      kW\", \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"\
+      ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
       : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
     deps:
     - path: results/Parameters/end.json
       hash: md5
-      md5: b8ebc1fbd0b1b38644236ba47c08eb4b
-      size: 173
+      md5: 49fd19b0c1bfd701584458e7afab6048
+      size: 143
     - path: results/PtoSweep/end.json
       hash: md5
       md5: 02f8bde0bdf6ba5c93cf6fde8e7b2712
@@ -8163,8 +8165,8 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: 38038b1f06380bf720f52f725ea5a556
-      size: 17885
+      md5: cf58a142a4ba03f51b465e4fa75e1591
+      size: 16878
   build-AOR-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/applied-ocean-research-model/.latexmkrc 
@@ -8179,10 +8181,6 @@ stages:
       hash: md5
       md5: 24aec81b8fca42335d1bc08ebc1136a0
       size: 679
-    - path: pubs/applied-ocean-research-model/commands-aor.tex
-      hash: md5
-      md5: 8ab55f405e355cdc301a16d38983e048
-      size: 968
     - path: pubs/applied-ocean-research-model/elsarticle-num-names.bst
       hash: md5
       md5: b24eb82d1afd0a3fa7d82c6efbe1f559
@@ -8216,44 +8214,36 @@ stages:
       size: 234
     - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: ddf91ed78c9f3ba2c44d16da2c41afbb
-      size: 17942
+      md5: cf58a142a4ba03f51b465e4fa75e1591
+      size: 16878
     - path: pubs/applied-ocean-research-model/references.bib
       hash: md5
       md5: bda0fd3d60930d7e04aed3a7250c0825
       size: 537913
     - path: pubs/applied-ocean-research-model/sections/
       hash: md5
-      md5: f64f8362f6f0c38dd0116c04e38a8b63.dir
-      size: 388250
+      md5: 642fa268540dc1a5e0eacaeabb1b6bc1.dir
+      size: 388887
       nfiles: 8
-    - path: pubs/applied-ocean-research-model/shared-pkg.tex
-      hash: md5
-      md5: c253a28efc7a86a51cf1271a7d232814
-      size: 3740
     - path: pubs/applied-ocean-research-model/tables/
       hash: md5
       md5: 2a0ede44175aafcf72ffb20183bb574e.dir
       size: 1597
       nfiles: 3
-    - path: pubs/applied-ocean-research-model/zotero-meem-refs.bib
-      hash: md5
-      md5: bc6c3e5ccad23eb982ab6cbe77119cf3
-      size: 47692
     outs:
     - path: pubs/applied-ocean-research-model/aux/
       hash: md5
-      md5: eab9972c4f1b1331632ebd82dfa4f24d.dir
-      size: 1859776
+      md5: 886d5e1796bee587d575191cee9c8e7e.dir
+      size: 1860982
       nfiles: 45
     - path: pubs/applied-ocean-research-model/main.pdf
       hash: md5
-      md5: 7cdc9f09a47a8c89a55369183bdf2d07
-      size: 4858464
+      md5: 66bb5d49785d24447822763b0e394b78
+      size: 4858602
     - path: pubs/applied-ocean-research-model/main.synctex.gz
       hash: md5
-      md5: 1806faddaea4575265575c1343851665
-      size: 953032
+      md5: 0ec416a46d625741dcf123bf899ee97f
+      size: 954217
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc pubs/renewable-energy-mdo/mdocean.tex
@@ -8623,8 +8613,8 @@ stages:
     deps:
     - path: mdocean/analysis/
       hash: md5
-      md5: 9ee5d780e34d0dce93e16c6d3fe049f4.dir
-      size: 248108
+      md5: b2affd53409875ec6de830443097e90b.dir
+      size: 248385
       nfiles: 94
     - path: mdocean/inputs/
       hash: md5
@@ -8633,9 +8623,9 @@ stages:
       nfiles: 45
     - path: mdocean/optimization/
       hash: md5
-      md5: 08a8cb901628a625cdcc6cb41e8b710f.dir
-      size: 89535
-      nfiles: 18
+      md5: 21f0760a8183f1fa6ba820c8c2eaecf2.dir
+      size: 6756802
+      nfiles: 33
     - path: mdocean/plots/all_figures.m
       hash: md5
       md5: 2c6817d01c7213deea30337c59398a57
@@ -8654,7 +8644,7 @@ stages:
       size: 1806
     - path: mdocean/plots/matlab_figs/
       hash: md5
-      md5: 39cb6e7eb1c8df3b8da4a88da588b6cd.dir
+      md5: cc4441e2b22576b9e0c837b186060b2c.dir
       size: 109840
       nfiles: 28
     - path: mdocean/plots/move_results_to_pubs.m
@@ -8666,16 +8656,60 @@ stages:
       md5: a1da5aaac921e0600950ad5a73986c97.dir
       size: 316241
       nfiles: 34
-    - path: mdocean/simulation/
+    - path: mdocean/simulation/modules/dynamics/
       hash: md5
-      md5: 3eda46f997b8ae2cd09e1fa750895f7b.dir
-      size: 6065027
-      nfiles: 59
+      md5: aad5a6168b522d955cb8b7aca992e9a7.dir
+      size: 147145
+      nfiles: 13
+    - path: mdocean/simulation/modules/econ/
+      hash: md5
+      md5: 3655e6846ed0866565aedaf867f34b8b.dir
+      size: 3605
+      nfiles: 2
+    - path: mdocean/simulation/modules/enviro.m
+      hash: md5
+      md5: e2e0f17b87b11b9609f02bdfb9edb5c2
+      size: 1408
+    - path: mdocean/simulation/modules/geometry.m
+      hash: md5
+      md5: 1975814636cf41c37516c2ef3f61007b
+      size: 11588
+    - path: mdocean/simulation/modules/grid_CEM.m
+      hash: md5
+      md5: 3999f6ee749feac0d14c30ff1ef5e23f
+      size: 2462
+    - path: mdocean/simulation/modules/hydro/
+      hash: md5
+      md5: 334d799bbcfdee989210cb1aed7737fa.dir
+      size: 5810914
+      nfiles: 21
+    - path: mdocean/simulation/modules/lin_ineq_constraints.m
+      hash: md5
+      md5: 5372450176749b7cc4d76d01540fbdd4
+      size: 2096
+    - path: mdocean/simulation/modules/structures/
+      hash: md5
+      md5: 1563be70a12e8dd094ad92c82dc3159f.dir
+      size: 27142
+      nfiles: 6
+    - path: mdocean/simulation/run/
+      hash: md5
+      md5: df8f940c95976584759ed46f5db5a02d.dir
+      size: 45015
+      nfiles: 11
+    - path: mdocean/simulation/sim_catch_warning.m
+      hash: md5
+      md5: f492154d3fe744b898222786513e046c
+      size: 1860
+    - path: mdocean/simulation/simulation.m
+      hash: md5
+      md5: 106bfe38921baa33d66f4f6ac62f27e2
+      size: 11792
     outs:
     - path: calkit_stages.yaml
       hash: md5
-      md5: 1a39e2eaa7d28888cf1bcde500f75970
-      size: 257967
+      md5: 31bee441e237de72c37f5531df4d765d
+      size: 262599
   make-drag-integral:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); make_drag_integral"
     deps:
@@ -14805,7 +14839,7 @@ stages:
       size: 554
     - path: ./mdocean/analysis/@Parameters/post_process_fcn.m
       hash: md5
-      md5: 896488bb4f970d9e8743faba52968ec4
+      md5: 6d126c81d3f5251d36bb8ed0132cebd6
       size: 1286
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
@@ -14851,19 +14885,20 @@ stages:
       hash: md5
       md5: cbc1d583d8b14203d4ed540258e82427
       size: 459
-    - path: ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
+    - path: ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
       hash: md5
       md5: 630b015e546fd4261be88c4e2b88a653
       size: 16304
-    - path: ./mdocean/plots/matlab_figs/make_slamming_plot.m
+    - path: ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
       hash: md5
       md5: 520cfd51ae8ecf8a97c2b76905325ef0
       size: 3491
-    - path: ./mdocean/plots/matlab_figs/plot_drag_convergence.m
+    - path: ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
       hash: md5
       md5: 95abeec7d17e231f7e6bdd569617e617
       size: 1657
-    - path: ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+    - path: 
+        ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
       hash: md5
       md5: ea1d27cfe23d58fb633b6460bb87da95
       size: 2940
@@ -15023,12 +15058,12 @@ stages:
     outs:
     - path: results/Parameters/end.json
       hash: md5
-      md5: b8ebc1fbd0b1b38644236ba47c08eb4b
-      size: 173
+      md5: 49fd19b0c1bfd701584458e7afab6048
+      size: 143
     - path: results/Parameters/end.mat
       hash: md5
-      md5: c7bcd41384895c2413a8d76d38fc8421
-      size: 481
+      md5: 0e832ab00859a91afc36f55f5e94f330
+      size: 445
     - path: results/Parameters/parameters.tex
       hash: md5
       md5: 280dde227a12ebf25aa7fb25966c983d
