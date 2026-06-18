@@ -4,6 +4,7 @@ set -u
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
+SAFE_NAME_PATTERN='^[A-Za-z0-9._-]+$'
 
 prompt_yes_no() {
   local message="$1"
@@ -49,7 +50,7 @@ prompt_valid_folder_name() {
   local value
   while true; do
     value="$(prompt_nonempty "$message")"
-    if [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    if [[ "$value" =~ $SAFE_NAME_PATTERN ]]; then
       printf '%s\n' "$value"
       return 0
     fi
@@ -62,7 +63,7 @@ prompt_valid_filename() {
   local value
   while true; do
     value="$(prompt_nonempty "$message")"
-    if [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    if [[ "$value" =~ $SAFE_NAME_PATTERN ]]; then
       printf '%s\n' "$value"
       return 0
     fi
@@ -72,13 +73,16 @@ prompt_valid_filename() {
 
 run_step() {
   local description="$1"
-  local cmd="$2"
+  shift
+  local -a cmd=( "$@" )
   local answer
+  local command_preview
 
   while true; do
     echo
     echo "Step: $description"
-    echo "Command: $cmd"
+    printf -v command_preview '%q ' "${cmd[@]}"
+    echo "Command: ${command_preview% }"
     read -r -p "Press Enter to run, 's' to skip, or 'q' to quit: " answer
 
     case "$answer" in
@@ -91,7 +95,7 @@ run_step() {
         return 0
         ;;
       "")
-        if eval "$cmd"; then
+        if "${cmd[@]}"; then
           return 0
         fi
 
@@ -118,13 +122,15 @@ run_step() {
 }
 
 run_calkit_pull_with_retry() {
-  local pull_cmd="$1"
+  local -a pull_cmd=( "$@" )
   local answer
+  local command_preview
 
   while true; do
     echo
     echo "Step: Pull data from Calkit"
-    echo "Command: $pull_cmd"
+    printf -v command_preview '%q ' "${pull_cmd[@]}"
+    echo "Command: ${command_preview% }"
     read -r -p "Press Enter to run, 's' to skip, or 'q' to quit: " answer
 
     case "$answer" in
@@ -137,7 +143,7 @@ run_calkit_pull_with_retry() {
         return 0
         ;;
       "")
-        if eval "$pull_cmd"; then
+        if "${pull_cmd[@]}"; then
           return 0
         fi
 
@@ -163,7 +169,10 @@ run_up_to_date_check() {
   local output_file
   local answer
 
-  output_file="$(mktemp)"
+  output_file="$(mktemp)" || {
+    echo "Failed to create temporary file for status check output."
+    exit 1
+  }
 
   while true; do
     echo
@@ -216,7 +225,7 @@ stage_paper_tex_updates() {
 
   while IFS= read -r -d '' tex_file; do
     git add "$tex_file" || {
-      echo "Failed to stage file: $tex_file"
+      echo "Failed to stage file: $tex_file. Check file permissions and git status."
       return 1
     }
     tex_found=1
@@ -228,7 +237,7 @@ stage_paper_tex_updates() {
 
   if [ -d "pubs/$PAPER_FOLDER/sections" ]; then
     git add "pubs/$PAPER_FOLDER/sections/" || {
-      echo "Failed to stage directory: pubs/$PAPER_FOLDER/sections/"
+      echo "Failed to stage directory: pubs/$PAPER_FOLDER/sections/. Check directory permissions and git status."
       return 1
     }
   else
@@ -275,14 +284,14 @@ workflow_github_to_overleaf() {
   choose_stage_and_folder
   branch_name="$(prompt_valid_branch_name 'Enter branch name to create (e.g., overleaf-my-update): ')"
 
-  run_step "Checkout main" "git checkout main"
-  run_step "Pull latest main" "git pull"
-  run_step "Create new branch" "git checkout -b '$branch_name'"
-  run_step "Push branch and set upstream" "git push --set-upstream origin '$branch_name'"
-  run_calkit_pull_with_retry "calkit pull -f"
-  run_step "Check pipeline" "calkit check pipeline -c"
+  run_step "Checkout main" git checkout main
+  run_step "Pull latest main" git pull
+  run_step "Create new branch" git checkout -b "$branch_name"
+  run_step "Push branch and set upstream" git push --set-upstream origin "$branch_name"
+  run_calkit_pull_with_retry calkit pull -f
+  run_step "Check pipeline" calkit check pipeline -c
   run_up_to_date_check "$PAPER_STAGE"
-  run_step "Sync GitHub changes to Overleaf" "calkit overleaf sync --push-only 'pubs/$PAPER_FOLDER'"
+  run_step "Sync GitHub changes to Overleaf" calkit overleaf sync --push-only "pubs/$PAPER_FOLDER"
 
   echo
   echo "Done: GitHub changes were synced toward Overleaf flow."
@@ -291,22 +300,21 @@ workflow_github_to_overleaf() {
 workflow_overleaf_to_github() {
   local branch_name
   local shared_file
-  local save_cmd
 
   choose_stage_and_folder
 
-  run_step "Checkout main" "git checkout main"
-  run_calkit_pull_with_retry "calkit pull -f"
-  run_step "Check pipeline" "calkit check pipeline -c"
+  run_step "Checkout main" git checkout main
+  run_calkit_pull_with_retry calkit pull -f
+  run_step "Check pipeline" calkit check pipeline -c
   run_up_to_date_check "$PAPER_STAGE"
-  run_step "Show Overleaf status" "calkit overleaf status 'pubs/$PAPER_FOLDER'"
+  run_step "Show Overleaf status" calkit overleaf status "pubs/$PAPER_FOLDER"
 
   if ! prompt_yes_no "Do the listed Overleaf changes look correct?"; then
     echo "Stopped so you can review differences."
     exit 1
   fi
 
-  run_step "Sync Overleaf changes locally without commit" "calkit overleaf sync --no-commit 'pubs/$PAPER_FOLDER'"
+  run_step "Sync Overleaf changes locally without commit" calkit overleaf sync --no-commit "pubs/$PAPER_FOLDER"
 
   echo
   echo "If merge conflicts occurred, resolve them now before continuing."
@@ -317,10 +325,10 @@ workflow_overleaf_to_github() {
 
   branch_name="$(prompt_valid_branch_name 'Enter branch to work on (new or existing): ')"
   if prompt_yes_no "Create this branch with -b now?"; then
-    run_step "Create and checkout branch" "git checkout -b '$branch_name'"
-    run_step "Push branch with upstream" "git push -u origin HEAD"
+    run_step "Create and checkout branch" git checkout -b "$branch_name"
+    run_step "Push branch with upstream" git push -u origin HEAD
   else
-    run_step "Checkout existing branch" "git checkout '$branch_name'"
+    run_step "Checkout existing branch" git checkout "$branch_name"
   fi
 
   # These files are shared outputs mapped across papers in the maintainer workflow docs.
@@ -335,9 +343,9 @@ workflow_overleaf_to_github() {
         echo "Stopped by user."
         exit 1
       fi
-      run_step "Copy shared file" "cp 'pubs/$PAPER_FOLDER/$shared_file' 'pubs/shared/$shared_file'"
-      run_step "Stage shared file" "git add 'pubs/shared/$shared_file'"
-      run_step "Commit shared file update" "git commit -m 'update shared $shared_file from overleaf'"
+      run_step "Copy shared file" cp "pubs/$PAPER_FOLDER/$shared_file" "pubs/shared/$shared_file"
+      run_step "Stage shared file" git add "pubs/shared/$shared_file"
+      run_step "Commit shared file update" git commit -m "update shared $shared_file from overleaf"
       if ! prompt_yes_no "Add another shared file update?"; then
         break
       fi
@@ -351,31 +359,33 @@ workflow_overleaf_to_github() {
       echo "Stopped by user."
       exit 1
     fi
-    run_step "Stage figure mapping" "git add mdocean/plots/fig_tab_pub_mapping.m"
-    run_step "Commit figure order update" "git commit -m 'update figure order'"
+    run_step "Stage figure mapping" git add mdocean/plots/fig_tab_pub_mapping.m
+    run_step "Commit figure order update" git commit -m "update figure order"
 
     if prompt_yes_no "Run figure-order pipeline steps locally now?"; then
-      run_step "Generate calkit stages" "calkit run make-calkit-stages"
-      run_step "Update calkit config" "python mdocean/analysis/update_calkit.py"
-      run_step "Run paper stage" "calkit run --log '$PAPER_STAGE'"
-      save_cmd="calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml \
-        \"pubs/$PAPER_FOLDER/numeric-results.tex\" results/**/end.json results/**/*.tex \
-        -m 'Run pipeline with updated fig order'"
-      run_step "Save pipeline outputs" "$save_cmd"
+      run_step "Generate calkit stages" calkit run make-calkit-stages
+      run_step "Update calkit config" python mdocean/analysis/update_calkit.py
+      run_step "Run paper stage" calkit run --log "$PAPER_STAGE"
+      run_step "Save pipeline outputs" calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml "pubs/$PAPER_FOLDER/numeric-results.tex" results/**/end.json results/**/*.tex -m "Run pipeline with updated fig order"
     else
       echo "Skipping local pipeline run; remember to verify CI for your branch."
     fi
   fi
 
-  run_step "Stage paper tex updates" "stage_paper_tex_updates"
-  run_step "Commit paper sync" "git commit -m 'Update paper from Overleaf sync'"
-  run_step "Push branch" "git push"
+  run_step "Stage paper tex updates" stage_paper_tex_updates
+  run_step "Commit paper sync" git commit -m "Update paper from Overleaf sync"
+  run_step "Push branch" git push
 
   echo
   echo "Done: Overleaf-to-GitHub flow completed."
 }
 
 main() {
+  if [[ ! -t 0 ]]; then
+    echo "This script requires an interactive terminal."
+    exit 1
+  fi
+
   echo "Interactive Calkit maintainer helper"
   echo "Source: docs/for_maintainers.rst (Writing section)"
   echo
