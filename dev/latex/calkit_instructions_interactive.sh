@@ -258,10 +258,15 @@ workflow_overleaf_to_github() {
   fi
 
   if prompt_yes_no "Did Overleaf change references.bib/shared-pkg.tex/elsarticle-num-names.bst?"; then
-    shared_file="$(prompt_nonempty 'Enter filename (e.g., references.bib): ')"
-    run_step "Copy shared file" "cp 'pubs/$PAPER_FOLDER/$shared_file' 'pubs/shared/$shared_file'"
-    run_step "Stage shared file" "git add 'pubs/shared/$shared_file'"
-    run_step "Commit shared file update" "git commit -m 'update shared $shared_file from overleaf'"
+    while true; do
+      shared_file="$(prompt_nonempty 'Enter one changed filename (e.g., references.bib): ')"
+      run_step "Copy shared file" "cp 'pubs/$PAPER_FOLDER/$shared_file' 'pubs/shared/$shared_file'"
+      run_step "Stage shared file" "git add 'pubs/shared/$shared_file'"
+      run_step "Commit shared file update" "git commit -m 'update shared $shared_file from overleaf'"
+      if ! prompt_yes_no "Add another shared file update?"; then
+        break
+      fi
+    done
   fi
 
   if prompt_yes_no "Did you change figure order in Overleaf?"; then
@@ -284,7 +289,7 @@ workflow_overleaf_to_github() {
     fi
   fi
 
-  run_step "Stage paper tex updates" "git add pubs/$PAPER_FOLDER/*.tex pubs/$PAPER_FOLDER/sections/"
+  run_step "Stage paper tex updates" "find 'pubs/$PAPER_FOLDER' -maxdepth 1 -type f -name '*.tex' -print0 | xargs -0 -r git add; if [ -d 'pubs/$PAPER_FOLDER/sections' ]; then git add 'pubs/$PAPER_FOLDER/sections/'; else echo 'No sections directory in pubs/$PAPER_FOLDER; skipping sections staging.'; fi"
   run_step "Commit paper sync" "git commit -m 'Update paper from Overleaf sync'"
   run_step "Push branch" "git push"
 
@@ -294,7 +299,7 @@ workflow_overleaf_to_github() {
 
 main() {
   echo "Interactive Calkit maintainer helper"
-  echo "Source: docs/for_maintainers.rst (Writing section)"
+  echo "Source: maintainer writing instructions"
   echo
   echo "Choose workflow:"
   echo "  1) Getting GitHub changes into Overleaf"
