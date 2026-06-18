@@ -985,15 +985,33 @@ def check_labels_referenced():
         lab = re.search(r"\\label\{([^\}]+)\}", l)
         if lab:
             labels.append((lab.group(1), i, lab.span()))
+
+    referenced_labels = set()
+    reference_pattern = re.compile(
+        r"\\(?:[cC]ref|[vV]ref|ref|eqref|autoref|nameref|labelcref|namecref|lcnamecref|fref|Fref|fullref)\*?\{([^\}]*)\}"
+    )
+    range_pattern = re.compile(
+        r"\\(?:[cC]refrange|[cC]labelcrefrange)\*?\{([^\}]*)\}\{([^\}]*)\}"
+    )
+
+    for line in tex_lines_clean:
+        for match in reference_pattern.finditer(line):
+            for ref_label in match.group(1).split(","):
+                ref_label = ref_label.strip()
+                if ref_label:
+                    referenced_labels.add(ref_label)
+        for match in range_pattern.finditer(line):
+            start_label = match.group(1).strip()
+            end_label = match.group(2).strip()
+            if start_label:
+                referenced_labels.add(start_label)
+            if end_label:
+                referenced_labels.add(end_label)
+
     for lab in labels:
         if "sec:" in lab[0] or "eq:" in lab[0]:
             continue
-        found = False
-        for i, l in enumerate(tex_lines):
-            if ("ref{%s}" % lab[0]) in l:
-                found = True
-                break
-        if not found:
+        if lab[0] not in referenced_labels:
             if not (lab[0].startswith("sec") or lab[0].startswith("subsec")):
                 warns.append((lab[1], "Label %s is not referenced" % lab[0], lab[2]))
     return warns
