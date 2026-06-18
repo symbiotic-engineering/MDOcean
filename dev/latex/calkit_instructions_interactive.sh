@@ -284,7 +284,7 @@ workflow_overleaf_to_github() {
     fi
   fi
 
-  run_step "Stage paper tex updates" "git add pubs/'$PAPER_FOLDER'/*.tex pubs/applied-ocean-research-model/sections/"
+  run_step "Stage paper tex updates" "git add pubs/$PAPER_FOLDER/*.tex pubs/$PAPER_FOLDER/sections/"
   run_step "Commit paper sync" "git commit -m 'Update paper from Overleaf sync'"
   run_step "Push branch" "git push"
 
