@@ -323,6 +323,7 @@ workflow_overleaf_to_github() {
     run_step "Checkout existing branch" "git checkout '$branch_name'"
   fi
 
+  # These files are shared outputs mapped across papers in the maintainer workflow docs.
   if prompt_yes_no "Did Overleaf change references.bib/shared-pkg.tex/elsarticle-num-names.bst?"; then
     while true; do
       shared_file="$(prompt_valid_filename 'Enter one changed filename (e.g., references.bib): ')"
@@ -358,7 +359,7 @@ workflow_overleaf_to_github() {
       run_step "Update calkit config" "python mdocean/analysis/update_calkit.py"
       run_step "Run paper stage" "calkit run --log '$PAPER_STAGE'"
       save_cmd="calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml \
-        'pubs/$PAPER_FOLDER/numeric-results.tex' results/**/end.json results/**/*.tex \
+        \"pubs/$PAPER_FOLDER/numeric-results.tex\" results/**/end.json results/**/*.tex \
         -m 'Run pipeline with updated fig order'"
       run_step "Save pipeline outputs" "$save_cmd"
     else
@@ -376,7 +377,7 @@ workflow_overleaf_to_github() {
 
 main() {
   echo "Interactive Calkit maintainer helper"
-  echo "Source: maintainer writing instructions"
+  echo "Source: docs/for_maintainers.rst (Writing section)"
   echo
   echo "Choose workflow:"
   echo "  1) Getting GitHub changes into Overleaf"
