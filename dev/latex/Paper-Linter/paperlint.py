@@ -561,6 +561,131 @@ def strip_explicit_math_text(content):
             return stripped
         stripped = updated
 
+
+GREEK_MATH_SYMBOLS = {
+    "alpha", "beta", "gamma", "delta", "epsilon", "varepsilon", "zeta", "eta", "theta", "vartheta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "varpi", "rho", "varrho", "sigma", "varsigma",
+    "tau", "upsilon", "phi", "varphi", "chi", "psi", "omega", "Gamma", "Delta", "Theta", "Lambda",
+    "Xi", "Pi", "Sigma", "Upsilon", "Phi", "Psi", "Omega"
+}
+
+MATH_SYMBOL_STOPWORDS = {
+    "sin", "cos", "tan", "cot", "sec", "csc", "log", "ln", "exp", "min", "max", "arg", "det",
+    "dim", "gcd", "hom", "ker", "rank", "span", "supp", "mod", "Pr", "Re", "Im", "sgn", "diag",
+    "lim", "limsup", "liminf", "sup", "inf", "left", "right", "big", "Big", "bigg", "Bigg",
+    "e", "i", "d"
+}
+
+
+def extract_math_symbols(content):
+    cleaned = strip_explicit_math_text(content)
+    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
+    cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
+    cleaned = re.sub(r"\\(?:left|right|,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
+    cleaned = re.sub(r"[_^]\s*(?:\{[^{}]*\}|\\[A-Za-z@]+|[A-Za-z0-9]+)", " ", cleaned)
+    commands = re.findall(r"\\[A-Za-z@]+", cleaned)
+    symbols = set()
+    for command in commands:
+        name = command[1:]
+        if name in GREEK_MATH_SYMBOLS:
+            symbols.add(command)
+    cleaned = re.sub(r"\\[A-Za-z@]+\*?", " ", cleaned)
+    cleaned = re.sub(r"[\{\}&=+\-*/(),.;:<>'\"\[\]]", " ", cleaned)
+    for token in re.findall(r"(?<![A-Za-z])([A-Za-z])(?![A-Za-z])", cleaned):
+        if token in MATH_SYMBOL_STOPWORDS:
+            continue
+        symbols.add(token)
+    return symbols
+
+
+def split_sentences(text):
+    sentences = []
+    start = 0
+    for match in SENTENCE_END_RE.finditer(text):
+        end = match.end()
+        sentence = text[start:end].strip()
+        if sentence:
+            sentences.append(sentence)
+        start = end
+    tail = text[start:].strip()
+    if tail:
+        sentences.append(tail)
+    return sentences
+
+
+def build_sentence_sequence():
+    sentences = []
+    for start, end, text in get_paragraphs():
+        for sentence in split_sentences(text):
+            sentences.append({"start": start, "end": end, "text": sentence})
+    return sentences
+
+
+def sentence_mentions_symbol(sentence_text, symbol):
+    for _, _, content in get_math_spans(sentence_text):
+        if symbol in extract_math_symbols(content):
+            return True
+    return False
+
+
+def check_equation_symbols_defined():
+    warns = []
+    symbol_first_use = {}
+    macro_block_depth = 0
+    for i, line in enumerate(tex_lines_clean):
+        if in_code(i):
+            continue
+        stripped = strip_comment_from_line(line)
+        if not stripped.strip():
+            continue
+        stripped_no_ws = stripped.strip()
+        if macro_block_depth > 0:
+            macro_block_depth += stripped_no_ws.count("{") - stripped_no_ws.count("}")
+            if macro_block_depth <= 0:
+                macro_block_depth = 0
+            continue
+        if stripped_no_ws.startswith(("\\newcommand", "\\providecommand", "\\def", "\\gdef", "\\xdef", "\\makeatletter")):
+            macro_block_depth = stripped_no_ws.count("{") - stripped_no_ws.count("}")
+            if macro_block_depth <= 0:
+                macro_block_depth = 0
+            continue
+        math_contents = [content for _, _, content in get_math_spans(stripped)]
+        if in_equation(i):
+            equation_line = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", stripped)
+            equation_line = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", equation_line)
+            math_contents.append(equation_line)
+        for content in math_contents:
+            for symbol in extract_math_symbols(content):
+                if symbol not in symbol_first_use:
+                    symbol_first_use[symbol] = i
+
+    if not symbol_first_use:
+        return warns
+
+    sentences = build_sentence_sequence()
+    if not sentences:
+        return warns
+
+    for symbol, first_line in symbol_first_use.items():
+        sentence_index = None
+        for idx, sentence in enumerate(sentences):
+            if sentence["start"] <= first_line <= sentence["end"]:
+                sentence_index = idx
+                break
+        if sentence_index is None:
+            continue
+
+        nearby = sentences[max(0, sentence_index - 3):min(len(sentences), sentence_index + 4)]
+        if any(sentence_mentions_symbol(sentence["text"], symbol) for sentence in nearby):
+            continue
+
+        if symbol.startswith("\\"):
+            symbol_text = symbol
+        else:
+            symbol_text = "$%s$" % symbol
+        warns.append((first_line, "Symbol %s is used in an equation but is not mentioned inline in the surrounding 3 sentences" % symbol_text, (0, 0)))
+    return warns
+
 def check_space_before_cite():
     warns = []
     for i, l in enumerate(tex_lines):
@@ -1583,6 +1708,7 @@ checks = [
     (check_unused_macro,                CATEGORY_GENERAL,    "unused-macro"),
     (check_required_sections,           CATEGORY_GENERAL,    "required-sections"),
     (check_math_numbers,                CATEGORY_TYPOGRAPHY, "math-numbers"),
+    (check_equation_symbols_defined,    CATEGORY_REFERENCE,  "symbol-mention"),
     (check_large_numbers_without_si,    CATEGORY_TYPOGRAPHY, "si"),
     (check_listing_in_correct_float,    CATEGORY_REFERENCE,  "listing-float"),
     (check_tabular_in_correct_float,    CATEGORY_REFERENCE,  "tabular-float"),
