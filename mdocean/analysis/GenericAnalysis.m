@@ -231,8 +231,57 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function obj = run_all_from_load_if_possible(obj)
-            obj = obj.run_analysis_from_load_if_possible();
-            obj = obj.run_post_process();
+            if obj.postpro_outputs_exist()
+                obj = obj.load_postpro_results();
+            else
+                obj = obj.run_analysis_from_load_if_possible();
+                obj = obj.run_post_process();
+            end
+        end
+
+        function tf = postpro_outputs_exist(obj)
+            fig_paths = {};
+            tab_paths = {};
+            if ~isempty(obj.fig_names)
+                fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.pdf'));
+            end
+            if ~isempty(obj.tab_names)
+                tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
+            end
+            required = [{fullfile(obj.output_folder, 'intermed.mat')}, ...
+                        {fullfile(obj.output_folder, 'end.mat')}, ...
+                        fig_paths, ...
+                        tab_paths];
+            tf = all(cellfun(@isfile, required));
+        end
+
+        function obj = load_postpro_results(obj)
+            obj = obj.load_intermed_results();
+
+            s = load(fullfile(obj.output_folder, 'end.mat'));
+            obj.end_result_struct = s;
+
+            num_figs = length(obj.fig_names);
+            fig_array = gobjects(1, num_figs);
+            for i = 1:num_figs
+                fig_path = fullfile(obj.output_folder, [obj.fig_names{i} '.fig']);
+                try
+                    fig_handle = openfig(fig_path, 'invisible');
+                    if ishghandle(fig_handle) ...
+                            && isstruct(fig_handle.UserData) ...
+                            && isfield(fig_handle.UserData, 'Position') ...
+                            && numel(fig_handle.UserData.Position) == 2
+                        fig_handle.Position(3:4) = fig_handle.UserData.Position;
+                    end
+                    fig_array(i) = fig_handle;
+                catch err
+                    warning('Failed to load cached figure from %s: %s.', fig_path, err.message)
+                end
+            end
+            obj.fig_array = fig_array;
+
+            % don't attempt to fill tab_array_latex or tab_array_display, since the
+            % matlab table object can't easily be reconstructed from the exported tex.
         end
 
         function stages = write_calkit_stage(obj)

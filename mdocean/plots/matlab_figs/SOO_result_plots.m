@@ -32,6 +32,6 @@ function [figs,tab] = SOO_result_plots(Xs_opt,lambdas,grads,hesses,objs_opt,whic
         figs(start_fig_num + 4) = delta_x(X_opt,grad,hess,obj_opt,p,b,which_obj);
     end
     table_data = [Xs_opt(1:end-1,:), b.X_mins, b.X_maxs b.X_noms];
-    tab = array2table(table_data,'RowNames',b.var_names(1:end-1),...
+    tab = array2table(table_data,'RowNames',b.var_names_pretty(1:end-1),...
             'VariableNames',[strcat("Min ", b.obj_names(which_objs)), {'Min bound','Max bound','Nom'}]);
 end
