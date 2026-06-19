@@ -17,11 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
-  pdf2svg:
-    kind: docker
-    path: pubs/defense/latex-standalone/Dockerfile
-    description: pdf2svg via Docker.
-    image: pdf2svg
+  # pdf2svg:
+  #   kind: docker
+  #   path: pubs/defense/latex-standalone/Dockerfile
+  #   description: pdf2svg via Docker.
+  #   image: pdf2svg
   quarto:
     kind: docker
     image: ghcr.io/quarto-dev/quarto:latest
@@ -5783,20 +5783,20 @@ pipeline:
         - pubs/defense/latex-standalone/standalone_{name}.pdf
         - path: pubs/defense/latex-standalone/standalone_{name}.log
           delete_before_run: false
-    make-standalone-tex-svg:
-      kind: shell-command
-      environment: pdf2svg
-      iterate_over:
-        - arg_name: name
-          values:
-            - parameter: latex_standalone_name
-      command: pdf2svg 
-        pubs/defense/latex-standalone/standalone_{name}.pdf 
-        pubs/defense/figs/standalone_{name}.svg
-      inputs:
-        - pubs/defense/latex-standalone/standalone_{name}.pdf
-      outputs:
-        - pubs/defense/figs/standalone_{name}.svg
+    # make-standalone-tex-svg:
+    #   kind: shell-command
+    #   environment: pdf2svg
+    #   iterate_over:
+    #     - arg_name: name
+    #       values:
+    #         - parameter: latex_standalone_name
+    #   command: pdf2svg 
+    #     pubs/defense/latex-standalone/standalone_{name}.pdf 
+    #     pubs/defense/figs/standalone_{name}.svg
+    #   inputs:
+    #     - pubs/defense/latex-standalone/standalone_{name}.pdf
+    #   outputs:
+    #     - pubs/defense/figs/standalone_{name}.svg
     render-quarto-html:
       kind: docker-command
       environment: quarto
