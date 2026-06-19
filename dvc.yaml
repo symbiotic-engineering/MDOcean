@@ -7872,22 +7872,54 @@ stages:
     desc: Automatically generated from the 'make-quarto-yaml' stage in
       calkit.yaml. Changes made here will be overwritten.
   make-standalone-tex-pdf:
-    cmd: calkit latex build -e tex --no-check 
-      pubs/defense/latex-standalone/standalone_${item.name}.tex
+    cmd: calkit latex build -e tex --no-check -r 
+      mdocean/plots/non_matlab_figs/.latexmkrc --no-synctex 
+      mdocean/plots/non_matlab_figs/${item.name}.tex
     deps:
-      - pubs/defense/latex-standalone/standalone_${item.name}.tex
-      - pubs/shared/equations/
+      - mdocean/plots/non_matlab_figs/${item.name}.tex
+      - pubs/applied-ocean-research-model/figs/tikz/${item.name}.tikz
       - .calkit/env-locks/tex
+      - mdocean/plots/non_matlab_figs/.latexmkrc
     outs:
-      - pubs/defense/latex-standalone/standalone_${item.name}.pdf
-      - pubs/defense/latex-standalone/standalone_${item.name}.log:
-          cache: true
+      - mdocean/plots/non_matlab_figs/${item.name}.pdf
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.log:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.aux:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.fdb_latexmk:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.fls:
+          cache: false
           persist: true
     matrix:
       name:
-        - eigenfunctions
-        - A_matrix
+        - circuit_intrinsic
+        - circuit_pto
+        - circuit_kinematics
+        - control_method_venn_diagram
+        - meem_dims
     desc: Automatically generated from the 'make-standalone-tex-pdf' 
+      stage in calkit.yaml. Changes made here will be overwritten.
+  move-standalone-pdfs:
+    cmd: calkit map-paths --file-to-file 
+      'mdocean/plots/non_matlab_figs/${item.name}.pdf->mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf'
+    deps:
+      - mdocean/plots/non_matlab_figs/${item.name}.pdf
+    outs:
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf:
+          cache: false
+          persist: true
+    matrix:
+      name:
+        - circuit_intrinsic
+        - circuit_pto
+        - circuit_kinematics
+        - control_method_venn_diagram
+        - meem_dims
+    desc: Automatically generated from the 'move-standalone-pdfs' 
       stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd

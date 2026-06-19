@@ -46,8 +46,11 @@ parameters:
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
   latex_standalone_name:
-    - eigenfunctions
-    - A_matrix
+    - circuit_intrinsic
+    - circuit_pto
+    - circuit_kinematics
+    - control_method_venn_diagram
+    - meem_dims
 # subprojects:
 #   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
@@ -5869,18 +5872,41 @@ pipeline:
           storage: git
     make-standalone-tex-pdf:
       kind: latex
-      target_path: pubs/defense/latex-standalone/standalone_{name}.tex
+      target_path: mdocean/plots/non_matlab_figs/{name}.tex
       environment: tex
+      latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      synctex: false
       iterate_over:
         - arg_name: name
           values:
             - parameter: latex_standalone_name
       inputs:
-        - pubs/shared/equations/
+        - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
       outputs:
-        - pubs/defense/latex-standalone/standalone_{name}.pdf
-        - path: pubs/defense/latex-standalone/standalone_{name}.log
+        - mdocean/plots/non_matlab_figs/{name}.pdf
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
+          delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
+          delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
+          delete_before_run: false
+          storage:
+    move-standalone-pdfs:
+      kind: map-paths
+      environment: _system
+      paths:
+        - src: mdocean/plots/non_matlab_figs/{name}.pdf
+          dest: mdocean/plots/non_matlab_figs/pdf/{name}.pdf
+          kind: file-to-file
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg
