@@ -51,7 +51,7 @@ xlabel('$x$','Interpreter','latex')
 ylabel('$\Delta J/J$','Interpreter','latex')
 improvePlot
 set(gca(),'TickLabelInterpreter','latex','YGrid','on')
-ylim([-1 1]*max(abs(bar_heights))*1.1)
+ylim( 1.1 * [-1 1] * max( abs(bar_heights(:)) ))
 f.Position(3:4) = [705 475];
 
 end
