@@ -32,6 +32,9 @@ environments:
     path: pubs/defense/quarto/Dockerfile
     description: Playwright via Docker.
     image: playwright
+  bibtex-conda:
+    path: dev/latex/environment.yml
+    kind: conda
 dependencies:
   - docker
   - matlab
@@ -5034,6 +5037,57 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+    postpro-WithTables:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages with tables."
+      inputs:
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
+    all-postpro:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages."
+      inputs:
+        - from_stage_outputs: postpro-AllFigCompare
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DampingPlateStructures
+        - from_stage_outputs: postpro-DescFcns
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-DragIntegral
+        - from_stage_outputs: postpro-FitOlaya
+        - from_stage_outputs: postpro-ForceSaturationFigFunc
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-HydroCoeffFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Meem
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-ParamSensitivities
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-ParetoFigFunc
+        - from_stage_outputs: postpro-ParetoSweep
+        - from_stage_outputs: postpro-PtoSweep
+        - from_stage_outputs: postpro-QPCircles
+        - from_stage_outputs: postpro-ReadNonMatlabFigs
+        - from_stage_outputs: postpro-RunSingleFigFunc
+        - from_stage_outputs: postpro-Runtime
+        - from_stage_outputs: postpro-Slamming
+        - from_stage_outputs: postpro-SparHydro
+        - from_stage_outputs: postpro-SweepGeoms
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
     test-aor:
       kind: matlab-command
       environment: _system
@@ -5377,13 +5431,13 @@ pipeline:
         - results/GradientOptimFigFunc/
         - results/Multistart/
         - results/ParamSensitivities/
-        #- results/ParetoFigFunc/
+        - results/ParetoFigFunc/
         - results/AllFigCompare/
         - results/ParetoSweep/
         - results/Constraints/
         - results/DesignVars/
         - results/Parameters/
-        #- results/LocationSensitivity/
+        - results/LocationSensitivity/
         - mdocean/plots/fig_tab_pub_mapping.m
         - mdocean/plots/move_results_to_pubs.m
         - mdocean/plots/non_matlab_figs/pdf/
@@ -5532,8 +5586,9 @@ pipeline:
         capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
         capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
-        # runtimes (stored in seconds, formatted as minutes)
+        # runtimes (stored in seconds, formatted as ms or minutes)
         simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         singleObjRuntime: "{singleObjRuntime/60:.1f} min"
         paretoRuntime: "{paretoRuntime/60:.0f} min"
         gradientSensRuntime: "{runtime_post_optim/60:.1f} min"
@@ -5549,6 +5604,8 @@ pipeline:
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
         lowestFmaxFactorMinLCOE: "{lowestFmaxFactorMinLCOE*100:.0f}%"
+        percentParamsRightSign: "{percentParamsRightSign:.0f}%"
+        percentMeanAbsErrorParamSens: "{percentMeanAbsErrorParamSens:.0f}%"
         # force saturation comparison (non-reoptimized) - values from GradientOptimFigFunc
         powerLossForceSatMinLCOE: "{powerLossForceSatMinLCOE:.1f} W"
         pctPowerLossForceSatMinLCOE: "{pctPowerLossForceSatMinLCOE:.3f}%"
@@ -5640,6 +5697,10 @@ pipeline:
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/renewable-energy-mdo/elsarticle-num-names.bst
+        - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        - pubs/renewable-energy-mdo/shared-pkg.tex
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
@@ -5663,6 +5724,9 @@ pipeline:
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
+        - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/shared-pkg.tex
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
@@ -5689,6 +5753,7 @@ pipeline:
         - pubs/dissertation/cornell.cls
         - pubs/dissertation/hangcaption.sty
         - pubs/dissertation/.latexmkrc
+        - pubs/dissertation/intro-contrib.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/content.tex
         - pubs/applied-ocean-research-model/sections/
@@ -5704,6 +5769,7 @@ pipeline:
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/references.bib
+        - pubs/shared/shared-pkg.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
@@ -5715,6 +5781,15 @@ pipeline:
         - path: pubs/dissertation/aux/
           storage: null
           delete_before_run: false
+    # all-writing:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+    #     -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    # all-latex:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     view-aor-figs:
       kind: jupyter-notebook
       environment: pubs
@@ -5723,31 +5798,39 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/
       html_storage: null
       executed_ipynb_storage: git
+    view-re-figs:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
+      inputs:
+        - pubs/renewable-energy-mdo/figs/
+      html_storage: null
+      executed_ipynb_storage: git
     all-viz:
       kind: shell-command
       environment: pubs
       command: echo "All viz stages complete"
       inputs:
-        #- from_stage_outputs: viz-AllFigCompare
-        #- from_stage_outputs: viz-Comparison
-        #- from_stage_outputs: viz-Constraints
+        - from_stage_outputs: viz-AllFigCompare
+        - from_stage_outputs: viz-Comparison
+        - from_stage_outputs: viz-Constraints
         - from_stage_outputs: viz-Cost
         - from_stage_outputs: viz-DampingPlateStructures
         - from_stage_outputs: viz-DescFcns
         - from_stage_outputs: viz-DesignSpaceExploration
-        #- from_stage_outputs: viz-DesignVars
+        - from_stage_outputs: viz-DesignVars
         - from_stage_outputs: viz-DragIntegral
         - from_stage_outputs: viz-FitOlaya
         - from_stage_outputs: viz-ForceSaturationFigFunc
-        #- from_stage_outputs: viz-GradientOptimFigFunc
+        - from_stage_outputs: viz-GradientOptimFigFunc
         - from_stage_outputs: viz-HydroCoeffFigFunc
-        #- from_stage_outputs: viz-LocationSensitivity
+        - from_stage_outputs: viz-LocationSensitivity
         - from_stage_outputs: viz-Meem
-        #- from_stage_outputs: viz-Multistart
-        #- from_stage_outputs: viz-ParamSensitivities
-        #- from_stage_outputs: viz-Parameters
-        #- from_stage_outputs: viz-ParetoFigFunc
-        #- from_stage_outputs: viz-ParetoSweep
+        - from_stage_outputs: viz-Multistart
+        - from_stage_outputs: viz-ParamSensitivities
+        - from_stage_outputs: viz-Parameters
+        - from_stage_outputs: viz-ParetoFigFunc
+        - from_stage_outputs: viz-ParetoSweep
         - from_stage_outputs: viz-PtoSweep
         - from_stage_outputs: viz-QPCircles
         - from_stage_outputs: viz-ReadNonMatlabFigs
@@ -5807,7 +5890,6 @@ pipeline:
       command: quarto render pubs/defense/quarto/slides.qmd
       inputs:
         - pubs/defense/figs/
-        - pubs/shared/equations/
         - pubs/defense/quarto/slides.qmd
         - pubs/defense/quarto/_variables.yml
         - pubs/defense/references.bib
@@ -5847,11 +5929,10 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-  - path: pubs/defense/quarto/slides.pdf
+  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
     title: PhD Defense Slides
     description: Slides for PhD defense presentation
     kind: presentation
-    stage: render-quarto-pdf
   - path: pubs/dissertation/sampleThesis.pdf
     title: PhD Dissertation
     stage: build-dissertation
@@ -5865,7 +5946,7 @@ overleaf_sync:
       - references.bib
       - numbers.tex
       - elsarticle-num-names.bst
-      - appendies.tex
+      - appendices.tex
       - commands-aor.tex
       - content.tex
     push_paths:
@@ -5895,19 +5976,3 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
-  pubs/defense:
-    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
-    sync_paths:
-      - beamer/backup.tex
-      - references.bib
-      - beamer/conclusion.tex
-      - beamer/content_cost.tex
-      - beamer/content_model.tex
-      - beamer/content_value.tex
-      - Cornell.pdf
-      - beamer/main.tex
-      - beamer/motivation.tex
-      - beamer/setup.tex
-      - figs/
-    #push_paths:
-    # - figs
