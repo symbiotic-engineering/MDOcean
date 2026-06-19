@@ -9,7 +9,7 @@ The computation involves splitting the fluid domain into regions, approximating 
 
 \subsection{Linear Hydrodynamics and Eigenfunctions}
 The dynamics of a floating body in water waves are well-described by linear potential flow theory, a simplification of the Navier-Stokes equation.
-This theory states that the fluid velocity field  is the gradient of some complex potential $\phi$, $\vec{v}=\nabla\phi$, and $\phi$ satisfies the Laplace equation, $\nabla^2\phi=0$.
+This theory states that the fluid velocity field is the gradient of some complex potential $\phi$, $\vec{v}=\nabla\phi$, and $\phi$ satisfies the Laplace equation, $\nabla^2\phi=0$.
 Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in reference \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
 When boundary conditions correspond to the heave radiation problem (body moving vertically, no incident waves), solving for the potential $\phi(r,\theta,z)$ determines the heave added mass and damping $A_h$ and $B_h$, hereafter ``hydro coefficients.”
 
@@ -526,7 +526,7 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 
 \subsection{Numerical Notes}\label{sec:appendix-meem-numerics}
-Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$, resulting in numeric overflow 
+Note that radial eigenfunctions $R_{1n}^{i1}(r)$ and $R_{1m}^{i2}(r)$ contain the modified Bessel function of the first kind $\mathrm{I}_0(\chi)$, which diverges for $\chi\rightarrow \infty$, resulting in numeric overflow. 
 To prevent overflow, each fluid region must exceed a minimum height $ \Delta z_{\text{min}}$ that is proportional to the region diameter $D$ for both the spar ($\Delta z_s, D_s$) and the float ($\Delta z_f, D_f$), with variables shown in \cref{fig:meem-geom}.
 The constant of proportionality between $\Delta z_{\text{min}}$ and $D$ is a function of the number of harmonics $N_{\text{harmonics}}$ used in that region ($N$ for spar, $M$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\chi_{\text{max}}$:
 \begin{equation}\label{eq:delta-z-min}
@@ -534,7 +534,7 @@ The constant of proportionality between $\Delta z_{\text{min}}$ and $D$ is a fun
 \end{equation}
 By trial, $\chi_{\text{max}}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log(realmax)} $\approx 709.8$ for exponential scaling.
 Since $N_{\text{harmonics}}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.
-In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
+In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled Bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
 
 Likewise, the vertical eigenfunction $Z_k^e$ for $k=0$ contains the $\cosh$ and $\sinh$ functions, which diverge for large values of $m_0h$ (high frequencies or deep water).
 Since the largest relevant value of $m_0h$ depends on the site rather than on the WEC design, it is not possible to add geometric constraints to prevent overflow as it was above.
@@ -595,5 +595,5 @@ For $N=M=K=10$, the simulation of a single frequency averages \resultsAOR[MEEMRu
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
 Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve can drive computation cost.
-On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer}
+On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer} 
 Thus, MEEM achieves a 10x time reduction over Capytaine.
