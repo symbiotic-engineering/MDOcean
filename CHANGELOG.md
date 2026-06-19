@@ -1,6 +1,12 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.11) - 2026-6-19
+### Changed
+- Tests: comment out assert success command in `run_tests.m`
+### Fixed
+- Tests: allow stages with tables to pass tests, just have to rerun their postpro
+
 ## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-17
 ### Added
 - Pipeline: OpenFLASH subproject
