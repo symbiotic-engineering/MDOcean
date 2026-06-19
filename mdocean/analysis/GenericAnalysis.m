@@ -239,7 +239,7 @@ classdef (Abstract) GenericAnalysis < handle
             end
         end
 
-        function tf = postpro_outputs_exist(obj)
+        function tf_2 = postpro_outputs_exist(obj)
             fig_paths = {};
             tab_paths = {};
             if ~isempty(obj.fig_names)
@@ -253,6 +253,9 @@ classdef (Abstract) GenericAnalysis < handle
                         fig_paths, ...
                         tab_paths];
             tf = all(cellfun(@isfile, required));
+            % force rerun of postpro if there are any tables, 
+            % since tables are only saved as tex and aren't recoverable
+            tf_2 = tf && isempty(obj.tab_names);
         end
 
         function obj = load_postpro_results(obj)
