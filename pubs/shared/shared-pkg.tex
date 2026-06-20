@@ -8,12 +8,17 @@
 \usepackage{longtable} % for table going multiple pages
 \usepackage{rotating}  % for rotated table headers
 \usepackage{color}     % also required for highlighting 
+\usepackage{pdftexcmds} % for detecting if shell escape is enabled
 
 % save bibliography command before bibcop modifies it
 \makeatletter
 \let\bibcop@truebibliography\bibliography
+\ifnum\pdf@shellescape=0
+  % shell escape is disabled, so don't load bibcop
+\else
+  \usepackage{bibcop}    % warnings for incorrect citations
+\fi
 \makeatother
-\usepackage{bibcop}    % warnings for incorrect citations
 
 \usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
@@ -53,6 +58,9 @@
 % allows bibcop to be used when bibliography includes multiple arguments
 \makeatletter
 \AtBeginDocument{%
+\ifnum\pdf@shellescape=0
+  % shell escape is disabled, so don't patch bibcop
+\else
 \ifdefined\bibliography
 
   \RequirePackage{etoolbox}
@@ -107,7 +115,7 @@
 
     \fi
   }
-
+\fi
 \fi
 }
 
