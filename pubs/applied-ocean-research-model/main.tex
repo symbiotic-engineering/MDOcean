@@ -1,117 +1,81 @@
-%% 
-%% Copyright 2007-2024 Elsevier Ltd
-%% 
-%% This file is part of the 'Elsarticle Bundle'.
-%% ---------------------------------------------
-%% 
-%% It may be distributed under the conditions of the LaTeX Project Public
-%% License, either version 1.3 of this license or (at your option) any
-%% later version.  The latest version of this license is in
-%%    http://www.latex-project.org/lppl.txt
-%% and version 1.3 or later is part of all distributions of LaTeX
-%% version 1999/12/01 or later.
-%% 
-%% The list of all files belonging to the 'Elsarticle Bundle' is
-%% given in the file `manifest.txt'.
-%%
-%% Template article for Elsevier's document class `elsarticle'
-%% with numbered style bibliographic references
-%% SP 2008/03/01
-%% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
-%%
-
-\documentclass[preprint,12pt]{elsarticle}
-
-%% Use the option review to obtain double line spacing
-%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
-
-%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
-%% for a journal layout:
-%% \documentclass[final,1p,times]{elsarticle}
-%% \documentclass[final,1p,times,twocolumn]{elsarticle}
-%% \documentclass[final,3p,times]{elsarticle}
-%% \documentclass[final,3p,times,twocolumn]{elsarticle}
-%% \documentclass[final,5p,times]{elsarticle}
-%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+\documentclass[a4paper,fleqn]{cas-dc}
 
 \input{shared-pkg}
 \input{commands-aor}
 
-\journal{Applied Ocean Research}
+\usepackage[authoryear]{natbib}
+
+%%Author macros
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\tsc{WGM}
+\tsc{QE}
+%%%
 
 \begin{document}
-% Make PDF metadata explicit and disable fragile commands from frontmatter
-\hypersetup{
-  pdftitle={Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters},
-  pdfauthor={Rebecca McCabe, Madison Dietrich, Maha Haji}
-}
-\makeatletter
-\pdfstringdefDisableCommands{%
-  \def\corref#1{}%
-  \def\cortext#1{}%
-  \def\cnotenum#1{}%
-  \def\tnoteref#1{}%
-  \def\tnotetext#1{}%
-  \def\@corref#1{}%
-}
-\makeatother
 
-\begin{frontmatter}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
 
-%% Title, authors and addresses
+\shorttitle{Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
+\shortauthors{R. McCabe et~al.}
 
-%% use the tnoteref command within \title for footnotes;
-%% use the tnotetext command for theassociated footnote;
-%% use the fnref command within \author or \affiliation for footnotes;
-%% use the fntext command for theassociated footnote;
-%% use the corref command within \author for corresponding author footnotes;
-%% use the cortext command for theassociated footnote;
-%% use the ead command for the email address,
-%% and the form \ead[url] for the home page:
-%% \title{Title\tnoteref{label1}}
-%% \tnotetext[label1]{}
-%% \author{Name\corref{cor1}\fnref{label2}}
-%% \ead{email address}
-%% \ead[url]{home page}
-%% \fntext[label2]{}
-%% \cortext[cor1]{}
-%% \affiliation{organization={},
-%%             addressline={},
-%%             city={},
-%%             postcode={},
-%%             state={},
-%%             country={}}
-%% \fntext[label3]{}
+\title[mode=title]
+{Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
 
-\title{Development, Validation, and Benchmarking of a Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
+% First author
+%
+% Options: Use if required
+% eg: \author[1,3]{Author Name}[type=editor,
+%       style=chinese,
+%       auid=000,
+%       bioid=1,
+%       prefix=Sir,
+%       orcid=0000-0000-0000-0000,
+%       facebook=<facebook id>,
+%       twitter=<twitter id>,
+%       linkedin=<linkedin id>,
+%       gplus=<gplus id>]
 
-%% use optional labels to link authors explicitly to addresses:
-\author[MAE]{Rebecca McCabe\corref{cor1}}
+
+\author[MAE]{Rebecca McCabe}
+\cormark[1]
+\fnmark[1]
 \ead{rgm222@cornell.edu}
+\ead[url]{http://sea.mae.cornell.edu}
+
+% Optional:
+\credit{Conceptualization, Methodology, Software, Validation, Writing - Original draft}
+
 \author[MAE]{Madison Dietrich}
+
+\credit{Software, Visualization,  Writing - Review \& Editing}
+
 \author[mich]{Maha Haji}
 
-\cortext[cor1]{Corresponding Author}
+\credit{Supervision, Writing - Review \& Editing}
 
-\affiliation[MAE]{organization={Sibley School of Mechanical and Aerospace Engineering, Cornell University},
-             addressline={124 Hoy Rd.},
-             city={Ithaca},
-             postcode={14853},
-             state={NY},
-             country={USA}}
+\affiliation[MAE]{
+    organization={Sibley School of Mechanical and Aerospace Engineering, Cornell University},
+    addressline={124 Hoy Rd.},
+    city={Ithaca},
+    postcode={14853},
+    state={NY},
+    country={USA}
+}
 
-\affiliation[mich]{organization={Department of Mechanical Engineering, University of Michigan},
-             addressline={G.G.
-Brown Laboratory, 2350 Hayward},
-             city={Ann Arbor},
-             postcode={48109},
-             state={MI},
-             country={USA}}
+\affiliation[mich]{
+    organization={Department of Mechanical Engineering, University of Michigan},
+    addressline={G.G. Brown Laboratory, 2350 Hayward},
+    city={Ann Arbor},
+    postcode={48109},
+    state={MI},
+    country={USA}
+}
 
-%% Abstract
+\cortext[cor1]{Corresponding author}
+
 \begin{abstract}
-%% Text of abstract
-
 Wave energy converters (WECs) require system-level techno-economic analysis to balance power production, cost, and survivability, yet existing simulation tools are often either too computationally intensive for large-scale optimization or too narrow in disciplinary scope to support integrated design studies.
 This work presents MDOcean, a novel modular WEC simulation framework developed for rapid early-stage design exploration, parametric analysis, and multidisciplinary optimization.
 MDOcean integrates hydrodynamics, dynamics, structures, and economics within a computationally efficient architecture based on analytical and semi-analytical methods that substantially reduce runtime while maintaining near-numerical accuracy. 
@@ -123,69 +87,33 @@ This formulation enables efficient treatment of nonlinear constraints while pres
 Validation and benchmarking demonstrate that MDOcean's \resultsAOR[simRuntime] runtime is orders of magnitude faster than leading WEC simulation tools while maintaining agreement with higher-fidelity baselines to within a few percent in most cases.
 Beyond computational performance, the framework also provides insight into limiting behaviors, scaling laws, subsystem interactions, and key tradeoffs governing WEC design and techno-economic performance.
 MDOcean is released as open-source software to support accelerated WEC research, design, and optimization.
+
 \end{abstract}
 
-%%Graphical abstract
 \begin{graphicalabstract}
-\centering
 \includegraphics[width=\linewidth]{figs/from-matlab/graphical_abstract_modeling.pdf}
 \end{graphicalabstract}
 
-%%Research highlights
-% Elsevier guidelines:
-% 3–5 bullets 
-% no more than 85 characters per bullet including spaces
-% No jargon, acronyms, or abbreviations — aim for general audience
-% Capture core findings/novel results; not a list of every module
-% Present tense, concise, specific
-
-% OLD
-% \begin{highlights}
-% \item Develop and validate a rapid (\resultsAOR[simRuntime]) open-source wave energy techno-economic simulation called MDOcean
-% \item Quasi-linear frequency domain dynamics model captures nonlinearities such as generator force saturation and drag while running 3 orders of magnitude faster than benchmark time-stepping model
-% \item Derive analytical constrained optimal control solution for underactuated wave-to-wire multi-port model respecting effort, flow, and power limits
-% \item Eigenfunction-based model computes hydrodynamic coefficients 10x faster than benchmark boundary element method (BEM) solver
-% \item Analytical stiffened-plate structural model assesses stress and stability failure modes under fatigue and storm survival loadcases
-% \item Simple economic model captures scaling of cost with structural material volume and powertrain rating
-% \item Validation shows error of <0.2\% (linear) and <10\% (nonlinear) in average power and peak amplitude for Reference Model 3 (RM3) design
-% \end{highlights}
-
-% NEW (Maha updated 5/18/26)
 \begin{highlights}
-  \input{sections/aor-contributions}
+\input{sections/aor-contributions}
 \end{highlights}
 
-%% Keywords
-\begin{keyword}
-wave energy conversion \sep 
-marine renewable energy \sep 
-semi-analytical hydrodynamics \sep 
+\begin{keywords}
+wave energy conversion \sep
+marine renewable energy \sep
+semi-analytical hydrodynamics \sep
 multi-port circuit \sep
 constrained optimal control \sep
-structural design \sep 
-survivability analysis \sep 
-techno-economic modeling \sep 
-two-body point absorber \sep 
-power take-off modeling \sep 
-validation \sep 
+structural design \sep
+survivability analysis \sep
+techno-economic modeling \sep
+two-body point absorber \sep
+power take-off modeling \sep
+validation \sep
 benchmarking
-%% keywords here, in the form: keyword \sep keyword
+\end{keywords}
 
-%% PACS codes here, in the form: \PACS code \sep code
-
-%% MSC codes here, in the form: \MSC code \sep code
-%% or \MSC[2008] code \sep code (2000 is the default)
-
-\end{keyword}
-
-\end{frontmatter}
-
-%% Add \usepackage{lineno} before \begin{document} and uncomment 
-%% following line to enable line numbers
-%% \linenumbers
-
-%% main text
-%%
+\maketitle
 
 % added for my convenience, should take out before submission
 %\tableofcontents
@@ -197,76 +125,38 @@ benchmarking
 %\detailtexcount{sections/other-appendices}{section}
 %\newpage
 
-%% Use \section commands to start a section
-%% Labels are used to cross-reference an item using \ref command.
-
 \include{content}
 
 \section*{Acknowledgements}
-The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics; Fabien Royer for guidance on structures; and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
+
+The authors thank Kapil Khanal, En Lo, Yinghui Bimali, and John Fernandez for assistance with hydrodynamics;
+Fabien Royer for guidance on structures;
+and Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback.
 
 R.M. acknowledges funding from the National Science Foundation Graduate Research Fellowship.
 M.D. acknowledges funding from the Fund for Undergraduate Research on Solutions to Climate Change and the Bill Nye ’77 Award in Undergraduate Research.
-This material is based on work supported by the National Science Foundation Graduate Research Fellowship under Grant No.
-DGE–2139899.
+
+This material is based on work supported by the National Science Foundation Graduate Research Fellowship under Grant No.~DGE--2139899.
 Any opinions, findings, conclusions, or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
 
 The graphical abstract uses icons from \url{www.flaticon.com} in accordance with the Flaticon license.
 
 \section*{Data availability statement}
-The MATLAB code for all simulation, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at \url{https://github.com/symbiotic-engineering/MDOcean} \cite{mccabe_mdocean_2024}.
+
+The MATLAB code for all simulation, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at
+\url{https://github.com/symbiotic-engineering/MDOcean} \cite{mccabe_mdocean_2024}.
 Questions and contributions via GitHub issues and pull requests are welcomed.
-A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
+%A Python version using the \texttt{OpenMDAO} package is forthcoming.
+All computational environments, results, and \LaTeX artifacts can be reproduced via a data version control pipeline built with the \texttt{Calkit} package
+and accessed at \url{https://calkit.io/symbiotic-engineering/mdocean}.
 
-\begin{appendices}
+\appendix
+
 \include{appendices}
-\end{appendices}
 
-%% Displayed equations can be tagged using various environments. 
-%% Single line equations can be tagged using the equation environment.
-%%\begin{equation}
-%%f(x) = (x+a)(x+b)
-%%\end{equation}
+\printcredits
 
-%% Unnumbered equations are tagged using starred versions of the environment.
-%% amsmath package needs to be loaded for the starred version of equation environment.
-%%\begin{equation*}
-%%f(x) = (x+a)(x+b)
-%%\end{equation*}
-
-%% align or eqnarray environments can be used for multi line equations.
-%% & is used to mark alignment points in equations.
-%% \\ is used to end a row in a multiline equation.
-%%\begin{align}
-%% f(x) &= (x+a)(x+b) \\
-%%      &= x^2 + (a+b)x + ab
-%%\end{align}
-
-%%\begin{eqnarray}
-%% f(x) &=& (x+a)(x+b) \nonumber\\ %% If equation numbering is not needed for a row use \nonumber.
-%%      &=& x^2 + (a+b)x + ab
-%%\end{eqnarray}
-
-%% Unnumbered versions of align and eqnarray
-%%\begin{align*}
-%% f(x) &= (x+a)(x+b) \\
-%%      &= x^2 + (a+b)x + ab
-%%\end{align*}
-
-%%\begin{eqnarray*}
-%% f(x)&=& (x+a)(x+b) \\
-%%     &=& x^2 + (a+b)x + ab
-%%\end{eqnarray*}
-
-%% Refer following link for more details.
-%% https://en.wikibooks.org/wiki/LaTeX/Mathematics
-%% https://en.wikibooks.org/wiki/LaTeX/Advanced_Mathematics
-
-\clearpage
-% Bibliography: point to files one level up in pubs/ so BibTeX can find them
-\bibliographystyle{elsarticle-harv}
+\bibliographystyle{cas-model2-names}
 \bibliography{references,zotero-meem-refs}
 
 \end{document}
-
-\endinput
