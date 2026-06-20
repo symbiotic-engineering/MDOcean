@@ -394,7 +394,7 @@ main() {
   echo
   echo "Choose workflow:"
   echo "  1) Getting GitHub changes into Overleaf"
-  echo "  2) Making changes on Overleaf and getting them onto GitHub"
+  echo "  2) Making changes on Overleaf and getting them onto GitHub - this will also push GitHub changes to Overleaf"
   echo "  q) Quit"
 
   local workflow
