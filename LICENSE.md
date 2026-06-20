@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 Cornell University
+Copyright (c) 2022-2026 Rebecca McCabe and Cornell University
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
