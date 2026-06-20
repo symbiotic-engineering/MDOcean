@@ -116,7 +116,7 @@ The physical and modeling basis for each requirement such as the underlying geom
 \fi
 
 \ifdefined\DISSERTATION
-    Requirements are ordered by priority in \cref{remdo:tab:requirements}, and within priority grouped by enforcement mechanism.
+    Requirements are ordered by priority in \Cref{remdo:tab:requirements}, and within priority grouped by enforcement mechanism.
     They include direct geometric relations among float, column, plate, and seafloor dimensions to prevent overlap (\reqref{float_spar_diam}, \reqref{float_in_out_diam}, \reqref{float_spar_draft}, \reqref{damping_plate_thickness}, \reqref{float_stiffener_height}), numerical overflow (\reqref{float_seafloor_overflow}, \reqref{spar_seafloor_overflow}), deviation from the truncated-cone shape (\reqref{float_base_diameter}, \reqref{float_draft}), submersion below the waterplane (\reqref{float_submergence}), and violation of dynamic assumptions (\reqref{spar_similarity}, \reqref{spar_damping_ratio});
     a power criterion ensuring net energy generation (\reqref{positive_net_power});
     height conditions for valid float-spar positioning in the static case (\reqref{clearance_static}, \reqref{tops_static}, \reqref{base_static}) and in operational seas (\reqref{tops_dynamic}, \reqref{base_dynamic}, \reqref{clearance_dynamic});
@@ -124,7 +124,7 @@ The physical and modeling basis for each requirement such as the underlying geom
     buoyancy measures ensuring the float and spar float and can be ballasted (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics});
     eight structural factors of safety (\reqref{FOS}); a stability measure preventing tipping (\reqref{GM});
     equality of maximum experienced and rated powertrain force and power to avoid oversized PTO components (\reqref{force_max}, \reqref{P_max});
-    and a maximum LCOE constraint required for the epsilon-constraint procedure of \cref{remdo:sec:multi-obj-process} (\reqref{LCOE}).
+    and a maximum LCOE constraint required for the epsilon-constraint procedure of \Cref{remdo:sec:multi-obj-process} (\reqref{LCOE}).
     Note that \reqref{base_static} dominates \reqref{float_spar_draft}, making the latter unnecessary to implement independently.
 \else
     The requirements span geometric relations preventing overlap, numerical overflow, shape deviation, submersion, and dynamic-assumption violation (\reqref{float_spar_diam}--\reqref{spar_similarity});
@@ -133,7 +133,7 @@ The physical and modeling basis for each requirement such as the underlying geom
     buoyancy and ballast feasibility (\reqref{float_hydrostatics}, \reqref{spar_hydrostatics});
     eight structural factors of safety (\reqref{FOS}); pitch stability (\reqref{GM});
     powertrain rating equality to avoid oversizing (\reqref{force_max}, \reqref{P_max});
-    and a maximum-LCOE constraint for the epsilon-constraint procedure of \cref{remdo:sec:multi-obj-process} (\reqref{LCOE}). 
+    and a maximum-LCOE constraint for the epsilon-constraint procedure of \Cref{remdo:sec:multi-obj-process} (\reqref{LCOE}). 
     \reqref{base_static} dominates \reqref{float_spar_draft}, so the latter need not be implemented independently.
 \fi
 
@@ -156,9 +156,9 @@ The encoding of a physical design space into optimization design variables is no
 \fi
 
 This logic is repeated for the remaining design variables and requirements.
-After several formulation iterations, the design variable and parameter definitions in \cref{remdo:tab:design-vars,remdo:tab:parameters} emerged as effective.
+After several formulation iterations, the design variable and parameter definitions in \Cref{remdo:tab:design-vars,remdo:tab:parameters} emerged as effective.
 The 12 design variables represent 5 bulk dimensions, 2 generator ratings, and 5 structural dimensions (3 thicknesses and 2 stiffener heights).
-Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
+Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
 
 \begin{table}[ht]
 \setlength\tabcolsep{1.5pt} % make less wide
@@ -185,7 +185,7 @@ Referring back to \cref{remdo:tab:lit}, this study is the most comprehensive WEC
 \end{center}
 \end{table}
 
-The parameters in \cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
 \ifdefined\DISSERTATION
     Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
     Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2026}.
@@ -233,12 +233,12 @@ $F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\
 \end{tabular}
 \end{table}
 
-Returning to \cref{remdo:tab:requirements}, the enforcement column shows that this encoding successfully avoids nonlinear constraints for all priority 1 requirements and all but one priority 2 requirement, helping prevent model errors while facilitating convergence.
-A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints; the eight linear inequality constraints are given in matrix form in \cref{remdo:sec:appendix-linear-constraints}.
+Returning to \Cref{remdo:tab:requirements}, the enforcement column shows that this encoding successfully avoids nonlinear constraints for all priority 1 requirements and all but one priority 2 requirement, helping prevent model errors while facilitating convergence.
+A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints; the eight linear inequality constraints are given in matrix form in \Cref{remdo:sec:appendix-linear-constraints}.
 
 \ifdefined\DISSERTATION
     Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters.
-    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \cref{remdo:sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
+    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \Cref{remdo:sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
     While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else

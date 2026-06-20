@@ -6,7 +6,7 @@ It considers both operational and storm design load cases.
 The structures module takes in these loads along with bulk dimensions and structural thicknesses to calculate the stress and factor of safety to various failure criterion.
 Finally, the economics module calculates the PTO and structural capital costs from generator ratings and material usage respectively, and combines it with the power matrix to estimate the levelized cost of energy.
 
-The extended design structure matrix (XDSM) diagram in \cref{remdo:fig:n2} illustrates the functional interfaces between modules.
+The extended design structure matrix (XDSM) diagram in \Cref{remdo:fig:n2} illustrates the functional interfaces between modules.
 XDSM diagrams are standard in MDO, with more details available in \cite{lambe_extensions_2012}.
 Variables above and below each module are inputs, and variables to the left and right are outputs.
 Design variables are shown in the first row.
@@ -47,7 +47,7 @@ The WecOptTool control co-optimization software pursues the SAND strategy by col
 
 Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
 In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
-As \cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
+As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
 This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
 For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
 Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
@@ -71,7 +71,7 @@ Depending on whether a user adds additional design variables to the existing pse
 For MDOcean, we choose the implicit-MDF architecture.
 Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
 This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{remdo:sec:model} will detail.
+Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \Cref{remdo:sec:model} will detail.
 
 \begin{figure}[htbp]
 \centering

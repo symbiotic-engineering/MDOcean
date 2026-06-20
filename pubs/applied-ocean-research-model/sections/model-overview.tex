@@ -51,7 +51,7 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     
     Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
     In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
-    As \cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
+    As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
     This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
     For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
     Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
@@ -75,7 +75,7 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     For MDOcean, we choose the implicit-MDF architecture.
     Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
     This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-    Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{sec:mod-freq-domain} will detail.
+    Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \Cref{sec:mod-freq-domain} will detail.
 \else
     The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
     This improves computational efficiency and is advantageous for optimization.
@@ -101,7 +101,7 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     These control formulations can be combined with both MDF and SAND analysis architectures.
     MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
     The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (\Cref{sec:mod-freq-domain}).
-    It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\cref{sec:sim-runtime}).
+    It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
     Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in [dissertation chapter].
     
     \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the implicit-MDF formulation used in this study highlighted.

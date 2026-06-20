@@ -33,12 +33,12 @@ Thus, a design process that emphasizes techno-economic viability from an early s
     An initial attempt to consolidate a multidisciplinary WEC design process, though without optimization, was the Reference Model Project.
     From 2010 to 2014, the U.S.\ Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \cite{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
     The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
-    The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, with labeled dimensions shown in \cref{fig:dims}.
+    The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, with labeled dimensions shown in \Cref{fig:dims}.
     The float oscillates up and down with oncoming incident waves while the spar stays mostly stationary, and electrical power is produced from this relative heave motion.
     RM3 has received considerable research attention in the decade since the original report was published.
     The present study builds on that work and presents a multidisciplinary techno-economic simulation of the RM3.
 \else
-    This paper builds on the U.S.\ Department of Energy's Reference Model Project, specifically the third reference model (RM3) \cite{RM3}: a two-body point-absorber WEC designed for Humboldt Bay, California, comprising a surface float and a spar with a subsurface damping plate (\cref{fig:dims}).
+    This paper builds on the U.S.\ Department of Energy's Reference Model Project, specifically the third reference model (RM3) \cite{RM3}: a two-body point-absorber WEC designed for Humboldt Bay, California, comprising a surface float and a spar with a subsurface damping plate (\Cref{fig:dims}).
     Electrical power is produced from the relative heave motion of the float against the spar.
 \fi
 
@@ -82,7 +82,7 @@ Major modeling choices include the representation (or lack thereof) of the WEC's
 % table summary
 \ifdefined\DISSERTATION
     Major modeling choices include the representation (or lack thereof) of the WEC's hydrodynamics, dynamics, controls, mooring, powertrain, structures, and economic viability, as well as the sea states considered.
-    After examining the overall trends in \cref{tab:lit}, each table entry will be described in more detail.
+    After examining the overall trends in \Cref{tab:lit}, each table entry will be described in more detail.
     Point absorbers (PA) seem to be the most common device architecture, though most major device types are represented, and several studies optimize arrays of multiple devices.
     Nearly all model hydrodynamics and power production in some way.
     Hydrodynamic modeling is typically performed with the boundary element method (BEM), occasionally with semi-analytical models like matched eigenfunction expansion method (MEEM), and rarely with high fidelity computational fluid dynamics (CFD), fitting a model to numerical or experimental data (FIT), or algebraic approximations (ALG).
@@ -182,7 +182,7 @@ This work & 2-PA & MEEM & DF & F+ & PI+ & - & DY & AN & STR, PTO & REG+, STO \\
 
 \hline 
 \caption{Comparison of the disciplinary scope and fidelity of optimization-relevant WEC models.
-See \cref{fig:model-taxonomy} for abbreviations. * in type column means array effects from multiple interacting devices are modeled.}
+See \Cref{fig:model-taxonomy} for abbreviations. * in type column means array effects from multiple interacting devices are modeled.}
 \label{tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
@@ -253,12 +253,12 @@ See \cref{fig:model-taxonomy} for abbreviations. * in type column means array ef
 
     A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} identified that industry-wide needs broadly include using state-of-the-art computation; overcoming limitations of existing software; ensuring appropriate language, architecture, and license of new software; accessing data; and ensuring usability and accuracy of free open source software.
     Specifically, relevant gaps include tools for powertrain and controls modeling, co-design, and optimization; high-fidelity models with faster runtime and low/mid-fidelity models with higher accuracy; inter-operabilty of models across disciplines and fidelities; and data for verification and validation \cite{ruehl_next-generation_2023}.
-    This lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization helps explain why no optimization study in \cref{tab:lit} simultaneously optimizes the device geometry, structures, and powertrain.
+    This lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization helps explain why no optimization study in \Cref{tab:lit} simultaneously optimizes the device geometry, structures, and powertrain.
 \else
     The two leading open-source WEC simulation tools illustrate the gap.
     WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations (NEMOH/Capytaine for hydrodynamics, PTO-Sim for powertrain, MoorDyn for mooring), but is too slow for large-scale optimization \cite{housner_numerical_2024}.
     WecOptTool \cite{coe_initial_2020} is a faster pseudospectral tool suitable for control co-design but currently limited to hydrodynamics and control.
-    A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
+    A 2023 marine energy software assessment \cite{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \Cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
     
     Existing studies therefore tend to sacrifice either disciplinary breadth or computational tractability: high-fidelity multidisciplinary models are generally too expensive for large-scale optimization, while optimization-oriented models often omit structures, powertrain dynamics, or economic assessment.
     This tradeoff motivates the development of a computationally efficient framework capable of concurrently capturing the major techno-economic couplings governing WEC performance.
@@ -292,7 +292,7 @@ For early-stage WEC design optimization, where the model must be run many thousa
     This is especially true if the models are closed-source, preventing others besides the model authors from using them.
     In the context of WECs, low practical realism usually means studies are limited to mechanical power production, without considering cost and realistic constraints, or perhaps using volume or surface area as a cost proxy.
     The design studies with high practical realism tend to use numerical models instead.
-    As the literature review in \cref{tab:lit} revealed, the high computational cost of the numerical models means that often a study is either multidisciplinary without optimization \cite{RM3,mi_multi-scale_2025}, or performs optimization for a single discipline, such as controls, powertrain, or structures, not all at once.
+    As the literature review in \Cref{tab:lit} revealed, the high computational cost of the numerical models means that often a study is either multidisciplinary without optimization \cite{RM3,mi_multi-scale_2025}, or performs optimization for a single discipline, such as controls, powertrain, or structures, not all at once.
 
     Of the few studies that perform multidisciplinary optimization, those that use numerical models take many hours to run, especially when using heuristic optimizers, preventing designers from iterating quickly.
     For example, the BEM-based 4-WEC array optimization in the study \cite{khanal_multi-objective_2024} took 36 hours to run on a high-end workstation for only a single frequency.
@@ -322,11 +322,11 @@ For early-stage WEC design optimization, where the model must be run many thousa
 \fi
 
 \ifdefined\DISSERTATION
-    In \cref{sec:model-structure}, the research objective and design scope are first used to define a broad problem formulation and module decomposition.
-    Next, \cref{sec:modules} describes the construction of the simulation model.
+    In \Cref{sec:model-structure}, the research objective and design scope are first used to define a broad problem formulation and module decomposition.
+    Next, \Cref{sec:modules} describes the construction of the simulation model.
     It develops the assumptions, analysis method, and implementation details of each module based on the appropriate balance of accuracy and speed.
     \Cref{sec:validation-benchmarking} discusses model validation and runtime benchmarking.
-    Finally, \cref{sec:discussion} showcases results from model sweeps and insights from the model structure.
+    Finally, \Cref{sec:discussion} showcases results from model sweeps and insights from the model structure.
 \else
     \Cref{sec:model-structure} introduces MDOcean's modular structure and the rationale behind its analysis architecture.
     \Cref{sec:modules} develops each module -- geometry, hydrodynamics, dynamics and control, structures, and economics -- documenting the assumptions, analysis methods, and implementation choices.
