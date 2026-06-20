@@ -105,7 +105,11 @@ Major modeling choices include the representation (or lack thereof) of the WEC's
 \fi
 
 %Need to copy sources over from slide 27 and 35 of F24 reseach slides with original charts (with color)
-\clearpage
+\ifdefined\DISSERTATION
+    \clearpage
+\else
+    \onecolumn
+\fi
 \begin{longtable}{
     >{\centering\arraybackslash}p{0.045\linewidth}|
     >{\centering\arraybackslash}p{0.081\linewidth}|
@@ -182,6 +186,10 @@ See \cref{fig:model-taxonomy} for abbreviations. * in type column means array ef
 \label{tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
+\ifdefined\DISSERTATION
+\else
+    \twocolumn
+\fi
 
 % Per-study paragraphs
 \ifdefined\DISSERTATION
@@ -306,7 +314,7 @@ For early-stage WEC design optimization, where the model must be run many thousa
     The contributions are:
     \begin{itemize}
         \item integration of semi-analytical models from hydrodynamics, dynamics, control, structures, and economics in a single framework suitable for optimization;
-        \item a modified frequency-domain dynamics formulation that extends prior describing-function and constrained-control approaches with an analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller, with a geometric interpretation on the complex reflection-coefficient plane;
+        \item a linearized pseudo-spectral dynamics formulation that extends prior describing-function and constrained-control approaches with an analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller, with a geometric interpretation on the complex reflection-coefficient plane;
         \item validation against WEC-Sim and the RM3 reference design across power, structural, and economic outputs; and
         \item demonstration of computational performance (\resultsAOR[simRuntime] simulation runtime) enabling optimization studies that are otherwise infeasible. 
     \end{itemize}

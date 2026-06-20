@@ -198,30 +198,30 @@ To ensure physical consistency, the added mass and damping matrices are required
 This subsection introduces the dynamics and control modeling assumptions before detailing the frequency-domain methods and control formulations.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Modified Frequency Domain Techniques}
+\subsubsection{linearized pseudo-spectral Techniques}
 \label{sec:mod-freq-domain}
 
 \ifdefined\DISSERTATION
-    Methods for WEC dynamics and control simulation in an optimization context were reviewed in \cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
+    Methods for WEC dynamics and control simulation in an optimization context were reviewed in \cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
     In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
-    This section describes both the technical concept and the practical rationale for the choice of a modified frequency domain method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
+    This section describes both the technical concept and the practical rationale for the choice of a linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
     Inherent nonlinearities such as drag significantly affect the amplitude and power production at resonance.
     Even with linearized intrinsic dynamics, maintaining optimality subject to dynamic constraints also requires a nonlinear controller.
     Dynamic constraints on amplitude, force, and peak power significantly influence the trade-off of power and cost, and amplitude limits are required to obtain a physically meaningful result.
     Besides nonlinearities, MDOcean also requires a low computation cost, since the dynamics will be evaluated many thousands of times during optimization.
-    Of the methods mentioned, Pontryagin's maximum principle (PMP) and modified frequency domain techniques meet these requirements.
+    Of the methods mentioned, Pontryagin's maximum principle (PMP) and linearized pseudo-spectral techniques meet these requirements.
     PMP requires an analytically difficult derivation unique to the specific nonlinearities in question because wave energy dynamics have a particular form requiring so-called singular control \cite{zou_optimal_2017}.
-    On the other hand, modified frequency domain techniques are simple and intuitive.
-    Therefore, MDOcean pursues a quasi-linear semi-analytical modified frequency domain method.
+    On the other hand, linearized pseudo-spectral techniques are simple and intuitive.
+    Therefore, MDOcean pursues a quasi-linear semi-analytical linearized pseudo-spectral method.
 \else
     Standard linear frequency-domain WEC analysis assumes monochromatic wave forcing and linear dynamics, enabling closed-form impedance-matched optimal control.
     However, real WECs are subject to (i) dynamic constraints (e.g., generator force, power, and stroke limits) and (ii) nonlinear forces, particularly viscous drag.
     Time-domain simulation handles both naturally but is computationally expensive, especially in an optimization loop.
     Pseudo-spectral methods handle constraints by collocating dynamic equations within an optimization, but require an outer numerical optimizer for control synthesis.
 \fi
-MDOcean adopts a modified frequency-domain approach that retains the speed of frequency-domain analysis while handling both constraints and drag nonlinearities.
+MDOcean adopts a linearized pseudo-spectral approach that retains the speed of frequency-domain analysis while handling both constraints and drag nonlinearities.
 This formulation seeks to preserve the computational advantages of classical frequency-domain analysis while extending its applicability to practical WEC operating regimes that include saturation, drag, and dynamic constraints.
 Two techniques are combined: (a) describing functions, which quasi-linearize a nonlinear waveform by retaining only its fundamental harmonic, and (b) an analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller, exploiting the low dimensionality of the monochromatic problem.
 The analytical structure of the monochromatic problem permits many constrained-control solutions to be obtained without iterative numerical optimization, substantially reducing computational cost in large parametric studies.
@@ -232,7 +232,7 @@ The analytical structure of the monochromatic problem permits many constrained-c
     \resizebox{0.5\linewidth}{!}{%
     \includegraphics{figs/from-matlab/control_method_venn_diagram.pdf}
     }
-    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's modified frequency domain approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
+    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's linearized pseudo-spectral approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
 See text for a description of each acronym.}
     \label{fig:venn-diagram}
 \end{figure}
@@ -257,7 +257,7 @@ See text for a description of each acronym.}
     It can also be thought of as the combination of describing functions with constrained impedance matching.
 \fi 
 
-\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, the plant, or both are nonlinear).
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the linearized pseudo-spectral method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, the plant, or both are nonlinear).
 
 MDOcean uses the linearized pseudo-spectral method for both control synthesis and evaluation.
 In prior wave energy studies (see \Cref{tab:lit}), related linearized pseudo-spectral approaches have primarily been used for evaluation, often with simplified treatments of constraints.
@@ -290,7 +290,7 @@ Method M3 can in general only be used for evaluation, although in the special ca
 
 \begin{table}[htbp]
 \centering
-\caption{Constraint Satisfaction Approaches for Modified Frequency Domain Methods}
+\caption{Constraint Satisfaction Approaches for linearized pseudo-spectral Methods}
 \label{tab:constraint-approaches}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.6\linewidth}l l}
 \textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \hline
@@ -303,14 +303,14 @@ Method M3 can in general only be used for evaluation, although in the special ca
 \end{table}
 
 % --- M1 ---
-The modified frequency-domain approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
+The linearized pseudo-spectral approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
 This synthesis can occur in a number of ways.
 \ifdefined\DISSERTATION
-    If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of the modified frequency-domain linearization in the control synthesis step (\cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\cref{fig:mod-freq-domain-evaluation}).
+    If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of the linearized pseudo-spectral linearization in the control synthesis step (\cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\cref{fig:mod-freq-domain-evaluation}).
     This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \cite{zou_optimal_2017}) or analytical time-integration (as in the method of \cite{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
     For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization, and then adjusting it to be nonlinear using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
-    This approach (M1.2) should be considered the primary formulation of the modified frequency domain method, and the other approaches (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of this method with varying levels of accuracy and optimality.
+    This approach (M1.2) should be considered the primary formulation of the linearized pseudo-spectral method, and the other approaches (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of this method with varying levels of accuracy and optimality.
     In either case (M1.1 and M1.2), the nonlinear controller is linearized via the describing function method.
 \else
     For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
@@ -339,10 +339,10 @@ If neither a numerical nor an analytical implementation is available to identify
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
+    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common linearized pseudo-spectral method in the marine energy field.
 \else
     This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
-    and is the most common modified frequency-domain method in the marine energy field.
+    and is the most common linearized pseudo-spectral method in the marine energy field.
 \fi
 It is utilized here for the power limit.
 
@@ -388,7 +388,7 @@ MDOcean uses iteration to handle both the drag force and control force nonlinear
 The former encodes the describing function formula directly into the simulation (see derivation in \cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \cref{sec:appendix-force-sat}).
 
 \ifdefined\DISSERTATION
-    This is possible because the describing function modified frequency domain method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \cref{fig:mod-freq-domain-synthesis} is fed into the top left of \cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
+    This is possible because the describing function linearized pseudo-spectral method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \cref{fig:mod-freq-domain-synthesis} is fed into the top left of \cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
     Unless intentionally made different to study robustness, the linearized plant model is identical for the synthesis and evaluation steps.
     In this case, two workflows essentially become one, with no further computation required after the optimal control step.
     Reconstruction of the nonlinear controller is not necessary for the evaluation of the power corresponding to that controller.
@@ -404,7 +404,7 @@ MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabl
 %%%%%%%%%%%%%%%
 \subsubsection{Equation of Motion}\label{sec:eom}
 \ifdefined\DISSERTATION
-    Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
+    Before applying the linearized pseudo-spectral method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
     Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
     The MDOcean dynamic model combines the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
