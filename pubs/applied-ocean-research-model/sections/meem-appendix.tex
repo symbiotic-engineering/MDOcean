@@ -10,7 +10,7 @@ The computation involves splitting the fluid domain into regions, approximating 
 \subsection{Linear Hydrodynamics and Eigenfunctions}
 The dynamics of a floating body in water waves are well-described by linear potential flow theory, a simplification of the Navier-Stokes equation.
 This theory states that the fluid velocity field is the gradient of some complex potential $\phi$, $\vec{v}=\nabla\phi$, and $\phi$ satisfies the Laplace equation, $\nabla^2\phi=0$.
-Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in reference \cite{chatjigeorgiou_analytical_2018} yields a boundary value problem.
+Adding the free surface condition, far-field or incident waves, and body surface and sea-bed conditions detailed in \citet{chatjigeorgiou_analytical_2018} yields a boundary value problem.
 When boundary conditions correspond to the heave radiation problem (body moving vertically, no incident waves), solving for the potential $\phi(r,\theta,z)$ determines the heave added mass and damping $A_h$ and $B_h$, hereafter ``hydro coefficients.”
 
 For appropriate geometries, the partial differential equation is separable and $\phi$ can be expressed as the product of radial, vertical, and circumferential basis functions called eigenfunctions.
@@ -291,7 +291,7 @@ $
 \label{sec:appendix-meem-matching}
 
 The eigencoefficients must be selected to enforce the radial velocity body boundary condition and the matching of the potentials and radial velocities at the edges of each region, earning this technique the name Matched Eigenfunction Expansion Method (MEEM).
-The radiation problem was first solved this way for a floating cylinder in 1980 \cite{yeung_added_1981}.
+The radiation problem was first solved this way for a floating cylinder in 1980 \citep{yeung_added_1981}.
 
 First, the infinite sums in $\phi_h$ must be truncated.
 Assuming truncation to $N$ terms in \textit{i1}, $M$ terms in \textit{i2}, and $K$ terms in \textit{e}, the total number of eigencoefficients to solve for is $N+2M+K$.
@@ -372,7 +372,7 @@ $\\ \hline
 The dense blocks contain coupling integrals $\boldsymbol{\mathcal{Z}}$ of the vertical eigenfunctions.
 
 Of the sixteen blocks that make up the matrix, six are diagonal, four are zero, and six are dense, resulting in the sparsity pattern shown in \Cref{fig:sparsity}.
-An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in reference \cite{chau_inertia_2012}. 
+An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in \citet{chau_inertia_2012}. 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_sparsity.pdf}
@@ -484,13 +484,13 @@ The hydrostatic stiffness $K_h$ and the excitation coefficient $\gamma$ are calc
    \angle \gamma = -\frac{\pi}{2} + \angle\frac{ B_{k=0}^e}{\textrm{H}_0^{1}(m_0 a_2)},\quad
     K_h       = \rho_w g A_w  % hydrostatic stiffness
 \end{equation}
-where $g$ is the acceleration due to gravity, $\rho_w$ is the density of water, $m_0$ is the wavenumber, $V_g$ is the finite depth group velocity, $\textrm{H}_0^1$ is the zeroth-order Hankel function of the first kind, and $A_w= \frac{\pi}{4} (D_f^2 - D_s^2)$ is the waterplane area \cite{newman}.
+where $g$ is the acceleration due to gravity, $\rho_w$ is the density of water, $m_0$ is the wavenumber, $V_g$ is the finite depth group velocity, $\textrm{H}_0^1$ is the zeroth-order Hankel function of the first kind, and $A_w= \frac{\pi}{4} (D_f^2 - D_s^2)$ is the waterplane area \citep{newman}.
 This method of calculating excitation from damping is the well-known Haskind relation.
 Note that while the excitation magnitude $|\gamma|$ depends on the radiation damping $B_h$ which in turn depends on all the inner region eigencoefficients ($\vec{C}_{m}^{i2}$ for float excitation and $\vec{C}_{1n}^{i1}$ for the spar excitation), the excitation phase $\angle\gamma$ depends only on the first exterior eigencoefficient, $B_{k=0}^e$. 
 
 \subsection{Validation}
 
-Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in reference \cite{chau_inertia_2012}.
+Hydro coefficient results are validated by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in \citet{chau_inertia_2012}.
 Excellent agreement is observed, shown in \Cref{fig:meem-yeung-validation}.
 The results are also experimentally validated in the studies \cite{chau_inertia_2012,son_performance_2016}.
 Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to WAMIT results for RM3 in deep water.
@@ -498,14 +498,14 @@ Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to W
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/meem_validation.pdf}
-    \caption{Nondimensional added mass and damping coefficient validation against \cite{chau_inertia_2012}}
+    \caption{Nondimensional added mass and damping coefficient validation against \citep{chau_inertia_2012}}
     \label{fig:meem-yeung-validation}
 \end{figure}
 
 \subsection{Convergence}
 
 As $N,M,K\rightarrow\infty$, matching quality improves, and hydro coefficients converge toward their true values.
-Previous MEEM papers use $N=M=K=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \cite{chau_inertia_2012}.
+Previous MEEM papers use $N=M=K=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \citep{chau_inertia_2012}.
 We observe that potential matching converges faster than velocity matching.
 \Cref{fig:meem-matching} shows the matching behavior for $N=M=K=11$, where potential matches well but velocity still has noticeable mismatch. 
 \begin{figure}[htbp]
@@ -515,7 +515,7 @@ We observe that potential matching converges faster than velocity matching.
     \label{fig:meem-matching}
 \end{figure}
 
-Hydro coefficient convergence depends on the geometry: the benchmark shallow-water geometry of \cite{chau_inertia_2012} converges to within 0.25\% with only $N=M=K=4$, but RM3 requires $N=M=K>10$, shown in \Cref{fig:meem-convergence}.
+Hydro coefficient convergence depends on the geometry: the benchmark shallow-water geometry of \citep{chau_inertia_2012} converges to within 0.25\% with only $N=M=K=4$, but RM3 requires $N=M=K>10$, shown in \Cref{fig:meem-convergence}.
 There, damping converges well at low frequencies but requires more harmonics at higher frequencies, while added mass has similar convergence across frequencies. 
 \begin{figure}[htbp]
     \centering
@@ -593,7 +593,7 @@ The radial integrals for the c-vector do not require evaluating Bessel functions
 For $N=M=K=10$, the simulation of a single frequency averages \resultsAOR[MEEMRuntime] on the hardware described in \Cref{sec:sim-runtime}.
 \Cref{fig:runtime-hydro} shows the time breakdown.
 Most of the time is spent evaluating Bessel functions, so future code optimization should focus on speeding up Bessel evaluations, such as with lookup tables.
-Reference \cite{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
+\citet{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve can drive computation cost.
 On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer} 
 Thus, MEEM achieves a 10x time reduction over Capytaine.
