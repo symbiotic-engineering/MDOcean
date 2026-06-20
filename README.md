@@ -112,6 +112,7 @@ As exceptions, the following files have been adapted from other code and have di
 - `mdocean/plots/util/hatchfill2.m` and `hatchfill2_demo.m`: BSD-2-Clause
 - `mdocean/plots/util/table2latex.m`: BSD-2-Clause
 - `dev/latex/Paper-Linter/`: MIT License, different copyright holder
+- `pubs/shared/els-cas/`: LaTeX Project Public License v1.3c
 
 ## Dependencies
 
