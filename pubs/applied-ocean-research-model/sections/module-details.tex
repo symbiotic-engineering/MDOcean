@@ -286,7 +286,8 @@ This check can be performed in the frequency domain if the time-domain constrain
 If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state as the frequency-domain linear optimal controller.
 Otherwise, a variety of approaches are possible to address the violated constraint, summarized in \Cref{tab:constraint-approaches} and described below.
 Methods M1 and M2 can be used for both control synthesis and evaluation, while methods M4--M5 can only be used for evaluation since they do not attempt to find a controller that satisfies the constraint.
-Method M3 can in general only be used for evaluation, although in the special case where the only time-domain constraint is on the control force, the method can be used for control synthesis.
+Method M3 can, in general, only be used for evaluation.
+However, in the special case where the only time-domain constraint is on the control force, the method can be used for control synthesis.
 
 \begin{table}[htbp]
 \centering
@@ -641,7 +642,7 @@ To implement the constraints, we create an intentional linear impedance mismatch
 For select constraints where a describing function is available (currently the torque limit), we additionally use nonlinear control to satisfy the limit with less of a power sacrifice (method M1.2 in \cref{tab:constraint-approaches}).
 
 For the linear impedance mismatch, the average electrical power from \cref{eq:power-avg-peak} can be maximized subject to quadratic constraints on the effort and flow variables.
-This is a quadratically constrained quadratic program (QCQP):
+This is a quadratically-constrained quadratic program (QCQP):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
 & \max_{\vec{x} \in \mathbb{C}^2} & p_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{A}_P \vec{x} \\[3pt]
