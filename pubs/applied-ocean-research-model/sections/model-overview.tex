@@ -79,10 +79,11 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     In WecOptTool, the pseudo-spectral optimizer determines the state and control variables for a fixed design without using previously-known optimality conditions.
     Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \citep{coe_initial_2020}.
     
-    For MDOcean, we choose the implicit-MDF architecture.
-    Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+    For MDOcean, we choose the explicit-MDF architecture.
+    Like the implicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
     This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-    Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \Cref{sec:mod-freq-domain} will detail.
+    Explicit-MDF is chosen over implicit-MDF because it avoids the latter's numerical root-finding and is thus faster, as \Cref{sec:mod-freq-domain} will detail.
+    An early version of MDOcean used the implicit-MDF architecture, which is described in \Cref{sec:appendix-qp-numerical} for completeness.
 \else
     The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
     This improves computational efficiency and is advantageous for optimization.
@@ -111,7 +112,7 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
     Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in \cite{mccabe_dissertation_2026}.
     
-    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the implicit-MDF formulation used in this study highlighted.
+    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
 \fi
 
 

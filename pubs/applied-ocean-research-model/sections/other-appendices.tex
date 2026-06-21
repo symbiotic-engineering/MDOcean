@@ -368,26 +368,27 @@ Once all the port variables have been calculated, power at each port can be calc
 This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Indirect Optimal Control Solution Procedure}
-\label{sec:appendix-qp-numerical}
-The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
-The optimality conditions depend on the active set of constraints.
-In the most straightforward case where simply one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint. 
-For example, if only a maximum force constraint exists, the constrained solution has a force $\hat{F}_{p,\text{constr}}$ that is the minimum of the unconstrained force $\hat{F}_{p,\text{unconstrained}}$ and the maximum allowed force fundamental $F_{\text{max}}$:
-\begin{equation}
-\hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
-\end{equation}
-The solver guesses a value of $\Gamma$, calculates the resulting force $\hat{F}_{p,\text{guess}}$, and then uses $\hat{F}_{p,\text{guess}}-\hat{F}_{p,\text{constr}}$ as an error signal to adjust its next guess of $\Gamma$, iterating until the error converges to zero.
-This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\hat{F}_{p,\text{unconstrained}}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\hat{F}_{p,\text{unconstrained}}$ and the system linearization are updated each control iteration).
-MDOcean implements the latter, which simplifies the setup by requiring only one solver.
-Comparing the efficiency of the two approaches is left for future work.
+\ifdefined\DISSERTATION
+    \subsection{Indirect Optimal Control Solution Procedure}
+    \label{sec:appendix-qp-numerical}
+    The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
+    The optimality conditions depend on the active set of constraints.
+    In the most straightforward case where simply one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint. 
+    For example, if only a maximum force constraint exists, the constrained solution has a force $\hat{F}_{p,\text{constr}}$ that is the minimum of the unconstrained force $\hat{F}_{p,\text{unconstrained}}$ and the maximum allowed force fundamental $F_{\text{max}}$:
+    \begin{equation}
+    \hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
+    \end{equation}
+    The solver guesses a value of $\Gamma$, calculates the resulting force $\hat{F}_{p,\text{guess}}$, and then uses $\hat{F}_{p,\text{guess}}-\hat{F}_{p,\text{constr}}$ as an error signal to adjust its next guess of $\Gamma$, iterating until the error converges to zero.
+    This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\hat{F}_{p,\text{unconstrained}}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\hat{F}_{p,\text{unconstrained}}$ and the system linearization are updated each control iteration).
+    MDOcean implements the latter, which simplifies the setup by requiring only one solver.
+    Comparing the efficiency of the two approaches is left for future work.
 
-When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
-In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
-When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
-Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of active set possibilities instead of a continuous control domain as it would be in a direct optimal control method. 
-The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{Nonlinear meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
-
+    When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
+    In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
+    When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+    Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of active set possibilities instead of a continuous control domain as it would be in a direct optimal control method. 
+    The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{Nonlinear meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
+\fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Analytical Quadratic Program for Constrained Power Maximization}
 \label{sec:appendix-qp-solution}
@@ -1029,7 +1030,7 @@ This coincides with the fundamental to peak ratio of a square wave, which is the
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
 For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
 
-The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \Cref{sec:appendix-qp-numerical,sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
+The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \Cref{sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
 %Mathematically, a saturation factor $0< f_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
 %\begin{equation}

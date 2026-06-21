@@ -272,7 +272,7 @@ Avoiding iterative numerical optimization substantially reduces computational co
     It can also be thought of as the combination of describing functions with constrained impedance matching.
 \fi 
 
-\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two application workflows for the QLPS method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the quasi-linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, plant, or both are nonlinear).
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation,fig:mod-freq-domain-combined} distinguish three application workflows for the QLPS method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the quasi-linearized system), evaluation (simulation of an arbitrary controller's power performance, where the controller, plant, or both are nonlinear), and both.
 
 MDOcean uses QLPS for both control synthesis and evaluation.
 In prior wave energy studies, related approaches have been used for evaluation, with simplified treatments of constraints (see F+ and PI+ entries in \Cref{tab:lit}).
@@ -293,6 +293,12 @@ This differs from linearization approaches such as stochastic linearization, whi
     \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_evaluation.pdf}
     \caption{Control evaluation - applies to both (M1.1) and (M1.2).}
     \label{fig:mod-freq-domain-evaluation}
+\end{subfigure}
+\vfill
+\begin{subfigure}[t]{.9\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_combined.pdf}
+    \caption{Combined synthesis and evaluation.}
+    \label{fig:mod-freq-domain-combined}
 \end{subfigure}
 \end{figure*}
 
@@ -693,16 +699,16 @@ The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ enforces the WEC and P
 \begin{aligned}
     \vec{x}_{opt} &=
     \frac{\hat{V}_{s,th}}{2\Re(Z_{s,th})}
-        \begin{bmatrix} Z_{s,th}^* (1+\Gamma) \\ 1-\Gamma \end{bmatrix} \\
-    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
+        \begin{bmatrix} Z_{s,th}^* (1+\Gamma_{\text{opt}}) \\ 1-\Gamma_{\text{opt}} \end{bmatrix} \\
+    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
-where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient.
+where $\Gamma_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
 The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch.
-$\Gamma=0$ corresponds to the impedance-matched solution (no active inequality constraints).
+$\Gamma_{\text{opt}}=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
 \ifdefined\DISSERTATION
-    As \Cref{sec:mod-freq-domain} describes, the solution for $\Gamma$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
+    As \Cref{sec:mod-freq-domain} describes, the solution for $\Gamma_{\text{opt}}$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
     Direct methods solve the optimization problem itself, while indirect methods first derive the optimality conditions and then solve those conditions.
     MDOcean currently implements both the analytical approach, which corresponds to the explicit architecture in \Cref{fig:control-arch}, and the numerical indirect approach, which corresponds to the implicit architecture in \Cref{fig:control-arch}.
     The analytical approach is described in \Cref{sec:appendix-qp-solution}, and the numerical indirect approach in \Cref{sec:appendix-qp-numerical}.
@@ -711,7 +717,9 @@ $\Gamma=0$ corresponds to the impedance-matched solution (no active inequality c
     While the nested architecture solves the quadratic program \Cref{eq:opt-problem}, the simultaneous architecture integrates the QCQP into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation.
     It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is used for all results and benchmarks presented here.
 \else
-    Both analytical and numerical-indirect solutions for $\Gamma$ are implemented in MDOcean and described in \Cref{sec:appendix-qp-solution,sec:appendix-qp-numerical}; the analytical approach has a geometric interpretation as a minimum-distance problem on the complex plane of $\Gamma$ (see \Cref{sec:appendix-qp-solution}) and is used for all results presented here.
+    Both analytical and numerical-indirect solutions for $\Gamma_{\text{opt}}$ are implemented in MDOcean.
+    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\Gamma_{\text{opt}}$ and is used for all results presented here.
+    \citet[Appendix A.3.3]{mccabe_dissertation_2026} describes the numerical-indirect approach.
 \fi
 
 \paragraph{Nonlinear controller}
