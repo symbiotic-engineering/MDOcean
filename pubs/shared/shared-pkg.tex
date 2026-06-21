@@ -16,7 +16,7 @@
 \ifnum\pdf@shellescape=0
   % shell escape is disabled, so don't load bibcop
 \else
-  \usepackage{bibcop}    % warnings for incorrect citations
+  %\usepackage{bibcop}    % warnings for incorrect citations
 \fi
 \makeatother
 
@@ -28,9 +28,9 @@
 \ifdefined\DISSERTATION
   \usepackage[numbers,square]{natbib}    % citep command
 \else
-  \usepackage[numbers]{natbib}             % citep command
+  %\usepackage[numbers]{natbib}             % citep command
 \fi
-\usepackage[unicode,hypertexnames=false]{hyperref}
+\usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
 \usepackage{cleveref}
 
 \newcommand*\rot{\rotatebox{90}} % for rotated table headers
@@ -57,67 +57,67 @@
 
 % allows bibcop to be used when bibliography includes multiple arguments
 \makeatletter
-\AtBeginDocument{%
-\ifnum\pdf@shellescape=0
-  % shell escape is disabled, so don't patch bibcop
-\else
-\ifdefined\bibliography
+% \AtBeginDocument{%
+% \ifnum\pdf@shellescape=0
+%   % shell escape is disabled, so don't patch bibcop
+% \else
+% \ifdefined\bibliography
 
-  \RequirePackage{etoolbox}
+%   \RequirePackage{etoolbox}
 
-  \renewcommand{\bibliography}[1]{%
-    \def\bibcop@list{#1}%
-    \@for\bibcop@file:=\bibcop@list\do{%
-      \edef\bibcop@file{\bibcop@file}%
-      \ifx\bibcop@file\@empty\else
-        \expandafter\bibcop@processbib\expandafter{\bibcop@file}%
-      \fi
-    }%
-    \bibcop@truebibliography{#1}%
-  }
+%   \renewcommand{\bibliography}[1]{%
+%     \def\bibcop@list{#1}%
+%     \@for\bibcop@file:=\bibcop@list\do{%
+%       \edef\bibcop@file{\bibcop@file}%
+%       \ifx\bibcop@file\@empty\else
+%         \expandafter\bibcop@processbib\expandafter{\bibcop@file}%
+%       \fi
+%     }%
+%     \bibcop@truebibliography{#1}%
+%   }
 
-  \newcommand{\bibcop@processbib}[1]{%
-    % trim spaces
-    \edef\bibcop@file{\zap@space#1 \@empty}%
+%   \newcommand{\bibcop@processbib}[1]{%
+%     % trim spaces
+%     \edef\bibcop@file{\zap@space#1 \@empty}%
 
-    % skip empty entries
-    \ifx\bibcop@file\@empty
-      \relax
-    \else
+%     % skip empty entries
+%     \ifx\bibcop@file\@empty
+%       \relax
+%     \else
 
-      % build .bib filename
-      \edef\bibcop@bibfile{\bibcop@file.bib}%
+%       % build .bib filename
+%       \edef\bibcop@bibfile{\bibcop@file.bib}%
 
-      % use kpsewhich to resolve path using BIBINPUTS
-      \immediate\write18{kpsewhich \bibcop@bibfile > aux/\jobname.bibcop.tmp}%
+%       % use kpsewhich to resolve path using BIBINPUTS
+%       \immediate\write18{kpsewhich \bibcop@bibfile > aux/\jobname.bibcop.tmp}%
 
-      % read result
-      \begingroup
-        \endlinechar=-1
-        \newread\bibcop@in
-        \openin\bibcop@in=aux/\jobname.bibcop.tmp
-        \read\bibcop@in to \bibcop@resolved
-        \closein\bibcop@in
-        \xdef\bibcop@resolved{\bibcop@resolved}%
-      \endgroup
+%       % read result
+%       \begingroup
+%         \endlinechar=-1
+%         \newread\bibcop@in
+%         \openin\bibcop@in=aux/\jobname.bibcop.tmp
+%         \read\bibcop@in to \bibcop@resolved
+%         \closein\bibcop@in
+%         \xdef\bibcop@resolved{\bibcop@resolved}%
+%       \endgroup
 
-      % fallback if kpsewhich fails
-      \ifx\bibcop@resolved\@empty
-        \edef\bibcop@resolved{\bibcop@bibfile}%
-      \fi
+%       % fallback if kpsewhich fails
+%       \ifx\bibcop@resolved\@empty
+%         \edef\bibcop@resolved{\bibcop@bibfile}%
+%       \fi
 
-      % call original bibcop
-      \begingroup
-        \edef\x{\endgroup
-          \noexpand\bibcop@exec{\bibcop@resolved}%
-        }%
-      \x
+%       % call original bibcop
+%       \begingroup
+%         \edef\x{\endgroup
+%           \noexpand\bibcop@exec{\bibcop@resolved}%
+%         }%
+%       \x
 
-    \fi
-  }
-\fi
-\fi
-}
+%     \fi
+%   }
+% \fi
+% \fi
+% }
 
 \AddToHook{cmd/appendices/before}{%
   \crefalias{section}{appendix}%
