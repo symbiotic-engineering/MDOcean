@@ -34,7 +34,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 \fi
 
 \paragraph{Best Design as a function of Wave Environment}
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \begin{subfigure}[t]{0.48\linewidth}
         \includegraphics[width=\linewidth]{figs/from-matlab/sweep_geoms_line.pdf}
@@ -49,7 +49,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
     \end{subfigure}
     \caption{Effect of wave environment and hydrodynamic design variables on (a) radiation efficiency and (b) capture width ratio}
     \label{fig:meem-sweep-m0h}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     Starting with \Cref{fig:meem-sweep-eff}, we observe that the most efficient design depends on the frequency-depth regime $m_0h$ of the wave environment, shown on the x-axis.
@@ -77,7 +77,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\linewidth]{figs/from-matlab/sweep_geoms_pareto_nondim.pdf}
+    \includegraphics[width=.9\linewidth]{figs/from-matlab/sweep_geoms_pareto_nondim.pdf}
     \caption{Effect of hydrodynamic design variables on radiation efficiency and power per unit surface area}
     \label{fig:meem-sweep-pareto}
 \end{figure}
@@ -88,7 +88,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 This is because the same force has a lower lever arm to the column and therefore creates less bending moment.
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\linewidth]{figs/from-matlab/damping_plate_aspect_ratio.pdf}
+    \includegraphics[width=.85\linewidth]{figs/from-matlab/damping_plate_aspect_ratio.pdf}
     \caption{Normalized effect of damping plate aspect ratio on maximum stress and deflection.
 The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     \label{fig:damping-plate-maxs}
@@ -139,7 +139,7 @@ We next move to a simultaneous sweep of both the force limit and the power limit
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=.8\linewidth]{figs/from-matlab/pto_sweep.pdf}
+\includegraphics[width=.9\linewidth]{figs/from-matlab/pto_sweep.pdf}
 \caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and LCOE}
 \label{fig:force-power-limit-sweep}
 \end{figure}
@@ -153,7 +153,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     The theoretical analysis in \Cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
     Convexity suggests that local optimization methods should be effective for finding the optimal PTO design.
 \else
-    Power and LCOE both appear to be convex with respect to the force and power limits across the feasible region, a structural property exploited by the optimization strategy in the companion paper \citep{mccabe_leveraging_2026}.
+    Power and LCOE both appear to be convex with respect to the force and power limits across the feasible region, a structural property that future optimizations can exploit.
 \fi
 
 %%%%%%%%%%%%%%%%%%%
@@ -172,7 +172,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
+\includegraphics[width=.9\linewidth]{figs/from-matlab/experiments_ratios.pdf}
 \caption{Design of experiments}\label{fig:experiments}
 \end{figure}
 
@@ -211,6 +211,8 @@ Explicit definitions are given in \Cref{sec:appendix-power-decomposition}.
 
 This multiplicative decomposition allows isolation of the effect of each design variable and parameter on power, intuitively identifying which design variables are most important for improving power.
 \Cref{tab:power-matrix-dependence} maps the dependence explicitly.
+{
+\renewcommand{\arraystretch}{1.35}
 \begin{table}[h]
 \centering
 \caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
@@ -225,6 +227,7 @@ $\mathbf{\eta}^{H,T}_{\text{elec}}$  & $\checkmark$ & $\checkmark$ & $\checkmark
 \hline
 \end{tabular}
 \end{table}
+}
 
 \ifdefined\DISSERTATION
     Importantly, the later matrices in the product depend on the design variables and parameters that affect the earlier matrices.
@@ -243,12 +246,12 @@ $\mathbf{\eta}^{H,T}_{\text{elec}}$  & $\checkmark$ & $\checkmark$ & $\checkmark
     Low-period sea states achieve higher radiation efficiency, while high-period sea states have lower radiation efficiency but contribute significantly to total production due to their higher energy content; despite the most probable period being 6--8~s, 10~s waves contribute the most to annual energy production \citep{zou_practical_2023}.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/nominal_power_matrix.pdf}
+\includegraphics[width=.95\linewidth]{figs/from-matlab/nominal_power_matrix.pdf}
 \caption{Power matrix decomposition}
 \label{fig:power-matrix-decomposition}
-\end{figure}
+\end{figure*}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
 \ifdefined\DISSERTATION
     Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
@@ -278,19 +281,21 @@ When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the
 The result is:
 \begin{equation}\label{eq:power-double-sum-main}
 \begin{aligned}
-    \overline{P}_{elec} = \overline{P}_{elec,0}
+    \overline{P}_{elec} =~&\overline{P}_{elec,0}
     - \eta \sum_{\mu\nu\beta}
-    &\left[
+    \left[ 
         \sqrt{\textrm{aff}_{\mu\nu\beta}(b_{\mu})}
-        + \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})
+        ~+ \right. \\
+        & \left. \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})
     \right.+
      \\
     &\left.
         \left(\textrm{aff}_{\mu\nu\beta}(b_{\mu}) + \textrm{aff}_{\mu\nu\beta}(b_{\nu})\right)
-        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}
+        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}~
     \right]
 \end{aligned}\end{equation}
 where $\overline{P}_{\text{elec},0}$ is the unconstrained power and $\textrm{aff}_{\mu\nu\beta}$, $\textrm{quad}_{\mu\nu\beta}$ are affine and quadratic functions of $b_\mu$ and $b_\nu$, respectively.
+$\mu$ and $\nu$ are constraint indices, expanded in \Cref{sec:appendix-constraint-sensitivity}.
 
 Under conditions derived in \Cref{sec:appendix-constraint-sensitivity}, this scaling law is convex in the constraint coefficients $b_\mu$.
 While satisfaction of these conditions is not guaranteed, convexity is observed to hold across the PTO sweep of \Cref{fig:force-power-limit-sweep}.
@@ -328,12 +333,12 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
     \Cref{tab:future-work} summarizes potential future improvements to the model, distinguishing between model improvements that would enhance the accuracy or realism of studies that can be conducted with the present model and those that would unlock the ability to answer design questions that the current model cannot.
     This section describes the relevance and possible implementation paths for each development area.
 \else
-    \Cref{tab:future-work} summarizes principal limitations and future work, distinguishing model improvements that would enhance the accuracy of currently-achievable studies from extensions that would unlock new design questions.
+    \Cref{tab:future-work} summarizes principal limitations and future work, distinguishing model improvements to enhance the accuracy of currently-achievable studies from extensions to unlock new design questions.
     MDOcean is open-source \citep{mccabe_mdocean_2024}; community contributions are welcome, and the authors are pursuing the multi-objective RM3 optimization in the companion paper \citep{mccabe_leveraging_2026}.
 \fi
 
 \newcommand{\modelTrustBuilders}{
-    \begin{enumerate}
+    \begin{enumerate}[leftmargin=*]
         \item Surge force and mooring cost
         \item Nonlinear storm wave forces
         \item Irregular waves
@@ -343,7 +348,7 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
 }
 
 \newcommand{\modelStudyEnablers}{
-    \begin{enumerate}
+    \begin{enumerate}[leftmargin=*]
         \item Spectral power, load, amplitude
         \item Different WEC archetypes
         \item Lifetime and sea state contours
@@ -357,8 +362,8 @@ The fact that decreasing a constraint limit causes the numerator of the LCOE to 
 \caption{Future model improvements}
     \label{tab:future-work}
 \begin{tabular}{
-        >{\centering\arraybackslash}p{0.5\linewidth}
-        >{\centering\arraybackslash}p{0.5\linewidth}}
+        >{\raggedright\arraybackslash}m{0.35\linewidth}
+        >{\raggedright\arraybackslash}m{0.5\linewidth}}
 Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
 \modelTrustBuilders                & \modelStudyEnablers \\
     \end{tabular}
@@ -451,7 +456,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     Whether semi-analytical or numerical, extension to other archetypes would require significant development effort but unlock new comparative insights.
 \else
     The most consequential current limitations are:
-\begin{itemize}
+\begin{itemize}[leftmargin=*]
     \item \textbf{Neglect of surge force in the structures module and absence of a mooring cost model.} Surge forces on the nominal RM3 are \resultsAOR[surgeForceFloatNominal] (float) and \resultsAOR[surgeForceSparNominal] (spar), and mooring/foundation accounts for 12\% of CAPEX (\Cref{tab:CBS}); incorporating these would likely affect optimal designs.
     \item \textbf{Regular-wave assumption in storm load cases.} Storm waves are nonlinear, and the regular-wave equivalent cannot capture transient peaks; second-order MEEM \citep{cong_novel_2020,mavrakos_second-order_2009} or the slender-body approximation in RAFT \citep{carmo_slender-body_2025} are candidate extensions.
     \item \textbf{Regular-wave assumption in operational loads.} Stochastic linearization \citep{da_silva_statistical_2020,da_silva_stochastic_2023,kluger_synergistic_2017,folley_spectral-domain_2016,spanos_efficient_2016,neshat_enhancing_2024} could replace the describing function to handle spectral inputs and enable spectral fatigue, grid-integration, and storage-sizing analyses \citep{mccabe_wec_2025}.
