@@ -17,11 +17,12 @@ By plotting the data for a variety of geometries on a single plot and scaling th
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
 |\gamma_s| = \rho g \pi D_s^2/4 |H_0(kR_x)| \exp(-k e_1) kh \alpha \max(1,\alpha) 
-\sqrt{\frac{f(\frac{kh R_x \alpha^3}{\beta R_p})}
-           {\beta(1+\frac{\beta}{\alpha})}}
+\sqrt{\frac{\Upsilon\left(\frac{kh R_x \alpha^3}{\beta R_p}\right)}
+           {\beta\left(1+\frac{\beta}{\alpha}\right)}}
 \end{equation}
-where $f(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\alpha$, $\beta$,  $e_1$, $R_p$, and $R_x$ are dimensions defined in \citet{olaya_hydrodynamic_2015}.
-\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably for the variety of $\alpha$ and $\beta$ values.
+where $\Upsilon(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\alpha$, $\beta$,  $e_1$, $R_p$, and $R_x$ are dimensions and nondimensional ratios defined in \citet{olaya_hydrodynamic_2015}.
+\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably well for the variety of $\alpha$ and $\beta$ values.
+Case numbers in the legend refer to the numerical parameters used by \citet[Section~V.]{olaya_hydrodynamic_2015}
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=.8\linewidth]{figs/from-matlab/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf}
@@ -1260,7 +1261,7 @@ The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
 The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \Cref{eq:eom-freq-domain} and $k$ is the iteration index.
-It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria :
+It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
     \frac{\partial}

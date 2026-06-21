@@ -169,7 +169,7 @@ The excitation term is additionally scaled as $\exp(-k(T_s - T_{s,nom}))$ to acc
 
 Because float and spar coefficients are computed using different approximations, positive definiteness of the hydrodynamic matrices is not guaranteed (see \Cref{sec:appendix-additional-hydro}).
 To ensure physicality, the added mass and damping matrices are required to remain positive definite.
-Any violations are corrected by reducing the coupling terms $A_c$ and $B_c$.
+Any violations are corrected by adjusting the coupling terms $A_c$ and $B_c$.
 
 %  \subsubsection{Spar Dynamics}
 % The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \cite{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
@@ -329,7 +329,7 @@ M5 &Mark design as infeasible& N/A& \Stars{0} \\
 \paragraph{M1: QLPS with nonlinear control}
 The modified frequency-domain approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
 This synthesis can occur in a number of ways.
-If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of QLPS in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
+If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via the Pontryagin Maximum Principle (PMP)) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of QLPS in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
 \ifdefined\DISSERTATION
     This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \cite{zou_optimal_2017}) or analytical time-integration (as in the method of \cite{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
