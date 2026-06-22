@@ -64,12 +64,12 @@ The optimal designs are generally larger than the nominal.
 \subsubsection{Optimal Performance Outputs}
 The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \Cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist}, with numerical results in \Cref{remdo:tab:opt-output}.
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/overlaid_hydro_coeffs.pdf}
 \caption{Hydrodynamic coefficients overlaid}
 \label{remdo:fig:overlaid-hydro}
-\end{figure}
+\end{figure*}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/probability_CDF.pdf}
@@ -115,12 +115,12 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency; their product with the annual hours per sea state yields annual energy production.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
     \caption{Power matrix multiplicative breakdown for minimum LCOE design}
     \label{remdo:fig:power-matrix-opt}
-\end{figure}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Post-Optimality Derivatives}
@@ -261,12 +261,12 @@ This subsection quantifies how parameter and model-assumption changes affect the
 \Cref{remdo:fig:param-sens-J-star-tornado,remdo:fig:param-sens-x-star-tornado,remdo:fig:param-sens-x-star-tornado-2}
 show tornado charts of the highest normalized sensitivities for the objective and design respectively,
 normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in $J^*$ or $x^*$.
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
+    \includegraphics[width=.8\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
     \caption{Tornado chart showing highest objective sensitivities}
     \label{remdo:fig:param-sens-J-star-tornado}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     On the left side of \Cref{remdo:fig:param-sens-J-star-tornado}, the minimum LCOE is highly sensitive to operational wave characteristics,
@@ -611,16 +611,17 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     \Cref{remdo:fig:optim-runtimes} shows the runtime of each optimization and analysis routine, run in parallel on a 14-core server.
     The optimization also runs without issue, though more slowly, on unspecialized machines such as a Windows~10 laptop with MATLAB~R2022a.
 \else
-    \Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+    %\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+    The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
+    The optimization also runs, more slowly, on a commodity laptop.
 \fi
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
-    \caption{Bar chart of optimization and analysis runtimes}
-    \label{remdo:fig:optim-runtimes}
-\end{figure}
-%the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
+%     \caption{Bar chart of optimization and analysis runtimes}
+%     \label{remdo:fig:optim-runtimes}
+% \end{figure}
 
 \ifdefined\DISSERTATION
     Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and \resultsRE[singleObjFcnEvals]~function evaluations (objective and gradient combined).
@@ -630,12 +631,12 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     Each single-objective optimization takes \resultsRE[singleObjRuntime] (\resultsRE[singleObjIters]~iterations, \resultsRE[singleObjFcnEvals]~function evaluations); the Pareto front takes \resultsRE[paretoRuntime]; gradient-based sensitivities run in \resultsRE[gradientSensRuntime] versus \resultsRE[reoptimSensRuntime]~for re-optimization-based ones.
 \fi
 
-\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
+%\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
 %\hl{Analysis is left for during scrutineering.}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{example-image-a}
-    \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
-    \label{remdo:fig:pareto-epsilon-runtime-sweep}
-\end{figure}
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{example-image-a}
+%     \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
+%     \label{remdo:fig:pareto-epsilon-runtime-sweep}
+% \end{figure}
