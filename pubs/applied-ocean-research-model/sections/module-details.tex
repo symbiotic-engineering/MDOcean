@@ -364,7 +364,7 @@ This approach neglects the corresponding effect of the saturation/zeroing on oth
     This simple approach does not require any derivations to implement.
     It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \else
-    This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
+    This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
     and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \fi
 It is utilized here for the power limit.
@@ -382,7 +382,7 @@ The latter approach (M5) is actually the only option for evaluation of slamming 
 %Approach (M5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
 
 \Cref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits and the method MDOcean currently uses to handle each.
-The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
+The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \citep{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
 \ifdefined\DISSERTATION
     In future work, MDOcean could instead utilize describing functions (M1.2) or the optimal constrained linear controller (M2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
 \fi
@@ -526,7 +526,7 @@ The instantaneous time-domain power at any port is simply the product of the por
     The same expression is evaluated at the floating body, PTO, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,q\}$.
 \fi
 
-In the frequency domain assuming sinusoidal waveforms, the active power $P$, reactive power $Q$, complex power $S$, and apparent power $|S|$ from electrical engineering \cite{saadat_power_1999} are
+In the frequency domain assuming sinusoidal waveforms, the active power $P$, reactive power $Q$, complex power $S$, and apparent power $|S|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
     P &= \tfrac{1}{2}\Re(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Re(Z)|\hat{q}|^2,\\
@@ -762,7 +762,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
     In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
     These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 \else
-    The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \cite{quartier_influence_2021}.
+    The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \citep{quartier_influence_2021}.
     Without modeling drag, the predicted resonant amplitude is unrealistically high and power is overestimated.
 \fi
 
@@ -960,7 +960,7 @@ This approximation can either under- or overestimate the true peak depending on 
 \end{tabular}
 \end{table}
 
-The surge force for each component is calculated as \cite{newman_motions_1963}
+The surge force for each component is calculated as \citep{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
    F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (e^{-kz_{\text{top}}}-e^{-kT})
 \end{equation}
@@ -1126,7 +1126,7 @@ Each of the twelve float sections is modeled as a stiffened shell subject to dis
 \fi
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
-The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \cite{previsic_reference_2011}.
+The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \citep{previsic_reference_2011}.
 
 The damping plate is a thin stiffened annular plate subject to a vertical distributed force on its bottom surface, reacted by the welded connection to the column along the column's circumference and by four welded tubular supports.
 \ifdefined\DISSERTATION
@@ -1173,11 +1173,11 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
     The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \else
     The MDOcean economics model captures the scaling of cost with design variables rather than predicting absolute cost.
-    Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
+    Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \fi
 
 Two CBS categories scale with design: structural cost (category 1.4) scales linearly with the volume of structural material $V_{\text{struct}}$, and PTO cost (category 1.5) scales with the peak electrical power $P_{pk,\text{elec}}$ and the force limit $F_{\text{max}}$.
-All other categories are held constant per device but decrease with the number of devices $N_{WEC}$ via a power law calibrated against the CBS estimates for $N_{WEC} = (1, 10, 50, 100)$ \cite{neary_reference_2014}.
+All other categories are held constant per device but decrease with the number of devices $N_{WEC}$ via a power law calibrated against the CBS estimates for $N_{WEC} = (1, 10, 50, 100)$ \citep{neary_reference_2014}.
 
 \ifdefined\DISSERTATION
     Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
@@ -1208,4 +1208,4 @@ where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structur
 The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via a power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
-For consistency with prior references \cite{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
+For consistency with prior references \citep{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
