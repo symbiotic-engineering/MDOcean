@@ -66,7 +66,7 @@
 
 \ifbool{casreviewlayout}{\RequirePackage{setspace}}{}
 
-\RequirePackage[colorlinks]{hyperref}
+\RequirePackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
 \colorlet{scolor}{black}
 \colorlet{hscolor}{DarkSlateGrey}
 \hypersetup{%
