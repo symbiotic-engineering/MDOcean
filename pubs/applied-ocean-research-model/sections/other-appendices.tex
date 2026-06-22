@@ -653,7 +653,7 @@ Therefore, the presence of apparent power constraints makes the optimal control 
 %%%%%%%%%%%%%%%
 \subsubsection{Extension to Higher Dimensions and Convexity}
 \label{sec:appendix-qp-convexity}
-Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study \cite{bacelli_numerical_2015}.
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study by \cite{bacelli_numerical_2015}.
 In the terminology of \Cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
 Both of these cases solve the full harmonic-balance equation, producing a higher-dimensional analog of \Cref{eq:opt-problem-gamma}.
 The problem dimension equals twice the number of frequencies retained in the spectral expansion, preventing the use of the geometric analytical solution used in the monochromatic case.
@@ -674,7 +674,7 @@ Constraints on the effort and flow magnitude (e.g., force limits $|\hat{F}|\leq 
 They show that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
 The quadratic matrices $\mathbf{Q}$ in \Cref{tab:qp-constraints} confirm this: $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
 For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \Cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
-Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
+Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \citep{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
 It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
 
 %%%%%%%%%%%%%%%
@@ -1016,7 +1016,7 @@ but also the derivatives of Th\'{e}venin parameters with respect to bulk dimensi
 because bulk dimensions affect $\mathbf{Q}_\mu, \vec{a}_\mu$, and the unconstrained power through the Th\'{e}venin parameters.
 The sensitivity formula would become significantly more complex and less intuitive with these additional terms, 
 and more importantly, the Th\'{e}venin-to-dimension derivatives are not currently available in MDOcean because they depend on the hydrodynamic coefficient-to-dimension derivatives.
-Application of the adjoint method has recently enabled efficient computation of hydrodynamic coefficient derivatives in the context of a numerical boundary element method solver \cite{khanal_fully_2025}, 
+Application of the adjoint method has recently enabled efficient computation of hydrodynamic coefficient derivatives in the context of a numerical boundary element method solver \citep{khanal_fully_2025}, 
 but the adjoint method has not yet been implemented for the semi-analytical MEEM model used here.
 Implementing the adjoint for a linear solve is relatively straightforward in a multidisciplinary design optimization package like OpenMDAO, 
 and would unlock a fully semi-analytical differentiation workflow.
@@ -1258,7 +1258,7 @@ Comparisons against WEC-Sim confirm that even without strip theory, assuming tha
 \subsubsection{Iterative Solution}
 With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
 The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
-Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
+Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
 The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \Cref{eq:eom-freq-domain} and $k$ is the iteration index.
 It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria:
@@ -1305,7 +1305,7 @@ To prevent slamming, the criteria
 \end{aligned}
 \end{equation}
 must be true at all times and over all positions where the body could exit the waves, $-D/2<y<D/2$.
-Note that this expression assumes a sinusoidal waveshape but still applies for irregular waves if a wave-by-wave approach \cite{lin_fast_2025} is utilized.
+Note that this expression assumes a sinusoidal waveshape but still applies for irregular waves if a wave-by-wave approach \citep{lin_fast_2025} is utilized.
 Manipulating \Cref{eq:slamming-time-domain} to ensure the inequality is satisfied for all $t$ yields the criterion:
 \begin{equation}
 |\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam}^2-\left(\frac{H}{2}\right)^2
@@ -1549,7 +1549,7 @@ The match is excellent in all four cases, confirming that the drag force is inde
 \end{figure}
 
 \subsubsection{Reference Model Report}
-While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, 
+While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, 
 it does record the mechanical power for each sea state.
 \Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
 \begin{figure}[htbp]
@@ -1644,7 +1644,7 @@ The per-WEC unit costs and prices in \Cref{eq:unit-cost} ($C_{\text{fixed}}$, $C
 \end{equation}
 where $C_\infty$ is the asymptotic large-scale unit cost, $C_1$ is the single-unit cost, and $\beta$ is the rate of decrease.
 
-The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained by curve-fitting \Cref{eq:cost-power-law} to the CBS estimates for $N_{WEC} \in \{1, 10, 50, 100\}$ \cite{neary_reference_2014}, and are tabulated in \Cref{tab:econ-model-values}.
+The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained by curve-fitting \Cref{eq:cost-power-law} to the CBS estimates for $N_{WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014}, and are tabulated in \Cref{tab:econ-model-values}.
 
 \begin{table}[h]
     \centering
@@ -1668,8 +1668,8 @@ The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained
 \label{sec:appendix-econ-pto-scaling}
 
 Linear PTO cost scaling is common for WEC techno-economic analysis.
-The RM3 cost numbers \cite{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
-The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \cite{nakhai_techno-economic_2022}.
+The RM3 cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
+The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
 %the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
 % \begin{equation}
 %     C_{gen} = \begin{cases}
@@ -1696,7 +1696,7 @@ The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly l
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
 It outputs a factor of safety for each limit case.
 First, it obtains equivalent section properties based on the plate and stiffener dimensions.
-Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \cite{young_roarks_2001} and the references therein.
+Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \citep{young_roarks_2001} and the references therein.
 Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit-state expressions for each possible failure mode of each major structural element under each design load case.
 For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
@@ -1758,12 +1758,12 @@ The plate buckling coefficient $k_{\text{buckle}}$ is expressed as:
 \begin{equation}\label{eq:k-buckle}
   k_{\text{buckle}} = 4+2\left(1-\psi\right)^3+2\left(1-\psi\right)
 \end{equation}
-This effective breadth procedure follows the American Iron and Steel Institute design manual \cite{american_iron_and_steel_institute_cold-formed_1991}.
+This effective breadth procedure follows the American Iron and Steel Institute design manual \citep{american_iron_and_steel_institute_cold-formed_1991}.
 Rather than enforcing $\lambda<0.673$, corresponding with $\rho_\lambda=1$, MDOcean more flexibly requires $\lambda<0.809$, corresponding to $\rho_\lambda=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
 MDOcean also uses $k_{\text{buckle}}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\lambda$.
 
 Broadening the design space to allow for more dominant stiffeners with higher slenderness factors would require modeling the stiffener-plate system not as a plate with the stiffeners absorbed into an equivalent thickness, but as individual stiffeners with the plate absorbed into the effective breadth.
-That model has other complexities such as the shear lag phenomenon so is left to future extensions \cite{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
+That model has other complexities such as the shear lag phenomenon so is left to future extensions \citep{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
 
 %\hl{Describe how this informs the lower design variable bounds on the structural stiffnesses.}
 
@@ -1777,7 +1777,7 @@ The top and bottom plates are the only ones with external heave loads, arising f
 
 The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \Cref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
-For example, Ref.~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
+For example, reference~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
 They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
 This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{\text{min}}^2$.
 For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{\text{min}}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{\text{min}}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{\text{min}}=b_1$, and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
@@ -1850,7 +1850,7 @@ This results in the following expression for the radial plate bending stress $\s
 \end{equation}
 
 The critical buckling stress $\sigma_{\text{buckle}}$ is found according to \cite{american_bureau_of_shipping_requirements_2022}.
-The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \cite{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
+The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
 The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
 \begin{figure}[htbp]
@@ -1891,7 +1891,7 @@ The Euler critical buckling force $F_{\text{crit}}$ is:
     F_{\text{crit}} = \frac{\pi^2 E I}{(K_{end} L)^2}
 \end{equation}
 where $E$ is the Young's modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface), and $L$ is the beam length, set to $h_s$ the full spar height.
-The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \cite{american_bureau_of_shipping_requirements_2022}:
+The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
     FOS = \frac{\sigma_{s,\text{max}}}{\sigma_s} = \frac{\sigma_Y \frac{\zeta + \sqrt{\zeta^2+4\omega}}{2}}{\frac{F}{A} + q}
 \end{equation}
@@ -1907,7 +1907,7 @@ and the hoop stress $\sigma_\theta$ is
      \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
 \end{equation}
 $P_r$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
-These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \cite{american_bureau_of_shipping_requirements_2022}.
+These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
 % \begin{equation}
 % \begin{split}
