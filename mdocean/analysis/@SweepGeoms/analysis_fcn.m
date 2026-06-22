@@ -40,7 +40,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         warning('off', verbosity_warning_ids{k});
     end
 
-    n = 3; % number of points per dimension
+    n = 5; % number of points per dimension
 
     zero_to_one   = linspace(0.01, 0.99, n);
     zero_to_three = linspace(0.01, 3,    n);
@@ -171,6 +171,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.hydro_ratio_result = hydro_ratio_result;
     intermed_result_struct.m0h_stored         = m0h_stored;
     intermed_result_struct.val                = val;
+    intermed_result_struct.n_geoms            = n_geoms;
 
     % Dimensional grid arrays (needed for CWR computation)
     intermed_result_struct.H     = H;

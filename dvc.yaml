@@ -7474,13 +7474,14 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
     cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
-      'results/Runtime/end.json' 'results/PtoSweep/end.json' 'results/Wecsim/end.json'
-      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
-      resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
-      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
-      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
-      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+      'results/Runtime/end.json' 'results/SweepGeoms/end.json' 'results/PtoSweep/end.json'
+      'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
+      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
+      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
+      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
+      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
+      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\"\
       : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
       , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
       : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
@@ -7491,11 +7492,13 @@ stages:
       : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
       : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
       : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
-      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
+      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"\
+      }'"
     deps:
       - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
+      - results/SweepGeoms/end.json
       - results/PtoSweep/end.json
       - results/Wecsim/end.json
     outs:

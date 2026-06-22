@@ -7335,8 +7335,8 @@ stages:
       size: 1529
     - path: ./mdocean/analysis/@SweepGeoms/analysis_fcn.m
       hash: md5
-      md5: 9c87926a85da12b9939ab1dc8262d29d
-      size: 9888
+      md5: 65ecf334342dfb6af850818c8cb2ad2b
+      size: 9945
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
       md5: 4926cc6082ca23736741c904afa0253a
@@ -7590,8 +7590,8 @@ stages:
     outs:
     - path: results/SweepGeoms/intermed.mat
       hash: md5
-      md5: 890cf9334d2cc0ff5774aa140b73886c
-      size: 35018822
+      md5: 0cc2d47de2b396009e108ba112d49276
+      size: 96316749
   analysis-Validation:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation; 
       obj.run_analysis();"
@@ -8157,21 +8157,22 @@ stages:
       size: 29710879
   aor-results-to-latex:
     cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
-      'results/Runtime/end.json' 'results/PtoSweep/end.json' 'results/Wecsim/end.json'
-      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command resultsAOR
-      --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\", \"surgeForceFloatNominal\"\
-      : \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
-      ms\", \"pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\"\
-      : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
-      , \"wecsimAvgPowerErrorBestCase\": \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"\
-      wecsimAvgPowerErrorWorstCase\": \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"\
-      powerScaleFactor\": \"{powerScaleFactor:.2f}\", \"forceScaleFactor\": \"{forceScaleFactor:.2f}\"\
-      , \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"ptoSweepMinLCOE_F_max\"\
-      : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\": \"{ptoSweepMinLCOE_P_max/1e3:.0f}
-      kW\", \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"\
-      ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
-      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
+      'results/Runtime/end.json' 'results/SweepGeoms/end.json' 'results/PtoSweep/end.json'
+      'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
+      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"simRuntime\": \"{simRuntime*1000:.0f}
+      ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
+      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\"\
+      , \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\"\
+      : \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\": \"{wecsimAvgPowerErrorBestCase:.2f}%\"\
+      , \"wecsimAvgPowerErrorWorstCase\": \"{wecsimAvgPowerErrorWorstCase:.2f}%\"\
+      , \"powerScaleFactor\": \"{powerScaleFactor:.2f}\", \"forceScaleFactor\": \"\
+      {forceScaleFactor:.2f}\", \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"\
+      ptoSweepMinLCOE_F_max\": \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
+      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f}
+      kW\", \"ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
+      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"}'"
     deps:
     - path: results/Parameters/end.json
       hash: md5
@@ -8189,6 +8190,10 @@ stages:
       hash: md5
       md5: 59ac14e7f4b9960b5d58538c4ff47f0f
       size: 212
+    - path: results/SweepGeoms/end.json
+      hash: md5
+      md5: 770376cdf1adc3528af842dc13424b18
+      size: 136
     - path: results/Wecsim/end.json
       hash: md5
       md5: d65c5a6d187641276b4324cbfeb73eb7
@@ -8196,8 +8201,8 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: cf58a142a4ba03f51b465e4fa75e1591
-      size: 16878
+      md5: cd619e72007475015d9892a8b6ff5537
+      size: 17600
   build-AOR-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/applied-ocean-research-model/.latexmkrc 
@@ -8222,8 +8227,8 @@ stages:
       size: 28896
     - path: pubs/applied-ocean-research-model/figs/from-matlab/
       hash: md5
-      md5: 61aa150e0f347dd0408434d283f4afb4.dir
-      size: 4157545
+      md5: 04dc1a813a2c8ab64000ff4ace30fb9f.dir
+      size: 7089266
       nfiles: 58
     - path: pubs/applied-ocean-research-model/figs/manual/
       hash: md5
@@ -8237,29 +8242,29 @@ stages:
       nfiles: 8
     - path: pubs/applied-ocean-research-model/main.tex
       hash: md5
-      md5: 619a62c42122ff3bb28eae78b460a112
-      size: 6579
+      md5: b9cb143c77a74f68ec96f84148f3f3aa
+      size: 12560
     - path: pubs/applied-ocean-research-model/main.tex
       hash: md5
-      md5: 619a62c42122ff3bb28eae78b460a112
-      size: 6579
+      md5: b9cb143c77a74f68ec96f84148f3f3aa
+      size: 12560
     - path: pubs/applied-ocean-research-model/numeric-results.tex
       hash: md5
-      md5: cf58a142a4ba03f51b465e4fa75e1591
-      size: 16878
+      md5: cd619e72007475015d9892a8b6ff5537
+      size: 17600
     - path: pubs/applied-ocean-research-model/references.bib
       hash: md5
       md5: 81a7c7e018e9e13f89c7784bdc23409e
       size: 538397
     - path: pubs/applied-ocean-research-model/sections/
       hash: md5
-      md5: abf8b9e09931f0a801ed3ee878e57709.dir
-      size: 396579
+      md5: 013a2ced2d3f264388255a99de8e63c5.dir
+      size: 396888
       nfiles: 8
     - path: pubs/applied-ocean-research-model/shared-pkg.tex
       hash: md5
-      md5: e0faedaa742173711a6e0638158ac193
-      size: 4141
+      md5: b8d430b1bf0ece31bf80afa74cd6205d
+      size: 4226
     - path: pubs/applied-ocean-research-model/tables/
       hash: md5
       md5: 2a0ede44175aafcf72ffb20183bb574e.dir
@@ -8272,17 +8277,17 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/aux/
       hash: md5
-      md5: c087cb426c0982bdd0cf9dfdc7ddfcf7.dir
-      size: 376292
+      md5: bfc0c3c0777f4fde42ec5052e7051086.dir
+      size: 377772
       nfiles: 14
     - path: pubs/applied-ocean-research-model/main.pdf
       hash: md5
-      md5: c3b84a0828139ef223ccc82fb561dd3b
-      size: 4773348
+      md5: a10c5f6bbfa0bcbbfa1b56d8685a20dc
+      size: 7611750
     - path: pubs/applied-ocean-research-model/main.synctex.gz
       hash: md5
-      md5: 005a995dbd3589617246622ff9fd8dca
-      size: 1164473
+      md5: 311b4cadd25f0000d3b1ce6c9484b4f3
+      size: 1186657
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc pubs/renewable-energy-mdo/mdocean.tex
@@ -8616,12 +8621,12 @@ stages:
       size: 538397
     - path: pubs/shared/shared-pkg.tex
       hash: md5
-      md5: e0faedaa742173711a6e0638158ac193
-      size: 4141
+      md5: b8d430b1bf0ece31bf80afa74cd6205d
+      size: 4226
     - path: pubs/shared/shared-pkg.tex
       hash: md5
-      md5: e0faedaa742173711a6e0638158ac193
-      size: 4141
+      md5: b8d430b1bf0ece31bf80afa74cd6205d
+      size: 4226
     outs:
     - path: pubs/applied-ocean-research-model/elsarticle-num-names.bst
       hash: md5
@@ -8633,8 +8638,8 @@ stages:
       size: 538397
     - path: pubs/applied-ocean-research-model/shared-pkg.tex
       hash: md5
-      md5: e0faedaa742173711a6e0638158ac193
-      size: 4141
+      md5: b8d430b1bf0ece31bf80afa74cd6205d
+      size: 4226
     - path: pubs/applied-ocean-research-model/zotero-meem-refs.bib
       hash: md5
       md5: 2b239e27c2b3fe0e1ff79c16314db608
@@ -8653,8 +8658,8 @@ stages:
       size: 538397
     - path: pubs/renewable-energy-mdo/shared-pkg.tex
       hash: md5
-      md5: e0faedaa742173711a6e0638158ac193
-      size: 4141
+      md5: b8d430b1bf0ece31bf80afa74cd6205d
+      size: 4226
     - path: pubs/renewable-energy-mdo/zotero-meem-refs.bib
       hash: md5
       md5: 2b239e27c2b3fe0e1ff79c16314db608
@@ -9094,8 +9099,8 @@ stages:
       nfiles: 6
     - path: results/SweepGeoms/
       hash: md5
-      md5: 96c995db0055e32ea511d22d54f3b35a.dir
-      size: 41086556
+      md5: 1caba9936690907758e9c4de52d6ddf7.dir
+      size: 165284004
       nfiles: 29
     - path: results/Validation/
       hash: md5
@@ -9110,8 +9115,8 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/figs/from-matlab/
       hash: md5
-      md5: 61aa150e0f347dd0408434d283f4afb4.dir
-      size: 4157545
+      md5: 04dc1a813a2c8ab64000ff4ace30fb9f.dir
+      size: 7089266
       nfiles: 58
     - path: pubs/applied-ocean-research-model/tables/from-matlab/
       hash: md5
@@ -17639,8 +17644,8 @@ stages:
       size: 1529
     - path: ./mdocean/analysis/@SweepGeoms/post_process_fcn.m
       hash: md5
-      md5: 6bea69a26338508d6faec76cc5e03227
-      size: 25151
+      md5: 207fc1742250e9b80dbadb86cc603b4d
+      size: 25222
     - path: ./mdocean/analysis/GenericAnalysis.m
       hash: md5
       md5: 4926cc6082ca23736741c904afa0253a
@@ -17865,121 +17870,121 @@ stages:
       size: 11792
     - path: results/SweepGeoms/intermed.mat
       hash: md5
-      md5: 890cf9334d2cc0ff5774aa140b73886c
-      size: 35018822
+      md5: 0cc2d47de2b396009e108ba112d49276
+      size: 96316749
     outs:
     - path: results/SweepGeoms/end.json
       hash: md5
-      md5: 7586a6f17fd19d25fb1b3459e4002a73
-      size: 101
+      md5: 76a8f9a44a37c7048f4e8f379fbc69b5
+      size: 125
     - path: results/SweepGeoms/end.mat
       hash: md5
-      md5: f750190c222032a60e07edc9f146530b
-      size: 315
+      md5: 6861bad2f29c0e57c4fbd8eda0b224e9
+      size: 367
     - path: results/SweepGeoms/factor_grid.fig
       hash: md5
-      md5: 6ac3449eb115bc670bf65f0f985961bf
-      size: 24723
+      md5: 87c012a7c8e52718cb8f8af8295bd9cc
+      size: 24678
     - path: results/SweepGeoms/factor_grid.pdf
       hash: md5
-      md5: 9d098a7ae73cfac608c71fb1bcc35775
-      size: 88665
+      md5: 147a3c8c43074f9f4a0f4d003cd64616
+      size: 86081
     - path: results/SweepGeoms/sweep_geoms_grid_scatter.fig
       hash: md5
-      md5: 77b3981e4ccfa56cacab80d35d607914
-      size: 1765476
+      md5: 4865d4c6488f907e19b9f88620b1ef2b
+      size: 20091653
     - path: results/SweepGeoms/sweep_geoms_grid_scatter.pdf
       hash: md5
-      md5: f54ffddedc345757bca38e8ec61728c2
-      size: 2133512
+      md5: 859e904b9c449c1d751cf8af1d8f87bc
+      size: 27661269
     - path: results/SweepGeoms/sweep_geoms_line.fig
       hash: md5
-      md5: 8bae67d4f198486bd4f72ece7162cbf3
-      size: 163595
+      md5: 444044f695bbcb2bf29e6510cb7fbf9a
+      size: 1641498
     - path: results/SweepGeoms/sweep_geoms_line.pdf
       hash: md5
-      md5: 1eb270761f80be9a685c80b49cbfb28c
-      size: 121912
+      md5: 3bf0dcceaa872fcf12c82b8c90479f90
+      size: 1370337
     - path: results/SweepGeoms/sweep_geoms_line_cwr_a2.fig
       hash: md5
-      md5: 2ed5b6a8b2b148d2e7140b3aa2a11031
-      size: 164249
+      md5: ce8727d17b75e1a58f311f64d3772d42
+      size: 1646300
     - path: results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
       hash: md5
-      md5: e240d67940fd5958ca898c93e725e610
-      size: 120993
+      md5: e24b1e983dc63d2db762a0eeea72587d
+      size: 1283727
     - path: results/SweepGeoms/sweep_geoms_line_cwr_sa.fig
       hash: md5
-      md5: 03d4b9db6bac0d646bebd2d2fb7d192a
-      size: 164383
+      md5: 139943a3325538f5e1c675d0b424720e
+      size: 1648867
     - path: results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
       hash: md5
-      md5: 3fdd960882eec7d16c840cf4ab8b85c5
-      size: 119576
+      md5: e67dd801198efc487a968e7bd97f18c1
+      size: 1276999
     - path: results/SweepGeoms/sweep_geoms_line_cwr_vol.fig
       hash: md5
-      md5: 26b45da9c668d1b20da253a55455a2fd
-      size: 164410
+      md5: 8c9727cb4ca0c05d95f68a5a5f9d6c6b
+      size: 1649016
     - path: results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
       hash: md5
-      md5: 72e282ebfb3349327bb35c9edfa52b29
-      size: 120500
+      md5: 43804a97d9c2bfc77cde5b8f14133d86
+      size: 1288615
     - path: results/SweepGeoms/sweep_geoms_parallel.fig
       hash: md5
-      md5: 8da5a1811a1694f54ce89651975f10d2
-      size: 12078
+      md5: 84c78465f69984178508290c5598c581
+      size: 46686
     - path: results/SweepGeoms/sweep_geoms_parallel.pdf
       hash: md5
-      md5: 3d186caf41f82aab162a99ff8e784a68
-      size: 69030
+      md5: a1f2584b5fbf7b0a17f6b5b9c1e9cc36
+      size: 750426
     - path: results/SweepGeoms/sweep_geoms_pareto.fig
       hash: md5
-      md5: f78cc56f9d5b15403a9f7acf3bffd5cb
-      size: 43320
+      md5: d994949e7f6d8a48c31ec487ed98e757
+      size: 105378
     - path: results/SweepGeoms/sweep_geoms_pareto.pdf
       hash: md5
-      md5: 80ee6b6d311b957ea6de358df725b74e
-      size: 25392
+      md5: b230ff054c1f385751bead02f955d388
+      size: 73602
     - path: results/SweepGeoms/sweep_geoms_pareto_nondim.fig
       hash: md5
-      md5: d11125e477d32562fe110a6a53f27783
-      size: 130775
+      md5: 7ea4a3d4e66fa7e90c608a4ca7f8eacc
+      size: 1357241
     - path: results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
       hash: md5
-      md5: 46de338aaed35c5941c1a8a9e413df07
-      size: 61168
+      md5: fbcc7da48106748a9e9c8129309fcc40
+      size: 587041
     - path: results/SweepGeoms/sweep_geoms_scatter.fig
       hash: md5
-      md5: 3bcbd90ae678b7ce5f635305bd7874e3
-      size: 58165
+      md5: fc45b6dfc6dbd32d02b24bc39b99baa8
+      size: 631949
     - path: results/SweepGeoms/sweep_geoms_scatter.pdf
       hash: md5
-      md5: 59612ae5a14ebc2f2cd93bac11c9ed70
-      size: 84757
+      md5: 991d89aa8dbf1a3b3c988af92a0c919d
+      size: 975219
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_a2.fig
       hash: md5
-      md5: 0dde3cdac5ac80253ebf4c7368fda0e5
-      size: 59781
+      md5: 40d56da19d6450d83fc4a0a8dee1e512
+      size: 644587
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
       hash: md5
-      md5: 02be45de67633c5ce062e459b34efde4
-      size: 83455
+      md5: b8df162680d9d80a57894b38312b2a4d
+      size: 938124
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_sa.fig
       hash: md5
-      md5: 6a11229863b3ad413e99c02936c8c89d
-      size: 60331
+      md5: 96affaca54f984e091c6855cb5e78527
+      size: 650345
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
       hash: md5
-      md5: 1dfce472cf79411dae3b334f9e3464f6
-      size: 82882
+      md5: 63f192f436a8cb92d37895afaf922cd6
+      size: 937013
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_vol.fig
       hash: md5
-      md5: e32ad305aa9db386167d1344c4969051
-      size: 60351
+      md5: 231bd2628009f4cec8af9471a862f1f5
+      size: 651042
     - path: results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
       hash: md5
-      md5: 61d121202b3a6d681e4a2fadc266f1a8
-      size: 83839
+      md5: 2dd1d177b5a313490cb05b5fbebd3575
+      size: 949059
   postpro-Validation:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation; 
       obj.run_all_from_load();"
