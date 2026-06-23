@@ -51,7 +51,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     grid on
     x_string = strcat('x_{', num2str((1:num_design_vars).') , "} ", b.var_names_pretty(1:end-1).' );
     set(gca,'ytick',1:num_design_vars,'yticklabel',x_string)
-    set(gca, 'PlotBoxAspectRatio', [num_pareto num_design_vars 1])
+    set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_design_vars 1])
     xlabel('Number Along Pareto Front','FontSize',14)
     legend('Lower bound','Upper bound')
 
@@ -61,7 +61,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     lin_string = strcat('g_{L,', num2str((1:length(b.lin_constraint_names)).') , "} ", b.lin_constraint_names_pretty.' );
 
     set(gca,'ytick',1:num_lincon,'yticklabel',lin_string)
-    set(gca, 'PlotBoxAspectRatio', [num_pareto num_lincon 1])
+    set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_lincon 1])
     grid on
     xlabel('Number Along Pareto Front','FontSize',14)
 
@@ -71,7 +71,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     grid on
     nl_string = strcat('g_{NL,', num2str((1:length(constraint_names_mod)).') , "} ", constraint_names_mod.' );
     set(gca,'ytick',1:num_nlcon,'yticklabel',nl_string)
-    set(gca, 'PlotBoxAspectRatio', [num_pareto num_nlcon 1])
+    set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_nlcon 1])
     xlabel('Number Along Pareto Front','FontSize',14)
 
     fig.Position = [2 128 1532  626];
