@@ -81,7 +81,7 @@ function [figs,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,cost,power,fa
     
     ylab1 = ylabel('LCOE ($/kWh)');
     x_range = [1/3 3];
-    axis(ax1,[x_range .6 1.1])
+    axis(ax1,[x_range 0.95*min(LCOE(:)) 1.1])
     l = legend(b.var_names_pretty{1:end-1});
     l.Location = 'northeastoutside';
     grid on
