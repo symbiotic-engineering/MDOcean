@@ -11,13 +11,20 @@ Finally, the economics module estimates capital cost (PTO and structure) and lev
 
 Although this work does not perform optimization, the model is developed to support system-level design optimization.
 The module coupling structure is illustrated in the XDSM diagram in \Cref{fig:n2}.
-Inputs and outputs are organized according to standard MDO conventions \cite{lambe_extensions_2012}, and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
+Inputs and outputs are organized according to standard MDO conventions \citep{lambe_extensions_2012}, and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
 
-\begin{figure}[htbp]
+
+\begin{figure*}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
 \caption{Simplified XDSM diagram}\label{fig:n2}
-\end{figure}
+\end{figure*}
+\begin{figure*}[b!]
+\centering
+\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
+\caption{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}
+\label{fig:control-arch}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     \paragraph{Absence of Feedback Coupling}
@@ -30,7 +37,7 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     Moreover, the presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
     
     Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
-    For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \cite{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \cite{azarm_monotonicity-based_1988,papalambros_principles_2017}.
+    For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \citep{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \citep{azarm_monotonicity-based_1988,papalambros_principles_2017}.
     The present coupling of WEC disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
     Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
     Non-convexity arises from the presence of both positive and negative curvature in the coupled variable space, leading to multiple local optima.
@@ -45,22 +52,22 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
     The dynamics iteration occurs separately for each outer iteration of the optimizer.
     This structure is known as the multiple discipline feasible (MDF) architecture.
-    In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
+    In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \citep{martins_multidisciplinary_2013}.
     SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
-    The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
+    The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \citep{coe_initial_2020}.
     
-    Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
+    Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \citep{tedrake_underactuated_2024}.
     In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
-    As \cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
+    As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
     This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
     For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
-    Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
+    Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
     
     \paragraph{Control Optimization Architecture}
-    In control co-design, the nested and simultaneous architectures are often contrasted \cite{sundarrajan_towards_2021,herber_nested_2018}.
-    The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \cite{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
+    In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
+    The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
     This takes advantage of the fact that the inner optimization is often convex and can be solved quickly.
-    On the other hand, the simultaneous architecture uses a single optimizer to optimize design and control variables concurrently, creating a larger (typically non-convex) optimization problem and avoiding the difficulty of inner loop infeasibility that may arise in the nested approach \cite{herber_nested_2018}. 
+    On the other hand, the simultaneous architecture uses a single optimizer to optimize design and control variables concurrently, creating a larger (typically non-convex) optimization problem and avoiding the difficulty of inner loop infeasibility that may arise in the nested approach \citep{herber_nested_2018}. 
     We presently distinguish two additional types of control co-design architectures in which the controller is not numerically optimized and instead obtained through an optimal control law.
     The optimal control law can be either explicitly derived and applied in the simulation (``explicit'' or analytical), or implicitly solved for by numerically zeroing the residual of an analytical optimal control condition (``implicit'' or semi-analytical).
     
@@ -70,12 +77,13 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     While the implicit-SAND and simultaneous-SAND block diagrams look nearly identical, the former determines the control variables via residuals of pre-determined optimality conditions expressed as constraints to the optimizer, while the latter determines them to maximize the optimization objective without a-priori knowledge of the optimal control conditions.
     
     In WecOptTool, the pseudo-spectral optimizer determines the state and control variables for a fixed design without using previously-known optimality conditions.
-    Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \cite{coe_initial_2020}.
+    Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \citep{coe_initial_2020}.
     
-    For MDOcean, we choose the implicit-MDF architecture.
-    Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+    For MDOcean, we choose the explicit-MDF architecture.
+    Like the implicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
     This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-    Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{sec:mod-freq-domain} will detail.
+    Explicit-MDF is chosen over implicit-MDF because it avoids the latter's numerical root-finding and is thus faster, as \Cref{sec:mod-freq-domain} will detail.
+    An early version of MDOcean used the implicit-MDF architecture, which is described in \Cref{sec:appendix-qp-numerical} for completeness.
 \else
     The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
     This improves computational efficiency and is advantageous for optimization.
@@ -89,30 +97,25 @@ Inputs and outputs are organized according to standard MDO conventions \cite{lam
     The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
     This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
     
-    An alternative simultaneous analysis and design (SAND) formulation \cite{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
+    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
     However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
     For this reason, MDF is adopted.
     
     \paragraph{Control Co-Design Architecture}
-    Control co-design problems are commonly classified into nested and simultaneous formulations \cite{sundarrajan_towards_2021,herber_nested_2018}.
+    Control co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
     In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together.
     In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
     
     These control formulations can be combined with both MDF and SAND analysis architectures.
     MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
     The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (\Cref{sec:mod-freq-domain}).
-    It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\cref{sec:sim-runtime}).
-    Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in [dissertation chapter].
+    It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
+    Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in \cite{mccabe_dissertation_2026}.
     
-    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the implicit-MDF formulation used in this study highlighted.
+    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
 \fi
 
-\begin{figure}[b!]
-\centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
-\caption{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}
-\label{fig:control-arch}
-\end{figure}
+
 
 
 

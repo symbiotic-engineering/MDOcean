@@ -1,7 +1,7 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize an 
-  ocean wave energy converter (WEC).
+description: Multidisciplinary Design Optimization (MDO) to optimize 
+  an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
@@ -45,9 +45,13 @@ parameters:
     - taxonomy
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
+    - mod_freq_domain_ctrl_combined
   latex_standalone_name:
-    - eigenfunctions
-    - A_matrix
+    - circuit_intrinsic
+    - circuit_pto
+    - circuit_kinematics
+    - control_method_venn_diagram
+    - meem_dims
 # subprojects:
 #   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
@@ -410,7 +414,8 @@ pipeline:
     analysis-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; obj.run_analysis();
+      command: add_mdocean_path(); obj=Constraints; 
+        obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
@@ -1040,7 +1045,7 @@ pipeline:
         - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
         - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
-        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
+        - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
         - ./mdocean/plots/matlab_figs/sim_results/experiments_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
@@ -1222,7 +1227,8 @@ pipeline:
     analysis-DragIntegral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DragIntegral; obj.run_analysis();
+      command: add_mdocean_path(); obj=DragIntegral; 
+        obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -2937,7 +2943,7 @@ pipeline:
         - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
         - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
         - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
+      #  - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3010,7 +3016,7 @@ pipeline:
         - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
         - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
-        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
+        - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3066,7 +3072,8 @@ pipeline:
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; obj.run_analysis();
+      command: add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3855,7 +3862,8 @@ pipeline:
     postpro-Runtime:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Runtime; obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Runtime; 
+        obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Runtime
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4597,7 +4605,8 @@ pipeline:
     postpro-Wecsim:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Wecsim; obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Wecsim; 
+        obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Wecsim
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -5040,7 +5049,8 @@ pipeline:
     postpro-WithTables:
       kind: shell-command
       environment: _system
-      command: echo "Running postprocessing for all stages with tables."
+      command: echo "Running postprocessing for all stages with 
+        tables."
       inputs:
         - from_stage_outputs: postpro-Comparison
         - from_stage_outputs: postpro-Constraints
@@ -5113,9 +5123,9 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/aor/
-          storage: null
+          storage:
         - path: code-coverage/aor/
-          storage: null
+          storage:
     test-re:
       kind: matlab-command
       environment: _system
@@ -5138,16 +5148,16 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/re/
-          storage: null
+          storage:
         - path: code-coverage/re/
-          storage: null
+          storage:
     viz-AllFigCompare:
       kind: jupyter-notebook
       environment: pubs
       notebook_path: results/fig_notebooks/AllFigCompare.ipynb
       inputs:
         - from_stage_outputs: postpro-AllFigCompare
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Comparison:
@@ -5156,7 +5166,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Comparison.ipynb
       inputs:
         - from_stage_outputs: postpro-Comparison
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Constraints:
@@ -5165,7 +5175,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Constraints.ipynb
       inputs:
         - from_stage_outputs: postpro-Constraints
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Cost:
@@ -5174,16 +5184,17 @@ pipeline:
       notebook_path: results/fig_notebooks/Cost.ipynb
       inputs:
         - from_stage_outputs: postpro-Cost
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DampingPlateStructures:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
+      notebook_path: 
+        results/fig_notebooks/DampingPlateStructures.ipynb
       inputs:
         - from_stage_outputs: postpro-DampingPlateStructures
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DescFcns:
@@ -5192,16 +5203,17 @@ pipeline:
       notebook_path: results/fig_notebooks/DescFcns.ipynb
       inputs:
         - from_stage_outputs: postpro-DescFcns
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignSpaceExploration:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
+      notebook_path: 
+        results/fig_notebooks/DesignSpaceExploration.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignSpaceExploration
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignVars:
@@ -5210,7 +5222,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DesignVars.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignVars
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DragIntegral:
@@ -5219,7 +5231,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DragIntegral.ipynb
       inputs:
         - from_stage_outputs: postpro-DragIntegral
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-FitOlaya:
@@ -5228,16 +5240,17 @@ pipeline:
       notebook_path: results/fig_notebooks/FitOlaya.ipynb
       inputs:
         - from_stage_outputs: postpro-FitOlaya
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ForceSaturationFigFunc:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      notebook_path: 
+        results/fig_notebooks/ForceSaturationFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ForceSaturationFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-GradientOptimFigFunc:
@@ -5246,7 +5259,7 @@ pipeline:
       notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-GradientOptimFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-HydroCoeffFigFunc:
@@ -5255,7 +5268,7 @@ pipeline:
       notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-HydroCoeffFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-LocationSensitivity:
@@ -5264,7 +5277,7 @@ pipeline:
       notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
       inputs:
         - from_stage_outputs: postpro-LocationSensitivity
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Meem:
@@ -5273,7 +5286,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Meem.ipynb
       inputs:
         - from_stage_outputs: postpro-Meem
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Multistart:
@@ -5282,7 +5295,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Multistart.ipynb
       inputs:
         - from_stage_outputs: postpro-Multistart
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParamSensitivities:
@@ -5291,7 +5304,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
       inputs:
         - from_stage_outputs: postpro-ParamSensitivities
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Parameters:
@@ -5300,7 +5313,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Parameters.ipynb
       inputs:
         - from_stage_outputs: postpro-Parameters
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoFigFunc:
@@ -5309,7 +5322,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoSweep:
@@ -5318,7 +5331,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-PtoSweep:
@@ -5327,7 +5340,7 @@ pipeline:
       notebook_path: results/fig_notebooks/PtoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-PtoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-QPCircles:
@@ -5336,7 +5349,7 @@ pipeline:
       notebook_path: results/fig_notebooks/QPCircles.ipynb
       inputs:
         - from_stage_outputs: postpro-QPCircles
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ReadNonMatlabFigs:
@@ -5345,7 +5358,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
       inputs:
         - from_stage_outputs: postpro-ReadNonMatlabFigs
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-RunSingleFigFunc:
@@ -5354,7 +5367,7 @@ pipeline:
       notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-RunSingleFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Runtime:
@@ -5363,7 +5376,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Runtime.ipynb
       inputs:
         - from_stage_outputs: postpro-Runtime
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Slamming:
@@ -5372,7 +5385,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Slamming.ipynb
       inputs:
         - from_stage_outputs: postpro-Slamming
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SparHydro:
@@ -5381,7 +5394,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SparHydro.ipynb
       inputs:
         - from_stage_outputs: postpro-SparHydro
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SweepGeoms:
@@ -5390,7 +5403,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SweepGeoms.ipynb
       inputs:
         - from_stage_outputs: postpro-SweepGeoms
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Validation:
@@ -5399,7 +5412,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Validation.ipynb
       inputs:
         - from_stage_outputs: postpro-Validation
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Wecsim:
@@ -5408,7 +5421,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Wecsim.ipynb
       inputs:
         - from_stage_outputs: postpro-Wecsim
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     pyxdsm:
@@ -5490,6 +5503,7 @@ pipeline:
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
+        - results/SweepGeoms/end.json
         - results/PtoSweep/end.json
         # - results/Slamming/end.json
         # - results/SparHydro/end.json
@@ -5508,6 +5522,7 @@ pipeline:
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
         MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        meemSweepTime: "{geom_sweep_analysis_time/60:.0f} minutes"
         # percentages
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
@@ -5524,6 +5539,8 @@ pipeline:
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+        # numbers
+        meemSweepSize: "{n_combos}"
     check-dup-json-keys:
       kind: python-script
       environment: pubs
@@ -5633,6 +5650,10 @@ pipeline:
         - src: pubs/shared/references.bib
           dest: pubs/renewable-energy-mdo/references.bib
           kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/dissertation/references.bib
+          kind: file-to-file
+          #
         - src: pubs/shared/elsarticle-num-names.bst
           dest: 
             pubs/applied-ocean-research-model/elsarticle-num-names.bst
@@ -5640,15 +5661,28 @@ pipeline:
         - src: pubs/shared/elsarticle-num-names.bst
           dest: pubs/renewable-energy-mdo/elsarticle-num-names.bst
           kind: file-to-file
+          #
         - src: pubs/shared/shared-pkg.tex
           dest: pubs/applied-ocean-research-model/shared-pkg.tex
           kind: file-to-file
         - src: pubs/shared/shared-pkg.tex
           dest: pubs/renewable-energy-mdo/shared-pkg.tex
           kind: file-to-file
-        - src: pubs/shared/references.bib
-          dest: pubs/dissertation/references.bib
+        #
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/applied-ocean-research-model/cas-dc.cls
           kind: file-to-file
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/renewable-energy-mdo/cas-dc.cls
+          kind: file-to-file
+        #
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/applied-ocean-research-model/cas-common.sty
+          kind: file-to-file
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/renewable-energy-mdo/cas-common.sty
+          kind: file-to-file
+        #
         - src: 
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
@@ -5663,7 +5697,8 @@ pipeline:
       script_path: dev/latex/Paper-Linter/paperlint.py
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
+        - --ignore 
+          pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
         - --output dev/latex/Paper-Linter/lint-aor.txt
       inputs:
@@ -5704,9 +5739,9 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
-          storage: null
+          storage:
         - path: pubs/renewable-energy-mdo/aux/
-          storage: null
+          storage:
           delete_before_run: false
     build-AOR-paper:
       kind: latex
@@ -5720,7 +5755,6 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/tikz/
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
-        - pubs/applied-ocean-research-model/numbers.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
@@ -5730,13 +5764,14 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
-          storage: null
+          storage:
         - path: pubs/applied-ocean-research-model/aux/
-          storage: null
+          storage:
           delete_before_run: false
     build-UMERC-paper:
       kind: latex
-      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      target_path: 
+        pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       environment: tex
       inputs:
         - pubs/UMERC-2025-grid-value/figures/
@@ -5777,9 +5812,9 @@ pipeline:
       outputs:
         - pubs/dissertation/sampleThesis.pdf
         - path: pubs/dissertation/sampleThesis.synctex.gz
-          storage: null
+          storage:
         - path: pubs/dissertation/aux/
-          storage: null
+          storage:
           delete_before_run: false
     # all-writing:
     #   kind: shell-command
@@ -5796,7 +5831,7 @@ pipeline:
       notebook_path: pubs/applied-ocean-research-model/view_figs.ipynb
       inputs:
         - pubs/applied-ocean-research-model/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     view-re-figs:
       kind: jupyter-notebook
@@ -5804,7 +5839,7 @@ pipeline:
       notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
       inputs:
         - pubs/renewable-energy-mdo/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     all-viz:
       kind: shell-command
@@ -5858,18 +5893,41 @@ pipeline:
           storage: git
     make-standalone-tex-pdf:
       kind: latex
-      target_path: pubs/defense/latex-standalone/standalone_{name}.tex
+      target_path: mdocean/plots/non_matlab_figs/{name}.tex
       environment: tex
+      latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      synctex: false
       iterate_over:
         - arg_name: name
           values:
             - parameter: latex_standalone_name
       inputs:
-        - pubs/shared/equations/
+        - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
       outputs:
-        - pubs/defense/latex-standalone/standalone_{name}.pdf
-        - path: pubs/defense/latex-standalone/standalone_{name}.log
+        - mdocean/plots/non_matlab_figs/{name}.pdf
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
+          delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
+          delete_before_run: false
+          storage:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
+          delete_before_run: false
+          storage:
+    move-standalone-pdfs:
+      kind: map-paths
+      environment: _system
+      paths:
+        - src: mdocean/plots/non_matlab_figs/{name}.pdf
+          dest: mdocean/plots/non_matlab_figs/pdf/{name}.pdf
+          kind: file-to-file
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg
@@ -5914,7 +5972,8 @@ publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
     description: Development, Validation, and Benchmarking of a 
-      Multidisciplinary Semi-Analytical Model for Wave Energy Converters
+      Multidisciplinary Semi-Analytical Model for Wave Energy 
+      Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
@@ -5944,15 +6003,18 @@ overleaf_sync:
       - main.tex
       - sections/
       - references.bib
-      - numbers.tex
+      - zotero-meem-refs.bib
       - elsarticle-num-names.bst
       - appendices.tex
       - commands-aor.tex
       - content.tex
+      - shared-pkg.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs/
-      - tables/
-      - numeric-results.tex
+      # - tables/
+      # - numeric-results.tex
   pubs/renewable-energy-mdo:
     url: https://www.overleaf.com/project/6753a38b61276b931380c29c
     sync_paths:
@@ -5960,12 +6022,17 @@ overleaf_sync:
       - sections/
       - tables/
       - references.bib
-      - numbers.tex
+      - zotero-meem-refs.bib
+      - elsarticle-num-names.bst
       - commands-re.tex
+      - shared-pkg.tex
+      - content-re.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs
-      - numeric-results.tex
-      - tables/from-matlab/
+      # - numeric-results.tex
+      # - tables/from-matlab/
   pubs/UMERC-2025-grid-value:
     url: https://www.overleaf.com/project/68516ba5bc36663bb61711a6
     sync_paths:
@@ -5976,3 +6043,5 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
+  pubs/defense:
+    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
