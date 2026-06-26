@@ -19,12 +19,15 @@
     If wavelength were used as the characteristic length scale, the resulting capture width ratio would be a constant multiple of the radiation efficiency).
     For the final output, to nondimensionalize the wetted surface area, we divide it by the wavelength squared.
 \else
-\Cref{sec:validation-benchmarking} demonstrates that MDOcean achieves accuracies generally within 10\% of established models and benchmarks both at the individual subsystem level and at the system level. 
-Just three scale factors are used to tune results across disciplines and achieve an interdisciplinary model fully consistent with all relevant outputs in the reference model report, providing a valuable benchmark to compare technology improvements while retaining the flexibility to adjust scale factors as needed to represent other scenarios.
-The model is quite accurate for inputs near the nominal RM3 design and therefore its ability to capture multidisciplinary interactions in a single software package while running 1-3 orders of magnitude faster than established software is considered a major success.
-Still, the model is not perfect, and although only minor tuning was performed, the model's development centers around the Reference Model 3 and there may be unidentified discrepancies for geometries far from the reference design.
-We emphasize that the model is not intended to replace detailed models for final design and analysis, but rather to enable rapid design space exploration and optimization in the early stages of design.
-Since the values without scale factors are of the correct order of magnitude and the trends are reasonable, the use of scale factors to resolve discrepancies in the force, power, and mass models is deemed acceptable for the purposes of this study.
+    A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $m_0h$ allows for the identification of design trends.
+    MDOcean performs a six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in only \resultsAOR[meemSweepTime] seconds, an average of \resultsAOR[meemSweepTimePerCombo] per combination.
+    Using only the hydrodynamics and dynamics modules for the present, we examine nondimensional outputs including radiation efficiency, capture width ratio, and nondimensionalized surface area.
+    These serve respectively as rough proxies for power, power per unit cost, and cost, allowing for the visualization of tradeoffs between power and cost across the design space.
+    Radiation efficiency was defined in \cref{eq:power-matrix-decomposition} as the ratio of the capture width to the maximum radiation-limited capture width, and represents how well the device's geometry allows it to absorb power at a given frequency.
+    Capture width ratio is the ratio of capture width to a characteristic length scale, often taken as the device diameter but taken here as the square root of the wetted surface area to better serve as a proxy for cost.
+    (The cube root of submerged volume was also considered as a characteristic length scale; results were qualitatively similar to the square root of surface area and are not shown here.
+    If wavelength were used as the characteristic length scale, the resulting capture width ratio would be a constant multiple of the radiation efficiency).
+    For the final output, to nondimensionalize the wetted surface area, we divide it by the wavelength squared.
 \fi
 
 \ifdefined\DISSERTATION
@@ -64,6 +67,7 @@ Since the values without scale factors are of the correct order of magnitude and
     At high $m_0h$ (deep water, fast waves), the most efficient designs (pink/red) have
 \else
     The most efficient design depends on the frequency-depth regime $m_0h$.
+    The radiation limit is marked with a horizontal dashed line; efficiencies above the limit indicate simulation errors and are disregarded.
     Low $m_0h$ (shallow water, slow waves) favors a pure cylinder geometry with small radius.
     Moderate $m_0h$ favors low $a_1/a_2$ (a small spar relative to the float).
     High $m_0h$ favors qualitatively different geometries.
@@ -72,9 +76,15 @@ Since the values without scale factors are of the correct order of magnitude and
 \paragraph{Design Cost-Power Tradeoffs}
 \Cref{fig:meem-sweep-pareto} shows a Pareto front for the tradeoff of radiation efficiency (power proxy) and normalized surface area (cost proxy) across the six geometric design variables.
 \ifdefined\DISSERTATION
-    The normalized surface area does not depend on the seventh input variable $m_0h$, and the largest radiation efficiency for that geometry across all $m_0h$ is plotted, essentially showing the best possible radiation efficiency for each geometry across all wave environments.
-    Black squares denote the non-dominated Pareto-optimal points: the geometries that achieve the highest radiation efficiency for a given normalized surface area.
+    The normalized surface area does not depend on the seventh input variable $m_0h$,
+    and the largest radiation efficiency for that geometry across all $m_0h$ is plotted,
+    essentially showing the best possible radiation efficiency for each geometry across all wave environments.
+    Black squares denote the non-dominated Pareto-optimal points:
+    the geometries that achieve the highest radiation efficiency for a given normalized surface area.
     %Designs with \hl{some quality} tend to perform well, with \hl{some quality} being optimal for the high-efficiency, high-cost end of the Pareto front and \hl{some quality} being optimal for the low-efficiency, low-cost end of the Pareto front.
+\else
+    The plot shows only the largest radiation efficiency across all $m_0h$ for each geometry.
+    Black squares denote Pareto-optimal points.
 \fi
 
 \begin{figure}
@@ -268,6 +278,8 @@ Despite the most probable wave period being 6-8 seconds, 10 second waves contrib
 \end{figure}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
 \ifdefined\DISSERTATION
+    Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
+\else
     Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
 \fi
 

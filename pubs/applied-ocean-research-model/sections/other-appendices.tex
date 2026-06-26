@@ -82,56 +82,7 @@ They will be used for the PTO kinematics.
 Converting between the three multiport conventions is accomplished using the formulas in \cite{reveyrand_multiport_2018}, although some port relationships require a particular convention to capture the physics and are undefined in other conventions.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Time-Domain Expansion of Instantaneous Power}
-\label{sec:appendix-power-time}
 
-\Cref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ as \cite{saadat_power_1999}:
-\begin{equation}\label{eq:power-time-PQS}
-    p(t) = P + |S| \cos\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\left(\frac{Q}{P}\right)\right)
-\end{equation}
-The average, peak, and minimum powers over a wave period are then:
-\begin{equation}\label{eq:power-avg-peak}
-    p_{avg} = P, \quad p_{pk} = P + |S|, \quad p_{min} = P - |S|
-\end{equation}
-
-%%%%%%%%%%%%%%%
-\subsubsection{Electrical-Port Power in Optimal-Control Variables}
-\label{sec:appendix-power-elec}
-
-The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
-\begin{equation}\label{eq:power-elec}
-\begin{bmatrix}
-p_{avg,elec} \\
-p_{pk,elec}
-\end{bmatrix}
-= 
-\eta
-\begin{bmatrix}
-p_{avg,VI} \\
-p_{pk,VI}
-\end{bmatrix}
-= 
-\eta \frac{1}{2} B_l |\hat{I}|^2
-\begin{bmatrix}
-1 \\
- 1 + \sqrt{1 + \left(\frac{K_l}{B_l \omega }\right) ^2  }
-\end{bmatrix}
-\end{equation}
-% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
-% \begin{equation}
-% [a]_m = \begin{bmatrix}
-% 1/R &~ 0 \\
-% 0 &~ R
-% \end{bmatrix} = \begin{bmatrix}
-% 1 &~ 0 \\
-% 0 &~ 1
-% \end{bmatrix}
-% \end{equation}
-% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
-% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
-
-%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
-%%%%%%%%%%%%%%%
 \subsubsection{PTO Kinematics and Underactuation}
 The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
 In general form, the PTO kinematics can be expressed as:
@@ -339,6 +290,58 @@ The load voltage and current can then be found as:
     \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
 \end{equation}
 
+%%%%%%%%%%%%%%%
+\subsubsection{Time-Domain Expansion of Instantaneous Power}
+\label{sec:appendix-power-time}
+
+\Cref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ as \cite{saadat_power_1999}:
+\begin{equation}\label{eq:power-time-PQS}
+    p(t) = P + |S| \cos\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\left(\frac{Q}{P}\right)\right)
+\end{equation}
+The average, peak, and minimum powers over a wave period are then:
+\begin{equation}\label{eq:power-avg-peak}
+    p_{avg} = P, \quad p_{pk} = P + |S|, \quad p_{min} = P - |S|
+\end{equation}
+
+%%%%%%%%%%%%%%%
+\subsubsection{Electrical-Port Power in Optimal-Control Variables}
+\label{sec:appendix-power-elec}
+
+The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general because, as in \cref{sec:power}, controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
+\begin{equation}\label{eq:power-elec}
+\begin{bmatrix}
+p_{avg,elec} \\
+p_{pk,elec}
+\end{bmatrix}
+= 
+\eta
+\begin{bmatrix}
+p_{avg,VI} \\
+p_{pk,VI}
+\end{bmatrix}
+= 
+\eta \frac{1}{2} B_l |\hat{I}|^2
+\begin{bmatrix}
+1 \\
+ 1 + \sqrt{1 + \left(\frac{K_l}{B_l \omega }\right) ^2  }
+\end{bmatrix}
+\end{equation}
+% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
+% \begin{equation}
+% [a]_m = \begin{bmatrix}
+% 1/R &~ 0 \\
+% 0 &~ R
+% \end{bmatrix} = \begin{bmatrix}
+% 1 &~ 0 \\
+% 0 &~ 1
+% \end{bmatrix}
+% \end{equation}
+% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
+% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
+
+%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
+%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Linear Solution Procedure}
 \label{sec:appendix-dynamics-solution}
@@ -461,7 +464,9 @@ Using $\hat{I}_p$ for brevity to denote the current in the particular solution, 
 \end{equation}
 
 Inequality constraints 
-$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x} + 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\} \le b_\mu$
+$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x}
++ 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\}
+\le b_\mu$
 further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
 While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition, even if the problem is non-convex (see \cref{sec:qp-convexity} for a discussion on convexity). 
 First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
@@ -1082,6 +1087,7 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
 Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at the body draft, with $\vec{T}=[T_{f,2},T_s]$ collecting the bottom draft of the float and spar:
 \begin{equation}
+\label{eq:wave-velocity-phasor}
 \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
 \end{equation}
 

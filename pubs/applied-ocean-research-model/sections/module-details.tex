@@ -421,6 +421,8 @@ Describing functions assume a certain time-domain nonlinear signal shape and the
 \ifdefined\DISSERTATION
     The two signals where describing functions are used are both force signals.
     For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it also undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
+\else
+    The fundamental is the most relevant harmonic for power because typically, its force is the largest and its position undergoes the least filtering by the low-pass plant.
 \fi
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
@@ -787,13 +789,6 @@ The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ 
 \end{aligned}
 \end{equation}
 where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
-\ifdefined\DISSERTATION
-    Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at the body draft, with $\vec{T}=[T_{f,2},T_s]$ collecting the bottom draft of the float and spar:
-    \begin{equation}\label{eq:wave-velocity-phasor}
-        \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
-    \end{equation}
-\else
-\fi
 The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in Figure~\ref{fig:desc-fcns}(b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
 
@@ -1203,6 +1198,7 @@ This yields:
 \end{aligned}
 \end{equation}
 where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
+See \Cref{sec:appendix-econ-power-laws} for more details.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
 For consistency with \cite{neary_reference_2014} and \cite{RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
