@@ -793,13 +793,12 @@ where the last line of \cref{eq:drag-pressure} applies the describing function a
         \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
     \end{equation}
 \else
-where the last line of \cref{eq:drag-pressure} applies the describing function approximation. 
 \fi
 The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in Figure~\ref{fig:desc-fcns}(b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
 
 \ifdefined\DISSERTATION
-The integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals detailed in \appendixname~\ref{sec:appendix-drag}.
+Using strip theory, the integrals of \cref{eq:drag-coeffs} can be expressed in terms of standard nondimensional integrals detailed in \appendixname~\ref{sec:appendix-drag}.
 These integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values and accessed via a lookup table to reduce runtime.
 
 The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
@@ -818,7 +817,7 @@ Further derivation, convergence details, and control implications are discussed 
 
 %%%%%%%%%%%%%%%
 \subsubsection{Energy Production}
-The analysis thus far has either been sea-state agnostic (\cref{sec:geom}) or applied separately to each individual sea state (\cref{sec:hydro,sec:dynamics}).
+The analysis thus far either is sea-state agnostic (\cref{sec:geom}) or applies separately to each individual sea state (\cref{sec:hydro,sec:dynamics}).
 We now combine the results across sea states to find the long-term energy statistics in a given wave environment.
 While matrices in \cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e. $\vec{\hat{\xi}}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e. $\hat{\xi}_f$) or the sum across all degrees of freedom (i.e. power in systems with multiple actuated degrees of freedom).
 \ifdefined\DISSERTATION
@@ -1173,6 +1172,7 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
 \else
 The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
 With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
+The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\cref{tab:CBS} in \appendixname~\ref{sec:appendix-econ}).
 \fi
 
 Since the RM3 CBS only applies to a single WEC design, MDOcean extends its scope to capture the scaling of structural cost (category 1.4) with the volume of structural material $V_{struct}$, and the power take off (PTO) cost (category 1.5) with the peak electrical power $P_{pk,elec}$ and force $F_{max}$.
