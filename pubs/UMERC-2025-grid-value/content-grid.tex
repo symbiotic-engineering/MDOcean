@@ -97,7 +97,7 @@ The ROM is used only to capture the effect of WEC design on the hourly CEM varia
 
 First we nondimensionalize to reduce the design space.
 The $CW(H_s,T_e)$ equation has 18 quantities: $CW$, $H_s$, $T_e$, 6 design variables, and 9 parameters.
-The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\mathbf{\Pi_1}$ without approximation (see A).
+The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\mathbf{\Pi_1}$ without approximation (see \cref{sec:appendix-grid}).
 To further reduce, we leverage rigid body dynamics, which dictates the following:
 \begin{equation}
     \label{eq:CW-fraction}
@@ -115,9 +115,9 @@ Future work could develop a mechanistic surrogate model to understand CEM drivin
 Two approaches are possible in selecting $\mathbf{\Pi_2}$ and the corresponding error model: a pole-zero description of the dynamics to obtain a low-order transfer function, or a hydrodynamics-informed curve fit.
 A pole-zero description, $\mathbf{\Pi_{2,pz}}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics. 
 A variety of existing WEC models use this \cite{bacelli_system_2017} or similar approaches \cite{kristiansen_state-space_2005}. 
-A shows the equation for an arbitrary number of poles and zeros.
+\Cref{sec:appendix-grid} shows the equation for an arbitrary number of poles and zeros.
 Alternatively, a custom hydrodynamics curve fit, $\mathbf{\Pi_{2,hyd}}$, offers more accuracy at lower order using deep mechanistic understanding of the physics.
-A shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
+\Cref{sec:appendix-grid} shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
 
 This study evaluates a second-order pole-zero model $\mathbf{\Pi_{2,pz}=(\zeta,\omega_n)}$ to fit the closed loop system compliance, $\hat{X}/\hat{F}=1/(i\omega(\hat{Z}_h+\hat{Z}_u+\hat{Z}_d))$,  but finds a poor fit.
 Specifically, \cref{fig:bode} shows that for the nominal RM3, the model is valid only at frequencies at and below resonance.
@@ -254,7 +254,7 @@ Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-v
 It took 20 minutes to run the 15 CEM optimizations on an Ubuntu 20.04 server with Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz, using up to 28 threads for each optimization and executing successive optimizations in series.
 Of this time, only around half is spent in GenX, since PowerGenome takes 35 seconds per case. %, downloading MHKit data takes 17 seconds, 
 %It took \hl{XX} minutes to run the design optimization, with each simulation taking \hl{XX} ms and each single-objective optimization taking \hl{XX} iterations.
-\Cref{fig:cem-cost-sweep} shows the normalized grid cost, CO2 emissions, and capacity from the CEM for a WEC with $\zeta=0.05, \omega_n=0.4$, and $B_{u}=10^5\omega e^{-\omega^2}$ (a Rayleigh distribution: an alternative model to the one in A) in the Northeast.
+\Cref{fig:cem-cost-sweep} shows the normalized grid cost, CO2 emissions, and capacity from the CEM for a WEC with $\zeta=0.05, \omega_n=0.4$, and $B_{u}=10^5\omega e^{-\omega^2}$ (a Rayleigh distribution: an alternative model to the one in \cref{sec:appendix-grid}) in the Northeast.
 %These results have WEC capacities of zero in the yellow regions due to a lack of economic viability, and therefore have constant system cost and emissions there.
 As the WEC gets cheaper (moving from right to left), %and more consistent power profile,
 the grid cost, emissions, and capacity of other renewables reduce as expected, and WEC capacity increases.
