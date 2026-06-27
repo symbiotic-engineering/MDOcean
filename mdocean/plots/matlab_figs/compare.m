@@ -121,9 +121,23 @@ numeric_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
 vector_names = {'over_rho','phase','force_surge'};
 vector_rows = contains(temp_table.Properties.VariableNames,vector_names);
 out_table = rows2vars(temp_table(:,numeric_vals & ~vector_rows));
-out_table.Properties.RowNames = out_table.OriginalVariableNames;
+out_table.Properties.RowNames = fix_underscores(out_table.OriginalVariableNames);
 out_table = removevars(out_table,'OriginalVariableNames');
 
+end
+
+function cell = fix_underscores(cell)
+    for i = 1:length(cell)
+        str = cell{i};
+        if contains(str,'_')
+            prefix = extractBefore(str,'_');
+            subscript = extractAfter(str,[prefix '_']);
+            subscript = strrep(subscript,'_',','); % avoid nested subscripts
+            if  length(subscript) > 1
+                cell{i} = [prefix '_{' subscript '}'];
+            end
+        end
+    end
 end
 
 function f = hydro_compare(vals,colors)

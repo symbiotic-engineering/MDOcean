@@ -200,6 +200,8 @@ analysis-Comparison:
     - ./mdocean/simulation/modules/structures/get_plate_stress.m
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/Comparison/intermed.mat
@@ -1555,11 +1557,16 @@ analysis-ForceSaturationFigFunc:
     - ./mdocean/inputs/var_bounds.mat
     - ./mdocean/inputs/wave_conditions/trim_jpd.m
     - ./mdocean/optimization/find_nominal_inputs.m
+    - ./mdocean/optimization/gradient_optim.m
+    - ./mdocean/optimization/run_solver.m
     - ./mdocean/plots/matlab_figs/force_sat_results.m
     - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
     - ./mdocean/plots/matlab_figs/make_slamming_plot.m
+    - ./mdocean/plots/matlab_figs/optim_geomviz.m
+    - ./mdocean/plots/matlab_figs/optimplotx_custom.m
     - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
     - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+    - ./mdocean/plots/matlab_figs/visualize_geometry.m
     - ./mdocean/plots/util/bluewhitered.m
     - ./mdocean/plots/util/check_fig_size.m
     - ./mdocean/plots/util/contourx.m
@@ -1590,12 +1597,15 @@ analysis-ForceSaturationFigFunc:
     - ./mdocean/simulation/modules/hydro/get_m_k_h.m
     - ./mdocean/simulation/modules/hydro/group_velocity.m
     - ./mdocean/simulation/modules/hydro/run_MEEM.m
+    - ./mdocean/simulation/modules/lin_ineq_constraints.m
     - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
     - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
     - ./mdocean/simulation/modules/structures/float_plate_stress.m
     - ./mdocean/simulation/modules/structures/get_plate_stress.m
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/ForceSaturationFigFunc/intermed.mat
@@ -1742,6 +1752,8 @@ analysis-GradientOptimFigFunc:
     - ./mdocean/simulation/modules/structures/get_plate_stress.m
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/GradientOptimFigFunc/intermed.mat
@@ -1817,6 +1829,8 @@ postpro-GradientOptimFigFunc:
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/check_max_CW.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
     - results/GradientOptimFigFunc/intermed.mat
   outputs: 
@@ -2050,9 +2064,16 @@ analysis-LocationSensitivity:
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/check_max_CW.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/LocationSensitivity/intermed.mat
+    - results/LocationSensitivity/intermed_h_power_matrix_1.fig
+    - results/LocationSensitivity/intermed_h_power_matrix_2.fig
+    - results/LocationSensitivity/intermed_h_power_matrix_3.fig
+    - results/LocationSensitivity/intermed_h_power_matrix_4.fig
+    - results/LocationSensitivity/intermed_h_probability_PDF_1.fig
 postpro-LocationSensitivity:
   kind: matlab-command
   environment: _system
@@ -2363,6 +2384,8 @@ analysis-Multistart:
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/is_feasible.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/Multistart/intermed.mat
@@ -2402,10 +2425,12 @@ postpro-Multistart:
     - ./mdocean/plots/util/hatchfill2.m
     - ./mdocean/plots/util/improvePlot.m
     - ./mdocean/plots/util/imrange.m
+    - ./mdocean/plots/util/raster_text.m
     - ./mdocean/plots/util/remove_underscores.m
     - ./mdocean/plots/util/save_fig_with_diagnostic.m
     - ./mdocean/plots/util/signed_log.m
     - ./mdocean/plots/util/table2latex.m
+    - ./mdocean/plots/util/unicode.m
     - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
     - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
     - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2521,6 +2546,8 @@ analysis-ParamSensitivities:
     - ./mdocean/simulation/modules/structures/get_plate_stress.m
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/ParamSensitivities/intermed.mat
@@ -2853,6 +2880,8 @@ analysis-ParetoFigFunc:
     - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/is_feasible.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/ParetoFigFunc/intermed.mat
@@ -3580,7 +3609,9 @@ analysis-RunSingleFigFunc:
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/check_max_CW.m
     - ./mdocean/simulation/run/is_feasible.m
+    - ./mdocean/simulation/run/run_and_catch_warnings.m
     - ./mdocean/simulation/run/run_single.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/RunSingleFigFunc/intermed.mat
@@ -4177,6 +4208,7 @@ analysis-SweepGeoms:
     - ./mdocean/simulation/modules/structures/structures.m
     - ./mdocean/simulation/run/check_max_CW.m
     - ./mdocean/simulation/run/run_and_catch_warnings.m
+    - ./mdocean/simulation/sim_catch_warning.m
     - ./mdocean/simulation/simulation.m
   outputs: 
     - results/SweepGeoms/intermed.mat
@@ -4572,375 +4604,375 @@ postpro-Wecsim:
     - ./mdocean/simulation/simulation.m
     - results/Wecsim/intermed.mat
   outputs: 
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.pdf
-    - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_multi__histogram.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_wcsm_single__histogram.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_elec_sat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__relative_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__PTO_damping.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__force_pto.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__rel_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_elec_sat.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__CW_to_CW_max.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__relative_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_amplitude.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__PTO_damping.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__force_pto.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_fund.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__rel_phase.pdf
+    - results/Wecsim/wecsim_rpt_multi__histogram.pdf
     - results/Wecsim/accel_fourier_harmonics.pdf
     - results/Wecsim/drag_force_desc_fcn.pdf
     - results/Wecsim/position_THD_contour.pdf
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.fig
-    - results/Wecsim/wecsim_geom_report_multibody_true__histogram.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_multi__histogram.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_wcsm_single__histogram.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_mech_unsat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_elec_sat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__relative_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__PTO_damping.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__force_pto.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__rel_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_elec_sat.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__CW_to_CW_max.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__relative_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_amplitude.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__PTO_damping.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__force_pto.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_fund.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_phase.fig
+    - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__rel_phase.fig
+    - results/Wecsim/wecsim_rpt_multi__histogram.fig
     - results/Wecsim/accel_fourier_harmonics.fig
     - results/Wecsim/drag_force_desc_fcn.fig
     - results/Wecsim/position_THD_contour.fig

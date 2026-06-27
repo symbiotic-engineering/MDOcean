@@ -162,6 +162,13 @@ if ~criteria
     disp(['g: ' num2str(g_vec)])
     disp(['LCOE: ' num2str(LCOE) ', P_var: ' num2str(P_var)])
     warning('MDOcean:Simulation:InfNanImaginary', 'Inf, NaN, or imaginary constraint or objective detected')
+    bad_obj = ~isfinite(J) | ~isreal(J);
+    bad_g = ~isfinite(g_vec) | ~isreal(g_vec);
+    J(bad_obj) = 1e12;
+    g_vec(bad_g) = -1e12;
+    if ~isfinite(P_var) || ~isreal(P_var)
+        P_var = 1e12;
+    end
 end
 
 if nargout > 3 % if returning extra struct output for validation
