@@ -17,6 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  # pdf2svg:
+  #   kind: docker
+  #   path: pubs/defense/latex-standalone/Dockerfile
+  #   description: pdf2svg via Docker.
+  #   image: pdf2svg
   quarto:
     kind: docker
     image: ghcr.io/quarto-dev/quarto:latest
@@ -40,8 +45,11 @@ parameters:
     - taxonomy
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
+  latex_standalone_name:
+    - eigenfunctions
+    - A_matrix
 # subprojects:
-  # - path: mdocean/simulation/modules/OpenFLASH
+#   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
   stages:
     mermaid-make-pdfs:
@@ -131,10 +139,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -194,10 +202,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -265,13 +273,13 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -334,13 +342,13 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/compare.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/compare.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -417,10 +425,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -480,10 +488,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -546,10 +554,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -608,10 +616,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -675,10 +683,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/matlab_figs/structures/make_four_loads_plot.m
         - ./mdocean/plots/matlab_figs/structures/viz_damping_plate.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -743,10 +751,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -816,11 +824,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/sin_desc_fcn_demo.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/sin_desc_fcn_demo.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -883,10 +891,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -957,10 +965,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1027,13 +1035,13 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
         - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/experiments_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
+        - ./mdocean/plots/matlab_figs/sim_results/experiments_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1100,10 +1108,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1163,10 +1171,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1229,10 +1237,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1293,10 +1301,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1390,10 +1398,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1453,10 +1461,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1676,14 +1684,14 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/force_sat_results.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/force_sat_results.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1748,10 +1756,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1821,13 +1829,13 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1895,16 +1903,16 @@ pipeline:
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/delta_x.m
-        - ./mdocean/plots/matlab_figs/SOO_result_plots.m
-        - ./mdocean/plots/matlab_figs/lagrange_multiplier_bar_chart.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/SOO_result_plots.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sens/lagrange_multiplier_bar_chart.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1988,10 +1996,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2053,10 +2061,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2125,15 +2133,15 @@ pipeline:
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/location_sensitivity.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2203,10 +2211,10 @@ pipeline:
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/sensitivities/location_post_process.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2284,11 +2292,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/b_inf_numeric.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/b_inf_numeric.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2357,10 +2365,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2443,13 +2451,13 @@ pipeline:
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/gradient_mult_x0.m
         - ./mdocean/optimization/sensitivities/random_x0.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2519,11 +2527,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/multistart_postpro.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/optim/multistart_postpro.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2602,13 +2610,13 @@ pipeline:
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/local_sens_both_obj_all_param.m
         - ./mdocean/optimization/sensitivities/param_sweep.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/color_each_element.m
@@ -2672,12 +2680,12 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/all_sens_plots.m
-        - ./mdocean/plots/matlab_figs/global_sens_plots.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/sens/all_sens_plots.m
+        - ./mdocean/plots/matlab_figs/sens/global_sens_plots.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/color_each_element.m
@@ -2787,10 +2795,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2850,10 +2858,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2922,14 +2930,14 @@ pipeline:
         - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
         - ./mdocean/optimization/multiobjective/pareto_search.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2997,12 +3005,12 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
         - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/sim_results/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3073,10 +3081,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3136,10 +3144,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3203,10 +3211,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3266,10 +3274,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3337,10 +3345,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3402,10 +3410,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3484,11 +3492,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/circle_intersect_script.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/circle_intersect_script.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3549,10 +3557,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3620,15 +3628,15 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3702,11 +3710,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_nominal_constraint_circles.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_nominal_constraint_circles.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3801,10 +3809,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3863,11 +3871,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/module_runtime_compare.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/sim_results/module_runtime_compare.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3940,11 +3948,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/slam_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/slam_plot.m
         - ./mdocean/plots/util/arrow.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
@@ -4006,10 +4014,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4073,11 +4081,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/spar_hydro_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/spar_hydro_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4138,10 +4146,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4208,13 +4216,13 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4279,10 +4287,10 @@ pipeline:
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/MatlabSVG/loadSVG.m
         - ./mdocean/plots/util/MatlabSVG/plotSVG.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -4386,10 +4394,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4454,10 +4462,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4530,10 +4538,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4608,10 +4616,10 @@ pipeline:
           Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -5506,28 +5514,39 @@ pipeline:
         pctRuntimeOther: "{pctRuntimeOther:.0f}%"
         wecsimAvgPowerErrorBestCase: "{wecsimAvgPowerErrorBestCase:.2f}%"
         wecsimAvgPowerErrorWorstCase: "{wecsimAvgPowerErrorWorstCase:.2f}%"
+        # parameters
+        powerScaleFactor: "{powerScaleFactor:.2f}"
+        forceScaleFactor: "{forceScaleFactor:.2f}"
+        massScaleFactor: "{massScaleFactor:.2f}"
         # PTO sweep min-LCOE point
         ptoSweepMinLCOE_F_max: "{ptoSweepMinLCOE_F_max/1e6:.2f} MN"
         ptoSweepMinLCOE_P_max: "{ptoSweepMinLCOE_P_max/1e3:.0f} kW"
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+    check-dup-json-keys:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/duplicate_json_key.py
+      inputs:
+        - results/
+        - pubs/renewable-energy-mdo/numbers.json
     re-results-to-latex:
       kind: json-to-latex
       inputs:
         - pubs/renewable-energy-mdo/numbers.json
         # - results/AllFigCompare/end.json
-        # - results/Comparison/end.json
-        # - results/Constraints/end.json
+        - results/Comparison/end.json
+        - results/Constraints/end.json
         # - results/DesignSpaceExploration/end.json
         # - results/DesignVars/end.json
         - results/ForceSaturationFigFunc/end.json
-        # - results/GradientOptimFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
         # - results/LocationSensitivity/end.json
         # - results/Multistart/end.json
-        # - results/ParamSensitivities/end.json
-        # - results/Parameters/end.json
-        # - results/ParetoFigFunc/end.json
+        - results/ParamSensitivities/end.json
+        - results/Parameters/end.json
+        - results/ParetoFigFunc/end.json
         # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/Runtime/end.json
@@ -5567,8 +5586,9 @@ pipeline:
         capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
         capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
-        # runtimes (stored in seconds, formatted as minutes)
+        # runtimes (stored in seconds, formatted as ms or minutes)
         simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         singleObjRuntime: "{singleObjRuntime/60:.1f} min"
         paretoRuntime: "{paretoRuntime/60:.0f} min"
         gradientSensRuntime: "{runtime_post_optim/60:.1f} min"
@@ -5584,6 +5604,8 @@ pipeline:
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
         lowestFmaxFactorMinLCOE: "{lowestFmaxFactorMinLCOE*100:.0f}%"
+        percentParamsRightSign: "{percentParamsRightSign:.0f}%"
+        percentMeanAbsErrorParamSens: "{percentMeanAbsErrorParamSens:.0f}%"
         # force saturation comparison (non-reoptimized) - values from GradientOptimFigFunc
         powerLossForceSatMinLCOE: "{powerLossForceSatMinLCOE:.1f} W"
         pctPowerLossForceSatMinLCOE: "{pctPowerLossForceSatMinLCOE:.3f}%"
@@ -5635,6 +5657,34 @@ pipeline:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
           kind: file-to-file
+    paperlint-aor:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - pubs/applied-ocean-research-model/main.tex
+        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-aor.txt
+      inputs:
+        - pubs/applied-ocean-research-model/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-aor.txt
+          storage: git
+    paperlint-re:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - pubs/renewable-energy-mdo/mdocean.tex
+        - --ignore pubs/renewable-energy-mdo/numeric-results.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-re.txt
+      inputs:
+        - pubs/renewable-energy-mdo/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-re.txt
+          storage: git
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
@@ -5645,7 +5695,6 @@ pipeline:
         - pubs/renewable-energy-mdo/sections/
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
-        - pubs/renewable-energy-mdo/numbers.tex
         - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/renewable-energy-mdo/elsarticle-num-names.bst
         - pubs/renewable-energy-mdo/zotero-meem-refs.bib
@@ -5676,6 +5725,8 @@ pipeline:
         - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
         - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/shared-pkg.tex
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
@@ -5710,13 +5761,11 @@ pipeline:
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/appendices.tex
         - pubs/applied-ocean-research-model/commands-aor.tex
-        - pubs/applied-ocean-research-model/numbers.tex
         - pubs/renewable-energy-mdo/numeric-results.tex
         - pubs/renewable-energy-mdo/sections/
         - pubs/renewable-energy-mdo/figs/
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/commands-re.tex
-        - pubs/renewable-energy-mdo/numbers.tex
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/references.bib
@@ -5807,6 +5856,34 @@ pipeline:
       outputs:
         - path: pubs/defense/quarto/_variables.yml
           storage: git
+    make-standalone-tex-pdf:
+      kind: latex
+      target_path: pubs/defense/latex-standalone/standalone_{name}.tex
+      environment: tex
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
+      inputs:
+        - pubs/shared/equations/
+      outputs:
+        - pubs/defense/latex-standalone/standalone_{name}.pdf
+        - path: pubs/defense/latex-standalone/standalone_{name}.log
+          delete_before_run: false
+    # make-standalone-tex-svg:
+    #   kind: shell-command
+    #   environment: pdf2svg
+    #   iterate_over:
+    #     - arg_name: name
+    #       values:
+    #         - parameter: latex_standalone_name
+    #   command: pdf2svg 
+    #     pubs/defense/latex-standalone/standalone_{name}.pdf 
+    #     pubs/defense/figs/standalone_{name}.svg
+    #   inputs:
+    #     - pubs/defense/latex-standalone/standalone_{name}.pdf
+    #   outputs:
+    #     - pubs/defense/figs/standalone_{name}.svg
     render-quarto-html:
       kind: docker-command
       environment: quarto

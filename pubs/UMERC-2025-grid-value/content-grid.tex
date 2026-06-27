@@ -24,13 +24,13 @@ New in this study, the primary optimization objective is CEM grid cost.
 To avoid flatness, the objective becomes the margin to viability if the WEC is not economically viable.
 To capture system environmental impacts, we add a second new objective of net eco-value per energy.
 %MDOcean utilizes gradient-based nonlinear programming for single-objective optimization and combines gradient and gradient-free methods for multi-objective optimization \cite{mccabe_leveraging_2026}.
-\figureautorefname~\ref{umerc:fig:n2} depicts the optimization structure in an xDSM diagram \cite{lambe_extensions_2012}, with design variables on the top, objectives and constraints in the rightmost two columns, and simulation modules along the diagonal.
+\Cref{umerc:fig:n2} depicts the optimization structure in an xDSM diagram \cite{lambe_extensions_2012}, with design variables on the top, objectives and constraints in the rightmost two columns, and simulation modules along the diagonal.
 
 \subsection{\textit{Modeling}}
 MDOcean integrates hydrodynamic, structural, control, and economic models, detailed in \cite{mccabe_leveraging_2026}.
 %The model handles nonlinear dynamics including drag and generator force limits.
 This study introduces new ``grid'' and ``environment'' modules to MDOcean.
-Grey lines in \figureautorefname~\ref{umerc:fig:n2} show module connections.
+Grey lines in \cref{umerc:fig:n2} show module connections.
 As \cite{mccabe_system_2023} proposes, we perform CEM optimizations before the design optimization for a wide set of inputs that reflect the range of possible WEC designs and parameters.
 The grid module of the design optimization captures CEM results in a surrogate model to reduce computation time, enabled by a reduced order dynamics model.
 Using a CEM rather than historical grid data correlations means that we accurately account for marginal generators, unlike prior work \cite{canet_eco-conscious_2023,kainz_how_2024}.
@@ -63,7 +63,7 @@ The CEM grid system cost metric captures more effects than NVOE, such as costs a
 GenX requires detailed input data on the cost, hourly profile, and existing infrastructure of all generation, transmission, storage, and load on the grid.
 This is managed by the PowerGenome package \cite{schivley_powergenomepowergenome_2025}, which consolidates data from multiple sources including scenarios for reference, moderate, and high levels of electrification.
 PowerGenome also allows control over a grid-wide maximum CO\textsubscript{2} constraint.
-\figureautorefname~\ref{fig:CEM-data-flow} depicts the data flow for the CEM runs prior to design optimization and documents the grid data sources.
+\Cref{fig:CEM-data-flow} depicts the data flow for the CEM runs prior to design optimization and documents the grid data sources.
 %Coefficients $\beta$ 
 Grid costs and emissions are found for each input combination of WEC cost, grid scenario, location, and WEC dynamics (damping ratio and natural frequency).
 Orange outlines indicate code implemented in this work rather than an existing package.
@@ -97,7 +97,7 @@ The ROM is used only to capture the effect of WEC design on the hourly CEM varia
 
 First we nondimensionalize to reduce the design space.
 The $CW(H_s,T_e)$ equation has 18 quantities: $CW$, $H_s$, $T_e$, 6 design variables, and 9 parameters.
-The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\mathbf{\Pi_1}$ without approximation (see \appendixname~A).
+The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\mathbf{\Pi_1}$ without approximation (see A).
 To further reduce, we leverage rigid body dynamics, which dictates the following:
 \begin{equation}
     \label{eq:CW-fraction}
@@ -115,17 +115,17 @@ Future work could develop a mechanistic surrogate model to understand CEM drivin
 Two approaches are possible in selecting $\mathbf{\Pi_2}$ and the corresponding error model: a pole-zero description of the dynamics to obtain a low-order transfer function, or a hydrodynamics-informed curve fit.
 A pole-zero description, $\mathbf{\Pi_{2,pz}}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics. 
 A variety of existing WEC models use this \cite{bacelli_system_2017} or similar approaches \cite{kristiansen_state-space_2005}. 
-\appendixname~A shows the equation for an arbitrary number of poles and zeros.
+A shows the equation for an arbitrary number of poles and zeros.
 Alternatively, a custom hydrodynamics curve fit, $\mathbf{\Pi_{2,hyd}}$, offers more accuracy at lower order using deep mechanistic understanding of the physics.
-\appendixname~A shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
+A shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
 
 This study evaluates a second-order pole-zero model $\mathbf{\Pi_{2,pz}=(\zeta,\omega_n)}$ to fit the closed loop system compliance, $\hat{X}/\hat{F}=1/(i\omega(\hat{Z}_h+\hat{Z}_u+\hat{Z}_d))$,  but finds a poor fit.
-Specifically, \figureautorefname~\ref{fig:bode} shows that for the nominal RM3, the model is valid only at frequencies at and below resonance.
+Specifically, \cref{fig:bode} shows that for the nominal RM3, the model is valid only at frequencies at and below resonance.
 Capturing behavior above resonance would require a higher order model such as one with five poles, two standard zeros, and two right half plane zeros to capture the abrupt increase in phase.
 This is similar to another study where a point absorber intrinsic impedance $\hat{Z}_h + \hat{Z}_d$ was fit with three poles and one right half plane zero \cite{bacelli_system_2017}.
 However, sweeping this many dynamic inputs to the CEM is impractical, and high frequencies are less common in the ocean, so here we maintain a second order model and exclude frequencies with $\omega>0.6$ from the fit (shown in grey).
 Fitting each wave height separately lets the model capture drag nonlinearities, which manifest as a roughly locally linear dependence of $\zeta$ and $\omega_n$ on wave height.
-\figureautorefname~\ref{fig:fit-versus-wave-height} shows this relation when fitting magnitude and phase separately.
+\Cref{fig:fit-versus-wave-height} shows this relation when fitting magnitude and phase separately.
 The magnitude fit depends significantly more on $H_s$ than the phase fit.
 Mismatch of magnitude and phase fits at low $H_s$ is evidence of a nonminimum phase system, and the larger mismatch at high $H_s$ is due to drag nonlinearities.
 While it doesn't affect the shape of $\hat{Z}(\omega)$, stiffness $K$ also shows nonlinearity.
@@ -192,7 +192,7 @@ This includes material use (steel, fiberglass) but not aquatic habitat disruptio
 Although the present study holds distance from shore constant, the environmental model includes offshore transportation (diesel fuel) so future work can evaluate the tradeoff between better energetics but worse survivability, operating cost, and maintenance emissions for WECs further offshore.
 
 MDOcean's geometry module calculates WEC material masses and the environment module multiplies by appropriate weighting coefficients from the Idemat LCA dataset \cite{van_den_herik_idemat_2024}.
-These are scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express diverse lifetime environmental impacts (i.e. water, emissions, pollution) of various materials and processes in monetary units (see \tableautorefname~\ref{tab:lca-weights}).
+These are scope 3 eco-cost coefficients \cite{vogtlander_lca-based_2010} that express diverse lifetime environmental impacts (i.e. water, emissions, pollution) of various materials and processes in monetary units (see \cref{tab:lca-weights}).
 We convert Euros to USD via the March 2024 exchange rate of 1.09 \$/\texteuro.
 MDOcean then offsets the eco-cost with the eco-value of CEM avoided grid emissions using the social cost of carbon.
 Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-value per unit energy (\$/kWh).
@@ -254,7 +254,7 @@ Finally, it normalizes by CEM WEC grid energy production to obtain the net eco-v
 It took 20 minutes to run the 15 CEM optimizations on an Ubuntu 20.04 server with Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz, using up to 28 threads for each optimization and executing successive optimizations in series.
 Of this time, only around half is spent in GenX, since PowerGenome takes 35 seconds per case. %, downloading MHKit data takes 17 seconds, 
 %It took \hl{XX} minutes to run the design optimization, with each simulation taking \hl{XX} ms and each single-objective optimization taking \hl{XX} iterations.
-Figure~\ref{fig:cem-cost-sweep} shows the normalized grid cost, CO2 emissions, and capacity from the CEM for a WEC with $\zeta=0.05, \omega_n=0.4$, and $B_{u}=10^5\omega e^{-\omega^2}$ (a Rayleigh distribution: an alternative model to the one in \appendixname~A) in the Northeast.
+\Cref{fig:cem-cost-sweep} shows the normalized grid cost, CO2 emissions, and capacity from the CEM for a WEC with $\zeta=0.05, \omega_n=0.4$, and $B_{u}=10^5\omega e^{-\omega^2}$ (a Rayleigh distribution: an alternative model to the one in A) in the Northeast.
 %These results have WEC capacities of zero in the yellow regions due to a lack of economic viability, and therefore have constant system cost and emissions there.
 As the WEC gets cheaper (moving from right to left), %and more consistent power profile,
 the grid cost, emissions, and capacity of other renewables reduce as expected, and WEC capacity increases.
@@ -279,14 +279,14 @@ Future work could examine the sensitivity of CEM results to the resource and dem
 Finally, design optimization results will yield insight into whether and how the objective values and optimal design features meaningfully vary when optimizing for LCOE, grid cost, or net eco-value across various grid scenarios.
 %-  can the CEM results be predicted by correlation coefficient of WEC power with demand or with energy storage or with lost load of solar, the capacity factor, sum of hourly profit, other proxies?
 
-% Proceeding to the design optimization results, \figureautorefname~\ref{fig:single-obj-compare} visualizes the optimal designs for the various objectives, alongside the standard RM3 for reference.
+% Proceeding to the design optimization results, \cref{fig:single-obj-compare} visualizes the optimal designs for the various objectives, alongside the standard RM3 for reference.
 % The WEC optimized for grid cost is \hl{(larger/smaller)} compared to the one optimized for LCOE.
 % Meanwhile, the WEC optimized for the net eco-value per energy is (the same as, with \hl{XX} exceptions) the one optimized for grid cost.
-% \figureautorefname~\ref{fig:pareto} shows the Pareto front of the multi-objective optimization.
+% \cref{fig:pareto} shows the Pareto front of the multi-objective optimization.
 % We observe \hl{XX} about the tradeoff, which \hl{(confirms/negates)} the suggestion from the environmental model inspection that the two objectives minimally conflict.
 % While this study initially hypothesized a meaningful environmental-economic tradeoff, insights obtained by building the model suggests that economic and environmental objectives align in the early design phase.
 % This means that environmentally-conscious engineers and policymakers can feel satisfied that here, economic optimization also directly benefits the environmental bottom line.
-% \figureautorefname~\ref{fig:design-heuristics} shows the design heuristics for the pareto front.
+% \cref{fig:design-heuristics} shows the design heuristics for the pareto front.
 % As we transition from economically optimal WECs to environmentally optimal WECs, the bulk dimensions \hl{(grow/shrink)}, the generator ratings \hl{(grow/shrink)}, and the structural thicknesses \hl{(grow/shrink)}.
 
 

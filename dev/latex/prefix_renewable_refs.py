@@ -4,7 +4,7 @@
 import re
 from pathlib import Path
 
-ROOT = Path("/home/becca/Documents/git/MDOcean-worktrees/review")
+ROOT = Path("/home/becca/Documents/git/MDOcean")
 TARGET_DIR = ROOT / "pubs" / "renewable-energy-mdo"
 
 REF_CMDS = ["ref", "eqref", "cref", "Cref", "autoref", "pageref", "nameref"]
