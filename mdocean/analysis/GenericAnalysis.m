@@ -46,7 +46,9 @@ classdef (Abstract) GenericAnalysis < handle
 
     methods
         function obj = GenericAnalysis(p,b)
-            obj.output_folder = ['results' filesep class(obj)];
+            output_folder_rel = ['results' filesep class(obj)]; % relative to MDOcean folder
+            MDOcean_folder = fileparts(fileparts(fileparts(mfilename('fullpath')))); % absolute path
+            obj.output_folder = fullfile(MDOcean_folder, output_folder_rel); % absolute path
             if ~isfolder(obj.output_folder)
                 mkdir(obj.output_folder)
             end
@@ -65,9 +67,9 @@ classdef (Abstract) GenericAnalysis < handle
                 end
             end
             
-            obj.analysis_outputs = {[obj.output_folder, filesep, 'intermed.mat']};
+            obj.analysis_outputs = {[output_folder_rel, filesep, 'intermed.mat']};
 
-            obj.postpro_outputs  = strcat(obj.output_folder,...
+            obj.postpro_outputs  = strcat(output_folder_rel,...
                 filesep, [strcat(obj.fig_names,'.pdf') ...
                           strcat(obj.fig_names,'.fig') ...
                           strcat(obj.tab_names,'.tex') ...
@@ -100,17 +102,22 @@ classdef (Abstract) GenericAnalysis < handle
             val = sorted(~contains(sorted, to_remove));
         end
         function obj = run_analysis(obj)
-            cd('mdocean');
+            original_folder = pwd;
+            mdocean_folder = fileparts(fileparts(mfilename('fullpath')));
+            cleanup_obj = onCleanup(@() cd(original_folder)); %#ok<NASGU>
+            cd(mdocean_folder);
             t = tic;
             intermed_result_struct = obj.analysis_fcn(obj.p, obj.b);
             intermed_result_struct.analysis_time = toc(t);
             obj.intermed_result_struct = intermed_result_struct;
-            cd('..');
             obj.save_intermed_results();
         end
 
         function obj = run_post_process(obj)
-            cd('mdocean');
+            original_folder = pwd;
+            mdocean_folder = fileparts(fileparts(mfilename('fullpath')));
+            cleanup_obj = onCleanup(@() cd(original_folder)); %#ok<NASGU>
+            cd(mdocean_folder);
             t = tic;
             [obj.fig_array,...
                 obj.tab_array_display,...
@@ -118,7 +125,6 @@ classdef (Abstract) GenericAnalysis < handle
                 end_result_struct,...
                 obj.tab_firstrows,...
                 obj.tab_colspecs] = obj.post_process_fcn(obj.intermed_result_struct);
-            cd('..');
             end_result_struct.postpro_time = toc(t);
             end_result_struct.analysis_time = obj.intermed_result_struct.analysis_time;
             obj.end_result_struct = end_result_struct;
@@ -166,6 +172,7 @@ classdef (Abstract) GenericAnalysis < handle
         function save_intermed_results(obj)
             s = obj.intermed_result_struct;
             fn = fieldnames(s);
+            
             for i=1:length(fn)
                 if any(isgraphics(s.(fn{i})) & isa(s.(fn{i}),'matlab.ui.Figure'))
                     figs = s.(fn{i});
@@ -216,16 +223,68 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function obj = run_analysis_from_load_if_possible(obj)
-            if isempty(obj.intermed_result_struct)
-                obj = obj.run_analysis();
-            else
+            if isfile([obj.output_folder filesep 'intermed.mat'])
                 obj = obj.load_intermed_results();
+            else
+                obj = obj.run_analysis();
             end
         end
 
         function obj = run_all_from_load_if_possible(obj)
-            obj = obj.run_analysis_from_load_if_possible();
-            obj = obj.run_post_process();
+            if obj.postpro_outputs_exist()
+                obj = obj.load_postpro_results();
+            else
+                obj = obj.run_analysis_from_load_if_possible();
+                obj = obj.run_post_process();
+            end
+        end
+
+        function tf_2 = postpro_outputs_exist(obj)
+            fig_paths = {};
+            tab_paths = {};
+            if ~isempty(obj.fig_names)
+                fig_paths = fullfile(obj.output_folder, strcat(obj.fig_names, '.pdf'));
+            end
+            if ~isempty(obj.tab_names)
+                tab_paths = fullfile(obj.output_folder, strcat(obj.tab_names, '.tex'));
+            end
+            required = [{fullfile(obj.output_folder, 'intermed.mat')}, ...
+                        {fullfile(obj.output_folder, 'end.mat')}, ...
+                        fig_paths, ...
+                        tab_paths];
+            tf = all(cellfun(@isfile, required));
+            % force rerun of postpro if there are any tables, 
+            % since tables are only saved as tex and aren't recoverable
+            tf_2 = tf && isempty(obj.tab_names);
+        end
+
+        function obj = load_postpro_results(obj)
+            obj = obj.load_intermed_results();
+
+            s = load(fullfile(obj.output_folder, 'end.mat'));
+            obj.end_result_struct = s;
+
+            num_figs = length(obj.fig_names);
+            fig_array = gobjects(1, num_figs);
+            for i = 1:num_figs
+                fig_path = fullfile(obj.output_folder, [obj.fig_names{i} '.fig']);
+                try
+                    fig_handle = openfig(fig_path, 'invisible');
+                    if ishghandle(fig_handle) ...
+                            && isstruct(fig_handle.UserData) ...
+                            && isfield(fig_handle.UserData, 'Position') ...
+                            && numel(fig_handle.UserData.Position) == 2
+                        fig_handle.Position(3:4) = fig_handle.UserData.Position;
+                    end
+                    fig_array(i) = fig_handle;
+                catch err
+                    warning('Failed to load cached figure from %s: %s.', fig_path, err.message)
+                end
+            end
+            obj.fig_array = fig_array;
+
+            % don't attempt to fill tab_array_latex or tab_array_display, since the
+            % matlab table object can't easily be reconstructed from the exported tex.
         end
 
         function stages = write_calkit_stage(obj)

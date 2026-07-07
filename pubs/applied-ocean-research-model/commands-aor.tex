@@ -1,0 +1,34 @@
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+\usepackage{microtype}
+\usepackage{circuitikz} % circuit figures
+\usepackage{subcaption} % for subfigures
+
+% set tikz to compile externally to work with latexmk
+\usetikzlibrary{external,positioning,calc}
+\tikzset{
+    external/system call={
+      pdflatex \tikzexternalcheckshellescape 
+      -halt-on-error 
+      -interaction=batchmode 
+      -output-directory=aux/
+      -jobname "\image" "\texsource"
+    }
+}
+\tikzexternalize
+
+%\usepackage{graphicx}
+%\usepackage{float}
+%\usepackage{placeins}
+
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+\input{numeric-results.tex}

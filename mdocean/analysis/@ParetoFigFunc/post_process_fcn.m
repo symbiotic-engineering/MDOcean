@@ -41,5 +41,17 @@ function [fig_array,...
             tab_firstrows = {};
             tab_colspecs = {};
             
-            end_result_struct = struct();
+            end_result_struct.paretoPctTimeSeeds = intermed_result_struct.paretoPctTimeSeeds;
+            end_result_struct.paretoPctTimePatternSearch = intermed_result_struct.paretoPctTimePatternSearch;
+            end_result_struct.paretoRuntime = intermed_result_struct.paretoTotalRuntime;
+            end_result_struct.paretoFcnEvals = intermed_result_struct.paretoFcnEvals;
+
+            % Compute pareto shape heuristics
+            b = var_bounds();
+            % [powerWhereCusp, powerWhereNonconvexEnds, dampingReactivePowerIntersect] = ...
+            %     compute_pareto_shape_heuristics(intermed_result_struct.r1, intermed_result_struct.r2, ...
+            %                                     intermed_result_struct.r1.p, b);
+            % end_result_struct.powerWhereCusp = powerWhereCusp;
+            % end_result_struct.powerWhereNonconvexEnds = powerWhereNonconvexEnds;
+            % end_result_struct.dampingReactivePowerIntersect = dampingReactivePowerIntersect;
 end
