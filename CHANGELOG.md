@@ -1,6 +1,44 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.16) - 2026-7-7
+### Added
+- Dev: create latex linter to check common mistakes
+### Changed
+- Paper: Maha's word choice changes from Overleaf - note that these are not yet fully reviewed but are merged anyway to maintain accurate history
+- Pipeline: comment out svg2png calkit stage
+- Deps: bump `OpenFLASH` submodule by 2 commits
+- Pipeline: move `matlab_figs` plot functions into folders, regenerate calkit.yaml, and force commit dependent stages
+- Paper: update UMERC paper to use shared citation references and cref for appendices
+- Dev: Change `.mlx` to `.m` for file changed scraper
+### Fixed
+- Pipeline/paper: fixing citations, refs, json2latex, numbers, and addressing linter-identified issues in Maha's wording changes
+- Figures: Improve readability of Mermaid control flowchart diagrams, PTO sweep (remove hashing), and `GradientOptim`'s `delta_x`
+
+## [v1.2.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.15) - 2026-7-7
+### Added
+- Docs: instructions for using calkit with overleaf
+- Dev: interactive script to help execute a calkit overleaf sync
+
+## [v1.2.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.14) - 2026-7-7
+### Added
+- Dev: script to check convexity with cvxpy
+- Dev: script to return which github copilot models were used from json log, for AI acknowledgement statement
+
+## [v1.2.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.13) - 2026-7-7
+### Fixed
+- CI: fixed codecov upload by using OIDC instead of token
+
+## [v1.2.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.12) - 2026-6-26
+- Paper: portion of Maha's Overleaf changes that move things to appendix and introduce if/else structure, without changing wording.
+- Submodule: update OpenFLASH to reflect JFM submission changes (`jfm-thesis` branch with `main` merged into it)
+
+## [v1.2.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.11) - 2026-6-19
+### Changed
+- Tests: comment out assert success command in `run_tests.m`
+### Fixed
+- Tests: allow stages with tables to pass tests, just have to rerun their postpro
+
 ## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-17
 ### Added
 - Pipeline: OpenFLASH subproject

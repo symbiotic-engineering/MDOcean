@@ -20,18 +20,26 @@ The WEC-Sim RM3 example is run with regular waves and with the device constraine
     to separate dynamics-model error from hydrodynamic-coefficient error.
 \fi
 
-The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case, with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
+The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
+with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
 \begin{figure*}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
     \caption{Error breakdown based on WEC-Sim Verification Runs}
     \label{fig:error-histogram}
 \end{figure*}
-The detailed error breakdown across drag-on/drag-off and MEEM/WAMIT coefficient configurations is provided in \Cref{sec:appendix-dynamic-validation}, revealing that the dominant error sources are interactions between drag, hydrodynamic-coefficient mismatch, and the inter-body phase relationship in the 2-DOF model.
-\Cref{sec:appendix-dynamic-validation} also validates the describing-function approximation itself, showing total harmonic distortion below 1\% in the worst sea state and excellent agreement between the assumed and actual drag force waveforms at all four corners of the JPD.
+Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
+(\resultsAOR[wecsimAvgPowerErrorBestCase] and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
+but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
+\Cref{sec:appendix-dynamic-validation} provides errors of additional outputs as a function of sea state.
 
-These errors are deemed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines and the ability to quickly evaluate a large number of design options.
+\Cref{sec:appendix-dynamic-validation} also validates the describing-function approximation itself,
+showing total harmonic distortion below 1\% in the worst sea state
+and excellent agreement between the assumed and actual drag force waveforms at all four corners of the JPD.
 
+These errors are deemed acceptable for the purposes of this study,
+since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines
+and the ability to quickly evaluate a large number of design options.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Static Validation}
 

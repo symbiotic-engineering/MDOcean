@@ -7596,6 +7596,14 @@ stages:
       --file-to-file 
       'pubs/shared/references.bib->pubs/dissertation/references.bib' 
       --file-to-file 
+      'pubs/shared/references.bib->pubs/UMERC-2025-grid-value/references.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/UMERC-2025-grid-value/zotero-meem-refs.bib'
+      --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst'
       --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst'
@@ -7619,6 +7627,10 @@ stages:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
       - pubs/shared/references.bib
+      - pubs/shared/references.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/shared-pkg.tex
@@ -7637,6 +7649,18 @@ stages:
           cache: false
           persist: true
       - pubs/dissertation/references.bib:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/references.bib:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib:
           cache: false
           persist: true
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst:
@@ -7770,6 +7794,7 @@ stages:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       - pubs/UMERC-2025-grid-value/figures/
       - pubs/UMERC-2025-grid-value/references.bib
+      - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
       - pubs/UMERC-2025-grid-value/logo.jpg
       - .calkit/env-locks/tex
     outs:
@@ -7901,7 +7926,7 @@ stages:
   make-standalone-tex-pdf:
     cmd: calkit latex build -e tex --no-check -r 
       mdocean/plots/non_matlab_figs/.latexmkrc --no-synctex 
-      mdocean/plots/non_matlab_figs/${item.name}.tex
+      'mdocean/plots/non_matlab_figs/${item.name}.tex'
     deps:
       - mdocean/plots/non_matlab_figs/${item.name}.tex
       - pubs/applied-ocean-research-model/figs/tikz/${item.name}.tikz
