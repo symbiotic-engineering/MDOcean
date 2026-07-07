@@ -1,11 +1,6 @@
 # Changelog
 ## Unreleased
 
-## [v1.2.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.15) - 2026-7-7
-### Added
-- Docs: instructions for using calkit with overleaf
-- Dev: interactive script to help execute a calkit overleaf sync
-
 ## [v1.2.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.14) - 2026-7-7
 ### Added
 - Dev: script to check convexity with cvxpy
