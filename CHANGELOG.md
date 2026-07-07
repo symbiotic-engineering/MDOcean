@@ -1,10 +1,15 @@
 # Changelog
 ## Unreleased
 
-## [v1.2.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.14) - 2026-7-7
+## [v1.2.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.15) - 2026-7-7
 ### Added
 - Docs: instructions for using calkit with overleaf
 - Dev: interactive script to help execute a calkit overleaf sync
+
+## [v1.2.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.14) - 2026-7-7
+### Added
+- Dev: script to check convexity with cvxpy
+- Dev: script to return which github copilot models were used from json log, for AI acknowledgement statement
 
 ## [v1.2.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.13) - 2026-7-7
 ### Fixed
