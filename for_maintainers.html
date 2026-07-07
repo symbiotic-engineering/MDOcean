@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Maintainers &mdash; MDOcean v1.2.15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=e1d1198c"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/mathjax-config.js?v=86b1d7f1"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MDOcean
+              <img src="_static/SEALab_Logo_Light_202101_120ht.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modification.html">Modification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="videos.html">Videos</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MDOcean</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">For Maintainers</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/symbiotic-engineering/MDOcean/blob/main/docs/for_maintainers.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="for-maintainers">
+<h1>For Maintainers<a class="headerlink" href="#for-maintainers" title="Link to this heading"></a></h1>
+<p>These instructions are intended for SEA Lab members who are developing, maintaining, or co-authoring MDOcean.</p>
+<section id="one-time-setup">
+<h2>One-time Setup<a class="headerlink" href="#one-time-setup" title="Link to this heading"></a></h2>
+<p>First install calkit using the appropriate instructions for your system:
+see <a class="reference external" href="https://docs.calkit.org/installation/">https://docs.calkit.org/installation/</a>. You should set up cloud integration.
+Then set up git:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/symbiotic-engineering/MDOcean.git<span class="w"> </span><span class="c1"># this downloads MDOcean and its submodules</span>
+git<span class="w"> </span>config<span class="w"> </span>merge.dvclock.driver<span class="w"> </span><span class="s2">&quot;python dev/dvc_lock_merge.py %O %A %B&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="writing">
+<h2>Writing<a class="headerlink" href="#writing" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you get <code class="docutils literal notranslate"><span class="pre">ERROR:</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">pull</span> <span class="pre">data</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">cloud</span> <span class="pre">-</span> <span class="pre">&lt;number&gt;</span> <span class="pre">files</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">download</span></code>
+or <code class="docutils literal notranslate"><span class="pre">ERROR:</span> <span class="pre">unexpected</span> <span class="pre">error</span></code> on any of the the <code class="docutils literal notranslate"><span class="pre">calkit</span> <span class="pre">pull</span></code> commands, repeat the command until success.
+You can safely ignore <code class="docutils literal notranslate"><span class="pre">ERROR:</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">pull</span> <span class="pre">data</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">cloud</span> <span class="pre">-</span> <span class="pre">Checkout</span> <span class="pre">failed</span> <span class="pre">for</span> <span class="pre">following</span> <span class="pre">targets</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When following these instructions, fill in in <code class="docutils literal notranslate"><span class="pre">&lt;paper-stage&gt;</span></code> with either <code class="docutils literal notranslate"><span class="pre">build-AOR-paper</span></code> or <code class="docutils literal notranslate"><span class="pre">build-RE-paper</span></code>, and <code class="docutils literal notranslate"><span class="pre">&lt;paper-folder&gt;</span></code> with either <code class="docutils literal notranslate"><span class="pre">applied-ocean-research-model</span></code> or <code class="docutils literal notranslate"><span class="pre">renewable-energy-mdo</span></code> (no slashes).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a guided interactive version of these Overleaf sync workflows, run
+<code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">dev/latex/calkit_instructions_interactive.sh</span></code> from the repository root.</p>
+</div>
+<p><strong>Getting github changes into overleaf</strong></p>
+<p>If simulation code (git), figures (dvc), or tex source code (git) have changed
+and you want the most updated version on Overleaf, use the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>main<span class="w">                    </span><span class="c1"># must be main, not another branch</span>
+git<span class="w"> </span>pull
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>overleaf-&lt;desc&gt;<span class="w">      </span><span class="c1"># create new branch called overleaf-&lt;your description here&gt;. Required because main is a protected branch.</span>
+git<span class="w"> </span>push<span class="w"> </span>--set-upstream<span class="w"> </span>origin<span class="w"> </span>overleaf-&lt;desc&gt;
+calkit<span class="w"> </span>pull<span class="w"> </span>-f<span class="w">                       </span><span class="c1"># download data - this may take several minutes</span>
+calkit<span class="w"> </span>check<span class="w"> </span>pipeline<span class="w"> </span>-c<span class="w">             </span><span class="c1"># this updates dvc.yaml if needed</span>
+calkit<span class="w"> </span>dvc<span class="w"> </span>status<span class="w"> </span>-d<span class="w"> </span>build-AOR-paper<span class="w"> </span><span class="c1"># only proceed to overleaf sync step if this step prints &quot;Data and pipelines are up to date.&quot;</span>
+calkit<span class="w"> </span>overleaf<span class="w"> </span>sync<span class="w"> </span>--push-only<span class="w"> </span>pubs/applied-ocean-research-model<span class="w">    </span><span class="c1"># this pushes changes to overleaf, and creates/pushes an overleaf sync git commit.</span>
+</pre></div>
+</div>
+<p><strong>Making changes on overleaf and getting them onto github</strong></p>
+<ul class="simple">
+<li><p>Before making any changes on Overleaf, check if a new version has been released on GitHub to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. If so, perform the steps above to get those changes onto Overleaf.</p></li>
+<li><p>Make your changes on Overleaf. Note that any changes you make to <code class="docutils literal notranslate"><span class="pre">figs/</span></code>, <code class="docutils literal notranslate"><span class="pre">tables/</span></code>, and <code class="docutils literal notranslate"><span class="pre">numeric-results.tex</span></code> on overleaf will be lost when you sync since they are pipeline outputs specified as <code class="docutils literal notranslate"><span class="pre">push_paths</span></code>, so changes to those files should be made in Git only.</p></li>
+<li><p>By default, when you make a change on overleaf, it will apply to both the dissertation version and the journal version. If you want different versions of the text for the journal and dissertation, use the following latex code structure:</p></li>
+</ul>
+<div class="highlight-latex notranslate"><div class="highlight"><pre><span></span>put content that goes in both dissertation and journal here
+<span class="k">\ifdefined\DISSERTATION</span>
+   put content that goes in dissertation here
+<span class="k">\else</span>
+   put content that goes in journal here
+<span class="k">\fi</span>
+put more content that goes in both dissertation and journal here
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>When you are done, do the following steps:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>main<span class="w">                    </span><span class="c1"># must be main, not another branch</span>
+calkit<span class="w"> </span>pull<span class="w"> </span>-f<span class="w">                       </span><span class="c1"># download data - this may take several minutes</span>
+calkit<span class="w"> </span>check<span class="w"> </span>pipeline<span class="w"> </span>-c<span class="w">             </span><span class="c1"># this updates dvc.yaml if needed</span>
+calkit<span class="w"> </span>dvc<span class="w"> </span>status<span class="w"> </span>-d<span class="w"> </span>&lt;paper-stage&gt;<span class="w"> </span><span class="c1"># only proceed to overleaf sync step if this step prints &quot;Data and pipelines are up to date.&quot;</span>
+calkit<span class="w"> </span>overleaf<span class="w"> </span>status<span class="w"> </span>pubs/&lt;paper-folder&gt;<span class="w">               </span><span class="c1"># check that all the changes are as you would expect</span>
+calkit<span class="w"> </span>overleaf<span class="w"> </span>sync<span class="w"> </span>--no-commit<span class="w"> </span>pubs/&lt;paper-folder&gt;<span class="w">     </span><span class="c1"># this will make overleaf changes locally, they are not saved to git yet</span>
+<span class="c1"># if the sync produced any merge conflicts, resolve them in the editor before proceeding.</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>another-old-or-new-branch<span class="w"> </span><span class="c1"># omit the -b if it&#39;s an existing branch instead of a new branch. Typically this is overleaf-&lt;desc&gt; from above.</span>
+git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>HEAD<span class="w">              </span><span class="c1"># only necessary if it&#39;s a new branch</span>
+
+<span class="c1"># The following steps are only required if you made any changes to references.bib, shared-pkg.tex,</span>
+<span class="c1"># or elsarticle-num-names.bst in overleaf, since they are outputs of a map-paths calkit stage.</span>
+cp<span class="w"> </span>pubs/&lt;paper-folder&gt;/&lt;filename&gt;<span class="w"> </span>pubs/shared/&lt;filename&gt;<span class="w"> </span><span class="c1"># replace &lt;filename&gt; with whichever file edited</span>
+git<span class="w"> </span>add<span class="w"> </span>pubs/shared/&lt;filename&gt;
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s1">&#39;update shared &lt;filename&gt; from overleaf&#39;</span>
+
+<span class="c1"># The following steps are only required if you changed the order of any figures in overleaf</span>
+code<span class="w"> </span>mdocean/plots/fig_tab_pub_mapping.m<span class="w"> </span><span class="c1"># opens file in vscode</span>
+<span class="c1"># edit mdocean/plots/fig_tab_pub_mapping.m to reflect your new figure order</span>
+git<span class="w"> </span>add<span class="w"> </span>mdocean/plots/fig_tab_pub_mapping.m
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s1">&#39;update figure order&#39;</span>
+
+<span class="c1"># The following steps are only required if you changed the order of any figures in overleaf.</span>
+<span class="c1"># These can be performed locally if you have matlab and docker installed, or skipped and they will be</span>
+<span class="c1"># automatically performed on CI. If skipping, you should check the CI for your branch</span>
+<span class="c1"># (https://github.com/symbiotic-engineering/MDOcean/actions/workflows/calkit-run.yml)</span>
+<span class="c1">#  after pushing and confirm that the &#39;Run Calkit&#39; step succeeds, and revise if not.</span>
+calkit<span class="w"> </span>run<span class="w"> </span>make-calkit-stages<span class="w">               </span><span class="c1"># this line is only necessary if you added a new figure, not if you just changed the order. May take a few minutes.</span>
+python<span class="w"> </span>mdocean/analysis/update_calkit.py<span class="w">    </span><span class="c1"># this line is only necessary if you added a new figure, not if you just changed the order</span>
+calkit<span class="w"> </span>run<span class="w"> </span>--log<span class="w"> </span>&lt;paper-stage&gt;<span class="w">              </span><span class="c1"># necessary for figure order changes. May take a few minutes.</span>
+<span class="c1"># Only proceed to next step if the previous step  succeeded (green check mark)</span>
+calkit<span class="w"> </span>save<span class="w"> </span>dvc.lock<span class="w"> </span>dvc.yaml<span class="w"> </span>.calkit/<span class="w"> </span>calkit.yaml<span class="w"> </span>calkit_stages.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>pubs/&lt;paper-folder&gt;/numeric-results.tex<span class="w"> </span>results/**/end.json<span class="w"> </span>results/**/*.tex<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-m<span class="w"> </span><span class="s2">&quot;Run pipeline with updated fig order&quot;</span><span class="w"> </span><span class="c1"># pipeline definition and git-tracked pipeline outputs</span>
+
+<span class="c1"># the following steps are always required</span>
+git<span class="w"> </span>add<span class="w"> </span>pubs/&lt;paper-folder&gt;/*.tex<span class="w"> </span>pubs/applied-ocean-research-model/sections/<span class="w"> </span><span class="c1"># git-tracked pipeline inputs</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Update paper from Overleaf sync&quot;</span>
+git<span class="w"> </span>push
+</pre></div>
+</div>
+</section>
+<section id="ci">
+<h2>CI<a class="headerlink" href="#ci" title="Link to this heading"></a></h2>
+<p>MDOcean uses six self-hosted runners on the lab computer for CI.
+To create additional runners, follow these instructions (todo).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Rebecca McCabe, Madison Dietrich, Olivia Murphy, Iris Ren, Maha Haji.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
