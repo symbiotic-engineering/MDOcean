@@ -10,7 +10,7 @@ repo_path = '.';  % Modify this to your repo path
 cd(repo_path);
 
 % Get the list of commits in the current branch
-[~, commitList] = system('git log --pretty=format:"%H"');
+[~, commitList] = system('git log main..HEAD --pretty=format:"%H"');
 
 % Split the commit list into individual commit hashes
 commitHashes = strsplit(strtrim(commitList), '\n');
