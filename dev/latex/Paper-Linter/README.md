@@ -4,14 +4,17 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-i/x <include/exclude switch>] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--error]
 
-Provide either a single .tex file to check or a path to recursively check all .tex files in that directory!
+Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
 The switches can be configured with the `-x` and `-i` parameters to exclude and include entire categories of rules or single rules. 
 The include/exclude switches are evaluated in the order they are specified. 
 For example, `-i typography` only activates the typography rules, whereas `-i all -x typography -i cite-space` enables all rules without the typography rules, but enables the `cite-space` rule from the typography category. 
 
+If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1 <switch>` (`1` enables, `0` disables).
+The `--ignore` flag can be repeated to skip specific files by path or filename.
+If `--output` is provided, warnings are written to the specified file.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings
@@ -22,7 +25,7 @@ Warnings are grouped in five different categories:
 * Typography
 * Visual
 * Style
-* References
+* Reference
 
 ### General
 This category includes general mistakes and discouraged things (switch `general`).
@@ -235,6 +238,18 @@ This category includes warning of things that are discouraged or wrong for the s
 * **Description**: Warns if a listing has no explicit alignment
 * **Switch**: `listing-alignment`
 
+#### Figure without Caption
+* **Description**: Warns if a figure has no caption
+* **Switch**: `figure-caption`
+
+#### Table without Caption
+* **Description**: Warns if a table has no caption
+* **Switch**: `table-caption`
+
+#### Listing without Caption
+* **Description**: Warns if a listing has no caption
+* **Switch**: `listing-caption`
+
 #### Float Placement Specifiers
 * **Description**: Warns if floats use discouraged `[h]` or `[H]` placement specifiers
 * **Switch**: `float-placement`
@@ -265,7 +280,7 @@ This category includes warning of things that are discouraged or wrong for the s
 
 
 ### References
-This category includes warnings for everything related to (cross-)references (switch `references`).
+This category includes warnings for everything related to (cross-)references (switch `reference`).
 
 #### Figure without Label
 * **Description**: Warns if a figure has no label
@@ -314,3 +329,7 @@ This category includes warnings for everything related to (cross-)references (sw
 #### Empty Citation Key
 * **Description**: Warns if a `cite` command is empty, i.e., has no key
 * **Switch**: `cite-empty`
+
+#### Equation Symbols Mentioned in Text
+* **Description**: Warns if a symbol first used in an equation is not mentioned inline in the surrounding text
+* **Switch**: `symbol-mention`
