@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+
+## [v1.2.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.13) - 2026-7-7
+### Fixed
+- CI: fixed codecov upload by using OIDC instead of token
+
 ## [v1.2.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.12) - 2026-6-26
 - Paper: portion of Maha's Overleaf changes that move things to appendix and introduce if/else structure, without changing wording.
 - Submodule: update OpenFLASH to reflect JFM submission changes (`jfm-thesis` branch with `main` merged into it)
