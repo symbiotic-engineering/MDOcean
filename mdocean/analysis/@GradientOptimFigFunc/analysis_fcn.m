@@ -7,10 +7,12 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :returns: Intermediate results struct (cached heavy analyses)
     which_objs = 1;
 
-    % Run gradient optimization
+    % Run gradient optimization (timed)
+    t_optim = tic;
     [Xs_opt, objs_opt, flags, probs, ...
-     lambdas, grads, hesses, vals] = gradient_optim(b.X_start_struct,p,b,which_objs,...
+     lambdas, grads, hesses, vals, fmincon_outputs] = gradient_optim(b.X_start_struct,p,b,which_objs,...
                                                        {@optimplotfval, @(x,~,~)optim_geomviz(x,p,b)},true);
+    singleObjRuntime = toc(t_optim);
     
     intermed_result_struct.p = p;
     intermed_result_struct.b = b;
@@ -23,5 +25,7 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.grads = grads;
     intermed_result_struct.hesses = hesses;
     intermed_result_struct.vals = vals;
+    intermed_result_struct.fmincon_outputs = fmincon_outputs;
+    intermed_result_struct.singleObjRuntime = singleObjRuntime;
     intermed_result_struct.convergence_plot = gcf();
 end

@@ -39,12 +39,12 @@
 %% please give \usepackage{epsfig}
 
 \input{commands-re}
+\input{shared-pkg}
 
 \journal{Renewable Energy}
 
 \begin{document}
 
-\include{numbers}
 \begin{frontmatter}
 
 %% Title, authors and addresses
@@ -90,7 +90,8 @@
              country={USA}}
 
 \affiliation[mich]{organization={Department of Mechanical Engineering, University of Michigan},
-             addressline={G.G. Brown Laboratory, 2350 Hayward},
+             addressline={G.G.
+Brown Laboratory, 2350 Hayward},
              city={Ann Arbor},
              postcode={48109},
              state={MI},
@@ -108,11 +109,11 @@ MDO principles motivate the optimization formulation and solution process.
 
 The optimization's large scope and comprehensive nature are uniquely possible due to the purpose-developed semi-analytical model used for simulation, which is called MDOcean and released open-source.
 
-The obtained optimization results achieve a \pctImproveDesignCostMinLCOE~reduction in modeled cost, \pctImprovePowerMinLCOE~increase in power, and resulting \pctImproveLCOEMinLCOE~decrease in LCOE compared to the original RM3 design.
-Parameter sensitivity analysis indicates that LCOE depends more strongly on \sensitiveParamCategoriesMinLCOE~parameters than \insensitiveParamCategoriesMinLCOE~parameters and that the optimal design is sensitive to \sensitiveDesignCategoriesMinLCOE~parameters.
+The obtained optimization results achieve a \resultsRE[pctImproveDesignCostMinLCOE]~reduction in modeled cost, \resultsRE[pctImprovePowerMinLCOE]~increase in power, and resulting \resultsRE[pctImproveLCOEMinLCOE]~decrease in LCOE compared to the original RM3 design.
+Parameter sensitivity analysis indicates that LCOE depends more strongly on \resultsRE[sensitiveParamCategoriesMinLCOE]~parameters than \resultsRE[insensitiveParamCategoriesMinLCOE]~parameters and that the optimal design is sensitive to \resultsRE[sensitiveDesignCategoriesMinLCOE]~parameters.
 A Pareto trade-off between cost and power reveals different optimal designs depending on which objective is prioritized, suggesting application-specific design heuristics.
 Three representative optimal designs are investigated: a minimum-LCOE design for cost-sensitive operations like utility power, a minimum-cost design for small offshore systems with fixed power needs, and a balanced design for intermediate applications.
-Gradient-based optimization for one objective requires \singleObjFcnEvals~function evaluations, while the combination gradient and gradient-free procedure for two objectives requires over \paretoFcnEvals~evaluations.
+Gradient-based optimization for one objective requires \resultsRE[singleObjFcnEvals]~function evaluations, while the combination gradient and gradient-free procedure for two objectives requires over \resultsRE[paretoFcnEvals]~evaluations.
 \end{abstract}
 
 %%Graphical abstract
@@ -123,10 +124,7 @@ Gradient-based optimization for one objective requires \singleObjFcnEvals~functi
 
 %%Research highlights
 \begin{highlights}
-\item Formulate and solve a constrained multi-objective multidisciplinary design optimization with twelve dimensional, structural, and power take-off design variables to maximize power and minimize estimated capital cost
-\item Optimal designs achieve up to \pctImproveLCOEMinLCOE~LCOE reduction and tend to be \optDesignDescriptionMinLCOE~than the standard RM3 design
-\item Sensitivity analysis reveals LCOE is most sensitive to \sensitiveParamCategoriesMinLCOE, while cost is most sensitive to \sensitiveParamCategoriesMinCapex
-\item Single- and dual-objective optimization require \singleObjFcnEvals~and over \paretoFcnEvals~function evaluations respectively.
+    \input{sections/re-contributions}
 \end{highlights}
 
 %% Keywords
@@ -151,14 +149,14 @@ wave energy conversion \sep marine renewable energy \sep structural design \sep 
 %%
 
 % added for my convenience, should take out before submission
-\tableofcontents
-\listoffigures
-\listoftables
+%\tableofcontents
+%\listoffigures
+%\listoftables
 %\clearpage
 %\summarytexcount{mdocean}
 %\detailtexcount{sections/model}{subsection}
 %\detailtexcount{sections/other-appendices}{section}
-\newpage
+%\newpage
 
 %% Use \section commands to start a section
 %% Labels are used to cross-reference an item using \ref command.
@@ -179,7 +177,9 @@ The MATLAB code for all simulation, optimization, analysis, and visualization to
 Questions and contributions via GitHub issues and pull requests are welcomed.
 A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
 
+\begin{appendices}
 \include{sections/other-appendices}
+\end{appendices}
 
 %% Displayed equations can be tagged using various environments. 
 %% Single line equations can be tagged using the equation environment.
@@ -223,8 +223,8 @@ A Python version using the OpenMDAO package is forthcoming. % todo: replace with
 
 \clearpage
 
-\bibliographystyle{elsarticle-num-names} % due to latexmk quirks, the bst path should be relative to the out dir not the main tex file
-\bibliography{references}
+\bibliographystyle{elsarticle-num-names}
+\bibliography{references,zotero-meem-refs}
 
 \end{document}
 

@@ -113,7 +113,7 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
     improvePlot
 
     %% parallel axis plot
-    parallelFig = figure(Units="normalized", Position=[0.1,0.2,0.3,0.4], Color="white");
+    parallelFig = figure(Units="normalized", Position=[0.05,0.05,0.95,0.6], Color="white");
     t = tiledlayout(3, 4);
     t.TileSpacing = 'compact';
     t.Padding = 'compact';
@@ -151,19 +151,25 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
                                  'LegendVisible','off',...
                                  'Jitter',0,...
                                  'FontSize',fontsize,...
-                                 'Title',[b.var_descs{i} ' ' b.var_names_pretty{i}]);
+                                 'Title',"");
         h.CoordinateTickLabels = ""; % Suppress x tick labels in original axes
 
+        hAxesOverlay = axes(t);
+        hAxesOverlay.Layout.Tile = i;
+
         if i>8
-            labels = { '$$\frac{x_0}{x_{nom}}$$',...
+            X_bb = unicode('1D54F');
+            L_bb = unicode('1D543');
+            C_bb = unicode('2102');
+            labels = {[X_bb '_0'], [X_bb '_L'], [X_bb '_C'], L_bb, C_bb};
+            label_meanings = { '$$\frac{x_0}{x_{nom}}$$',...
                      ['$$\frac{x^*(' b.obj_names_pretty{1} '^*)}{x_{nom}}$$'],...
                      ['$$\frac{x^*(' b.obj_names_pretty{2} '^*)}{x_{nom}}$$'],...
                      ['$$\frac{' b.obj_names_pretty{1} '^*}{' b.obj_names_pretty{1} '_{nom}}$$'],...
-                     ['$$\frac{' b.obj_names_pretty{2} '^*}{' b.obj_names_pretty{2} ',nom}$$'] };
+                     ['$$\frac{' b.obj_names_pretty{2} '^*}{' b.obj_names_pretty{2}(1:end-1) ',nom}}$$'] };
 
             nLabels = numel(labels);
-            hAxesOverlay= axes(t);
-            hAxesOverlay.Layout.Tile=i;
+            
             if i==9
                 for j=1:length(cols_used)
                     plot(hAxesOverlay,NaN,NaN,lines_used{j},'LineWidth',1.5,'Color',cols_used{j})
@@ -174,13 +180,62 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
                 title(leg,'Global Min','FontSize',fontsize)
                 set(hAxesOverlay,Box='off');
             end
-            set(hAxesOverlay, XLim=[0.5,nLabels+0.5], ...
-                Color="none", XColor="black", YColor="none", ...
-                XTick=1:nLabels, XTickLabels=labels,...
-                TickLabelInterpreter='latex',...
-                FontSize=fontsize-2);
+            if i==12
+                x_key = strcat('=', label_meanings);
+                for j=1:length(x_key)
+                    plot(hAxesOverlay,NaN,NaN,'DisplayName',x_key{j},'Color','none')
+                    hold on
+                end
+                key_leg = legend(hAxesOverlay,'FontSize',fontsize,'Interpreter','latex');
+                key_leg.Layout.Tile = 'east';
+                title(key_leg,'Key','FontSize',fontsize)
+                drawnow
+                layout = [key_leg.EntryContainer.NodeChildren.LayoutInfo];
+                mid = ( [layout.TopEdge] + [layout.BottomEdge] ) / 2
 
+                % Draw the rasterized icons in a transparent overlay axes that
+                % shares the legend box. The legend object itself is not a data
+                % axes, so figure-relative positions must not be passed directly
+                % into raster_text.
+                key_leg_overlay = axes(ancestor(t,'figure'),'Units','normalized', ...
+                    'Position',key_leg.Position, ...
+                    'Color','none', 'XColor','none', 'YColor','none', ...
+                    'Box','off', 'XLim',[0 1], 'YLim',[0 1], ...
+                    'Visible','on');
+                hold(key_leg_overlay,'on')
+
+                y_positions = layout(end).TopEdge - mid
+
+                for j = 1:numel(labels)
+                    if contains(labels{j},'_')
+                        size = 0.16;
+                    else
+                        size = 0.1;
+                    end
+                    raster_text(key_leg_overlay, 0.12, y_positions(j), labels{j}, size, 'TeX Gyre DejaVu Math');
+                end
+                set(hAxesOverlay,Box='off');
+            end
+            set(hAxesOverlay, XLim=[0.5,nLabels+0.5], XTick=1:nLabels, XColor="black", ...
+                 FontSize=fontsize-2, XTickLabel="");
+            for j=1:numel(labels)
+                if contains(labels{j},'_')
+                    size = 0.08;
+                else
+                    size = 0.05;
+                end
+                x_j = j; % position at center of each label
+                ylim(hAxesOverlay,[0 1]);
+                y_j = -0.1;    % position below y-axis
+                raster_text(hAxesOverlay, x_j, y_j, labels{j}, size, 'TeX Gyre DejaVu Math');
+            end  
+
+        else
+            set(hAxesOverlay, XColor="none")
         end
+        set(hAxesOverlay, Color="none", YColor="none")
+        title(hAxesOverlay, [b.var_descs{i} ' $' b.var_names_pretty{i} '$'],...
+            'FontSize',fontsize,'Interpreter','latex')
     end
 
     %% bar plot data
@@ -225,11 +280,10 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
     bar_data_clean = fillmissing(bar_data,'constant',0);
     bar(categorical(b.var_names_pretty(1:end-1)),bar_data_clean)
     title('Sensitivity to starting point');
-    legend({['X* Sensitivity for J_1 = ' b.obj_names_pretty{1}], ...
-            ['J* Sensitivity for J_1 = ' b.obj_names_pretty{1}], ...
-            ['X* Sensitivity for J_2 = ' b.obj_names_pretty{2}], ...
-            ['J* Sensitivity for J_2 = ' b.obj_names_pretty{2}], ...
-        })
+    legend({['X* Sensitivity for $J_1 = ' b.obj_names_pretty{1} '$'], ...
+            ['J* Sensitivity for $J_1 = ' b.obj_names_pretty{1} '$'], ...
+            ['X* Sensitivity for $J_2 = ' b.obj_names_pretty{2} '$'], ...
+            ['J* Sensitivity for $J_2 = ' b.obj_names_pretty{2} '$'] }, 'Interpreter','latex')
     improvePlot
 end
 

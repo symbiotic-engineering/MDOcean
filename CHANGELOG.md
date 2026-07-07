@@ -1,6 +1,113 @@
 # Changelog
 ## Unreleased
 
+
+## [v1.2.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.13) - 2026-7-7
+### Fixed
+- CI: fixed codecov upload by using OIDC instead of token
+
+## [v1.2.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.12) - 2026-6-26
+- Paper: portion of Maha's Overleaf changes that move things to appendix and introduce if/else structure, without changing wording.
+- Submodule: update OpenFLASH to reflect JFM submission changes (`jfm-thesis` branch with `main` merged into it)
+
+## [v1.2.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.11) - 2026-6-19
+### Changed
+- Tests: comment out assert success command in `run_tests.m`
+### Fixed
+- Tests: allow stages with tables to pass tests, just have to rerun their postpro
+
+## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-17
+### Added
+- Pipeline: OpenFLASH subproject
+- Docs: add defense video to readme and sphinx site
+- Presentation: upload pptx and pdf of dissertation slides
+- Plots: `raster_text()` matlab utility required for displaying text with certain fonts
+- Plots: `unicode()` utility for handling supplementary plane unicode codepoints
+- Dev: `bibtex-conda` environment for manual latex citation checking
+- Dissertation: create sections for contributions, list of research outputs, conclusion
+- Dissertation: add quote to beginning of each chapter
+- Calkit status: version sent to committee 6/9
+### Changed
+- Paper: Use subimport for Overleaf-friendly path inclusion
+- CI: Initialize submodules recursively
+- CI: Turn off quarto stage (since no longer used)
+- CI: stop using retry script for calkit pull
+- Docs: update repo status badge from in progress to active
+- Docs: better details on licensing of external code
+- Dissertation and paper: updates for readability and clarity
+- Dissertation: use submitted JFM paper but with US spelling
+- Tests: delete unused AI-generated tests
+- Pipeline: use new ck DVC remote
+- Submodule: move `sea-lab-utils` to `analysis` folder in `OpenFLASH`
+- Paper: create line breaks for each sentence
+### Fixed
+- Analysis: comment out broken AI-generated `compute_pareto_shape_heuristics()` in `ParetoFigFunc`
+- Test: fix wecsim filenames being inconsistent after previous shortening for struct fieldnames
+- Test: further shorten wecsim filenames (multibody)
+- Test: fix string vs char handling in `save_fig_with_diagnostic.m`
+- Test: avoid rerunning postprocessing in tests (but this introduces test errors in stages that have tables) 
+- Plots: fix filename in `ReadNonMatlabFigs` that caused raster instead of vector images to be used in paper
+- Plot: fix multistart parallel axis plot visibility, including latex font
+- Tables: fix first column formatting in matlab latex table generation
+- Tables: introduce, and then fix, an issue with string escape parsing in `table2latex()`
+- Tables: fix multi-character underscores in `Comparison`, `DesignVars`, and `GradientOptimFigFunc` tables
+- Paper: fixing citations, including making bibcop compatible with multiple .bib files
+- Paper: fix references, including prefacing labels with paper name to avoid collisions
+- Citations: fix JFM citations, title of JFM paper in self-citation, and RE bibcop
+- CI: ignore `not our ref` error in calkit save branching logic
+- CI: turn on write permission for checks
+
+## [v1.2.9](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.9) - 2026-5-7
+### Added
+- Paper: dissertation writeup
+### Changed
+- Submodules: update OpenFLASH submodule to include jfm paper in thesis
+### Fixed
+- Fix error in circle constraint center/radius for positve power
+- Location sensitivity wrong class name in analysis outputs
+
+## [v1.2.8](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.8) - 2026-5-5
+### Added
+- Pipeline: create `test-aor` and `test-re` stages
+### Changed
+- CI: combine calkit and test workflow, triggers on push to main
+- Inputs: break out `make_drag_integral()` into its own function
+- Pipeline: more string/char filename sanity checks in `save_fig_with_diagnostic()`
+### Fixed
+- Analysis: make `LocationSensitivity` run by adding forgotten analysis outputs, fixing figure concatenation,  
+- Analysis: make `ParameterSensitivity` run by removing material column from linear constraint A-matrix
+- Analysis: fix relative path issue in `GenericAnalysis`
+- Tests: fixed `Wecsim` tests by ensuring filenames are within character limit for struct fields
+- Tests: fixed relative path of `save_folder` in `all_figures()`
+
+## [v1.2.7](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.7) - 2026-5-5
+### Added
+- Paper: discussion on scaling and convexity of power and LCOE with respect to dynamic constraint limits
+
+## [v1.2.6](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.6) - 2026-5-4
+## Added
+- Add report wecsim validation figure to AOR paper appendix
+## Changed
+- Phase error validation plots now wrap from -pi to pi for better readability
+- Wecsim validation plots use log scale x-axis for wecsim geometry, no drag, multibody
+- Wecsim validation plots label colorbar axis with % symbol
+- Wecsim visualization notebook only shows first page of pdf to reduce filesize
+- Wecsim validation cases only turn amplitude saturation on for multibody cases
+- Better aesthetics on signed log plot: tick label format, level selection, show contours
+## Fixed
+- CI: prevent dvc pull issues by retrying up to 10x
+
+## [v1.2.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.5) - 2026-5-3
+## Fixed
+- setup: `add_mdocean_path.m` ensures local parallel pool is used to avoid interference between runners
+- CI: use runner-specific temp directory and add cleanup function to avoid orphaned processes 
+
+## [v1.2.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.4) - 2026-5-3
+### Fixed
+- Pipeline: add RunSingleFigFunc and Runtime as deps of `re-results-to-latex` so `nominalLCOE` and `simRuntime` format resolves
+### Changed
+- CI: use latest version of calkit again
+
 ## [v1.2.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.3) - 2026-4-29
 ## Added
 - Slides: create first draft defense slides in both quarto and beamer

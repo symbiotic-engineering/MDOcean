@@ -10,8 +10,10 @@
 % fixed up by Andrew Myers.
 %
 % Shared packages
-\input{../shared-pkg}
-\input{../applied-ocean-research-model/commands-aor}
+\usepackage{import}
+\subimport{../shared}{shared-pkg}
+\subimport{../applied-ocean-research-model}{commands-aor}
+\subimport{../renewable-energy-mdo}{commands-re}
 
 % From template
 \usepackage{graphicx,pstricks}
@@ -22,6 +24,9 @@
 \usepackage{hangcaption}
 \usepackage{txfonts}
 \usepackage{palatino}
+
+% For bibliography
+\usepackage{natbib}
 
 % for grid paper
 \usepackage{framed}
@@ -36,12 +41,36 @@
 \usepackage{wrapfig}
 \usepackage{caption}
 
+% for subtitles
+\usepackage{titlesec}
+
+\makeatletter
+\titleformat{\chapter}[display]
+{\normalfont\bfseries}{\Large\centering\MakeUppercase{\@chapapp\space \thechapter}}{0pt}{\LARGE\center}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+\graphicspath{
+  {../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}
+  {../applied-ocean-research-model/}
+  {../renewable-energy-mdo/}
+}
+
+% adjust margins
+\usepackage[
+  top=1in,
+  bottom=1in,
+  left=1in,
+  right=1in
+]{geometry}
+
 %if you're having problems with overfull boxes, you may need to increase
 %the tolerance to 9999
 \tolerance=9999
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 %\bibliographystyle{IEEEbib}
+
+\newcommand{\DISSERTATION}{} % used for dissertation-specific formatting in shared files
 
 \renewcommand{\caption}[1]{\singlespacing\hangcaption{#1}\normalspacing}
 \renewcommand{\topfraction}{0.85}
@@ -62,85 +91,148 @@
 \makecopyright
 
 \begin{abstract}
-Your abstract goes here. Make sure it sits inside the brackets. If not,
-your biosketch page may not be roman numeral iii, as required by the
-graduate school.
+Wave energy converters (WECs) can advance the global energy transition by harnessing ocean waves to produce clean power for utility grids and offshore activities.
+This dissertation describes (1) the development of a fast and accurate computational model to simulate the WEC including hydrodynamics, constrained optimal control, and structural survival;
+(2) the application of the model in a systems optimization framework to understand how WEC shape and size mediate the tradeoff between cost and power;
+and (3) the extension of this framework to holistically incorporate techno-economic viability and environmental impacts at the grid level.
+
+Guided by a first-principles understanding of frequency-domain dynamics and a geometric interpretation of the constrained optimal control problem, we quasi-linearize the drag and force saturation nonlinearities and solve the resulting low-order quadratic program analytically.
+The simplified dynamics model achieves runtimes 10-1000x faster than prior state-of-the-art with acceptable accuracy (errors of 1-10\%).
+We combine this quasi-linearized dynamics model with mathematical models for concentric-cylinder hydrodynamics, stiffened-plate structural stress, hydrostatic stability, allowable oscillation amplitude, and material and component cost to form a multidisciplinary WEC simulation.
+We release the software and corresponding numerical benchmarks open source as MDOcean and OpenFLASH.
+
+The subsequent design study leverages the model's efficiency and structure to enable a more comprehensive and thoughtful search of the design space.
+We synthesize aspects of multidisciplinary design optimization, control co-design, techno-economic analysis, and systems engineering to create an integrated methodology for WEC design optimization that incorporates necessary coupling while remaining computationally efficient and robust to uncertainty.
+We demonstrate ~50\% reduction in the levelized cost of energy, outline the dominant role of powertrain constraints in the power-cost balance, derive sensitivities, and discuss implications for WEC design and future model development.
+Finally, we revise the framework by integrating life cycle analysis and capacity expansion modeling to maximize more meaningful net value metrics including profitability and avoided carbon emissions.
+Preliminary results suggest that while seasonal grid variation complicates the power-cost tradeoff, carbon emissions can be considered more simply.
+The system design process articulated here can generalize to other emerging energy technologies, ultimately advancing the decarbonization of the electricity sector.
 \end{abstract}
 
+% todo: plain language abstract
+
 \begin{biosketch}
-Your biosketch goes here. Make sure it sits inside
-the brackets.
+Becca is a 5th-year Ph.D. candidate in Mechanical Engineering interested in the design of renewable energy systems.
+She enjoys solving integrated mechanical, electromagnetic, fluid, and controls problems through simulation, systems design, and prototyping.
+Her PhD research at Cornell's Symbiotic Engineering and Analysis Lab with Prof. Maha Haji involves 
+optimizing ocean wave energy toward economic viability and reduced carbon emissions. 
+Outside of research, Becca enjoys distance running, working with engineering for social impact organizations, and neurodiversity advocacy.
+During her PhD, she completed three half-marathons and founded and led two student organizations: 
+GAIA (Global Action Impact Association) and SNAC (Student Neurodiversity Alliance at Cornell).
+Becca graduated from MIT in 2021 with a B.S. in Mechanical Engineering. 
+At MIT, she focused on electric vehicles, writing her bachelor's thesis on electric motor optimization for Formula SAE cars. 
 \end{biosketch}
 
 \begin{dedication}
-This document is dedicated to my neurokin: all neurodivergent people across space, time, and context.
-We think differently, and this dissertation reflects that more than any other work I've undertaken.
-Its content spans disciplines and makes unexpected connections with our trademark blend of systemization and chaos.
-Many of these words were written in the cramped and cozy sensory lair under my bed, 
-others in the big fortress-like green chair in the library, others in Flor's fidget-toy-filled office, and still more outside on the porch swing.
-I can count at least thirteen distinct types of physical and digital media that I've tracked research tasks in over the past two years,
-and I don't want to count the number of times I've had to revise my timelines.
-% 1 trello, 2 notion, 3 spreadsheet, 4 engineering notebook, 5 git issues, 6 small notebook, 7 adhd planner, 8 whiteboard slider todo, 9 sticky note kanban, 10 research/debugging slides, 11 google doc template with anna, 12 visual timer whiteboard, 13 matlab visual timer,
- of its content, authorship via , its inspiration from --, the million rabbit holes deep and - reflects that.
-Let's make sure the world knows that is a good thing.
+This dissertation is dedicated to my neurokin:
+all neurodivergent people across space, time, and context.
+Thinking differently is a gift.
+Let's make sure the world knows it.
 \end{dedication}
 
 \begin{acknowledgements}
-\emph{The people you love will change you. The things you have learned will guide you. 
-And nothing on earth can silence the quiet voice still inside you. - Moana} 
+\emph{The people you love will change you.
+The things you have learned will guide you. 
+And nothing on earth can silence the quiet voice still inside you.} 
+
+- Moana
+
 The PhD was hard in a way that undergrad wasn't.
 The technical challenges were simple compared to the emotional, mental, and structural/systemic challenges.
 I learned a lot about myself and what I need to be successful,
 how to navigate inaccessible systems, how to advocate for myself and others, 
 and how to both enact and know the limits of grassroots systemic change.
-and got a lot of experience building, overhauling, and refining the processes and systems that help me navigate these challenges.
+and got a lot of experience building, overhauling, 
+and refining the processes and systems that help me navigate these challenges.
 I am grateful to everyone who supported me through the process, including but not limited to:
 
-(academic and support)
-- racecar for raising me as an engineer and giving me the technical skills in multidisciplinary modeling and practical design and teamwork experience
-- Maha for taking me on as a student and ultimately persisting with me through the PhD process
-- my committee members, Jacob, Pat, and Ryan, for their technical insight and feedback
-- Sam and Dmitry, for stepping in to provide additional departmental advising support when I needed it 
-- NREL for my undergraduate internship which exposed me to marine energy, includng my menor Scott Jenne
-- Andras, my mentor at my internship at Infinite Cooling, for showing me what someone with a PhD can do in industry and for being my role model
-- Physical and mental healthcare support and advising system, including Rachel, Dawn, Erin, Ila, Matt
+First, I thank my academic and professional mentors and supporters, including:
+\begin{itemize}
+  \item Maha for taking me on as a student and ultimately persisting with me through the PhD process
+  \item my committee members, Jacob, Pat, and Ryan, for their technical insight and feedback
+  \item Sam and Dmitry, for stepping in to provide additional departmental advising support when I needed it 
+  \item NREL for my undergraduate internship which exposed me to marine energy, includng my menor Scott Jenne
+  \item Andras, my mentor at my internship at Infinite Cooling, 
+  for showing me what someone with a PhD can do in industry and for being my role model
+  \item Racecar (the MIT Formula SAE Team) for raising me as an engineer and giving me the technical skills 
+  in multidisciplinary modeling and practical design and teamwork experience
+  \item Physical and mental healthcare support and advising system, 
+  including Rachel, Dawn, Erin, Ila, Matt
+\end{itemize} 
 
-(academic/club friends)
-- SEA Lab for being a fun and supportive research group: Can Jam on the fifth floor of Upson, PhD meetings, running, 
-- Olivia V for being my best friend in the lab, conference buddy, and for being there for each other when our phds were hard
-- Nate, Matt, and Kapil, for making the lab fun with their antics. One day we'll build a nuclear outer-space WEC.
-- other MAE PhD students, including Colby, Charlotte, Diane, Jared. The DnD campaign where Onaam Timunuo got to meet his grandfather, who talks to rocks.
-- everyone who was willing to body double with me, including Colby, Arthur, Joe, Demola, Stefan, Matt, Olivia V, Olivia G, Shariwa, Sam, Hana,
-- all the undergrads I've had the pleasure of mentoring, including Madison who has worked with me for 4 years and has grown so much, and En, Andrea, and Moho, who turned wait terrace into a sea lab house. Teamwork is really important to me, 
-- Flor for being a devoted SNAC advisor; SNAC members including Matthew, Anthony, Jessa, Will, Ethan, Sierra, Aishat
-- the engineering leadership program, including professor Rob and Erica, the geckos cohort, and the GAIA co-founders Mark and Moe.
-- other GAIA members, including AJ, Nicholas, Sofia, Erick
+Next, I thank my academic and extracurricular peers at Cornell:
+\begin{itemize}
+  \item SEA Lab for being a fun and supportive research group: 
+  Can Jam on the fifth floor of Upson, PhD meetings, running, the hot tub
+  \item Olivia V for being my best friend in the lab, conference buddy, 
+  and for being there for each other when our phds were hard
+  \item Nate, Matt, and Kapil, for making the lab fun with their antics. 
+  One day we'll build a nuclear outer-space WEC.
+  \item other MAE PhD students, including Colby, Charlotte, Diane, Jared. 
+  The DnD campaign where Onaam Timunuo got to meet his grandfather, who talks to rocks.
+  \item everyone who was willing to body double with me, including 
+  Colby, Arthur, Joe, Demola, Stefan, Matt, Olivia V, Olivia G, Shariwa, Sam, Hana, and Jared.
+  \item all the undergrads I've had the pleasure of mentoring, 
+  including Madison who has worked with me for 4 years and has grown so much, 
+  and En, Andrea, and Moho, who turned wait terrace into a SEA Lab house.
+  Teamwork is really important to me, 
+  \item Flor for being a devoted SNAC advisor; SNAC members 
+  including Matthew, Anthony, Jessa, Will, Ethan, Sierra, Aishat
+  \item the engineering leadership program, including professor Rob and Erica, 
+  the geckos cohort, and the GAIA co-founders Mark and Moe.
+  \item other GAIA members, including AJ, Nicholas, Sofia, Erick
+\end{itemize}
 
-(non-academic friends and family)
-- the cgsu graduate union for their energy to stand up to injustices that are startlingly common in academia and beyond,
-and willingness to fight for me and my fellow graduate students
-- Meghana for being the best friend I could ask for and always being a phone call away for life debriefs, support, and even the mutually distracted calls where we just exist together on the phone.
-You have been my sounding board since the very beginning deciding where to go to grad school and an invaluable friend throughout the process.
-Thanks for calling me out on my perfectionism, helping me reflect on what I've learned about myself and what I want, and for just getting me.
-You sometimes know me better than I know myself, and I would not have made it here without you.
+Next, I thank my friends and housemates outside of the academic environment, including:
+\begin{itemize}
+  \item the CGSU graduate union for their energy to stand up to injustices 
+  that are startlingly common in academia and beyond,
+  and willingness to fight for me and my fellow graduate students
+  \item Meghana for being the best friend I could ask for and always being a phone call away 
+  for life debriefs, support, and even the times where 
+  we just exist together mutually distracted on the phone.
+  You have been my sounding board since the very beginning deciding where to go to grad school 
+  and an invaluable friend throughout the process.
+  Thanks for calling me out on my perfectionism, 
+  helping me reflect on what I've learned about myself and what I want, 
+  and for just getting me.
+  You sometimes know me better than I know myself, 
+  and I would be a different person without you.
+  \item the wonderful housemates of Wait terrace cooperative 
+  for late night wagon rides, floor time, squirrels in the walls, fridge quotes, karaoke
+  \item Marina, Karen, and Marc, for cultivating a thriving house culture 
+  full of Bob the Builder cakes, eight foot inflatable gnomes, and british accents.
+  \item Ilana, Olivia G, and Firdavs, for being great co-house managers 
+  and spending lovely midnights together on the Beebee Lake bridge. 
+  I leave the house in your capable hands.
+  \item Other roommates during PhD, including Andrea, Alexa, and Helena
+  \item Ilana, my beloved roommate for the last 1.5 years, 
+  who has been there for both the uncontrollable giggles and the uncontrollable tears.
+  Yes, you can still be my roommate even if you turn into Kafka's beetle, 
+  a pickled worm in a jar, or an inanimate object.
+  Thanks for encouraging me to write Sun articles, 
+  inviting me on that barefoot 4am walk to Goldwin Smith, 
+  and helping me cement my identity.
+  One day you'll be a PhD too, and maybe we'll start that questionable cult together (kidding).
+  You're like a little sister to me, and I can't wait to see what's ahead for you.
+\end{itemize}
 
-(house)
-- the wonderful housemates of Wait terrace cooperative for late night wagon rides, floor time, squirrels in the walls, fridge quotes, karaoke
-- Marina, Karen, and Marc, for cultivating a thriving house culture full of Bob the Builder cakes, eight foot inflatable gnomes, and british accents.
-- Ilana, Olivia G, and Firdavs, for being great co-house managers and spending lovely midnights together on the Beebee Lake bridge. 
-I leave the house in your capable hands.
-- Other roommates during PhD, including Andrea, Alexa, and Helena
-- Ilana, my beloved roommate for the last 1.5 years, who has been there for both the uncontrollable giggles and the uncontrollable tears.
-Yes, you can still be my roommate even if you turn into Kafka's beetle, a pickled worm in a jar, or an inanimate but inappropriate object.
-Thanks for encouraging me to write Sun articles, inviting me on that barefoot 4am walk to Goldwin Smith, and for helping me cement my identity.
-One day you'll be a PhD too, and maybe we'll start that questionable cult together.
-You're like a little sister to me, and I can't wait to see what's ahead for you.
+Finally, I thank my family, including:
+\begin{itemize}
+  \item Brielle, who really is a little sister to me, 
+  and sends me encouragement, hometown updates, handmade craft gifts, 
+  and hidden little notes that always make me smile.
+  \item My parents, for raising me to love learning enough to start a PhD 
+  and to have the persistence to finish it.
+  you keep a watchful eye on the Cornell red-tailed hawk cam, 
+  and the annual excitement of the fledging of the hawks has marked the milestones of my PhD journey.
+  I hope that with this thesis, I have likewise taken flight.
+\end{itemize}
 
-(family)
-- Brielle, who really is a little sister to me, 
-and sends me encouragement, hometown updates, handmade craft gifts, and hidden little notes that always make me smile.
-- my parents, for raising me to love learning enough to start a phd and to be persistent enough to finish one. 
-Your support and encouragement throughout the process is constant. I love you.
+
+To everyone who has supported and encouraged me throughout this journey, thank you.
+I love you all.
+
 \end{acknowledgements}
 
 \contentspage
@@ -150,68 +242,90 @@ Your support and encouragement throughout the process is constant. I love you.
 \normalspacing \setcounter{page}{1} \pagenumbering{arabic}
 \pagestyle{cornell} \addtolength{\parskip}{0.5\baselineskip}
 
-\chapter{Introduction}
+\chapter{Introduction}\label{ch:intro}
+\input{intro-contrib}
 
-\section{SECTION 1}
-The text for Section 1 goes here, without brackets.
+\chapter[System Modeling]{System Modeling\\
+\large Development, Validation, and Benchmarking of a \\[-4ex]
+Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
+\label{ch:modeling}
 
-\section{SECTION 2}
-Section 2 text.
+\emph{All models are wrong, but some are useful.}
 
-\subsection{Subsection heading goes here}
+- George Box, 1987
 
-Subsection 1 text
+This chapter is adapted from \cite{mccabe_development_2026}, \hl{(pending submission)} [currently under review] for publication in Applied Ocean Research.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
+\subimport{../applied-ocean-research-model/}{content}
 
-\subsubsection{Subsubsection 1 heading goes here}
-Subsubsection 1 text
+\chapter[Hydrodynamic Modeling]{Hydrodynamic Modeling\\
+\large Matrix Structure and Convergence Behavior of the\\[-4ex] 
+Matched Eigenfunction Method for Generalized Concentric Bodies}
+\label{ch:hydrodynamic}
 
-\subsubsection{Subsubsection 2 heading goes here}
-Subsubsection 2 text
+\emph{The purpose of computing is insight, not numbers.}
 
-\section{SECTION 3}
-Section 3 text. The dielectric constant at the air-metal interface
-determines the resonance shift as absorption or capture occurs.
+- Richard Hamming, 1962
 
-\begin{equation}
-k_1=\frac{\omega }{c({1/\varepsilon_m + 1/\varepsilon_i})^{1/2}}=k_2=\frac{\omega
-sin(\theta)\varepsilon_{air}^{1/2}}{c}
-\end{equation}
+This chapter is adapted from \cite{bimali_matrix_2026}, currently under review for publication in the Journal of Fluid Mechanics (submission number JFM-2026-1453).
+See \cref{sec:research-outputs} for other research outputs associated with this work.
 
-\noindent
-where $\omega$ is the frequency of the plasmon, $c$ is the speed of
-light, $\varepsilon_m$ is the dielectric constant of the metal,
-$\varepsilon_i$ is the dielectric constant of neighboring insulator,
-and $\varepsilon_{air}$ is the dielectric constant of air.
+\subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{FLMguide}
 
-\chapter{Modeling}
-This chapter will be submitted to Applied Ocean Research as a journal article.
-Early versions of the work were presented as ASME IDETC and UMERC.
-\input{../applied-ocean-research-model/numeric-results.tex}
-\input{../applied-ocean-research-model/content}
-\input{../applied-ocean-research-model/appendices}
+\chapter[Design Optimization]{Design Optimization\\
+\large Leveraging Multidisciplinary Design Optimization to \\[-4ex]
+Advance Wave Energy Converter Viability
+}
+\label{ch:optimization}
 
-\chapter{Hydrodynamics Model: Matched Eigenfunction Expansion Method}
-This chapter will be submitted to Journal of Fluid Mechanics as a journal article.
-Early versions of the work were presented at SIAM and UMERC.
-The software package developed for this chapter has been submitted to the Journal of Open Source Software.
+\emph{The performance of a system doesn't depend on how the parts perform taken separately, it depends on how they perform together. [...] When you improve the performance of a part of a system taken separately, you can destroy the system.}
 
-%\input{../mdocean/simulation/modules/OpenFlash/pubs/jfm/main}
+- Russell Ackoff, 2003 \cite{ackoff_video_2003}
 
-\chapter{Optimization}
-This chapter will be submitted to Renewable Energy as a journal article.
+This chapter is adapted from \cite{mccabe_leveraging_2026}, \hl{(pending submission)} [currently under review] for publication in Renewable Energy.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
+\subimport{../renewable-energy-mdo/}{content-re}
 
-\input{../renewable-energy-mdo/numeric-results.tex}
-\input{../renewable-energy-mdo/content-re}
+\chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
+\large
+A Paradigm for Grid-Informed Design Optimization\\[-4ex] 
+to Maximize System Economic and Environmental Value}
+\label{ch:grid-value}
 
-\chapter{System Value Metrics}
-This chapter will be submitted to Applied Energy as a journal article.
+\emph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
 
-\input{../UMERC-2025-grid-value/content-grid}
+- Greta Thunberg, 2019 \cite{thunberg_speech_2019}
 
+This chapter is currently unpublished.
+See \cref{sec:research-outputs} for research outputs associated with this work.
+\subimport{../UMERC-2025-grid-value/}{content-grid}
+
+\chapter{Conclusion}
+\hl{A conclusion will be written here}.
+% \chapter{Vision for the Future of Wave Energy Optimization}
+% - extend to other architectures and more complex models (already written in modeling paper)
+% - integrate with wecopttool and wecsim
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
-\chapter{Chapter 1 of appendix}
-Appendix chapter 1 text goes here
+\begin{appendices}
 
-\bibliography{references}
+\chapter{System Modeling Appendices}
+\subimport{../applied-ocean-research-model/}{appendices}
+
+\chapter{Hydrodynamic Modeling Appendices}
+\subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{jfm-appendix}
+
+\chapter{Design Optimization Appendices}
+\subimport{../renewable-energy-mdo/sections/}{other-appendices}
+
+\chapter{Grid Impact Synthesis Appendices}
+\section{Reduced order model details}
+\subimport{../UMERC-2025-grid-value/}{appendix-grid}
+
+\end{appendices}
+
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{references,jfm,zotero-meem-refs}
 
 \end{document}

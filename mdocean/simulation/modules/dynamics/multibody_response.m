@@ -206,7 +206,7 @@ if nargout > 1
     % The physical response in this degenerate case is zero (no drive → no motion).
     zero_over_zero = t_numer==0 & t_denom==0;
     if any(zero_over_zero,'all')
-        warning('0/0 in multibody_response: setting degenerate t_n_d to 0')
+        warning('MDOcean:MultibodyResponse:ZeroOverZero', '0/0 in multibody_response: setting degenerate t_n_d to 0')
         t_n_d(zero_over_zero) = 0;
     end
 

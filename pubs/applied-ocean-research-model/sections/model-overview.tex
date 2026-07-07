@@ -26,7 +26,7 @@ Thicknesses and generator ratings are each input to two modules, with thicknesse
 Moreover, the presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{../applied-ocean-research-model/figs/from-matlab/xdsm.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
 \caption{Simplified XDSM diagram}\label{fig:n2}
 \end{figure}
 Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
@@ -40,6 +40,7 @@ Furthermore, while even in a unified optimization it may be tempting to calculat
 If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
 Using a single optimizer to drive the design of all modules and consider all constraints addresses this non-monotonic coupling. 
 
+\ifdefined\DISSERTATION
 \paragraph{Multiple-Discipline-Feasible Analysis Architecture}
 All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
 The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
@@ -48,6 +49,16 @@ This structure is known as the multiple discipline feasible (MDF) architecture.
 In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
 SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
 The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
+\else
+\paragraph{Multiple-Discipline-Feasible Analysis Architecture}
+All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
+The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
+The dynamics iteration occurs separately for each outer iteration of the optimizer.
+This structure is known as the multiple discipline feasible (MDF) architecture.
+In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \cite{martins_multidisciplinary_2013}.
+SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
+The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \cite{coe_initial_2020}.
+\fi
 
 Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
 In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
@@ -72,13 +83,14 @@ While the implicit-SAND and simultaneous-SAND block diagrams look nearly identic
 In WecOptTool, the pseudo-spectral optimizer determines the state and control variables for a fixed design without using previously-known optimality conditions.
 Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \cite{coe_initial_2020}.
 
-For MDOcean, we choose the implicit-MDF architecture. Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+For MDOcean, we choose the implicit-MDF architecture.
+Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
 This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
 Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{sec:mod-freq-domain} will detail.
 
 \begin{figure}
 \centering
-\includegraphics[width=1.1\linewidth]{../applied-ocean-research-model/figs/from-matlab/control_analysis_flowcharts.pdf}
+\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
 \caption{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}
 \label{fig:control-arch}
 \end{figure}
