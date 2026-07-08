@@ -27,8 +27,8 @@
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
 \makeatletter
-\newcommand{\ifTwoColumn}[2]{%
-    \if@twocolumn
+\newcommand{\ifJournalTwoColumn}[2]{%
+    \ifdefined\JOURNALTWOCOLUMN
         #1%
     \else
         #2%
@@ -37,9 +37,9 @@
 \makeatother
 
 \newcommand{\singleColMacro}[1]{%
-    \ifTwoColumn{\onecolumn}{}%
+    \ifJournalTwoColumn{\onecolumn}{}%
     {#1}%
-    \ifTwoColumn{\twocolumn}{}%
+    \ifJournalTwoColumn{\twocolumn}{}%
 }
 
 \usepackage{verbatim}  % word counts
