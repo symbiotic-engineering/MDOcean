@@ -1,7 +1,11 @@
 # Changelog
 ## Unreleased
 
-## [v1.2.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.16) - 2026-7-7
+## [v1.2.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.17) - 2026-7-8
+### Changed
+- License: updated Copyright to include UMich and all contributors
+
+## [v1.2.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.16) - 2026-7-8
 ### Added
 - Dev: create latex linter to check common mistakes
 ### Changed
