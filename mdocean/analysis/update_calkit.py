@@ -190,6 +190,61 @@ def merge_outputs(old_outputs, new_outputs):
     return seq
 
 
+TABLE2LATEX_DEP = "./mdocean/plots/util/table2latex.m"
+ABSTRACT_STAGE_DEP = "./mdocean/analysis/AbstractStageClass.m"
+ANALYSIS_STAGE_DEP = "./mdocean/analysis/AnalysisClass.m"
+POSTPRO_STAGE_DEP = "./mdocean/analysis/PostproClass.m"
+POSTPRO_TABLE_STAGE_DEP = "./mdocean/analysis/PostproTableClass.m"
+LEGACY_GENERIC_STAGE_DEP = "./mdocean/analysis/GenericAnalysis.m"
+
+
+def _output_path(entry):
+    if isinstance(entry, dict):
+        return str(entry.get("path", ""))
+    return str(entry)
+
+
+def _has_tex_output(outputs):
+    return any(_output_path(entry).endswith(".tex") for entry in list(outputs or []))
+
+
+def normalize_stage_inputs(stage_key, inputs, outputs):
+    """Normalize generated stage inputs for the split stage-class hierarchy."""
+    stage_inputs = list(inputs or [])
+    stage_outputs = list(outputs or [])
+    has_tex_output = _has_tex_output(stage_outputs)
+
+    normalized = []
+    for entry in stage_inputs:
+        path = entry.get("path") if isinstance(entry, dict) else entry
+        if path == LEGACY_GENERIC_STAGE_DEP:
+            continue
+        if path == TABLE2LATEX_DEP:
+            keep_table2latex = stage_key.startswith("postpro-") and has_tex_output
+            if not keep_table2latex:
+                continue
+        normalized.append(entry)
+
+    if stage_key.startswith("analysis-"):
+        required = [ABSTRACT_STAGE_DEP, ANALYSIS_STAGE_DEP]
+    elif stage_key.startswith("postpro-"):
+        postpro_dep = POSTPRO_TABLE_STAGE_DEP if has_tex_output else POSTPRO_STAGE_DEP
+        required = [ABSTRACT_STAGE_DEP, postpro_dep]
+    else:
+        required = []
+
+    existing_paths = {
+        entry.get("path") if isinstance(entry, dict) else entry
+        for entry in normalized
+    }
+    for dep in required:
+        if dep not in existing_paths:
+            normalized.append(dep)
+            existing_paths.add(dep)
+
+    return _to_commented_seq(normalized)
+
+
 # ---------------------------------------------------------------------------
 # Insertion helpers
 # ---------------------------------------------------------------------------
@@ -367,6 +422,7 @@ def main():
             merged_out = merge_outputs(
                 old.get("outputs"), gen_stage.get("outputs")
             )
+            merged_in = normalize_stage_inputs(stage_key, merged_in, merged_out)
 
             # Only replace inputs and outputs; preserve kind, command, etc.
             stages[stage_key]["inputs"] = merged_in
@@ -382,6 +438,12 @@ def main():
                     new_value[k] = _to_commented_seq(v or [])
                 else:
                     new_value[k] = v
+            if "inputs" in new_value:
+                new_value["inputs"] = normalize_stage_inputs(
+                    stage_key,
+                    new_value.get("inputs"),
+                    new_value.get("outputs"),
+                )
             new_stages = insert_stage(stages, after, stage_key, new_value)
             calkit["pipeline"]["stages"] = new_stages
             stages = calkit["pipeline"]["stages"]

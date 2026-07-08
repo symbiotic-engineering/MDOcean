@@ -4,7 +4,9 @@ function [analysis_list] = get_all_analyses()
 %
 % :returns: analysis_list
 %GET_ALL_ANALYSES Returns cell array of strings of all analysis classes
-    dont_include = ["GenericAnalysis.m","analysis_to_calkit.m","get_all_analyses.m"];
+    dont_include = ["analysis_to_calkit.m","get_all_analyses.m",...
+                    "AbstractStageClass.m","AnalysisClass.m","PostproClass.m",...
+                    "PostproTableClass.m","GroupedStageClass.m"];
     analysis_list = dir('analysis/@*');
     if isempty(analysis_list)
         analysis_list = dir('mdocean/analysis/@*');
@@ -22,4 +24,3 @@ function [analysis_list] = get_all_analyses()
     analysis_list = analysis_list(~contains(analysis_list, dont_include));
     disp(['Found analyses: ' strjoin(analysis_list, ', ')]);
 end
-

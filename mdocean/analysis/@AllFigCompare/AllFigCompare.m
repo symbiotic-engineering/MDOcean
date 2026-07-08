@@ -1,4 +1,4 @@
-classdef AllFigCompare < GenericAnalysis
+classdef AllFigCompare < GroupedStageClass
     %ALLFIGCOMPARE Analysis class for runtime comparison bar chart
     %   Generates runtime bar chart comparing all figures
 

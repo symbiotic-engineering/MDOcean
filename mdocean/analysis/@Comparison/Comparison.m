@@ -1,4 +1,4 @@
-classdef Comparison < GenericAnalysis
+classdef Comparison < GroupedStageClass
     %COMPARISON Analysis class for comparison figures and tables
     %   Generates overlaid geometry, hydro coeffs, probability CDF figures and optimal design tables
 

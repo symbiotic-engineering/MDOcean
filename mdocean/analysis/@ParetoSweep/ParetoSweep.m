@@ -1,4 +1,4 @@
-classdef ParetoSweep < GenericAnalysis
+classdef ParetoSweep < GroupedStageClass
     %PARETOSWEEP Analysis class for Pareto sweep figures
     %   Generates sweep number of seeds figure
 

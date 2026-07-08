@@ -1,4 +1,4 @@
-classdef GradientOptimFigFunc < GenericAnalysis
+classdef GradientOptimFigFunc < GroupedStageClass
     %GRADIENTOPTIMFIGFUNC Analysis class for gradient optimization figures
     %   Generates single objective optimization convergence and visualization figures
 
@@ -13,7 +13,7 @@ classdef GradientOptimFigFunc < GenericAnalysis
 
     methods
         function obj = GradientOptimFigFunc(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/GradientOptimFigFunc/intermed_convergence_plot_1.fig' ...
             };

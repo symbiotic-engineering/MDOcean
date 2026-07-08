@@ -1,4 +1,4 @@
-classdef ParetoFigFunc < GenericAnalysis
+classdef ParetoFigFunc < GroupedStageClass
     %PARETOFIGFUNC Analysis class for Pareto optimization figures
     %   Generates Pareto front figures and heuristics visualization
 

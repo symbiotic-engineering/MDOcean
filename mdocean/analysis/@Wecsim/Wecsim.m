@@ -1,4 +1,4 @@
-classdef Wecsim < GenericAnalysis
+classdef Wecsim < GroupedStageClass
     %WECSIM Analysis class for WEC-Sim validation figures and tables
     %   Generates WEC-Sim error histograms/contour plots and validation tables
 
@@ -10,7 +10,7 @@ classdef Wecsim < GenericAnalysis
 
     methods
         function obj = Wecsim(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_inputs = [obj.extra_analysis_inputs, ...
                                 {'./mdocean/inputs/wave_conditions/Humboldt_California_Wave Resource _SAM CSV.csv'}];
             obj.extra_analysis_outputs = {'results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.mat', ...

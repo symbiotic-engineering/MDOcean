@@ -1,4 +1,4 @@
-classdef DescFcns < GenericAnalysis
+classdef DescFcns < GroupedStageClass
     %DESCFCNS Analysis class for describing function figures
     %   Generates drag and saturation describing function figures
 
@@ -11,7 +11,7 @@ classdef DescFcns < GenericAnalysis
 
     methods
         function obj = DescFcns(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/DescFcns/intermed_created_figs_1.fig', ...
                 'results/DescFcns/intermed_created_figs_3.fig', ...

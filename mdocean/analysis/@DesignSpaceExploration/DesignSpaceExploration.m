@@ -1,4 +1,4 @@
-classdef DesignSpaceExploration < GenericAnalysis
+classdef DesignSpaceExploration < GroupedStageClass
     %DESIGNSPACEEXPLORATION Analysis class for design space exploration figures
     %   Generates design space exploration experimental figures
 

@@ -9,8 +9,8 @@ for i = 1:length(analysis_list)
     [~, class_name] = fileparts(analysis_list{i});
     
     try
-        analysis_obj = feval(class_name,p,b);
-        stage = analysis_obj.write_calkit_stage();
+        stage_obj = feval(class_name,p,b);
+        stage = stage_obj.write_calkit_stage();
     catch ME
         warning("Failed to write calkit stage for %s: %s", class_name, ME.message);
         stage = '';
@@ -21,4 +21,3 @@ end
 stages_combined = strjoin(stages,newline);
 
 writelines(stages_combined,'calkit_stages.yaml') % then run update_calkit.py to merge into calkit.yaml
-

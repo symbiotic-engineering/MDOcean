@@ -1,4 +1,4 @@
-classdef Constraints < GenericAnalysis
+classdef Constraints < GroupedStageClass
     %CONSTRAINTS Analysis class for constraints table
     %   Generates constraints information table
 

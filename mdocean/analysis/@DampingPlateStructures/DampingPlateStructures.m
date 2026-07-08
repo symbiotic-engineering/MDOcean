@@ -1,4 +1,4 @@
-classdef DampingPlateStructures < GenericAnalysis
+classdef DampingPlateStructures < GroupedStageClass
     %DAMPINGPLATESTRUCTURES Analysis class for damping plate structural figures
     %   Generates damping plate moment, deflection, and aspect ratio figures
 
@@ -11,7 +11,7 @@ classdef DampingPlateStructures < GenericAnalysis
 
     methods
         function obj = DampingPlateStructures(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/DampingPlateStructures/intermed_figs_1.fig', ...
                 'results/DampingPlateStructures/intermed_figs_2.fig', ...

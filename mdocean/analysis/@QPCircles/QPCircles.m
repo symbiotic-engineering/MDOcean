@@ -1,4 +1,4 @@
-classdef QPCircles < GenericAnalysis
+classdef QPCircles < GroupedStageClass
     %QPCIRCLES Analysis class for QP circle intersection figure
     %   Generates the QP circles figure from circle_intersect_script
 
@@ -8,7 +8,7 @@ classdef QPCircles < GenericAnalysis
     end
     methods
         function obj = QPCircles(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/QPCircles/intermed_figure_handle_1.fig'};
         end

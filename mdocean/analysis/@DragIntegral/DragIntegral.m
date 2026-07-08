@@ -1,4 +1,4 @@
-classdef DragIntegral < GenericAnalysis
+classdef DragIntegral < GroupedStageClass
     %DRAGINTEGRAL Analysis class for damping plate structural figures
     %   Generates damping plate moment, deflection, and aspect ratio figures
 

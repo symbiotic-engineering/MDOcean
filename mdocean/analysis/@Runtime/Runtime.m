@@ -1,4 +1,4 @@
-classdef Runtime < GenericAnalysis
+classdef Runtime < GroupedStageClass
     %RUNTIME Analysis class for runtime comparison figures
     %   Generates dynamics, hydro, and simulation runtime figures
 
