@@ -26,20 +26,10 @@
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
-\makeatletter
-\newcommand{\ifJournalTwoColumn}[2]{%
-    \ifdefined\JOURNALTWOCOLUMN
-        #1%
-    \else
-        #2%
-    \fi
-}
-\makeatother
-
 \newcommand{\singleColMacro}[1]{%
-    \ifJournalTwoColumn{\onecolumn}{}%
+    \ifdefined\JOURNALTWOCOLUMN\onecolumn%
     {#1}%
-    \ifJournalTwoColumn{\twocolumn}{}%
+    \ifdefined\JOURNALTWOCOLUMN\twocolumn%
 }
 
 \usepackage{verbatim}  % word counts
