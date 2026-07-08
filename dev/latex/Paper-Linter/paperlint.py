@@ -596,6 +596,15 @@ def get_environment_blocks(text, env_name):
 
 def strip_latex_for_word_count(text):
     cleaned = strip_tex_comments(text)
+    cleaned = re.sub(
+        r"\\begin\{(?:equation|equation\*|align|align\*|eqnarray|eqnarray\*|gather|gather\*|multline|multline\*|split)\}.*?\\end\{(?:equation|equation\*|align|align\*|eqnarray|eqnarray\*|gather|gather\*|multline|multline\*|split)\}",
+        " ",
+        cleaned,
+        flags=re.DOTALL,
+    )
+    cleaned = re.sub(r"(?<!\\)\$(?:\\.|[^$])*(?<!\\)\$", " ", cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r"\\\((?:\\.|[^\)])*\\\)", " ", cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r"\\\[(?:\\.|[^\]])*\\\]", " ", cleaned, flags=re.DOTALL)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
     cleaned = re.sub(r"\\(?:cite\w*|Cite\w*|ref|eqref|label|url|href|includegraphics|footnote)\*?(?:\[[^\]]*\])?\{[^{}]*\}", " ", cleaned)
     cleaned = re.sub(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?", " ", cleaned)
