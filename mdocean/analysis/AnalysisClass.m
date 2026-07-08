@@ -23,7 +23,8 @@ classdef AnalysisClass < AbstractStageClass
 
         function val = get.analysis_dependencies(obj)
             analysis_deps = obj.get_dependencies(['@' obj.class_name filesep 'analysis_fcn']);
-            all_deps = [obj.class_dependencies, analysis_deps];
+            stage_deps = {'./mdocean/analysis/AbstractStageClass.m', './mdocean/analysis/AnalysisClass.m'};
+            all_deps = [stage_deps, analysis_deps];
             sorted = sort(unique(all_deps));
             to_remove = 'OpenFLASH';
             val = sorted(~contains(sorted, to_remove));

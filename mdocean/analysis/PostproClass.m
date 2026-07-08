@@ -34,7 +34,13 @@ classdef PostproClass < AbstractStageClass
 
         function val = get.postpro_dependencies(obj)
             postpro_deps = obj.get_dependencies(['@' obj.class_name filesep 'post_process_fcn']);
-            all_deps = [obj.class_dependencies, postpro_deps, obj.analysis_outputs];
+            if isa(obj, 'PostproTableClass')
+                stage_class_dep = './mdocean/analysis/PostproTableClass.m';
+            else
+                stage_class_dep = './mdocean/analysis/PostproClass.m';
+            end
+            stage_deps = {'./mdocean/analysis/AbstractStageClass.m', stage_class_dep};
+            all_deps = [stage_deps, postpro_deps, obj.analysis_outputs];
             sorted = sort(unique(all_deps));
             to_remove = 'OpenFLASH';
             val = sorted(~contains(sorted, to_remove));
