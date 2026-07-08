@@ -26,16 +26,20 @@
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
-\newcommand{\singleColMacro}[1]{
-    \ifdefined\DISSERATION 
+\makeatletter
+\newcommand{\ifTwoColumn}[2]{%
+    \if@twocolumn
+        #1%
     \else
-        \onecolumn
+        #2%
     \fi
-    {#1}
-    \ifdefined\DISSERATION 
-    \else
-        \twocolumn
-    \fi
+}
+\makeatother
+
+\newcommand{\singleColMacro}[1]{%
+    \ifTwoColumn{\onecolumn}{}%
+    {#1}%
+    \ifTwoColumn{\twocolumn}{}%
 }
 
 \usepackage{verbatim}  % word counts
