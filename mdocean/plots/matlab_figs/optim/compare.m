@@ -123,19 +123,12 @@ out_table.Properties.RowNames = fix_underscores(out_table.OriginalVariableNames)
 out_table = removevars(out_table,'OriginalVariableNames');
 
 %% design variable stacked number line plot
+markers = {'o','x','^','v','d'};
 h_stacked_dv = figure;
-stacked_number_line(X(:,1:end-1).', b.X_mins, b.X_maxs, color, {'o','x','^','v','d'}, titles, b.var_names_pretty(1:end-1))
+stacked_number_line(X(:,1:end-1).', b.X_mins, b.X_maxs, color, markers, titles, b.var_names_pretty(1:end-1))
 
 h_stacked_out = figure;
-try
-    disp(out_table.Properties.RowNames)
-    disp(out_table.Properties.VariableNames)
-    disp(out_table.Properties.OriginalRowNames)
-end
-disp(class(out_table{:,:}))
-disp(size(out_table{:,:}))
-
-stacked_number_line(out_table{:,:}, [], [], color, {'o','x','^','v','d'}, titles, out_table.Properties.RowNames);
+stacked_number_line(out_table{:,:}, [], [], color, markers, titles, out_table.Properties.RowNames);
 h_stacked_out.Position(3:4) = [1000  400]; % make taller
 
 figs = [h_geom, h_hydro, h_prob, h_power_matrix, h_stacked_dv, h_stacked_out];
