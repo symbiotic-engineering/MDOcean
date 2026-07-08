@@ -602,9 +602,7 @@ def strip_latex_for_word_count(text):
         cleaned,
         flags=re.DOTALL,
     )
-    cleaned = re.sub(r"(?<!\\)\$(?:\\.|[^$])*(?<!\\)\$", " ", cleaned, flags=re.DOTALL)
-    cleaned = re.sub(r"\\\((?:\\.|[^\)])*\\\)", " ", cleaned, flags=re.DOTALL)
-    cleaned = re.sub(r"\\\[(?:\\.|[^\]])*\\\]", " ", cleaned, flags=re.DOTALL)
+    cleaned = "\n".join(mask_math_in_lines(cleaned.split("\n")))
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
     cleaned = re.sub(r"\\(?:cite\w*|Cite\w*|ref|eqref|label|url|href|includegraphics|footnote)\*?(?:\[[^\]]*\])?\{[^{}]*\}", " ", cleaned)
     cleaned = re.sub(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?", " ", cleaned)
