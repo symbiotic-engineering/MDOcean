@@ -88,7 +88,7 @@ This category includes length and count constraints for submissions (switch `cou
 * **Switch**: `keyword-count`
 
 #### Graphical Abstract Size
-* **Description**: Warns if the graphical abstract is not 531 x 1328 or the same proportion at higher resolution
+* **Description**: Warns if the graphical abstract is not landscape, does not keep the 1328:531 ratio, or is smaller than 1328 x 531
 * **Switch**: `graphical-abstract-size`
 
 

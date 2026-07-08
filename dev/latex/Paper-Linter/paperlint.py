@@ -1254,17 +1254,15 @@ def check_graphical_abstract_dimensions():
         return warns
 
     width, height = dimensions
-    target_small = 531.0
-    target_large = 1328.0
-    target_ratio = target_large / target_small
-    actual_ratio = max(width, height) / min(width, height)
+    target_width = 1328.0
+    target_height = 531.0
+    target_ratio = target_width / target_height
+    actual_ratio = width / height
+    is_landscape = width > height
     ratio_close = abs(actual_ratio - target_ratio) <= 0.01
-    exact_size = (
-        (abs(width - target_small) <= 1 and abs(height - target_large) <= 1)
-        or (abs(width - target_large) <= 1 and abs(height - target_small) <= 1)
-    )
-    if not ratio_close and not exact_size:
-        warns.append((-1, "Graphical abstract dimensions are %.1f x %.1f; expected 531 x 1328 or equivalent aspect ratio" % (width, height)))
+    meets_minimum_size = width >= target_width and height >= target_height
+    if not (is_landscape and ratio_close and meets_minimum_size):
+        warns.append((-1, "Graphical abstract dimensions are %.1f x %.1f; expected landscape with ratio 1328:531 and minimum size 1328 x 531" % (width, height)))
     return warns
 
 
