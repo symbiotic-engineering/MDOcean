@@ -1,6 +1,20 @@
 # Changelog
 ## Unreleased
 
+## [v1.2.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.16) - 2026-7-7
+### Added
+- Dev: create latex linter to check common mistakes
+### Changed
+- Paper: Maha's word choice changes from Overleaf - note that these are not yet fully reviewed but are merged anyway to maintain accurate history
+- Pipeline: comment out svg2png calkit stage
+- Deps: bump `OpenFLASH` submodule by 2 commits
+- Pipeline: move `matlab_figs` plot functions into folders, regenerate calkit.yaml, and force commit dependent stages
+- Paper: update UMERC paper to use shared citation references and cref for appendices
+- Dev: Change `.mlx` to `.m` for file changed scraper
+### Fixed
+- Pipeline/paper: fixing citations, refs, json2latex, numbers, and addressing linter-identified issues in Maha's wording changes
+- Figures: Improve readability of Mermaid control flowchart diagrams, PTO sweep (remove hashing), and `GradientOptim`'s `delta_x`
+
 ## [v1.2.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.15) - 2026-7-7
 ### Added
 - Docs: instructions for using calkit with overleaf
