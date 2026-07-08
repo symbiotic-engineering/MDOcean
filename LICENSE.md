@@ -1,10 +1,17 @@
 MIT License
 
-Copyright (c) 2023 The Regents of the University of Michigan and Cornell University Symbiotic Engineering Analysis Lab and the following individuals:
-Rebecca McCabe
-Madison Dietrich
-(...)
-
+Copyright (c) 2021-2026 The Regents of the University of Michigan,
+Cornell University Symbiotic Engineering Analysis Lab, 
+and the following individuals:
+Rebecca McCabe,
+Madison Dietrich,
+Olivia Murphy,
+Anthony Long,
+Iris Ren,
+Pete Bachant,
+Rebecca Spirer,
+Kapil Khanal,
+Maha Haji
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
