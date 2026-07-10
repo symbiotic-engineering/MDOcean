@@ -27,11 +27,5 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.vals = vals;
     intermed_result_struct.fmincon_outputs = fmincon_outputs;
     intermed_result_struct.singleObjRuntime = singleObjRuntime;
-    lcoe_obj_idx = find(which_objs == 1, 1);
-    if ~isempty(lcoe_obj_idx) && ~isempty(fmincon_outputs{lcoe_obj_idx})
-        intermed_result_struct.numIterationsToConverge = fmincon_outputs{lcoe_obj_idx}.total_iterations;
-    else
-        intermed_result_struct.numIterationsToConverge = NaN;
-    end
     intermed_result_struct.convergence_plot = gcf();
 end
