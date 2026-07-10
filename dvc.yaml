@@ -7968,7 +7968,6 @@ stages:
       - .calkit/env-locks/tex
       - mdocean/plots/non_matlab_figs/.latexmkrc
     outs:
-      - mdocean/plots/non_matlab_figs/${item.name}.pdf
       - mdocean/plots/non_matlab_figs/aux/${item.name}.log:
           cache: false
           persist: true
@@ -7981,6 +7980,7 @@ stages:
       - mdocean/plots/non_matlab_figs/aux/${item.name}.fls:
           cache: false
           persist: true
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
       name:
         - circuit_intrinsic
@@ -7989,24 +7989,6 @@ stages:
         - control_method_venn_diagram
         - meem_dims
     desc: Automatically generated from the 'make-standalone-tex-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  move-standalone-pdfs:
-    cmd: calkit map-paths --file-to-file 
-      'mdocean/plots/non_matlab_figs/${item.name}.pdf->mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf'
-    deps:
-      - mdocean/plots/non_matlab_figs/${item.name}.pdf
-    outs:
-      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf:
-          cache: false
-          persist: true
-    matrix:
-      name:
-        - circuit_intrinsic
-        - circuit_pto
-        - circuit_kinematics
-        - control_method_venn_diagram
-        - meem_dims
-    desc: Automatically generated from the 'move-standalone-pdfs' 
       stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd

@@ -115,7 +115,6 @@ function [fig_array, ...
                   'Power Limit Only (# sea states)', ...
                   'Both Limits (# sea states)', ...
                   'Neither Limit (# sea states)'};
-    fig1.Position(3:4) = [1000 500];  % widen to accommodate legend
 
     fig2 = figure;
     t2 = tiledlayout(2, 2, 'TileSpacing', 'compact');
@@ -135,7 +134,7 @@ function [fig_array, ...
     end
 
     improvePlot;
-    fig1.Position(3:4) = [1000 500];
+    fig1.Position(3:4) = [800 400];
 
     % --- Outputs ---
     fig_array         = [fig, fig2];
