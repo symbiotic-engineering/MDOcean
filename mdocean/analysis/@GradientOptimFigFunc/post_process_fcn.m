@@ -66,11 +66,9 @@ function [fig_array,...
     if ~isempty(lcoe_obj_idx) && ~isempty(fmincon_outputs{lcoe_obj_idx})
         out_lcoe = fmincon_outputs{lcoe_obj_idx};
         end_result_struct.singleObjIters = out_lcoe.total_iterations;
-        end_result_struct.numIterationsToConverge = out_lcoe.total_iterations;
         end_result_struct.singleObjFcnEvals = out_lcoe.total_funcCount;
     else
         end_result_struct.singleObjIters = NaN;
-        end_result_struct.numIterationsToConverge = NaN;
         end_result_struct.singleObjFcnEvals = NaN;
     end
     end_result_struct.singleObjRuntime = intermed_result_struct.singleObjRuntime;
