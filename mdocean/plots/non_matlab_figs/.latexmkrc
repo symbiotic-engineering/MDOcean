@@ -1,2 +1,2 @@
-#$out_dir = 'pdf';
+$out_dir = 'pdf';
 $aux_dir = 'aux';

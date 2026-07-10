@@ -5913,6 +5913,7 @@ pipeline:
       target_path: mdocean/plots/non_matlab_figs/{name}.tex
       environment: tex
       latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      output_dir: mdocean/plots/non_matlab_figs/pdf/
       synctex: false
       iterate_over:
         - arg_name: name
@@ -5921,7 +5922,6 @@ pipeline:
       inputs:
         - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
       outputs:
-        - mdocean/plots/non_matlab_figs/{name}.pdf
         - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
           storage:
@@ -5934,17 +5934,6 @@ pipeline:
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
           delete_before_run: false
           storage:
-    move-standalone-pdfs:
-      kind: map-paths
-      environment: _system
-      paths:
-        - src: mdocean/plots/non_matlab_figs/{name}.pdf
-          dest: mdocean/plots/non_matlab_figs/pdf/{name}.pdf
-          kind: file-to-file
-      iterate_over:
-        - arg_name: name
-          values:
-            - parameter: latex_standalone_name
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg
