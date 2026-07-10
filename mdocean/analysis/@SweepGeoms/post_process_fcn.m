@@ -253,6 +253,7 @@ function [fig_array,...
 
     end_result_struct.percent_nans = 100 * sum(~isfinite(hydro_ratio_result(:))) / numel(hydro_ratio_result);
     end_result_struct.n_combos = intermed_result_struct.n_geoms * nT;
+    end_result_struct.geom_sweep_analysis_time = intermed_result_struct.elapsed_time;
 end
 
 % ======================================================================
