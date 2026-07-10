@@ -18,6 +18,7 @@ function stacked_number_line(data, lower_lim, upper_lim, colors, markers, legend
 %
 % stacked_number_line(data)
 % stacked_number_line(data, lower_lim, upper_lim)
+% stacked_number_line(data, lower_lim, upper_lim, colors, markers, legend_cell, ylabel_cell)
 %
 % Inputs
 % -------
@@ -29,6 +30,18 @@ function stacked_number_line(data, lower_lim, upper_lim, colors, markers, legend
 %
 % upper_lim : Nx1 or 1xN numeric vector (optional)
 %     Upper x-axis limit for each row.
+%
+% colors : 1xM cell array of color specifiers (optional)
+%     Color for each marker series.
+%
+% markers : 1xM cell array of marker specifiers (optional)
+%     Marker type for each marker series.
+%
+% legend_cell : 1xM cell array of character vectors or strings (optional)
+%     Legend labels for marker series.
+%
+% ylabel_cell : Nx1 or 1xN cell array of character vectors or strings (optional)
+%     Y-axis labels for each row.
 %
 % Notes
 % -----
@@ -121,5 +134,4 @@ function stacked_number_line(data, lower_lim, upper_lim, colors, markers, legend
         xlim(ax2,lims)
     end
 end
-
 
