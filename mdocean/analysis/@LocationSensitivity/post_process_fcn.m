@@ -39,13 +39,12 @@ function [fig_array,...
     tab_array_display = {tab};
     tab_array_latex = {tablatex};
     
-    tab_colspecs = {['
-                    l
-                    L{0.1\linewidth}
-                    L{0.1\linewidth}
-                    L{0.1\linewidth}
-                    L{0.1\linewidth}
-                    L{0.12\linewidth}']};
+    tab_colspecs = {['l' ...
+                     'L{0.1\linewidth}' ...
+                     'L{0.1\linewidth}' ...
+                     'L{0.1\linewidth}' ...
+                     'L{0.1\linewidth}' ...
+                     'L{0.12\linewidth}']};
     tab_firstrows = {'&& \multicolumn{4}{c}{Location}\\  \cline{3-6}'};
 
     end_result_struct.location_flags = location_flags;
