@@ -228,6 +228,7 @@ function matrix = local_sens_LHS_matrix(x0,p,hess,active,active_lin,active_lb,ac
 
     % obtain B from constraint A_ineq matrix for linear constraints
     A_ineq_lin_part = lin_ineq_constraints(p);
+    A_ineq_lin_part = A_ineq_lin_part(:, 1:end-1); % remove material column (consistent with get_partials)
     A_ineq_lin = zeros(size(A_ineq_lin_part,1), length(x0)-1);
     A_ineq_lin(:, 1:size(A_ineq_lin_part,2)) = A_ineq_lin_part;
     B_lin = A_ineq_lin(active_lin,:).';
@@ -333,4 +334,3 @@ function deriv = finite_difference_scalar_x(f_handle,x_1,idx)
     deriv = delta_y / delta_x;
     % deriv is size(y)
 end
-

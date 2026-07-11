@@ -13,9 +13,9 @@ function inputCell = modify_suffix(inputCell)
         elseif endsWith(inputString, '_f')
             modifiedString = replace(inputString, '_f', '_float');
         elseif endsWith(inputString, '_vc')
-            modifiedString = replace(inputString, '_vc', '_vertical_column');
+            modifiedString = replace(inputString, '_vc', '_column');
         elseif endsWith(inputString, '_rp')
-            modifiedString = replace(inputString, '_rp', '_reaction_plate');
+            modifiedString = replace(inputString, '_rp', '_plate');
         elseif endsWith(inputString, '_avg')
             modifiedString = replace(inputString, '_avg', '_average');
         elseif endsWith(inputString, '_tot')

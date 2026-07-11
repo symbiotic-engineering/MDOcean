@@ -1,6 +1,8 @@
-use Cwd;
-my $root = getcwd();  # /workdir/pubs/renewable-energy-mdo
-print "Current working directory: $root\n";
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+
+my $cwd = getcwd; # /work/
+my $root = File::Spec->catfile($cwd, 'pubs', 'renewable-energy-mdo'); # /work/pubs/renewable-energy-mdo
 
 # Ensure BibTeX finds references.bib
 push @BIBINPUTS, $root;
@@ -15,3 +17,8 @@ push @TEXINPUTS, $root;
 
 $out_dir = '.';
 $aux_dir = 'aux';
+
+# Enable -shell-escape for pdflatex (required for bibcop override)
+set_tex_cmds( '--shell-escape %O %S' );
+
+$max_repeat = 10;
