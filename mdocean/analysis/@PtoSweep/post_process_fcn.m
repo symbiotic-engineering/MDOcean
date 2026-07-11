@@ -102,6 +102,7 @@ function [fig_array, ...
     end
 
     legend(ax(1), 'Location', 'best');
+    fig.Position(3:4) = [800 400];
 
     % --- Figure 2: per-sea-state constraint activity counts ---
     n_force_only = intermed_result_struct.n_force_only;
@@ -134,7 +135,6 @@ function [fig_array, ...
     end
 
     improvePlot;
-    fig.Position(3:4) = [800 400];
 
     % --- Outputs ---
     fig_array         = [fig, fig2];
