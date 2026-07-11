@@ -1,15 +1,16 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{soul}      % for highlighting text with \hl 
-\usepackage{multirow}  % for multi row/col tables
+\usepackage{soul}       % for highlighting text with \hl 
+\usepackage{multirow}   % for multi row/col tables
 \usepackage{tikz}
-\usepackage{array}     % required for text wrapping in tables
-\usepackage{pdflscape} % for landscape table
-\usepackage{longtable} % for table going multiple pages
-\usepackage{rotating}  % for rotated table headers
-\usepackage{color}     % also required for highlighting 
+\usepackage{array}      % required for text wrapping in tables
+\usepackage{pdflscape}  % for landscape table
+\usepackage{longtable}  % for table going multiple pages
+\usepackage{rotating}   % for rotated table headers
+\usepackage{color}      % also required for highlighting 
 \usepackage{pdftexcmds} % for detecting if shell escape is enabled
-\usepackage{enumitem} % bullets
+\usepackage{enumitem}   % bullets
+\usepackage{booktabs}   % for better looking tables
 
 % save bibliography command before bibcop modifies it
 \makeatletter
@@ -26,26 +27,19 @@
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
-\newcommand{\singleColMacro}[1]{
-    \ifdefined\DISSERATION 
-    \else
-        \onecolumn
+\newcommand{\singleColMacro}[1]{%
+    \ifdefined\JOURNALTWOCOLUMN
+      \onecolumn%
     \fi
-    {#1}
-    \ifdefined\DISSERATION 
-    \else
-        \twocolumn
+    {#1}%
+    \ifdefined\JOURNALTWOCOLUMN
+      \twocolumn%
     \fi
 }
 
 \usepackage{verbatim}  % word counts
 \usepackage{textcomp}  % cent symbol
 
-\ifdefined\DISSERTATION
-  \usepackage[numbers,square]{natbib}    % citep command
-\else
-  %\usepackage[numbers]{natbib}             % citep command
-\fi
 \usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
 \usepackage{cleveref}
 
@@ -53,7 +47,7 @@
 \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
 
 \newcommand{\summarytexcount}[1]{\textbf{Word Count}
-  \immediate\write18{texcount -nosub -inc -sum=[1,0,0,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
+  \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
   \verbatiminput{#1.wcsum}%
 }
 
@@ -145,3 +139,4 @@
 
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}

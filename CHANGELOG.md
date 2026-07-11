@@ -1,6 +1,86 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.0) - 2026-7-11
+Papers at the state of journal submission, plus a few post-submission edits.
+### Added
+- Paper: custom table column types P, M, L
+- Paper: plain language abstract in dissertation
+- Figures: stacked bar charts for Comparison outputs
+- Figures: create real graphical abstract for RE
+- Figures: create `mod_freq_domain_ctrl_combined` mermaid flowchart
+- Paper: macro to switch between one and two columns
+- Paper: declaration of interests and declaration of generative AI
+- AOR paper: describe spar coefficients Olaya fit
+- AOR paper: use stars instead of low/med/high for method comparison table
+- RE paper: add back design of experiments section
+### Changed
+- Figures: `DesignSpaceExploration` marks infeasibility with x/o
+- Figures: add color to mermaid control flowcharts
+- Figures/tables: format tweaks to `LocationSensitivity`, `FitOlaya`, `PtoSweep` fig/table outputs
+- Figures: fix aspect ratio of `constraint_active_plot.m` 
+- Analysis: `SweepGeoms` real timing as output, increase sweep fidelity from 3 to 5 points per dimension
+- Pipeline: Tikz figures are standalone and part of `ReadNonMatlabFigs` instead of externalized
+- Pipeline: remove pareto search dependence on constraint active figure
+- Pipeline: update overleaf sync paths
+- Paper: use `cas-dc` document class
+- AOR paper: add overlines to hydrostatic stability line segments
+- AOR paper: bring back definition of storm hydro coeffs
+- AOR paper: change modified frequency domain to QLPS and describe dimension of QLPS problem in `module_details.tex`
+- Dissertation: appendices occur after each chapter instead of all at the end
+### Fixed
+- Tables: fix extra math `$` that occurred in `table2latex` entries with subscripts
+- Paper: use pipeline outputs instead of manual figures for power matrix multiplication
+- Paper: appropriate `citet/citep`, capitalization of `Cref`
+- Pipeline: removed unnecessary dependencies in optimization folder from `make-calkit-stages` stage
+### Removed
+- Pipeline: removed overleaf sync for beamer slides
+- Pipeline: removed `sim_runtime.pdf` figure
+- Paper: deleted `numbers.tex` in AOR
+- Paper: commented out multistart bar chart, runtime bar chart, epsilon constraint seed figures and some discussion about sensitivity to drag coefficient in RE
+
+## [v1.2.17](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.17) - 2026-7-8
+### Changed
+- License: updated Copyright to include UMich and all contributors
+
+## [v1.2.16](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.16) - 2026-7-8
+### Added
+- Dev: create latex linter to check common mistakes
+### Changed
+- Paper: Maha's word choice changes from Overleaf - note that these are not yet fully reviewed but are merged anyway to maintain accurate history
+- Pipeline: comment out svg2png calkit stage
+- Deps: bump `OpenFLASH` submodule by 2 commits
+- Pipeline: move `matlab_figs` plot functions into folders, regenerate calkit.yaml, and force commit dependent stages
+- Paper: update UMERC paper to use shared citation references and cref for appendices
+- Dev: Change `.mlx` to `.m` for file changed scraper
+### Fixed
+- Pipeline/paper: fixing citations, refs, json2latex, numbers, and addressing linter-identified issues in Maha's wording changes
+- Figures: Improve readability of Mermaid control flowchart diagrams, PTO sweep (remove hashing), and `GradientOptim`'s `delta_x`
+
+## [v1.2.15](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.15) - 2026-7-7
+### Added
+- Docs: instructions for using calkit with overleaf
+- Dev: interactive script to help execute a calkit overleaf sync
+
+## [v1.2.14](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.14) - 2026-7-7
+### Added
+- Dev: script to check convexity with cvxpy
+- Dev: script to return which github copilot models were used from json log, for AI acknowledgement statement
+
+## [v1.2.13](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.13) - 2026-7-7
+### Fixed
+- CI: fixed codecov upload by using OIDC instead of token
+
+## [v1.2.12](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.12) - 2026-6-26
+- Paper: portion of Maha's Overleaf changes that move things to appendix and introduce if/else structure, without changing wording.
+- Submodule: update OpenFLASH to reflect JFM submission changes (`jfm-thesis` branch with `main` merged into it)
+
+## [v1.2.11](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.11) - 2026-6-19
+### Changed
+- Tests: comment out assert success command in `run_tests.m`
+### Fixed
+- Tests: allow stages with tables to pass tests, just have to rerun their postpro
+
 ## [v1.2.10](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.2.10) - 2026-6-17
 ### Added
 - Pipeline: OpenFLASH subproject

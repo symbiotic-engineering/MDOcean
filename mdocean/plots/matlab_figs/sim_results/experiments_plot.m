@@ -19,10 +19,6 @@ function [figs,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,cost,power,fa
         pareto_results_struct = [];
     end
     idx_infeasible = ~cell2mat(cellfun(@isempty,failed_mat,'UniformOutput',false));
-    disp(class(idx_infeasible))
-    disp(size(idx_infeasible))
-    disp(idx_infeasible)
-    disp(size(ratios))
 
     % create table for display	
     results_tab = array2table(X_ins, 'VariableNames', b.var_names(1:end-1));	
@@ -30,8 +26,7 @@ function [figs,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,cost,power,fa
     cost = cost';
     power = power';
     results_tab = addvars(results_tab, round(LCOE(LCOE~=Inf),2), round(cost(cost~=Inf),1), failed, ...
-                    'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','Failed Constraints'});	
-    disp(results_tab)
+                    'NewVariableNames', {'LCOE ($/kWh)','c_v (%)','Failed Constraints'});
     
     % plot pareto curve for comparison, if pareto results exist
     if ~isempty(pareto_results_struct)

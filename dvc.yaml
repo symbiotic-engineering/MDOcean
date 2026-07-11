@@ -65,7 +65,13 @@ stages:
     deps:
       - mdocean/analysis/
       - mdocean/inputs/
-      - mdocean/optimization/
+      - mdocean/optimization/multiobjective/
+      - mdocean/optimization/sensitivities/
+      - mdocean/optimization/compare_run.m
+      - mdocean/optimization/find_nominal_inputs.m
+      - mdocean/optimization/gradient_optim.m
+      - mdocean/optimization/max_avg_power.m
+      - mdocean/optimization/run_solver.m
       - mdocean/plots/util/
       - mdocean/plots/matlab_figs/
       - mdocean/plots/all_figures.m
@@ -3389,6 +3395,7 @@ stages:
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
@@ -5751,13 +5758,13 @@ stages:
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
@@ -6889,13 +6896,13 @@ stages:
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
@@ -7632,6 +7639,16 @@ stages:
       --file-to-file 
       'pubs/shared/references.bib->pubs/dissertation/references.bib' 
       --file-to-file 
+      'pubs/shared/references.bib->pubs/UMERC-2025-grid-value/references.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/UMERC-2025-grid-value/zotero-meem-refs.bib'
+      --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
+      --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst'
       --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst'
@@ -7649,14 +7666,15 @@ stages:
       'pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty'
       --file-to-file 
       'pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty'
-      --file-to-file 
-      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
-      --file-to-file 
-      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib'
     deps:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
       - pubs/shared/references.bib
+      - pubs/shared/references.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/shared-pkg.tex
@@ -7666,8 +7684,6 @@ stages:
       - pubs/shared/els-cas/cas-sc.cls
       - pubs/shared/els-cas/cas-common.sty
       - pubs/shared/els-cas/cas-common.sty
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
     outs:
       - pubs/applied-ocean-research-model/references.bib:
           cache: false
@@ -7676,6 +7692,21 @@ stages:
           cache: false
           persist: true
       - pubs/dissertation/references.bib:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/references.bib:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
           cache: false
           persist: true
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst:
@@ -7703,12 +7734,6 @@ stages:
           cache: false
           persist: true
       - pubs/renewable-energy-mdo/cas-common.sty:
-          cache: false
-          persist: true
-      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
-          cache: false
-          persist: true
-      - pubs/renewable-energy-mdo/zotero-meem-refs.bib:
           cache: false
           persist: true
     desc: Automatically generated from the 'copy-shared-latex' stage 
@@ -7817,6 +7842,7 @@ stages:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       - pubs/UMERC-2025-grid-value/figures/
       - pubs/UMERC-2025-grid-value/references.bib
+      - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
       - pubs/UMERC-2025-grid-value/logo.jpg
       - .calkit/env-locks/tex
     outs:
@@ -7832,6 +7858,8 @@ stages:
       - pubs/dissertation/hangcaption.sty
       - pubs/dissertation/.latexmkrc
       - pubs/dissertation/intro-contrib.tex
+      - pubs/dissertation/abstract.tex
+      - pubs/dissertation/acknowledgements.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/content.tex
       - pubs/applied-ocean-research-model/sections/
@@ -7955,7 +7983,6 @@ stages:
       - .calkit/env-locks/tex
       - mdocean/plots/non_matlab_figs/.latexmkrc
     outs:
-      - mdocean/plots/non_matlab_figs/${item.name}.pdf
       - mdocean/plots/non_matlab_figs/aux/${item.name}.log:
           cache: false
           persist: true
@@ -7968,6 +7995,7 @@ stages:
       - mdocean/plots/non_matlab_figs/aux/${item.name}.fls:
           cache: false
           persist: true
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
       name:
         - circuit_intrinsic
@@ -7976,24 +8004,6 @@ stages:
         - control_method_venn_diagram
         - meem_dims
     desc: Automatically generated from the 'make-standalone-tex-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
-  move-standalone-pdfs:
-    cmd: calkit map-paths --file-to-file 
-      'mdocean/plots/non_matlab_figs/${item.name}.pdf->mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf'
-    deps:
-      - mdocean/plots/non_matlab_figs/${item.name}.pdf
-    outs:
-      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf:
-          cache: false
-          persist: true
-    matrix:
-      name:
-        - circuit_intrinsic
-        - circuit_pto
-        - circuit_kinematics
-        - control_method_venn_diagram
-        - meem_dims
-    desc: Automatically generated from the 'move-standalone-pdfs' 
       stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd
