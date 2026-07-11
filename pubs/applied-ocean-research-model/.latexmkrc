@@ -17,7 +17,7 @@ print "TEXINPUTS after: @TEXINPUTS\n";
 $out_dir = '.';
 $aux_dir = 'aux';
 
-# Enable -shell-escape for pdflatex (required for TikZ externalization)
+# Enable -shell-escape for pdflatex (required for TikZ externalization and bibcop override)
 set_tex_cmds( '--shell-escape %O %S' );
 
 $max_repeat = 10;

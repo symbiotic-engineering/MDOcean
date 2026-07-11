@@ -27,7 +27,7 @@ end
 
 %% prep for saving outputs
 date = datestr(now,'yyyy-mm-dd_HH.MM.SS');
-save_folder = ['../test-results/' date '/'];
+save_folder = ['test-results/' date '/'];
 mkdir(save_folder)
 table_save_fcn = @(tab,filename,varargin) table2latex(tab, [save_folder filename], varargin{:});
 
@@ -83,8 +83,7 @@ for i = 1:length(fig_names)
             
             % Run the analysis if not already done
             if isempty(analysis_obj.fig_array)
-                analysis_obj = analysis_obj.run_analysis();
-                analysis_obj = analysis_obj.run_post_process();
+                analysis_obj = analysis_obj.run_all_from_load_if_possible();
                 analysis_instances(class_name) = analysis_obj;
             end
             
@@ -144,8 +143,7 @@ for i = 1:length(tab_names)
             
             % Run the analysis if not already done
             if isempty(analysis_obj.tab_array_display)
-                analysis_obj = analysis_obj.run_analysis();
-                analysis_obj = analysis_obj.run_post_process();
+                analysis_obj = analysis_obj.run_all_from_load_if_possible();
                 analysis_instances(class_name) = analysis_obj;
             end
             

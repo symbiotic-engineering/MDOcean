@@ -17,6 +17,6 @@ If you are running individual scipts/functions, you will need to ``cd`` to the `
 Reproducibility
 ---------------
 
-This project uses ``calkit <https://docs.calkit.org/>``_ pipelines to ensure all figures and publications are fully reproducible.
+This project uses `calkit <https://docs.calkit.org/>`_ pipelines to ensure all figures and publications are fully reproducible.
 To reproduce, `download calkit <https://docs.calkit.org/installation/>`_ and then enter the command ``calkit run``. 
 You can also view the project artifacts on `calkit.io <https://calkit.io/symbiotic-engineering/mdocean>`_. Larger files like images and pdfs are stored in DVC rather than Git.

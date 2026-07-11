@@ -28,10 +28,11 @@ else
 end
 
 mcr.header = {'waves.height','waves.period','pto(1).damping','stiffness'};
-idx = p.JPD ~= 0;
+idx = p.JPD > 0 & ~isnan(p.JPD);
 control_B = val.B_p(idx);
 control_K = -val.K_p(idx);
 mcr.cases = [H(idx),T(idx),control_B,control_K];
+mcr.jpd = reshape(p.JPD(idx), [], 1);
 save('mcrMDOcean.mat','mcr')
 
 % filename to save

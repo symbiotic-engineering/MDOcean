@@ -1,11 +1,357 @@
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Additional Hydrodynamics Details}
+\label{sec:appendix-additional-hydro}
+The hydrodynamic coefficients for the spar are calculated by fitting and interpolating data from WAMIT and reference \cite{olaya_hydrodynamic_2015}.
+The data show the excitation and damping coefficients experiencing ``rebound'' effects where rather than slowly asymptoting to zero like those of a single cylinder, they go quickly to zero, increase to a peak, then slowly asymptote down to zero again.
+The coefficients have the following form:
+\begin{equation}
+|\gamma_s| = \rho g \pi D_s^2/4 |H_0(kR_x)| \exp(-k e_1) kh \alpha \max(1,\alpha) 
+\sqrt{\frac{f(\frac{kh R_x \alpha^3}{\beta R_p})}
+           {\beta(1+\frac{\beta}{\alpha})}}
+\end{equation}
+
+Computing the float coefficients in a different way than the spar and coupling coefficients introduces the possibility of violating physical requirements of the solution.
+In particular, the damping matrix must be positive definite because it represents a dissipative force where outgoing waves remove energy from the system, and the added mass matrix must be positive definite because it represents the kinetic energy of the fluid which must be non-negative.
+\begin{equation}\label{eq:open-loop-stabilty}
+    \det(\mathbf{A_{h,op}})=A_f A_s - A_c^2>0 \,, \quad
+    \det(\mathbf{B_{h,op}})=B_f B_s - B_c^2>0
+\end{equation}
+This positive-definiteness may be violated for certain combinations of coefficients and can cause the system dynamics to become unstable.
+Even when other forces such as body inertia, drag, friction, and control stabilize the system, violation of the conditions of \cref{eq:open-loop-stabilty} can artificially inflate power production.
+These conditions must be checked for each sea state and the coefficients adjusted if needed.
+MDOcean chooses to decrease the magnitude of the coupling coefficients $|A_c|$ and $|B_c|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
+This intends to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dynamics and Control Module Details}
-\subsection{Linear Solution Procedure}\label{sec:appendix-dynamics-solution}
-\Cref{sec:eom,sec:pto-dynamics} introduced linear models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
+This section provides supplementary derivations and implementation details for the dynamics and control module.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PTO Model Details}
+\label{sec:appendix-pto-model}
+We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
+A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
+Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
+Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \cite{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
+This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
+
+
+%%%%%%%%%%%%%%%
+\subsubsection{Multiport Circuit Conventions}
+\label{sec:appendix-multiport}
+
+The intrinsic, powertrain, and Th\'evenin-equivalent representations used throughout \cref{sec:dynamics} are all instances of multiport circuit models, with effort variables $\vec{e}$ and flow variables $\vec{q}$ at each port.
+Following \cite{reveyrand_multiport_2018}, three matrix forms describe the relationships between port variables: impedance ($\mathbf{Z}$), cascade ($\mathbf{a}$, also called ABCD), and hybrid ($\mathbf{h}$):
+\begin{equation}\label{eq:multiport-matrix-definitions}
+\vec{e} = \mathbf{Z}\,\vec{q},
+\qquad
+\begin{bmatrix} \vec{e}_2 \\ \vec{q}_2 \end{bmatrix}
+= [\mathbf{a}]_{2\leftarrow 1}
+\begin{bmatrix} \vec{e}_1 \\ \vec{q}_1 \end{bmatrix},
+\qquad
+\begin{bmatrix} \vec{e}_1 \\ \vec{q}_2 \end{bmatrix}
+= [\mathbf{h}]_{1,2}
+\begin{bmatrix} \vec{q}_1 \\ \vec{e}_2 \end{bmatrix}.
+\end{equation}
+These equations apply to both time-domain and phasor representations of each port.
+The three forms differ in how the ports are grouped:
+\begin{itemize}
+    \item \textbf{Impedance} ($\mathbf{Z}$) groups all ports together, describing the effort required to produce a unit of flow.
+The intrinsic dynamics matrix $\mathbf{Z}_i$ and the PTO impedance $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain,eq:intrinsic-impedance} both use this form.
+    \item \textbf{Cascade} ($\mathbf{a}$) divides the ports into two groups and describes how effort and flow transmit from one group to the other.
+The arrow subscript indicates direction: $[\mathbf{a}]_{2\leftarrow 1}$ maps port group 1 to port group 2.
+Reversing direction inverts the matrix,
+    \begin{equation}\label{eq:cascade-inverse}
+        [\mathbf{a}]_{1\leftarrow 2} = [\mathbf{a}]_{2\leftarrow 1}^{-1},
+    \end{equation}
+    and sequential multiplication represents serial composition of two-port elements.
+This form is used for the PTO dynamics (drivetrain followed by generator).
+    \item \textbf{Hybrid} ($\mathbf{h}$) mixes the two conventions, expressing one effort and one flow at the two port groups as functions of the complementary variables.
+This form is used for the PTO kinematics, where it naturally accommodates underactuation.
+\end{itemize}
+
+Conversion between the three forms is accomplished using the formulas in reference \cite{reveyrand_multiport_2018}.
+Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
+
+% Verify against \cite{coe_co-design_2025} before submission and edit
+% if the convention differs.
+The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
+
+%%%%%%%%%%%%%%%
+\subsubsection{PTO Kinematics and Underactuation}
+The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
+In general form, the PTO kinematics can be expressed as:
+\begin{equation}\label{eq:pto-kinematics-motion}
+\vec{\hat{X}}_{PTO} = \mathbf{T}_{kin}~ \vec{\hat{\xi}}
+\end{equation}
+with kinematic transformation matrix $\mathbf{T}_{kin}$ that may depend on the body displacements $\vec{\hat{\xi}}$ if the linkages are nonlinear, but hereafter is assumed constant for simplicity.
+This assumption means that \cref{eq:pto-kinematics-motion} can be differentiated trivially to yield the same matrix relationship for velocities.
+Assuming power conservation across the linkages, the kinematics describe the relationship between not only motions but also forces:
+\begin{equation}\label{eq:pto-kinematics-force}
+\vec{\hat{F}}_p = [\mathbf{T}_{kin}]^T  \vec{\hat{F}}_{PTO}
+\end{equation}
+To avoid confusion, subscript $PTO$ is used for forces in the PTO degrees of freedom (post-kinematics), while subscript $p$ denotes forces in the hydrodynamic body degrees of freedom (pre-kinematics).
+\Cref{eq:pto-kinematics-motion,eq:pto-kinematics-force} imply rigid lossless massless linkages, and any linkage deflection, dissipation, and inertia would be included in the PTO dynamics rather than kinematics.
+
+Multibody WECs are frequently underactuated, meaning that the PTO has fewer controlled degrees of freedom than the hydrodynamic bodies, and $\mathbf{T}_{kin}$ has more columns than rows.
+Underactuated systems receive considerable attention in robotics \cite{tedrake_underactuated_2024} but have only recently been explored in the context of wave energy conversion \cite{faedo_principle_2022}.
+Cascade matrices require an identical number of input and output ports and thus cannot be used to describe the unbalanced ports that underactuated kinematics create \cite{reveyrand_multiport_2018}.
+Non-square impedance matrices may be used to capture unbalanced port relations in general, but the impedance is undefined for the specific relations of \cref{eq:pto-kinematics-motion,eq:pto-kinematics-force}.
+Instead, the kinematics can be packaged into a square hybrid matrix $[\mathbf{h}]_{kin}$ which accurately represents the underactuated system:
+\begin{equation}\label{eq:h-matrix-kinematics}
+    \begin{bmatrix}
+        \vec{\hat{F}}_p \\
+        \vec{\hat{\dot{X}}}_{PTO}
+    \end{bmatrix}
+    = \underbrace{
+        \begin{bmatrix}
+            \mathbf{0} & \mathbf{T}_{kin}^T \\
+            \mathbf{T}_{kin} & \mathbf{0}
+        \end{bmatrix}}
+        _{[\mathbf{h}]_{kin}}
+    \begin{bmatrix}
+        \vec{\hat{\dot{\xi}}} \\ \vec{\hat{F}}_{PTO}
+    \end{bmatrix}
+\end{equation}
+
+Here, we model two hydrodynamic degrees of freedom (heave of the float and spar respectively) and a single PTO degree of freedom corresponding to the relative heave motion between the float and spar.
+The kinematics matrix is therefore:
+\begin{equation}\label{eq:T-kin-specific}
+\mathbf{T}_{kin} = \begin{bmatrix}1 & -1\end{bmatrix}
+\end{equation}
+Thus, even absent any mechanism with ``kinematics'' in the traditional sense, the kinematics matrix is filled with zeroes, ones, and negative ones to represent which degrees of freedom are controlled.
+
+In the circuit representation with two hydrodynamic and one PTO degree of freedom, the hybrid matrix \cref{eq:h-matrix-kinematics} can be represented as a three-port element, as shown in \cref{fig:multiport-circuit-kinematics}.
+\begin{figure}[htbp]
+\centering
+    \input{figs/tikz/circuit_kinematics.tikz}
+\caption{Multiport circuit with powertrain kinematics represented as a hybrid matrix, followed by the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics}
+\label{fig:multiport-circuit-kinematics}
+\end{figure}
+
+%%%%%%%%%%%%%%%
+\subsubsection{Combining Intrinsic Dynamics with PTO Kinematics}
+Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the PTO port yields a scalar equivalent circuit for each PTO degree of freedom, with force sources $\vec{\hat{F}}_{th}$ and mechanical impedances $\vec{Z}_{i,th}$, shown in the bottom portion of \cref{fig:multiport-circuit-kinematics} and computed with the following expressions:
+
+\begin{equation}
+\begin{aligned}
+    \vec{\hat{F}}_{th} &= (\mathbf{T}_{kin}\mathbf{T}_{kin}^T)^{-1} \mathbf{T}_{kin} \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta}
+    = \frac{1}{2} [1,~-1] \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta} \\
+    \vec{Z}_{i,th} &= (-\mathbf{T}_{kin}\mathbf{Z}_{i}^{-1}\mathbf{T}_{kin}^T)^{-1} = -\frac{\det(\mathbf{Z}_{i})}{\Sigma \mathbf{Z}_{i}} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
+\end{aligned}
+\end{equation}
+where the vector expressions for the general case are shown first, followed by the scalar result for the $\mathbf{T}_{kin}$ in \cref{eq:T-kin-specific} with 1 controlled degree of freedom.
+
+Although as previously mentioned a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the PTO port to the body ports, although it cannot transform in the other direction due to underactuation.
+Even so, this matrix cannot transform to the body ports directly because due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero, so there is no way to express $\hat{\dot{\xi}}$ as a weighted sum of $\hat{F}_{PTO}$ and $\dot{\hat{X}}_{PTO}$.
+$\hat{\dot{\xi}}$ could be expressed as a function of the PTO variables by substituting $\mathbf{Z}_p=\mathbf{T}_{kin}^T (\vec{\hat{F}}_{PTO}/\vec{\hat{\dot{X}}}_{PTO}) \mathbf{T}_{kin}$ into \cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
+Instead, we can use cascade-like matrices to solve for a modified variable $\vec{\dot{\xi}}_\Delta$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actual body velocities $\vec{\dot{\xi}}$ and their values if the PTO were disconnected with $F_{PTO}=0$, $\vec{\dot{\xi}}_{0}$:
+\begin{equation}\label{eq:modified-body-velocity}
+    \vec{\dot{\xi}}_\Delta = \vec{\dot{\xi}} - \vec{\dot{\xi}}_{0}
+    \quad \textrm{ where } \quad
+    \vec{\dot{\xi}}_{0} = \mathbf{Z}_i^{-1}~\vec{\gamma}~\frac{H}{2}
+\end{equation}
+The cascade-like matrix from the PTO port $\{F_{PTO}, \dot{X}_{PTO}\}$ to the modified body port $\{F_p, \dot{\xi}_\Delta\}$ is then:
+\begin{equation}\label{eq:body-transmission-matrix}
+[\mathbf{a}]_{F_p\xi_\Delta\leftarrow F\dot{X}} =
+\begin{bmatrix}
+\mathbf{I}_2 \\
+-\mathbf{Z}_i^{-1}
+\end{bmatrix}
+\mathbf{T}_{kin}^T
+\begin{bmatrix}
+1 & 0
+\end{bmatrix}
+\end{equation}
+noting that this matrix is non-square ($\in \mathbb{C}^{4\times2}$) since there are more hydrodynamic than PTO degrees of freedom, and that the matrix label drops the $PTO$ subscripts for compactness.
+\Cref{fig:multiport-circuit-kinematics} represents this in circuit form, noting that the excitation source must be duplicated to create $\vec{\hat{\dot{\xi}}}_0$.
+
+%%%%%%%%%%%%%%%
+\subsubsection{PTO Dynamics}
+\label{sec:appendix-pto-dynamics}
+In addition to the PTO port already discussed, we define two additional ports of relevance: the generator mechanical port (torque $\tau$ and rotation speed $\Omega$) and the generator electrical port (voltage $V$ and current $I$).
+Assuming a drivetrain consisting of a linear to rotational gear ratio with equivalent radius $R$ followed by a driveshaft with impedance $Z_{\text{shaft}}$, the PTO mechanical dynamics are expressed with cascade matrix $[\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}$:
+\begin{equation}\label{eq:mech-transmission-matrix}
+\begin{bmatrix}
+F_{PTO} \\ \dot{X}_{PTO}
+\end{bmatrix}
+=
+\underbrace{\begin{bmatrix}
+Z_{shaft}/R & 1/R \\
+R & 0
+\end{bmatrix}}
+_{[\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}}
+\begin{bmatrix}
+ \tau\\ \Omega
+\end{bmatrix}
+\end{equation}
+
+Meanwhile, a synchronous permanent magnet generator modeled as an ideal gyrator with torque constant $k_\tau$ plus a winding impedance $Z_{w}$ has cascade matrix $[\mathbf{a}]_{\tau \Omega \leftarrow V I}$:
+\begin{equation}\label{eq:elec-transmission-matrix}
+\begin{bmatrix}
+ \tau\\ \Omega
+\end{bmatrix}
+=
+\underbrace{\begin{bmatrix}
+0 & k_\tau \\
+1/k_\tau & Z_{w}/k_\tau
+\end{bmatrix}}
+_{[\mathbf{a}]_{\tau \Omega \leftarrow V I}}
+\begin{bmatrix}
+ V \\ I
+\end{bmatrix}
+\end{equation}
+with Park-transformed quadrature electrical voltage and current $V$ and $I$.
+
+The system operating point is determined by a controller that applies some electrical load to the generator.
+The controller can be formulated as an impedance at either the generator mechanical or electrical port.
+The former is more convenient for hardware implementation, because modern drives typically expect torque commands, while the latter is more convenient for electrical power calculations and optimal control.
+%Here we formulate both as linear impedances with damping and stiffness terms, where 
+The mechanical control impedance $Z_u$ and electrical load impedance $Z_l$ are defined as follows:
+\begin{equation}\label{eq:controller-impedances}
+    Z_l = \frac{V}{I} = B_l + \frac{K_l}{i\omega}
+    ,  \qquad
+    Z_u = \frac{\tau}{\Omega}% = B_u + \frac{K_u}{s}
+\end{equation}
+Combining \cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the following expression for $Z_u$ as a function of $Z_l$:
+\begin{equation}\label{eq:control-impedance}
+    Z_u = 
+    \frac{
+    \begin{bmatrix}
+    1 & 0
+    \end{bmatrix}
+    [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+    \begin{bmatrix}
+    Z_l \\ 1
+    \end{bmatrix}
+}{
+    \begin{bmatrix}
+    0 & 1
+    \end{bmatrix}
+    [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+    \begin{bmatrix}
+    Z_l \\ 1
+    \end{bmatrix}
+}
+\end{equation}
+This equation allows the $Z_l$ identified with optimal control to be implemented as a corresponding $Z_u$ in hardware.
+%Incorporating \cref{eq:mech-transmission-matrix} yields the Th\'{e}venin equivalent scalar PTO impedance at the hydrodynamic body port:
+% \begin{equation}\label{eq:pto-impedance}
+% Z_{PTO,th} = 
+% \frac{
+%     \begin{bmatrix}
+%     1 & 0
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega}
+%     [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }{
+%     \begin{bmatrix}
+%     0 & 1
+%     \end{bmatrix}
+%     [\mathbf{a}]_{F\dot{X}\leftarrow \tau \Omega} [\mathbf{a}]_{\tau \Omega \leftarrow V I}
+%     \begin{bmatrix}
+%     Z_l \\ 1
+%     \end{bmatrix}
+% }
+% \end{equation}
+% which is useful for calculating the mechanical response of each body.
+
+The PTO dynamics can be represented as a multiport circuit, as shown in \cref{fig:multiport-circuit-pto}.
+\begin{figure}[htbp]
+\centering
+    \input{figs/tikz/circuit_pto.tikz}
+\caption{PTO dynamics represented as a multiport circuit and electrical Th\'{e}venin equivalent}
+\label{fig:multiport-circuit-pto}
+\end{figure}
+
+The intrinsic dynamics, PTO kinematics, and PTO dynamics can be combined into a Th\'{e}venin equivalent source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as follows:
+\begin{equation}\label{eq:thevenin-electrical}
+    Z_{s,th} = \frac{
+    \begin{bmatrix}1 & 0\end{bmatrix}
+    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}}
+    {\begin{bmatrix}0 & 1\end{bmatrix}
+    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}
+    } = \frac{B-AZ_{i,th}}{D-CZ_{i,th}}
+    \qquad \hat{V}_{s,th} = \hat{F}_{th}(A-CZ_{s,th})
+\end{equation}
+where $A,B,C,D$ are the elements of $\mathbf{a}_{VI \leftarrow F\dot{X}}$.
+This is shown in the bottom portion of \cref{fig:multiport-circuit-pto}.
+The load voltage and current can then be found as:
+\begin{equation}\label{eq:voltage-current}
+    \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
+\end{equation}
+
+%%%%%%%%%%%%%%%
+\subsubsection{Time-Domain Expansion of Instantaneous Power}
+\label{sec:appendix-power-time}
+
+Equation~\eqref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ at any port as \cite{saadat_power_1999}
+\begin{equation}\label{eq:power-time-PQS}
+    p(t) = P + |S|\cos\!\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\!\left(\frac{Q}{P}\right)\right),
+\end{equation}
+a DC offset of $P$ plus an oscillation at $2\omega$ with amplitude $|S|$.
+The average and peak powers in \cref{eq:power-avg-peak} follow directly: $p_{\text{avg}} = P$ since the oscillation averages to zero, and $p_{pk} = P + |S|$ at the cosine maximum.
+The minimum $p_{\text{min}} = P - |S|$ is negative when $|S|>P$, corresponding to instants when energy flows from the load back into the source under reactive control.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Electrical-Port Power in Optimal-Control Variables}
+\label{sec:appendix-power-elec}
+
+Expressing the average and peak powers at the electrical port in terms of the constrained-control parameters introduced in \cref{sec:optimal-control} (control damping $B_l$, control stiffness $K_l$, and current phasor $\hat{I}$), and applying the constant electrical efficiency $\eta$,
+\begin{equation}\label{eq:power-elec}
+\begin{bmatrix}
+p_{avg,elec} \\
+p_{pk,elec}
+\end{bmatrix}
+=
+\eta
+\begin{bmatrix}
+p_{avg,VI} \\
+p_{pk,VI}
+\end{bmatrix}
+=
+\eta \tfrac{1}{2} B_l |\hat{I}|^2
+\begin{bmatrix}
+1 \\
+1 + \sqrt{1 + \left(\tfrac{K_l}{B_l\omega}\right)^2}
+\end{bmatrix}.
+\end{equation}
+The peak-power form is used as the apparent-power constraint in the QCQP of \cref{sec:optimal-control}.
+
+% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
+% \begin{equation}
+% [a]_m = \begin{bmatrix}
+% 1/R &~ 0 \\
+% 0 &~ R
+% \end{bmatrix} = \begin{bmatrix}
+% 1 &~ 0 \\
+% 0 &~ 1
+% \end{bmatrix}
+% \end{equation}
+% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
+% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
+
+%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
+%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Solution Procedure}
+\label{sec:appendix-dynamics-solution}
+\Cref{sec:eom,sec:pto-dynamics-overview} introduced linear models for the rigid body dynamics, PTO kinematics, and PTO dynamics using impedance, hybrid, and cascade matrices respectively.
 Here we unify the formulation and present a clear system-level solution procedure for all port variables:
 \begin{enumerate}
-\item Use \cref{eq:Th\'{e}venin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
-\item Set the load impedance $Z_l$. Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports. \Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
+\item Use \cref{eq:thevenin-electrical} to assemble the Th\'{e}venin source voltage and impedance $\hat{V}_{s,th}$ and $Z_{s,th}$ as seen from the port on which power should be maximized (in this case, the electrical generator port $\{V,I\}$).
+\item Set the load impedance $Z_l$.
+Any load impedance can be simulated, but typically it is selected as a function of $Z_s$ to maximize the power at this port, possibly subject to constraints on various ports.
+\Cref{sec:optimal-control} frames the load impedance selection as a constrained optimization problem.
 \item From  $\hat{V}_{s,th}$, $Z_{s,th}$, and $Z_l$, calculate the $\{V,I\}$ port variables from \cref{eq:voltage-current}.
 \item Use cascade matrices \cref{eq:mech-transmission-matrix,eq:elec-transmission-matrix,eq:body-transmission-matrix} to propagate the variables back toward the rigid body, yielding the $\{\tau,\Omega\}$, $\{F_{PTO},\dot{X}_{PTO}\}$, and $\{F_p, \dot{\xi}_\Delta\}$ port variables.
 \item Transform from $\dot{\xi}_\Delta$ to $\dot{\xi}$ via \cref{eq:modified-body-velocity}.
@@ -13,8 +359,79 @@ Here we unify the formulation and present a clear system-level solution procedur
 Once all the port variables have been calculated, power at each port can be calculated according to \cref{sec:power}.
 This serves as the solution to a linear subproblem, which is then re-solved using updated quasi-linear coefficients until drag and force saturation nonlinearities have converged.
 
-\subsection{Quadratic Program for Constrained Power Maximization}\label{sec:appendix-qp-solution}
-This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in section~\ref{sec:optimal-control}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indirect Optimal Control Solution Procedure}
+\label{sec:appendix-qp-numerical}
+The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
+The optimality conditions depend on the active set of constraints.
+In the most straightforward case where just one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint. 
+For example, if only a maximum force constraint exists, the constrained solution has a force $\hat{F}_{p,\text{constr}}$ that is the minimum of the unconstrained force $\hat{F}_{p,\text{unconstrained}}$ and the maximum allowed force fundamental $F_{\text{max}}$:
+\begin{equation}
+\hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
+\end{equation}
+The solver guesses a value of $\Gamma$, calculates the resulting force $\hat{F}_{p,\text{guess}}$, and then uses $\hat{F}_{p,\text{guess}}-\hat{F}_{p,\text{constr}}$ as an error signal to adjust its next guess of $\Gamma$, iterating until the error converges to zero.
+This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\hat{F}_{p,\text{unconstrained}}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\hat{F}_{p,\text{unconstrained}}$ and the system linearization are updated each control iteration).
+MDOcean implements the latter, which simplifies the setup by requiring only one solver.
+Comparing the efficiency of the two approaches is left for future work.
+
+When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
+In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
+When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of possibilities instead of a continuous domain. 
+The main advantage of the indirect approach is its ability to handle nonlinear constraints, although for the quadratic constraints considered here, the analytical approach described in \cref{sec:appendix-qp-solution} is more efficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analytical Quadratic Program for Constrained Power Maximization}
+\label{sec:appendix-qp-solution}
+This section describes the solution process for the constrained optimal control problem \cref{eq:opt-problem} introduced in \cref{sec:optimal-control}.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Quadratic Constraint Coefficients}
+\label{sec:appendix-qp-constraints-table}
+
+The quadratic coefficients $\{\mathbf{Q}_i, \vec{a}_i, b_i\}$ in \cref{eq:opt-problem} for each constraint implemented in MDOcean are given in \cref{tab:qp-constraints}.
+
+\begin{table}[b!]
+\centering
+\caption{Quadratic constraint coefficients}
+\label{tab:qp-constraints}
+\begin{tabular}{lccc}
+    Constraint & $\mathbf{Q}$ & $\vec{a}$ & $b$ \\ \hline
+    $|\hat{\xi}_f| \leq \hat{\xi}_{f,\text{max}}$ &
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_f\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{f,0}]^T$ & $\hat{\xi}_{f,\text{max}} - |\hat{\xi}_{f,0}|$ \\
+    $|\hat{\xi}_s| \leq \hat{\xi}_{s,\text{max}}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{(F_{p}\dot{\xi})_s\leftarrow VI}]$ & 
+        $[0,~ \hat{\xi}_{s,0}]^T$ & $\hat{\xi}_{s,\text{max}} - |\hat{\xi}_{s,0}|$ \\
+    $|\hat{X}_{PTO}| \leq \hat{X}_{PTO,\text{max}}$ & 
+        $\frac{1}{\omega^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{q}|^2}
+        [\mathbf{a}_{F\dot{X}\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{X}_{PTO,\text{max}}^2$ \\
+    $|\hat{\tau}| \leq \hat{\tau}_{\text{max}}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{|\hat{e}|^2}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $\hat{\tau}_{\text{max}}^2$ \\
+    $P_{\tau\Omega} \leq P_{\tau\Omega,\text{max}}$ & 
+        $[\mathbf{a}_{\tau\Omega \leftarrow VI}]^* 
+        \mathbf{A}_{P}
+        [\mathbf{a}_{\tau\Omega\leftarrow VI}]$ & 
+        $\vec{0}$ & $P_{\tau\Omega,\text{max}}$ \\
+    $P_{VI} \geq 0$ & 
+        $-\mathbf{A}_{P}$ & 
+        $\vec{0}$ & $0$ \\
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%
 \subsubsection{Reduced Dimension Formulation}
 The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ reduces the optimization problem dimension from $\vec{x} \in \mathbb{C}^2$ to $\mathbb{C}^1$.
 Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\vec{n}$, the null space vector of $\vec{c}^{\,*}$:
@@ -47,9 +464,11 @@ Using $\hat{I}_p$ for brevity to denote the current in the particular solution, 
 \end{equation}
 
 Inequality constraints 
-$\vec{x}^{\,*}\mathbf{Q}_i\vec{x} + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\} \le b_i$
+$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x}
++ 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\}
+\le b_\mu$
 further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \cref{eq:opt-problem} having no solutions due to infeasibility.
-While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition. 
+While constrained quadratic programs like \cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition, even if the problem is non-convex (see \cref{sec:appendix-qp-convexity} for a discussion on convexity). 
 First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \cref{eq:x-p-plus-nullspace-simplified} into \cref{eq:opt-problem}:
 \begin{subequations}\label{eq:obj-inequality-gamma}
 \begin{align}
@@ -57,28 +476,28 @@ P_{avg,VI}
 &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
 \label{eq:obj-gamma}
 \\[6pt]
-A_{q,i}|\Gamma|^2 +&
+A_{q,\mu}|\Gamma|^2 +&
 2\Re\!\left\{
-    B_{q,i}\Gamma
-\right\}+C_{q,i}
+    B_{q,\mu}\Gamma
+\right\}+C_{q,\mu}
 \le
 0
-\quad \forall i
+\quad \forall \mu
 \label{eq:ineq-gamma}
 \end{align}
 \end{subequations}
-where quadratic coefficients $A_{q,i}$, $B_{q,i}$, and $C_{q,i}$ from \cref{eq:ineq-gamma} are defined as:
+where quadratic coefficients $A_{q,\mu}$, $B_{q,\mu}$, and $C_{q,\mu}$ from \cref{eq:ineq-gamma} are defined as:
 \begin{equation}
 \begin{aligned}
-    A_{q,i} &= |\hat{I}_p|^{2}\,
-    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}& &\in \mathbb{R} \\
-    B_{q,i} &= -\hat{I}_p\,
-    \left(\vec{x}_p^{\,*}\mathbf{Q}_i + \vec{a}_i^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
-    C_{q,i} &= 
-        \vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+    A_{q,\mu} &= |\hat{I}_p|^{2},
+    \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}& &\in \mathbb{R} \\
+    B_{q,\mu} &= -\hat{I}_p,
+    \left(\vec{x}_p^{\,*}\mathbf{Q}_{\mu} + \vec{a}_{\mu}^{\,*}\right)\vec{n}& &\in \mathbb{C} \\
+    C_{q,\mu} &= 
+        \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
         +
-        2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
-        -b_i&
+        2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}
+        -b_{\mu}&
     &\in \mathbb{R}
 \end{aligned}
 \end{equation}
@@ -87,101 +506,128 @@ Since \cref{eq:obj-gamma} shows that power decreases with increasing $|\Gamma|$,
 \begin{alignat}{2}
 & \min_{\Gamma \in \mathbb{C}} &  |\Gamma|& \\[3pt]
 & \text{s.t.} &
-S_i|\Gamma - \Gamma_{c,i}|^2 &\le S_i r_i^2,
-\quad \forall i \label{eq:disc-constraint}\\
+S_{\mu}|\Gamma - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
+\quad \forall \mu \label{eq:disc-constraint}\\
 & \text{where} &
-\Gamma_{c,i}  &\in \mathbb{C} \nonumber\\
-& & r_i^2 &\in \mathbb{R} \nonumber \\
-& & S_i &\in \left\{-1,1\right\} \nonumber
+\Gamma_{c,\mu}  &\in \mathbb{C} \nonumber\\
+& & r_{\mu}^2 &\in \mathbb{R} \nonumber \\
+& & S_{\mu} &\in \left\{-1,1\right\} \nonumber
 \end{alignat}
 \end{subequations}
 where the constraint \cref{eq:disc-constraint} is derived from \cref{eq:ineq-gamma} by completing the square.
-More precisely, when $A_{q,i} \neq 0$, the $i$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,i}$ with radius $r_i$. The constraint requires that $\Gamma$ lie within this circle when $A_{q,i} > 0$ ($S_i=1$) or outside this circle when $A_{q,i} < 0$ ($S_i=-1$). Parameters $\Gamma_{c,i}$, $r_i$, and $S_i$ are defined as:
+More precisely, when $A_{q,\mu} \neq 0$, the $\mu$th inequality constraint defines a circle in the complex plane of $\Gamma$ centered at $\Gamma_{c,\mu}$ with radius $r_{\mu}$.
+The constraint requires that $\Gamma$ lie within this circle when $A_{q,\mu} > 0$ ($S_{\mu}=1$) or outside this circle when $A_{q,\mu} < 0$ ($S_{\mu}=-1$).
+Parameters $\Gamma_{c,\mu}$, $r_{\mu}$, and $S_{\mu}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
-\Gamma_{c,i}
-&= \frac{-B_{q,i}^{\,*}}{A_{q,i}} = 
+\Gamma_{c,\mu}
+&= \frac{-B_{q,\mu}^{\,*}}{A_{q,\mu}} = 
 \frac{
     \hat{I}_p^{\,*}\,
     \vec{n}^{\,*}
-    \left(\mathbf{Q}_i\vec{x}_p + \vec{a}_i\right)
+    \left(\mathbf{Q}_{\mu}\vec{x}_p + \vec{a}_{\mu}\right)
 }{
     |\hat{I}_p|^{2}\,
-    \vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+    \vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
+\label{eq:gamma-disc-center}
 \\[6pt]
-r_i^2
+r_{\mu}^2
 &=
-\frac{|B_{q,i}|^2-A_{q,i}C_{q,i}}{A_{q,i}^2} = 
+\frac{|B_{q,\mu}|^2-A_{q,\mu}C_{q,\mu}}{A_{q,\mu}^2} = 
 \frac{
-b_i
+b_{\mu}
 -
-\vec{x}_p^{\,*}\mathbf{Q}_i\vec{x}_p
+\vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
 -
-2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}_p\right\}
+2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}
 }{
 |\hat{I}_p|^{2}\,
-\vec{n}^{\,*}\mathbf{Q}_i\vec{n}
+\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}
 }
 +
-|\Gamma_{c,i}|^2 \\
-S_i &= \textrm{sign}(A_{q,i}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_i\vec{n}\right)
+|\Gamma_{c,\mu}|^2 
+\label{eq:gamma-disc-radius}
+\\
+S_{\mu} &= \textrm{sign}(A_{q,\mu}) = \textrm{sign}\left(\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}\right)
+\label{eq:gamma-disc-sign}
 \end{align}
 \end{subequations}
 
+%%%%%%%%%%%%%%%
 \subsubsection{Solution}
-\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_i=1$ and exterior to all circles for which $S_i=-1$.
-The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_i C_{q,i} \leq 0 \quad \forall i$.
+\Cref{eq:opt-problem-gamma} can be interpreted graphically as finding the point closest to the origin that is interior to all constraint circles for which $S_{\mu}=1$ and exterior to all circles for which $S_{\mu}=-1$.
+The unconstrained optimal solution of \cref{eq:opt-problem-gamma} is the origin ($\Gamma=0$), and the constrained optimal solution will also be zero in the case where the origin is feasible (no active constraints), which occurs when $ S_{\mu} C_{q,\mu} \leq 0 \quad \forall \mu$.
 If the origin is infeasible, the constrained optimal solution will lie on the boundary of one or more of the circles, specifically either at an intersection of two or more circles or at any circle's point closest to the origin.
 We analytically compute all such candidate points and select the one with the lowest $|\Gamma|$ that satisfies all constraints.
 For $N$ constraints, there are up to $N^2$ candidate points ($N^2-N$ at intersections and $N$ at closest points).
-This leads to the following expression for the constrained optimal solution (valid when $A_{q,i} \neq 0 ~\forall i$):
+This leads to the following expression for the constrained optimal solution (valid when $A_{q,\mu} \neq 0 ~\forall \mu$):
 \begin{equation}\label{eq:gamma-opt-quadratic}
 \Gamma_{opt} =
 \begin{cases}
- 0 & \textrm{if } S_i C_{q,i} \leq 0 \quad \forall i \\[3pt]
+ 0 & \textrm{if } S_{\mu} C_{q,\mu} \leq 0 \quad \forall \mu \\[3pt]
  \arg\min\limits_{\Gamma \in \mathcal{F} \bigcap \mathcal{C}} |\Gamma| 
  & \textrm{otherwise} \\[3pt]
  \textrm{infeasible} & \textrm{if } \mathcal{F} \bigcap \mathcal{C} = \emptyset
 \end{cases}
 \end{equation}
-where $\mathcal{F} = \bigcap_i \left\{\Gamma : S_i|\Gamma - \Gamma_{c,i}| \le S_i r_i \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
+where $\mathcal{F} = \bigcap_{\mu} \left\{\Gamma : S_{\mu}|\Gamma - \Gamma_{c,\mu}| \le S_{\mu} r_{\mu} \right\}$ is the set of all feasible points and $\mathcal{C}$ is the set of candidate points. $\mathcal{C}$ is the union of $\mathcal{C}_{int}$, the candidates at circle intersections, and $\mathcal{C}_{cl}$, the candidates at the closest point on each circle to the origin:
 \begin{equation}\label{eq:candidate-points}
 \begin{aligned}
 \mathcal{C}_{int} &= \left\{
-    \Gamma : 
-    |\Gamma - \Gamma_{c,i}| = r_i, ~|\Gamma - \Gamma_{c,j}| = r_j, \quad \forall i \neq j
-\right\}. \\
+    \Gamma_{\mu,\nu}, \quad \forall \mu \neq \nu
+\right\}.
+\\
 \mathcal{C}_{cl} &= \left\{
-    \Gamma : 
-    \Gamma = \Gamma_{c,i} - r_i \frac{\Gamma_{c,i}}{|\Gamma_{c,i}|}, \quad \forall i
+    (|\Gamma_{c,\mu}| - r_{\mu})e^{i\angle\,\Gamma_{c,\mu}}, \quad \forall \mu
 \right\}.
 \end{aligned}
 \end{equation}
+The intersection points of the $\mu$th and $\nu$th circles are given by:
+\begin{equation}\label{eq:circle-intersection}
+    \Gamma_{\mu,\nu} = 
+    \Gamma_{c,\mu} + \frac{\Gamma_{c,\nu} - \Gamma_{c,\mu}}{d_{\mu\nu}}
+    \left(
+        a_{\mu\nu}
+        \pm
+        1i \sqrt{r_{\mu}^2-a_{\mu\nu}^2}
+    \right)
+\end{equation}
+where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between the circle centers, 
+$a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from 
+the center of the $\mu$th circle to the midpoint of the two intersection points, 
+and $1i$ is the imaginary unit.
+The closest-point candidates $\mathcal{C}_{cl}$ match \cref*{eq:circle-intersection}~4 of \cite{mccabe_force-limited_2024},
+which provides the solution for problems with only one constraint.
+
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
-\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_i=4$, $S_i=1$, and various $\Gamma_{c,i}$.
-\begin{figure}
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $r_{\mu}=4$, $S_{\mu}=1$, and various $\Gamma_{c,\mu}$.
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figs/manual/qp_circles.pdf}
-    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$. Toy problems with various constraint circle centers $\Gamma_{c,i}$, all with radius $r_i=4$ and $S_i=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
+    \caption{Visualization of the optimization problem \cref{eq:opt-problem-gamma} in the complex plane of $\Gamma$.
+Toy problems with various constraint circle centers $\Gamma_{c,\mu}$, all with radius $r_{\mu}=4$ and $S_{\mu}=1$, demonstrate the various solution cases in \cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
-If $A_{q,i} = 0$ for any $i$, the $i$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
-This can occur when $\mathbf{Q}_i = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\,*}\mathbf{Q}_i\vec{n} = 0$ ($\mathbf{Q}_i$ is rank-deficient and $\vec{n}$ is in its nullspace).
-The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,i}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
+If $A_{q,\mu} = 0$ for any $\mu$, the $\mu$th inequality constraint defines a line in the complex plane of $\Gamma$ rather than a circle.
+This can occur when $\mathbf{Q}_{\mu} = 0$ (the constraint on $\vec{x}$ is linear rather than quadratic, which is not the case for any of the constraints in \cref{tab:qp-constraints}) or when $\vec{n}^{\, *}\mathbf{Q}_{\mu}\vec{n} = 0$ ($\mathbf{Q}_{\mu}$ is rank-deficient and $\vec{n}$ is in its nullspace).
+The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $A_{q,\mu}$ with a small positive $\epsilon$ in this case and use the quadratic implementation.
 
-\subsubsection{Quartic Apparent Power Constraints}\label{sec:appendix-mag-S-constraints}
-While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{max}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
-This results in a ``Cassini oval'' curve on the complex plane of $\Gamma$, which consists of two closed curves when $|S_{max}|<|S_0|$ and one curve when $|S_{max}|\geq|S_0|$, where $|S_0|$ is the apparent power of the unconstrained optimum \cite{weisstein_cassini_2026}.
-Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\mathcal{C}_{int,oval-circ}$, oval-oval intersections, and oval closest points $\mathcal{C}_{cl,oval}$ to the set of candidate points $\mathcal{C}$.
+%%%%%%%%%%%%%%%
+\subsubsection{Quartic Apparent Power Constraints}
+\label{sec:appendix-mag-S-constraints}
+While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\vec{x}$, constraints on the magnitude of apparent power $|S|<|S_{\text{max}}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\vec{x}$ and thus $\Gamma$.
+This results in a ``Cassini oval'' curve on the complex plane of $\Gamma$, which consists of two closed curves when $|S_{\text{max}}|<|S_0|$ and one curve when $|S_{\text{max}}|\geq|S_0|$, where $|S_0|$ is the apparent power of the unconstrained optimum \cite{weisstein_cassini_2026}.
+Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\mathcal{C}_{int,\text{oval}-\text{circ}}$, oval-oval intersections, and oval closest points $\mathcal{C}_{cl,\text{oval}}$ to the set of candidate points $\mathcal{C}$.
 The new candidate points are:
 \begin{equation}
 \begin{aligned}
 \mathcal{C}_{int,oval-circ} &= \left\{
     \Gamma : 
-    |\Gamma - \Gamma_{c,i}| = r_i, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall i,k
-\right\}. \\
+    |\Gamma - \Gamma_{c,\mu}| = r_{\mu}, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall \mu,k
+\right\}.
+\\
 \mathcal{C}_{cl,oval} &= \left\{
     \Gamma : 
     \Gamma = \begin{cases}
@@ -191,42 +637,400 @@ The new candidate points are:
 \right\}.
 \end{aligned}
 \end{equation}
-where $i$ indexes circle constraints and $k$ indexes oval constraints.
+where $\mu$ indexes circle constraints and $k$ indexes oval constraints.
 While the earlier circle-circle intersections \cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\Gamma$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
-We currently assume there is only one apparent power constraint, so oval-oval intersections are not present.
+We currently assume there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\Gamma$.
 
-\subsubsection{Discussion}
+%%%%%%%%%%%%%%%
+\subsubsection{Extension to Higher Dimensions and Convexity}
+\label{sec:appendix-qp-convexity}
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study \cite{bacelli_numerical_2015}.
+In the terminology of \cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
+Both of these cases solve the full harmonic-balance equation, producing a higher-dimensional analog of \cref{eq:opt-problem-gamma}.
+The problem dimension equals twice the number of frequencies retained in the spectral expansion, preventing the use of the geometric analytical solution used in the monochromatic case.
+Instead, a numerical solver must be used, and the computational scaling of that solver depends critically on whether the problem is \emph{convex}.
+
+A convex optimization problem is one in which both the feasible set and the objective function are convex---informally, the feasible region has no holes or concavities, and the objective is bowl-shaped with no local valleys.
+The key practical implication is that any locally optimal solution is also globally optimal, so gradient-based solvers converge to the true optimum without exhaustive search, and solution time scales polynomially with the number of decision variables rather than exponentially.
+
+After reducing to the $\Gamma$ parameterization, the power objective $|\Gamma|^2$ is a sum of squares and therefore convex.
+Even though the original power matrix $\mathbf{A}_P$ (see \cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \cite{bacelli_numerical_2015} shows that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\Gamma$ in \cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
+Nonlinear dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
+
+The inequality constraints are more problematic.
+A constraint is convex if the set of points satisfying it forms a convex region.
+In the $\Gamma$ plane, a convex constraint corresponds to a circle whose feasible region is the \emph{interior} ($S_\mu=1$ in \cref{eq:disc-constraint}), while a non-convex constraint corresponds to a circle whose feasible region is the \emph{exterior} ($S_\mu=-1$).
+Constraints on the effort and flow magnitude (e.g., force limits $|\hat{F}|\leq F_{\text{max}}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent impedance of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
+Reference \cite{mccabe_force-limited_2024} visualizes the feasible regions for families of such constraints on the complex $\Gamma$ plane. 
+It shows that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
+The quadratic matrices $\mathbf{Q}$ in \cref{tab:qp-constraints} confirm this: $\mathbf{A}_{|\hat{q}|^2}$ and $\mathbf{A}_{|\hat{e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
+For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
+Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \cite{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
+It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Comparison to Other WEC Constrained Control Formulations}
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
-References \cite{mccabe_force-limited_2024,coe_co-design_2024} further discuss the reflection coefficient for WECs.
+References \cite{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
 
-Similar graphical interpretations of constraints for wave energy converters are presented in \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
+Similar graphical interpretations of constraints for wave energy converters are presented in the studies \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 Reference \cite{mccabe_force-limited_2024} focuses on force/current limits but discusses amplitude, phase voltage, and apparent power constraints as well.
-Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while \cite{bacelli_geometric_2013} covers amplitude and force limits.
-Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while \cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and \cite{bacelli_geometric_2013} in that of the PTO force.
+Reference \cite{merigaud_geometrical_2023} considers exclusively amplitude limits while Ref.~\cite{bacelli_geometric_2013} covers amplitude and force limits.
+Reference \cite{mccabe_force-limited_2024} uses Smith charts to show constraints directly in $\Gamma$ space as we do here, while Ref.~\cite{merigaud_geometrical_2023} works in the complex plane of the hydrodynamic transmission coefficient and Ref.~\cite{bacelli_geometric_2013} in that of the PTO force.
 Reference \cite{bacelli_geometric_2013} also extends the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
-\subsection{Force Saturation}\label{sec:appendix-force-sat}
-Section~\ref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Constraint Sensitivity Analysis via Parametric Programming}
+\label{sec:appendix-constraint-sensitivity}
+To support the discussion in \cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its conditions for convexity.
+
+The constraint limits are 
+$\tau_{\text{max}}$, $P_{\tau\Omega,\text{max}}$, $\xi_{f,\text{max}}$, $\xi_{s,\text{max}}$, and $X_{PTO,\text{max}}$, which we collectively denote as $L_\mu$.
+The dependence of power on the first two limits (PTO sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through PTO design, while the latter can only be manipulated by changing the bulk dimensions.
+The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons disussed in \cref{sec:appendix-dimension-sensitivity}, so we focus on the PTO sizing sensitivities here.
+
+In a given sea state, the global sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory, where a local sensitivity is found parametrically and then integrated over the parameter space to find the global parameter  relationship.
+The local sensitivity of power to a constraint parameter 
+$\frac{\partial p_{\text{avg},VI,opt}}{\partial L_\mu}$
+equals the product of the Lagrange multiplier for that constraint, $\lambda_\mu$,
+and the partial derivative of the constraint function with respect to the parameter,
+$\frac{\partial g_\mu}{\partial L_\mu}$ \cite[Section~5.9.3]{boyd_convex_2004}.
+Since the constraint function is defined as 
+$g_\mu(\vec{x}) = \vec{x}^{\,*}\mathbf{Q}_\mu\vec{x} 
+                 + 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\} - b_\mu\leq 0$,
+and \cref{tab:qp-constraints} shows that each constraint limit $L_\mu$ enters $g_\mu$ only through $b_\mu$, we have
+$\frac{\partial g_\mu}{\partial L_\mu} = -\frac{\partial b_\mu}{\partial L_\mu}$.
+This derivative can be trivially computed for all constraints in \cref{tab:qp-constraints}.
+The power sensitivity simplifies to:
+\begin{equation}
+    \frac{\partial p_{avg,VI,opt}}{\partial L_\mu} = -\lambda_\mu \frac{\partial b_\mu}{\partial L_\mu}
+\end{equation}
+If the optimization problem were solved with a numerical solver,
+the Lagrange multipliers would be directly available as part of the solution.
+In our case, we have a semi-analytical solution for the optimal reflection coefficient at each sea state in terms of the constraint centers and radii at that sea state,
+$\Gamma_{opt}(r_{\mu}, \Gamma_{c,\mu})$,
+so we can compute the Lagrange multipliers as follows:
+\begin{equation}
+\begin{aligned}
+   \lambda_\mu 
+    &\equiv 
+    \frac{\partial p_{avg,VI,opt}}{\partial g_\mu}
+    \\
+    &= - \frac{\partial p_{avg,VI,opt}}{\partial b_\mu}
+    \\
+    &= -
+    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
+    \frac{\partial |\Gamma_{opt}|}{\partial b_\mu}
+    \\
+    &= -
+    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
+    \left(
+        \frac{\partial |\Gamma_{opt}|}{\partial r_{\mu}}
+        \frac{\partial r_{\mu}}{\partial b_\mu}
+        +
+        \frac{\partial |\Gamma_{opt}|}{\partial \Gamma_{c,\mu}}
+        \frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}
+    \right) 
+\end{aligned}
+\end{equation}
+
+%%%%%%%%%%%%%%%
+\subsubsection{Effect of Constraint Limits on Circle Radii}
+Recall from \cref{eq:gamma-disc-radius} that each inequality constraint maps to a circle in the complex $\Gamma$ plane 
+with center $\Gamma_{c,\mu}$ and radius $r_\mu$ given by:
+\begin{equation}\label{eq:radius-full}
+    r_\mu^2
+    = \frac{b_{\mu} - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
+            - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}}
+           {|\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}}
+    + |\Gamma_{c,\mu}|^2
+\end{equation}
+The constraint limit $L_\mu$ enters $r_\mu$ only through $b_\mu$ 
+(the right-hand side of the quadratic inequality in \cref{tab:qp-constraints}),
+while $\vec{x}_p$, $\vec{n}$, $\hat{I}_p$, $\mathbf{Q}_\mu$, $\vec{a}_\mu$, and $\Gamma_{c,\mu}$ depend only on the Th\'{e}venin impedance $Z_{s,th}$ and excitation $\hat{V}_{s,th}$ for the sea state,
+which are independent of the constraint limits.
+Defining $d_\mu = |\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}$ 
+and $c_\mu = d_\mu|\Gamma_{c,\mu}|^2 - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}$, 
+both independent of the constraint limits, \cref{eq:radius-full} and its derivative simplify to:
+\begin{equation}\label{eq:radius-simplified}
+    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
+    , \quad
+    \frac{\partial r_\mu}{\partial b_\mu} = \frac{1}{2\sqrt{d_\mu(b_\mu + c_\mu)}}
+\end{equation}
+Since $r_\mu\in\mathbb{R}$, then $b_\mu + c_\mu$ and $d_\mu$ must have the same sign, so $\frac{\partial r_\mu}{\partial b_\mu}$ is always positive.
+In other words, increasing $b_\mu$ always enlarges the circle radius, regardless of whether the constraint represents the interior or exterior of the circle.
+Meanwhile, \cref{eq:gamma-disc-center} shows that the center $\Gamma_{c,\mu}$ does not depend on $b_\mu$, so $\frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}=0$.
+Thus, the constraint limit $L_\mu$ does not affect the circle center.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Optimal Reflection Coefficient as a Function of Constraint Limits}
+Now we combine the relationship between circle radius and optimal reflection coefficient $\Gamma_{opt}(r_\mu)$, with the relationship between circle radius and constraint limit $r_\mu(b_\mu)$ derived above
+to obtain a relationship between reflection coefficient magnitude and constraint limit in a given sea state, $|\Gamma_{opt}|(b_\mu)$.
+Substituting \cref{eq:radius-simplified} into \cref{eq:candidate-points} shows that
+the squared optimal reflection coefficient magnitude in each sea state takes one of the following values depending on the number of active constraints:
+\begin{equation}\label{eq:gamma-opt-summary}
+    |\Gamma_{opt}|^2 =
+    \begin{cases}
+        0 
+    & \text{none active} \\
+        |\Gamma_{c,\mu^*}|^2 
+        - 2|\Gamma_{c,\mu^*}|\sqrt{\frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}}} 
+        + \frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}} 
+    & \text{only $\mu^*$ active} \\
+        \left|
+            \Gamma_{c,\mu^*} + \frac{\Gamma_{c,\nu^*} - \Gamma_{c,\mu^*}}{d_{\mu^*\nu^*}}
+            \left(
+                a_{\mu^*\nu^*}
+                \pm
+                1i \sqrt{\frac{b_{\mu^*} + c_{\mu^*}}{d_{\mu^*}}-a_{\mu^*\nu^*}^2}
+            \right)
+        \right|^2 
+    & \text{$\mu^*$ \& $\nu^*$ active}
+    \end{cases}
+\end{equation}
+where $\mu^*,\nu^*$ refer to the indices of the active constraint(s) for a given sea state,
+and $a_{\mu^*,\nu^*}$ and $d_{\mu^*,\nu^*}$ are real numbers defined in the discussion following \cref{eq:circle-intersection}.
+$d_{\mu^*,\nu^*}$ is independent of the constraint limits, while $a_{\mu^*,\nu^*}$ is affine in $b_{\mu^*}$ and $b_{\nu^*}$.
+Thus, using \textrm{aff}() and \textrm{quad}() to denote affine and quadratic functions of the arguments, we have the following scale behavior:
+\begin{equation}\label{eq:gamma-opt-scale}
+    |\Gamma_{opt}|^2 =
+    \begin{cases}
+        0 
+    & \text{none active} \\
+        \textrm{aff}(b_{\mu^*}) + \sqrt{\textrm{aff}(b_{\mu^*})} 
+    & \text{only $\mu^*$ active} \\
+        \left|
+            \textrm{aff}(b_{\mu^*})+\textrm{aff}(b_{\nu^*})
+            \pm
+            1i \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})}
+        \right|^2 
+    & \text{$\mu^*$ \& $\nu^*$ active} \\
+    = \textrm{quad}(b_{\mu^*}, b_{\nu^*}) + 
+    (\textrm{aff}(b_{\mu^*}) + \textrm{aff}(b_{\nu^*}))
+    \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})} & 
+    \end{cases}
+\end{equation}
+Constraint activity indices $\mu^*,\nu^*$ depend on the constraint limits,
+and this dependence must be accounted for before the curvature of $|\Gamma_{opt}|^2$ can be analyzed.
+From \cref{eq:gamma-opt-quadratic}, we can define $\mu^*$ and $\nu^*$ more explicitly as functions of $b_\mu$ by defining a penalty function $f(\Gamma)$ that returns $\Gamma$ if $\Gamma$ is feasible and $\infty$ otherwise.
+This function can be constructed as $f(\Gamma) = \Gamma + \sum_\mu \mathbb{I}_\mu(\Gamma)$,
+where $\mathbb{I}_\mu(\Gamma)$ is an indicator function that returns $0$ if $\Gamma$ satisfies the $\mu$th constraint and $\infty$ otherwise.
+The penalty function is convex in $\Gamma$ if and only if all constraints are convex, i.e., if $S_\mu=1 ~\forall \mu$.
+Then, the optimal reflection coefficient of each candidate type can be written as the minimum of the candidate points passed through the penalty function, and the overall optimal reflection coefficient is the minimum of those:
+\begin{equation}\label{eq:gamma-opt-min}
+\begin{aligned}
+   |\Gamma_{cl,\mu^*}| &= 
+    \min_\mu \left\{
+        | f\left(\Gamma_{cl,\mu}(b_\mu)\right) |
+    \right\}, \quad
+    |\Gamma_{int,\mu^*,\nu^*}| =
+    \min_{\mu,\nu} \left\{
+        | f\left(\Gamma_{\mu,\nu}(b_\mu, b_\nu)\right) |
+    \right\} \\
+    |\Gamma_{opt}| &=
+    \min \left\{
+        |\Gamma_{cl,\mu^*}(b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*}(b_\mu, b_\nu)|
+    \right\} 
+\end{aligned}
+\end{equation}
+
+Working from the inside out, we now analyze the convexity of $|\Gamma_{opt}|^2$ with respect to $b_\mu$.
+Starting with the candidates at closest points, the square root is a concave increasing function, 
+and a concave increasing function of an affine function is concave, 
+so $\sqrt{\textrm{aff}(b_{\mu})}$ is concave.
+The sum of a concave function and an affine function is concave, 
+so $|\Gamma_{cl}|=\textrm{aff}(b_{\mu}) + \sqrt{\textrm{aff}(b_{\mu})}$ is concave.
+The penalty function is convex if and only if all constraints are convex, 
+so $-|f(\Gamma_{cl})|$ is concave if and only if $S_\mu=1 ~\forall \mu$.
+The minimum of a set of concave functions is a concave increasing function,
+% or the maximum of a set of convex functions is a convex increasing function
+and $|\Gamma_{cl,\mu^*}|$ is the minimum of a set of concave functions if and only if all constraints are concave, 
+so $|\Gamma_{cl,\mu^*}|$ is concave if and only if $S_\mu=1 ~\forall \mu$.
+
+Moving onto the candidates at intersection points, a quadratic function is concave if its leading order term is negative, and the leading order term of $\textrm{quad}(b_{\mu}, b_{\nu})$ is negative (arising from the subtraction of squared-affine term $a_{\mu\nu}^2$).
+%Square root is a concave function, and a concave function of a concave function is concave, so $\sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ is concave.
+The geometric mean of two positive values is a concave function, so the geometric mean of two positive concave functions is concave.
+The term $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$
+is the geometric mean of $(\textrm{aff}(b_{\mu})+\textrm{aff}(b_{\nu}))^2$ and $\textrm{quad}(b_{\mu}, b_{\nu})$.
+The $(\textrm{aff}(b_{\mu})+\textrm{aff}(b_{\nu}))^2$ is positive but is convex rather than concave.
+This means the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ cannot be established with the present analysis.
+If the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ could be established as concave, 
+then the sum of two concave functions is concave, so the candidate points $|\Gamma_{int}|$ would be concave.
+If that were the case, then by the same argument as for the closest points, the minimum of feasible $|\Gamma_{int}|$ would be concave if and only if all constraints are concave.
+The optimum $|\Gamma_{opt}|$ is the minimum of the feasible $|\Gamma_{cl}|$ and $|\Gamma_{int}|$, so if both of those are concave, then it is also concave.
+Therefore, the criteria for the concavity of $|\Gamma_{opt}|$ with respect to $b_\mu$ is that all constraints are convex (interior of circles), and the curvature of $\left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right) \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}$ is concave.
+
+As future work, the above curvature analysis should be verified with a disciplined convex programming package such as CVXPY.
+
+To facilitate the analysis of the next section, we observe that although the squared optimal reflection coefficient magnitude, $|\Gamma_{opt}|^2$,
+has so far been expressed as a function only of the active constraints $(\mu^*,\nu^*)$,
+it can be written as a sum over all constraint pairs $(\mu,\nu)$ multiplied by an appropriate Kronecker delta function:
+\begin{equation} 
+\label{eq:gamma-opt-scale-sum}
+\begin{aligned}
+    |\Gamma_{opt}|^2 
+    = &\sum_\mu \sum_{\nu > \mu}
+    \left[
+        \delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})
+        \left(
+            \textrm{aff}(b_{\mu})
+            + \sqrt{\textrm{aff}(b_{\mu})}
+        \right)
+     + \delta_{\mu,\mu^*}\delta_{\nu,\nu^*}
+    \right.
+\\
+    &\left.
+        \left(
+            \textrm{quad}(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right)
+            \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation}
+where $\delta_{\mu,\mu^*}\delta_{\nu,\nu^*}$ is non-zero when both $\mu$ and $\nu$ are active in that sea state, 
+and $\delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})$ is non-zero when $\mu$ is active and $\nu$ is inactive in the sea state.
+Both Kronecker delta functions are implicitly functions of the constraint limit $b_\mu$, as seen in \cref{eq:gamma-opt-min}.  
+% delta mu mu* is monotonially decreasing (negative step) with $b_\mu$ when $S_\mu=1$ (enlarging the mu-th circle when the mu-th constraint is feasible-inside will make more candidate points mu-feasible, so the mu-th constraint would transition from active to inactive) 
+% and monotonically increasing with $b_\mu$ when $S_\mu=-1$ (enlarging the mu-th circle when the mu-th constraint is feasible-outside will make fewer candidate points mu-feasible, so the mu-th constraint would transition from inactive to active).
+% $\delta_{\nu,\nu^*}$ is monotonially decreasing with $b_\mu$.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Average Power as a Function of Constraint Limits}
+The results just obtained establish conditions for the convexity of power in a single sea state to the constraint limit in that sea state, which we now make explicit by adding a $\beta$ subscript to all sea state dependent quantities.
+For LCOE, we are interested in the weighted average power across sea states as a function of the constraint limits.
+All constraint limits are independent of the sea state ($L_{\mu\beta}=L_\mu$), with the exception of the amplitude limits due to slamming.
+\Cref{sec:appendix-slam} will show that the slamming limits are a function of $\Delta z_{\text{slam}}/H$, which depends explicitly on the wave height, and $\theta$, which depends implicitly on both the wave period and wave height through the guessed phase $\angle\xi$.
+Since the PTO sizing limits are of primary relevance, the following derivation assumes that the constraint limits are independent of the sea state to simplify the expression, although sea-state-dependent limits can easily be accommodated by adding a $\beta$ index on $b_\mu$ and carrying it through the derivation.
+
+From \cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be written as:
+\begin{equation}\label{eq:power-elec-sensitivity}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\beta=1}^{N_{sea}} w_\beta
+    \cdot |\Gamma_{\beta,opt}|^2
+\end{equation}
+where $\overline{P}_{\text{elec},0}$ is the power available if all sea states were unconstrained (impedance-matched) and 
+$w_\beta=JPD_\beta \cdot
+    \frac{|\hat{V}_{s,th,\beta}|^2}
+         {8\Re(Z_{s,th,\beta})}$ is a constant weight for each sea state.
+The second term represents power lost to constraint-induced impedance mismatch and depends on the constraint limits through \cref{eq:gamma-opt-summary}.
+
+Substituting \cref{eq:gamma-opt-scale-sum} into \cref{eq:power-elec-sensitivity} requires a $\beta$ subscript on the starred index to the Kronecker delta functions since constraint activity varies by sea state, as well as a $\beta$ subscript on the affine and quadratic functions to capture sea-state dependence of the Th\'{e}venin parameters:
+\begin{equation}
+\begin{aligned}
+    \overline{P}_{elec} = &\overline{P}_{elec,0}
+    - \eta \sum_\mu \sum_{\nu > \mu}
+    \sum_{\beta=1}^{N_{sea}} w_\beta
+    \left[
+        \delta_{\mu,\mu^*_\beta}(1-\delta_{\nu,\nu^*_\beta})
+        \left(
+            \textrm{aff}_\beta(b_{\mu})
+            + \sqrt{\textrm{aff}_\beta(b_{\mu})}
+        \right)
+    \right.
+\\
+    &\left.
+        + \delta_{\mu,\mu^*_\beta}\delta_{\nu,\nu^*_\beta}
+        \left(
+            \textrm{quad}_\beta(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}_\beta(b_{\mu}) + \textrm{aff}_\beta(b_{\nu})\right)
+            \sqrt{\textrm{quad}_\beta(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation} 
+Expanding under the assumption that each constraint is sometimes active by itself and sometimes active with another constraint, 
+we find that $\overline{P}_{\text{elec}}$ is a piecewise function of each constraint limit $b_\mu$, with a quadratic leading order term as well as affine, square root of affine, and affine times square root of quadratic terms.
+The two Kronecker delta terms are combined with the weighting term $w_\beta$ to create revised weighting terms $\tilde{w}_{1\mu\nu\beta}$ and $\tilde{w}_{2\mu\nu\beta}$ that are non-zero only when the corresponding constraint(s) are active in that sea state:
+\begin{equation}\label{eq:power-triple-sum}
+\begin{aligned}
+    \overline{P}_{elec} &= \overline{P}_{elec,0}
+    - \eta \sum_\mu \sum_{\nu > \mu}
+    \left[
+        \sum_{\beta=1}^{N_{sea}} \tilde{w}_{1\mu\nu\beta}
+        \left(
+            \textrm{aff}_\beta(b_{\mu})
+            + \sqrt{\textrm{aff}_\beta(b_{\mu})}
+        \right)
+    \right. + \\
+    &\left.
+     \sum_{\beta=1}^{N_{sea}} \tilde{w}_{2\mu\nu\beta}
+        \left(
+            \textrm{quad}_\beta(b_{\mu}, b_{\nu}) + 
+            \left(\textrm{aff}_\beta(b_{\mu}) + \textrm{aff}_\beta(b_{\nu})\right)
+            \sqrt{\textrm{quad}_\beta(b_{\mu}, b_{\nu})}
+        \right)
+    \right]
+\end{aligned}
+\end{equation}
+so the power-constraint relationship is a sum over sea states of piecewise functions of the constraint limit $b_\mu$.
+Recognizing that the sea state sum in \eqref{eq:power-triple-sum} essentially just scales the individual piecewise functions, the expression can be simplified by absorbing the weights into the subscripts of the affine and quadratic terms, and combining the sum of an affine and quadratic term into a single quadratic term:
+\begin{equation}\label{eq:power-double-sum}
+\begin{aligned}
+    \overline{P}_{elec} = \overline{P}_{elec,0}
+    - \eta \sum_{\mu\nu\beta}
+    &\left[
+        \sqrt{\textrm{aff}_{\mu\nu\beta}(b_{\mu})}
+        + \textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu}) 
+    \right.+ 
+     \\
+    &\left.
+        \left(\textrm{aff}_{\mu\nu\beta}(b_{\mu}) + \textrm{aff}_{\mu\nu\beta}(b_{\nu})\right)
+        \sqrt{\textrm{quad}_{\mu\nu\beta}(b_{\mu}, b_{\nu})}
+    \right]
+\end{aligned}\end{equation}
+We can then use a similar analysis as before to obtain conditions for the convexity of the overall power-constraint relationship.
+
+%The convexity of $|\Gamma_{opt}|^2$ in $b_\mu$ derived above translates directly to convexity of $\overline{P}_{\text{elec}}$ in $b_\mu$ via \cref{eq:power-elec-sensitivity}, since the weighted sum of concave functions ($-|\Gamma_{opt}|^2$) is concave and the addition of constant $\overline{P}_{\text{elec},0}$ preserves concavity. Equivalently, $\overline{P}_{\text{elec}}$ is convex in the constraint coefficients $b_\mu$ under the same conditions, namely that all constraints are convex ($S_\mu = 1$) and that the curvature of $(\textrm{aff}(b_\mu) + \textrm{aff}(b_\nu))\sqrt{\textrm{quad}(b_\mu, b_\nu)}$ resolves favorably (see the caveat above). This is the convexity claim referenced in \cref{sec:multidisciplinary-insights}.
+
+% \subsubsection{Convexity of the Power-Constraint Relationship}
+% To illustrate convexity, we use an intuitive geometric argument, leaving formal proof to future work.
+% In a constraint that has $S_\mu=1$ in a given sea state, the feasible region is the interior of a circle, so increasing the constraint limit $b_\mu$ enlarges the circle radius and therefore enlarges the feasible region, which can only decrease or maintain the optimal $|\Gamma_{\beta,opt}|$ and therefore increase or maintain power.
+% In a constraint with $S_\mu=-1$, the feasible region is the exterior of a circle, so increasing the constraint limit $b_\mu$ enlarges the circle radius and therefore shrinks the feasible region, which can only increase or maintain the optimal $|\Gamma_{\beta,opt}|$ and therefore decrease or maintain power.
+% This corresonds to the sign of the leading order term of a given piecewise segment in the power-constraint relationship, which is negative for $S_\mu=1$ and positive for $S_\mu=-1$.
+% Furthermore, the number of sea states in which a particular constraint is singularly or pairwise active ($\sum_{\beta}\mathbb{I}_\beta$) is monotonically non-decreasing with the constraint limit, so the leading order term in the overall power-constraint relationship (all piecewise segments together) is positive if the constraint has $S_\mu=1$ at all sea states, or negative if $S_\mu=-1$ at all sea states.
+% This means that as long as the sign of $S_\mu$ is consistent across sea states, the power-constraint relationship is globally convex.
+% Relaxing any constraint thus always increases or maintains power, and the marginal power benefit diminishes as the constraint limit grows.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Extension to Dimension Sensitivity}
+\label{sec:appendix-dimension-sensitivity}
+In principle, the same parametric programming approach can be used to semi-analytically compute the derivatives of the constrained optimal power with respect to bulk dimensions, 
+though the implementation remains out of reach.
+These derivatives would be highly valuable, and indeed would enable the full wave-to-wire control co-design optimization problem to be solved semi-analytically, rather than the present approach which requires a numerical bulk-dimension optimization to be wrapped around the semi-analytical control optimization and simulation.
+Computing bulk-dimension derivatives would require not only $\partial \Gamma_{opt}/\partial b_\mu$ as we derive here,
+but also the derivatives of Th\'{e}venin parameters with respect to bulk dimensions, 
+because bulk dimensions affect $\mathbf{Q}_\mu, \vec{a}_\mu$, and the unconstrained power through the Th\'{e}venin parameters.
+The sensitivity formula would become significantly more complex and less intuitive with these additional terms, 
+and more importantly, the Th\'{e}venin-to-dimension derivatives are not currently available in MDOcean because they depend on the hydrodynamic coefficient-to-dimension derivatives.
+Application of the adjoint method has recently enabled efficient computation of hydrodynamic coefficient derivatives in the context of a numerical boundary element method solver \cite{khanal_fully_2025}, 
+but the adjoint method has not yet been implemented for the semi-analytical MEEM model used here.
+Implementing the adjoint for a linear solve is relatively straightforward in a multidisciplinary design optimization package like OpenMDAO, 
+and would unlock a fully semi-analytical differentiation workflow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Force Saturation}
+\label{sec:appendix-force-sat}
+\Cref{sec:dynamics} introduced the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
 
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
 This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \cite{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \cite{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in \cite{mccabe_force-limited_2024}. 
+For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
 
-MDOcean assumes that the saturated control impedance, and thus its fundamental, share the same phase as the optimal unsaturated controller (damping or reactive respectively).
-This is optimal for the damping case, and slightly sub-optimal for the reactive case due to the presence of a small phase shift in the optimal saturated impedance and the matched impedance \cite{mccabe_force-limited_2024}.
-The appropriate scale factor from the optimal unsaturated controller is found with numerical iteration. 
+The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \cref{sec:appendix-qp-numerical,sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
 %Mathematically, a saturation factor $0< f_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
 %\begin{equation}
 %    f_{sat} = \min\left( \alpha\frac{\tau_{max}}{\tau}, 1\right),
 %\end{equation}
-%where $\tau_{max}$ is the maximum permissible generator torque and $\alpha$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\tau_{max}$, using the describing function derived in \cite{mccabe_force-limited_2024},
+%where $\tau_{\text{max}}$ is the maximum permissible generator torque and $\alpha$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\tau_{\text{max}}$, using the describing function derived in \cite{mccabe_force-limited_2024},
 %\begin{equation}
 %    \alpha = \frac{2}{\pi} \left( \frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left(\frac{\tau_{max}}{F_p}\right)^2} \right).
 %\end{equation}
     
-%When $\frac{F_p}{\tau_{max}}$ = 1 (no saturation), then $\alpha= 1$; when $\frac{F_p}{\tau_{max}} \rightarrow \infty$ (full saturation), then $\alpha= \frac{4}{\pi}$. This makes sense because $\frac{4}{\pi}$ is the harmonic amplitude of a unit square wave, and in full saturation the saturated signal approaches a square wave. $\alpha$ is plotted in Figure \ref{fig:alpha-fit}.
+%When $\frac{F_p}{\tau_{\text{max}}}$ = 1 (no saturation), then $\alpha= 1$; when $\frac{F_p}{\tau_{\text{max}}} \rightarrow \infty$ (full saturation), then $\alpha= \frac{4}{\pi}$. This makes sense because $\frac{4}{\pi}$ is the harmonic amplitude of a unit square wave, and in full saturation the saturated signal approaches a square wave. $\alpha$ is plotted in \cref{fig:alpha-fit}.
 
 %The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \cite{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
 
@@ -282,9 +1086,54 @@ The appropriate scale factor from the optimal unsaturated controller is found wi
 % \end{align}
 % and these new control gains are then plugged into equation \eqref{eq:eom-freq-domain} to find the saturated displacement amplitude $X_{sat}$.
 
-\clearpage
-\subsection{Drag Model\label{sec:appendix-drag}}
-As described in section \ref{sec:drag}, a describing function approximation is used to model the form drag.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Drag Model
+\label{sec:appendix-drag}}
+As described in \cref{sec:drag}, a describing function approximation is used to model the form drag.
+The relative-velocity computation in \cref{eq:drag-pressure} uses the standard finite-depth linear-wave velocity phasor evaluated at body draft,
+with $\vec{T} = [T_{f,2}, T_s]$ collecting the bottom drafts of the float and spar:
+\begin{equation}
+    \label{eq:wave-velocity-phasor}
+    \vec{\hat{V}}_{wave}(y) = \frac{H}{2}\,\frac{gk}{\omega}\, e^{-k\vec{T}}\, e^{-iky}.
+\end{equation}
+
+Strip theory integrates the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted surface area $A_{wet}$.
+For a hollow cylinder of outer radius $\vec{R}$ and inner radius $\vec{R}_{in}$,
+% derived p156-159 notebook 3/10/25
+% simplified p169-173 notebook 3/12/25
+\begin{equation}\label{eq:drag-force-integral}
+    \vec{\hat{F}}_d = \int_{A_{wet}} d\vec{\hat{F}}_d(y) = -\int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y)\, \vec{\hat{p}}_d(y)\, dy,
+\end{equation}
+where $\vec{w}(y)$ is the local body width perpendicular to wave propagation:
+\begin{equation}\label{eq:drag-width}
+    \vec{w}(y) = \begin{cases}
+        2\sqrt{\vec{R}^2-y^2}, & \vec{R}_{in}<|y|<\vec{R} \\
+        2\sqrt{\vec{R}^2-y^2} - 2\sqrt{\vec{R}_{in}^2-y^2}, & 0<|y|<\vec{R}_{in}.
+    \end{cases}
+\end{equation}
+
+Plugging the describing function \cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
+\begin{equation}\label{eq:drag-damping-excitation-2}
+    \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
+    + \vec{\gamma}_{d} \hat{\zeta}
+\end{equation}
+The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \cref{subsec:appendix-drag-others}.
+The coefficients in \cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
+\begin{equation}\label{eq:drag-coeffs}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi}\frac{1}{2} \rho_w \, \textrm{diag}\left(\vec{C}_d |\vec{\hat{\dot{\xi}}}| \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) dy \right) \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \frac{1}{2} \rho_w \vec{C}_d \, |\vec{\hat{\dot{\xi}}}| \frac{gke^{-k\vec{T}}}{\omega} \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) e^{-iky} dy 
+\end{aligned}
+\end{equation}
+where we use radii vectors $\vec{R}=[D_f/2,D_d/2]$ and $\vec{R}_{in}=[D_{f,in},0]$ to represent the float and spar.
+$\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velocity:
+\begin{equation}\label{eq:drag-alpha-definitions}
+    \vec{\alpha}_v(y) = \frac{\vec{|\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} e^{-2ky} - 2 \vec{r} e^{-ky}  \sin\angle \vec{\hat{\dot{\xi}}}}
+\end{equation}
+and $\vec{r} = |\hat{V}_{\text{wave}}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+
+%%%%%%%%%%%%%%%
 \subsubsection{Nondimensional Drag Integrals $I_B$ and $I_G$}
 The drag coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ are expressed in \cref{eq:drag-coeffs} as dimensional integrals over the width of the WEC.
 Here we present an alternative form of the coefficients in terms of nondimensionalized integral functions, which we refer to as $I_B(r,\theta,\kappa)$ and $I_G(r,\theta,\kappa)$:
@@ -331,7 +1180,7 @@ The integrals must be evaluated numerically, except for special limit cases for 
         \caption{Phase of drag excitation integral $\angle I_G$, scaled by $\frac{1}{\pi}$.}
         \label{fig:drag-excitation-phase-integral}
     \end{subfigure}
-    \caption{Nondimensional drag integrals shown on in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
+    \caption{Nondimensional drag integrals shown in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
     \label{fig:drag-integrals}
 \end{figure}
 
@@ -378,46 +1227,48 @@ The relevant limits are then:
 \end{aligned}
 \end{equation}
 
+%%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
-The WEC drag model in \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+\label{subsec:appendix-drag-others}
+The WEC drag model in the study \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
 Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
-This creates the possibility for negative ``damping'' coefficients that would appear to violate energy conservation if interpreted as a true damping coefficient.
-The damping-excitation grouping chosen in \ref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
+This creates the confusing possibility for negative apparent damping coefficients, leading to false concerns about violating energy conservation if erroneously interpreted as a true damping coefficient.
+The damping-excitation grouping chosen in \cref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
 
 Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
-\cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
-This means that \cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
-Early MDOcean simulations that used the \cite{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radation damping) at high frequencies and large wave heights in the operational regime.
+Reference \cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+Early MDOcean simulations that used the formulation of \cite{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in \cite{quartier_influence_2021}.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming the relative velocity is perfectly in phase with the body velocity yields more accurate results than the drag formulation used in the study \cite{quartier_influence_2021}.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
 With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
-The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
+The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \cite{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-This is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \cref{eq:eom-freq-domain} and $k$ is the iteration index.
+The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \cref{eq:eom-freq-domain} and $k$ is the iteration index.
 It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which has the following criteria \cite{chicone_contraction_2006}:
 \begin{equation}
  \left|
-    \frac{\partial g\left(\vec{\hat{\dot{\xi}}}~\right)}
-    {\partial \vec{\hat{\dot{\xi}}}}
+    \frac{\partial}
+    {\partial \vec{\hat{\dot{\xi}}}}~\left[
+    g\left(
+        \vec{\hat{\dot{\xi}}}~
+    \right)\right]
 \right| < 1
 \end{equation}
 
-Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees, % from summer research slide 44 5/30/24
-and a sample convergence plot is shown in Figure~\ref{fig:drag-convergence}.
+Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees. % from summer research slide 44 5/30/24
+%In high-frequency sea states where there is substantial phase difference between $\dot{X}_{\text{rel}}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
+At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \cref{sec:optimal-control}, although since v1.2.0 by default the solver is used only for drag convergence and optimal control is done analytically.
+Compared to numerical optimal control nested inside the drag solve, combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
+However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{figs/from-matlab/drag_convergence.pdf}
-    \caption{Convergence plot for drag iteration}
-    \label{fig:drag-convergence}
-\end{figure}
-%In high-frequency sea states where there is substantial phase difference between $\dot{X}_{rel}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
-
+%%%%%%%%%%%%%%%
 \subsubsection{Optimal Control Condition}
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
 The optimal load damping $B_l$ is derived by setting
@@ -431,9 +1282,11 @@ The optimal load damping $B_l$ is derived by setting
 and the typical simplification $\frac{\partial \hat{V}_{s,th}}{\partial B_l}=\frac{\partial Z_{s,th}}{\partial B_l}=0$ must be replaced with the implicit dependence of the Th\'{e}venin equivalent parameters on $B_l$ because $B_l$ affects $\hat{\dot\xi}$ and therefore $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ via \eqref{eq:drag-coeffs}.
 In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.
 
-\clearpage
-\subsection{Slamming and Submersion Amplitude}\label{sec:appendix-slam}
-In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{slam}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slamming and Submersion Amplitude}
+\label{sec:appendix-slam}
+
+In regular waves of height $H$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the WEC, $\xi(t)-\Delta z_{\text{slam}}$, with the wave elevation $\zeta(y,t)$, which depends on the horizontal position coordinate $y$.
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
 \begin{aligned}
@@ -447,43 +1300,46 @@ Manipulating \cref{eq:slamming-time-domain} to ensure the inequality is satisfie
 \begin{equation}
 |\hat{\xi}|^2 - H\cos(ky)|\hat{\xi}|\cos\angle\hat{\xi} + H\sin(ky)|\hat{\xi}|\sin\angle\hat{\xi} < \Delta z_{slam}^2-\left(\frac{H}{2}\right)^2
 \end{equation}
-which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:appendix-qp-solution}, once the appropriate worst-case $y$ is substituted.
+which is quadratic in $\hat{\xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \cref{sec:optimal-control,sec:appendix-qp-solution}, once the appropriate worst-case $y$ is substituted.
 The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios and the corresponding worst-case $y$.
 Completing the square results in:
 \begin{equation}\label{eq:slamming-squared}
     \left[ |\hat{\xi}|- \frac{H}{2}\cos(\angle\hat{\xi} + ky)\right]^2 < \Delta z_{slam}^2 - (H/2)^2 \sin^2(\angle\hat{\xi} + ky)
 \end{equation}
 In general, after taking the square root of \cref{eq:slamming-squared}, both the positive and negative branches must be used.
-This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{min,slam}<|\hat{\xi}|<\xi_{max,slam}$, with the following values:
+This yields a maximum and minimum amplitude criteria to prevent slamming, $\xi_{\text{min},\text{slam}}<|\hat{\xi}|<\xi_{\text{max},\text{slam}}$, with the following values:
 \begin{equation}\label{eq:slamming-min-max}
 \begin{aligned}
     \xi_{max,slam} &= \frac{H}{2} \cos\theta + \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 } \\
     \xi_{min,slam} &= \frac{H}{2} \cos\theta - \sqrt{\Delta z_{slam}^2-\left(\frac{H}{2}\sin\theta\right)^2 }
 \end{aligned}
 \end{equation}
-where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{max,slam}$ and the maximum value of $\xi_{min,slam}$ to ensure lack of slamming across the entire WEC surface.
+where $\theta=\angle\hat{\xi} + ky$ must be evaluated with the value of $y$ that creates the minimum value of $\xi_{\text{max},\text{slam}}$ and the maximum value of $\xi_{\text{min},\text{slam}}$ to ensure lack of slamming across the entire WEC surface.
 The relevant value of $\theta$ differs depending on the wave amplitude.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Case 1: Small Wave Amplitudes}
-For the case of $\Delta z_{slam}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{max,slam}$ because $\xi_{min,slam}<0$. This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
-The value of $\theta$ that minimizes $\xi_{max,slam}$ over the relevant range is 
+For the case of $\Delta z_{\text{slam}}>H/2$ (wave amplitudes smaller than the draft), \cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\hat{\xi}|<\xi_{\text{max},\text{slam}}$ because $\xi_{\text{min},\text{slam}}<0$.
+This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
+The value of $\theta$ that minimizes $\xi_{\text{max},\text{slam}}$ over the relevant range is 
 \begin{equation}\label{eq:slamming-limit-small-waves}
 \theta = \pi - \max\left(0,~ \frac{-kD}{2}+|\pi-\angle \xi|\right)
 \end{equation}
 where the symmetry of \cref{eq:slamming-min-max} has been used to collapse possible values onto $[0,\pi]$.
 
-This expression reduces to the simple limits $\Delta z_{slam}-H/2$ and $\Delta z_{slam}+H/2$ for short wavelengths $(\theta=\pi)$ and long wavelengths $(\theta=0)$ respectively.
-These limits are also the minimum and maximum values of $\xi_{max,slam}$ for any diameter and wave condition where $\Delta z_{slam}>H/2$.
+This expression reduces to the simple limits $\Delta z_{\text{slam}}-H/2$ and $\Delta z_{\text{slam}}+H/2$ for short wavelengths $(\theta=\pi)$ and long wavelengths $(\theta=0)$ respectively.
+These limits are also the minimum and maximum values of $\xi_{\text{max},\text{slam}}$ for any diameter and wave condition where $\Delta z_{\text{slam}}>H/2$.
 For intermediate wavelengths, the variable $\theta$ accurately accounts for the effect of body diameter and the phase offset of body motion from the waves.
 Intuitively, $\theta$ represents how high up the free surface the bottom of the WEC is allowed to get before the edge exits the water, with $\theta=0$ allowing the body to get all the way to the wave crest (top) and $\theta=\pi$ requiring the float to remain fully below the wave trough (bottom).
 
+%%%%%%%%%%%%%%%
 \subsubsection{Case 2: Large Wave Amplitudes}
-In sufficiently large waves ($H/2>\Delta z_{slam}$), \cref{eq:slamming-limit-small-waves} does not apply.
+In sufficiently large waves ($H/2>\Delta z_{\text{slam}}$), \cref{eq:slamming-limit-small-waves} does not apply.
 Intuitively, when the wave amplitude exceeds the draft, a minimum amplitude of motion in-phase with the incident wave is required to prevent the wave trough from going below the body surface.
-The minimum amplitude arises mathematically when $\xi_{min,slam}>0$, which occurs exactly for waves meeting the amplitude criterion.
-The ``in-phase'' motion requirement is consistent with the observation that in this wave regime, the maximum amplitude in \cref{eq:slamming-min-max} becomes unsatisfiable ($\xi_{max,slam}<0$) for WEC phases that are more than 90 degrees out of phase with the incident wave ($\theta \in [\pi/2,3\pi/2]$).
+The minimum amplitude arises mathematically when $\xi_{\text{min},\text{slam}}>0$, which occurs exactly for waves meeting the amplitude criterion.
+The ``in-phase'' motion requirement is consistent with the observation that in this wave regime, the maximum amplitude in \cref{eq:slamming-min-max} becomes unsatisfiable ($\xi_{\text{max},\text{slam}}<0$) for WEC phases that are more than 90 degrees out of phase with the incident wave ($\theta \in [\pi/2,3\pi/2]$).
 
-For evaluating \cref{eq:slamming-min-max}, the value of $\theta$ that produces both minimum $\xi_{max,slam}$ and maximum $\xi_{min,slam}$ in this regime is:
+For evaluating \cref{eq:slamming-min-max}, the value of $\theta$ that produces both minimum $\xi_{\text{max},\text{slam}}$ and maximum $\xi_{\text{min},\text{slam}}$ in this regime is:
 \begin{equation}
 \theta = \angle\hat{\xi} + \frac{kD}{2}\textrm{sgn}(\pi-\angle\hat{\xi})
 \end{equation}
@@ -496,32 +1352,32 @@ The following requirement on $D$ ensures that there exist some values of $\angle
     kD<2\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)
 \end{equation}
 which has upper bound $kD<\pi$.
-Once \cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\hat{\xi}$ that avoid negative values for both $\xi_{max,slam}$ and the right hand side of \cref{eq:slamming-squared} are:
+Once \cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\hat{\xi}$ that avoid negative values for both $\xi_{\text{max},\text{slam}}$ and the right hand side of \cref{eq:slamming-squared} are:
 \begin{equation}\label{eq:slamming-allowed-angles}
 \begin{aligned}
     \angle\hat{\xi} \in &\left[0,~~\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)-\frac{kD}{2}\right] \\
     \cup & \left[2\pi-\arcsin\left(\frac{\Delta z_{slam}}{H/2}\right)+\frac{kD}{2}, ~~2\pi\right]
 \end{aligned}
 \end{equation}
-At the edge-case $\angle\hat{\xi}$ on the inner boundaries of this interval, only a single amplitude is permitted because the values for $\xi_{max,slam}$ and $\xi_{min,slam}$ coincide at $\sqrt{(H/2)^2-\Delta z_{slam}^2}$.
+At the edge-case $\angle\hat{\xi}$ on the inner boundaries of this interval, only a single amplitude is permitted because the values for $\xi_{\text{max},\text{slam}}$ and $\xi_{\text{min},\text{slam}}$ coincide at $\sqrt{(H/2)^2-\Delta z_{\text{slam}}^2}$.
 At any lower amplitude, the WEC would exit the water at the wave trough, and any higher, the WEC would raise out of the water at the wave crest.
 The permissible amplitude range can be widened by decreasing $D$ or moving $\angle\hat{\xi}$ towards the closer of $0$ and $2\pi$.
-The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{slam} < |\hat{\xi}| < H/2+\Delta z_{slam}$.
+The widest permissible amplitude range occurs when the WEC is perfectly in-phase with the incident wave ($\angle\hat{\xi}=0$) and is small with respect to the wavelength ($kD\approx0$), which yields the limits $H/2-\Delta z_{\text{slam}} < |\hat{\xi}| < H/2+\Delta z_{\text{slam}}$.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Implementation}
-Figure~\ref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{max,slam}/(H/2)$ and $\xi_{min,slam}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{slam}/(H/2)$.
+\Cref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes $\xi_{\text{max},\text{slam}}/(H/2)$ and $\xi_{\text{min},\text{slam}}/(H/2)$ as a function of the worst-case phase angle $\theta$ and the draft to wave amplitude ratio $\Delta z_{\text{slam}}/(H/2)$.
 This reveals that besides increasing the draft, decreasing $\theta$ can prevent slamming, for example by decreasing the diameter or adjusting $\angle \xi$ via control.
-If $\Delta z_{slam}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
-\begin{figure}
+If $\Delta z_{\text{slam}}<H/2|\sin\theta|$, the design is unviable and the slamming limits are undefined, consistent with the negative right hand side of \cref{eq:slamming-squared} discussed above.
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/slamming_amplitude.pdf}
     \caption{Nondimensional critical slamming amplitude}
     \label{fig:slam}
 \end{figure}
-%\hl{add description of similarities and differences of this to Budal's upper bound}
 
 Separately, there exists a symmetrical counterpart to the slamming condition that we will call the submersion condition. 
-While preventing slamming requires that the bottom of the WEC remains below the free surface, preventng submersion requires that the top of the WEC remains above the free surface. 
+While preventing slamming requires that the bottom of the WEC remains below the free surface, preventing submersion requires that the top of the WEC remains above the free surface. 
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
 \begin{equation}\label{eq:submersion}
     \xi(t) + \Delta z_{sub} > \zeta(y,t)
@@ -531,28 +1387,76 @@ Conceptually, both the slamming requirement \eqref{eq:slamming-time-domain} and 
 However, the limit on $|\hat{\xi}_f-\hat{\xi}_s|$ described in \cref{tab:DLCs} already ensures that the top of the spar remains above the top of the float across all dynamic conditions.
 Coupled with the fact that the float diameter always exceeds the spar diameter, this means that satisfaction of the float submersion requirement implies automatic satisfaction of the spar submersion requirement.
 While this logic works for submersion, it does not apply for slamming because the damping plate diameter may exceed the float diameter.
-The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{surf}=\min(\Delta z_{sub}, \Delta z_{slam})$, where the values for $\Delta z_{sub}$ and $\Delta z_{slam}$ were given in \sectionautorefname~\ref{sec:dynamics}.
+The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\Delta z_{\text{surf}}=\min(\Delta z_{\text{sub}}, \Delta z_{\text{slam}})$, where the values for $\Delta z_{\text{sub}}$ and $\Delta z_{\text{slam}}$ were given in \cref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
-Relevant model values for the nominal float design under reactive optimal control are plotted for each sea state in \figureautorefname~\ref{fig:slamming-validation}.
+For operational waves, the vertical dimension $\Delta z$ in \cref{eq:slam-constraint-quadratic} is set as follows.
+For float slamming, $\Delta z = T_{f,1}$ (rather than $T_{f,2}$): this prevents slamming on the slanted underside of the float and additionally maintains constant waterplane area, avoiding unmodeled nonlinearities in the hydrostatic stiffness and Froude–Krylov excitation force.
+For spar slamming, $\Delta z = T_s - h_d$ prevents both slamming on the bottom of the spar and surfacing of the damping plate.
+For float and spar submersion, $\Delta z$ is set to the above-water heights $h_f - T_{f,2}$ and $h_s - T_s$ respectively.
+
+The storm case slamming constraint is not currently applied.
+A future extension should set $\Delta z = T_{f,2}$ in the storm case to prevent slamming on the (now-merged) bottom surface of the float-spar system.
+
+The amplitude limits $h_{fs,\text{clear}}$, $h_{fs,\text{up}}$, $h_{fs,\text{down}}$, $\xi_{f,\text{linear}}$, and $\xi_{s,\text{linear}}$ are sea-state-independent upper limits, while $\xi_{\text{slam}}$ depends on the sea state and can act as both an upper and lower limit on oscillation magnitude.
+
+Relevant model values for the nominal float design under reactive optimal control are plotted for each sea state in \cref{fig:slamming-validation}.
 Comparing the first two subplots for the phase of the float motion $\angle\hat{\xi}_f$ and the slamming angle $\theta$ shows that the slamming angle roughly ``wraps'' the motion angle around a value of $\pi/2$, colored white in the figure.
 The third plot shows that the minimum slamming and submersion amplitude is not a concern since it is negative for all sea states and thus will never be an active constraint.
 The fourth plot shows the maximum amplitude limit and the fifth depicts the actual amplitude, with amplitudes in violation of the limit indicated with an overlaid black hatching.
-A significant fraction of sea states violate the limit and will require adjusted control gains.
+A significant fraction of sea states violate the limit and will require adjusted control gains computed via constrained optimal control per \cref{sec:optimal-control,sec:appendix-qp-solution}.
 Significant wave heights in excess of 5.5 meters have negative maximum slamming amplitudes (colored blue), indicating that control adjustments in those waves must not only decrease $|\hat{\xi}_f|$ but also adjust $\angle\hat{\xi}_f$ to reduce $\theta$.
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1.1\linewidth]{figs/from-matlab/slamming_model_comparison_float.pdf}
     \caption{Slamming Model Results for Nominal RM3 Float Design in Operational Sea States}
     \label{fig:slamming-validation}
 \end{figure}
 
-\subsection{Dynamic Validation}\label{sec:appendix-dynamic-validation}
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 3100s with a 100s ramp time using the ode4 solver and a 10 ms timestep, with the default mass properties of the WEC-Sim RM3 tutorial.
-Each of the 210 sea states are simulated individually. %Table~\ref{tab:dynamic-validation} and 
-Figure~\ref{fig:dynamic-validation} compares the results.
-\hl{Explain results.}
-% \begin{table}
+%%%%%%%%%%%%%%%
+\subsubsection{Conservatism of the Fundamental-Amplitude Approximation for Fluid Forces}
+\label{sec:appendix-peak-fluid-force}
+
+\Cref{eq:peak-fluid-force} approximates the peak fluid force by the magnitude of its fundamental harmonic phasor.
+This approximation can either under- or overestimate the true peak depending on whether the higher-harmonic content (primarily from the drag describing function) interferes constructively or destructively with the fundamental.
+
+The fundamental amplitudes are also used for the peak float and spar displacements $\max_t|\xi_f(t)|$ and $\max_t|\xi_s(t)|$ in both load cases.
+The fundamental is more accurate for displacements than for forces because the second-order plant dynamics filter out high-frequency inputs, attenuating drag-induced harmonics in the displacement response.
+
+A future refinement could explicitly reconstruct the time-domain drag force from the describing function and track its peak directly, at the cost of either time-domain integration or additional Fourier-component bookkeeping in the frequency-domain formulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Validation}
+\label{sec:appendix-dynamic-validation}
+
+\subsubsection{WEC-Sim}
+The drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
+The extremely low errors in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively) indicate that this is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF.
+The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
+
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+Each of the 210 sea states are simulated individually as the equivalent regular wave.
+Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
+%\cref{tab:dynamic-validation} and 
+\Cref{fig:dynamic-validation} compares the results.
+The $C_d=0$ simulation with identical hydrodynamic coefficients (top left of \cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions. 
+The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
+An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+Turning on drag ($C_d=1$, top right of \cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
+While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
+
+Moving to the bottom left corner of \cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's MEEM hydrodynamic coefficients on its dynamic power production.
+The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the MEEM hydro coefficients has minimal effect on the overall dynamic response.
+Finally, the bottom right corner of \cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
+Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \cref{sec:dynamic-validation}.
+Meanwhile, MDOcean underpredicts the peak power by around 25\%.
+Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
+
+% \begin{table}[htbp]
 %     \centering
 %     \begin{tabular}{|c|c|c|} \hline 
 %          Power Percent Error: Average, Maximum&  $C_d=0$& $C_d=1$\\ \hline 
@@ -564,27 +1468,221 @@ Figure~\ref{fig:dynamic-validation} compares the results.
 % \end{table}
 \begin{landscape}
 \begingroup
-\begin{figure}
+\begin{figure}[htbp]
 \centering
 \begin{tabular}{c m{1em} | >{\centering\arraybackslash}m{.5\linewidth} | >{\centering\arraybackslash}m{.5\linewidth} }
-  && \multicolumn{2}{c}{Drag Coefficent}\\
+  && \multicolumn{2}{c}{Drag Coefficient}\\
          && $C_d=0$& $C_d=1$\\ \hline
     \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& 
-    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf} 
-  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}
 \\ &\rot{Different} & 
-    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf} 
-  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf} \\
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
-\caption{Dynamic validation showing error in a variety of modeling assumptions}
+\caption{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
 \label{fig:dynamic-validation}
 \fillandplacepagenumber
 \end{figure}
 \endgroup
 \end{landscape}
 
+Besides mechanical power, a variety of other signals including amplitudes, phases, and forces are compared between the models.
+While most signals show good agreement between the models, interestingly, large errors are observed in the drag forces, although these errors do not cause significant deviations in the overall system response.
+\Cref{fig:drag-validation} compares the drag force on the float and spar in each model using identical hydro coefficients and $C_d=1$.
 
-\clearpage
+\begin{landscape}
+\begingroup
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{c m{1em} | >{\centering\arraybackslash}m{.5\linewidth} | >{\centering\arraybackslash}m{.5\linewidth} }
+  && \multicolumn{2}{c}{Drag Force}\\
+         && Magnitude& Phase\\ \hline
+    \multirow{2}{*}[-3em]{\rot{Body}} &\rot{Float}& 
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}
+\\ &\rot{Spar} & 
+    \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf} 
+  & \includegraphics[width=\linewidth]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf} \\
+\end{tabular}
+\caption{Drag force comparison showing large errors in drag force, despite low errors in amplitude and power}
+\label{fig:drag-validation}
+\fillandplacepagenumber
+\end{figure}
+\endgroup
+\end{landscape}
+The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worst at mid-range frequencies.
+Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
+The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
+
+We also validate the describing function approximation for the drag force.
+The general application of the describing function technique requires that the fundamental frequency $\omega$ contains the vast majority of the energy, resulting in body displacements of the form $\xi(t) \sim \cos(\omega t+\phi)$.
+\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $C_d=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
+This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
+The paricular describing function relation used for drag assumes that the drag force has the form $F_d(t) \sim |\cos(\omega t+\phi)|\cos(\omega t+\phi)$.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresonding to the four corners of the JPD.
+The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/position_THD_contour.pdf}
+    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \label{fig:wecsim-thd}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/drag_force_desc_fcn.pdf}
+    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \label{fig:wecsim-drag-waveform}
+\end{figure}
+
+\subsubsection{Reference Model Report}
+While the original reference model report \cite{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, 
+it does record the mechanical power for each sea state.
+\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.1\linewidth]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
+    \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
+    \label{fig:report-power-validation}
+\end{figure}
+Note that the data is independent of \cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
+and that the power multiplier mentioned in \cref{sec:dynamic-validation} has not been applied in the figure.
+We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
+The discrepancy is of minimal concern for the reasons described in \cref{sec:dynamic-validation}.
+Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power Matrix Decomposition}
+\label{sec:appendix-power-decomposition}
+
+The efficiency matrices introduced in \cref{eq:power-matrix-decomposition} are defined as follows.
+The wave power density $\mathbf{J}^{H,T}_{wave}$ and maximum capture width  $\mathbf{CW}^{H,T}_{max}$ are independent of design:
+\begin{equation}
+\mathbf{J}^{H,T}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2, \qquad
+\mathbf{CW}^{H,T}_{max} = \frac{g T_e^2}{4\pi^2}.
+\end{equation}
+The maximum capture width matrix represents the radiation limit determined by the WEC mode of motion
+(heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
+
+The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{P}_{F\dot{X},\text{no drag}}$ (computed with $C_{d,f}=C_{d,s}=0$, ideal PTO):
+\begin{equation}
+\mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}}, \qquad
+\mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
+\end{equation}
+$\mathbf{\eta}^{H,T}_{\text{drag}}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{P}_{F\dot{X},\text{no drag}}$ (the denominator) rather than raising the numerator.
+In cases where the unconstrained controller is stable, $\mathbf{\eta}^{H,T}_{\text{drag}} \leq 1$ is guaranteed.
+
+The product of the first four matrices is the theoretical ideal mechanical power:
+\begin{equation}
+    \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}\,\mathbf{\eta}^{H,T}_{rad}\,\mathbf{\eta}^{H,T}_{drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\mathbf{Z}^{H,T}_{i,th})}.
+\end{equation}
+The remaining two efficiency matrices capture the loss to dynamic constraints and to PTO electrical inefficiency:
+\begin{equation}
+    \mathbf{\eta}^{H,T}_{limits} = \frac{\mathbf{P}^{H,T}_{F\dot{X}}}{\mathbf{P}^{H,T}_{F\dot{X},\text{ideal}}}, \qquad
+    \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}.
+\end{equation}
+
+Although it would be possible to formulate alternative variants such as $\mathbf{\eta}^{H,T}_{\text{drag},\text{var}} = \mathbf{P}_{IV}/\mathbf{P}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
+The current decomposition preserves multiplicativity, which is the key advantage of the formulation in \cref{eq:power-matrix-decomposition}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Economics Module Details}
+\label{sec:appendix-econ}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{RM3 Cost Breakdown Structure}
+\label{sec:appendix-econ-cbs}
+
+The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \cite{neary_reference_2014}, reproduced in \cref{tab:CBS}.
+Percentages are shown for both single-device ($N_{WEC}=1$) and array ($N_{WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \cref{eq:cost-power-law}.
+
+\begin{table}[htbp]
+    \centering
+
+    \caption{Cost Breakdown Structure}
+    \label{tab:CBS}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.45\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
+         CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
+         1.1 - Development&  26\%&  3\%&No\\
+         1.2 - Infrastructure&  6\%&  4\%&No\\
+         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
+         1.4 - Structural&  17\%&  46\%&$V_{\text{struct}}$\\
+         1.5 - Power Take Off&  4\%&  11\%&$F_{\text{max}}, P_{pk,\text{elec}}$\\
+         1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
+         1.7 - Installation&  34\%&  10\%&No\\
+         1.8 - Decommissioning&  9\%&  9\%&No\\
+         1.9 - Contingency&  9\%&  9\%&No\\
+ \textbf{Total 1.1-1.9 (CAPEX)}& 93.3\%& 97.6\%&-\\\hline
+ 2.1 - Insurance& 1.3\%& 0.4\%&No\\
+ 2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
+ 2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
+ 2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
+ 2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
+ 2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
+ \textbf{Total 2.1-2.6 (OPEX)}& 6.7\%& 2.4\%&-\\
+    \end{tabular}
+    \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power-Law Scaling with Number of Devices}
+\label{sec:appendix-econ-power-law}
+
+The per-WEC unit costs and prices in \cref{eq:unit-cost} ($C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, $p_{s}$) each decrease with the number of devices $N_{WEC}$ according to
+\begin{equation}\label{eq:cost-power-law}
+    C = C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta},
+\end{equation}
+where $C_\infty$ is the asymptotic large-scale unit cost, $C_1$ is the single-unit cost, and $\beta$ is the rate of decrease.
+
+The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained by curve-fitting \cref{eq:cost-power-law} to the CBS estimates for $N_{WEC} \in \{1, 10, 50, 100\}$ \cite{neary_reference_2014}, and are tabulated in \cref{tab:econ-model-values}.
+
+\begin{table}[h]
+    \centering
+    \caption{Cost model values for each CBS category}
+    \label{tab:econ-model-values}
+\begin{tabular}{
+        >{\raggedright\arraybackslash}p{0.33\linewidth}
+        >{\raggedright\arraybackslash}p{0.1\linewidth}
+        >{\raggedright\arraybackslash}p{0.25\linewidth}
+        >{\raggedright\arraybackslash}p{0.25\linewidth}}
+         CBS Category& Exponent $\beta$&Unit cost at scale $C_{\infty}$&Single-unit cost \newline $C_1$\\\hline
+         \textbf{1.1-1.3, 1.6-1.9} - Design-Independent CAPEX& 0.741& 1.24 \$M&13.92 \$M\\
+         \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
+         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N&Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
+ \textbf{2.1-2.6} - OPEX&0.557& 0&1.193 \$M\\
+    \end{tabular}
+    \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear PTO Cost Scaling}
+\label{sec:appendix-econ-pto-scaling}
+
+Linear PTO cost scaling is common for WEC techno-economic analysis.
+The RM3 cost numbers \cite{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
+The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \cite{nakhai_techno-economic_2022}.
+%the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
+% \begin{equation}
+%     C_{gen} = \begin{cases}
+%     80.86 \tau + 1032, & 0~\leq\tau <47~\text{Nm, ~~~~induction generator} \\
+%     9.151 \tau + 4386, & 47\leq\tau \leq 4000~\text{Nm, permanent magnet generator}
+%     \end{cases}
+% \end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Economic Validation}
+\label{sec:appendix-econ-validation}
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \cite{RM3} reference values.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figs/from-matlab/cost_vs_N_WEC.pdf}
+    \caption{Validation for cost scaling with number of WECs}
+    \label{fig:econ-nwec-validate}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Structures Module Details}
 \label{sec:appendix-structures}
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
@@ -594,11 +1692,13 @@ Second, it relates applied loads to stresses and deflection using analytical sol
 Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit state expressions for each possible failure mode of each major structural element under each design load case.
 For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
-\subsection{Equivalent Section Properties for Stiffened Plates}\label{sec:equivalent-thickness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalent Section Properties for Stiffened Plates}
+\label{sec:appendix-equivalent-thickness}
 Stiffeners are structural elements, frequently with I or T profiles, that can be welded or riveted to flat plates to provide additional load-carrying capacity and prevent buckling.
 Stiffened plates are common in marine and aerospace structural design because they are an efficient way to carry spatially distributed fluid loads.
 To analyze these compound sections, equivalent properties can be established that describe the overall bending stiffness of the combined section as if it were a simple uniform section, while still utilizing the maximum distance from the neutral axis of the irregular section to accurately determine stress.
-Figure~\ref{fig:stiffened-plate} illustrates the concept of equivalent thickness for a stiffened plate.
+\Cref{fig:stiffened-plate} illustrates the concept of equivalent thickness for a stiffened plate.
 \begin{figure}[hbtp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/equivalent_stiffness.pdf}
@@ -617,9 +1717,9 @@ Next, deflection of the stiffened plate is equal to the deflection of the equiva
 
 The maximum stress $\sigma$ of the stiffened plate is then:
 \begin{equation}\label{eq:plate-stress}
-    \sigma= 12M z_{max}/t_{eq}^3
+    \sigma= 12M z_{\text{max}}/t_{eq}^3
 \end{equation}
-where $M$ is the maximum moment per unit length and $z_{max}$ is the maximum distance from the neutral axis of the stiffened section.
+where $M$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
 This parallels the stress for an unstiffened plate of thickness $t$, which is $\sigma=6M/t^2 = 12 M(t/2)/t^3$.
 
 Note that this equivalent-thickness method of accounting for stiffeners assumes that as a whole, the stiffener-plate system deflects like a single plate element, rather than as set of multiple plate elements separated by stiffeners.
@@ -640,25 +1740,26 @@ The so-called effective breadth ratio $\rho$ is used to quantify the validity of
 The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\psi$, found as follows:
 \begin{equation}
 \begin{aligned}
-    \lambda &= \frac{1.052}{\sqrt{k_{buckle}}} \frac{w}{t} \sqrt{\frac{f_1}{E}} \\
+    \lambda &= \frac{1.052}{\sqrt{k_{\text{buckle}}}} \frac{w}{t} \sqrt{\frac{f_1}{E}} \\
     \psi&=\frac{f_2}{f_1}
     \end{aligned}
 \end{equation}
 with $t$ referring to the plate unstiffened thickness, $w$ as the distance between stiffeners, $f_1$ as the maximum compression stress along the width, and $f_2$ as the maximum tension stress along the width (or minimum compression stress, if there is no tension).
 By convention, compression stress is positive and tension is negative, so $\psi$ ranges from $-\infty$ to $+1$.
-The plate buckling coefficient $k_{buckle}$ is expressed as:
+The plate buckling coefficient $k_{\text{buckle}}$ is expressed as:
 \begin{equation}\label{eq:k-buckle}
-  k_{buckle} = 4+2\left(1-\psi\right)^3+2\left(1-\psi\right)
+  k_{\text{buckle}} = 4+2\left(1-\psi\right)^3+2\left(1-\psi\right)
 \end{equation}
 This effective breadth procedure follows the American Iron and Steel Institute design manual \cite{american_iron_and_steel_institute_cold-formed_1991}.
 Rather than enforcing $\lambda<0.673$, corresponding with $\rho_\lambda=1$, MDOcean more flexibly requires $\lambda<0.809$, corresponding to $\rho_\lambda=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
-MDOcean also uses $k_{buckle}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\lambda$.
+MDOcean also uses $k_{\text{buckle}}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\lambda$.
 
 Broadening the design space to allow for more dominant stiffeners with higher slenderness factors would require modeling the stiffener-plate system not as a plate with the stiffeners absorbed into an equivalent thickness, but as individual stiffeners with the plate absorbed into the effective breadth.
 That model has other complexities such as the shear lag phenomenon so is left to future extensions \cite{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
 
 %\hl{Describe how this informs the lower design variable bounds on the structural stiffnesses.}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Float}
 The float is composed of 12 watertight stiffened shells in the shape of trapezoidal prisms.
 Each shell consists of a top and a bottom trapezoidal plate, and an inner, an outer, and two side rectangular plates.
@@ -666,83 +1767,85 @@ All edges are welded.
 Rather than model the deflections of each edge and apply compatibility, for simplicity the edges of each plate are conservatively modeled as fixed.
 The top and bottom plates are the only ones with external heave loads, arising from the float-spar tubular connection and the hydrodynamic pressure respectively.
 
-The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \figurename~\ref{fig:trapezoid}).
+The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \cref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
-For example, \cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
-They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{min}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
-This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{min}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{min}^2$.
-For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{min}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{min}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{min}=b_1$, and intermediate trapezoids to have an $x_{min}$ that depends on the trapezoid slope.
+For example, Ref.~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
+They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
+This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{\text{min}}^2$.
+For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{\text{min}}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{\text{min}}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{\text{min}}=b_1$, and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
 The nominal RM3 design falls into this intermediate case, with $b_1\approx1.7$~m, $b_2\approx5.2$~m, and $h_0\approx6.8$~m.
-These dimensions are shown in figure~\ref{fig:trapezoid}.
+These dimensions are shown in \cref{fig:trapezoid}.
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/from-matlab/trapezoid.pdf}
-    \caption{Trapezoidal float plate with inscribed circle used to determine $x_{min}$}
+    \caption{Trapezoidal float plate with inscribed circle used to determine $x_{\text{min}}$}
     \label{fig:trapezoid}
 \end{figure}
 
-To approximately capture the dimensions of a trapezoid which effectively set the deflection curvature and therefore stress, $x_{min}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $b_1$.
+To approximately capture the dimensions of a trapezoid which effectively set the deflection curvature and therefore stress, $x_{\text{min}}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $b_1$.
 This inscribed circle scheme satisfies all limit cases mentioned above and can be calculated as
 \begin{equation}
-    x_{min} = \begin{cases}b_1 \left( m + \sqrt{1+m^2}\right), & h_0 \geq \sqrt{b_1b_2} \\ h_0, & h_0 < \sqrt{b_1b_2}\end{cases}
+    x_{\text{min}} = \begin{cases}b_1 \left( m + \sqrt{1+m^2}\right), & h_0 \geq \sqrt{b_1b_2} \\ h_0, & h_0 < \sqrt{b_1b_2}\end{cases}
 \end{equation}
 where $m=(b_2-b_1)/(2h_0)$ is the slope of the trapezoid.
 The expression is continuous at $h_0=\sqrt{b_1b_2}$, the point where the inscribed circle becomes tangent to base $b_2$ in addition to $b_1$.
 Continuity of the model across the design space avoids problems in the gradient-based optimization due to undefined gradients.
-The inscribed circle model gives $x_{min}\approx2.2$~m for the nominal float design.
-In addition to the shorter side length $x_{min}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $x_{max}$, which for the trapezoid is taken as
+The inscribed circle model gives $x_{\text{min}}\approx2.2$~m for the nominal float design.
+In addition to the shorter side length $x_{\text{min}}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $x_{\text{max}}$, which for the trapezoid is taken as
 \begin{equation}
-    x_{max} = \begin{cases} h_0,& h_0 \geq \sqrt{b_1b_2} \\ \frac{b_1+b_2}{2} + h(1-\sqrt{1+m^2}), & h_0 < \sqrt{b_1 b_2}\end{cases}
+    x_{\text{max}} = \begin{cases} h_0,& h_0 \geq \sqrt{b_1b_2} \\ \frac{b_1+b_2}{2} + h(1-\sqrt{1+m^2}), & h_0 < \sqrt{b_1 b_2}\end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
 
 \subsubsection{Float Bottom Plate}
 Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then:
 \begin{equation}\label{eq:bottom-plate-moment}
-M_{bot}=\beta q x_{min}^2
+M_{bot}=\beta q x_{\text{min}}^2
 \end{equation}
-for $\beta$ tabulated as a function of $x_{max}/x_{min}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
-While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{max}/x_{min}$.
+for $\beta$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
 
 \subsubsection{Float Top Plate}
-The top float plate has equivalent thickness $t_{f,top,eq}$ and the same dimensions and edge fixity as the bottom plate.
+The top float plate has equivalent thickness $t_{f,\text{top},eq}$ and the same dimensions and edge fixity as the bottom plate.
 Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $r_0$, where $r_0$ is assumed to be at least half the thickness.
-Under these conditions, either the stress at the center $\sigma_{cent}$ or along the longer edge $\sigma_{edge}$ may dominate:
+Under these conditions, either the stress at the center $\sigma_{\text{cent}}$ or along the longer edge $\sigma_{\text{edge}}$ may dominate:
 \begin{equation}\label{eq:top-plate-stress}
     \begin{aligned}
-    \sigma_{edge}&= \frac{3W}{2\pi t_{f,top,eq}^2}\left( (1+\nu)\ln\frac{2x_{min}}{\pi r_0}+\beta_1\right)\\
-        \sigma_{cent}&=-\beta_2 W/t_{f,top,eq}^2
+    \sigma_{\text{edge}}&= \frac{3W}{2\pi t_{f,\text{top},eq}^2}\left( (1+\nu)\ln\frac{2x_{\text{min}}}{\pi r_0}+\beta_1\right)\\
+        \sigma_{\text{cent}}&=-\beta_2 W/t_{f,\text{top},eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{max}/x_{min}$ in \cite{young_roarks_2001}.
-The bending moment per unit length is then found as $M_{top}=\sigma_{edge}t_{f,top,eq}^2/6$.
-However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in \cite{RM3,previsic_reference_2011}.
+using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \cite{young_roarks_2001}.
+The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
+However, unlike \cref{eq:bottom-plate-moment}, it is found that \cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in references \cite{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue and remains future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \cref{tab:struct-calc-vs-scale}.
 
 \subsubsection{Other Float Plates}
 The other float plates besides the top and bottom ones experience only the edge reaction moments from the top and bottom plates, with no additional external loads in heave. 
-Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design. This prevents the need for a separate structural analysis of the side plates.
+Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design.
+This prevents the need for a separate structural analysis of the side plates.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
-For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{plate}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
-In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{heave}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{tube}$.
-Formulas for the concentrated loading are given in \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in \cite{young_roarks_2001}.
-The 24 radial plate stiffeners are taken into account with the procedure described in section~\ref{sec:equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
-The tube force $F_{tube}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{plate}=\delta_{tube}$, where the tube displacement is expressed in terms of its bending stiffness $K_{tube}$.
+For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{\text{plate}}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
+In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
+Formulas for the concentrated loading are given in reference \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in reference \cite{young_roarks_2001}.
+The 24 radial plate stiffeners are taken into account with the procedure described in \cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
+The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
 \begin{equation}
-    \sigma_r =  \frac{F_{heave}}{S_{eq}} \left( 
-    \overline{M}_{r,dis} + \overline{M}_{r,con} \frac{\overline{\delta}_{plate,dis}}{\frac{D_{eq}}{a^2K_{tube}} - \overline{\delta}_{plate,con}}
+    \sigma_r =  \frac{F_{\text{heave}}}{S_{eq}} \left( 
+    \overline{M}_{r,dis} + \overline{M}_{r,con} \frac{\overline{\delta}_{\text{plate},dis}}{\frac{D_{eq}}{a^2K_{\text{tube}}} - \overline{\delta}_{\text{plate},con}}
     \right)
 \end{equation}
 
-The critical buckling stress $\sigma_{buckle}$ is found according to \cite{american_bureau_of_shipping_requirements_2022}.
-The ultimate stress is then $\sqrt{\sigma_Y \sigma_{buckle}}$  \cite{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
+The critical buckling stress $\sigma_{\text{buckle}}$ is found according to \cite{american_bureau_of_shipping_requirements_2022}.
+The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \cite{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
-The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
-\begin{figure}
+The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/damping_plate_flowchart.pdf}
     \caption{Calculation process flowchart for the damping plate structural assessment}
@@ -751,45 +1854,51 @@ The procedure is summarized in Figure~\ref{fig:damping-plate-flowchart}.
 %\hl{Todo: typeset equations for all the inputs with leftmost boxes: Seq, Deq, Ktube, the nondim variables, and sigma buckle.
 
 %Todo: describe the plots of plate stress/deflection over space, maybe add dots in the 4 corners showing the point of load application}
-\begin{figure}
+\Cref{fig:damping-plate-struct} shows the spatial distribution of radial bending moment and deflection across the plate radius for the nominal design, computed using the analytical solutions described above.
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/damping_plate_moment.pdf}
-    \caption{Damping plate moment}
-    \label{fig:damping-plate-moment}
+    \begin{subfigure}[t]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{figs/from-matlab/damping_plate_moment.pdf}
+        \caption{Damping plate moment}
+        \label{fig:damping-plate-moment}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{figs/from-matlab/damping_plate_deflection.pdf}
+        \caption{Damping plate deflection}
+        \label{fig:damping-plate-deflection}
+    \end{subfigure}
+    \caption{Damping plate structural analysis: radial bending moment (a) and deflection (b) over the plate radius.}
+    \label{fig:damping-plate-struct}
 \end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/damping_plate_deflection.pdf}
-    \caption{Damping plate deflection}
-    \label{fig:damping-plate-deflection}
-\end{figure}
-In Figure~\ref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
+In \Cref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Column}
-As stated in \ref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
+As stated in \cref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
 Meanwhile, the hydrostatic pressure at the bottom creates a substantial compressive hoop stress.
 
-The Euler critical buckling force $F_{crit}$ is:
+The Euler critical buckling force $F_{\text{crit}}$ is:
 \begin{equation}
-    F_{crit} = \frac{\pi^2 E I}{(K_{end} L)^2}
+    F_{\text{crit}} = \frac{\pi^2 E I}{(K_{end} L)^2}
 \end{equation}
 where $E$ is the Young's modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface), and $L$ is the beam length, set to $h_s$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \cite{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
-    FOS = \frac{\sigma_{s,max}}{\sigma_s} = \frac{\sigma_Y \frac{\zeta + \sqrt{\zeta^2+4\omega}}{2}}{\frac{F}{A} + q}
+    FOS = \frac{\sigma_{s,\text{max}}}{\sigma_s} = \frac{\sigma_Y \frac{\zeta + \sqrt{\zeta^2+4\omega}}{2}}{\frac{F}{A} + q}
 \end{equation}
 where $\zeta$ and $\omega$ are defined as follows:
 \begin{equation}
 \begin{aligned}
-     \zeta &= 1 - P_r(1 - P_r)~\frac{\sigma_Y}{F_{crit}/A} - \frac{\sigma_\theta}{\sigma_Y} \\
-    \omega &= \frac{\sigma_\theta}{2\sigma_Y}  (1 - \frac{\sigma_\theta}{2\sigma_Y})
+     \zeta &= 1 - P_r(1 - P_r)~\frac{\sigma_Y}{F_{\text{crit}}/A} - \frac{\sigma_\theta}{\sigma_Y} \\
+    \omega &= \frac{\sigma_\theta}{2\sigma_Y}  \left(1 - \frac{\sigma_\theta}{2\sigma_Y}\right)
 \end{aligned}
 \end{equation}
 and the hoop stress $\sigma_\theta$ is 
 \begin{equation}
      \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
 \end{equation}
-$P_r$ is a constant and $q$ is the distributed hydrosatic pressure at the bottom of the spar.
+$P_r$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
 These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \cite{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
 % \begin{equation}
@@ -803,18 +1912,22 @@ These equations assume that the spar is compact, meaning that local buckling of 
 % \begin{equation}
 % \begin{aligned}
 %     FOS_{y~{i,j}} = \frac{\sigma_y}{\sigma_{vm,ij}} ~~&~~
-%     FOS_{b,j} = \frac{F_{crit}}{F_j} \\
+%     FOS_{b,j} = \frac{F_{\text{crit}}}{F_j} \\
 %     i = 1..3, ~& j = 1..2
 % \end{aligned}
 % \end{equation}
 
 
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Parameters}
 \label{sec:appendix-parameters}
+\Cref{tab:parameters} lists the constant parameters assumed in this work, including their descriptions, values, and units.
+
 \begin{table}[ht]
 \centering
-
+\caption{Selected Parameters}
+\label{tab:parameters}
 %\setlength{\tabrowsep}{} % default value:
 \renewcommand{\arraystretch}{1.4}
 
@@ -825,31 +1938,28 @@ $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\
 $h$& Water depth & 100 & m  \\ 
 JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
 $H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,struct}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
+$H_{s,\text{struct}}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
 $T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{struct}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
+$T_{\text{struct}}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
 $\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
 $E$& Material Young's modulus& 200 & GPa  \\ 
-$cost_m$ & Material cost& 1.89 & \$/kg \\ 
+$\text{cost}_m$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
 %$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
 %$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
 %$t_{fb}$ & Float Bottom Thickness & 0.014 & m  \\ 
 %$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\ 
-%$B_{min}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
-$FOS_{min}$ & Minimum factor of safety& 1.5 & -  \\ 
-$D_{d_{min}}$ & Minimum damping plate diameter & 30 & m  \\ 
+%$B_{\text{min}}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
+$FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
+$D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
 $FCR$ & Fixed charge rate& 10.8 & \%  \\ 
 $N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
 $D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
 $h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
 $T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
-$F_{heave,mult}$ & Heave force multiplier & 1.65 & - \\ 
+$F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
- \caption{Selected Parameters}\label{tab:parameters}
-\end{table}
+ \end{table}
 \clearpage
-
-\end{appendices}

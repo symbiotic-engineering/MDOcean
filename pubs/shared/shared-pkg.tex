@@ -1,0 +1,119 @@
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{soul}      % for highlighting text with \hl 
+\usepackage{multirow}  % for multi row/col tables
+\usepackage{tikz}
+\usepackage{array}     % required for text wrapping in tables
+\usepackage{pdflscape} % for landscape table
+\usepackage{longtable} % for table going multiple pages
+\usepackage{rotating}  % for rotated table headers
+\usepackage{color}     % also required for highlighting 
+
+% save bibliography command before bibcop modifies it
+\makeatletter
+\let\bibcop@truebibliography\bibliography
+\makeatother
+\usepackage{bibcop}    % warnings for incorrect citations
+
+\usepackage[title,titletoc]{appendix} % make it possible to do \ref of an appendix section without automatically getting the word "Appendix"
+\usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
+\usepackage{verbatim}  % word counts
+\usepackage{textcomp}  % cent symbol
+
+\ifdefined\DISSERTATION
+  \usepackage[numbers,square]{natbib}    % citep command
+\else
+  \usepackage[numbers]{natbib}             % citep command
+\fi
+\usepackage[unicode,hypertexnames=false]{hyperref}
+\usepackage{cleveref}
+
+\newcommand*\rot{\rotatebox{90}} % for rotated table headers
+\newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
+
+\newcommand{\summarytexcount}[1]{\textbf{Word Count}
+  \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
+  \verbatiminput{#1.wcsum}%
+}
+
+\newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
+  \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
+  \verbatiminput{#1.wcdetail}
+}%
+
+\def\fillandplacepagenumber{% for landscape page numbers
+ \par\thispagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
+
+% allows bibcop to be used when bibliography includes multiple arguments
+\makeatletter
+\AtBeginDocument{%
+\ifdefined\bibliography
+
+  \RequirePackage{etoolbox}
+
+  \renewcommand{\bibliography}[1]{%
+    \def\bibcop@list{#1}%
+    \@for\bibcop@file:=\bibcop@list\do{%
+      \edef\bibcop@file{\bibcop@file}%
+      \ifx\bibcop@file\@empty\else
+        \expandafter\bibcop@processbib\expandafter{\bibcop@file}%
+      \fi
+    }%
+    \bibcop@truebibliography{#1}%
+  }
+
+  \newcommand{\bibcop@processbib}[1]{%
+    % trim spaces
+    \edef\bibcop@file{\zap@space#1 \@empty}%
+
+    % skip empty entries
+    \ifx\bibcop@file\@empty
+      \relax
+    \else
+
+      % build .bib filename
+      \edef\bibcop@bibfile{\bibcop@file.bib}%
+
+      % use kpsewhich to resolve path using BIBINPUTS
+      \immediate\write18{kpsewhich \bibcop@bibfile > aux/\jobname.bibcop.tmp}%
+
+      % read result
+      \begingroup
+        \endlinechar=-1
+        \newread\bibcop@in
+        \openin\bibcop@in=aux/\jobname.bibcop.tmp
+        \read\bibcop@in to \bibcop@resolved
+        \closein\bibcop@in
+        \xdef\bibcop@resolved{\bibcop@resolved}%
+      \endgroup
+
+      % fallback if kpsewhich fails
+      \ifx\bibcop@resolved\@empty
+        \edef\bibcop@resolved{\bibcop@bibfile}%
+      \fi
+
+      % call original bibcop
+      \begingroup
+        \edef\x{\endgroup
+          \noexpand\bibcop@exec{\bibcop@resolved}%
+        }%
+      \x
+
+    \fi
+  }
+
+\fi
+}
+\AddToHook{cmd/appendices/before}{%
+  \crefalias{section}{appendix}%
+  \crefalias{subsection}{appendix}
+  \crefalias{subsubsection}{appendix}
+  \crefalias{chapter}{appendix}
+}
+\makeatother

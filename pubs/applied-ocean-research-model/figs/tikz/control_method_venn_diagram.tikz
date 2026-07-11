@@ -1,0 +1,64 @@
+\begin{tikzpicture}[scale=1, every node/.style={font=\small}]
+
+%%%%%%%%%%%% Circles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Circle radius
+\def\r{3.2}
+\def\overlapFrac{.5}
+
+% Circle centers (spread farther apart)
+\coordinate (A) at (-{\r*(1-\overlapFrac)},0);
+\coordinate (B) at ( {\r*(1-\overlapFrac)},0);
+\coordinate (C) at ( 0,{\r*(1-\overlapFrac)*sqrt(3)});
+
+% Draw circles
+\begin{scope}
+  \clip (A) circle (\r);
+  \clip (B) circle (\r);
+  \clip (C) circle (\r);
+  \fill[green!35] (-10,-10) rectangle (10,10);
+\end{scope}
+\draw[thick] (A) circle (\r);
+\draw[thick] (B) circle (\r);
+\draw[thick] (C) circle (\r);
+
+%%%%%%%%%%%%% Circle titles %%%%%%%%%%%%%%%%%%%
+\node[align=center, font=\bfseries] at ($(A)+(-.7,-4)$)
+{Frequency-domain\\synthesis};
+
+\node[align=center, font=\bfseries] at ($(B)+(.7,-4)$)
+{Constraint-aware\\optimal control};
+
+\node[align=center, font=\bfseries] at ($(C)+(0,4)$)
+{Nonlinear controller\\synthesis};
+
+%%%%%%%%%%%%% Single-circle regions %%%%%%%%%
+\node[align=center] at ($(A)+(-1.5,-1)$)
+{Imped. matching\\Loop shaping\\PID tuning\\$H_\infty$, $H_2$};
+
+\node[align=center] at ($(B)+(1.5,-0.6)$)
+{Linear MPC\\Constr. LQR\\Trajectory opt.};
+
+\node[align=center] at ($(C)+(0,1.6)$)
+{Feedback lin.\\Sliding mode\\Backstepping\\Lyapunov\\Latching/declutching};
+
+%%%%%%%%% Pairwise overlaps %%%%%%%%%%%%%%%%%%%%%
+\node[align=center, font=\footnotesize] at (-1.8,2.3)
+{Harmonic bal.\\Descr. fn.\\Spec. lin.};
+
+\node[align=center, font=\footnotesize] at (0,-1.45)
+{Constr. loop shpg.\\Lin. spectral OC\\Constr. IM\\LMIs};
+
+\node[align=center, font=\footnotesize] at (1.95,1.85)
+{Ctl. Barrier Fn.\\Constr. iLQR\\Diff. DP\\NMPC\\PMP};
+
+%%%%%%% Center overlap %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\node[align=center] at (0,1.35)
+{Modified\\freq-domain};
+
+\node[align=center] at (0,0.35)
+{Pseudospectral\\Nonlin. spec. OC};
+%{DF\\inversion \\+ freq-domain \\constr. OC};
+
+\draw[thick,rounded corners] (-1.05,1.78) rectangle (1.05,0.88);
+
+\end{tikzpicture}

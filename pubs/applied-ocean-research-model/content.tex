@@ -1,0 +1,56 @@
+\input{sections/model-intro}
+%\clearpage
+\input{sections/model-overview}
+%\clearpage
+\input{sections/module-details}
+%\clearpage
+\input{sections/benchmarking}
+%\clearpage
+\input{sections/discussion}
+
+\section{Conclusion}
+% Summary:
+This paper develops MDOcean, an open-source semi-analytical modeling framework for two-body axisymmetric point-absorber wave energy converters that integrates hydrodynamics, dynamics, control, structures, and economics in a single fast simulation.
+
+% Model
+\ifdefined\DISSERTATION
+    The geometry module calculates volumes, areas, and the pitch stability margin with simple algebraic relations, and the economics module calculates design-dependent cost from structural material volume and powertrain force and power ratings.
+    The hydrodynamics module implements the matched eigenfunction expansion method (MEEM) for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing BEM solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current MEEM model.
+    This achieves an order of magnitude speedup compared to the popular BEM solver Capytaine.
+    The dynamics module employs describing functions to extend the typical frequency-domain formulation to capture nonlinearities and dynamic constraints, including viscous drag and generator force saturation, and includes a novel analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller.
+    This achieves a three-order-of-magnitude computational speedup over the common time-domain solver WEC-Sim.
+    The structures module uses an equivalent-thickness model of stiffened plates and a library of canonical solutions to structural boundary-value problems to assess the factor of safety of the float bottom plate, spar shell, and damping plate in cyclic fatigue and storm load cases.
+    This represents, to the authors' knowledge, the only public WEC structural simulation regardless of modeling technique.
+    Finally, the economics module calculates the design-dependent cost based on structural material volume and powertrain force and power rating, performing a straightforward LCOE calculation.
+\else
+    The geometry module handles hydrostatics.
+    The hydrodynamics module uses the matched eigenfunction expansion method (MEEM) for the float, achieving an order-of-magnitude speedup over BEM.
+    The dynamics module employs describing functions and a novel analytical QCQP for constrained linear control, achieving a three-order-of-magnitude speedup over time-domain solvers.
+    The structures module uses semi-analytical stiffened-plate models with realistic failure criteria for fatigue and storm load cases---to the authors' knowledge, the only public WEC structural simulation.
+    The economics module includes a calibrated cost model.
+    Full MEEM derivation appears in the forthcoming \cite{bimali_matrix_2026}.
+\fi
+
+
+Validation against WEC-Sim and the RM3 reference design demonstrates that MDOcean reproduces the dynamics of an established time-domain solver to within a few percent under matched modeling assumptions and within single-digit-percent JPD-weighted annual average power under realistic conditions, despite worst-case per-sea-state errors that can be larger due to drag and inter-body phase sensitivity in the 2-DOF model.
+Three tuned scale factors, on storm force, average power, and structural mass, bring the simulated outputs within 1\% of the reference model report across all major modules.
+Total simulation runtime is \resultsAOR[simRuntime], which is 1-3 orders of magnitude faster than established baselines and enables multidisciplinary optimization workflows that would otherwise be prohibitive.
+
+The methodological contribution most relevant to the broader WEC modeling community is the modified frequency-domain dynamics formulation, which unifies prior describing-function and constrained-control approaches and adds a closed-form QCQP solution with a geometric interpretation on the complex plane of the reflection coefficient.
+This solves analytically a problem that previously required numerical optimization, and we believe it is the first application of describing functions for both controller synthesis and evaluation in wave energy.
+
+More broadly, the results suggest that semi-analytical multidisciplinary modeling can provide a useful intermediate between simplified conceptual studies and computationally intensive high-fidelity simulation, enabling both rapid optimization and improved physical insight during early-stage WEC development.
+
+% Discussion
+\ifdefined\DISSERTATION
+    A key feature of this study that other WEC models lack is the inclusion of more realistic effects such as shape-informed structural stress, force saturation, amplitude limits, and a nonlinear drag model.
+    Nonetheless, the model has limitations: the structural loads and stresses have non-trivial uncertainty due to the regular-wave assumption in storm load cases; the impact of irregular waves on operational power and constraints is approximated rather than directly modeled; surge force is not propagated to the structures module and no mooring cost model is included; and only a single WEC archetype (two-body axisymmetric point absorber) is considered.
+    Future modeling work should pursue these enhancements alongside extensions to additional WEC archetypes, generator magnetics, and probabilistic / spectral analyses for fatigue, grid integration, and storage sizing.
+\else
+    Principal limitations include the regular-wave assumption in storm load cases, the approximation of irregular-wave operational dynamics through equivalent regular waves, the absence of surge force in the structures module and of a mooring cost model, and restriction to a single WEC archetype.
+Detailed future-work directions are given in \cref{sec:unmodeled-effects}.
+\fi
+
+% Impact of findings:
+The companion paper \cite{mccabe_leveraging_2026} applies MDOcean to a multidisciplinary techno-economic optimization of the RM3 reference design.
+MDOcean is open-source and is intended to support continued community development of fast multidisciplinary WEC modeling tools that integrate insights from hydrodynamics, controls, structures, and economics in a unified framework.

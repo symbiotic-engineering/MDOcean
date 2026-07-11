@@ -44,7 +44,7 @@ function [] = improvePlot()
         [100 100 plot_width_in_px plot_height_in_px]);
 
     % Grab the axes handle(s)
-    axis_handles=findobj(hFig,'type','axe');
+    axis_handles = [findobj(hFig,'type','polaraxe'), findobj(hFig,'type','axe')];
 
     % Iterate over all axes handle(s), this is useful if there are subplots
     for i = 1:length(axis_handles)
@@ -55,10 +55,12 @@ function [] = improvePlot()
         
         set(ax, 'Box', 'on');
 
-        % Change font size for axis text labels
-        set(get(ax, 'XLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
-        set(get(ax, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
-        
+        % Change font size for axis text labels (not available for polar axes)
+        if ~isa(ax,'matlab.graphics.axis.PolarAxes')
+            set(get(ax, 'XLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+            set(get(ax, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+        end
+
         try % try statement to avoid error with categorical axes
         ax.XRuler.Exponent = 0; % Remove exponential notation from the X axis
         ax.YRuler.Exponent = 0; % Remove exponential notation from the Y axis
