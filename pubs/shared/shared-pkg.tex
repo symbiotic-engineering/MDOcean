@@ -1,15 +1,16 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{soul}      % for highlighting text with \hl 
-\usepackage{multirow}  % for multi row/col tables
+\usepackage{soul}       % for highlighting text with \hl 
+\usepackage{multirow}   % for multi row/col tables
 \usepackage{tikz}
-\usepackage{array}     % required for text wrapping in tables
-\usepackage{pdflscape} % for landscape table
-\usepackage{longtable} % for table going multiple pages
-\usepackage{rotating}  % for rotated table headers
-\usepackage{color}     % also required for highlighting 
+\usepackage{array}      % required for text wrapping in tables
+\usepackage{pdflscape}  % for landscape table
+\usepackage{longtable}  % for table going multiple pages
+\usepackage{rotating}   % for rotated table headers
+\usepackage{color}      % also required for highlighting 
 \usepackage{pdftexcmds} % for detecting if shell escape is enabled
-\usepackage{enumitem} % bullets
+\usepackage{enumitem}   % bullets
+\usepackage{booktabs}   % for better looking tables
 
 % save bibliography command before bibcop modifies it
 \makeatletter
@@ -27,9 +28,13 @@
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
 \newcommand{\singleColMacro}[1]{%
-    \ifdefined\JOURNALTWOCOLUMN\onecolumn%
+    \ifdefined\JOURNALTWOCOLUMN
+      \onecolumn%
+    \fi
     {#1}%
-    \ifdefined\JOURNALTWOCOLUMN\twocolumn%
+    \ifdefined\JOURNALTWOCOLUMN
+      \twocolumn%
+    \fi
 }
 
 \usepackage{verbatim}  % word counts
