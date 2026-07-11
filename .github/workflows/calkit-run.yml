@@ -97,12 +97,12 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: Generate calkit_stages.yaml
-        uses: calkit/run-action@v2
+        uses: rebeccamccabe/run-action@main
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: make-calkit-stages
+          run_args: make-calkit-stages --pull --allow-missing
           save: false
-          cache_dvc: false
+          pull_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
@@ -110,14 +110,12 @@ jobs:
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
-        uses: calkit/run-action@v2
+        uses: rebeccamccabe/run-action@main
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          # render-quarto-pdf
-          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz test-aor test-re check-dup-json-keys
+          run_args: --keep-going --log --pull --allow-missing build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz test-aor test-re check-dup-json-keys
           pull_dvc: false
           save: false
-          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
