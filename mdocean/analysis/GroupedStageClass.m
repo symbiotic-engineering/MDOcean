@@ -47,6 +47,12 @@ classdef (Abstract) GroupedStageClass < handle
 
     methods
         function obj = GroupedStageClass(p,b)
+            if nargin < 1
+                p = [];
+            end
+            if nargin < 2
+                b = [];
+            end
             class_name = class(obj);
             analysis_handle = str2func([class_name '.analysis_fcn']);
             postpro_handle = str2func([class_name '.post_process_fcn']);
