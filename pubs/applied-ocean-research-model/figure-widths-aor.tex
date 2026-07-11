@@ -1,0 +1,25 @@
+\newcommand{\FigureWidthDefaultTwoCol}{\linewidth}
+\newcommand{\FigureWidthDefaultOneCol}{0.75\linewidth}
+
+\newcommand{\DeclareFigureWidth}[3]{%
+    \expandafter\def\csname figwidth@#1@twocol\endcsname{#2}%
+    \expandafter\def\csname figwidth@#1@onecol\endcsname{#3}%
+}
+
+\newcommand{\FigureWidth}[1]{%
+    \ifdefined\JOURNALTWOCOLUMN
+        \ifcsname figwidth@#1@twocol\endcsname
+            \csname figwidth@#1@twocol\endcsname
+        \else
+            \FigureWidthDefaultTwoCol
+        \fi
+    \else
+        \ifcsname figwidth@#1@onecol\endcsname
+            \csname figwidth@#1@onecol\endcsname
+        \else
+            \FigureWidthDefaultOneCol
+        \fi
+    \fi
+}
+
+\DeclareFigureWidth{dims}{\linewidth}{0.75\linewidth}
