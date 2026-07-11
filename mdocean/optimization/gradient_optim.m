@@ -38,7 +38,7 @@ else
 end
 
 if nargin<4
-    which_objs = [1 2]; % run both objectives by default
+    which_objs = [1 2 3]; % run both objectives by default
     % 1 = min LCOE
     % 2 = min design-dependent capex cost, subject to power above threshold
     % 3 = max average power
@@ -106,12 +106,12 @@ function [Xs_opt, objs_opt, flags, probs, ...
     probs = cell([1 length(objs)]); 
     
     % allocate outputs
-    Xs_opt = zeros(length(X),num_objectives_to_run);
-    objs_opt = zeros(1,num_objectives_to_run);
-    flags = zeros(1,num_objectives_to_run);
-    grads = zeros(length(X)-1,num_objectives_to_run);
-    hesses = zeros(length(X)-1,length(X)-1,num_objectives_to_run);
-    fmincon_outputs = cell(1,num_objectives_to_run);
+    Xs_opt = zeros(length(X), num_objectives_to_run);
+    objs_opt = zeros(1, num_objectives_to_run);
+    flags = zeros(1, num_objectives_to_run);
+    grads = zeros(length(X)-1, num_objectives_to_run);
+    hesses = zeros(length(X)-1, length(X)-1, num_objectives_to_run);
+    fmincon_outputs = cell(1, num_objectives_to_run);
 
     % add nonlinear constraints
     prob = optimproblem();
@@ -124,12 +124,10 @@ function [Xs_opt, objs_opt, flags, probs, ...
         prob.Constraints.(name) = A_lin(i,:)*X.' <= b_lin(i);
     end
 
-    % iterate through the two objectives: LCOE and P_var
+    % iterate through the objectives
     for i = 1:num_objectives_to_run
         which_obj = which_objs(i);
         prob.Objective = objs(which_obj);
-        
-        %show(prob)
 
         if length(x0_input)==1
             x0 = x0_input;

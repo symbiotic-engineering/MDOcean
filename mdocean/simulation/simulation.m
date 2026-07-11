@@ -100,13 +100,14 @@ if model_grid_value
                             in.eco_cost_steel, in.eco_cost_fiberglass, ...
                             in.eco_cost_distance, in.eco_cost_carbon);
 else
-    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost,net_eco_value] = deal(0);
+    [CEM_CO2, CEM_wec_capacity, CEM_grid_cost, net_eco_value] = deal(0);
 end
 
 
 J_capex_design = capex_design / 1e6; % convert $ to $M
+J_P_avg = -P_avg_elec / 1e6; % convert W to MW, negate to make it a minimization problem
 
-J = [LCOE, J_capex_design, CEM_grid_cost, net_eco_value];
+J = [LCOE, J_capex_design, J_P_avg, CEM_grid_cost, net_eco_value];
 
 %% Assemble constraints g(x) >= 0
 num_g = 25+numel(p.JPD)+length(p.T_struct);
