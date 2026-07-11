@@ -134,7 +134,7 @@ function [fig_array, ...
     end
 
     improvePlot;
-    fig1.Position(3:4) = [800 400];
+    fig.Position(3:4) = [800 400];
 
     % --- Outputs ---
     fig_array         = [fig, fig2];
