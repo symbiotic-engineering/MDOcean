@@ -49,13 +49,10 @@
 \usepackage{moresize}
 \usepackage[skip=0.5ex]{subcaption}
 
-\AtBeginEnvironment{subappendices}{%
-  \chapter*{Chapter \thechapter \quad\appendixname}
-  %\numberline{<num-chap>A}
-  \addcontentsline{toc}{chapter}{%
-    \protect\numberline{\thechapter A}\appendixname}
-  \counterwithin{figure}{section}
-  \counterwithin{table}{section}
+% appendices after each chapter
+\newcommand{\appendixchapter}[1]{%
+  \chapter*{#1}
+  \addcontentsline{toc}{chapter}{#1}
 }
 
 % nicer formatting of chapter titles
@@ -130,6 +127,7 @@ Let's make sure the world knows it.
 \input{acknowledgements.tex}
 \end{acknowledgements}
 
+\setcounter{tocdepth}{1}
 \contentspage
 \tablelistpage
 \figurelistpage
@@ -154,9 +152,8 @@ This chapter is adapted from \cite{mccabe_development_2026}, currently under rev
 See \cref{sec:research-outputs} for other research outputs associated with this work.
 \subimport{../applied-ocean-research-model/}{content}
 
+\appendixchapter{System Modeling Appendices}
 \begin{subappendices}
-  \renewcommand{\appendixtocname}{Chapter 1 Appendix}
-  \section{System Modeling Appendices}
   \subimport{../applied-ocean-research-model/}{appendices}
 \end{subappendices}
 
@@ -175,6 +172,11 @@ See \cref{sec:research-outputs} for other research outputs associated with this 
 
 \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{FLMguide}
 
+\appendixchapter{Hydrodynamic Modeling Appendices}
+\begin{subappendices}
+  \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{jfm-appendix}
+\end{subappendices}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Design Optimization]{Design Optimization\\
 \large Leveraging Multidisciplinary Design Optimization to \\[-4ex]
@@ -191,6 +193,11 @@ This chapter is adapted from \cite{mccabe_leveraging_2026}, \hl{(pending submiss
 See \cref{sec:research-outputs} for other research outputs associated with this work.
 \subimport{../renewable-energy-mdo/}{content-re}
 
+\appendixchapter{Design Optimization Appendices}
+\begin{subappendices}
+  \subimport{../renewable-energy-mdo/sections}{other-appendices}
+\end{subappendices}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
 \large
@@ -206,6 +213,12 @@ This chapter is currently unpublished.
 See \cref{sec:research-outputs} for research outputs associated with this work.
 \subimport{../UMERC-2025-grid-value/}{content-grid}
 
+\appendixchapter{Grid Impact Synthesis Appendices}
+\begin{subappendices}
+  \section{Reduced order model details}
+  \subimport{../UMERC-2025-grid-value/}{appendix-grid}
+\end{subappendices}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
 \hl{A conclusion will be written here}.
@@ -215,21 +228,6 @@ See \cref{sec:research-outputs} for research outputs associated with this work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-\appendix
-\begin{appendices}
-
-\chapter{Hydrodynamic Modeling Appendices}
-\subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{jfm-appendix}
-
-\chapter{Design Optimization Appendices}
-\subimport{../renewable-energy-mdo/sections/}{other-appendices}
-
-\chapter{Grid Impact Synthesis Appendices}
-\section{Reduced order model details}
-\subimport{../UMERC-2025-grid-value/}{appendix-grid}
-
-\end{appendices}
 
 \addcontentsline{toc}{chapter}{\bibname}
 \bibliography{references,jfm,zotero-meem-refs}
