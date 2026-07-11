@@ -5,6 +5,7 @@
 Papers at the state of journal submission, plus a few post-submission edits.
 ### Added
 - Paper: custom table column types P, M, L
+- Paper: plain language abstract in dissertation
 - Figures: stacked bar charts for Comparison outputs
 - Figures: create real graphical abstract for RE
 - Figures: create `mod_freq_domain_ctrl_combined` mermaid flowchart
@@ -26,10 +27,12 @@ Papers at the state of journal submission, plus a few post-submission edits.
 - AOR paper: add overlines to hydrostatic stability line segments
 - AOR paper: bring back definition of storm hydro coeffs
 - AOR paper: change modified frequency domain to QLPS and describe dimension of QLPS problem in `module_details.tex`
+- Dissertation: appendices occur after each chapter instead of all at the end
 ### Fixed
 - Tables: fix extra math `$` that occurred in `table2latex` entries with subscripts
 - Paper: use pipeline outputs instead of manual figures for power matrix multiplication
 - Paper: appropriate `citet/citep`, capitalization of `Cref`
+- Pipeline: removed unnecessary dependencies in optimization folder from `make-calkit-stages` stage
 ### Removed
 - Pipeline: removed overleaf sync for beamer slides
 - Pipeline: removed `sim_runtime.pdf` figure
