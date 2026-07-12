@@ -4,12 +4,11 @@ function [mag_U,phase_U,...
          mag_X_f,phase_X_f,...
          mag_X_s,phase_X_s,...
          B_p_sat,K_p_sat,...
-         qcqp_debug,...
          force_lim_err,...
          amp_lim_err,...
          ctrl_mult_best,...
          phase_ctrl_mult_best,...
-         P_unsat] = constrained_opt_ctrl(real_G_u, imag_G_u, w, control_type, ...
+         P_unsat,qcqp_debug] = constrained_opt_ctrl(real_G_u, imag_G_u, w, control_type, ...
                                           control_evaluation_fcn, F_max, P_max, X_max,...
                                           control_solve_type, ctrl_mult_guess, ...
                                           phase_ctrl_mult_guess, T_f_slam, ...
@@ -33,11 +32,6 @@ function [mag_U,phase_U,...
      mag_X_f_unsat,mag_X_s_unsat] = control_evaluation_fcn(K_p,B_p,stabilize_B,stabilize_K);
     
     Z_th = 1 ./ complex(real_G_u, imag_G_u);
-
-    % default qcqp_debug (only populated for 'analytical' path)
-    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
-                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
-                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
 
     if strcmpi(control_type,'none')
         % if no control, no control authority to enforce constraints
@@ -79,7 +73,8 @@ function [mag_U,phase_U,...
         %Z_f =, Z_s, Z_c to avoid repeat calcs in loop and fewer params passed
 
         warn_if_infeasible = opt_ctrl_plot_debug_on;
-        [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th_complex, w, ...
+        if nargout > 17
+            [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th_complex, w, ...
                                 mag_X_u_unsat, phase_X_u_unsat, ...
                                 mag_X_f_unsat, phase_X_f_unsat, ...
                                 mag_X_s_unsat, phase_X_s_unsat, ...
@@ -90,6 +85,19 @@ function [mag_U,phase_U,...
                                 B_drag_f, B_drag_s, m_c, m_f, m_s, ...
                                 control_type, multibody, merge_bodies, ...
                                 warn_if_infeasible);
+        else
+            [B_p_sat,K_p_sat,mult] = solve_qcqp_control(Z_th_complex, w, ...
+                                mag_X_u_unsat, phase_X_u_unsat, ...
+                                mag_X_f_unsat, phase_X_f_unsat, ...
+                                mag_X_s_unsat, phase_X_s_unsat, ...
+                                mag_U_unsat, phase_U_unsat, ...
+                                B_p_stabilized, K_p_stabilized, ...
+                                F_max, X_max, ...
+                                B_h_f, B_h_s, B_c, K_h_f, K_h_s, ...
+                                B_drag_f, B_drag_s, m_c, m_f, m_s, ...
+                                control_type, multibody, merge_bodies, ...
+                                warn_if_infeasible);
+        end
 
         % evaluate final response with constrained optimal controller
         [mag_U,real_P,...
@@ -149,6 +157,13 @@ function [mag_U,phase_U,...
     else
         error('Invalid control_solve_type: %s. Supported values are ''analytical'', ''solver'', or ''brute_force''.', control_solve_type);
     end
+
+    if nargout>17 && ~exist("qcqp_debug", "var")
+        % default qcqp_debug (only populated for 'analytical' path)
+        qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
+    end
 end
 
 function [B_p,K_p] = controller(real_G_u, imag_G_u, w, control_type)
@@ -196,9 +211,6 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     B_p_sat = B_p_stabilized;
     K_p_sat = K_p_stabilized;
     mult = NaN(size(B_p_sat));
-    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
-                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
-                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
     
     % skip QCQP if no constraints or no PTO
     use_force_sat = isfinite(F_max) && F_max > 0;
@@ -265,35 +277,39 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     enforce_P_all     = true(size(enforce_force_all));
     enforce_damp_all  = strcmpi(control_type, 'damping') & abs(imag(Z_th)) > COEFF_TOL;
     join_dim = ndims(enforce_force_all) + 1; % ie for a 2D sea state array, join along 3rd dimension
-    logical_enforce_all = cat(join_dim, enforce_force_all, enforce_X_f_all, enforce_X_s_all, enforce_X_u_all, enforce_P_all); % damping intentionally not included here
+    logical_enforce_all = cat(join_dim, enforce_force_all, enforce_X_f_all, ...
+                                enforce_X_s_all, enforce_X_u_all, enforce_P_all); % damping intentionally not included here
     num_enforce_all = sum(logical_enforce_all, join_dim);
-    logical_enforce_2d = reshape(logical_enforce_all, [], 5);   % num_sea_states × 5
+    n_states = numel(mult);
+    logical_enforce_2d = reshape(logical_enforce_all, n_states, 5);   % num_sea_states × 5 constraints
     num_enforce_flat = num_enforce_all(:);
+    
 
+    % determine circle centers and radii
     center_F_all = -U_0_all ./ c_V_all;
     center_Xf_all = -X_f_0_all ./ c_Xf_all;
     center_Xs_all = -X_s_0_all ./ c_Xs_all;
     center_Xu_all = -X_u_0_all ./ c_Xu_all;
+    center_power_all = zeros(n_states,1);
 
     radius_F_all = F_max ./ abs(c_V_all);
     radius_Xf_all = X_f_max ./ abs(c_Xf_all);
     radius_Xs_all = X_s_max ./ abs(c_Xs_all);
     radius_Xu_all = X_u_max ./ abs(c_Xu_all);
+    radius_power_all = ones(n_states,1);
 
-    n_states = numel(mult);
-    constraint_centers_real = [real(center_F_all(:)), real(center_Xf_all(:)), real(center_Xs_all(:)), real(center_Xu_all(:)), zeros(n_states,1)];
-    constraint_centers_imag = [imag(center_F_all(:)), imag(center_Xf_all(:)), imag(center_Xs_all(:)), imag(center_Xu_all(:)), zeros(n_states,1)];
-    constraint_radii = [radius_F_all(:), radius_Xf_all(:), radius_Xs_all(:), radius_Xu_all(:), ones(n_states,1)];
+    constraint_centers = [center_F_all(:), center_Xf_all(:), center_Xs_all(:), center_Xu_all(:), center_power_all];
+    constraint_centers_real = real(constraint_centers);
+    constraint_centers_imag = imag(constraint_centers);
+    constraint_radii = [radius_F_all(:), radius_Xf_all(:), radius_Xs_all(:), radius_Xu_all(:), radius_power_all];
 
     Gamma_opt_all = NaN(size(mult));
+    feasible_all  = NaN(size(mult));
 
     for k_idx = 1:numel(valid_idx)
         idx = valid_idx(k_idx);
 
         % index vars by sea state
-        Z_th_i = Z_th(idx);
-        w_i = w(idx);    
-        num_enforce = num_enforce_flat(idx);
         enforce_damp = enforce_damp_all(idx);
         logical_enforce = logical_enforce_2d(idx,:);
         centers = [constraint_centers_real(idx,logical_enforce).', constraint_centers_imag(idx,logical_enforce).'];
@@ -305,6 +321,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         % where R = Re(Z_th), X = Im(Z_th)
         p_star = [];
         if enforce_damp
+            Z_th_i = Z_th(idx);
             R_th = real(Z_th_i);
             X_th = imag(Z_th_i);
             center_Q0 = [0, -R_th/X_th];
@@ -317,9 +334,11 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             % reactive control or no reactance: use standard circle intersection
             if isempty(centers)
                 Gamma_opt = 0;  % no constraints active
+                feasible = true;
             else
-                [p_star, ~, ~] = circle_intersect_optim(centers, radii, warn_if_infeasible);
-                if isempty(p_star)
+                p_star = circle_intersect_optim(centers, radii, warn_if_infeasible);
+                feasible = ~isempty(p_star);
+                if ~feasible
                     % Constraint circles are mutually infeasible.
                     % This typically happens when force (circle at Gamma=-1)
                     % and amplitude (circle at Gamma=+1) limits are both
@@ -354,22 +373,30 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             end
         end
         Gamma_opt_all(idx) = Gamma_opt;
-        
-        % update debug struct if this is the most constrained feasible sea state
-        most_constr_so_far = abs(Gamma_opt) > abs(qcqp_debug.Gamma_opt) || isnan(qcqp_debug.Gamma_opt);
-        if most_constr_so_far && ~isempty(centers) && isfinite(Gamma_opt)
-            qcqp_debug.centers = centers;
-            qcqp_debug.radii = radii;
-            qcqp_debug.labels = all_labels(logical_enforce);
-            qcqp_debug.Gamma_opt = Gamma_opt;
-            qcqp_debug.alpha = imag(Z_th_i) / real(Z_th_i);
-            qcqp_debug.Z_th = Z_th_i;
-            qcqp_debug.w = w_i;
-            qcqp_debug.n_active_constraints = num_enforce;
-            qcqp_debug.feasible = ~isempty(p_star);
-        end
+        feasible_all(idx) = feasible;
     end
 
+    % create debug struct containing most constrained sea state
+    if nargout > 3
+        [~,idx_most_constrained_ss] = max(abs(Gamma_opt_all),[],'all');
+        logical_enforce_most_constrained = logical_enforce_2d(idx_most_constrained_ss,:);
+
+        most_constr_centers = [constraint_centers_real(idx_most_constrained_ss,logical_enforce_most_constrained); ...
+                              constraint_centers_imag(idx_most_constrained_ss,logical_enforce_most_constrained)].';
+        most_constr_radii = constraint_radii(idx_most_constrained_ss,logical_enforce_most_constrained).';
+        most_constr_labels = all_labels(logical_enforce_most_constrained);
+        most_constr_gamma = Gamma_opt_all(idx_most_constrained_ss);
+        most_constr_alpha = imag(Z_th(idx_most_constrained_ss)) / real(Z_th(idx_most_constrained_ss));
+
+        qcqp_debug = struct('centers', most_constr_centers, 'radii', most_constr_radii, ...
+                            'labels', most_constr_labels, 'Gamma_opt', most_constr_gamma, ...
+                            'alpha', most_constr_alpha, 'Z_th', Z_th(idx_most_constrained_ss), ...
+                            'w', w(idx_most_constrained_ss), 'n_active_constraints', ...
+                            num_enforce_flat(idx_most_constrained_ss), ...
+                            'feasible', feasible_all(idx_most_constrained_ss));
+    end
+
+    % compute multiplier for valid sea states
     valid_mask = false(size(mult));
     valid_mask(valid_idx) = true;
     mult(valid_mask) = (1 + Gamma_opt_all(valid_mask)) ./ (1 - Gamma_opt_all(valid_mask));
