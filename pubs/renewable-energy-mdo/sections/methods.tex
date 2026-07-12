@@ -7,10 +7,9 @@
     (2) implementing and verifying models for each simulation module,
     (3) formally defining the optimization problem, and 
     (4) outlining a process for solving the problem and analyzing the results.
-    \Cref{remdo:fig:overview-methods} depicts the overall flow, with the simulation and modeling components covered in this section and the formulation and solution-process components developed in \cref{remdo:sec:formulation,remdo:sec:optim-process}.
+    \Cref{remdo:fig:overview-methods} depicts the overall flow, with the simulation and modeling components covered in this section and the formulation and solution-process components developed in \Cref{remdo:sec:formulation,remdo:sec:optim-process}.
 \else
-    This methodology consists of four iterative components summarized in \cref{remdo:fig:overview-methods}: selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process.
-    This section addresses the first two whereas \cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
+    This methodology consists of four iterative components summarized in \Cref{remdo:fig:overview-methods}: selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process. \Cref{remdo:sec:model} addresses the first two while \Cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
 \fi
 \begin{figure}[htbp]
     \centering
@@ -38,24 +37,24 @@ This study uses the MDOcean framework \cite{mccabe_development_2026}, an open-so
 These together compute the system-level quantities the optimization acts on: power production, capital and operational cost, levelized cost of energy (LCOE), and structural factors of safety under operational and storm design load cases.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
     \caption{Simplified extended design structure matrix (XDSM) diagram of the MDOcean modules, adapted from \citet{mccabe_development_2026}.
 Inputs enter at the top, data passes forward between modules left to right along the diagonal, and outputs exit at the left; the orange block denotes the internally iterated dynamics module.}
     \label{remdo:fig:n2}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
-    The module structure is shown in the XDSM diagram of \cref{remdo:fig:n2}, a standard MDO representation \cite{lambe_extensions_2012} in which modules lie on the diagonal, inter-module data dependencies occupy the off-diagonal, and design-variable inputs and objective and constraint outputs enter and exit at the edges.
+    The module structure is shown in the XDSM diagram of \Cref{remdo:fig:n2}, a standard MDO representation \cite{lambe_extensions_2012} in which modules lie on the diagonal, inter-module data dependencies occupy the off-diagonal, and design-variable inputs and objective and constraint outputs enter and exit at the edges.
     The disciplines are coupled in two ways: through shared design variables (most prominently the bulk dimensions, which feed the geometry, hydrodynamics, and structures modules) and through the feed-forward passing of each module's outputs to those downstream.
     Crucially, there is no feedback coupling: the data dependencies are strictly feed-forward (all off-diagonal coupling lies on one side of the diagonal), so a single pass through the modules evaluates the design, with internal iteration confined to the dynamics module where nonlinear drag and powertrain saturation are converged.
-    Because this coupling is non-convex and non-monotonic, the disciplines cannot be optimized sequentially without sacrificing optimality; the design variables across all modules must instead be driven concurrently by a single system-level optimizer, which is the central premise of the formulation developed in \cref{remdo:sec:formulation}.
+    Because this coupling is non-convex and non-monotonic, the disciplines cannot be optimized sequentially without sacrificing optimality; the design variables across all modules must instead be driven concurrently by a single system-level optimizer, which is the central premise of the formulation developed in \Cref{remdo:sec:formulation}.
 \else
     \Cref{remdo:fig:n2} shows the module structure as an XDSM diagram \cite{lambe_extensions_2012}: design variables enter at the edges, data passes feed-forward between the modules on the diagonal, and the objective and constraint outputs exit at the left.
     The disciplines couple through shared design variables (most prominently the bulk dimensions, which feed geometry, hydrodynamics, and structures) and through feed-forward output dependence, with no feedback coupling, so a single pass evaluates each design apart from internal iteration in the dynamics module.
-    Because this coupling is non-convex and non-monotonic, the modules cannot be optimized sequentially without sacrificing optimality, so all design variables are driven concurrently by a single optimizer, which is the central premise of the formulation in \cref{remdo:sec:formulation}.
+    Because this coupling is non-convex and non-monotonic, the modules cannot be optimized sequentially without sacrificing optimality, so all design variables are driven concurrently by a single optimizer, which is the central premise of the formulation in \Cref{remdo:sec:formulation}.
 \fi
 
 MDOcean adopts an implicit multiple-discipline-feasible (MDF) analysis architecture, in which an analytically-derived optimal control condition is solved implicitly inside the dynamics iteration rather than introducing control variables into the outer optimization.
-The reader is referred to \cite{mccabe_development_2026} for the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime, the property that makes the present optimization computationally feasible.
+The reader is referred to \cite{mccabe_development_2026} for the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime (the property that makes the present optimization computationally feasible).

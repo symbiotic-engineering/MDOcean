@@ -5,14 +5,15 @@
 \section{Literature Review Column Legends}
 \label{remdo:sec:appendix-lit-legend}
 
-The following tables define column-abbreviation legends for the optimization-study comparison in \cref{remdo:tab:lit}.
+The following tables define column-abbreviation legends for the optimization-study comparison in \Cref{remdo:tab:lit}.
 
 \begin{landscape}
 \begingroup
+\setlength{\tabcolsep}{2pt}
 \begin{table}[htbp]
     \centering
-    \caption{Legend keys for the dynamics and controls columns of \cref{remdo:tab:lit}}
-\begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}}
+    \caption{Legend keys for the dynamics and controls columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}}
          \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
          N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
          ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
@@ -27,9 +28,10 @@ The following tables define column-abbreviation legends for the optimization-stu
 
 \begin{landscape}
 \begingroup
+\setlength{\tabcolsep}{2pt}
 \begin{table}[htbp]
-    \caption{Legend keys for other modeling columns of \cref{remdo:tab:lit}}
-\begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
+    \caption{Legend keys for other modeling columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
          \multicolumn{2}{c|}{Mooring}& \multicolumn{2}{c|}{Structures} &  \multicolumn{2}{c|}{Economics}&  \multicolumn{2}{c}{Sea state}\\ \hline
          DYN&  Model incorporates mooring dynamics &  AN&  Models stress analytically as a function of dimensions&  STR&  Models structural cost &  REG& Regular waves\\
          DES&  Study considers mooring physical design &  LO&  Models load without dimension-dependent stress &  PTO&  Models power take-off cost &  IRR& Irregular wave spectrum\\
@@ -41,8 +43,8 @@ The following tables define column-abbreviation legends for the optimization-stu
 \bigskip
 
 \begin{table}[htbp]
-    \caption{Legend keys for the optimization columns of \cref{remdo:tab:lit}}
-\begin{tabular}{>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
+    \caption{Legend keys for the optimization columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
          \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
          LOC&  Local optimizer (gradient-based, derivative-free)&  ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
          GA&  Genetic algorithm&  PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
@@ -66,7 +68,7 @@ This section provides additional details on constraint definitions, scaling, and
 \subsection{Linear Inequality Constraints}
 \label{remdo:sec:appendix-linear-constraints}
 
-The eight linear inequality constraints of the optimization formulation (\cref{remdo:sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $g_{L,*}$ given in parentheses:
+The eight linear inequality constraints of the optimization formulation (\Cref{remdo:sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $g_{L,*}$ given in parentheses:
 % notebook p137 11/16/25
 % TODO: verify row 2 ($g_{L,2}$) coefficient — should the leading entry use D_{f,in}/D_s or D_{f,in} directly? See formulation note, unresolved against MATLAB source.
 \begin{equation}
@@ -150,6 +152,7 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 \subsection{Single Objective Optimization Results}
 
 \Cref{remdo:fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
+The optimization converges in \resultsRE[singleObjIters]~iterations, not including the 8 initial iterations used to perform Hessian scaling.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
@@ -158,12 +161,13 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 
 \Cref{remdo:fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
 The meaning of $x$ in each subplot is indicated by the subplot title.
-The two starting points that achieve global optima, denoted in green and orange, both have low inital values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
+The two starting points that achieve global optima, denoted in green and orange, both have low initial values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
 The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
 On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
 This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
-\Cref{remdo:fig:multistart-parallel-axis} also sheds light on the convexity of the search space: local minima are common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
+\Cref{remdo:fig:multistart-parallel-axis} also sheds light on the convexity of the search space: multimodality (several local minima) is common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
 Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
+Future multistart procedures could therefore fix deterministic starts for the unimodal variables and sample only the multimodal ones, reducing the total function evaluations.
 %\hl{This requires further investigation to explain and will be done during re-scrutineering.}
 
 \begin{landscape}
@@ -251,6 +255,6 @@ This reinforces the decision to utilize the re-optimization based sensitivities 
 \end{figure}
 
 Finally, the authors note that while the re-optimization method is valid even when the parameters are far from their nominal values and can be considered a global sensitivity analysis method, it has here only been performed for parameters perturbed in a OAT fashion very close to the nominal and is therefore used as a local sensitivity analysis method.
-The global sensitivities of \cref{remdo:sec:sensitivities} only investigate a few select parameters.
+The global sensitivities of \Cref{remdo:sec:sensitivities} only investigate a few select parameters.
 Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
 This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.

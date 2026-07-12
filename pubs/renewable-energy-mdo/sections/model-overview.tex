@@ -6,7 +6,7 @@ It considers both operational and storm design load cases.
 The structures module takes in these loads along with bulk dimensions and structural thicknesses to calculate the stress and factor of safety to various failure criterion.
 Finally, the economics module calculates the PTO and structural capital costs from generator ratings and material usage respectively, and combines it with the power matrix to estimate the levelized cost of energy.
 
-The extended design structure matrix (XDSM) diagram in \cref{remdo:fig:n2} illustrates the functional interfaces between modules.
+The extended design structure matrix (XDSM) diagram in \Cref{remdo:fig:n2} illustrates the functional interfaces between modules.
 XDSM diagrams are standard in MDO, with more details available in \cite{lambe_extensions_2012}.
 Variables above and below each module are inputs, and variables to the left and right are outputs.
 Design variables are shown in the first row.
@@ -29,7 +29,7 @@ Analysis of coupling is important because under certain conditions, the optimiza
 For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \cite{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \cite{azarm_monotonicity-based_1988,papalambros_principles_2017}.
 The present coupling of WEC disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
 Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
-Non-convexity arises from the presence of both positve and negative curvature in the coupled variable space, leading to multiple local optima.
+Non-convexity arises from the presence of both positive and negative curvature in the coupled variable space, leading to multiple local optima.
 With an objective $J$ of LCOE, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $J$), it also increases structural loading (detrimental to $g$), and the larger bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $g$) and increase the required structural material (detrimental to $J$).
 Thus, it would be sub-optimal to optimize the hydrodynamics module strictly for damping or power production followed by a separate optimization considering structures and economics.
 Furthermore, while even in a unified optimization it may be tempting to calculate the structural thicknesses within the structures module as the minimum required to sustain loads without failure, it is important to keep structural thicknesses as design variables because they also contribute to the hydrostatic constraints computed in the geometry module.
@@ -47,7 +47,7 @@ The WecOptTool control co-optimization software pursues the SAND strategy by col
 
 Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \cite{tedrake_underactuated_2024}.
 In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
-As \cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
+As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
 This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
 For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
 Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \cite{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
@@ -69,9 +69,9 @@ In WecOptTool, the pseudo-spectral optimizer determines the state and control va
 Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \cite{coe_initial_2020}.
 
 For MDOcean, we choose the implicit-MDF architecture.
-Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+Like the explicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints that the optimizer must consider.
 This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \cref{remdo:sec:model} will detail.
+Implicit-MDF is chosen over explicit-MDF because the available optimal control condition is implicit, as \Cref{remdo:sec:model} will detail.
 
 \begin{figure}[htbp]
 \centering
