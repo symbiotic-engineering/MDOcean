@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Solution Methodology}\label{remdo:sec:optim-process}
-The optimization solution and post-optimality analysis process is shown in \cref{remdo:fig:optim-process}, consisting of design space exploration, single-objective optimization, and multi-objective optimization.
+The optimization solution and post-optimality analysis process is shown in \Cref{remdo:fig:optim-process}, consisting of design space exploration, single-objective optimization, and multi-objective optimization.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/optimization_flowchart.pdf}
@@ -22,7 +22,7 @@ The optimization solution and post-optimality analysis process is shown in \cref
 %%%
 This subsection defines the single-objective optimization setup, including algorithm choice, derivatives, and scaling.
 \paragraph{Algorithm}
-The single-objective algorithm is selected by characterizing the problem following \cite[Ch.~1.5]{martins_engineering_2022}, as summarized in \cref{remdo:tab:characterization}.
+The single-objective algorithm is selected by characterizing the problem following \cite[Ch.~1.5]{martins_engineering_2022}, as summarized in \Cref{remdo:tab:characterization}.
 \begin{table}[htbp]
     \centering
     \caption{Problem characterization to inform algorithm choice}
@@ -40,11 +40,11 @@ The single-objective algorithm is selected by characterizing the problem followi
 This motivates sequential quadratic programming (SQP) with multistart.
 \ifdefined\DISSERTATION
     SQP is a gradient-based method that builds successive quadratic approximations of the objective and linear approximations of the constraints, solving each subproblem as an efficient quadratic program and updating the approximations every iteration to track the true nonlinear functions.
-    The MATLAB SQP implementation also guarantees that every intermediate design query obeys its bounds, which helps remain within the zone of model validity defined by the priority 1 requirements of \cref{remdo:sec:requirements}.
+    The MATLAB SQP implementation also guarantees that every intermediate design query obeys its bounds, which helps remain within the zone of model validity defined by the priority 1 requirements of \Cref{remdo:sec:requirements}.
     Because only local, not global, optimality can be verified for a non-convex objective, the multistart method is used to search for better local optima across several initial guesses.
 \else
     SQP is a gradient-based method that solves successive quadratic-program approximations of the objective and constraints.
-    Its MATLAB implementation keeps every intermediate query within bounds, helping maintain the model validity required by the priority 1 requirements of \cref{remdo:sec:requirements}.
+    The MATLAB implementation keeps every intermediate query within bounds, helping maintain the model validity required by the priority 1 requirements of \Cref{remdo:sec:requirements}.
     Since only local optimality can be verified for a non-convex objective, multistart searches for better local optima from several initial guesses.
 \fi
 \resultsRE[numMultistartRandom]~designs are randomly drawn between the upper and lower bounds, and those obeying the linear constraints (typically around \resultsRE[numMultistartObeyConstraint]) are evaluated.
@@ -80,10 +80,10 @@ When $f_{\text{min}}$ or $f_{\text{max}}$ is zero --- as for $g_{NL,5}$ and $g_{
 \ifdefined\DISSERTATION
     Design variables are implemented in the engineering-notation SI unit that places the nominal value between 1 and 1000: meters for bulk dimensions, millimeters for structural dimensions, MN for force, and kilowatts for power.
     The objectives are scaled to magnitude near one, using megawatts for power, millions of dollars for cost, and \$/kWh for LCOE.
-    For SQP, Hessian scaling further rescales the design variables so that each has a similar effect magnitude on the objective; \cref{remdo:sec:appendix-scaling} details the procedure.
+    For SQP, Hessian scaling further rescales the design variables so that each has a similar effect magnitude on the objective; \Cref{remdo:sec:appendix-scaling} details the procedure.
 \else
     Design variables use the engineering-notation SI unit that places each nominal value between 1 and 1000, and the objectives are scaled to magnitude near one.
-    For SQP, Hessian scaling further equalizes each variable's effect magnitude on the objective, detailed in \cref{remdo:sec:appendix-scaling}.
+    For SQP, Hessian scaling further equalizes each variable's effect magnitude on the objective, detailed in \Cref{remdo:sec:appendix-scaling}.
 \fi
 
 \paragraph{Sensitivity Analysis}
@@ -96,13 +96,13 @@ After optimization, sensitivity analysis is performed, first local then OAT glob
     \end{equation}
     Nonzero Lagrange multipliers imply the associated constraint is active at the optimum, larger values indicating a more influential constraint.
     Beyond their inherent value for analyzing constraint activity, the multipliers facilitate calculation of local parameter sensitivities, obtained analytically from $\vec{\lambda}$, other solver outputs such as the Hessian $\mathbf{H}$ and gradient $\nabla J$, and additional finite-difference derivatives.
-    \cref{remdo:sec:appendix-sensitivties} gives the details.
+    \Cref{remdo:sec:appendix-sensitivties} gives the details.
     These sensitivities estimate not only how the objective would change if a parameter changed at fixed design, but also how the optimal objective, optimal design, and constraint activity would change if the optimization were repeated with the modified parameter, without re-optimizing, and thus at very little cost.
     They serve as a screening step to identify high-sensitivity parameters for further study in the global sensitivity analysis.
 \else
     Local sensitivities exploit the SQP solver's Lagrange multiplier vector $\vec{\lambda} = -dJ/d\vec{g}$ \cite{martins_engineering_2022}, which measures the objective's sensitivity to each constraint; nonzero multipliers mark active constraints, larger values more influential ones.
     The multipliers also yield local parameter sensitivities analytically (from $\vec\lambda$, the Hessian, the gradient, and a few finite-difference derivatives), estimating how the re-optimized objective, design, and constraint activity would respond to a parameter change without re-optimizing.
-    \cref{remdo:sec:appendix-sensitivties} gives the details.
+    \Cref{remdo:sec:appendix-sensitivties} gives the details.
     This screens for high-sensitivity parameters to study further in the global analysis.
 \fi
 
@@ -121,6 +121,6 @@ Single-objective algorithms typically require adaptation for multiple objectives
     Here the single-objective optima of each objective set the constraint values: the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ becomes the center of a circle, and twenty constraint values are taken at equal angular spacing on that circle.
     The MATLAB \texttt{paretosearch} function then executes the constrained multi-objective pattern search of \cite{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
 \else
-    While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers using them are rare, since a Pareto front demands exploration rather than the pure exploitation gradient methods excel at.
+    While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers using them are rare, since a Pareto front demands exploration rather than the pure exploitation that gradient methods excel at.
     This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP --- repeatedly optimizing one objective while sweeping a constraint on the other, with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \cite{custodio_direct_2011}, which maximizes Pareto hypervolume and spread to fill the gaps.
 \fi

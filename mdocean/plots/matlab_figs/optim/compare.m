@@ -109,11 +109,9 @@ text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 %% hydro coeff comparison plot
 h_hydro = hydro_compare(vals,color);
 
-figs = [h_geom, h_hydro, h_prob, h_power_matrix];
-
 %% design variable table
-DV_table = array2table(X.', ...
-    'VariableNames',titles, 'RowNames', b.var_names_pretty);
+DV_table = array2table(X(:,1:end-1).', ...
+    'VariableNames',titles, 'RowNames', b.var_names_pretty(1:end-1));
 
 %% output table
 temp_table = struct2table(vals,'RowNames',titles);
@@ -123,6 +121,17 @@ vector_rows = contains(temp_table.Properties.VariableNames,vector_names);
 out_table = rows2vars(temp_table(:,numeric_vals & ~vector_rows));
 out_table.Properties.RowNames = fix_underscores(out_table.OriginalVariableNames);
 out_table = removevars(out_table,'OriginalVariableNames');
+
+%% design variable stacked number line plot
+markers = {'o','x','^','v','d'};
+h_stacked_dv = figure;
+stacked_number_line(X(:,1:end-1).', b.X_mins, b.X_maxs, color, markers, titles, b.var_names_pretty(1:end-1))
+
+h_stacked_out = figure;
+stacked_number_line(out_table{:,:}, [], [], color, markers, titles, out_table.Properties.RowNames);
+h_stacked_out.Position(3:4) = [1000  400]; % make taller
+
+figs = [h_geom, h_hydro, h_prob, h_power_matrix, h_stacked_dv, h_stacked_out];
 
 end
 

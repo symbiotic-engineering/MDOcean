@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 60;
+num_figs_AOR = 59;
 num_tabs_AOR = 2;
 num_tabs_RE = 6;
 
@@ -63,10 +63,10 @@ figs_in_AOR{3}  = 'ReadNonMatlabFigs.control_analysis_flowcharts';
 % 3: module details
 figs_in_AOR{4}  = 'ReadNonMatlabFigs.dimensions';
 figs_in_AOR{5}  = 'ReadNonMatlabFigs.MEEM_geometry';
-figs_in_AOR{6}  = 'Tikz.circuit_intrinsic';
+figs_in_AOR{6}  = 'ReadNonMatlabFigs.control_method_venn_diagram';
 figs_in_AOR{7}  = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_synthesis';
-figs_in_AOR{8}  = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_evaluation';
-figs_in_AOR{9}  = 'DescFcns.saturation_desc_fcn'; % subfig (a), combined with {51}
+figs_in_AOR{8}  = 'ReadNonMatlabFigs.circuit_intrinsic';
+figs_in_AOR{9}  = 'DescFcns.saturation_desc_fcn'; % subfig (a), combined with {49}
 figs_in_AOR{10}  = 'RunSingleFigFunc.nominal_power_matrix';
 figs_in_AOR{11}  = 'ReadNonMatlabFigs.FBD';
 % 4: validation and benchmarking
@@ -75,57 +75,56 @@ figs_in_AOR{13} = 'Runtime.sim_runtime';
 figs_in_AOR{14} = 'Runtime.hydro_runtime_logscale';
 figs_in_AOR{15} = 'Runtime.dynamics_runtime';
 % 5: insights and discussion
-figs_in_AOR{16} = 'SweepGeoms.sweep_geoms_line';
-figs_in_AOR{17} = 'SweepGeoms.sweep_geoms_line_cwr_sa';
-figs_in_AOR{18} = 'SweepGeoms.sweep_geoms_pareto_nondim';
-figs_in_AOR{19} = 'DampingPlateStructures.damping_plate_aspect_ratio';
-figs_in_AOR{20} = 'ForceSaturationFigFunc.power_force_sensitivity';
-figs_in_AOR{21} = 'PtoSweep.pto_sweep';
-figs_in_AOR{22} = 'DesignSpaceExploration.experiments_ratios';
-figs_in_AOR{23} = 'RunSingleFigFunc.nominal_power_matrix';
+figs_in_AOR{16} = 'SweepGeoms.sweep_geoms_line'; % subfig (a), combined with {50}
+figs_in_AOR{17} = 'SweepGeoms.sweep_geoms_pareto_nondim';
+figs_in_AOR{18} = 'DampingPlateStructures.damping_plate_aspect_ratio';
+figs_in_AOR{19} = 'ForceSaturationFigFunc.power_force_sensitivity';
+figs_in_AOR{20} = 'PtoSweep.pto_sweep';
+figs_in_AOR{21} = 'DesignSpaceExploration.experiments_ratios';
+figs_in_AOR{22} = 'RunSingleFigFunc.nominal_power_matrix';
 % appendix A - hydro
-figs_in_AOR{24} = 'Tikz.meem_regions';
-figs_in_AOR{25} = 'Meem.meem_sparsity';
-figs_in_AOR{26} = 'Meem.meem_validation';
-figs_in_AOR{27} = 'Meem.meem_matching';
-figs_in_AOR{28} = 'Meem.meem_convergence_vs_omega';
-figs_in_AOR{29} = 'Meem.asymptotic_b_vector';
-figs_in_AOR{30} = 'FitOlaya.case4_v1_auto_semilogx_khRxRpa4b_fv1';
+figs_in_AOR{23} = 'ReadNonMatlabFigs.meem_dims';
+figs_in_AOR{24} = 'Meem.meem_sparsity';
+figs_in_AOR{25} = 'Meem.meem_validation';
+figs_in_AOR{26} = 'Meem.meem_matching';
+figs_in_AOR{27} = 'Meem.meem_convergence_vs_omega';
+figs_in_AOR{28} = 'Meem.asymptotic_b_vector';
+figs_in_AOR{29} = 'FitOlaya.case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1';
 % appendix B - dynamics (PTO kinematics, PTO circuit, QP, drag, slamming, WECSim)
-figs_in_AOR{31} = 'Tikz.circuit_kinematics';
-figs_in_AOR{32} = 'Tikz.circuit_pto';
-figs_in_AOR{33} = 'QPCircles.qp_circles';
-figs_in_AOR{34} = 'RunSingleFigFunc.qcqp_circles_nominal';
-figs_in_AOR{35} = 'RunSingleFigFunc.ctrl_polar_plot_mult';
-figs_in_AOR{36} = 'DragIntegral.drag_integral_B';     % subfig (a), combined with {52},{53}
-figs_in_AOR{37} = 'Slamming.slamming_amplitude';
-figs_in_AOR{38} = 'RunSingleFigFunc.slamming_model_comparison_float';
-figs_in_AOR{39} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {54},{55},{56}
-figs_in_AOR{40} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund'; % subfig, combined with {57},{58},{59}
-figs_in_AOR{41} = 'Wecsim.accel_fourier_harmonics';
-figs_in_AOR{42} = 'Wecsim.drag_force_desc_fcn';
-figs_in_AOR{43} = 'Wecsim.position_THD_contour';
-figs_in_AOR{44} = 'Wecsim.wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat';
+figs_in_AOR{30} = 'ReadNonMatlabFigs.circuit_kinematics';
+figs_in_AOR{31} = 'ReadNonMatlabFigs.circuit_pto';
+figs_in_AOR{32} = 'QPCircles.qp_circles';
+figs_in_AOR{33} = 'DragIntegral.drag_integral_B';     % subfig (a), combined with {51},{52}
+figs_in_AOR{34} = 'Slamming.slamming_amplitude';
+figs_in_AOR{35} = 'RunSingleFigFunc.slamming_model_comparison_float';
+figs_in_AOR{36} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat'; % subfig, combined with {53},{54},{55}
+figs_in_AOR{37} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund'; % subfig, combined with {56},{57},{58}
+figs_in_AOR{38} = 'Wecsim.position_THD_contour';
+figs_in_AOR{39} = 'Wecsim.drag_force_desc_fcn';
+figs_in_AOR{40} = 'Wecsim.wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat';
 % appendix C - economic validation
-figs_in_AOR{45} = 'Validation.cost_vs_N_WEC';
+figs_in_AOR{41} = 'Validation.cost_vs_N_WEC';
 % appendix D - structures
-figs_in_AOR{46} = 'ReadNonMatlabFigs.equivalent_stiffness';
-figs_in_AOR{47} = 'ReadNonMatlabFigs.trapezoid';
-figs_in_AOR{48} = 'ReadNonMatlabFigs.damping_plate_flowchart';
-figs_in_AOR{49} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {60}
+figs_in_AOR{42} = 'ReadNonMatlabFigs.equivalent_stiffness';
+figs_in_AOR{43} = 'ReadNonMatlabFigs.trapezoid';
+figs_in_AOR{44} = 'ReadNonMatlabFigs.damping_plate_flowchart';
+figs_in_AOR{45} = 'DampingPlateStructures.damping_plate_moment';  % subfig (a), combined with {59}
 % graphical abstract (unnumbered so at the end)
-figs_in_AOR{50}  = 'ReadNonMatlabFigs.graphical_abstract_modeling';
+figs_in_AOR{46} = 'ReadNonMatlabFigs.graphical_abstract_modeling';
 % extra subplot entries (additional MATLAB outputs for multi-panel figures)
-figs_in_AOR{51} = 'DescFcns.drag_desc_fcn';                         % fig 9 subfig (b)
-figs_in_AOR{52} = 'DragIntegral.drag_integral_G_m';                  % fig 36 subfig (b)
-figs_in_AOR{53} = 'DragIntegral.drag_integral_G_p';                  % fig 36 subfig (c)
-figs_in_AOR{54} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat';  % fig 39 subfig
-figs_in_AOR{55} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat';  % fig 39 subfig
-figs_in_AOR{56} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat';   % fig 39 subfig
-figs_in_AOR{57} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund';  % fig 40 subfig
-figs_in_AOR{58} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase'; % fig 40 subfig
-figs_in_AOR{59} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase';  % fig 40 subfig
-figs_in_AOR{60} = 'DampingPlateStructures.damping_plate_deflection'; % fig 49 subfig (b)
+figs_in_AOR{47} = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_evaluation'; % fig 8 subfig (b)
+figs_in_AOR{48} = 'ReadNonMatlabFigs.mod_freq_domain_ctrl_combined'; % fig 8 subfig (c)
+figs_in_AOR{49} = 'DescFcns.drag_desc_fcn';                         % fig 9 subfig (b)
+figs_in_AOR{50} = 'SweepGeoms.sweep_geoms_line_cwr_sa';                 % fig 16 subfig (b)
+figs_in_AOR{51} = 'DragIntegral.drag_integral_G_m';                  % fig 33 subfig (b)
+figs_in_AOR{52} = 'DragIntegral.drag_integral_G_p';                  % fig 33 subfig (c)
+figs_in_AOR{53} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat';  % fig 36 subfig
+figs_in_AOR{54} = 'Wecsim.wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat';  % fig 36 subfig
+figs_in_AOR{55} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat';   % fig 36 subfig
+figs_in_AOR{56} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund';  % fig 37 subfig
+figs_in_AOR{57} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase';  % fig 37 subfig
+figs_in_AOR{58} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase'; % fig 37 subfig
+figs_in_AOR{59} = 'DampingPlateStructures.damping_plate_deflection'; % fig 45 subfig (b)
 
 %% TABLES
 
@@ -152,30 +151,26 @@ figs_classes = figs_split(:,1);
 tabs_classes = tabs_split(:,1);
 for i=1:length(figs_classes)
     class_name = figs_classes{i};
-    if ~strcmp(class_name, 'Tikz')
-        all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
-        this_fig_name = figs_split(i,2);
-        valid = ismember(this_fig_name,all_fig_names_this_class);
-        msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
-            class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
-        %assert(valid, msg)
-        if ~valid
-            warning(msg);
-        end
+    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+    this_fig_name = figs_split(i,2);
+    valid = ismember(this_fig_name,all_fig_names_this_class);
+    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
     end
 end
 for i=1:length(tabs_classes)
     class_name = tabs_classes{i};
-    if ~strcmp(class_name, 'Tikz')
-        all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
-        this_tab_name = tabs_split(i,2);
-        valid = ismember(this_tab_name,all_tab_names_this_class);
-        msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
-            class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
-        %assert(valid, msg)
-        if ~valid
-            warning(msg);
-        end
+    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+    this_tab_name = tabs_split(i,2);
+    valid = ismember(this_tab_name,all_tab_names_this_class);
+    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
     end
 
 end

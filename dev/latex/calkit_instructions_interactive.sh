@@ -188,11 +188,9 @@ run_up_to_date_check() {
         rm -f "$output_file"
         return 0
       fi
+
     else
       echo "Status command failed."
-      if prompt_yes_no "Retry status check?"; then
-        continue
-      fi
       if prompt_yes_no "Skip this status check?"; then
         rm -f "$output_file"
         return 0
@@ -200,6 +198,9 @@ run_up_to_date_check() {
       echo "Stopped by user."
       rm -f "$output_file"
       exit 1
+    fi
+    if prompt_yes_no "Run stage?"; then
+      calkit run --log "$stage"
     fi
 
     read -r -p "Enter to retry, 's' to skip, or 'q' to quit: " answer
@@ -288,6 +289,7 @@ workflow_github_to_overleaf() {
   run_step "Pull latest main" git pull
   run_step "Create new branch" git checkout -b "$branch_name"
   run_step "Push branch and set upstream" git push --set-upstream origin "$branch_name"
+  run_step "Push dvc data to avoid overwriting upon pull" calkit push
   run_calkit_pull_with_retry calkit pull -f
   run_step "Check pipeline" calkit check pipeline -c
   run_up_to_date_check "$PAPER_STAGE"
@@ -303,6 +305,7 @@ workflow_overleaf_to_github() {
 
   choose_stage_and_folder
 
+  run_step "Push dvc data to avoid overwriting upon pull" calkit push
   run_step "Checkout main" git checkout main
   run_calkit_pull_with_retry calkit pull -f
   run_step "Check pipeline" calkit check pipeline -c
@@ -391,7 +394,7 @@ main() {
   echo
   echo "Choose workflow:"
   echo "  1) Getting GitHub changes into Overleaf"
-  echo "  2) Making changes on Overleaf and getting them onto GitHub"
+  echo "  2) Making changes on Overleaf and getting them onto GitHub - this will also push GitHub changes to Overleaf"
   echo "  q) Quit"
 
   local workflow

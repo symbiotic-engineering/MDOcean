@@ -22,32 +22,32 @@
 The geometry module computes submerged volume $V_{\text{sub}}$, structural volume $V_{\text{struct}}$, and associated hydrostatic properties from bulk dimensions.
 \Cref{fig:dims} defines the principal geometric variables, where $T$ denotes drafts, $h$ heights, and $D$ diameters.
 Subscripts $f$, $s$, and $d$ refer to the float, spar, and damping plate, respectively.
-Key points include the center of buoyancy $B$, center of gravity $G$, and metacenter $M$ for the combined system.
+Key points include the center of buoyancy $B$, center of gravity $G$, the keel $K$, and metacenter $M$ for the combined system.
 Additional structural dimensions and thickness definitions are provided in \Cref{sec:structures}.
 
 \begin{figure}[htbp]
 \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/dimensions.pdf}
+    \includegraphics[width=\linewidth]{figs/from-matlab/dimensions.pdf}
 \caption{Dimension labeling of system}\label{fig:dims}
 \end{figure}
 
-Static stability is enforced by requiring $GM>0$, where
+Static pitch stability is enforced by requiring:
 \begin{equation}\label{eq:GM}
-    GM = KB + BM - KG,
+    \overline{GM} = \overline{KB} + \overline{BM} - \overline{KG} > 0,
 \end{equation}
-\noindent where $BM = \pi D_f^4/(64V_{\text{sub}})$ \cite{newman}.
+\noindent where $\overline{BM} = \pi D_f^4/(64V_{\text{sub}})$ \citep{newman}.
 
-Hydrostatic equilibrium is enforced by matching displaced water mass to total system mass and any mismatch is compensated using ballast. 
+Hydrostatic equilibrium is enforced by matching displaced water mass to total system mass, with any mismatch compensated using ballast with mass $m_{bal}$:
 \begin{equation}
     m_{bal} = \rho_w V_{sub} - \rho_M V_{struct},
 \end{equation}
 where $\rho_w$ and $\rho_M$ are water and structural material densities.
 To ensure feasible buoyancy, $m_{bal}$ must be non-negative and physically storable within the hull.
-Assuming seawater ballast, this imposes a volume feasibility constraint:
+Assuming seawater ballast, this imposes a volume constraint:
 \begin{equation}\label{eq:vol-constraint}
 V_{struct} \le V_{sub} + V_{surf} - V_{pto},
 \end{equation}
-where $V_{\text{surf}}$ is the above-water structural volume and $V_{pto}$ is the (fixed) PTO volume.
+where $V_{\text{surf}}$ (design-dependent) and $V_{pto}$ (fixed) are volumes of the above-water structures and PTO respectively.
 
 %TC:break Hydrodynamic Coefficients
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,105 +59,117 @@ The first-order hydrodynamic force phasors $\vec{\hat{F}}$ for interacting float
 where, under monochromatic forcing,
 \begin{equation}\label{eq:hydro-forces-expanded}
 \begin{aligned}
-    \vec{\hat{F}}_{e}   &= \vec{\gamma}\,\hat{\zeta},
-    & \vec{\hat{F}}_{rad} &= -\mathbf{A}_h\vec{\hat{\ddot{\xi}}} - \mathbf{B}_h\vec{\hat{\dot{\xi}}}, \\
+    \vec{\hat{F}}_{e} &= \vec{\gamma}\,\hat{\zeta},&~~
+    \vec{\hat{F}}_{rad} &= -\mathbf{A}_h\vec{\hat{\ddot{\xi}}} - \mathbf{B}_h\vec{\hat{\dot{\xi}}},&~~
     \vec{\hat{F}}_{res} &= -\mathbf{K}_h\vec{\hat{\xi}}.
 \end{aligned}
 \end{equation}
-Here $\vec{\hat{\xi}}$ is the body displacement phasor vector, and the hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, and $\mathbf{K}_h$ are the wave excitation vector, added mass matrix, radiation damping matrix, and restoring stiffness matrix, respectively.
-The origin is taken as the center of the float at the still waterline.
+Here $\vec{\hat{\xi}}$ is the body displacement phasor vector from the origin at the center of the float at the still waterline.
+The hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, and $\mathbf{K}_h$ are the wave excitation vector, added mass matrix, radiation damping matrix, and hydrostatic stiffness matrix, respectively.
 
-For a two-body heaving point absorber under operational conditions ($op$), the hydrodynamic matrices are $2\times 2$, representing the float ($f$), spar ($s$), and their coupling ($c$):
-\begin{equation}\label{eq:op-hydro-coeffs}
+The displacement vector $\vec{\hat{\xi}}$ contains a state for each degree of freedom.
+We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
+A two-body heaving point absorber that rigidly locks the bodies in a storm following \cite{RM3} has vectors:
+\begin{equation}\label{eq:define-vectors}
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
-    \end{bmatrix},~
-    \vec{\gamma}_{op} = \begin{bmatrix}
+    \end{bmatrix}, ~~
+    \vec{\hat{\xi}}_{st}=\begin{bmatrix}\hat{\xi}_m 
+    \end{bmatrix}, ~~
+     \vec{\gamma}_{op} = \begin{bmatrix}
         \gamma_f \\ \gamma_s
-    \end{bmatrix},~
-    \mathbf{A_{h,op}} = \begin{bmatrix}
+    \end{bmatrix},~~
+     \vec{\gamma}_{st} = \begin{bmatrix}
+        \gamma_m
+    \end{bmatrix}.
+\end{equation}
+with subscripts for the float ($f$), spar ($s$), their coupling ($c$), and the merged float-spar ($m$).
+Operational hydrodynamic matrices are symmetric $2\times 2$:
+\begin{equation}\label{eq:op-hydro-coeffs}
+\begin{aligned}
+    \mathbf{A}_{h,op} = \begin{bmatrix}
         A_f & A_c \\ A_c & A_s
     \end{bmatrix},~ 
-    \mathbf{B_{h,op}} = \begin{bmatrix}
+    \mathbf{B}_{h,op} &= \begin{bmatrix}
         B_f & B_c \\ B_c & B_s
-    \end{bmatrix},~
-    \mathbf{K_{h,op}} = \begin{bmatrix}
+    \end{bmatrix},\\
+    \mathbf{K}_{h,op} &= \begin{bmatrix}
         K_f & 0\\ 0 & K_s
     \end{bmatrix}
+\end{aligned}
 \end{equation}
-
-In storm conditions ($st$), the float and spar are assumed rigidly connected following \cite{RM3}, yielding a single-body representation ($m$):
+while storm (merged-body) coefficients are scalar:
 \begin{equation}\label{eq:st-hydro-coeffs}
-\vec{\hat{\xi}}_{st}, \vec{\gamma}_{st}, \mathbf{A}_{h,st}, \mathbf{B}_{h,st}, \mathbf{K}_{h,st}.
+\begin{aligned}
+\vec{\gamma}_{st}&=\gamma_{m}=\Sigma~\vec{\gamma}_{op},&
+~\mathbf{A}_{h,st}&=A_m=\Sigma~\mathbf{A}_{h,op}, \\
+~\mathbf{B}_{h,st}&=B_m=\Sigma~\mathbf{B}_{h,op},&
+~\mathbf{K}_{h,st}&=K_m=\Sigma~\mathbf{K}_{h,op}.
+\end{aligned}
 \end{equation}
-
-The merged-body coefficients are obtained by summing the individual and coupling contributions, e.g., $A_m = A_f + A_s + 2A_c$, with analogous expressions for $B_m$, while hydrostatic stiffness is additive.
+with $\Sigma$ denoting the sum of all elements in the matrix or vector (``grand sum'').
 
 The remaining task is to compute the float, spar, and coupling coefficients, with operational and storm implications discussed in \Cref{sec:design-load-cases}.
-The hydrostatic stiffness terms ($K_f$, $K_s$) are frequency-independent and are computed directly from geometry (see \cref{sec:appendix-meem-details}), while the remaining coefficients require solving the frequency-domain radiation boundary value problem for the velocity potential.
+The hydrostatic stiffness terms ($K_f$, $K_s$) are frequency-independent and are computed directly from geometry (see \Cref{eq:gamma-K} in \Cref{sec:appendix-meem-details}), while the remaining coefficients require solving the frequency-domain radiation boundary value problem for the velocity potential.
 Traditionally, this is performed using a BEM solver, which discretizes the body surfaces and solves a large linear system.
 In MDOcean, float coefficients are instead computed using the semi-analytical Matched Eigenfunction Expansion Method (MEEM), exploiting cylindrical symmetry for improved efficiency.
 Spar and coupling terms are obtained via algebraic approximations and interpolation of pre-computed BEM data, and could be extended to MEEM in future work.
+\Cref{tab:hydro-methods} summarizes the methods used for each coefficient.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Float Coefficients: Matched Eigenfunction Expansion Method}\label{sec:hydro-meem}
 MEEM solves the radiation and excitation problems by expanding the velocity potential in eigenfunctions within each fluid region and enforcing matching across region boundaries.
-The MEEM radiation solution for two concentric heaving cylinders was first presented in the studies \cite{mavrakos_hydrodynamic_2004} and detailed in reference \cite{chau_inertia_2012}.
+The MEEM radiation solution for two concentric heaving cylinders was first presented by \citet{mavrakos_hydrodynamic_2004} and detailed by \citet{chau_inertia_2012}.
 In this approach, the fluid domain is partitioned into regions with separable analytical solutions, and continuity conditions are enforced at region interfaces to determine the unknown expansion coefficients.
-The open-source implementation used here, summarized in \cref{sec:appendix-meem-details}, follows the formulation derived in the study \cite{mccabe_open-source_2024}, with numerical properties detailed in the forthcoming companion paper \cite{bimali_matrix_2026,best_openflash_2026}. 
+The open-source implementation used here, summarized in \Cref{sec:appendix-meem-details}, follows the formulation by \citet{mccabe_open-source_2024}.
+Forthcoming companion papers \citet{bimali_matrix_2026,best_openflash_2026} detail the numerical properties and code implementation respectively of an expanded implementation. 
 
 The primary advantage of MEEM is computational efficiency.
 Timing comparisons (\Cref{sec:sim-runtime}) show more than an order-of-magnitude speedup over Capytaine BEM at comparable convergence, significantly reducing the cost of multidisciplinary analysis.
 Additional benefits include lower memory usage, elimination of meshing, and avoidance of numerical Green’s function approximation.
 
-Limitations include geometric restrictions and numerical overflow (discussed in \cref{sec:appendix-meem-details}).
+Limitations include geometric restrictions and numerical overflow (discussed in \Cref{sec:appendix-meem-details}).
 As a semi-analytical method, MEEM is restricted to simplified geometries; the formulation used here assumes a dual concentric cylinder (\Cref{fig:meem-geom}).
 Consequently, float coefficients neglect the damping plate and approximate the float bottom as flat rather than slanted.
 The damping plate enters through the spar coefficients (next subsection).
-These approximations have minor impact but could be relaxed in future extensions using more general MEEM formulations \cite{olaya_hydrodynamic_2015,kokkinowrachos_behaviour_1986}. 
+These approximations have minor impact and could be relaxed in future extensions using more general MEEM formulations \citep{olaya_hydrodynamic_2015,kokkinowrachos_behaviour_1986,bimali_matrix_2026}.
 
 \begin{figure}[b!]
     \centering
-     \includegraphics[width=0.75\linewidth]{figs/from-matlab/MEEM_geometry.pdf}
+     \includegraphics[width=\linewidth]{figs/from-matlab/MEEM_geometry.pdf}
     \caption{MEEM geometry.
 Dashed lines represent geometry that is neglected in the MEEM calculations}
    \label{fig:meem-geom}
 \end{figure}
 
 %%%%%%%%%%%%%%%
-\subsubsection{Other Coefficients: Approximations}\label{sec:hydro-other}
+\subsubsection{Other coefficients: approximations}\label{sec:hydro-other}
 Because the damping plate affects the spar coefficients more strongly than the float, the former are obtained by scaling existing solutions that include the damping plate rather than using MEEM.
-\Cref{tab:hydro-methods} summarizes the methods used for each coefficient.
 
 \begin{table}[htbp]
     \centering
-    \caption{Method of computing different hydrodynamic coefficients in MDOcean}
+    \caption{Method of computing hydrodynamic coefficients in MDOcean}
     \label{tab:hydro-methods}
-\begin{tabular}{cc}
+    \begin{tabular}
+    {M{0.25\linewidth}M{0.63\linewidth}}
          Coefficient& Method\\ \hline
-         $A_f$, $B_f$, $\gamma_f$ & MEEM\\
-         $A_s$& Approximate $\omega\rightarrow\infty$ solution (\eqref{eq:As})\\
-         $A_c$, $B_s$, $B_c$, $\gamma_s$& Nominal BEM solution, scaled with $D_d$ and $T_s$\\
+         $A_f$, $B_f$, $\gamma_f$ & MEEM (\Cref{eq:hydro,eq:gamma-K} in \Cref{sec:appendix-meem-details})\\
+         $A_s$& Approximate $\omega\rightarrow\infty$ solution (\Cref{eq:As} in \Cref{sec:appendix-additional-hydro})\\
+         $A_c$, $B_s$, $B_c$, $\gamma_s$& Nominal BEM solution, scaled with $D_d$ and $T_s$ (\Cref{eq:scale-wamit} in \Cref{sec:appendix-additional-hydro})\\
     \end{tabular}
-    \end{table}
-
+\end{table}
 %\hl{Describe how I did the WAMIT damping plate scaling for the spar excitation.}
-
 %The MEEM implementation currently cannot take the damping plate into account, and the plate is expected to have a large impact on the spar added mass and damping. Therefore, algebraic approximations of the damping plate coefficients are used instead of the MEEM solution. 
-The spar added mass coefficient $A_s$ is approximated as a frequency-independent quantity based on the displaced water volume in the spherical projection of the damping plate \cite{philip_damping_2012}:
-\begin{equation}\label{eq:As}
- A_s =\frac{1}{3}\rho_w D_d^3\left(1 - \frac{3}{4}r^2\sqrt{1-r^2} - \frac{1}{4}(1-\sqrt{1-r^2})^2(2+\sqrt{1-r^2})\right),
-\end{equation}
-where $r = D_s/D_d$.
-This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\rho_w D_d^3$ at $r=0$) to a pure column limit ($\frac{1}{6}\rho_w D_d^3$ at $r=1$).
+The spar added mass coefficient $A_s$ is approximated as a frequency-independent quantity based on the displaced water volume in the spherical projection of the damping plate, with the formula given in \Cref{sec:appendix-additional-hydro}.
 
-The spar damping ($B_s$), excitation ($\gamma_s$), and coupling terms ($A_c$, $B_c$) are obtained by interpolating a pre-computed WAMIT BEM solution over the nondimensional parameter $kD_d$ (see \cref{sec:appendix-additional-hydro}).
-The excitation term is additionally scaled as $e^{-k(T_s - T_{s,nom})}$ to account for depth-dependent attenuation.
+The spar damping ($B_s$), excitation ($\gamma_s$), and coupling terms ($A_c$, $B_c$) are obtained by interpolating a pre-computed WAMIT BEM solution over the nondimensional parameter $kD_d$ (see \Cref{sec:appendix-additional-hydro}).
+The excitation term is additionally scaled as $\exp(-k(T_s - T_{s,nom}))$ to account for depth-dependent attenuation.
 
 %\hl{I suspect this imposes a constraint on $D_d$ needing to be similar to the nominal design, see notebook 3/20/26 referencing analysis from 4/4/25.}
 
-Because float and spar coefficients are computed using different approximations, positive definiteness of the hydrodynamic matrices is not guaranteed (see \cref{sec:appendix-additional-hydro}).
-To ensure physical consistency, the added mass and damping matrices are required to remain positive definite, and any violations are corrected by reducing the coupling terms $A_c$ and $B_c$.
+Because float and spar coefficients are computed using different approximations, positive definiteness of the hydrodynamic matrices is not guaranteed (see \Cref{sec:appendix-additional-hydro}).
+To ensure physicality, the added mass and damping matrices are required to remain positive definite.
+Any violations are corrected by adjusting the coupling terms $A_c$ and $B_c$.
 
 %  \subsubsection{Spar Dynamics}
 % The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \cite{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
@@ -198,42 +210,45 @@ To ensure physical consistency, the added mass and damping matrices are required
 This subsection introduces the dynamics and control modeling assumptions before detailing the frequency-domain methods and control formulations.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Modified Frequency Domain Techniques}
+\subsubsection{Modified frequency-domain methods}
 \label{sec:mod-freq-domain}
 
 \ifdefined\DISSERTATION
-    Methods for WEC dynamics and control simulation in an optimization context were reviewed in \cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), modified frequency domain techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
+    Methods for WEC dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), quasi-linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
     In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
-    This section describes both the technical concept and the practical rationale for the choice of a modified frequency domain method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
+    This section describes both the technical concept and the practical rationale for the choice of a quasi-linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
     Inherent nonlinearities such as drag significantly affect the amplitude and power production at resonance.
     Even with linearized intrinsic dynamics, maintaining optimality subject to dynamic constraints also requires a nonlinear controller.
     Dynamic constraints on amplitude, force, and peak power significantly influence the trade-off of power and cost, and amplitude limits are required to obtain a physically meaningful result.
     Besides nonlinearities, MDOcean also requires a low computation cost, since the dynamics will be evaluated many thousands of times during optimization.
-    Of the methods mentioned, Pontryagin's maximum principle (PMP) and modified frequency domain techniques meet these requirements.
+    Of the methods mentioned, Pontryagin's maximum principle (PMP) and quasi-linearized pseudo-spectral techniques meet these requirements.
     PMP requires an analytically difficult derivation unique to the specific nonlinearities in question because wave energy dynamics have a particular form requiring so-called singular control \cite{zou_optimal_2017}.
-    On the other hand, modified frequency domain techniques are simple and intuitive.
-    Therefore, MDOcean pursues a quasi-linear semi-analytical modified frequency domain method.
+    On the other hand, quasi-linearized pseudo-spectral techniques are simple and intuitive.
+    Therefore, MDOcean pursues a semi-analytical quasi-linearized pseudo-spectral method.
 \else
-    Standard linear frequency-domain WEC analysis assumes monochromatic wave forcing and linear dynamics, enabling closed-form impedance-matched optimal control.
+    Standard linear frequency-domain WEC analysis assumes unconstrained linear dynamics, enabling closed-form impedance-matched optimal control.
     However, real WECs are subject to (i) dynamic constraints (e.g., generator force, power, and stroke limits) and (ii) nonlinear forces, particularly viscous drag.
     Time-domain simulation handles both naturally but is computationally expensive, especially in an optimization loop.
-    Pseudo-spectral methods handle constraints by collocating dynamic equations within an optimization, but require an outer numerical optimizer for control synthesis.
+    Pseudo-spectral methods are nonlinear and handle constraints by collocating the dynamics at specific time-steps, but require an outer numerical optimizer for both simulation and control synthesis.
 \fi
-MDOcean adopts a modified frequency-domain approach that retains the speed of frequency-domain analysis while handling both constraints and drag nonlinearities.
-This formulation seeks to preserve the computational advantages of classical frequency-domain analysis while extending its applicability to practical WEC operating regimes that include saturation, drag, and dynamic constraints.
-Two techniques are combined: (a) describing functions, which quasi-linearize a nonlinear waveform by retaining only its fundamental harmonic, and (b) an analytical quadratically-constrained quadratic program (QCQP) for the constrained linear controller, exploiting the low dimensionality of the monochromatic problem.
-The analytical structure of the monochromatic problem permits many constrained-control solutions to be obtained without iterative numerical optimization, substantially reducing computational cost in large parametric studies.
-\Cref{fig:venn-diagram} positions these techniques relative to existing methods.
+MDOcean adopts a quasi-linearized pseudo-spectral (QLPS) approach that retains the speed of frequency-domain analysis while handling both temporal constraints and drag nonlinearities.
+This formulation seeks to preserve the computational advantages and simplicity of classical linear analysis while extending its applicability to practical WEC operating regimes that include saturation, drag, and dynamic constraints.
+QLPS combines two techniques: (a) describing functions, which quasi-linearize a nonlinear waveform by retaining only its fundamental harmonic,
+and (b) constrained spectral optimal control, which solves the optimal control problem as a quadratically-constrained quadratic program (QCQP) assuming linear dynamics and spectral-domain constraints.
+\Cref{fig:venn-diagram} positions QLPS relative to existing methods.
+Augmenting spectral optimal control with describing functions extends its scope to approximate time-domain constraints and nonlinear dynamics.
+Furthermore, because QLPS assumptions under monochromatic forcing lead to a monochromatic problem, the QCQP becomes univariate for systems with a single control degree of freedom.
+The optimal constrained linear controller can then be found analytically through a geometric interpretation that exploits the low dimensionality. 
+Its nonlinear counterpart can be reconstructed semi-analytically with inverse describing functions.
+Avoiding iterative numerical optimization substantially reduces computational cost in large parametric studies and produces insight into the mathematical structure of dynamic tradeoffs to inform PTO sizing.
 
 \begin{figure}[htbp]
     \centering
-    \resizebox{0.5\linewidth}{!}{%
-    \input{figs/tikz/control_method_venn_diagram.tikz}
-    }
-    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's modified frequency domain approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
-See text for a description of each acronym.}
+    \includegraphics[width=.9\linewidth]{figs/from-matlab/control_method_venn_diagram.pdf}
+    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's quasi-linearized pseudo-spectral approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
+    See text for acronym descriptions.}
     \label{fig:venn-diagram}
 \end{figure}
 
@@ -248,101 +263,109 @@ See text for a description of each acronym.}
     These methods are not optimal control methods and do not incorporate constraints, although it is possible to sub-optimally enforce constraints by applying a saturation nonlinearity to the constrained quantity.
     Finally, methods which combine frequency domain synthesis with constrained optimal control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (OC), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (IM), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (LMIs), typically in the context of robust control \cite{vanantwerp_tutorial_2000}.
 
-    At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``linearized pseudo-spectral OC.''
+    At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``quasi-linearized pseudo-spectral OC.''
     The pseudospectral method uses the same global basis function representation as spectral OC, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \cite{elnagar_pseudospectral_1995}.
     Pseudo-spectral methods often employ Legendre or Chebyshev polynomial bases, although in wave energy Fourier bases are more typical.
     In this case, the method is equivalent to a nonlinear trajectory optimization problem that enforces both spectral-domain harmonic balance and time-domain constraints.
-    The linearized pseudo-spectral method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
+    The quasi-linearized pseudo-spectral method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
     This is exactly analogous to the way that describing functions linearize the harmonic balance method.
     It can also be thought of as the combination of describing functions with constrained impedance matching.
 \fi 
 
-\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation} distinguish two use cases for the modified frequency domain method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the linearized system) and evaluation (simulation of an arbitrary controller's power performance, where the controller, the plant, or both are nonlinear).
+\Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation,fig:mod-freq-domain-combined} distinguish three application workflows for the QLPS method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the quasi-linearized system), evaluation (simulation of an arbitrary controller's power performance, where the controller, plant, or both are nonlinear), and both.
 
-MDOcean uses the linearized pseudo-spectral method for both control synthesis and evaluation.
-In prior wave energy studies (see \Cref{tab:lit}), related linearized pseudo-spectral approaches have primarily been used for evaluation, often with simplified treatments of constraints.
-In contrast, the present work applies the same framework to control synthesis, enabling nonlinear controller design within a frequency-domain formulation.
+MDOcean uses QLPS for both control synthesis and evaluation.
+In prior wave energy studies, related approaches have been used for evaluation, with simplified treatments of constraints (see F+ and PI+ entries in \Cref{tab:lit}).
+We refer to these as the modified frequency-domain family of methods, of which QLPS is the most accurate and optimal.
+In contrast, the present work applies QLPS and other modified frequency-domain methods to control synthesis, enabling nonlinear controller design within a frequency-domain formulation.
 This differs from linearization approaches such as stochastic linearization, which are generally limited to linear controller design.
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
-\caption{Flowchart depicting the linearized pseudo-spectral method with describing function linearization (1)}
-\begin{subfigure}[t]{1.1\linewidth}
+\caption{Flowchart depicting the QLPS method (M1). The describing functions (DFs) for response/constraint, controller, and plant are shown in yellow, pink, and blue respectively.}
+\begin{subfigure}[t]{.9\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}
-    \caption{Control synthesis - applies to (1.1) only.}
+    \caption{Control synthesis - applies to (M1.2) only.}
     \label{fig:mod-freq-domain-synthesis}
 \end{subfigure}
 \vfill
-\begin{subfigure}[t]{1.1\linewidth}
+\begin{subfigure}[t]{.9\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_evaluation.pdf}
-    \caption{Control evaluation - applies to both (1.1) and (1.2).}
+    \caption{Control evaluation - applies to both (M1.1) and (M1.2).}
     \label{fig:mod-freq-domain-evaluation}
 \end{subfigure}
-\end{figure}
+\vfill
+\begin{subfigure}[t]{.9\linewidth}
+    \includegraphics[width=\linewidth]{figs/from-matlab/mod_freq_domain_ctrl_combined.pdf}
+    \caption{Combined synthesis and evaluation.}
+    \label{fig:mod-freq-domain-combined}
+\end{subfigure}
+\end{figure*}
 
-When handling dynamic constraints with a linearized pseudo-spectral method, first the system is linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
+When handling dynamic constraints with a modified frequency-domain method, first the system is (quasi-) linearized and the unconstrained optimal controller (and the response signals corresponding to that controller) are determined in the frequency domain.
 Then the unconstrained response is checked for constraint violations.
 This check can be performed in the frequency domain if the time-domain constraint can be adequately linearized (via describing functions) as a harmonic constraint, as shown in the top of \Cref{fig:mod-freq-domain-synthesis}, or the response can be reconstructed in the time domain via the inverse describing function if the constraint is not easily representable via harmonics.
 If the response for a given sea state does not violate any constraints, then the unconstrained controller and corresponding power is used for that sea state as the frequency-domain linear optimal controller.
 Otherwise, a variety of approaches are possible to address the violated constraint, summarized in \Cref{tab:constraint-approaches} and described below.
-Methods M1 and M2 can be used for both control synthesis and evaluation, while methods M4--M5 can only be used for evaluation since they do not attempt to find a controller that satisfies the constraint.
-Method M3 can in general only be used for evaluation, although in the special case where the only time-domain constraint is on the control force, the method can be used for control synthesis.
+Methods M1--M2 can be used for both control synthesis and evaluation, while methods M4--M5 can only be used for evaluation since they do not attempt to find a controller that satisfies the constraint.
+Method M3 can, in general, only be used for evaluation.
+However, in the special case where the only time-domain constraint is on the control force, the method can be used for control synthesis.
 
 \begin{table}[htbp]
 \centering
-\caption{Constraint Satisfaction Approaches for Modified Frequency Domain Methods}
+\caption{Constraint satisfaction approaches for modified frequency domain methods. Filled stars indicate better performance.}
 \label{tab:constraint-approaches}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.6\linewidth}l l}
-\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \hline
-(M1) Nonlinear optimal (or near-optimal) controller, linearized via describing functions& High & High \\
-(M2) Linear optimal controller& High & Medium \\
-(M3) Saturate or zero the times with constraint violations, neglecting the effect on other signals& Medium & Medium-low\\
-(M4) Saturate or zero entire sea state& Low & Low \\
-(M5) Mark design as infeasible& N/A& Lowest \\
+\begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l l}
+&\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \toprule
+M1 & Nonlinear optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
+M2 & Linear optimal controller& \Stars{3} & \Stars{2} \\ \hline
+M3 & Saturate or zero the times with constraint violations, neglecting the effect on other signals& \Stars{2} & \Stars{1}\\ \hline
+M4 & Saturate or zero entire sea state& \Stars{1} & \Stars{0.5} \\ \hline
+M5 &Mark design as infeasible& N/A& \Stars{0} \\
 \end{tabular}
 \end{table}
 
 % --- M1 ---
+\paragraph{M1: QLPS with nonlinear control}
 The modified frequency-domain approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
 This synthesis can occur in a number of ways.
+If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via the Pontryagin Maximum Principle (PMP)) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of QLPS in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
 \ifdefined\DISSERTATION
-    If a time-domain PMP control law is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of the modified frequency-domain linearization in the control synthesis step (\cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\cref{fig:mod-freq-domain-evaluation}).
     This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \cite{zou_optimal_2017}) or analytical time-integration (as in the method of \cite{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
-    For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization, and then adjusting it to be nonlinear using insights from signal saturation and filtering, which is the approach pursued here for the force limit.
-    This approach (M1.2) should be considered the primary formulation of the modified frequency domain method, and the other approaches (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of this method with varying levels of accuracy and optimality.
-    In either case (M1.1 and M1.2), the nonlinear controller is linearized via the describing function method.
-\else
-    For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
-    and then adjusting it to be nonlinear using insights from signal saturation and filtering.
-    This is the approach pursued here for the force limit.
-    The nonlinear controller is linearized via the describing function method.
 \fi
+For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
+(M2) and then adjusting it to be nonlinear using insights from signal saturation and filtering.
+This is the approach pursued here for the force limit.
+M1.2 should be considered the primary formulation of QLPS, and the other modified frequency-domain methods (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of QLPS with varying levels of accuracy and optimality.
+M1.1 and M1.2 both linearize the nonlinear controller via the describing function method.
 In addition to the control nonlinearity, a describing function is also utilized to linearize the plant drag nonlinearity.
 
 % --- M2 ---
+\paragraph{M2: QLPS with linear control}
 If a nonlinear controller or the corresponding describing function to linearize it are not available, the most optimal linear controller that obeys the constraint can be used instead (M2).
 This approach accurately evaluates the maximum power that a linear controller could produce, although this power will be lower (less optimal) than that of the optimal nonlinear controller.
 MDOcean pursues this approach for amplitude limits in the operational design load case.
 
 \ifdefined\DISSERTATION
-    The constrained optimization to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \cref{sec:optimal-control}.
+    The constrained optimization to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \Cref{sec:optimal-control}.
     The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
-    The analytical approach is nonetheless derived in \cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \cref{sec:appendix-qp-solution} and reference \cite{mccabe_force-limited_2024}) and recommended for future implementation.
+    The analytical approach is nonetheless derived in \Cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \Cref{sec:appendix-qp-solution} and reference \cite{mccabe_force-limited_2024}) and recommended for future implementation.
 \else
     The constrained optimization used to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain;
-    the analytical derivation is provided in \cref{sec:optimal-control}, with additional details in \cref{sec:appendix-qp-solution}.
+    the analytical derivation is provided in \Cref{sec:optimal-control}, with additional details in \Cref{sec:appendix-qp-solution}.
 \fi
 
 % --- M3, M4, M5 ---
+\paragraph{M3--M5: Constrained frequency-domain estimates}
 If neither a numerical nor an analytical implementation is available to identify the optimal constrained linear controller, then the violating portion of the time-domain signals can be saturated or zeroed for the sake of power calculation (M3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common modified frequency domain method in the marine energy field.
+    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \else
-    This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
-    and is the most common modified frequency-domain method in the marine energy field.
+    This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
+    and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \fi
 It is utilized here for the power limit.
 
@@ -359,7 +382,7 @@ The latter approach (M5) is actually the only option for evaluation of slamming 
 %Approach (M5) is also pursued here for amplitude limits in the operational design load case, in the interest of consistency and implementation expedience. 
 
 \Cref{tab:nonlinearities} summarizes the dynamic nonlinearities and limits and the method MDOcean currently uses to handle each.
-The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \cite{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
+The describing function for control force is prioritized due to its simpler implementation as well as the force constraint's frequent activity and strong impact on results observed in prior RM3 optimizations \citep{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024}.
 \ifdefined\DISSERTATION
     In future work, MDOcean could instead utilize describing functions (M1.2) or the optimal constrained linear controller (M2) for the power and operational amplitude limits respectively to improve accuracy and optimality.
 \fi
@@ -368,7 +391,7 @@ The describing function for control force is prioritized due to its simpler impl
     \centering
     \caption{Dynamic nonlinearities and approach for each}
     \label{tab:nonlinearities}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.7\linewidth}}
+\begin{tabular}{L{0.25\linewidth}L{0.7\linewidth}}
          \textbf{Dynamic nonlinearity/limit}& \parbox{\linewidth}{\centering\textbf{Method}}\\ \hline
          Drag& Describing function (M1.2) for $\sin(\omega t)|\sin(\omega t)|$ with iteration to find effect on response and optimal controller\\
          Force limit& Describing function (M1.2) for $\text{sat}(\sin(\omega t))$ with iteration to find effect on response and optimal controller\\
@@ -387,10 +410,10 @@ Describing functions assume a certain time-domain nonlinear signal shape and the
 \fi
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
-The former encodes the describing function formula directly into the simulation (see derivation in \cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \cref{sec:appendix-force-sat}).
+The former encodes the describing function formula directly into the simulation (see derivation in \Cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
 
 \ifdefined\DISSERTATION
-    This is possible because the describing function modified frequency domain method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \cref{fig:mod-freq-domain-synthesis} is fed into the top left of \cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
+    This is possible because the describing function quasi-linearized pseudo-spectral method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \Cref{fig:mod-freq-domain-synthesis} is fed into the top left of \Cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
     Unless intentionally made different to study robustness, the linearized plant model is identical for the synthesis and evaluation steps.
     In this case, two workflows essentially become one, with no further computation required after the optimal control step.
     Reconstruction of the nonlinear controller is not necessary for the evaluation of the power corresponding to that controller.
@@ -406,7 +429,7 @@ MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabl
 %%%%%%%%%%%%%%%
 \subsubsection{Equation of Motion}\label{sec:eom}
 \ifdefined\DISSERTATION
-    Before applying the modified frequency domain method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
+    Before applying the quasi-linearized pseudo-spectral method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
     Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
     The MDOcean dynamic model combines the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
@@ -416,12 +439,12 @@ The float and spar are each modeled as a floating rigid body, and the two bodies
 Forces include wave excitation $\vec{F}_e$, hydrodynamic radiation $\vec{F}_{rad}$, hydrostatic restoring $\vec{F}_{res}$, drag $\vec{F}_d$, and power takeoff $\vec{F}_p$.
 
 \ifdefined\DISSERTATION
-    The MDOcean dynamic model assumes regular waves for reasons to be detailed in \cref{sec:irregular-waves}, so the system experiences monochromatic wave forcing.
+    The MDOcean dynamic model assumes regular waves for reasons to be detailed in \Cref{sec:irregular-waves}, so the system experiences monochromatic wave forcing.
     Combined with the linearity of the model, this implies that all signals are sinusoids.
     Therefore, the time-domain radiation force is a simple product rather than a convolution integral.
     With these considerations, the equation of motion can be expressed in the time domain as:
 \else
-    Under the regular-wave assumption justified in \cref{sec:irregular-waves}, all signals are sinusoidal
+    Under the regular-wave assumption justified in \Cref{sec:irregular-waves}, all signals are sinusoidal
     and the radiation force reduces to a simple product rather than a convolution integral, yielding the time-domain equation of motion:
 \fi
 
@@ -440,7 +463,7 @@ where, in the frequency domain under monochromatic forcing,
     \vec{F}_{p}(t)   &= -\mathbf{B}_p\dot{\vec{\xi}}(t) - \mathbf{K}_p\vec{\xi}(t).
 \end{aligned}
 \end{equation}
-for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in \cref{sec:hydro}.
+for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in \Cref{sec:hydro}.
 The mass matrix is:
 \begin{equation}
 \mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
@@ -450,9 +473,9 @@ The mass matrix is:
     For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\vec{\gamma}_d$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
     The excitation coefficients $\vec{\gamma}$ and $\vec{\gamma}_d$ are complex, and all other coefficients are real.
 \else
-    Hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ come from \cref{sec:hydro};
-    drag coefficients $\mathbf{B_d}$, $\vec{\gamma}_d$ are derived in \cref{sec:drag};
-    PTO coefficients $\mathbf{B_p}$, $\mathbf{K_p}$ are derived in \cref{sec:appendix-pto-model,sec:optimal-control}.
+    Hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ come from \Cref{sec:hydro};
+    drag coefficients $\mathbf{B_d}$, $\vec{\gamma}_d$ are derived in \Cref{sec:drag};
+    PTO coefficients $\mathbf{B_p}$, $\mathbf{K_p}$ are derived in \Cref{sec:appendix-pto-model,sec:optimal-control}.
     The excitation coefficients $\vec{\gamma}$ and $\vec{\gamma}_d$ are complex;
     all others are real.
 \fi
@@ -467,16 +490,16 @@ where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damp
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\mathbf{Z}_p = \mathbf{B}_p+\frac{\mathbf{K}_p}{i\omega}$.
 
-Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} are represented as a multiport circuit (\cref{fig:multiport-circuit-intrinsic}), with effort variables $\vec{e}$ and flow variables $\vec{q}$ at each port.
+Equations \eqref{eq:eom-freq-domain}-\eqref{eq:intrinsic-impedance} are represented as a multiport circuit (\Cref{fig:multiport-circuit-intrinsic}), with effort variables $\vec{e}$ and flow variables $\vec{q}$ at each port.
 Three matrix forms describe the port relationships:
 impedance ($\mathbf{Z}$) groups all ports together;
-cascade ($\mathbf{a}$/ABCD) transmits efforts and flows sequentially between port groups and is used for the PTO dynamics (\cref{sec:appendix-pto-model});
+cascade ($\mathbf{a}$/ABCD) transmits efforts and flows sequentially between port groups and is used for the PTO dynamics (\Cref{sec:appendix-pto-model});
 hybrid ($\mathbf{h}$) mixes the two and is used for the PTO kinematics.
-Full conventions, conversion formulas, and the cascade inversion rule are given in \cref{sec:appendix-multiport}, following \cite{reveyrand_multiport_2018}.
+Full conventions, conversion formulas, and the cascade inversion rule are given in \Cref{sec:appendix-multiport}, following \cite{reveyrand_multiport_2018}.
 
 \begin{figure}[htbp]
 \centering
-    \input{figs/tikz/circuit_intrinsic.tikz}
+    \includegraphics[width=\linewidth]{figs/from-matlab/circuit_intrinsic.pdf}
 \caption{Multiport circuit for two hydrodynamic degrees of freedom with intrinsic and powertrain impedances $\mathbf{Z}_i$ and $\mathbf{Z}_p$}
 \label{fig:multiport-circuit-intrinsic}
 \end{figure}
@@ -487,11 +510,11 @@ This bounds the maximum absorbed power for any geometry.
 
 %%%%%%%%%%%%%%%
 \subsubsection{PTO Model}\label{sec:pto-dynamics-overview}
-The PTO model specifies the generic powertrain impedance matrix $\mathbf{Z}_p$ in \cref{eq:eom-freq-domain}.
+The PTO model specifies the generic powertrain impedance matrix $\mathbf{Z}_p$ in \Cref{eq:eom-freq-domain}.
 It is a linear multiport effort-flow model that is valid for multiple degree of freedom devices across various energy domains.
 It consists of PTO kinematics (a hybrid matrix relating body degrees of freedom to the PTO port, accommodating underactuation) and PTO dynamics (cascade matrices for a mechanical drivetrain and permanent magnet generator, relating the PTO port to the generator electrical port, with generator voltage $\hat{V}$ and current $\hat{I}$ as the effort and flow variables).
 The Thévenin equivalent circuit method is used to find the effective intrinsic impedance $Z_{s,th}$ and open-circuit source voltage $\hat{V}_{s,th}$ viewed from the generator electrical port, as required for impedance matching.
-Details and circuit diagrams are provided in \cref{sec:appendix-pto-dynamics}.
+Details and circuit diagrams are provided in \Cref{sec:appendix-pto-dynamics}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Power Production}\label{sec:power}
@@ -505,18 +528,18 @@ The instantaneous time-domain power at any port is simply the product of the por
     The same expression is evaluated at the floating body, PTO, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,q\}$.
 \fi
 
-In the frequency domain assuming sinusoidal waveforms, the active power $P$, reactive power $Q$, complex power $S$, and apparent power $|S|$ from electrical engineering \cite{saadat_power_1999} are
+In the frequency domain assuming sinusoidal waveforms, the active power $P$, reactive power $Q$, complex power $S$, and apparent power $|S|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    P &= \tfrac{1}{2}\Re(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Re(Z)|\hat{q}|^2,
-    & Q &= \tfrac{1}{2}\Im(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Im(Z)|\hat{q}|^2, \\
-    S &= P + iQ = \tfrac{1}{2}\hat{e}\hat{q}^* = \tfrac{1}{2}Z|\hat{q}|^2,
-    & |S| &= \tfrac{1}{2}|Z||\hat{q}|^2,
+    P &= \tfrac{1}{2}\Re(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Re(Z)|\hat{q}|^2,\\
+    Q &= \tfrac{1}{2}\Im(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Im(Z)|\hat{q}|^2, \\
+    S &= P + iQ = \tfrac{1}{2}\hat{e}\hat{q}^* = \tfrac{1}{2}Z|\hat{q}|^2, \\
+    |S| &= \tfrac{1}{2}|Z||\hat{q}|^2,
 \end{aligned}
 \end{equation}
 where the port is terminated with complex impedance $Z$ and $(\,)^*$ denotes the conjugate transpose.
 
-The average and peak powers over a wave period, derived in \cref{sec:appendix-power-time}, are
+The average and peak powers over a wave period, derived in \Cref{sec:appendix-power-time}, are
 \begin{equation}\label{eq:power-avg-peak}
     p_{avg} = P, \qquad p_{pk} = P + |S|.
 \end{equation}
@@ -528,9 +551,9 @@ To capture non-dynamic power losses such as those in an electrical drive, a cons
     Note that this is not strictly equivalent to assuming the generator has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
     The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
 \fi
-Validation in \cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \cite{RM3}.
+Validation in \Cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \cite{RM3}.
 
-The full expansion of $p_{\text{avg},\text{elec}}$ and $p_{pk,\text{elec}}$ in terms of the optimal-control variables $B_l$, $K_l$, and the electrical-port current phasor $\hat{I}$ is given in \cref{sec:appendix-power-elec}.
+The full expansion of $p_{\text{avg},\text{elec}}$ and $p_{pk,\text{elec}}$ in terms of the optimal-control variables $B_l$, $K_l$, and the electrical-port current phasor $\hat{I}$ is given in \Cref{sec:appendix-power-elec}.
 
 % Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
 % \begin{equation}
@@ -592,12 +615,12 @@ We first compile expressions for all metrics $M$ which must be constrained.
     \hat{e} \\ \hat{q}
     \end{bmatrix}
 \end{equation}
-The matrices for various metrics are given in \cref{tab:power-metrics}.
-\begin{table}[htbp]
+The matrices for various metrics are given in \Cref{tab:power-metrics}.
+\begin{table}[bhp]
 \centering
-\caption{Matrices for calculating various metrics at a port via \cref{eq:metrics}}
+\caption{Matrices for calculating various metrics at a port via \Cref{eq:metrics}}
 \label{tab:power-metrics}
-\begin{tabular}{l|ccccc}
+\begin{tabular}{L{0.1\linewidth}|ccccc}
     Metric $M$ & $p_{\text{avg}}=P$ & $Q$ & $S$ & $|\hat{e}|^2$ & $|\hat{q}|^2$ \\ \hline
     Matrix $\mathbf{A}_M$ &
     $\begin{bmatrix}
@@ -628,7 +651,7 @@ The matrices for various metrics are given in \cref{tab:power-metrics}.
 \end{tabular}
 \end{table}
 
-Note that the apparent power $|S|$, and therefore the peak power from \cref{eq:power-avg-peak}, cannot be written in the quadratic form of \cref{eq:metrics} and is instead fourth-order:
+Note that the apparent power $|S|$, and therefore the peak power from \Cref{eq:power-avg-peak}, cannot be written in the quadratic form of \Cref{eq:metrics} and is instead fourth-order:
 \begin{equation}
     |S|^2 = S S^* = \frac{1}{16} \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}^*
     \mathbf{A}_S
@@ -637,13 +660,13 @@ Note that the apparent power $|S|$, and therefore the peak power from \cref{eq:p
     \mathbf{A}_S^T
     \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}
 \end{equation}
-Peak power constraints use a more complicated approach discussed in \cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
+Peak power constraints use a more complicated approach discussed in \Cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
 
-To implement the constraints, we create an intentional linear impedance mismatch, sacrificing power to satisfy the limits (method M2 in \cref{tab:constraint-approaches}).
-For select constraints where a describing function is available (currently the torque limit), we additionally use nonlinear control to satisfy the limit with less of a power sacrifice (method M1.2 in \cref{tab:constraint-approaches}).
+To implement the constraints, we create an intentional linear impedance mismatch, sacrificing power to satisfy the limits (method M2 in \Cref{tab:constraint-approaches}).
+For select constraints where a describing function is available (currently the torque limit), we additionally use nonlinear control to satisfy the limit with less of a power sacrifice (method M1.2 in \Cref{tab:constraint-approaches}).
 
-For the linear impedance mismatch, the average electrical power from \cref{eq:power-avg-peak} can be maximized subject to quadratic constraints on the effort and flow variables.
-This is a quadratically constrained quadratic program (QCQP):
+For the linear impedance mismatch, the average electrical power from \Cref{eq:power-avg-peak} can be maximized subject to quadratic constraints on the effort and flow variables.
+This is a quadratically-constrained quadratic program (QCQP):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
 & \max_{\vec{x} \in \mathbb{C}^2} & p_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{A}_P \vec{x} \\[3pt]
@@ -665,12 +688,12 @@ This is a quadratically constrained quadratic program (QCQP):
 
 The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ enforces the WEC and PTO dynamics through a voltage-current relationship at the generator electrical port, while the quadratic inequality constraints encode limits on linear or quadratic combinations of effort and flow at any port.
 \ifdefined\DISSERTATION
-    The specific quantities constrained in this case are shown in \cref{tab:qp-constraints}.
+    The specific quantities constrained in this case are shown in \Cref{tab:qp-constraints}.
     More precisely, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
-    In addition to the amplitude limits shown in the first three rows of \cref{tab:qp-constraints}, a differently-structured quadratic amplitude constraint will be presented in \cref{sec:design-load-cases} (see \cref{eq:slam-constraint-quadratic}) representing a coupled amplitude-phase criterion for the bodies to not exit the water or be fully submerged.
+    In addition to the amplitude limits shown in the first three rows of \Cref{tab:qp-constraints}, a differently-structured quadratic amplitude constraint will be presented in \Cref{sec:design-load-cases} (see \Cref{eq:slam-constraint-quadratic}) representing a coupled amplitude-phase criterion for the bodies to not exit the water or be fully submerged.
 \else
-    Constraints implemented in MDOcean include generator torque, mechanical power, float and spar amplitudes, PTO amplitude, and electrical power positivity; quadratic coefficients $\{\mathbf{Q}_i, \vec{a}_i, b_i\}$ for each are given in \cref{tab:qp-constraints} (\cref{sec:appendix-qp-constraints-table}).
-    A differently-structured quadratic amplitude constraint for float and spar slamming/submersion is presented in \cref{sec:design-load-cases}.
+    Constraints implemented in MDOcean include generator torque, mechanical power, float and spar amplitudes, PTO amplitude, and electrical power positivity; quadratic coefficients $\{\mathbf{Q}_i, \vec{a}_i, b_i\}$ for each are given in \Cref{tab:qp-constraints} (\Cref{sec:appendix-qp-constraints-table}).
+    A differently-structured quadratic amplitude constraint for float and spar slamming/submersion is presented in \Cref{sec:design-load-cases}.
 \fi
 
 \Cref{eq:opt-problem} has the following solution:
@@ -678,25 +701,27 @@ The linear equality constraint $\vec{c}^{\,*}\vec{x} = d$ enforces the WEC and P
 \begin{aligned}
     \vec{x}_{opt} &=
     \frac{\hat{V}_{s,th}}{2\Re(Z_{s,th})}
-        \begin{bmatrix} Z_{s,th}^* (1+\Gamma) \\ 1-\Gamma \end{bmatrix} \\
-    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
+        \begin{bmatrix} Z_{s,th}^* (1+\Gamma_{\text{opt}}) \\ 1-\Gamma_{\text{opt}} \end{bmatrix} \\
+    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
-where $\Gamma$ is a complex scalar with magnitude between 0 and 1 called the reflection coefficient.
+where $\Gamma_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
 The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch.
-$\Gamma=0$ corresponds to the impedance-matched solution (no active inequality constraints).
+$\Gamma_{\text{opt}}=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
 \ifdefined\DISSERTATION
-    As \cref{sec:mod-freq-domain} describes, the solution for $\Gamma$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
+    As \Cref{sec:mod-freq-domain} describes, the solution for $\Gamma_{\text{opt}}$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
     Direct methods solve the optimization problem itself, while indirect methods first derive the optimality conditions and then solve those conditions.
-    MDOcean currently implements both the analytical approach, which corresponds to the explicit architecture in \cref{fig:control-arch}, and the numerical indirect approach, which corresponds to the implicit architecture in \cref{fig:control-arch}.
-    The analytical approach is described in \cref{sec:appendix-qp-solution}, and the numerical indirect approach in \cref{sec:appendix-qp-numerical}.
+    MDOcean currently implements both the analytical approach, which corresponds to the explicit architecture in \Cref{fig:control-arch}, and the numerical indirect approach, which corresponds to the implicit architecture in \Cref{fig:control-arch}.
+    The analytical approach is described in \Cref{sec:appendix-qp-solution}, and the numerical indirect approach in \Cref{sec:appendix-qp-numerical}.
 
-    The numerical direct approach can correspond to either the nested architecture or the simultaneous architecture of \cref{fig:control-arch}.
-    While the nested architecture solves the quadratic program \cref{eq:opt-problem}, the simultaneous architecture integrates the QCQP into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation.
+    The numerical direct approach can correspond to either the nested architecture or the simultaneous architecture of \Cref{fig:control-arch}.
+    While the nested architecture solves the quadratic program \Cref{eq:opt-problem}, the simultaneous architecture integrates the QCQP into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation.
     It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is used for all results and benchmarks presented here.
 \else
-    Both analytical and numerical-indirect solutions for $\Gamma$ are implemented in MDOcean and described in \cref{sec:appendix-qp-solution,sec:appendix-qp-numerical}; the analytical approach has a geometric interpretation as a minimum-distance problem on the complex plane of $\Gamma$ (see \cref{sec:appendix-qp-solution}) and is used for all results presented here.
+    Both analytical and numerical-indirect solutions for $\Gamma_{\text{opt}}$ are implemented in MDOcean.
+    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\Gamma_{\text{opt}}$ and is used for all results presented here.
+    \citet[Appendix A.3.3]{mccabe_dissertation_2026} describes the numerical-indirect approach.
 \fi
 
 \paragraph{Nonlinear controller}
@@ -710,37 +735,36 @@ $\Gamma=0$ corresponds to the impedance-matched solution (no active inequality c
 \else
     The maximum generator torque constraint is handled separately.
     Saturation makes the optimal torque non-sinusoidal (approaching a square wave for low torque limits), which would normally require time-domain simulation.
-    The describing function method instead represents the saturated signal by its fundamental Fourier component (\cref{fig:desc-fcns}a), with higher harmonics filtered out by the second-order plant.
+    The describing function method instead represents the saturated signal by its fundamental Fourier component (\Cref{fig:desc-fcns}a), with higher harmonics filtered out by the second-order plant.
 \fi
 
 \begin{figure}[htbp]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/saturation_desc_fcn.pdf}
-    \caption{Saturated sin vs. time (red) and its fundamental amplitude (blue).}\label{fig:sat}
+    \caption{Generator torque saturation}\label{fig:sat}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
     \includegraphics[width=\linewidth]{figs/from-matlab/drag_desc_fcn.pdf}
-    \caption{Conceptual demonstration of the drag describing function in the time domain.
-The nonlinear signal (red) is approximated by its fundamental amplitude (blue).}\label{fig:drag-df}
+    \caption{Quadratic drag}\label{fig:drag-df}
 \end{subfigure}
-\caption{Describing function approximations for force saturation (a) and drag (b).}\label{fig:desc-fcns}
+\caption{Conceptual demonstration of describing function approximations. Plots show force versus time. Nonlinear signals in red; fundamental amplitudes in blue.}\label{fig:desc-fcns}
 \end{figure}
-Details of the calculation are provided in \cref{sec:appendix-force-sat}.
-The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \cref{eq:constrained-qp-solution}.
+Details of the calculation are provided in \Cref{sec:appendix-force-sat}.
+The result is updated effective values for control gains $B_l$ and $K_l$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \Cref{eq:constrained-qp-solution}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Drag}\label{sec:drag}
 \ifdefined\DISSERTATION
-    The hydrodynamics model of \cref{sec:hydro} does not capture all fluid forces on the body due to its linear, irrotational, and inviscid assumptions.
+    The hydrodynamics model of \Cref{sec:hydro} does not capture all fluid forces on the body due to its linear, irrotational, and inviscid assumptions.
     More specifically, viscous shear stresses (skin friction),
     higher-order nonlinear potential flow effects, and
     steady and unsteady viscous separation phenomena are all neglected.
     In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
     These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 \else
-    The linear, inviscid hydrodynamics model of \cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \cite{quartier_influence_2021}.
+    The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \citep{quartier_influence_2021}.
     Without modeling drag, the predicted resonant amplitude is unrealistically high and power is overestimated.
 \fi
 
@@ -750,26 +774,32 @@ The resulting quadratic form $|\vec{F}_d|\sim|\vec{v}_{\text{rel}}|^2$ implies a
 To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \cite{quartier_influence_2021}.
 The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ is modeled with empirical drag coefficient vector $\vec{C}_d$:
 \begin{equation}\label{eq:drag-pressure}
+    \vec{p}_{d}(y,t) = \frac{1}{2}\rho_w \vec{C}_d ~\vec{v}_{rel}(y,t) |\vec{v}_{rel}(y,t)|
+\end{equation}
+\Cref{eq:drag-pressure-approx} expands the velocity term then applies the describing function approximation:
+\begin{equation}\label{eq:drag-pressure-approx}
 \begin{aligned}
-    \vec{p}_{d}(y,t) &= \frac{1}{2}\rho_w \vec{C}_d ~\vec{v}_{rel}(y,t) |\vec{v}_{rel}(y,t)| \\     
-    &= \frac{1}{2}\rho_w \vec{C}_d ~|\vec{\hat{V}}_{rel}(y)|^2 \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y)) \left| \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\right|\\
-    &\approx \frac{1}{2}\rho_w \vec{C}_d ~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
+    \left(\vec{v}_{rel}(y,t)~\cdot\right.\\
+    \left.\left|\vec{v}_{rel}(y,t)\right|\right)
+    &= |\vec{\hat{V}}_{rel}(y)|^2 \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y)) 
+    \left| \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\right|\\
+    &\approx~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
 \end{aligned}
 \end{equation}
 where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
-The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \cref{sec:appendix-drag} (\cref{eq:wave-velocity-phasor}). 
+The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \Cref{sec:appendix-drag} (\Cref{eq:wave-velocity-phasor}). 
 
 The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in \Cref{fig:desc-fcns}(b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
 
-Integrating the drag pressure over the wetted surface via strip theory (\cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
+Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
 \begin{equation}\label{eq:drag-damping-excitation}
     \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \cref{sec:appendix-drag}.
-Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \cref{sec:appendix-drag} (\cref{eq:drag-coeffs}).
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
+Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
 The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
@@ -781,31 +811,31 @@ The resulting magnitude and phase of WEC motion are obtained by numerically conv
 
 %%%%%%%%%%%%%%%
 \subsubsection{Energy Production}
-The analysis thus far either is sea-state agnostic (\cref{sec:geom}) or applies separately to each individual sea state (\cref{sec:hydro,sec:dynamics}).
+The analysis thus far either is sea-state agnostic (\Cref{sec:geom}) or applies separately to each individual sea state (\Cref{sec:hydro,sec:dynamics}).
 We now combine the results across sea states to find the long-term energy statistics in a given wave environment.
 
 \ifdefined\DISSERTATION
-    While matrices in \cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\vec{\hat{\xi}}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\hat{\xi}_f$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
+    While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\vec{\hat{\xi}}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\hat{\xi}_f$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
     These scalars are assembled into ``matrices'' (i.e.\ $\mathbf{\hat{\xi}}^{H,T}_f$) indexed by sea state rather than by degree of freedom, indicated by the $H,T$ superscript.
     Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
-    To distinguish from the average and maximum signal values over a wave period denoted with $avg$ and $pk$ subscripts in \cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $max$.
-    This intentionally matches the $max$ subscript used in \cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
-    An exception is the slamming and submergence constraints, which will be discussed separately in \cref{sec:design-load-cases}.
+    To distinguish from the average and maximum signal values over a wave period denoted with $avg$ and $pk$ subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $max$.
+    This intentionally matches the $max$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
+    An exception is the slamming and submergence constraints, which will be discussed separately in \Cref{sec:design-load-cases}.
 \else
     Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{H,T}$ (e.g.\ $\mathbf{P}_{\text{elec}}^{H,T}$),
     with operations interpreted elementwise across sea states rather than as matrix multiplication.
     Long-term averages across sea states are denoted with an overbar $\overline{(\cdot)}$ and long-term maxima with subscript $max$,
-    distinguishing them from the within-period averages and peaks ($avg$, $pk$) introduced in \cref{sec:power}.
-    A separate quadratic amplitude limit for slamming and submergence, which varies across sea states, is treated in \cref{sec:design-load-cases}.
+    distinguishing them from the within-period averages and peaks ($avg$, $pk$) introduced in \Cref{sec:power}.
+    A separate quadratic amplitude limit for slamming and submergence, which varies across sea states, is treated in \Cref{sec:design-load-cases}.
 \fi
 
 To find the long-term average power production $\overline{P}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
-This method is illustrated in \cref{fig:JPD-multiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study \cite{janzou_system_2020}.
+This method is illustrated in \Cref{fig:JPD-multiply}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \cite{janzou_system_2020}.
 
 \begin{figure}[b!]
 \centering
-\includegraphics[width=0.75\linewidth]{figs/manual/jpd_mult.pdf}
+\includegraphics[width=\linewidth]{figs/manual/jpd_mult.pdf}
 \caption{Power matrix multiplication}
 \label{fig:JPD-multiply}
 \end{figure}
@@ -865,7 +895,7 @@ MDOcean currently uses the fundamental amplitude for both load cases:
 \begin{equation}\label{eq:peak-fluid-force}
 \max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
 \end{equation}
-This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \cref{sec:appendix-peak-fluid-force}.
+This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
 \ifdefined\DISSERTATION
     The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_t |\xi_f(t)|$ and $\max_t |\xi_s(t)|$ in both cases.
     Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
@@ -879,31 +909,31 @@ This approximation can either under- or overestimate the true peak depending on 
     \centering
     \caption{Forces, amplitudes, and maximum allowable amplitudes in each design load case}
 \label{tab:DLCs}
-\begin{tabular}{>{\centering\arraybackslash}p{0.28\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.33\linewidth}}
+\begin{tabular}{P{0.28\linewidth}P{0.3\linewidth}P{0.33\linewidth}}
     & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
     \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Peak powertrain force, $\max_t |F_p(t)|$ \vspace{8pt} }
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:peak-pto-force}} 
+        Given by \Cref{eq:peak-pto-force}} 
         & \parbox[m]{\linewidth}{\centering
-        Solve \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients for $F_p$}\\ \hline
+        Solve \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients for $F_p$}\\ \hline
     \parbox[m]{\linewidth}{\centering 
     Peak fluid force, $\max_t |m\ddot{\xi}(t)-F_p(t)|$ }
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:peak-fluid-force} with \cref{eq:op-hydro-coeffs} coefficients and $F_p$ from \cref{eq:peak-pto-force}}
+        Given by \Cref{eq:peak-fluid-force} with \Cref{eq:op-hydro-coeffs} coefficients and $F_p$ from \Cref{eq:peak-pto-force}}
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:peak-fluid-force} with \cref{eq:st-hydro-coeffs} coefficients and $F_p$ from storm case}\\ \hline
+        Given by \Cref{eq:peak-fluid-force} with \Cref{eq:st-hydro-coeffs} coefficients and $F_p$ from storm case}\\ \hline
     \parbox[m]{\linewidth}{\centering 
     Peak float travel, $\max_t |\xi_f(t)|$ }
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients}
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:eom-freq-domain} with \cref{eq:st-hydro-coeffs} coefficients and $F_p=0$}\\ \hline
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:st-hydro-coeffs} coefficients and $F_p=0$}\\ \hline
     \parbox[m]{\linewidth}{\centering 
     Peak spar travel, $\max_t |\xi_s(t)|$ }
         & \parbox[m]{\linewidth}{\centering 
-        Given by \cref{eq:eom-freq-domain} with \cref{eq:op-hydro-coeffs} coefficients}
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients}
         &Equals $\xi_f$ due to brake\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Maximum allowable relative amplitude between float and spar, $|\xi_f-\xi_s|_{\text{max}}$ \vspace{8pt}}
@@ -920,7 +950,7 @@ This approximation can either under- or overestimate the true peak depending on 
 \end{tabular}
 \end{table}
 
-The surge force for each component is calculated as \cite{newman_motions_1963}
+The surge force for each component is calculated as \citep{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
    F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (e^{-kz_{\text{top}}}-e^{-kT})
 \end{equation}
@@ -930,21 +960,24 @@ The design surge force is the maximum surge force over all nonzero-probability s
 Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
 Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work. 
 Maximum acceptable heave %and surge 
-forces will be evaluated with structural factors of safety in \cref{sec:structures}.
-The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the optimization.
+forces will be evaluated with structural factors of safety in \Cref{sec:structures}.
+The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the simulation.
 
 The table also indicates the maximum permissible amplitudes.
 In operational sea states, the geometric clearance between the float and spar is enforced to prevent overtravel.
 The permissible heights for upward and downward motion of the float relative to the spar are:
 \begin{equation}\label{eq:h-fs-up-down}
-    h_{fs,\text{up}} = h_s - T_s - (h_f- T_{f,2}), \qquad h_{fs,\text{down}} = T_s - T_{f,2} - h_d
+\begin{aligned}
+    h_{fs,\text{up}} &= h_s - T_s - (h_f- T_{f,2}) \\
+    h_{fs,\text{down}} &= T_s - T_{f,2} - h_d
+\end{aligned}
 \end{equation}
-Additionally, a limit of $h_{fs,\text{clear}}$ (see definition in \cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
+Additionally, a limit of $h_{fs,\text{clear}}$ (see definition in \Cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
-The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \cref{sec:hydro}.
+The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
 This maximum amplitude $\xi_{\text{linear}}$ for the float and spar respectively is
 \begin{equation}
-    \xi_{f,\text{linear}} = (h-T_{f,2})/10, \qquad \xi_{s,\text{linear}}  = (h-T_s)/10
+    \xi_{f,\text{linear}} = \frac{1}{10}(h-T_{f,2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10}(h-T_s)
 \end{equation}
 \ifdefined\DISSERTATION
     which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
@@ -954,30 +987,30 @@ This maximum amplitude $\xi_{\text{linear}}$ for the float and spar respectively
 
 In both operational and storm states, the WEC surface should not transiently pierce the wave free surface, since this causes extremely high loads.
 This includes slamming (the bottom surface rises out of the water and impacts on reentry) and submersion (the top of the WEC becomes fully submerged).
-The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \cref{sec:appendix-slam}.
-These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \cref{eq:opt-problem}:
+The condition to prevent slamming and submersion in regular waves of height $H$ is derived in \Cref{sec:appendix-slam}.
+These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \Cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \Cref{eq:opt-problem}:
 \begin{equation}\label{eq:slam-constraint-quadratic}
     \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
 \end{equation}
 for relevant vertical body dimension $\Delta z$ and horizontal coordinate $y$.
-The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \cref{sec:appendix-slam}.
+The values of $\Delta z$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \Cref{sec:appendix-slam}.
 
 \ifdefined\DISSERTATION
-    The values $h_{fs,\text{clear}}$, $h_{fs,\text{up}}$, $h_{fs,\text{down}}$, $\xi_{f,\text{linear}}$, and $\xi_{s,\text{linear}}$ are all upper limits and are independent of sea state, while $\xi_{\text{slam}}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \cref{sec:appendix-slam}.
+    The values $h_{fs,\text{clear}}$, $h_{fs,\text{up}}$, $h_{fs,\text{down}}$, $\xi_{f,\text{linear}}$, and $\xi_{s,\text{linear}}$ are all upper limits and are independent of sea state, while $\xi_{\text{slam}}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \Cref{sec:appendix-slam}.
     In early design studies that do not directly compute the hydrodynamic coefficients and associated power production, the amplitude limits proposed here could be plugged into Budal's upper bound, a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity to yield an upper bound on power production \cite{zou_practical_2023}.
 
     Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
     This is a questionable assumption, but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
     \Cref{sec:discussion} will discuss possible future alternatives to this modeling choice.
 \else
-    Both load cases use standard linear wave theory with equivalent regular waves, an approximation whose limitations and possible future alternatives are discussed in \cref{sec:unmodeled-effects}.
+    Both load cases use standard linear wave theory with equivalent regular waves, an approximation whose limitations and possible future alternatives are discussed in \Cref{sec:unmodeled-effects}.
 \fi
 
 % Todo: This \creftab:sea-state} is \hl{possibly out of date now:}
 % \begin{table}[htbp]
 % \centering
 
-% \begin{tabular}{| l  |>{\raggedright\arraybackslash}p{0.35\linewidth}|>{\raggedright\arraybackslash}p{0.35\linewidth}|}
+% \begin{tabular}{| l  |L{0.35\linewidth}|L{0.35\linewidth}|}
 % \hline
 % \textbf{Value} & \textbf{Sea state to use} & \textbf{Saturation to meet it?} \\
 % \hline
@@ -1013,7 +1046,7 @@ This regular wave assumption avoids the time-consuming convolution integral or s
 % Approximation accuracy discussion. Trim closing clause for AOR.
 In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
 If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
-A previous study using a Bretschneider spectrum found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power \cite{coe_practical_2021}, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
+\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 
 \ifdefined\DISSERTATION
     Nonetheless, irregular time-domain transient peaks and the variation of hydrodynamic coefficients over the spectral width of each individual sea state are not considered.
@@ -1021,7 +1054,7 @@ A previous study using a Bretschneider spectrum found the irregular wave power g
     \Cref{sec:discussion} will discuss possible future extensions to incorporate irregular wave effects into the analysis.
 \else
     Transient peaks and spectral coefficient variation within sea states are not captured, so MDOcean likely underestimates sensitivity to peak force, power, and amplitude constraints.
-    Stochastic linearization is a candidate future extension; see \cref{sec:unmodeled-effects}.
+    Stochastic linearization is a candidate for future extension; see \Cref{sec:unmodeled-effects}.
 \fi
 
 %TC:break Structures
@@ -1041,8 +1074,8 @@ The factors of safety represent the multiplicative increase in force before stre
     the endurance limit assesses high-cycle fatigue.
 \fi
 
-The factor of safety is directly calculated for the most heavily loaded subcomponent in each of the three components: the bottom plate in the float, the cylindrical shell of the spar, and the annular plate of the damping plate.
-Thicknesses of other subcomponents are either held constant or scaled with the dimensions of subcomponents that are directly assessed, as outlined in \cref{tab:struct-calc-vs-scale}.
+The factor of safety is directly calculated for the most heavily loaded subcomponent in each of the three components: the bottom plate in the float, the cylindrical shell of the spar, and the annular disc of the damping plate.
+Thicknesses of other subcomponents are either held constant or scaled with the dimensions of subcomponents that are directly assessed, as outlined in \Cref{tab:struct-calc-vs-scale}.
 \ifdefined\DISSERTATION
     In the future, extending the structures module to directly calculate the factor of safety for each subcomponent would allow for more realistic structural design.
 \fi
@@ -1051,16 +1084,16 @@ Thicknesses of other subcomponents are either held constant or scaled with the d
     \centering
     \caption{Structural analysis methodology by subcomponent}
     \label{tab:struct-calc-vs-scale}
-\begin{tabular}{ccc}
+\begin{tabular}{M{0.15\linewidth} M{0.4\linewidth} M{0.3\linewidth}}
          \textbf{Component}&  \textbf{Structural Subcomponent}&  \textbf{Method of Analysis}\\ \hline
-         \multirow{5}{*}{\centering Float}&  Bottom trapezoidal plate&  Directly calculated\\
-         &  Top trapezoidal plate&  Scaled from bottom plate\\
-         &  Radial rectangular plates&  Scaled from bottom plate\\
-        & Circumferential rectangular plates& Scaled from bottom plate\\
-        & PTO connection tubes& Held constant\\ \hline
+         \multirow[c]{5}{*}{\centering Float}&  \begin{itemize}\item Bottom trapezoidal plate\end{itemize}&  Directly calculated\\
+         &  \begin{itemize}\item Top trapezoidal plate\end{itemize}&  Scaled from bottom plate\\
+         &  \begin{itemize}\item Radial rectangular plate\end{itemize}&  Scaled from bottom plate\\
+        & \begin{itemize}\item Circumferential rectangular plates\end{itemize}& Scaled from bottom plate\\
+        & \begin{itemize}\item PTO connection tubes\end{itemize}& Held constant\\ \hline
         Spar& Cylindrical shell& Directly calculated\\ \hline
-        \multirow{2}{*}{\centering Damping plate}& Annular plate& Directly calculated\\
-        & Spar connection tubes& Held constant\\
+        \multirow[c]{2}{*}{\centering Damping plate}& \begin{itemize}\item Annular plate\end{itemize}& Directly calculated\\
+        & \begin{itemize}\item Spar connection tubes\end{itemize}& Held constant\\
     \end{tabular}
     \end{table}
 
@@ -1068,7 +1101,7 @@ Thicknesses of other subcomponents are either held constant or scaled with the d
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=0.5\linewidth]{figs/from-matlab/FBD.pdf}
+\includegraphics[width=.9\linewidth]{figs/from-matlab/FBD.pdf}
 \caption{Applied loads and fixed points of each structure}\label{fig:FBDs}
 \end{figure}
 
@@ -1083,7 +1116,7 @@ Each of the twelve float sections is modeled as a stiffened shell subject to dis
 \fi
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
-The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \cite{previsic_reference_2011}.
+The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \citep{previsic_reference_2011}.
 
 The damping plate is a thin stiffened annular plate subject to a vertical distributed force on its bottom surface, reacted by the welded connection to the column along the column's circumference and by four welded tubular supports.
 \ifdefined\DISSERTATION
@@ -1092,7 +1125,7 @@ The damping plate is a thin stiffened annular plate subject to a vertical distri
     Two analytical solutions for a fixed-inner-radius annular plate (distributed pressure and four point loads at the edge) are superimposed, with modifications for the stiffeners.
 \fi
 
-Further details of all structural calculations performed in the simulation are provided in \cref{sec:appendix-structures}.
+Further details of all structural calculations performed in the simulation are provided in \Cref{sec:appendix-structures}.
 For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
 \begin{equation}\label{eq:struct-scaling}
 \begin{aligned}
@@ -1103,13 +1136,13 @@ For illustrative purposes only, assuming a fixed maximum stress and considering 
 \end{equation}
 
 \ifdefined\DISSERTATION
-    Since structural material scales linearly with both the thickness $t$ and the stiffener height $h_{\text{stiff}}$, the squaring of stiffener heights in \cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
+    Since structural material scales linearly with both the thickness $t$ and the stiffener height $h_{\text{stiff}}$, the squaring of stiffener heights in \Cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
     We therefore expect that an optimization would potentially drive the thicknesses to their minimum values, and thus it is also required to model the minimum value of $t/h_{\text{stiff}}$ for which the stiffened plate assumptions hold.
-    These limits are also derived in \cref{sec:appendix-structures}.
+    These limits are also derived in \Cref{sec:appendix-structures}.
 \else
-    Because structural material volume scales linearly in both $t$ and $h_{\text{stiff}}$, the squared dependence on stiffener height in \cref{eq:struct-scaling} implies that taller stiffeners are more material-efficient than thicker plates.
+    Because structural material volume scales linearly in both $t$ and $h_{\text{stiff}}$, the squared dependence on stiffener height in \Cref{eq:struct-scaling} implies that taller stiffeners are more material-efficient than thicker plates.
     Optimization therefore tends to drive thicknesses toward the minimum value of $t/h_{\text{stiff}}$ for which the stiffened-plate assumptions hold;
-    these limits are derived in \cref{sec:appendix-structures}.
+    these limits are derived in \Cref{sec:appendix-structures}.
 \fi
 
 %TC:break Economics
@@ -1127,24 +1160,24 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
 \ifdefined\DISSERTATION
     The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
     With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
-    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\cref{tab:CBS} in \cref{sec:appendix-econ}).
+    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \else
     The MDOcean economics model prioritizes capturing the scaling of cost with design variables over predicting absolute cost.
-    Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\cref{tab:CBS} in \cref{sec:appendix-econ}).
+    Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \fi
 
 Two CBS categories scale with design: structural cost (category 1.4) scales linearly with the volume of structural material $V_{\text{struct}}$, and PTO cost (category 1.5) scales with the peak electrical power $P_{pk,\text{elec}}$ and the force limit $F_{\text{max}}$.
-All other categories are held constant per device but decrease with the number of devices $N_{WEC}$ via a power law calibrated against the CBS estimates for $N_{WEC} = (1, 10, 50, 100)$ \cite{neary_reference_2014}.
+All other categories are held constant per device but decrease with the number of devices $N_{WEC}$ via a power law calibrated against the CBS estimates for $N_{WEC} = (1, 10, 50, 100)$ \citep{neary_reference_2014}.
 
 \ifdefined\DISSERTATION
     Some cost components assumed constant in the model would scale with design in reality, and modifying the model to reflect this is an area for future work.
     For example, installation and decommissioning costs (categories 1.7 and 1.8) could scale with the device maximum dimension since a larger device requires a larger ship, but this is not included due to the difficulty of determining dimension thresholds.
     Likewise, the mooring and foundation costs (category 1.3) could scale with storm surge force, and the replacement parts and consumables costs (categories 2.5 and 2.6) could scale with the PTO power and force as the PTO capital costs do.
 \else
-    Several categories that would scale with design in reality (installation by device size, mooring by storm surge force, replacement parts and consumables by PTO ratings) are held constant here and flagged in \cref{sec:unmodeled-effects} as future work.
+    Several categories that would scale with design in reality (installation by device size, mooring by storm surge force, replacement parts and consumables by PTO ratings) are held constant here and flagged in \Cref{sec:unmodeled-effects} as future work.
 \fi
 
-The chosen scalings are a power law for the number of devices to reflect economies of scale, direct proportionality between structural cost and material volume, and constant plus linear for the PTO cost since the main components of the PTO (generator, drivetrain, and structural support) are generally sized linearly with power and torque (\cref{sec:appendix-econ}).
+The chosen scalings are a power law for the number of devices to reflect economies of scale, direct proportionality between structural cost and material volume, and constant plus linear for the PTO cost since the main components of the PTO (generator, drivetrain, and structural support) are generally sized linearly with power and torque (\Cref{sec:appendix-econ}).
     %the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
     % \begin{equation}
     %     C_{gen} = \begin{cases}
@@ -1163,7 +1196,7 @@ This yields:
 where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
 See \Cref{sec:appendix-econ-power-laws} for more details.
 
-The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via a power law (\cref{eq:cost-power-law} in \cref{sec:appendix-econ}), with curve-fit parameters given in \cref{tab:econ-model-values}.
+The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via a power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
-For consistency with prior references \cite{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
+For consistency with prior references \citep{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.
