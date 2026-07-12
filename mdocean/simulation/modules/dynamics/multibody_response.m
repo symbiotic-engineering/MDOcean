@@ -22,6 +22,24 @@ function [mag_U,real_P,mag_X_u,mag_X_f,mag_X_s,...
 % :param F_f_phase: F_f_phase
 % :param F_s_mag: F_s_mag
 % :param F_s_phase: F_s_phase
+% :param D_sys: D_sys
+% :param t18: t18
+% :param t9: t9
+% :param t108: t108
+% :param t121: t121
+% :param t_110_118: t_110_118
+% :param t144: t144
+% :param t109: t109
+% :param t119: t119
+% :param h_D_sys: h_D_sys
+% :param t145: t145
+% :param t103: t103
+% :param t126: t126
+% :param t130: t130
+% :param t129: t129
+% :param t131: t131
+% :param t102: t102
+% :param t124: t124
 % :returns: mag_U
 % :returns: real_P
 % :returns: mag_X_u

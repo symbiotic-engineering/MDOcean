@@ -13,6 +13,7 @@ function [real_G_u,imag_G_u,D_sys] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c
 % :param w: Angular wave frequency (rad/s)
 % :returns: real_G_u
 % :returns: imag_G_u
+% :returns: D_sys
 %MULTIBODY_IMPEDANCE
 %    [real_G_u,imag_G_u] = MULTIBODY_IMPEDANCE(B_c,B_f,B_s,K_f,K_s,M_C,M_F,M_S,W)
 

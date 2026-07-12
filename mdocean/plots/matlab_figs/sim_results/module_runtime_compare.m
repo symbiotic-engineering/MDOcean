@@ -18,11 +18,11 @@ function [figs, ...
 % :param t_singlebody_fullsim_timeit: t_singlebody_fullsim_timeit
 % :param t_freq_domain_fullsim_timeit: t_freq_domain_fullsim_timeit
 % :param t_wecsim: t_wecsim
-% :param profile_no_amp_sat: profile with use_amp_sat=false
-% :param t_no_amp_sat_timeit: timeit with use_amp_sat=false
-% :param profile_no_force_amp_sat: profile with use_amp_sat=false and use_force_sat=false
-% :param t_no_force_amp_sat_timeit: timeit with use_amp_sat=false and use_force_sat=false
-% :returns: figs
+% :param profile_no_amp_sat: profile_no_amp_sat
+% :param t_no_amp_sat_timeit: t_no_amp_sat_timeit
+% :param profile_no_force_amp_sat: profile_no_force_amp_sat
+% :param t_no_force_amp_sat_timeit: t_no_force_amp_sat_timeit
+% :returns: Figure handles
 % :returns: pct_runtime_MEEM
 % :returns: pct_runtime_dynamics
 % :returns: pct_runtime_other

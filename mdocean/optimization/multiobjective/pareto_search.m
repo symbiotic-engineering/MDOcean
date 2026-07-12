@@ -10,6 +10,10 @@ function [x,fval,residuals,tol,p,paretoPctTimeSeeds,paretoPctTimePatternSearch,p
 % :returns: residuals
 % :returns: tol
 % :returns: Parameter struct
+% :returns: paretoPctTimeSeeds
+% :returns: paretoPctTimePatternSearch
+% :returns: paretoTotalRuntime
+% :returns: paretoFcnEvals
 
     if nargin<1
         p = parameters();
