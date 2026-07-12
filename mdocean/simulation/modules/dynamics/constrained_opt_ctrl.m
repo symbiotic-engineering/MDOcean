@@ -268,81 +268,36 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     logical_enforce_all = cat(join_dim, enforce_force_all, enforce_X_f_all, enforce_X_s_all, enforce_X_u_all, enforce_P_all); % damping intentionally not included here
     num_enforce_all = sum(logical_enforce_all, join_dim);
     logical_enforce_2d = reshape(logical_enforce_all, [], 5);   % num_sea_states × 5
+    num_enforce_flat = num_enforce_all(:);
+
+    center_F_all = -U_0_all ./ c_V_all;
+    center_Xf_all = -X_f_0_all ./ c_Xf_all;
+    center_Xs_all = -X_s_0_all ./ c_Xs_all;
+    center_Xu_all = -X_u_0_all ./ c_Xu_all;
+
+    radius_F_all = F_max ./ abs(c_V_all);
+    radius_Xf_all = X_f_max ./ abs(c_Xf_all);
+    radius_Xs_all = X_s_max ./ abs(c_Xs_all);
+    radius_Xu_all = X_u_max ./ abs(c_Xu_all);
+
+    n_states = numel(mult);
+    constraint_centers_real = [real(center_F_all(:)), real(center_Xf_all(:)), real(center_Xs_all(:)), real(center_Xu_all(:)), zeros(n_states,1)];
+    constraint_centers_imag = [imag(center_F_all(:)), imag(center_Xf_all(:)), imag(center_Xs_all(:)), imag(center_Xu_all(:)), zeros(n_states,1)];
+    constraint_radii = [radius_F_all(:), radius_Xf_all(:), radius_Xs_all(:), radius_Xu_all(:), ones(n_states,1)];
+
+    Gamma_opt_all = NaN(size(mult));
 
     for k_idx = 1:numel(valid_idx)
         idx = valid_idx(k_idx);
 
         % index vars by sea state
-        X_u_0 = X_u_0_all(idx);
-        X_f_0 = X_f_0_all(idx);
-        X_s_0 = X_s_0_all(idx);
-        U_0   = U_0_all(idx);
         Z_th_i = Z_th(idx);
         w_i = w(idx);    
-        num_enforce = num_enforce_all(idx);
-        c_V = c_V_all(idx);
-        c_Xf = c_Xf_all(idx);
-        c_Xs = c_Xs_all(idx);
-        c_Xu = c_Xu_all(idx);
-        enforce_force = enforce_force_all(idx);
-        enforce_X_f = enforce_X_f_all(idx);
-        enforce_X_s = enforce_X_s_all(idx);
-        enforce_X_u = enforce_X_u_all(idx);
+        num_enforce = num_enforce_flat(idx);
         enforce_damp = enforce_damp_all(idx);
         logical_enforce = logical_enforce_2d(idx,:);
-        
-        centers = zeros(num_enforce, 2);
-        radii   = zeros(num_enforce, 1);
-        curr_idx = 1;
-
-        % build circle constraints
-        % For constraint |Y| <= Y_max where Y = Y_0 + c_Y * Gamma:
-        % circle center = -Y_0/c_Y, radius = Y_max/|c_Y|, S=+1 (inside)
-        
-        % force constraint: |V| <= F_max
-        if enforce_force
-            center_F = -U_0 / c_V;
-            radius_F = F_max / abs(c_V);
-            centers(curr_idx,:) = [real(center_F), imag(center_F)];
-            radii(curr_idx) = radius_F;
-            curr_idx = curr_idx + 1;
-        end
-        
-        % float amplitude constraint: |X_f| <= X_f_max
-        if enforce_X_f
-            center_Xf = -X_f_0 / c_Xf;
-            radius_Xf = X_f_max / abs(c_Xf);
-            centers(curr_idx,:) = [real(center_Xf), imag(center_Xf)];
-            radii(curr_idx) = radius_Xf;
-            curr_idx = curr_idx + 1;
-        end
-        
-        % spar amplitude constraint: |X_s| <= X_s_max
-        if enforce_X_s
-            center_Xs = -X_s_0 / c_Xs;
-            radius_Xs = X_s_max / abs(c_Xs);
-            centers(curr_idx,:) = [real(center_Xs), imag(center_Xs)];
-            radii(curr_idx) = radius_Xs;
-            curr_idx = curr_idx + 1;
-        end
-        
-        % PTO amplitude constraint: |X_u| <= X_u_max
-        if enforce_X_u
-            center_Xu = -X_u_0 / c_Xu;
-            radius_Xu = X_u_max / abs(c_Xu);
-            centers(curr_idx,:) = [real(center_Xu), imag(center_Xu)];
-            radii(curr_idx) = radius_Xu;
-            curr_idx = curr_idx + 1;
-        end
-        
-        % positive power constraint: |Gamma|^2 <= 1
-        center_P = [0, 0];
-        radius_P = 1;
-        % always include positive power constraint (it's cheap and prevents P<0)
-        centers(curr_idx,:) = center_P;
-        radii(curr_idx) = radius_P;
-        
-        assert(curr_idx==num_enforce)
+        centers = [constraint_centers_real(idx,logical_enforce).', constraint_centers_imag(idx,logical_enforce).'];
+        radii = constraint_radii(idx,logical_enforce).';
 
         % damping control: add Q=0 constraint circle
         % Gamma must lie ON the Q=0 circle (equality constraint)
@@ -398,6 +353,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
                 end
             end
         end
+        Gamma_opt_all(idx) = Gamma_opt;
         
         % update debug struct if this is the most constrained feasible sea state
         most_constr_so_far = abs(Gamma_opt) > abs(qcqp_debug.Gamma_opt) || isnan(qcqp_debug.Gamma_opt);
@@ -412,23 +368,24 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             qcqp_debug.n_active_constraints = num_enforce;
             qcqp_debug.feasible = ~isempty(p_star);
         end
+    end
 
-        mult(idx) = (1 + Gamma_opt) / (1 - Gamma_opt);
+    valid_mask = false(size(mult));
+    valid_mask(valid_idx) = true;
+    mult(valid_mask) = (1 + Gamma_opt_all(valid_mask)) ./ (1 - Gamma_opt_all(valid_mask));
 
-        % convert Gamma to Z_l, then to B_p and K_p
-        if abs(Gamma_opt) < GAMMA_TOL
-            % no constraint active, keep unsaturated gains
-            continue
-        end
-        
-        Z_l = conj(Z_th_i) * mult(idx);
-        B_p_sat(idx) = real(Z_l);
-        K_p_sat(idx) = -w_i * imag(Z_l);
-        
+    % convert Gamma to Z_l, then to B_p and K_p
+    needs_gain_update = valid_mask & ~(abs(Gamma_opt_all) < GAMMA_TOL);
+    if any(needs_gain_update(:))
+        Z_l = conj(Z_th(needs_gain_update)) .* mult(needs_gain_update);
+        B_p_sat(needs_gain_update) = real(Z_l);
+        K_p_sat(needs_gain_update) = -w(needs_gain_update) .* imag(Z_l);
+
         % ensure B_p >= 0
-        if B_p_sat(idx) < 0
-            B_p_sat(idx) = 0;
-            mult(idx) = 1i * K_p_sat(idx);
+        neg_damping = needs_gain_update & (B_p_sat < 0);
+        if any(neg_damping(:))
+            B_p_sat(neg_damping) = 0;
+            mult(neg_damping) = 1i * K_p_sat(neg_damping);
         end
     end
 end
