@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.1) - 2026-7-12
+### Changed
+- CI: run `paperlint-aor` and `paperlint-re` in `.github/workflows/calkit-run.yml` Calkit stage args
+
 ## [v1.3.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.0) - 2026-7-11
 Papers at the state of journal submission, plus a few post-submission edits.
 ### Added
