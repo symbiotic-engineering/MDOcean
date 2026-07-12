@@ -736,9 +736,9 @@ function fig = plot_case2_case4_overlay_v1(case_4, case_2, x_f1_v1, y_f1_v1, ...
         'MarkerFaceColor', 'none', 'MarkerSize', 6, ...
         'DisplayName', sprintf('WAMIT RM3 ($T_s/R_b=%.1f$, $\\alpha=%.1f$, $\\beta=%g$)', e2_rm3/Rb_rm3, alpha_rm3, beta_rm3));
 
-    xlabel(x_label_v1, 'FontSize', 14)
-    ylabel(y_label_v1, 'Interpreter', 'latex', 'FontSize', 14)
-    title('Case 4, Case 2, and WAMIT RM3 data in v1 space')
+    xlabel(x_label_v1, 'FontSize', 18)
+    ylabel(['$\Upsilon^2 = ' y_label_v1(2:end)], 'Interpreter', 'latex', 'FontSize', 18)
+    title('Spar Excitation Data from Olaya et al. (2015) and Ruehl et al. (2022)')
     axis tight
     ylim_default = ylim();
     ylim([ylim_default(1), max_y_case24 * 1.1])
