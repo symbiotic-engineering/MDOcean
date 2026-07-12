@@ -35,6 +35,7 @@ Options
 
 import sys
 import argparse
+import json
 from pathlib import Path
 
 try:
@@ -66,6 +67,91 @@ def _to_commented_seq(seq):
         else:
             cs.append(x)
     return cs
+
+
+# ---------------------------------------------------------------------------
+# Notebook creation
+# ---------------------------------------------------------------------------
+
+def create_fig_notebook(class_name, notebooks_dir="results/fig_notebooks"):
+    """Create a figure-display notebook for *class_name* if it does not exist.
+
+    The generated notebook contains a single code cell that glob-finds all
+    PDF files under ``results/<class_name>/`` and renders each page as an
+    inline image.  This mirrors the boilerplate shared by every existing
+    notebook in ``results/fig_notebooks/``.
+
+    Parameters
+    ----------
+    class_name : str
+        The analysis class name (e.g. ``'PtoSweep'``).
+    notebooks_dir : str or Path
+        Directory where notebooks live (default: ``results/fig_notebooks``).
+
+    Returns
+    -------
+    Path
+        Path to the notebook file (created or already existing).
+    """
+    notebooks_dir = Path(notebooks_dir)
+    notebooks_dir.mkdir(parents=True, exist_ok=True)
+
+    nb_path = notebooks_dir / f"{class_name}.ipynb"
+    if nb_path.exists():
+        return nb_path
+
+    source = [
+        "import glob\n",
+        "import fitz\n",
+        "from IPython.display import Image, display\n",
+        "\n",
+        f"pdf_files = sorted(glob.glob('../{class_name}/*.pdf'))\n",
+        "\n",
+        "for pdf_path in pdf_files:\n",
+        "    print(pdf_path)\n",
+        "    doc = fitz.open(pdf_path)\n",
+        "    for page in doc:\n",
+        "        im = page.get_pixmap()\n",
+        "        display(Image(im.tobytes()))\n",
+        "    doc.close()",
+    ]
+
+    notebook = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "metadata": {},
+                "outputs": [],
+                "source": source,
+            }
+        ],
+        "metadata": {
+            "kernelspec": {
+                "display_name": "mdocean-pubs",
+                "language": "python",
+                "name": "python3",
+            },
+            "language_info": {
+                "codemirror_mode": {"name": "ipython", "version": 3},
+                "file_extension": ".py",
+                "mimetype": "text/x-python",
+                "name": "python",
+                "nbformat_minor": 5,
+                "pygments_lexer": "ipython3",
+                "version": "3.14.3",
+            },
+        },
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+
+    with open(nb_path, "w") as fh:
+        json.dump(notebook, fh, indent=1)
+        fh.write("\n")
+
+    print(f"Created notebook {nb_path}")
+    return nb_path
 
 
 def merge_inputs(old_inputs, new_inputs):
@@ -111,9 +197,11 @@ def merge_outputs(old_outputs, new_outputs):
 def analysis_name(stage_key):
     """Extract the analysis class name from a stage key.
 
-    E.g. ``'analysis-AllFigCompare'`` → ``'AllFigCompare'``.
+    E.g. ``'analysis-AllFigCompare'`` → ``'AllFigCompare'``,
+         ``'postpro-AllFigCompare'`` → ``'AllFigCompare'``,
+         ``'viz-AllFigCompare'`` → ``'AllFigCompare'``.
     """
-    for prefix in ("analysis-", "postpro-"):
+    for prefix in ("analysis-", "postpro-", "viz-"):
         if stage_key.startswith(prefix):
             return stage_key[len(prefix):]
     return stage_key
@@ -131,18 +219,24 @@ def find_insert_after(stages_map, new_key):
     """
     new_name = analysis_name(new_key)
     new_is_postpro = new_key.startswith("postpro-")
+    new_is_viz = new_key.startswith("viz-")
 
     insert_after = None
     for key in stages_map:
-        if not (key.startswith("analysis-") or key.startswith("postpro-")):
+        is_analysis = key.startswith("analysis-")
+        is_postpro = key.startswith("postpro-")
+        is_viz = key.startswith("viz-")
+        if not (is_analysis or is_postpro or is_viz):
             continue
         name = analysis_name(key)
-        is_postpro = key.startswith("postpro-")
 
         if name < new_name:
             insert_after = key
-        elif name == new_name and (not is_postpro) and new_is_postpro:
+        elif name == new_name and is_analysis and new_is_postpro:
             # analysis-X is the immediate predecessor of postpro-X
+            insert_after = key
+        elif name == new_name and is_postpro and new_is_viz:
+            # postpro-X is the immediate predecessor of viz-X
             insert_after = key
 
     return insert_after
@@ -258,6 +352,7 @@ def main():
         if not (
             stage_key.startswith("analysis-")
             or stage_key.startswith("postpro-")
+            or stage_key.startswith("viz-")
         ):
             print(f"Skipping non-analysis entry in generated file: {stage_key!r}")
             continue
@@ -290,6 +385,11 @@ def main():
             new_stages = insert_stage(stages, after, stage_key, new_value)
             calkit["pipeline"]["stages"] = new_stages
             stages = calkit["pipeline"]["stages"]
+
+            # Auto-create the companion notebook for new viz-* stages
+            if stage_key.startswith("viz-"):
+                class_name = stage_key[len("viz-"):]
+                create_fig_notebook(class_name)
 
     # ------------------------------------------------------------------
     # Write back

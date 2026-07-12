@@ -14,8 +14,15 @@ function [fig_array,...
 % :returns: end_result_struct
 % :returns: tab_firstrows
 % :returns: tab_colspecs
+    
+    figs_intermed = intermed_result_struct.created_figs;
 
-    fig_array = intermed_result_struct.created_figs;
+    fig_circles = plot_nominal_constraint_circles(intermed_result_struct.val);
+
+    fig_gamma = figs_intermed(6);
+    fig_circles_overlay = plot_nominal_constraint_circles(intermed_result_struct.val, fig_gamma.CurrentAxes);
+
+    fig_array = [figs_intermed, fig_circles, fig_circles_overlay];
     
     tab_array_display = {};
     tab_array_latex = {};

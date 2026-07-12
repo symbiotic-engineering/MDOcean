@@ -112,17 +112,20 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
                                                                 K_num, show_A, plot_phi, fname, m_k_h);
             if mu_nondim(i)<0
                 mu_nondim(i) = 1e-9;
-                warning('MEEM computed negative added mass. Setting added mass to very small value.')
+                warning('MDOcean:RunMEEM:NegativeAddedMass', ...
+                    'MEEM computed negative added mass. Setting added mass to very small value.')
             end
             if lambda_nondim(i)<0
                 lambda_nondim(i) = 1e-9;
-                warning('MEEM computed negative damping. Setting damping to very small value.')
+                warning('MDOcean:RunMEEM:NegativeDamping', ...
+                    'MEEM computed negative damping. Setting damping to very small value.')
             end
         else
             mu_nondim(i) = 1e-9;
             lambda_nondim(i) = 1e-9;
             exc_phases(i) = 0;
-            warning('MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
+            warning('MDOcean:RunMEEM:InvalidGeometry', ...
+                'MEEM encountered invalid geometry. Setting hydro coeffs to very small values.')
         end
     end
 
@@ -137,7 +140,8 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
 
     if any(lambda_nondim<0,'all')
         lambda_nondim(lambda_nondim<0) = 1e-9;
-        warning('MEEM calculated negative damping. Setting damping to very small positive value.')
+        warning('MDOcean:RunMEEM:NegativeDampingGlobal', ...
+            'MEEM calculated negative damping. Setting damping to very small positive value.')
     end
 end
 
@@ -218,16 +222,19 @@ function [x_cell, m_k_cell, ...
     % throw warning for unexpected NaNs
     if any(~isfinite(A_num),'all')
         A_num(~isfinite(A_num)) = 0;
-        warning(['MEEM got non-finite result for some elements in A-matrix, ' ...
+        warning('MDOcean:RunMEEM:NonFiniteA', ...
+            ['MEEM got non-finite result for some elements in A-matrix, ' ...
             'perhaps due to too large argument in besseli. Elements will be zeroed.'])
     end
     if any(~isfinite(b_num),'all')
         b_num(~isfinite(b_num)) = 0;
-        warning('MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
+        warning('MDOcean:RunMEEM:NonFiniteB', ...
+            'MEEM got non-finite result for some elements in b-vector. Elements will be zeroed.')
     end
     if any(~isfinite(c_num),'all')
         c_num(~isfinite(c_num)) = 0; 
-        warning('MEEM got non-finite result for some elements in c-vector. Elements will be zeroed.')
+        warning('MDOcean:RunMEEM:NonFiniteC', ...
+            'MEEM got non-finite result for some elements in c-vector. Elements will be zeroed.')
     end
     % show A matrix values
     if show_A

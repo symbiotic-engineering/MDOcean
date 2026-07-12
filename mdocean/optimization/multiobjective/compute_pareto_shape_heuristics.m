@@ -1,0 +1,113 @@
+function [powerWhereCusp, powerWhereNonconvexEnds, dampingReactivePowerIntersect] = ...
+    compute_pareto_shape_heuristics(r1, r2, p, b)
+% Function compute_pareto_shape_heuristics
+%
+% Computes scalar heuristics from the pareto front shape.
+% r1 and r2 are the damping and reactive pareto search results respectively.
+% All power values are returned in watts.
+%
+% :param r1: Damping control pareto search result struct (fields: fval, x, p)
+% :param r2: Reactive control pareto search result struct
+% :param p: Parameter struct
+% :param b: Design variable bounds struct
+% :returns: powerWhereCusp (W) - average power at the sharpest slope change in the capex-power pareto front
+% :returns: powerWhereNonconvexEnds (W) - average power at the rightmost non-convex region of the pareto front
+% :returns: dampingReactivePowerIntersect (W) - average power where damping and reactive LCOE curves cross
+
+    cols = b.idxs_recover;
+
+    % --- Compute power_avg for all damping pareto points ---
+    X_r1 = r1.x(:, cols);
+    X_r1 = [X_r1, ones(size(X_r1,1),1)]; % add material column
+    n1 = size(X_r1,1);
+    P_avg_r1 = zeros(n1,1);
+    capex_r1  = zeros(n1,1);
+    for i = 1:n1
+        [~,~,~,val_i] = simulation(X_r1(i,:), r1.p);
+        P_avg_r1(i) = val_i.power_avg;
+        capex_r1(i) = val_i.capex_design;
+    end
+    LCOE_r1 = r1.fval(:,1);
+
+    % Sort by power ascending
+    [P_sorted_r1, idx_sort1] = sort(P_avg_r1);
+    C_sorted_r1 = capex_r1(idx_sort1);
+    LCOE_sorted_r1 = LCOE_r1(idx_sort1);
+
+    % --- powerWhereCusp: sharpest slope change in capex-power front ---
+    if numel(P_sorted_r1) >= 3
+        slope = diff(C_sorted_r1) ./ diff(P_sorted_r1);
+        cusp_slope_change = abs(diff(slope));
+        [~, idx_cusp] = max(cusp_slope_change);
+        % cusp is at the midpoint of the two consecutive slope intervals
+        powerWhereCusp = P_sorted_r1(idx_cusp + 1);
+    else
+        powerWhereCusp = NaN;
+    end
+
+    % --- powerWhereNonconvexEnds: rightmost point above the convex hull ---
+    if numel(P_sorted_r1) >= 3
+        % Convex hull in (P_avg, capex) space (maximize P, minimize capex = lower-left hull)
+        hull_pts = convhull(P_sorted_r1, C_sorted_r1);
+        % Interpolate convex hull at each P
+        P_hull = P_sorted_r1(hull_pts);
+        C_hull = C_sorted_r1(hull_pts);
+        [P_hull_sorted, ih] = sort(P_hull);
+        C_hull_sorted = C_hull(ih);
+        C_convex = interp1(P_hull_sorted, C_hull_sorted, P_sorted_r1, 'linear', 'extrap');
+        % Non-convex = points above the convex hull (higher cost than hull at same power)
+        tolerance = 1e-6 * max(C_sorted_r1);
+        nonconvex_mask = C_sorted_r1 > C_convex + tolerance;
+        if any(nonconvex_mask)
+            last_nonconvex_idx = find(nonconvex_mask, 1, 'last');
+            powerWhereNonconvexEnds = P_sorted_r1(last_nonconvex_idx);
+        else
+            powerWhereNonconvexEnds = NaN;
+        end
+    else
+        powerWhereNonconvexEnds = NaN;
+    end
+
+    % --- dampingReactivePowerIntersect: where LCOE_damping == LCOE_reactive ---
+    if isempty(r2) || ~isfield(r2,'x')
+        dampingReactivePowerIntersect = NaN;
+        return
+    end
+
+    X_r2 = r2.x(:, cols);
+    X_r2 = [X_r2, ones(size(X_r2,1),1)];
+    n2 = size(X_r2,1);
+    P_avg_r2 = zeros(n2,1);
+    for i = 1:n2
+        [~,~,~,val_i] = simulation(X_r2(i,:), r2.p);
+        P_avg_r2(i) = val_i.power_avg;
+    end
+    LCOE_r2 = r2.fval(:,1);
+
+    [P_sorted_r2, idx_sort2] = sort(P_avg_r2);
+    LCOE_sorted_r2 = LCOE_r2(idx_sort2);
+
+    % Find intersection by interpolating: LCOE_r1(P) - LCOE_r2(P) = 0
+    P_common = linspace(max(min(P_sorted_r1), min(P_sorted_r2)), ...
+                        min(max(P_sorted_r1), max(P_sorted_r2)), 500);
+    if isempty(P_common)
+        dampingReactivePowerIntersect = NaN;
+        return
+    end
+
+    LCOE_interp1 = interp1(P_sorted_r1, LCOE_sorted_r1, P_common, 'linear', 'extrap');
+    LCOE_interp2 = interp1(P_sorted_r2, LCOE_sorted_r2, P_common, 'linear', 'extrap');
+    diff_LCOE = LCOE_interp1 - LCOE_interp2;
+
+    % Find sign change (crossing point)
+    sign_changes = find(diff(sign(diff_LCOE)) ~= 0);
+    if ~isempty(sign_changes)
+        idx_cross = sign_changes(1);
+        % Linear interpolation within the interval
+        t = -diff_LCOE(idx_cross) / (diff_LCOE(idx_cross+1) - diff_LCOE(idx_cross));
+        dampingReactivePowerIntersect = P_common(idx_cross) + t * (P_common(idx_cross+1) - P_common(idx_cross));
+    else
+        dampingReactivePowerIntersect = NaN;
+    end
+
+end

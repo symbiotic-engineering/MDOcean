@@ -159,7 +159,14 @@ criteria = no_inf && no_nan && no_imag;
 if ~criteria
     disp(['g: ' num2str(g_vec)])
     disp(['LCOE: ' num2str(LCOE) ', P_var: ' num2str(P_var)])
-    warning('Inf, NaN, or imaginary constraint or objective detected')
+    warning('MDOcean:Simulation:InfNanImaginary', 'Inf, NaN, or imaginary constraint or objective detected')
+    bad_obj = ~isfinite(J) | ~isreal(J);
+    bad_g = ~isfinite(g_vec) | ~isreal(g_vec);
+    J(bad_obj) = 1e12;
+    g_vec(bad_g) = -1e12;
+    if ~isfinite(P_var) || ~isreal(P_var)
+        P_var = 1e12;
+    end
 end
 
 if nargout > 3 % if returning extra struct output for validation
@@ -186,7 +193,8 @@ if nargout > 3 % if returning extra struct output for validation
      gamma_phase_f,gamma_phase_s,w,...
      phase_X_f,phase_X_s,phase_X_u,...
      F_drag_f,F_drag_s,...
-     phase_F_drag_f,phase_F_drag_s] = dynamics(in, m_f_tot, m_s_tot);
+     phase_F_drag_f,phase_F_drag_s,...
+     qcqp_debug] = dynamics(in, m_f_tot, m_s_tot);
 
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);
@@ -238,6 +246,7 @@ if nargout > 3 % if returning extra struct output for validation
     val.F_drag_s = F_drag_s;
     val.phase_F_drag_f = phase_F_drag_f;
     val.phase_F_drag_s = phase_F_drag_s;
+    val.qcqp_debug = qcqp_debug;
 end
 
 end

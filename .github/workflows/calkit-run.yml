@@ -1,6 +1,9 @@
 name: Run calkit pipeline
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 # env:
@@ -8,6 +11,8 @@ on:
   # MLM_LICENSE_FILE: ${{ secrets.MATLAB_LICENSE_FILE }}:27000
 permissions:
   contents: write
+  checks: write
+  id-token: write
 
 # Make sure we only ever run one per branch so we don't have issues pushing
 # after running the pipeline
@@ -21,10 +26,21 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 1440 # 24 hours
     steps:
+      - name: Setup temp environment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
       - name: Clear stale submodule caches
         run: |
-          # On self-hosted runners .git/ persists between runs. Remove the entire
-          # gitdir module cache so the next manual submodule init starts clean.
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
           rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
@@ -38,11 +54,8 @@ jobs:
           # then fail with "No url found" for that nested submodule).
           submodules: false
           persist-credentials: false
-      - name: Init top-level submodules
-        # Initialize only the three top-level submodules (WEC-Sim, SAFE, OpenFLASH)
-        # without recursing into their nested submodules, avoiding the stale
-        # sea-lab-utils nested submodule that is no longer in OpenFLASH's .gitmodules.
-        run: git submodule update --init
+      - name: Init submodules
+        run: git submodule update --init --recursive
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
@@ -89,18 +102,22 @@ jobs:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
           save: false
+          cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
         run: python mdocean/analysis/update_calkit.py
-
+      - name: add any newly generated .ipynb files to git
+        run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --keep-going --log build-AOR-paper view-aor-figs
+          # render-quarto-pdf
+          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz test-aor test-re check-dup-json-keys
           pull_dvc: false
           save: false
+          cache_dvc: false
       - name: calkit save
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
@@ -108,10 +125,10 @@ jobs:
           fi
   
           set +e # Continue even if pull fails
-          git pull --recurse-submodules
+          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
           PULL_STATUS=$?
 
-          if [ $PULL_STATUS -ne 0 ]; then
+          if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
             BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
             echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
             git checkout -b "$BRANCH"
@@ -127,9 +144,90 @@ jobs:
           if [ $PUSH_STATUS -ne 0 ]; then
             echo "Push failed, perhaps due to dvc push timeout. Retrying."
             calkit dvc push
-            git push
+            git push || true
           fi
       - run: |
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
+
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: code-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+
+      - name: Publish test report to codecov
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          fail_ci_if_error: true
+          directory: test-results
+          report_type: test_results
+          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+
+      - name: Publish test report to GitHub UI
+        uses: mikepenz/action-junit-report@v6
+        if: always()
+        with:
+          report_paths: 'test-results/**/junit.xml'
+          job_name: main
+
+      - name: Upload test report PDF
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-report
+          path: |
+            test-results/**/junit.xml
+            test-results/**/testreport.pdf
+            test-results/**/table_*.tex
+            code-coverage/**/coverage.xml
+            **/DynamicValidation_*.pdf
+            test-results/Figure_*.pdf
+            mdocean/optimization/multiobjective/pareto_search_results_*.mat
+            **/wecsim_*.mat
+
+      - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        if: always()
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v20
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          path: test-results-baseline
+          workflow_conclusion: completed
+          check_artifacts: true
+          allow_forks: true
+
+      - name: Compare test results to base branch
+        if: always()
+        continue-on-error: true
+        run: |
+          if ls test-results-baseline/test-report/test-results 2>/dev/null; then
+            python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
+            cat test-results-baseline/delta-junit.xml
+          else
+            echo 'No baseline test results found, skipping comparison'
+          fi
+        shell: bash
+
+      - name: Publish changed tests to GitHub UI
+        if: always()
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: 'test-results-baseline/delta-junit.xml'
+          check_name: 'Changed Tests'
+          job_name: main
+          include_passed: true
+
+      - name: Clean up temp environment
+        if: always()
+        shell: bash
+        run: |
+          echo "Cleaning up temp environment..."
+          rm -rf "$TMPDIR" || true

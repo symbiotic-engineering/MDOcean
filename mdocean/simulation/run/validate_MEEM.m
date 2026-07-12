@@ -33,6 +33,8 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     spatial_res = 30;
 
     %% run with small NMK for sparsity
+    warning('off','MATLAB:nearlySingularMatrix')
+    warning('off','MATLAB:singularMatrix')
 
     run_MEEM(heaving_IC, heaving_OC, auto_BCs, NMK_sparsity, NMK_sparsity, NMK_sparsity, ...
                         a1_num, a2_num, d1_num, d2_num, h_num, m0_num, spatial_res, show_A, plot_phi);
@@ -76,6 +78,8 @@ function [figPotMatch, figVelMatch, figAMatrixSparsity, figHydroCoeff] = validat
     hold on
     plot_hydro_coeff_validation()
 
+    warning('on','MATLAB:nearlySingularMatrix')
+    warning('on','MATLAB:singularMatrix')
 end
 
 %% validation functions
