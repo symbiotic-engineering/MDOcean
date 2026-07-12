@@ -1,6 +1,13 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.1) - 2026-7-12
+### Added
+- CI: run `dev/docs/add_docstrings.py` as a workflow step to auto-stamp Sphinx-compatible docstrings onto `.m` files; include `*.m` in `calkit save` so docstring updates are committed with pipeline outputs
+### Changed
+- CI: run Python scripts via `uv run` with Python 3.12 managed by `astral-sh/setup-uv`; remove `actions/setup-python` and `pip install ruamel.yaml` steps
+- CI: add fork PR guard to `calkit save` step to skip save/push for fork PRs
+
 ## [v1.3.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.0) - 2026-7-11
 Papers at the state of journal submission, plus a few post-submission edits.
 ### Added

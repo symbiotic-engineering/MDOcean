@@ -22,6 +22,7 @@ function [mu_nondim, lambda_nondim, exc_phases] = run_MEEM(heaving_IC, heaving_O
 % :param spatial_res: spatial_res
 % :param show_A: show_A
 % :param plot_phi: plot_phi
+% :param m_k_h_precomputed: m_k_h_precomputed
 % :returns: $\\mu$ nondim
 % :returns: $\\lambda$ nondim
 % :returns: exc_phases

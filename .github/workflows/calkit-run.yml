@@ -63,16 +63,47 @@ jobs:
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
       - name: Install Calkit
         run: uv tool install --upgrade calkit-python
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Install python dependencies
-        run: pip install ruamel.yaml
+      - name: Add docstrings to .m files
+        run: |
+          # Snapshot which stages are already stale before touching any .m files
+          STALE_BEFORE=$(dvc status --json 2>/dev/null || echo '{}')
+          STALE_BEFORE_STAGES=$(echo "$STALE_BEFORE" | jq -r 'keys[]')
+          echo "Stages stale before docstrings:"
+          echo "${STALE_BEFORE_STAGES:-<none>}"
+
+          # Run docstring generation
+          uv run python dev/docs/add_docstrings.py
+
+          # Snapshot which stages are stale after docstring changes
+          STALE_AFTER=$(dvc status --json 2>/dev/null || echo '{}')
+          STALE_AFTER_STAGES=$(echo "$STALE_AFTER" | jq -r 'keys[]')
+          echo "Stages stale after docstrings:"
+          echo "${STALE_AFTER_STAGES:-<none>}"
+
+          # Find stages that became stale solely due to docstring changes
+          # (clean before, stale after); skip stages that were already dirty
+          NEWLY_STALE_STAGES=()
+          while IFS= read -r stage; do
+            [ -z "$stage" ] && continue
+            if ! echo "$STALE_BEFORE_STAGES" | grep -qxF "$stage"; then
+              NEWLY_STALE_STAGES+=("$stage")
+            fi
+          done <<< "$STALE_AFTER_STAGES"
+
+          if [ ${#NEWLY_STALE_STAGES[@]} -gt 0 ]; then
+            echo "Force-committing DVC stages newly dirtied by docstrings: ${NEWLY_STALE_STAGES[*]}"
+            calkit dvc commit "${NEWLY_STALE_STAGES[@]}"
+            git add dvc.lock '*.m'
+            git diff --cached --quiet || git commit -m "Update docstrings and force-commit dvc stages"
+          else
+            echo "No stages newly dirtied by docstring generation."
+          fi
       # - name: Setup matlab
       #   uses: matlab-actions/setup-matlab@v2
       #   with:
@@ -104,7 +135,7 @@ jobs:
           save: false
           cache_dvc: false
       - name: Use calkit_stages.yaml to update calkit.yaml
-        run: python mdocean/analysis/update_calkit.py
+        run: uv run --with ruamel.yaml python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
       - name: Run Calkit
@@ -120,6 +151,12 @@ jobs:
           cache_dvc: false
       - name: calkit save
         run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] && \
+             [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "Fork PR detected – skipping save/push"
+            exit 0
+          fi
+
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
             exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
           fi
@@ -138,7 +175,7 @@ jobs:
           fi
 
           calkit dvc pull
-          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex '*.m' -m "Run pipeline"
           PUSH_STATUS=$?
 
           if [ $PUSH_STATUS -ne 0 ]; then

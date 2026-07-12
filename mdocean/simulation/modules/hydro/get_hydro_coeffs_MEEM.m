@@ -17,6 +17,7 @@ function [A_f_over_rho, A_s_over_rho, A_c_over_rho, ...
 % :param w: Angular wave frequency (rad/s)
 % :param harmonics: number of harmonics to use for MEEM (int)
 % :param spar_excitation_coeffs: spar excitation hydro coeffs from WAMIT for nominal RM3
+% :param m_k_h_precomputed: m_k_h_precomputed
 % :returns: A f / $\\rho$
 % :returns: A s / $\\rho$
 % :returns: A c / $\\rho$

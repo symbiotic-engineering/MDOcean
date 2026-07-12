@@ -5,9 +5,9 @@ function [figs,LCOE,val] = run_single(p,b,X)
 % :param p: Parameter struct
 % :param b: Design variable bounds struct
 % :param X: Design variable vector
-% :returns: Figure handless
-% :returns: LCOE
-% :returns: output value struct
+% :returns: Figure handles
+% :returns: Levelized cost of energy ($/kWh)
+% :returns: Simulation result values struct
 % Run and plot a single design. Defaults to nominal design if no X input.
 
     if nargin==0
