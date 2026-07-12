@@ -1,6 +1,18 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-12
+### Added
+- Paper: add Elsevier `cas-sc.cls` support for single-column journal submission formatting.
+### Changed
+- Paper/Pipeline: switch the RE manuscript from `cas-dc` to `cas-sc`, and update calkit stage dependencies for shared Elsevier class files.
+- Figures: fill Pareto sweep markers and adjust `dimensions.pdf` width for single-column readability.
+- Paper: revise AOR abstract wording.
+- Pipeline: store standalone LaTeX aux outputs in DVC.
+- Paper: merge latest `overleaf-sync` updates into this journal-edit branch.
+### Removed
+- RE paper: delete obsolete hardcoded table files from `pubs/renewable-energy-mdo/tables/2025-04-11_04.04.45/`.
+
 ## [v1.3.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.0) - 2026-7-11
 Papers at the state of journal submission, plus a few post-submission edits.
 ### Added

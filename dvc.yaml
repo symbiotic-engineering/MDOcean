@@ -7659,6 +7659,8 @@ stages:
       --file-to-file 
       'pubs/shared/els-cas/cas-dc.cls->pubs/renewable-energy-mdo/cas-dc.cls'
       --file-to-file 
+      'pubs/shared/els-cas/cas-sc.cls->pubs/renewable-energy-mdo/cas-sc.cls'
+      --file-to-file 
       'pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty'
       --file-to-file 
       'pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty'
@@ -7677,6 +7679,7 @@ stages:
       - pubs/shared/shared-pkg.tex
       - pubs/shared/els-cas/cas-dc.cls
       - pubs/shared/els-cas/cas-dc.cls
+      - pubs/shared/els-cas/cas-sc.cls
       - pubs/shared/els-cas/cas-common.sty
       - pubs/shared/els-cas/cas-common.sty
     outs:
@@ -7720,6 +7723,9 @@ stages:
           cache: false
           persist: true
       - pubs/renewable-energy-mdo/cas-dc.cls:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/cas-sc.cls:
           cache: false
           persist: true
       - pubs/applied-ocean-research-model/cas-common.sty:
@@ -7780,6 +7786,9 @@ stages:
       - pubs/renewable-energy-mdo/commands-re.tex
       - pubs/renewable-energy-mdo/content-re.tex
       - pubs/renewable-energy-mdo/shared-pkg.tex
+      - pubs/renewable-energy-mdo/cas-dc.cls
+      - pubs/renewable-energy-mdo/cas-sc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
       - .calkit/env-locks/tex
       - pubs/renewable-energy-mdo/.latexmkrc
     outs:
@@ -7810,6 +7819,8 @@ stages:
       - pubs/applied-ocean-research-model/zotero-meem-refs.bib
       - pubs/applied-ocean-research-model/commands-aor.tex
       - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
@@ -7971,16 +7982,16 @@ stages:
       - mdocean/plots/non_matlab_figs/.latexmkrc
     outs:
       - mdocean/plots/non_matlab_figs/aux/${item.name}.log:
-          cache: false
+          cache: true
           persist: true
       - mdocean/plots/non_matlab_figs/aux/${item.name}.aux:
-          cache: false
+          cache: true
           persist: true
       - mdocean/plots/non_matlab_figs/aux/${item.name}.fdb_latexmk:
-          cache: false
+          cache: true
           persist: true
       - mdocean/plots/non_matlab_figs/aux/${item.name}.fls:
-          cache: false
+          cache: true
           persist: true
       - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
