@@ -6,11 +6,12 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :param b: Design variable bounds struct
 % :returns: Intermediate results struct (cached heavy analyses)
     % Run comparison analysis
-    [Xs,vals] = compare_run(p,b);
+    [Xs,vals,flags] = compare_run(p,b);
 
     % Store results and returned figure handles for post-processing
     intermed_result_struct.p = p;
     intermed_result_struct.b = b;
     intermed_result_struct.Xs = Xs;
     intermed_result_struct.vals = vals;
+    intermed_result_struct.flags = flags;
 end

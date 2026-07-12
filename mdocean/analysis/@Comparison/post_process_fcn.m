@@ -39,4 +39,5 @@ function [fig_array,...
     cost_savings_PTO = vals(2).capex_PTO - vals(3).capex_PTO;
     cost_savings_total = vals(2).capex - vals(3).capex;
     end_result_struct.pctCostSavingsFromPTO = cost_savings_PTO / cost_savings_total * 100;
+    end_result_struct.flags = intermed_result_struct.flags;
 end

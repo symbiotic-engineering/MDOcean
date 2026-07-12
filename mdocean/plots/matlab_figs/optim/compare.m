@@ -118,7 +118,8 @@ temp_table = struct2table(vals,'RowNames',titles);
 numeric_vals = varfun(@isnumeric, temp_table, 'OutputFormat', 'uniform');
 vector_names = {'over_rho','phase','force_surge'};
 vector_rows = contains(temp_table.Properties.VariableNames,vector_names);
-out_table = rows2vars(temp_table(:,numeric_vals & ~vector_rows));
+ignore_rows = contains(temp_table.Properties.VariableNames,{'J_capex_design','c_v'});
+out_table = rows2vars(temp_table(:,numeric_vals & ~vector_rows & ~ignore_rows));
 out_table.Properties.RowNames = fix_underscores(out_table.OriginalVariableNames);
 out_table = removevars(out_table,'OriginalVariableNames');
 
