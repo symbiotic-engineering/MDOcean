@@ -1,27 +1,24 @@
 \newcommand{\FigureWidthOption}[1]{%
-    \if\relax\detokenize{#1}\relax
-    \else
-        width=#1%
-    \fi
+    \if\relax\detokenize{#1}\relax\else width=#1\fi
 }
 \newcommand{\FigureOptionsDefaultTwoCol}{\FigureWidthOption{\linewidth}}
 \newcommand{\FigureOptionsDefaultOneCol}{\FigureWidthOption{0.75\linewidth}}
 
 \newcommand{\DeclareFigureOptions}[3]{%
-    \expandafter\def\csname figopts@#1@twocol\endcsname{\FigureWidthOption{#2}}%
-    \expandafter\def\csname figopts@#1@onecol\endcsname{\FigureWidthOption{#3}}%
+    \expandafter\def\csname figopts@\detokenize{#1}@twocol\endcsname{\FigureWidthOption{#2}}%
+    \expandafter\def\csname figopts@\detokenize{#1}@onecol\endcsname{\FigureWidthOption{#3}}%
 }
 
 \newcommand{\FigureOptions}[1]{%
     \ifdefined\JOURNALTWOCOLUMN
-        \ifcsname figopts@#1@twocol\endcsname
-            \csname figopts@#1@twocol\endcsname
+        \ifcsname figopts@\detokenize{#1}@twocol\endcsname
+            \csname figopts@\detokenize{#1}@twocol\endcsname
         \else
             \FigureOptionsDefaultTwoCol
         \fi
     \else
-        \ifcsname figopts@#1@onecol\endcsname
-            \csname figopts@#1@onecol\endcsname
+        \ifcsname figopts@\detokenize{#1}@onecol\endcsname
+            \csname figopts@\detokenize{#1}@onecol\endcsname
         \else
             \FigureOptionsDefaultOneCol
         \fi
