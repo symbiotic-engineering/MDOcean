@@ -1,0 +1,235 @@
+\documentclass[phd,tocprelim]{cornell}
+%
+% tocprelim option must be included to put the roman numeral pages in the
+% table of contents
+%
+% The cornellheadings option will make headings completely consistent with
+% guidelines.
+%
+% This sample document was originally provided by Blake Jacquot, and
+% fixed up by Andrew Myers.
+%
+% Shared packages
+\usepackage{import}
+\subimport{../shared}{shared-pkg}
+\subimport{../applied-ocean-research-model}{commands-aor}
+\subimport{../renewable-energy-mdo}{commands-re}
+
+% From template
+\usepackage{graphicx,pstricks}
+\usepackage{graphics}
+\usepackage{moreverb}
+%\usepackage{subfigure}
+\usepackage{epsfig}
+\usepackage{hangcaption}
+\usepackage{txfonts}
+\usepackage{palatino}
+
+% For bibliography
+\usepackage[numbers,square]{natbib}
+
+% for grid paper
+\usepackage{framed}
+\usepackage{adjustbox}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{multicol}
+\usepackage[svgnames]{xcolor}
+\usepackage{titlesec}
+\usepackage{wrapfig}
+\usepackage{caption}
+
+% for subtitles
+\usepackage{titlesec}
+
+% for appendix - from Olivia V.
+\usepackage{appendix}
+\usepackage{moresize}
+\usepackage[skip=0.5ex]{subcaption}
+
+% appendices after each chapter
+\newcommand{\appendixchapter}[1]{%
+  \chapter*{#1}
+  \addcontentsline{toc}{chapter}{#1}
+}
+
+% nicer formatting of chapter titles
+\makeatletter
+\titleformat{\chapter}[display]
+{\normalfont\bfseries}{\Large\centering\MakeUppercase{\@chapapp\space \thechapter}}{0pt}{\LARGE\center}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+\graphicspath{
+  {../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}
+  {../applied-ocean-research-model/}
+  {../renewable-energy-mdo/}
+}
+
+% adjust margins
+\usepackage[
+  top=1in,
+  bottom=1in,
+  left=1in,
+  right=1in
+]{geometry}
+
+%if you're having problems with overfull boxes, you may need to increase
+%the tolerance to 9999
+\tolerance=9999
+
+\bibliographystyle{plainnat}
+%\bibliographystyle{IEEEbib}
+
+\newcommand{\DISSERTATION}{} % used for dissertation-specific formatting in shared files
+
+\renewcommand{\caption}[1]{\singlespacing\hangcaption{#1}\normalspacing}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+\title {Leveraging Semi-Analytical Modeling, Multidisciplinary Design Optimization, 
+        and System Value Metrics to Advance Wave Energy Converter Viability}
+\author {Rebecca McCabe}
+\conferraldate {August}{2026}
+\degreefield {Ph.D.}
+\copyrightholder{Rebecca McCabe}
+\copyrightyear{2026}
+
+\begin{document}
+
+\maketitle
+\makecopyright
+
+\input{abstract.tex}
+
+\begin{biosketch}
+Becca is a 5th-year Ph.D. candidate in Mechanical Engineering interested in the design of renewable energy systems.
+She enjoys solving integrated mechanical, electromagnetic, fluid, and controls problems through simulation, systems design, and prototyping.
+Her PhD research at Cornell's Symbiotic Engineering and Analysis Lab with Prof. Maha Haji involves 
+optimizing ocean wave energy toward economic viability and reduced carbon emissions. 
+Outside of research, Becca enjoys distance running, working with engineering for social impact organizations, and neurodiversity advocacy.
+During her PhD, she completed three half-marathons and founded and led two student organizations: 
+GAIA (Global Action Impact Association) and SNAC (Student Neurodiversity Alliance at Cornell).
+Becca graduated from MIT in 2021 with a B.S. in Mechanical Engineering. 
+At MIT, she focused on electric vehicles, writing her bachelor's thesis on electric motor optimization for Formula SAE cars. 
+\end{biosketch}
+
+\begin{dedication}
+This dissertation is dedicated to my neurokin:
+all neurodivergent people across space, time, and context.
+Thinking differently is a gift.
+Let's make sure the world knows it.
+\end{dedication}
+
+\begin{acknowledgements}
+\input{acknowledgements.tex}
+\end{acknowledgements}
+
+\setcounter{tocdepth}{1}
+\contentspage
+\tablelistpage
+\figurelistpage
+
+\normalspacing \setcounter{page}{1} \pagenumbering{arabic}
+\pagestyle{cornell} \addtolength{\parskip}{0.5\baselineskip}
+
+\chapter{Introduction}\label{ch:intro}
+\input{intro-contrib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[System Modeling]{System Modeling\\
+\large Development, Validation, and Benchmarking of a \\[-4ex]
+Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
+\label{ch:modeling}
+
+\emph{All models are wrong, but some are useful.}
+
+- George Box, 1987
+
+This chapter is adapted from \cite{mccabe_development_2026}, currently under review for publication in Applied Ocean Research.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
+\subimport{../applied-ocean-research-model/}{content}
+
+\appendixchapter{System Modeling Appendices}
+\begin{subappendices}
+  \subimport{../applied-ocean-research-model/}{appendices}
+\end{subappendices}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Hydrodynamic Modeling]{Hydrodynamic Modeling\\
+\large Matrix Structure and Convergence Behavior of the\\[-4ex] 
+Matched Eigenfunction Method for Generalized Concentric Bodies}
+\label{ch:hydrodynamic}
+
+\emph{The purpose of computing is insight, not numbers.}
+
+- Richard Hamming, 1962
+
+This chapter is adapted from \cite{bimali_matrix_2026}, currently under review for publication in the Journal of Fluid Mechanics (submission number JFM-2026-1453).
+See \cref{sec:research-outputs} for other research outputs associated with this work.
+
+\subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{FLMguide}
+
+\appendixchapter{Hydrodynamic Modeling Appendices}
+\begin{subappendices}
+  \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{jfm-appendix}
+\end{subappendices}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Design Optimization]{Design Optimization\\
+\large Leveraging Multidisciplinary Design Optimization to \\[-4ex]
+Advance Wave Energy Converter Viability
+}
+\label{ch:optimization}
+
+\emph{The performance of a system doesn't depend on how the parts perform taken separately, it depends on how they perform together.
+[...] When you improve the performance of a part of a system taken separately, you can destroy the system.}
+
+- Russell Ackoff, 2003 \cite{ackoff_video_2003}
+
+This chapter is adapted from \cite{mccabe_leveraging_2026}, \hl{(pending submission)} [currently under review] for publication in Renewable Energy.
+See \cref{sec:research-outputs} for other research outputs associated with this work.
+\subimport{../renewable-energy-mdo/}{content-re}
+
+\appendixchapter{Design Optimization Appendices}
+\begin{subappendices}
+  \subimport{../renewable-energy-mdo/sections}{other-appendices}
+\end{subappendices}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
+\large
+A Paradigm for Grid-Informed Design Optimization\\[-4ex] 
+to Maximize System Economic and Environmental Value}
+\label{ch:grid-value}
+
+\emph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
+
+- Greta Thunberg, 2019 \cite{thunberg_speech_2019}
+
+This chapter is currently unpublished.
+See \cref{sec:research-outputs} for research outputs associated with this work.
+\subimport{../UMERC-2025-grid-value/}{content-grid}
+
+\appendixchapter{Grid Impact Synthesis Appendices}
+\begin{subappendices}
+  \section{Reduced order model details}
+  \subimport{../UMERC-2025-grid-value/}{appendix-grid}
+\end{subappendices}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Conclusion}
+\hl{A conclusion will be written here}.
+% \chapter{Vision for the Future of Wave Energy Optimization}
+% - extend to other architectures and more complex models (already written in modeling paper)
+% - integrate with wecopttool and wecsim
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{references,jfm,zotero-meem-refs}
+
+\end{document}

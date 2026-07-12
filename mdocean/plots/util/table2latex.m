@@ -25,21 +25,22 @@
 %   Date:    09/10/2018                                                   %
 %   E-mail:  vicmarcag (at) gmail (dot) com                               %
 % ----------------------------------------------------------------------- %
-function table2latex(T, filename, special_col_spec, special_first_row)
+function table2latex(tab, filename, special_col_spec, special_first_row)
     
     % Error detection and default parameters
     if nargin < 2
         filename = 'table.tex';
         fprintf('Output path is not defined. The table will be written in %s.\n', filename); 
-    elseif ~ischar(filename)
+    elseif ~(ischar(filename) || (isstring(filename) && isscalar(filename)))
         error('The output file name must be a string.');
     else
+        filename = char(filename);
         if ~strcmp(filename(end-3:end), '.tex')
             filename = [filename '.tex'];
         end
     end
     if nargin < 1, error('Not enough parameters.'); end
-    if ~istable(T), error('Input must be a table.'); end
+    if ~istable(tab), error('Input must be a table.'); end
     if nargin<3
         special_col_spec = [];
     end
@@ -48,13 +49,13 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     end
     
     % Parameters
-    n_col = size(T,2);
+    n_col = size(tab,2);
     col_spec = [];
     for c = 1:n_col
         col_spec = [col_spec 'l'];
     end
-    col_names = strjoin(T.Properties.VariableNames, ' & ');
-    row_names = T.Properties.RowNames;
+    col_names = strjoin(tab.Properties.VariableNames, ' & ');
+    row_names = tab.Properties.RowNames;
     if ~isempty(row_names)
         col_spec = ['l' col_spec]; 
         col_names = ['& ' col_names];
@@ -79,19 +80,19 @@ function table2latex(T, filename, special_col_spec, special_first_row)
 
     % Writing the data
     try
-        for row = 1:size(T,1)
+        for row = 1:size(tab,1)
             row_data = cell(1,n_col);
             row_data{1,n_col} = [];
             for col = 1:n_col
-                value = T{row,col};
+                value = tab{row,col};
                 
-                use_percent = contains(T.Properties.VariableNames{col},'error','IgnoreCase',true);
+                use_percent = contains(tab.Properties.VariableNames{col},'error','IgnoreCase',true);
                 value = format_value(value, use_percent);
                 
                 row_data{1,col} = char(value);
             end
             if ~isempty(row_names)
-                row_data = [row_names{row}, row_data];
+                row_data = [format_value(row_names{row}, false), row_data];
             end
             row_string = append(strjoin(row_data, ' & '), ' \\\\ \n'); % need 4 \ in row_string and 2 \ in file
             table_string = append(table_string, row_string);
@@ -107,11 +108,17 @@ function table2latex(T, filename, special_col_spec, special_first_row)
     
     table_string = append(table_string,'\\end{tabular}');
 
-    fileID = fopen(filename, 'w');
-    fprintf(fileID, table_string);
+    [filepath, ~, ~] = fileparts(filename);
+    if ~isempty(filepath) && ~exist(filepath, 'dir')
+        mkdir(filepath);
+    end
 
-    % Closing the file
-    fclose(fileID);
+    fileID = fopen(filename, 'w');
+    if fileID == -1
+        error('MDOcean:table2latex:InvalidFid', 'Could not open file for writing: %s', filename);
+    end
+    cleanup = onCleanup(@() fclose(fileID)); %#ok<NASGU>
+    fprintf(fileID, table_string);
 end
 
 function value = format_value(value, use_percent)
@@ -126,7 +133,9 @@ function value = format_value(value, use_percent)
     end
     if ~isempty(value) && (ischar(value) || isstring(value))
         value = char(value);
-        if isstrprop(value(1), 'digit')
+        if contains(value, '_') && ~contains(value, '$')
+            value = ['$' value '$']; 
+        elseif isstrprop(value(1), 'digit')
             value = str2double(value);
         end
     end
@@ -137,14 +146,23 @@ function value = format_value(value, use_percent)
             value = '$\infty$';
         elseif use_percent
             value = sprintf('$%.1f\\\\%%%% $',value*100);
-        else % use engineering notation
-            exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
-            mantissa = value / 10.^exponent; % Calculate mantissa
-            if exponent==0
-                value = sprintf('$%.3g $',mantissa);
-            else
-                value = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
-            end
+        elseif isscalar(value) % use engineering notation
+            value = engr_notation(value);
+        else % array
+            numbers = strjoin(arrayfun(@(x) engr_notation(x),value,'UniformOutput',false), ', ');
+            value = ['[ ' numbers ' ]'];
         end
+    else
+        value = formattedDisplayText(value,"UseTrueFalseForLogical",true);
+    end
+end
+
+function formatted = engr_notation(value)
+    exponent = floor(log10(abs(value))/3) * 3; % Round down to nearest multiple of 3
+    mantissa = value / 10.^exponent; % Calculate mantissa
+    if exponent==0
+        formatted = sprintf('$%.3g $',mantissa);
+    else
+        formatted = sprintf('$%.3g \\\\cdot 10^{%d}$', mantissa, exponent);
     end
 end

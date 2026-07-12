@@ -1,0 +1,195 @@
+function [p_star,candidates,constraints_active] = circle_intersect_optim(c,r,warn_if_infeasible)
+% Finds the point p_star=[x,y] closest to the origin that is 
+% within the intersection of circular discs with centers c and radii r.
+% This is equivalent to the following optimization problem: 
+% p_star = argmin_p |p| s.t. |p-c_i|-r_i <= 0 for all i.
+% If the origin is feasible, p_star is the origin.
+% If not, p_star will either be on the intersections of the circles,
+% or on the point on each circle closest to the origin - these points
+% are returned as candidates. If the problem is infeasible, 
+% p_star is returned empty, constraints_active is all true, and a warning is issued.
+
+N = length(r);
+max_num_intersects = N * (N-1);
+max_num_candidates = max_num_intersects + N;
+candidates = NaN(max_num_candidates,2);
+circle_indices = zeros(max_num_candidates,2);
+too_far_check = false(max_num_candidates,1);
+
+% 1) check if origin feasible
+origin = [0,0];
+origin_feasible = check_feasible(origin,c,r);
+if origin_feasible
+    p_star = origin;
+    constraints_active = false(size(r));
+else
+
+    % 2) pairwise intersections
+    count = 0;
+    if N > 1
+        pair_idx = pair_indices_2comb(N);
+        c1 = c(pair_idx(:,1),:);
+        c2 = c(pair_idx(:,2),:);
+        r1 = r(pair_idx(:,1));
+        r2 = r(pair_idx(:,2));
+        [xs, ys, too_far] = circle_circle_intersect_batch(c1,r1,c2,r2);
+        pair_candidates = [xs(:,1), ys(:,1); xs(:,2), ys(:,2)];
+        n_pair_candidates = size(pair_candidates,1);
+        candidates(1:n_pair_candidates,:) = pair_candidates;
+        circle_indices(1:n_pair_candidates,:) = [pair_idx; pair_idx];
+        too_far_check(1:n_pair_candidates) = repelem(too_far,2,1);
+        count = n_pair_candidates;
+    end
+    
+    % 3) single-circle closest boundary
+    dist = hypot(c(:,1), c(:,2)); % distance of circle center from origin
+    ctr_origin = dist < 1e-10;
+    p = zeros(N,2);
+    nonzero_ctr = ~ctr_origin;
+    p(nonzero_ctr,:) = c(nonzero_ctr,:) - (r(nonzero_ctr) ./ dist(nonzero_ctr)) .* c(nonzero_ctr,:);
+    r_origin = r(ctr_origin);
+    p(ctr_origin,:) = [r_origin(:), zeros(numel(r_origin),1)]; % center at origin: any boundary point is equally close
+    candidates(count+(1:N),:) = p;
+    circle_indices(count+(1:N),:) = [1:N; 1:N].';
+    
+    % 4) filter feasible
+    feasible_all_circles = check_feasible(candidates,c,r);
+    feasible_p = candidates(feasible_all_circles,:);
+    
+    % 5) choose closest
+    if isempty(feasible_p)
+        p_star = [];
+    else
+        [~,idx] = min(hypot(feasible_p(:,1), feasible_p(:,2)));
+        p_star = feasible_p(idx,:);
+    end
+    
+    if isempty(p_star)
+        constraints_active = true(size(r));
+        if any(isnan(candidates(:)))
+            idx_nan = any(isnan(candidates),2);
+            idx_infeasible = idx_nan & too_far_check; % this assumes all circles are feasible inside, infeasible outside
+            circles_no_intersect = unique(circle_indices(idx_infeasible,:),'rows');
+            if warn_if_infeasible
+                for i = 1:size(circles_no_intersect,1)
+                    warning('MDOcean:circle_intersect_optim:infeasible',...
+                        'infeasible: circle %i and %i do not intersect and are not contained/coincident',...
+                        circles_no_intersect(i,1),circles_no_intersect(i,2))
+                end
+            end
+        else
+            if warn_if_infeasible
+                warning('MDOcean:circle_intersect_optim:infeasible',...
+                    ['Each constraint pair is individually feasible, '...
+                    'but all constraints together are infeasible'])
+            end
+        end
+    else
+        constraints_active = abs(eval_constraint(p_star,c,r)) < 1e-4;
+    end
+end
+end
+
+function feasible_all_circles = check_feasible(p,c,r)
+% checks if point(s) p are within all circles
+% returns scalar boolean for 1x2 p, vector for Nx2 p
+    dist_outside = eval_constraint(p,c,r);
+    feas_each_circle = dist_outside <= 1e-4;
+    feasible_all_circles = all(feas_each_circle,2);
+    if isvector(p) && numel(p) == 2
+        feasible_all_circles = feasible_all_circles(1);
+    end
+end
+
+function constr_fcn = eval_constraint(p,c,r)
+% checks how far point(s) p are in violation of the constraints
+% positive means not ok (outside circle), negative means ok (inside circle)
+% returns 1xN for single p, MxN for M points
+    if isempty(p)
+        constr_fcn = zeros(0,length(r));
+        return
+    end
+    cx = c(:,1).';
+    cy = c(:,2).';
+    rr = r(:).';
+    if isvector(p) && numel(p) == 2
+        constr_fcn = hypot(p(1) - cx, p(2) - cy) - rr;
+        return
+    end
+    dx = p(:,1) - cx;
+    dy = p(:,2) - cy;
+    constr_fcn = hypot(dx,dy) - rr;
+end
+
+function pair_idx = pair_indices_2comb(N)
+% Faster pair indexing alternative to nchoosek(1:N,2)
+    n_pairs = N * (N - 1) / 2;
+    pair_idx = zeros(n_pairs,2);
+    pos = 1;
+    for i = 1:(N-1)
+        n_j = N - i;
+        idx = pos:(pos + n_j - 1);
+        pair_idx(idx,1) = i;
+        pair_idx(idx,2) = (i+1:N).';
+        pos = pos + n_j;
+    end
+end
+
+function [xs, ys, too_far] = circle_circle_intersect(x1,y1,r1,x2,y2,r2)
+% Finds the intersection points of two circles.
+% Returns NaN if circles don't intersect or are coincident.
+    d = sqrt((x2-x1)^2 + (y2-y1)^2);
+    
+    too_far = d > r1 + r2;
+    contained_or_coincident = d < abs(r1-r2) || d == 0;
+    if too_far || contained_or_coincident
+        % no intersection (too far, contained, or coincident)
+        xs = [NaN, NaN];
+        ys = [NaN, NaN];
+        return
+    end
+    
+    a = (r1^2 - r2^2 + d^2) / (2*d);
+    h = sqrt(max(r1^2 - a^2, 0));  % max with 0 for numerical safety
+    
+    % midpoint
+    mx = x1 + a*(x2-x1)/d;
+    my = y1 + a*(y2-y1)/d;
+    
+    % offset
+    dx = h*(y2-y1)/d;
+    dy = h*(x2-x1)/d;
+    
+    xs = [mx+dx, mx-dx];
+    ys = [my-dy, my+dy];
+end
+
+function [xs, ys, too_far] = circle_circle_intersect_batch(c1,r1,c2,r2)
+% Vectorized circle-circle intersections.
+% c1,c2 are Nx2 and r1,r2 are Nx1; xs,ys are Nx2.
+    dx_c = c2(:,1) - c1(:,1);
+    dy_c = c2(:,2) - c1(:,2);
+    d = hypot(dx_c, dy_c);
+
+    too_far = d > (r1 + r2);
+    contained_or_coincident = d < abs(r1-r2) | d == 0;
+    invalid = too_far | contained_or_coincident;
+
+    d_safe = d;
+    d_safe(invalid) = 1;
+
+    a = (r1.^2 - r2.^2 + d.^2) ./ (2 .* d_safe);
+    h = sqrt(max(r1.^2 - a.^2, 0));
+    mx = c1(:,1) + a .* dx_c ./ d_safe;
+    my = c1(:,2) + a .* dy_c ./ d_safe;
+    dx = h .* dy_c ./ d_safe;
+    dy = h .* dx_c ./ d_safe;
+
+    xs = NaN(length(r1),2);
+    ys = NaN(length(r1),2);
+    valid = ~invalid;
+    xs(valid,1) = mx(valid) + dx(valid);
+    xs(valid,2) = mx(valid) - dx(valid);
+    ys(valid,1) = my(valid) - dy(valid);
+    ys(valid,2) = my(valid) + dy(valid);
+end

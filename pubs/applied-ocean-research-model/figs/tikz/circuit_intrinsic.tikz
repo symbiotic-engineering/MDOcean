@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+	% Paths, nodes and wires:
+	\draw (1.241, 6.733) to[sinusoidal voltage source, l={$\hat{\zeta}$}] (1.241, 8.733);
+	\draw (3.25, 6.733) to[controlled sinusoidal voltage source, l={$\gamma_f\hat{\zeta}$}, name=float_excitation] (3.25, 8.733);
+	\draw (3.25, 2.75) to[controlled sinusoidal voltage source, l={$\gamma_s \hat{\zeta}$}] (3.25, 4.75);
+	\draw (1.241, 6.733) -- (3.241, 6.733);
+	\draw (3.25, 2.75) -| (1.241, 3.233) -- (1.241, 6.733);
+	\node[ocirc] at (1.241, 8.733){};
+	\node[fourport, rotate=-90, xscale=0.81, yscale=0.81](Z_i) at (5.36, 5.746){} node[anchor=center] at (Z_i.center){$\mathbf{Z}_i$};
+	\draw (3.25, 4.75) -- (5, 4.75) -| (5.009, 5.017);
+	\draw (3.241, 6.733) -- (4.991, 6.733) -- (4.991, 6.483);
+	\node[fourport, rotate=-90, xscale=0.81, yscale=0.81](N1) at (7.212, 5.75){} node[anchor=center] at (N1.center){$\mathbf{Z}_{p}$};
+	\draw (3.241, 8.75) -| (8, 8.75) -- (8, 6.75);
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N2) at (5.378, 6.953){} node[anchor=center] at (N2.text){$-\hat{F}_{i,f}+$};
+	\node[shape=rectangle, minimum width=0.706cm, minimum height=0.465cm](N3) at (5.379, 4.54){} node[anchor=center] at (N3.text){$+\hat{F}_{i,s}-$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N4) at (7.25, 4.547){} node[anchor=center] at (N4.text){$+\hat{F}_{p,s}-$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=0.465cm](N5) at (7.25, 6.953){} node[anchor=center] at (N5.text){$-\hat{F}_{p,f}+$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=1.465cm] at (4.25, 7.75){} node[anchor=north, align=center, text width=0.929cm, inner sep=1pt] at (4.25, 8.5){$+$  $\hat{F}_{e,f}$  $-$};
+	\node[shape=rectangle, minimum width=0.715cm, minimum height=1.465cm] at (4.125, 3.75){} node[anchor=north west, align=left, text width=0.327cm, inner sep=6pt] at (3.75, 4.5){$+$  $\hat{F}_{e,s}$  $-$};
+	\node[shape=rectangle, minimum width=0.965cm, minimum height=0.465cm](N6) at (3.75, 9.059){} node[anchor=center] at (N6.text){$\hat{\dot{\xi}}_f \rightarrow$};
+	\draw (5.728, 6.483) -| (5.75, 6.75) -- (6.625, 6.75) -| (6.631, 6.487);
+	\draw (3.25, 8.75) |- (3.241, 8.733);
+	\node[shape=rectangle, minimum width=0.706cm, minimum height=0.465cm](N7) at (3.75, 5.059){} node[anchor=center] at (N7.text){$\hat{\dot{\xi}}_s\rightarrow$};
+	\draw (5.75, 5) |- (5.741, 4.75) -- (6.625, 4.75) -| (6.631, 5.013);
+	\draw (3.25, 2.75) -| (8, 4.75);
+	\draw (8, 4.75) -- (7.75, 4.75) -| (7.75, 5);
+	\draw (7.75, 6.5) -- (7.75, 6.75) -- (8, 6.75);
+	\draw[dash pattern={on 1.6pt off 1.6pt}] (6.25, 9.75) -- (6.25, 2.25);
+	\node[shape=rectangle, minimum width=1.715cm, minimum height=0.465cm] at (5.375, 9.5){} node[anchor=north east, align=right, text width=1.327cm, inner sep=6pt] at (6.25, 9.75){Intrinsic};
+	\node[shape=rectangle, minimum width=3.715cm, minimum height=0.965cm] at (8.125, 9.5){} node[anchor=north west, align=left, text width=3.327cm, inner sep=6pt] at (6.25, 10){PTO kinematics, dynamics, load};
+\end{tikzpicture}

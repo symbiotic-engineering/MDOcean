@@ -1,0 +1,189 @@
+\newcommand{\JOURNALTWOCOLUMN}{} % comment out for single-column journal class
+\ifdefined\JOURNALTWOCOLUMN
+\documentclass[a4paper,fleqn,colorlinks]{cas-dc}
+\else
+\documentclass[a4paper,fleqn,colorlinks]{cas-sc}
+\fi
+
+\input{shared-pkg}
+\input{commands-re}
+\newcommand{\journal}{Renewable Energy}
+
+\usepackage[numbers,square]{natbib}
+
+%%Author macros
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\tsc{WGM}
+\tsc{QE}
+%%%
+
+\begin{document}
+
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+
+\shorttitle{Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability}
+\shortauthors{R. McCabe et~al.}
+
+\title[mode=title]
+{Leveraging Multidisciplinary Design Optimization to Advance Wave Energy Converter Viability}
+
+\author[MAE]{Rebecca McCabe}[
+orcid=0000-0001-5108-998X,
+auid=57980095200,
+linkedin=rebecca-mccabe]
+
+
+\ead{rgm222@cornell.edu}
+\ead[url]{http://sea.mae.cornell.edu}
+
+% Optional:
+\credit{Conceptualization, Methodology, Software, Validation, Writing - Original draft}
+
+\author[MAE]{Madison Dietrich}[
+    orcid=0009-0000-3590-5334
+]
+
+\credit{Software, Visualization,  Writing - Review \& Editing}
+
+\author[mich]{Maha Haji}[
+    orcid=0000-0002-2953-7253
+]
+\cormark[1]
+\credit{Supervision, Writing - Review \& Editing}
+
+\affiliation[MAE]{
+    organization={Sibley School of Mechanical and Aerospace Engineering, Cornell University},
+    addressline={124 Hoy Rd.},
+    city={Ithaca},
+    postcode={14853},
+    state={NY},
+    country={USA}
+}
+
+\affiliation[mich]{
+    organization={Department of Mechanical Engineering, University of Michigan},
+    addressline={G.G. Brown Laboratory, 2350 Hayward},
+    city={Ann Arbor},
+    postcode={48109},
+    state={MI},
+    country={USA}
+}
+
+\cortext[1]{Corresponding author}
+
+%% Abstract
+\begin{abstract}
+%% Text of abstract
+Wave energy converters (WECs) can advance the global energy transition by producing clean power for utility grids and offshore technologies.
+Considering many disciplines concurrently in an optimization process allows WEC designers to systematically explore interdisciplinary tradeoffs and leverage coupling for system-wide benefit.
+This paper applies the multidisciplinary design optimization (MDO) methodology to perform single- and multi-objective gradient-based optimization of the Reference Model 3 (RM3), a two-body point absorber WEC design benchmark.
+Five hull dimensions, five structural thicknesses, and the generator force and power rating are simultaneously optimized while obeying various static, dynamic, and structural failure constraints.
+Objectives include the levelized cost of energy (LCOE), power production, and capital cost.
+MDO principles motivate the optimization formulation and solution process.
+
+The obtained optimization results achieve a \resultsRE[pctImproveDesignCostMinLCOE]~reduction in modeled cost, \resultsRE[pctImprovePowerMinLCOE]~increase in power, and resulting \resultsRE[pctImproveLCOEMinLCOE]~decrease in LCOE compared to the original RM3 design.
+Parameter sensitivity analysis indicates that LCOE depends more strongly on \resultsRE[sensitiveParamCategoriesMinLCOE]~parameters than \resultsRE[insensitiveParamCategoriesMinLCOE]~parameters and that the optimal design is sensitive to \resultsRE[sensitiveDesignCategoriesMinLCOE]~parameters.
+A Pareto trade-off between cost and power reveals different optimal designs depending on which objective is prioritized, suggesting application-specific design heuristics.
+Three representative optimal designs are investigated: a minimum-LCOE design for cost-sensitive operations like utility power, a minimum-cost design for small offshore systems with fixed power needs, and a balanced design for intermediate applications.
+\end{abstract}
+
+%%Graphical abstract
+\begin{graphicalabstract}
+\includegraphics[width=\linewidth]{figs/from-matlab/graphical_abstract_optim.pdf}
+
+
+\textbf{The optimization results achieve a \resultsRE[pctImproveDesignCostMinLCOE]~reduction in modeled cost, \resultsRE[pctImprovePowerMinLCOE]~increase in power, and resulting \resultsRE[pctImproveLCOEMinLCOE]~decrease in LCOE compared to the original RM3 design.}
+\end{graphicalabstract}
+
+%%Research highlights
+\begin{highlights}
+    \input{sections/re-contributions}
+\end{highlights}
+
+%% Keywords
+\begin{keywords}
+wave energy conversion \sep marine renewable energy \sep multidisciplinary design optimization \sep structural design \sep sensitivity analysis  \sep techno-economic optimization
+%% keywords here, in the form: keyword \sep keyword
+
+%% PACS codes here, in the form: \PACS code \sep code
+
+%% MSC codes here, in the form: \MSC code \sep code
+%% or \MSC[2008] code \sep code (2000 is the default)
+
+\end{keywords}
+
+\maketitle
+
+% added for my convenience, should take out before submission
+%\tableofcontents
+%\listoffigures
+%\listoftables
+%\clearpage
+%\summarytexcount{mdocean}
+%\detailtexcount{sections/model}{subsection}
+%\detailtexcount{sections/other-appendices}{section}
+%\newpage
+
+\include{content-re}
+
+\section*{Acknowledgements}
+The authors thank Iris Ren for assistance with optimization code;
+Pete Bachant for support on the reproducible computation pipeline;
+Ryan Coe, Jacob Mays, Patrick Reed, Nate DeGeode, and Alaa Ahmed for providing valuable manuscript feedback;
+and Meghana Vemulapalli, Alex Cuellar, Nathan Huffman, and Nola McCabe for proofreading support.
+
+Rebecca McCabe acknowledges funding from the National Science Foundation Graduate Research Fellowship.
+Madison Dietrich acknowledges funding from the Fund for Undergraduate Research on Solutions to Climate Change and the Bill Nye ’77 Award in Undergraduate Research.
+This material is based on work supported by the National Science Foundation Graduate Research Fellowship under Grant No.
+DGE–2139899.
+Any opinions, findings, conclusions, or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
+
+\section*{Data Availability Statement}
+The MATLAB code for all simulation, optimization, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at \url{https://github.com/symbiotic-engineering/MDOcean} \cite{mccabe_mdocean_2024}.
+Questions and contributions via GitHub issues and pull requests are welcomed.
+%A Python version using the OpenMDAO package is forthcoming. % todo: replace with updated Zotero citation
+All computational environments, results, and \LaTeX~artifacts can be reproduced via a data version control pipeline built with the \texttt{Calkit} package
+and accessed at \url{https://calkit.io/symbiotic-engineering/mdocean}.
+
+\section*{Declaration of interests}
+Rebecca McCabe reports administrative support was provided by New York State Education Department Adult Career and Continuing Education Services Vocational Rehabilitation Services.
+Rebecca McCabe reports travel was provided by University Marine Energy Research Community.
+Maha Haji reports a relationship with University Marine Energy Research Community that includes board membership. 
+Madison Dietrich declares no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work, the authors used the following generative AI tools:
+Anthropic Claude (accessed May 2026);
+OpenAI ChatGPT (GPT-5.5, GPT-5.3, GPT-5.3-mini, and GPT-5-mini: accessed June 2025--June 2026);
+GitHub Copilot Cloud Agent (GPT-5.3 Codex: accessed March 2026--June 2026);
+GitHub Copilot Chat Extension for Visual Studio Code (Claude Sonnet 4, Claude Sonnet 4.5, GPT-4.1, GPT-5.4 mini, and GPT-5 mini: accessed February 2024--June 2026); and
+Google Search AI Overview (Gemini 1.0, Gemini 1.5, Gemini 2.0, Gemini 2.5, Gemini 3, Gemini 3.5: accessed May 2024--June 2026).
+AI tools were dominantly used for the generation and debugging of code and computational workflows not core to the technical contributions of the work.
+This includes generation of changelogs, pull request reviews, and continuous integration pipeline features;
+execution of merges, dependency version bumps, and compatibility updates;
+refactoring of code for improved organization and readability;
+syntax reference and usage examples for MATLAB, Python, Bash, \LaTeX, and their associated packages;
+resolution of errors and warnings encountered in the above languages during human-led code development and manuscript preparation;
+and the execution of specific formatting refinements to figures without altering their core content.
+
+The following exceptions describe instances where AI tools were used to assist with technical development, mathematical derivations, or figure generation related to the core technical contributions of the work:
+ChatGPT was used to conduct targeted literature review to identify relevant optimization algorithms for systems with structured coupling, optimal control techniques to populate the Venn diagram, and references describing convex optimization sensitivity analysis.
+Claude and ChatGPT were used editorially to improve clarity, grammar, style, and readability of the text.
+
+After using these tools, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+Author-generated continuous-integration tests and validation cases were used to verify the correctness of simulation code, both AI- and human-generated.
+
+\appendix
+\singleColMacro{
+\include{sections/other-appendices}
+}
+\printcredits
+
+
+\bibliographystyle{cas-model2-names}
+\bibliography{references,zotero-meem-refs}
+
+\end{document}
