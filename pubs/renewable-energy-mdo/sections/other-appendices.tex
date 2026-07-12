@@ -1,0 +1,260 @@
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Literature Review Column Legends}
+\label{remdo:sec:appendix-lit-legend}
+
+The following tables define column-abbreviation legends for the optimization-study comparison in \Cref{remdo:tab:lit}.
+
+\begin{landscape}
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\begin{table}[htbp]
+    \centering
+    \caption{Legend keys for the dynamics and controls columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}}
+         \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
+         N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
+         ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
+         TRM&  Terminator&  CFD&  Computational fluid dynamics&  Q& Quadratic & T&Time domain & P+, PI+&P/PI control with extension to incorporate constraints \\
+         OSW&  Oscillating surge WEC&  FIT&  Fit of model to numerical or experimental data&  CFD& Computational fluid dynamics & PS&Pseudo-spectral& NL&Nonlinear structured \\
+         OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
+        OWC& Oscillating water column& & & & & & & & \\
+    \end{tabular}
+    \end{table}
+\endgroup
+\end{landscape}
+
+\begin{landscape}
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\begin{table}[htbp]
+    \caption{Legend keys for other modeling columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+         \multicolumn{2}{c|}{Mooring}& \multicolumn{2}{c|}{Structures} &  \multicolumn{2}{c|}{Economics}&  \multicolumn{2}{c}{Sea state}\\ \hline
+         DYN&  Model incorporates mooring dynamics &  AN&  Models stress analytically as a function of dimensions&  STR&  Models structural cost &  REG& Regular waves\\
+         DES&  Study considers mooring physical design &  LO&  Models load without dimension-dependent stress &  PTO&  Models power take-off cost &  IRR& Irregular wave spectrum\\
+         &  &  FEA&  Models stress using finite element analysis &  GEO&  Geometric cost proxy (i.e.\ hull volume, surface area)&  REG+, IRR+& Joint probabilities of wave heights and periods for multiple sea states\\
+         &  &  &  &  FULL&  Full cost model &  STO& Storm condition\\
+    \end{tabular}
+    \end{table}
+
+\bigskip
+
+\begin{table}[htbp]
+    \caption{Legend keys for the optimization columns of \Cref{remdo:tab:lit}}
+\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+         \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
+         LOC&  Local optimizer (gradient-based, derivative-free)&  ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
+         GA&  Genetic algorithm&  PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
+         DOE&  Design of experiments (Monte Carlo, Taguchi)&  VAR&  Power variability (peak/average, std.\ dev., capacity factor)&  PTO&  PTO force, power, or electromagnetic feasibility& PTO&Power takeoff\\
+         IT&  Iterated by hand&  ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
+         ALT& Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
+         BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
+    \end{tabular}
+    \end{table}
+\endgroup
+\end{landscape}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Optimization Process Details}
+This section provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Inequality Constraints}
+\label{remdo:sec:appendix-linear-constraints}
+
+The eight linear inequality constraints of the optimization formulation (\Cref{remdo:sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $g_{L,*}$ given in parentheses:
+% notebook p137 11/16/25
+% TODO: verify row 2 ($g_{L,2}$) coefficient — should the leading entry use D_{f,in}/D_s or D_{f,in} directly? See formulation note, unresolved against MATLAB source.
+\begin{equation}
+    \begin{bmatrix}
+    -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\
+    \frac{h_d}{D_s}-\frac{T_s}{D_s} & 0 & 1 & ~~~0& 0  & 0\\
+    \frac{T_s}{D_s} & 0 & ~-1+\frac{1}{T_{f,2}/h_f} & ~~-1 & 0 & 0\\
+    0 & \frac{N}{2\cdot223} & 1 & ~~~0& 0  & 0\\
+    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
+    -\frac{h_d}{D_s} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
+    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & ~~~0 & 0 & 1 \\
+    \end{bmatrix}
+    \begin{bmatrix} D_s \\ D_f \\ T_{f,2} \\ h_s \\ t_d \\ h_{stiff,f}
+    \end{bmatrix}
+    \leq
+    \begin{bmatrix}
+    -D_{d,min} \\ -0.01 \\ -0.01 \\ -0.01 \\ h \\ h \\ -0.01 \\ -0.01
+    \end{bmatrix}~
+    \begin{pmatrix}
+    g_{L,1} \\ g_{L,2} \\ g_{L,3} \\g_{L,4} \\ g_{L,5} \\ g_{L,6} \\ g_{L,7} \\ g_{L,8}
+    \end{pmatrix}
+\end{equation}
+The $-0.01$ values on the right-hand side provide a small numerical buffer against the constraints to avoid model limits.
+The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hessian Scaling Procedure}
+\label{remdo:sec:appendix-scaling}
+First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
+Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
+\begin{equation}
+    s_i = \frac{1}{\sqrt{H_{ii}}}
+\end{equation}
+A new scaled optimization problem is solved using the scaled design variables $\textbf{x}_s$:
+\begin{equation}
+\begin{aligned}
+    \text{min}~~& \textbf{J}(\textbf{x}_s \odot \textbf{s},~\textbf{p}) \\
+    \text{by varying}~~&\textbf{x}_s= \textbf{x} \varoslash \textbf{s}\\
+    \text{subject to}~~ &\textbf{x}_{LB}\varoslash \textbf{s} \leq \textbf{x}_s \leq \textbf{x}_{UB} \varoslash \textbf{s}\\
+    &\textbf{g}_{NL}(\textbf{x}_s\odot\textbf{s},~\textbf{p}) \geq 0\\
+    & (A_{ineq} \odot \textbf{s}^T)\textbf{x}_s \leq b_{ineq}
+    \label{remdo:eq:scaled-standard}
+\end{aligned}
+\end{equation}
+where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ element-wise matrix division.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hyper-parameters}
+\label{remdo:sec:appendix-extra-param}
+\Cref{remdo:tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation and optimization.
+\begin{table}[htbp]
+    \centering
+    \caption{Hyper-parameters used to control numerics}
+    \label{remdo:tab:hyperparams}
+\begin{tabular}{lccc} \hline 
+          &Variable&  Value& Unit\\ \hline 
+          Simulation&$X_{tol}$&  0.01 & m \\ \hline 
+          &$\angle X_{tol}$& 3 & degrees\\ \hline 
+          &Maximum drag iterations& 100 & -\\ \hline 
+          &$N_{\text{harmonics}}$& 10 & - \\ \hline
+          &$b_{\text{max}}$ & 700.5 & - \\ \hline
+          SQP Optimization&Constraint tolerance& 1e-5 & - \\ \hline
+          &Iterations before Hessian scaling& 8 & - \\ \hline
+  &Maximum iterations after Hessian scaling& 150&-\\\hline
+  &Maximum function evaluations& 2000&-\\\hline
+ Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\\hline
+ & Minimum poll fraction& 1&\\\hline
+ & Pareto set change tolerance& 1.6e-8&\\\hline
+ & Maximum pattern search iterations& 100&\\\hline
+    \end{tabular}
+    \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Supplementary Results}
+\label{remdo:sec:appendix-supplemental-results}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single Objective Optimization Results}
+
+\Cref{remdo:fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
+The optimization converges in \resultsRE[singleObjIters]~iterations, not including the 8 initial iterations used to perform Hessian scaling.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
+\caption{Single objective convergence plots}\label{remdo:fig:single-objective-convergence}
+\end{figure}
+
+\Cref{remdo:fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
+The meaning of $x$ in each subplot is indicated by the subplot title.
+The two starting points that achieve global optima, denoted in green and orange, both have low initial values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
+The value of the optimal draft, $T_{f,2}^*$, is likewise lowest at the global minima. 
+On the other hand, the optimal float thickness, $t_{f,b}^*$, both depends less on and differs more from the initial value for float thickness.
+This suggests that it is primarily the initial value of the draft $T_{f,2}$, rather than the initial float thickness $t_{f,b}$, that is important for arriving at the global optimum.
+\Cref{remdo:fig:multistart-parallel-axis} also sheds light on the convexity of the search space: multimodality (several local minima) is common for all design variables except $T_{f,2}$ and $t_{f,b}$, which usually converge to the same optimal $x^*$ value regardless of the starting point $x_0$.
+Surprisingly, the optimal values take on many different continuous values, as opposed to converging to several discrete values as might be expected from distinct local optima in a multimodal problem.
+Future multistart procedures could therefore fix deterministic starts for the unimodal variables and sample only the multimodal ones, reducing the total function evaluations.
+%\hl{This requires further investigation to explain and will be done during re-scrutineering.}
+
+\begin{landscape}
+\begingroup
+\centering
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{figs/from-matlab/multistart_parallel_coordinates.pdf}
+\caption{Parallel axis plot for effect of starting point on convergence}\label{remdo:fig:multistart-parallel-axis}
+\fillandplacepagenumber
+\end{figure}
+
+\endgroup
+\end{landscape}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Sensitivities}
+\label{remdo:sec:appendix-sensitivties}
+\Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
+\begin{figure}[htbp]
+\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
+\caption{Local parameter sensitivity analysis to optimal objective $J^*$}
+\label{remdo:fig:param-sens-local-global-J-star}
+\end{figure}
+
+\Cref{remdo:fig:param-sens-local-global-J-star} compares four ways of computing the objective total derivative local sensitivity, $\frac{dJ^*}{dp}$.
+The first and simplest method uses only the partial derivative, $\frac{dJ^*}{dp}\approx \frac{\partial J}{\partial p}$.
+This partial derivative is found via finite difference around the optimal point and does not attempt to take into account the effect of the parameter change on the optimal design $x^*$.
+The second method, suggested by \citet{martins_engineering_2022}, uses a linear model to account for the change in $x^*$ due to parameter-dependent constraints.
+The change in $x^*$ is not calculated directly and is instead incorporated through the Lagrange multipliers $\lambda$:
+\begin{equation}
+\frac{dJ^*}{dp} \approx \frac{\partial J}{\partial p} -  \lambda^T \frac{\partial g}{\partial p}
+\end{equation}
+The third method, proposed by \citet{sobieszczanski-sobieski_sensitivity_1982}, uses a quadratic model that not only takes into account the change of $x^*$ through the parameter-dependent constraints, but also the change of $x^*$ due to the second-order curvature of the objective.
+This method involves setting up a simple linear system for each parameter $p_i$ and solving it for the sensitivity vector $\vec{x}_{\text{sens}}$:
+\begin{equation}
+    A_{sens} \vec{x}_{sens}(p_i) = \vec{b}_{sens}(p_i)
+\end{equation}
+The forms of the parameter-agnostic $A_{\text{sens}}$ matrix and the parameter-specific $b_{\text{sens}}$ vector are given in reference \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
+They are computed from solver outputs like the Lagrange multipliers $\vec{\lambda}$, Hessian $\mathbf{H}$, and gradient $\vec{\nabla} J$, as well as other derivatives %\hl{(specify which)} 
+obtained here via finite difference simulation evaluations % \hl{(specify how many)} 
+without re-optimizing.
+The sensitivity vector $\vec{x}_{\text{sens}}$ is then used to solve for a number of quantities of interest including the objective parameter sensitivity $dJ^*/dp$ and the optimal design parameter sensitivity $\partial x^*/\partial p$: %, and the parameter change constraint activity threshold $\Delta p_{ij}$ associated with constraint $g_j$:
+\begin{equation}
+\begin{aligned}
+    \frac{dJ^*}{dp_i} &=  \frac{\partial J}{\partial p_i} + C_{sens}\vec{x}_{sens}(p_i) \\
+    \partial x^*/\partial p &=  [I ~0] ~\vec{x}_{sens}(p_i) \\
+    %\Delta p_{ij} &= \frac{d_{sens,j}}{\vec{e}_{sens,j}^{~T}\vec{x}_{sens}(p_i)}
+\end{aligned}
+\end{equation}
+where additional sensitivity quantities introduced are matrix $C_{\text{sens}}$, scalar $d_{\text{sens},j}$, and vector $\vec{e}_{\text{sens},j}$ assembled from the same inputs as $A_{\text{sens}}$ and $b_{\text{sens}}$ \cite{sobieszczanski-sobieski_sensitivity_1982}.
+
+%\hl{This formula could be cleaned up by making it vectorized.}
+
+The fourth method requires significantly more computational expense than the first three methods, since rather than using post-optimality derivatives, it repeats the optimization with the changed parameter.
+This method is the ``ground truth'' local sensitivity against which the other methods can be compared.
+While the first three methods take \resultsRE[gradientSensRuntime]~to run, the fourth method takes \resultsRE[reoptimSensRuntime], since \resultsRE[numReoptims]~separate optimizations are performed.
+
+While the sensitivities computed with post-optimality derivatives enjoy a significant advantage in computational speed over the re-optimization sensitivity, their accuracy is unfortunately low.
+The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
+For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
+For others, %some such as \hl{XX}, 
+the values are opposite signs.
+This could indicate the presence of discontinuities, strong nonlinearities, or the interference of finite precision effects when computing the partial derivatives.
+
+On the bright side, for the majority (\resultsRE[percentParamsRightSign]) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
+Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
+For example, this occurs for $h$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, $D_{d,tu}$, $FOS_{\text{mult},d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
+All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
+
+\Cref{remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.
+Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
+This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
+\begin{figure}[htbp]
+\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_design_grid.pdf}
+\caption{Quadratic parameter sensitivity analysis to optimal design $x^*$}
+\label{remdo:fig:param-sens-local-x-star}
+\end{figure}
+
+\begin{figure}[htbp]
+\includegraphics[width=\linewidth]{figs/from-matlab/re_optim_design_grid.pdf}
+\caption{Re-optimization parameter sensitivity analysis to optimal design $x^*$}
+\label{remdo:fig:param-sens-global-x-star}
+\end{figure}
+
+Finally, the authors note that while the re-optimization method is valid even when the parameters are far from their nominal values and can be considered a global sensitivity analysis method, it has here only been performed for parameters perturbed in a OAT fashion very close to the nominal and is therefore used as a local sensitivity analysis method.
+The global sensitivities of \Cref{remdo:sec:sensitivities} only investigate a few select parameters.
+Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
+This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.

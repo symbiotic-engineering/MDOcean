@@ -1,0 +1,74 @@
+\label{sec:appendix-grid}
+The $CW(H_s,T_e)$ equation initially involves 18 quantities: $CW$, $H_s$, $T_e$,
+6 design variables (generator ratings $F_{lim}$ and $P_{lim}$ and float and spar diameters $D_f$ and $D_s$ and drafts $T_f$ and $T_s$), 
+and 9 parameters (damping plate diameter and thickness $D_d$ and $h_d$, efficiency $\eta_{PTO}$, float and spar drag coefficient $C_{d,f}$ and $C_{d,s}$, damping versus reactive control type $C$, water depth $h$, water density $\rho$, and acceleration of gravity $g$). 
+These span three physical dimensions (length, time, and mass).
+By the Buckingham-$\pi$ theorem, the relationship can be reduced to a function of $18-3=15$ dimensionless groups \cite{mckinley_dimensional_2021}. 
+Capture width is nondimensionalized by the maximum radiative capture width, $CW_{max}=Gg/\omega^2$, with gain $G$ (1 for heave, 2 for surge/pitch) and frequency $\omega$ \cite{zou_practical_2023}. % 1 
+Wave height is divided by water depth. % 2
+Wave period is captured as the product of wavenumber and water depth, $kh$. % 3
+Generator force and power limits are nondimensionalized by the force and power at the maximum capture width, $F_{max}$ and $P_{max}$. % 4-5
+The six dimensions are divided by each other or the water depth.% 6-11
+The efficiency, drag coefficients, and control type are already nondimensional. % 12-15
+Thus, we have the following $\mathbf{\Pi_1}$ dimensionless groups:
+\begin{equation}
+    \frac{CW}{CW_{max}} = f\left( \mathbf{\Pi_1} \right) = f\left(\frac{H_s}{h}, kh, 
+    \frac{P_{lim}}{P_{max}}, \frac{F_{lim}}{F_{max}},
+    \frac{D_f}{h}, \frac{D_s}{D_f}, \frac{T_f}{T_s}, \frac{T_s}{h}, \frac{D_d}{D_f}, \frac{t_d}{D_d}, 
+    \eta_{PTO}, C_{d,f}, C_{d,s},  C\right)
+\end{equation}
+Moving to the pole-zero ROM, a general model with $C_P$ complex pole pairs, $C_Z$ complex zero pairs, $R_P$ real poles, and $R_Z$ real zeros has a total of $2C_P+2C_Z+R_P+R_Z$ parameters and is expressed as:
+\begin{equation}
+    \mathbf{\Pi_{2,pz}} =  \left(
+        \zeta_{p},~ \omega_{n,p},~
+        \zeta_{z},~ \omega_{n,z},~
+        \tau_{p},~ 
+        \tau_{z} 
+        \right),
+    \quad
+    \frac{\hat{X}}{\hat{F}} = 
+    \prod_{r_p=1}^{R_P} 
+    \prod_{r_z=1}^{R_Z} 
+    \prod_{c_p=1}^{C_P}
+    \prod_{c_z=1}^{C_Z}
+    \frac{1+\tau_{z,r_z} i \omega}
+         {1+\tau_{p,r_p} i \omega}  \times
+    \frac{1-\left(\frac{\omega}{\omega_{n,c_z}}\right)^2 + i 2 \zeta_{c_z} \frac{\omega}{\omega_{n,c_z}}}
+         {1-\left(\frac{\omega}{\omega_{n,c_p}}\right)^2 + i 2 \zeta_{c_p} \frac{\omega}{\omega_{n,c_p}}}
+    \quad
+\end{equation}
+The pole-zero ROM tested in the paper uses $C_P=1, C_Z=R_P=R_Z=0$.
+
+Alternatively, the following custom hydrodynamics curve fits radiation impedance as a function of $kh$ using only two parameters, $kD_f$ and $B_0^e$.
+The latter is approximated as constant, neglecting frequency and geometry dependence:
+\begin{equation}\label{eq:hydro-fit}
+    \mathbf{\Pi_{2,hyd}} = (kh, kD_f, B_0^e),
+    \quad
+    \frac{\hat{F}}{\eta} = \frac{-4i\rho g h \sqrt{N_0}B_0^e}{\cosh(kh)~H_0(kD_f/2)},
+    \quad
+    B_h = \frac{k \omega~ |\hat{F}/\eta|^2}{2 \mathcal{D} \rho g^2},
+    \quad
+    A = \frac{1}{\pi \omega} \displaystyle \operatorname {p.\!v.}\int_0^\infty \frac{B(t)}{t-kD_f/2} dt
+\end{equation}
+The $\hat{F}/\eta$ equation leverages the eigenfunction form of the excitation coefficient for axisymmetric bodies, where $H_0$ is the Hankel function and $N_0=\frac{1}{2}\left(1+\frac{\sinh(2kh)}{2kh}  \right)$ \cite{chau_inertia_2012}.
+The $B_h$ equation applies the Haskind relation to obtain the damping, where $\mathcal{D}=\tanh(kh)+kh(1-\tanh^2(kh))$ \cite{chau_inertia_2012}.
+The $A$ equation applies the Kramers-Kronig relation to obtain the added mass, where $\operatorname {p.\!v.}$ is Cauchy principal value \cite{greenhow_added_1988}.
+Note that \eqref{eq:hydro-fit} only yields a fit for $\hat{Z}_h$ and does not attempt to capture the effect of drag nonlinearities ($\hat{Z}_d$) or impedance mismatch due to force limit, power limit, or damping control ($\hat{Z}_u$), although it is expected that mechanistic curve fits for these effects could be developed using only 2-3 additional parameters, as opposed to the 5 such groups in $\mathbf{\Pi_1}$.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $C$ refers to costs (\$M) (output from CEM), $S$ refers to specific capacity costs (\$M/kW) (input to CEM), $x_{grid}$ refers to installed capacities (decision variable in CEM), and $E$ refers to specific energy costs (\$/kWh). The amount of built wave capacity $x_{grid,WEC}$ is not to be confused with $x_{design}$, the WEC design variables in the outer (MDOcean) optimization that are parameters (held constant) in the CEM.
+
+% \begin{equation}
+% \begin{aligned}
+%     C_{grid}(p_{grid},x_{design}) &= C_{grid,0}(p_{grid})- \beta_1(p_{grid})~ x_{grid,WEC}(p_{grid},x_{design}) \\
+%     \frac{x_{grid,WEC}(p_{grid},x_{design})}{x_{grid,WEC}(p_{grid},x_{design})+\sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design})} &= \min\left(\beta_2(p_{grid}) \times \max\left(\frac{S_{WEC,thresh}(p_{grid},x_{design})}{S_{WEC}(x_{design})}-1,0\right), 1\right) \\
+%     S_{WEC,thresh}(p_{grid},x_{design}) &= S_{max,thresh}(p_{grid}) - \beta_3(p_{grid}) \zeta(x_{design}) - \beta_4(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_5(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right) \\
+%     \sum_{gen\neq WEC}x_{grid,gen}(p_{grid},x_{design}) &= \sum_{gen}x_{grid,gen,0}(p_{grid})-\beta_6(p_{grid}) \zeta(x_{design}) - \beta_7(p_{grid}) \frac{\omega_n}{\omega_p}(x_{design}) - \beta_8(p_{grid}) \min\left(\frac{P_{max}}{P_{pk}}(x_{design}),1\right)
+% \end{aligned}
+% \end{equation}
+
+%improvements to make to above eqn:
+%- debatable whether coeffs should be kept dimensional, ie should $\beta_1$ get divided by total capacity and $C_{grid,0}(p_{grid})$ so it's relating percent cost to percent capacity?
+%- $\beta_{3-8}$ terms could be made nonlinear as needed - ie $(\frac{\omega_n}{\omega_p})^2-1$ shows up in theory. I could also try to feed-forward incorporate the time domain power reconstruction, ie a peak to average ratio, if that is looking like a better fit than the freq domain stuff, but that just tells me that my hope of doing freq domain to connect to mdocean won't work out.
+%- ideally some of these betas turn out to be independent of p grid, which means more of the p grid dependence can be found just from the 0 (no wec) case for that p, without requiring a whole design sweep. That is the reason all this modeling is potentially more useful than a lookup table.
+%- Could add saturation to make sure $S_{WEC,thresh}>0$ and $C_{grid}>0$.
+%- add hats or some other notation to differentiate predicted (fit) from actual

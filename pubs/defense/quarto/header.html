@@ -1,0 +1,140 @@
+<script>
+  Reveal.on('ready', () => {
+  Reveal.layout();
+  Reveal.sync();
+
+  requestAnimationFrame(() => {
+
+  function isAppendixSlide(slide) {
+    return slide.hasAttribute("data-appendix") ||
+           slide.getAttribute("appendix") === "true" ||
+           slide.getAttribute("data-appendix") === "true";
+  }
+
+  // Reveal slide list (includes verticals)
+  const allSlides = Array.from(
+    document.querySelectorAll(".reveal .slides section")
+  );
+  const filtered = allSlides.filter(s =>
+    !s.classList.contains("stack")
+  );
+  // Build section groups
+  let groups = [];
+  let currentGroup = null;
+  let inAppendix = false;
+  let seenFirstSlide = false;
+
+
+  filtered.forEach((slide) => {
+    // ignore vertical stack containers
+    // ignore vertical stack containers
+    if (slide.classList.contains("stack")) return;
+
+    // skip the very first slide (title slide)
+    if (slide.id === "title-slide") return;
+
+    // detect appendix start
+    if (slide.getAttribute("data-appendix") === "true") {
+      inAppendix = true;
+    }
+    if (inAppendix) return;
+
+    // Reveal uses <section> for each slide.
+    // Quarto often encodes section titles in data-section-title
+    let secTitle =
+      slide.getAttribute("data-section-title") ||
+      slide.getAttribute("data-state") ||
+      slide.getAttribute("data-title") ||
+      null;
+
+    // Fallback: if it's an H1 slide, treat it as a new section
+    const h1 = slide.querySelector("h1");
+    if (h1) secTitle = h1.textContent.trim();
+
+    // If we still have nothing, inherit previous section title
+    if (!secTitle && currentGroup) secTitle = currentGroup.title;
+
+    // If new section title appears, start a new group
+    if (!currentGroup || (secTitle && secTitle !== currentGroup.title)) {
+      currentGroup = { title: secTitle || "", slides: [] };
+      groups.push(currentGroup);
+    }
+
+    currentGroup.slides.push(slide);
+  });
+
+  // Build DOM
+  const nav = document.createElement("div");
+  nav.id = "miniframe-nav";
+
+  groups.forEach((group, gi) => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "miniframe-group";
+
+    if (group.title) {
+      const label = document.createElement("div");
+      label.className = "miniframe-label";
+      label.textContent = group.title;
+      groupDiv.appendChild(label);
+    }
+
+    const dots = document.createElement("div");
+    dots.className = "miniframe-dots";
+
+    group.slides.forEach((slide, si) => {
+      const dot = document.createElement("span");
+      dot.className = "miniframe-dot";
+
+      dot.addEventListener("click", () => {
+        Reveal.slide(Reveal.getIndices(slide).h, Reveal.getIndices(slide).v);
+      });
+
+      dots.appendChild(dot);
+    });
+
+    groupDiv.appendChild(dots);
+    nav.appendChild(groupDiv);
+  });
+
+  document.body.appendChild(nav);
+
+  // Highlight current slide dot
+ function updateActive() {
+  const current = Reveal.getCurrentSlide();
+
+  // Hide nav on first slide
+  const indices = Reveal.getIndices(current);
+  const nav = document.getElementById("miniframe-nav");
+
+  if (indices.h === 0 && (!indices.v || indices.v === 0)) {
+    nav.style.display = "none";
+    return;
+  } else {
+    nav.style.display = "flex";
+  }
+
+  // Clear old highlight
+  document.querySelectorAll(".miniframe-dot").forEach(d => {
+    d.classList.remove("active");
+  });
+
+  // Highlight current dot
+  let dotIndex = 0;
+  for (const g of groups) {
+    for (const s of g.slides) {
+      if (s === current) {
+        const dot = document.querySelectorAll(".miniframe-dot")[dotIndex];
+        if (dot) dot.classList.add("active");
+        return;
+      }
+      dotIndex++;
+    }
+  }
+}
+
+  Reveal.on("slidechanged", updateActive);
+  updateActive();
+
+});
+  });
+</script>
