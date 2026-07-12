@@ -217,12 +217,13 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     X_f_0_all = mag_X_f_unsat .* exp(1i * phase_X_f_unsat);
     X_s_0_all = mag_X_s_unsat .* exp(1i * phase_X_s_unsat);
     U_0_all   = mag_U_unsat   .* exp(1i * phase_U_unsat);
-    I_p_all = 1i .* w .* X_u_0_all;
+    I_p_all = 1i .* w .* X_u_0_all; % check, this has units of velocity not current, is this assuming no PTO dynamics?
     valid_idx = find(~isnan(B_h_f) & isfinite(Z_th) & real(Z_th) > 0 & abs(I_p_all) >= COEFF_TOL);
     
     all_labels = {'Force limit','Float amplitude','Spar amplitude','PTO amplitude','Positive power'};
-    for k_idx = 1:numel(valid_idx)
-        idx = valid_idx(k_idx);
+    for sea_state_idx = 1:numel(valid_idx)
+        idx = valid_idx(sea_state_idx); % sea_state_idx is the index of the sea state out of only valid sea states,
+                                        %   whereas idx is the index of the sea state out of all sea states.
         Z_th_i = Z_th(idx);
         w_i = w(idx);
 
@@ -281,7 +282,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
 
         centers = zeros(num_enforce, 2);
         radii   = zeros(num_enforce, 1);
-        curr_idx = 1;
+        curr_idx = 1; % index of which constraint circle we are currently adding to centers/radii
 
         % build circle constraints
         % For constraint |Y| <= Y_max where Y = Y_0 + c_Y * Gamma:
@@ -326,7 +327,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         % positive power constraint: |Gamma|^2 <= 1
         center_P = [0, 0];
         radius_P = 1;
-        % always include positive power constraint (it's cheap and prevents P<0)
+        % always include positive power constraint (never desired to have P<0)
         centers(curr_idx,:) = center_P;
         radii(curr_idx) = radius_P;
         

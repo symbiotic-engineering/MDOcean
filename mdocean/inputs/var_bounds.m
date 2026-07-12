@@ -33,21 +33,21 @@ b.D_f_min = 1;
 b.D_f_max = 80;
 b.D_f_wecsim = 20;
 b.D_f_nom = 20;
-b.D_f_start = 20;
+b.D_f_start = 36;
 
 % draft of float (m)
 b.T_f_2_min = .5;
 b.T_f_2_max = 100;
 b.T_f_2_nom = 3.2;
 b.T_f_2_wecsim = 3;
-b.T_f_2_start = 3;
+b.T_f_2_start = 10;
 
 % height of spar (m)
 b.h_s_min = 5;
 b.h_s_max = 100;
 b.h_s_nom = 44;
 b.h_s_wecsim = 37.9;
-b.h_s_start = 37.9;
+b.h_s_start = 49;
 
 % vertical clearance between float tube support and spar (m)
 b.h_fs_clear_min = .01;
@@ -61,14 +61,14 @@ b.F_max_min = 0.01;
 b.F_max_max = 100;
 b.F_max_wecsim = 100;
 b.F_max_nom = 1;
-b.F_max_start = 5;
+b.F_max_start = 10;
 
 % maximum generator power (100 kW)
 b.P_max_min = .01;
 b.P_max_max = 30;
 b.P_max_nom = 2.86;
 b.P_max_wecsim = 2.86;
-b.P_max_start = 2.86;
+b.P_max_start = 5;
 
 in2mm = 25.4;
 % material thickness of float bottom (mm)
@@ -90,7 +90,7 @@ b.t_d_min = 0.05 * in2mm;
 b.t_d_max = 2.0 * in2mm;
 b.t_d_nom = 1.0 * in2mm;
 b.t_d_wecsim = 1.0 * in2mm;
-b.t_d_start = 1.0 * in2mm;
+b.t_d_start = 0.05 * in2mm;
 
 in2m = in2mm / 1000;
 % float stiffener height (dm)
@@ -105,7 +105,7 @@ b.h1_stiff_d_min = 0;
 b.h1_stiff_d_max = 2;
 b.h1_stiff_d_nom    = 22 * in2m;
 b.h1_stiff_d_wecsim = 22 * in2m;
-b.h1_stiff_d_start  = 22 * in2m;
+b.h1_stiff_d_start  = 30 * in2m;
 
 % material index (-)
 b.M_min = 1;
