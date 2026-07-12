@@ -272,72 +272,25 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     for k_idx = 1:numel(valid_idx)
         idx = valid_idx(k_idx);
 
-        % complex phasors at Gamma=0
+        % index vars by sea state
         X_u_0 = X_u_0_all(idx);
         X_f_0 = X_f_0_all(idx);
         X_s_0 = X_s_0_all(idx);
         U_0   = U_0_all(idx);
         Z_th_i = Z_th(idx);
         w_i = w(idx);    
-
-        oldway = false;
-        if oldway
-            I_p = I_p_all(idx);
-            
-            % derivative coefficients: Y(Gamma) = Y_0 + c_Y * Gamma
-            % From the paper: V = I_p*Z_th^**(1+Gamma), I = I_p*(1-Gamma)
-            c_V = I_p * conj(Z_th_i);   % force derivative: dV/dGamma
-            %c_I = -I_p;                   % velocity derivative: dI/dGamma
-            c_Xu = -X_u_0;               % PTO displacement: X_u = I/(iw)
-            
-            % float and spar displacement derivatives depend on topology
-            if ~multibody || merge_bodies
-                % single body: X_f = X_u, X_s = 0
-                c_Xf = c_Xu;
-                c_Xs = 0;
-            else
-                % multibody: compute transfer functions from impedance matrices
-                % All arrays indexed by (idx) to extract the scalar for this sea state
-                B_f_total = B_h_f(idx) + B_drag_f(idx);
-                B_s_total = B_h_s(idx) + B_drag_s(idx);
-                Z_f_i = B_f_total + 1i*(m_f(idx)*w_i - K_h_f(idx)/w_i);
-                Z_s_i = B_s_total + 1i*(m_s(idx)*w_i - K_h_s(idx)/w_i);
-                Z_c_i = B_c(idx) + 1i*(m_c(idx)*w_i);
-                det_Z_i = Z_f_i .* Z_s_i - Z_c_i.^2;
-                
-                % transfer from PTO force to body displacement
-                % v_f = v_f_forced + (Z_s+Z_c)/det_Z * F_pto
-                % X_f = X_f_forced + (Z_s+Z_c)/(det_Z*iw) * F_pto
-                % F_pto = V = I_p * Z_th^* * (1+Gamma)
-                % c_Xf = (Z_s+Z_c)/(det_Z*iw) * I_p * Z_th^*
-                T_f = (Z_s_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
-                T_s = -(Z_f_i + Z_c_i) ./ (det_Z_i .* 1i .* w_i);
-                c_Xf = T_f .* I_p .* conj(Z_th_i);
-                c_Xs = T_s .* I_p .* conj(Z_th_i);
-            end
-            
-            % determine what constraints to enforce
-            enforce_force = use_force_sat && abs(c_V) > COEFF_TOL;
-            enforce_X_f   = isfinite(X_f_max) && abs(c_Xf) > COEFF_TOL;
-            enforce_X_s   = isfinite(X_s_max) && abs(c_Xs) > COEFF_TOL && multibody && ~merge_bodies;
-            enforce_X_u   = isfinite(X_u_max) && abs(c_Xu) > COEFF_TOL;
-            enforce_P     = true;
-            enforce_damp  = strcmpi(control_type, 'damping') && abs(imag(Z_th_i)) > COEFF_TOL;
-            logical_enforce = [enforce_force, enforce_X_f, enforce_X_s, enforce_X_u, enforce_P]; % damping intentionally not included here
-            num_enforce = sum(logical_enforce);
-        else
-            num_enforce = num_enforce_all(idx);
-            c_V = c_V_all(idx);
-            c_Xf = c_Xf_all(idx);
-            c_Xs = c_Xs_all(idx);
-            c_Xu = c_Xu_all(idx);
-            enforce_force = enforce_force_all(idx);
-            enforce_X_f = enforce_X_f_all(idx);
-            enforce_X_s = enforce_X_s_all(idx);
-            enforce_X_u = enforce_X_u_all(idx);
-            enforce_damp = enforce_damp_all(idx);
-            logical_enforce = logical_enforce_2d(idx,:);
-        end
+        num_enforce = num_enforce_all(idx);
+        c_V = c_V_all(idx);
+        c_Xf = c_Xf_all(idx);
+        c_Xs = c_Xs_all(idx);
+        c_Xu = c_Xu_all(idx);
+        enforce_force = enforce_force_all(idx);
+        enforce_X_f = enforce_X_f_all(idx);
+        enforce_X_s = enforce_X_s_all(idx);
+        enforce_X_u = enforce_X_u_all(idx);
+        enforce_damp = enforce_damp_all(idx);
+        logical_enforce = logical_enforce_2d(idx,:);
+        
         centers = zeros(num_enforce, 2);
         radii   = zeros(num_enforce, 1);
         curr_idx = 1;
