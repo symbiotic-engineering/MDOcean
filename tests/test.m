@@ -1,13 +1,14 @@
 classdef (SharedTestFixtures={ ...
-        matlab.unittest.fixtures.CurrentFolderFixture('../mdocean')}) ...
+        matlab.unittest.fixtures.CurrentFolderFixture('.')}) ...
         test < matlab.unittest.TestCase
     % class based unit tests, as in https://www.mathworks.com/help/matlab/matlab_prog/class-based-unit-tests.html
     
     properties (Constant)
-        run_slow_tests = true;
+        run_slow_tests = false;
 
-        slow_figs = [25:35, 53:55, 58];
-        slow_tabs = 8;
+        slow_analyses = {'LocationSensitivity','Multistart','ParamSensitivities',...
+                        'ParetoSweep'}; %,'ParetoFigFunc',...
+                        %'Comparison','GradientOptimFigFunc'};
     end
 
     properties
@@ -45,25 +46,19 @@ classdef (SharedTestFixtures={ ...
 
     % helper methods to enumerate all figures and tables
     methods (Static)
-        function which_fig_struct = enumerateFigs()
-            [~,~,~,~,~,~,num_figs,num_tabs,fig_names,~] = all_figures( [],[] );
+        function which_figs_cell = enumerateFigs()
+            [fig_names,tab_names] = get_fig_tab_names('all', 'all');
+            num_tabs = length(tab_names);
 
-            which_figs_vec = [1:num_figs zeros(1, num_tabs)];
             none = strcat(repmat({'none'},1,num_tabs), string(1:num_tabs));
-            fig_names = matlab.lang.makeValidName([fig_names.', none]);
-
-            which_figs_cell = num2cell(which_figs_vec);
-            which_fig_struct = cell2struct(which_figs_cell,fig_names,2);
+            which_figs_cell = num2cell([fig_names, none]);
         end
-        function which_tab_struct = enumerateTabs()
-            [~,~,~,~,~,~,num_figs,num_tabs,~,tab_names] = all_figures( [],[] );
+        function which_tabs_cell = enumerateTabs()
+            [fig_names,tab_names] = get_fig_tab_names('all', 'all');
+            num_figs = length(fig_names);
 
-            which_tabs_vec = [zeros(1,num_figs), 1:num_tabs];
             none = strcat(repmat({'none'},1,num_figs), string(1:num_figs));
-            tab_names = matlab.lang.makeValidName([none, tab_names.']);
-
-            which_tabs_cell = num2cell(which_tabs_vec);
-            which_tab_struct = cell2struct(which_tabs_cell,tab_names,2);
+            which_tabs_cell = num2cell([none, tab_names]);
         end
     end
 
@@ -96,18 +91,19 @@ classdef (SharedTestFixtures={ ...
         end
 
         function runAllFigsTabs(testCase)
-            [~,~,~,~,~,~,num_figs,num_tabs,...
-                fig_names,tab_names] = all_figures( [], [] );
+            [all_figs,all_tabs] = get_fig_tab_names('all', 'all');
+            num_figs = length(all_figs);
+            num_tabs = length(all_tabs);
 
-            all_figs = 1:num_figs;
-            all_tabs = 1:num_tabs;
             if ~testCase.run_slow_tests
-                run_figs = all_figs(~ismember(all_figs,testCase.slow_figs));
-                run_tabs = all_tabs(~ismember(all_tabs,testCase.slow_tabs));
+                idx_run_fig = ~contains(all_figs,testCase.slow_analyses);
+                idx_run_tab = ~contains(all_tabs,testCase.slow_analyses);
             else
-                run_figs = all_figs;
-                run_tabs = all_tabs;
+                idx_run_fig = true(size(all_figs));
+                idx_run_tab = true(size(all_tabs));
             end
+            run_figs = all_figs(idx_run_fig);
+            run_tabs = all_tabs(idx_run_tab);
 
             dry_run = false;
             if dry_run
@@ -125,24 +121,24 @@ classdef (SharedTestFixtures={ ...
 
             % store success info
             f_success = cell(1,num_figs);
-            f_success(run_figs) = f_success_run;
+            f_success(idx_run_fig) = f_success_run;
 
             t_success = cell(1,num_tabs);
-            t_success(run_tabs) = t_success_run;
+            t_success(idx_run_tab) = t_success_run;
 
             % store output
             f_output = gobjects(1, num_figs);
-            f_output(run_figs) = f_output_run;
+            f_output(idx_run_fig) = f_output_run;
 
             t_output = cell(1,num_tabs);
-            t_output(run_tabs) = t_output_run;
+            t_output(idx_run_tab) = t_output_run;
 
             % store runtimes
             f_runtime = NaN(1,num_figs);
-            f_runtime(run_figs) = f_runtime_run;
+            f_runtime(idx_run_fig) = f_runtime_run;
 
             t_runtime = NaN(1,num_tabs);
-            t_runtime(run_tabs) = t_runtime_run;
+            t_runtime(idx_run_tab) = t_runtime_run;
 
             % add runtime figure
             try
@@ -218,37 +214,29 @@ classdef (SharedTestFixtures={ ...
         function allFiguresRun(testCase, which_figs, which_tabs)
 
             if ~test.run_slow_tests % mark slow tests as filtered
-                testCase.assumeFalse( ismember(which_figs, test.slow_figs) );
-                testCase.assumeFalse( ismember(which_tabs, test.slow_tabs) );
+                testCase.assumeFalse( contains(which_figs, test.slow_analyses) );
+                testCase.assumeFalse( contains(which_tabs, test.slow_analyses) );
             end
 
-            if which_figs ~= 0 % figure
-                success_criterion = testCase.fig_success{which_figs};
-                fig_out = testCase.fig_output(which_figs);
+            if ~contains(which_figs,'none') % figure
+                fig_name = "Figure_" + strrep(which_figs, '.', '_');
 
-                fig_name = ['Figure_' num2str(which_figs)];
-                pdf_name = ['../test-results/' fig_name];
-                
-                if isgraphics(fig_out) % if figure exists (didn't error first and wasn't deleted)
-                    if ~isempty(fig_out.UserData)
-                        % pdf already exists in files, just copy to folder
-                        copyfile(fig_out.UserData, pdf_name)
-                    else
-                        % save pdf from matlab figure output
-                        save_pdf(fig_out,pdf_name)
-                    end
-                    % in either case, use figure itself, not pdf, for printing the diagnostic
-                    diagnostic = matlab.unittest.diagnostics.FigureDiagnostic(fig_out,'Prefix',[fig_name '_']);
-                elseif ~isvalid(fig_out)
-                    msg = 'Figure has been deleted, probably because of a "close all" in a subsequent script.';
-                    err = MException('MDOcean:test:deletedFigure',msg);
-                    throw(err)
-                end   
+                % Use find+string() for a numeric index that is type-safe
+                % (handles char/string mix) and avoids logical-index size
+                % mismatch: testCase.which_figs has N+M entries but
+                % fig_success only has N; real figs are at positions 1..N.
+                idx = find(strcmp(string(which_figs), string(testCase.which_figs)));
+                success_criterion = testCase.fig_success(idx);
+                fig_out = testCase.fig_output(idx);
+
+                diagnostic = save_fig_with_diagnostic(fig_out, fig_name, "test-results/");
 
             else % table
-                success_criterion = testCase.tab_success{which_tabs};
-                tab_out = testCase.tab_output(which_tabs);
-
+                non_none_tabs = testCase.which_tabs(~contains(string(testCase.which_tabs), 'none'));
+                idx = find(strcmp(string(which_tabs), string(non_none_tabs)));
+                success_criterion = testCase.tab_success{idx};
+                tab_out = testCase.tab_output(idx);
+               
                 diagnostic = matlab.unittest.diagnostics.DisplayDiagnostic(tab_out{:});
             end
 

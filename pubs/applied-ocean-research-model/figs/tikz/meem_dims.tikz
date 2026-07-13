@@ -1,0 +1,103 @@
+\begin{tikzpicture}[scale=0.9]
+
+% -----------------------
+% Parameters
+% -----------------------
+\def\aone{1.0}
+\pgfmathsetmacro{\atwo}{2*\aone}
+\def\dtwo{1.0}
+\pgfmathsetmacro{\done}{3*\dtwo}
+\pgfmathsetmacro{\hdepth}{2*\done}
+
+% -----------------------
+% Free surface (TOP)
+% -----------------------
+\draw[thick] (-3,0) -- (3,0);
+\node[above] at (2.6,0) {free surface};
+
+% -----------------------
+% Cylinders (hanging downward)
+% -----------------------
+
+% Outer shell portion (0 to d2)
+\fill[gray!25]
+(-\atwo,0) --
+(-\atwo,-\dtwo) --
+(-\aone,-\dtwo) --
+(-\aone,-\done) --
+(\aone,-\done) --
+(\aone,-\dtwo) --
+(\atwo,-\dtwo) --
+(\atwo,0) -- cycle;
+
+% Body outline (external boundary only)
+
+\draw[thick] (-\atwo,0) -- (\atwo,0);          % top
+\draw[thick] (-\atwo,0) -- (-\atwo,-\dtwo);
+\draw[thick] (\atwo,0) -- (\atwo,-\dtwo);
+\draw[thick] (-\atwo,-\dtwo) -- (-\aone,-\dtwo);
+\draw[thick] (\aone,-\dtwo) -- (\atwo,-\dtwo);
+\draw[thick] (-\aone,-\dtwo) -- (-\aone,-\done);
+\draw[thick] (\aone,-\dtwo) -- (\aone,-\done);
+\draw[thick] (-\aone,-\done) -- (\aone,-\done);
+
+% -----------------------
+% Seabed
+% -----------------------
+\draw[thick] (-3,-\hdepth) -- (3,-\hdepth);
+
+% -----------------------
+% Dashed region boundaries
+% -----------------------
+
+% Vertical continuation below outer cylinder
+\draw[dashed] (-\atwo,-\dtwo) -- (-\atwo,-\hdepth);
+\draw[dashed] (\atwo,-\dtwo) -- (\atwo,-\hdepth);
+
+% Vertical continuation below inner cylinder
+\draw[dashed] (-\aone,-\done) -- (-\aone,-\hdepth);
+\draw[dashed] (\aone,-\done) -- (\aone,-\hdepth);
+
+% middle r=0 line
+\draw[dashed] (0,0) -- (0,-\hdepth);
+
+% -----------------------
+% Axes
+% -----------------------
+\draw[->] (0,0) -- (0.5,0) node[above right] {$r$};
+\draw[->] (0,0) -- (0,0.5) node[above] {$z$};
+
+% -----------------------
+% Radius arrows (inside body)
+% -----------------------
+\draw[<->] (0,-2.5) -- (\aone,-2.5);
+\node at (0.5*\aone,-2.3) {$a_1$};
+
+\draw[<->] (0,-\dtwo*.6) -- (\atwo,-\dtwo*0.6);
+\node at (0.5*\atwo,-\dtwo*0.4) {$a_2$};
+
+% -----------------------
+% Depth arrows
+% -----------------------
+
+% d2
+\draw[<->] (-1.6,0) -- (-1.6,-\dtwo);
+\node[right] at (-1.7,0.5*-\dtwo) {$d_2$};
+
+% d1
+\draw[<->] (-.7,0) -- (-.7,-\done);
+\node[right] at (-.7,0.5*-\done) {$d_1$};
+
+% total water depth
+\draw[<->] (-2.6,0) -- (-2.6,-\hdepth);
+\node[left] at (-2.6,0.5*-\hdepth) {$h$};
+
+% -----------------------
+% Region labels
+% -----------------------
+
+\node at (\aone/2,-4.8) {$i_1$};
+\node at (\aone+\atwo/2-\aone/2,-4.8) {$i_2$};
+\node at (2.6,-4.8) {$e$};
+
+\end{tikzpicture}
