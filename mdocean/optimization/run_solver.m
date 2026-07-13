@@ -182,6 +182,10 @@ end
 
 function [c, ceq, gradc, gradceq] = scaled_nonlcon(nonlcon_fcn, x, scale)
     [c, ceq, gradc_unscaled, gradceq_unscaled] = nonlcon_fcn(x .* scale);
-    gradc = scale .* gradc_unscaled;
-    gradceq = scale .* gradceq_unscaled;
+    gradc = bsxfun(@times, scale(:), gradc_unscaled);
+    if isempty(gradceq_unscaled)
+        gradceq = gradceq_unscaled;
+    else
+        gradceq = bsxfun(@times, scale(:), gradceq_unscaled);
+    end
 end
