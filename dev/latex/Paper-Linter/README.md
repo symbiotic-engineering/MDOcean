@@ -19,9 +19,10 @@ If `--error` is provided, the tool exits with error code 1 if there are warnings
 
 ## Warnings
 
-Warnings are grouped in five different categories:
+Warnings are grouped in six different categories:
 
 * General
+* Count
 * Typography
 * Visual
 * Style
@@ -63,6 +64,34 @@ This category includes general mistakes and discouraged things (switch `general`
 * **Switch**: `required-sections`
 
 
+### Count
+This category includes length and count constraints for submissions (switch `count`).
+
+#### Abstract Word Count
+* **Description**: Warns if the abstract exceeds 250 words
+* **Switch**: `abstract-word-count`
+
+#### Total Word Count
+* **Description**: Warns if the document word count (excluding captions, references, and appendix) is outside 4000-6000 words
+* **Switch**: `total-word-count`
+
+#### Highlights Limits
+* **Description**: Warns if highlights are not 3-5 bullets or if a bullet exceeds 85 characters including spaces
+* **Switch**: `highlights-count`
+
+#### Citation Count
+* **Description**: Warns if the paper cites more than 50 unique references
+* **Switch**: `citation-count`
+
+#### Keyword Count
+* **Description**: Warns if keyword count is outside 1-6 keywords
+* **Switch**: `keyword-count`
+
+#### Graphical Abstract Size
+* **Description**: Warns if the graphical abstract is not landscape, does not keep the 1328:531 ratio, or is smaller than 1328 x 531
+* **Switch**: `graphical-abstract-size`
+
+
 ### Typography
 This category includes typography-related issues, such as wrong punctuation (switch `typography`).
 
@@ -73,6 +102,14 @@ This category includes typography-related issues, such as wrong punctuation (swi
 #### Numbers in math Environment
 * **Description**: Warns if the math environment is used purely to format numbers
 * **Switch**: `math-numbers`
+
+#### Small Fraction Formatting
+* **Description**: Warns if small fractions use `\frac{X}{Y}` instead of `X/Y`
+* **Switch**: `solidus-fraction`
+
+#### Exponential Formatting
+* **Description**: Warns if powers of `e` are written as `e^...` instead of `\exp(...)`
+* **Switch**: `exp-power`
 
 #### Math/Text Mode Mixing
 * **Description**: Warns if text-like content is used inside math mode without explicit text markup

@@ -189,6 +189,7 @@ in_env = None
 envs = None
 is_document_root = False
 math_text_mix_strings = set()
+current_tex_file = None
 
 FLOAT_ENVS = ["figure", "listing", "table"]
 CODE_WARNING_EXCEPTIONS = {
@@ -211,13 +212,14 @@ def mask_false_sentence_ends(text):
     return masked
     
 def next_file(file):
-    global tex, tex_lines, tex_lines_clean, tex_lines_math_masked, tex_lines_math_texttt_masked, in_env, envs, is_document_root
+    global tex, tex_lines, tex_lines_clean, tex_lines_math_masked, tex_lines_math_texttt_masked, in_env, envs, is_document_root, current_tex_file
     try:
         tex = open(file).read()
     except:
         print("Could not open '%s'" % sys.argv[1])
         sys.exit(1)
 
+    current_tex_file = os.path.normpath(file)
     is_document_root = re.search(r"\\begin\{document\}", tex) is not None
 
     tex_lines = tex.split("\n")
@@ -550,6 +552,157 @@ def mask_inline_math_and_texttt(line):
     spans = get_inline_math_spans(line)
     spans.extend(get_command_brace_spans(line, "texttt"))
     return mask_spans(line, spans)
+
+
+def expand_includes(file_path, visited=None):
+    if visited is None:
+        visited = set()
+
+    normalized_path = os.path.normpath(file_path)
+    if normalized_path in visited:
+        return ""
+    visited.add(normalized_path)
+
+    try:
+        with open(normalized_path) as handle:
+            content = strip_tex_comments(handle.read())
+    except Exception:
+        return ""
+
+    include_pattern = re.compile(r"\\(?:input|include)\*?\{([^\}]+)\}")
+
+    def replace_include(match):
+        included_file = resolve_included_file(normalized_path, match.group(1))
+        if included_file is None:
+            return " "
+        return expand_includes(included_file, visited)
+
+    return include_pattern.sub(replace_include, content)
+
+
+def get_root_expanded_tex():
+    if current_tex_file is None:
+        return ""
+    return expand_includes(current_tex_file)
+
+
+def get_environment_blocks(text, env_name):
+    pattern = re.compile(
+        r"\\begin\{%s\*?\}(.*?)\\end\{%s\*?\}" % (re.escape(env_name), re.escape(env_name)),
+        flags=re.DOTALL,
+    )
+    return [match.group(1) for match in pattern.finditer(text)]
+
+
+def strip_latex_for_word_count(text):
+    cleaned = strip_tex_comments(text)
+    cleaned = re.sub(
+        r"\\begin\{(?:equation|equation\*|align|align\*|eqnarray|eqnarray\*|gather|gather\*|multline|multline\*|split)\}.*?\\end\{(?:equation|equation\*|align|align\*|eqnarray|eqnarray\*|gather|gather\*|multline|multline\*|split)\}",
+        " ",
+        cleaned,
+        flags=re.DOTALL,
+    )
+    cleaned = "\n".join(mask_math_in_lines(cleaned.split("\n")))
+    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
+    cleaned = re.sub(r"\\(?:cite\w*|Cite\w*|ref|eqref|label|url|href|includegraphics|footnote)\*?(?:\[[^\]]*\])?\{[^{}]*\}", " ", cleaned)
+    cleaned = re.sub(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?", " ", cleaned)
+    cleaned = cleaned.replace("{", " ").replace("}", " ")
+    cleaned = cleaned.replace("~", " ")
+    words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", cleaned)
+    return len(words)
+
+
+def strip_latex_to_plain_text(text):
+    plain = text
+    plain = strip_tex_comments(plain)
+    plain = plain.replace(r"\&", "&").replace(r"\%", "%").replace(r"\_", "_")
+    plain = re.sub(r"\\(?:cite\w*|Cite\w*|ref|eqref|label)\*?(?:\[[^\]]*\])?\{[^{}]*\}", " ", plain)
+    command_with_arg = re.compile(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?\{([^{}]*)\}")
+    while True:
+        updated = command_with_arg.sub(r"\1", plain)
+        if updated == plain:
+            break
+        plain = updated
+    plain = re.sub(r"\\[A-Za-z@]+\*?(?:\[[^\]]*\])?", " ", plain)
+    plain = plain.replace("{", " ").replace("}", " ")
+    plain = re.sub(r"\s+", " ", plain).strip()
+    return plain
+
+
+def get_jpeg_dimensions(path):
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read()
+    except Exception:
+        return None
+
+    if not data.startswith(b"\xFF\xD8"):
+        return None
+
+    idx = 2
+    while idx < len(data) - 1:
+        if data[idx] != 0xFF:
+            idx += 1
+            continue
+        marker = data[idx + 1]
+        idx += 2
+        if marker in [0xD8, 0xD9]:
+            continue
+        if idx + 1 >= len(data):
+            return None
+        segment_len = int.from_bytes(data[idx:idx + 2], "big")
+        if segment_len < 2 or idx + segment_len > len(data):
+            return None
+        if marker in [0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF]:
+            if idx + 7 >= len(data):
+                return None
+            height = int.from_bytes(data[idx + 3:idx + 5], "big")
+            width = int.from_bytes(data[idx + 5:idx + 7], "big")
+            return width, height
+        idx += segment_len
+    return None
+
+
+def get_pdf_dimensions(path):
+    try:
+        with open(path, "rb") as handle:
+            content = handle.read().decode("latin1", errors="ignore")
+    except Exception:
+        return None
+
+    match = re.search(
+        r"/MediaBox\s*\[\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*\]",
+        content,
+    )
+    if not match:
+        return None
+
+    x0, y0, x1, y1 = [float(x) for x in match.groups()]
+    width = abs(x1 - x0)
+    height = abs(y1 - y0)
+    if width <= 0 or height <= 0:
+        return None
+    return width, height
+
+
+def get_image_dimensions(path):
+    extension = os.path.splitext(path)[1].lower()
+    try:
+        if extension == ".png":
+            with open(path, "rb") as handle:
+                header = handle.read(24)
+            if header[:8] != b"\x89PNG\r\n\x1a\n":
+                return None
+            width = int.from_bytes(header[16:20], "big")
+            height = int.from_bytes(header[20:24], "big")
+            return width, height
+        if extension in [".jpg", ".jpeg"]:
+            return get_jpeg_dimensions(path)
+        if extension == ".pdf":
+            return get_pdf_dimensions(path)
+    except Exception:
+        return None
+    return None
 
 
 def strip_explicit_math_text(content):
@@ -949,6 +1102,167 @@ def check_required_sections():
     missing = [section.title() for section in required if section not in sections]
     if missing:
         warns.append((-1, "Missing required paper components: %s" % ", ".join(missing)))
+    return warns
+
+
+def get_document_text_for_counting(expanded_tex):
+    match = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", expanded_tex, flags=re.DOTALL)
+    content = match.group(1) if match else expanded_tex
+
+    appendix_markers = [r"\\appendix\b", r"\\begin\{appendices\}", r"\\begin\{appendix\}"]
+    appendix_positions = [m.start() for marker in appendix_markers for m in re.finditer(marker, content)]
+    if appendix_positions:
+        content = content[:min(appendix_positions)]
+
+    reference_markers = [r"\\bibliography\b", r"\\begin\{thebibliography\}", r"\\printbibliography\b"]
+    reference_positions = [m.start() for marker in reference_markers for m in re.finditer(marker, content)]
+    if reference_positions:
+        content = content[:min(reference_positions)]
+
+    content = re.sub(r"\\begin\{(?:figure|table|listing)\*?\}.*?\\end\{(?:figure|table|listing)\*?\}", " ", content, flags=re.DOTALL)
+    return content
+
+
+def check_abstract_word_count():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    abstract_blocks = get_environment_blocks(expanded_tex, "abstract")
+    if not abstract_blocks:
+        warns.append((-1, "Missing abstract for abstract word count check"))
+        return warns
+
+    abstract_words = strip_latex_for_word_count(" ".join(abstract_blocks))
+    if abstract_words > 250:
+        warns.append((-1, "Abstract has %d words (limit: 250)" % abstract_words))
+    return warns
+
+
+def check_total_word_count():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    total_words = strip_latex_for_word_count(get_document_text_for_counting(expanded_tex))
+    if total_words < 4000 or total_words > 6000:
+        warns.append((-1, "Document has %d words (required range: 4000-6000, excluding captions/references/appendix)" % total_words))
+    return warns
+
+
+def check_highlights_limits():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    highlights_blocks = get_environment_blocks(expanded_tex, "highlights")
+    if not highlights_blocks:
+        warns.append((-1, "Missing highlights section"))
+        return warns
+
+    items = []
+    item_pattern = re.compile(r"\\item(?:\s*\[[^\]]*\])?\s*", flags=re.DOTALL)
+    for block in highlights_blocks:
+        matches = list(item_pattern.finditer(block))
+        for idx, match in enumerate(matches):
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(block)
+            item_text = strip_latex_to_plain_text(block[start:end])
+            if item_text:
+                items.append(item_text)
+
+    if len(items) < 3 or len(items) > 5:
+        warns.append((-1, "Highlights contain %d bullets (required range: 3-5)" % len(items)))
+    for idx, item in enumerate(items):
+        if len(item) > 85:
+            warns.append((-1, "Highlight bullet %d has %d characters (limit: 85 including spaces)" % (idx + 1, len(item))))
+    return warns
+
+
+def check_citation_count():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    unique_citations = set()
+    cite_pattern = re.compile(r"\\cite[a-zA-Z*]*\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]*)\}")
+    for cite_group in cite_pattern.findall(expanded_tex):
+        for key in cite_group.split(","):
+            clean_key = key.strip()
+            if clean_key:
+                unique_citations.add(clean_key)
+
+    if len(unique_citations) > 50:
+        warns.append((-1, "Document cites %d unique references (limit: 50)" % len(unique_citations)))
+    return warns
+
+
+def check_keyword_count():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    keyword_blocks = get_environment_blocks(expanded_tex, "keyword")
+    if not keyword_blocks:
+        warns.append((-1, "Missing keyword section"))
+        return warns
+
+    keywords = []
+    for block in keyword_blocks:
+        for entry in re.split(r"\\sep", block):
+            keyword = strip_latex_to_plain_text(entry)
+            if keyword:
+                keywords.append(keyword)
+
+    if len(keywords) < 1 or len(keywords) > 6:
+        warns.append((-1, "Keyword section has %d keywords (required range: 1-6)" % len(keywords)))
+    return warns
+
+
+def check_graphical_abstract_dimensions():
+    warns = []
+    if not is_document_root:
+        return warns
+
+    expanded_tex = get_root_expanded_tex()
+    graphical_blocks = get_environment_blocks(expanded_tex, "graphicalabstract")
+    if not graphical_blocks:
+        warns.append((-1, "Missing graphical abstract"))
+        return warns
+
+    include_pattern = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}")
+    image_path = None
+    for block in graphical_blocks:
+        match = include_pattern.search(block)
+        if match:
+            image_path = resolve_included_file(current_tex_file, match.group(1))
+            if image_path is not None:
+                break
+
+    if image_path is None:
+        warns.append((-1, "Graphical abstract does not include a resolvable image file"))
+        return warns
+
+    dimensions = get_image_dimensions(image_path)
+    if dimensions is None:
+        warns.append((-1, "Could not determine graphical abstract dimensions for '%s'" % image_path))
+        return warns
+
+    width, height = dimensions
+    target_width = 1328.0
+    target_height = 531.0
+    target_ratio = target_width / target_height
+    actual_ratio = width / height
+    is_landscape = width > height
+    ratio_close = abs(actual_ratio - target_ratio) <= 0.01
+    meets_minimum_size = width >= target_width and height >= target_height
+    if not (is_landscape and ratio_close and meets_minimum_size):
+        warns.append((-1, "Graphical abstract dimensions are %.1f x %.1f; expected landscape with ratio 1328:531 and minimum size 1328 x 531" % (width, height)))
     return warns
 
 
@@ -1451,6 +1765,42 @@ def check_eqnarray():
     return warns
 
 
+def is_small_fraction_term(term):
+    stripped = term.strip()
+    if not stripped:
+        return False
+    if any(op in stripped for op in ["+", "-", "*", "/", "=", "\\frac", "\\sum", "\\int", "\\prod", "\\sqrt"]):
+        return False
+    return len(stripped) <= 8 and " " not in stripped
+
+
+def check_small_fraction_solidus():
+    warns = []
+    fraction_pattern = re.compile(r"\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}")
+    for i, line in enumerate(tex_lines_clean):
+        if in_code(i):
+            continue
+        for fraction in fraction_pattern.finditer(line):
+            numerator = fraction.group(1)
+            denominator = fraction.group(2)
+            if is_small_fraction_term(numerator) and is_small_fraction_term(denominator):
+                warns.append((i, "Use solidus (/) instead of horizontal fraction line for small terms: %s/%s" % (numerator.strip(), denominator.strip()), fraction.span()))
+    return warns
+
+
+def check_e_power_exp():
+    warns = []
+    power_pattern = re.compile(r"(?<![A-Za-z\\])e\s*\^\s*(\{[^{}]+\}|\\[A-Za-z@]+|[A-Za-z0-9]+)")
+    for i, line in enumerate(tex_lines_clean):
+        if in_code(i):
+            continue
+        segments = [line] if in_equation(i) else [content for _, _, content in get_math_spans(line)]
+        for segment in segments:
+            for match in power_pattern.finditer(segment):
+                warns.append((i, "Denote powers of e with \\exp(...) instead of e^...", match.span()))
+    return warns
+
+
 def check_acm_pc():
     # based on https://www.acm.org/diversity-inclusion/words-matter
     warns = []
@@ -1760,6 +2110,7 @@ CATEGORY_TYPOGRAPHY = 2
 CATEGORY_VISUAL = 4
 CATEGORY_STYLE = 8
 CATEGORY_REFERENCE = 16
+CATEGORY_COUNT = 32
 
 checks = [
     (check_space_before_cite,           CATEGORY_TYPOGRAPHY, "cite-space"),
@@ -1784,6 +2135,12 @@ checks = [
     (check_notes,                       CATEGORY_GENERAL,    "note"),
     (check_unused_macro,                CATEGORY_GENERAL,    "unused-macro"),
     (check_required_sections,           CATEGORY_GENERAL,    "required-sections"),
+    (check_abstract_word_count,         CATEGORY_COUNT,      "abstract-word-count"),
+    (check_total_word_count,            CATEGORY_COUNT,      "total-word-count"),
+    (check_highlights_limits,           CATEGORY_COUNT,      "highlights-count"),
+    (check_citation_count,              CATEGORY_COUNT,      "citation-count"),
+    (check_keyword_count,               CATEGORY_COUNT,      "keyword-count"),
+    (check_graphical_abstract_dimensions, CATEGORY_COUNT,    "graphical-abstract-size"),
     (check_math_numbers,                CATEGORY_TYPOGRAPHY, "math-numbers"),
     (check_equation_symbols_defined,    CATEGORY_REFERENCE,  "symbol-mention"),
     (check_large_numbers_without_si,    CATEGORY_TYPOGRAPHY, "si"),
@@ -1820,6 +2177,8 @@ checks = [
     (check_center_in_float,             CATEGORY_VISUAL,     "float-center"),
     (check_appendix,                    CATEGORY_STYLE,      "appendix"),
     (check_eqnarray,                    CATEGORY_VISUAL,     "eqnarray"),
+    (check_small_fraction_solidus,      CATEGORY_TYPOGRAPHY, "solidus-fraction"),
+    (check_e_power_exp,                 CATEGORY_TYPOGRAPHY, "exp-power"),
     (check_deprecated,                  CATEGORY_STYLE,      "deprecated"),
     (check_package_conflict,            CATEGORY_STYLE,      "package-conflict"),
     (check_acm_pc,                      CATEGORY_STYLE,      "inclusion"),
@@ -1837,7 +2196,8 @@ checks = [
 ]
 
 category_switches = [
-    ("all",        CATEGORY_GENERAL | CATEGORY_REFERENCE | CATEGORY_STYLE | CATEGORY_TYPOGRAPHY | CATEGORY_VISUAL),
+    ("all",        CATEGORY_GENERAL | CATEGORY_REFERENCE | CATEGORY_STYLE | CATEGORY_TYPOGRAPHY | CATEGORY_VISUAL | CATEGORY_COUNT),
+    ("count",      CATEGORY_COUNT),
     ("general",    CATEGORY_GENERAL),
     ("reference",  CATEGORY_REFERENCE),
     ("style",      CATEGORY_STYLE),
