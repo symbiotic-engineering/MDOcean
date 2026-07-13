@@ -8,7 +8,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
 % :param b: Design variable bounds struct
 % :param reversed: reversed
 % :returns: idx
-% :returns: fig
+% :returns: Figure handle
 
     if nargin<5
         reversed = false;

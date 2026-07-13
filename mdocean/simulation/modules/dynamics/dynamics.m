@@ -51,6 +51,7 @@ function [F_heave_storm, F_surge_storm, ...
 % :returns: F_drag_s
 % :returns: phase_F_drag_f
 % :returns: phase_F_drag_s
+% :returns: qcqp_debug
 
     % use probabilistic sea states for power and PTO force and max amplitude
     [T,Hs] = meshgrid(in.T,in.Hs);

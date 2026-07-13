@@ -7,6 +7,8 @@ function cb = signed_log(Z_data,C,levels,X_data,Y_data,contour_on)
 % :param levels: levels
 % :param X_data: X_data
 % :param Y_data: Y_data
+% :param contour_on: contour_on
+% :returns: cb
 % modified from the following
 % https://www.mathworks.com/matlabcentral/answers/1700655-symmetric-diverging-log-color-scale#answer_1380451
     

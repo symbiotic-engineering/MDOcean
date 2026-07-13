@@ -18,6 +18,7 @@ function [Xs_opt, objs_opt, flags, probs, ...
 % :returns: grads
 % :returns: hesses
 % :returns: vals
+% :returns: fmincon_outputs
 
 warning('off','MATLAB:nearlySingularMatrix')
 warning('off','MATLAB:singularMatrix')

@@ -41,6 +41,7 @@ function [ratios, LCOE, LCOE_nom, P_var, P_var_nom, ...
 % :returns: $\\delta$ p change activity re optim
 % :returns: runtime_post_optim
 % :returns: runtime_re_optim
+% :returns: num_reoptims
 
     %% Setup
     b = var_bounds();

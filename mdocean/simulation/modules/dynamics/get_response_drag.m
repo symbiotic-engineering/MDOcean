@@ -33,12 +33,14 @@ function [mag_U,phase_U,...
 % :param gamma_s_mag: $\\gamma$ s mag
 % :param gamma_s_phase: $\\gamma$ s phase
 % :param F_max: Maximum Force
+% :param P_max: Maximum Power
 % :param drag_const_f: drag_const_f
 % :param drag_const_s: drag_const_s
 % :param mag_v0_f: mag_v0_f
 % :param mag_v0_s: mag_v0_s
 % :param X_max: X_max
 % :param control_type: reactive or damping
+% :param control_solve_type: method for constrained control solve: analytical (QCQP circle intersection), solver (multiplier-based fsolve), or brute_force (grid search)
 % :param multibody: multibody
 % :param merge_bodies: merge_bodies
 % :param X_tol: max allowable iteration error on magnitude of amplitude (m)
@@ -47,11 +49,13 @@ function [mag_U,phase_U,...
 % :param X_lim_tol: max allowable iteration error on relative magnitude of displacement (-)
 % :param max_drag_iters_fixed_point: max_drag_iters_fixed_point
 % :param max_drag_iters_solver: max_drag_iters_solver
-% :param drag_convergence_plot_on: drag_convergence_plot_on
+% :param drag_ctrl_plots_on: drag_ctrl_plots_on
 % :param drag_fcn: precomputed drag integral lookup table (-)
 % :param D_f: Float Diameter
 % :param D_f_in: D_f_in
 % :param D_d: Diameter of damping plate (m)
+% :param T_f_slam: T_f_slam
+% :param T_s_slam: T_s_slam
 % :returns: mag_U
 % :returns: phase_U
 % :returns: real_P
@@ -65,6 +69,7 @@ function [mag_U,phase_U,...
 % :returns: B_p
 % :returns: K_p
 % :returns: P_sat_ratio
+% :returns: qcqp_debug
 % :returns: F_drag_f
 % :returns: F_drag_s
 % :returns: phase_F_drag_f

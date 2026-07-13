@@ -13,6 +13,7 @@ function [X_ins,ratios,LCOE,cost,power,failed,failed_mat] = experiments(p,b)
 % :returns: cost
 % :returns: power
 % :returns: Indices or names of violated constraints
+% :returns: failed_mat
     
 if nargin==0
     p = parameters();

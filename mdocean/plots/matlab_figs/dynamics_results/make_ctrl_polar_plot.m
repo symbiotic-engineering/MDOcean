@@ -3,6 +3,16 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
                                                  mag_ctrl_mult_stabilized, phase_ctrl_mult_stabilized)
 % Function make_ctrl_polar_plot
 %
+% :param MAG_GUESS: MAG_GUESS
+% :param PHASE_GUESS: PHASE_GUESS
+% :param real_P: real_P
+% :param constraint_err: constraint_err
+% :param idx_opt: idx_opt
+% :param mag_ctrl_mult_stabilized: mag_ctrl_mult_stabilized
+% :param phase_ctrl_mult_stabilized: phase_ctrl_mult_stabilized
+% :returns: Figure handle
+% :returns: fig_gamma
+%
 % Visualisation of the brute-force controller search grid on complex axes.
 % Selects the sea state with the highest optimal power and shows:
 %   - power as a pcolor patch map using a log10-scaled radius:
@@ -20,15 +30,6 @@ function [fig, fig_gamma] = make_ctrl_polar_plot(MAG_GUESS, PHASE_GUESS, real_P,
 % constructed as midpoints between adjacent centres in (log_r, phase) space,
 % with the inner radial edge clamped to 0.
 %
-% :param MAG_GUESS:                   meshgrid of ctrl mult magnitudes  (n_phase x n_mag)
-% :param PHASE_GUESS:                 meshgrid of ctrl mult phases in rad (n_phase x n_mag)
-% :param real_P:                      power in W (n_Hs x n_T x n_ctrl), unmodified raw values
-% :param constraint_err:              constraint error scalar (n_Hs x n_T x n_ctrl)
-% :param idx_opt:                     optimal controller index for each sea state (n_Hs x n_T)
-% :param mag_ctrl_mult_stabilized:   (optional) stabilized ctrl mult magnitudes (n_Hs x n_T x n_ctrl)
-% :param phase_ctrl_mult_stabilized: (optional) stabilized ctrl mult phases in rad (n_Hs x n_T x n_ctrl)
-% :returns: fig       Cartesian alpha-space figure handle
-% :returns: fig_gamma Polar gamma-space figure handle
 
     % handle optional stabilized arguments
     have_stab = nargin >= 7 && ~isempty(mag_ctrl_mult_stabilized) && ~isempty(phase_ctrl_mult_stabilized);

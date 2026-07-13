@@ -9,7 +9,7 @@ function [figs,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,cost,power,fa
 % :param cost: cost
 % :param power: power
 % :param failed: Indices or names of violated constraints
-% :param failed_mat: Matrix of failed constraints
+% :param failed_mat: failed_mat
 % :param pareto_results_struct: pareto_results_struct
 % :returns: Figure handles
 % :returns: results_tab
