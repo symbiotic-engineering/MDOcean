@@ -59,21 +59,21 @@ opts = optimoptions('fmincon',	'Display',display,...
                                 'FunValCheck','on',...
                                 'ConstraintTolerance',1e-5,...
                                 'FiniteDifferenceStepSize',1e-4,...
-                                'TypicalX',b.X_noms(b.idxs_sort));%,...
-                                %'SpecifyObjectiveGradient',true,...
-                                %'SpecifyConstraintGradient',true); % would require ALL constraints to be AD-supported
+                                'TypicalX',b.X_noms(b.idxs_sort),...
+                                'SpecifyObjectiveGradient',true,...
+                                'SpecifyConstraintGradient',true);
 
 % iterate through material choices                            
 for matl = 1%1:2:3 %b.M_min : b.M_max
     X = [x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 matl];
-    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs);
+    [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs,matl);
 
 end
 
 end
 
 %%
-function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs)
+function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimize_both_objectives(X,p,b,x0_input,opts,ploton,which_objs,matl)
 
     num_constraints = length(b.constraint_names);
     num_objectives_total = length(b.obj_names);
@@ -119,7 +119,7 @@ function [Xs_opt, objs_opt, flags, probs, lambdas, grads, hesses, vals] = optimi
         end
             
         [X_opt_raw,obj_opt,flag,...
-            output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid);
+            output,lambda,grad,hess,problem] = run_solver(prob, b.obj_names{which_obj}, x0, opts, b.idxs_recover, b.filename_uuid, p, matl);
         probs{i} = problem;
 
         tol = eps(2);
