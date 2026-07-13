@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-\label{remdo:intro}
+\label{remdo:sec:intro}
+This section motivates the problem context, identifies literature gaps, and outlines the study contributions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Wave Energy Overview}
@@ -9,51 +10,26 @@
 
 % stronger opening sentence
 \ifdefined\DISSERTATION
-The global climate crisis requires a transition to carbon-free energy sources such as ocean wave energy.
-Ocean waves have higher consistency, predictability, and energy density than other renewable energy sources such as wind and solar, while the temporal complementarity of waves with other resources can improve grid resilience and capacity adequacy, decrease energy prices, and decrease requirements for energy storage and balancing power \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}.
-Wave energy converters (WECs), the devices that harness and convert this energy, could provide both electricity for the grid at large scale and power for smaller offshore technologies like aquaculture, desalination, and marine sensing \cite{livecchi_powering_2019}.
-Despite the potential advantages of WECs, a significant decrease in the cost per unit energy production is required before the technology can be deployed at large scales. %\hl{(Add a more specific number to show that the LCOE needs to come down an order of magnitude).} Meanwhile, a lack of design convergence (...)
-Thus, a design process that emphasizes techno-economic viability from an early stage is necessary.
+    Reducing global greenhouse emissions requires every viable carbon-free energy source, including ocean wave energy.
+    Wave power offers higher temporal consistency and energy density than wind or solar, and its complementarity with other renewables can ease energy storage requirements and improve capacity adequacy \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}.
+    Wave energy converters (WECs) can deliver both utility-scale electricity and power for offshore applications such as aquaculture, desalination, and marine sensing \cite{livecchi_powering_2019}.
+    Yet WECs still face a substantial cost gap relative to wind and solar before large-scale deployment becomes viable, motivating a design process focused on techno-economic competitiveness from the earliest stages.
 
-%(Why multidisciplinary):
-However, the presence of strong interdisciplinary coupling complicates the application of typical design and optimization techniques to WECs.
-The powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses must be selected to balance the complex tradeoff between power production and cost while ensuring survivability and practical feasibility.
-Concentrating and automating the design decision-making efforts of structural, control, hydrodynamics, and electrical engineers while accurately capturing all major relationships and requirements is challenging, not to mention computationally prohibitive.
-Nonetheless, leveraging the coupling between subsystems and across technical domains can produce large gains in techno-economic viability.
-Automating this process through optimization allows WEC designers to more quickly and systematically explore tradeoffs of major design decisions, and could eventually allow standardized comparisons between different WEC architectures.
-Thus, performing a system-level WEC optimization that simultaneously considers the coupled techno-economic goals, design decisions, and requirements is highly advantageous.
-%Figure~\ref{fig:disciplines} is a non-exhaustive outline of the most common disciplines in a wave energy converter, and the level and direction of coupling between them.
+    Achieving that competitiveness is complicated by strong interdisciplinary coupling.
+    The powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses must be selected jointly to balance power, cost, and survivability while remaining practically feasible.
+    Sequential discipline-by-discipline design cannot exploit the coupling between subsystems, and computational cost has historically prevented system-level concurrent optimization from filling that gap.
+    Automating concurrent decision-making allows WEC designers to systematically explore tradeoffs across major design choices and, ultimately, to compare architectures on a standardized footing.
 
-% what is RM3
-An initial attempt to consolidate a multidisiplinary WEC design process, though without optimization, was the Reference Model Project.
-From 2010 to 2014, the U.S.
-Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \cite{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
-The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
-The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, shown in Figure \ref{remdo:fig:rm3-parts}.
-The float oscillates up and down with oncoming incident waves while the spar stays mostly stationary, and electrical power is produced from this relative heave motion.
+    A landmark step toward a multidisciplinary WEC design baseline was the U.S.\ Department of Energy's Reference Model Project (2010--2014), which produced six benchmark designs along with design artifacts and a comprehensive report \cite{RM3}.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}}
+    The third reference model (RM3), a two-body point-absorber WEC sited for Humboldt Bay, California, has received considerable research attention.
+    Its surface float oscillates against a spar consisting of a vertical column and a subsurface damping plate (\Cref{remdo:fig:rm3-parts}), with electrical power produced from the relative heave motion.
+    The present study builds on that work, presenting a multidisciplinary techno-economic optimization of RM3.
 \else
-The global climate crisis requires a transition to carbon-free energy sources such as ocean wave energy.
-Ocean waves have higher consistency, predictability, and energy density than other renewable energy sources such as wind and solar, while the temporal complementarity of waves with other resources can improve grid resilience and capacity adequacy, decrease energy prices, and decrease requirements for energy storage and balancing power \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}.
-Wave energy converters (WECs), the devices that harness and convert this energy, could provide both electricity for the grid at large scale and power for smaller offshore technologies like aquaculture, desalination, and marine sensing \cite{livecchi_powering_2019}.
-Despite the potential advantages of WECs, a significant decrease in the cost per unit energy production is required before the technology can be deployed at large scales. %\hl{(Add a more specific number to show that the LCOE needs to come down an order of magnitude).} Meanwhile, a lack of design convergence (...)
-Thus, a design process that emphasizes techno-economic viability from an early stage is necessary.
+    Wave energy converters (WECs) can deliver both utility-scale electricity and power for offshore applications such as aquaculture, desalination, and marine sensing \cite{livecchi_powering_2019,akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, but large-scale deployment requires substantial cost reduction.
+    Achieving that reduction is complicated by strong interdisciplinary coupling: the powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses jointly determine performance, cost, and survivability.
+    Sequential single-discipline design cannot exploit this coupling, motivating system-level concurrent optimization.
 
-%(Why multidisciplinary):
-However, the presence of strong interdisciplinary coupling complicates the application of typical design and optimization techniques to WECs.
-The powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses must be selected to balance the complex tradeoff between power production and cost while ensuring survivability and practical feasibility.
-Concentrating and automating the design decision-making efforts of structural, control, hydrodynamics, and electrical engineers while accurately capturing all major relationships and requirements is challenging, not to mention computationally prohibitive.
-Nonetheless, leveraging the coupling between subsystems and across technical domains can produce large gains in techno-economic viability.
-Automating this process through optimization allows WEC designers to more quickly and systematically explore tradeoffs of major design decisions, and could eventually allow standardized comparisons between different WEC architectures.
-Thus, performing a system-level WEC optimization that simultaneously considers the coupled techno-economic goals, design decisions, and requirements is highly advantageous.
-%Figure~\ref{fig:disciplines} is a non-exhaustive outline of the most common disciplines in a wave energy converter, and the level and direction of coupling between them.
-
-% what is RM3
-An initial attempt to consolidate a multidisiplinary WEC design process, though without optimization, was the Reference Model Project.
-From 2010 to 2014, the U.S.
-Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \cite{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
-The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
-The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, shown in Figure \ref{remdo:fig:rm3-parts}.
-The float oscillates up and down with oncoming incident waves while the spar stays mostly stationary, and electrical power is produced from this relative heave motion.
+    This paper presents a multidisciplinary techno-economic optimization of the Reference Model 3 (RM3) WEC \cite{RM3}: a two-body point absorber sited for Humboldt Bay, California, in which a surface float oscillates against a spar with a subsurface damping plate (\Cref{remdo:fig:rm3-parts}), with electrical power produced from the relative heave motion.
 \fi
 
 \begin{figure}[!ht]
@@ -62,8 +38,6 @@ The float oscillates up and down with oncoming incident waves while the spar sta
 \caption{RM3 geometry visualized}
 \label{remdo:fig:rm3-parts}
 \end{figure}
-RM3 has received considerable research attention in the decade since the original report was published.
-The present study builds on that work and presents a multidisciplinary techno-economic optimization of the RM3.
 
 The remainder of the introduction reviews WEC optimization literature, frames the research gap, articulates the case for multidisciplinary design optimization, and identifies the paper's contributions and structure.
 
@@ -72,85 +46,49 @@ The remainder of the introduction reviews WEC optimization literature, frames th
 \label{remdo:sec:lit}
 
 \ifdefined\DISSERTATION
-% design optim / concurrent design in industry
-Before reviewing the academic state of the art in WEC optimization, it is worth evaluating the popularity of optimization and concurrent design practices in the wave energy industry.
-\cite{trueworthy_wave_2020} provides a critical summary of the WEC design process and shares survey results from 25 WEC designers and developers.
-The survey indicates that industry use of optimization techniques is far from universal, with the highest adoption rates at 48\% and 40\% for controls and hydrodynamic shape optimization respectively.
-Authors of \cite{trueworthy_wave_2020} speculate that this is due to the large time, expertise, and computational resources needed to perform optimization, the inability of optimization to capture all requirements of a WEC, and the diversity of optimization techniques and design priorities.
-A similar rate of 50\% of respondents design all subsystems concurrently.
-The others tend to start with the WEC shape and PTO, then move to the controller and moorings, and finish with the power transportation system.
-\cite{trueworthy_wave_2020} concludes that concurrent design has promise to take advantage of subsystem interactions and is an under-utilized technique worthy of further study, emphasizing the importance of incorporating all design requirements at an early stage.
+    Before reviewing the academic state of the art, it is worth assessing how optimization and concurrent design are practiced in the wave energy industry.
+    A survey of 25 WEC designers and developers \cite{trueworthy_wave_2020} reports that industry use of optimization is far from universal, with the highest adoption rates at 48\% and 40\% for controls and hydrodynamic shape respectively.
+    The authors attribute this to the time, expertise, and computational resources optimization demands; the inability of optimization to capture all WEC requirements; and the diversity of available techniques.
+    Half of respondents design all subsystems concurrently; the rest follow a sequential pattern (shape and PTO first, then controller and moorings, then power transportation).
+    The same study concludes that concurrent design is promising but under-utilized, and emphasizes the importance of incorporating all design requirements at an early stage.
+    
+    Several review papers describe the state of the art in WEC design optimization.
+    \Cref{remdo:tab:lit} draws on these and the underlying primary literature \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018,coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} to compare the most relevant studies along modeling and optimization axes.
 \else
-% design optim / concurrent design in industry
-Before reviewing the academic state of the art in WEC optimization, it is worth evaluating the popularity of optimization and concurrent design practices in the wave energy industry.
-\cite{trueworthy_wave_2020} provides a critical summary of the WEC design process and shares survey results from 25 WEC designers and developers.
-The survey indicates that industry use of optimization techniques is far from universal, with the highest adoption rates at 48\% and 40\% for controls and hydrodynamic shape optimization respectively.
-Authors of \cite{trueworthy_wave_2020} speculate that this is due to the large time, expertise, and computational resources needed to perform optimization, the inability of optimization to capture all requirements of a WEC, and the diversity of optimization techniques and design priorities.
-A similar rate of 50\% of respondents design all subsystems concurrently.
-The others tend to start with the WEC shape and PTO, then move to the controller and moorings, and finish with the power transportation system.
-\cite{trueworthy_wave_2020} concludes that concurrent design has promise to take advantage of subsystem interactions and is an under-utilized technique worthy of further study, emphasizing the importance of incorporating all design requirements at an early stage.
+    A survey of 25 WEC designers \cite{trueworthy_wave_2020} reports that only 48\% and 40\% of developers use optimization for controls and hydrodynamic shape respectively, and only 50\% design all subsystems concurrently --- attributed to the time, expertise, and computational resources optimization demands, and concluding that concurrent design is a promising but under-utilized technique.
+    Review papers \cite{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018} and primary literature on WEC survivability guidelines \cite{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} together motivate the comparison in \Cref{remdo:tab:lit}.
 \fi
 
-% review papers on wec optim
-A number of review papers describe the state of the art in WEC design optimization.
-Authors of \cite{garcia-teruel_review_2021,guo_geometric_2021} provide overviews of WEC shape optimization, while \cite{ringwood_empowering_2023} reviews wave energy control design, including optimal control and optimization-based control co-design.
-On the structures side, \cite{clark_reliability-based_2018} reviews reliability-based design optimization for offshore wind and wave energy, though notably it finds only two examples of WEC structural design optimization.
-These two sources \cite{ambuhl_reliability-based_2014, ferri_balancing_2014} will be described further below.
-Other references outline relevant guidelines for WEC survivability design without a formal optimization procedure \cite{coe_survey_2018, ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022}.
+\Cref{remdo:tab:lit} compares previous WEC optimization studies along modeling fidelity (hydrodynamics, drag, degrees of freedom, domain, controls, mooring, powertrain, structures, economics, sea states) and optimization formulation (optimizer, objectives, constraints, design variables).
+Column-abbreviation legends are provided in \Cref{remdo:sec:appendix-lit-legend}.
 
-
-% table summary
-Moving on to specific optimization studies, table~\ref{remdo:tab:lit} compares the modeling and optimization formulations of a variety of the most relevant examples.
-A wide variety of WEC optimizations have been conducted.
-After first examining the overall trends, each table entry will be described in more detail.
 \ifdefined\DISSERTATION
-Point absorbers (PA) seem to be the most common device architecture, though most major device types are represented, and several studies optimize arrays of multiple devices.
-Nearly all model hydrodynamics and power production in some way.
-Hydrodynamic modeling is typically performed with the boundary element method (BEM), occasionally with semi-analytical models like matched eigenfunction expansion method (MEEM), and rarely with high fidelity CFD.
-Dynamic modeling is frequently performed both in the frequency domain (F) and time domain (T), with a handful of studies using extensions of frequency domain techniques (F+) to handle constraints and nonlinearities that are typically only handled in the time domain, and a few using the newer pseudo-spectral method (PS).
-A range of controllers are considered, including proportional-integral / reactive (PI), proportional / pure damping (P), their extensions to incorporate constraints (P+/PI+), nonlinear structured (NL), and unstructured (UNS).
-Optimizations that incorporate powertrain, structures, and economics are less of a guarantee but still common, while incorporating mooring is relatively rare.
-Each discipline may be incorporated with varying levels of fidelity.
-It is most common to simulate irregular waves (IRR), though several assume regular waves (REG).
-Several incorporate multiple sea states through the use of a joint probability density matrix (IRR+/REG+), and only a few consider storm sea states (STO).
-Optimizers used include numerical optimization algorithms like genetic algorithms (GA) and local optimizers (LOC), analytical optimization via Pontryagin's maximum principle (PMP), as well as non-optimization techniques such as design of experiments (DOE), manual iteration (IT), and brute force sweeps (BF).
-Objectives are usually power (PWR) or a measure of economic viability or proxy thereof (ECON).
-Less common objectives include measures of power variability (VAR), array interaction (ARRY), load (LO), and bandwidth (BW).
-The constraints column describes all the requirements the designs are made to satisfy, whether this is achieved with actual optimization constraints or by the simulation model.
-Constraint categories include device geometry (GEO), motion amplitude (AMP), the power take-off (PTO), dynamic stability (STA), structural failure (STR), and power (PWR).
-The design variables column counts only the optimization decision variables corresponding to an actual design parameter, and not any state variables that may be included in the optimization decisions, such as in the direct transcription or pseudospectral formulations.
-Common design variables are bulk dimensions (DIM), hull shape (SHP), and control parameters (CTL).
-PTO design variables are common among the pseudo-spectral optimizations, while structural (STR) design variables are rare.
-Most studies have fewer than five design variables, with the three largest optimizations having 14, 15, and 66 variables.
+    Point absorbers dominate as the most common architecture, though all major device types are represented and several studies optimize arrays.
+    Boundary element method (BEM) hydrodynamics is most common, with occasional semi-analytical (MEEM) treatments and rare CFD use.
+    Dynamic modeling occurs in either frequency (F) or time (T) domain, with constraint-handling extensions (F+) and pseudo-spectral (PS) methods both gaining traction.
+    Controllers range from pure damping (P) and proportional-integral (PI) through their constrained extensions (P+/PI+) to nonlinear structured (NL) and unstructured (UNS) forms.
+    Mooring, powertrain, structural, and economic disciplines are unevenly represented.
+    Optimizers used include genetic algorithms (GA), local optimizers (LOC), Pontryagin's maximum principle (PMP), design of experiments (DOE), manual iteration (IT), and brute force sweeps (BF), with objectives spanning power (PWR), economic viability (ECON), variability (VAR), array interaction (ARRY), load (LO), and bandwidth (BW).
+    The constraints column captures all enforced requirements whether implemented as optimization constraints or as model assumptions, spanning geometry (GEO), motion amplitude (AMP), PTO (PTO), stability (STA), structural failure (STR), and power (PWR).
+    The design-variable count includes only true design parameters, not state variables internal to direct-transcription or pseudo-spectral formulations.
+    Bulk dimensions (DIM), hull shape (SHP), and control parameters (CTL) are common; structural (STR) variables are rare; and most studies have fewer than five design variables, with the three largest at 14, 15, and 66.
 \else
-Point absorbers (PA) seem to be the most common device architecture, though most major device types are represented, and several studies optimize arrays of multiple devices.
-Nearly all model hydrodynamics and power production in some way.
-Hydrodynamic modeling is typically performed with the boundary element method (BEM), occasionally with semi-analytical models like matched eigenfunction expansion method (MEEM), and rarely with high fidelity CFD.
-Dynamic modeling is frequently performed both in the frequency domain (F) and time domain (T), with a handful of studies using extensions of frequency domain techniques (F+) to handle constraints and nonlinearities that are typically only handled in the time domain, and a few using the newer pseudo-spectral method (PS).
-A range of controllers are considered, including proportional-integral / reactive (PI), proportional / pure damping (P), their extensions to incorporate constraints (P+/PI+), nonlinear structured (NL), and unstructured (UNS).
-Optimizations that incorporate powertrain, structures, and economics are less of a guarantee but still common, while incorporating mooring is relatively rare.
-Each discipline may be incorporated with varying levels of fidelity.
-It is most common to simulate irregular waves (IRR), though several assume regular waves (REG).
-Several incorporate multiple sea states through the use of a joint probability density matrix (IRR+/REG+), and only a few consider storm sea states (STO).
-Optimizers used include numerical optimization algorithms like genetic algorithms (GA) and local optimizers (LOC), analytical optimization via Pontryagin's maximum principle (PMP), as well as non-optimization techniques such as design of experiments (DOE), manual iteration (IT), and brute force sweeps (BF).
-Objectives are usually power (PWR) or a measure of economic viability or proxy thereof (ECON).
-Less common objectives include measures of power variability (VAR), array interaction (ARRY), load (LO), and bandwidth (BW).
-The constraints column describes all the requirements the designs are made to satisfy, whether this is achieved with actual optimization constraints or by the simulation model.
-Constraint categories include device geometry (GEO), motion amplitude (AMP), the power take-off (PTO), dynamic stability (STA), structural failure (STR), and power (PWR).
-The design variables column counts only the optimization decision variables corresponding to an actual design parameter, and not any state variables that may be included in the optimization decisions, such as in the direct transcription or pseudospectral formulations.
-Common design variables are bulk dimensions (DIM), hull shape (SHP), and control parameters (CTL).
-PTO design variables are common among the pseudo-spectral optimizations, while structural (STR) design variables are rare.
-Most studies have fewer than five design variables, with the three largest optimizations having 14, 15, and 66 variables.
+    Point absorbers dominate the literature, and BEM hydrodynamics is the most commonly used method, with occasional semi-analytical (MEEM) approaches.
+    Dynamic modeling is typically performed in either the frequency or time domain, sometimes with constraint-handling extensions (F+) or pseudo-spectral (PS) variants.
+    Mooring, powertrain, structural, and economic disciplines are included inconsistently across studies.
+    Common optimization methods include genetic algorithms (GA), local optimizers (LOC), Pontryagin’s maximum principle (PMP), and design-of-experiment or brute-force approaches.
+    Most studies consider fewer than five design variables, although the three largest cases include 14, 15, and 66 variables.
 \fi
 %Need to copy sources over from slide 27 and 35 of F24 reseach slides with original charts (with color)
 
-\begin{landscape}
+%\begin{landscape}
 \begingroup
 \centering
 
 %\begin{tabular}
-
-\begin{longtable}{>{\centering\arraybackslash}p{0.03\linewidth}|>{\centering\arraybackslash}p{0.05\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.040\linewidth}|>{\centering\arraybackslash}p{0.015\linewidth}|>{\centering\arraybackslash}p{0.025\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.045\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.055\linewidth}|>{\centering\arraybackslash}p{0.02\linewidth}}
+\singleColMacro{
+\setlength{\tabcolsep}{1pt}
+\begin{longtable}{P{0.04\linewidth}|P{0.05\linewidth}|P{0.06\linewidth}|P{0.040\linewidth}|P{0.02\linewidth}|P{0.025\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}|P{0.045\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}|P{0.02\linewidth}}
 \rot{\textbf{Ref}} & \rot{\textbf{Device}} & \rot{\textbf{Hydro}}& \rot{\textbf{Drag}} & \rot{\textbf{\# DOF}} & \rot{\textbf{Domain}} & \rot{\textbf{Controls}} & \rot{\textbf{Mooring}} & \rot{\textbf{Powertrain}} & \rot{\textbf{Structures}} & \rot{\textbf{Economics}} & \rot{\textbf{Sea state}}
 & \rot{\textbf{Optimizer}}& \rot{\textbf{Objective}} & \rot{\textbf{Constraints}} & \rot{\textbf{\shortstack{Design \\ Variables}}}& \rot{\textbf{\# DVs}} \\
 \hline
@@ -189,7 +127,7 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
 \cite{RM3} & 2-PA & BEM & Q & 2 & T & P & DES & - & FEA & FULL & IRR+, STO
 & IT & - & - & - & - \\
 
-\cite{mi_multi-scale_2025} & OSW & BEM & Various & 8 & T & PI & DYN, DES & DYN & FEA & FULL & IRR+, STO
+\cite{mi_multi-scale_2025} & OSW & BEM & Var. & 8 & T & PI & DYN, DES & DYN & FEA & FULL & IRR+, STO
 & IT & - & - & - & - \\
 
 \cite{an_optimal_2024} & OTP & CFD & CFD & - & T & - & - & - & FEA & - & STO
@@ -235,232 +173,120 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & EFF & AN & STR, PTO & REG+, ST
 
 \hline 
 %\end{tabular}
-\caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation}
+\caption{Comparison of previous WEC optimization studies' disciplinary scope, modeling fidelity, and optimization formulation.
+See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
 \label{remdo:tab:lit}
 %\fillandplacepagenumber
 \end{longtable}
+}
 \endgroup
-\end{landscape}
+%\end{landscape}
 
+% Prior WEC optimization across discipline
 \ifdefined\DISSERTATION
-% Prior WEC optimization across discipline
-More specifically, a few studies \cite{gaudin_single_2021,khanal_multi-objective_2024,edwards_optimisation_2022,garcia-teruel_reliability-based_2021} perform WEC optimization with several disciplines.
-These studies are notable for their large scales of 120 degrees of freedom and 14, 15, and 66 design variables respectively.
-\cite{gaudin_single_2021} optimizes an array of 20 submerged cylinders, holding the WEC design constant but optimizing site selection, array layout, and mooring design while considering cable and pile cost as well as pile load capacity.
-\cite{khanal_multi-objective_2024} optimizes an array of four cylindrical point absorbers, with 4 modeled disciplines of array layout, hydrodynamics, controls, and economics.
-\cite{edwards_optimisation_2022} is a point absorber shape optimization study that minimizes surface area as a cost proxy, accounts for stability constraints, and considers only geometries with power extraction equal to theoretical radiation, amplitude, and steepness limits.
-\cite{garcia-teruel_reliability-based_2021}, along with the smaller scale study \cite{garcia-teruel_design_2022} by the same authors, apply multi-objective optimization to trade off power with fatigue load and device volume, respectively.
-\cite{cotten_multi-objective_2022} similarly optimizes fatigue load for an attenuator-style WEC with many more degrees of freedom but fewer (8) design variables.
-A different 8-variable shape optimization \cite{abdulkadir_control_2024} notably calculates hydrodynamic coefficients via the semi-analytical matched eigenfunction expansion method (MEEM), rather than from boundary element method as is typical, but does not include disciplines beyond hydrodynamics and dynamics/controls.
+    A handful of studies perform WEC optimization spanning several disciplines.
+    \citet{gaudin_single_2021} optimizes an array of 20 submerged cylinders, holding the device design constant while varying site, layout, and mooring with 120 degrees of freedom.
+    \citet{khanal_multi-objective_2024} optimizes a four-WEC array's layout, hydrodynamics, controls, and economics (14 design variables).
+    \citet{edwards_optimisation_2022} performs point-absorber shape optimization with stability constraints, minimizing surface area subject to power-extraction targets at radiation, amplitude, and steepness limits.
+    \citet{garcia-teruel_reliability-based_2021} and the smaller-scale \citet{garcia-teruel_design_2022} apply multi-objective optimization to trade off power with fatigue load and device volume respectively.
+    \citet{cotten_multi-objective_2022} performs a similar fatigue-load study for an attenuator-style WEC with eight design variables.
+    \citet{abdulkadir_control_2024} performs an eight-variable shape optimization using semi-analytical hydrodynamics (MEEM) but no other disciplines beyond hydrodynamics and dynamics.
 
-Regarding optimization algorithm, all seven of these studies \cite{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,abdulkadir_control_2024} utilize the genetic algorithm, a population-based heuristic method.
-The alternative to heuristic methods is local optimization, which lacks the exploratory capability of heuristic methods to avoid getting stuck in local optima, but beneficially leverages any smoothness in the objective and scales well to a large ($>50$) number of design variables \cite{martins_engineering_2022}.
-A team at NREL attempted local optimization for a terminator shape study but found they could only reasonably optimize 3 of the intended 13 design variables at a time due to the high computational cost of their time-domain simulation \cite{housner_numerical_2024}.
-The previous studies \cite{garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} avoided this issue by simulating primarily in the frequency domain and using the time domain only to address PTO constraints.
-Alternatively, design-of-experiment techniques enable systematic exploration of the design space without the use of traditional optimizers.
-For example, \cite{al_shami_parameter_2019} performs a 7 design variable shape optimization with the Taguchi method.
+    All seven of these large-scale studies \cite{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,abdulkadir_control_2024} use the genetic algorithm, a population-based heuristic.
+    The alternative is local optimization, which lacks heuristic exploration but leverages smoothness and scales well to many design variables \cite{martins_engineering_2022}.
+    \citet{housner_numerical_2024} attempted local optimization for a terminator-shape study and could only handle 3 of an intended 13 design variables due to time-domain simulation cost;
+    \citet{garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} avoided that issue by simulating primarily in the frequency domain, falling back to time domain only for PTO constraints.
+    Design-of-experiment alternatives such as the Taguchi method \cite{al_shami_parameter_2019} enable systematic exploration without traditional optimizers.
 
-Structural optimization of WECs faces a similar challenge in the high compute time of finite element analysis (FEA).
-FEA of WECs is most often performed with manual design iterations, as in \cite{RM3,mi_multi-scale_2025}.
-These two studies, while not optimization, are extremely multidisciplinary, encompassing mooring design and detailed economic evaluation in addition to the more common hydrodynamics, powertrain, controls, and structures.
-Automating the design process reported there remains a long term vision for WEC MDO.
-Notably, one study \cite{an_optimal_2024} performs true optimization of WEC structural FEA using the commercial computer aided engineering software Altair Inspire.
-The study examines four design variables, although it keeps the power calculations entirely separate from the structural optimization, neglecting the interdisciplinary coupling.
-Another structural optimization does not consider power at all, but is able to perform a brute-force sweep of 3 design variables by using analytical equations for stress and other failure modes \cite{ambuhl_reliability-based_2014}.
-Finally, several studies consider structures indirectly by examining the load on the device rather than the stress, e.g. \cite{nguyen_theoretical_2024, ferri_balancing_2014}, or equivalently assuming that stress scales with load and does not depend on any other dimensional design variable, e.g. \cite{garcia-teruel_reliability-based_2021, cotten_multi-objective_2022}.
-Like the earlier MEEM study, \cite{nguyen_theoretical_2024} uses the equivalent analytical hydrodynamics in elliptical coordinates for an oscillating surge WEC.
+    Structural optimization of WECs faces an analogous compute bottleneck: FEA-based optimization is usually replaced by manual iteration \cite{RM3,mi_multi-scale_2025} (with these two studies notably encompassing mooring, powertrain, controls, structures, and detailed economics), commercial decoupled tools \cite{an_optimal_2024}, brute-force sweeps over analytical stress \cite{ambuhl_reliability-based_2014}, or load-magnitude proxies in place of stress \cite{nguyen_theoretical_2024,ferri_balancing_2014,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022}.
 
-The study \cite{ferri_balancing_2014} is notable because in addition to structural loads, it compares various control schemes and simulates second-order drivetrain dynamics.
-The control co-design (CCD) methodology \cite{garcia-sanz_control_2019} emphasizes the importance of considering drivetrain dynamics and generator efficiency due to their strong effect on electrical power generation \cite{coe_useful_2023}.
-A number of recent studies \cite{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024} simultaneously optimize the PTO with the controller.
-\cite{rosati_control_2023} optimizes an OWC and is notable for its comparatively detailed cost modeling and its optimization of both economic and power variability metrics.
-\cite{mccabe_multidisciplinary_2022} also optimized power variation, although that study's use of regular waves makes the variation formulation less useful.
-Meanwhile, one point absorber PTO optimization \cite{son_performance_2016} is additionally notable for its use of the MEEM method.
-\cite{gaebele_tpl_2025} is relevant because it optimizes the dimensional scale and PTO of the RM3 WEC directly using a control co-design approach.
-It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, RMS torque, and stroke) while maintaining frequency-domain hydrodynamics via the pseudo-spectral (PS) method, which \cite{devin_high-dimensional_2024,grasberger_control_2024} also use.
-\cite{devin_high-dimensional_2024} completes a brute-force PTO optimization with 5 design variables, the highest of any brute force optimization considered here.
-This is possible because instead of a five-dimensional sweep, the authors perform ten two-dimensional sweeps around a starting point obtained from an initial monte carlo design-of-experiments.
-Finally, \cite{grasberger_control_2024} performs an outer brute-force sweep of two geometric design variables and an inner local optimization of 5 PTO and control design variables for an oscillating surge WEC. 
+    The control co-design (CCD) literature \cite{garcia-sanz_control_2019,coe_useful_2023} emphasizes drivetrain dynamics and generator efficiency due to their strong effect on electrical power.
+    Recent joint PTO-and-controller optimizations \cite{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024,gaebele_tpl_2025} often leverage the pseudo-spectral method to embed time-domain constraints in frequency-domain hydrodynamics.
+    Of these, \cite{gaebele_tpl_2025} directly addresses RM3, finding a 0.55 scaling factor optimizes power per unit surface area with frequently active continuous-torque constraints.
+    \citet{lin_fast_2025} introduces a CCD formulation faster than PS by leveraging Pontryagin's maximum principle analytically; \cite{abdulkadir_optimal_2024} uses PMP for PTO-constrained array dynamics; \cite{herber_dynamic_2014} performs direct-transcription co-optimization of cylinder draft and radius with control.
 
-Other CCD papers optimize WEC dimensions without modeling the PTO.
-\cite{herber_dynamic_2014} performs a direct transcription co-optimization of cylinder draft and radius with control.
-\cite{lin_fast_2025} introduces a new CCD formulation for constrained control that is even faster than PS.
-The method leverages the analytical Pontryagin Maximum Principle (PMP) and performs a case study to optimize a single geometric variable.
-A different PMP formulation \cite{abdulkadir_optimal_2024} incorporates PTO-constrained array dynamics, although it has not yet been used for design optimization. 
+    Several studies have independently concluded that significantly undersizing the PTO and accepting force saturation is favorable.
+    \citet{mcgilton_optimal_2024} reports only 3\% energy loss from a 70\% force-rating reduction across multiple device archetypes (RM3, RM5), sites, and scales, supporting analytical predictions in \cite{coe_maybe_2021,devin_high-dimensional_2024}.
+    None of these studies perform full economic analysis to confirm that the cost savings outweigh the power decrease --- a gap this paper addresses.
+    \else
+    Of the multi-discipline studies in \Cref{remdo:tab:lit}, the largest in scope are those summarized in the studies \cite{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022}, spanning four-WEC array layout, hydrodynamics, controls, economics, high-dimensional site/layout/mooring, shape with stability constraints, and power-versus-structure trade-offs.
+    All large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm; local optimization is limited to small design spaces or frequency-domain settings due to time-domain simulation cost \cite{housner_numerical_2024,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,martins_engineering_2022}.
+    Structural optimization faces a parallel compute bottleneck, with FEA-based optimization usually replaced by manual iteration \cite{RM3,mi_multi-scale_2025}, commercial decoupled tools \cite{an_optimal_2024}, brute-force sweeps over analytical stress \cite{ambuhl_reliability-based_2014}, or load-magnitude proxies \cite{nguyen_theoretical_2024,ferri_balancing_2014}.
+    The control co-design literature \cite{garcia-sanz_control_2019,coe_useful_2023} has produced joint PTO-and-controller optimizations \cite{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024,gaebele_tpl_2025} often leveraging the pseudo-spectral method; \cite{gaebele_tpl_2025} directly addresses RM3 and finds a 0.55 scaling factor optimal.
+    Several studies independently conclude that undersizing the PTO and accepting force saturation is favorable: \citet{mcgilton_optimal_2024} reports only 3\% energy loss from a 70\% force-rating reduction across archetypes, sites, and scales, supporting analytical predictions made in other studies \citep{coe_maybe_2021,devin_high-dimensional_2024}.
+    None perform a full economic analysis to confirm cost savings exceed power loss, a gap this paper addresses.
+    \fi
 
-% results / findings of the work
-The results of prior studies provide insight into the level of improvement available with optimization and potential trends in the optimal design.
-\cite{edwards_optimisation_2022} found that the axisymmetric geometry with minimum surface area and maximum power is a diamond-like shape that flares out just below the waterline and then back in.
-\cite{devin_high-dimensional_2024} found that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
-This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
-This agrees with the conceptual argument of \cite{coe_maybe_2021} and the numerical findings of \cite{mcgilton_optimal_2024}.
-The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\% decrease in annual energy production, a trend consistent across two device archetypes (RM3 and RM5), four locations, and several dimensional scales.
-The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the optimization.
-%\hl{Summarize more results of the papers described above - what seems promising to motivate that I will look into it.}
-
-% Previous work optimizing point absorbers
-%\hl{elaborate, and add previous work studying RM3}
+    % Gaps
+    \ifdefined\DISSERTATION
+    The literature review reveals that no existing optimization study includes dimensional, structural, and PTO design variables simultaneously.
+    The closest are the studies \cite{ambuhl_reliability-based_2014} (dimensional and structural) and the study \cite{grasberger_control_2024} (dimensional and PTO).
+    There is also a gap of work that uses a scalable optimization framework to trade off power production with survivability while accurately modeling stress as a function of bulk dimensions, rather than using force as a proxy.
+    The closest is \cite{rosati_control_2023}, which minimizes a cost proxy incorporating PTO and valve material cost but assumes constant structural material cost.
+    Given the coupling among these disciplines, a system-level optimization considering them all is needed.
+    Part of the issue is the lack of a multidisciplinary WEC simulation platform sufficiently fast for optimization: the popular time-domain hydrodynamics tool WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is too slow for large-scale optimization \cite{housner_numerical_2024}, while the newer pseudo-spectral tool WecOptTool \cite{coe_initial_2020} is faster and suited to control co-design but currently limited to hydrodynamics and control.
+    Finally, several studies note that cost-model uncertainty may significantly affect results, evidencing the need for sensitivity analysis.
 \else
-% Prior WEC optimization across discipline
-More specifically, a few studies \cite{gaudin_single_2021,khanal_multi-objective_2024,edwards_optimisation_2022,garcia-teruel_reliability-based_2021} perform WEC optimization with several disciplines.
-These studies are notable for their large scales of 120 degrees of freedom and 14, 15, and 66 design variables respectively.
-\cite{gaudin_single_2021} optimizes an array of 20 submerged cylinders, holding the WEC design constant but optimizing site selection, array layout, and mooring design while considering cable and pile cost as well as pile load capacity.
-\cite{khanal_multi-objective_2024} optimizes an array of four cylindrical point absorbers, with 4 modeled disciplines of array layout, hydrodynamics, controls, and economics.
-\cite{edwards_optimisation_2022} is a point absorber shape optimization study that minimizes surface area as a cost proxy, accounts for stability constraints, and considers only geometries with power extraction equal to theoretical radiation, amplitude, and steepness limits.
-\cite{garcia-teruel_reliability-based_2021}, along with the smaller scale study \cite{garcia-teruel_design_2022} by the same authors, apply multi-objective optimization to trade off power with fatigue load and device volume, respectively.
-\cite{cotten_multi-objective_2022} similarly optimizes fatigue load for an attenuator-style WEC with many more degrees of freedom but fewer (8) design variables.
-A different 8-variable shape optimization \cite{abdulkadir_control_2024} notably calculates hydrodynamic coefficients via the semi-analytical matched eigenfunction expansion method (MEEM), rather than from boundary element method as is typical, but does not include disciplines beyond hydrodynamics and dynamics/controls.
-
-Regarding optimization algorithm, all seven of these studies \cite{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,abdulkadir_control_2024} utilize the genetic algorithm, a population-based heuristic method.
-The alternative to heuristic methods is local optimization, which lacks the exploratory capability of heuristic methods to avoid getting stuck in local optima, but beneficially leverages any smoothness in the objective and scales well to a large ($>50$) number of design variables \cite{martins_engineering_2022}.
-A team at NREL attempted local optimization for a terminator shape study but found they could only reasonably optimize 3 of the intended 13 design variables at a time due to the high computational cost of their time-domain simulation \cite{housner_numerical_2024}.
-The previous studies \cite{garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} avoided this issue by simulating primarily in the frequency domain and using the time domain only to address PTO constraints.
-Alternatively, design-of-experiment techniques enable systematic exploration of the design space without the use of traditional optimizers.
-For example, \cite{al_shami_parameter_2019} performs a 7 design variable shape optimization with the Taguchi method.
-
-Structural optimization of WECs faces a similar challenge in the high compute time of finite element analysis (FEA).
-FEA of WECs is most often performed with manual design iterations, as in \cite{RM3,mi_multi-scale_2025}.
-These two studies, while not optimization, are extremely multidisciplinary, encompassing mooring design and detailed economic evaluation in addition to the more common hydrodynamics, powertrain, controls, and structures.
-Automating the design process reported there remains a long term vision for WEC MDO.
-Notably, one study \cite{an_optimal_2024} performs true optimization of WEC structural FEA using the commercial computer aided engineering software Altair Inspire.
-The study examines four design variables, although it keeps the power calculations entirely separate from the structural optimization, neglecting the interdisciplinary coupling.
-Another structural optimization does not consider power at all, but is able to perform a brute-force sweep of 3 design variables by using analytical equations for stress and other failure modes \cite{ambuhl_reliability-based_2014}.
-Finally, several studies consider structures indirectly by examining the load on the device rather than the stress, e.g. \cite{nguyen_theoretical_2024, ferri_balancing_2014}, or equivalently assuming that stress scales with load and does not depend on any other dimensional design variable, e.g. \cite{garcia-teruel_reliability-based_2021, cotten_multi-objective_2022}.
-Like the earlier MEEM study, \cite{nguyen_theoretical_2024} uses the equivalent analytical hydrodynamics in elliptical coordinates for an oscillating surge WEC.
-
-The study \cite{ferri_balancing_2014} is notable because in addition to structural loads, it compares various control schemes and simulates second-order drivetrain dynamics.
-The control co-design (CCD) methodology \cite{garcia-sanz_control_2019} emphasizes the importance of considering drivetrain dynamics and generator efficiency due to their strong effect on electrical power generation \cite{coe_useful_2023}.
-A number of recent studies \cite{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024} simultaneously optimize the PTO with the controller.
-\cite{rosati_control_2023} optimizes an OWC and is notable for its comparatively detailed cost modeling and its optimization of both economic and power variability metrics.
-\cite{mccabe_multidisciplinary_2022} also optimized power variation, although that study's use of regular waves makes the variation formulation less useful.
-Meanwhile, one point absorber PTO optimization \cite{son_performance_2016} is additionally notable for its use of the MEEM method.
-\cite{gaebele_tpl_2025} is relevant because it optimizes the dimensional scale and PTO of the RM3 WEC directly using a control co-design approach.
-It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, RMS torque, and stroke) while maintaining frequency-domain hydrodynamics via the pseudo-spectral (PS) method, which \cite{devin_high-dimensional_2024,grasberger_control_2024} also use.
-\cite{devin_high-dimensional_2024} completes a brute-force PTO optimization with 5 design variables, the highest of any brute force optimization considered here.
-This is possible because instead of a five-dimensional sweep, the authors perform ten two-dimensional sweeps around a starting point obtained from an initial monte carlo design-of-experiments.
-Finally, \cite{grasberger_control_2024} performs an outer brute-force sweep of two geometric design variables and an inner local optimization of 5 PTO and control design variables for an oscillating surge WEC. 
-
-Other CCD papers optimize WEC dimensions without modeling the PTO.
-\cite{herber_dynamic_2014} performs a direct transcription co-optimization of cylinder draft and radius with control.
-\cite{lin_fast_2025} introduces a new CCD formulation for constrained control that is even faster than PS.
-The method leverages the analytical Pontryagin Maximum Principle (PMP) and performs a case study to optimize a single geometric variable.
-A different PMP formulation \cite{abdulkadir_optimal_2024} incorporates PTO-constrained array dynamics, although it has not yet been used for design optimization. 
-
-% results / findings of the work
-The results of prior studies provide insight into the level of improvement available with optimization and potential trends in the optimal design.
-\cite{edwards_optimisation_2022} found that the axisymmetric geometry with minimum surface area and maximum power is a diamond-like shape that flares out just below the waterline and then back in.
-\cite{devin_high-dimensional_2024} found that impedance matching at resonance has a large effect on power and PTO sizing has little effect.
-This suggests that if cost were included, it may be preferable to have an undersized PTO that frequently saturates its control force.
-This agrees with the conceptual argument of \cite{coe_maybe_2021} and the numerical findings of \cite{mcgilton_optimal_2024}.
-The latter shows that reducing the maximum PTO force by 70\% leads only to a 3\% decrease in annual energy production, a trend consistent across two device archetypes (RM3 and RM5), four locations, and several dimensional scales.
-The recent RM3 optimization \cite{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the optimization.
-%\hl{Summarize more results of the papers described above - what seems promising to motivate that I will look into it.}
-
-% Previous work optimizing point absorbers
-%\hl{elaborate, and add previous work studying RM3}
+    No existing optimization study simultaneously includes dimensional, structural, and PTO design variables: the closest are the studies \cite{ambuhl_reliability-based_2014,grasberger_control_2024}, covering dimensional-and-structural and dimensional-and-PTO formulations respectively.
+    A parallel gap exists in trading off power against survivability with stress modeled as a function of bulk dimensions rather than force as a proxy.
+    The lack of a multidisciplinary WEC simulation platform fast enough for optimization is part of the issue (e.g., WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is too slow at scale \cite{housner_numerical_2024}, and WecOptTool \cite{coe_initial_2020} is currently limited to hydrodynamics and control) and cost-model uncertainty in prior work evidences the need for sensitivity analysis.
 \fi
 
-
-
-% Gaps
-\ifdefined\DISSERTATION
-The literature review reveals that no existing optimization study includes dimensional, structural, and PTO design variables.
-The closest are \cite{ambuhl_reliability-based_2014} which includes dimensional and structural, and \cite{grasberger_control_2024} which includes dimensional and PTO.
-Furthermore, there is a gap of work that use a scalable optimization framework to trade off power production with survivability in a way that accurately considers stress (including the effect of bulk dimensions, rather than using force as a proxy).
-The closest is \cite{rosati_control_2023}, which minimizes a cost proxy that incorporates PTO cost and valve material cost but assumes constant structural material cost.
-Given the coupling between these disciplines, a system-level optimization considering them all is needed.
-Part of the issue in filling these optimization gaps is the lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization.
-The popular time-domain hydrodynamics tool WEC-Sim \cite{ruehl_wec-simwec-sim_2024} can become multidisciplinary through the use of integrations like NEMOH/Capytaine (hydrodynamic coefficients), PTO-Sim (electric and hydraulic components), WEC-Sim Applications (optimal control and other useful tools), and MoorDyn (mooring).
-However, as \cite{housner_numerical_2024} reveals, it is too slow to use for large-scale optimization.
-Meanwhile, the newer pseudospectral tool WecOptTool \cite{coe_initial_2020} is faster and suitable for control co-design, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like PTO and mooring as needed, and it still can take considerable time for large optimizations.
-Finally, several studies note that uncertainty in the cost model may have a significant impact on the results, evidencing the need for sensitivity analysis.
-\else
-The literature review reveals that no existing optimization study includes dimensional, structural, and PTO design variables.
-The closest are \cite{ambuhl_reliability-based_2014} which includes dimensional and structural, and \cite{grasberger_control_2024} which includes dimensional and PTO.
-Furthermore, there is a gap of work that use a scalable optimization framework to trade off power production with survivability in a way that accurately considers stress (including the effect of bulk dimensions, rather than using force as a proxy).
-The closest is \cite{rosati_control_2023}, which minimizes a cost proxy that incorporates PTO cost and valve material cost but assumes constant structural material cost.
-Given the coupling between these disciplines, a system-level optimization considering them all is needed.
-Part of the issue in filling these optimization gaps is the lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization.
-The popular time-domain hydrodynamics tool WEC-Sim \cite{ruehl_wec-simwec-sim_2024} can become multidisciplinary through the use of integrations like NEMOH/Capytaine (hydrodynamic coefficients), PTO-Sim (electric and hydraulic components), WEC-Sim Applications (optimal control and other useful tools), and MoorDyn (mooring).
-However, as \cite{housner_numerical_2024} reveals, it is too slow to use for large-scale optimization.
-Meanwhile, the newer pseudospectral tool WecOptTool \cite{coe_initial_2020} is faster and suitable for control co-design, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like PTO and mooring as needed, and it still can take considerable time for large optimizations.
-Finally, several studies note that uncertainty in the cost model may have a significant impact on the results, evidencing the need for sensitivity analysis.
-\fi
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Relevance of Multidisciplinary Design Optimization}
 %(Why MDO):
 \ifdefined\DISSERTATION
-Multidisciplinary Design Optimization (MDO) has emerged as a powerful strategy to address such challenges.
-MDO is a quantitative methodology to formulate, solve, and interpret the results of complex engineering design problems that involve multiple coupled disciplines \cite{agte_mdo_2010}.
-Solutions typically utilize local and global optimization algorithms, and the method emphasizes that comprehensive consideration of the coupling between all disciplines often yields designs that perform better than those found by sequentially optimizing each discipline individually \cite{martins_multidisciplinary_2013}.
-MDO falls under the umbrella of concurrent design.
-When one of the disciplines considered is controls, MDO is a form of control co-design.
-MDO originated from the field of structural optimization and is well-established in the aerospace industry and gaining traction in the broader energy industry, especially in floating offshore wind turbines (e.g. \cite{abbas_control_2024,jasa_effectively_2022,patryniak_multidisciplinary_2022}).
-While there is a recognized need and growing interest in leveraging concurrent design and control co-design for WECs \cite{mi_multi-scale_2025,ringwood_empowering_2023}, MDO has not yet caught on in the wave energy space, preventing potential techno-economic breakthroughs.
-It appears that only two existing studies \cite{mccabe_multidisciplinary_2022,khanal_multi-objective_2024} approach WEC design explicitly from an MDO perspective.
-The present study builds directly off \cite{mccabe_multidisciplinary_2022}, a preliminary MDO formulation by the same authors that employs significantly less accurate models and fewer design variables.
-\cite{khanal_multi-objective_2024}, which one author also contributed to, includes a Sobol global sensitivity analysis in addition to the basic MDO formulation.
-Neither paper provides a comprehensive description of how the MDO approach influences the model development and problem formulation, which this paper intends to outline, while also providing useful results and insights for a much more comprehensive WEC optimization. 
+    Multidisciplinary Design Optimization (MDO) is a quantitative methodology for formulating, solving, and interpreting complex engineering design problems involving multiple coupled disciplines \cite{agte_mdo_2010}.
+    The method emphasizes that comprehensive consideration of inter-disciplinary coupling typically yields designs that outperform those found by sequential single-discipline optimization \cite{martins_multidisciplinary_2013}.
+    MDO falls under the broader umbrella of concurrent design and, when controls is one of the disciplines, constitutes a form of control co-design.
+    The field originated in structural optimization, is well-established in aerospace, and is gaining traction in the broader energy industry, particularly in floating offshore wind \cite{abbas_control_2024,jasa_effectively_2022,patryniak_multidisciplinary_2022}.
 
-The other papers discussed earlier as being multidisciplinary do not explicitly acknowledge the field of MDO and sometimes do not adhere to the major MDO principle of adequately capturing interdisciplinary coupling in the optimization.
-For example, the optimization in \cite{edwards_optimisation_2022} minimizes surface material for only the subset of WEC designs achieving maximum power.
-This sub-optimal approach fails to account for the tradeoff between power and cost, since the minimum cost to power ratio may occur at a design that sacrifices some power to achieve significant cost savings.
+    Despite recognized need and growing interest in concurrent design and control co-design for WECs \cite{mi_multi-scale_2025,ringwood_empowering_2023}, MDO has not yet caught on in the wave energy space, preventing potential techno-economic breakthroughs.
+    Only two existing studies \cite{mccabe_multidisciplinary_2022,khanal_multi-objective_2024} approach WEC design explicitly from an MDO perspective.
+    The present study builds directly on \cite{mccabe_multidisciplinary_2022}, a preliminary MDO formulation by the same authors that used substantially less accurate models and fewer design variables.
+    \citet{khanal_multi-objective_2024} adds a Sobol global sensitivity analysis to a basic MDO formulation.
+    Neither provides a comprehensive description of how the MDO approach influences model development and problem formulation, which this paper provides alongside results and insights from a much more comprehensive WEC optimization.
 
-%(Why semi analytical):
+    The remaining WEC papers discussed as multidisciplinary do not explicitly invoke MDO and sometimes do not adhere to the principle of adequately capturing inter-disciplinary coupling.
+    For instance, \cite{edwards_optimisation_2022} minimizes surface material for only the subset of designs achieving maximum power, which fails to account for the power--cost tradeoff: the minimum cost-to-power ratio may occur at a design that sacrifices some power for significant cost savings.
 
-% This section needs some more refining.
-% The idea is to explain why having open source semi-analytical multidisciplinary models like MDOcean addresses a bottleneck in WEC development, and provide a frame of reference for interpreting lit review in the next section as being in one of these categories.
-% This makes it more clear why I'm citing papers that are all over the place: some just-hydro and some just-controls and some multidisciplinary-but-no-optimization.
-
-MDO can use any kind of simulation model to assess the design's performance, including simple algebraic models, theory-intensive semi-analytical models, and standard numerical models.
-Table~\ref{remdo:tab:model-types} summarizes the tradeoffs.
-\begin{table}
-    \centering
-    \begin{tabular}{c>{\centering\arraybackslash}p{0.25\linewidth}c>{\centering\arraybackslash}p{0.2\linewidth}} 
-         \textbf{Model type}&  \textbf{Expertise required}&  \textbf{Accuracy}&  \textbf{Computational cost}\\ \hline
-         \textbf{Algebraic}&  Low&  Low&  Low\\ 
-         \textbf{Semi-analytical}&  High&  Med&  Low\\ 
-         \textbf{Numerical}&  Med&  Med/High&  High\\ 
-    \end{tabular}
-    \caption{Comparison of model types}
-    \label{remdo:tab:model-types}
-\end{table}
-The authors propose that for early-stage WEC design, MDO with a semi-analytical model is the most beneficial.
-Semi-analytical models can be orders of magnitude faster than numerical models, often with minimal sacrifices in accuracy.
-This is especially helpful for optimization, where the model must be run many thousands of times.
-Additionally, semi-analytical models typically vary smoothly with their inputs and can make it easier to obtain accurate gradients, a feature that is often not the case for fully numerical models that may contain non-differentiable artifacts.
-Accurate gradients can also speed up convergence of the optimization and allow it to navigate high-dimension design spaces that would be intractable with heuristic algorithms.
-
-Unfortunately, semi-analytical models are less likely to be available commercially or open-source as numerical models are, and developing them from scratch requires substantial background in mathematics, numerical methods, and the technical domain of the model (for example, hydrodynamics or constrained optimal control).
-Often, semi-analytical models remain in the realm of theoretical academics, and ``application'' studies that use them to perform design/optimization usually consider just one discipline and have low practical realism.
-
-This is especially true if the models are closed-source, preventing others besides the model authors from using them.
-In the context of WECs, low practical realism usually means studies are limited to mechanical power production, without considering cost and realistic constraints, or perhaps using volume or surface area as a cost proxy.
-The design studies with high practical realism tend to use numerical models instead.
-As the literature review in table~\ref{remdo:tab:lit} revealed, the high computational cost of the numerical models means that often a study is either multidisciplinary without optimization \cite{RM3,mi_multi-scale_2025}, or performs optimization for a single discipline, such as controls, powertrain, or structures, not all at once. 
-
-Of the few studies that perform multidisciplinary optimization, those that use numerical models take many hours to run, especially when using heuristic optimizers, preventing designers from iterating quickly.
-For example, the BEM-based 4-WEC array optimization in \cite{khanal_multi-objective_2024} took 36 hours to run on a high-end workstation for only a single frequency.
-This type of model is too slow for use in realistic large-scale optimizations.
-On the other extreme, \cite{mccabe_multidisciplinary_2022} uses an algebraic hydrodynamic model that runs quickly but lacks sufficient accuracy to draw meaningful design conclusions.
-The present paper will combine MDO with semi-analytical models to perform a WEC optimization of unprecedented scope.
+    Semi-analytical models offer a uniquely suitable combination of speed and accuracy for early-stage WEC optimization, where the model must be run thousands of times and where smooth dependence on inputs facilitates accurate gradients \cite{mccabe_development_2026}.
+    This study uses the MDOcean framework \cite{mccabe_development_2026}, which integrates semi-analytical models across hydrodynamics, dynamics and control, structures, and economics, to enable a WEC optimization of unprecedented scope.
 \else
-MDO is a quantitative methodology to formulate, solve, and interpret the results of complex engineering design problems that involve multiple coupled disciplines \cite{agte_mdo_2010}.
-It appears that only two existing studies \cite{mccabe_multidisciplinary_2022,khanal_multi-objective_2024} approach WEC design explicitly from an MDO perspective.
-The present paper will combine MDO with semi-analytical models to perform a WEC optimization of unprecedented scope.
+    Multidisciplinary Design Optimization (MDO) is a quantitative methodology for formulating, solving, and interpreting design problems involving multiple coupled disciplines \cite{agte_mdo_2010}, highlighting that comprehensive consideration of coupling typically outperforms sequential single-discipline optimization \cite{martins_multidisciplinary_2013}.
+    Originating in structural optimization and established in aerospace, MDO is gaining traction in floating offshore wind \cite{abbas_control_2024,jasa_effectively_2022,patryniak_multidisciplinary_2022} but has not yet caught on in wave energy despite recognized need \cite{mi_multi-scale_2025,ringwood_empowering_2023}.
+    Only two existing studies approach WEC design explicitly from an MDO perspective: \citet{mccabe_multidisciplinary_2022}, a preliminary formulation by the same authors using less accurate models and fewer design variables, and \citet{khanal_multi-objective_2024}, which adds Sobol global sensitivity.
+    Other multidisciplinary WEC papers do not explicitly invoke MDO and sometimes neglect the coupling principle: for example, \cite{edwards_optimisation_2022} minimizes surface material only over designs achieving maximum power, missing the power--cost tradeoff where the minimum cost-to-power ratio may sacrifice some power for significant cost savings.
+
+    This study uses the MDOcean framework \cite{mccabe_development_2026}, which integrates semi-analytical models across hydrodynamics, dynamics and control, structures, and economics, to enable a WEC optimization of unprecedented scope.
 \fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Paper Contributions and Roadmap}
 \ifdefined\DISSERTATION
-To addresses the gaps just described, the authors of this paper (1) create a fast, multidisciplinary, and open-source WEC simulation software and (2) use the software to conduct what is believed to be the most comprehensive WEC techno-economic design optimization to date.
-The developed software, called MDOcean \cite{mccabe_mdocean_2024}, implements relevant semi-analytical models from various fields, integrates them in a scalable framework for WEC simulation and concurrent optimization, and validates them in a WEC system context.
-The multi-objective optimization simultaneously varies dimensional, structural, and PTO design variables of the RM3 WEC in order to balance power production, material cost, and generator cost while obeying a variety of practically-relevant constraints.
+    This paper applies the MDOcean framework \cite{mccabe_development_2026} to what is believed to be the most comprehensive WEC techno-economic design optimization to date.
+    The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings, subject to static, dynamic, structural, and operational constraints;
+    a solution methodology combining sequential quadratic programming with multistart for single-objective optimization and the epsilon-constraint method seeded with pattern search for multi-objective optimization;
+    single-objective optimization results with local and global sensitivity analysis identifying drivers of LCOE, cost, and power;
+    multi-objective optimization results revealing a non-convex Pareto front with a cusp corresponding to a force-saturation to power-saturation strategy shift, and quantitative design heuristics across the front;
+    and design recommendations distinguishing utility-scale from Powering-the-Blue-Economy applications.
+    The framework is scalable to additional disciplines and design variables and is ultimately intended to enable systematic comparison across WEC architectures.
 
-A local and partial global sensitivity analysis facilitates understanding of the results' uncertainty and applicability to different scenarios.
-In addition to the results' own merit, the framework articulated here is scalable to more design variables and disciplines, and could ultimately enable systematic design optimization of many WEC architectures.
-
-In the following sections, first the methodology for modeling and optimization setup is described in section~\ref{remdo:sec:optim-methods}.
-Next, the results of single-objective optimization, sensitivity analysis, and multi-objective optimization are shown in section~\ref{remdo:sec:results}.
-Finally, the authors discuss trends and implications, present three representative optimal designs, and recommend future work in section~\ref{remdo:sec:discussion}.
+    The remainder of the paper is organized as follows.
+    \Cref{remdo:sec:optim-methods} describes the optimization methodology, including the underlying model overview and references to \cite{mccabe_development_2026} for modeling details.
+    \Cref{remdo:sec:formulation} develops the optimization problem formulation.
+    \Cref{remdo:sec:optim-process} details the solution procedure.
+    \Cref{remdo:sec:results} presents single-objective optimization, sensitivity analysis, and multi-objective optimization results.
+    \Cref{remdo:sec:discussion} interprets the trends, presents three representative optimal designs, and outlines future work.
 \else
+    This paper applies the MDOcean framework \cite{mccabe_development_2026} to what is believed to be the most comprehensive WEC techno-economic design optimization to date.
+    The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings subject to static, dynamic, structural, and operational constraints;
+    a solution methodology combining sequential quadratic programming with multistart and an epsilon-constraint-plus-pattern-search procedure for multi-objective optimization;
+    single- and multi-objective results with sensitivity analysis revealing drivers of LCOE, cost, and power, and identifying a non-convex Pareto cusp tied to a force-saturation to power-saturation strategy shift;
+    and design recommendations distinguishing utility-scale from \emph{Powering the Blue Economy} applications.
+
+    The remainder of the paper is organized as follows.
+    \Cref{remdo:sec:optim-methods} describes the optimization methodology and references \cite{mccabe_development_2026} for the underlying simulation model.
+    \Cref{remdo:sec:formulation} develops the problem formulation and \Cref{remdo:sec:optim-process} the solution procedure.
+    \Cref{remdo:sec:results} presents results; \Cref{remdo:sec:discussion} interprets them and outlines future work.
 \fi

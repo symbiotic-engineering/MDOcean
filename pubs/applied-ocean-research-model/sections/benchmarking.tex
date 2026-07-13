@@ -4,8 +4,8 @@
 \label{sec:validation-benchmarking}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Dynamic Validation using WEC-Sim}\label{sec:dynamic-validation}
-The popular time-domain hydrodynamic simulation software WEC-Sim \cite{ruehl_wec-simwec-sim_2024} is used to validate the dynamics module.
+\subsection{Dynamic Validation Using WEC-Sim}\label{sec:dynamic-validation}
+The popular time-domain hydrodynamic simulation software WEC-Sim \citep{ruehl_wec-simwec-sim_2024} is used to validate the dynamics module.
 The WEC-Sim RM3 example is run with regular waves and with the device constrained to oscillate only in heave.
 \ifdefined\DISSERTATION
     Notably, the RM3 geometry provided in WEC-Sim differs slightly from the published dimensions in the RM3 report, so for validation the dimensions input to MDOcean are adjusted to match WEC-Sim.
@@ -15,66 +15,70 @@ The WEC-Sim RM3 example is run with regular waves and with the device constraine
     WEC-Sim runs utilize hydrodynamic coefficients obtained with the WAMIT BEM for dynamics, and control coefficients calculated with MDOcean for consistency.
     MDOcean is run with MEEM as usual, and separately also run with the WAMIT coefficients to distinguish differences caused by disparate hydrodynamic coefficients from those caused by the underlying dynamics.
 \else
-WEC-Sim runs utilize hydrodynamic coefficients obtained with the WAMIT BEM for dynamics, and control coefficients calculated with MDOcean for consistency.
-MDOcean is run with MEEM as usual, and separately also run with the WAMIT coefficients to distinguish differences caused by disparate hydrodynamic coefficients from those caused by the underlying dynamics. 
+    Two MDOcean configurations are compared against WEC-Sim:
+    one using MEEM hydrodynamic coefficients (the default) and one using WAMIT BEM coefficients matching WEC-Sim's,
+    to separate dynamics-model error from hydrodynamic-coefficient error.
 \fi
 
-The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case, with an error breakdown for all simulation scenarios and sea states shown in \cref{fig:error-histogram}.
-
-\begin{figure}
+The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
+with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
+\begin{figure*}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
-    \caption{Error breakdown based on WEC-Sim Validation Runs}
+    \caption{Error breakdown based on WEC-Sim Verification Runs}
     \label{fig:error-histogram}
-\end{figure}
-Errors are 38.2\% and 28.6\% on the average power and maximum amplitude respectively.
-Though this seems large, the extremely low errors in the system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself, but in the way that the model amplifies errors in drag and hydrodynamic coefficients. 
-These errors are deemed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines and the ability to quickly evaluate a large number of design options.
-More details on the WEC-Sim validation are described in \appendixname~\ref{sec:appendix-dynamic-validation}.
+\end{figure*}
+Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
+(\resultsAOR[wecsimAvgPowerErrorBestCase] and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
+but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
+\Cref{sec:appendix-dynamic-validation} provides errors of additional outputs as a function of sea state.
 
+\Cref{sec:appendix-dynamic-validation} also validates the describing-function approximation itself,
+showing total harmonic distortion below 1\% in the worst sea state
+and excellent agreement between the assumed and actual drag force waveforms at all four corners of the JPD.
+
+These errors are deemed acceptable for the purposes of this study,
+since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines
+and the ability to quickly evaluate a large number of design options.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Static Validation}
 
 \ifdefined\DISSERTATION
-    The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \cite{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
-    This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
+    The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \citep{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
+    This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \citep{mciver_added_1991}.
     For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
-    After the publication of reference~\cite{mccabe_open-source_2024}, excitation phase was added to the MEEM implementation.
+    After the publication of reference~\citet{mccabe_open-source_2024}, excitation phase was added to the MEEM implementation.
 It also matches WAMIT results well.
 \else
-The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \cite{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
-This is expected because the BEM solution assumes infinite depth, which requires a finite added mass at low frequency, whereas MEEM uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \cite{mciver_added_1991}.
-For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
-After the publication of reference~\cite{mccabe_open-source_2024}, excitation phase was added to the MEEM implementation.
-It also matches WAMIT results well.
+    The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely for $\omega \geq 0.3$~rad/s (Fig.~5 of \citet{mccabe_open-source_2024});
+    the divergence at lower frequencies arises from differing finite-depth versus infinite-depth assumptions \citep{mciver_added_1991} and is not a concern for the site considered (minimum sea-state frequency 0.4~rad/s).
 \fi
 
-The overall model is validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \cite{RM3}, as shown in \Cref{tab:validation}.
+The overall model is validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \citet{RM3}, as shown in \Cref{tab:validation}.
 \ifdefined\DISSERTATION
     Volume and center of buoyancy results are also compared to the WEC-Sim RM3 tutorial geometry, which differs slightly from the nominal RM3 geometry.
-    Structural calculations are additionally compared to reference \cite{previsic_reference_2011}, an unpublished report by an author of the reference model report providing more detail on the structural calculations.
+    Structural calculations are additionally compared to \citet{previsic_reference_2011}, an unpublished report by an author of the reference model report providing more detail on the structural calculations.
 \fi
 The mass, power, and cost track well, but the structural force in storm waves has a significant discrepancy.
 \ifdefined\DISSERTATION
-    This is because load cases in reference \cite{RM3} are derived experimentally from wave tank tests rather than a linear model.
+    This is because load cases in \citet{RM3} are derived experimentally from wave tank tests rather than a linear model.
     For this study, a tuned scale factor on force is used to account for the discrepancy.
-    Improving the force model to align with the wave tank data is an area of future work, with suggestions discussed in \cref{sec:unmodeled-effects}.
+    Improving the force model to align with the wave tank data is an area of future work, with suggestions discussed in \Cref{sec:unmodeled-effects}.
 \else
-This is because load cases in reference \cite{RM3} are derived experimentally from wave tank tests rather than a linear model.
-For this study, a tuned scale factor on force is used to account for the discrepancy.
-Improving the force model to align with the wave tank data is an area of future work, with suggestions discussed in \cref{sec:unmodeled-effects}.
+    The reference storm loads in \citet{RM3} are derived from wave-tank tests rather than a linear model, so a tuned scale factor on force is used here;
+    improving this is identified in \Cref{sec:unmodeled-effects} as future work.
 \fi
 
 \ifdefined\DISSERTATION
     As with force, a tuned scale factor is also applied to the power when the geometry is set to the nominal RM3 geometry to obtain an equal average power to the reference model report (86~kW).
-    Unlike the force, the power discrepancy is not attributed to a modeling error because the separate power validation against WEC-Sim tracks extremely well as described in \cref{sec:dynamic-validation}.
+    Unlike the force, the power discrepancy is not attributed to a modeling error because the separate power validation against WEC-Sim tracks extremely well as described in \Cref{sec:dynamic-validation}.
     Rather, the discrepancy is attributed to the fact that the reference model report uses a different dynamic model that is not described in detail, and does not document the hydrodynamic coefficients, water depth, drag coefficient, and other necessary input parameters that would be required to obtain a close match.
     A final tuned scale factor is applied to the structural mass to account for the fact that not all structural components are modeled, including spar stiffeners, damping plate circumferential stiffeners, and miscellaneous features like flanges, enclosures, and access mounts.
 \else
-As with force, a tuned scale factor is also applied to the power when the geometry is set to the nominal RM3 geometry to obtain an equal average power to the reference model report (86~kW).
-Unlike the force, the power discrepancy is not attributed to a modeling error because the separate power validation against WEC-Sim tracks extremely well as described in \cref{sec:dynamic-validation}.
-Rather, the discrepancy is attributed to the fact that the reference model report uses a different dynamic model that is not described in detail, and does not document the hydrodynamic coefficients, water depth, drag coefficient, and other necessary input parameters that would be required to obtain a close match.
-A final tuned scale factor is applied to the structural mass to account for the fact that not all structural components are modeled, including spar stiffeners, damping plate circumferential stiffeners, and miscellaneous features like flanges, enclosures, and access mounts.
+    A power scale factor is similarly applied to match the reference report's 86~kW average power;
+    the discrepancy is attributed to the reference report's use of an undocumented dynamic model rather than to a modeling error in MDOcean
+    (the WEC-Sim validation of \Cref{sec:dynamic-validation} tracks closely).
+    A structural-mass scale factor accounts for unmodeled subcomponents (spar stiffeners, damping plate circumferential stiffeners, flanges, enclosures, access mounts).
 \fi
 
 After applying a structural force scale factor of \resultsAOR[forceScaleFactor],
@@ -82,12 +86,12 @@ a power scale factor of \resultsAOR[powerScaleFactor],
 and a mass scale factor of \resultsAOR[massScaleFactor],
 the scaled quantities match within 1\% of the reference model report.
 
-%\hl{Describe the radiation and amplitude limit and show they aren't violated} \cite{zou_practical_2023}.
+%\hl{Describe the radiation and amplitude limit and show they aren't violated} \citep{zou_practical_2023}.
 
-% \begin{table}[]
+% \begin{table}[htbp]
 % \centering
 % \begin{tabular}{l|l|l|l|l}
-%                                                      & \multicolumn{2}{l|}{WEC-Sim RM3 Design}                                      & \multicolumn{2}{l}{DOE Report RM3 Design \cite{RM3}}                               \\
+%                                                      & \multicolumn{2}{l|}{WEC-Sim RM3 Design}                                      & \multicolumn{2}{l}{DOE Report RM3 Design \citep{RM3}}                               \\
 %                                                      Variable& MDOcean                    & Actual                     & MDOcean                    & Actual                            \\ \hline
 % Float mass                     &                            &                            & 202.4 Mg                   & 208 Mg                            \\
 % Vertical column mass           &                            &                            & \hl{fail}                  &                                   \\
@@ -109,28 +113,28 @@ the scaled quantities match within 1\% of the reference model report.
 % \label{tab:validation}
 % \end{table}
 
-\begin{table}[]
-\centering
-\input{tables/from-matlab/validation.tex}
-\caption{Validation}
-\label{tab:validation}
-\end{table}
+    \begin{table*}[htbp]
+        \centering
+        \input{tables/from-matlab/validation.tex}
+        \caption{Verification}
+        \label{tab:validation}
+    \end{table*}
 
 %\hl{Explain sources of error and rough uncertainty and the implications of what we can trust}
 
-The scaling behavior of economic outputs against the number of WECs is validated by sweeping $N_{WEC}$ from 1 to 100 and comparing the simulated CAPEX, OPEX, and LCOE against the values in the reference model report \cite{RM3}.
-The average percent errors are included in \cref{tab:validation}, with additional detail in \cref{fig:econ-nwec-validate} of \appendixname~\ref{sec:appendix-econ-validation}.
+The scaling behavior of economic outputs against the number of WECs is validated by sweeping $N_{WEC}$ from 1 to 100 and comparing the simulated CAPEX, OPEX, and LCOE against the values in the reference model report \citep{RM3}.
+The average percent errors are included in \Cref{tab:validation}, with additional detail in \Cref{fig:econ-nwec-validate} of \Cref{sec:appendix-econ-validation}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Runtime Benchmarking}
 \label{sec:sim-runtime}
 Benchmarking the runtime of the MDOcean simulation is important to verify it achieves the desired speed to facilitate rapid design optimization.
-An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in around two minutes.
+An initial speed requirement order of magnitude of 100~ms for all modules was set to enable a 100-iteration finite difference optimization with 12 design variables to complete in approximately two minutes.
 Ultimately, each simulation run takes around \resultsAOR[simRuntime], solidly meeting the goal.
 The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
 
 \Cref{fig:runtime-modules} visualizes the breakdown of runtime between modules.
-The MEEM hydrodynamics module takes the majority (\resultsAOR[pctRuntimeMEEM]) of the time and is broken down in \cref{fig:runtime-hydro}.
+The MEEM hydrodynamics module takes the majority (\resultsAOR[pctRuntimeMEEM]) of the time and is broken down in \Cref{fig:runtime-hydro}.
 \ifdefined\DISSERTATION
     The biggest portion is dedicated to evaluating Bessel functions in the semi-analytical solution, another large portion to unpacking variables from the cell data structure, and a smaller portion to solving the imaginary modes of the dispersion relation and the linear matrix equation.
 \fi
@@ -138,17 +142,17 @@ The simulation is an order of magnitude faster than the Capytaine BEM solver for
 
 \begin{figure}[b!]
 \centering
-\includegraphics[width=0.5\linewidth]{figs/from-matlab/sim_runtime.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/sim_runtime.pdf}
 \caption{Bar chart showing simulation runtime breakdown between modules}\label{fig:runtime-modules}
 \end{figure}
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=0.5\linewidth]{figs/from-matlab/hydro_runtime_logscale.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/hydro_runtime_logscale.pdf}
 \caption{Bar chart demonstrating the speed improvement of MDOcean's hydro module over baseline solver Capytaine}\label{fig:runtime-hydro}
 \end{figure}
 
-The dynamics and controls module takes the next longest (\resultsAOR[pctRuntimeDynamics], enlarged in \figureautorefname~\ref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
+The dynamics and controls module takes the next longest (\resultsAOR[pctRuntimeDynamics], enlarged in \Cref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
 This represents a three-order-of-magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
 \ifdefined\DISSERTATION
     Simplifying the dynamics to a single degree of freedom (DOF) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-DOF model.
@@ -156,7 +160,7 @@ This represents a three-order-of-magnitude improvement over the equivalent regul
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=0.5\linewidth]{figs/from-matlab/dynamics_runtime.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/dynamics_runtime.pdf}
 \caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver WEC-Sim}\label{fig:runtime-dynamics}
 \end{figure}
 
@@ -167,17 +171,16 @@ The structures, geometry, and economics modules are not computationally expensiv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
 \ifdefined\DISSERTATION
-    \Cref{sec:validation-benchmarking} demonstrates that MDOcean achieves accuracies generally within 10\% of established models and benchmarks both at the individual subsystem level and at the system level.
+    \Cref{sec:validation-benchmarking} demonstrates that MDOcean achieves accuracies generally within single-digit-percent JPD-weighted annual average power under realistic conditions, despite worst-case per-sea-state errors that can be larger due to drag and inter-body phase sensitivity in the 2-DOF model %within 10\% of established models and benchmarks both at the individual subsystem level and at the system level.
     Just three scale factors are used to tune results across disciplines and achieve an interdisciplinary model fully consistent with all relevant outputs in the reference model report, providing a valuable benchmark to compare technology improvements while retaining the flexibility to adjust scale factors as needed to represent other scenarios.
     The model is quite accurate for inputs near the nominal RM3 design and therefore its ability to capture multidisciplinary interactions in a single software package while running 1-3 orders of magnitude faster than established software is considered a major success.
     Still, the model is not perfect, and although only minor tuning was performed, the model's development centers around the Reference Model 3 and there may be unidentified discrepancies for geometries far from the reference design.
     We emphasize that the model is not intended to replace detailed models for final design and analysis, but rather to enable rapid design space exploration and optimization in the early stages of design.
     Since the values without scale factors are of the correct order of magnitude and the trends are reasonable, the use of scale factors to resolve discrepancies in the force, power, and mass models is deemed acceptable for the purposes of this study.
 \else
-    \Cref{sec:validation-benchmarking} demonstrates that MDOcean achieves accuracies generally within 10\% of established models and benchmarks both at the individual subsystem level and at the system level.
-    Just three scale factors are used to tune results across disciplines and achieve an interdisciplinary model fully consistent with all relevant outputs in the reference model report, providing a valuable benchmark to compare technology improvements while retaining the flexibility to adjust scale factors as needed to represent other scenarios.
-    The model is quite accurate for inputs near the nominal RM3 design and therefore its ability to capture multidisciplinary interactions in a single software package while running 1-3 orders of magnitude faster than established software is considered a major success.
-    Still, the model is not perfect, and although only minor tuning was performed, the model's development centers around the Reference Model 3 and there may be unidentified discrepancies for geometries far from the reference design.
-    We emphasize that the model is not intended to replace detailed models for final design and analysis, but rather to enable rapid design space exploration and optimization in the early stages of design.
-    Since the values without scale factors are of the correct order of magnitude and the trends are reasonable, the use of scale factors to resolve discrepancies in the force, power, and mass models is deemed acceptable for the purposes of this study.
+    MDOcean reproduces the dynamics of an established time-domain solver within a few percent under matched modeling assumptions and within single-digit-percent JPD-weighted annual average power under realistic conditions, despite worst-case per-sea-state errors that can be larger due to drag and inter-body phase sensitivity in the 2-DOF model.
+    Three scale factors are used to tune force, power, and mass outputs across disciplines for consistency with the reference model report.
+    The \resultsAOR[simRuntime] runtime is 1-3 orders of magnitude faster than established software, enabling multidisciplinary optimization workflows that would otherwise be prohibitive.
+    The model is intended to support rapid design-space exploration in early design, not to replace detailed FEM or BEM simulations for final analysis.
+    Accuracy may degrade for geometries far from the reference design; users should validate against detailed models before drawing conclusions about previously-unexplored regions of the design space.
 \fi

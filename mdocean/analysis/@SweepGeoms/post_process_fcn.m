@@ -151,7 +151,7 @@ function [fig_array,...
     % ------------------------------------------------------------------
     % Figure 3: Line plot  (m0h vs CW/CW_max)
     % ------------------------------------------------------------------
-    fig3 = make_line_fig(m0h_mat, result_mat, '$CW/CW_{max}$', [0 1.5], ...
+    fig3 = make_line_fig(m0h_mat, result_mat, '$CW/CW_{max}$', [0 1.05], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
@@ -252,6 +252,8 @@ function [fig_array,...
     tab_colspecs      = {};
 
     end_result_struct.percent_nans = 100 * sum(~isfinite(hydro_ratio_result(:))) / numel(hydro_ratio_result);
+    end_result_struct.n_combos = intermed_result_struct.n_geoms * nT;
+    end_result_struct.geom_sweep_analysis_time = intermed_result_struct.elapsed_time;
 end
 
 % ======================================================================
