@@ -1,19 +1,13 @@
 \newcommand{\DeclareTableColumnSpecs}[3]{%
-    \expandafter\def\csname tablecols@\detokenize{#1}@twocol\endcsname{#2}%
-    \expandafter\def\csname tablecols@\detokenize{#1}@onecol\endcsname{#3}%
+    \expandafter\def\csname tablecols@#1@twocol\endcsname{#2}%
+    \expandafter\def\csname tablecols@#1@onecol\endcsname{#3}%
 }
 
-\newcommand{\TableColumnSpecs}[1]{%
-    \ifdefined\JOURNALTWOCOLUMN
-        \ifcsname tablecols@\detokenize{#1}@twocol\endcsname
-            \csname tablecols@\detokenize{#1}@twocol\endcsname
-        \fi
-    \else
-        \ifcsname tablecols@\detokenize{#1}@onecol\endcsname
-            \csname tablecols@\detokenize{#1}@onecol\endcsname
-        \fi
-    \fi
-}
+\ifdefined\JOURNALTWOCOLUMN
+    \newcommand{\TableColumnSpecs}[1]{\csname tablecols@#1@twocol\endcsname}
+\else
+    \newcommand{\TableColumnSpecs}[1]{\csname tablecols@#1@onecol\endcsname}
+\fi
 
 \DeclareTableColumnSpecs{aor:verification}{P{0.15\linewidth}|c|c|r|c|c|r}{P{0.26\linewidth}|c|c|r|c|c|r}
 \DeclareTableColumnSpecs{aor:future-improvements}{>{\raggedright\arraybackslash}m{0.35\linewidth}>{\raggedright\arraybackslash}m{0.5\linewidth}}{P{0.5\linewidth}P{0.5\linewidth}}

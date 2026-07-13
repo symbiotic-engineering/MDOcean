@@ -1,29 +1,21 @@
-\newcommand{\FigureWidthOption}[1]{%
-    \if\relax\detokenize{#1}\relax\else width=#1\fi
-}
-\newcommand{\FigureOptionsDefaultTwoCol}{\FigureWidthOption{\linewidth}}
-\newcommand{\FigureOptionsDefaultOneCol}{\FigureWidthOption{0.75\linewidth}}
-
 \newcommand{\DeclareFigureOptions}[3]{%
-    \expandafter\def\csname figopts@\detokenize{#1}@twocol\endcsname{\FigureWidthOption{#2}}%
-    \expandafter\def\csname figopts@\detokenize{#1}@onecol\endcsname{\FigureWidthOption{#3}}%
-}
-
-\newcommand{\FigureOptions}[1]{%
-    \ifdefined\JOURNALTWOCOLUMN
-        \ifcsname figopts@\detokenize{#1}@twocol\endcsname
-            \csname figopts@\detokenize{#1}@twocol\endcsname
-        \else
-            \FigureOptionsDefaultTwoCol
-        \fi
+    \if\relax\detokenize{#2}\relax
+        \expandafter\def\csname figopts@#1@twocol\endcsname{}%
     \else
-        \ifcsname figopts@\detokenize{#1}@onecol\endcsname
-            \csname figopts@\detokenize{#1}@onecol\endcsname
-        \else
-            \FigureOptionsDefaultOneCol
-        \fi
+        \expandafter\def\csname figopts@#1@twocol\endcsname{width=#2}%
+    \fi
+    \if\relax\detokenize{#3}\relax
+        \expandafter\def\csname figopts@#1@onecol\endcsname{}%
+    \else
+        \expandafter\def\csname figopts@#1@onecol\endcsname{width=#3}%
     \fi
 }
+
+\ifdefined\JOURNALTWOCOLUMN
+    \newcommand{\FigureOptions}[1]{\csname figopts@#1@twocol\endcsname}
+\else
+    \newcommand{\FigureOptions}[1]{\csname figopts@#1@onecol\endcsname}
+\fi
 
 \DeclareFigureOptions{aor:figs/from-matlab/FBD.pdf}{.9\linewidth}{\linewidth}
 \DeclareFigureOptions{aor:figs/from-matlab/MEEM_geometry.pdf}{\linewidth}{1\linewidth}
