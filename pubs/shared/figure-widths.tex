@@ -1,21 +1,23 @@
+\makeatletter
 \def\DeclareFigureOptions#1#2#3{%
     \if\relax\detokenize{#2}\relax
-        \expandafter\def\csname figopts@#1@twocol\endcsname{}%
+        \define@key{Gin}{figopts@\detokenize{#1}@twocol}[true]{}%
     \else
-        \expandafter\def\csname figopts@#1@twocol\endcsname{width=#2}%
+        \define@key{Gin}{figopts@\detokenize{#1}@twocol}[true]{\setkeys{Gin}{width=#2}}%
     \fi
     \if\relax\detokenize{#3}\relax
-        \expandafter\def\csname figopts@#1@onecol\endcsname{}%
+        \define@key{Gin}{figopts@\detokenize{#1}@onecol}[true]{}%
     \else
-        \expandafter\def\csname figopts@#1@onecol\endcsname{width=#3}%
+        \define@key{Gin}{figopts@\detokenize{#1}@onecol}[true]{\setkeys{Gin}{width=#3}}%
     \fi
 }
 
 \ifdefined\JOURNALTWOCOLUMN
-    \def\FigureOptions#1{\csname figopts@#1@twocol\endcsname}
+    \def\FigureOptions#1{figopts@\detokenize{#1}@twocol}
 \else
-    \def\FigureOptions#1{\csname figopts@#1@onecol\endcsname}
+    \def\FigureOptions#1{figopts@\detokenize{#1}@onecol}
 \fi
+\makeatother
 
 \DeclareFigureOptions{aor:figs/from-matlab/FBD.pdf}{.9\linewidth}{\linewidth}
 \DeclareFigureOptions{aor:figs/from-matlab/MEEM_geometry.pdf}{\linewidth}{1\linewidth}

@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 ### Fixed
-- Paper: make shared `\FigureOptions` and `\TableColumnSpecs` lookup macros fully expandable in key-value and tabular preamble contexts.
+- Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
 
 ## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-12
 ### Added
