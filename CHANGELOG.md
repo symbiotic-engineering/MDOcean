@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-14
+### Added
+- Dev: Create copilot agent instructions
+- Dev: Customize copilot setup to include calkit and matlab
+
 ## [v1.3.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.1) - 2026-7-13
 ### Added
 - Pipeline: feature in dvc_lock_merge.py to checkout git-tracked pipeline outputs consistent with dvc.lock merge
