@@ -246,6 +246,42 @@ Future multistart procedures could therefore fix deterministic starts for the un
 \end{landscape}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization Runtime}
+\ifdefined\DISSERTATION
+    \Cref{remdo:fig:optim-runtimes} shows the runtime of each optimization and analysis routine, run in parallel on a 14-core server.
+    The optimization also runs without issue, though more slowly, on unspecialized machines such as a Windows~10 laptop with MATLAB~R2022a.
+\else
+    %\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+    The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
+    The optimization also runs, more slowly, on a commodity laptop.
+\fi
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
+%     \caption{Bar chart of optimization and analysis runtimes}
+%     \label{remdo:fig:optim-runtimes}
+% \end{figure}
+
+\ifdefined\DISSERTATION
+    Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and \resultsRE[singleObjFcnEvals]~function evaluations (objective and gradient combined).
+    Generating the Pareto front takes \resultsRE[paretoRuntime], of which \resultsRE[paretoPctTimeSeeds]~is spent on epsilon-constraint seeding and \resultsRE[paretoPctTimePatternSearch]~on the pattern search.
+    Gradient-based post-optimality sensitivities run in just \resultsRE[gradientSensRuntime], while re-optimization-based sensitivities take \resultsRE[reoptimSensRuntime].
+\else
+    Each single-objective optimization takes \resultsRE[singleObjRuntime] (\resultsRE[singleObjIters]~iterations, \resultsRE[singleObjFcnEvals]~function evaluations); the Pareto front takes \resultsRE[paretoRuntime]; gradient-based sensitivities run in \resultsRE[gradientSensRuntime] versus \resultsRE[reoptimSensRuntime]~for re-optimization-based ones.
+\fi
+
+%\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
+%\hl{Analysis is left for during scrutineering.}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{example-image-a}
+%     \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
+%     \label{remdo:fig:pareto-epsilon-runtime-sweep}
+% \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Local Sensitivities}
 \label{remdo:sec:appendix-sensitivties}
 \Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 

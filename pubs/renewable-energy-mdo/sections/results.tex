@@ -1,11 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Results}\label{remdo:sec:results}
+\section{Results and Discussion}\label{remdo:sec:results}
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
 This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Single Objective Optimization}
+\subsection{Single Objective Optimization Results}
 \label{remdo:sec:results-single}
 
 %%%%%%%%%%%%%%%%%%%%
@@ -202,7 +202,7 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
 % \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Single Objective Sensitivity Analysis}\label{remdo:sec:sensitivities}
+\subsection{Sensitivity to Prioritize Disciplinary R\&D}\label{remdo:sec:sensitivities}
 This subsection quantifies how parameter and model-assumption changes affect the optimized designs and objective values.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -343,7 +343,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 %The global sensitivity analysis indicates that \hl{list parameters} have strongly nonlinear sensitivities over the range of interest. During re-scrutineering. \hl{Sentence interpreting any params that aren't location based}. 
 
 %%%%%%%%%%%%%%%%%%%%
-\subsubsection{Global Sensitivity to Deployment Location}
+\subsection{Global Sensitivity to Deployment Location}
 \ifdefined\DISSERTATION
     The high sensitivity to wave conditions warrants a global analysis by re-optimizing for several discrete deployment locations.
     This captures interactions among the simultaneous changes in wave height, period, water depth, and storm sea state that the OAT local analysis cannot, and reveals the effect of different spectral bandwidths.
@@ -562,38 +562,18 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 %Perhaps also do re-optimized pareto fronts for a parameter or two that was found to be highly influential in the single objective analysis. 
 %Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{example-image-a}
+    \caption{econ sensitivity contour plot}
+    \label{remdo:fig:econ-sensitivity-contour-placeholder}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{example-image-a}
+    \caption{post hoc nwec sweep}
+    \label{remdo:fig:post-hoc-nwec-sweep-placeholder}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%
-\subsection{Optimization Runtime}
-\ifdefined\DISSERTATION
-    \Cref{remdo:fig:optim-runtimes} shows the runtime of each optimization and analysis routine, run in parallel on a 14-core server.
-    The optimization also runs without issue, though more slowly, on unspecialized machines such as a Windows~10 laptop with MATLAB~R2022a.
-\else
-    %\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
-    The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
-    The optimization also runs, more slowly, on a commodity laptop.
-\fi
-
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
-%     \caption{Bar chart of optimization and analysis runtimes}
-%     \label{remdo:fig:optim-runtimes}
-% \end{figure}
-
-\ifdefined\DISSERTATION
-    Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and \resultsRE[singleObjFcnEvals]~function evaluations (objective and gradient combined).
-    Generating the Pareto front takes \resultsRE[paretoRuntime], of which \resultsRE[paretoPctTimeSeeds]~is spent on epsilon-constraint seeding and \resultsRE[paretoPctTimePatternSearch]~on the pattern search.
-    Gradient-based post-optimality sensitivities run in just \resultsRE[gradientSensRuntime], while re-optimization-based sensitivities take \resultsRE[reoptimSensRuntime].
-\else
-    Each single-objective optimization takes \resultsRE[singleObjRuntime] (\resultsRE[singleObjIters]~iterations, \resultsRE[singleObjFcnEvals]~function evaluations); the Pareto front takes \resultsRE[paretoRuntime]; gradient-based sensitivities run in \resultsRE[gradientSensRuntime] versus \resultsRE[reoptimSensRuntime]~for re-optimization-based ones.
-\fi
-
-%\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
-%\hl{Analysis is left for during scrutineering.}
-
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=\linewidth]{example-image-a}
-%     \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
-%     \label{remdo:fig:pareto-epsilon-runtime-sweep}
-% \end{figure}
