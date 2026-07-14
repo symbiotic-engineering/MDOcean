@@ -177,8 +177,8 @@ function [par_x_star_par_p_re_optim, ...
     slope_LCOE_norm = slope_LCOE.' / LCOE_nom; % normalize
     slope_Pvar_norm = slope_Pvar.' / Pvar_nom;
 
-    if all(~isfinite(slope_LCOE),'all') || all(~isfinite(slope_Pvar),'all')
-        msg = ['All slopes are NaN, meaning all optimizations failed. ' ...
+    if all(~isfinite(slope_LCOE),'all') && all(~isfinite(slope_Pvar),'all')
+        msg = ['All slopes are NaN, meaning all optimizations failed for both objectives. ' ...
             'This might be because no feasible solution can be found. ' ...
             'slope_LCOE = ', num2str(slope_LCOE(:).'), ' and slope_Pvar = ', num2str(slope_Pvar(:).')];
         error(msg)
@@ -306,4 +306,3 @@ function g_lambda = combine_g_lambda(lambda,X,p,b)
     g_lambda(idx_g) = all_g(idx_g);
 
 end
-
