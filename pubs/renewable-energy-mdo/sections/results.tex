@@ -3,22 +3,6 @@
 \section{Results}\label{remdo:sec:results}
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
 This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
-\subsection{Pre-Optimization Sweep}
-\Cref{remdo:fig:experiments} depicts a variable sweep using the one-at-a-time design-of-experiments method.
-Many designs are infeasible: those that violate nonlinear constraints are marked with an X,
-and those that violate linear constraints are not simulated to avoid errors as described in \cref{remdo:sec:requirements}.
-Most violations are due to structural failure of the damping plate, in both fatigue and ultimate load cases.
-A few designs violate hydrostatic pitch stability ($g_{NL,5}$) or geometrically incompatible damping plate thickness ($g_{L,7}$).
-Of particular note, the most significant LCOE decrease is obtained by increasing the float diameter.
-The LCOE attains a local minimum at a float diameter around 1.5 times the nominal design, but the plate fails structurally there.
-The PTO power and force ratings also attain local minima, as expected from the tradeoff of power generation and cost.
-The structural variables, meanwhile, increase with cost and do not affect power, so no direct LCOE tradeoff is expected; these variables exist solely to satisfy constraints.
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
-\caption{Exploratory one at a time sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
-\label{remdo:fig:experiments}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization}
@@ -44,11 +28,6 @@ The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-g
 \caption{Geometries overlaid}
 \label{remdo:fig:overlaid-geometry}
 \end{figure}
-
-\begin{table*}[htbp]
-\input{tables/from-matlab/optimal_design_vars.tex}
-\caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
-\end{table*}
 
 The optimal designs are generally larger than the nominal.
 \ifdefined\DISSERTATION
@@ -102,11 +81,6 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 
 %Finally, we recommend the balanced design for intermediate applications, where energy storage is available but not abundant, and cost is important but not the bottom line. An example is a grid-connected application for island communities. This balanced design has an LCOE of \$0.18/kWh and a power coefficient of variation equal to 100\%. 
 %Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in \Cref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
-
-\begin{table*}[htbp]
-\input{tables/from-matlab/optimal_outputs.tex}
-\caption{Optimal outputs}\label{remdo:tab:opt-output}
-\end{table*}
 
 \ifdefined\DISSERTATION
     The minimum-LCOE design achieves an annual average electrical power of \resultsRE[powerAvgAtMinLCOE]~kW with a structural material mass of \resultsRE[structMassAtMinLCOE]~kg, requiring a generator rated for \resultsRE[powerMaxAtMinLCOE]~kW and \resultsRE[forceMaxAtMinLCOE]~kN peak.
@@ -167,41 +141,6 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     the amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost,
     motivating future designs that mitigate them (e.g., submersion-based survival, bump stops, or active amplitude control).
     The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint, signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
-\fi
-
-\ifdefined\DISSERTATION
-    Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
-    and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
-    whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
-    Local parameter sensitivity is treated in \Cref{remdo:sec:sensitivities-local}; design-variable perturbation is examined here.
-    \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
-    $\Delta J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
-\else
-    The optimization also returns the objective gradient $\vec{\nabla} J$ and the Hessian of the Lagrangian, enabling further local sensitivities.
-    \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \Cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
-\fi
-
-\begin{equation}\label{remdo:eq:delta-J}
-    \Delta J \approx \vec{\nabla} J^T \Delta \vec{x}% + \frac{1}{2} \Delta \vec{x}^T H \Delta \vec{x}
-\end{equation}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figs/from-matlab/delta_x.pdf}
-\caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{remdo:fig:delta-J}
-\end{figure}
-
-\ifdefined\DISSERTATION
-    The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\Delta J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
-    Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
-    The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
-    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
-    More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
-\else
-    The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
-    Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%

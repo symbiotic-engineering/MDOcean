@@ -151,6 +151,67 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization Results}
 
+\Cref{remdo:fig:experiments} depicts a variable sweep using the one-at-a-time design-of-experiments method.
+Many designs are infeasible: those that violate nonlinear constraints are marked with an X,
+and those that violate linear constraints are not simulated to avoid errors as described in \cref{remdo:sec:requirements}.
+Most violations are due to structural failure of the damping plate, in both fatigue and ultimate load cases.
+A few designs violate hydrostatic pitch stability ($g_{NL,5}$) or geometrically incompatible damping plate thickness ($g_{L,7}$).
+Of particular note, the most significant LCOE decrease is obtained by increasing the float diameter.
+The LCOE attains a local minimum at a float diameter around 1.5 times the nominal design, but the plate fails structurally there.
+The PTO power and force ratings also attain local minima, as expected from the tradeoff of power generation and cost.
+The structural variables, meanwhile, increase with cost and do not affect power, so no direct LCOE tradeoff is expected; these variables exist solely to satisfy constraints.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
+\caption{Exploratory one at a time sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
+\label{remdo:fig:experiments}
+\end{figure}
+
+\begin{table*}[htbp]
+\input{tables/from-matlab/optimal_design_vars.tex}
+\caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
+\end{table*}
+
+\begin{table*}[htbp]
+\input{tables/from-matlab/optimal_outputs.tex}
+\caption{Optimal outputs}\label{remdo:tab:opt-output}
+\end{table*}
+
+\ifdefined\DISSERTATION
+    Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
+    and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
+    whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
+    Local parameter sensitivity is treated in \Cref{remdo:sec:sensitivities-local}; design-variable perturbation is examined here.
+    \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
+    $\Delta J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
+\else
+    The optimization also returns the objective gradient $\vec{\nabla} J$ and the Hessian of the Lagrangian, enabling further local sensitivities.
+    \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \Cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
+\fi
+
+\begin{equation}\label{remdo:eq:delta-J}
+    \Delta J \approx \vec{\nabla} J^T \Delta \vec{x}% + \frac{1}{2} \Delta \vec{x}^T H \Delta \vec{x}
+\end{equation}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figs/from-matlab/delta_x.pdf}
+\caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{remdo:fig:delta-J}
+\end{figure}
+
+\ifdefined\DISSERTATION
+    The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\Delta J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
+    Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
+    The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
+    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
+    More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
+\else
+    The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
+    Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
+\fi
+
 \Cref{remdo:fig:single-objective-convergence} shows the convergence of the single objective optimization (LCOE minimization) using the nominal RM3 design as a starting point.
 The optimization converges in \resultsRE[singleObjIters]~iterations, not including the 8 initial iterations used to perform Hessian scaling.
 \begin{figure}[htbp]
