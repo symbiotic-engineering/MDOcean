@@ -211,17 +211,24 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     B_p_sat = B_p_stabilized;
     K_p_sat = K_p_stabilized;
     mult = NaN(size(B_p_sat));
-    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
-                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
-                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
     
     % skip QCQP if no constraints or no PTO
     use_force_sat = isfinite(F_max) && F_max > 0;
     use_amp_sat = any(isfinite(X_max));
     if ~use_force_sat && ~use_amp_sat
+        if nargout > 3
+            qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
+        end
         return
     end
     if F_max == 0
+        if nargout > 3
+            qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
+        end
         return
     end
     
@@ -315,7 +322,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         % index vars by sea state
         enforce_damp = enforce_damp_all(idx);
         logical_enforce = logical_enforce_2d(idx,:);
-        centers = [constraint_centers_real(idx,logical_enforce).', constraint_centers_imag(idx,logical_enforce).'];
+        centers = [constraint_centers_real(idx,logical_enforce); constraint_centers_imag(idx,logical_enforce)].';
         radii = constraint_radii(idx,logical_enforce).';
 
         % damping control: add Q=0 constraint circle

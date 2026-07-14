@@ -866,7 +866,7 @@ function [idx_closed_loop_unstable,...
     recommended_increase_Bl = zeros(size(B_f));
     recommended_increase_Kl = zeros(size(B_f));
 
-    Z_l = B_l_sat - 1i*K_l_sat./w;
+    Z_l = B_l_sat - 1i*(K_l_sat./w);
     Z_p = Z_l; % fixme apply cascase here
     % uncomment and vectorize these once PTO dynamics are added
 %     if multibody

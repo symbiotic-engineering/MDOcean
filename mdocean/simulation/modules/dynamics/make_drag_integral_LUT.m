@@ -119,7 +119,8 @@ end
 function out = wrapToPiOver2(angle)
 
     wrapped = wrapToPi(angle);
-    out = sign(wrapped) .* min( abs(wrapped), pi - abs(wrapped));
+    abs_w = abs(wrapped);
+    out = sign(wrapped) .* min(abs_w, pi - abs_w);
 end
 
 function F = myinterpFcn(X,Y,Z,V)
