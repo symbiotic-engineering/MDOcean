@@ -19,9 +19,10 @@ Common targeted checks:
 - RE paper build: `calkit run -s build-RE-paper`
 - AOR LaTeX lint: `calkit run -s paperlint-aor`
 - RE LaTeX lint: `calkit run -s paperlint-re`
-- AOR tests: `calkit run -s test-aor`
-- RE tests: `calkit run -s test-re`
-- Duplicate JSON key check for paper numbers: `calkit run -s check-dup-json-keys`
+- AOR tests: `calkit run -s test-aor` (will run all stale matlab stages and can take multiple hours)
+- RE tests: `calkit run -s test-re` (will run all stale matlab stages and can take multiple hours)
+- Single matlab stage: `calkit run -s analysis-ClassName` or `calkit run -s postpro-ClassName` for `ClassName` in `mdocean/analysis/@ClassName/`
+- Duplicate key check for paper `.bib` citation files: `calkit run -s check-dup-json-keys`
 - Docs build (from `docs/`): `make html`
 
 ## Editing and contribution conventions
