@@ -109,6 +109,76 @@ text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 %% hydro coeff comparison plot
 h_hydro = hydro_compare(vals,color);
 
+%% stacked cost breakdown + power histogram (nominal vs min LCOE)
+h_cost_power = figure;
+t_cost = tiledlayout(1,3);
+t_cost.TileSpacing = 'compact';
+
+idx_compare = [1 2]; % nominal and min LCOE
+labels_compare = titles(idx_compare);
+
+% PTO cost stack (power + force)
+idx_F_max = strcmp(b.var_names,'F_max');
+idx_P_max = strcmp(b.var_names,'P_max');
+N_WEC = p.N_WEC;
+alpha_pto = 0.206;
+pto_power_mult = (0.4454 + 0.9099*N_WEC^(-alpha_pto)) * p.cost_perW_mult;
+pto_force_mult = (0.0086 + 0.0118*N_WEC^(-alpha_pto)) * p.cost_perN_mult;
+P_max_W = X(idx_compare,idx_P_max) * 1e5;
+F_max_N = X(idx_compare,idx_F_max) * 1e6;
+pto_power = pto_power_mult * P_max_W;
+pto_force = pto_force_mult * F_max_N;
+
+nexttile
+bar(categorical(labels_compare), [pto_power pto_force], 'stacked')
+ylabel('Cost ($)')
+title('PTO Cost Breakdown')
+legend({'Power','Force'},'Location','best')
+improvePlot
+
+% Structural cost stack (float, column, reaction plate, other)
+alpha_struct = 0.481;
+cost_per_kg = (1.64e6 + 1.31e6 * N_WEC^(-alpha_struct)) / 687000;
+struct_stack = zeros(length(idx_compare),4);
+for i = 1:length(idx_compare)
+    j = idx_compare(i);
+    mat_idx = max(1,min(length(p.cost_perkg_mult), round(X(j,end))));
+    cpk = cost_per_kg * p.cost_perkg_mult(mat_idx);
+    c_float = cpk * vals(j).mass_f;
+    c_col = cpk * vals(j).mass_vc;
+    c_rp = cpk * vals(j).mass_rp;
+    c_other = vals(j).capex_struct - (c_float + c_col + c_rp);
+    struct_stack(i,:) = [c_float c_col c_rp max(0,c_other)];
+end
+
+nexttile
+bar(categorical(labels_compare), struct_stack, 'stacked')
+ylabel('Cost ($)')
+title('Structural Cost Breakdown')
+legend({'Float','Column','Reaction Plate','Other'},'Location','best')
+improvePlot
+
+% Power histogram (from power CDF neighborhood implementation)
+nexttile
+hold on
+edges = logspace(log10(10),log10(10000),26);
+for i = 1:length(idx_compare)
+    [~,P_matrix] = simulation(X(idx_compare(i),:), p);
+    P_matrix = P_matrix / 1e3;
+    P_matrix(P_matrix==0) = 1e-3;
+    P_counts = repelem(P_matrix(:), round(p.JPD(:)*1000));
+    N = histcounts(P_counts,edges,'Normalization','probability');
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    plot(centers, N, '-o', 'Color', color{idx_compare(i)}, 'DisplayName', labels_compare{i});
+end
+set(gca,'XScale','log')
+xlabel('Average Electrical Power (kW)')
+ylabel('Probability (-)')
+title('Power Histogram')
+legend('Location','best')
+grid on
+improvePlot
+
 %% design variable table
 DV_table = array2table(X(:,1:end-1).', ...
     'VariableNames',titles, 'RowNames', b.var_names_pretty(1:end-1));
@@ -131,7 +201,7 @@ h_stacked_out = figure;
 stacked_number_line(out_table{:,:}, [], [], color, markers, titles, out_table.Properties.RowNames);
 h_stacked_out.Position(3:4) = [1000  400]; % make taller
 
-figs = [h_geom, h_hydro, h_prob, h_power_matrix, h_stacked_dv, h_stacked_out];
+figs = [h_geom, h_hydro, h_prob, h_power_matrix, h_cost_power, h_stacked_dv, h_stacked_out];
 
 end
 
@@ -154,7 +224,7 @@ function f = hydro_compare(vals,colors)
 f = figure;
 
 % first subplot: excitation
-t = tiledlayout(1,2);
+t = tiledlayout(1,3);
 t.TileSpacing = 'compact';
 nexttile
 hold on
@@ -215,17 +285,39 @@ for j = 1:length(h)
     %h(j).LineWidth = 1;
 end
 
-% east border subplot: dummy legend colors
-axLegend = nexttile('east');
+% third subplot: impedance (magnitude and phase)
+nexttile
 hold on
-dummy_style = {['k' '-'],['b' '-'],['r' '-'],['g' '-'],['m' '-']};
-for i = 1:length(dummy_style)
-    plot(NaN,NaN,dummy_style{i})
+for i=1:length(vals)
+    val = vals(i);
+    col = colors{i};
+    w=unique(val.w(~isnan(val.w)),'stable');
+    A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
+    B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
+    Z_h = B_f_over_rho_w + 1i * A_f_over_rho;
+    yyaxis left
+    plot(w(:,1), abs(Z_h(:,1)), [col '-*'])
+    ylabel('|Z_h| (m^3)')
+    yyaxis right
+    plot(w(:,1), angle(Z_h(:,1)), [col '-.'])
+    ylabel('\angle Z_h (rad)')
 end
-leg = legend({'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'});
-leg.Layout.Tile = 'east';
-axLegend.Visible = 'off';
+title('Hydrodynamic Impedance')
+xlabel('Wave Frequency (\omega)')
+xlim([0.3,1.45])
+legend({'|Z_h|','\angle Z_h'})
+hold off
 improvePlot
+
+% figure legend for design colors
+axLegend = axes('Position',[0.91 0.1 0.08 0.8]);
+hold(axLegend,'on')
+dummy_style = {'k-','b-','r-','g-','m-'};
+for i = 1:length(dummy_style)
+    plot(axLegend,NaN,NaN,dummy_style{i})
+end
+legend(axLegend,{'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'},'Location','northwest');
+axLegend.Visible = 'off';
 
 f.Position(3) = 1530;
 end
