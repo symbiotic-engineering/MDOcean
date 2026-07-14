@@ -1,0 +1,435 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Results 
+
+Optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions show ( —- ).
+
+3.1. Pre-Optimization Sweep
+
+Figure 5 depicts a variable sweep using the one-at-a-time design-of-experiments method.
+
+Many designs are infeasible: those that violate nonlinear constraints are marked with an X, and those that violate linear constraints are not simulated to avoid errors as described in section 2.2.2.
+
+Most violations are due to fatigue and ultimate failure of the damping plate, and a few designs violate hydrostatic stability (𝑔𝑁𝐿,5) or damping plate geometric compatibility (𝑔𝐿,7).
+
+Of particular note, increasing the float diameter obtains the most significant LCOE decrease.
+
+The LCOE attains a local minimum at a float diameter around 1.5 times the nominal value, but the plate fails structurally there.
+
+The PTO power and force ratings also attain local minima due to the tradeoff of power generation and cost, though the structural variables do not since they exist solely to satisfy constraints.
+
+In summary, the sweep’s local optimality behavior and large LCOE decrease are encouraging signs of appropriate design variable selection, but the pervasive constraint violation warns that caution is needed to preserve feasibility.
+
+3.2. Single Objective Optimization 
+
+3.2.1. Optimal Design 
+
+In the single-objective optimizations, 𝐿𝐶𝑂𝐸 and 𝐶𝐴𝑃 𝐸𝑋 are minimized and average power 𝑃elec,avg is maximized, each starting from the nominal RM3 configuration as the initial condition⃗𝑥 0, for which all optimizations converge successfully.
+
+The optimal designs⃗ 𝑥 ∗ are shown visually in Figure 6 and numerically in Table 6, alongside the nominal design and a balanced design.
+
+The balanced design is a 𝐶𝐴𝑃 𝐸𝑋 minimization constrained to exceed 140 kW average power (chosen from the Pareto front of Section 3.4), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
+
+The optimal designs are generally larger than the nominal.
+
+The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to 22.4 m), with a similarly sized PTO at slightly lower maximum force.
+
+In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material.
+
+The minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
+
+The activity of these lower-bound constraints (priority 2 requirements, Section 2.2.2) signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption [54] weakens;
+
+removing it in future work could yield more efficient structures.
+
+The above-water profiles show a consistent trend: the nominal design’s long support tubes give way to a taller float and shorter tubes, likely because the slamming constraint encourages higher draft 𝑇𝑓 ,2 while the fixed submersion fraction 𝑇𝑓 ,2∕ℎ𝑓 forces float height to grow with it.
+
+In essence, optimal designs tend to have larger bulk dimensions, thinner structures, and shorter tubes, although the latter may be a formulation artifact.
+
+3.2.2. Optimal Performance Outputs
+
+The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for The minimum-LCOE design achieves 92 kW annual average electrical power at an estimated 0.55 $/kWh, a 38% improvement over the nominal 0.89 $/kWh, from a simultaneous 47% design-cost reduction and 26% power increase (economic assumptions per [54]).
+
+This remains far above other renewables (onshore wind/solar 0.03-0.05 $/kWh; floating offshore wind projected 0.11-0.25 $/kWh by 2030 [62]).
+
+Relative to the minimum-LCOE design, CAPEX minimization cuts design-dependent cost a further 59% for a 36% power loss, and power maximization adds 26% power for a 53% cost increase.
+
+Figure 9 shows a multiplicative breakdown of the minimumLCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the 𝐹max force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency;
+
+their product with the annual hours per sea state yields annual energy production.
+
+The Lagrange multipliers⃗ 𝜆 = −𝑑𝐽 ∗∕𝑑⃗𝑔 (Section 2.3.1), reported in Figure 10, quantify each active constraint’s influence on the objective.
+
+Six constraints are active: one structural thickness lower bound, three factors of safety, and two amplitude constraints.
+
+The storm DLC limits the float and damping plate while the operational fatigue DLC drives column sizing.
+
+The amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost, motivating future designs that mitigate them (e.g., submersion-based survival, bump stops, or active amplitude control).
+
+The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint, signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
+
+The optimization also returns the objective gradient⃗ ∇𝐽 and the Hessian of the Lagrangian, enabling further local sensitivities.
+
+Figure 11 shows the relative objective change for a 10% perturbation of each design variable from its optimum via Equation (3), against ground-truth re-evaluation.
+
+Δ𝐽 ≈⃗ ∇𝐽 𝑇 Δ⃗𝑥 (3) The gradient estimate Δ𝐽 is zero for any design variable not in an active constraint at convergence;
+
+here all values are nonzero, showing every variable affects the active constraints of Figure 10.
+
+The highest sensitivities are 𝐷𝑠, 𝐷𝑓 , and ℎstiff,𝑓 (a 10% change raises LCOE by 7.9%, 4.4%, and 3.7%);
+
+the rest shift the objective only 1–2% under 10% perturbation.
+
+Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
+
+3.2.4. Multi-Start 
+
+Because non-convex optimization can stall at local minima, 1000 random starts are tested;
+
+974 are linearly infeasible, leaving 26 feasible, none of which converge while meeting the KKT conditions.
+
+For LCOE minimization 17 converge via small steps and 9 do not (reversed at 9/17 for cost minimization);
+
+of the converged runs, 5 and 4 reach the same presumed global minimum while more (12 and 5) reach a worse local minimum (Figure 12).
+
+With roughly one fifth reaching the global minimum, a 95% chance of finding it requires at least ceil ( ln(1−0.95) ln(1−0.2) ) = 14 feasible starts.
+
+More complete multistart results appear in Appendix C.
+
+3.3. Single Objective Sensitivity Analysis 
+
+This subsection quantifies how parameter and model assumption changes affect the optimized designs and objective values.
+
+3.3.1. Local Sensitivity to Parameters 
+
+Local parameter sensitivities are computed by perturbing each parameter from its nominal value and re-optimizing, the most accurate of several methods compared in Appendix C.2.
+
+Figures 13 to 15 show tornado charts of the highest normalized sensitivities for the objective and design respectively, normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in 𝐽 ∗ or 𝑥∗.
+
+For the minimum LCOE (left of Figure 13), the dominant sensitivities are operational wave characteristics (−1.4, as higher waves raise power), array and transmission efficiency (−1.0), PTO efficiency (−0.8), and the fixed charge rate (+0.84).
+
+The minimum design cost (right) is more broadly sensitive as seen by the fact that sixteen parameters exceed magnitude 0.5 versus five for LCOE, and is dominated by damping plate geometry (the nondimensional stiffener height at +2.1, 𝐷𝑑 ∕𝐷𝑠 at +1.7, and related terms), with no float or spar geometric parameter influential, indicating the damping plate sets the minimum achievable cost.
+
+Two counterintuitive findings stand out: the sign of the structural-period sensitivity 𝑇struct flips between the two objectives, and the material yield strength has a positive cost sensitivity (+1.0).
+
+Specifically, a stronger material yields a costlier design because–with thicknesses already at their lower bounds–the added strength is spent on larger, higherload dimensions rather than reduced structural cost.
+
+Figures 14 and 15 show the sensitivity of the optimal design variables to parameters, 𝑑⃗𝑥 ∗∕𝑑⃗𝑝 : high values for uncontrollable site inputs flag parameters to pin down early, while high values for geometric parameters held fixed flag candidates for promotion to design variables.
+
+The optimal design is driven mainly by site and geometric parameters;
+
+dynamic parameters, notably the drag coefficients, have little effect, implying detailed drag-coefficient modeling is likely unnecessary.
+
+Several structural thicknesses are insensitive to all parameters because they sit at their lower bounds.
+
+On this basis, 𝐷𝑑 , 𝑇𝑓 ,1, 𝑇𝑠, and possibly 𝐷𝑓 ,𝑖𝑛 should become design variables in future optimizations.
+
+3.3.2. Global Sensitivity to Deployment Location 
+
+The high sensitivity to wave conditions warrants a global analysis re-optimizing for four U.S. deployment locations (Humboldt Bay, CA; Pac-Wave North and South, OR; Wave Energy Test Site, HI), using NREL SAM wave resource data [44, 26] with economic assumptions held fixed.
+
+This captures interactions among wave height, period, depth, and storm state that the OAT analysis cannot, and tests whether the optimal design is robust to location, which is relevant because global deployability is a core viability requirement [17].
+
+Table 8 gives the results.
+
+All optimized LCOE values undercut the RM3 baseline, lowest at Pac-Wave South ($0.328/kWh, highest incident energy) and highest at WETS, HI ($0.579/kWh).
+
+The optimal designs are similar for California and Oregon but differ for Hawaii, which has a larger diameter and draft and thinner structural thicknesses.
+
+This is surprising, since the simple scaling 𝜔𝑛 ∼ 𝑇 −1∕2 𝑓 predicts a smaller draft at higher frequency sites;
+
+the reversal, likely because Hawaii’s lower excitation force demands higher amplitude and thus higher draft to avoid slamming, demonstrates the value of a fully coupled model over the scaling heuristic.
+
+3.4. Multi-Objective Optimization 
+
+The multi-objective optimization simultaneously trades off design-dependent capital cost 𝐶design against average electrical power 𝑃avg,elec (Section 2.3.2), giving insight where LCOE is inapplicable or uncertain in its constantmodeled cost terms (𝑂𝑃 𝐸𝑋, 𝐹 𝐶𝑅, 𝑝0).
+
+The Pareto front (Figure 16) shows all designs costing significantly less than the nominal RM3 [63] across a range of powers;
+
+the zoomed view with constant-𝐿𝐶𝑂𝐸 contours (Figure 17) places the minimum-LCOE design at the front’s tangency with the contours, nearly coincident with the maximum-power design.
+
+A cusp exists in the Pareto front where average electrical power is around 60 kW.
+
+The resulting non-convex region (from 47 kW to about 120 kW) would have been missed by a convex weighted-sum procedure, affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
+
+The geometry inlays in Figure 16 show the optimal spar draft and float diameter growing from left to right, as larger dimensions cost more but generate more power.
+
+Similar trends are quantified in Figure 18, which provides design heuristics for adapting WEC design to a given cost-power balance.
+
+The x-axis gives percent along the Pareto front and y-values are lightly smoothed;
+
+structural variables are green, powertrain ratings blue, and bulk dimensions red.
+
+With increasing cost and power (left to right), most design variables increase monotonically or nearly so;
+
+only 𝑇𝑓 ,2 and ℎ𝑓 𝑠,clear (both in the amplitude constraints) decrease, while the lower-bound thicknesses 𝑡𝑑 and 𝑡𝑓 ,𝑏 stay essentially constant.
+
+The (powertrain) ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using Table 6, only 1% of cost savings comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work [59] that weighed only the design change, not its cost impact.
+
+The objective trends (bottom of Figure 18) show largely linear power but a design-cost slope that changes discretely near 5%, the source of the Pareto cusp, corresponding to a shift in PTO sizing strategy from adjusting maximum power (0-5%) to adjusting maximum force at constant power (570%), beyond which a gradual slope change reflects diminishing returns.
+
+Figure 19 shows the active constraints along the front: one structural variable at its lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in Section 4), and the structural factor-of-safety, force, and power limits.
+
+3.5. Multi-Objective Sensitivity Analysis 
+
+Figure 17 compares the damping and reactive control schemes: reactive control achieves the lowest LCOE overall, but below 60 kW damping control is more cost-effective, since reactive control there requires a larger, costlier PTO and structure for the same power.
+
+This suggests the costoptimal controller at a given power may be neither pure scheme, as reactive control maximizes power for a given design but not for a given cost.
+
+This suggests that besides 𝐹𝑚𝑎𝑥 and 𝑃𝑚𝑎𝑥, 𝑃𝑟𝑒𝑎𝑐𝑡𝑖𝑣𝑒,𝑚𝑎𝑥 should be a design variable and a dynamic constraint.
+
+3.6. Optimization Runtime 
+
+The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3 GHz base clock) and 256 GB of DDR4 RAM at 3200 MHz, running MATLAB R2024b.
+
+The optimization also runs, more slowly, on a commodity laptop.
+
+Each single-objective optimization takes 24.6 min (89 iterations, 1,347 function evaluations); the Pareto front takes 36 min; gradient-based sensitivities run in 3.4 min versus 162 min for re-optimization-based ones.
+
+4. Discussion 
+
+Beyond the per-result analysis of Section 3, this section discusses the study’s contributions and limitations, comparing results to existing studies and suggesting future work.
+
+4.1. Result Comparison to Other Studies 
+
+This subsection compares the key findings to prior studies and highlights where the present results align or differ.
+
+4.1.1. Force Saturation 
+
+Previous studies [60, 19, 27, 31, 57] recommend capping maximum force well below the unsaturated point to minimize power loss, but none have economically confirmed that the financial savings outweigh the performance reduction.
+
+This study verifies the conclusion with a full cost analysis: the optimal design sizes its powertrain to require force saturation, and re-optimizing without it incurs a 5% LCOE penalty.
+
+4.1.2. Global Deployability 
+
+A survey finds 40% of WEC developers design for site agnostic deployment [78].
+
+A prior study [10] concludes that geometric tuning to the dominant wave period is unfavorable, but its devices have coupled diameter and height, use only damping control, and tune for power rather than cost.
+
+MDOcean’s results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (Tables 6 to 8), which contradicts de Andres et al. [10] and demonstrates the value of a fuller multidisciplinary model.
+
+4.1.3. Structural Efficiency
+
+A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding 278.76 kg/m3 for steel structures [72], with a 95% confidence interval of ±280 metric tons.
+
+This trendline predicts a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 80 metric tons, far below the confidence interval.
+
+Since the only comparable mass data points have an order-of-magnitude lower hull volume, MDOcean may underestimate the required thickness, warranting further investigation of possible load underestimation or factor-of-safety overestimation.
+
+4.1.4. Optimization Procedure 
+
+All prior large-scale (≥ 8 design variables) WEC optimizations use the genetic algorithm (Section 1.1), requiring roughly 2,000–12,000 function evaluations to converge [47, 35, 24, 2].
+
+This study is the first to use a gradient-based algorithm at this scale;
+
+surprisingly, finite-difference gradients over 12 design variables make its estimated 6, 828 evaluations on par with the heuristic counts, though MDOcean’s semi-analytical model likely still runs faster in wallclock time.
+
+Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension and less than heurisitcs, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
+
+4.2. Model Realism 
+
+The optimization and sensitivity results allow the modeling assumptions from reference [54] to be assessed, both the complexities worth including and the shortcomings that may need adding, which is the kind of systematic fidelity assessment called for by the study [35].
+
+4.2.1. Observed Impact of Modeled Effects 
+
+Force saturation, slamming amplitude limits, and 2-DOF dynamics all contribute significantly to the results. 
+
+Force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
+
+The impact of these effects justifies their model complexity and argues for their inclusion in other frameworks.
+
+Conversely, the simple long-wave slamming model is reasonably accurate where the slamming constraint is active [54], suggesting the intermediate-wavelength model may be unnecessary.
+
+Because the problem is nonlinear, however, disabling both simultaneously or changing the formulation could produce coupling effects, so model simplification warrants caution.
+
+4.2.2. Potential Impact of Unmodeled Effects 
+
+No priority 1 or 2 constraints are active at the optimum, suggesting the true optimum is unlikely to lie in a region of model inaccuracy, and the inactive pitch stability constraint mitigates any metacentric-height error from the geometry module [54].
+
+However, the active operational slamming constraints invite revisiting two assumptions [54]: enforcing amplitude limits as optimization constraints rather than via the constrained optimal controller, and requiring operation in all nonzero-probability sea states rather than allowing a survival mode.
+
+4.3. Formulation Realism 
+
+This subsection evaluates how realistic the optimization formulation choices are and what refinements are most impactful.
+
+4.3.1. Design Variable Suitability 
+
+Section 2.2 described the careful choice of design variables to maintain model validity and aid convergence.
+
+The sensitivity analysis (Section 3.3.1) suggests 𝐷𝑑 , 𝑇𝑓 ,1, 𝑇𝑠, and possibly 𝐷𝑓 ,𝑖𝑛 merit inclusion as design variables in future studies.
+
+Adding 𝑁𝑊 𝐸𝐶 matters little for LCOE minimization but is valuable in a modified multi-objective analysis using array power, relevant to fixed-requirement Powering the Blue Economy applications weighing many small WECs against one large one.
+
+A sensitivity analysis of design variables perturbed as parameters would further quantify interdisciplinary coupling, supporting either the fully coupled approach used here [54] or a future decoupled formulation should the design space grow too large for full coupling.
+
+4.3.2. Parameter Suitability
+
+Interpreting the parameter sensitivities (Section 3.3.1) broadly, parameters with high design sensitivity (aspect ratios, wave conditions, material properties) are most important for engineers to fix early, which should ideally be held constant in nondimensional form across scales, while those with high objective sensitivity (wave conditions, PTO efficiency, financing rates) are most important for funders and R&D incentives.
+
+The differing high-sensitivity parameters for cost minimization, and their greater number, suggest that innovation strategies for Powering the Blue Economy applications should differ from, and offer more avenues than, those for utility-scale energy.
+
+4.3.3. Constraint and Requirement Suitability 
+
+With 8 linear and 24 nonlinear constraints, this optimization captures more realistic requirements than any other WEC optimization known to the authors.
+
+The active constraints (Figure 19) are all survivability-related, such as structural factors of safety and amplitude limits, while ballast and pitch-stability constraints are inactive.
+
+Although survivability is a critical but rarely-optimized WEC requirement, this study quantifies its effect: the Lagrange multipliers (Figure 10) indicate that improving the damping plate is worth about 5 and 10 times more than improving the column and float respectively, motivating both incremental detail-design improvements and transformative storm-survival concepts (submersion, control surfaces, or amplitude-reducing control), whose viability can be screened using the same multipliers.
+
+Many considerations remain uncaptured, however, such as discrete component sizing, mooring loads, structural resonant modes, storm overturning moment, and manufacturing, regulatory, and transport limits [23], so caution is warranted before pursuing this optimum; ee [17, 11, 78] for comprehensive WEC requirement guidance.
+
+4.3.4. Objective Suitability 
+
+Because of LCOE’s uncertainty, this study optimizes cost and power as separate objectives with supporting sensitivity analysis.
+
+Prices for steel and powertrain force and power must still be assumed, which are addressable via more objectives or a global price-parameter sensitivity analysis with uncertainty quantification, but the two-objective formulation balances rigor against the interpretability lost beyond two objectives.
+
+The cost model, though uncertain, still improves substantially on the surface-area and hull-volume proxies common in WEC optimization, against which it would be useful to compare in future work.
+
+4.4. Future Work 
+
+Future improvements span two axes, model fidelity and optimization formulation, each applicable to the existing setup or a new one.
+
+With the current model, the highestvalue studies are a sequential-versus-coupled comparison to quantify the benefit of full coupling per subsystem, a survivability study comparing storm survival strategies, a detailed PTO drivetrain and gear-ratio study, an array-sizing study adding 𝑁𝑊 𝐸𝐶 as a design variable, and a comparison against simplified cost proxies.
+
+Accuracy-enhancing model additions include a more defensible nonlinear stormforce method, fatigue-lifetime-based structural sizing, and extreme-statistics amplitude assessment.
+
+The most transformative additions, such as multibody dynamics (enabling true spar optimization), irregular waves (enabling realistic fatigue and power-variability studies), additional WEC archetypes (addressing design convergence), multi-region MEEM hydrodynamics, and a generator physics model (enabling generator control co-design [9, 12]), would unlock qualitatively new design studies.
+
+The authors expect the speed of the semi-analytical models to permit full coupling even at substantially larger scale, including the ambitious target of comparing multiple hydrodynamic architectures with realistic powertrain models.
+
+5. Conclusion 
+
+This paper applies the MDOcean semi-analytical modeling framework [54] within a Multidisciplinary Design Optimization (MDO) approach to maximize power and minimize cost of the RM3 point absorber.
+
+The optimization is formulated systematically, with numerical linearity, convergence, and feasibility in mind, around 12 design variables spanning bulk dimensions, structural thicknesses, and powertrain ratings, with all disciplines optimized at once to overcome the loss of system optimality inherent in sequential optimization of coupled disciplines.
+
+Constraints prevent numerical overflow and structural failure and ensure geometric physicality, stability, buoyancy, ballast, positive power, and compliance with powertrain and amplitude limits.
+
+The gradient-based SQP algorithm aids convergence by exploiting the problem’s smoothness, generating 20 seeds via the epsilon-constraint method that a gradient-free pattern search extends to 60 Pareto points.
+
+Single-objective optimization to minimize LCOE yields a design with 47% lower design cost and 26% higher power, a 38% improvement over the original RM3 design;
+
+these reach 26% more power or 59% less cost when optimizing for maximum power or minimum cost respectively.
+
+The optimal designs have larger diameters and drafts, lower above-water spar profiles, and thinner structural material, with powertrains similar in size to the nominal RM3, and the non-convex, highly constrained problem requires a 14-point multistart for a 95% chance of the presumed global optimum.
+
+Sensitivity analysis shows LCOE is most sensitive to wave characteristics, efficiency, and the fixed charge rate, and design cost to damping plate dimensions, PTO power price, site parameters, and material choice;
+
+the optimal design is sensitive to wave characteristics (motivating site-specific designs) and to geometric parameters 𝐷𝑑 , 𝑇𝑓 ,1, 𝑇𝑠, and possibly 𝐷𝑓 ,𝑖𝑛 (suggesting their promotion to design variables).
+
+A global sensitivity across four U.S. deployment sites shows incident wave power drives LCOE, with Hawaii’s horter wave periods yielding an optimal design with a larger diameter and draft and thinner structural thicknesses than on the West Coast.
+
+The cost-power trade-off is then examined via multiobjective optimization.
+
+The Pareto front contains a nonconvex cusp: below 60 kW average power, cost declines sharply for small power decreases, corresponding to a shift in which power saturation, rather than force saturation, becomes optimal at low power;
+
+lower powers also favor larger drafts, smaller float diameters, larger spar diameters, and thinner structures.
+
+A previously proposed concept of trading power for cost through the PTO alone, leaving the hydrodynamic and structural design fixed, is shown to be minimally effective, since most low-power cost reduction comes from material rather than PTO savings.
+
+The optimization runs in just 36 min on a 14-core server, which is far faster than the hours required by prior studies, 
+
+though, surprisingly, gradients do not aid convergence enough to offset the finite difference evaluation cost, so the Pareto front takes several times as many function evaluations as prior genetic algorithm optimizations.
+
+A key feature this study adds over other WEC optimizations is the modeling of realistic effects, such as shapeinformed structural stress, force saturation, amplitude limits, and nonlinear drag, though structural loads remain uncertain, PTO dynamics and irregular waves are omitted, and only a two-body axisymmetric point absorber is considered.
+
+Future work should address these modeling limitations, enhance the formulation with additional design variables (PTO components, geometric ratios) and requirements (mooring, structural resonance, installation, manufacturing, reliability, regulatory compliance), and add global sensitivity sweeps over combined parameter and model-assumption uncertainty to assess robustness.
+
+The results of this study inform future WEC design optimization, highlighting the complex trade-off between power and cost, the necessity of accounting for multidisciplinary coupling, and the value of employing clever simulation and optimization techniques to reduce runtime and facilitate convergence.
