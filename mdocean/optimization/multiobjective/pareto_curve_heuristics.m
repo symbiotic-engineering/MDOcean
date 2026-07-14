@@ -47,7 +47,7 @@ function figs = pareto_curve_heuristics(r1,r2)
 
     [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
      J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,r1.p,p_w,b,b_w,new_objs);
+     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom, idx_min_LCOE] = process_pareto_front(LCOE,Pvar,X,r1.p,p_w,b,b_w,new_objs);
     
     %% super simple "pareto" plot of just single objective optimizations
     showSingleObj = true;
@@ -56,7 +56,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     f2 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, [], showSingleObj, ...
-                showImages, showLCOEContours, r1.p, new_objs);
+                showImages, showLCOEContours, r1.p, new_objs, [], [], idx_min_LCOE);
     
     %% simple pareto plot
     showSingleObj = false;
@@ -65,7 +65,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, r1.p, new_objs, LCOE_nom, min(LCOE));
+                showImages, showLCOEContours, r1.p, new_objs, LCOE_nom, min(LCOE), idx_min_LCOE);
     
     %% plot pareto front with annotations and embedded images of three recommended designs
     showSingleObj = true;
@@ -74,12 +74,13 @@ function figs = pareto_curve_heuristics(r1,r2)
     f4 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                 J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                 x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                showImages, showLCOEContours, r1.p, new_objs);
+                showImages, showLCOEContours, r1.p, new_objs, [], [], idx_min_LCOE);
     
     %% plots for DVs as a fn of percent along the pareto
     J1_max = Inf;%p.LCOE_max;
-    [f5,f6] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
-                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs);
+    [f5,f6,f8] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
+                           J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs, r1.p);
+    f9 = lcoe_tangent_contours_plot(J1(idxo), J2(idxo), r1.p);
 
     %% double pareto plot, if plotting two results
     if load_two
@@ -92,7 +93,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     
         [J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
          J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
-         x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,r2.p,p_w,b,b_w,new_objs);
+         x_best_J1, x_best_J2, x_nom, x_balanced, idxo, LCOE_nom, idx_min_LCOE] = process_pareto_front(LCOE,Pvar,X,r2.p,p_w,b,b_w,new_objs);
         
         %% simple pareto plot
         showSingleObj = false;
@@ -101,7 +102,7 @@ function figs = pareto_curve_heuristics(r1,r2)
         f3 = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim.*[1 NaN], J1_solar, J1_balanced,...
                     J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim.*[1 NaN], J2_solar, J2_balanced,...
                     x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj, ...
-                    showImages, showLCOEContours, r2.p, new_objs, LCOE_nom, min(LCOE), f3);
+                    showImages, showLCOEContours, r2.p, new_objs, LCOE_nom, min(LCOE), idx_min_LCOE, f3);
         legend(r1.p.control_type,'',r2.p.control_type,'LCOE ($/kWh)','Location','northwest');
         xlim([40 180])
         ylim([.6 1.85])
@@ -111,6 +112,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     if load_two
         figs = [figs f7];
     end
+    figs = [figs f8, f9];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
@@ -118,7 +120,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
          J2, bestJ2, idx_best_J2, J2_nom, ...
          J2_nom_sim, J2_solar, J2_balanced,...
          x_best_J1, x_best_J2, x_nom, x_balanced, ...
-         idxo, LCOE_nom] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs)
+         idxo, LCOE_nom, idx_min_LCOE] = process_pareto_front(LCOE,Pvar,X,p,p_w,b,b_w,new_objs)
     
     if new_objs
         num_points = size(X,1);
@@ -169,6 +171,7 @@ function [J1, bestJ1, idx_best_J1, J1_nom, ...
     bestJ1 = min_max_sign(1) * bestJ1;
     [bestJ2,idx_best_J2] = min(min_max_sign(2)*J2);
     bestJ2 = min_max_sign(2) * bestJ2;
+    [~,idx_min_LCOE] = min(LCOE);
 
     % RM3 nominal - actual
     RM3_report = validation_inputs('report');
@@ -233,7 +236,7 @@ end
 function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar, J1_balanced,...
                           J2, bestJ2, idx_best_J2, J2_nom, J2_nom_sim, J2_solar, J2_balanced,...
                           x_best_J1, x_best_J2, x_nom, x_balanced, idxo, showSingleObj,...
-                          showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min, fig)
+                          showImages, showLCOEContours, p, new_objs, LCOE_nom, LCOE_min, idx_min_LCOE, fig)
     if ~exist('fig','var')
         f = figure;
         pareto_color = 'b';
@@ -261,10 +264,10 @@ function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar
     plot(J1_nom_sim(2),J2_nom_sim(2),'ms','HandleVisibility','off')
     
     if showSingleObj  
-        % cyan squares for 3 ref points
-        plot(bestJ1,J2(idx_best_J1), 'cs','MarkerFaceColor','c','HandleVisibility','off')
-        plot(J1(idx_best_J2),bestJ2, 'cs','MarkerFaceColor','c','HandleVisibility','off')
-        plot(J1_balanced,J2_balanced,'cs','MarkerFaceColor','c','HandleVisibility','off')
+        plot(J1(idx_best_J1),J2(idx_best_J1), 'gs','MarkerFaceColor','g','HandleVisibility','off')
+        plot(J1(idx_best_J2),J2(idx_best_J2), 'rs','MarkerFaceColor','r','HandleVisibility','off')
+        plot(J1(idx_min_LCOE),J2(idx_min_LCOE),'bs','MarkerFaceColor','b','HandleVisibility','off')
+        plot(J1_balanced,J2_balanced,'ms','MarkerFaceColor','m','HandleVisibility','off')
     end
     
     % axis labels
@@ -273,6 +276,12 @@ function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar
         ylabel('Structural and PTO Cost ($M)')
         xlim([.9*min(J1) 1.1*max(J1)])
         ylim([.9*min(J2) 1.05*max(J2)])
+        [T_grid,Hs_grid] = meshgrid(p.T,p.Hs);
+        P_wave = p.rho_w * p.g^2 / (64*pi) .* T_grid .* (Hs_grid.^2);
+        CW_max = p.g * T_grid.^2 / (4*pi^2);
+        P_rad_limit = P_wave .* CW_max .* p.eff_array;
+        P_avg_rad_limit_kW = sum(P_rad_limit .* p.JPD/100, 'all') / 1000;
+        xline(P_avg_rad_limit_kW,'k--','HandleVisibility','off')
     else
         xlabel('LCOE ($/kWh)')
         ylabel('Power Variation (%)')
@@ -310,6 +319,7 @@ function [f] = pareto_plot(J1, bestJ1, idx_best_J1, J1_nom, J1_nom_sim, J1_solar
         y_spacing = (yy(2) - yy(1)) / 50;
         text(J1(idx_best_J1)+.5*x_spacing, J2(idx_best_J1)+y_spacing,   {'Most','Power'},     'FontSize',sz)
         text(J1(idx_best_J2)+   x_spacing, J2(idx_best_J2)-y_spacing,    'Least Cost',        'FontSize',sz)
+        text(J1(idx_min_LCOE)+  x_spacing, J2(idx_min_LCOE)+y_spacing,   {'Min','LCOE'},      'FontSize',sz)
         text(J1_balanced    -   x_spacing, J2_balanced    -9*y_spacing, {'Balanced','Design'},'FontSize',sz)
     end
 
@@ -347,9 +357,9 @@ function mini_plot(pos, x, p)
 end
 
 %%
-function [f_unfiltered,f_filtered] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
+function [f_unfiltered,f_filtered,f_nondim] = design_heuristics_plot(overallJ1, J1_best, idx_best_J1, x_best_J1, ...
                                      overallJ2, J2_best, idx_best_J2, ...
-                                     overallX, idxo, J1_max, var_names, new_objs)
+                                     overallX, idxo, J1_max, var_names, new_objs, p)
 
     % filter out pareto nonoptimal points
     J1_pareto = overallJ1(idxo);
@@ -377,7 +387,7 @@ function [f_unfiltered,f_filtered] = design_heuristics_plot(overallJ1, J1_best, 
      pct_angle] = pareto_order_normalize(J1_pareto(idx_keep), J2_pareto(idx_keep), ...
                                          X_pareto(idx_keep,:), dir,...
                                          J1_best, J1_worst, ...
-                                         J2_best, J2_worst, x_best_J1(1:end-1));
+                                         J2_best, J2_worst, x_best_J1(1:end-1), true);
     
     % apply filter
     backwards = strcmp(dir(1),'max');
@@ -456,6 +466,26 @@ function [f_unfiltered,f_filtered] = design_heuristics_plot(overallJ1, J1_best, 
     sub1.Position(2:4) = [.5 .6 .4];
     sub2.Position(3:4) = [.6 .28];
     l2.Position(1:2) = [.54 .16];
+
+    % nondimensionalized design variables (no front-point-to-front-point normalization)
+    X_nondim = nondimensionalize_design_vars(overallX, p);
+    X_pareto_nd = X_nondim(idxo,:);
+    [X_pareto_nd_ordered,...
+     ~, ~,...
+     pct_angle_nd] = pareto_order_normalize(J1_pareto(idx_keep), J2_pareto(idx_keep), ...
+                                            X_pareto_nd(idx_keep,:), dir,...
+                                            J1_best, J1_worst, ...
+                                            J2_best, J2_worst, [], false);
+    [X_filtered_nd,pct_angle_even_nd] = low_pass_filter(pct_angle_nd, X_pareto_nd_ordered, backwards);
+
+    f_nondim = figure;
+    semilogy(pct_angle_even_nd, X_filtered_nd)
+    grid on
+    xlabel('Percent along the Pareto Curve')
+    ylabel('Nondimensional Design Value')
+    title('Nondimensional Design Trends')
+    legend(nondim_var_names(var_names),'Location','eastoutside')
+    improvePlot
 end
 
 function [filtered, t_even_spread] = low_pass_filter(time, signals, backwards)
@@ -525,15 +555,18 @@ function [X_pareto_ordered_normed,...
           J1_pareto_ordered_normed, ...
           J2_pareto_ordered_normed, pct_angle] = pareto_order_normalize(J1_pareto, J2_pareto, X_pareto, dir,  ...
                                                                         J1_best, J1_worst, J2_best, J2_worst,...
-                                                                        X_best_J1)
+                                                                        X_best_J1, normalize_by_best)
 
     % sort from min J1 to max J1 (left to right)
     [J1_pareto_ordered,idx_order] = sort(J1_pareto);
     J2_pareto_ordered = J2_pareto(idx_order);
     X_pareto_ordered = X_pareto(idx_order,:);
     
-    % normalize by best J1
-    X_pareto_ordered_normed = X_pareto_ordered ./ repmat(X_best_J1,length(idx_order),1);
+    if normalize_by_best
+        X_pareto_ordered_normed = X_pareto_ordered ./ repmat(X_best_J1,length(idx_order),1);
+    else
+        X_pareto_ordered_normed = X_pareto_ordered;
+    end
     J1_pareto_ordered_normed = J1_pareto_ordered / J1_best;
     J2_pareto_ordered_normed = J2_pareto_ordered / J2_worst;
 
@@ -565,4 +598,141 @@ function [X_pareto_ordered_normed,...
     pct_angle = 100/(pi/2) * angle;
     pct_angle(pct_angle==-100) = 100;
     
+end
+
+function X_nondim = nondimensionalize_design_vars(X_full, p)
+    X = X_full(:,1:end-1);
+    X_nondim = X;
+    D_s = X(:,1);
+    D_f = X(:,2);
+    n_pts = size(X_full,1);
+    F_uncon = nan(n_pts,1);
+    P_uncon = nan(n_pts,1);
+    for ii = 1:n_pts
+        [~,~,~,val_i] = simulation(X_full(ii,:), p);
+        F_uncon(ii) = max(val_i.force_ptrain/1e6, 1e-6);
+        P_uncon(ii) = max(val_i.power_max/1e5, 1e-6);
+    end
+    X_nondim(:,1) = D_s ./ D_f;
+    X_nondim(:,3) = X(:,3) ./ D_f;
+    X_nondim(:,4) = X(:,4) ./ D_f;
+    X_nondim(:,5) = X(:,5) ./ D_f;
+    X_nondim(:,6) = X(:,6) ./ F_uncon;
+    X_nondim(:,7) = X(:,7) ./ P_uncon;
+    X_nondim(:,8) = (X(:,8)/1000) ./ D_f;
+    X_nondim(:,9) = (X(:,9)/1000) ./ D_f;
+    X_nondim(:,10) = (X(:,10)/1000) ./ D_f;
+    X_nondim(:,11) = (X(:,11)/10) ./ D_f;
+    X_nondim(:,12) = X(:,12) ./ D_f;
+end
+
+function names_out = nondim_var_names(names_in)
+    names_out = names_in;
+    names_out{1} = 'D_s/D_f';
+    names_out{3} = 'T_{f,2}/D_f';
+    names_out{4} = 'h_s/D_f';
+    names_out{5} = 'h_{fs,clear}/D_f';
+    names_out{6} = 'F_{max}/F_{max,unconstrained}';
+    names_out{7} = 'P_{max}/P_{max,unconstrained}';
+    names_out{8} = 't_{fb}/D_f';
+    names_out{9} = 't_{sr}/D_f';
+    names_out{10} = 't_d/D_f';
+    names_out{11} = 'h_{stiff,f}/D_f';
+    names_out{12} = 'h_{1,stiff,d}/D_f';
+end
+
+function f = lcoe_tangent_contours_plot(P_pareto_kW, C_pareto_M, p)
+    f = figure;
+    t = tiledlayout(2,2);
+    t.TileSpacing = 'compact';
+
+    P = P_pareto_kW(:) * 1000;
+    C = C_pareto_M(:) * 1e6;
+    [P,idx_sort] = sort(P);
+    C = C(idx_sort);
+    [P,ia] = unique(P,'stable');
+    C = C(ia);
+
+    ellipse = fit_ellipse_arc(P,C);
+
+    alpha_non_design = 0.741;
+    capex_indep_nom = (12.68e6 * p.N_WEC^(-alpha_non_design) + 1.24e6);
+    alpha_opex = 0.5567;
+    opex_nom = 1.193e6 * p.N_WEC^-alpha_opex;
+
+    FCR_values = p.FCR .* [0.75 0.9 1.1 1.25];
+    opex_vec = linspace(0.5*opex_nom, 1.5*opex_nom, 45);
+    capex_indep_vec = linspace(0.5*capex_indep_nom, 1.5*capex_indep_nom, 45);
+    [OPEX,CAPEX_INDEP] = meshgrid(opex_vec, capex_indep_vec);
+
+    for i = 1:length(FCR_values)
+        FCR_i = FCR_values(i);
+        pct_star = nan(size(OPEX));
+        for j = 1:numel(OPEX)
+            pct_star(j) = tangent_percent_from_econ_terms(ellipse, FCR_i, OPEX(j), CAPEX_INDEP(j));
+        end
+        nexttile
+        contourf(OPEX/1e6, CAPEX_INDEP/1e6, pct_star, 0:10:100, 'LineStyle','none')
+        colorbar
+        xlabel('OPEX design-independent ($M/yr)')
+        ylabel('CAPEX design-independent ($M)')
+        title(sprintf('FCR = %.3f', FCR_i))
+        grid on
+        improvePlot
+    end
+end
+
+function ellipse = fit_ellipse_arc(P,C)
+    p0 = [mean(P), mean(C), 0.6*(max(P)-min(P)), 0.6*(max(C)-min(C))];
+    lb = [min(P)-2*range(P), min(C)-2*range(C), 1, 1];
+    ub = [max(P)+2*range(P), max(C)+2*range(C), 10*range(P)+1, 10*range(C)+1];
+    obj = @(q) sum(( ((P-q(1))./q(3)).^2 + ((C-q(2))./q(4)).^2 - 1 ).^2);
+    opts = optimoptions('fmincon','Display','off');
+    q = fmincon(obj,p0,[],[],[],[],lb,ub,[],opts);
+    ellipse = struct('P0',q(1),'C0',q(2),'a',q(3),'b',q(4), ...
+                     'Pmin',min(P),'Pmax',max(P));
+end
+
+function pct = tangent_percent_from_econ_terms(ellipse, FCR, opex, capex_indep)
+    K = capex_indep + opex/FCR;
+    f_root = @(P) P .* dC_dP_ellipse(ellipse, P) - C_ellipse(ellipse, P) - K;
+    P_scan = linspace(ellipse.Pmin, ellipse.Pmax, 300);
+    val = f_root(P_scan);
+    idx = find(diff(sign(val))~=0,1,'first');
+    if isempty(idx)
+        [~,idx_min] = min(abs(val));
+        P_star = P_scan(idx_min);
+    else
+        P_star = fzero(f_root, [P_scan(idx), P_scan(idx+1)]);
+    end
+    P_star = max(min(P_star, ellipse.Pmax), ellipse.Pmin);
+    s = linspace(ellipse.Pmin, ellipse.Pmax, 500);
+    C_s = C_ellipse(ellipse,s);
+    ds = sqrt(diff(s).^2 + diff(C_s).^2);
+    s_cum = [0 cumsum(ds)];
+    s_star = interp1(s, s_cum, P_star, 'linear','extrap');
+    pct = 100 * s_star / s_cum(end);
+end
+
+function C = C_ellipse(e, P)
+    term = max(0, 1 - ((P - e.P0)./e.a).^2);
+    C_upper = e.C0 + e.b * sqrt(term);
+    C_lower = e.C0 - e.b * sqrt(term);
+    if abs(mean(C_upper) - e.C0) < abs(mean(C_lower) - e.C0)
+        C = C_lower;
+    else
+        C = C_upper;
+    end
+end
+
+function dC = dC_dP_ellipse(e, P)
+    denom = max(1e-12, sqrt(max(0, 1 - ((P - e.P0)./e.a).^2)));
+    base = -e.b * (P - e.P0) ./ (e.a^2 .* denom);
+    C_upper = e.C0 + e.b * sqrt(max(0, 1 - ((P - e.P0)./e.a).^2));
+    C_lower = e.C0 - e.b * sqrt(max(0, 1 - ((P - e.P0)./e.a).^2));
+    if abs(mean(C_upper) - e.C0) < abs(mean(C_lower) - e.C0)
+        dC = -base;
+    else
+        dC = base;
+    end
 end
