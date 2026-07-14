@@ -16,3 +16,15 @@
   % :returns: Output parameter 1
   % :returns: Output parameter 2
   ```
+- When you complete a task, add a line to the `CHANGELOG.md` under the `## Unreleased` section, or update the existing entry. Use the following format:
+  ```
+  ### Added (or changed, removed, fixed)
+  - Category: Short description of the change.
+  ```
+  Available change categories are Model, Validation, Speedup, CI, Paper, Figures, Tables, Pipeline, Analysis, Dev, Tests, Docs, Submodules.
+- If I ask you to merge, you should pull/fetch first to ensure the most updated version.
+  Ensure it is a proper merge commit with two parents, not a regular commit.
+  If I say to use ours or theirs to resolve merge conflicts, this refers to the keyboard input
+  of `o` or `t` required by the custom merge driver for pipeline-managed files, 
+  unless otherwise specified. When merging the changelog, you should combine the entries,
+  putting the entry from ours at the top.
