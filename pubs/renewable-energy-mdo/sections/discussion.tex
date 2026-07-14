@@ -60,25 +60,6 @@ A previous study compares structural mass per unit hull volume for marine struct
 % compare to the Sandia RM3 optimization results
 
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Optimization Procedure}
-\label{remdo:sec:discussion-optimization}
-\ifdefined\DISSERTATION
-    Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
-    Based on the stated generation counts and population sizes \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, these require roughly 12{,}000, 2{,}200, 6{,}100, and 2{,}400 function evaluations to converge.
-    The present study is the first large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer evaluations.
-    Generating the Pareto seeds, however, entails 20 single-objective optimizations at about 100 iterations each, using finite difference over 12 design variables, for an estimated $20\cdot100\cdot(12+1)=\resultsRE[paretoFcnEvals]$ evaluations,  dwarfing the genetic algorithm counts.
-    This surprising result is attributable to finite difference.
-    Despite the greater evaluation count, MDOcean's semi-analytical model likely makes the optimization faster than the BEM-based alternatives, though those papers report no runtime to confirm this.
-    Given the fast runtime, little effort was spent reducing iterations, but moderate reductions should be possible by tuning convergence criteria, exploiting a gradient sparsity pattern to cut finite-difference evaluations, and tuning the ratio of seeds to pattern-search set size.
-    A more substantial reduction is possible via automatic differentiation or the adjoint method, which would make the evaluation count independent of the number of design variables at the cost of greater implementation effort: the adjoint method would require constraint aggregation given the many constraints, and automatic differentiation would require rewriting functions in terms of elementary operations and manually supplying gradients for unsupported functions such as the Bessel functions in the hydrodynamics module.
-    Even with the higher evaluation count, the gradient-based algorithm retains the advantage of certifying convergence to a local optimum, and with systematic multistart, reasonable confidence of a global optimum, which a heuristic optimization cannot provide.
-\else
-    All prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm (\Cref{remdo:sec:lit}), requiring roughly 2{,}000--12{,}000 function evaluations to converge \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}.
-    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations exceed the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
-    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
-\fi
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model Realism}
 \ifdefined\DISSERTATION
     Using the optimization and sensitivity results, the modeling assumptions of \Cref{remdo:sec:model} can now be assessed for reasonableness.
@@ -218,6 +199,26 @@ This subsection evaluates how realistic the optimization formulation choices are
 
 %\paragraph{Does this design have high TPL? What are the risks and uncertainties?}
 %use \url{https://tpl.nrel.gov/assessment} and \url{https://www.osti.gov/biblio/1825239} for RM3 TPL.
+
+\subsubsection{Optimization Procedure}
+\label{remdo:sec:discussion-optimization}
+\ifdefined\DISSERTATION
+    Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
+    Based on the stated generation counts and population sizes \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, these require roughly 12{,}000, 2{,}200, 6{,}100, and 2{,}400 function evaluations to converge.
+    The present study is the first large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer evaluations.
+    Generating the Pareto seeds, however, entails 20 single-objective optimizations at about 100 iterations each, using finite difference over 12 design variables, for an estimated $20\cdot100\cdot(12+1)=\resultsRE[paretoFcnEvals]$ evaluations,  dwarfing the genetic algorithm counts.
+    This surprising result is attributable to finite difference.
+    Despite the greater evaluation count, MDOcean's semi-analytical model likely makes the optimization faster than the BEM-based alternatives, though those papers report no runtime to confirm this.
+    Given the fast runtime, little effort was spent reducing iterations, but moderate reductions should be possible by tuning convergence criteria, exploiting a gradient sparsity pattern to cut finite-difference evaluations, and tuning the ratio of seeds to pattern-search set size.
+    A more substantial reduction is possible via automatic differentiation or the adjoint method, which would make the evaluation count independent of the number of design variables at the cost of greater implementation effort: the adjoint method would require constraint aggregation given the many constraints, and automatic differentiation would require rewriting functions in terms of elementary operations and manually supplying gradients for unsupported functions such as the Bessel functions in the hydrodynamics module.
+    Even with the higher evaluation count, the gradient-based algorithm retains the advantage of certifying convergence to a local optimum, and with systematic multistart, reasonable confidence of a global optimum, which a heuristic optimization cannot provide.
+\else
+    All prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm (\Cref{remdo:sec:lit}), requiring roughly 2{,}000--12{,}000 function evaluations to converge \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}.
+    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations exceed the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
+    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Future Work}
 \ifdefined\DISSERTATION
