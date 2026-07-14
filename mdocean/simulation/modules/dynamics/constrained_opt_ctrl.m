@@ -211,6 +211,9 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
     B_p_sat = B_p_stabilized;
     K_p_sat = K_p_stabilized;
     mult = NaN(size(B_p_sat));
+    qcqp_debug = struct('centers', [], 'radii', [], 'labels', {{}}, ...
+                        'Gamma_opt', NaN, 'alpha', NaN, 'Z_th', NaN, ...
+                        'w', NaN, 'n_active_constraints', 0, 'feasible', false);
     
     % skip QCQP if no constraints or no PTO
     use_force_sat = isfinite(F_max) && F_max > 0;
@@ -320,6 +323,7 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
         % Q=0 circle: center = -i*R/X, radius = |Z_th|/|X|
         % where R = Re(Z_th), X = Im(Z_th)
         p_star = [];
+        feasible = true;
         if enforce_damp
             Z_th_i = Z_th(idx);
             R_th = real(Z_th_i);
@@ -329,6 +333,8 @@ function [B_p_sat,K_p_sat,mult,qcqp_debug] = solve_qcqp_control(Z_th, w, ...
             
             % for damping, find optimal on Q=0 circle subject to other constraints
             Gamma_opt = solve_damping_qcqp(center_Q0, radius_Q0, centers, radii);
+            feasible = isempty(centers) || ...
+                       check_inside_circles([real(Gamma_opt), imag(Gamma_opt)], centers, radii);
         else
             
             % reactive control or no reactance: use standard circle intersection
