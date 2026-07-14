@@ -1,6 +1,7 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
 ### Changed
 - Dev: expand `.github/copilot-instructions.md` with cloud-agent onboarding guidance, targeted Calkit commands, and known error/workaround notes.
 
