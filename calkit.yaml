@@ -1,7 +1,7 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize 
-  an ocean wave energy converter (WEC).
+description: Multidisciplinary Design Optimization (MDO) to optimize an 
+  ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
@@ -420,8 +420,7 @@ pipeline:
     analysis-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=Constraints; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
@@ -1226,8 +1225,7 @@ pipeline:
     analysis-DragIntegral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DragIntegral; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=DragIntegral; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -2991,8 +2989,7 @@ pipeline:
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=ParetoSweep; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3773,8 +3770,7 @@ pipeline:
     postpro-Runtime:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Runtime; 
-        obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Runtime; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Runtime
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4496,8 +4492,7 @@ pipeline:
     postpro-Wecsim:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Wecsim; 
-        obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Wecsim; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Wecsim
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4940,8 +4935,7 @@ pipeline:
     postpro-WithTables:
       kind: shell-command
       environment: _system
-      command: echo "Running postprocessing for all stages with 
-        tables."
+      command: echo "Running postprocessing for all stages with tables."
       inputs:
         - from_stage_outputs: postpro-Comparison
         - from_stage_outputs: postpro-Constraints
@@ -5014,9 +5008,9 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/aor/
-          storage:
+          storage: null
         - path: code-coverage/aor/
-          storage:
+          storage: null
     test-re:
       kind: matlab-command
       environment: _system
@@ -5039,16 +5033,16 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/re/
-          storage:
+          storage: null
         - path: code-coverage/re/
-          storage:
+          storage: null
     viz-AllFigCompare:
       kind: jupyter-notebook
       environment: pubs
       notebook_path: results/fig_notebooks/AllFigCompare.ipynb
       inputs:
         - from_stage_outputs: postpro-AllFigCompare
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Comparison:
@@ -5057,7 +5051,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Comparison.ipynb
       inputs:
         - from_stage_outputs: postpro-Comparison
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Constraints:
@@ -5066,7 +5060,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Constraints.ipynb
       inputs:
         - from_stage_outputs: postpro-Constraints
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Cost:
@@ -5075,17 +5069,16 @@ pipeline:
       notebook_path: results/fig_notebooks/Cost.ipynb
       inputs:
         - from_stage_outputs: postpro-Cost
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DampingPlateStructures:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/DampingPlateStructures.ipynb
+      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
       inputs:
         - from_stage_outputs: postpro-DampingPlateStructures
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DescFcns:
@@ -5094,17 +5087,16 @@ pipeline:
       notebook_path: results/fig_notebooks/DescFcns.ipynb
       inputs:
         - from_stage_outputs: postpro-DescFcns
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DesignSpaceExploration:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/DesignSpaceExploration.ipynb
+      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignSpaceExploration
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DesignVars:
@@ -5113,7 +5105,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DesignVars.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignVars
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DragIntegral:
@@ -5122,7 +5114,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DragIntegral.ipynb
       inputs:
         - from_stage_outputs: postpro-DragIntegral
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-FitOlaya:
@@ -5131,17 +5123,16 @@ pipeline:
       notebook_path: results/fig_notebooks/FitOlaya.ipynb
       inputs:
         - from_stage_outputs: postpro-FitOlaya
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ForceSaturationFigFunc:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ForceSaturationFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-GradientOptimFigFunc:
@@ -5150,7 +5141,7 @@ pipeline:
       notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-GradientOptimFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-HydroCoeffFigFunc:
@@ -5159,7 +5150,7 @@ pipeline:
       notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-HydroCoeffFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-LocationSensitivity:
@@ -5168,7 +5159,7 @@ pipeline:
       notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
       inputs:
         - from_stage_outputs: postpro-LocationSensitivity
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Meem:
@@ -5177,7 +5168,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Meem.ipynb
       inputs:
         - from_stage_outputs: postpro-Meem
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Multistart:
@@ -5186,7 +5177,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Multistart.ipynb
       inputs:
         - from_stage_outputs: postpro-Multistart
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParamSensitivities:
@@ -5195,7 +5186,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
       inputs:
         - from_stage_outputs: postpro-ParamSensitivities
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Parameters:
@@ -5204,7 +5195,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Parameters.ipynb
       inputs:
         - from_stage_outputs: postpro-Parameters
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoFigFunc:
@@ -5213,7 +5204,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoSweep:
@@ -5222,7 +5213,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoSweep
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-PtoSweep:
@@ -5231,7 +5222,7 @@ pipeline:
       notebook_path: results/fig_notebooks/PtoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-PtoSweep
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-QPCircles:
@@ -5240,7 +5231,7 @@ pipeline:
       notebook_path: results/fig_notebooks/QPCircles.ipynb
       inputs:
         - from_stage_outputs: postpro-QPCircles
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ReadNonMatlabFigs:
@@ -5249,7 +5240,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
       inputs:
         - from_stage_outputs: postpro-ReadNonMatlabFigs
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-RunSingleFigFunc:
@@ -5258,7 +5249,7 @@ pipeline:
       notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-RunSingleFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Runtime:
@@ -5267,7 +5258,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Runtime.ipynb
       inputs:
         - from_stage_outputs: postpro-Runtime
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Slamming:
@@ -5276,7 +5267,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Slamming.ipynb
       inputs:
         - from_stage_outputs: postpro-Slamming
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-SparHydro:
@@ -5285,7 +5276,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SparHydro.ipynb
       inputs:
         - from_stage_outputs: postpro-SparHydro
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-SweepGeoms:
@@ -5294,7 +5285,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SweepGeoms.ipynb
       inputs:
         - from_stage_outputs: postpro-SweepGeoms
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Validation:
@@ -5303,7 +5294,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Validation.ipynb
       inputs:
         - from_stage_outputs: postpro-Validation
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Wecsim:
@@ -5312,7 +5303,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Wecsim.ipynb
       inputs:
         - from_stage_outputs: postpro-Wecsim
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     pyxdsm:
@@ -5603,8 +5594,7 @@ pipeline:
       script_path: dev/latex/Paper-Linter/paperlint.py
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore 
-          pubs/applied-ocean-research-model/numeric-results.tex
+        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
         - --output dev/latex/Paper-Linter/lint-aor.txt
       inputs:
@@ -5648,9 +5638,9 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
-          storage:
+          storage: null
         - path: pubs/renewable-energy-mdo/aux/
-          storage:
+          storage: null
           delete_before_run: false
     build-AOR-paper:
       kind: latex
@@ -5675,14 +5665,13 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
-          storage:
+          storage: null
         - path: pubs/applied-ocean-research-model/aux/
-          storage:
+          storage: null
           delete_before_run: false
     build-UMERC-paper:
       kind: latex
-      target_path: 
-        pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       environment: tex
       inputs:
         - pubs/UMERC-2025-grid-value/figures/
@@ -5726,9 +5715,9 @@ pipeline:
       outputs:
         - pubs/dissertation/sampleThesis.pdf
         - path: pubs/dissertation/sampleThesis.synctex.gz
-          storage:
+          storage: null
         - path: pubs/dissertation/aux/
-          storage:
+          storage: null
           delete_before_run: false
     # all-writing:
     #   kind: shell-command
@@ -5745,7 +5734,7 @@ pipeline:
       notebook_path: pubs/applied-ocean-research-model/view_figs.ipynb
       inputs:
         - pubs/applied-ocean-research-model/figs/
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
     view-re-figs:
       kind: jupyter-notebook
@@ -5753,7 +5742,7 @@ pipeline:
       notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
       inputs:
         - pubs/renewable-energy-mdo/figs/
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
     all-viz:
       kind: shell-command
@@ -5875,8 +5864,7 @@ publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
     description: Development, Validation, and Benchmarking of a 
-      Multidisciplinary Semi-Analytical Model for Wave Energy 
-      Converters
+      Multidisciplinary Semi-Analytical Model for Wave Energy Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
