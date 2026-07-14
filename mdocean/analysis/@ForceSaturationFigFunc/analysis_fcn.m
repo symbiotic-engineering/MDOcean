@@ -5,10 +5,26 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :param p: Parameter struct
 % :param b: Design variable bounds struct
 % :returns: Intermediate results struct (cached heavy analyses)
-    % Run force saturation analysis
+    % Run force saturation sweep figures
     [fig1, fig2] = force_sat_results(p, b);
     
-    % Store figures for post-processing
+    % Re-run optimization without force saturation for comparison
+    p_nosat = p;
+    p_nosat.use_force_sat = false;
+    which_obj = 1;
+    % Only capture needed outputs; remaining outputs (lambdas, grads, hesses, fmincon_outputs) are not needed here
+    [Xs_nosat, objs_nosat, ~] = gradient_optim(b.X_start_struct, p_nosat, b, which_obj, {}, false);
+    [~, ~, ~, val_nosat] = simulation(Xs_nosat, p_nosat);
+
+    % Also run the default (with force saturation) optimization for comparison
+    [Xs_sat, objs_sat, ~] = gradient_optim(b.X_start_struct, p, b, which_obj, {}, false);
+    [~, ~, ~, val_sat] = simulation(Xs_sat, p);
+
+    % Store figures and comparison results for post-processing
     intermed_result_struct.fig1 = fig1;
     intermed_result_struct.fig2 = fig2;
+    intermed_result_struct.val_nosat = val_nosat;
+    intermed_result_struct.val_sat = val_sat;
+    intermed_result_struct.objs_nosat = objs_nosat;
+    intermed_result_struct.objs_sat = objs_sat;
 end

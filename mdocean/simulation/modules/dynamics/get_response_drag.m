@@ -312,7 +312,9 @@ function [mag_U,phase_U,...
         end
 
         if all(isnan(X_f_guess))
-            error('all nan')
+            warning('MDOcean:GetResponseDrag:AllNanIteration', ...
+                'Drag fixed-point iteration produced all-NaN float amplitudes; treating this point as infeasible.')
+            break
         end
 
         % increment iterations and check max iters

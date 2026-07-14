@@ -17,6 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  # pdf2svg:
+  #   kind: docker
+  #   path: pubs/defense/latex-standalone/Dockerfile
+  #   description: pdf2svg via Docker.
+  #   image: pdf2svg
   quarto:
     kind: docker
     image: ghcr.io/quarto-dev/quarto:latest
@@ -27,6 +32,9 @@ environments:
     path: pubs/defense/quarto/Dockerfile
     description: Playwright via Docker.
     image: playwright
+  bibtex-conda:
+    path: dev/latex/environment.yml
+    kind: conda
 dependencies:
   - docker
   - matlab
@@ -37,6 +45,15 @@ parameters:
     - taxonomy
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
+    - mod_freq_domain_ctrl_combined
+  latex_standalone_name:
+    - circuit_intrinsic
+    - circuit_pto
+    - circuit_kinematics
+    - control_method_venn_diagram
+    - meem_dims
+# subprojects:
+#   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
   stages:
     mermaid-make-pdfs:
@@ -68,10 +85,9 @@ pipeline:
     make-drag-integral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); drag_fcn = 
-        make_drag_integral_LUT(.01, .5, 50.01, pi/24, .1, 120); 
-        save('./mdocean/inputs/drag_integral.mat','drag_fcn');
+      command: add_mdocean_path(); make_drag_integral
       inputs:
+        - ./mdocean/inputs/make_drag_integral.m
         - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
         - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
       outputs:
@@ -96,7 +112,13 @@ pipeline:
       inputs:
         - mdocean/analysis/
         - mdocean/inputs/
-        - mdocean/optimization/
+        - mdocean/optimization/multiobjective/
+        - mdocean/optimization/sensitivities/
+        - mdocean/optimization/compare_run.m
+        - mdocean/optimization/find_nominal_inputs.m
+        - mdocean/optimization/gradient_optim.m
+        - mdocean/optimization/max_avg_power.m
+        - mdocean/optimization/run_solver.m
         - mdocean/plots/util/
         - mdocean/plots/matlab_figs/
         - mdocean/plots/all_figures.m
@@ -127,10 +149,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -190,10 +212,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -260,13 +282,13 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -304,6 +326,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/Comparison/intermed.mat
@@ -327,13 +351,13 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/compare.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/compare.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -343,6 +367,7 @@ pipeline:
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
+        - ./mdocean/plots/util/stacked_number_line.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
@@ -377,10 +402,14 @@ pipeline:
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
         - results/Comparison/comparison_power_matrix.pdf
+        - results/Comparison/stacked_optimal_design_vars.pdf
+        - results/Comparison/stacked_optimal_outputs.pdf
         - results/Comparison/overlaid_geometry.fig
         - results/Comparison/overlaid_hydro_coeffs.fig
         - results/Comparison/probability_CDF.fig
         - results/Comparison/comparison_power_matrix.fig
+        - results/Comparison/stacked_optimal_design_vars.fig
+        - results/Comparison/stacked_optimal_outputs.fig
         - path: results/Comparison/optimal_design_vars.tex
           storage: git
         - path: results/Comparison/optimal_outputs.tex
@@ -406,10 +435,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -469,10 +498,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -535,10 +564,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -597,10 +626,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -664,10 +693,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/matlab_figs/structures/make_four_loads_plot.m
         - ./mdocean/plots/matlab_figs/structures/viz_damping_plate.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -732,10 +761,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -802,11 +831,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/sin_desc_fcn_demo.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/sin_desc_fcn_demo.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -869,10 +898,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -940,10 +969,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1010,13 +1039,13 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
         - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/experiments_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
+        - ./mdocean/plots/matlab_figs/sim_results/experiments_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1082,10 +1111,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1145,10 +1174,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1211,10 +1240,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1275,10 +1304,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1367,10 +1396,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1430,10 +1459,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1599,11 +1628,16 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/force_sat_results.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/optimization/gradient_optim.m
+        - ./mdocean/optimization/run_solver.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/force_sat_results.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1634,12 +1668,15 @@ pipeline:
         - ./mdocean/simulation/modules/hydro/get_m_k_h.m
         - ./mdocean/simulation/modules/hydro/group_velocity.m
         - ./mdocean/simulation/modules/hydro/run_MEEM.m
+        - ./mdocean/simulation/modules/lin_ineq_constraints.m
         - ./mdocean/simulation/modules/structures/concentrated_plate_nondim.m
         - ./mdocean/simulation/modules/structures/distributed_plate_nondim.m
         - ./mdocean/simulation/modules/structures/float_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/ForceSaturationFigFunc/intermed.mat
@@ -1665,10 +1702,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1736,13 +1773,13 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1780,6 +1817,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/GradientOptimFigFunc/intermed.mat
@@ -1808,16 +1847,16 @@ pipeline:
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/delta_x.m
-        - ./mdocean/plots/matlab_figs/SOO_result_plots.m
-        - ./mdocean/plots/matlab_figs/lagrange_multiplier_bar_chart.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/SOO_result_plots.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sens/lagrange_multiplier_bar_chart.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1856,6 +1895,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/check_max_CW.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
         - results/GradientOptimFigFunc/intermed.mat
       outputs:
@@ -1894,10 +1935,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -1959,10 +2000,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2030,15 +2071,15 @@ pipeline:
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/location_sensitivity.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2077,9 +2118,16 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/check_max_CW.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/LocationSensitivity/intermed.mat
+        - results/LocationSensitivity/intermed_h_power_matrix_1.fig
+        - results/LocationSensitivity/intermed_h_power_matrix_2.fig
+        - results/LocationSensitivity/intermed_h_power_matrix_3.fig
+        - results/LocationSensitivity/intermed_h_power_matrix_4.fig
+        - results/LocationSensitivity/intermed_h_probability_PDF_1.fig
     postpro-LocationSensitivity:
       kind: matlab-command
       environment: _system
@@ -2101,10 +2149,10 @@ pipeline:
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/sensitivities/location_post_process.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2177,11 +2225,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/b_inf_numeric.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/b_inf_numeric.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2250,10 +2298,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2330,13 +2378,13 @@ pipeline:
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/gradient_mult_x0.m
         - ./mdocean/optimization/sensitivities/random_x0.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2375,6 +2423,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/is_feasible.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/Multistart/intermed.mat
@@ -2404,21 +2454,23 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/multistart_postpro.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/optim/multistart_postpro.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
         - ./mdocean/plots/util/hatchfill2.m
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
+        - ./mdocean/plots/util/raster_text.m
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
         - ./mdocean/plots/util/table2latex.m
+        - ./mdocean/plots/util/unicode.m
         - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -2482,13 +2534,13 @@ pipeline:
         - ./mdocean/optimization/run_solver.m
         - ./mdocean/optimization/sensitivities/local_sens_both_obj_all_param.m
         - ./mdocean/optimization/sensitivities/param_sweep.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/color_each_element.m
@@ -2527,6 +2579,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_plate_stress.m
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/ParamSensitivities/intermed.mat
@@ -2550,12 +2604,12 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/all_sens_plots.m
-        - ./mdocean/plots/matlab_figs/global_sens_plots.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/sens/all_sens_plots.m
+        - ./mdocean/plots/matlab_figs/sens/global_sens_plots.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/color_each_element.m
@@ -2665,10 +2719,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2728,10 +2782,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2800,14 +2854,13 @@ pipeline:
         - ./mdocean/optimization/multiobjective/damping_vs_reactive.m
         - ./mdocean/optimization/multiobjective/pareto_search.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2846,6 +2899,8 @@ pipeline:
         - ./mdocean/simulation/modules/structures/get_stiffener_equivalent_properties.m
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/is_feasible.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/ParetoFigFunc/intermed.mat
@@ -2873,12 +2928,12 @@ pipeline:
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
         - ./mdocean/optimization/multiobjective/pareto_curve_heuristics.m
-        - ./mdocean/plots/matlab_figs/constraint_active_plot.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -2949,10 +3004,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3012,10 +3067,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3078,10 +3133,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3141,10 +3196,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3210,10 +3265,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3275,10 +3330,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3318,17 +3373,23 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/ReadNonMatlabFigs/intermed.mat
       outputs:
+        - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+        - results/ReadNonMatlabFigs/circuit_pto.pdf
+        - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+        - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
         - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
         - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
         - results/ReadNonMatlabFigs/dimensions.pdf
         - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
         - results/ReadNonMatlabFigs/FBD.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/meem_dims.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
         - results/ReadNonMatlabFigs/section_flow.pdf
@@ -3357,11 +3418,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/circle_intersect_script.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/circle_intersect_script.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3422,10 +3483,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3492,15 +3553,15 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_power_matrix.m
-        - ./mdocean/plots/matlab_figs/power_PDF.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
+        - ./mdocean/plots/matlab_figs/sim_results/plot_power_matrix.m
+        - ./mdocean/plots/matlab_figs/sim_results/power_PDF.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3540,7 +3601,9 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/check_max_CW.m
         - ./mdocean/simulation/run/is_feasible.m
+        - ./mdocean/simulation/run/run_and_catch_warnings.m
         - ./mdocean/simulation/run/run_single.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/RunSingleFigFunc/intermed.mat
@@ -3572,11 +3635,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/plot_nominal_constraint_circles.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_nominal_constraint_circles.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3661,10 +3724,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3723,11 +3786,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/module_runtime_compare.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/sim_results/module_runtime_compare.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3796,11 +3859,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/slam_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/slam_plot.m
         - ./mdocean/plots/util/arrow.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
@@ -3862,10 +3925,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3928,11 +3991,11 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/spar_hydro_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/spar_hydro_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3993,10 +4056,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4062,13 +4125,13 @@ pipeline:
         - ./mdocean/optimization/gradient_optim.m
         - ./mdocean/optimization/max_avg_power.m
         - ./mdocean/optimization/run_solver.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/optim_geomviz.m
-        - ./mdocean/plots/matlab_figs/optimplotx_custom.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
-        - ./mdocean/plots/matlab_figs/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
+        - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
+        - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4108,6 +4171,7 @@ pipeline:
         - ./mdocean/simulation/modules/structures/structures.m
         - ./mdocean/simulation/run/check_max_CW.m
         - ./mdocean/simulation/run/run_and_catch_warnings.m
+        - ./mdocean/simulation/sim_catch_warning.m
         - ./mdocean/simulation/simulation.m
       outputs:
         - results/SweepGeoms/intermed.mat
@@ -4132,10 +4196,10 @@ pipeline:
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
         - ./mdocean/optimization/multiobjective/paretoFront.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/MatlabSVG/loadSVG.m
         - ./mdocean/plots/util/MatlabSVG/plotSVG.m
         - ./mdocean/plots/util/bluewhitered.m
@@ -4226,10 +4290,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4294,10 +4358,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4369,10 +4433,10 @@ pipeline:
         - ./mdocean/inputs/var_bounds.mat
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4447,10 +4511,10 @@ pipeline:
           Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
-        - ./mdocean/plots/matlab_figs/make_ctrl_polar_plot.m
-        - ./mdocean/plots/matlab_figs/make_slamming_plot.m
-        - ./mdocean/plots/matlab_figs/plot_drag_convergence.m
-        - ./mdocean/plots/matlab_figs/plot_drag_integral_debug.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/make_slamming_plot.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_convergence.m
+        - ./mdocean/plots/matlab_figs/dynamics_results/plot_drag_integral_debug.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -4491,375 +4555,375 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Wecsim/intermed.mat
       outputs:
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.pdf
-        - results/Wecsim/wecsim_geom_report_multibody_true__histogram.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_multi__histogram.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_wcsm_single__histogram.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_elec_sat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__relative_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__PTO_damping.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__force_pto.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__rel_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_elec_sat.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__CW_to_CW_max.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__relative_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_amplitude.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__PTO_damping.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__force_pto.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_fund.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__rel_phase.pdf
+        - results/Wecsim/wecsim_rpt_multi__histogram.pdf
         - results/Wecsim/accel_fourier_harmonics.pdf
         - results/Wecsim/drag_force_desc_fcn.pdf
         - results/Wecsim/position_THD_contour.pdf
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_off_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true_drag_on_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_true__histogram.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_off_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false_drag_on_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_wecsim_multibody_false__histogram.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__force_pto.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__float_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__spar_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_off__rel_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_off_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_mech_unsat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__power_elec_sat.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__CW_to_CW_max.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__relative_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_amplitude.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__PTO_damping.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__force_pto.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_fund.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_drag_force_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__float_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__spar_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true_drag_on_meem_on__rel_phase.fig
-        - results/Wecsim/wecsim_geom_report_multibody_true__histogram.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi_drag_on_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_multi__histogram.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_off_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_wcsm_single_drag_on_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_wcsm_single__histogram.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_mech_unsat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__power_elec_sat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__relative_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__PTO_damping.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__force_pto.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__float_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__spar_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_off__rel_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_off_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__power_elec_sat.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__CW_to_CW_max.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__relative_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_amplitude.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__PTO_damping.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__force_pto.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_fund.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_drag_force_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__float_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__spar_phase.fig
+        - results/Wecsim/wecsim_rpt_multi_drag_on_meem_on__rel_phase.fig
+        - results/Wecsim/wecsim_rpt_multi__histogram.fig
         - results/Wecsim/accel_fourier_harmonics.fig
         - results/Wecsim/drag_force_desc_fcn.fig
         - results/Wecsim/position_THD_contour.fig
@@ -4868,6 +4932,110 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+    postpro-WithTables:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages with tables."
+      inputs:
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
+    all-postpro:
+      kind: shell-command
+      environment: _system
+      command: echo "Running postprocessing for all stages."
+      inputs:
+        - from_stage_outputs: postpro-AllFigCompare
+        - from_stage_outputs: postpro-Comparison
+        - from_stage_outputs: postpro-Constraints
+        - from_stage_outputs: postpro-Cost
+        - from_stage_outputs: postpro-DampingPlateStructures
+        - from_stage_outputs: postpro-DescFcns
+        - from_stage_outputs: postpro-DesignSpaceExploration
+        - from_stage_outputs: postpro-DesignVars
+        - from_stage_outputs: postpro-DragIntegral
+        - from_stage_outputs: postpro-FitOlaya
+        - from_stage_outputs: postpro-ForceSaturationFigFunc
+        - from_stage_outputs: postpro-GradientOptimFigFunc
+        - from_stage_outputs: postpro-HydroCoeffFigFunc
+        - from_stage_outputs: postpro-LocationSensitivity
+        - from_stage_outputs: postpro-Meem
+        - from_stage_outputs: postpro-Multistart
+        - from_stage_outputs: postpro-ParamSensitivities
+        - from_stage_outputs: postpro-Parameters
+        - from_stage_outputs: postpro-ParetoFigFunc
+        - from_stage_outputs: postpro-ParetoSweep
+        - from_stage_outputs: postpro-PtoSweep
+        - from_stage_outputs: postpro-QPCircles
+        - from_stage_outputs: postpro-ReadNonMatlabFigs
+        - from_stage_outputs: postpro-RunSingleFigFunc
+        - from_stage_outputs: postpro-Runtime
+        - from_stage_outputs: postpro-Slamming
+        - from_stage_outputs: postpro-SparHydro
+        - from_stage_outputs: postpro-SweepGeoms
+        - from_stage_outputs: postpro-Validation
+        - from_stage_outputs: postpro-Wecsim
+    test-aor:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); addpath('tests'); run_tests('AOR')
+      inputs:
+        - from_stage_outputs: analysis-Comparison
+        - from_stage_outputs: analysis-Cost
+        - from_stage_outputs: analysis-DampingPlateStructures
+        - from_stage_outputs: analysis-DescFcns
+        - from_stage_outputs: analysis-DesignSpaceExploration
+        - from_stage_outputs: analysis-DragIntegral
+        - from_stage_outputs: analysis-ForceSaturationFigFunc
+        - from_stage_outputs: analysis-HydroCoeffFigFunc
+        - from_stage_outputs: analysis-Meem
+        - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - from_stage_outputs: analysis-RunSingleFigFunc
+        - from_stage_outputs: analysis-Runtime
+        - from_stage_outputs: analysis-Slamming
+        - from_stage_outputs: analysis-SparHydro
+        - from_stage_outputs: analysis-Validation
+        - from_stage_outputs: analysis-Wecsim
+        - tests/
+        - mdocean/
+      outputs:
+        - path: test-results/aor/
+          storage: null
+        - path: code-coverage/aor/
+          storage: null
+    test-re:
+      kind: matlab-command
+      environment: _system
+      command: add_mdocean_path(); addpath('tests'); run_tests('RE')
+      inputs:
+        - from_stage_outputs: analysis-AllFigCompare
+        - from_stage_outputs: analysis-Comparison
+        - from_stage_outputs: analysis-Constraints
+        - from_stage_outputs: analysis-DesignSpaceExploration
+        - from_stage_outputs: analysis-DesignVars
+        - from_stage_outputs: analysis-GradientOptimFigFunc
+        - from_stage_outputs: analysis-LocationSensitivity
+        - from_stage_outputs: analysis-Multistart
+        - from_stage_outputs: analysis-ParamSensitivities
+        - from_stage_outputs: analysis-Parameters
+        - from_stage_outputs: analysis-ParetoFigFunc
+        - from_stage_outputs: analysis-ParetoSweep
+        - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - tests/
+        - mdocean/
+      outputs:
+        - path: test-results/re/
+          storage: null
+        - path: code-coverage/re/
+          storage: null
     viz-AllFigCompare:
       kind: jupyter-notebook
       environment: pubs
@@ -5217,6 +5385,7 @@ pipeline:
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
+        - results/SweepGeoms/end.json
         - results/PtoSweep/end.json
         # - results/Slamming/end.json
         # - results/SparHydro/end.json
@@ -5225,7 +5394,7 @@ pipeline:
       outputs:
         - path: pubs/applied-ocean-research-model/numeric-results.tex
           storage: git
-      command_name: results
+      command_name: resultsAOR
       format:
         # LCOE
         nominalLCOE: "{nominalLCOE:.2f} $/kWh"
@@ -5235,32 +5404,48 @@ pipeline:
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
         MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        meemSweepTime: "{geom_sweep_analysis_time/60:.0f} minutes"
         # percentages
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
         pctRuntimeOther: "{pctRuntimeOther:.0f}%"
         wecsimAvgPowerErrorBestCase: "{wecsimAvgPowerErrorBestCase:.2f}%"
         wecsimAvgPowerErrorWorstCase: "{wecsimAvgPowerErrorWorstCase:.2f}%"
+        # parameters
+        powerScaleFactor: "{powerScaleFactor:.2f}"
+        forceScaleFactor: "{forceScaleFactor:.2f}"
+        massScaleFactor: "{massScaleFactor:.2f}"
         # PTO sweep min-LCOE point
         ptoSweepMinLCOE_F_max: "{ptoSweepMinLCOE_F_max/1e6:.2f} MN"
         ptoSweepMinLCOE_P_max: "{ptoSweepMinLCOE_P_max/1e3:.0f} kW"
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+        # numbers
+        meemSweepSize: "{n_combos}"
+    check-dup-json-keys:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/duplicate_json_key.py
+      inputs:
+        - results/
+        - pubs/renewable-energy-mdo/numbers.json
     re-results-to-latex:
       kind: json-to-latex
       inputs:
+        - pubs/renewable-energy-mdo/numbers.json
         # - results/AllFigCompare/end.json
         - results/Comparison/end.json
-        # - results/Constraints/end.json
+        - results/Constraints/end.json
         # - results/DesignSpaceExploration/end.json
         # - results/DesignVars/end.json
+        - results/ForceSaturationFigFunc/end.json
         - results/GradientOptimFigFunc/end.json
         # - results/LocationSensitivity/end.json
         # - results/Multistart/end.json
-        # - results/ParamSensitivities/end.json
-        # - results/Parameters/end.json
-        # - results/ParetoFigFunc/end.json
+        - results/ParamSensitivities/end.json
+        - results/Parameters/end.json
+        - results/ParetoFigFunc/end.json
         # - results/ParetoSweep/end.json
         # - results/ReadNonMatlabFigs/end.json
         - results/Runtime/end.json
@@ -5268,7 +5453,7 @@ pipeline:
       outputs:
         - path: pubs/renewable-energy-mdo/numeric-results.tex
           storage: git
-      command_name: results
+      command_name: resultsRE
       format:
         # LCOE
         nominalLCOE: "{nominalLCOE:.2f} $/kWh"
@@ -5280,6 +5465,10 @@ pipeline:
         powerAvgAtMinCapex: "{powerAvgAtMinCapex/1000:.0f} kW"
         powerAvgMaxPower: "{powerAvgMaxPower/1000:.0f} kW"
         powerBalanced: "{powerBalanced/1000:.0f} kW"
+        powerWhereCusp: "{powerWhereCusp/1000:.0f} kW"
+        powerWhereNonconvexEnds: "{powerWhereNonconvexEnds/1000:.0f} kW"
+        dampingReactivePowerIntersect: "{dampingReactivePowerIntersect/1000:.0f}
+          kW"
         # masses
         structMassAtMinLCOE: "{structMassAtMinLCOE/1000:.0f} Mg"
         # dimensions
@@ -5296,8 +5485,13 @@ pipeline:
         capexDesignNominal: "{capexDesignNominal/1e6:.2f} $M"
         capexDesignMinCapex: "{capexDesignMinCapex/1e6:.2f} $M"
         capexDesignMaxPower: "{capexDesignMaxPower/1e6:.2f} $M"
-        # runtimes
+        # runtimes (stored in seconds, formatted as ms or minutes)
         simRuntime: "{simRuntime*1000:.0f} ms"
+        MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        singleObjRuntime: "{singleObjRuntime/60:.1f} min"
+        paretoRuntime: "{paretoRuntime/60:.0f} min"
+        gradientSensRuntime: "{runtime_post_optim/60:.1f} min"
+        reoptimSensRuntime: "{runtime_re_optim/60:.0f} min"
         # percent changes
         pctImproveLCOEMinLCOE: "{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%"
         pctImproveDesignCostMinLCOE: "{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%"
@@ -5308,12 +5502,117 @@ pipeline:
         pctWorseDesignCostMaxPower: "{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%"
         # percentages
         pctCostSavingsFromPTO: "{pctCostSavingsFromPTO:.0f}%"
-    copy-bib:
+        lowestFmaxFactorMinLCOE: "{lowestFmaxFactorMinLCOE*100:.0f}%"
+        percentParamsRightSign: "{percentParamsRightSign:.0f}%"
+        percentMeanAbsErrorParamSens: "{percentMeanAbsErrorParamSens:.0f}%"
+        # force saturation comparison (non-reoptimized) - values from GradientOptimFigFunc
+        powerLossForceSatMinLCOE: "{powerLossForceSatMinLCOE:.1f} W"
+        pctPowerLossForceSatMinLCOE: "{pctPowerLossForceSatMinLCOE:.3f}%"
+        pctPTOSavingsForceSatMinLCOE: "{pctPTOSavingsForceSatMinLCOE:.0f}%"
+        pctImproveLCOEForceSatMinLCOE: "{pctImproveLCOEForceSatMinLCOE:.0f}%"
+        # force saturation comparison (re-optimized) - values from ForceSaturationFigFunc
+        pctPowerGainForceSatOptMinLCOE: "{pctPowerGainForceSatOptMinLCOE:.1f}%"
+        pctPTOCostIncreaseForceSatOptMinLCOE: "{pctPTOCostIncreaseForceSatOptMinLCOE:.0f}%"
+        pctStructCostIncreaseForceSatOptMinLCOE: "{pctStructCostIncreaseForceSatOptMinLCOE:.0f}%"
+        pctLCOEIncreaseForceSatOptMinLCOE: "{pctLCOEIncreaseForceSatOptMinLCOE:.0f}%"
+        # optimization counts
+        singleObjIters: "{singleObjIters:.0f}"
+        singleObjFcnEvals: "{singleObjFcnEvals:,.0f}"
+        numReoptims: "{numReoptims:.0f}"
+        paretoFcnEvals: "{paretoFcnEvals:,.0f}"
+        # pareto timing percentages
+        paretoPctTimeSeeds: "{paretoPctTimeSeeds*100:.0f}%"
+        paretoPctTimePatternSearch: "{paretoPctTimePatternSearch*100:.0f}%"
+    copy-shared-latex:
       kind: map-paths
       paths:
-        - src: pubs/renewable-energy-mdo/references.bib
+        # references
+        - src: pubs/shared/references.bib
           dest: pubs/applied-ocean-research-model/references.bib
           kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/renewable-energy-mdo/references.bib
+          kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/dissertation/references.bib
+          kind: file-to-file
+        - src: pubs/shared/references.bib
+          dest: pubs/UMERC-2025-grid-value/references.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
+          kind: file-to-file
+                #
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+          kind: file-to-file
+        # bib style file
+        - src: pubs/shared/elsarticle-num-names.bst
+          dest: 
+            pubs/applied-ocean-research-model/elsarticle-num-names.bst
+          kind: file-to-file
+        - src: pubs/shared/elsarticle-num-names.bst
+          dest: pubs/renewable-energy-mdo/elsarticle-num-names.bst
+          kind: file-to-file
+        # shared packages
+        - src: pubs/shared/shared-pkg.tex
+          dest: pubs/applied-ocean-research-model/shared-pkg.tex
+          kind: file-to-file
+        - src: pubs/shared/shared-pkg.tex
+          dest: pubs/renewable-energy-mdo/shared-pkg.tex
+          kind: file-to-file
+        #
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/applied-ocean-research-model/cas-dc.cls
+          kind: file-to-file
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/renewable-energy-mdo/cas-dc.cls
+          kind: file-to-file
+        #
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/applied-ocean-research-model/cas-common.sty
+          kind: file-to-file
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/renewable-energy-mdo/cas-common.sty
+          kind: file-to-file
+    paperlint-aor:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - pubs/applied-ocean-research-model/main.tex
+        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-aor.txt
+      inputs:
+        - pubs/applied-ocean-research-model/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-aor.txt
+          storage: git
+    paperlint-re:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - pubs/renewable-energy-mdo/mdocean.tex
+        - --ignore pubs/renewable-energy-mdo/numeric-results.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-re.txt
+      inputs:
+        - pubs/renewable-energy-mdo/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-re.txt
+          storage: git
     build-RE-paper:
       kind: latex
       target_path: pubs/renewable-energy-mdo/mdocean.tex
@@ -5324,9 +5623,12 @@ pipeline:
         - pubs/renewable-energy-mdo/sections/
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/references.bib
-        - pubs/renewable-energy-mdo/numbers.tex
         - pubs/renewable-energy-mdo/numeric-results.tex
-        - pubs/elsarticle-num-names.bst
+        - pubs/renewable-energy-mdo/elsarticle-num-names.bst
+        - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        - pubs/renewable-energy-mdo/shared-pkg.tex
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
@@ -5346,10 +5648,12 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/tikz/
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
-        - pubs/applied-ocean-research-model/numbers.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
-        - pubs/elsarticle-num-names.bst
+        - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
+        - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/shared-pkg.tex
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
@@ -5364,9 +5668,58 @@ pipeline:
       inputs:
         - pubs/UMERC-2025-grid-value/figures/
         - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
         - pubs/UMERC-2025-grid-value/logo.jpg
       outputs:
         - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
+    build-dissertation:
+      kind: latex
+      target_path: pubs/dissertation/sampleThesis.tex
+      environment: tex
+      latexmkrc_path: pubs/dissertation/.latexmkrc
+      inputs:
+        - pubs/dissertation/cornell.cls
+        - pubs/dissertation/hangcaption.sty
+        - pubs/dissertation/.latexmkrc
+        - pubs/dissertation/intro-contrib.tex
+        - pubs/dissertation/abstract.tex
+        - pubs/dissertation/acknowledgements.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
+        - pubs/applied-ocean-research-model/content.tex
+        - pubs/applied-ocean-research-model/sections/
+        - pubs/applied-ocean-research-model/figs/
+        - pubs/applied-ocean-research-model/tables/
+        - pubs/applied-ocean-research-model/appendices.tex
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/renewable-energy-mdo/numeric-results.tex
+        - pubs/renewable-energy-mdo/sections/
+        - pubs/renewable-energy-mdo/figs/
+        - pubs/renewable-energy-mdo/tables/
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        - pubs/UMERC-2025-grid-value/
+        - pubs/dissertation/references.bib
+        - pubs/shared/shared-pkg.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      outputs:
+        - pubs/dissertation/sampleThesis.pdf
+        - path: pubs/dissertation/sampleThesis.synctex.gz
+          storage: null
+        - path: pubs/dissertation/aux/
+          storage: null
+          delete_before_run: false
+    # all-writing:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+    #     -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
+    # all-latex:
+    #   kind: shell-command
+    #   environment: _system
+    #   command: calkit run -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     view-aor-figs:
       kind: jupyter-notebook
       environment: pubs
@@ -5375,31 +5728,39 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/
       html_storage: null
       executed_ipynb_storage: git
+    view-re-figs:
+      kind: jupyter-notebook
+      environment: pubs
+      notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
+      inputs:
+        - pubs/renewable-energy-mdo/figs/
+      html_storage: null
+      executed_ipynb_storage: git
     all-viz:
       kind: shell-command
       environment: pubs
       command: echo "All viz stages complete"
       inputs:
-        #- from_stage_outputs: viz-AllFigCompare
-        #- from_stage_outputs: viz-Comparison
-        #- from_stage_outputs: viz-Constraints
+        - from_stage_outputs: viz-AllFigCompare
+        - from_stage_outputs: viz-Comparison
+        - from_stage_outputs: viz-Constraints
         - from_stage_outputs: viz-Cost
         - from_stage_outputs: viz-DampingPlateStructures
         - from_stage_outputs: viz-DescFcns
         - from_stage_outputs: viz-DesignSpaceExploration
-        #- from_stage_outputs: viz-DesignVars
+        - from_stage_outputs: viz-DesignVars
         - from_stage_outputs: viz-DragIntegral
         - from_stage_outputs: viz-FitOlaya
         - from_stage_outputs: viz-ForceSaturationFigFunc
-        #- from_stage_outputs: viz-GradientOptimFigFunc
+        - from_stage_outputs: viz-GradientOptimFigFunc
         - from_stage_outputs: viz-HydroCoeffFigFunc
-        #- from_stage_outputs: viz-LocationSensitivity
+        - from_stage_outputs: viz-LocationSensitivity
         - from_stage_outputs: viz-Meem
-        #- from_stage_outputs: viz-Multistart
-        #- from_stage_outputs: viz-ParamSensitivities
-        #- from_stage_outputs: viz-Parameters
-        #- from_stage_outputs: viz-ParetoFigFunc
-        #- from_stage_outputs: viz-ParetoSweep
+        - from_stage_outputs: viz-Multistart
+        - from_stage_outputs: viz-ParamSensitivities
+        - from_stage_outputs: viz-Parameters
+        - from_stage_outputs: viz-ParetoFigFunc
+        - from_stage_outputs: viz-ParetoSweep
         - from_stage_outputs: viz-PtoSweep
         - from_stage_outputs: viz-QPCircles
         - from_stage_outputs: viz-ReadNonMatlabFigs
@@ -5410,6 +5771,61 @@ pipeline:
         - from_stage_outputs: viz-SweepGeoms
         - from_stage_outputs: viz-Validation
         - from_stage_outputs: viz-Wecsim
+    make-quarto-yaml:
+      kind: python-script
+      environment: pubs
+      script_path: pubs/defense/quarto/make_quarto_yaml.py
+      inputs:
+        - results/DesignSpaceExploration/end.json
+        - results/ForceSaturationFigFunc/end.json
+        - results/GradientOptimFigFunc/end.json
+        - results/Parameters/end.json
+        - results/Runtime/end.json
+        - results/Validation/end.json
+        - results/Wecsim/end.json
+      outputs:
+        - path: pubs/defense/quarto/_variables.yml
+          storage: git
+    make-standalone-tex-pdf:
+      kind: latex
+      target_path: mdocean/plots/non_matlab_figs/{name}.tex
+      environment: tex
+      latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      output_dir: mdocean/plots/non_matlab_figs/pdf/
+      synctex: false
+      iterate_over:
+        - arg_name: name
+          values:
+            - parameter: latex_standalone_name
+      inputs:
+        - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
+      outputs:
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.log
+          delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
+          delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
+          delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
+          delete_before_run: false
+          storage: null
+    # make-standalone-tex-svg:
+    #   kind: shell-command
+    #   environment: pdf2svg
+    #   iterate_over:
+    #     - arg_name: name
+    #       values:
+    #         - parameter: latex_standalone_name
+    #   command: pdf2svg 
+    #     pubs/defense/latex-standalone/standalone_{name}.pdf 
+    #     pubs/defense/figs/standalone_{name}.svg
+    #   inputs:
+    #     - pubs/defense/latex-standalone/standalone_{name}.pdf
+    #   outputs:
+    #     - pubs/defense/figs/standalone_{name}.svg
     render-quarto-html:
       kind: docker-command
       environment: quarto
@@ -5417,6 +5833,7 @@ pipeline:
       inputs:
         - pubs/defense/figs/
         - pubs/defense/quarto/slides.qmd
+        - pubs/defense/quarto/_variables.yml
         - pubs/defense/references.bib
         - pubs/defense/quarto/asme.csl
         - pubs/defense/quarto/dots.css
@@ -5454,11 +5871,14 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-  - path: pubs/defense/quarto/slides.pdf
+  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
     title: PhD Defense Slides
     description: Slides for PhD defense presentation
     kind: presentation
-    stage: render-quarto-pdf
+  - path: pubs/dissertation/sampleThesis.pdf
+    title: PhD Dissertation
+    stage: build-dissertation
+    description: dissertation manuscript
 overleaf_sync:
   pubs/applied-ocean-research-model:
     url: https://www.overleaf.com/project/69ecde8851d14790c59f03d5
@@ -5466,12 +5886,18 @@ overleaf_sync:
       - main.tex
       - sections/
       - references.bib
-      - numbers.tex
-      - ../elsarticle-num-names.bst
+      - zotero-meem-refs.bib
+      - elsarticle-num-names.bst
+      - appendices.tex
+      - commands-aor.tex
+      - content.tex
+      - shared-pkg.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs/
-      - tables/
-      - numeric-results.tex
+      # - tables/
+      # - numeric-results.tex
   pubs/renewable-energy-mdo:
     url: https://www.overleaf.com/project/6753a38b61276b931380c29c
     sync_paths:
@@ -5479,31 +5905,24 @@ overleaf_sync:
       - sections/
       - tables/
       - references.bib
-      - numbers.tex
-      - ../elsarticle-num-names.bst
+      - zotero-meem-refs.bib
+      - elsarticle-num-names.bst
+      - commands-re.tex
+      - shared-pkg.tex
+      - content-re.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs
+      # - numeric-results.tex
+      # - tables/from-matlab/
   pubs/UMERC-2025-grid-value:
     url: https://www.overleaf.com/project/68516ba5bc36663bb61711a6
     sync_paths:
       - UMERC_2025_grid_value.tex
+      - appendix-grid.tex
+      - content-grid.tex
       - references.bib
       - logo.jpg
     push_paths:
       - figures
-  pubs/defense:
-    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565
-    sync_paths:
-      - beamer/backup.tex
-      - references.bib
-      - beamer/conclusion.tex
-      - beamer/content_cost.tex
-      - beamer/content_model.tex
-      - beamer/content_value.tex
-      - Cornell.pdf
-      - beamer/main.tex
-      - beamer/motivation.tex
-      - beamer/setup.tex
-      - figs/
-    #push_paths:
-    # - figs

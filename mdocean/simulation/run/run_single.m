@@ -21,6 +21,8 @@ function [figs,LCOE,val] = run_single(p,b,X)
 
     [J, ~, g, val] = simulation(X,p);
 
+    assert(length(b.constraint_names)==length(g))
+
     LCOE = J(1);
     P_var = J(2);
 

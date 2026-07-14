@@ -15,6 +15,10 @@ jobs:
           # git submodule foreach --recursive (which fails on the stale
           # sea-lab-utils nested submodule inside OpenFLASH).
           submodules: false
+      - name: Check validity of citation.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "-i ./CITATION.cff -f zenodo --validate --show-trace"
       - name: Init top-level submodules
         # Initialize only the three top-level submodules without recursing into
         # their nested submodules, avoiding the stale sea-lab-utils entry.

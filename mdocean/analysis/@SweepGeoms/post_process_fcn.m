@@ -151,27 +151,31 @@ function [fig_array,...
     % ------------------------------------------------------------------
     % Figure 3: Line plot  (m0h vs CW/CW_max)
     % ------------------------------------------------------------------
-    fig3 = make_line_fig(m0h_mat, result_mat, '$CW/CW_{max}$', [0 1.5], ...
+    fig3 = make_line_fig(m0h_mat, result_mat, '$CW/CW_{max}$', [0 1.05], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
     % ------------------------------------------------------------------
     % Figures 4-6: CWR scatter plots
     % ------------------------------------------------------------------
-    fig4 = make_scatter_fig(m0h_stored, CWR_a2,  size_var, color, '$CW/a_2$', 30);
-    fig5 = make_scatter_fig(m0h_stored, CWR_vol, size_var, color, '$CW/V^{1/3}$', 100);
-    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, '$CW/SA^{1/2}$', 30);
+    CWR_a2_ylim = 18;
+    CWR_vol_ylim = 65;
+    CWR_sa_ylim = 12;
+    
+    fig4 = make_scatter_fig(m0h_stored, CWR_a2,  size_var, color, '$CW/a_2$', CWR_a2_ylim);
+    fig5 = make_scatter_fig(m0h_stored, CWR_vol, size_var, color, '$CW/V^{1/3}$', CWR_vol_ylim);
+    fig6 = make_scatter_fig(m0h_stored, CWR_sa,  size_var, color, '$CW/SA^{1/2}$', CWR_sa_ylim);
 
     % ------------------------------------------------------------------
     % Figures 7-9: CWR line plots
     % ------------------------------------------------------------------
-    fig7 = make_line_fig(m0h_mat, CWR_a2_mat,  '$CW/a_2$',         [0 30], ...
+    fig7 = make_line_fig(m0h_mat, CWR_a2_mat,  '$CW/a_2$',         [0 CWR_a2_ylim], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
-    fig8 = make_line_fig(m0h_mat, CWR_vol_mat, '$CW/V^{1/3}$',     [0 100], ...
+    fig8 = make_line_fig(m0h_mat, CWR_vol_mat, '$CW/V^{1/3}$',     [0 CWR_vol_ylim], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
-    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  '$CW/SA^{1/2}$',   [0 30], ...
+    fig9 = make_line_fig(m0h_mat, CWR_sa_mat,  '$CW/SA^{1/2}$',   [0 CWR_sa_ylim], ...
                          color2, size_var2, size_mult, size_var_name, ...
                          marker_type_var, marker_var_name, marker_types, a2_h, m0h_minmax);
 
@@ -201,7 +205,8 @@ function [fig_array,...
     % Collapse the T dimension by taking the best CW/CW_max for each geometry.
     hydro_ratio_max_T = squeeze(max(hydro_ratio_result, [], 1));   % [size(A1)]
 
-    wavelength = m0h_stored(:) ./ myresize(H,nT);
+    wavenumber = m0h_stored(:) ./ myresize(H,nT);
+    wavelength = 2*pi ./ wavenumber;
     fig11 = make_pareto_fig(hydro_ratio_result, myresize(SA_total,nT)./wavelength.^2, ...
                             color, size_var, myresize(marker_pareto,nT), a2_h, marker_var_name, size_mult*6, ...
                             size_var_name, 'Radiation Efficiency $CW/CW_{max}$','Surface Area/Wavelength$^2$', 1, [.05 2]);
@@ -247,6 +252,8 @@ function [fig_array,...
     tab_colspecs      = {};
 
     end_result_struct.percent_nans = 100 * sum(~isfinite(hydro_ratio_result(:))) / numel(hydro_ratio_result);
+    end_result_struct.n_combos = intermed_result_struct.n_geoms * nT;
+    end_result_struct.geom_sweep_analysis_time = intermed_result_struct.elapsed_time;
 end
 
 % ======================================================================
