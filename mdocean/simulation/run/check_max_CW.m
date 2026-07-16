@@ -53,13 +53,14 @@ function [hydro_ratio, P_wave, ...
     P_mech_unsat =  P_mech ./ force_sat_ratio;
     eff = P_elec ./ P_mech;
 
-    % solution with no force sat, power sat, or drag
-    p_no_drag_no_sat = p;
-    p_no_drag_no_sat.C_d_float = 0;
-    p_no_drag_no_sat.C_d_spar  = 0;
-    p_no_drag_no_sat.use_force_sat = 0;
-    p_no_drag_no_sat.use_power_sat = 0;
-    [~,~,~,val_no_drag] = simulation(X, p_no_drag_no_sat);
+    % no-drag reference with only amplitude constraints active
+    p_no_drag_amp_sat = p;
+    p_no_drag_amp_sat.C_d_float = 0;
+    p_no_drag_amp_sat.C_d_spar  = 0;
+    p_no_drag_amp_sat.use_force_sat = 0;
+    p_no_drag_amp_sat.use_power_sat = 0;
+    p_no_drag_amp_sat.use_amp_sat = 1;
+    [~,~,~,val_no_drag] = simulation(X, p_no_drag_amp_sat);
     P_no_drag = val_no_drag.P_mech;
     drag_ratio = P_mech_unsat ./ P_no_drag;
 
@@ -91,4 +92,3 @@ function [hydro_ratio, P_wave, ...
         improvePlot
     end
 end
-
