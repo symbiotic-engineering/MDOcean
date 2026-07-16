@@ -25,13 +25,51 @@ else
     color = {color,color,color};
 end
 
-[D_s,D_f,T_f_2,h_s,h_fs_clear,~,~,~] = deal(x(1),x(2),x(3),x(4),x(5),x(6),x(7),x(8));
+[D_s,D_f,T_f_2,h_s,h_fs_clear] = deal(x(1),x(2),x(3),x(4),x(5));
+if length(x) >= 6
+    F_max_MN = x(6);
+else
+    F_max_MN = NaN;
+end
+if length(x) >= 7
+    P_max_MW = x(7) * 0.1;
+else
+    P_max_MW = NaN;
+end
+if length(x) >= 8
+    t_f_b = x(8) * 1e-3;
+else
+    t_f_b = NaN;
+end
+if length(x) >= 9
+    t_s_r = x(9) * 1e-3;
+else
+    t_s_r = NaN;
+end
+if length(x) >= 10
+    t_d = x(10) * 1e-3;
+else
+    t_d = NaN;
+end
+if length(x) >= 11
+    h_stiff_f = x(11) / 10;
+else
+    h_stiff_f = NaN;
+end
+if length(x) >= 12
+    h_stiff_d = p.h_over_h1_stiff_d * x(12);
+else
+    h_stiff_d = NaN;
+end
 
 if ~mini && ~compare
     fig = figure;
+    t = tiledlayout(fig,2,2,'TileSpacing','compact','Padding','compact');
+    ax_geom = nexttile(t,1,[2 1]);
 else
     % If we didn't create a new figure, return the current figure
     fig = gcf;
+    ax_geom = gca;
 end
 
 % Geometric similarity float submergence
@@ -45,6 +83,7 @@ T_s = p.T_s_over_D_s * D_s;
 h_d = p.h_d_over_D_s * D_s;
 
 % waves
+axes(ax_geom);
 x = linspace(-30,30,100);
 Hs = 3;
 T = 7.5;
@@ -84,6 +123,14 @@ ylim([-40 20])
 xlim([-27 27])
 set(waves,'HandleVisibility','off')
 
+if ~mini && ~compare
+    ax_pto = nexttile(t,2);
+    plot_pto_diagram(ax_pto, F_max_MN, P_max_MW);
+
+    ax_struct = nexttile(t,4);
+    plot_structure_cross_sections(ax_struct, t_f_b, t_s_r, t_d, h_stiff_f, h_stiff_d);
+end
+
 end
 
 function center_rect(vec,color)
@@ -102,4 +149,76 @@ function trapezoid(base_1,base_2,y_1,y_2,color)
     y = [y_1 y_1 y_2 y_2 y_1];
     h = plot(x,y,'LineWidth',3,'Color',color);
     h.Annotation.LegendInformation.IconDisplayStyle= 'off'; % no legend
+end
+
+function plot_pto_diagram(ax, force_mn, power_mw)
+    axes(ax)
+    cla(ax)
+    hold on
+    grid on
+    if isfinite(force_mn) && isfinite(power_mw) && force_mn > 0 && power_mw > 0
+        rectangle('Position',[0 0 force_mn power_mw], ...
+            'EdgeColor','k','LineWidth',3,'FaceColor',[0.5 0.8 1]);
+        xlim([0 force_mn*1.2])
+        ylim([0 power_mw*1.2])
+        text(force_mn/2,power_mw/2,sprintf('%.2f MN x %.2f MW',force_mn,power_mw),...
+            'HorizontalAlignment','center','FontWeight','bold');
+    else
+        xlim([0 1])
+        ylim([0 1])
+        text(0.5,0.5,'PTO data unavailable','HorizontalAlignment','center');
+    end
+    xlabel('Force limit (MN)')
+    ylabel('Power limit (MW)')
+    title('PTO Size Envelope')
+end
+
+function plot_structure_cross_sections(ax, t_f_b, t_s_r, t_d, h_stiff_f, h_stiff_d)
+    axes(ax)
+    cla(ax)
+    hold on
+    grid on
+
+    names = {'Float','Spar','Damping plate'};
+    t_vals = [t_f_b, t_s_r, t_d];
+    h_vals = [h_stiff_f, 0, max(h_stiff_d)];
+    x_centers = 1:3;
+    bar_w = 0.6;
+    total_h = t_vals + h_vals;
+    total_h = total_h(isfinite(total_h));
+    if isempty(total_h)
+        max_h = NaN;
+    else
+        max_h = max(total_h);
+    end
+    if ~isfinite(max_h) || max_h <= 0
+        max_h = 1;
+    end
+
+    for i=1:3
+        if ~isfinite(t_vals(i))
+            continue
+        end
+        rectangle('Position',[x_centers(i)-bar_w/2,0,bar_w,t_vals(i)], ...
+            'EdgeColor','k','LineWidth',2,'FaceColor',[0.85 0.85 0.85]);
+        text(x_centers(i),t_vals(i)/2,sprintf('t=%.1f mm',t_vals(i)*1e3),...
+            'HorizontalAlignment','center','FontSize',9);
+
+        if isfinite(h_vals(i)) && h_vals(i) > 0
+            rectangle('Position',[x_centers(i)-bar_w/6,t_vals(i),bar_w/3,h_vals(i)], ...
+                'EdgeColor','k','LineWidth',2,'FaceColor',[1 0.75 0.75]);
+            text(x_centers(i),t_vals(i)+h_vals(i)/2,sprintf('h=%.2f m',h_vals(i)),...
+                'HorizontalAlignment','center','FontSize',9);
+        end
+    end
+
+    if all(isfinite(h_stiff_d))
+        text(3,max_h*1.02,sprintf('damping stiffeners: [%.3g %.3g %.3g %.3g] m',h_stiff_d), ...
+            'HorizontalAlignment','center','FontSize',8);
+    end
+    xlim([0.4 3.6])
+    ylim([0 max_h*1.2])
+    set(ax,'XTick',x_centers,'XTickLabel',names)
+    ylabel('Cross-section dimensions (m)')
+    title('Structural cross sections (rectangular stiffener model)')
 end
