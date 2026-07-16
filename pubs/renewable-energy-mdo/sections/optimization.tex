@@ -11,10 +11,10 @@ The optimization solution and post-optimality analysis process is shown in \Cref
 \ifdefined\DISSERTATION
     First, design space exploration is performed using a one-at-a-time (OAT) sweep, in which each design variable is individually varied while the others remain at their nominal values.
     This provides an initial understanding of the problem behavior, can reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
-    OAT does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \cite{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
+    OAT does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \citet{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
 \else
     First, design space exploration uses a one-at-a-time (OAT) sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
-    OAT does not capture inter-variable coupling \cite{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
+    OAT does not capture inter-variable coupling \citet{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +100,7 @@ After optimization, sensitivity analysis is performed, first local then OAT glob
     These sensitivities estimate not only how the objective would change if a parameter changed at fixed design, but also how the optimal objective, optimal design, and constraint activity would change if the optimization were repeated with the modified parameter, without re-optimizing, and thus at very little cost.
     They serve as a screening step to identify high-sensitivity parameters for further study in the global sensitivity analysis.
 \else
-    Local sensitivities exploit the SQP solver's Lagrange multiplier vector $\vec{\lambda} = -dJ/d\vec{g}$ \cite{martins_engineering_2022}, which measures the objective's sensitivity to each constraint; nonzero multipliers mark active constraints, larger values more influential ones.
+    Local sensitivities exploit the SQP solver's Lagrange multiplier vector $\vec{\lambda} = -dJ/d\vec{g}$ \citet{martins_engineering_2022}, which measures the objective's sensitivity to each constraint; nonzero multipliers mark active constraints, larger values more influential ones.
     The multipliers also yield local parameter sensitivities analytically (from $\vec\lambda$, the Hessian, the gradient, and a few finite-difference derivatives), estimating how the re-optimized objective, design, and constraint activity would respond to a parameter change without re-optimizing.
     \Cref{remdo:sec:appendix-sensitivties} gives the details.
     This screens for high-sensitivity parameters to study further in the global analysis.
@@ -122,5 +122,5 @@ Single-objective algorithms typically require adaptation for multiple objectives
     The MATLAB \texttt{paretosearch} function then executes the constrained multi-objective pattern search of \cite{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
 \else
     While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers using them are rare, since a Pareto front demands exploration rather than the pure exploitation that gradient methods excel at.
-    This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP --- repeatedly optimizing one objective while sweeping a constraint on the other, with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \cite{custodio_direct_2011}, which maximizes Pareto hypervolume and spread to fill the gaps.
+    This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP --- repeatedly optimizing one objective while sweeping a constraint on the other, with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \citet{custodio_direct_2011}, which maximizes Pareto hypervolume and spread to fill the gaps.
 \fi
