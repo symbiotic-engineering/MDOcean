@@ -1,67 +1,27 @@
 % 99 - 103
 \section{Results}\label{remdo:sec:results}
 This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
-% new
-Rather than organizing results by the method that produces them, the section groups results by the type of insight they provide.
-
-% 149 - 167
-The optimal designs are generally larger than the nominal.
-\ifdefined\DISSERTATION
-    The minimum-LCOE design is larger in all bulk dimensions, with a particularly large increase in float diameter, nearly doubling from 20~m to \resultsRE[DfoptMinLCOE]~m.
-    Its PTO is similarly sized, with a slightly lower maximum force rating and slightly higher maximum power rating.
-    The other objectives all retain this lower maximum force, while the maximum power rating is less consistent, falling both above and below the nominal.
-    
-    In all optima, the three structural thicknesses decrease significantly and the float stiffener height decreases moderately, indicating that the optimized floats experience lower hydrodynamic forces and can shed structural material.
-    In the minimum-LCOE design, the lower damping plate thickness trades off against larger damping plate stiffeners, mimicking the aerospace paradigm in which thin sheet-metal skin and substantial stiffeners are favored over thick plate stock.
-    In several scenarios, structural thickness variables converge to their lower bounds.
-    The activity of these bound constraints (priority 2 requirements in the language of \Cref{remdo:sec:requirements}) indicates that the structures model is at the edge of its validity for thin-skinned stiffened shells, calling into question the assumption that the deflection field resembles a plate rather than a beam \cite{mccabe_development_2026}.
-    Expanding the structures model to remove this assumption could yield even more efficient structural designs.
-    In the minimum-cost design, the damping plate stiffeners instead decrease in size.
-\else
-    The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]), with a similarly sized PTO at slightly lower maximum force.
-    In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material; the minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
-    The activity of these lower-bound constraints (priority 2 requirements, \Cref{remdo:sec:requirements}) signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption \cite{mccabe_development_2026} weakens; removing it in future work could yield more efficient structures.
-\fi
-% 168-173
-\ifdefined\DISSERTATION
-    Comparing the above-water profiles of the nominal and Pareto-optimal designs, a consistent trend emerges: the long support tubes of the nominal design are replaced by a taller float and shorter support tubes.
-    This likely arises because the slamming constraints $g_{NL,23}$-$g_{NL,239}$ encourages higher draft $T_{f,2}$, and the float height $h_f$ grows correspondingly since the submersion fraction $T_{f,2}/h_f$ is held constant as a parameter.
-\else
-    The above-water profiles show a consistent trend: the nominal design's long support tubes give way to a taller float and shorter tubes, likely because the slamming constraint encourages higher draft $T_{f,2}$ while the fixed submersion fraction $T_{f,2}/h_f$ forces float height to grow with it.
-\fi
-% 175 - 177 not synced from overleaf
-
-% 439 - 457
 \ifdefined\DISSERTATION
     Beyond the analysis of individual results in \Cref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
     It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
 \else
     Beyond the per-result analysis of \Cref{remdo:sec:results}, this section discusses the study's contributions and limitations, comparing results to existing studies and suggesting future work.
 \fi
+Rather than organizing results by the method that produces them, the section groups results by the type of insight they provide.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Result Comparison to Other Studies }
-% (and comparison to commercial WECs)
-This subsection compares the key findings to prior studies and highlights where the present results align or differ.
+\subsection{Features of the Minimum LCOE Design}
+\label{remdo:sec:results-single}
 
-% compare to the Sandia RM3 optimization results
-%\paragraph{Does this design have high TPL? What are the risks and uncertainties?}
-%use \url{https://tpl.nrel.gov/assessment} and \url{https://www.osti.gov/biblio/1825239} for RM3 TPL.
-
-%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Force Saturation}
+\subsubsection{Larger Bulk Geometry}
+The optimal designs are generally larger than the nominal.
 \ifdefined\DISSERTATION
-    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping the maximum force well below the unsaturated point, finding that this sacrifices only minimal power, but none perform a full economic analysis confirming that the cost savings outweigh the power loss.
-    The results in \Cref{remdo:sec:results-single} verify the conclusion with an appropriate cost analysis, since the optimal design sizes its powertrain small enough to require force saturation.
-    The follow-up analysis in \Cref{remdo:sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
-    Force saturation is therefore highly valuable as a control technique, capable of tangible LCOE reductions once the power--cost tradeoff is considered.
-    Future studies could quantify the lowest marginal PTO force price (\$/N) for which this conclusion still holds.
+    The minimum-LCOE design is larger in all bulk dimensions, with a particularly large increase in float diameter, nearly doubling from 20~m to \resultsRE[DfoptMinLCOE]~m.
+    Comparing the above-water profiles of the nominal and Pareto-optimal designs, a consistent trend emerges: the long support tubes of the nominal design are replaced by a taller float and shorter support tubes.
+    This likely arises because the slamming constraints $g_{NL,23}$-$g_{NL,239}$ encourages higher draft $T_{f,2}$, and the float height $h_f$ grows correspondingly since the submersion fraction $T_{f,2}/h_f$ is held constant as a parameter.
 \else
-    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping maximum force well below the unsaturated point to minimize power loss, but none have economically confirmed that the financial savings outweigh the performance reduction.
-    This study verifies the conclusion with a full cost analysis: the optimal design sizes its powertrain to require force saturation, and re-optimizing without it incurs a 5\% LCOE penalty. %(\Cref{remdo:sec:sensitivity-model-assumptions}), confirming force saturation as a valuable control technique.
+    The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]).
+    The above-water profiles show a consistent trend: the nominal design's long support tubes give way to a taller float and shorter tubes, likely because the slamming constraint encourages higher draft $T_{f,2}$ while the fixed submersion fraction $T_{f,2}/h_f$ forces float height to grow with it.
 \fi
-% \hl{add similar analysis for power saturation}
-
 % geometry overlaid figure
 \begin{figure}[htbp]
 \centering
@@ -69,26 +29,6 @@ This subsection compares the key findings to prior studies and highlights where 
 \caption{Geometries overlaid}
 \label{remdo:fig:overlaid-geometry}
 \end{figure}
-
-% lines 179-187
-\subsubsection{Optimal Performance Outputs}
-The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \Cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist}, with numerical results in \Cref{remdo:tab:opt-output}.
-
-% 188-193
-\ifdefined\DISSERTATION
-    The minimum-LCOE design achieves an annual average electrical power of \resultsRE[powerAvgAtMinLCOE]~kW with a structural material mass of \resultsRE[structMassAtMinLCOE]~kg, requiring a generator rated for \resultsRE[powerMaxAtMinLCOE]~kW and \resultsRE[forceMaxAtMinLCOE]~kN peak.
-    Its estimated capital cost is \resultsRE[capexAtMinLCOE]~\$M, of which \resultsRE[capexDesignAtMinLCOE]~\$M is design-dependent (structural material and PTO size), and its estimated LCOE is \resultsRE[minLCOE]~\$/kWh under the economic assumptions of \cite{mccabe_development_2026}.
-    This is a \resultsRE[pctImproveLCOEMinLCOE]~LCOE improvement over the nominal design's \resultsRE[nominalLCOE], achieved through a simultaneous \resultsRE[pctImproveDesignCostMinLCOE]~reduction in design-dependent cost and an \resultsRE[pctImprovePowerMinLCOE]~increase in average power.
-    This LCOE remains far above other renewables: onshore wind and solar at 0.03--0.05~\$/kWh, fixed-bottom offshore wind at 0.11--0.14~\$/kWh, and floating offshore wind projected at 0.11--0.25~\$/kWh in 2030 \cite{national_renewable_energy_laboratory_2024_2024}.
-    
-    The CAPEX minimization reduces design-dependent cost by a further \resultsRE[pctImproveDesignCostMinCapex]~at the cost of a \resultsRE[pctWorsePowerMinCapex]~power reduction, while the power maximization increases power by a further \resultsRE[pctImprovePowerMaxPower]~at the expense of a \resultsRE[pctWorseDesignCostMaxPower]~increase in design-dependent cost, both relative to the minimum-LCOE design.
-\else
-    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE] annual average electrical power at an estimated \resultsRE[minLCOE], a \resultsRE[pctImproveLCOEMinLCOE] improvement over the nominal \resultsRE[nominalLCOE], from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE] design-cost reduction and \resultsRE[pctImprovePowerMinLCOE] power increase (economic assumptions per \cite{mccabe_development_2026}).
-    This remains far above other renewables (onshore wind/solar 0.03-0.05~\$/kWh; floating offshore wind projected 0.11-0.25~\$/kWh by 2030 \cite{national_renewable_energy_laboratory_2024_2024}).
-    Relative to the minimum-LCOE design, CAPEX minimization cuts design-dependent cost a further \resultsRE[pctImproveDesignCostMinCapex]~for a \resultsRE[pctWorsePowerMinCapex]~power loss, and power maximization adds \resultsRE[pctImprovePowerMaxPower]~power for a \resultsRE[pctWorseDesignCostMaxPower]~cost increase.
-\fi
-
-% figures
 % insert new bar chart with cost breakdown
 \begin{figure*}[htbp]
 \centering
@@ -103,15 +43,97 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \label{remdo:fig:overlaid-power-dist}
 \end{figure}
 
+\subsubsection{Undersized PTO}
+\ifdefined\DISSERTATION
+    Its PTO is similarly sized, with a slightly lower maximum force rating and slightly higher maximum power rating.
+    The other objectives all retain this lower maximum force, while the maximum power rating is less consistent, falling both above and below the nominal.
+\else
+    It has a similarly sized PTO at slightly lower maximum force.
+\fi
+\ifdefined\DISSERTATION
+    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping the maximum force well below the unsaturated point, finding that this sacrifices only minimal power, but none perform a full economic analysis confirming that the cost savings outweigh the power loss.
+    The results in \Cref{remdo:sec:results-single} verify the conclusion with an appropriate cost analysis, since the optimal design sizes its powertrain small enough to require force saturation.
+    The follow-up analysis in \Cref{remdo:sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
+    Force saturation is therefore highly valuable as a control technique, capable of tangible LCOE reductions once the power--cost tradeoff is considered.
+    Future studies could quantify the lowest marginal PTO force price (\$/N) for which this conclusion still holds.
+\else
+    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping maximum force well below the unsaturated point to minimize power loss, but none have economically confirmed that the financial savings outweigh the performance reduction.
+    This study verifies the conclusion with a full cost analysis: the optimal design sizes its powertrain to require force saturation, and re-optimizing without it incurs a 5\% LCOE penalty. %(\Cref{remdo:sec:sensitivity-model-assumptions}), confirming force saturation as a valuable control technique.
+\fi
+% \hl{add similar analysis for power saturation}
+
+\subsubsection{Thin-Skinned Structures}
+% 149 - 167
+\ifdefined\DISSERTATION
+    In all optima, the three structural thicknesses decrease significantly and the float stiffener height decreases moderately, indicating that the optimized floats experience lower hydrodynamic forces and can shed structural material.
+    In the minimum-LCOE design, the lower damping plate thickness trades off against larger damping plate stiffeners, mimicking the aerospace paradigm in which thin sheet-metal skin and substantial stiffeners are favored over thick plate stock.
+    In several scenarios, structural thickness variables converge to their lower bounds.
+    The activity of these bound constraints (priority 2 requirements in the language of \Cref{remdo:sec:requirements}) indicates that the structures model is at the edge of its validity for thin-skinned stiffened shells, calling into question the assumption that the deflection field resembles a plate rather than a beam \cite{mccabe_development_2026}.
+    Expanding the structures model to remove this assumption could yield even more efficient structural designs.
+    In the minimum-cost design, the damping plate stiffeners instead decrease in size.
+\else
+    In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material.
+    The minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
+    The activity of these lower-bound constraints
+    (priority 2 requirements, \Cref{remdo:sec:requirements})
+    signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption \cite{mccabe_development_2026} weakens;
+    removing it in future work could yield more efficient structures.
+\fi
+% 168-173
+% 175 - 177 not synced from overleaf
+% 439 - 457
+% compare to the Sandia RM3 optimization results
+%\paragraph{Does this design have high TPL? What are the risks and uncertainties?}
+%use \url{https://tpl.nrel.gov/assessment} and \url{https://www.osti.gov/biblio/1825239} for RM3 TPL.
+
+% lines 179-187
+\subsubsection{Cheaper, More Powerful, Yet Not Viable}
+The hydrodynamic coefficients and power distributions of each single-objective optimal design,
+with the nominal for reference,
+are compared in \Cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist},
+with numerical results in \Cref{remdo:tab:opt-output}.
+
+% 188-193
+\ifdefined\DISSERTATION
+    The minimum-LCOE design achieves an annual average electrical power of \resultsRE[powerAvgAtMinLCOE]
+    with a structural material mass of \resultsRE[structMassAtMinLCOE],
+    requiring a generator rated for \resultsRE[powerMaxAtMinLCOE] and \resultsRE[forceMaxAtMinLCOE] peak.
+    Its estimated capital cost is \resultsRE[capexAtMinLCOE]~\$M,
+    of which \resultsRE[capexDesignAtMinLCOE]~\$M is design-dependent (structural material and PTO size),
+    and its estimated LCOE is \resultsRE[minLCOE]~\$/kWh under the economic assumptions of \cite{mccabe_development_2026}.
+    This is a \resultsRE[pctImproveLCOEMinLCOE]~LCOE improvement over the nominal design's \resultsRE[nominalLCOE],
+    achieved through a simultaneous \resultsRE[pctImproveDesignCostMinLCOE]~reduction in design-dependent cost
+    and an \resultsRE[pctImprovePowerMinLCOE]~increase in average power.
+    This LCOE remains far above other renewables:
+    onshore wind and solar at 0.03--0.05~\$/kWh,
+    fixed-bottom offshore wind at 0.11--0.14~\$/kWh,
+    and floating offshore wind projected at 0.11--0.25~\$/kWh in 2030
+    \cite{national_renewable_energy_laboratory_2024_2024}.
+    
+    The CAPEX minimization reduces design-dependent cost by a further \resultsRE[pctImproveDesignCostMinCapex] at the cost of a \resultsRE[pctWorsePowerMinCapex] power reduction,
+    while the power maximization increases power by a further \resultsRE[pctImprovePowerMaxPower] at the expense of a \resultsRE[pctWorseDesignCostMaxPower] increase in design-dependent cost,
+    both relative to the minimum-LCOE design.
+\else
+    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE] annual average electrical power at an estimated \resultsRE[minLCOE],
+    a \resultsRE[pctImproveLCOEMinLCOE] improvement over the nominal \resultsRE[nominalLCOE],
+    from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE] design-cost reduction and
+    \resultsRE[pctImprovePowerMinLCOE] power increase (economic assumptions per \cite{mccabe_development_2026}).
+    This remains far above other renewables (onshore wind/solar 0.03-0.05~\$/kWh; floating offshore wind projected 0.11-0.25~\$/kWh by 2030 \cite{national_renewable_energy_laboratory_2024_2024}).
+    Relative to the minimum-LCOE design,
+    CAPEX minimization cuts design-dependent cost a further \resultsRE[pctImproveDesignCostMinCapex]
+    for a \resultsRE[pctWorsePowerMinCapex] power loss,
+    and power maximization adds \resultsRE[pctImprovePowerMaxPower] power
+    for a \resultsRE[pctWorseDesignCostMaxPower]~cost increase.
+\fi
+
 % 203 - 222
-\subsubsection{Post-Optimality Derivatives}
+\subsubsection{Active Structural and Amplitude Constraints}
 \ifdefined\DISSERTATION
     \Cref{remdo:sec:single-obj-process} introduced the Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ to quantify the activity and influence of constraints at the optimum.
     Nonzero multiplier values are reported in \Cref{remdo:fig:lagrange-multiplier}, each signifying the increase in objective $J$ per unit increase in an active constraint $g$.
 \else
     The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\Cref{remdo:sec:single-obj-process}), nonzero values reported in \Cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
 \fi
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=1\linewidth]{figs/from-matlab/lagrange_multipliers.pdf}
@@ -121,20 +143,29 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \ifdefined\DISSERTATION
     Six constraints are active at the optimum: one structural thickness lower bound, three structural factors of safety, and two amplitude constraints.
     While the storm (maximum) DLC limits the float and damping plate, it is the operational (fatigue) DLC that drives the column sizing.
-    The amplitude constraints and the damping plate factor of safety in the storm DLC have the highest multipliers, indicating that these limits drive the optimal cost.
-    This motivates a future search for designs that obviate or mitigate these constraints, for example, underwater submersion as a storm-survival strategy, or bump stops and active control to limit amplitude without enlarging the device.
-    Meanwhile, the activity of the float thickness lower bound, with a larger multiplier than the float factor-of-safety constraint, indicates that the float structural model is inadequate in this regime and should be extended to capture the local buckling that dominates for very thin-skinned designs.
+    The amplitude constraints and the damping plate factor of safety in the storm DLC have the highest multipliers,
+    indicating that these limits drive the optimal cost.
+    This motivates a future search for designs that obviate or mitigate these constraints,
+    for example, underwater submersion as a storm-survival strategy,
+    or bump stops and active control to limit amplitude without enlarging the device.
+    Meanwhile, the activity of the float thickness lower bound, with a larger multiplier than the float factor-of-safety constraint,
+    indicates that the float structural model is inadequate in this regime and should be extended to capture the local buckling that dominates for very thin-skinned designs.
 \else
     Six constraints are active: one structural thickness lower bound, three factors of safety, and two amplitude constraints.
     The storm DLC limits the float and damping plate while the operational fatigue DLC drives column sizing;
     the amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost,
     motivating future designs that mitigate them (e.g., submersion-based survival, bump stops, or active amplitude control).
-    The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint, signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
+    The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint,
+    signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
 \fi
 
 % 349 - 369
 %%%%%%%%%%%%%%%%%%%%
-\subsection{Multi-Objective Optimization}\label{remdo:sec:results-multi}
+\subsection{Cost-Power Tradeoff}\label{remdo:sec:results-multi}
+\subsubsection{Minimum Cost and Maximum Power Designs}
+In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
+The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
+
 \ifdefined\DISSERTATION
     In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
     As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
@@ -167,30 +198,24 @@ A cusp exists in the Pareto front where average electrical power is around \resu
     As a result of this cusp, the bulk of the front, from the least-cost design at \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds], is non-convex.
     This region would have been missed by a convex multi-objective procedure optimizing weighted sums of the objectives, affirming the necessity of the epsilon-constraint-plus-pattern-search procedure used here.
 \else
-    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure, affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
+    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure,
+    affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
 \fi
 
 % 132 - 143
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Single Objective Optimization}
-\label{remdo:sec:results-single}
 
-%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Optimal Design}
-
-In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
-The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
 
 % 144 - 148
 \ifdefined\DISSERTATION
     The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
     This would be preferred whenever design-dependent capital expenditures matter more than modeled here, for shorter-duration projects, higher discount rates, lower operational cost, or lower design-independent capital cost.
 \else
-    The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
+    The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}),
+    trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
 \fi
 
 % 370 - 403
-
 
 \ifdefined\DISSERTATION
     \Cref{remdo:fig:pareto} inlays geometry visualizations for a few designs (light blue).
@@ -270,7 +295,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 
 % 410 - 423
 %%%%%%%%%%%%%%%%%%%%
-\subsection{Multi-Objective Sensitivity Analysis}
+\subsubsection{Effect of Control Scheme}
 %%%
 %\paragraph{Control Scheme}
 \ifdefined\DISSERTATION
@@ -293,7 +318,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 %Also show the effect of keeping geometric DVs fixed and what the new pareto front and design heuristics curve would look like.}
 
 % 320
-\subsubsection{Global Sensitivity to Deployment Location}
+\subsection{Global Sensitivity to Deployment Location}
 
 % 302-305
 \ifdefined\DISSERTATION
@@ -351,7 +376,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 \fi
 
 % 458 - 473
-\subsubsection{Global Deployability}
+\subsubsection{Comparison to Other Studies on Global Deployability}
 \ifdefined\DISSERTATION
     A survey indicates that 40\% of WEC developers design for site-agnostic deployment, so global deployability is of industrial interest \cite{trueworthy_wave_2020}.
     A previous study \cite{de_andres_adaptability_2015} compares the global deployability of a uniform versus a tunable WEC design across wave climates, finding that tuning the resonant period to the dominant ocean period by changing geometry increases capture width ratio but decreases the more important power-to-mass ratio (an inverse LCOE proxy), and concluding that tuning is unfavorable because it requires expensive larger diameters.
@@ -368,11 +393,10 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 
 % 265 - 301
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Single Objective Sensitivity Analysis}\label{remdo:sec:sensitivities}
+\subsection{Prioritizing R\&D Effort}\label{remdo:sec:sensitivities}
 This subsection quantifies how parameter and model-assumption changes affect the optimized designs and objective values.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Local Sensitivity to Parameters}\label{remdo:sec:sensitivities-local}
+\subsubsection{Enhancing Subsystem Performance}
 \ifdefined\DISSERTATION
     This section interprets the most accurate local parameter sensitivity method (perturbing each parameter slightly from its nominal value and re-optimizing) while \Cref{remdo:sec:appendix-sensitivties} compares the accuracy and cost of several computation methods.
     Re-optimization accounts for nonlinearities and is thus more accurate, but far more expensive, than post-optimality-derivative sensitivities.
@@ -462,7 +486,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 %\Cref{fig:constraint-sens} gives the estimated parameter change threshold required to make inactive constraints active and active constraints inactive. Values are again normalized, where here a value of 1 means that a parameter would need to double (increase by 100\%) before the constraint activity changes.
 
 % 474-489
-\subsubsection{Structural Efficiency}
+\paragraph{Structural Efficiency}
 A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \cite{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
 \ifdefined\DISSERTATION
     This trendline predicts a nominal float structural mass of 72-632 metric tons and a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 213 and 80 metric tons respectively.
@@ -475,6 +499,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 \fi
 
 % 195 - 201
+\paragraph{Dynamics and Control}
 \ifdefined\DISSERTATION
     Finally, \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
     The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
@@ -497,7 +522,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 % 510-536
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Model Realism}
+\subsubsection{Enhancing Model Realism}
 \ifdefined\DISSERTATION
     Using the optimization and sensitivity results, the modeling assumptions of \Cref{remdo:sec:model} can now be assessed for reasonableness.
     We examine both the model complexities MDOcean captures, to confirm they were worth including, and the shortcomings it cannot capture, to judge whether they must be added in future versions.
@@ -507,7 +532,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Observed Impact of Modeled Effects}
+\paragraph{Observed Impact of Modeled Effects}
 \ifdefined\DISSERTATION
     Several areas of model complexity, force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the results, evident in the constraint activity and in the differences from using 1-DOF (stationary-spar) dynamics; \Cref{remdo:sec:sensitivity-model-assumptions} analyzed these in detail.
     MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \cite{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
@@ -535,7 +560,7 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 % 537-549
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Potential Impact of Unmodeled Effects}
+\paragraph{Potential Impact of Unmodeled Effects}
 \ifdefined\DISSERTATION
     No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}  % TODO (scrutineering)
     a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
@@ -574,9 +599,15 @@ A previous study compares structural mass per unit hull volume for marine struct
     motivating both incremental detail-design improvements and transformative storm-survival concepts (submersion, control surfaces, or amplitude-reducing control), whose viability can be screened using the same multipliers.
 \fi
 
+\subsubsection{Assessing Design Paradigms}
+Based on the above, is reactive control best?
+Should structural sizing inform control design, like PTO sizing does, not the other way around?
+Is drag a big deal?
+Do you always want $N_{WEC}$ low when you have a target power?
+
 % 550 - 579
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Formulation Realism}
+\subsection{Takeaways for Future Optimizations}
 This subsection evaluates how realistic the optimization formulation choices are and what refinements are most impactful.
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -661,7 +692,8 @@ This subsection evaluates how realistic the optimization formulation choices are
 
 % 245 - 263
 %%%%%%%%%%%%%%%%%%%%
-\subsubsection{Multi-Start}
+\subsubsection{Utility of Gradients for Single-Objective Optimization}
+
 \ifdefined\DISSERTATION
     Because non-convex optimization can become trapped in local minima, 1000 random initial guesses are tested, of which 974 are linearly infeasible and discarded.
     Of the 26 linearly feasible starting points, none converge while satisfying the Karush-Kuhn-Tucker (KKT) first-order optimality conditions.
@@ -704,7 +736,7 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
 
 % 490 - 509
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Optimization Procedure}
+\subsubsection{Utility of Gradients for Multi-Objective Optimization}
 \label{remdo:sec:discussion-optimization}
 \ifdefined\DISSERTATION
     Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
