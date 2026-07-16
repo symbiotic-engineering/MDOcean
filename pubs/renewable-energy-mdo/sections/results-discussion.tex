@@ -337,7 +337,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     This captures interactions among the simultaneous changes in wave height, period, water depth, and storm sea state that the OAT local analysis cannot, and reveals the effect of different spectral bandwidths.
     It shows not only which locations are most favorable through the resulting LCOE, but also whether the optimal design is robust to location through the resulting design variables which is important because global deployability is a core WEC viability requirement \citet{bull_systems_2017} and a single design usable across wave conditions facilitates economies of scale.
     
-    Wave resource data for four U.S.\ locations (Humboldt Bay, CA; Pac-Wave North and South, OR; and the Wave Energy Test Site, HI) is obtained from the NREL SAM repository \cite{janzou_sam_2022}, sourced from a 2015 Sandia report \citep{dallman_characterization_2015}.
+    Wave resource data for four U.S.\ locations (Humboldt Bay, CA; Pac-Wave North and South, OR; and the Wave Energy Test Site, HI) is obtained from the NREL SAM repository \citep{janzou_sam_2022}, sourced from a 2015 Sandia report \citep{dallman_characterization_2015}.
     All economic assumptions are held fixed for consistency, neglecting location-specific bathymetry (foundation cost) and distance from shore (installation and O\&M cost).
     \Cref{remdo:tab:location} gives the optimal design variables and LCOE for each location.
 \else
@@ -487,7 +487,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 
 % 474-489
 \paragraph{Structural Efficiency}
-A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \cite{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
+A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \citep{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
 \ifdefined\DISSERTATION
     This trendline predicts a nominal float structural mass of 72-632 metric tons and a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 213 and 80 metric tons respectively.
     The nominal design lies within the confidence interval, but the optimized design lies far below it.
@@ -535,26 +535,26 @@ A previous study compares structural mass per unit hull volume for marine struct
 \paragraph{Observed Impact of Modeled Effects}
 \ifdefined\DISSERTATION
     Several areas of model complexity, force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the results, evident in the constraint activity and in the differences from using 1-DOF (stationary-spar) dynamics; \Cref{remdo:sec:sensitivity-model-assumptions} analyzed these in detail.
-    MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \cite{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
+    MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \citep{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
     Force saturation is especially relevant: it directly reduces powertrain cost and indirectly reduces structural cost by lowering operational heave loading, which permits a thinner spar given the active column fatigue factor-of-safety constraint.
     The observed impact of these effects justifies the corresponding model complexity and suggests other optimization frameworks should include them for realistic results.
 \else
     Force saturation, slamming amplitude limits, and 2-DOF dynamics all contribute significantly to the results.% (\Cref{remdo:sec:sensitivity-model-assumptions}).
-    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \cite{mccabe_development_2026}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
+    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \citep{mccabe_development_2026}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
     The impact of these effects justifies their model complexity and argues for their inclusion in other frameworks.
 \fi
 
 \ifdefined\DISSERTATION
     Conversely, a few modeling complexities appear unnecessary in hindsight because they have little effect.
     \Cref{remdo:sec:sensitivities-local} finds low sensitivity to drag coefficient, and the re-optimization without drag in \Cref{remdo:sec:sensitivity-model-assumptions} confirms it, suggesting that modeling the drag nonlinearity is inessential and that future optimizations may disable drag to avoid iterating the drag damping coefficient.
-    Likewise, the slamming model is derived to be valid not only for long waves but also intermediate wavelengths, where the maximum amplitude depends on the phase of the dynamic response; the simple long-wave slamming model is reasonably accurate at sea states with an active slamming constraint \cite{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
+    Likewise, the slamming model is derived to be valid not only for long waves but also intermediate wavelengths, where the maximum amplitude depends on the phase of the dynamic response; the simple long-wave slamming model is reasonably accurate at sea states with an active slamming constraint \citep{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Confirming this would require checking all points during the optimization, not just the optimum, since the slamming model fidelity is not currently a model setting and the long-wave condition is verified manually at the optimum. %\hl{I should actually check this.}  % TODO (scrutineering)
     Finally, although drag and intermediate-wavelength slamming each have little individual effect, the problem's nonlinearity admits a possible coupling effect were both disabled simultaneously, or an emergent effect under a changed formulation (a different objective or added constraints), so users should exercise caution when simplifying the model.
 \else
     Conversely, 
     %the low sensitivity to drag coefficient (\Cref{remdo:sec:sensitivities-local}), confirmed by re-optimization without drag (\Cref{remdo:sec:sensitivity-model-assumptions}), suggests the drag nonlinearity is inessential.
     %Similarly, 
-    the simple long-wave slamming model is reasonably accurate where the slamming constraint is active \cite{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
+    the simple long-wave slamming model is reasonably accurate where the slamming constraint is active \citep{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Because the problem is nonlinear, however, disabling both simultaneously or changing the formulation could produce coupling effects, so model simplification warrants caution.
 \fi
 
@@ -684,10 +684,10 @@ This subsection evaluates how realistic the optimization formulation choices are
     Design variables are assumed continuous, whereas structural thicknesses and, to a lesser extent, generator specifications are constrained to discrete commercially available sizes.
     Additional requirement omissions for future work include mooring loads, structural resonant mode frequencies, and overturning moment in the storm design load case.
     Requirements such as installation and manufacturing feasibility, environmental and regulatory acceptability, reliability, and social benefit are harder to incorporate but nonetheless important;
-    for instance, maximum dimensions may be limited by roadway transport, as for wind turbines, constraining component dimensions to 4.3--4.6~m \cite{cotrell_analysis_2014}, though relating maximum transported component size to maximum installed WEC dimensions requires manufacturability and on-site assembly analysis beyond this scope.
+    for instance, maximum dimensions may be limited by roadway transport, as for wind turbines, constraining component dimensions to 4.3--4.6~m \citep{cotrell_analysis_2014}, though relating maximum transported component size to maximum installed WEC dimensions requires manufacturability and on-site assembly analysis beyond this scope.
     For guidance on requirements and constraints in WEC design optimization, the reader is referred to \citet{bull_systems_2017,babarit_stakeholder_2017} for a comprehensive breakdown and mapping of WEC requirements, and to \citet{trueworthy_wave_2020} for how developers prioritize requirements in practice.
 \else
-    Many considerations remain uncaptured, however, such as discrete component sizing, mooring loads, structural resonant modes, storm overturning moment, and manufacturing, regulatory, and transport limits \cite{cotrell_analysis_2014}, so caution is warranted before pursuing this optimum; see \citet{bull_systems_2017,babarit_stakeholder_2017,trueworthy_wave_2020} for comprehensive WEC requirement guidance.
+    Many considerations remain uncaptured, however, such as discrete component sizing, mooring loads, structural resonant modes, storm overturning moment, and manufacturing, regulatory, and transport limits \citep{cotrell_analysis_2014}, so caution is warranted before pursuing this optimum; see \citet{bull_systems_2017,babarit_stakeholder_2017,trueworthy_wave_2020} for comprehensive WEC requirement guidance.
 \fi
 
 % 245 - 263
@@ -740,7 +740,7 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
 \label{remdo:sec:discussion-optimization}
 \ifdefined\DISSERTATION
     Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
-    Based on the stated generation counts and population sizes \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, these require roughly 12{,}000, 2{,}200, 6{,}100, and 2{,}400 function evaluations to converge.
+    Based on the stated generation counts and population sizes \citep{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, these require roughly 12{,}000, 2{,}200, 6{,}100, and 2{,}400 function evaluations to converge.
     The present study is the first large-scale WEC optimization with a gradient-based algorithm, which was expected to require fewer evaluations.
     Generating the Pareto seeds, however, entails 20 single-objective optimizations at about 100 iterations each, using finite difference over 12 design variables, for an estimated $20\cdot100\cdot(12+1)=\resultsRE[paretoFcnEvals]$ evaluations,  dwarfing the genetic algorithm counts.
     This surprising result is attributable to finite difference.
@@ -820,7 +820,7 @@ Would require integration with WDRT or similar to get the environmental contour 
 
 	6) generator physics and model - building off the PTO CCD study that is easily realizable with the current model, a generator model would unlock control co-design with the generator itself, for example whether a high-torque (expensive) generator is worth it compared to a low torque generator.
     The torque limit would essentially impose a constraint on the $F_{\text{max}}$ design var, the core losses introduce nonlinear damping, and impose a relation between generator torque limit and max/min generator inertia.
-    A simplified generator model is explored in the RM3 CCD study \cite{anderson_re-imagining_2024}, or a full generator model as in the offshore wind MDO study \citep{barter_beyond_2023}.
+    A simplified generator model is explored in the RM3 CCD study \citep{anderson_re-imagining_2024}, or a full generator model as in the offshore wind MDO study \citep{barter_beyond_2023}.
 
     7) structures constraint that accounts for other types of materials (ie brittle fracture (Mohr's circle) for concrete, however inflatables are modeled, composites, inflatable polyurethane coated nylon fabric, which \citet{roberts_bringing_2021} found to be more optimal than steel/reinforced concrete/fiberglass/rubber).
     My relations between force and stress should still be good, but the relation between stress and FOS (the material limit state) is what needs to change.

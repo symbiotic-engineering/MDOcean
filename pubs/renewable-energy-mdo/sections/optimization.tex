@@ -55,7 +55,7 @@ As a gradient-based optimizer, SQP requires derivatives of the objective and con
 \ifdefined\DISSERTATION
     Obtaining derivatives for WEC simulations is a difficult problem that few have approached.
     WecOptTool uses the Python package JAX \citet{bradbury_jax_2018} to automatically differentiate the pseudo-spectral dynamics, but cannot differentiate the hydrodynamic coefficients.
-    Two recent papers introduce derivatives for BEM hydrodynamics packages \cite{rohrer_analytical_2024,khanal_fully_2025}, the former reviewing other work on hydrodynamic gradients.
+    Two recent papers introduce derivatives for BEM hydrodynamics packages \citep{rohrer_analytical_2024,khanal_fully_2025}, the former reviewing other work on hydrodynamic gradients.
     Most similar to the present approach, \citet{gambarini_gradient_2024} uses semi-analytical hydrodynamics and analytically differentiates the linear system with respect to control and array-layout variables, but does not provide the body-dimension derivatives required here.
     For the MEEM hydrodynamics used in this study, symbolic differentiation of the linear system was attempted but exhausts memory at any reasonable matrix size; obtaining MEEM gradients via adjoints or algorithmic differentiation remains future work.
     This study therefore uses finite difference, with step size set automatically by the MATLAB Optimization Toolbox --- a viable choice given the simulation's low cost.
@@ -114,13 +114,13 @@ After optimization, sensitivity analysis is performed, first local then OAT glob
 %%%
 Single-objective algorithms typically require adaptation for multiple objectives, and gradient-based multi-objective optimization is particularly challenging.
 \ifdefined\DISSERTATION
-    While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers that use such multi-objective gradient information are rare, partly because building a Pareto front requires the exploration that gradient-based optimizers --- which excel at exploitation --- do not naturally provide.
+    While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012}, solvers that use such multi-objective gradient information are rare, partly because building a Pareto front requires the exploration that gradient-based optimizers --- which excel at exploitation --- do not naturally provide.
     Two more common approaches exist: reformulating the multi-objective problem as repeated single-objective optimization to permit a gradient-based algorithm, or using a multi-objective derivative-free or heuristic method that extends readily from its single-objective counterpart.
     This work pursues both: the epsilon-constraint method first creates an ensemble of single-objective problems solved by the familiar SQP algorithm, and these solutions then seed a derivative-free pattern search.
     In the epsilon-constraint method, one objective is repeatedly optimized while a constraint on the second objective is swept, tracing out the Pareto front.
     Here the single-objective optima of each objective set the constraint values: the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ becomes the center of a circle, and twenty constraint values are taken at equal angular spacing on that circle.
-    The MATLAB \texttt{paretosearch} function then executes the constrained multi-objective pattern search of \cite{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
+    The MATLAB \texttt{paretosearch} function then executes the constrained multi-objective pattern search of \citep{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
 \else
-    While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers using them are rare, since a Pareto front demands exploration rather than the pure exploitation that gradient methods excel at.
+    While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012}, solvers using them are rare, since a Pareto front demands exploration rather than the pure exploitation that gradient methods excel at.
     This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP --- repeatedly optimizing one objective while sweeping a constraint on the other, with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \citet{custodio_direct_2011}, which maximizes Pareto hypervolume and spread to fill the gaps.
 \fi
