@@ -13,6 +13,7 @@ stages:
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
+        - mod_freq_domain_ctrl_combined
     desc: Automatically generated from the 'mermaid-make-pdfs' stage 
       in calkit.yaml. Changes made here will be overwritten.
   mermaid-make-pngs:
@@ -31,6 +32,7 @@ stages:
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
+        - mod_freq_domain_ctrl_combined
     desc: Automatically generated from the 'mermaid-make-pngs' stage 
       in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
@@ -63,7 +65,13 @@ stages:
     deps:
       - mdocean/analysis/
       - mdocean/inputs/
-      - mdocean/optimization/
+      - mdocean/optimization/multiobjective/
+      - mdocean/optimization/sensitivities/
+      - mdocean/optimization/compare_run.m
+      - mdocean/optimization/find_nominal_inputs.m
+      - mdocean/optimization/gradient_optim.m
+      - mdocean/optimization/max_avg_power.m
+      - mdocean/optimization/run_solver.m
       - mdocean/plots/util/
       - mdocean/plots/matlab_figs/
       - mdocean/plots/all_figures.m
@@ -207,6 +215,8 @@ stages:
       - ./mdocean/plots/util/improvePlot.m
       - ./mdocean/plots/util/imrange.m
       - ./mdocean/plots/util/signed_log.m
+      - ./mdocean/plots/util/stacked_number_line.m
+      - ./mdocean/plots/util/table2latex.m
       - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
       - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
       - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -240,10 +250,14 @@ stages:
       - results/Comparison/overlaid_hydro_coeffs.pdf
       - results/Comparison/probability_CDF.pdf
       - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/stacked_optimal_design_vars.pdf
+      - results/Comparison/stacked_optimal_outputs.pdf
       - results/Comparison/overlaid_geometry.fig
       - results/Comparison/overlaid_hydro_coeffs.fig
       - results/Comparison/probability_CDF.fig
       - results/Comparison/comparison_power_matrix.fig
+      - results/Comparison/stacked_optimal_design_vars.fig
+      - results/Comparison/stacked_optimal_outputs.fig
       - results/Comparison/optimal_design_vars.tex:
           cache: false
           persist: false
@@ -1938,17 +1952,23 @@ stages:
       - ./mdocean/analysis/PostproClass.m
       - results/ReadNonMatlabFigs/intermed.mat
     outs:
+      - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+      - results/ReadNonMatlabFigs/circuit_pto.pdf
+      - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+      - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
       - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
       - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
       - results/ReadNonMatlabFigs/dimensions.pdf
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
@@ -3031,10 +3051,14 @@ stages:
       - results/Comparison/overlaid_hydro_coeffs.pdf
       - results/Comparison/probability_CDF.pdf
       - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/stacked_optimal_design_vars.pdf
+      - results/Comparison/stacked_optimal_outputs.pdf
       - results/Comparison/overlaid_geometry.fig
       - results/Comparison/overlaid_hydro_coeffs.fig
       - results/Comparison/probability_CDF.fig
       - results/Comparison/comparison_power_matrix.fig
+      - results/Comparison/stacked_optimal_design_vars.fig
+      - results/Comparison/stacked_optimal_outputs.fig
       - results/Comparison/optimal_design_vars.tex
       - results/Comparison/optimal_outputs.tex
       - results/Comparison/end.mat
@@ -3486,10 +3510,14 @@ stages:
       - results/Comparison/overlaid_hydro_coeffs.pdf
       - results/Comparison/probability_CDF.pdf
       - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/stacked_optimal_design_vars.pdf
+      - results/Comparison/stacked_optimal_outputs.pdf
       - results/Comparison/overlaid_geometry.fig
       - results/Comparison/overlaid_hydro_coeffs.fig
       - results/Comparison/probability_CDF.fig
       - results/Comparison/comparison_power_matrix.fig
+      - results/Comparison/stacked_optimal_design_vars.fig
+      - results/Comparison/stacked_optimal_outputs.fig
       - results/Comparison/optimal_design_vars.tex
       - results/Comparison/optimal_outputs.tex
       - results/Comparison/end.mat
@@ -3780,17 +3808,23 @@ stages:
       - results/QPCircles/qp_circles.fig
       - results/QPCircles/end.mat
       - results/QPCircles/end.json
+      - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+      - results/ReadNonMatlabFigs/circuit_pto.pdf
+      - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+      - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
       - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
       - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
       - results/ReadNonMatlabFigs/dimensions.pdf
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
@@ -4380,10 +4414,14 @@ stages:
       - results/Comparison/overlaid_hydro_coeffs.pdf
       - results/Comparison/probability_CDF.pdf
       - results/Comparison/comparison_power_matrix.pdf
+      - results/Comparison/stacked_optimal_design_vars.pdf
+      - results/Comparison/stacked_optimal_outputs.pdf
       - results/Comparison/overlaid_geometry.fig
       - results/Comparison/overlaid_hydro_coeffs.fig
       - results/Comparison/probability_CDF.fig
       - results/Comparison/comparison_power_matrix.fig
+      - results/Comparison/stacked_optimal_design_vars.fig
+      - results/Comparison/stacked_optimal_outputs.fig
       - results/Comparison/optimal_design_vars.tex
       - results/Comparison/optimal_outputs.tex
       - results/Comparison/end.mat
@@ -4908,17 +4946,23 @@ stages:
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ReadNonMatlabFigs.ipynb
       - .calkit/env-locks/pubs
+      - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+      - results/ReadNonMatlabFigs/circuit_pto.pdf
+      - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+      - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
       - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
       - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
       - results/ReadNonMatlabFigs/dimensions.pdf
       - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
       - results/ReadNonMatlabFigs/FBD.pdf
       - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/meem_dims.pdf
       - results/ReadNonMatlabFigs/MEEM_geometry.pdf
       - results/ReadNonMatlabFigs/methodology_flowchart.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
       - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-      - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+      - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
       - results/ReadNonMatlabFigs/optimization_flowchart.pdf
       - results/ReadNonMatlabFigs/RM3_image.pdf
       - results/ReadNonMatlabFigs/section_flow.pdf
@@ -5532,13 +5576,14 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
     cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
-      'results/Runtime/end.json' 'results/PtoSweep/end.json' 'results/Wecsim/end.json'
-      --output 'pubs/applied-ocean-research-model/numeric-results.tex' --command
-      resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
-      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\"\
-      , \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f} MN\"\
-      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
-      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"pctRuntimeMEEM\"\
+      'results/Runtime/end.json' 'results/SweepGeoms/end.json' 'results/PtoSweep/end.json'
+      'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
+      --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
+      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
+      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
+      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
+      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
+      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\"\
       : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
       , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
       : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
@@ -5549,11 +5594,13 @@ stages:
       : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
       : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
       : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
-      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\"}'"
+      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"\
+      }'"
     deps:
       - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
+      - results/SweepGeoms/end.json
       - results/PtoSweep/end.json
       - results/Wecsim/end.json
     outs:
@@ -5660,6 +5707,8 @@ stages:
       --file-to-file 
       'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/UMERC-2025-grid-value/zotero-meem-refs.bib'
       --file-to-file 
+      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
+      --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst'
       --file-to-file 
       'pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst'
@@ -5667,6 +5716,14 @@ stages:
       'pubs/shared/shared-pkg.tex->pubs/applied-ocean-research-model/shared-pkg.tex'
       --file-to-file 
       'pubs/shared/shared-pkg.tex->pubs/renewable-energy-mdo/shared-pkg.tex'
+      --file-to-file 
+      'pubs/shared/els-cas/cas-dc.cls->pubs/applied-ocean-research-model/cas-dc.cls'
+      --file-to-file 
+      'pubs/shared/els-cas/cas-dc.cls->pubs/renewable-energy-mdo/cas-dc.cls'
+      --file-to-file 
+      'pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty'
+      --file-to-file 
+      'pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty'
     deps:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
@@ -5675,10 +5732,15 @@ stages:
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/shared-pkg.tex
       - pubs/shared/shared-pkg.tex
+      - pubs/shared/els-cas/cas-dc.cls
+      - pubs/shared/els-cas/cas-dc.cls
+      - pubs/shared/els-cas/cas-common.sty
+      - pubs/shared/els-cas/cas-common.sty
     outs:
       - pubs/applied-ocean-research-model/references.bib:
           cache: false
@@ -5701,6 +5763,9 @@ stages:
       - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib:
           cache: false
           persist: true
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib:
+          cache: false
+          persist: true
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst:
           cache: false
           persist: true
@@ -5711,6 +5776,18 @@ stages:
           cache: false
           persist: true
       - pubs/renewable-energy-mdo/shared-pkg.tex:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/cas-dc.cls:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/cas-dc.cls:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/cas-common.sty:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/cas-common.sty:
           cache: false
           persist: true
     desc: Automatically generated from the 'copy-shared-latex' stage 
@@ -5789,7 +5866,6 @@ stages:
       - pubs/applied-ocean-research-model/figs/tikz/
       - pubs/applied-ocean-research-model/tables/
       - pubs/applied-ocean-research-model/main.tex
-      - pubs/applied-ocean-research-model/numbers.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
@@ -5831,6 +5907,8 @@ stages:
       - pubs/dissertation/hangcaption.sty
       - pubs/dissertation/.latexmkrc
       - pubs/dissertation/intro-contrib.tex
+      - pubs/dissertation/abstract.tex
+      - pubs/dissertation/acknowledgements.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/content.tex
       - pubs/applied-ocean-research-model/sections/
@@ -5945,20 +6023,35 @@ stages:
     desc: Automatically generated from the 'make-quarto-yaml' stage in
       calkit.yaml. Changes made here will be overwritten.
   make-standalone-tex-pdf:
-    cmd: calkit latex build -e tex --no-check 
-      'pubs/defense/latex-standalone/standalone_${item.name}.tex'
+    cmd: calkit latex build -e tex --no-check -r 
+      mdocean/plots/non_matlab_figs/.latexmkrc --no-synctex 
+      'mdocean/plots/non_matlab_figs/${item.name}.tex'
     deps:
-      - pubs/defense/latex-standalone/standalone_${item.name}.tex
+      - mdocean/plots/non_matlab_figs/${item.name}.tex
+      - pubs/applied-ocean-research-model/figs/tikz/${item.name}.tikz
       - .calkit/env-locks/tex
+      - mdocean/plots/non_matlab_figs/.latexmkrc
     outs:
-      - pubs/defense/latex-standalone/standalone_${item.name}.pdf
-      - pubs/defense/latex-standalone/standalone_${item.name}.log:
-          cache: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.log:
+          cache: false
           persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.aux:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.fdb_latexmk:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/aux/${item.name}.fls:
+          cache: false
+          persist: true
+      - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
       name:
-        - eigenfunctions
-        - A_matrix
+        - circuit_intrinsic
+        - circuit_pto
+        - circuit_kinematics
+        - control_method_venn_diagram
+        - meem_dims
     desc: Automatically generated from the 'make-standalone-tex-pdf' 
       stage in calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:

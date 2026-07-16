@@ -3,6 +3,22 @@
 \section{Results}\label{remdo:sec:results}
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
 This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
+\subsection{Pre-Optimization Sweep}
+\Cref{remdo:fig:experiments} depicts a variable sweep using the one-at-a-time design-of-experiments method.
+Many designs are infeasible: those that violate nonlinear constraints are marked with an X,
+and those that violate linear constraints are not simulated to avoid errors as described in \cref{remdo:sec:requirements}.
+Most violations are due to structural failure of the damping plate, in both fatigue and ultimate load cases.
+A few designs violate hydrostatic pitch stability ($g_{NL,5}$) or geometrically incompatible damping plate thickness ($g_{L,7}$).
+Of particular note, the most significant LCOE decrease is obtained by increasing the float diameter.
+The LCOE attains a local minimum at a float diameter around 1.5 times the nominal design, but the plate fails structurally there.
+The PTO power and force ratings also attain local minima, as expected from the tradeoff of power generation and cost.
+The structural variables, meanwhile, increase with cost and do not affect power, so no direct LCOE tradeoff is expected; these variables exist solely to satisfy constraints.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
+\caption{Exploratory one at a time sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
+\label{remdo:fig:experiments}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization}
@@ -12,25 +28,27 @@ This section presents optimization outcomes and targeted sensitivity analyses fo
 \subsubsection{Optimal Design}
 
 In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
-The optimal designs $\vec{x}^*$ are shown visually in \cref{remdo:fig:overlaid-geometry} and numerically in \cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
+The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
 \ifdefined\DISSERTATION
-    The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced]~kW, a value chosen from the shape of the multi-objective Pareto front (\cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
+    The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
     This would be preferred whenever design-dependent capital expenditures matter more than modeled here, for shorter-duration projects, higher discount rates, lower operational cost, or lower design-independent capital cost.
 \else
-    The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced]~kW average power (chosen from the Pareto front of \cref{remdo:sec:results-multi}), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
+    The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
 \fi
+
+
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
+\includegraphics[width=\linewidth]{figs/from-matlab/overlaid_geometry.pdf}
 \caption{Geometries overlaid}
 \label{remdo:fig:overlaid-geometry}
 \end{figure}
 
-\begin{table}[htbp]
+\begin{table*}[htbp]
 \input{tables/from-matlab/optimal_design_vars.tex}
 \caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
-\end{table}
+\end{table*}
 
 The optimal designs are generally larger than the nominal.
 \ifdefined\DISSERTATION
@@ -41,13 +59,13 @@ The optimal designs are generally larger than the nominal.
     In all optima, the three structural thicknesses decrease significantly and the float stiffener height decreases moderately, indicating that the optimized floats experience lower hydrodynamic forces and can shed structural material.
     In the minimum-LCOE design, the lower damping plate thickness trades off against larger damping plate stiffeners, mimicking the aerospace paradigm in which thin sheet-metal skin and substantial stiffeners are favored over thick plate stock.
     In several scenarios, structural thickness variables converge to their lower bounds.
-    The activity of these bound constraints (priority 2 requirements in the language of \cref{remdo:sec:requirements}) indicates that the structures model is at the edge of its validity for thin-skinned stiffened shells, calling into question the assumption that the deflection field resembles a plate rather than a beam \cite{mccabe_development_2026}.
+    The activity of these bound constraints (priority 2 requirements in the language of \Cref{remdo:sec:requirements}) indicates that the structures model is at the edge of its validity for thin-skinned stiffened shells, calling into question the assumption that the deflection field resembles a plate rather than a beam \cite{mccabe_development_2026}.
     Expanding the structures model to remove this assumption could yield even more efficient structural designs.
     In the minimum-cost design, the damping plate stiffeners instead decrease in size.
 \else
-    The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]~m), with a similarly sized PTO at slightly lower maximum force.
+    The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]), with a similarly sized PTO at slightly lower maximum force.
     In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material; the minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
-    The activity of these lower-bound constraints (priority 2 requirements, \cref{remdo:sec:requirements}) signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption \cite{mccabe_development_2026} weakens; removing it in future work could yield more efficient structures.
+    The activity of these lower-bound constraints (priority 2 requirements, \Cref{remdo:sec:requirements}) signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption \cite{mccabe_development_2026} weakens; removing it in future work could yield more efficient structures.
 \fi
 
 %\hl{discuss the difference between material reductions driven by structural load decrease versus structural efficiency increase, and how to tell the difference and which is happening here.}
@@ -62,14 +80,14 @@ The optimal designs are generally larger than the nominal.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Optimal Performance Outputs}
-The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist}, with numerical results in \cref{remdo:tab:opt-output}.
+The hydrodynamic coefficients and power distributions of each single-objective optimal design, with the nominal for reference, are compared in \Cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist}, with numerical results in \Cref{remdo:tab:opt-output}.
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/overlaid_hydro_coeffs.pdf}
 \caption{Hydrodynamic coefficients overlaid}
 \label{remdo:fig:overlaid-hydro}
-\end{figure}
+\end{figure*}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/probability_CDF.pdf}
@@ -83,12 +101,12 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 %On the opposite end of the spectrum, a second design is the least variable design, with an LCOE of \$1.00/kWh and merely 58\% power variation. This design is recommended for applications where the cost of energy is less critical, and storage is extremely limited. Powering the Blue Economy (PBE) applications such as aquaculture farms and AUV charging likely meet these criteria. 
 
 %Finally, we recommend the balanced design for intermediate applications, where energy storage is available but not abundant, and cost is important but not the bottom line. An example is a grid-connected application for island communities. This balanced design has an LCOE of \$0.18/kWh and a power coefficient of variation equal to 100\%. 
-%Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in \cref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
+%Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in \Cref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
 
-\begin{table}[htbp]
+\begin{table*}[htbp]
 \input{tables/from-matlab/optimal_outputs.tex}
 \caption{Optimal outputs}\label{remdo:tab:opt-output}
-\end{table}
+\end{table*}
 
 \ifdefined\DISSERTATION
     The minimum-LCOE design achieves an annual average electrical power of \resultsRE[powerAvgAtMinLCOE]~kW with a structural material mass of \resultsRE[structMassAtMinLCOE]~kg, requiring a generator rated for \resultsRE[powerMaxAtMinLCOE]~kW and \resultsRE[forceMaxAtMinLCOE]~kN peak.
@@ -98,13 +116,13 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     
     The CAPEX minimization reduces design-dependent cost by a further \resultsRE[pctImproveDesignCostMinCapex]~at the cost of a \resultsRE[pctWorsePowerMinCapex]~power reduction, while the power maximization increases power by a further \resultsRE[pctImprovePowerMaxPower]~at the expense of a \resultsRE[pctWorseDesignCostMaxPower]~increase in design-dependent cost, both relative to the minimum-LCOE design.
 \else
-    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE]~kW annual average electrical power at an estimated \resultsRE[minLCOE]~\$/kWh, a \resultsRE[pctImproveLCOEMinLCOE]~improvement over the nominal \resultsRE[nominalLCOE], from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE]~design-cost reduction and \resultsRE[pctImprovePowerMinLCOE]~power increase (economic assumptions per \cite{mccabe_development_2026}).
+    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE] annual average electrical power at an estimated \resultsRE[minLCOE], a \resultsRE[pctImproveLCOEMinLCOE] improvement over the nominal \resultsRE[nominalLCOE], from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE] design-cost reduction and \resultsRE[pctImprovePowerMinLCOE] power increase (economic assumptions per \cite{mccabe_development_2026}).
     This remains far above other renewables (onshore wind/solar 0.03-0.05~\$/kWh; floating offshore wind projected 0.11-0.25~\$/kWh by 2030 \cite{national_renewable_energy_laboratory_2024_2024}).
     Relative to the minimum-LCOE design, CAPEX minimization cuts design-dependent cost a further \resultsRE[pctImproveDesignCostMinCapex]~for a \resultsRE[pctWorsePowerMinCapex]~power loss, and power maximization adds \resultsRE[pctImprovePowerMaxPower]~power for a \resultsRE[pctWorseDesignCostMaxPower]~cost increase.
 \fi
 
 \ifdefined\DISSERTATION
-    Finally, \cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
+    Finally, \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
     The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
     The radiation efficiency is the ratio of the maximum lossless power for the given shape to the maximum radiation-limited power, the former computed with the design's hydrodynamic coefficients, no drag, and an unsaturated controller of the specified type (damping or reactive).
     The drag efficiency captures the effect of enabling drag and increases with wave height as expected.
@@ -115,20 +133,20 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency; their product with the annual hours per sea state yields annual energy production.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
     \caption{Power matrix multiplicative breakdown for minimum LCOE design}
     \label{remdo:fig:power-matrix-opt}
-\end{figure}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Post-Optimality Derivatives}
 \ifdefined\DISSERTATION
     \Cref{remdo:sec:single-obj-process} introduced the Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ to quantify the activity and influence of constraints at the optimum.
-    Values of the nonzero Lagrange multipliers $\vec{\lambda}$ are reported in \figureautorefname~\ref{remdo:fig:lagrange-multiplier}, signifying the increase in objective $J$ for a given increase in active constraint $\vec{g}$.
+    Nonzero multiplier values are reported in \Cref{remdo:fig:lagrange-multiplier}, each signifying the increase in objective $J$ per unit increase in an active constraint $g$.
 \else
-    The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\cref{remdo:sec:single-obj-process}), nonzero values reported in \cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
+    The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\Cref{remdo:sec:single-obj-process}), nonzero values reported in \Cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
 \fi
 
 \begin{figure}[htbp]
@@ -155,12 +173,12 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
     and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
     whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
-    Local parameter sensitivity is treated in \cref{remdo:sec:sensitivities-local}; design-variable perturbation is examined here.
+    Local parameter sensitivity is treated in \Cref{remdo:sec:sensitivities-local}; design-variable perturbation is examined here.
     \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
-    $\Delta J/J$, computed via \cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
+    $\Delta J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
 \else
     The optimization also returns the objective gradient $\vec{\nabla} J$ and the Hessian of the Lagrangian, enabling further local sensitivities.
-    \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
+    \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \Cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
 \fi
 
 \begin{equation}\label{remdo:eq:delta-J}
@@ -175,13 +193,13 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 
 \ifdefined\DISSERTATION
     The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\Delta J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
-    Here all values are nonzero, indicating that every design variable affects the active constraints of \cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
+    Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
     The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
     The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
     The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
     More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
 \else
-    The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \cref{remdo:fig:lagrange-multiplier}.
+    The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
     The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
     Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
@@ -201,7 +219,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     $\textrm{ceil}\!\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\resultsRE[numMultistartRequired]$ linearly feasible starting points.
 \else
     Because non-convex optimization can stall at local minima, 1000 random starts are tested; 974 are linearly infeasible, leaving 26 feasible, none of which converge while meeting the KKT conditions.
-    For LCOE minimization 17 converge via small steps and 9 do not (reversed at 9/17 for cost minimization); of the converged runs, 5 and 4 reach the same presumed global minimum while more (12 and 5) reach a worse local minimum (\cref{remdo:fig:multistart-tree}).
+    For LCOE minimization 17 converge via small steps and 9 do not (reversed at 9/17 for cost minimization); of the converged runs, 5 and 4 reach the same presumed global minimum while more (12 and 5) reach a worse local minimum (\Cref{remdo:fig:multistart-tree}).
     With roughly one fifth reaching the global minimum, a 95\% chance of finding it requires at least
     $\textrm{ceil}\!\left(\frac{\ln(1-0.95)}{\ln(1-0.2)}\right)=\resultsRE[numMultistartRequired]$ feasible starts.
 \fi
@@ -224,16 +242,15 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     Future studies can exploit this to reduce the function evaluations needed to reach the global optimum.
     Within each optimization, the multistart could use deterministic starting points for the float draft and bottom plate thickness, sampling only the multimodal variables; across optimizations, the multimodal variables could be sampled from a non-uniform distribution to capture multiple local minima.
 \else
-    \Cref{remdo:fig:multistart-bar} shows convergence behavior versus each design variable's starting value: the float draft $T_{f,2}$ and bottom plate thickness $t_{f,b}$ converge to the same optimum regardless of start (nearly unimodal), while the others are highly multimodal.
-    Future multistart procedures could therefore fix deterministic starts for the unimodal variables and sample only the multimodal ones, reducing the total function evaluations.
-\fi
-More complete multistart results appear in \cref{remdo:sec:appendix-supplemental-results}.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{example-image-a}  % TODO (scrutineering): replace placeholder with real multistart bar chart
-\caption{Bar chart showing impact of starting point on convergence behavior}\label{remdo:fig:multistart-bar}
-\end{figure}
+\fi
+More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental-results}.
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=\linewidth]{example-image-a}  % TODO (scrutineering): replace placeholder with real multistart bar chart
+% \caption{Bar chart showing impact of starting point on convergence behavior}\label{remdo:fig:multistart-bar}
+% \end{figure}
 
 % \begin{table}[htbp]
 % \begin{tabular}{c|c|c}
@@ -252,24 +269,24 @@ This subsection quantifies how parameter and model-assumption changes affect the
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Local Sensitivity to Parameters}\label{remdo:sec:sensitivities-local}
 \ifdefined\DISSERTATION
-    This section interprets the most accurate local parameter sensitivity method (perturbing each parameter slightly from its nominal value and re-optimizing) while \cref{remdo:sec:appendix-sensitivties} compares the accuracy and cost of several computation methods.
+    This section interprets the most accurate local parameter sensitivity method (perturbing each parameter slightly from its nominal value and re-optimizing) while \Cref{remdo:sec:appendix-sensitivties} compares the accuracy and cost of several computation methods.
     Re-optimization accounts for nonlinearities and is thus more accurate, but far more expensive, than post-optimality-derivative sensitivities.
 \else
-    Local parameter sensitivities are computed by perturbing each parameter from its nominal value and re-optimizing, the most accurate of several methods compared in \cref{remdo:sec:appendix-sensitivties}.
+    Local parameter sensitivities are computed by perturbing each parameter from its nominal value and re-optimizing, the most accurate of several methods compared in \Cref{remdo:sec:appendix-sensitivties}.
 \fi
 
 \Cref{remdo:fig:param-sens-J-star-tornado,remdo:fig:param-sens-x-star-tornado,remdo:fig:param-sens-x-star-tornado-2}
 show tornado charts of the highest normalized sensitivities for the objective and design respectively,
 normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in $J^*$ or $x^*$.
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
+    \includegraphics[width=.8\linewidth]{figs/from-matlab/re_optim_objective_tornado.pdf}
     \caption{Tornado chart showing highest objective sensitivities}
     \label{remdo:fig:param-sens-J-star-tornado}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
-    On the left side of \cref{remdo:fig:param-sens-J-star-tornado}, the minimum LCOE is highly sensitive to operational wave characteristics,
+    On the left side of \Cref{remdo:fig:param-sens-J-star-tornado}, the minimum LCOE is highly sensitive to operational wave characteristics,
     with normalized sensitivities of $-1.4$: a 1\% increase in wave height or period lowers LCOE by 1.4\% through increased power.
     LCOE is also sensitive to array availability and transmission efficiency ($-1.0$) and PTO efficiency ($-0.8$);
     the 1:1 correspondence for array efficiency is expected since it directly scales annual energy production,
@@ -303,7 +320,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     Finally, minimum design cost is sensitive to material density and cost (both $+0.6$, expected to be equal given the mass-based cost model),
     suggesting a lighter, cheaper material may benefit the low-power WEC.
 \else
-    For the minimum LCOE (left of \cref{remdo:fig:param-sens-J-star-tornado}), the dominant sensitivities are
+    For the minimum LCOE (left of \Cref{remdo:fig:param-sens-J-star-tornado}), the dominant sensitivities are
     operational wave characteristics ($-1.4$, as higher waves raise power),
     array and transmission efficiency ($-1.0$),
     PTO efficiency ($-0.8$), and the 
@@ -313,8 +330,9 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     and is dominated by damping plate geometry (the nondimensional stiffener height at $+2.1$, $D_d/D_s$ at $+1.7$, and related terms),
     with no float or spar geometric parameter influential, indicating the damping plate sets the minimum achievable cost.
     Two counterintuitive findings stand out: the sign of the structural-period sensitivity $T_{\text{struct}}$ flips between the two objectives,
-    and material yield strength has a \emph{positive} cost sensitivity ($+1.0$), that is a stronger material yields a costlier design,
-    because with thicknesses already at their lower bounds the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
+    and the material yield strength has a \emph{positive} cost sensitivity ($+1.0$).
+    Specifically, a stronger material yields a costlier design
+    because--with thicknesses already at their lower bounds--the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
 \fi
 
 \begin{landscape}
@@ -344,7 +362,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     For controllable choices held fixed for simplicity, such as many geometric parameters, high values indicate the value should become a design variable in future studies.
     
     The LCOE-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) also sensitive to structural (yellow) parameters.
-    In \cref{remdo:fig:param-sens-x-star-tornado-2}, the cost-minimizing design variables add sensitivity to economic parameters.
+    In \Cref{remdo:fig:param-sens-x-star-tornado-2}, the cost-minimizing design variables add sensitivity to economic parameters.
     Dynamic parameters (blue), including the float and spar drag coefficients and PTO efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
     Some structural thicknesses ($t_{fb}$ and $t_d$ in both, $t_{sr}$ in cost minimization) are insensitive to all parameters because the optimum sits consistently at the lower bound, reinforcing the need to improve the structures model for thin-skinned stiffened shells.
     
@@ -373,7 +391,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 %Maybe also show dJ/dx and that's important because you need that DV exact or not without affecting your bottom line.}
 %\hl{Is it possible to use these sensitivities to demonstrate coupling, and predict the effect of holding some DVs constant?) - during re scrutineering} 
 
-%For these highly sensitive parameters, it is worthwhile to perform a global sensitivity analysis to observe any nonlinearity. \Cref{remdo:fig:param-sens-global,remdo:fig:x-opt-sens-global} demonstrate the new optimal objective and optimal design variable values respectively under the re-optimization-based OAT global parameter sensitivity process described in \cref{sec:single-obj-process}.
+%For these highly sensitive parameters, it is worthwhile to perform a global sensitivity analysis to observe any nonlinearity. \Cref{remdo:fig:param-sens-global,remdo:fig:x-opt-sens-global} demonstrate the new optimal objective and optimal design variable values respectively under the re-optimization-based OAT global parameter sensitivity process described in \Cref{sec:single-obj-process}.
 % \begin{figure}\label{remdo:fig:param-sens-global}
 % \includegraphics[width=\linewidth]{example-image-a}
 % \caption{Global OAT parameter sensitivity analysis to optimal objective $J^*$}
@@ -397,16 +415,16 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     \Cref{remdo:tab:location} gives the optimal design variables and LCOE for each location.
 \else
     The high sensitivity to wave conditions warrants a global analysis re-optimizing for four U.S.\ deployment locations (Humboldt Bay, CA; Pac-Wave North and South, OR; Wave Energy Test Site, HI), using NREL SAM wave resource data \cite{janzou_sam_2022,dallman_characterization_2015} with economic assumptions held fixed.
-    This captures interactions among wave height, period, depth, and storm state that the OAT analysis cannot, and tests whether the optimal design is robust to location which is relevant because global deployability is a core viability requirement \cite{bull_systems_2017}.
+    This captures interactions among wave height, period, depth, and storm state that the OAT analysis cannot, and tests whether the optimal design is robust to location, which is relevant because global deployability is a core viability requirement \cite{bull_systems_2017}.
     \Cref{remdo:tab:location} gives the results.
 \fi
 
-\begin{table}[htbp]\centering
+\begin{table*}[htbp]\centering
 \setlength\arraycolsep{1pt}
-\input{tables/location_table.tex}
+\input{tables/from-matlab/location_sensitivity.tex}
 \caption{Results for Re-Optimization in Four Distinct Locations}
 \label{remdo:tab:location}
-\end{table}
+\end{table*}
 
 \ifdefined\DISSERTATION
     All optimized LCOE values undercut the RM3 baseline.
@@ -436,18 +454,18 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 %We also perform a global sensitivity analysis for price parameters $p_\tau$, $p_P$, $p_M$, and $p_0$ from equation~\eqref{remdo:eq:LCOE-scale}. For $p_0$, if the design-independent (unmodeled) cost goes to zero, \hl{(and maybe change 80\% efficiency into 100\%)}, that's essentially the best LCOE that a WEC of these technical assumptions (steel point absorber with given operational conditions) can get. We can think of the rest as a cost gap \hl{(explain)}. Meanwhile, the global sensitivity analysis for $p_\tau$ gives preliminary insight into the multi-objective problem, recovering a portion of the pareto front between the four variables that influence $LCOE$: $\tau$, $P_{pk,\text{elec}}$, $V_{\text{struct}}$, and $P_{\text{avg},\text{elec}}$. This shows \hl{XXX conclusion}, to be clarified further in the multi-objective optimization.
 
 %%%%%%%%%%%%%%%%%%%%
-\subsubsection{Global Sensitivity to Modeling Assumptions}
-\label{remdo:sec:sensitivity-model-assumptions}
-Beyond continuous parameters, the simulation depends on discrete options governing model behavior: the control scheme (damping or reactive), the presence of generator force saturation, the presence of drag, and the number of dynamic degrees of freedom (float-heave only, or float and spar heave).
+% \subsubsection{Global Sensitivity to Modeling Assumptions}
+% \label{remdo:sec:sensitivity-model-assumptions}
+% Beyond continuous parameters, the simulation depends on discrete options governing model behavior: the control scheme (damping or reactive), the presence of generator force saturation, the presence of drag, and the number of dynamic degrees of freedom (float-heave only, or float and spar heave).
 
 %\paragraph{Control Scheme}
 %\hl{This analysis is left for during scrutineering.}
 
 %%%
-\paragraph{Force Saturation}
+% \paragraph{Force Saturation}
 \ifdefined\DISSERTATION
-    For the minimum-LCOE design of \cref{remdo:sec:results-single}, the lowest force-saturation power factor across all sea states in \cref{remdo:fig:power-matrix-opt} is 
-    $P_{sat}/P_{\text{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{\text{max}}/F_{\text{unsat}}=\lowestFsatMinLCOE$ in that sea state.
+    For the minimum-LCOE design of \Cref{remdo:sec:results-single}, the lowest force-saturation power factor across all sea states in \Cref{remdo:fig:power-matrix-opt} is 
+    $P_{sat}/P_{\text{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{\text{max}}/F_{\text{unsat}}=\resultsRE[lowestFsatMinLCOE]$ in that sea state.
     Across all sea states, the optimal force-saturated design sacrifices only 
     \resultsRE[powerLossForceSatMinLCOE]~of average power (about \resultsRE[pctPowerLossForceSatMinLCOE]) while cutting PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE],
     for an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~versus the same design without saturation, which in any case violates structural constraints due to the higher force.
@@ -457,9 +475,9 @@ Beyond continuous parameters, the simulation depends on discrete options governi
     \resultsRE[pctStructCostIncreaseForceSatOptMinLCOE]~higher structural cost, and
     \resultsRE[pctLCOEIncreaseForceSatOptMinLCOE]~higher LCOE than the optimization with saturation.
 \else
-    For the minimum-LCOE design, the optimal force-saturated solution sacrifices only \resultsRE[powerLossForceSatMinLCOE]~of average power (about \resultsRE[pctPowerLossForceSatMinLCOE]) 
-    while cutting PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE], for an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~versus the unsaturated equivalent (which violates structural constraints).
-    Re-optimizing to avoid saturation while satisfying constraints gives \resultsRE[pctLCOEIncreaseForceSatOptMinLCOE]~higher LCOE, confirming that force saturation is advantageous.
+    % For the minimum-LCOE design, the optimal force-saturated solution sacrifices only \resultsRE[powerLossForceSatMinLCOE]~of average power (about \resultsRE[pctPowerLossForceSatMinLCOE]) 
+    % while cutting PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE], for an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~versus the unsaturated equivalent (which violates structural constraints).
+    % Re-optimizing to avoid saturation while satisfying constraints gives \resultsRE[pctLCOEIncreaseForceSatOptMinLCOE]~higher LCOE, confirming that force saturation is advantageous.
 \fi
 %This corresponds almost exactly with the relationship expected in the purely resistive Thevenin impedance case in \cite{mccabe_force-limited_2024}:
 %\begin{equation}
@@ -469,14 +487,14 @@ Beyond continuous parameters, the simulation depends on discrete options governi
 % fixme: what about the factor of 4/pi in the force ratio? Then the quadratic equation wouldn't apply, it would be more complicated (alpha non zero case) which casts doubt on my conclusion that alpha=0 emerges as optimal. Would need to compute alpha directly I think? I also think that the assumption of damping control means my Im(Gamma)=0 assumption in the notebook is false. Also Psat/Punsat is the the same as Psat/Pmax. So leaving this sentence out.
 
 %%%
-\paragraph{Drag}
+% \paragraph{Drag}
 \ifdefined\DISSERTATION
-    As \cref{remdo:sec:sensitivities-local} notes, the low sensitivity to drag coefficient suggests that modeling the drag nonlinearity may not be essential.
+    As \Cref{remdo:sec:sensitivities-local} notes, the low sensitivity to drag coefficient suggests that modeling the drag nonlinearity may not be essential.
     This is surprising, since without drag the resonant amplitude is significantly higher, which should matter given the active slamming constraint.
     One reason for the discrepancy is that the drag sensitivity was local only; a re-optimization at $C_d=0$ would likely give different results.
 \else
-    The low local sensitivity to drag coefficient (\cref{remdo:sec:sensitivities-local}) suggests modeling the drag nonlinearity may be inessential,
-    which is surprising given the active slamming constraint, though a global re-optimization at $C_d=0$ is needed to confirm.
+    % The low local sensitivity to drag coefficient (\Cref{remdo:sec:sensitivities-local}) suggests modeling the drag nonlinearity may be inessential.
+    % This is surprising given the active slamming constraint, though a global re-optimization at $C_d=0$ is needed to confirm.
 \fi
 %\hl{Performing this re-optimization is left for during scrutineering.}
 
@@ -487,16 +505,16 @@ Beyond continuous parameters, the simulation depends on discrete options governi
 \subsection{Multi-Objective Optimization}\label{remdo:sec:results-multi}
 \ifdefined\DISSERTATION
     In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
-    As described in \cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
-    The Pareto front is shown in \cref{remdo:fig:pareto}, with the utopia point marked by a green star, simulated designs by squares, and the actual nominal performance reported in the RM3 reference \cite{RM3} by a diamond.
+    As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
+    The Pareto front is shown in \Cref{remdo:fig:pareto}, with the utopia point marked by a green star, simulated designs by squares, and the actual nominal performance reported in the RM3 reference \cite{RM3} by a diamond.
     All Pareto-front designs cost significantly less than the nominal RM3, spanning powers both below and above it.
     \Cref{remdo:fig:pareto-lcoe} provides a zoomed view with superimposed constant-$LCOE$ contours; the minimum-LCOE design lies at the tangency between the Pareto front and the contours and very nearly coincides with the maximum-power design.
     %\hl{analyze more: how are the max power and min LCOE designs different? ... multiple apparent points of tangency ...}  % TODO (scrutineering)
 \else
-    The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{\text{design}}$ against average electrical power $P_{\text{avg},\text{elec}}$ (\cref{remdo:sec:multi-obj-process}),
+    The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{\text{design}}$ against average electrical power $P_{\text{avg},\text{elec}}$ (\Cref{remdo:sec:multi-obj-process}),
     giving insight where LCOE is inapplicable or uncertain in its constant-modeled cost terms ($OPEX$, $FCR$, $p_0$).
-    The Pareto front (\cref{remdo:fig:pareto}) shows all designs costing significantly less than the nominal RM3 \cite{RM3} across a range of powers;
-    the zoomed view with constant-$LCOE$ contours (\cref{remdo:fig:pareto-lcoe}) places the minimum-LCOE design at the front's tangency with the contours, nearly coincident with the maximum-power design.
+    The Pareto front (\Cref{remdo:fig:pareto}) shows all designs costing significantly less than the nominal RM3 \cite{RM3} across a range of powers;
+    the zoomed view with constant-$LCOE$ contours (\Cref{remdo:fig:pareto-lcoe}) places the minimum-LCOE design at the front's tangency with the contours, nearly coincident with the maximum-power design.
 \fi
 \begin{figure}[htbp]
     \centering
@@ -523,13 +541,13 @@ A cusp exists in the Pareto front where average electrical power is around \resu
     \Cref{remdo:fig:pareto} inlays geometry visualizations for a few designs (light blue).
     One apparent trend is that the optimal spar draft and float diameter grow from left to right along the front, this is intuitive since minimizing material keeps components as small as constraints allow, while larger dimensions cost more and generate more power.
 \else
-    The geometry inlays in \cref{remdo:fig:pareto} show the optimal spar draft and float diameter growing from left to right, as larger dimensions cost more but generate more power.
+    The geometry inlays in \Cref{remdo:fig:pareto} show the optimal spar draft and float diameter growing from left to right, as larger dimensions cost more but generate more power.
 \fi
 
-Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provides design heuristics for adapting WEC design to a given cost-power balance.
+Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provides design heuristics for adapting WEC design to a given cost-power balance.
 \ifdefined\DISSERTATION
     To show consistent, interpretable trends despite the non-uniform spacing of points, the x-axis gives percent along the Pareto front (the angle of each point from the nadir point) and the y-values are lightly low-pass smoothed.
-    The individual Pareto points appear as black squares on the x-axis for comparison against \cref{remdo:fig:pareto} and to visualize clusters.
+    The individual Pareto points appear as black squares on the x-axis for comparison against \Cref{remdo:fig:pareto} and to visualize clusters.
     Structural design variables are green, powertrain ratings blue, and bulk geometry dimensions red.
 \else
     The x-axis gives percent along the Pareto front and y-values are lightly smoothed; structural variables are green, powertrain ratings blue, and bulk dimensions red.
@@ -548,40 +566,40 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
     
     Examining the magnitude of change, the powertrain ratings vary most dramatically across the front while geometric and structural variables need only moderate adjustment.
     This raises the question of how much the cost savings at lower power come from smaller PTO versus smaller material cost: if PTO cost dominated, companies selling devices at multiple power levels could keep one geometric and structural design and vary only the PTO, easing design effort and economies of scale.
-    Using the costs in \cref{remdo:tab:opt-dv-values}, however, only \resultsRE[pctCostSavingsFromPTO]~of the savings come from the smaller PTO, so for a lower-power WEC under these price assumptions the slightly smaller hydrodynamic design matters far more than the substantially smaller PTO, making design reuse across power levels unlikely.
+    Using the costs in \Cref{remdo:tab:opt-dv-values}, however, only \resultsRE[pctCostSavingsFromPTO]~of the savings come from the smaller PTO, so for a lower-power WEC under these price assumptions the slightly smaller hydrodynamic design matters far more than the substantially smaller PTO, making design reuse across power levels unlikely.
     This differs from preliminary work \cite{mccabe_multidisciplinary_2022}, which wrongly examined only the change in optimal design without weighting the relative cost impact of PTO and dimensions.
 \else
     With increasing cost and power (left to right), most design variables increase monotonically or nearly so; only $T_{f,2}$ and $h_{fs,\text{clear}}$ (both in the amplitude constraints) decrease, while the lower-bound thicknesses $t_d$ and $t_{f,b}$ stay essentially constant.
-    The powertrain ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO]~comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \cite{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
+    The powertrain ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \Cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO]~comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \cite{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
 \fi
 
 \ifdefined\DISSERTATION
-    The bottom of \cref{remdo:fig:design-heuristics} gives the analogous trends for the objectives.
+    The bottom of \Cref{remdo:fig:design-heuristics} gives the analogous trends for the objectives.
     Power output is largely linear, while design cost shows a discrete slope change near 5\% and a gradual one beyond.
     The discrete change causes the Pareto cusp and corresponds to a shift in PTO sizing strategy: from 0-5\% along, the cost-power trade is made by adjusting maximum power, whereas from 5-70\% it is made by adjusting maximum force at constant maximum power.
     The gradual slope change reflects diminishing returns, that is an increasing marginal cost of additional power.
 \else
-    The objective trends (bottom of \cref{remdo:fig:design-heuristics}) show largely linear power but a design-cost slope that changes discretely near 5\%, the source of the Pareto cusp, corresponding to a shift in PTO sizing strategy from adjusting maximum power (0-5\%) to adjusting maximum force at constant power (5-70\%), beyond which a gradual slope change reflects diminishing returns.
+    The objective trends (bottom of \Cref{remdo:fig:design-heuristics}) show largely linear power but a design-cost slope that changes discretely near 5\%, the source of the Pareto cusp, corresponding to a shift in PTO sizing strategy from adjusting maximum power (0-5\%) to adjusting maximum force at constant power (5-70\%), beyond which a gradual slope change reflects diminishing returns.
 \fi
 
-%An additional point of note on the Pareto front of \cref{remdo:fig:pareto} is the LCOE and coefficient of variation of a typical solar array plotted for comparison (data from \cite{borettiSolar}). Even the cheapest WEC design is still almost an order of magnitude more expensive than solar, indicative of the immaturity of WEC technology and the need for further innovation and cost reduction. On the bright side, many of the designs achieve a lower coefficient of power variation than solar, indicating the potential for wave energy as a relatively steady grid-connected renewable. Finally, it is worth highlighting that the amount of power variation directly affects the required energy storage, so the local cost of storage affects the position along the Pareto front that is optimal for a given application.
+%An additional point of note on the Pareto front of \Cref{remdo:fig:pareto} is the LCOE and coefficient of variation of a typical solar array plotted for comparison (data from \cite{borettiSolar}). Even the cheapest WEC design is still almost an order of magnitude more expensive than solar, indicative of the immaturity of WEC technology and the need for further innovation and cost reduction. On the bright side, many of the designs achieve a lower coefficient of power variation than solar, indicating the potential for wave energy as a relatively steady grid-connected renewable. Finally, it is worth highlighting that the amount of power variation directly affects the required energy storage, so the local cost of storage affects the position along the Pareto front that is optimal for a given application.
 
 %We can plot LCOE contours under different economic assumptions (sweep a couple FCRs, p0s, and opexes) and overlay this to the results already obtained in the global sensitivity analysis of FCR, p0, and opex but now plotted in multiobjective space.\hl{(Explain this better)}
 
 \ifdefined\DISSERTATION
     \Cref{remdo:fig:constraint-activity} shows which constraints are active along the front.
     Three structural design variables ($t_d$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) reach their lower bound and none their upper bound.
-    The only active linear constraint is the spar natural frequency constraint; since it is priority 2 (required for modeling accuracy under the assumptions), its activity is significant and discussed further in \cref{remdo:sec:discussion}.
+    The only active linear constraint is the spar natural frequency constraint; since it is priority 2 (required for modeling accuracy under the assumptions), its activity is significant and discussed further in \Cref{remdo:sec:discussion}.
     Aside from the maximum force constraint (always active by design), the active nonlinear constraints are the float, column, and damping plate factors of safety and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing float slamming.
 \else
-    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: three structural variables at their lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \cref{remdo:sec:discussion}), and the structural factor-of-safety and float-amplitude constraints.
+    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: three structural variables at their lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \Cref{remdo:sec:discussion}), and the structural factor-of-safety and float-amplitude constraints.
 \fi
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_constraint_activity_reactive.pdf}
     \caption{Constraint Activity}
     \label{remdo:fig:constraint-activity}
-\end{figure}
+\end{figure*}
 
 %\hl{If there's room/time, consider a bonus pareto of LCOE vs CF.}
 
@@ -611,16 +629,17 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
     \Cref{remdo:fig:optim-runtimes} shows the runtime of each optimization and analysis routine, run in parallel on a 14-core server.
     The optimization also runs without issue, though more slowly, on unspecialized machines such as a Windows~10 laptop with MATLAB~R2022a.
 \else
-    \Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+    %\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+    The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
+    The optimization also runs, more slowly, on a commodity laptop.
 \fi
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
-    \caption{Bar chart of optimization and analysis runtimes}
-    \label{remdo:fig:optim-runtimes}
-\end{figure}
-%the standard GitHub Linux runner for public repositories, which has 4 CPUs and 16 GB RAM with Ubuntu 24.04 operating system.
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
+%     \caption{Bar chart of optimization and analysis runtimes}
+%     \label{remdo:fig:optim-runtimes}
+% \end{figure}
 
 \ifdefined\DISSERTATION
     Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and \resultsRE[singleObjFcnEvals]~function evaluations (objective and gradient combined).
@@ -630,12 +649,12 @@ Similar trends are quantified in \cref{remdo:fig:design-heuristics}, which provi
     Each single-objective optimization takes \resultsRE[singleObjRuntime] (\resultsRE[singleObjIters]~iterations, \resultsRE[singleObjFcnEvals]~function evaluations); the Pareto front takes \resultsRE[paretoRuntime]; gradient-based sensitivities run in \resultsRE[gradientSensRuntime] versus \resultsRE[reoptimSensRuntime]~for re-optimization-based ones.
 \fi
 
-\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
+%\Cref{remdo:fig:pareto-epsilon-runtime-sweep} shows the effect of the number of epsilon-constraint seeds on function evaluations and hypervolume.
 %\hl{Analysis is left for during scrutineering.}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{example-image-a}
-    \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
-    \label{remdo:fig:pareto-epsilon-runtime-sweep}
-\end{figure}
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{example-image-a}
+%     \caption{Effect of number of epsilon-constraint seeds on pareto front function evaluations and hypervolume}
+%     \label{remdo:fig:pareto-epsilon-runtime-sweep}
+% \end{figure}

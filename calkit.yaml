@@ -45,9 +45,13 @@ parameters:
     - taxonomy
     - mod_freq_domain_ctrl_synthesis
     - mod_freq_domain_ctrl_evaluation
+    - mod_freq_domain_ctrl_combined
   latex_standalone_name:
-    - eigenfunctions
-    - A_matrix
+    - circuit_intrinsic
+    - circuit_pto
+    - circuit_kinematics
+    - control_method_venn_diagram
+    - meem_dims
 # subprojects:
 #   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
@@ -108,7 +112,13 @@ pipeline:
       inputs:
         - mdocean/analysis/
         - mdocean/inputs/
-        - mdocean/optimization/
+        - mdocean/optimization/multiobjective/
+        - mdocean/optimization/sensitivities/
+        - mdocean/optimization/compare_run.m
+        - mdocean/optimization/find_nominal_inputs.m
+        - mdocean/optimization/gradient_optim.m
+        - mdocean/optimization/max_avg_power.m
+        - mdocean/optimization/run_solver.m
         - mdocean/plots/util/
         - mdocean/plots/matlab_figs/
         - mdocean/plots/all_figures.m
@@ -147,7 +157,6 @@ pipeline:
         - ./mdocean/analysis/PostproClass.m
         - results/AllFigCompare/intermed.mat
       outputs:
-        # - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/runtime_bar_chart.fig
         - results/AllFigCompare/end.mat
@@ -252,6 +261,8 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - ./mdocean/plots/util/imrange.m
         - ./mdocean/plots/util/signed_log.m
+        - ./mdocean/plots/util/stacked_number_line.m
+        - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
         - ./mdocean/simulation/modules/dynamics/dynamics.m
@@ -281,18 +292,18 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Comparison/intermed.mat
       outputs:
-        # - results/Comparison/overlaid_geometry.pdf
-        # - results/Comparison/overlaid_hydro_coeffs.pdf
-        # - results/Comparison/probability_CDF.pdf
-        # - results/Comparison/comparison_power_matrix.pdf
         - results/Comparison/overlaid_geometry.pdf
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
         - results/Comparison/comparison_power_matrix.pdf
+        - results/Comparison/stacked_optimal_design_vars.pdf
+        - results/Comparison/stacked_optimal_outputs.pdf
         - results/Comparison/overlaid_geometry.fig
         - results/Comparison/overlaid_hydro_coeffs.fig
         - results/Comparison/probability_CDF.fig
         - results/Comparison/comparison_power_matrix.fig
+        - results/Comparison/stacked_optimal_design_vars.fig
+        - results/Comparison/stacked_optimal_outputs.fig
         - path: results/Comparison/optimal_design_vars.tex
           storage: git
         - path: results/Comparison/optimal_outputs.tex
@@ -2019,17 +2030,23 @@ pipeline:
         - ./mdocean/analysis/PostproClass.m
         - results/ReadNonMatlabFigs/intermed.mat
       outputs:
+        - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+        - results/ReadNonMatlabFigs/circuit_pto.pdf
+        - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+        - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
         - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
         - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
         - results/ReadNonMatlabFigs/dimensions.pdf
         - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
         - results/ReadNonMatlabFigs/FBD.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/meem_dims.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
         - results/ReadNonMatlabFigs/section_flow.pdf
@@ -2069,7 +2086,6 @@ pipeline:
         - ./mdocean/analysis/PostproClass.m
         - results/QPCircles/intermed.mat
       outputs:
-        # - results/QPCircles/qp_circles.pdf
         - results/QPCircles/qp_circles.pdf
         - results/QPCircles/qp_circles.fig
         - results/QPCircles/end.mat
@@ -2172,16 +2188,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - results/RunSingleFigFunc/intermed.mat
       outputs:
-        # - results/RunSingleFigFunc/nominal_geometry_viz.pdf
-        # - results/RunSingleFigFunc/nominal_power_pdf.pdf
-        # - results/RunSingleFigFunc/nominal_power_matrix.pdf
-        # - results/RunSingleFigFunc/drag_convergence.pdf
-        # - results/RunSingleFigFunc/ctrl_polar_plot_mult.pdf
-        # - results/RunSingleFigFunc/ctrl_polar_plot_gamma.pdf
-        # - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
-        # - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
-        # - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
-        # - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
         - results/RunSingleFigFunc/nominal_geometry_viz.pdf
         - results/RunSingleFigFunc/nominal_power_pdf.pdf
         - results/RunSingleFigFunc/nominal_power_matrix.pdf
@@ -2325,7 +2331,6 @@ pipeline:
         - ./mdocean/analysis/PostproClass.m
         - results/Slamming/intermed.mat
       outputs:
-        # - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/slamming_amplitude.fig
         - results/Slamming/end.mat
@@ -2360,7 +2365,6 @@ pipeline:
         - ./mdocean/analysis/PostproClass.m
         - results/SparHydro/intermed.mat
       outputs:
-        # - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/spar_added_mass.fig
         - results/SparHydro/end.mat
@@ -2452,19 +2456,6 @@ pipeline:
         - ./mdocean/plots/util/improvePlot.m
         - results/SweepGeoms/intermed.mat
       outputs:
-        # - results/SweepGeoms/sweep_geoms_parallel.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter.pdf
-        # - results/SweepGeoms/sweep_geoms_line.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
-        # - results/SweepGeoms/sweep_geoms_pareto.pdf
-        # - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
-        # - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
-        # - results/SweepGeoms/factor_grid.pdf
         - results/SweepGeoms/sweep_geoms_parallel.pdf
         - results/SweepGeoms/sweep_geoms_scatter.pdf
         - results/SweepGeoms/sweep_geoms_line.pdf
@@ -2575,7 +2566,6 @@ pipeline:
         - ./mdocean/plots/util/remove_underscores.m
         - results/Validation/intermed.mat
       outputs:
-        # - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
         - path: results/Validation/validation.tex
@@ -3550,6 +3540,7 @@ pipeline:
         # - results/ReadNonMatlabFigs/end.json
         - results/RunSingleFigFunc/end.json
         - results/Runtime/end.json
+        - results/SweepGeoms/end.json
         - results/PtoSweep/end.json
         # - results/Slamming/end.json
         # - results/SparHydro/end.json
@@ -3568,6 +3559,7 @@ pipeline:
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
         MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
+        meemSweepTime: "{geom_sweep_analysis_time/60:.0f} minutes"
         # percentages
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
@@ -3584,6 +3576,8 @@ pipeline:
         ptoSweepMinLCOE_power: "{ptoSweepMinLCOE_power/1e3:.0f} kW"
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
+        # numbers
+        meemSweepSize: "{n_combos}"
     check-dup-json-keys:
       kind: python-script
       environment: pubs
@@ -3712,6 +3706,11 @@ pipeline:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
           kind: file-to-file
+                #
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+          kind: file-to-file
         # bib style file
         - src: pubs/shared/elsarticle-num-names.bst
           dest: 
@@ -3726,6 +3725,20 @@ pipeline:
           kind: file-to-file
         - src: pubs/shared/shared-pkg.tex
           dest: pubs/renewable-energy-mdo/shared-pkg.tex
+          kind: file-to-file
+        #
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/applied-ocean-research-model/cas-dc.cls
+          kind: file-to-file
+        - src: pubs/shared/els-cas/cas-dc.cls
+          dest: pubs/renewable-energy-mdo/cas-dc.cls
+          kind: file-to-file
+        #
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/applied-ocean-research-model/cas-common.sty
+          kind: file-to-file
+        - src: pubs/shared/els-cas/cas-common.sty
+          dest: pubs/renewable-energy-mdo/cas-common.sty
           kind: file-to-file
     paperlint-aor:
       kind: python-script
@@ -3790,7 +3803,6 @@ pipeline:
         - pubs/applied-ocean-research-model/figs/tikz/
         - pubs/applied-ocean-research-model/tables/
         - pubs/applied-ocean-research-model/main.tex
-        - pubs/applied-ocean-research-model/numbers.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/elsarticle-num-names.bst
         - pubs/applied-ocean-research-model/references.bib
@@ -3825,6 +3837,8 @@ pipeline:
         - pubs/dissertation/hangcaption.sty
         - pubs/dissertation/.latexmkrc
         - pubs/dissertation/intro-contrib.tex
+        - pubs/dissertation/abstract.tex
+        - pubs/dissertation/acknowledgements.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/content.tex
         - pubs/applied-ocean-research-model/sections/
@@ -3929,18 +3943,30 @@ pipeline:
           storage: git
     make-standalone-tex-pdf:
       kind: latex
-      target_path: pubs/defense/latex-standalone/standalone_{name}.tex
+      target_path: mdocean/plots/non_matlab_figs/{name}.tex
       environment: tex
+      latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      output_dir: mdocean/plots/non_matlab_figs/pdf/
+      synctex: false
       iterate_over:
         - arg_name: name
           values:
             - parameter: latex_standalone_name
-      #inputs:
-        #- pubs/shared/equations/
+      inputs:
+        - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
       outputs:
-        - pubs/defense/latex-standalone/standalone_{name}.pdf
-        - path: pubs/defense/latex-standalone/standalone_{name}.log
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
+          delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
+          delete_before_run: false
+          storage: null
+        - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
+          delete_before_run: false
+          storage: null
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg
@@ -4015,15 +4041,18 @@ overleaf_sync:
       - main.tex
       - sections/
       - references.bib
-      - numbers.tex
+      - zotero-meem-refs.bib
       - elsarticle-num-names.bst
       - appendices.tex
       - commands-aor.tex
       - content.tex
+      - shared-pkg.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs/
-      - tables/
-      - numeric-results.tex
+      # - tables/
+      # - numeric-results.tex
   pubs/renewable-energy-mdo:
     url: https://www.overleaf.com/project/6753a38b61276b931380c29c
     sync_paths:
@@ -4031,12 +4060,17 @@ overleaf_sync:
       - sections/
       - tables/
       - references.bib
-      - numbers.tex
+      - zotero-meem-refs.bib
+      - elsarticle-num-names.bst
       - commands-re.tex
+      - shared-pkg.tex
+      - content-re.tex
+      - cas-dc.cls
+      - cas-common.sty
     push_paths:
       - figs
-      - numeric-results.tex
-      - tables/from-matlab/
+      # - numeric-results.tex
+      # - tables/from-matlab/
   pubs/UMERC-2025-grid-value:
     url: https://www.overleaf.com/project/68516ba5bc36663bb61711a6
     sync_paths:

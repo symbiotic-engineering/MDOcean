@@ -40,7 +40,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         warning('off', verbosity_warning_ids{k});
     end
 
-    n = 3; % number of points per dimension
+    n = 5; % number of points per dimension
 
     zero_to_one   = linspace(0.01, 0.99, n);
     zero_to_three = linspace(0.01, 3,    n);
@@ -86,6 +86,7 @@ function intermed_result_struct = analysis_fcn(p, b)
     drag_lut_rp_range    = nan(2, n_geoms); % row 1 = min, row 2 = max rp per geometry
     drag_lut_kappa_range = nan(2, n_geoms); % row 1 = min, row 2 = max kappa per geometry
 
+    start_time = tic;
     parfor i = 1:n_geoms
 
         D_s   = 2 * A1(i);
@@ -124,6 +125,7 @@ function intermed_result_struct = analysis_fcn(p, b)
         drag_lut_rp_range(:, i)    = rp_range_i;
         drag_lut_kappa_range(:, i) = kappa_range_i;
     end
+    elapsed_time = toc(start_time);
 
     m0h_stored = reshape(m0h_stored_linear, [nT, size(A1)]);
     hydro_ratio_result = reshape(hydro_ratio_result_linear, [nT, size(A1)]);
@@ -171,6 +173,8 @@ function intermed_result_struct = analysis_fcn(p, b)
     intermed_result_struct.hydro_ratio_result = hydro_ratio_result;
     intermed_result_struct.m0h_stored         = m0h_stored;
     intermed_result_struct.val                = val;
+    intermed_result_struct.n_geoms            = n_geoms;
+    intermed_result_struct.elapsed_time       = elapsed_time;
 
     % Dimensional grid arrays (needed for CWR computation)
     intermed_result_struct.H     = H;
