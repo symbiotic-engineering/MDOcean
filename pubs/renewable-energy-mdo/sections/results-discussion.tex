@@ -1,27 +1,20 @@
 % 99 - 103
-\section{Results}\label{remdo:sec:results}
-This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
-\ifdefined\DISSERTATION
-    Beyond the analysis of individual results in \Cref{remdo:sec:results}, this section discusses the study's contributions, implications, and limitations more broadly.
-    It compares results to existing studies for context and suggests avenues for future work to resolve model shortcomings and answer additional design questions.
-\else
-    Beyond the per-result analysis of \Cref{remdo:sec:results}, this section discusses the study's contributions and limitations, comparing results to existing studies and suggesting future work.
-\fi
-Rather than organizing results by the method that produces them, the section groups results by the type of insight they provide.
+\section{Results and Discussion}\label{remdo:sec:results}
+This section presents the outcomes and implications of the optimization and sensitivity analyses, compares them to previous work, and discusses the study's contributions, limitations, and future directions.
+The section organizes results by the type of insight they provide; raw results of each method are available in \cref{remdo:sec:appendix-supplemental-results}.
 
 \subsection{Features of the Minimum LCOE Design}
 \label{remdo:sec:results-single}
 
 \subsubsection{Larger Bulk Geometry}
-The optimal designs are generally larger than the nominal.
-\ifdefined\DISSERTATION
-    The minimum-LCOE design is larger in all bulk dimensions, with a particularly large increase in float diameter, nearly doubling from 20~m to \resultsRE[DfoptMinLCOE]~m.
-    Comparing the above-water profiles of the nominal and Pareto-optimal designs, a consistent trend emerges: the long support tubes of the nominal design are replaced by a taller float and shorter support tubes.
-    This likely arises because the slamming constraints $g_{NL,23}$-$g_{NL,239}$ encourages higher draft $T_{f,2}$, and the float height $h_f$ grows correspondingly since the submersion fraction $T_{f,2}/h_f$ is held constant as a parameter.
-\else
-    The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]).
-    The above-water profiles show a consistent trend: the nominal design's long support tubes give way to a taller float and shorter tubes, likely because the slamming constraint encourages higher draft $T_{f,2}$ while the fixed submersion fraction $T_{f,2}/h_f$ forces float height to grow with it.
-\fi
+\Cref{remdo:fig:overlaid-geometry} compares the minimum-LCOE geometry to the nominal.
+The optimized design is larger in all bulk dimensions, most strikingly in float diameter: $D_f$ nearly doubles from 20~m to \resultsRE[DfoptMinLCOE].
+This larger diameter increases the radiation damping (see \Cref{remdo:fig:overlaid-hydro})
+and thus the radiation-limited maximum power generation.
+Meanwhile, the larger draft $T_{f,2}$ increases the upper limit on oscillation amplitude imposed by the slamming constraints $g_{NL,23}$-$g_{NL,239}$, which brings actual power generation closer to the maximum.
+Above water, the nominal design's long float-spar connection tubes give way to a taller float and shorter tubes.
+This results from the fixed submersion fraction $T_{f,2}/h_f$, which forces float height $h_f$ to grow when draft $T_{f,2}$ increases.
+
 % geometry overlaid figure
 \begin{figure}[htbp]
 \centering
@@ -44,33 +37,28 @@ The optimal designs are generally larger than the nominal.
 \end{figure}
 
 \subsubsection{Undersized PTO}
-\ifdefined\DISSERTATION
-    Its PTO is similarly sized, with a slightly lower maximum force rating and slightly higher maximum power rating.
-    The other objectives all retain this lower maximum force, while the maximum power rating is less consistent, falling both above and below the nominal.
-\else
-    It has a similarly sized PTO at slightly lower maximum force.
-\fi
-\ifdefined\DISSERTATION
-    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping the maximum force well below the unsaturated point, finding that this sacrifices only minimal power, but none perform a full economic analysis confirming that the cost savings outweigh the power loss.
-    The results in \Cref{remdo:sec:results-single} verify the conclusion with an appropriate cost analysis, since the optimal design sizes its powertrain small enough to require force saturation.
-    The follow-up analysis in \Cref{remdo:sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
-    Force saturation is therefore highly valuable as a control technique, capable of tangible LCOE reductions once the power--cost tradeoff is considered.
-    Future studies could quantify the lowest marginal PTO force price (\$/N) for which this conclusion still holds.
-\else
-    Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024} recommend capping maximum force well below the unsaturated point to minimize power loss, but none have economically confirmed that the financial savings outweigh the performance reduction.
-    This study verifies the conclusion with a full cost analysis: the optimal design sizes its powertrain to require force saturation, and re-optimizing without it incurs a 5\% LCOE penalty. %(\Cref{remdo:sec:sensitivity-model-assumptions}), confirming force saturation as a valuable control technique.
-\fi
+Dimensionally, the nominal and optimal PTOs are similarly sized,
+with a slightly lower maximum force rating and slightly higher maximum power rating at optimality.
+Nondimensionally, however, the optimized PTO is significantly smaller than that required to avoid active PTO limits,
+with force and power ratings respectively \resultsRE[percentForceLimitMinLCOE] and \resultsRE[percentPowerLimitMinLCOE] of those for the same hull geometry with only amplitude saturation.
+
+Previous studies \cite{mcgilton_optimal_2024,coe_maybe_2021,devin_high-dimensional_2024,gaebele_tpl_2025,mccabe_force-limited_2024}
+likewise recommend capping the maximum force well below the unsaturated point since this sacrifices only minimal power, but none perform an economic analysis confirming that the cost savings outweigh the performance loss.
+The results here verify the conclusion with an appropriate cost analysis as well as the presence of three simultaneous dynamic constraints: force, power, and amplitude.
+The follow-up analysis in \Cref{remdo:sec:sensitivity-model-assumptions} repeats the optimization without allowing force saturation and finds a 5\% LCOE penalty.
+Force saturation is therefore highly valuable as a control technique, capable of tangible LCOE reductions once the power--cost tradeoff is considered.
+Future studies could quantify the lowest marginal PTO force price (\$/N) for which this conclusion still holds.
 % \hl{add similar analysis for power saturation}
 
 \subsubsection{Thin-Skinned Structures}
 % 149 - 167
 \ifdefined\DISSERTATION
-    In all optima, the three structural thicknesses decrease significantly and the float stiffener height decreases moderately, indicating that the optimized floats experience lower hydrodynamic forces and can shed structural material.
-    In the minimum-LCOE design, the lower damping plate thickness trades off against larger damping plate stiffeners, mimicking the aerospace paradigm in which thin sheet-metal skin and substantial stiffeners are favored over thick plate stock.
-    In several scenarios, structural thickness variables converge to their lower bounds.
+    The three structural thicknesses decrease significantly and the float stiffener height decreases moderately, indicating that the optimized float experiences lower loads and can shed structural material.
+    In the minimum-LCOE design, the damping plate decreases in thickness while increasing in stiffener height.
+    This mimics the aerospace paradigm in which thin sheet-metal skin and substantial stiffeners are favored over thick plate stock.
+    In fact, structural thickness variables converge to their lower bounds.
     The activity of these bound constraints (priority 2 requirements in the language of \Cref{remdo:sec:requirements}) indicates that the structures model is at the edge of its validity for thin-skinned stiffened shells, calling into question the assumption that the deflection field resembles a plate rather than a beam \cite{mccabe_development_2026}.
     Expanding the structures model to remove this assumption could yield even more efficient structural designs.
-    In the minimum-cost design, the damping plate stiffeners instead decrease in size.
 \else
     In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material.
     The minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
@@ -88,10 +76,6 @@ The optimal designs are generally larger than the nominal.
 
 % lines 179-187
 \subsubsection{Cheaper, More Powerful, Yet Not Viable}
-The hydrodynamic coefficients and power distributions of each single-objective optimal design,
-with the nominal for reference,
-are compared in \Cref{remdo:fig:overlaid-hydro,remdo:fig:overlaid-power-dist},
-with numerical results in \Cref{remdo:tab:opt-output}.
 
 % 188-193
 \ifdefined\DISSERTATION
