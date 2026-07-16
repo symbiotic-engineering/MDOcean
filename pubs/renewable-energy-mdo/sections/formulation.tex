@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Problem Formulation}\label{remdo:sec:formulation}
-The standard optimization problem is expressed \cite{martins_engineering_2022,papalambros_principles_2017}:
+The standard optimization problem is expressed \citep{martins_engineering_2022,papalambros_principles_2017}:
 \begin{equation}
 \label{remdo:eq:standard-opt-prob}
 \begin{aligned}
@@ -16,20 +16,20 @@ Parameters $\vec{p}$ are constant inputs required to compute the objective or co
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Objective Function}\label{remdo:sec:obj}
-For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \citet{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2026}.
+For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \citet{trueworthy_wave_2020} and computed by the economics module \citep{mccabe_development_2026}.
 
 \ifdefined\DISSERTATION
     LCOE is adopted for its simplicity, although this choice brings three major limitations.
     First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
-    On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, so capturing nonuniform sources of WEC value such as consistency or complementarity would require modifications (e.g.\ \cite{mccabe_system_2023}) outside the scope of the present model.
+    On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \cite{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, so capturing nonuniform sources of WEC value such as consistency or complementarity would require modifications (e.g.\ \citep{mccabe_system_2023}) outside the scope of the present model.
     Second, LCOE has high uncertainty for early-stage designs: the economic model assumes only structural and PTO costs scale with design \cite{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
-    Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \cite{livecchi_powering_2019}.
-    For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \cite{jenne_powering_2021}.
+    Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \citep{livecchi_powering_2019}.
+    For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \citep{jenne_powering_2021}.
     
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citet{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \citep{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \citep{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citet{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
     The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
 \fi
 
@@ -170,8 +170,8 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive WEC
  \textbf{\#}&\textbf{Design Var.}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
  $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
  $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\
- $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\cite{mccabe_development_2026}&100& m\\
- $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\cite{mccabe_development_2026}& 100& m\\
+ $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\citep{mccabe_development_2026}&100& m\\
+ $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\citep{mccabe_development_2026}& 100& m\\
  $x_5$&$h_{fs,\text{clear}}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $F_{\text{max}}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
  $x_{7}$&$P_{pk,\text{elec}}$& Generator peak power rating & 50& 286& 1000& kW\\
@@ -185,14 +185,14 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive WEC
 \end{center}
 \end{table}
 
-The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \cite{RM3}.
+The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \citep{RM3}.
 \ifdefined\DISSERTATION
     Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
-    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2026}.
+    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citep{mccabe_development_2026}.
     In effect, the spar dimensional design space is restricted to comply with the model assumptions.
     This prevents determining the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \else
-    Three parameters of note, the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \cite{mccabe_development_2026}.
+    Three parameters of note, the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citep{mccabe_development_2026}.
     This restricts the spar design space to remain model-valid; it precludes finding the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \fi
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
@@ -207,11 +207,11 @@ The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Hu
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
 $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
 $h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,\text{struct}}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{\text{struct}}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
+JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
+$H_s$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
+$T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
 $\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
 $E$& Material Young's modulus& 200 & GPa  \\ 
@@ -244,11 +244,11 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else
     While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed, a choice that adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
-    Recent papers have demonstrated the value of full PTO co-design \cite{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
+    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
 \fi
 
 %\subsubsection{Model Checking}
-%\hl{todo: check for redundant constraints, monotonicity, etc} \cite{papalambros_principles_2017}.
+%\hl{todo: check for redundant constraints, monotonicity, etc} \citep{papalambros_principles_2017}.
 %It was initially speculated that the structural constraints would always be active, 
 
 \subsection{Interpretation}

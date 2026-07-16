@@ -55,7 +55,7 @@ This section provides supplementary derivations and implementation details for t
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \Cref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \citet{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \citet{penalba_review_2016} reviews WEC PTO models and reference~\citep{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
 Reference \citet{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
 This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
@@ -94,12 +94,12 @@ This form is used for the PTO dynamics (drivetrain followed by generator).
 This form is used for the PTO kinematics, where it naturally accommodates underactuation.
 \end{itemize}
 
-Conversion between the three forms is accomplished using the formulas in reference \cite{reveyrand_multiport_2018}.
+Conversion between the three forms is accomplished using the formulas in reference \citep{reveyrand_multiport_2018}.
 Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
 
 % Verify against \citet{coe_co-design_2025} before submission and edit
 % if the convention differs.
-The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
+The sign convention adopted here treats both flows as positive when entering the multiport, matching \citep{coe_co-design_2025}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{PTO Kinematics and Underactuation}
@@ -1049,7 +1049,7 @@ and would unlock a fully semi-analytical differentiation workflow.
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
 This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \citet{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \citet{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
+For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \citep{mccabe_force-limited_2024}. 
 
 The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \Cref{sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
@@ -1271,10 +1271,10 @@ The damping-excitation grouping chosen in \Cref{sec:drag} avoids this confusion 
 
 Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
 Reference \citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
-This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+This means that Ref.~\citep{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
 Early MDOcean simulations that used the formulation of \citet{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \Cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \cite{quartier_influence_2021}.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \citep{quartier_influence_2021}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
@@ -1802,7 +1802,7 @@ The top and bottom plates are the only ones with external heave loads, arising f
 
 The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \Cref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
-For example, reference~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
+For example, reference~\citep{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
 They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
 This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{\text{min}}^2$.
 For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{\text{min}}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{\text{min}}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{\text{min}}=b_1$, and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
@@ -1849,9 +1849,9 @@ Under these conditions, either the stress at the center $\sigma_{\text{cent}}$ o
         \sigma_{\text{cent}}&=-\beta_2 W/t_{f,\text{top},eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \cite{young_roarks_2001}.
+using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \citep{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
-However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in references \cite{RM3,previsic_reference_2011}.
+However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in references \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
 
@@ -1864,7 +1864,7 @@ This prevents the need for a separate structural analysis of the side plates.
 \subsection{Damping Plate}
 For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{\text{plate}}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
-Formulas for the concentrated loading are given in reference \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in reference \cite{young_roarks_2001}.
+Formulas for the concentrated loading are given in reference \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in reference \citep{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
 The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
@@ -1874,7 +1874,7 @@ This results in the following expression for the radial plate bending stress $\s
     \right)
 \end{equation}
 
-The critical buckling stress $\sigma_{\text{buckle}}$ is found according to \cite{american_bureau_of_shipping_requirements_2022}.
+The critical buckling stress $\sigma_{\text{buckle}}$ is found according to \citep{american_bureau_of_shipping_requirements_2022}.
 The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
 The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
@@ -1969,11 +1969,11 @@ These equations assume that the spar is compact, meaning that local buckling of 
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
 $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
 $h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,\text{struct}}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{\text{struct}}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
+JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
+$H_s$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
+$T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
 $\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
 $E$& Material Young's modulus& 200 & GPa  \\ 
