@@ -4,7 +4,7 @@
 \label{sec:appendix-additional-hydro}
 \subsection{Spar Coefficients}
 As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides MEEM.
-We approximate the spar added mass coefficient $A_s$ as a frequency-independent quantity using a formula proposed by \cite{philip_damping_2012} based on the displaced water volume in the spherical projection of the damping plate:
+We approximate the spar added mass coefficient $A_s$ as a frequency-independent quantity using a formula proposed by \citet{philip_damping_2012} based on the displaced water volume in the spherical projection of the damping plate:
 \begin{equation}\label{eq:As}
  A_s =\frac{1}{3}\rho_w D_d^3\left(1 - \frac{3}{4}r^2\sqrt{1-r^2} - \frac{1}{4}(1-\sqrt{1-r^2})^2(2+\sqrt{1-r^2})\right),
 \end{equation}
@@ -12,7 +12,7 @@ where $r = D_s/D_d$.
 This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\rho_w D_d^3$ at $r=0$) to a pure column limit ($\frac{1}{6}\rho_w D_d^3$ at $r=1$).
 
 The other spar coefficients are calculated by fitting and interpolating data from WAMIT for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
-To derive the dimensional scalings, we use the numerical results that \cite{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
+To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
 By plotting the data for a variety of geometries on a single plot and scaling the axes by dimensionless geometric ratios until the points begin to overlap as a single trend,
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
@@ -55,8 +55,8 @@ This section provides supplementary derivations and implementation details for t
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \Cref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
+Reference \citet{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
+Reference \citet{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
 This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 
@@ -97,7 +97,7 @@ This form is used for the PTO kinematics, where it naturally accommodates undera
 Conversion between the three forms is accomplished using the formulas in reference \cite{reveyrand_multiport_2018}.
 Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
 
-% Verify against \cite{coe_co-design_2025} before submission and edit
+% Verify against \citet{coe_co-design_2025} before submission and edit
 % if the convention differs.
 The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
 
@@ -1047,7 +1047,7 @@ and would unlock a fully semi-analytical differentiation workflow.
 \Cref{sec:dynamics} introduces the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
 
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
-This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \cite{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \cite{coe_initial_2020} finds as numerically optimal).
+This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \citet{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \citet{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
 For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
 
@@ -1064,7 +1064,7 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
     
 %When $\frac{F_p}{\tau_{\text{max}}}$ = 1 (no saturation), then $\alpha= 1$; when $\frac{F_p}{\tau_{\text{max}}} \rightarrow \infty$ (full saturation), then $\alpha= \frac{4}{\pi}$. This makes sense because $\frac{4}{\pi}$ is the harmonic amplitude of a unit square wave, and in full saturation the saturated signal approaches a square wave. $\alpha$ is plotted in \Cref{fig:alpha-fit}.
 
-%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \cite{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
+%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \citet{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
 
 % %Substituting $f_{sat}$ back into the equation of motion reveals that the control gain saturation multiplier $m_{sat}$ is the solution to a quadratic equation $a_q m_{sat}^2 + b_q m_{sat} + c_q = 0$. If the uncontrolled dynamics have a natural frequency $\omega_{n,u}$ and damping ratio $\zeta_u$, and the controlled unsaturated dynamics have natural frequency $\omega_n$ and damping ratio $\zeta$, then the quadratic coefficients can be expressed as:
 
@@ -1150,7 +1150,7 @@ Plugging the describing function \Cref{eq:drag-pressure} into the drag force int
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
 The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
@@ -1262,17 +1262,17 @@ The relevant limits are then:
 %%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
 \label{subsec:appendix-drag-others}
-The WEC drag model in the study \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+The WEC drag model in the study \citet{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
-Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
+Furthermore, the drag ``damping'' term in the grouping of \citet{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
 This creates the confusing possibility for negative apparent damping coefficients, leading to false concerns about violating energy conservation if erroneously interpreted as a true damping coefficient.
 The damping-excitation grouping chosen in \Cref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
 
-Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
-Reference \cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
+Reference \citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
 This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
-Early MDOcean simulations that used the formulation of \cite{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
+Early MDOcean simulations that used the formulation of \citet{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \Cref{sec:drag} avoids this issue.
 Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \cite{quartier_influence_2021}.
 
@@ -1283,7 +1283,7 @@ The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
 The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \Cref{eq:eom-freq-domain} and $k$ is the iteration index.
-It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria:
+It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \citet{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
     \frac{\partial}
@@ -1467,7 +1467,7 @@ Meanwhile, the error is extremely low in the 2-DOF system enforcing the same hyd
 This indicates that the larger error in the 2-DOF-drag-MEEM case is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF.
 The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
 
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citet{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
 For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
@@ -1577,7 +1577,7 @@ it does record the mechanical power for each sea state.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1.05\linewidth]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
-    \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
+    \caption{Comparison of mechanical power for RM3 report \citet{RM3} and MDOcean}
     \label{fig:report-power-validation}
 \end{figure}
 Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
@@ -1706,7 +1706,7 @@ The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Economic Validation}
 \label{sec:appendix-econ-validation}
-\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \cite{RM3} reference values.
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \citet{RM3} reference values.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/cost_vs_N_WEC.pdf}

@@ -16,7 +16,7 @@ Parameters $\vec{p}$ are constant inputs required to compute the objective or co
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Objective Function}\label{remdo:sec:obj}
-For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \cite{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2026}.
+For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \citet{trueworthy_wave_2020} and computed by the economics module \cite{mccabe_development_2026}.
 
 \ifdefined\DISSERTATION
     LCOE is adopted for its simplicity, although this choice brings three major limitations.
@@ -29,7 +29,7 @@ For the single-objective formulation, the optimization minimizes the levelized c
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citet{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
     The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
 \fi
 
@@ -148,11 +148,11 @@ The encoding of a physical design space into optimization design variables is no
     
     Continuing the draft example, two priority 1 requirements, \reqref{float_spar_draft} and \reqref{spar_seafloor_overflow}, contain $T_{f,2}$, while $T_s$ appears in \reqref{float_spar_draft} and \reqref{float_seafloor_overflow}.
     Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
-    Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
+    Early results with nondimensional encodings \citet{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
     For example, the float and spar drafts may be encoded directly as dimensions or nondimensionally as a dimension and a ratio.
     An encoding may be chosen to control the objective directly, induce convexity, or maintain feasibility; the last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
-    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint; early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
+    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint; early results with nondimensional encodings \citet{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
 \fi
 
 This logic is repeated for the remaining design variables and requirements.
@@ -239,7 +239,7 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 
 \ifdefined\DISSERTATION
     Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters.
-    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \cite{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \Cref{remdo:sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
+    Rather than perform PTO co-design, whose value a number of recent papers (e.g.\ \citet{coe_useful_2023,gaebele_incorporating_2023} and those discussed in \Cref{remdo:sec:lit}) have already proven, this study keeps the PTO design fixed at representative values.
     While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else

@@ -75,7 +75,7 @@ The hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, an
 
 The displacement vector $\vec{\hat{\xi}}$ contains a state for each degree of freedom.
 We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
-A two-body heaving point absorber that rigidly locks the bodies in a storm following \cite{RM3} has vectors:
+A two-body heaving point absorber that rigidly locks the bodies in a storm following \citet{RM3} has vectors:
 \begin{equation}\label{eq:define-vectors}
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
@@ -221,7 +221,7 @@ This subsection introduces the dynamics and control modeling assumptions before 
 
 \ifdefined\DISSERTATION
     Methods for WEC dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), quasi-linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
-    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
+    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \citet{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \citet{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
     This section describes both the technical concept and the practical rationale for the choice of a quasi-linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
@@ -368,7 +368,7 @@ If neither a numerical nor an analytical implementation is available to identify
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
+    It has been used in several previous WEC optimization studies for various constraints \citet{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \else
     This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
     and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
@@ -436,9 +436,9 @@ MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabl
 \subsubsection{Equation of Motion}\label{sec:eom}
 \ifdefined\DISSERTATION
     Before applying the quasi-linearized pseudo-spectral method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
-    Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
-    The MDOcean dynamic model combines the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    The MDOcean dynamic model combines the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \fi
 
 The float and spar are each modeled as a floating rigid body, and the two bodies are kinematically coupled to transmit force between them.
@@ -768,7 +768,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
     higher-order nonlinear potential flow effects, and
     steady and unsteady viscous separation phenomena are all neglected.
     In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
-    These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
+    These effects have been found to be the dominant drag force for heaving WECs \citet{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 \else
     The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \citep{quartier_influence_2021}.
     Without modeling drag, the predicted resonant amplitude is unrealistically high and power is overestimated.
@@ -804,7 +804,7 @@ Integrating the drag pressure over the wetted surface via strip theory (\Cref{se
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
 Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
