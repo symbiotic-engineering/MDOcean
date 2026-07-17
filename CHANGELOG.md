@@ -3,6 +3,10 @@
 ### Fixed
 - Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
 
+## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-17
+### Changed
+- Dev: merge `main` into `post-submit-edits-old` and prepare branch for merge.
+
 ## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-12
 ### Added
 - Paper: add Elsevier `cas-sc.cls` support for single-column journal submission formatting.
