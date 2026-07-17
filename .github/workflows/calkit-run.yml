@@ -34,28 +34,12 @@ jobs:
           export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
           mkdir -p "$TMPDIR"
           echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
-      - name: Clear stale submodule caches
-        run: |
-          # Deinit any previously-initialized submodules first (while their gitdirs
-          # still exist) so that actions/checkout's auth-setup foreach won't try to
-          # traverse into stale submodule directories and fail.
-          git submodule deinit --all --force 2>/dev/null || true
-          # Now remove the entire gitdir module cache so the next manual init starts clean.
-          rm -rf .git/modules 2>/dev/null || true
       - uses: actions/checkout@v6
         with:
           # For PRs, checkout the head ref to avoid detached HEAD
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Use submodules: false so actions/checkout does NOT run
-          # `git submodule update --init --recursive` (which would register
-          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
-          # `git submodule foreach --recursive` for auth removal (which would
-          # then fail with "No url found" for that nested submodule).
-          submodules: false
           persist-credentials: false
-      - name: Init submodules
-        run: git submodule update --init --recursive
       - name: Configure Git credentials
         run: |
           git config user.name github-actions[bot]
@@ -89,6 +73,18 @@ jobs:
       #       Simscape_Multibody
       - name: Add MATLAB to PATH
         run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+      - name: Set up mip project environment
+        # Installs mip if needed and builds ./.mip to match mip.lock, so the
+        # pipeline stages can run their MATLAB commands with
+        # `mip project run '<target>'`, which loads the locked dependencies
+        # (openflash, wec-sim, safe) before running. MATLABPATH points every
+        # later matlab -batch session at the MEP 8/9 preview build of mip
+        # (which provides `mip project`; temporary until MEPs 8/9 land in a
+        # mip release) -- and works even when the installer could not save
+        # the MATLAB path (pathdef.m is often read-only on shared installs).
+        run: |
+          matlab -batch "setup_mip"
+          echo "MATLABPATH=$HOME/Documents/MATLAB/mip/packages/gh/mip-org/labs/mip/mip" >> $GITHUB_ENV
       # - name: test matlab can run
       #   run: matlab -batch "disp('Matlab is working')"
       # - name: test matlab license server
@@ -125,7 +121,7 @@ jobs:
           fi
   
           set +e # Continue even if pull fails
-          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
+          PULL_OUTPUT=$(git pull 2>&1)
           PULL_STATUS=$?
 
           if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then

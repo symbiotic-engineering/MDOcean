@@ -61,10 +61,7 @@ Common targeted checks:
 - `calkit pull` checkout warning:
   - `failed to pull data from the cloud - Checkout failed for following targets`
   - **Workaround:** this is documented as safe to ignore in maintainer guidance.
-- Submodule checkout/auth errors in CI (`No url found` for nested submodule):
-  - Caused by stale nested submodule metadata under `.git/modules`.
-  - **Workaround pattern:** deinit submodules, remove stale module cache, checkout with `submodules: false`, then run explicit `git submodule update --init --recursive`.
-- During automated `git pull`, `not our ref` can occur with submodule pointers:
+- During automated `git pull`, `not our ref` can occur:
   - **Workaround pattern in CI:** continue flow; only create fallback branch for other pull failures.
 
 ## Efficiency tips for cloud agents

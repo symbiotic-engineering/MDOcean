@@ -76,10 +76,28 @@ Documentation for the function API for this code is in progress at [this Sphinx 
 
 ## Installation
 
-Clone the repository via Git. Use the `--recursive` flag to include submodules.
+Clone the repository via Git.
 ```
-git clone --recursive https://github.com/symbiotic-engineering/MDOcean.git
+git clone https://github.com/symbiotic-engineering/MDOcean.git
 ```
+
+Then, in MATLAB, run the one-time setup from the repository root to install the
+external MATLAB dependencies (OpenFLASH, WEC-Sim, and SAFE):
+```
+>> setup_mip
+```
+This uses the [mip](https://mip.sh) package manager to build a project-local
+environment (`./.mip`) containing the exact package versions pinned in
+`mip.lock`, so every machine gets an identical dependency set. The declared
+dependencies live in `mip.yaml`; see the [mip projects
+documentation](https://mip.sh/docs/projects) for details. After setup, run
+MATLAB commands with the dependencies loaded via
+
+```
+>> mip project run '<script, function, or expression>'
+```
+
+which is also how the calkit pipeline stages run.
 
 If you are unfamiliar with Git and want to download the code another way, click "Code > Download ZIP" to get a .zip file, or try the "Open in MATLAB Online" button above to use the MATLAB Online IDE instead.
 
@@ -132,9 +150,10 @@ The following packages are used in this code:
 | Simscape | Optional for WEC-Sim validation | 
 | Simscape Multibody | Optional for WEC-Sim validation |
 | [WEC-Sim](https://github.com/WEC-Sim/WEC-Sim/) | Optional for WEC-Sim validation |
-| [SAFE](https://github.com/rebeccamccabe/SAFE-matlab) | Optional for sensitivity analysis |
+| [SAFE](https://github.com/SAFEtoolbox/SAFE-matlab) | Optional for sensitivity analysis |
 
-The external codes (OpenFLASH, WEC-Sim, and SAFE) are included as submodules for ease of use.
+The external codes (OpenFLASH, WEC-Sim, and SAFE) are declared in `mip.yaml`, pinned in `mip.lock`,
+and installed by the [mip](https://mip.sh) package manager (run `setup_mip` once; see Installation).
 The code has been tested on MATLAB R2022a (Windows) and R2024b (Linux), and likely works on other versions and operating systems.
 
 ## Contributing

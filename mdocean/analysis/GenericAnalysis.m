@@ -91,14 +91,17 @@ classdef (Abstract) GenericAnalysis < handle
             analysis_deps = obj.get_dependencies(['@' class(obj) filesep 'analysis_fcn']);
             all_deps = [obj.class_dependencies, analysis_deps];
             sorted = sort(unique(all_deps));
-            to_remove = 'OpenFLASH';
+            % OpenFLASH's run_MEEM is not integrated yet; files inside the mip
+            % project environment ./.mip are not source inputs (mip.lock is
+            % the stage input that captures the environment instead)
+            to_remove = {'OpenFLASH', ['.mip' filesep]};
             val = sorted(~contains(sorted, to_remove));
         end
         function val = get.postpro_dependencies(obj)
             postpro_deps = obj.get_dependencies(['@' class(obj) filesep 'post_process_fcn']);
             all_deps = [obj.class_dependencies, postpro_deps, obj.analysis_outputs];
             sorted = sort(unique(all_deps));
-            to_remove = 'OpenFLASH';
+            to_remove = {'OpenFLASH', ['.mip' filesep]};
             val = sorted(~contains(sorted, to_remove));
         end
         function obj = run_analysis(obj)
@@ -288,21 +291,35 @@ classdef (Abstract) GenericAnalysis < handle
         end
 
         function stages = write_calkit_stage(obj)
+            % The MATLAB package environment is an input to every stage: when
+            % mip.lock changes (a dependency is added or changes version), the
+            % stages re-run. This mirrors how calkit wires environment lock
+            % files (e.g. uv.lock) into stages as dependencies.
+            env_inputs = {};
+            s = split(mfilename('fullpath'), filesep);
+            MDOcean_folder = strjoin(s(1:end-3), filesep);
+            if isfile(fullfile(MDOcean_folder, 'mip.lock'))
+                env_inputs = {'./mip.lock'};
+            end
+            analysis_cmd = obj.wrap_stage_command( ...
+                ['add_mdocean_path(); obj=' class(obj) '; obj.run_analysis();']);
+            postpro_cmd = obj.wrap_stage_command( ...
+                ['add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();']);
             analysis_stage = ['analysis-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
-                              '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_analysis();' newline ...
+                              '  command: ' analysis_cmd newline ...
                               '  inputs: ' newline ...
-                              obj.format_inputs_list(obj.extra_analysis_inputs, obj.analysis_dependencies) newline ...
+                              obj.format_inputs_list([env_inputs, obj.extra_analysis_inputs], obj.analysis_dependencies) newline ...
                               '  outputs: ' newline ...
                               obj.format_outputs([obj.analysis_outputs, obj.extra_analysis_outputs]) ];
             postpro_stage = ['postpro-' class(obj) ':' newline ...
                               '  kind: matlab-command' newline ...
                               '  environment: _system' newline ...
-                              '  command: add_mdocean_path(); obj=' class(obj) '; obj.run_all_from_load();' newline ...
+                              '  command: ' postpro_cmd newline ...
                               '  inputs: ' newline ...
                               '    - from_stage_outputs: analysis-' class(obj) newline ...
-                              obj.format_inputs_list(obj.extra_postpro_inputs, obj.postpro_dependencies) newline ...
+                              obj.format_inputs_list([env_inputs, obj.extra_postpro_inputs], obj.postpro_dependencies) newline ...
                               '  outputs: ' newline ...
                               obj.format_outputs([obj.postpro_outputs, obj.extra_postpro_outputs]) ];
             viz_stage = ['viz-' class(obj) ':' newline ...
@@ -314,6 +331,20 @@ classdef (Abstract) GenericAnalysis < handle
                           '  html_storage: null' newline ...
                           '  executed_ipynb_storage: git'];
             stages = [analysis_stage newline postpro_stage newline viz_stage];
+        end
+
+        function cmd = wrap_stage_command(~, inner)
+            %WRAP_STAGE_COMMAND Wrap MATLAB code in "mip project run" so the
+            %   stage executes with the locked dependencies from mip.yaml
+            %   loaded (single quotes are doubled for the quoted expression
+            %   target). Without a mip.lock the code runs bare.
+            s = split(mfilename('fullpath'), filesep);
+            MDOcean_folder = strjoin(s(1:end-3), filesep);
+            if isfile(fullfile(MDOcean_folder, 'mip.lock'))
+                cmd = ['mip project run ''' strrep(inner, '''', '''''') ''''];
+            else
+                cmd = inner;
+            end
         end
 
         function list_str = format_inputs_list(~, extras, deps)
