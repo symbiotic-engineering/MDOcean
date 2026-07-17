@@ -67,9 +67,9 @@ function [fig_array, ...
     improvePlot;
 
     % --- Hatching and markers (after improvePlot) ---
-    marker_props_mp = {'mo', 'MarkerSize', 8, 'LineWidth', 2, ...
+    marker_props_mp = {'mo', 'MarkerFaceColor', 'm', 'MarkerSize', 8, 'LineWidth', 2, ...
                        'DisplayName', 'Max Power'};
-    marker_props_ml = {'cd', 'MarkerSize', 8, 'LineWidth', 2, ...
+    marker_props_ml = {'cd', 'MarkerFaceColor', 'c', 'MarkerSize', 8, 'LineWidth', 2, ...
                        'DisplayName', 'Min LCOE'};
 
     for k = 1:3
@@ -102,6 +102,7 @@ function [fig_array, ...
     end
 
     legend(ax(1), 'Location', 'best');
+    fig.Position(3:4) = [800 400];
 
     % --- Figure 2: per-sea-state constraint activity counts ---
     n_force_only = intermed_result_struct.n_force_only;
@@ -115,7 +116,6 @@ function [fig_array, ...
                   'Power Limit Only (# sea states)', ...
                   'Both Limits (# sea states)', ...
                   'Neither Limit (# sea states)'};
-    fig1.Position(3:4) = [1000 500];  % widen to accommodate legend
 
     fig2 = figure;
     t2 = tiledlayout(2, 2, 'TileSpacing', 'compact');
@@ -135,7 +135,6 @@ function [fig_array, ...
     end
 
     improvePlot;
-    fig1.Position(3:4) = [1000 500];
 
     % --- Outputs ---
     fig_array         = [fig, fig2];

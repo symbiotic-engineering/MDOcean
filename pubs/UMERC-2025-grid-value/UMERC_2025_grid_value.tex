@@ -25,8 +25,19 @@
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \addbibresource{references.bib}
+\addbibresource{zotero-meem-refs.bib}
 \usepackage[paperheight=27.94cm,paperwidth=21.59cm,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm]{geometry}
 \usepackage{hyperref}
+\usepackage{cleveref}
+
+\makeatletter
+\AddToHook{cmd/appendix/before}{%
+  \crefalias{section}{appendix}%
+  \crefalias{subsection}{appendix}
+  \crefalias{subsubsection}{appendix}
+  \crefalias{chapter}{appendix}
+}
+\makeatother
 
 \titleformat*{\section}{\normalsize\bfseries}
 \titleformat*{\subsection}{\normalsize\bfseries}
@@ -133,8 +144,9 @@ Full design optimization results are pending and will demonstrate the impact of 
 
 \noindent\rule{\textwidth}{0.4pt}
 \input{content-grid}
-\section*{Appendix A.
-Reduced order model details}
+
+\appendix
+\section{Reduced order model details}
 \input{appendix-grid}
 
 \printbibliography

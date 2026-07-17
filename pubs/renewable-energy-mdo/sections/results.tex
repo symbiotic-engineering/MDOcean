@@ -32,7 +32,7 @@ In summary, the sweep's local optimality behavior and large LCOE decrease are en
 In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
 The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
 \ifdefined\DISSERTATION
-    The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], kW a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
+    The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
     This would be preferred whenever design-dependent capital expenditures matter more than modeled here, for shorter-duration projects, higher discount rates, lower operational cost, or lower design-independent capital cost.
 \else
     The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}), trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
@@ -122,7 +122,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     
     The CAPEX minimization reduces design-dependent cost by a further \resultsRE[pctImproveDesignCostMinCapex]~at the cost of a \resultsRE[pctWorsePowerMinCapex]~power reduction, while the power maximization increases power by a further \resultsRE[pctImprovePowerMaxPower]~at the expense of a \resultsRE[pctWorseDesignCostMaxPower]~increase in design-dependent cost, both relative to the minimum-LCOE design.
 \else
-    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE]~annual average electrical power at an estimated \resultsRE[minLCOE], a \resultsRE[pctImproveLCOEMinLCOE]~improvement over the nominal \resultsRE[nominalLCOE], from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE]~design-cost reduction and \resultsRE[pctImprovePowerMinLCOE]~power increase (economic assumptions per \cite{mccabe_development_2026}).
+    The minimum-LCOE design achieves \resultsRE[powerAvgAtMinLCOE] annual average electrical power at an estimated \resultsRE[minLCOE], a \resultsRE[pctImproveLCOEMinLCOE] improvement over the nominal \resultsRE[nominalLCOE], from a simultaneous \resultsRE[pctImproveDesignCostMinLCOE] design-cost reduction and \resultsRE[pctImprovePowerMinLCOE] power increase (economic assumptions per \cite{mccabe_development_2026}).
     This remains far above other renewables (onshore wind/solar 0.03-0.05~\$/kWh; floating offshore wind projected 0.11-0.25~\$/kWh by 2030 \cite{national_renewable_energy_laboratory_2024_2024}).
     Relative to the minimum-LCOE design, CAPEX minimization cuts design-dependent cost a further \resultsRE[pctImproveDesignCostMinCapex]~for a \resultsRE[pctWorsePowerMinCapex]~power loss, and power maximization adds \resultsRE[pctImprovePowerMaxPower]~power for a \resultsRE[pctWorseDesignCostMaxPower]~cost increase.
 \fi
@@ -150,9 +150,9 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \subsubsection{Post-Optimality Derivatives}
 \ifdefined\DISSERTATION
     \Cref{remdo:sec:single-obj-process} introduced the Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ to quantify the activity and influence of constraints at the optimum.
-    The nonzero multipliers are reported in \Cref{remdo:fig:lagrange-multiplier}, each signifying the increase in objective $J$ per unit increase in an active constraint $g$.
+    Nonzero multiplier values are reported in \Cref{remdo:fig:lagrange-multiplier}, each signifying the increase in objective $J$ per unit increase in an active constraint $g$.
 \else
-    The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\Cref{remdo:sec:single-obj-process}), reported in \Cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
+    The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\Cref{remdo:sec:single-obj-process}), nonzero values reported in \Cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
 \fi
 \begin{figure}[htbp]
 \centering
@@ -334,7 +334,8 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     and is dominated by damping plate geometry (the nondimensional stiffener height at $+2.1$, $D_d/D_s$ at $+1.7$, and related terms),
     with no float or spar geometric parameter influential, indicating the damping plate sets the minimum achievable cost.
     Two counterintuitive findings stand out: the sign of the structural-period sensitivity $T_{\text{struct}}$ flips between the two objectives,
-    and the material yield strength has a \emph{positive} cost sensitivity ($+1.0$). Specifically, a stronger material yields a costlier design
+    and the material yield strength has a \emph{positive} cost sensitivity ($+1.0$).
+    Specifically, a stronger material yields a costlier design
     because--with thicknesses already at their lower bounds--the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
 \fi
 
@@ -424,7 +425,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 
 \begin{table*}[htbp]\centering
 \setlength\arraycolsep{1pt}
-\input{tables/location_table.tex}
+\input{tables/from-matlab/location_sensitivity.tex}
 \caption{Results for Re-Optimization in Four Distinct Locations}
 \label{remdo:tab:location}
 \end{table*}
@@ -468,7 +469,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 % \paragraph{Force Saturation}
 \ifdefined\DISSERTATION
     For the minimum-LCOE design of \Cref{remdo:sec:results-single}, the lowest force-saturation power factor across all sea states in \Cref{remdo:fig:power-matrix-opt} is 
-    $P_{sat}/P_{\text{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{\text{max}}/F_{\text{unsat}}=\lowestFsatMinLCOE$ in that sea state.
+    $P_{sat}/P_{\text{unsat}}=\resultsRE[lowestFmaxFactorMinLCOE]$, at a force limit of $F_{\text{max}}/F_{\text{unsat}}=\resultsRE[lowestFsatMinLCOE]$ in that sea state.
     Across all sea states, the optimal force-saturated design sacrifices only 
     \resultsRE[powerLossForceSatMinLCOE]~of average power (about \resultsRE[pctPowerLossForceSatMinLCOE]) while cutting PTO cost by \resultsRE[pctPTOSavingsForceSatMinLCOE],
     for an LCOE reduction of \resultsRE[pctImproveLCOEForceSatMinLCOE]~versus the same design without saturation, which in any case violates structural constraints due to the higher force.

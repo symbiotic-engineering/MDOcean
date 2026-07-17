@@ -55,9 +55,6 @@ function [x,fval,residuals,tol,p,paretoPctTimeSeeds,paretoPctTimePatternSearch,p
 
     % show which constraints are active along the pareto front
     tol = probMO.options.ConstraintTolerance;
-    idx = constraint_active_plot(residuals,fval,tol,b);
-
-    x_sorted = x(idx,b.idxs_recover)
 
     % save mat file to be read by pareto_heuristics.m
     date = datestr(now,'yyyy-mm-dd_HH.MM.SS');

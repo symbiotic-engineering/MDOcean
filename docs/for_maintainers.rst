@@ -24,6 +24,10 @@ Writing
 .. note::
    When following these instructions, fill in in ``<paper-stage>`` with either ``build-AOR-paper`` or ``build-RE-paper``, and ``<paper-folder>`` with either ``applied-ocean-research-model`` or ``renewable-energy-mdo`` (no slashes).
 
+.. note::
+   For a guided interactive version of these Overleaf sync workflows, run
+   ``bash dev/latex/calkit_instructions_interactive.sh`` from the repository root.
+
 **Getting github changes into overleaf**
 
 If simulation code (git), figures (dvc), or tex source code (git) have changed 

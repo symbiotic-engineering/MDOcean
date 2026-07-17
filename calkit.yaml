@@ -1,7 +1,7 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize 
-  an ocean wave energy converter (WEC).
+description: Multidisciplinary Design Optimization (MDO) to optimize an 
+  ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
@@ -112,7 +112,13 @@ pipeline:
       inputs:
         - mdocean/analysis/
         - mdocean/inputs/
-        - mdocean/optimization/
+        - mdocean/optimization/multiobjective/
+        - mdocean/optimization/sensitivities/
+        - mdocean/optimization/compare_run.m
+        - mdocean/optimization/find_nominal_inputs.m
+        - mdocean/optimization/gradient_optim.m
+        - mdocean/optimization/max_avg_power.m
+        - mdocean/optimization/run_solver.m
         - mdocean/plots/util/
         - mdocean/plots/matlab_figs/
         - mdocean/plots/all_figures.m
@@ -249,7 +255,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/AllFigCompare/intermed.mat
       outputs:
-        # - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/runtime_bar_chart.pdf
         - results/AllFigCompare/runtime_bar_chart.fig
         - results/AllFigCompare/end.mat
@@ -362,6 +367,7 @@ pipeline:
         - ./mdocean/plots/util/remove_underscores.m
         - ./mdocean/plots/util/save_fig_with_diagnostic.m
         - ./mdocean/plots/util/signed_log.m
+        - ./mdocean/plots/util/stacked_number_line.m
         - ./mdocean/plots/util/table2latex.m
         - ./mdocean/simulation/modules/dynamics/circle_intersect_optim.m
         - ./mdocean/simulation/modules/dynamics/constrained_opt_ctrl.m
@@ -392,18 +398,18 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Comparison/intermed.mat
       outputs:
-        # - results/Comparison/overlaid_geometry.pdf
-        # - results/Comparison/overlaid_hydro_coeffs.pdf
-        # - results/Comparison/probability_CDF.pdf
-        # - results/Comparison/comparison_power_matrix.pdf
         - results/Comparison/overlaid_geometry.pdf
         - results/Comparison/overlaid_hydro_coeffs.pdf
         - results/Comparison/probability_CDF.pdf
         - results/Comparison/comparison_power_matrix.pdf
+        - results/Comparison/stacked_optimal_design_vars.pdf
+        - results/Comparison/stacked_optimal_outputs.pdf
         - results/Comparison/overlaid_geometry.fig
         - results/Comparison/overlaid_hydro_coeffs.fig
         - results/Comparison/probability_CDF.fig
         - results/Comparison/comparison_power_matrix.fig
+        - results/Comparison/stacked_optimal_design_vars.fig
+        - results/Comparison/stacked_optimal_outputs.fig
         - path: results/Comparison/optimal_design_vars.tex
           storage: git
         - path: results/Comparison/optimal_outputs.tex
@@ -414,8 +420,7 @@ pipeline:
     analysis-Constraints:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Constraints; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=Constraints; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
@@ -799,9 +804,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DampingPlateStructures/intermed.mat
       outputs:
-        # - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
-        # - results/DampingPlateStructures/damping_plate_deflection.pdf
-        # - results/DampingPlateStructures/damping_plate_moment.pdf
         - results/DampingPlateStructures/damping_plate_aspect_ratio.pdf
         - results/DampingPlateStructures/damping_plate_deflection.pdf
         - results/DampingPlateStructures/damping_plate_moment.pdf
@@ -939,9 +941,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DescFcns/intermed.mat
       outputs:
-        # - results/DescFcns/saturation_desc_fcn.pdf
-        # - results/DescFcns/saturation_desc_fcn_alpha.pdf
-        # - results/DescFcns/drag_desc_fcn.pdf
         - results/DescFcns/saturation_desc_fcn.pdf
         - results/DescFcns/saturation_desc_fcn_alpha.pdf
         - results/DescFcns/drag_desc_fcn.pdf
@@ -1087,7 +1086,6 @@ pipeline:
         - results/DesignSpaceExploration/intermed.mat
       outputs:
        #- results/DesignSpaceExploration/experiments_pareto.pdf
-        # - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_ratios.pdf
         - results/DesignSpaceExploration/experiments_ratios.fig
         - path: results/DesignSpaceExploration/experiments_results.tex
@@ -1227,8 +1225,7 @@ pipeline:
     analysis-DragIntegral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=DragIntegral; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=DragIntegral; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1350,11 +1347,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/DragIntegral/intermed.mat
       outputs:
-        # - results/DragIntegral/drag_integral_B.pdf
-        # - results/DragIntegral/drag_integral_G_r.pdf
-        # - results/DragIntegral/drag_integral_G_i.pdf
-        # - results/DragIntegral/drag_integral_G_m.pdf
-        # - results/DragIntegral/drag_integral_G_p.pdf
         - results/DragIntegral/drag_integral_B.pdf
         - results/DragIntegral/drag_integral_G_r.pdf
         - results/DragIntegral/drag_integral_G_i.pdf
@@ -1510,58 +1502,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/FitOlaya/intermed.mat
       outputs:
-        # - results/FitOlaya/orig_3b_line_kRb_fbar.pdf
-        # - results/FitOlaya/orig_4b_line_kRb_fbar.pdf
-        # - results/FitOlaya/orig_12a_line_kRb_fbar.pdf
-        # - results/FitOlaya/orig_12b_line_kRb_fbar.pdf
-        # - results/FitOlaya/orig_12c_line_kRb_fbar.pdf
-        # - results/FitOlaya/orig_12d_line_kRb_fbar.pdf
-        # - results/FitOlaya/case24_compare_line_kRb_fnorm.pdf
-        # - results/FitOlaya/case2_line_khRxRp_fnorm.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_a2.pdf
-        # - results/FitOlaya/case2_line_khRxRpa2_f_over_a2.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_a2H0.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe1e2.pdf
-        # - results/FitOlaya/case2_line_khRxRp_f_over_RxRb_aH0_expe2.pdf
-        # - results/FitOlaya/case2_line_khRxRpa2_f_over_RxRb_aH0_expe1.pdf
-        # - results/FitOlaya/case4_sub_line_kRb_fnorm.pdf
-        # - results/FitOlaya/case4_sub_line_khRxRp_fnorm.pdf
-        # - results/FitOlaya/case4_sub_line_khRxRp_f_H0_cosh_N0.pdf
-        # - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe2_sqrtkh.pdf
-        # - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_sqrtkh.pdf
-        # - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1.pdf
-        # - results/FitOlaya/case4_sub_loglog_khRxRpb_f_H0_expe1_b2sqrtkh.pdf
-        # - results/FitOlaya/case4_sep_manual_khRxRpa2b_f_H0_expe1_sqrtkh.pdf
-        # - results/FitOlaya/case4_sep_auto_lnkhRxRpa2b_lnf_H0_expe1_sqrtkh.pdf
-        # - results/FitOlaya/case4_sep_coeffs_vs_beta.pdf
-        # - results/FitOlaya/case4_sep_coeffs_vs_alpha.pdf
-        # - results/FitOlaya/case4_v1_manual_semilogx_khRxRpa4b_fv1.pdf
-        # - results/FitOlaya/case4_v1_manual_scatter_actual_vs_pred.pdf
-        # - results/FitOlaya/case4_v1_manual_scatter_khRxRpa2b_frac_err.pdf
-        # - results/FitOlaya/case4_v1_auto_semilogx_khRxRpa4b_fv1.pdf
-        # - results/FitOlaya/case4_v1_auto_scatter_actual_vs_pred.pdf
-        # - results/FitOlaya/case4_v1_auto_scatter_khRxRpa2b_frac_err.pdf
-        # - results/FitOlaya/case4_v1_coeffs_vs_beta.pdf
-        # - results/FitOlaya/case4_v1_coeffs_vs_alpha.pdf
-        # - results/FitOlaya/case4_v2_manual_loglog_khRxRpa3b_fv2.pdf
-        # - results/FitOlaya/case4_v2_manual_scatter_actual_vs_pred.pdf
-        # - results/FitOlaya/case4_v2_manual_scatter_khRxRpa2b_frac_err.pdf
-        # - results/FitOlaya/case4_v2_auto_loglog_khRxRpa3b_fv2.pdf
-        # - results/FitOlaya/case4_v2_auto_scatter_actual_vs_pred.pdf
-        # - results/FitOlaya/case4_v2_auto_scatter_khRxRpa2b_frac_err.pdf
-        # - results/FitOlaya/case4_v2_coeffs_vs_beta.pdf
-        # - results/FitOlaya/case4_v2_coeffs_vs_alpha.pdf
-        # - results/FitOlaya/case4_v3_loglog_khRxRpa3b_fv2_x15.pdf
-        # - results/FitOlaya/case4_v3_scatter_actual_vs_pred.pdf
-        # - results/FitOlaya/case4_v3_scatter_khRxRpa2b_frac_err.pdf
-        # - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform.pdf
-        # - results/FitOlaya/case4_v4_loglog_khRxRpa2b_newform_fit_curves.pdf
-        # - results/FitOlaya/case4_v4_coeffs_vs_beta.pdf
-        # - results/FitOlaya/case4_v4_coeffs_vs_alpha.pdf
-        # - results/FitOlaya/case4_v4_coeffs_vs_alpha_and_beta.pdf
-        # - results/FitOlaya/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf
         - results/FitOlaya/orig_3b_line_kRb_fbar.pdf
         - results/FitOlaya/orig_4b_line_kRb_fbar.pdf
         - results/FitOlaya/orig_12a_line_kRb_fbar.pdf
@@ -1805,8 +1745,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/ForceSaturationFigFunc/intermed.mat
       outputs:
-        # - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
-        # - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/power_force_sensitivity.pdf
         - results/ForceSaturationFigFunc/runtime_sensitivity.pdf
         - results/ForceSaturationFigFunc/power_force_sensitivity.fig
@@ -1962,11 +1900,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/GradientOptimFigFunc/intermed.mat
       outputs:
-        # - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
-        # - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
-        # - results/GradientOptimFigFunc/lagrange_multipliers.pdf
-        # - results/GradientOptimFigFunc/delta_x.pdf
-        # - results/GradientOptimFigFunc/single_obj_convergence.pdf
         - results/GradientOptimFigFunc/single_obj_opt_power_matrix.pdf
         - results/GradientOptimFigFunc/single_obj_opt_geometry.pdf
         - results/GradientOptimFigFunc/lagrange_multipliers.pdf
@@ -2110,7 +2043,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/HydroCoeffFigFunc/intermed.mat
       outputs:
-        # - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/hydro_coeff_err.pdf
         - results/HydroCoeffFigFunc/hydro_coeff_err.fig
         - results/HydroCoeffFigFunc/end.mat
@@ -2260,11 +2192,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/LocationSensitivity/intermed.mat
       outputs:
-        # - results/LocationSensitivity/location_1_power_matrix.pdf
-        # - results/LocationSensitivity/location_2_power_matrix.pdf
-        # - results/LocationSensitivity/location_3_power_matrix.pdf
-        # - results/LocationSensitivity/location_4_power_matrix.pdf
-        # - results/LocationSensitivity/location_probability_PDF.pdf
         - results/LocationSensitivity/location_1_power_matrix.pdf
         - results/LocationSensitivity/location_2_power_matrix.pdf
         - results/LocationSensitivity/location_3_power_matrix.pdf
@@ -2414,12 +2341,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Meem/intermed.mat
       outputs:
-        # - results/Meem/meem_sparsity.pdf
-        # - results/Meem/meem_validation.pdf
-        # - results/Meem/meem_matching.pdf
-        # - results/Meem/meem_convergence_vs_omega.pdf
-        # - results/Meem/meem_convergence_vs_NMK.pdf
-        # - results/Meem/asymptotic_b_vector.pdf
         - results/Meem/meem_sparsity.pdf
         - results/Meem/meem_validation.pdf
         - results/Meem/meem_matching.pdf
@@ -2579,9 +2500,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Multistart/intermed.mat
       outputs:
-        # - results/Multistart/multistart_convergence_tree.pdf
-        # - results/Multistart/multistart_parallel_coordinates.pdf
-        # - results/Multistart/multistart_bar_chart.pdf
         - results/Multistart/multistart_convergence_tree.pdf
         - results/Multistart/multistart_parallel_coordinates.pdf
         - results/Multistart/multistart_bar_chart.pdf
@@ -2943,7 +2861,6 @@ pipeline:
         - ./mdocean/plots/matlab_figs/module_demos/visualize_geometry.m
         - ./mdocean/plots/matlab_figs/optim/optim_geomviz.m
         - ./mdocean/plots/matlab_figs/optim/optimplotx_custom.m
-      #  - ./mdocean/plots/matlab_figs/optim/constraint_active_plot.m
         - ./mdocean/plots/util/bluewhitered.m
         - ./mdocean/plots/util/check_fig_size.m
         - ./mdocean/plots/util/contourx.m
@@ -3072,8 +2989,7 @@ pipeline:
     analysis-ParetoSweep:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=ParetoSweep; 
-        obj.run_analysis();
+      command: add_mdocean_path(); obj=ParetoSweep; obj.run_analysis();
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3194,7 +3110,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/ParetoSweep/intermed.mat
       outputs:
-        # - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/sweep_num_seeds.pdf
         - results/ParetoSweep/sweep_num_seeds.fig
         - results/ParetoSweep/end.mat
@@ -3324,8 +3239,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/PtoSweep/intermed.mat
       outputs:
-        # - results/PtoSweep/pto_sweep.pdf
-        # - results/PtoSweep/pto_sweep_constraint_activity.pdf
         - results/PtoSweep/pto_sweep.pdf
         - results/PtoSweep/pto_sweep_constraint_activity.pdf
         - results/PtoSweep/pto_sweep.fig
@@ -3460,17 +3373,23 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/ReadNonMatlabFigs/intermed.mat
       outputs:
+        - results/ReadNonMatlabFigs/circuit_intrinsic.pdf
+        - results/ReadNonMatlabFigs/circuit_pto.pdf
+        - results/ReadNonMatlabFigs/circuit_kinematics.pdf
+        - results/ReadNonMatlabFigs/control_method_venn_diagram.pdf
         - results/ReadNonMatlabFigs/control_analysis_flowcharts.pdf
         - results/ReadNonMatlabFigs/damping_plate_flowchart.pdf
         - results/ReadNonMatlabFigs/dimensions.pdf
         - results/ReadNonMatlabFigs/equivalent_stiffness.pdf
         - results/ReadNonMatlabFigs/FBD.pdf
         - results/ReadNonMatlabFigs/graphical_abstract_modeling.pdf
+        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/meem_dims.pdf
         - results/ReadNonMatlabFigs/MEEM_geometry.pdf
         - results/ReadNonMatlabFigs/methodology_flowchart.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_synthesis.pdf
         - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_evaluation.pdf
-        - results/ReadNonMatlabFigs/graphical_abstract_optim.pdf
+        - results/ReadNonMatlabFigs/mod_freq_domain_ctrl_combined.pdf
         - results/ReadNonMatlabFigs/optimization_flowchart.pdf
         - results/ReadNonMatlabFigs/RM3_image.pdf
         - results/ReadNonMatlabFigs/section_flow.pdf
@@ -3607,7 +3526,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/QPCircles/intermed.mat
       outputs:
-        # - results/QPCircles/qp_circles.pdf
         - results/QPCircles/qp_circles.pdf
         - results/QPCircles/qp_circles.fig
         - results/QPCircles/end.mat
@@ -3761,16 +3679,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/RunSingleFigFunc/intermed.mat
       outputs:
-        # - results/RunSingleFigFunc/nominal_geometry_viz.pdf
-        # - results/RunSingleFigFunc/nominal_power_pdf.pdf
-        # - results/RunSingleFigFunc/nominal_power_matrix.pdf
-        # - results/RunSingleFigFunc/drag_convergence.pdf
-        # - results/RunSingleFigFunc/ctrl_polar_plot_mult.pdf
-        # - results/RunSingleFigFunc/ctrl_polar_plot_gamma.pdf
-        # - results/RunSingleFigFunc/slamming_model_comparison_float.pdf
-        # - results/RunSingleFigFunc/slamming_model_comparison_spar.pdf
-        # - results/RunSingleFigFunc/qcqp_circles_nominal.pdf
-        # - results/RunSingleFigFunc/qcqp_circles_overlay.pdf
         - results/RunSingleFigFunc/nominal_geometry_viz.pdf
         - results/RunSingleFigFunc/nominal_power_pdf.pdf
         - results/RunSingleFigFunc/nominal_power_matrix.pdf
@@ -3862,8 +3770,7 @@ pipeline:
     postpro-Runtime:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Runtime; 
-        obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Runtime; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Runtime
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3923,10 +3830,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Runtime/intermed.mat
       outputs:
-        # - results/Runtime/dynamics_runtime.pdf
-        # - results/Runtime/hydro_runtime_logscale.pdf
-        # - results/Runtime/hydro_runtime_breakdown.pdf
-        # - results/Runtime/sim_runtime.pdf
         - results/Runtime/dynamics_runtime.pdf
         - results/Runtime/hydro_runtime_logscale.pdf
         - results/Runtime/hydro_runtime_breakdown.pdf
@@ -4065,7 +3968,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Slamming/intermed.mat
       outputs:
-        # - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/slamming_amplitude.pdf
         - results/Slamming/slamming_amplitude.fig
         - results/Slamming/end.mat
@@ -4197,7 +4099,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/SparHydro/intermed.mat
       outputs:
-        # - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/spar_added_mass.pdf
         - results/SparHydro/spar_added_mass.fig
         - results/SparHydro/end.mat
@@ -4340,19 +4241,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/SweepGeoms/intermed.mat
       outputs:
-        # - results/SweepGeoms/sweep_geoms_parallel.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter.pdf
-        # - results/SweepGeoms/sweep_geoms_line.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_a2.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_vol.pdf
-        # - results/SweepGeoms/sweep_geoms_scatter_cwr_sa.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_a2.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_vol.pdf
-        # - results/SweepGeoms/sweep_geoms_line_cwr_sa.pdf
-        # - results/SweepGeoms/sweep_geoms_pareto.pdf
-        # - results/SweepGeoms/sweep_geoms_pareto_nondim.pdf
-        # - results/SweepGeoms/sweep_geoms_grid_scatter.pdf
-        # - results/SweepGeoms/factor_grid.pdf
         - results/SweepGeoms/sweep_geoms_parallel.pdf
         - results/SweepGeoms/sweep_geoms_scatter.pdf
         - results/SweepGeoms/sweep_geoms_line.pdf
@@ -4514,7 +4402,6 @@ pipeline:
         - ./mdocean/simulation/simulation.m
         - results/Validation/intermed.mat
       outputs:
-        # - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
         - path: results/Validation/validation.tex
@@ -4605,8 +4492,7 @@ pipeline:
     postpro-Wecsim:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); obj=Wecsim; 
-        obj.run_all_from_load();
+      command: add_mdocean_path(); obj=Wecsim; obj.run_all_from_load();
       inputs:
         - from_stage_outputs: analysis-Wecsim
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -5049,8 +4935,7 @@ pipeline:
     postpro-WithTables:
       kind: shell-command
       environment: _system
-      command: echo "Running postprocessing for all stages with 
-        tables."
+      command: echo "Running postprocessing for all stages with tables."
       inputs:
         - from_stage_outputs: postpro-Comparison
         - from_stage_outputs: postpro-Constraints
@@ -5123,9 +5008,9 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/aor/
-          storage:
+          storage: null
         - path: code-coverage/aor/
-          storage:
+          storage: null
     test-re:
       kind: matlab-command
       environment: _system
@@ -5148,16 +5033,16 @@ pipeline:
         - mdocean/
       outputs:
         - path: test-results/re/
-          storage:
+          storage: null
         - path: code-coverage/re/
-          storage:
+          storage: null
     viz-AllFigCompare:
       kind: jupyter-notebook
       environment: pubs
       notebook_path: results/fig_notebooks/AllFigCompare.ipynb
       inputs:
         - from_stage_outputs: postpro-AllFigCompare
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Comparison:
@@ -5166,7 +5051,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Comparison.ipynb
       inputs:
         - from_stage_outputs: postpro-Comparison
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Constraints:
@@ -5175,7 +5060,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Constraints.ipynb
       inputs:
         - from_stage_outputs: postpro-Constraints
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Cost:
@@ -5184,17 +5069,16 @@ pipeline:
       notebook_path: results/fig_notebooks/Cost.ipynb
       inputs:
         - from_stage_outputs: postpro-Cost
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DampingPlateStructures:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/DampingPlateStructures.ipynb
+      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
       inputs:
         - from_stage_outputs: postpro-DampingPlateStructures
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DescFcns:
@@ -5203,17 +5087,16 @@ pipeline:
       notebook_path: results/fig_notebooks/DescFcns.ipynb
       inputs:
         - from_stage_outputs: postpro-DescFcns
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DesignSpaceExploration:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/DesignSpaceExploration.ipynb
+      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignSpaceExploration
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DesignVars:
@@ -5222,7 +5105,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DesignVars.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignVars
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-DragIntegral:
@@ -5231,7 +5114,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DragIntegral.ipynb
       inputs:
         - from_stage_outputs: postpro-DragIntegral
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-FitOlaya:
@@ -5240,17 +5123,16 @@ pipeline:
       notebook_path: results/fig_notebooks/FitOlaya.ipynb
       inputs:
         - from_stage_outputs: postpro-FitOlaya
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ForceSaturationFigFunc:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: 
-        results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ForceSaturationFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-GradientOptimFigFunc:
@@ -5259,7 +5141,7 @@ pipeline:
       notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-GradientOptimFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-HydroCoeffFigFunc:
@@ -5268,7 +5150,7 @@ pipeline:
       notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-HydroCoeffFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-LocationSensitivity:
@@ -5277,7 +5159,7 @@ pipeline:
       notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
       inputs:
         - from_stage_outputs: postpro-LocationSensitivity
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Meem:
@@ -5286,7 +5168,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Meem.ipynb
       inputs:
         - from_stage_outputs: postpro-Meem
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Multistart:
@@ -5295,7 +5177,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Multistart.ipynb
       inputs:
         - from_stage_outputs: postpro-Multistart
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParamSensitivities:
@@ -5304,7 +5186,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
       inputs:
         - from_stage_outputs: postpro-ParamSensitivities
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Parameters:
@@ -5313,7 +5195,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Parameters.ipynb
       inputs:
         - from_stage_outputs: postpro-Parameters
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoFigFunc:
@@ -5322,7 +5204,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoSweep:
@@ -5331,7 +5213,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoSweep
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-PtoSweep:
@@ -5340,7 +5222,7 @@ pipeline:
       notebook_path: results/fig_notebooks/PtoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-PtoSweep
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-QPCircles:
@@ -5349,7 +5231,7 @@ pipeline:
       notebook_path: results/fig_notebooks/QPCircles.ipynb
       inputs:
         - from_stage_outputs: postpro-QPCircles
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-ReadNonMatlabFigs:
@@ -5358,7 +5240,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
       inputs:
         - from_stage_outputs: postpro-ReadNonMatlabFigs
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-RunSingleFigFunc:
@@ -5367,7 +5249,7 @@ pipeline:
       notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-RunSingleFigFunc
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Runtime:
@@ -5376,7 +5258,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Runtime.ipynb
       inputs:
         - from_stage_outputs: postpro-Runtime
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Slamming:
@@ -5385,7 +5267,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Slamming.ipynb
       inputs:
         - from_stage_outputs: postpro-Slamming
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-SparHydro:
@@ -5394,7 +5276,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SparHydro.ipynb
       inputs:
         - from_stage_outputs: postpro-SparHydro
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-SweepGeoms:
@@ -5403,7 +5285,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SweepGeoms.ipynb
       inputs:
         - from_stage_outputs: postpro-SweepGeoms
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Validation:
@@ -5412,7 +5294,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Validation.ipynb
       inputs:
         - from_stage_outputs: postpro-Validation
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     viz-Wecsim:
@@ -5421,7 +5303,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Wecsim.ipynb
       inputs:
         - from_stage_outputs: postpro-Wecsim
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
       outputs: []
     pyxdsm:
@@ -5644,6 +5526,7 @@ pipeline:
     copy-shared-latex:
       kind: map-paths
       paths:
+        # references
         - src: pubs/shared/references.bib
           dest: pubs/applied-ocean-research-model/references.bib
           kind: file-to-file
@@ -5653,7 +5536,27 @@ pipeline:
         - src: pubs/shared/references.bib
           dest: pubs/dissertation/references.bib
           kind: file-to-file
-          #
+        - src: pubs/shared/references.bib
+          dest: pubs/UMERC-2025-grid-value/references.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
+          kind: file-to-file
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
+          kind: file-to-file
+                #
+        - src: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+          kind: file-to-file
+        # bib style file
         - src: pubs/shared/elsarticle-num-names.bst
           dest: 
             pubs/applied-ocean-research-model/elsarticle-num-names.bst
@@ -5661,7 +5564,7 @@ pipeline:
         - src: pubs/shared/elsarticle-num-names.bst
           dest: pubs/renewable-energy-mdo/elsarticle-num-names.bst
           kind: file-to-file
-          #
+        # shared packages
         - src: pubs/shared/shared-pkg.tex
           dest: pubs/applied-ocean-research-model/shared-pkg.tex
           kind: file-to-file
@@ -5675,6 +5578,9 @@ pipeline:
         - src: pubs/shared/els-cas/cas-dc.cls
           dest: pubs/renewable-energy-mdo/cas-dc.cls
           kind: file-to-file
+        - src: pubs/shared/els-cas/cas-sc.cls
+          dest: pubs/renewable-energy-mdo/cas-sc.cls
+          kind: file-to-file
         #
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/applied-ocean-research-model/cas-common.sty
@@ -5682,23 +5588,13 @@ pipeline:
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/renewable-energy-mdo/cas-common.sty
           kind: file-to-file
-        #
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-          dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
-          kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-          dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
-          kind: file-to-file
     paperlint-aor:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore 
-          pubs/applied-ocean-research-model/numeric-results.tex
+        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
         - --output dev/latex/Paper-Linter/lint-aor.txt
       inputs:
@@ -5736,12 +5632,15 @@ pipeline:
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/renewable-energy-mdo/shared-pkg.tex
+        - pubs/renewable-energy-mdo/cas-dc.cls
+        - pubs/renewable-energy-mdo/cas-sc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
-          storage:
+          storage: null
         - path: pubs/renewable-energy-mdo/aux/
-          storage:
+          storage: null
           delete_before_run: false
     build-AOR-paper:
       kind: latex
@@ -5761,21 +5660,23 @@ pipeline:
         - pubs/applied-ocean-research-model/zotero-meem-refs.bib
         - pubs/applied-ocean-research-model/commands-aor.tex
         - pubs/applied-ocean-research-model/shared-pkg.tex
+        - pubs/applied-ocean-research-model/cas-dc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
-          storage:
+          storage: null
         - path: pubs/applied-ocean-research-model/aux/
-          storage:
+          storage: null
           delete_before_run: false
     build-UMERC-paper:
       kind: latex
-      target_path: 
-        pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       environment: tex
       inputs:
         - pubs/UMERC-2025-grid-value/figures/
         - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
         - pubs/UMERC-2025-grid-value/logo.jpg
       outputs:
         - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
@@ -5789,6 +5690,8 @@ pipeline:
         - pubs/dissertation/hangcaption.sty
         - pubs/dissertation/.latexmkrc
         - pubs/dissertation/intro-contrib.tex
+        - pubs/dissertation/abstract.tex
+        - pubs/dissertation/acknowledgements.tex
         - pubs/applied-ocean-research-model/numeric-results.tex
         - pubs/applied-ocean-research-model/content.tex
         - pubs/applied-ocean-research-model/sections/
@@ -5812,9 +5715,9 @@ pipeline:
       outputs:
         - pubs/dissertation/sampleThesis.pdf
         - path: pubs/dissertation/sampleThesis.synctex.gz
-          storage:
+          storage: null
         - path: pubs/dissertation/aux/
-          storage:
+          storage: null
           delete_before_run: false
     # all-writing:
     #   kind: shell-command
@@ -5831,7 +5734,7 @@ pipeline:
       notebook_path: pubs/applied-ocean-research-model/view_figs.ipynb
       inputs:
         - pubs/applied-ocean-research-model/figs/
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
     view-re-figs:
       kind: jupyter-notebook
@@ -5839,7 +5742,7 @@ pipeline:
       notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
       inputs:
         - pubs/renewable-energy-mdo/figs/
-      html_storage:
+      html_storage: null
       executed_ipynb_storage: git
     all-viz:
       kind: shell-command
@@ -5896,6 +5799,7 @@ pipeline:
       target_path: mdocean/plots/non_matlab_figs/{name}.tex
       environment: tex
       latexmkrc_path: mdocean/plots/non_matlab_figs/.latexmkrc
+      output_dir: mdocean/plots/non_matlab_figs/pdf/
       synctex: false
       iterate_over:
         - arg_name: name
@@ -5904,30 +5808,18 @@ pipeline:
       inputs:
         - pubs/applied-ocean-research-model/figs/tikz/{name}.tikz
       outputs:
-        - mdocean/plots/non_matlab_figs/{name}.pdf
         - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
-          storage:
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
           delete_before_run: false
-          storage:
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
           delete_before_run: false
-          storage:
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
           delete_before_run: false
-          storage:
-    move-standalone-pdfs:
-      kind: map-paths
-      environment: _system
-      paths:
-        - src: mdocean/plots/non_matlab_figs/{name}.pdf
-          dest: mdocean/plots/non_matlab_figs/pdf/{name}.pdf
-          kind: file-to-file
-      iterate_over:
-        - arg_name: name
-          values:
-            - parameter: latex_standalone_name
+          storage: dvc
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg
@@ -5972,8 +5864,7 @@ publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
     description: Development, Validation, and Benchmarking of a 
-      Multidisciplinary Semi-Analytical Model for Wave Energy 
-      Converters
+      Multidisciplinary Semi-Analytical Model for Wave Energy Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
@@ -6043,5 +5934,3 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
-  pubs/defense:
-    url: https://www.overleaf.com/project/69ef01941916c106f7f5c565

@@ -31,6 +31,12 @@ This subsection summarizes insights from variable-sweep analyses before presenti
     Meanwhile, \Cref{fig:meem-sweep-pareto} will show the tradeoff of radiation efficiency with nondimensionalized surface area and denote five of the six input dimensions, excluding only $m_0h$.
     In both figures, marker size and shape represent $a_2/h$ and $a_3/a_1$, which are swept over a range of 0-3 and 1-4 respectively.
     Ratios $a_1/a_2$, $d_1/h$, and $d_2/d_1$ must fall between zero and one and are represented as the red, blue, and green decimal values of the RGB color space, respectively.
+\else
+    Visualizing this many-dimensional dataset (six inputs, three outputs) can pose a challenge.
+    \Cref{fig:meem-sweep-m0h} will provide a view of all six input dimensions simultaneously, focusing centrally on the nondimensional wavenumber $m_0h$, and examine two outputs of radiation efficiency and capture width ratio.
+    Meanwhile, \cref{fig:meem-sweep-pareto} will show the tradeoff of radiation efficiency with nondimensionalized surface area and denote five of the six input dimensions, excluding only $m_0h$.
+    In both figures, marker size and shape represent $a_2/h$ and $a_3/a_1$, which are swept over a range of 0-3 and 1-4 respectively.
+    Ratios $a_1/a_2$, $d_1/h$, and $d_2/d_1$ must fall between zero and one and are represented as the red, blue, and green decimal values of the RGB color space, respectively.
 \fi
 
 \paragraph{Best Design as a function of Wave Environment}
@@ -62,6 +68,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
     At high $m_0h$ (deep water, fast waves), the most efficient designs (pink/red) have
 \else
     The most efficient design depends on the frequency-depth regime $m_0h$.
+    The radiation limit is marked with a horizontal dashed line; efficiencies above the limit indicate simulation errors and are disregarded.
     Low $m_0h$ (shallow water, slow waves) favors a pure cylinder geometry with small radius.
     Moderate $m_0h$ favors low $a_1/a_2$ (a small spar relative to the float).
     High $m_0h$ favors qualitatively different geometries.
@@ -70,9 +77,15 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 \paragraph{Design Cost-Power Tradeoffs}
 \Cref{fig:meem-sweep-pareto} shows a Pareto front for the tradeoff of radiation efficiency (power proxy) and normalized surface area (cost proxy) across the six geometric design variables.
 \ifdefined\DISSERTATION
-    The normalized surface area does not depend on the seventh input variable $m_0h$, and the largest radiation efficiency for that geometry across all $m_0h$ is plotted, essentially showing the best possible radiation efficiency for each geometry across all wave environments.
-    Black squares denote the non-dominated Pareto-optimal points: the geometries that achieve the highest radiation efficiency for a given normalized surface area.
+    The normalized surface area does not depend on the seventh input variable $m_0h$,
+    and the largest radiation efficiency for that geometry across all $m_0h$ is plotted,
+    essentially showing the best possible radiation efficiency for each geometry across all wave environments.
+    Black squares denote the non-dominated Pareto-optimal points:
+    the geometries that achieve the highest radiation efficiency for a given normalized surface area.
     %Designs with \hl{some quality} tend to perform well, with \hl{some quality} being optimal for the high-efficiency, high-cost end of the Pareto front and \hl{some quality} being optimal for the low-efficiency, low-cost end of the Pareto front.
+\else
+    The plot shows only the largest radiation efficiency across all $m_0h$ for each geometry.
+    Black squares denote Pareto-optimal points.
 \fi
 
 \begin{figure}[htbp]
@@ -105,6 +118,7 @@ The dashed lines indicate the nominal design point at $b/a = 0.2$.}
     The recent RM3 optimization \citep{gaebele_tpl_2025} finds that the device should be scaled down by a factor of 0.55 to a new float diameter of 11~m in order to maximize the power per unit surface area, and that the continuous torque constraint is often active, illustrating the importance of including this constraint in the model.
     \citet{mccabe_force-limited_2024} shows analytically that for a given sea state, power decreases quadratically with decreasing force limit for the worst-case scenario of zero intrinsic reactance, and that highly reactive devices are even less sensitive to force limits.
     Intuitively, the sensitivity of annual average power to force limit should be even lower when considering a range of realistic sea states, because large sea states that require higher forces are comparatively rare.
+    Using MDOcean, we investigate the effect of PTO force limit on average power and structural load in \figureautorefname~\ref{fig:force-limit}.
 \else
     Prior work consistently shows that capping the PTO force can substantially reduce PTO size and cost with minimal decrease in power \citep{devin_high-dimensional_2024,coe_maybe_2021,mcgilton_optimal_2024,gaebele_tpl_2025,mccabe_force-limited_2024}.
 \fi
@@ -139,7 +153,7 @@ We next move to a simultaneous sweep of both the force limit and the power limit
 
 \begin{figure*}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/manual/pto_sweep_3.pdf.pdf}
+\includegraphics[width=\linewidth]{figs/manual/pto_sweep_3.pdf}
 \caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and LCOE}
 \label{fig:force-power-limit-sweep}
 \end{figure*}
@@ -254,6 +268,8 @@ $\mathbf{\eta}^{H,T}_{\text{elec}}$  & $\checkmark$ & $\checkmark$ & $\checkmark
 \end{figure*}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
 \ifdefined\DISSERTATION
+    Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
+\else
     Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
 \fi
 

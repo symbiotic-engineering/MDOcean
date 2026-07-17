@@ -27,7 +27,13 @@ Additional structural dimensions and thickness definitions are provided in \Cref
 
 \begin{figure}[htbp]
 \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/dimensions.pdf}
+    \includegraphics[
+    \ifdefined\JOURNALTWOCOLUMN
+        width=\linewidth
+    \else
+        width=.75\linewidth
+    \fi
+    ]{figs/from-matlab/dimensions.pdf}
 \caption{Dimension labeling of system}\label{fig:dims}
 \end{figure}
 
@@ -391,7 +397,7 @@ The describing function for control force is prioritized due to its simpler impl
     \centering
     \caption{Dynamic nonlinearities and approach for each}
     \label{tab:nonlinearities}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.7\linewidth}}
+\begin{tabular}{L{0.25\linewidth}L{0.7\linewidth}}
          \textbf{Dynamic nonlinearity/limit}& \parbox{\linewidth}{\centering\textbf{Method}}\\ \hline
          Drag& Describing function (M1.2) for $\sin(\omega t)|\sin(\omega t)|$ with iteration to find effect on response and optimal controller\\
          Force limit& Describing function (M1.2) for $\text{sat}(\sin(\omega t))$ with iteration to find effect on response and optimal controller\\
@@ -405,6 +411,8 @@ Describing functions assume a certain time-domain nonlinear signal shape and the
 \ifdefined\DISSERTATION
     The two signals where describing functions are used are both force signals.
     For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it also undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
+\else
+    The fundamental is the most relevant harmonic for power because typically, its force is the largest and its position undergoes the least filtering by the low-pass plant.
 \fi
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
@@ -618,7 +626,7 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 \centering
 \caption{Matrices for calculating various metrics at a port via \Cref{eq:metrics}}
 \label{tab:power-metrics}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.1\linewidth}|ccccc}
+\begin{tabular}{L{0.1\linewidth}|ccccc}
     Metric $M$ & $p_{\text{avg}}=P$ & $Q$ & $S$ & $|\hat{e}|^2$ & $|\hat{q}|^2$ \\ \hline
     Matrix $\mathbf{A}_M$ &
     $\begin{bmatrix}
@@ -784,14 +792,8 @@ The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ 
     &\approx~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
 \end{aligned}
 \end{equation}
-\ifdefined\DISSERTATION
-    Computation of the relative velocity uses the following expression for the incident wave velocity phasor in finite depth water evaluated at the body draft, with $\vec{T}=[T_{f,2},T_s]$ collecting the bottom draft of the float and spar:
-    \begin{equation}\label{eq:wave-velocity-phasor}
-        \vec{\hat{V}}_{wave}(y) = \frac{H}{2} \frac{g k}{\omega} e^{-k\vec{T}} e^{-iky}
-    \end{equation}
-\else
-    The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \Cref{sec:appendix-drag} (\Cref{eq:wave-velocity-phasor}). 
-\fi
+where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
+The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \Cref{sec:appendix-drag} (\Cref{eq:wave-velocity-phasor}). 
 
 The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in \Cref{fig:desc-fcns}(b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$ times the peak of the nonlinear waveform.
@@ -803,17 +805,11 @@ Integrating the drag pressure over the wetted surface via strip theory (\Cref{se
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
-Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
+Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
-\ifdefined\DISSERTATION
-    The nondimensional integrals are computed numerically, and for applications like optimization where the simulation must be run many times, they are pre-computed for a range of nondimensional input values and accessed via a lookup table to reduce runtime.
-
-    The resulting magnitude and phase of WEC motion are obtained by numerically iterating the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
-    Further derivation, convergence details, and control implications are discussed in \Cref{sec:appendix-drag}.
-\else
-    These integrals are precomputed and stored as a lookup table to support fast optimization.
-    The state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ are converged by fixed-point iteration, typically in 5-8 iterations; details are in \Cref{sec:appendix-drag}. 
-\fi
+These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
+The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
+\Cref{sec:appendix-drag} discusses details and control implications. 
 
 %\subsubsection{Power Saturation}
 %Equation~\eqref{eq:mech-power} shows that the power peak to maximum ratio is at minimum two for a damping controller, 
@@ -821,7 +817,7 @@ Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondime
 
 %%%%%%%%%%%%%%%
 \subsubsection{Energy Production}
-The analysis thus far has either been sea-state agnostic (\Cref{sec:geom}) or applied separately to each individual sea state (\Cref{sec:hydro,sec:dynamics}).
+The analysis thus far either is sea-state agnostic (\Cref{sec:geom}) or applies separately to each individual sea state (\Cref{sec:hydro,sec:dynamics}).
 We now combine the results across sea states to find the long-term energy statistics in a given wave environment.
 
 \ifdefined\DISSERTATION
@@ -919,7 +915,7 @@ This approximation can either under- or overestimate the true peak depending on 
     \centering
     \caption{Forces, amplitudes, and maximum allowable amplitudes in each design load case}
 \label{tab:DLCs}
-\begin{tabular}{>{\centering\arraybackslash}p{0.28\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.33\linewidth}}
+\begin{tabular}{P{0.28\linewidth}P{0.3\linewidth}P{0.33\linewidth}}
     & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
     \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
@@ -1020,7 +1016,7 @@ The values of $\Delta z$ used for float and spar in operational and storm cases 
 % \begin{table}[htbp]
 % \centering
 
-% \begin{tabular}{| l  |>{\raggedright\arraybackslash}p{0.35\linewidth}|>{\raggedright\arraybackslash}p{0.35\linewidth}|}
+% \begin{tabular}{| l  |L{0.35\linewidth}|L{0.35\linewidth}|}
 % \hline
 % \textbf{Value} & \textbf{Sea state to use} & \textbf{Saturation to meet it?} \\
 % \hline
@@ -1056,7 +1052,7 @@ This regular wave assumption avoids the time-consuming convolution integral or s
 % Approximation accuracy discussion. Trim closing clause for AOR.
 In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
 If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
-\cite{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
+\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 
 \ifdefined\DISSERTATION
     Nonetheless, irregular time-domain transient peaks and the variation of hydrodynamic coefficients over the spectral width of each individual sea state are not considered.
@@ -1172,7 +1168,7 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
     With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
     The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \else
-    The MDOcean economics model captures the scaling of cost with design variables rather than predicting absolute cost.
+    The MDOcean economics model prioritizes capturing the scaling of cost with design variables over predicting absolute cost.
     Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \fi
 
@@ -1204,6 +1200,7 @@ This yields:
 \end{aligned}
 \end{equation}
 where $p_{P}$, $p_{F}$, and $p_{s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
+See \Cref{sec:appendix-econ-power-laws} for more details.
 
 The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via a power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 

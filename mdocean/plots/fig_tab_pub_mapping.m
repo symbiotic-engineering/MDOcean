@@ -151,30 +151,26 @@ figs_classes = figs_split(:,1);
 tabs_classes = tabs_split(:,1);
 for i=1:length(figs_classes)
     class_name = figs_classes{i};
-    if ~strcmp(class_name, 'ReadNonMatlabFigs')
-        all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
-        this_fig_name = figs_split(i,2);
-        valid = ismember(this_fig_name,all_fig_names_this_class);
-        msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
-            class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
-        %assert(valid, msg)
-        if ~valid
-            warning(msg);
-        end
+    all_fig_names_this_class = feval(class_name,struct(),struct()).fig_names;
+    this_fig_name = figs_split(i,2);
+    valid = ismember(this_fig_name,all_fig_names_this_class);
+    msg = [this_fig_name{1} ' defined in fig_tab_pub_mapping does not match any figures in ' ...
+        class_name '. Valid figures: ' strjoin(all_fig_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
     end
 end
 for i=1:length(tabs_classes)
     class_name = tabs_classes{i};
-    if ~strcmp(class_name, 'ReadNonMatlabFigs')
-        all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
-        this_tab_name = tabs_split(i,2);
-        valid = ismember(this_tab_name,all_tab_names_this_class);
-        msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
-            class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
-        %assert(valid, msg)
-        if ~valid
-            warning(msg);
-        end
+    all_tab_names_this_class = feval(class_name,struct(),struct()).tab_names;
+    this_tab_name = tabs_split(i,2);
+    valid = ismember(this_tab_name,all_tab_names_this_class);
+    msg = [this_tab_name{1} ' defined in fig_tab_pub_mapping does not match any tables in ' ...
+        class_name '. Valid tables: ' strjoin(all_tab_names_this_class,', ')];
+    %assert(valid, msg)
+    if ~valid
+        warning(msg);
     end
 
 end

@@ -102,43 +102,6 @@ Some port relationships are physically well-defined in one convention but degene
 The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Time-Domain Expansion of Instantaneous Power}
-\label{sec:appendix-power-time}
-
-Equation~\eqref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ at any port as \citep{saadat_power_1999}
-\begin{equation}\label{eq:power-time-PQS}
-    p(t) = P + |S|\cos\!\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\!\left(\frac{Q}{P}\right)\right),
-\end{equation}
-a DC offset of $P$ plus an oscillation at $2\omega$ with amplitude $|S|$.
-The average and peak powers in \Cref{eq:power-avg-peak} follow directly: $p_{\text{avg}} = P$ since the oscillation averages to zero, and $p_{pk} = P + |S|$ at the cosine maximum.
-The minimum $p_{\text{min}} = P - |S|$ is negative when $|S|>P$, corresponding to instants when energy flows from the load back into the source under reactive control.
-
-%%%%%%%%%%%%%%%
-\subsubsection{Electrical-Port Power in Optimal-Control Variables}
-\label{sec:appendix-power-elec}
-
-Expressing the average and peak powers at the electrical port in terms of the constrained-control parameters introduced in \Cref{sec:optimal-control} (control damping $B_l$, control stiffness $K_l$, and current phasor $\hat{I}$), and applying the constant electrical efficiency $\eta$,
-\begin{equation}\label{eq:power-elec}
-\begin{bmatrix}
-p_{avg,elec} \\
-p_{pk,elec}
-\end{bmatrix}
-=
-\eta
-\begin{bmatrix}
-p_{avg,VI} \\
-p_{pk,VI}
-\end{bmatrix}
-=
-\eta \tfrac{1}{2} B_l |\hat{I}|^2
-\begin{bmatrix}
-1 \\
-1 + \sqrt{1 + \left(\tfrac{K_l}{B_l\omega}\right)^2}
-\end{bmatrix}.
-\end{equation}
-The peak-power form is used as the apparent-power constraint in the QCQP of \Cref{sec:optimal-control}.
-
-%%%%%%%%%%%%%%%
 \subsubsection{PTO Kinematics and Underactuation}
 The PTO kinematics describe the relationship between WEC body displacements $\vec{\hat{\xi}}$ to PTO displacements $\vec{\hat{X}}_{PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
 In general form, the PTO kinematics can be expressed as:
@@ -351,6 +314,61 @@ The load voltage and current can then be found as:
     \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
 \end{equation}
 
+%%%%%%%%%%%%%%%
+
+\subsubsection{Time-Domain Expansion of Instantaneous Power}
+\label{sec:appendix-power-time}
+
+Equation~\eqref{eq:power-PQS} can be used to rewrite the instantaneous power $p(t)$ at any port as \citep{saadat_power_1999}
+\begin{equation}\label{eq:power-time-PQS}
+    p(t) = P + |S|\cos\!\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\!\left(\frac{Q}{P}\right)\right),
+\end{equation}
+a DC offset of $P$ plus an oscillation at $2\omega$ with amplitude $|S|$.
+The average and peak powers in \Cref{eq:power-avg-peak} follow directly: $p_{\text{avg}} = P$ since the oscillation averages to zero, and $p_{pk} = P + |S|$ at the cosine maximum.
+The minimum $p_{\text{min}} = P - |S|$ is negative when $|S|>P$, corresponding to instants when energy flows from the load back into the source under reactive control.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Electrical-Port Power in Optimal-Control Variables}
+\label{sec:appendix-power-elec}
+
+Expressing the average and peak powers at the electrical port in terms of the constrained-control parameters introduced in \Cref{sec:optimal-control} (control damping $B_l$, control stiffness $K_l$, and current phasor $\hat{I}$), and applying the constant electrical efficiency $\eta$,
+\begin{equation}\label{eq:power-elec}
+\begin{bmatrix}
+p_{avg,elec} \\
+p_{pk,elec}
+\end{bmatrix}
+=
+\eta
+\begin{bmatrix}
+p_{avg,VI} \\
+p_{pk,VI}
+\end{bmatrix}
+=
+\eta \tfrac{1}{2} B_l |\hat{I}|^2
+\begin{bmatrix}
+1 \\
+1 + \sqrt{1 + \left(\tfrac{K_l}{B_l\omega}\right)^2}
+\end{bmatrix}.
+\end{equation}
+The peak-power form is used as the apparent-power constraint in the QCQP of \Cref{sec:optimal-control}.
+
+%%%%%%%%%%%%%%%
+% Additionally, the drivetrain mechanical cascade matrix $[a]_m$ is set to the identity matrix, which represents a static effective gear radius $R=1$:
+% \begin{equation}
+% [a]_m = \begin{bmatrix}
+% 1/R &~ 0 \\
+% 0 &~ R
+% \end{bmatrix} = \begin{bmatrix}
+% 1 &~ 0 \\
+% 0 &~ 1
+% \end{bmatrix}
+% \end{equation}
+% With this $[a]_m$, the control damping and stiffness $B_u$ and $K_u$ equal the PTO damping and stiffness $B_p$ and $K_p$.
+% This will simplify the impedance matching procedure described below, requiring matching at only one interface.
+
+%The time-domain mechanical power is $P_{mech}(t) = \tau(t) \Omega(t) = (B_u \Omega(t) + K_u \theta(t) ) \Omega(t) $, where $\theta(t)$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
+%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Linear Solution Procedure}
 \label{sec:appendix-dynamics-solution}
@@ -474,11 +492,13 @@ Using $\hat{I}_p$ for brevity to denote the current in the particular solution, 
 \end{equation}
 
 Inequality constraints 
-$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x} + 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\} \le b_\mu$
+$\vec{x}^{\,*}\mathbf{Q}_\mu\vec{x}
++ 2\Re\!\left\{\vec{a}_\mu^{\,*}\vec{x}\right\}
+\le b_\mu$
 further reduce the feasible design space, and the presence of multiple inequality constraints introduces the possibility of \Cref{eq:opt-problem} having no solutions due to infeasibility.
 While constrained quadratic programs like \Cref{eq:opt-problem} generally require numerical solutions, the low dimensionality allows an analytical solution with geometric intuition, even if the problem is non-convex (see \Cref{sec:appendix-qp-convexity} for a discussion on convexity). 
 First, we rewrite the objective and inequality constraints in terms of $\Gamma$ by plugging \Cref{eq:x-p-plus-nullspace-simplified} into \Cref{eq:opt-problem}:
-\begin{subequations}\label{eq:obj-inequality-gamma}
+\begin{subequations}
 \begin{align}
 P_{avg,VI}
 &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma|^2)
@@ -653,7 +673,7 @@ Therefore, the presence of apparent power constraints makes the optimal control 
 %%%%%%%%%%%%%%%
 \subsubsection{Extension to Higher Dimensions and Convexity}
 \label{sec:appendix-qp-convexity}
-Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study by \cite{bacelli_numerical_2015}.
+Future work may wish to extend the constrained power maximization to the full nonlinear dynamics, or to linear dynamics with irregular wave forcing as in the study by \citet{bacelli_numerical_2015}.
 In the terminology of \Cref{fig:venn-diagram}, these would be known as nonlinear and linear spectral optimal control respectively.
 Both of these cases solve the full harmonic-balance equation, producing a higher-dimensional analog of \Cref{eq:opt-problem-gamma}.
 The problem dimension equals twice the number of frequencies retained in the spectral expansion, preventing the use of the geometric analytical solution used in the monochromatic case.
@@ -685,7 +705,7 @@ Notably, $\Gamma$ is equal to the reflection coefficient at the generator electr
 Similar graphical interpretations of constraints for wave energy converters are presented in the studies \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 \citet{mccabe_force-limited_2024} focus on force/current limits but discuss amplitude, phase voltage, and apparent power constraints as well.
 \citet{merigaud_geometrical_2023} consider exclusively amplitude limits while \citet{bacelli_geometric_2013} cover amplitude and force limits.
-\cite{mccabe_force-limited_2024} use Smith charts to show constraints directly in $\Gamma$ space as we do here, while \citet{merigaud_geometrical_2023} work in the complex plane of the hydrodynamic transmission coefficient and \citet{bacelli_geometric_2013} in that of the PTO force.
+\citet{mccabe_force-limited_2024} use Smith charts to show constraints directly in $\Gamma$ space as we do here, while \citet{merigaud_geometrical_2023} work in the complex plane of the hydrodynamic transmission coefficient and \citet{bacelli_geometric_2013} in that of the PTO force.
 \citet{bacelli_geometric_2013} also extend the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1102,8 +1122,10 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 \subsection{Drag Model
 \label{sec:appendix-drag}}
 As described in \Cref{sec:drag}, a describing function approximation is used to model the form drag.
-The relative-velocity computation in \Cref{eq:drag-pressure} uses the standard finite-depth linear-wave velocity phasor evaluated at body draft, with $\vec{T} = [T_{f,2}, T_s]$ collecting the bottom drafts of the float and spar:
-\begin{equation}\label{eq:wave-velocity-phasor}
+The relative-velocity computation in \Cref{eq:drag-pressure} uses the standard finite-depth linear-wave velocity phasor evaluated at body draft,
+with $\vec{T} = [T_{f,2}, T_s]$ collecting the bottom drafts of the float and spar:
+\begin{equation}
+    \label{eq:wave-velocity-phasor}
     \vec{\hat{V}}_{wave}(y) = \frac{H}{2}\,\frac{gk}{\omega}\, \exp\{-k\vec{T}-iky\}.
 \end{equation}
 
@@ -1569,11 +1591,14 @@ Nonetheless, researchers and practitioners should be aware of the inconsistency 
 \label{sec:appendix-power-decomposition}
 
 The efficiency matrices introduced in \Cref{eq:power-matrix-decomposition} are defined as follows.
-The wave power density and maximum capture width are independent of design:
+The wave power density $\mathbf{J}^{H,T}_{wave}$ and maximum capture width  $\mathbf{CW}^{H,T}_{max}$ are independent of design:
 \begin{equation}
 \mathbf{J}^{H,T}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2, \qquad
 \mathbf{CW}^{H,T}_{max} = \frac{g T_e^2}{4\pi^2}.
 \end{equation}
+The maximum capture width matrix represents the radiation limit determined by the WEC mode of motion
+(heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
+
 The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{P}_{F\dot{X},\text{no drag}}$ (computed with $C_{d,f}=C_{d,s}=0$, ideal PTO):
 \begin{equation}
 \mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}}, \qquad
@@ -1612,7 +1637,7 @@ Percentages are shown for both single-device ($N_{WEC}=1$) and array ($N_{WEC}=1
 
     \caption{Cost Breakdown Structure}
     \label{tab:CBS}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.15\linewidth}}
+\begin{tabular}{L{0.3\linewidth}P{0.2\linewidth}P{0.2\linewidth}P{0.15\linewidth}}
          CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
@@ -1651,10 +1676,10 @@ The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained
     \caption{Cost model values for each CBS category}
     \label{tab:econ-model-values}
 \begin{tabular}{
-        >{\raggedright\arraybackslash}p{0.33\linewidth}
-        >{\raggedright\arraybackslash}p{0.1\linewidth}
-        >{\raggedright\arraybackslash}p{0.18\linewidth}
-        >{\raggedright\arraybackslash}p{0.18\linewidth}}
+        L{0.33\linewidth}
+        L{0.1\linewidth}
+        L{0.18\linewidth}
+        L{0.18\linewidth}}
          CBS Category& Exponent $\beta$&Unit cost at scale $C_{\infty}$&Single-unit cost \newline $C_1$\\\hline
          \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. CAPEX& 0.741& 1.24 \$M&13.92 \$M\\
          \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
@@ -1939,7 +1964,7 @@ These equations assume that the spar is compact, meaning that local buckling of 
 %\setlength{\tabrowsep}{} % default value:
 \renewcommand{\arraystretch}{1.4}
 
-\begin{tabular}{c>{\centering\arraybackslash}p{0.35\linewidth}>{\centering\arraybackslash}p{0.3\linewidth}c}
+\begin{tabular}{cP{0.35\linewidth}P{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
 $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
