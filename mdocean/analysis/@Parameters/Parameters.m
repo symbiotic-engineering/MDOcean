@@ -1,4 +1,4 @@
-classdef Parameters < GenericAnalysis
+classdef Parameters < GroupedStageClass
     %PARAMETERS Analysis class for parameters table
     %   Generates parameters information table
 

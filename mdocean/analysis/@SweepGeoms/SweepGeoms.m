@@ -1,4 +1,4 @@
-classdef SweepGeoms < GenericAnalysis
+classdef SweepGeoms < GroupedStageClass
     %SWEEPGEOMS Analysis class for geometry sweep figures
     %   Sweeps six geometric ratios and water depth to explore how the
     %   non-dimensional wave-body parameter m_0*h and the geometry

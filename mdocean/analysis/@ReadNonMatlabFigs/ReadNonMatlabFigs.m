@@ -1,4 +1,4 @@
-classdef ReadNonMatlabFigs < GenericAnalysis
+classdef ReadNonMatlabFigs < GroupedStageClass
     %READNONMATLABFIGS Analysis class for non-MATLAB figure reading
     %   Reads external image files and creates MATLAB figures
 
@@ -33,7 +33,7 @@ classdef ReadNonMatlabFigs < GenericAnalysis
 
     methods
         function obj = ReadNonMatlabFigs(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             not_fig = ~endsWith(obj.postpro_outputs, '.fig');
             obj.postpro_outputs = obj.postpro_outputs(not_fig);
             obj.extra_postpro_inputs = [obj.extra_postpro_inputs, ...

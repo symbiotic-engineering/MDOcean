@@ -1,4 +1,4 @@
-classdef Cost < GenericAnalysis
+classdef Cost < GroupedStageClass
     %COST Analysis class for cost analysis tables
     %   Generates cost parameters table
 

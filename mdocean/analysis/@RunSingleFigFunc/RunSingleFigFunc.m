@@ -1,4 +1,4 @@
-classdef RunSingleFigFunc < GenericAnalysis
+classdef RunSingleFigFunc < GroupedStageClass
     %RUNSINGLEFIGFUNC Analysis class for single run figures
     %   Generates nominal geometry, power matrix, and drag convergence figures
 
@@ -17,7 +17,7 @@ classdef RunSingleFigFunc < GenericAnalysis
     end
     methods
         function obj = RunSingleFigFunc(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/RunSingleFigFunc/intermed_created_figs_1.fig', ...
                 'results/RunSingleFigFunc/intermed_created_figs_2.fig', ...

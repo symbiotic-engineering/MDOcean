@@ -1,4 +1,4 @@
-classdef Slamming < GenericAnalysis
+classdef Slamming < GroupedStageClass
     %SLAMMING Analysis class for slamming figures
     %   Generates slamming amplitude figures
 
@@ -9,7 +9,7 @@ classdef Slamming < GenericAnalysis
 
     methods
         function obj = Slamming(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/Slamming/intermed_figure_handle_1.fig' ...
             };

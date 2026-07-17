@@ -1,4 +1,4 @@
-classdef ParamSensitivities < GenericAnalysis
+classdef ParamSensitivities < GroupedStageClass
     %PARAMSENSITIVITIES Analysis class for parameter sensitivity figures
     %   Generates parameter sensitivity analysis figures including tornado plots and grids
 

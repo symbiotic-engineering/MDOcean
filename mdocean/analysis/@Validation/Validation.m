@@ -1,4 +1,4 @@
-classdef Validation < GenericAnalysis
+classdef Validation < GroupedStageClass
     %VALIDATION Analysis class for validation figures and tables
     %   Generates cost vs N WEC validation figure and validation table
 
@@ -9,7 +9,7 @@ classdef Validation < GenericAnalysis
 
     methods
         function obj = Validation(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/Validation/intermed_fig_cost_vs_N_WEC_1.fig' ...
             };

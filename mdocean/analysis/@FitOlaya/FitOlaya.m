@@ -1,4 +1,4 @@
-classdef FitOlaya < GenericAnalysis
+classdef FitOlaya < GroupedStageClass
     %FITOLAYA Analysis class for Olaya damping plate hydrodynamic coefficient fits
     %   Loads digitized data and creates derived signals in analysis_fcn;
     %   generates all fit and exploratory plots in post_process_fcn.
@@ -74,7 +74,7 @@ classdef FitOlaya < GenericAnalysis
 
     methods
         function obj = FitOlaya(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_inputs = [obj.extra_analysis_inputs, ...
                 {'./dev/hydro_coeffs/damping_plate/3b_black.csv', ...
                  './dev/hydro_coeffs/damping_plate/3b_blue.csv', ...

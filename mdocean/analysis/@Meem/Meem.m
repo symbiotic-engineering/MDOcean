@@ -1,4 +1,4 @@
-classdef Meem < GenericAnalysis
+classdef Meem < GroupedStageClass
     %MEEM Analysis class for MEEM validation figures
     %   Generates MEEM regions, sparsity, validation, matching, and convergence figures
 
@@ -14,7 +14,7 @@ classdef Meem < GenericAnalysis
 
     methods
         function obj = Meem(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/Meem/intermed_b_vector_fig_1.fig', ...
                 'results/Meem/intermed_figHydroCoeff_1.fig', ...

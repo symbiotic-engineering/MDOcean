@@ -1,4 +1,4 @@
-classdef SparHydro < GenericAnalysis
+classdef SparHydro < GroupedStageClass
     %SPARHYDRO Analysis class for spar hydrodynamic figures
     %   Generates spar added mass figures
 
@@ -9,7 +9,7 @@ classdef SparHydro < GenericAnalysis
 
     methods
         function obj = SparHydro(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/SparHydro/intermed_figure_handle_1.fig' ...
             };

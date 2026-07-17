@@ -1,4 +1,4 @@
-classdef HydroCoeffFigFunc < GenericAnalysis
+classdef HydroCoeffFigFunc < GroupedStageClass
     %HYDROCOEFFIGFUNC Analysis class for hydrodynamic coefficient figures
     %   Generates hydrodynamic coefficient error figures
 
@@ -9,7 +9,7 @@ classdef HydroCoeffFigFunc < GenericAnalysis
 
     methods
         function obj = HydroCoeffFigFunc(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/HydroCoeffFigFunc/intermed_created_figs_1.fig' ...
             };

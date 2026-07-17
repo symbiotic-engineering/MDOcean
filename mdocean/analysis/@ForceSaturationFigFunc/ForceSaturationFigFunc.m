@@ -1,4 +1,4 @@
-classdef ForceSaturationFigFunc < GenericAnalysis
+classdef ForceSaturationFigFunc < GroupedStageClass
     %FORCESATURATIONFIGFUNC Analysis class for force saturation figures
     %   Generates power-force sensitivity and runtime sensitivity figures
 
@@ -9,7 +9,7 @@ classdef ForceSaturationFigFunc < GenericAnalysis
 
     methods
         function obj = ForceSaturationFigFunc(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = { ...
                 'results/ForceSaturationFigFunc/intermed_fig2_1.fig', ...
                 'results/ForceSaturationFigFunc/intermed_fig1_1.fig' ...

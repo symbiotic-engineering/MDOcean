@@ -1,4 +1,4 @@
-classdef Multistart < GenericAnalysis
+classdef Multistart < GroupedStageClass
     %MULTISTART Analysis class for multistart optimization figures and tables
     %   Generates multistart convergence tree and parallel coordinates figures with results table
     

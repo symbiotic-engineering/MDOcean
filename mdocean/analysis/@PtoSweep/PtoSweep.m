@@ -1,4 +1,4 @@
-classdef PtoSweep < GenericAnalysis
+classdef PtoSweep < GroupedStageClass
     %PTOSWEEP Analysis class for PTO parameter sweep figures
     %   Performs a 2-D sweep of F_max (maximum powertrain force) and P_max
     %   (maximum powertrain power) for the nominal RM3 geometry.  For each

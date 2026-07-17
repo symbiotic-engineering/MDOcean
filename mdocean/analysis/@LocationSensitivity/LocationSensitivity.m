@@ -1,4 +1,4 @@
-classdef LocationSensitivity < GenericAnalysis
+classdef LocationSensitivity < GroupedStageClass
     %LOCATIONSENSITIVITY Analysis class for location sensitivity tables
     %   Generates location sensitivity analysis table
 
@@ -12,7 +12,7 @@ classdef LocationSensitivity < GenericAnalysis
     end
     methods
         function obj = LocationSensitivity(varargin)
-            obj = obj@GenericAnalysis(varargin{:});
+            obj = obj@GroupedStageClass(varargin{:});
             obj.extra_analysis_outputs = {'results/LocationSensitivity/intermed_h_power_matrix_1.fig',...
                                           'results/LocationSensitivity/intermed_h_power_matrix_2.fig',...
                                           'results/LocationSensitivity/intermed_h_power_matrix_3.fig',...

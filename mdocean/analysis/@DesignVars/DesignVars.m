@@ -1,4 +1,4 @@
-classdef DesignVars < GenericAnalysis
+classdef DesignVars < GroupedStageClass
     %DESIGNVARS Analysis class for design variables table
     %   Generates design variables bounds table
 
