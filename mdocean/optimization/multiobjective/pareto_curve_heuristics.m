@@ -80,7 +80,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     J1_max = Inf;%p.LCOE_max;
     [f5,f6,f8] = design_heuristics_plot(J1, bestJ1, idx_best_J1, x_best_J1, ...
                            J2, bestJ2, idx_best_J2, X, idxo, J1_max, b.var_names_pretty(1:end-1),new_objs, r1.p);
-    f9 = lcoe_tangent_contours_plot(J1(idxo), J2(idxo), r1.p);
+    [f9,f10] = lcoe_tangent_contours_plot(J1(idxo), J2(idxo), r1.p);
 
     %% double pareto plot, if plotting two results
     if load_two
@@ -112,7 +112,7 @@ function figs = pareto_curve_heuristics(r1,r2)
     if load_two
         figs = [figs f7];
     end
-    figs = [figs f8, f9];
+    figs = [figs f8, f9, f10];
 end
 %%
 function [J1, bestJ1, idx_best_J1, J1_nom, ...
@@ -484,8 +484,9 @@ function [f_unfiltered,f_filtered,f_nondim] = design_heuristics_plot(overallJ1, 
     xlabel('Percent along the Pareto Curve')
     ylabel('Nondimensional Design Value')
     title('Nondimensional Design Trends')
-    legend(nondim_var_names(var_names),'Location','eastoutside')
+    leg_nd = legend(nondim_var_names(var_names));
     improvePlot
+    leg_nd.Location = 'eastoutside';
 end
 
 function [filtered, t_even_spread] = low_pass_filter(time, signals, backwards)
@@ -605,43 +606,49 @@ function X_nondim = nondimensionalize_design_vars(X_full, p)
     X_nondim = X;
     D_s = X(:,1);
     D_f = X(:,2);
+    T_f_2 = X(:,3);
+    D_d = p.D_d_over_D_s * D_s;
     n_pts = size(X_full,1);
     F_uncon = nan(n_pts,1);
     P_uncon = nan(n_pts,1);
+    p_uncon = p;
+    p_uncon.use_force_sat = false;
+    p_uncon.use_power_sat = false;
+    p_uncon.use_amp_sat = true;
     for ii = 1:n_pts
-        [~,~,~,val_i] = simulation(X_full(ii,:), p);
+        [~,~,~,val_i] = simulation(X_full(ii,:), p_uncon);
         F_uncon(ii) = max(val_i.force_ptrain/1e6, 1e-6);
         P_uncon(ii) = max(val_i.power_max/1e5, 1e-6);
     end
     X_nondim(:,1) = D_s ./ D_f;
     X_nondim(:,3) = X(:,3) ./ D_f;
-    X_nondim(:,4) = X(:,4) ./ D_f;
-    X_nondim(:,5) = X(:,5) ./ D_f;
+    X_nondim(:,4) = X(:,4) ./ D_s;
+    X_nondim(:,5) = X(:,5) ./ T_f_2;
     X_nondim(:,6) = X(:,6) ./ F_uncon;
     X_nondim(:,7) = X(:,7) ./ P_uncon;
     X_nondim(:,8) = (X(:,8)/1000) ./ D_f;
-    X_nondim(:,9) = (X(:,9)/1000) ./ D_f;
-    X_nondim(:,10) = (X(:,10)/1000) ./ D_f;
+    X_nondim(:,9) = (X(:,9)/1000) ./ D_s;
+    X_nondim(:,10) = (X(:,10)/1000) ./ D_d;
     X_nondim(:,11) = (X(:,11)/10) ./ D_f;
-    X_nondim(:,12) = X(:,12) ./ D_f;
+    X_nondim(:,12) = X(:,12) ./ D_d;
 end
 
 function names_out = nondim_var_names(names_in)
     names_out = names_in;
     names_out{1} = 'D_s/D_f';
     names_out{3} = 'T_{f,2}/D_f';
-    names_out{4} = 'h_s/D_f';
-    names_out{5} = 'h_{fs,clear}/D_f';
+    names_out{4} = 'h_s/D_s';
+    names_out{5} = 'h_{fs,clear}/T_{f,2}';
     names_out{6} = 'F_{max}/F_{max,unconstrained}';
     names_out{7} = 'P_{max}/P_{max,unconstrained}';
     names_out{8} = 't_{fb}/D_f';
-    names_out{9} = 't_{sr}/D_f';
-    names_out{10} = 't_d/D_f';
+    names_out{9} = 't_{sr}/D_s';
+    names_out{10} = 't_d/D_d';
     names_out{11} = 'h_{stiff,f}/D_f';
-    names_out{12} = 'h_{1,stiff,d}/D_f';
+    names_out{12} = 'h_{1,stiff,d}/D_d';
 end
 
-function f = lcoe_tangent_contours_plot(P_pareto_kW, C_pareto_M, p)
+function [f,f_debug] = lcoe_tangent_contours_plot(P_pareto_kW, C_pareto_M, p)
     f = figure;
     t = tiledlayout(2,2);
     t.TileSpacing = 'compact';
@@ -654,11 +661,12 @@ function f = lcoe_tangent_contours_plot(P_pareto_kW, C_pareto_M, p)
     C = C(ia);
 
     ellipse = fit_ellipse_arc(P,C);
+    f_debug = ellipse_debug_plot(P,C,ellipse);
 
-    alpha_non_design = 0.741;
-    capex_indep_nom = (12.68e6 * p.N_WEC^(-alpha_non_design) + 1.24e6);
-    alpha_opex = 0.5567;
-    opex_nom = 1.193e6 * p.N_WEC^-alpha_opex;
+    alpha_non_design = p.econ_alpha_non_design;
+    capex_indep_nom = (p.econ_capex_non_design_scale * p.N_WEC^(-alpha_non_design) + p.econ_capex_non_design_offset);
+    alpha_opex = p.econ_alpha_opex;
+    opex_nom = p.econ_opex_scale * p.N_WEC^-alpha_opex;
 
     FCR_values = p.FCR .* [0.75 0.9 1.1 1.25];
     opex_vec = linspace(0.5*opex_nom, 1.5*opex_nom, 45);
@@ -689,8 +697,19 @@ function ellipse = fit_ellipse_arc(P,C)
     obj = @(q) sum(( ((P-q(1))./q(3)).^2 + ((C-q(2))./q(4)).^2 - 1 ).^2);
     opts = optimoptions('fmincon','Display','off');
     q = fmincon(obj,p0,[],[],[],[],lb,ub,[],opts);
+    term = max(0, 1 - ((P - q(1))./q(3)).^2);
+    C_upper = q(2) + q(4) * sqrt(term);
+    C_lower = q(2) - q(4) * sqrt(term);
+    mse_upper = mean((C - C_upper).^2);
+    mse_lower = mean((C - C_lower).^2);
+    if mse_lower <= mse_upper
+        branch_sign = -1;
+    else
+        branch_sign = 1;
+    end
     ellipse = struct('P0',q(1),'C0',q(2),'a',q(3),'b',q(4), ...
-                     'Pmin',min(P),'Pmax',max(P));
+                     'Pmin',min(P),'Pmax',max(P), ...
+                     'branch_sign',branch_sign);
 end
 
 function pct = tangent_percent_from_econ_terms(ellipse, FCR, opex, capex_indep)
@@ -716,23 +735,25 @@ end
 
 function C = C_ellipse(e, P)
     term = max(0, 1 - ((P - e.P0)./e.a).^2);
-    C_upper = e.C0 + e.b * sqrt(term);
-    C_lower = e.C0 - e.b * sqrt(term);
-    if abs(mean(C_upper) - e.C0) < abs(mean(C_lower) - e.C0)
-        C = C_lower;
-    else
-        C = C_upper;
-    end
+    C = e.C0 + e.branch_sign * e.b * sqrt(term);
 end
 
 function dC = dC_dP_ellipse(e, P)
     denom = max(1e-12, sqrt(max(0, 1 - ((P - e.P0)./e.a).^2)));
-    base = -e.b * (P - e.P0) ./ (e.a^2 .* denom);
-    C_upper = e.C0 + e.b * sqrt(max(0, 1 - ((P - e.P0)./e.a).^2));
-    C_lower = e.C0 - e.b * sqrt(max(0, 1 - ((P - e.P0)./e.a).^2));
-    if abs(mean(C_upper) - e.C0) < abs(mean(C_lower) - e.C0)
-        dC = -base;
-    else
-        dC = base;
-    end
+    dC = e.branch_sign * (-e.b * (P - e.P0) ./ (e.a^2 .* denom));
+end
+
+function f = ellipse_debug_plot(P,C,ellipse)
+f = figure;
+P_fit = linspace(min(P),max(P),500);
+C_fit = C_ellipse(ellipse,P_fit);
+plot(P/1000,C/1e6,'ko','DisplayName','Pareto points')
+hold on
+plot(P_fit/1000,C_fit/1e6,'r-','LineWidth',1.5,'DisplayName','Ellipse fit')
+grid on
+xlabel('Average Electrical Power (kW)')
+ylabel('CAPEX design-dependent ($M)')
+title('Ellipse Fit Debug')
+legend('Location','best')
+improvePlot
 end
