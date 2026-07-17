@@ -146,10 +146,7 @@ Future studies could quantify the lowest marginal PTO force price (\$/N) for whi
 % 349 - 369
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Cost-Power Tradeoff}\label{remdo:sec:results-multi}
-\subsubsection{Minimum Cost and Maximum Power Designs}
-In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
-The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
-
+\subsubsection{Pareto Front}
 \ifdefined\DISSERTATION
     In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
     As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
@@ -162,6 +159,14 @@ The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-g
     giving insight where LCOE is inapplicable or uncertain in its constant-modeled cost terms ($OPEX$, $FCR$, $p_0$).
     The Pareto front (\Cref{remdo:fig:pareto}) shows all designs costing significantly less than the nominal RM3 \citep{RM3} across a range of powers;
     the zoomed view with constant-$LCOE$ contours (\Cref{remdo:fig:pareto-lcoe}) places the minimum-LCOE design at the front's tangency with the contours, nearly coincident with the maximum-power design.
+\fi
+Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provides design heuristics for adapting WEC design to a given cost-power balance.
+\ifdefined\DISSERTATION
+    To show consistent, interpretable trends despite the non-uniform spacing of points, the x-axis gives percent along the Pareto front (the angle of each point from the nadir point) and the y-values are lightly low-pass smoothed.
+    The individual Pareto points appear as black squares on the x-axis for comparison against \Cref{remdo:fig:pareto} and to visualize clusters.
+    Structural design variables are green, powertrain ratings blue, and bulk geometry dimensions red.
+\else
+    The x-axis gives percent along the Pareto front and y-values are lightly smoothed; structural variables are green, powertrain ratings blue, and bulk dimensions red.
 \fi
 \begin{figure}[htbp]
     \centering
@@ -176,46 +181,6 @@ The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-g
 \label{remdo:fig:pareto-lcoe}
 \end{figure}
 %\hl{If there's room/time, consider a bonus pareto of LCOE vs CF.}
-
-A cusp exists in the Pareto front where average electrical power is around \resultsRE[powerWhereCusp].
-\ifdefined\DISSERTATION
-    As a result of this cusp, the bulk of the front, from the least-cost design at \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds], is non-convex.
-    This region would have been missed by a convex multi-objective procedure optimizing weighted sums of the objectives, affirming the necessity of the epsilon-constraint-plus-pattern-search procedure used here.
-\else
-    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure,
-    affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
-\fi
-
-% 132 - 143
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% 144 - 148
-\ifdefined\DISSERTATION
-    The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
-    This would be preferred whenever design-dependent capital expenditures matter more than modeled here, for shorter-duration projects, higher discount rates, lower operational cost, or lower design-independent capital cost.
-\else
-    The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}),
-    trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
-\fi
-
-% 370 - 403
-
-\ifdefined\DISSERTATION
-    \Cref{remdo:fig:pareto} inlays geometry visualizations for a few designs (light blue).
-    One apparent trend is that the optimal spar draft and float diameter grow from left to right along the front, this is intuitive since minimizing material keeps components as small as constraints allow, while larger dimensions cost more and generate more power.
-\else
-    The geometry inlays in \Cref{remdo:fig:pareto} show the optimal spar draft and float diameter growing from left to right, as larger dimensions cost more but generate more power.
-\fi
-
-Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provides design heuristics for adapting WEC design to a given cost-power balance.
-\ifdefined\DISSERTATION
-    To show consistent, interpretable trends despite the non-uniform spacing of points, the x-axis gives percent along the Pareto front (the angle of each point from the nadir point) and the y-values are lightly low-pass smoothed.
-    The individual Pareto points appear as black squares on the x-axis for comparison against \Cref{remdo:fig:pareto} and to visualize clusters.
-    Structural design variables are green, powertrain ratings blue, and bulk geometry dimensions red.
-\else
-    The x-axis gives percent along the Pareto front and y-values are lightly smoothed; structural variables are green, powertrain ratings blue, and bulk dimensions red.
-\fi
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{figs/from-matlab/pareto_heuristics.pdf}
@@ -246,8 +211,17 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     The objective trends (bottom of \Cref{remdo:fig:design-heuristics}) show largely linear power but a design-cost slope that changes discretely near 5\%, the source of the Pareto cusp, corresponding to a shift in PTO sizing strategy from adjusting maximum power (0-5\%) to adjusting maximum force at constant power (5-70\%), beyond which a gradual slope change reflects diminishing returns.
 \fi
 
+% convexity
+A cusp exists in the Pareto front where average electrical power is around \resultsRE[powerWhereCusp].
+\ifdefined\DISSERTATION
+    As a result of this cusp, the bulk of the front, from the least-cost design at \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds], is non-convex.
+    This region would have been missed by a convex multi-objective procedure optimizing weighted sums of the objectives, affirming the necessity of the epsilon-constraint-plus-pattern-search procedure used here.
+\else
+    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure,
+    affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
+\fi
+
 % 613 - 627
-\subsubsection{Objective Suitability}
 \ifdefined\DISSERTATION
     Due to LCOE's high uncertainty, this study performs multi-objective optimization on cost and power and includes local and limited global sensitivity analysis.
     While this overcomes many concerns, limitations remain: prices for steel, powertrain force, and powertrain power must still be assumed, which could be addressed by adding objectives for each cost separately, though moving beyond two objectives limits the intuition and visualization of results, and the authors believe the two chosen represent a good balance.
@@ -260,6 +234,45 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     but the two-objective formulation balances rigor against the interpretability lost beyond two objectives.
     The cost model, though uncertain, still improves substantially on the surface-area and hull-volume proxies common in WEC optimization, against which it would be useful to compare in future work.
 \fi
+
+If you want to cut the design cost in half, you are cutting the power into three, which is a big power penalty. Power falls off steeply.
+Diminishing returns.
+
+\subsubsection{Minimum Cost and Maximum Power Designs}
+
+I want to highlight these points because the one on the right (max power) is the highest power you can get.
+We compare it to the radiation limited max power, and it tells us that there is still a lot of gap because of the amplitude constraints and/or the achievable intrinsic impedance.
+That tells us the raditation limit and Budal bound is actually not that good of an approximation and it's important to use the actual impedance.
+
+I want to highlight the point on the left (min cost) to show how it's different than the points in the middle, in both PTO and geometry.
+This is relevant as a PBE design.
+This is different than the point on the right, which is close to the points in the middle in geometry and only differs for PTO size.
+
+If you maximize power (point on the right), which is the status quo, you get close to the same answer as min LCOE in the middle, which means that my emphaisis on looking at the tradeoff isn't all that necessary for grid power applications.
+So the presence of amplitude constraints is more important than the accuracy of the cost model.
+The accuracy of the cost model becomes more important when you have a fixed power that you are looking for (PBE).
+
+These points are tabulated in the appendix.
+
+% In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
+% The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
+
+% % 144 - 148
+% \ifdefined\DISSERTATION
+%     The balanced design is a $CAPEX$ minimization with an added constraint that average power exceed \resultsRE[powerBalanced], a value chosen from the shape of the multi-objective Pareto front (\Cref{remdo:sec:results-multi}) to trade a small power reduction for a cost reduction relative to the minimum-LCOE design.
+%     This would be preferred whenever design-dependent capital expenditures matter more than modeled here, for shorter-duration projects, higher discount rates, lower operational cost, or lower design-independent capital cost.
+% \else
+%     The balanced design is a $CAPEX$ minimization constrained to exceed \resultsRE[powerBalanced] average power (chosen from the Pareto front of \Cref{remdo:sec:results-multi}),
+%     trading a small power reduction for lower cost, preferable when design-dependent capital cost matters more than modeled here.
+% \fi
+
+% % 370 - 403
+% \ifdefined\DISSERTATION
+%     \Cref{remdo:fig:pareto} inlays geometry visualizations for a few designs (light blue).
+%     One apparent trend is that the optimal spar draft and float diameter grow from left to right along the front, this is intuitive since minimizing material keeps components as small as constraints allow, while larger dimensions cost more and generate more power.
+% \else
+%     The geometry inlays in \Cref{remdo:fig:pareto} show the optimal spar draft and float diameter growing from left to right, as larger dimensions cost more but generate more power.
+% \fi
 
 % 404-409
 \ifdefined\DISSERTATION
@@ -291,6 +304,11 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     \Cref{remdo:fig:pareto-lcoe} compares the damping and reactive control schemes: reactive control achieves the lowest LCOE overall, but below \resultsRE[dampingReactivePowerIntersect] damping control is more cost-effective, since reactive control there requires a larger, costlier PTO and structure for the same power.
     This suggests the cost-optimal controller at a given power may be neither pure scheme, as reactive control maximizes power for a given design but not for a given cost.
 \fi
+Looking at this tradeoff helps arbitrate the dispute about whether you should assume reactive control (which is what people doing CCD more recently will tend to advocate) or damping control (which is what historically was the assumption for hardware simplicity).
+The CCD people are right if you're grid scale (no fixed power requirement), but the damping people are right if you're small scale (fixed power requirement, PBE).
+This is especially relevant for PBE because it means they don't have to worry about the technical complexities of reactive control.
+In both cases, you don't quite want purely either, you want something in the middle.
+People should start designing with a nominal reactive power, not as much or as little as possible.
 % add sentence here with adding reactive power as a design variable
 % insert new plots here: econ sens contour plot, post hoc N-WEC sweep
 
@@ -303,6 +321,9 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 
 % 320
 \subsection{Global Sensitivity to Deployment Location}
+
+There is a divide between the west coast and Hawaii, and it's more predictive to look at how energetic the waves are (calmer waves means you need a bigger device), and less predictive to look at the frequency of the waves (higher frequency means you need a smaller device).
+It would be interesting to see if this trend holds at other loctions, because I've only looked at four.
 
 % 302-305
 \ifdefined\DISSERTATION
@@ -337,6 +358,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 \label{remdo:tab:location}
 \end{table*}
 
+\subsubsection{Calmer Hawaii favors large, light designs}
 \ifdefined\DISSERTATION
     All optimized LCOE values undercut the RM3 baseline.
     Pac-Wave South, OR, gives the lowest LCOE, \$\resultsRE[LCOEPacWaveNorth]/kWh, as expected from its highest incident wave energy flux, while WETS, HI, gives the highest, \$\resultsRE[LCOEHawaii]/kWh, consistent with its low incident energy.
@@ -361,7 +383,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 \fi
 
 % 458 - 473
-\subsubsection{Comparison to Other Studies on Global Deployability}
+\subsubsection{Mixed Agreement with Other Studies on Global Deployability}
 \ifdefined\DISSERTATION
     A survey indicates that 40\% of WEC developers design for site-agnostic deployment, so global deployability is of industrial interest \citep{trueworthy_wave_2020}.
     \citet{de_andres_adaptability_2015} compare the global deployability of a uniform versus a tunable WEC design across wave climates, finding that tuning the resonant period to the dominant ocean period by changing geometry increases capture width ratio but decreases the more important power-to-mass ratio (an inverse LCOE proxy), and concluding that tuning is unfavorable because it requires expensive larger diameters.
@@ -376,6 +398,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     \citet{de_andres_adaptability_2015} concludes that geometric tuning to the dominant wave period is unfavorable, but its devices have coupled diameter and height, use only damping control, and tune for power rather than cost.
     MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\Cref{remdo:tab:opt-dv-values,remdo:tab:opt-output,remdo:tab:location}), which contradicts \citet{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
 \fi
+Takeaway: we need to do further studies to say for sure and better understand exactly why this model agrees in some places and disagrees in others.
 
 % 265 - 301
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -400,6 +423,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     \label{remdo:fig:param-sens-J-star-tornado}
 \end{figure*}
 
+\paragraph{Power Production and Financing are Important at Grid Scale}
 \ifdefined\DISSERTATION
     On the left side of \Cref{remdo:fig:param-sens-J-star-tornado}, the minimum LCOE is highly sensitive to operational wave characteristics,
     with normalized sensitivities of $-1.4$: a 1\% increase in wave height or period lowers LCOE by 1.4\% through increased power.
@@ -408,7 +432,37 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     and the slightly lower PTO value follows since it scales energy only in sea states below the power limit.
     The fixed charge rate has a sensitivity of $+0.84$; though modeled as constant, it scales positively with interest rate ($+0.21$)
     and negatively with device lifetime ($-0.45$), giving LCOE sensitivities of $+0.18$ and $-0.38$ to those quantities.
-    
+\else
+    For the minimum LCOE (left of \Cref{remdo:fig:param-sens-J-star-tornado}), the dominant sensitivities are
+    operational wave characteristics ($-1.4$, as higher waves raise power),
+    array and transmission efficiency ($-1.0$),
+    PTO efficiency ($-0.8$), and the 
+    fixed charge rate ($+0.84$).
+\fi
+
+% 195 - 201
+\ifdefined\DISSERTATION
+    Finally, \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
+    The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
+    The radiation efficiency is the ratio of the maximum lossless power for the given shape to the maximum radiation-limited power, the former computed with the design's hydrodynamic coefficients, no drag, and an unsaturated controller of the specified type (damping or reactive).
+    The drag efficiency captures the effect of enabling drag and increases with wave height as expected.
+    The $F_{\text{max}}$ factor captures the force limit, departing from unity only at high wave heights near the resonant period of about 10~s.
+    The electrical efficiency captures generator efficiency and the power limit.
+    Multiplying by the annual hours in each sea state yields the annual energy production.
+\else
+    \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency;
+    their product with the annual hours per sea state yields annual energy production.
+\fi
+% power mult fig
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
+    \caption{Power matrix multiplicative breakdown for minimum LCOE design}
+    \label{remdo:fig:power-matrix-opt}
+\end{figure*}
+
+\paragraph{Structures and Geometry are Important at Small Scale}
+\ifdefined\DISSERTATION
     On the right side, the sensitivities are higher overall:
     minimum LCOE has 5 parameters with normalized magnitude above 0.5, whereas minimum design cost has sixteen.
     The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $h_{\text{stiff},d}/h_{1,\text{stiff},d}$,
@@ -435,11 +489,6 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     Finally, minimum design cost is sensitive to material density and cost (both $+0.6$, expected to be equal given the mass-based cost model),
     suggesting a lighter, cheaper material may benefit the low-power WEC.
 \else
-    For the minimum LCOE (left of \Cref{remdo:fig:param-sens-J-star-tornado}), the dominant sensitivities are
-    operational wave characteristics ($-1.4$, as higher waves raise power),
-    array and transmission efficiency ($-1.0$),
-    PTO efficiency ($-0.8$), and the 
-    fixed charge rate ($+0.84$).
     The minimum design cost (right) is more broadly sensitive as seen by the fact that 
     sixteen parameters exceed magnitude 0.5 versus five for LCOE,
     and is dominated by damping plate geometry (the nondimensional stiffener height at $+2.1$, $D_d/D_s$ at $+1.7$, and related terms),
@@ -449,6 +498,11 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     Specifically, a stronger material yields a costlier design
     because--with thicknesses already at their lower bounds--the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
 \fi
+
+This insight for min-LCOE confirms what we already knew, that power and financing are important for grid scale.
+This doesn't really shift our R\&D priorities here, but it maybe can help us set targets and tradeoffs more systematically and quantitatively.
+But the insight for smaller systems is new: there are a lot more areas for R\&D that could be helpful, and those areas are not necessarily the same as for grid scale, they are more focused on structures and geometry.
+So maybe this will lead to new R\&D programs for small scale systems that focus on geometric and structural optimization.
 
 % page 8-9
 \begin{landscape}
@@ -471,40 +525,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 \end{landscape}
 %\Cref{fig:constraint-sens} gives the estimated parameter change threshold required to make inactive constraints active and active constraints inactive. Values are again normalized, where here a value of 1 means that a parameter would need to double (increase by 100\%) before the constraint activity changes.
 
-% 474-489
-\paragraph{Structural Efficiency}
-A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \citep{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
-\ifdefined\DISSERTATION
-    This trendline predicts a nominal float structural mass of 72-632 metric tons and a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 213 and 80 metric tons respectively.
-    The nominal design lies within the confidence interval, but the optimized design lies far below it.
-    Even though the optimal design's hull volume exceeds that of any data point used in the fit, the large departure warrants concern: the only data points with structural mass comparable to the optimized 80-ton float have an order-of-magnitude lower hull volume, indicating that MDOcean may vastly underestimate the required thickness.
-    This requires further investigation and may stem from underestimating loads in the dynamics module or overestimating the factor of safety in the structures module.
-\else
-    This trendline predicts a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 80 metric tons, far below the confidence interval.
-    Since the only comparable-mass data points have an order-of-magnitude lower hull volume, MDOcean may underestimate the required thickness, warranting further investigation of possible load underestimation or factor-of-safety overestimation.
-\fi
 
-% 195 - 201
-\paragraph{Dynamics and Control}
-\ifdefined\DISSERTATION
-    Finally, \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
-    The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
-    The radiation efficiency is the ratio of the maximum lossless power for the given shape to the maximum radiation-limited power, the former computed with the design's hydrodynamic coefficients, no drag, and an unsaturated controller of the specified type (damping or reactive).
-    The drag efficiency captures the effect of enabling drag and increases with wave height as expected.
-    The $F_{\text{max}}$ factor captures the force limit, departing from unity only at high wave heights near the resonant period of about 10~s.
-    The electrical efficiency captures generator efficiency and the power limit.
-    Multiplying by the annual hours in each sea state yields the annual energy production.
-\else
-    \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency;
-    their product with the annual hours per sea state yields annual energy production.
-\fi
-% power mult fig
-\begin{figure*}[htbp]
-    \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
-    \caption{Power matrix multiplicative breakdown for minimum LCOE design}
-    \label{remdo:fig:power-matrix-opt}
-\end{figure*}
 
 % 510-536
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -519,7 +540,8 @@ A previous study compares structural mass per unit hull volume for marine struct
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
-\paragraph{Observed Impact of Modeled Effects}
+\paragraph{Importance of Including Dynamic Constraints}
+We observed the impact of modeled effects, especially effects that this model incorporates that others often lack, to judge whether they are worth including.
 \ifdefined\DISSERTATION
     Several areas of model complexity, force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the results, evident in the constraint activity and in the differences from using 1-DOF (stationary-spar) dynamics; \Cref{remdo:sec:sensitivity-model-assumptions} analyzed these in detail.
     MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \citep{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
@@ -548,7 +570,9 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 % 537-549
 %%%%%%%%%%%%%%%%%%%%%%%
-\paragraph{Potential Impact of Unmodeled Effects}
+\paragraph{Survivability Drives Design} % or, survivability warrants further research?
+The results obtained here can also tells us of the potential impact of unmodeled effects to prioritize and inform future model development.
+Survivability is highlighted as the most important effect to further model, both for its importance and its potential inaccuracy.
 \ifdefined\DISSERTATION
     No constraints corresponding to priority 1 or 2 requirements are active in the optimal solution, % \hl{(double check this - structures effective breadth could make this false)}  % TODO (scrutineering)
     a hopeful sign that the true optimum is unlikely to lie in a region of model inaccuracy.
@@ -559,6 +583,19 @@ A previous study compares structural mass per unit hull volume for marine struct
 \else
     No priority 1 or 2 constraints are active at the optimum, suggesting the true optimum is unlikely to lie in a region of model inaccuracy, and the inactive pitch stability constraint mitigates any metacentric-height error from the geometry module \citep{mccabe_development_2026}.
     However, the active operational slamming constraints invite revisiting two assumptions \citep{mccabe_development_2026}: enforcing amplitude limits as optimization constraints rather than via the constrained optimal controller, and requiring operation in all nonzero-probability sea states rather than allowing a survival mode.
+\fi
+
+% 474-489
+\paragraph{Structural Realism is Lacking}
+A previous study compares structural mass per unit hull volume for marine structures including WECs and ship hulls, finding $278.76$~kg/m\textsuperscript{3} for steel structures \citep{roberts_bringing_2021}, with a 95\% confidence interval of $\pm280$ metric tons.
+\ifdefined\DISSERTATION
+    This trendline predicts a nominal float structural mass of 72-632 metric tons and a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 213 and 80 metric tons respectively.
+    The nominal design lies within the confidence interval, but the optimized design lies far below it.
+    Even though the optimal design's hull volume exceeds that of any data point used in the fit, the large departure warrants concern: the only data points with structural mass comparable to the optimized 80-ton float have an order-of-magnitude lower hull volume, indicating that MDOcean may vastly underestimate the required thickness.
+    This requires further investigation and may stem from underestimating loads in the dynamics module or overestimating the factor of safety in the structures module.
+\else
+    This trendline predicts a minimum-LCOE structural mass of 1814-2374 metric tons, whereas MDOcean calculates 80 metric tons, far below the confidence interval.
+    Since the only comparable-mass data points have an order-of-magnitude lower hull volume, MDOcean may underestimate the required thickness, warranting further investigation of possible load underestimation or factor-of-safety overestimation.
 \fi
 
 % 579 - 587
@@ -590,13 +627,15 @@ A previous study compares structural mass per unit hull volume for marine struct
 
 \subsubsection{Assessing Design Paradigms}
 Based on the above, is reactive control best?
+Survivability and dynamics constraints and the level at which you choose to constrain being the thing to focus on, not an argument about full reactive versus pure damping.
 Should structural sizing inform control design, like PTO sizing does, not the other way around?
-Is drag a big deal?
+Is drag a big deal? The presence of it is, but the exact value isn't, because the dynamic constraints are more important.
+Reason: the dynamic constraints are what medaite the multidisciplinary interactions and coupling, so this supports the importance of coupling, and dynamic constraints are a good way to frame that conversation because they are both concrete and important.
 Do you always want $N_{WEC}$ low when you have a target power?
 
 % 550 - 579
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Takeaways for Future Optimizations}
+\subsection{Takeaways for Revised Optimizations}
 This subsection evaluates how realistic the optimization formulation choices are and what refinements are most impactful.
 
 %%%%%%%%%%%%%%%%%%%%%%%
