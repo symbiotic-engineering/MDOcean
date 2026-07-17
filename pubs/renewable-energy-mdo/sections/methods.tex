@@ -9,7 +9,7 @@
     (4) outlining a process for solving the problem and analyzing the results.
     \Cref{remdo:fig:overview-methods} depicts the overall flow, with the simulation and modeling components covered in this section and the formulation and solution-process components developed in \Cref{remdo:sec:formulation,remdo:sec:optim-process}.
 \else
-    This methodology consists of four iterative components summarized in \Cref{remdo:fig:overview-methods}: selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process. \Cref{remdo:sec:model} addresses the first two while \Cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
+\Cref{remdo:fig:overview-methods} summarizes the four iterative components that comprise the methodologies: selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process. \Cref{remdo:sec:model} addresses the first two while \Cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
 \fi
 \begin{figure}[htbp]
     \centering
@@ -29,19 +29,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MDOcean Simulation Model}\label{remdo:sec:model}
 
-This study uses the MDOcean framework \cite{mccabe_development_2026}, an open-source MATLAB package developed by the authors for fast and accurate semi-analytical WEC modeling.
+This study uses the MDOcean framework \cite{mccabe_development_2026}, an open-source MATLAB package that the authors developed for fast and accurate semi-analytical WEC modeling.
 \ifdefined\DISSERTATION
     The framework comprises five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics, which together compute the system-level quantities the optimization acts on: power production, capital and operational cost, levelized cost of energy (LCOE), and structural factors of safety across yield, ultimate, buckling, and fatigue criteria, evaluated under both operational and storm design load cases.
 \else
     MDOcean comprises five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics.
-These together compute the system-level quantities the optimization acts on: power production, capital and operational cost, levelized cost of energy (LCOE), and structural factors of safety under operational and storm design load cases.
+These together compute the system-level quantities the optimization acts on: annual average power production, capital and operational cost, levelized cost of energy (LCOE), and structural factors of safety under operational and storm design load cases.
 \fi
 
 \begin{figure*}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
     \caption{Simplified extended design structure matrix (XDSM) diagram of the MDOcean modules, adapted from \citet{mccabe_development_2026}.
-Inputs enter at the top, data passes forward between modules left to right along the diagonal, and outputs exit at the left; the orange block denotes the internally iterated dynamics module.}
+Inputs enter at the top, data passes forward between modules left to right along the diagonal, and outputs of the optim exit at the left; the orange block denotes iteration in the dynamics module.}
     \label{remdo:fig:n2}
 \end{figure*}
 
@@ -56,5 +56,5 @@ Inputs enter at the top, data passes forward between modules left to right along
     Because this coupling is non-convex and non-monotonic, the modules cannot be optimized sequentially without sacrificing optimality, so all design variables are driven concurrently by a single optimizer, which is the central premise of the formulation in \Cref{remdo:sec:formulation}.
 \fi
 
-MDOcean adopts an implicit multiple-discipline-feasible (MDF) analysis architecture, in which an analytically-derived optimal control condition is solved implicitly inside the dynamics iteration rather than introducing control variables into the outer optimization.
-The reader is referred to \cite{mccabe_development_2026} for the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime (the property that makes the present optimization computationally feasible).
+MDOcean adopts an implicit multiple-discipline-feasible (MDF) analysis architecture, in which an analytically-derived optimal controller is solved explicitly inside the dynamics iteration rather than introducing control variables into the outer optimization.
+The reader is referred to \citet{mccabe_development_2026} for the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime (the property that makes the present optimization computationally feasible).
