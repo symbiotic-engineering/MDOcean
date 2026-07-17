@@ -1,5 +1,7 @@
 # Changelog
 ## Unreleased
+### Fixed
+- Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
 
 ## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-12
 ### Added
