@@ -7,7 +7,7 @@ The structures module takes in these loads along with bulk dimensions and struct
 Finally, the economics module calculates the PTO and structural capital costs from generator ratings and material usage respectively, and combines it with the power matrix to estimate the levelized cost of energy.
 
 The extended design structure matrix (XDSM) diagram in \Cref{remdo:fig:n2} illustrates the functional interfaces between modules.
-XDSM diagrams are standard in MDO, with more details available in \citep{lambe_extensions_2012}.
+\citet{lambe_extensions_2012} describes XDSM diagram standards in MDO.
 Variables above and below each module are inputs, and variables to the left and right are outputs.
 Design variables are shown in the first row.
 The optimizer uses the objective $J$ and constraint $g$ outputs from a simulation run to inform the next iteration of design variables $x$, iterating until ultimately converging to a set of optimal values $x^*$, $J^*$, and $g^*$.
@@ -26,7 +26,7 @@ Moreover, the presence of variables in the upper right of the diagram indicates 
 \caption{Simplified XDSM diagram}\label{remdo:fig:n2}
 \end{figure}
 Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
-For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \citet{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \citep{azarm_monotonicity-based_1988,papalambros_principles_2017}.
+For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \citep{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \citep{azarm_monotonicity-based_1988,papalambros_principles_2017}.
 The present coupling of WEC disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
 Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
 Non-convexity arises from the presence of both positive and negative curvature in the coupled variable space, leading to multiple local optima.
@@ -50,7 +50,7 @@ In MDO, the appropriate decision depends on characteristics of all modules, not 
 As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
 This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
 For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
-Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citet{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
+Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
 
 \paragraph{Control Optimization Architecture}
 In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
