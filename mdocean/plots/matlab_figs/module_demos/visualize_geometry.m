@@ -53,13 +53,17 @@ else
 end
 if length(x) >= 11
     h_stiff_f = x(11) / 10;
+    w_stiff_f = p.w_over_h_stiff_f * h_stiff_f;
 else
     h_stiff_f = NaN;
+    w_stiff_f = NaN;
 end
 if length(x) >= 12
     h_stiff_d = p.h_over_h1_stiff_d * x(12);
+    w_stiff_d = p.w_over_h1_stiff_d * x(12);
 else
     h_stiff_d = NaN;
+    w_stiff_d = NaN;
 end
 
 if ~mini && ~compare
@@ -128,7 +132,8 @@ if ~mini && ~compare
     plot_pto_diagram(ax_pto, F_max_MN, P_max_MW);
 
     ax_struct = nexttile(t,4);
-    plot_structure_cross_sections(ax_struct, t_f_b, t_s_r, t_d, h_stiff_f, h_stiff_d);
+    plot_structure_cross_sections(ax_struct, D_f, D_s, D_d, ...
+        t_f_b, t_s_r, t_d, h_stiff_f, w_stiff_f, h_stiff_d, w_stiff_d);
 end
 
 end
@@ -173,52 +178,130 @@ function plot_pto_diagram(ax, force_mn, power_mw)
     title('PTO Size Envelope')
 end
 
-function plot_structure_cross_sections(ax, t_f_b, t_s_r, t_d, h_stiff_f, h_stiff_d)
+function plot_structure_cross_sections(ax, D_f, D_s, D_d, ...
+        t_f_b, t_s_r, t_d, h_stiff_f, w_stiff_f, h_stiff_d, w_stiff_d)
     axes(ax)
     cla(ax)
     hold on
     grid on
 
-    names = {'Float','Spar','Damping plate'};
-    t_vals = [t_f_b, t_s_r, t_d];
-    h_vals = [h_stiff_f, 0, max(h_stiff_d)];
-    x_centers = 1:3;
-    bar_w = 0.6;
-    total_h = t_vals + h_vals;
-    total_h = total_h(isfinite(total_h));
-    if isempty(total_h)
-        max_h = NaN;
-    else
-        max_h = max(total_h);
+    structures = {
+        'Float',         D_f, t_f_b, h_stiff_f, w_stiff_f;
+        'Spar',          D_s, t_s_r, [], [];
+        'Damping plate', D_d, t_d,   h_stiff_d, w_stiff_d
+    };
+
+    finite_d = [structures{:,2}];
+    finite_d = finite_d(isfinite(finite_d) & finite_d > 0);
+    if isempty(finite_d)
+        finite_d = 1;
     end
-    if ~isfinite(max_h) || max_h <= 0
-        max_h = 1;
+    gap = 0.12 * max(finite_d);
+
+    heights = zeros(size(structures,1),1);
+    for i = 1:size(structures,1)
+        heights(i) = section_total_height(structures{i,3}, structures{i,4});
+    end
+    ymax = max(heights(isfinite(heights)));
+    if isempty(ymax) || ymax <= 0
+        ymax = 1;
     end
 
-    for i=1:3
-        if ~isfinite(t_vals(i))
+    x_start = 0;
+    centers = NaN(size(structures,1),1);
+    for i = 1:size(structures,1)
+        name = structures{i,1};
+        D = structures{i,2};
+        t = structures{i,3};
+        h_stiff = structures{i,4};
+        w_stiff = structures{i,5};
+        if ~isfinite(D) || ~isfinite(t) || D <= 0 || t <= 0
             continue
         end
-        rectangle('Position',[x_centers(i)-bar_w/2,0,bar_w,t_vals(i)], ...
-            'EdgeColor','k','LineWidth',2,'FaceColor',[0.85 0.85 0.85]);
-        text(x_centers(i),t_vals(i)/2,sprintf('t=%.1f mm',t_vals(i)*1e3),...
-            'HorizontalAlignment','center','FontSize',9);
-
-        if isfinite(h_vals(i)) && h_vals(i) > 0
-            rectangle('Position',[x_centers(i)-bar_w/6,t_vals(i),bar_w/3,h_vals(i)], ...
-                'EdgeColor','k','LineWidth',2,'FaceColor',[1 0.75 0.75]);
-            text(x_centers(i),t_vals(i)+h_vals(i)/2,sprintf('h=%.2f m',h_vals(i)),...
-                'HorizontalAlignment','center','FontSize',9);
-        end
+        draw_stiffened_section(x_start, D, t, h_stiff, w_stiff, ymax);
+        centers(i) = x_start + D/2;
+        text(centers(i), -0.18*ymax, name, 'HorizontalAlignment','center');
+        text(centers(i), -0.08*ymax, sprintf('D=%.2f m',D), 'HorizontalAlignment','center','FontSize',8);
+        x_start = x_start + D + gap;
     end
 
-    if all(isfinite(h_stiff_d))
-        text(3,max_h*1.02,sprintf('damping stiffeners: [%.3g %.3g %.3g %.3g] m',h_stiff_d), ...
-            'HorizontalAlignment','center','FontSize',8);
-    end
-    xlim([0.4 3.6])
-    ylim([0 max_h*1.2])
-    set(ax,'XTick',x_centers,'XTickLabel',names)
-    ylabel('Cross-section dimensions (m)')
+    xlim([0 max(x_start-gap,1)])
+    ylim([-0.25*ymax 1.2*ymax])
+    yline(0,'k-','LineWidth',1)
+    xlabel('Diameter direction, x (m)')
+    ylabel('Thickness / stiffener height, y (m)')
     title('Structural cross sections (rectangular stiffener model)')
+end
+
+function total_height = section_total_height(t_plate, h_stiff)
+    if ~isfinite(t_plate) || t_plate <= 0
+        total_height = NaN;
+        return
+    end
+    if isempty(h_stiff)
+        total_height = t_plate;
+    elseif length(h_stiff)==4
+        total_height = t_plate + max(sum(h_stiff(1:2)), sum(h_stiff(3:4)));
+    else
+        total_height = t_plate + sum(h_stiff);
+    end
+end
+
+function draw_stiffened_section(x_left, width_plate, t_plate, h_stiff, width_stiff, ymax)
+    rectangle('Position',[x_left,0,width_plate,t_plate], ...
+        'EdgeColor','k','LineWidth',1.8,'FaceColor',[0.85 0.85 0.85]);
+    text(x_left + width_plate/2, t_plate/2, sprintf('t=%.1f mm',t_plate*1e3), ...
+        'HorizontalAlignment','center','FontSize',8)
+
+    shape = classify_stiffener_shape(h_stiff, width_stiff);
+    if strcmp(shape,'none')
+        return
+    end
+
+    if strcmp(shape,'tee')
+        draw_rect_stiffener(x_left + width_plate/2, t_plate, width_stiff(1), h_stiff(1), 1);
+    elseif strcmp(shape,'I')
+        draw_rect_stiffener(x_left + width_plate/2, t_plate, width_stiff(1), h_stiff(1), 1);
+        draw_rect_stiffener(x_left + width_plate/2, t_plate + h_stiff(1), width_stiff(2), h_stiff(2), 2);
+    elseif strcmp(shape,'doubleI')
+        x_offsets = x_left + width_plate * [0.3 0.7];
+        draw_rect_stiffener(x_offsets(1), t_plate,                 width_stiff(1), h_stiff(1), 1);
+        draw_rect_stiffener(x_offsets(1), t_plate + h_stiff(1),    width_stiff(2), h_stiff(2), 2);
+        draw_rect_stiffener(x_offsets(2), t_plate,                 width_stiff(3), h_stiff(3), 3);
+        draw_rect_stiffener(x_offsets(2), t_plate + h_stiff(3),    width_stiff(4), h_stiff(4), 4);
+    end
+
+    if strcmp(shape,'doubleI')
+        y_top = t_plate + max(sum(h_stiff(1:2)), sum(h_stiff(3:4)));
+    else
+        y_top = t_plate + sum(h_stiff);
+    end
+    text(x_left + width_plate/2, min(y_top + 0.05*ymax, 1.15*ymax), ['shape: ' shape], ...
+        'HorizontalAlignment','center','FontSize',8);
+
+    function draw_rect_stiffener(x_center, y_bottom, w, h, idx)
+        if ~isfinite(w) || ~isfinite(h) || w <= 0 || h <= 0
+            return
+        end
+        rectangle('Position',[x_center-w/2,y_bottom,w,h], ...
+            'EdgeColor','k','LineWidth',1.6,'FaceColor',[1 0.75 0.75]);
+        text(x_center,y_bottom+h/2,sprintf('h_%d=%.2f m',idx,h), ...
+            'HorizontalAlignment','center','FontSize',7);
+    end
+end
+
+function shape = classify_stiffener_shape(h_stiff, width_stiff)
+    if isempty(h_stiff) || isempty(width_stiff)
+        shape = 'none';
+        return
+    end
+    if length(h_stiff)==1 && length(width_stiff)==1
+        shape = 'tee';
+    elseif length(h_stiff)==2 && length(width_stiff)==2
+        shape = 'I';
+    elseif length(h_stiff)==4 && length(width_stiff)==4
+        shape = 'doubleI';
+    else
+        shape = 'none';
+    end
 end
