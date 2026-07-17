@@ -61,7 +61,7 @@ The following tables define column-abbreviation legends for the optimization-stu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Optimization Process Details}
-This section provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
+This appendix provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,10 +97,27 @@ The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert f
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Hessian Scaling Procedure}
-\label{remdo:sec:appendix-scaling}
+\subsection{Optimization Scaling Procedure}
+Problem scaling is critical for good results in practice.
+All constraints are normalized, transforming inequalities $f_{\text{min}} \leq f(x) \leq f_{\text{max}}$ to:
+\begin{equation}
+\begin{aligned}
+    \frac{f(x)}{f_{min}}-1 &\geq 0 \\
+    -\frac{f(x)}{f_{max}}+1 &\geq 0 \\
+\end{aligned}
+\end{equation}
+When $f_{\text{min}}$ or $f_{\text{max}}$ is zero --- as for $g_{NL,5}$ and $g_{NL,14}$, which constrain $GM$ and $P_{\text{avg}}$ to be positive --- the constraint is instead normalized by a constant of suitable order of magnitude.
+\ifdefined\DISSERTATION
+    Design variables are implemented in the engineering-notation SI unit that places the nominal value between 1 and 1000: meters for bulk dimensions, millimeters for structural dimensions, MN for force, and kilowatts for power.
+    The objectives are scaled to magnitude near one, using megawatts for power, millions of dollars for cost, and \$/kWh for LCOE.
+\else
+    Scaled design variables use the engineering-notation SI unit that places each nominal value between 1 and 1000, and the objectives are scaled to magnitude near one.
+\fi
+
+\paragraph{Hessian Scaling}
+For SQP, Hessian scaling further equalizes each variable's effect magnitude on the objective.
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
-Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
+Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as \citet[section 8.3]{papalambros_principles_2017} recommend:
 \begin{equation}
     s_i = \frac{1}{\sqrt{H_{ii}}}
 \end{equation}
@@ -125,21 +142,21 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
     \centering
     \caption{Hyper-parameters used to control numerics}
     \label{remdo:tab:hyperparams}
-\begin{tabular}{lccc} \hline 
-          &Variable&  Value& Unit\\ \hline 
-          Simulation&$X_{tol}$&  0.01 & m \\ \hline 
-          &$\angle X_{tol}$& 3 & degrees\\ \hline 
-          &Maximum drag iterations& 100 & -\\ \hline 
-          &$N_{\text{harmonics}}$& 10 & - \\ \hline
-          &$b_{\text{max}}$ & 700.5 & - \\ \hline
-          SQP Optimization&Constraint tolerance& 1e-5 & - \\ \hline
-          &Iterations before Hessian scaling& 8 & - \\ \hline
-  &Maximum iterations after Hessian scaling& 150&-\\\hline
-  &Maximum function evaluations& 2000&-\\\hline
- Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\\hline
- & Minimum poll fraction& 1&\\\hline
- & Pareto set change tolerance& 1.6e-8&\\\hline
- & Maximum pattern search iterations& 100&\\\hline
+\begin{tabular}{lccc} \toprule 
+          &Variable&  Value& Unit\\ \midrule 
+          Simulation&$\xi_{tol}$&  0.01 & m \\
+          &$\angle \xi_{tol}$& 3 & degrees\\
+          &Maximum drag iterations& 100 & -\\
+          &$N_{\text{harmonics}}$& 10 & - \\
+          &$b_{\text{max}}$ & 700.5 & - \\ \midrule
+          SQP Optimization&Constraint tolerance& 1e-5 & - \\
+          &Iterations before Hessian scaling& 8 & - \\
+  &Maximum iterations after Hessian scaling& 150&-\\
+  &Maximum function evaluations& 2000&-\\ \midrule
+ Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\
+ & Minimum poll fraction& 1&-\\
+ & Pareto set change tolerance& 1.6e-8&-\\
+ & Maximum pattern search iterations& 100&-\\\bottomrule
     \end{tabular}
     \end{table}
 

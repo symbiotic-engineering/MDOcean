@@ -2,21 +2,23 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}\label{remdo:sec:results}
 %\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
-This section presents optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions.
+Optimization outcomes and targeted sensitivity analyses for the formulation and model assumptions show ( ---- ).
 \subsection{Pre-Optimization Sweep}
 \Cref{remdo:fig:experiments} depicts a variable sweep using the one-at-a-time design-of-experiments method.
 Many designs are infeasible: those that violate nonlinear constraints are marked with an X,
 and those that violate linear constraints are not simulated to avoid errors as described in \cref{remdo:sec:requirements}.
-Most violations are due to structural failure of the damping plate, in both fatigue and ultimate load cases.
-A few designs violate hydrostatic pitch stability ($g_{NL,5}$) or geometrically incompatible damping plate thickness ($g_{L,7}$).
-Of particular note, the most significant LCOE decrease is obtained by increasing the float diameter.
-The LCOE attains a local minimum at a float diameter around 1.5 times the nominal design, but the plate fails structurally there.
-The PTO power and force ratings also attain local minima, as expected from the tradeoff of power generation and cost.
-The structural variables, meanwhile, increase with cost and do not affect power, so no direct LCOE tradeoff is expected; these variables exist solely to satisfy constraints.
+Most violations are due to fatigue and ultimate failure of the damping plate, 
+and a few designs violate hydrostatic stability ($g_{NL,5}$) or damping plate geometric compatibility ($g_{L,7}$).
+Of particular note, increasing the float diameter obtains the most significant LCOE decrease.  The LCOE attains a local minimum at a float diameter around 1.5 times the nominal value, but the plate fails structurally there.
+The PTO power and force ratings also attain local minima due to the tradeoff of power generation and cost, though the structural variables do not since they exist solely to satisfy constraints.
+In summary, the sweep's local optimality behavior and large LCOE decrease are encouraging signs of appropriate design variable selection, but the pervasive constraint violation warns that caution is needed to preserve feasibility.
+% it's looking good (large decrease especially with D_f, and local optim behavior), but we need to be careful about infeasibility because a lot of constraints are violated
+
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figs/from-matlab/experiments_ratios.pdf}
-\caption{Exploratory one at a time sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
+\caption{Exploratory OAT sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
 \label{remdo:fig:experiments}
 \end{figure}
 
@@ -46,6 +48,7 @@ The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-g
 \end{figure}
 
 \begin{table*}[htbp]
+\centering
 \input{tables/from-matlab/optimal_design_vars.tex}
 \caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
 \end{table*}
@@ -64,7 +67,8 @@ The optimal designs are generally larger than the nominal.
     In the minimum-cost design, the damping plate stiffeners instead decrease in size.
 \else
     The minimum-LCOE design is larger in all bulk dimensions, most strikingly in float diameter (nearly doubling to \resultsRE[DfoptMinLCOE]), with a similarly sized PTO at slightly lower maximum force.
-    In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material; the minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
+    In all optima the three structural thicknesses decrease significantly, in several cases reaching their lower bounds, indicating lower hydrodynamic forces and reduced structural material.
+    The minimum-LCOE design trades thinner damping plate for larger stiffeners, mimicking the aerospace thin-skin-and-stiffener paradigm.
     The activity of these lower-bound constraints (priority 2 requirements, \Cref{remdo:sec:requirements}) signals that the structures model is at the edge of its validity for thin-skinned stiffened shells, where the plate-like deflection assumption \cite{mccabe_development_2026} weakens; removing it in future work could yield more efficient structures.
 \fi
 
@@ -76,7 +80,8 @@ The optimal designs are generally larger than the nominal.
 \else
     The above-water profiles show a consistent trend: the nominal design's long support tubes give way to a taller float and shorter tubes, likely because the slamming constraint encourages higher draft $T_{f,2}$ while the fixed submersion fraction $T_{f,2}/h_f$ forces float height to grow with it.
 \fi
-
+In essence, optimal designs tend to have larger bulk dimensions, thinner structures, and shorter tubes, although the latter may be a formulation artifact.
+%This suggests formulation changes for future work: incorporate manufacturing-driven max dimension constraints, different structures model, and allow Tf2/hf to be a design variable.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Optimal Performance Outputs}
@@ -104,6 +109,7 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 %Further insight on the power profiles of these recommended designs compared to the baseline can be uncovered through probability distribution plots, shown in \Cref{fig:power-dist}. The minimum variation design is seen to be tuned to produce most of its power from moderate sea states only ($\sim$60-300 kW), whereas the minimum LCOE design has a much broader spectrum, collecting significant power both below 10~kW and above 1~MW. The balanced design falls in the middle. %As expected, the minimum LCOE design operates at high powers the most, spending 50\% of the time above 500~kW, compared to 40\% and 10\% for the balanced and minimum variation designs respectively. Also as expected, the minimum variation design spends a large amount of time ($\approx$40\%) at low powers below 50~kW. Interestingly, the minimum-LCOE design actually spends more time at low powers than the balanced design. In future work, the power distributions could be optimized more explicitly, incorporating information other than the coefficient of variation as an objective based on grid-level analysis.
 
 \begin{table*}[htbp]
+\centering
 \input{tables/from-matlab/optimal_outputs.tex}
 \caption{Optimal outputs}\label{remdo:tab:opt-output}
 \end{table*}
@@ -148,13 +154,11 @@ The hydrodynamic coefficients and power distributions of each single-objective o
 \else
     The Lagrange multipliers $\vec{\lambda}=-dJ^*/d\vec{g}$ (\Cref{remdo:sec:single-obj-process}), nonzero values reported in \Cref{remdo:fig:lagrange-multiplier}, quantify each active constraint's influence on the objective.
 \fi
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=1\linewidth]{figs/from-matlab/lagrange_multipliers.pdf}
 \caption{Lagrange multipliers for LCOE-minimization}\label{remdo:fig:lagrange-multiplier}
 \end{figure}
-
 \ifdefined\DISSERTATION
     Six constraints are active at the optimum: one structural thickness lower bound, three structural factors of safety, and two amplitude constraints.
     While the storm (maximum) DLC limits the float and damping plate, it is the operational (fatigue) DLC that drives the column sizing.
@@ -163,8 +167,8 @@ The hydrodynamic coefficients and power distributions of each single-objective o
     Meanwhile, the activity of the float thickness lower bound, with a larger multiplier than the float factor-of-safety constraint, indicates that the float structural model is inadequate in this regime and should be extended to capture the local buckling that dominates for very thin-skinned designs.
 \else
     Six constraints are active: one structural thickness lower bound, three factors of safety, and two amplitude constraints.
-    The storm DLC limits the float and damping plate while the operational fatigue DLC drives column sizing;
-    the amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost,
+    The storm DLC limits the float and damping plate while the operational fatigue DLC drives column sizing.
+    The amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost,
     motivating future designs that mitigate them (e.g., submersion-based survival, bump stops, or active amplitude control).
     The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint, signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
 \fi
@@ -570,7 +574,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     This differs from preliminary work \cite{mccabe_multidisciplinary_2022}, which wrongly examined only the change in optimal design without weighting the relative cost impact of PTO and dimensions.
 \else
     With increasing cost and power (left to right), most design variables increase monotonically or nearly so; only $T_{f,2}$ and $h_{fs,\text{clear}}$ (both in the amplitude constraints) decrease, while the lower-bound thicknesses $t_d$ and $t_{f,b}$ stay essentially constant.
-    The powertrain ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \Cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO]~comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \cite{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
+    The (powertrain) ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \Cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO] of cost savings comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \cite{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
 \fi
 
 \ifdefined\DISSERTATION
@@ -592,7 +596,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     The only active linear constraint is the spar natural frequency constraint; since it is priority 2 (required for modeling accuracy under the assumptions), its activity is significant and discussed further in \Cref{remdo:sec:discussion}.
     Aside from the maximum force constraint (always active by design), the active nonlinear constraints are the float, column, and damping plate factors of safety and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing float slamming.
 \else
-    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: three structural variables at their lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \Cref{remdo:sec:discussion}), and the structural factor-of-safety and float-amplitude constraints.
+    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: one structural variable at its lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \Cref{remdo:sec:discussion}), and the structural factor-of-safety, force, and power limits.
 \fi
 \begin{figure*}[htbp]
     \centering
@@ -614,7 +618,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
     This also suggests the optimal controller at a given power level may be neither pure damping nor pure reactive: while reactive control yields the highest power for a given design, it does not necessarily yield the highest power for a given cost, since PTO and structural cost scale with the controller.
 \else
     \Cref{remdo:fig:pareto-lcoe} compares the damping and reactive control schemes: reactive control achieves the lowest LCOE overall, but below \resultsRE[dampingReactivePowerIntersect] damping control is more cost-effective, since reactive control there requires a larger, costlier PTO and structure for the same power.
-    This suggests the cost-optimal controller at a given power may be neither pure scheme, as reactive control maximizes power for a given design but not for a given cost.
+    This suggests the cost-optimal controller at a given power may be neither pure scheme, as reactive control maximizes power for a given design but not for a given cost. This suggests that besides $F_{max}$ and $P_{max}$, $P_{reactive,max}$ should be a design variable and a dynamic constraint.
 \fi
 %\hl{This section I don't have results for yet and can be cut if needed. 
 %Maybe show trace out the effect of parameter variation without reoptimizing in multiobjective space, 

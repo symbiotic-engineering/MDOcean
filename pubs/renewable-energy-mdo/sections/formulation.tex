@@ -29,8 +29,8 @@ For the single-objective formulation, the optimization minimizes the levelized c
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since only structural and PTO costs are modeled as design-dependent \cite{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
-    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$, removing the influence of the fixed charge rate and inaccurately-scaled costs and exposing the minimum-capital design for a given power requirement.
+    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \cite{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since costs other than structural and PTO costs are difficult to predict early on and thus modeled as fixed wrt design \cite{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \cite{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$. This removes the influence of the fixed charge rate and inaccurately-scaled costs and exposes the minimum-capital design for a given power requirement.
 \fi
 
 The objective function is expressed:
@@ -50,8 +50,8 @@ The objective function is expressed:
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Requirements}\label{remdo:sec:requirements}
-This section describes the requirements that the optimization must enforce and how they shape the formulation.
-Here, requirements refer both to traditional design requirements (model-agnostic criteria ensuring the design meets stakeholder needs and is physically realizable) and to criteria needed to facilitate the optimization itself (such as keeping intermediate designs within the model's range of validity).
+The requirements that the optimization must enforce significantly shape the formulation.
+Here, requirements include both traditional design requirements (model-agnostic criteria ensuring the design meets stakeholder needs and is physically realizable) and criteria that facilitate the optimization itself (such as keeping intermediate designs within the model's range of validity).
 Constraints are the most common but not the only enforcement mechanism.
 \ifdefined\DISSERTATION
     Explicitly outlining the requirements and resulting formulation logic serves three purposes:
@@ -63,7 +63,7 @@ Constraints are the most common but not the only enforcement mechanism.
 \fi
 
 \Cref{remdo:tab:requirements} lists each requirement with its priority and enforcement mechanism.
-The physical and modeling basis for each requirement such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations, is developed in \citet{mccabe_development_2026}.
+\citet{mccabe_development_2026} develops the physical and modeling basis for each requirement, such as the underlying geometry, dynamics, hydrostatics, structural, and economic relations.
 \newcounter{reqnumber}
 \singleColMacro{
     \begin{longtable}{cP{0.25\linewidth}P{0.27\linewidth}P{0.08\linewidth}L{0.28\linewidth}}
@@ -74,22 +74,24 @@ The physical and modeling basis for each requirement such as the underlying geom
   \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,\text{min}}$&  Float seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,5}$\\
   \requirement{spar_seafloor_overflow}&$h-T_{f,2}>\Delta z_{f,\text{min}}$&  Spar seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,6}$\\
+  \hline
   \requirement{float_base_diameter}& $D_{f,in} <D_{f,b} < D_f$& Float base diameter& 2&Parameter $D_{f,b}/D_f$ \\
   \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Parameter $T_{f,1}/T_{f,2}$ \\
   \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2&Parameter $T_{f,2}/h_f$\\
   \requirement{spar_damping_ratio}& $\zeta > \zeta_{\text{min}}$& Spar damping ratio& 2&Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
   \requirement{spar_similarity}&$\omega_n<\omega_{n,\text{max}}$& Spar similarity& 2&Lin. ineq. constraint $g_{L,1}$\\
   \requirement{positive_net_power}&$P_{\text{avg}}>0$& Positive net power& 2&Nonlin. ineq. constraint $g_{NL,14}$\\
+  \hline
   \requirement{clearance_static}& $h_{fs,\text{clear}}>0$& Float spar tube clearance (static)& 3&Design variable bound\\
   \requirement{tops_static}&$h_{fs,\text{up}}>0$& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
   \requirement{base_static}& $h_{fs,\text{down}}>0$& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{damping_plate_thickness}& $t_d < h_d$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
   \requirement{float_stiffener_height}& $h_{\text{stiff},f} < h_f / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
-  \requirement{tops_dynamic}&$h_{fs,\text{up}}>|X_f-X_s|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
-  \requirement{base_dynamic}& $h_{fs,\text{down}}>|X_f-X_s|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
-  \requirement{clearance_dynamic}& $h_{fs,\text{clear}}>|X_f-X_s|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
-  \requirement{linear_amplitude}& $X_{lin}>|X_f|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
-  \requirement{slam_amplitude}& $X_{\text{slam}}>|X_f|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
+  \requirement{tops_dynamic}&$h_{fs,\text{up}}>|\xi_f-\xi_s|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
+  \requirement{base_dynamic}& $h_{fs,\text{down}}>|\xi_f-\xi_s|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
+  \requirement{clearance_dynamic}& $h_{fs,\text{clear}}>|\xi_f-\xi_s|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
+  \requirement{linear_amplitude}& $\xi_{lin}>|\xi_f|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
+  \requirement{slam_amplitude}& $\xi_{\text{slam}}>|\xi_f|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
   \requirement{float_hydrostatics}&$V_{f,\text{struct},\text{min}} < V_{f,\text{struct}} < V_{f,\text{struct},\text{max}}$& Float hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
   \requirement{spar_hydrostatics}&$V_{s,\text{struct},\text{min}} < V_{s,\text{struct}} < V_{s,\text{struct},\text{max}}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
   \requirement{FOS}&$FOS > FOS_{\text{min}}$& Structural factors of safety& 3&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
@@ -110,8 +112,8 @@ The physical and modeling basis for each requirement such as the underlying geom
     This three-level prioritization ultimately informs the selection of design variables and parameters.
 \else
     Priority 1 requirements must never be violated during optimization, as they cause the simulation to error or return invalid results (\texttt{Inf}, \texttt{NaN}, imaginary numbers) that can stall or derail the algorithm.
-    Priority 2 violations yield an inaccurate but valid objective, undesirable during the search and a sign, if active at the solution, that the optimum lies outside the model's accurate range.
-    Priority 3 requirements return an accurate objective even when violated; active priority 3 constraints in the final design are acceptable and expected.
+    Priority 2 violations yield an inaccurate but valid objective, and constraints undesirable during the search and a sign, if active at the solution, that the optimum lies outside the model's accurate range.
+    Priority 3 requirements return an accurate objective and constraints even when violated; active priority 3 constraints in the final design are acceptable and expected.
     This three-level prioritization informs the selection of design variables and parameters.
 \fi
 
@@ -136,6 +138,8 @@ The physical and modeling basis for each requirement such as the underlying geom
     and a maximum-LCOE constraint for the epsilon-constraint procedure of \Cref{remdo:sec:multi-obj-process} (\reqref{LCOE}). 
     \reqref{base_static} dominates \reqref{float_spar_draft}, so the latter need not be implemented independently.
 \fi
+In summary, the requirements table clearly articulates and prioritizes the necessary items based on both design needs and model assumptions,
+and will inform the optimization problem formulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Design Variables, Parameters, and Constraints}
@@ -150,12 +154,12 @@ The encoding of a physical design space into optimization design variables is no
     Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
     Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
-    For example, the float and spar drafts may be encoded directly as dimensions or nondimensionally as a dimension and a ratio.
-    An encoding may be chosen to control the objective directly, induce convexity, or maintain feasibility; the last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
-    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint; early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
+    For example, bulk dimensions hvm may be encoded directly as dimensions or as nondimensional ratios.
+    An encoding may be chosen to control the objective directly, induce convexity in the obj or constraints, or maintain feasibility. The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
+    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint. Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
 \fi
 
-This logic is repeated for the remaining design variables and requirements.
+This logic repeats for the remaining design variables and requirements.
 After several formulation iterations, the design variable and parameter definitions in \Cref{remdo:tab:design-vars,remdo:tab:parameters} emerged as effective.
 The 12 design variables represent 5 bulk dimensions, 2 generator ratings, and 5 structural dimensions (3 thicknesses and 2 stiffener heights).
 Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
@@ -243,7 +247,7 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
     While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else
-    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed, a choice that adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
+    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed. This choice adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
     Recent papers have demonstrated the value of full PTO co-design \cite{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
 \fi
 
