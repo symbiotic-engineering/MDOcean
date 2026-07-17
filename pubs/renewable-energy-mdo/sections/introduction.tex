@@ -25,7 +25,7 @@ This section motivates the problem context, identifies literature gaps, and outl
     Its surface float oscillates against a spar consisting of a vertical column and a subsurface damping plate (\Cref{remdo:fig:rm3-parts}), with electrical power produced from the relative heave motion.
     The present study builds on that work, presenting a multidisciplinary techno-economic optimization of RM3.
 \else
-    Wave energy converters (WECs) can deliver both utility-scale electricity and power for offshore applications such as aquaculture, desalination, and marine sensing \citet{livecchi_powering_2019,akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, but large-scale deployment requires substantial cost reduction.
+    Wave energy converters (WECs) can deliver both utility-scale electricity and power for offshore applications such as aquaculture, desalination, and marine sensing \citep{livecchi_powering_2019,akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022}, but large-scale deployment requires substantial cost reduction.
     Achieving that reduction is complicated by strong interdisciplinary coupling: the powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses jointly determine performance, cost, and survivability.
     Sequential single-discipline design cannot exploit this coupling, motivating system-level concurrent optimization.
 
@@ -47,16 +47,17 @@ The remainder of the introduction reviews WEC optimization literature, frames th
 
 \ifdefined\DISSERTATION
     Before reviewing the academic state of the art, it is worth assessing how optimization and concurrent design are practiced in the wave energy industry.
-    A survey of 25 WEC designers and developers \citet{trueworthy_wave_2020} reports that industry use of optimization is far from universal, with the highest adoption rates at 48\% and 40\% for controls and hydrodynamic shape respectively.
+    \citet{trueworthy_wave_2020} surveys 25 WEC designers and developers to report that industry use of optimization is far from universal, with the highest adoption rates at 48\% and 40\% for controls and hydrodynamic shape respectively.
     The authors attribute this to the time, expertise, and computational resources optimization demands; the inability of optimization to capture all WEC requirements; and the diversity of available techniques.
     Half of respondents design all subsystems concurrently; the rest follow a sequential pattern (shape and PTO first, then controller and moorings, then power transportation).
     The same study concludes that concurrent design is promising but under-utilized, and emphasizes the importance of incorporating all design requirements at an early stage.
     
     Several review papers describe the state of the art in WEC design optimization.
-    \Cref{remdo:tab:lit} draws on these and the underlying primary literature \citet{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018,coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} to compare the most relevant studies along modeling and optimization axes.
+    \Cref{remdo:tab:lit} draws on these and the underlying primary literature \citep{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018,coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} to compare the most relevant studies along modeling and optimization axes.
 \else
-    A survey of 25 WEC designers \citet{trueworthy_wave_2020} reports that only 48\% and 40\% of developers use optimization for controls and hydrodynamic shape respectively, and only 50\% design all subsystems concurrently --- attributed to the time, expertise, and computational resources optimization demands, and concluding that concurrent design is a promising but under-utilized technique.
-    Review papers \citet{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018} and primary literature on WEC survivability guidelines \citet{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} together motivate the comparison in \Cref{remdo:tab:lit}.
+    After surveying 25 WEC designers, \citet{trueworthy_wave_2020} reports that only 48\% and 40\% of developers use optimization for controls and hydrodynamic shape respectively, and only 50\% design all subsystems concurrently due to the time, expertise, and computational resources that optimization demands.
+    They conclude that concurrent design is a promising but under-utilized technique.
+    Review papers \citep{garcia-teruel_review_2021,guo_geometric_2021,ringwood_empowering_2023,clark_reliability-based_2018} and primary literature on WEC survivability guidelines \citep{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} together motivate the comparison in \Cref{remdo:tab:lit}.
 \fi
 
 \Cref{remdo:tab:lit} compares previous WEC optimization studies along modeling fidelity (hydrodynamics, drag, degrees of freedom, domain, controls, mooring, powertrain, structures, economics, sea states) and optimization formulation (optimizer, objectives, constraints, design variables).
@@ -192,15 +193,16 @@ See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
     \citet{cotten_multi-objective_2022} performs a similar fatigue-load study for an attenuator-style WEC with eight design variables.
     \citet{abdulkadir_control_2024} performs an eight-variable shape optimization using semi-analytical hydrodynamics (MEEM) but no other disciplines beyond hydrodynamics and dynamics.
 
-    All seven of these large-scale studies \citet{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,abdulkadir_control_2024} use the genetic algorithm, a population-based heuristic.
+    All seven of these large-scale studies \citep{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022,abdulkadir_control_2024} use the genetic algorithm, a population-based heuristic.
     The alternative is local optimization, which lacks heuristic exploration but leverages smoothness and scales well to many design variables \citep{martins_engineering_2022}.
     \citet{housner_numerical_2024} attempted local optimization for a terminator-shape study and could only handle 3 of an intended 13 design variables due to time-domain simulation cost;
     \citet{garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} avoided that issue by simulating primarily in the frequency domain, falling back to time domain only for PTO constraints.
-    Design-of-experiment alternatives such as the Taguchi method \citet{al_shami_parameter_2019} enable systematic exploration without traditional optimizers.
+    Design-of-experiment alternatives such as the Taguchi method \citep{al_shami_parameter_2019} enable systematic exploration without traditional optimizers.
 
-    Structural optimization of WECs faces an analogous compute bottleneck: FEA-based optimization is usually replaced by manual iteration \citep{RM3,mi_multi-scale_2025} (with these two studies notably encompassing mooring, powertrain, controls, structures, and detailed economics), commercial decoupled tools \citep{an_optimal_2024}, brute-force sweeps over analytical stress \citep{ambuhl_reliability-based_2014}, or load-magnitude proxies in place of stress \citep{nguyen_theoretical_2024,ferri_balancing_2014,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022}.
+    Structural optimization of WECs faces an analogous compute bottleneck: FEA-based optimization is avoided in favor of commercial decoupled tools \citep{an_optimal_2024}, brute-force sweeps over analytical stress \citep{ambuhl_reliability-based_2014}, load-magnitude proxies in place of stress \citep{nguyen_theoretical_2024,ferri_balancing_2014,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022}, or manual iteration \citep{RM3,mi_multi-scale_2025}.
+    The last two studies \citep{RM3,mi_multi-scale_2025} notably encompass mooring, powertrain, controls, structures, and detailed economics.
 
-    The control co-design (CCD) literature \citet{garcia-sanz_control_2019,coe_useful_2023} emphasizes drivetrain dynamics and generator efficiency due to their strong effect on electrical power.
+    The control co-design (CCD) literature \citep{garcia-sanz_control_2019,coe_useful_2023} emphasizes drivetrain dynamics and generator efficiency due to their strong effect on electrical power.
     Recent joint PTO-and-controller optimizations \citet{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024,gaebele_tpl_2025} often leverage the pseudo-spectral method to embed time-domain constraints in frequency-domain hydrodynamics.
     Of these, \citet{gaebele_tpl_2025} directly addresses RM3, finding a 0.55 scaling factor optimizes power per unit surface area with frequently active continuous-torque constraints.
     \citet{lin_fast_2025} introduces a CCD formulation faster than PS by leveraging Pontryagin's maximum principle analytically; \citet{abdulkadir_optimal_2024} uses PMP for PTO-constrained array dynamics; \citet{herber_dynamic_2014} performs direct-transcription co-optimization of cylinder draft and radius with control.

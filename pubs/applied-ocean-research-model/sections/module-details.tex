@@ -221,7 +221,7 @@ This subsection introduces the dynamics and control modeling assumptions before 
 
 \ifdefined\DISSERTATION
     Methods for WEC dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), quasi-linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
-    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \citet{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \citet{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
+    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest. \citet{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} study the former and \citet{abdulkadir_optimal_2024,lin_fast_2025} illustrate the latter.
     This section describes both the technical concept and the practical rationale for the choice of a quasi-linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
@@ -337,7 +337,7 @@ The modified frequency-domain approach with the highest accuracy and optimality 
 This synthesis can occur in a number of ways.
 If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via the Pontryagin Maximum Principle (PMP)) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of QLPS in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
 \ifdefined\DISSERTATION
-    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \citep{zou_optimal_2017}) or analytical time-integration (as in the method of \citep{lin_fast_2025}).
+    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \citet{zou_optimal_2017}) or analytical time-integration (as in the method of \citet{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
 \fi
 For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
@@ -356,7 +356,7 @@ MDOcean pursues this approach for amplitude limits in the operational design loa
 \ifdefined\DISSERTATION
     The constrained optimization to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \Cref{sec:optimal-control}.
     The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
-    The analytical approach is nonetheless derived in \Cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \Cref{sec:appendix-qp-solution} and reference \citep{mccabe_force-limited_2024}) and recommended for future implementation.
+    \Cref{sec:optimal-control} derives the analytical approach, while \citet{mccabe_force-limited_2024} and \Cref{sec:appendix-qp-solution} provide details and visualizations.
 \else
     The constrained optimization used to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain;
     the analytical derivation is provided in \Cref{sec:optimal-control}, with additional details in \Cref{sec:appendix-qp-solution}.
@@ -368,7 +368,7 @@ If neither a numerical nor an analytical implementation is available to identify
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous WEC optimization studies for various constraints \citet{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
+    It has been used in several previous WEC optimization studies for various constraints \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \else
     This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
     and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
@@ -376,7 +376,7 @@ This approach neglects the corresponding effect of the saturation/zeroing on oth
 It is utilized here for the power limit.
 
 As a last resort, the energy in that sea state can be zeroed (M4),
-essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which reference~\citep{mccabe_constrained_2013} pursues for a radiation limit constraint.
+essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which \citet{mccabe_constrained_2013} pursues for a radiation limit constraint.
 These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization through either the objective or constraints.
 The latter approach (M5) is actually the only option for evaluation of slamming amplitude limits in the storm design load case.
 \ifdefined\DISSERTATION
@@ -429,7 +429,7 @@ The former encodes the describing function formula directly into the simulation 
     Because the same describing function is applied in both synthesis and evaluation, the inverse and forward describing functions cancel; the time-domain nonlinear controller need not be reconstructed for power evaluation, only for hardware implementation.
 \fi
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
-The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \citep{hall_open-source_2022}.
+\citet{hall_open-source_2022} documents the RAFT open-source Python package for offshore wind turbines, which uses the drag describing function with iteration but does not include describing functions for saturation.
 MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabling efficient simulation while retaining model fidelity.
 
 %%%%%%%%%%%%%%%
@@ -501,7 +501,7 @@ Three matrix forms describe the port relationships:
 impedance ($\mathbf{Z}$) groups all ports together;
 cascade ($\mathbf{a}$/ABCD) transmits efforts and flows sequentially between port groups and is used for the PTO dynamics (\Cref{sec:appendix-pto-model});
 hybrid ($\mathbf{h}$) mixes the two and is used for the PTO kinematics.
-Full conventions, conversion formulas, and the cascade inversion rule are given in \Cref{sec:appendix-multiport}, following \citep{reveyrand_multiport_2018}.
+Full conventions, conversion formulas, and the cascade inversion rule are given in \Cref{sec:appendix-multiport}, following \citet{reveyrand_multiport_2018}.
 
 \begin{figure}[htbp]
 \centering
@@ -557,7 +557,7 @@ To capture non-dynamic power losses such as those in an electrical drive, a cons
     Note that this is not strictly equivalent to assuming the generator has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
     The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
 \fi
-Validation in \Cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \citep{RM3}.
+Validation in \Cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \citet{RM3}.
 
 The full expansion of $p_{\text{avg},\text{elec}}$ and $p_{pk,\text{elec}}$ in terms of the optimal-control variables $B_l$, $K_l$, and the electrical-port current phasor $\hat{I}$ is given in \Cref{sec:appendix-power-elec}.
 
@@ -768,7 +768,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
     higher-order nonlinear potential flow effects, and
     steady and unsteady viscous separation phenomena are all neglected.
     In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
-    These effects have been found to be the dominant drag force for heaving WECs \citet{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
+    \citet{quartier_influence_2021} finds that these effects are the dominant drag force for heaving WECs and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 \else
     The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \citep{quartier_influence_2021}.
     Without modeling drag, the predicted resonant amplitude is unrealistically high and power is overestimated.
@@ -777,7 +777,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
 % Maha question: should we just jump to the result instead of deriving p_d approximation? (5/18/26)
 Drag force $\vec{F}_d$ is proportional to the product of the relative velocity of the WEC and incident wave, $\vec{v}_{\text{rel}}(y,t)=\vec{\dot{\xi}}(t)-\vec{v}_{\text{wave}}(y,t)$, with its absolute value.
 The resulting quadratic form $|\vec{F}_d|\sim|\vec{v}_{\text{rel}}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
-To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \citep{quartier_influence_2021}.
+To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \citet{quartier_influence_2021}.
 The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ is modeled with empirical drag coefficient vector $\vec{C}_d$:
 \begin{equation}\label{eq:drag-pressure}
     \vec{p}_{d}(y,t) = \frac{1}{2}\rho_w \vec{C}_d ~\vec{v}_{rel}(y,t) |\vec{v}_{rel}(y,t)|
@@ -837,7 +837,7 @@ We now combine the results across sea states to find the long-term energy statis
 
 To find the long-term average power production $\overline{P}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in \Cref{fig:JPD-multiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \citep{janzou_system_2020}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \citet{janzou_system_2020}.
 
 \begin{figure}[b!]
 \centering
@@ -1166,7 +1166,7 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
 \ifdefined\DISSERTATION
     The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
     With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
-    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
+    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS), first published by \citet{neary_reference_2014} and reproduced in \Cref{tab:CBS} of \Cref{sec:appendix-econ}.
 \else
     The MDOcean economics model prioritizes capturing the scaling of cost with design variables over predicting absolute cost.
     Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
