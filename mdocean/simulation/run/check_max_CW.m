@@ -41,6 +41,7 @@ function [hydro_ratio, P_wave, ...
         [X,val,~,P_elec] = max_avg_power(p,b);    
     elseif isfloat(b_or_X)
         X = b_or_X;
+        b = var_bounds();
         [~,P_elec,~,val] = simulation(X, p);
     else
         msg = ['b_or_X is ' class(b_or_X) ...
