@@ -77,7 +77,7 @@ function [hydro_ratio, P_wave, ...
     D_f = X(strcmp(b.var_names, 'T_f_2'));
     max_amp = draft + H/2; % slamming upper bound when theta = 0 (applies for both small and large wave regimes)
     waterplane_area = pi/4 * D_f^2;
-    P_max_budal = H/4 * p.rho_w * p.g * (2*pi./T) .* waterplane_area .* max_amp;
+    P_max_budal = H/4 * p.rho_w * p.g .* (2*pi./T) .* waterplane_area .* max_amp;
     CW_max_budal = P_max_budal ./ P_wave;
     CW_max = min(CW_max_radiation, CW_max_budal);
     hydro_ratio = CW_unsat ./ CW_max;
