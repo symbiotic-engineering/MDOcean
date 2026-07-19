@@ -2,6 +2,7 @@
 ## Unreleased
 ### Fixed
 - Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
+- Paper: add dissertation glossaries integration with generated symbol and acronym source files plus `makeglossaries` support in `pubs/dissertation/.latexmkrc`.
 
 ## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-17
 ### Changed
