@@ -145,8 +145,8 @@ and will inform the optimization problem formulation.
 \subsubsection{Design Variables, Parameters, and Constraints}
 The encoding of a physical design space into optimization design variables is non-unique.
 \ifdefined\DISSERTATION
-    For example, the float and spar drafts could be encoded directly as dimensions $T_{f,2}$ and $T_s$, or nondimensionally as dimension $T_s$ and ratio $T_{f,2}/T_s$.
-    An encoding may be chosen because it more directly controls the objective, makes the problem convex, or helps maintain feasibility and convergence during optimization; the last is pursued here.
+    For example, bulk dimensions hvm could be encoded directly as dimensions $T_{f,2}$ and $T_s$, or nondimensionally as dimension $T_s$ and ratio $T_{f,2}/T_s$.
+    An encoding may be chosen because it more directly controls the objective, makes the problem convex in the obj or constraints, or helps maintain feasibility and convergence during optimization. The last is pursued here.
     Depending on the encoding, each requirement can be enforced via parameters, design variable bounds, linear inequality or equality constraints, or nonlinear inequality or equality constraints, listed from least to most difficult for the optimizer.
     It is therefore desirable to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements, ensuring they hold even at intermediate points.
     
@@ -154,9 +154,9 @@ The encoding of a physical design space into optimization design variables is no
     Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
     Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
-    For example, the float and spar drafts may be encoded directly as dimensions or nondimensionally as a dimension and a ratio.
-    An encoding may be chosen to control the objective directly, induce convexity, or maintain feasibility; the last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
-    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint; early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
+    For example, bulk dimensions hvm may be encoded directly as dimensions or as nondimensional ratios.
+    An encoding may be chosen to control the objective directly, induce convexity in the obj or constraints, or maintain feasibility. The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
+    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint. Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
 \fi
 
 This logic is repeated for the remaining design variables and requirements.
