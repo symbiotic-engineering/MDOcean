@@ -36,7 +36,20 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     [~,idx] = sort(fval(:,1),dir); % order by increasing LCOE (decreasing if reversed)
 
     num_pareto = length(idx);
-    num_design_vars = length(b.var_names)-1;
+    keep_dv = any(lb_active(idx,:) | ub_active(idx,:), 1);
+    lb_active = lb_active(:,keep_dv);
+    ub_active = ub_active(:,keep_dv);
+    var_names_mod = b.var_names_pretty(keep_dv);
+
+    keep_lincon = any(lincon_active(idx,:), 1);
+    lincon_active = lincon_active(:,keep_lincon);
+    lin_constraint_names_mod = b.lin_constraint_names_pretty(keep_lincon);
+
+    keep_nlcon = any(nlcon_active(idx,:), 1);
+    nlcon_active = nlcon_active(:,keep_nlcon);
+    constraint_names_mod = constraint_names_mod(keep_nlcon);
+
+    num_design_vars = size(lb_active,2);
     num_lincon = size(lincon_active,2);
     num_nlcon = size(nlcon_active,2);
 
@@ -49,7 +62,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     spy(ub_active(idx,:)','^r')
     title('Design Variable Bound Active','FontSize',14)
     grid on
-    x_string = strcat('x_{', num2str((1:num_design_vars).') , "} ", b.var_names_pretty(1:end-1).' );
+    x_string = strcat('x_{', num2str((1:num_design_vars).') , "} ", var_names_mod.' );
     set(gca,'ytick',1:num_design_vars,'yticklabel',x_string)
     set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_design_vars 1])
     xlabel('Number Along Pareto Front','FontSize',14)
@@ -58,7 +71,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     nexttile(4)
     spy(lincon_active(idx,:)')
     title('Linear Constraint Active','FontSize',14)
-    lin_string = strcat('g_{L,', num2str((1:length(b.lin_constraint_names)).') , "} ", b.lin_constraint_names_pretty.' );
+    lin_string = strcat('g_{L,', num2str((1:num_lincon).') , "} ", lin_constraint_names_mod.' );
 
     set(gca,'ytick',1:num_lincon,'yticklabel',lin_string)
     set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_lincon 1])
@@ -69,7 +82,7 @@ function [idx,fig] = constraint_active_plot(residuals,fval,tol,b,reversed)
     spy(nlcon_active(idx,:)')
     title('Nonlinear Constraint Active','FontSize',14)
     grid on
-    nl_string = strcat('g_{NL,', num2str((1:length(constraint_names_mod)).') , "} ", constraint_names_mod.' );
+    nl_string = strcat('g_{NL,', num2str((1:num_nlcon).') , "} ", constraint_names_mod.' );
     set(gca,'ytick',1:num_nlcon,'yticklabel',nl_string)
     set(gca, 'PlotBoxAspectRatio', [.25*num_pareto num_nlcon 1])
     xlabel('Number Along Pareto Front','FontSize',14)

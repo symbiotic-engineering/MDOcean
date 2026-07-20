@@ -152,7 +152,6 @@ function [treeFig, parallelFig, barFig, results] = multistart_postpro(p,b,X_opt,
                                  'Jitter',0,...
                                  'FontSize',fontsize,...
                                  'Title',"");
-        h.CoordinateTickLabels = ""; % Suppress x tick labels in original axes
 
         hAxesOverlay = axes(t);
         hAxesOverlay.Layout.Tile = i;

@@ -201,7 +201,7 @@ stacked_number_line(X(:,1:end-1).', b.X_mins, b.X_maxs, color, markers, titles, 
 
 h_stacked_out = figure;
 stacked_number_line(out_table{:,:}, [], [], color, markers, titles, out_table.Properties.RowNames);
-h_stacked_out.Position(3:4) = [1000  400]; % make taller
+h_stacked_out.Position(3:4) = [1000 1200]; % make taller so all row labels are visible
 
 figs = [h_geom, h_hydro, h_hydro_imp, h_prob, h_power_matrix, h_cost_power, h_stacked_dv, h_stacked_out];
 
@@ -307,38 +307,105 @@ end
 
 function f = hydro_impedance_compare(vals,colors,p,X)
 f = figure;
-hold on
+t = tiledlayout(2,1);
+t.TileSpacing = 'compact';
+t.Padding = 'compact';
+ax_mag = nexttile;
+hold(ax_mag,'on')
+ax_phase = nexttile;
+hold(ax_phase,'on')
+
+Hs_sorted = sort(p.Hs(:));
+n_hs = length(Hs_sorted);
+alpha_min = 0.2;
+alpha_max = 1.0;
+if n_hs > 1
+    alpha_vals = linspace(alpha_min, alpha_max, n_hs).';
+else
+    alpha_vals = alpha_max;
+end
+cmap = jet(max(n_hs,2));
+if n_hs == 1
+    cmap = cmap(1,:);
+else
+    cmap = cmap(1:n_hs,:);
+end
+line_styles = {'-','--',':','-.'};
+
 for i=1:length(vals)
     val = vals(i);
-    col = colors{i};
-    w=unique(val.w(~isnan(val.w)),'stable');
+    style_i = line_styles{mod(i-1,length(line_styles))+1};
+    w = val.w;
     if isempty(w)
         continue
     end
-    [B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s] = linear_coeffs_for_impedance(X(i,:), p, val, w(:,1));
-    if p.use_multibody
-        [real_G_u,imag_G_u] = multibody_impedance(B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s,w(:,1));
-    else
-        resistance = B_f;
-        reactance = m_f.*w(:,1) - K_f./w(:,1);
-        mag_G_u_squared = 1 ./ (resistance.^2 + reactance.^2);
-        real_G_u = resistance .* mag_G_u_squared;
-        imag_G_u = -reactance .* mag_G_u_squared;
+    [B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s] = linear_coeffs_for_impedance(X(i,:), p, val, w);
+    for j=1:size(w,1)
+        if j <= length(p.Hs)
+            hs_j = p.Hs(j);
+        else
+            hs_j = Hs_sorted(min(j,n_hs));
+        end
+        idx_hs = find(abs(Hs_sorted - hs_j) < 1e-12, 1, 'first');
+        if isempty(idx_hs)
+            [~,idx_hs] = min(abs(Hs_sorted - hs_j));
+        end
+        alpha_j = alpha_vals(idx_hs);
+        col_j = cmap(idx_hs,:);
+        w_j = w(j,:).';
+        idx_valid = ~isnan(w_j);
+        if ~any(idx_valid)
+            continue
+        end
+        w_j = w_j(idx_valid);
+        B_c_j = B_c(j,idx_valid).';
+        B_f_j = B_f(j,idx_valid).';
+        B_s_j = B_s(j,idx_valid).';
+        K_f_j = K_f(j,idx_valid).';
+        K_s_j = K_s(j,idx_valid).';
+        m_c_j = m_c(j,idx_valid).';
+        m_f_j = m_f(j,idx_valid).';
+        m_s_j = m_s(j,idx_valid).';
+        if p.use_multibody
+            [real_G_u,imag_G_u] = multibody_impedance(B_c_j,B_f_j,B_s_j,K_f_j,K_s_j,m_c_j,m_f_j,m_s_j,w_j);
+        else
+            resistance = B_f_j;
+            reactance = m_f_j.*w_j - K_f_j./w_j;
+            mag_G_u_squared = 1 ./ (resistance.^2 + reactance.^2);
+            real_G_u = resistance .* mag_G_u_squared;
+            imag_G_u = -reactance .* mag_G_u_squared;
+        end
+        G_u = real_G_u + 1i * imag_G_u;
+        Z_th = 1./G_u;
+        plot(ax_mag, w_j, abs(Z_th), style_i, 'Color', [col_j alpha_j], 'LineWidth', 1.2, ...
+            'HandleVisibility', 'off')
+        plot(ax_phase, w_j, angle(Z_th), style_i, 'Color', [col_j alpha_j], 'LineWidth', 1.2, ...
+            'HandleVisibility', 'off')
     end
-    G_u = real_G_u + 1i * imag_G_u;
-    Z_th = 1./G_u;
-    yyaxis left
-    plot(w(:,1), abs(Z_th), [col '-*'])
-    ylabel('|Z_{th}| (N s/m)')
-    yyaxis right
-    plot(w(:,1), angle(Z_th), [col '-.'])
-    ylabel('\angle Z_{th} (rad)')
 end
-title('Controlled DOF Thevenin Impedance')
-xlabel('Wave Frequency (\omega)')
-xlim([0.3,1.45])
-legend({'|Z_{th}|','\angle Z_{th}'})
-grid on
+
+dummy_min = plot(ax_mag, NaN, NaN, '-', 'Color', [0 0 0 alpha_vals(1)], ...
+    'LineWidth', 2, 'DisplayName', sprintf('Low H_s = %.2f m', Hs_sorted(1)));
+dummy_max = plot(ax_mag, NaN, NaN, '-', 'Color', [0 0 0 alpha_vals(end)], ...
+    'LineWidth', 2, 'DisplayName', sprintf('High H_s = %.2f m', Hs_sorted(end)));
+legend(ax_mag, [dummy_min, dummy_max], 'Location', 'best')
+
+colormap(f,cmap)
+cb = colorbar(ax_phase);
+cb.Layout.Tile = 'east';
+cb.Label.String = 'H_s (m)';
+cb.Ticks = linspace(0,1,n_hs);
+cb.TickLabels = compose('%.2f', Hs_sorted);
+clim(ax_phase,[0 1])
+
+title(ax_mag, 'Controlled DOF Thevenin Impedance')
+ylabel(ax_mag, '|Z_{th}| (N s/m)')
+ylabel(ax_phase, '\angle Z_{th} (rad)')
+xlabel(ax_phase, 'Wave Frequency (\omega)')
+xlim(ax_mag,[0.3,1.45])
+xlim(ax_phase,[0.3,1.45])
+grid(ax_mag,'on')
+grid(ax_phase,'on')
 improvePlot
 end
 
@@ -349,7 +416,7 @@ T_f_2 = x(3);
 D_d = p.D_d_over_D_s * D_s;
 T_s = p.T_s_over_D_s * D_s;
 T = 2*pi./w;
-Hs = ones(size(T));
+Hs = repmat(p.Hs(:), 1, size(T,2));
 m_float = val.mass_f;
 m_spar = val.mass_vc + val.mass_rp;
 [m_f,B_f,K_f,~,~,...
