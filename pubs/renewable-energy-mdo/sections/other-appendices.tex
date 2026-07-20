@@ -13,7 +13,9 @@ The following tables define column-abbreviation legends for the optimization-stu
 \begin{table}[htbp]
     \centering
     \caption{Legend keys for the dynamics and controls columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-8}}
+    }
          \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
          N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
          ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
@@ -21,7 +23,7 @@ The following tables define column-abbreviation legends for the optimization-stu
          OSW&  Oscillating surge WEC&  FIT&  Fit of model to numerical or experimental data&  CFD& Computational fluid dynamics & PS&Pseudo-spectral& NL&Nonlinear structured \\
          OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
         OWC& Oscillating water column& & & & & & & & \\
-    \end{tabular}
+    \endtabular
     \end{table}
 \endgroup
 \end{landscape}
@@ -31,20 +33,24 @@ The following tables define column-abbreviation legends for the optimization-stu
 \setlength{\tabcolsep}{2pt}
 \begin{table}[htbp]
     \caption{Legend keys for other modeling columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-9}}
+    }
          \multicolumn{2}{c|}{Mooring}& \multicolumn{2}{c|}{Structures} &  \multicolumn{2}{c|}{Economics}&  \multicolumn{2}{c}{Sea state}\\ \hline
          DYN&  Model incorporates mooring dynamics &  AN&  Models stress analytically as a function of dimensions&  STR&  Models structural cost &  REG& Regular waves\\
          DES&  Study considers mooring physical design &  LO&  Models load without dimension-dependent stress &  PTO&  Models power take-off cost &  IRR& Irregular wave spectrum\\
          &  &  FEA&  Models stress using finite element analysis &  GEO&  Geometric cost proxy (i.e.\ hull volume, surface area)&  REG+, IRR+& Joint probabilities of wave heights and periods for multiple sea states\\
          &  &  &  &  FULL&  Full cost model &  STO& Storm condition\\
-    \end{tabular}
+    \endtabular
     \end{table}
 
 \bigskip
 
 \begin{table}[htbp]
     \caption{Legend keys for the optimization columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-10}}
+    }
          \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
          LOC&  Local optimizer (gradient-based, derivative-free)&  ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
          GA&  Genetic algorithm&  PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
@@ -52,7 +58,7 @@ The following tables define column-abbreviation legends for the optimization-stu
          IT&  Iterated by hand&  ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
          ALT& Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
          BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
-    \end{tabular}
+    \endtabular
     \end{table}
 \endgroup
 \end{landscape}
@@ -61,7 +67,7 @@ The following tables define column-abbreviation legends for the optimization-stu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Optimization Process Details}
-This section provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
+This appendix provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,10 +103,27 @@ The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert f
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Hessian Scaling Procedure}
-\label{remdo:sec:appendix-scaling}
+\subsection{Optimization Scaling Procedure}
+Problem scaling is critical for good results in practice.
+All constraints are normalized, transforming inequalities $f_{\text{min}} \leq f(x) \leq f_{\text{max}}$ to:
+\begin{equation}
+\begin{aligned}
+    \frac{f(x)}{f_{min}}-1 &\geq 0 \\
+    -\frac{f(x)}{f_{max}}+1 &\geq 0 \\
+\end{aligned}
+\end{equation}
+When $f_{\text{min}}$ or $f_{\text{max}}$ is zero --- as for $g_{NL,5}$ and $g_{NL,14}$, which constrain $GM$ and $P_{\text{avg}}$ to be positive --- the constraint is instead normalized by a constant of suitable order of magnitude.
+\ifdefined\DISSERTATION
+    Design variables are implemented in the engineering-notation SI unit that places the nominal value between 1 and 1000: meters for bulk dimensions, millimeters for structural dimensions, MN for force, and kilowatts for power.
+    The objectives are scaled to magnitude near one, using megawatts for power, millions of dollars for cost, and \$/kWh for LCOE.
+\else
+    Scaled design variables use the engineering-notation SI unit that places each nominal value between 1 and 1000, and the objectives are scaled to magnitude near one.
+\fi
+
+\paragraph{Hessian Scaling}
+For SQP, Hessian scaling further equalizes each variable's effect magnitude on the objective.
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
-Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
+Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as \citet[section 8.3]{papalambros_principles_2017} recommend:
 \begin{equation}
     s_i = \frac{1}{\sqrt{H_{ii}}}
 \end{equation}
@@ -125,21 +148,21 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
     \centering
     \caption{Hyper-parameters used to control numerics}
     \label{remdo:tab:hyperparams}
-\begin{tabular}{lccc} \hline 
-          &Variable&  Value& Unit\\ \hline 
-          Simulation&$X_{tol}$&  0.01 & m \\ \hline 
-          &$\angle X_{tol}$& 3 & degrees\\ \hline 
-          &Maximum drag iterations& 100 & -\\ \hline 
-          &$N_{\text{harmonics}}$& 10 & - \\ \hline
-          &$b_{\text{max}}$ & 700.5 & - \\ \hline
-          SQP Optimization&Constraint tolerance& 1e-5 & - \\ \hline
-          &Iterations before Hessian scaling& 8 & - \\ \hline
-  &Maximum iterations after Hessian scaling& 150&-\\\hline
-  &Maximum function evaluations& 2000&-\\\hline
- Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\\hline
- & Minimum poll fraction& 1&\\\hline
- & Pareto set change tolerance& 1.6e-8&\\\hline
- & Maximum pattern search iterations& 100&\\\hline
+\begin{tabular}{lccc} \toprule 
+          &Variable&  Value& Unit\\ \midrule 
+          Simulation&$\xi_{tol}$&  0.01 & m \\
+          &$\angle \xi_{tol}$& 3 & degrees\\
+          &Maximum drag iterations& 100 & -\\
+          &$N_{\text{harmonics}}$& 10 & - \\
+          &$b_{\text{max}}$ & 700.5 & - \\ \midrule
+          SQP Optimization&Constraint tolerance& 1e-5 & - \\
+          &Iterations before Hessian scaling& 8 & - \\
+  &Maximum iterations after Hessian scaling& 150&-\\
+  &Maximum function evaluations& 2000&-\\ \midrule
+ Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\
+ & Minimum poll fraction& 1&-\\
+ & Pareto set change tolerance& 1.6e-8&-\\
+ & Maximum pattern search iterations& 100&-\\\bottomrule
     \end{tabular}
     \end{table}
 
@@ -155,7 +178,7 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 The optimization converges in \resultsRE[singleObjIters]~iterations, not including the 8 initial iterations used to perform Hessian scaling.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/single_obj_convergence.pdf}]{figs/from-matlab/single_obj_convergence.pdf}
 \caption{Single objective convergence plots}\label{remdo:fig:single-objective-convergence}
 \end{figure}
 
@@ -176,7 +199,7 @@ Future multistart procedures could therefore fix deterministic starts for the un
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/multistart_parallel_coordinates.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/multistart_parallel_coordinates.pdf}]{figs/from-matlab/multistart_parallel_coordinates.pdf}
 \caption{Parallel axis plot for effect of starting point on convergence}\label{remdo:fig:multistart-parallel-axis}
 \fillandplacepagenumber
 \end{figure}
@@ -189,7 +212,7 @@ Future multistart procedures could therefore fix deterministic starts for the un
 \label{remdo:sec:appendix-sensitivties}
 \Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_re_optim_objective_grid.pdf}]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
 \caption{Local parameter sensitivity analysis to optimal objective $J^*$}
 \label{remdo:fig:param-sens-local-global-J-star}
 \end{figure}
@@ -243,13 +266,13 @@ All in all, the quadratic post-optimality sensitivities are useful for rapidly e
 Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
 This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_design_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_design_grid.pdf}]{figs/from-matlab/post_optim_design_grid.pdf}
 \caption{Quadratic parameter sensitivity analysis to optimal design $x^*$}
 \label{remdo:fig:param-sens-local-x-star}
 \end{figure}
 
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/re_optim_design_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/re_optim_design_grid.pdf}]{figs/from-matlab/re_optim_design_grid.pdf}
 \caption{Re-optimization parameter sensitivity analysis to optimal design $x^*$}
 \label{remdo:fig:param-sens-global-x-star}
 \end{figure}

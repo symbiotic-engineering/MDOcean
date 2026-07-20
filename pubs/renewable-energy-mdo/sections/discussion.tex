@@ -41,7 +41,7 @@ This subsection compares the key findings to prior studies and highlights where 
 \else
     A survey finds 40\% of WEC developers design for site-agnostic deployment \cite{trueworthy_wave_2020}.
     A prior study \cite{de_andres_adaptability_2015} concludes that geometric tuning to the dominant wave period is unfavorable, but its devices have coupled diameter and height, use only damping control, and tune for power rather than cost.
-    MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\Cref{remdo:tab:opt-dv-values,remdo:tab:opt-output,remdo:tab:location}), which contradicts \cite{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
+    MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\Cref{remdo:tab:opt-dv-values,remdo:tab:opt-output,remdo:tab:location}), which contradicts \citet{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -74,8 +74,8 @@ A previous study compares structural mass per unit hull volume for marine struct
     Even with the higher evaluation count, the gradient-based algorithm retains the advantage of certifying convergence to a local optimum, and with systematic multistart, reasonable confidence of a global optimum, which a heuristic optimization cannot provide.
 \else
     All prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm (\Cref{remdo:sec:lit}), requiring roughly 2{,}000--12{,}000 function evaluations to converge \cite{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}.
-    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations exceed the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
-    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
+    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations on par with the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
+    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension and less than heurisitcs, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +97,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     The observed impact of these effects justifies the corresponding model complexity and suggests other optimization frameworks should include them for realistic results.
 \else
     Force saturation, slamming amplitude limits, and 2-DOF dynamics all contribute significantly to the results.% (\Cref{remdo:sec:sensitivity-model-assumptions}).
-    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \cite{mccabe_development_2026}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
+    Force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
     The impact of these effects justifies their model complexity and argues for their inclusion in other frameworks.
 \fi
 
@@ -192,7 +192,7 @@ This subsection evaluates how realistic the optimization formulation choices are
 \else
     With \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear constraints, this optimization captures more realistic requirements than any other WEC optimization known to the authors.
     The active constraints (\Cref{remdo:fig:constraint-activity}) are all survivability-related, such as structural factors of safety and amplitude limits, while ballast and pitch-stability constraints are inactive.
-    Although survivability is a critical but rarely optimized WEC requirement, this study quantifies its effect:
+    Although survivability is a critical but rarely-optimized WEC requirement, this study quantifies its effect:
     the Lagrange multipliers (\Cref{remdo:fig:lagrange-multiplier}) indicate that improving the damping plate is worth about 5 and 10 times more than improving the column and float respectively,
     motivating both incremental detail-design improvements and transformative storm-survival concepts (submersion, control surfaces, or amplitude-reducing control), whose viability can be screened using the same multipliers.
     Many considerations remain uncaptured, however, such as discrete component sizing, mooring loads, structural resonant modes, storm overturning moment, and manufacturing, regulatory, and transport limits \cite{cotrell_analysis_2014}, so caution is warranted before pursuing this optimum; see \cite{bull_systems_2017,babarit_stakeholder_2017,trueworthy_wave_2020} for comprehensive WEC requirement guidance.

@@ -1,5 +1,11 @@
 # Changelog
 ## Unreleased
+### Fixed
+- Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
+
+## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-17
+### Changed
+- Dev: merge `main` into `post-submit-edits-old` and prepare branch for merge.
 
 ## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-12
 ### Added
@@ -12,6 +18,19 @@
 - Paper: merge latest `overleaf-sync` updates into this journal-edit branch.
 ### Removed
 - RE paper: delete obsolete hardcoded table files from `pubs/renewable-energy-mdo/tables/2025-04-11_04.04.45/`.
+
+## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
+### Changed
+- Dev: expand `.github/copilot-instructions.md` with cloud-agent onboarding guidance, targeted Calkit commands, and known error/workaround notes.
+
+## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-14
+### Added
+- Dev: Create copilot agent instructions
+- Dev: Customize copilot setup to include calkit and matlab
+
+## [v1.3.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.1) - 2026-7-13
+### Added
+- Pipeline: feature in dvc_lock_merge.py to checkout git-tracked pipeline outputs consistent with dvc.lock merge
 
 ## [v1.3.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.0) - 2026-7-11
 Papers at the state of journal submission, plus a few post-submission edits.
