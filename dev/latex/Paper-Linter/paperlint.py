@@ -960,6 +960,7 @@ def read_existing_symbol_descriptions(path):
         symbol, description = _parse_glsxtrnewsymbol_line(line)
         if symbol is None or description is None:
             continue
+        symbol = _canonicalize_symbol(_normalize_symbol(symbol))
         if description or symbol not in descriptions:
             descriptions[symbol] = description
     return descriptions
