@@ -661,9 +661,9 @@ def _script_is_ignored_superscript(script_value):
     raw = _unwrap_braces(script_value)
     if raw in {"T", "*"}:
         return True
-    if re.fullmatch(r"\d+", raw):
+    if re.fullmatch(r"[+-]?\d+", raw):
         return True
-    if re.fullmatch(r"\d+\\times\d+", raw):
+    if re.fullmatch(r"[+-]?\d+\\times[+-]?\d+", raw):
         return True
     return False
 
