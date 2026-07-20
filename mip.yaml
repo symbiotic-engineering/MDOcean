@@ -1,0 +1,29 @@
+# MDOcean's MATLAB package dependencies, declared for the mip package
+# manager (https://mip.sh). Exact resolved versions are pinned in mip.lock,
+# and `mip project sync` builds the project environment ./.mip to match the
+# lock identically on any machine. See https://mip.sh/docs/projects.
+#
+# One-time setup after cloning:
+#
+#   >> setup_mip
+#
+# Then run commands with the dependencies loaded:
+#
+#   >> mip project run '<script, function, or expression>'
+
+dependencies:
+  - openflash # MEEM hydrodynamics (matched eigenfunction expansion method)
+
+dependency_groups:
+  # Installed by default by `mip project sync`; skip with --no-dev.
+  dev:
+    - wec-sim # WEC-Sim validation
+    # safe@main is the rebeccamccabe/SAFE-matlab fork (upstream + a fix for
+    # PAWN's pawn_model_execution); an unpinned "safe" resolves to 1.2.0,
+    # which is unpatched upstream.
+    - safe@main # sensitivity analysis
+
+channels:
+  # Consulted after mip-org/core when resolving the bare names above.
+  - mip-org/staging # wec-sim, safe
+  - mip-org/labs # openflash

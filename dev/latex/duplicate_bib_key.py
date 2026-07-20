@@ -6,7 +6,7 @@ def load(path):
     return {e['ID']: e for e in db.entries}
 
 a = load("pubs/shared/references.bib")
-b = load("mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib") # jfm.bib
+b = load("pubs/shared/zotero-meem-refs.bib") # jfm.bib, vendored from OpenFLASH pubs/JFM
 
 keys = set(a) | set(b)
 

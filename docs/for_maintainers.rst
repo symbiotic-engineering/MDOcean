@@ -10,8 +10,15 @@ Then set up git:
 
 .. code-block:: bash
 
-  git clone --recursive https://github.com/symbiotic-engineering/MDOcean.git # this downloads MDOcean and its submodules
+  git clone https://github.com/symbiotic-engineering/MDOcean.git
   git config merge.dvclock.driver "python dev/dvc_lock_merge.py %O %A %B"
+
+Then, in MATLAB, install the external MATLAB dependencies (run once, from the
+repository root):
+
+.. code-block:: matlab
+
+  setup_mip
 
 Writing
 *******
