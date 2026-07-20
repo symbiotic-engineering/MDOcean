@@ -669,32 +669,40 @@ def _script_is_ignored_superscript(script_value):
 
 
 def _canonicalize_script(script_op, script_value):
-    if script_op == "^" and _script_is_ignored_superscript(script_value):
+    normalized_value = script_value
+    if script_value.startswith("{") and script_value.endswith("}"):
+        normalized_value = "{" + _normalize_scripts_in_expression(script_value[1:-1]) + "}"
+    if script_op == "^" and _script_is_ignored_superscript(normalized_value):
         return None
     if script_op == "_":
-        single_char_match = re.fullmatch(r"\{([A-Za-z0-9])\}", script_value)
+        single_char_match = re.fullmatch(r"\{([A-Za-z0-9])\}", normalized_value)
         if single_char_match:
             return script_op + single_char_match.group(1)
-    return script_op + script_value
+    return script_op + normalized_value
 
 
-def _canonicalize_symbol(symbol):
+def _normalize_scripts_in_expression(expr):
+    canonical = ""
     idx = 0
-    while idx < len(symbol) and symbol[idx] not in "_^":
-        idx += 1
-    base = symbol[:idx]
-    canonical = base
-    while idx < len(symbol):
-        script_op = symbol[idx]
-        script_value, next_idx = _read_script_value(symbol, idx + 1)
+    while idx < len(expr):
+        if expr[idx] not in "_^":
+            canonical += expr[idx]
+            idx += 1
+            continue
+        script_op = expr[idx]
+        script_value, next_idx = _read_script_value(expr, idx + 1)
         if script_value is None:
-            canonical += symbol[idx:]
+            canonical += expr[idx:]
             break
         updated = _canonicalize_script(script_op, script_value)
         if updated is not None:
             canonical += updated
         idx = next_idx
     return canonical
+
+
+def _canonicalize_symbol(symbol):
+    return _normalize_scripts_in_expression(symbol)
 
 
 def extract_math_symbols(content):
