@@ -854,15 +854,101 @@ def symbol_to_glossary_label(symbol):
     return "sym-%s" % safe
 
 
+def _split_top_level_options(options):
+    parts = []
+    current = ""
+    depth = 0
+    for ch in options:
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            if depth > 0:
+                depth -= 1
+        if ch == "," and depth == 0:
+            if current.strip():
+                parts.append(current.strip())
+            current = ""
+            continue
+        current += ch
+    if current.strip():
+        parts.append(current.strip())
+    return parts
+
+
+def _extract_description_option(options):
+    for option in _split_top_level_options(options):
+        if "=" not in option:
+            continue
+        key, value = option.split("=", 1)
+        if key.strip() != "description":
+            continue
+        value = value.strip()
+        group, end_idx = _read_braced_group(value, 0)
+        if group is not None and end_idx == len(value):
+            return _unwrap_braces(group)
+        return value
+    return None
+
+
+def _parse_glsxtrnewsymbol_line(line):
+    stripped = line.strip()
+    comment_idx = re.search(r"(?<!\\)%", stripped)
+    if comment_idx:
+        stripped = stripped[:comment_idx.start()].rstrip()
+    if not stripped.startswith(r"\glsxtrnewsymbol"):
+        return None, None
+
+    idx = len(r"\glsxtrnewsymbol")
+    idx = _skip_ws(stripped, idx)
+    options = ""
+    if idx < len(stripped) and stripped[idx] == "[":
+        end_idx = idx + 1
+        brace_depth = 0
+        while end_idx < len(stripped):
+            char = stripped[end_idx]
+            if char == "{":
+                brace_depth += 1
+            elif char == "}":
+                if brace_depth > 0:
+                    brace_depth -= 1
+            elif char == "]" and brace_depth == 0:
+                break
+            end_idx += 1
+        if end_idx >= len(stripped) or stripped[end_idx] != "]":
+            return None, None
+        options = stripped[idx + 1:end_idx]
+        idx = end_idx + 1
+
+    idx = _skip_ws(stripped, idx)
+    label_group, idx = _read_braced_group(stripped, idx)
+    if label_group is None:
+        return None, None
+    idx = _skip_ws(stripped, idx)
+    ensuremath_group, idx = _read_braced_group(stripped, idx)
+    if ensuremath_group is None:
+        return None, None
+    if _skip_ws(stripped, idx) != len(stripped):
+        return None, None
+
+    ensuremath_content = _unwrap_braces(ensuremath_group).strip()
+    if not ensuremath_content.startswith(r"\ensuremath"):
+        return None, None
+    symbol_idx = _skip_ws(ensuremath_content, len(r"\ensuremath"))
+    symbol_group, symbol_end = _read_braced_group(ensuremath_content, symbol_idx)
+    if symbol_group is None:
+        return None, None
+    if _skip_ws(ensuremath_content, symbol_end) != len(ensuremath_content):
+        return None, None
+
+    symbol = _unwrap_braces(symbol_group)
+    description = _extract_description_option(options)
+    return symbol, description
+
+
 def read_existing_symbol_descriptions(path):
     descriptions = {}
     if not os.path.exists(path):
         return descriptions
-
-    entry_re = re.compile(
-        r"\s*\\glsxtrnewsymbol(?:\[(?P<options>[^\]]*)\])?\{[^{}]+\}\{\\ensuremath\{(?P<symbol>.+)\}\}\s*$"
-    )
-    description_re = re.compile(r"description\s*=\s*\{(?P<description>.*)\}")
 
     try:
         with open(path) as handle:
@@ -871,14 +957,11 @@ def read_existing_symbol_descriptions(path):
         return descriptions
 
     for line in lines:
-        match = entry_re.match(line.strip())
-        if not match:
+        symbol, description = _parse_glsxtrnewsymbol_line(line)
+        if symbol is None or description is None:
             continue
-        options = match.group("options") or ""
-        description_match = description_re.search(options)
-        if not description_match:
-            continue
-        descriptions[match.group("symbol")] = description_match.group("description")
+        if description or symbol not in descriptions:
+            descriptions[symbol] = description
     return descriptions
 
 
