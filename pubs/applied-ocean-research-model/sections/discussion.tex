@@ -482,3 +482,30 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     Additional model refinements that would build trust without unlocking new study types include local buckling and effective-breadth criteria in the structures module, FEA-based validation of the structural model, additional PTO nonlinearities (drivetrain friction, check-valve rectification, power saturation), and Miner's-law fatigue analysis coupled with storm-sea-state contour modeling for finite-lifetime designs.
     Per-item rationale and implementation paths are in \citet{mccabe_dissertation_2026}.
 \fi
+
+\ifdefined\DISSERTATION
+    \paragraph{Runtime Improvements}
+    The runtime of the simulation could also be improved, either by further simplifying the model
+    or by implementing code optimizations to avoid unnecessary computations.
+    Early MDOcean versions (v0.2.0 to v0.3.1) ran in under 40~ms,
+    about one third of the time of the current version.
+    These versions feature largely the same disciplinary scope but use fixed-point iteration rather than a solver to converge the drag loop.
+    This results in far fewer evaluations of the dynamics but an inability to converge the drag loop for some sea states under reactive control.
+    Other instances where returning to a simpler model that could be justified in certain instances and would improve runtime include
+    turning off the QLPS constrained optimal control in favor of a suboptimal control scheme
+    and reverting to a simpler drag formulation that neglects the strip-theory integration of the drag force.
+    
+    To increase speed while preserving the current features, recommended areas for code optimization include:
+    \begin{enumerate}
+        \item share calculations between the multibody dynamics evaluation function and the QCQP function
+        \item refactor to enhance vectorization
+        \item strategically balance complex-valued and real-valued operations in the dynamics module: a given transfer function may be implemented in a small number of expensive complex operations or a large number of inexpensive real operations, and the preferred balance has not yet been systematically explored. Deferring the introduction of complex numbers until later in the calculation may also be beneficial.
+        \item decrease the number of iterations required to converge the drag loop (e.g., improve the initial guess, tune solver parameters, or solve the nonlinear equations analyticaly to avoid iteration entirely).
+    \end{enumerate}
+\else
+    The runtime of the simulation could also be improved by revisiting earlier model versions that achieved
+    even faster (<40~ms) runtimes but exhibited difficulty converging,
+    and by code optimizations such as sharing calculations between the dynamics and controls,
+    enhancing vectorization, balancing complex and real operations,
+    and solving the drag equation analytically to obviate the need for iteration entirely.
+\fi
