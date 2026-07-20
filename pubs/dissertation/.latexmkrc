@@ -33,7 +33,18 @@ $aux_dir = 'aux';
 # Enable -shell-escape for pdflatex (required for TikZ externalization)
 set_tex_cmds( '--shell-escape %O %S' );
 add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
+add_cus_dep('glo-abr', 'gls-abr', 0, 'run_makeglossaries');
 add_cus_dep('acn', 'acr', 0, 'run_makeglossaries');
+add_cus_dep('cld', 'cln', 0, 'run_makeglossaries');
+add_cus_dep('mdd', 'mdn', 0, 'run_makeglossaries');
+add_cus_dep('ord', 'orn', 0, 'run_makeglossaries');
+add_cus_dep('std', 'stn', 0, 'run_makeglossaries');
+add_cus_dep('ecd', 'ecn', 0, 'run_makeglossaries');
+add_cus_dep('dyd', 'dyn', 0, 'run_makeglossaries');
+add_cus_dep('opd', 'opn', 0, 'run_makeglossaries');
+add_cus_dep('swd', 'swn', 0, 'run_makeglossaries');
+add_cus_dep('wad', 'wan', 0, 'run_makeglossaries');
+add_cus_dep('sad', 'san', 0, 'run_makeglossaries');
 
 sub run_makeglossaries {
     my ($base) = @_;
