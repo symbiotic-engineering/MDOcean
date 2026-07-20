@@ -66,7 +66,7 @@ else
     w_stiff_d = NaN;
 end
 
-if ~mini && ~compare
+if ~mini
     fig = figure;
     t = tiledlayout(fig,2,2,'TileSpacing','compact','Padding','compact');
     ax_geom = nexttile(t,1,[2 1]);
@@ -225,12 +225,13 @@ function plot_structure_cross_sections(ax, D_f, D_s, D_d, ...
         x_start = x_start + D + gap;
     end
 
-    xlim([0 max(x_start-gap,1)])
+    %xlim([0 max(x_start-gap,1)])
+    axis equal
     ylim([-0.25*ymax 1.2*ymax])
     yline(0,'k-','LineWidth',1)
     xlabel('Diameter direction, x (m)')
     ylabel('Thickness / stiffener height, y (m)')
-    title('Structural cross sections (rectangular stiffener model)')
+    title('Structural Cross Sections')
 end
 
 function total_height = section_total_height(t_plate, h_stiff)
