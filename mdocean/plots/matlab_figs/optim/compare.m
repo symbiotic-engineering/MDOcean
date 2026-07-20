@@ -416,7 +416,11 @@ T_f_2 = x(3);
 D_d = p.D_d_over_D_s * D_s;
 T_s = p.T_s_over_D_s * D_s;
 T = 2*pi./w;
-Hs = repmat(p.Hs(:), 1, size(T,2));
+if size(T,1) == numel(p.Hs)
+    Hs = repmat(p.Hs(:), 1, size(T,2));
+else
+    Hs = ones(size(T));
+end
 m_float = val.mass_f;
 m_spar = val.mass_vc + val.mass_rp;
 [m_f,B_f,K_f,~,~,...
