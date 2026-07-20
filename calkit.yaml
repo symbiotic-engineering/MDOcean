@@ -5319,10 +5319,10 @@ pipeline:
           storage: git
         - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
     move-re-results:
-      kind: shell-command
-      command: |
-        cp results/**/*.pdf pubs/renewable-energy-mdo/figs/from-matlab/
-        cp results/**/*.tex pubs/renewable-energy-mdo/tables/from-matlab/
+      kind: matlab-command
+      # command: |
+      #   cp results/**/*.pdf pubs/renewable-energy-mdo/figs/from-matlab/
+      #   cp results/**/*.tex pubs/renewable-energy-mdo/tables/from-matlab/
       environment: _system
       inputs:
         - results/ReadNonMatlabFigs/
@@ -5344,12 +5344,12 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      #command: add_mdocean_path(); move_results_to_pubs('RE');
+      command: add_mdocean_path(); move_results_to_pubs('RE');
     move-aor-results:
-      kind: shell-command
-      command: |
-        cp results/**/*.pdf pubs/applied-ocean-research-model/figs/from-matlab/
-        cp results/**/*.tex pubs/applied-ocean-research-model/tables/from-matlab/
+      kind: matlab-command
+      # command: |
+      #   cp results/**/*.pdf pubs/applied-ocean-research-model/figs/from-matlab/
+      #   cp results/**/*.tex pubs/applied-ocean-research-model/tables/from-matlab/
       environment: _system
       inputs:
         - results/DragIntegral/
@@ -5378,7 +5378,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      #command: add_mdocean_path(); move_results_to_pubs('AOR');
+      command: add_mdocean_path(); move_results_to_pubs('AOR');
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
