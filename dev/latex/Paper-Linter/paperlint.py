@@ -566,14 +566,6 @@ def strip_explicit_math_text(content):
         "textsc",
         "mbox",
         "operatorname",
-        "mathrm",
-        "mathit",
-        "mathbf",
-        "mathsf",
-        "mathtt",
-        "mathcal",
-        "mathbb",
-        "mathfrak",
     ]
     pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(explicit_text_commands))
     while True:
@@ -597,25 +589,139 @@ MATH_SYMBOL_STOPWORDS = {
     "e", "i", "d"
 }
 
+SYMBOL_DECORATOR_COMMANDS = {
+    "vec", "mathbf", "boldsymbol", "bm", "hat", "dot", "ddot", "bar", "tilde",
+    "mathit", "mathsf", "mathtt", "mathcal", "mathbb", "mathfrak", "mathrm"
+}
+
+
+def _skip_ws(text, idx):
+    while idx < len(text) and text[idx].isspace():
+        idx += 1
+    return idx
+
+
+def _read_command(text, idx):
+    if idx >= len(text) or text[idx] != "\\":
+        return None, idx
+    end = idx + 1
+    while end < len(text) and (text[end].isalpha() or text[end] == "@"):
+        end += 1
+    if end == idx + 1:
+        return text[idx:end], end
+    return text[idx:end], end
+
+
+def _read_braced_group(text, idx):
+    if idx >= len(text) or text[idx] != "{":
+        return None, idx
+    depth = 0
+    end = idx
+    while end < len(text):
+        if text[end] == "{":
+            depth += 1
+        elif text[end] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[idx:end + 1], end + 1
+        end += 1
+    return None, idx
+
+
+def _read_script_value(text, idx):
+    idx = _skip_ws(text, idx)
+    if idx >= len(text):
+        return None, idx
+    if text[idx] == "{":
+        return _read_braced_group(text, idx)
+    if text[idx] == "\\":
+        command, command_end = _read_command(text, idx)
+        if command is None:
+            return None, idx
+        next_idx = _skip_ws(text, command_end)
+        if next_idx < len(text) and text[next_idx] == "{":
+            group, group_end = _read_braced_group(text, next_idx)
+            if group is not None:
+                return command + group, group_end
+        return command, command_end
+    return text[idx], idx + 1
+
+
+def _normalize_symbol(symbol):
+    return re.sub(r"\s+", "", symbol)
+
 
 def extract_math_symbols(content):
     cleaned = strip_explicit_math_text(content)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
     cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
     cleaned = re.sub(r"\\(?:left|right|,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
-    cleaned = re.sub(r"[_^]\s*(?:\{[^{}]*\}|\\[A-Za-z@]+|[A-Za-z0-9]+)", " ", cleaned)
-    commands = re.findall(r"\\[A-Za-z@]+", cleaned)
     symbols = set()
-    for command in commands:
-        name = command[1:]
-        if name in GREEK_MATH_SYMBOLS:
-            symbols.add(command)
-    cleaned = re.sub(r"\\[A-Za-z@]+\*?", " ", cleaned)
-    cleaned = re.sub(r"[\{\}&=+\-*/(),.;:<>'\"\[\]]", " ", cleaned)
-    for token in re.findall(r"(?<![A-Za-z])([A-Za-z])(?![A-Za-z])", cleaned):
-        if token in MATH_SYMBOL_STOPWORDS:
+    idx = 0
+    while idx < len(cleaned):
+        base = None
+        next_idx = idx + 1
+        char = cleaned[idx]
+
+        if char.isalpha():
+            prev_alpha = idx > 0 and cleaned[idx - 1].isalpha()
+            next_alpha = idx + 1 < len(cleaned) and cleaned[idx + 1].isalpha()
+            if prev_alpha or next_alpha:
+                idx += 1
+                continue
+            base = char
+            next_idx = idx + 1
+        elif char == "\\":
+            command, command_end = _read_command(cleaned, idx)
+            if command is None:
+                idx += 1
+                continue
+            name = command[1:]
+            if name in GREEK_MATH_SYMBOLS:
+                base = command
+                next_idx = command_end
+            elif name in SYMBOL_DECORATOR_COMMANDS:
+                arg_start = _skip_ws(cleaned, command_end)
+                if arg_start < len(cleaned) and cleaned[arg_start] == "{":
+                    group, group_end = _read_braced_group(cleaned, arg_start)
+                    if group is not None:
+                        base = command + group
+                        next_idx = group_end
+                if base is None:
+                    idx = command_end
+                    continue
+            else:
+                idx = command_end
+                continue
+        else:
+            idx += 1
             continue
-        symbols.add(token)
+
+        symbol = base
+        script_idx = next_idx
+        while True:
+            script_idx = _skip_ws(cleaned, script_idx)
+            if script_idx >= len(cleaned) or cleaned[script_idx] not in "_^":
+                break
+            script_op = cleaned[script_idx]
+            script_val, script_end = _read_script_value(cleaned, script_idx + 1)
+            if script_val is None:
+                break
+            symbol += script_op + script_val
+            script_idx = script_end
+
+        normalized = _normalize_symbol(symbol)
+        if normalized.startswith("\\"):
+            base_name = normalized[1:].split("{", 1)[0]
+            if base_name in MATH_SYMBOL_STOPWORDS:
+                idx = script_idx
+                continue
+        elif normalized in MATH_SYMBOL_STOPWORDS:
+            idx = script_idx
+            continue
+
+        symbols.add(normalized)
+        idx = script_idx
     return symbols
 
 
@@ -700,7 +806,7 @@ def read_existing_symbol_descriptions(path):
         return descriptions
 
     entry_re = re.compile(
-        r"\s*\\glsxtrnewsymbol(?:\[(?P<options>[^\]]*)\])?\{[^{}]+\}\{\\ensuremath\{(?P<symbol>[^{}]+)\}\}\s*$"
+        r"\s*\\glsxtrnewsymbol(?:\[(?P<options>[^\]]*)\])?\{[^{}]+\}\{\\ensuremath\{(?P<symbol>.+)\}\}\s*$"
     )
     description_re = re.compile(r"description\s*=\s*\{(?P<description>.*)\}")
 
