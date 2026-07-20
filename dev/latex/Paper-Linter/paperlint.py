@@ -651,6 +651,52 @@ def _normalize_symbol(symbol):
     return re.sub(r"\s+", "", symbol)
 
 
+def _unwrap_braces(value):
+    if len(value) >= 2 and value[0] == "{" and value[-1] == "}":
+        return value[1:-1]
+    return value
+
+
+def _script_is_ignored_superscript(script_value):
+    raw = _unwrap_braces(script_value)
+    if raw in {"T", "*"}:
+        return True
+    if re.fullmatch(r"\d+", raw):
+        return True
+    if re.fullmatch(r"\d+\\times\d+", raw):
+        return True
+    return False
+
+
+def _canonicalize_script(script_op, script_value):
+    if script_op == "^" and _script_is_ignored_superscript(script_value):
+        return None
+    if script_op == "_":
+        single_char_match = re.fullmatch(r"\{([A-Za-z0-9])\}", script_value)
+        if single_char_match:
+            return script_op + single_char_match.group(1)
+    return script_op + script_value
+
+
+def _canonicalize_symbol(symbol):
+    idx = 0
+    while idx < len(symbol) and symbol[idx] not in "_^":
+        idx += 1
+    base = symbol[:idx]
+    canonical = base
+    while idx < len(symbol):
+        script_op = symbol[idx]
+        script_value, next_idx = _read_script_value(symbol, idx + 1)
+        if script_value is None:
+            canonical += symbol[idx:]
+            break
+        updated = _canonicalize_script(script_op, script_value)
+        if updated is not None:
+            canonical += updated
+        idx = next_idx
+    return canonical
+
+
 def extract_math_symbols(content):
     cleaned = strip_explicit_math_text(content)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
@@ -710,7 +756,7 @@ def extract_math_symbols(content):
             symbol += script_op + script_val
             script_idx = script_end
 
-        normalized = _normalize_symbol(symbol)
+        normalized = _canonicalize_symbol(_normalize_symbol(symbol))
         if normalized.startswith("\\"):
             base_name = normalized[1:].split("{", 1)[0]
             if base_name in MATH_SYMBOL_STOPWORDS:
