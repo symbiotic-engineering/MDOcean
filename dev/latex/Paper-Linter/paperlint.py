@@ -5,7 +5,7 @@ import os
 
 
 def usage():
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
     sys.exit(1)
 
 if len(sys.argv) < 2:
@@ -16,6 +16,7 @@ tex_files = []
 ignored_files = []
 settings_files = []
 output_file = None
+symbol_glossary_file = None
 output_handle = sys.stdout
 use_color = True
 
@@ -189,6 +190,7 @@ in_env = None
 envs = None
 is_document_root = False
 math_text_mix_strings = set()
+current_file_equation_symbols = set()
 
 FLOAT_ENVS = ["figure", "listing", "table"]
 CODE_WARNING_EXCEPTIONS = {
@@ -647,8 +649,7 @@ def sentence_mentions_symbol(sentence_text, symbol):
     return False
 
 
-def check_equation_symbols_defined():
-    warns = []
+def collect_equation_symbol_first_use():
     symbol_first_use = {}
     macro_block_depth = 0
     for i, line in enumerate(tex_lines_clean):
@@ -677,6 +678,49 @@ def check_equation_symbols_defined():
             for symbol in extract_math_symbols(content):
                 if symbol not in symbol_first_use:
                     symbol_first_use[symbol] = i
+    return symbol_first_use
+
+
+def symbol_sort_key(symbol):
+    stripped = symbol[1:] if symbol.startswith("\\") else symbol
+    return (stripped.lower(), symbol.startswith("\\"), symbol)
+
+
+def symbol_to_glossary_label(symbol):
+    stripped = symbol[1:] if symbol.startswith("\\") else symbol
+    safe = re.sub(r"[^A-Za-z0-9]+", "-", stripped).strip("-")
+    if not safe:
+        safe = "symbol"
+    return "sym-%s" % safe
+
+
+def build_symbol_glossary_lines(symbols):
+    lines = []
+    used_labels = set()
+    for symbol in sorted(symbols, key=symbol_sort_key):
+        label_base = symbol_to_glossary_label(symbol)
+        label = label_base
+        suffix = 2
+        while label in used_labels:
+            label = "%s-%d" % (label_base, suffix)
+            suffix += 1
+        used_labels.add(label)
+        lines.append(f"\\glsxtrnewsymbol[description={{}}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
+    return lines
+
+
+def write_symbol_glossary(path, symbols):
+    lines = build_symbol_glossary_lines(symbols)
+    with open(path, "w") as handle:
+        for line in lines:
+            handle.write(line + "\n")
+
+
+def check_equation_symbols_defined():
+    global current_file_equation_symbols
+    warns = []
+    symbol_first_use = collect_equation_symbol_first_use()
+    current_file_equation_symbols = set(symbol_first_use.keys())
 
     if not symbol_first_use:
         return warns
@@ -1884,11 +1928,12 @@ def remove_categories(cat, rem_cat):
 
 def main():
 
-    global output_file, output_handle, use_color, math_text_mix_strings
+    global output_file, symbol_glossary_file, output_handle, use_color, math_text_mix_strings
 
     nr_warnings = 0
     nr_suppressed = 0
     math_text_mix_strings = set()
+    all_equation_symbols = set()
 
     idx = 1
     has_rules = False
@@ -1951,6 +1996,14 @@ def main():
             else:
                 print("Missing file after --output")
                 usage()
+
+        if arg == "--symbol-glossary-output":
+            if idx + 1 < len(sys.argv):
+                symbol_glossary_file = sys.argv[idx + 1]
+                idx += 1
+            else:
+                print("Missing file after --symbol-glossary-output")
+                usage()
         
         if arg == "--error":
             exit_code = True
@@ -1982,6 +2035,8 @@ def main():
             suppressed = []
             for c in checks:
                 add_warn = c[0]()
+                if c[2] == "symbol-mention":
+                    all_equation_symbols.update(current_file_equation_symbols)
                 if c[2] in used_categories:
                     warnings += [(x, c[2]) for x in add_warn]
                 else:
@@ -1997,6 +2052,9 @@ def main():
             write_output("Unique text strings in math environments [math-text-mix]:")
             for text_string in sorted(math_text_mix_strings):
                 write_output("- %s" % text_string)
+        if symbol_glossary_file is not None:
+            write_symbol_glossary(symbol_glossary_file, all_equation_symbols)
+            write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), symbol_glossary_file))
     finally:
         if output_handle is not sys.stdout:
             output_handle.close()

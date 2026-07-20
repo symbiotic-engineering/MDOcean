@@ -4,7 +4,7 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--error]
 
 Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
@@ -15,6 +15,7 @@ For example, `-i typography` only activates the typography rules, whereas `-i al
 If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1 <switch>` (`1` enables, `0` disables).
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
+If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings
