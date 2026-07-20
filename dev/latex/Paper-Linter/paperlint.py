@@ -5,7 +5,7 @@ import os
 
 
 def usage():
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
     sys.exit(1)
 
 if len(sys.argv) < 2:
@@ -16,6 +16,7 @@ tex_files = []
 ignored_files = []
 settings_files = []
 output_file = None
+symbol_glossary_file = None
 output_handle = sys.stdout
 use_color = True
 
@@ -189,6 +190,7 @@ in_env = None
 envs = None
 is_document_root = False
 math_text_mix_strings = set()
+current_file_equation_symbols = set()
 
 FLOAT_ENVS = ["figure", "listing", "table"]
 CODE_WARNING_EXCEPTIONS = {
@@ -564,14 +566,6 @@ def strip_explicit_math_text(content):
         "textsc",
         "mbox",
         "operatorname",
-        "mathrm",
-        "mathit",
-        "mathbf",
-        "mathsf",
-        "mathtt",
-        "mathcal",
-        "mathbb",
-        "mathfrak",
     ]
     pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(explicit_text_commands))
     while True:
@@ -595,25 +589,193 @@ MATH_SYMBOL_STOPWORDS = {
     "e", "i", "d"
 }
 
+SYMBOL_DECORATOR_COMMANDS = {
+    "vec", "mathbf", "boldsymbol", "bm", "hat", "dot", "ddot", "bar", "tilde",
+    "mathit", "mathsf", "mathtt", "mathcal", "mathbb", "mathfrak", "mathrm"
+}
+
+
+def _skip_ws(text, idx):
+    while idx < len(text) and text[idx].isspace():
+        idx += 1
+    return idx
+
+
+def _read_command(text, idx):
+    if idx >= len(text) or text[idx] != "\\":
+        return None, idx
+    end = idx + 1
+    while end < len(text) and (text[end].isalpha() or text[end] == "@"):
+        end += 1
+    if end == idx + 1:
+        return text[idx:end], end
+    return text[idx:end], end
+
+
+def _read_braced_group(text, idx):
+    if idx >= len(text) or text[idx] != "{":
+        return None, idx
+    depth = 0
+    end = idx
+    while end < len(text):
+        if text[end] == "{":
+            depth += 1
+        elif text[end] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[idx:end + 1], end + 1
+        end += 1
+    return None, idx
+
+
+def _read_script_value(text, idx):
+    idx = _skip_ws(text, idx)
+    if idx >= len(text):
+        return None, idx
+    if text[idx] == "{":
+        return _read_braced_group(text, idx)
+    if text[idx] == "\\":
+        command, command_end = _read_command(text, idx)
+        if command is None:
+            return None, idx
+        next_idx = _skip_ws(text, command_end)
+        if next_idx < len(text) and text[next_idx] == "{":
+            group, group_end = _read_braced_group(text, next_idx)
+            if group is not None:
+                return command + group, group_end
+        return command, command_end
+    return text[idx], idx + 1
+
+
+def _normalize_symbol(symbol):
+    return re.sub(r"\s+", "", symbol)
+
+
+def _unwrap_braces(value):
+    if len(value) >= 2 and value[0] == "{" and value[-1] == "}":
+        return value[1:-1]
+    return value
+
+
+def _script_is_ignored_superscript(script_value):
+    raw = _unwrap_braces(script_value)
+    if raw in {"T", "*"}:
+        return True
+    if re.fullmatch(r"[+-]?\d+", raw):
+        return True
+    if re.fullmatch(r"[+-]?\d+\\times[+-]?\d+", raw):
+        return True
+    return False
+
+
+def _canonicalize_script(script_op, script_value):
+    normalized_value = script_value
+    if script_value.startswith("{") and script_value.endswith("}"):
+        normalized_value = "{" + _normalize_scripts_in_expression(script_value[1:-1]) + "}"
+    if script_op == "^" and _script_is_ignored_superscript(normalized_value):
+        return None
+    if script_op == "_":
+        single_char_match = re.fullmatch(r"\{([A-Za-z0-9])\}", normalized_value)
+        if single_char_match:
+            return script_op + single_char_match.group(1)
+    return script_op + normalized_value
+
+
+def _normalize_scripts_in_expression(expr):
+    canonical = ""
+    idx = 0
+    while idx < len(expr):
+        if expr[idx] not in "_^":
+            canonical += expr[idx]
+            idx += 1
+            continue
+        script_op = expr[idx]
+        script_value, next_idx = _read_script_value(expr, idx + 1)
+        if script_value is None:
+            canonical += expr[idx:]
+            break
+        updated = _canonicalize_script(script_op, script_value)
+        if updated is not None:
+            canonical += updated
+        idx = next_idx
+    return canonical
+
+
+def _canonicalize_symbol(symbol):
+    return _normalize_scripts_in_expression(symbol)
+
 
 def extract_math_symbols(content):
     cleaned = strip_explicit_math_text(content)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
     cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
     cleaned = re.sub(r"\\(?:left|right|,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
-    cleaned = re.sub(r"[_^]\s*(?:\{[^{}]*\}|\\[A-Za-z@]+|[A-Za-z0-9]+)", " ", cleaned)
-    commands = re.findall(r"\\[A-Za-z@]+", cleaned)
     symbols = set()
-    for command in commands:
-        name = command[1:]
-        if name in GREEK_MATH_SYMBOLS:
-            symbols.add(command)
-    cleaned = re.sub(r"\\[A-Za-z@]+\*?", " ", cleaned)
-    cleaned = re.sub(r"[\{\}&=+\-*/(),.;:<>'\"\[\]]", " ", cleaned)
-    for token in re.findall(r"(?<![A-Za-z])([A-Za-z])(?![A-Za-z])", cleaned):
-        if token in MATH_SYMBOL_STOPWORDS:
+    idx = 0
+    while idx < len(cleaned):
+        base = None
+        next_idx = idx + 1
+        char = cleaned[idx]
+
+        if char.isalpha():
+            prev_alpha = idx > 0 and cleaned[idx - 1].isalpha()
+            next_alpha = idx + 1 < len(cleaned) and cleaned[idx + 1].isalpha()
+            if prev_alpha or next_alpha:
+                idx += 1
+                continue
+            base = char
+            next_idx = idx + 1
+        elif char == "\\":
+            command, command_end = _read_command(cleaned, idx)
+            if command is None:
+                idx += 1
+                continue
+            name = command[1:]
+            if name in GREEK_MATH_SYMBOLS:
+                base = command
+                next_idx = command_end
+            elif name in SYMBOL_DECORATOR_COMMANDS:
+                arg_start = _skip_ws(cleaned, command_end)
+                if arg_start < len(cleaned) and cleaned[arg_start] == "{":
+                    group, group_end = _read_braced_group(cleaned, arg_start)
+                    if group is not None:
+                        base = command + group
+                        next_idx = group_end
+                if base is None:
+                    idx = command_end
+                    continue
+            else:
+                idx = command_end
+                continue
+        else:
+            idx += 1
             continue
-        symbols.add(token)
+
+        symbol = base
+        script_idx = next_idx
+        while True:
+            script_idx = _skip_ws(cleaned, script_idx)
+            if script_idx >= len(cleaned) or cleaned[script_idx] not in "_^":
+                break
+            script_op = cleaned[script_idx]
+            script_val, script_end = _read_script_value(cleaned, script_idx + 1)
+            if script_val is None:
+                break
+            symbol += script_op + script_val
+            script_idx = script_end
+
+        normalized = _canonicalize_symbol(_normalize_symbol(symbol))
+        if normalized.startswith("\\"):
+            base_name = normalized[1:].split("{", 1)[0]
+            if base_name in MATH_SYMBOL_STOPWORDS:
+                idx = script_idx
+                continue
+        elif normalized in MATH_SYMBOL_STOPWORDS:
+            idx = script_idx
+            continue
+
+        symbols.add(normalized)
+        idx = script_idx
     return symbols
 
 
@@ -647,8 +809,7 @@ def sentence_mentions_symbol(sentence_text, symbol):
     return False
 
 
-def check_equation_symbols_defined():
-    warns = []
+def collect_equation_symbol_first_use():
     symbol_first_use = {}
     macro_block_depth = 0
     for i, line in enumerate(tex_lines_clean):
@@ -677,6 +838,163 @@ def check_equation_symbols_defined():
             for symbol in extract_math_symbols(content):
                 if symbol not in symbol_first_use:
                     symbol_first_use[symbol] = i
+    return symbol_first_use
+
+
+def symbol_sort_key(symbol):
+    stripped = symbol[1:] if symbol.startswith("\\") else symbol
+    return (stripped.lower(), symbol.startswith("\\"), symbol)
+
+
+def symbol_to_glossary_label(symbol):
+    stripped = symbol[1:] if symbol.startswith("\\") else symbol
+    safe = re.sub(r"[^A-Za-z0-9]+", "-", stripped).strip("-")
+    if not safe:
+        safe = "symbol"
+    return "sym-%s" % safe
+
+
+def _split_top_level_options(options):
+    parts = []
+    current = ""
+    depth = 0
+    for ch in options:
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            if depth > 0:
+                depth -= 1
+        if ch == "," and depth == 0:
+            if current.strip():
+                parts.append(current.strip())
+            current = ""
+            continue
+        current += ch
+    if current.strip():
+        parts.append(current.strip())
+    return parts
+
+
+def _extract_description_option(options):
+    for option in _split_top_level_options(options):
+        if "=" not in option:
+            continue
+        key, value = option.split("=", 1)
+        if key.strip() != "description":
+            continue
+        value = value.strip()
+        group, end_idx = _read_braced_group(value, 0)
+        if group is not None and end_idx == len(value):
+            return _unwrap_braces(group)
+        return value
+    return None
+
+
+def _parse_glsxtrnewsymbol_line(line):
+    stripped = line.strip()
+    comment_idx = re.search(r"(?<!\\)%", stripped)
+    if comment_idx:
+        stripped = stripped[:comment_idx.start()].rstrip()
+    if not stripped.startswith(r"\glsxtrnewsymbol"):
+        return None, None
+
+    idx = len(r"\glsxtrnewsymbol")
+    idx = _skip_ws(stripped, idx)
+    options = ""
+    if idx < len(stripped) and stripped[idx] == "[":
+        end_idx = idx + 1
+        brace_depth = 0
+        while end_idx < len(stripped):
+            char = stripped[end_idx]
+            if char == "{":
+                brace_depth += 1
+            elif char == "}":
+                if brace_depth > 0:
+                    brace_depth -= 1
+            elif char == "]" and brace_depth == 0:
+                break
+            end_idx += 1
+        if end_idx >= len(stripped) or stripped[end_idx] != "]":
+            return None, None
+        options = stripped[idx + 1:end_idx]
+        idx = end_idx + 1
+
+    idx = _skip_ws(stripped, idx)
+    label_group, idx = _read_braced_group(stripped, idx)
+    if label_group is None:
+        return None, None
+    idx = _skip_ws(stripped, idx)
+    ensuremath_group, idx = _read_braced_group(stripped, idx)
+    if ensuremath_group is None:
+        return None, None
+    if _skip_ws(stripped, idx) != len(stripped):
+        return None, None
+
+    ensuremath_content = _unwrap_braces(ensuremath_group).strip()
+    if not ensuremath_content.startswith(r"\ensuremath"):
+        return None, None
+    symbol_idx = _skip_ws(ensuremath_content, len(r"\ensuremath"))
+    symbol_group, symbol_end = _read_braced_group(ensuremath_content, symbol_idx)
+    if symbol_group is None:
+        return None, None
+    if _skip_ws(ensuremath_content, symbol_end) != len(ensuremath_content):
+        return None, None
+
+    symbol = _unwrap_braces(symbol_group)
+    description = _extract_description_option(options)
+    return symbol, description
+
+
+def read_existing_symbol_descriptions(path):
+    descriptions = {}
+    if not os.path.exists(path):
+        return descriptions
+
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return descriptions
+
+    for line in lines:
+        symbol, description = _parse_glsxtrnewsymbol_line(line)
+        if symbol is None or description is None:
+            continue
+        symbol = _canonicalize_symbol(_normalize_symbol(symbol))
+        if description or symbol not in descriptions:
+            descriptions[symbol] = description
+    return descriptions
+
+
+def build_symbol_glossary_lines(symbols, descriptions):
+    lines = []
+    used_labels = set()
+    for symbol in sorted(symbols, key=symbol_sort_key):
+        label_base = symbol_to_glossary_label(symbol)
+        label = label_base
+        suffix = 2
+        while label in used_labels:
+            label = "%s-%d" % (label_base, suffix)
+            suffix += 1
+        used_labels.add(label)
+        description = descriptions.get(symbol, "")
+        lines.append(f"\\glsxtrnewsymbol[description={{{description}}}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
+    return lines
+
+
+def write_symbol_glossary(path, symbols):
+    descriptions = read_existing_symbol_descriptions(path)
+    lines = build_symbol_glossary_lines(symbols, descriptions)
+    with open(path, "w") as handle:
+        for line in lines:
+            handle.write(line + "\n")
+
+
+def check_equation_symbols_defined():
+    global current_file_equation_symbols
+    warns = []
+    symbol_first_use = collect_equation_symbol_first_use()
+    current_file_equation_symbols = set(symbol_first_use.keys())
 
     if not symbol_first_use:
         return warns
@@ -1884,11 +2202,12 @@ def remove_categories(cat, rem_cat):
 
 def main():
 
-    global output_file, output_handle, use_color, math_text_mix_strings
+    global output_file, symbol_glossary_file, output_handle, use_color, math_text_mix_strings
 
     nr_warnings = 0
     nr_suppressed = 0
     math_text_mix_strings = set()
+    all_equation_symbols = set()
 
     idx = 1
     has_rules = False
@@ -1951,6 +2270,14 @@ def main():
             else:
                 print("Missing file after --output")
                 usage()
+
+        if arg == "--symbol-glossary-output":
+            if idx + 1 < len(sys.argv):
+                symbol_glossary_file = sys.argv[idx + 1]
+                idx += 1
+            else:
+                print("Missing file after --symbol-glossary-output")
+                usage()
         
         if arg == "--error":
             exit_code = True
@@ -1982,6 +2309,8 @@ def main():
             suppressed = []
             for c in checks:
                 add_warn = c[0]()
+                if c[2] == "symbol-mention":
+                    all_equation_symbols.update(current_file_equation_symbols)
                 if c[2] in used_categories:
                     warnings += [(x, c[2]) for x in add_warn]
                 else:
@@ -1997,6 +2326,9 @@ def main():
             write_output("Unique text strings in math environments [math-text-mix]:")
             for text_string in sorted(math_text_mix_strings):
                 write_output("- %s" % text_string)
+        if symbol_glossary_file is not None:
+            write_symbol_glossary(symbol_glossary_file, all_equation_symbols)
+            write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), symbol_glossary_file))
     finally:
         if output_handle is not sys.stdout:
             output_handle.close()
