@@ -15,7 +15,7 @@ For example, `-i typography` only activates the typography rules, whereas `-i al
 If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1 <switch>` (`1` enables, `0` disables).
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
-If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows.
+If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows. If the file already exists, matching symbols keep their existing `description={...}` values and only new symbols receive a blank description.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings

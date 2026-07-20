@@ -694,7 +694,35 @@ def symbol_to_glossary_label(symbol):
     return "sym-%s" % safe
 
 
-def build_symbol_glossary_lines(symbols):
+def read_existing_symbol_descriptions(path):
+    descriptions = {}
+    if not os.path.exists(path):
+        return descriptions
+
+    entry_re = re.compile(
+        r"\s*\\glsxtrnewsymbol(?:\[(?P<options>[^\]]*)\])?\{[^{}]+\}\{\\ensuremath\{(?P<symbol>[^{}]+)\}\}\s*$"
+    )
+    description_re = re.compile(r"description\s*=\s*\{(?P<description>.*)\}")
+
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return descriptions
+
+    for line in lines:
+        match = entry_re.match(line.strip())
+        if not match:
+            continue
+        options = match.group("options") or ""
+        description_match = description_re.search(options)
+        if not description_match:
+            continue
+        descriptions[match.group("symbol")] = description_match.group("description")
+    return descriptions
+
+
+def build_symbol_glossary_lines(symbols, descriptions):
     lines = []
     used_labels = set()
     for symbol in sorted(symbols, key=symbol_sort_key):
@@ -705,12 +733,14 @@ def build_symbol_glossary_lines(symbols):
             label = "%s-%d" % (label_base, suffix)
             suffix += 1
         used_labels.add(label)
-        lines.append(f"\\glsxtrnewsymbol[description={{}}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
+        description = descriptions.get(symbol, "")
+        lines.append(f"\\glsxtrnewsymbol[description={{{description}}}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
     return lines
 
 
 def write_symbol_glossary(path, symbols):
-    lines = build_symbol_glossary_lines(symbols)
+    descriptions = read_existing_symbol_descriptions(path)
+    lines = build_symbol_glossary_lines(symbols, descriptions)
     with open(path, "w") as handle:
         for line in lines:
             handle.write(line + "\n")
