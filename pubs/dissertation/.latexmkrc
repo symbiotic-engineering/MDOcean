@@ -16,13 +16,16 @@ print "TEXINPUTS after: @TEXINPUTS\n";
 
 # Ensure bib files are found by latexmk
 print "BIBINPUTS before: @BIBINPUTS\n";
-push @BIBINPUTS, "$root/", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
+push @BIBINPUTS, "$root/", "$root/../shared", "$root/../applied-ocean-research-model", "$root/../renewable-energy-mdo", "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM";
 print "BIBINPUTS after: @BIBINPUTS\n";
 
 # Ensure bib files are found by BibTeX
 $ENV{'BIBINPUTS'} = join(
     ':',
     "$root",
+    "$root/../shared",
+    "$root/../applied-ocean-research-model",
+    "$root/../renewable-energy-mdo",
     "$root/../../mdocean/simulation/modules/OpenFLASH/pubs/JFM",
     $ENV{'BIBINPUTS'} // ''
 );

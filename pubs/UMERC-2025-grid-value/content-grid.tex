@@ -97,29 +97,29 @@ The ROM is used only to capture the effect of WEC design on the hourly CEM varia
 
 First we nondimensionalize to reduce the design space.
 The $CW(H_s,T_e)$ equation has 18 quantities: $CW$, $H_s$, $T_e$, 6 design variables, and 9 parameters.
-The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\mathbf{\Pi_1}$ without approximation (see \cref{sec:appendix-grid}).
+The Buckingham-$\pi$ theorem reduces this to 15 dimensionless variables $\gls{sym-Pi-1}$ without approximation (see \cref{sec:appendix-grid}).
 To further reduce, we leverage rigid body dynamics, which dictates the following:
 \begin{equation}
     \label{eq:CW-fraction}
-    \frac{CW}{CW_{max}} = \frac{4 \mathcal{D}\eta_{PTO}}{G} \frac{\omega^2}{g k}  \frac{\Re(\hat{Z}_h(\mathbf{\Pi_1}))~ \Re(\hat{Z}_u(\mathbf{\Pi_1}))}{\left|\hat{Z}_h(\mathbf{\Pi_1})+\hat{Z}_u(\mathbf{\Pi_1})+\hat{Z}_d(\mathbf{\Pi_1})\right|^2}
+    \frac{CW}{CW_{max}} = \frac{4 \mathcal{D}\eta_{PTO}}{G} \frac{\omega^2}{g k}  \frac{\Re(\hat{Z}_h(\gls{sym-Pi-1}))~ \Re(\hat{Z}_u(\gls{sym-Pi-1}))}{\left|\hat{Z}_h(\gls{sym-Pi-1})+\hat{Z}_u(\gls{sym-Pi-1})+\hat{Z}_d(\gls{sym-Pi-1})\right|^2}
 \end{equation}
 where complex impedances $\hat{Z}$ have subscript $u$ for control, $h$ for hydrodynamic radiation, and $d$ for drag.
 $\mathcal{D}$ is defined in the appendix.
 % response amplitude operator $\widehat{RAO}$ is the complex ratio of WEC motion to wave amplitude, $\hat{X}/\eta$.
-The ROM seeks to approximate the three functions $\hat{Z}(\mathbf{\Pi_1})$ as functions of a reduced set of values $\mathbf{\Pi_2}$.
-Before the design optimization, the CEM is run for all combinations of $\mathbf{\Pi_2}$.
-During design optimization, we perform a least-squares fit over an error model to find the reduced groups $\mathbf{\Pi_2}$ at each iteration, and then use a surrogate model to find CEM outputs as a function of $\mathbf{\Pi_2}$. 
+The ROM seeks to approximate the three functions $\hat{Z}(\gls{sym-Pi-1})$ as functions of a reduced set of values $\gls{sym-Pi-2}$.
+Before the design optimization, the CEM is run for all combinations of $\gls{sym-Pi-2}$.
+During design optimization, we perform a least-squares fit over an error model to find the reduced groups $\gls{sym-Pi-2}$ at each iteration, and then use a surrogate model to find CEM outputs as a function of $\gls{sym-Pi-2}$. 
 Currently, the surrogate model is a lookup table with linear interpolation.
 Future work could develop a mechanistic surrogate model to understand CEM driving factors and allow extrapolation to different grid scenarios.
 
-Two approaches are possible in selecting $\mathbf{\Pi_2}$ and the corresponding error model: a pole-zero description of the dynamics to obtain a low-order transfer function, or a hydrodynamics-informed curve fit.
-A pole-zero description, $\mathbf{\Pi_{2,pz}}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics. 
+Two approaches are possible in selecting $\gls{sym-Pi-2}$ and the corresponding error model: a pole-zero description of the dynamics to obtain a low-order transfer function, or a hydrodynamics-informed curve fit.
+A pole-zero description, $\gls{sym-Pi-2-pz}$, is easy to implement via standard system identification tools, but may require a high order to adequately capture the dynamics. 
 A variety of existing WEC models use this \cite{bacelli_system_2017} or similar approaches \cite{kristiansen_state-space_2005}. 
 \Cref{sec:appendix-grid} shows the equation for an arbitrary number of poles and zeros.
-Alternatively, a custom hydrodynamics curve fit, $\mathbf{\Pi_{2,hyd}}$, offers more accuracy at lower order using deep mechanistic understanding of the physics.
+Alternatively, a custom hydrodynamics curve fit, $\gls{sym-Pi-2-hyd}$, offers more accuracy at lower order using deep mechanistic understanding of the physics.
 \Cref{sec:appendix-grid} shows a fit to describe radiation impedance $\hat{Z}_h$ as a function of $kh$ using only two parameters.
 
-This study evaluates a second-order pole-zero model $\mathbf{\Pi_{2,pz}=(\zeta,\omega_n)}$ to fit the closed loop system compliance, $\hat{X}/\hat{F}=1/(i\omega(\hat{Z}_h+\hat{Z}_u+\hat{Z}_d))$,  but finds a poor fit.
+This study evaluates a second-order pole-zero model $\gls{sym-Pi-2-pz-zeta-omega-n}$ to fit the closed loop system compliance, $\hat{X}/\hat{F}=1/(i\omega(\hat{Z}_h+\hat{Z}_u+\hat{Z}_d))$,  but finds a poor fit.
 Specifically, \cref{fig:bode} shows that for the nominal RM3, the model is valid only at frequencies at and below resonance.
 Capturing behavior above resonance would require a higher order model such as one with five poles, two standard zeros, and two right half plane zeros to capture the abrupt increase in phase.
 This is similar to another study where a point absorber intrinsic impedance $\hat{Z}_h + \hat{Z}_d$ was fit with three poles and one right half plane zero \cite{bacelli_system_2017}.
@@ -133,7 +133,7 @@ While it doesn't affect the shape of $\hat{Z}(\omega)$, stiffness $K$ also shows
 Difficulty capturing high-frequency behavior is expected from the model structure. 
 A second-order system has equivalent damping $B=\Re(\hat{F}/(i\omega\hat{X}))=2\zeta/\omega_n$, which is constant across frequency, and equivalent reactance $K-(m+A)/\omega^2=\Re(\hat{F}/\hat{X})\sim 1-\omega^2/\omega_n^2$, which only permits added mass frequency-dependence of the form $A = A_\infty + A_0/\omega^2$ \cite{franklin2014feedback}.
 This does not align with the true shape of $\hat{Z}_h(\omega)$, in which $B$ decreases (perhaps after an initial increase) and $A$ often has local minima and maxima.
-Future work should better explore hydrodynamic curve fits $\mathbf{\Pi_{2,hyd}}$.
+Future work should better explore hydrodynamic curve fits $\gls{sym-Pi-2-hyd}$.
 %Combined with the impedance relation $\hat{Z}=1/\widehat{RAO} \cdot \hat{F}/\eta$ for excitation force $\hat{F}$, and the optimal reactive control law $B_u(\omega) = \Im(\hat{Z}(\omega))/(2\omega)$, this forces a form for the control damping related to $\hat{F}/\eta$ the excitation coefficient.
 
 

@@ -59,13 +59,13 @@ The first-order hydrodynamic force phasors $\vec{\hat{F}}$ for interacting float
 where, under monochromatic forcing,
 \begin{equation}\label{eq:hydro-forces-expanded}
 \begin{aligned}
-    \vec{\hat{F}}_{e} &= \vec{\gamma}\,\hat{\zeta},&~~
+    \vec{\hat{F}}_{e} &= \gls{sym-vec-gamma}\,\hat{\zeta},&~~
     \vec{\hat{F}}_{rad} &= -\mathbf{A}_h\vec{\hat{\ddot{\xi}}} - \mathbf{B}_h\vec{\hat{\dot{\xi}}},&~~
     \vec{\hat{F}}_{res} &= -\mathbf{K}_h\vec{\hat{\xi}}.
 \end{aligned}
 \end{equation}
 Here $\vec{\hat{\xi}}$ is the body displacement phasor vector from the origin at the center of the float at the still waterline.
-The hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, and $\mathbf{K}_h$ are the wave excitation vector, added mass matrix, radiation damping matrix, and hydrostatic stiffness matrix, respectively.
+The hydrodynamic coefficients $\gls{sym-vec-gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, and $\mathbf{K}_h$ are the wave excitation vector, added mass matrix, radiation damping matrix, and hydrostatic stiffness matrix, respectively.
 
 The displacement vector $\vec{\hat{\xi}}$ contains a state for each degree of freedom.
 We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
@@ -76,10 +76,10 @@ A two-body heaving point absorber that rigidly locks the bodies in a storm follo
     \end{bmatrix}, ~~
     \vec{\hat{\xi}}_{st}=\begin{bmatrix}\hat{\xi}_m 
     \end{bmatrix}, ~~
-     \vec{\gamma}_{op} = \begin{bmatrix}
+     \gls{sym-vec-gamma}_{op} = \begin{bmatrix}
         \gamma_f \\ \gamma_s
     \end{bmatrix},~~
-     \vec{\gamma}_{st} = \begin{bmatrix}
+     \gls{sym-vec-gamma}_{st} = \begin{bmatrix}
         \gamma_m
     \end{bmatrix}.
 \end{equation}
@@ -101,7 +101,7 @@ Operational hydrodynamic matrices are symmetric $2\times 2$:
 while storm (merged-body) coefficients are scalar:
 \begin{equation}\label{eq:st-hydro-coeffs}
 \begin{aligned}
-\vec{\gamma}_{st}&=\gamma_{m}=\Sigma~\vec{\gamma}_{op},&
+\gls{sym-vec-gamma}_{st}&=\gamma_{m}=\Sigma~\gls{sym-vec-gamma}_{op},&
 ~\mathbf{A}_{h,st}&=A_m=\Sigma~\mathbf{A}_{h,op}, \\
 ~\mathbf{B}_{h,st}&=B_m=\Sigma~\mathbf{B}_{h,op},&
 ~\mathbf{K}_{h,st}&=K_m=\Sigma~\mathbf{K}_{h,op}.
@@ -456,33 +456,33 @@ Forces include wave excitation $\vec{F}_e$, hydrodynamic radiation $\vec{F}_{rad
 where, in the frequency domain under monochromatic forcing,
 \begin{equation}\label{eq:eom-forces}
 \begin{aligned}
-    \vec{F}_{e}(t)   &= \Re\!\left(\vec{\gamma}\,\tilde{\zeta}(t)\right),
+    \vec{F}_{e}(t)   &= \Re\!\left(\gls{sym-vec-gamma}\,\tilde{\zeta}(t)\right),
     & \vec{F}_{rad}(t) &= -\mathbf{A}_h\ddot{\vec{\xi}}(t) - \mathbf{B}_h\dot{\vec{\xi}}(t), \\
     \vec{F}_{res}(t) &= -\mathbf{K}_h\vec{\xi}(t),
-    & \vec{F}_{d}(t)   &= -\mathbf{B}_d\dot{\vec{\xi}}(t) + \Re\!\left(\vec{\gamma}_d\,\tilde{\zeta}(t)\right), \\
+    & \vec{F}_{d}(t)   &= -\mathbf{B}_d\dot{\vec{\xi}}(t) + \Re\!\left(\gls{sym-vec-gamma-d}\,\tilde{\zeta}(t)\right), \\
     \vec{F}_{p}(t)   &= -\mathbf{B}_p\dot{\vec{\xi}}(t) - \mathbf{K}_p\vec{\xi}(t).
 \end{aligned}
 \end{equation}
 for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in \Cref{sec:hydro}.
 The mass matrix is:
 \begin{equation}
-\mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
+\gls{sym-M-op}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \gls{sym-M-storm}=\begin{bmatrix}m_f + m_s \end{bmatrix}
 \end{equation}
 
 \ifdefined\DISSERTATION
-    For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\vec{\gamma}_d$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
-    The excitation coefficients $\vec{\gamma}$ and $\vec{\gamma}_d$ are complex, and all other coefficients are real.
+    For each force component, a linear or quasi-linear model is adopted, with coefficients $\gls{sym-vec-gamma}$, $\gls{sym-A-h-mat}$, $\gls{sym-B-h-mat}$, $\gls{sym-K-h-mat}$ from the hydrodynamics module and $\gls{sym-B-d-mat}$, $\gls{sym-vec-gamma-d}$, $\gls{sym-B-p-mat}$, and $\gls{sym-K-p-mat}$ to be derived in the following sections.
+    The excitation coefficients $\gls{sym-vec-gamma}$ and $\gls{sym-vec-gamma-d}$ are complex, and all other coefficients are real.
 \else
-    Hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ come from \Cref{sec:hydro};
-    drag coefficients $\mathbf{B_d}$, $\vec{\gamma}_d$ are derived in \Cref{sec:drag};
-    PTO coefficients $\mathbf{B_p}$, $\mathbf{K_p}$ are derived in \Cref{sec:appendix-pto-model,sec:optimal-control}.
-    The excitation coefficients $\vec{\gamma}$ and $\vec{\gamma}_d$ are complex;
+    Hydrodynamic coefficients $\gls{sym-vec-gamma}$, $\gls{sym-A-h-mat}$, $\gls{sym-B-h-mat}$, $\gls{sym-K-h-mat}$ come from \Cref{sec:hydro};
+    drag coefficients $\gls{sym-B-d-mat}$, $\gls{sym-vec-gamma-d}$ are derived in \Cref{sec:drag};
+    PTO coefficients $\gls{sym-B-p-mat}$, $\gls{sym-K-p-mat}$ are derived in \Cref{sec:appendix-pto-model,sec:optimal-control}.
+    The excitation coefficients $\gls{sym-vec-gamma}$ and $\gls{sym-vec-gamma-d}$ are complex;
     all others are real.
 \fi
 
 In the frequency domain, the complex transfer function from real regular wave height $H$ to the vector of complex body velocity phasors $\vec{\hat{\dot{\xi}}}$ is then: 
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}(\vec{\gamma}+\vec{\gamma}_d)
+    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}(\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
 \end{equation}
 where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\mathbf{Z}_{i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
@@ -795,14 +795,14 @@ The amplitude of the sinusoidal approximation equals $\frac{8}{3\pi}\approx0.85$
 Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
 \begin{equation}\label{eq:drag-damping-excitation}
     \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
-    + \vec{\gamma}_{d} \hat{\zeta}
+    + \gls{sym-vec-gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
-Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
+Explicit expressions for $\mathbf{B}_d$ and $\gls{sym-vec-gamma-d}$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
-The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$.
+The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\mathbf{B}_{d}$ and $\gls{sym-vec-gamma}_{d}$.
 \Cref{sec:appendix-drag} discusses details and control implications. 
 
 %\subsubsection{Power Saturation}

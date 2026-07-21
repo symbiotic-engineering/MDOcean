@@ -7796,6 +7796,49 @@ stages:
           persist: false
     desc: Automatically generated from the 'paperlint-re' stage in 
       calkit.yaml. Changes made here will be overwritten.
+  paperlint-umerc:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/Paper-Linter/paperlint.py 
+      pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex --settings 
+      dev/latex/Paper-Linter/settings.txt --output 
+      dev/latex/Paper-Linter/lint-umerc.txt --symbol-glossary-output 
+      pubs/shared/symbol-glossary-umerc.tex
+    deps:
+      - dev/latex/Paper-Linter/paperlint.py
+      - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      - pubs/UMERC-2025-grid-value/references.bib
+      - .calkit/env-locks/pubs
+    outs:
+      - dev/latex/Paper-Linter/lint-umerc.txt:
+          cache: false
+          persist: false
+      - pubs/shared/symbol-glossary-umerc.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'paperlint-umerc' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  paperlint-jfm:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/Paper-Linter/paperlint.py 
+      mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex 
+      --settings dev/latex/Paper-Linter/settings.txt --output 
+      dev/latex/Paper-Linter/lint-jfm.txt --symbol-glossary-output 
+      pubs/shared/symbol-glossary-jfm.tex
+    deps:
+      - dev/latex/Paper-Linter/paperlint.py
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - .calkit/env-locks/pubs
+    outs:
+      - dev/latex/Paper-Linter/lint-jfm.txt:
+          cache: false
+          persist: false
+      - pubs/shared/symbol-glossary-jfm.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'paperlint-jfm' stage in 
+      calkit.yaml. Changes made here will be overwritten.
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc 
@@ -7898,7 +7941,9 @@ stages:
       - pubs/renewable-energy-mdo/commands-re.tex
       - pubs/renewable-energy-mdo/content-re.tex
       - pubs/UMERC-2025-grid-value/
-      - pubs/dissertation/references.bib
+      - pubs/shared/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/renewable-energy-mdo/zotero-meem-refs.bib
       - pubs/shared/shared-pkg.tex
       - pubs/shared/table-column-specs.tex
       - pubs/shared/figure-widths.tex
