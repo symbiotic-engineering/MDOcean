@@ -100,7 +100,9 @@ Single-objective algorithms typically require adaptation for multiple objectives
     In the epsilon-constraint method, one objective is repeatedly optimized while a constraint on the second objective is swept, tracing out the Pareto front.
     Here the single-objective optima of each objective set the constraint values: the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ becomes the center of a circle, and twenty constraint values are taken at equal angular spacing on that circle.
     The MATLAB \texttt{paretosearch} function then executes a constrained multi-objective pattern search \citep{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
+    This retains the benefit of gradient based optimization; guarantee of local optimality; faster convergence.
 \else
     While derivative criteria for local Pareto optimality exist \cite{desideri_multiple-gradient_2012}, solvers using them are rare, since Pareto front generation demands exploration rather than the pure exploitation that gradient methods excel at.
     This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP --- repeatedly optimizing one objective while sweeping a constraint on the other, with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \citep{custodio_direct_2011}, which maximizes Pareto hypervolume and spread to fill the gaps.
+    This retains the benefit of gradient based optimization; guarantee of local optimality; faster convergence.
 \fi
