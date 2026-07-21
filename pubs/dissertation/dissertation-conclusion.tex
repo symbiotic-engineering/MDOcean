@@ -47,6 +47,14 @@ This provides understanding not just of the system's behavior under one set of i
 While these simple models and methods do not replace more costly numerical tools, they provide necessary yet overlooked insight that is particularly valuable early in the design cycle and can blend symbiotically with the results of more detailed methods.
 
 \subsection{Key Findings}
+\Cref{ch:modeling} shows that for the nominal RM3 design, the \texttt{MDOcean} simulation achieves a runtime of \resultsAOR[simRuntime] across all disciplinary modules and sea states.
+The runtime of its dynamics and control module represents a 1000x speedup over the dynamics-only WEC-Sim time-domain simulation.
+Furthermore, its MEEM hydrodynamics module achieves a runtime of \resultsAOR[meemRuntime] for each frequency.
+\Cref{ch:hydrodynamic}'s deep dive into the numerics of the MEEM model uncovers the polynomial dependence of this runtime on the number of terms retained in the infinite series,
+and derives a prediction scheme for the number of terms required to achieve a desired accuracy for various geometries. 
+Using the prediction scheme to target 1\% convergence yields results that obtain 2\% convergence and avoids using 30+ more terms than necessary for over 95\% of geometries.
+For slanted geometries with potential sampled at the radial midpoint of each fluid region, errors in sampled potential are shown to be less than 3\% for a representative geometry,
+and error in the damping coefficient is less than 5\% using 30 subdivisions for slant angles as steep as 15 degrees from vertical.
 Direct comparisons with a boundary element method solver demonstrate that MEEM achieves comparable hydrodynamic coefficients while converging faster with substantially smaller matrices.
 This establishes the method's practical computational advantage and strengthens understanding of the link between its mathematical structure and numerical properties.
 
