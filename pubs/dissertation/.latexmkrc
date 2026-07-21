@@ -51,7 +51,7 @@ add_cus_dep('slo', 'sls', 0, 'run_makeglossaries');
 # sub run_makeglossaries {
 #     return system("makeglossaries -d '$aux_dir' sampleThesis");
 # }
-$clean_ext .= " acr acn alg glo gls glg";
+$clean_ext .= " acr acn alg glo gls glg glo-abr gls-abr cld cln mdd mdn ord orn std stn ecd ecn dyd dyn opd opn swd swn wad wan sad san slo sls";
 
 sub run_makeglossaries {
     my ($base_name, $path) = fileparse( $_[0] );
