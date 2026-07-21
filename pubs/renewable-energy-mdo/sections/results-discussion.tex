@@ -8,12 +8,18 @@ The section organizes results by the type of insight they provide; raw results o
 
 \subsubsection{Larger Bulk Geometry}
 \Cref{remdo:fig:overlaid-geometry} compares the minimum-LCOE geometry to the nominal.
-The optimized design is larger in all bulk dimensions, most strikingly in float diameter: $D_f$ nearly doubles from 20~m to \resultsRE[DfoptMinLCOE].
+The optimized design is larger in all bulk dimensions, most strikingly in float diameter: $D_f$ \hl{nearly doubles} from 20~m to \resultsRE[DfoptMinLCOE].
 This larger diameter increases the radiation damping (see \Cref{remdo:fig:overlaid-hydro})
 and thus the radiation-limited maximum power generation.
 Meanwhile, the larger draft $T_{f,2}$ increases the upper limit on oscillation amplitude imposed by the slamming constraints $g_{NL,23}$-$g_{NL,239}$, which brings actual power generation closer to the maximum.
 Above water, the nominal design's long float-spar connection tubes give way to a taller float and shorter tubes.
 This results from the fixed submersion fraction $T_{f,2}/h_f$, which forces float height $h_f$ to grow when draft $T_{f,2}$ increases.
+This is reasonable given the symmetry of the slamming and submersion constraints
+\ifdefined\DISSERTATION
+    (see \Cref{aor:sec:appendix-slamming})
+    %though a different $h_f$ could potentially obtain better performance by capitalizing on the slight asymmetry.
+\fi
+.
 
 % geometry overlaid figure
 \begin{figure}[htbp]
@@ -82,8 +88,8 @@ Future studies could quantify the lowest marginal PTO force price (\$/N) for whi
     The minimum-LCOE design achieves an annual average electrical power of \resultsRE[powerAvgAtMinLCOE]
     with a structural material mass of \resultsRE[structMassAtMinLCOE],
     requiring a generator rated for \resultsRE[powerMaxAtMinLCOE] and \resultsRE[forceMaxAtMinLCOE] peak.
-    Its estimated capital cost is \resultsRE[capexAtMinLCOE]~\$M,
-    of which \resultsRE[capexDesignAtMinLCOE]~\$M is design-dependent (structural material and PTO size),
+    Its estimated capital cost is \resultsRE[capexAtMinLCOE],
+    of which \resultsRE[capexDesignAtMinLCOE] is design-dependent (structural material and PTO size),
     and its estimated LCOE is \resultsRE[minLCOE]~\$/kWh under the economic assumptions of \citet{mccabe_development_2026}.
     This is a \resultsRE[pctImproveLCOEMinLCOE]~LCOE improvement over the nominal design's \resultsRE[nominalLCOE],
     achieved through a simultaneous \resultsRE[pctImproveDesignCostMinLCOE]~reduction in design-dependent cost
@@ -125,20 +131,21 @@ Future studies could quantify the lowest marginal PTO force price (\$/N) for whi
 \end{figure}
 
 \ifdefined\DISSERTATION
-    Six constraints are active at the optimum: one structural thickness lower bound, three structural factors of safety, and two amplitude constraints.
-    While the storm (maximum) DLC limits the float and damping plate, it is the operational (fatigue) DLC that drives the column sizing.
-    The amplitude constraints and the damping plate factor of safety in the storm DLC have the highest multipliers,
+    Six constraints are active at the optimum: one structural thickness lower bound, three structural factors of safety, and \hl{two} amplitude constraints.
+    \hl{While the storm (maximum) DLC limits the float and damping plate, it is the operational (fatigue) DLC that drives the column sizing.}
+    The amplitude constraints and the damping plate factor of safety in the \hl{storm} DLC have the highest multipliers,
     indicating that these limits drive the optimal cost.
     This motivates a future search for designs that obviate or mitigate these constraints,
     for example, underwater submersion as a storm-survival strategy,
-    or bump stops and active control to limit amplitude without enlarging the device.
+    or accepting slamming as an operational necessity and further reinforcing the hull accordingly.
     Meanwhile, the activity of the float thickness lower bound, with a larger multiplier than the float factor-of-safety constraint,
     indicates that the float structural model is inadequate in this regime and should be extended to capture the local buckling that dominates for very thin-skinned designs.
 \else
     Six constraints are active: one structural thickness lower bound, three factors of safety, and two amplitude constraints.
     The storm DLC limits the float and damping plate while the operational fatigue DLC drives column sizing;
     the amplitude constraints and the storm damping-plate factor of safety carry the highest multipliers and thus drive optimal cost,
-    motivating future designs that mitigate them (e.g., submersion-based survival, bump stops, or active amplitude control).
+    motivating future designs that mitigate them
+    (e.g., submersion-based survival or intentionally allowing slamming).
     The active float thickness bound, with a larger multiplier than the float factor-of-safety constraint,
     signals that the float structural model should be extended to capture local buckling in thin-skinned designs.
 \fi
@@ -151,8 +158,9 @@ Future studies could quantify the lowest marginal PTO force price (\$/N) for whi
     In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
     As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where LCOE may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $p_0$.
     The Pareto front is shown in \Cref{remdo:fig:pareto}, with the utopia point marked by a green star, simulated designs by squares, and the actual nominal performance reported in the RM3 reference \citep{RM3} by a diamond.
-    All Pareto-front designs cost significantly less than the nominal RM3, spanning powers both below and above it.
-    \Cref{remdo:fig:pareto-lcoe} provides a zoomed view with superimposed constant-$LCOE$ contours; the minimum-LCOE design lies at the tangency between the Pareto front and the contours and very nearly coincides with the maximum-power design.
+    All Pareto-optimal designs cost significantly less than the nominal RM3, spanning powers both below and above it.
+    \Cref{remdo:fig:pareto-lcoe} provides a zoomed view with superimposed constant-$LCOE$ contours.
+    The minimum-LCOE design lies at the tangency between the Pareto front and the contours and very nearly coincides with the maximum-power design.
     %\hl{analyze more: how are the max power and min LCOE designs different? ... multiple apparent points of tangency ...}  % TODO (scrutineering)
 \else
     The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{\text{design}}$ against average electrical power $P_{\text{avg},\text{elec}}$ (\Cref{remdo:sec:multi-obj-process}),
@@ -189,14 +197,20 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 \end{figure}
 
 \ifdefined\DISSERTATION
-    Examining the direction of change, with increasing cost and power (left to right) most design variables either increase monotonically ($P_{\text{max}}$, $D_s$, $t_{s,r}$) or nearly so with one brief decline ($F_{\text{max}}$, $D_f$, $h_{1,\text{stiff},d}$, $h_s$).
-    Only two mainly decrease: $T_{f,2}$ and $h_{fs,\text{clear}}$, both involved in the float amplitude constraints.
-    Of the remaining three, $t_d$ and $t_{f,b}$ (structural thicknesses at their lower bound) stay essentially constant apart from small upward excursions in $t_d$ near 2\%, 23\%, and 60\% along, while $h_{\text{stiff},f}$ shows several small oscillations.
+    Examining the direction of change, with increasing cost and power (left to right) most design variables either \hl{increase monotonically} ($P_{\text{max}}$, $D_s$, $t_{s,r}$) or \hl{nearly so with one brief decline} ($F_{\text{max}}$, $D_f$, $h_{1,\text{stiff},d}$, $h_s$).
+    \hl{Only two mainly decrease}: $T_{f,2}$ and $h_{fs,\text{clear}}$, both involved in the float amplitude constraints.
+    Of the \hl{remaining three}, $t_d$ and $t_{f,b}$ (structural thicknesses at their lower bound) stay essentially constant apart from small upward excursions in $t_d$ \hl{near 2\%, 23\%, and 60\% along}, while $h_{\text{stiff},f}$ shows \hl{several small oscillations}.
     
     Examining the magnitude of change, the powertrain ratings vary most dramatically across the front while geometric and structural variables need only moderate adjustment.
-    This raises the question of how much the cost savings at lower power come from smaller PTO versus smaller material cost: if PTO cost dominated, companies selling devices at multiple power levels could keep one geometric and structural design and vary only the PTO, easing design effort and economies of scale.
-    Using the costs in \Cref{remdo:tab:opt-dv-values}, however, only \resultsRE[pctCostSavingsFromPTO]~of the savings come from the smaller PTO, so for a lower-power WEC under these price assumptions the slightly smaller hydrodynamic design matters far more than the substantially smaller PTO, making design reuse across power levels unlikely.
-    This differs from preliminary work \citep{mccabe_multidisciplinary_2022}, which wrongly examined only the change in optimal design without weighting the relative cost impact of PTO and dimensions.
+    This raises the question of how much of the cost savings at lower power come from smaller PTO versus lower material cost:
+    if PTO cost dominates, companies selling devices at multiple power levels could keep one geometric and structural design and vary only the PTO,
+    easing design effort and economies of scale.
+    Using the costs in \Cref{remdo:tab:opt-dv-values}, however,
+    only \resultsRE[pctCostSavingsFromPTO]~of the savings come from the smaller PTO,
+    so for a lower-power WEC under these price assumptions the slightly smaller hydrodynamic design matters far more than the substantially smaller PTO.
+    Design reuse across power levels is thus unattractive.
+    This differs from preliminary work \citep{mccabe_multidisciplinary_2022},
+    which wrongly examined only the change in optimal design without weighting the relative cost impact of PTO and dimensions.
 \else
     With increasing cost and power (left to right), most design variables increase monotonically or nearly so; only $T_{f,2}$ and $h_{fs,\text{clear}}$ (both in the amplitude constraints) decrease, while the lower-bound thicknesses $t_d$ and $t_{f,b}$ stay essentially constant.
     The powertrain ratings vary most across the front, raising whether cost savings at low power come mainly from smaller PTO or smaller material: using \Cref{remdo:tab:opt-dv-values}, only \resultsRE[pctCostSavingsFromPTO]~comes from the PTO, so the smaller hydrodynamic design dominates and design reuse across power levels is unlikely, correcting preliminary work \citep{mccabe_multidisciplinary_2022} that weighed only the design change, not its cost impact.
@@ -204,30 +218,30 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 
 \ifdefined\DISSERTATION
     The bottom of \Cref{remdo:fig:design-heuristics} gives the analogous trends for the objectives.
-    Power output is largely linear, while design cost shows a discrete slope change near 5\% and a gradual one beyond.
-    The discrete change causes the Pareto cusp and corresponds to a shift in PTO sizing strategy: from 0-5\% along, the cost-power trade is made by adjusting maximum power, whereas from 5-70\% it is made by adjusting maximum force at constant maximum power.
-    The gradual slope change reflects diminishing returns, that is an increasing marginal cost of additional power.
+    Power output is \hl{largely linear}, while design cost shows a \hl{discrete slope change near 5\%} and a gradual one beyond.
+    The discrete change corresponds to a \hl{shift in PTO sizing strategy}: from 0-5\% along, the cost-power trade is made by adjusting maximum power, whereas from 5-70\% it is made by adjusting maximum force at constant maximum power.
+    The gradual slope change reflects diminishing returns, i.e. an increasing marginal cost of additional power.
 \else
     The objective trends (bottom of \Cref{remdo:fig:design-heuristics}) show largely linear power but a design-cost slope that changes discretely near 5\%, the source of the Pareto cusp, corresponding to a shift in PTO sizing strategy from adjusting maximum power (0-5\%) to adjusting maximum force at constant power (5-70\%), beyond which a gradual slope change reflects diminishing returns.
 \fi
 
-% convexity
-A cusp exists in the Pareto front where average electrical power is around \resultsRE[powerWhereCusp].
-\ifdefined\DISSERTATION
-    As a result of this cusp, the bulk of the front, from the least-cost design at \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds], is non-convex.
-    This region would have been missed by a convex multi-objective procedure optimizing weighted sums of the objectives, affirming the necessity of the epsilon-constraint-plus-pattern-search procedure used here.
-\else
-    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure,
-    affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
-\fi
+Considering the magnitude of objective variation,
+we find that power falls off more steeply for a given percent cost reduction than cost falls off for a given percent power reduction.
+The trend worsens when considering full levelized cost instead of design-dependent cost.
+This asymmetry is a consequence of the fixed cost in the numerator of LCOE and the absence of any fixed additive power in the denominator.
 
 % 613 - 627
 \ifdefined\DISSERTATION
-    Due to LCOE's high uncertainty, this study performs multi-objective optimization on cost and power and includes local and limited global sensitivity analysis.
-    While this overcomes many concerns, limitations remain: prices for steel, powertrain force, and powertrain power must still be assumed, which could be addressed by adding objectives for each cost separately, though moving beyond two objectives limits the intuition and visualization of results, and the authors believe the two chosen represent a good balance.
-    Alternatively, a global parameter sensitivity analysis of the price parameters, paired with uncertainty quantification and robustness analysis, would complete the picture.
-    Although the cost formulation is uncertain, it still represents a significant improvement over the cost proxies typically used in WEC optimization, such as wetted surface area and hull volume.
-    Future work running the MDOcean optimization with those simplified metrics would be useful for comparison and to assess the suitability of various proxy metrics.
+    % Due to LCOE's high uncertainty, this study performs multi-objective optimization on cost and power and includes local and limited global sensitivity analysis.
+    While the multi-objective optimization presented here addresses LCOE's high uncertainty better than most other approaches, limitations remain.
+    Prices for steel, powertrain force, and powertrain power must still be assumed.
+    This could be addressed by adding objectives for each cost separately,
+    though moving beyond two objectives limits the intuition and visualization of results,
+    and the authors believe the two chosen represent a good balance.
+    Alternatively, a global parameter sensitivity analysis of the price parameters,
+    paired with uncertainty quantification and robustness analysis, would complete the picture.
+    Although the cost model is uncertain, it still represents a significant improvement over typical WEC cost proxies such as wetted surface area and hull volume.
+    Future work should rerun the optimization with those proxy metrics for comparison and to assess their suitability.
 \else
     Because of LCOE's uncertainty, this study optimizes cost and power as separate objectives with supporting sensitivity analysis.
     Prices for steel and powertrain force and power must still be assumed, which are addressable via more objectives or a global price-parameter sensitivity analysis with uncertainty quantification,
@@ -235,12 +249,9 @@ A cusp exists in the Pareto front where average electrical power is around \resu
     The cost model, though uncertain, still improves substantially on the surface-area and hull-volume proxies common in WEC optimization, against which it would be useful to compare in future work.
 \fi
 
-If you want to cut the design cost in half, you are cutting the power into three, which is a big power penalty. Power falls off steeply.
-Diminishing returns.
-
 \subsubsection{Minimum Cost and Maximum Power Designs}
 
-I want to highlight these points because the one on the right (max power) is the highest power you can get.
+\hl{I want to highlight these points because the one on the right (max power) is the highest power you can get.
 We compare it to the radiation limited max power, and it tells us that there is still a lot of gap because of the amplitude constraints and/or the achievable intrinsic impedance.
 That tells us the raditation limit and Budal bound is actually not that good of an approximation and it's important to use the actual impedance.
 
@@ -250,9 +261,18 @@ This is different than the point on the right, which is close to the points in t
 
 If you maximize power (point on the right), which is the status quo, you get close to the same answer as min LCOE in the middle, which means that my emphaisis on looking at the tradeoff isn't all that necessary for grid power applications.
 So the presence of amplitude constraints is more important than the accuracy of the cost model.
-The accuracy of the cost model becomes more important when you have a fixed power that you are looking for (PBE).
+The accuracy of the cost model becomes more important when you have a fixed power that you are looking for (PBE).}
 
 These points are tabulated in the appendix.
+
+\paragraph{The Base Cost of Survival}
+The y-intercept of the Pareto front, were the curve extended to zero power, is around \$700,000 for damping control and \$900,000 for reactive control.
+Adding on the design-independent costs gives a total of \hl{XXX} of capital cost, which levelizes to \hl{XXX} \$/year at the specified FCR and OPEX.
+We term this the ``base cost of survival'' because it is the minimum cost of a two-body point absorber WEC that survives the storm DLC and satisfies all other constraints, even if it produces negligible power.
+This quantity should interest designers of WECs for PBE applications:
+it can be compared to the maximum cost a customer is willing to pay for an extremely low-power WEC,
+and to the infinitesimal-power fixed cost of other energy sources such as solar, wind, and other WEC archetypes, to determine if a two-body point absorber WEC is a sensible option for such applications.
+If the WEC is infeasible, the gap determines the reduction to the base cost of survival that is required for viability.
 
 % In the single-objective optimizations, $LCOE$ and $CAPEX$ are minimized and average power $P_{\text{elec},\text{avg}}$ is maximized, each starting from the nominal RM3 configuration as the initial condition $\vec{x}_0$, for which all optimizations converge successfully.
 % The optimal designs $\vec{x}^*$ are shown visually in \Cref{remdo:fig:overlaid-geometry} and numerically in \Cref{remdo:tab:opt-dv-values}, alongside the nominal design and a balanced design.
@@ -304,11 +324,30 @@ These points are tabulated in the appendix.
     \Cref{remdo:fig:pareto-lcoe} compares the damping and reactive control schemes: reactive control achieves the lowest LCOE overall, but below \resultsRE[dampingReactivePowerIntersect] damping control is more cost-effective, since reactive control there requires a larger, costlier PTO and structure for the same power.
     This suggests the cost-optimal controller at a given power may be neither pure scheme, as reactive control maximizes power for a given design but not for a given cost.
 \fi
-Looking at this tradeoff helps arbitrate the dispute about whether you should assume reactive control (which is what people doing CCD more recently will tend to advocate) or damping control (which is what historically was the assumption for hardware simplicity).
+\hl{Looking at this tradeoff helps arbitrate the dispute about whether you should assume reactive control (which is what people doing CCD more recently will tend to advocate) or damping control (which is what historically was the assumption for hardware simplicity).
 The CCD people are right if you're grid scale (no fixed power requirement), but the damping people are right if you're small scale (fixed power requirement, PBE).
 This is especially relevant for PBE because it means they don't have to worry about the technical complexities of reactive control.
 In both cases, you don't quite want purely either, you want something in the middle.
-People should start designing with a nominal reactive power, not as much or as little as possible.
+People should start designing with a nominal reactive power, not as much or as little as possible.}
+
+\paragraph{Assessing the Appeal of Fatigue-Minimizing Control}
+Notably, the base cost of survival differs substantially between damping and reactive control.
+This implies that the base cost of survival does not depend entirely on the storm DLC as might be expected, since the model assumes that the PTO locks and the control scheme is irrelevant in a storm.
+An examination of Lagrange multipliers (see \Cref{fig:re:constraint-activity}) confirms that operational fatigue constraints are active while storm constraints are inactive.
+Essentially, damping control reduces fatigue loads compared to a reactive controller of the same power capability.
+This suggests that an R\&D program targeting reductions in the base cost of survival
+(or more generally enhancing the economic viability of WECs with power requirements under 100~kW,
+the point where the reactive and damping Pareto fronts intersect)
+should focus on fatigue-minimizing control strategies rather than storm-survival strategies.
+While fatigue-minimizing WEC control has been explored before \cite{}, this study is the first to quantify its potential economic impact and relevance for low-power WECs.
+In these regions of the design space, and indeed anywhere with active fatigue constraints,
+it would be beneficial to add the operational force as a dynamic constraint in the optimal control problem,
+the way PTO force, power, and amplitude are currently handled.
+However, it is worth confirming whether fatigue constraints still supersede storm constraints under a less conservative fatigue model.
+The current model uses the infinite-lifetime fatigue strength for steel \citep{mccabe_development_2026}, but a cycle-counting approach would loosen the fatigue constraints.
+Finally, investigating how wave environment affects the fatigue-storm constraint relationship would be useful,
+as fatigue-minimizing control should appeal more at higher ratios of operational to storm wave height.
+
 % add sentence here with adding reactive power as a design variable
 % insert new plots here: econ sens contour plot, post hoc N-WEC sweep
 
@@ -398,7 +437,7 @@ It would be interesting to see if this trend holds at other loctions, because I'
     \citet{de_andres_adaptability_2015} concludes that geometric tuning to the dominant wave period is unfavorable, but its devices have coupled diameter and height, use only damping control, and tune for power rather than cost.
     MDOcean's results agree that power maximization does not align with LCOE minimization, but show the cost penalty as PTO rather than structural cost, and show a significantly larger optimal float in Hawaii (\Cref{remdo:tab:opt-dv-values,remdo:tab:opt-output,remdo:tab:location}), which contradicts \citet{de_andres_adaptability_2015} and demonstrates the value of a fuller multidisciplinary model.
 \fi
-Takeaway: we need to do further studies to say for sure and better understand exactly why this model agrees in some places and disagrees in others.
+\hl{Takeaway: we need to do further studies to say for sure and better understand exactly why this model agrees in some places and disagrees in others.}
 
 % 265 - 301
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -765,7 +804,7 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
 
 % 490 - 509
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Utility of Gradients for Multi-Objective Optimization}
+\subsubsection{Assessing Utility of Gradients for Multi-Objective Optimization}
 \label{remdo:sec:discussion-optimization}
 \ifdefined\DISSERTATION
     Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
@@ -781,6 +820,22 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
     All prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm (\Cref{remdo:sec:lit}), requiring roughly 2{,}000--12{,}000 function evaluations to converge \citep{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}.
     This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations exceed the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
     Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
+\fi
+
+
+% convexity
+\subsubsection{Assessing Importance of a Nonconvex Multiobjective Search Scheme}
+The reactive control pareto front is largely convex, with a small non-convex region from 85 to 95~kW average power.
+The damping control front is a bit more non-convex, with cusps at around 85, 90, and 100~kW.
+%A cusp exists in the Pareto front where average electrical power is around \resultsRE[powerWhereCusp].
+\ifdefined\DISSERTATION
+    %As a result of this cusp, the bulk of the front, from the least-cost design at \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds], is non-convex.
+    These non-convex regions would have been missed by a convex weighted-sum procedure.
+    This affirms the necessity of the epsilon-constraint-plus-pattern-search procedure used here to resolve the details around the cusp,
+    although for early analysis, a convex approach appears sufficient to capture the majority of the front.
+\else
+    The resulting non-convex region (from \resultsRE[powerAvgAtMinCapex] to about \resultsRE[powerWhereNonconvexEnds]) would have been missed by a convex weighted-sum procedure,
+    affirming the necessity of the epsilon-constraint-plus-pattern-search approach.
 \fi
 
 % 628 - 654
