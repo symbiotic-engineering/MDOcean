@@ -9,6 +9,7 @@ from pathlib import Path
 
 BASE_LOCK, OURS_LOCK, THEIRS_LOCK = sys.argv[1:4]
 REPO_ROOT = Path.cwd()
+CALKIT_YAML = REPO_ROOT / "calkit.yaml"
 
 
 # -------------------------------
@@ -66,6 +67,157 @@ def _repo_dot_dvc_paths():
             p = p[:-4]
         normalized.add(p)
     return normalized
+
+
+# -------------------------------
+# calkit.yaml helpers
+# -------------------------------
+
+def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
+    """Return a list of output paths from calkit.yaml stages that have storage: git."""
+    try:
+        with open(calkit_path) as f:
+            calkit = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        print(f"Warning: {calkit_path} not found; no git-tracked outputs to check out.")
+        return []
+
+    paths = []
+    stages = (calkit.get("pipeline") or {}).get("stages", {})
+    for stage_data in stages.values():
+        if not isinstance(stage_data, dict):
+            continue
+        for out in stage_data.get("outputs", []):
+            if isinstance(out, dict) and out.get("storage") == "git":
+                p = out.get("path")
+                if p:
+                    paths.append(_norm_path(p))
+    return paths
+
+
+def _read_blob(spec):
+    """Return bytes for a git object *spec*, or None if it does not exist.
+
+    Prints a warning if the command fails for a reason other than the object
+    simply not existing (e.g. a repository error).
+    """
+    result = subprocess.run(
+        ["git", "cat-file", "blob", spec],
+        capture_output=True,
+    )
+    if result.returncode == 0:
+        return result.stdout
+    # "Not a valid object name" / "unknown revision" means the blob genuinely
+    # doesn't exist at that spec — expected, not worth reporting.
+    stderr = result.stderr.decode("utf-8", errors="replace").strip()
+    expected_msgs = ("Not a valid object name", "unknown revision", "bad revision")
+    if not any(m in stderr for m in expected_msgs) and stderr:
+        print(f"  [WARN] git cat-file {spec}: {stderr}")
+    return None
+
+
+def _resolve_commit_ref(prefer):
+    """Return the git ref for the ours/theirs commit, or None if not found.
+
+    During different git operations the "theirs" commit is recorded under
+    different ref names:
+      - git merge      -> MERGE_HEAD
+      - git cherry-pick / rebase (internal) -> CHERRY_PICK_HEAD
+      - git rebase (newer git) -> REBASE_HEAD or REBASE_MERGE_HEAD
+
+    For "ours" HEAD is always correct.
+    """
+    if prefer == "O":
+        candidates = ["HEAD"]
+    else:
+        candidates = [
+            "MERGE_HEAD",
+            "CHERRY_PICK_HEAD",
+            "REBASE_HEAD",
+            "REBASE_MERGE_HEAD",
+        ]
+
+    for ref in candidates:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", ref],
+            capture_output=True,
+        )
+        if result.returncode == 0:
+            return ref
+    return None
+
+
+def checkout_git_tracked_outputs(prefer):
+    """Write ours/theirs blob content for each calkit.yaml output with storage: git.
+
+    prefer must be "O" (ours) or "T" (theirs).  Any other value is a no-op.
+
+    Strategy (avoids touching the index, so no index.lock conflict):
+    1. Try the commit-tree blob using the resolved commit ref.
+       git merge      -> MERGE_HEAD
+       git cherry-pick / rebase -> CHERRY_PICK_HEAD / REBASE_HEAD
+       The commit tree is fully available as soon as the merge starts, so
+       this lookup always works regardless of which file git is currently
+       processing.
+    2. Fall back to the staged conflict blob (:2:<path> for ours, :3:<path>
+       for theirs).  Git writes these lazily — only for the specific file it
+       is currently merging — so they may not exist yet for other files when
+       this driver runs.
+    3. If neither exists the file was deleted (or is genuinely absent) on that
+       side — skip it.
+
+    Because the index is not updated here, the caller should print a reminder
+    for the user to `git add` the resolved files.
+    """
+    if prefer not in {"O", "T"}:
+        return
+
+    # git index stages: 1=base, 2=ours, 3=theirs
+    stage = "2" if prefer == "O" else "3"
+    commit_ref = _resolve_commit_ref(prefer)
+    strategy = "ours" if prefer == "O" else "theirs"
+    paths = get_git_tracked_outputs()
+
+    if not paths:
+        return
+
+    print(f"\nWriting {strategy} version of git-tracked stage outputs:")
+    if commit_ref is None:
+        print(
+            f"  [WARN] Could not find a {strategy} commit ref "
+            "(tried MERGE_HEAD, CHERRY_PICK_HEAD, REBASE_HEAD, REBASE_MERGE_HEAD). "
+            "Staged conflict blobs only will be used."
+        )
+    resolved = []
+    for p in paths:
+        # Try the commit-tree blob first — always available during a merge.
+        # Fall back to the staged conflict blob, which git writes lazily and
+        # may not exist yet for files other than the one currently being merged.
+        content = None
+        if commit_ref is not None:
+            content = _read_blob(f"{commit_ref}:{p}")
+        if content is None:
+            content = _read_blob(f":{stage}:{p}")
+        if content is not None:
+            try:
+                dest = Path(p)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(content)
+                print(f"  [OK] {p}")
+                resolved.append(p)
+            except OSError as exc:
+                print(f"  [ERROR] {p}: {exc}")
+        else:
+            # File is absent on this side (deleted or never existed).
+            ref_desc = commit_ref or "no commit ref found"
+            print(f"  [SKIP] {p}: not present in {strategy} ({ref_desc})")
+
+    if resolved:
+        print(
+            "\nThese files were written to the working tree but not staged.\n"
+            "After the merge completes, run:\n"
+            f"  git add {' '.join(resolved)}"
+        )
 
 
 # -------------------------------
@@ -172,7 +324,7 @@ def merge_lockfiles(base, ours, theirs):
 
         conflict_blocks.append("\n".join(block_lines))
 
-    return merged_stages, conflict_stage_names, conflict_blocks
+    return merged_stages, conflict_stage_names, conflict_blocks, prefer
 
 
 # -------------------------------
@@ -198,7 +350,7 @@ def main():
     ours = load_yaml(OURS_LOCK)
     theirs = load_yaml(THEIRS_LOCK)
 
-    merged_stages, conflict_stage_names, conflict_blocks = merge_lockfiles(
+    merged_stages, conflict_stage_names, conflict_blocks, prefer = merge_lockfiles(
         base, ours, theirs
     )
 
@@ -236,12 +388,14 @@ def main():
             print(f"  - {stage}")
 
         print("\nResolve these conflicts manually in dvc.lock.")
+        checkout_git_tracked_outputs(prefer)
         sys.exit(1)
     # ---------------------------------------
     # No conflicts: safe to run global dry repro
     # ---------------------------------------
 
     print("Merged dvc.lock successfully.")
+    checkout_git_tracked_outputs(prefer)
     print("Running `dvc repro --dry` to detect stages that need recomputation...\n")
 
     result = subprocess.run(["dvc", "repro", "--dry"])

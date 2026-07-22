@@ -4404,7 +4404,9 @@ pipeline:
       outputs:
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
-        - path: results/Validation/validation.tex
+        - path: results/Validation/validation_smaller.tex
+          storage: git
+        - path: results/Validation/validation_larger.tex
           storage: git
         - results/Validation/end.mat
         - path: results/Validation/end.json
@@ -5317,7 +5319,10 @@ pipeline:
           storage: git
         - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
     move-re-results:
-      kind: matlab-command
+      kind: shell-command
+      command: |
+        cp results/**/*.pdf pubs/renewable-energy-mdo/figs/from-matlab/
+        cp results/**/*.tex pubs/renewable-energy-mdo/tables/from-matlab/
       environment: _system
       inputs:
         - results/ReadNonMatlabFigs/
@@ -5339,9 +5344,12 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('RE');
+      #command: add_mdocean_path(); move_results_to_pubs('RE');
     move-aor-results:
-      kind: matlab-command
+      kind: shell-command
+      command: |
+        cp results/**/*.pdf pubs/applied-ocean-research-model/figs/from-matlab/
+        cp results/**/*.tex pubs/applied-ocean-research-model/tables/from-matlab/
       environment: _system
       inputs:
         - results/DragIntegral/
@@ -5370,7 +5378,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('AOR');
+      #command: add_mdocean_path(); move_results_to_pubs('AOR');
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
@@ -5708,6 +5716,8 @@ pipeline:
         - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/references.bib
         - pubs/shared/shared-pkg.tex
+        - pubs/shared/table-column-specs.tex
+        - pubs/shared/figure-widths.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
