@@ -211,7 +211,7 @@ The optimization converges in \resultsRE[singleObjIters]~iterations, not includi
     Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
     and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
     whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
-    Local parameter sensitivity is treated in \Cref{remdo:sec:sensitivities-local}; design-variable perturbation is examined here.
+    Local parameter sensitivity is treated in \Cref{remdo:sec:appendix-sensitivities-local}; design-variable perturbation is examined here.
     \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
     $\Delta J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
 \else
@@ -244,7 +244,7 @@ The optimization converges in \resultsRE[singleObjIters]~iterations, not includi
     Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
 Inaccuracies here, due to the nonlinear curvature of the true objective,
-motivates the choice to use reoptimization rather than post-optimality derivatives for the local parameter sensitivity analysis in \Cref{remdo:sec:sensitivities-local}.
+motivates the choice to use reoptimization rather than post-optimality derivatives for the local parameter sensitivity analysis in \Cref{remdo:sec:appendix-sensitivities-local}.
 This makes gradient-based sensitivity analysis unappealing, but does not detract from the gradient's utility in the optimization itself.
 
 \subsection{Multistart}
@@ -292,7 +292,7 @@ Future multistart procedures could therefore fix deterministic starts for the un
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Local Sensitivities}
-\label{remdo:sec:appendix-sensitivties}
+\label{remdo:sec:appendix-sensitivities-local}
 \Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}[htbp]
 \includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_re_optim_objective_grid.pdf}]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
@@ -367,14 +367,10 @@ This would reveal higher order effects like interactions between parameters and 
 
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Optimization Runtime}
-\ifdefined\DISSERTATION
-    \Cref{remdo:fig:optim-runtimes} shows the runtime of each optimization and analysis routine, run in parallel on a 14-core server.
-    The optimization also runs without issue, though more slowly, on unspecialized machines such as a Windows~10 laptop with MATLAB~R2022a.
-\else
-    %\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
-    The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
-    The optimization also runs, more slowly, on a commodity laptop.
-\fi
+%\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
+The optimization also runs, more slowly, on a commodity laptop.
+
 
 % \begin{figure}[htbp]
 %     \centering

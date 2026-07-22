@@ -458,10 +458,10 @@ This subsection quantifies how parameter and model-assumption changes affect the
 
 \subsubsection{Enhancing Subsystem Performance}
 \ifdefined\DISSERTATION
-    This section interprets the most accurate local parameter sensitivity method (perturbing each parameter slightly from its nominal value and re-optimizing) while \Cref{remdo:sec:appendix-sensitivties} compares the accuracy and cost of several computation methods.
+    This section interprets the most accurate local parameter sensitivity method (perturbing each parameter slightly from its nominal value and re-optimizing) while \Cref{remdo:sec:appendix-sensitivities-local} compares the accuracy and cost of several computation methods.
     Re-optimization accounts for nonlinearities and is thus more accurate, but far more expensive, than post-optimality-derivative sensitivities.
 \else
-    Local parameter sensitivities are computed by perturbing each parameter from its nominal value and re-optimizing, the most accurate of several methods compared in \Cref{remdo:sec:appendix-sensitivties}.
+    Local parameter sensitivities are computed by perturbing each parameter from its nominal value and re-optimizing, the most accurate of several methods compared in \Cref{remdo:sec:appendix-sensitivities-local}.
 \fi
 
 \Cref{remdo:fig:param-sens-J-star-tornado,remdo:fig:param-sens-x-star-tornado,remdo:fig:param-sens-x-star-tornado-2}
@@ -595,7 +595,7 @@ So maybe this will lead to new R\&D programs for small scale systems that focus 
 
 % 510-536
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Enhancing Model Realism}
+\subsubsection{Enhancing Model Realism}\label{remdo:sec:sensitivity-model-assumptions}
 \ifdefined\DISSERTATION
     Using the optimization and sensitivity results, the modeling assumptions of \Cref{remdo:sec:model} can now be assessed for reasonableness.
     We examine both the model complexities MDOcean captures, to confirm they were worth including, and the shortcomings it cannot capture, to judge whether they must be added in future versions.
@@ -621,14 +621,14 @@ We observed the impact of modeled effects, especially effects that this model in
 
 \ifdefined\DISSERTATION
     Conversely, a few modeling complexities appear unnecessary in hindsight because they have little effect.
-    \Cref{remdo:sec:sensitivities-local} finds low sensitivity to drag coefficient, and the re-optimization without drag in \Cref{remdo:sec:sensitivity-model-assumptions} confirms it, suggesting that modeling the drag nonlinearity is inessential and that future optimizations may disable drag to avoid iterating the drag damping coefficient.
+    \Cref{remdo:sec:appendix-sensitivities-local} finds low sensitivity to drag coefficient, and the re-optimization without drag in \Cref{remdo:sec:sensitivity-model-assumptions} confirms it, suggesting that modeling the drag nonlinearity is inessential and that future optimizations may disable drag to avoid iterating the drag damping coefficient.
     Likewise, the slamming model is derived to be valid not only for long waves but also intermediate wavelengths, where the maximum amplitude depends on the phase of the dynamic response.
     The simple long-wave slamming model is reasonably accurate at sea states with an active slamming constraint \citep{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Confirming this would require checking all points during the optimization, not just the optimum, since the slamming model fidelity is not currently a model setting and the long-wave condition is verified manually at the optimum. %\hl{I should actually check this.}  % TODO (scrutineering)
     Finally, although drag and intermediate-wavelength slamming each have little individual effect, the problem's nonlinearity admits a possible coupling effect were both disabled simultaneously, or an emergent effect under a changed formulation (a different objective or added constraints), so users should exercise caution when simplifying the model.
 \else
     Conversely, 
-    %the low sensitivity to drag coefficient (\Cref{remdo:sec:sensitivities-local}), confirmed by re-optimization without drag (\Cref{remdo:sec:sensitivity-model-assumptions}), suggests the drag nonlinearity is inessential.
+    %the low sensitivity to drag coefficient (\Cref{remdo:sec:appendix-sensitivities-local}), confirmed by re-optimization without drag (\Cref{remdo:sec:sensitivity-model-assumptions}), suggests the drag nonlinearity is inessential.
     %Similarly, 
     the simple long-wave slamming model is reasonably accurate where the slamming constraint is active \citep{mccabe_development_2026}, suggesting the intermediate-wavelength model may be unnecessary.
     Because the problem is nonlinear, however, disabling both simultaneously or changing the formulation could produce coupling effects, so model simplification warrants caution.
@@ -670,7 +670,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     Notably, other parameters, such as PTO price, storm wave conditions, and dimensional variables, are more relevant to design cost minimization, highlighting that incentives and innovation strategies for Powering the Blue Economy applications may differ from those for utility-scale energy.
     The larger number of highly sensitive parameters in cost minimization further implies more diverse avenues for impactful innovation in PBE applications than in utility-scale energy.
     
-    Further useful analysis includes a sensitivity analysis of hyperparameters, following \Cref{remdo:sec:sensitivities-local}, to ensure numerical convergence and adequate tuning, and a global parameter sensitivity analysis accounting for both nonlinearities across operating points and interaction effects among uncertain parameters.
+    Further useful analysis includes a sensitivity analysis of hyperparameters, following \Cref{remdo:sec:appendix-sensitivities-local}, to ensure numerical convergence and adequate tuning, and a global parameter sensitivity analysis accounting for both nonlinearities across operating points and interaction effects among uncertain parameters.
 \else
     while those with high objective sensitivity (wave conditions, PTO efficiency, financing rates) are most important for funders and R\&D incentives.
     The differing high-sensitivity parameters for cost minimization, and their greater number, suggest that 
@@ -708,7 +708,7 @@ This subsection evaluates how realistic the optimization formulation choices are
 \subsubsection{Design Variable Suitability}
 \ifdefined\DISSERTATION
     \Cref{remdo:sec:formulation} described this study's careful choice of design variables to facilitate satisfaction of high-priority requirements, such as maintaining model validity and aiding convergence, while balancing the computational challenge of a large design space.
-    The analysis of \Cref{remdo:sec:sensitivities-local} reveals that several variables chosen as parameters may merit inclusion as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
+    The analysis of \Cref{remdo:sec:appendix-sensitivities-local} reveals that several variables chosen as parameters may merit inclusion as design variables in future studies: $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$.
     Adding $N_{WEC}$ as a design variable carries little importance in LCOE minimization, where economies of scale always favor larger $N_{WEC}$, but offers useful insight in a modified multi-objective analysis where the first objective changes from per-WEC power to array power.
     This is relevant for small-scale Powering the Blue Economy applications with a fixed power requirement, where it is unclear whether multiple smaller WECs or one larger WEC is preferable.
     
@@ -719,17 +719,17 @@ This subsection evaluates how realistic the optimization formulation choices are
     The authors predict, however, that the speed of the semi-analytical models and the extensions discussed here will permit full coupling even for substantially larger WEC optimizations, including the ambitious target of comparing multiple hydrodynamic architectures with realistic powertrain models.
 \else
     \Cref{remdo:sec:formulation} described the careful choice of design variables to maintain model validity and aid convergence.
-    The sensitivity analysis (\Cref{remdo:sec:sensitivities-local}) suggests $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ merit inclusion as design variables in future studies.
+    The sensitivity analysis (\Cref{remdo:sec:appendix-sensitivities-local}) suggests $D_d$, $T_{f,1}$, $T_s$, and possibly $D_{f,in}$ merit inclusion as design variables in future studies.
     Adding $N_{WEC}$ matters little for LCOE minimization but is valuable in a modified multi-objective analysis using array power, relevant to fixed-requirement Powering the Blue Economy applications weighing many small WECs against one large one.
     A sensitivity analysis of design variables perturbed as parameters would further quantify inter-disciplinary coupling, supporting either the fully coupled approach used here \citep{mccabe_development_2026} or a future decoupled formulation should the design space grow too large for full coupling.
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Parameter Suitability}
 \ifdefined\DISSERTATION
-    The local parameter sensitivity analysis of \Cref{remdo:sec:sensitivities-local} already yields significant insight into the choice of parameters.
+    The local parameter sensitivity analysis of \Cref{remdo:sec:appendix-sensitivities-local} already yields significant insight into the choice of parameters.
     Interpreting those results more broadly, parameters with high design sensitivity $\left(\frac{dx^*}{dp}\right)$, such as dimensional aspect ratios, wave conditions, and material properties, are especially important for engineers to pin down early, since they affect the optimal design; where relevant, designers should consider holding their nondimensional forms constant across prototype scales, extending the common practice of Froude scaling for wave conditions.
 \else
-    Interpreting the parameter sensitivities (\Cref{remdo:sec:sensitivities-local}) broadly, parameters with high design sensitivity (aspect ratios, wave conditions, material properties) are most important for engineers to fix early,
+    Interpreting the parameter sensitivities (\Cref{remdo:sec:appendix-sensitivities-local}) broadly, parameters with high design sensitivity (aspect ratios, wave conditions, material properties) are most important for engineers to fix early,
     which should ideally be held constant in nondimensional form across scales,
 \fi
 
@@ -818,12 +818,18 @@ This subsection evaluates how realistic the optimization formulation choices are
 
 
 \ifdefined\DISSERTATION
-    It is also worth examining which starting-point characteristics drive the outcome.
-    \Cref{remdo:fig:multistart-bar} shows convergence behavior as a function of the starting value of each design variable.
-    The float draft $T_{f,2}$ and float bottom plate thickness $t_{f,b}$ usually converge to the same optimal value regardless of starting point, while the others are highly sensitive to it, indicating that the float draft and bottom plate thickness are nearly unimodal in the search space while the remaining variables are highly multimodal.
+    %It is also worth examining which starting-point characteristics drive the outcome.
+    %\Cref{remdo:fig:multistart-bar} shows convergence behavior as a function of the starting value of each design variable.
+    %The float draft $T_{f,2}$ and float bottom plate thickness $t_{f,b}$ usually converge to the same optimal value regardless of starting point,
+    %while the others are highly sensitive to it.
+    %This suggests that the float draft and bottom plate thickness are nearly unimodal in the search space
+    %while the remaining variables are highly multimodal.
     
-    Future studies can exploit this to reduce the function evaluations needed to reach the global optimum.
-    Within each optimization, the multistart could use deterministic starting points for the float draft and bottom plate thickness, sampling only the multimodal variables; across optimizations, the multimodal variables could be sampled from a non-uniform distribution to capture multiple local minima.
+    Future studies should examine which starting-point characteristics drive the outcome
+    and exploit this to reduce the function evaluations needed to reach the global optimum.
+    Within each optimization, the multistart could use deterministic starting points for unimodal variables, %the float draft and bottom plate thickness,
+    sampling only the multimodal variables.
+    %Across optimizations, the multimodal variables could be sampled from a non-uniform distribution to capture multiple local minima.
 \else
 
 \fi
