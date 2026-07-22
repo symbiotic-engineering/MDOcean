@@ -361,8 +361,8 @@ as fatigue-minimizing control should appeal more at higher ratios of operational
 % 320
 \subsection{Global Sensitivity to Deployment Location}
 
-There is a divide between the west coast and Hawaii, and it's more predictive to look at how energetic the waves are (calmer waves means you need a bigger device), and less predictive to look at the frequency of the waves (higher frequency means you need a smaller device).
-It would be interesting to see if this trend holds at other loctions, because I've only looked at four.
+\hl{There is a divide between the west coast and Hawaii, and it's more predictive to look at how energetic the waves are (calmer waves means you need a bigger device), and less predictive to look at the frequency of the waves (higher frequency means you need a smaller device).
+It would be interesting to see if this trend holds at other loctions, because I've only looked at four.}
 
 % 302-305
 \ifdefined\DISSERTATION
@@ -462,10 +462,10 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     \label{remdo:fig:param-sens-J-star-tornado}
 \end{figure*}
 
-\paragraph{Power Production and Financing are Important at Grid Scale}
+\paragraph{Energy Production and Financing are Important at Grid Scale}
 \ifdefined\DISSERTATION
     On the left side of \Cref{remdo:fig:param-sens-J-star-tornado}, the minimum LCOE is highly sensitive to operational wave characteristics,
-    with normalized sensitivities of $-1.4$: a 1\% increase in wave height or period lowers LCOE by 1.4\% through increased power.
+    with a normalized sensitivity of \hl{-1.4}.
     LCOE is also sensitive to array availability and transmission efficiency ($-1.0$) and PTO efficiency ($-0.8$);
     the 1:1 correspondence for array efficiency is expected since it directly scales annual energy production,
     and the slightly lower PTO value follows since it scales energy only in sea states below the power limit.
@@ -481,17 +481,18 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 
 % 195 - 201
 \ifdefined\DISSERTATION
-    Finally, \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design.
-    The maximum capture width is that of any shape oscillating in heave, based on the far-field radiation pattern.
-    The radiation efficiency is the ratio of the maximum lossless power for the given shape to the maximum radiation-limited power, the former computed with the design's hydrodynamic coefficients, no drag, and an unsaturated controller of the specified type (damping or reactive).
-    The drag efficiency captures the effect of enabling drag and increases with wave height as expected.
-    The $F_{\text{max}}$ factor captures the force limit, departing from unity only at high wave heights near the resonant period of about 10~s.
-    The electrical efficiency captures generator efficiency and the power limit.
-    Multiplying by the annual hours in each sea state yields the annual energy production.
+    Because sensitivities show that the optimal LCOE is particularly sensitive to efficiencies and site characteristcs that drive energy generation,
+    \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design to reveal which factors most limit energy production.
+    See \Cref{aor:sec:power-matrix-mult} for the definitions of each quantity.
+    The radiation efficiency (closely related to the intrinsic impedance frequency response) has an unexpected bimodal shape, exhibiting both a gradual peak at low periods and a sharp resonant peak around 11~s.
+    We observe a reduction in drag efficiency near the resonant period, where the oscillation amplitude and thus the relative WEC-water velocity is particularly high.
+    The force limit factor departs from unity only at high wave heights and periods, and there it drops precipitously to less than 10\% at the highest period.
+    The electrical efficiency, which includes the power limit factor, is more moderate, with a minimum around 50\% at high wave heights and moderate periods.
 \else
     \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the minimum-LCOE power matrix into maximum capture width, radiation efficiency, drag efficiency, the $F_{\text{max}}$ force-limit factor (departing from unity only near resonance at high wave heights), and electrical efficiency;
     their product with the annual hours per sea state yields annual energy production.
 \fi
+The ultimate contribution to annual energy is also bimodal, with a dominant peak at the rarer high-energy sea states and a secondary peak at the more common low-energy sea states.
 % power mult fig
 \begin{figure*}[htbp]
     \centering
@@ -500,9 +501,23 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     \label{remdo:fig:power-matrix-opt}
 \end{figure*}
 
+Paradoxically, these features can be interpreted to both confirm and contradict the argument that WECs should prioritize consistent capture of small frequent waves.
+In terms of the PTO sizing, the WEC should indeed prioritize the more common low-energy sea states and sacrifice operation in the largest waves.
+Of the remaining waves, however, the WEC's hydrodynamic design should split its priority between the small-yet-common and large-yet-rare sea states, while de-emphasizing the waves that are moderate in both size and probability.
+This can be traced directly back to the nature of the design space.
+The PTO sizing design variables specify a \textit{maximal cut-off point} in some aspect of the WEC's dynamic response (either force or power).
+On the other hand, the bulk dimension variables not only specify a \textit{maximum cut-off point}
+(e.g. draft sets both the response amplitude via the slamming/submersion limit and the maximum response frequency via low-pass filtering),
+but also a \textit{nominal operating point} in the WEC's dynamic response (e.g. draft sets its resonant frequency while diameter sets the damping ratio and bandwidth).
+Conceptually, setting a larger maximum cut-off point does nothing to penalize the WEC's energy generation in smaller waves, so the only tradeoff is between cost and power.
+Conversely, setting a strictly larger nominal operating point could interfere with power generation in the smallest yet most frequent waves, so the tradeoff is between cost, power, and probability.
+That the optimization is able to find a hull design with a radiation impedance that peaks in performance both at low and high periods is quite remarkable.
+This feat is likely made easier by the ability to independently shape the float and spar impedances to obtain a high-order relative response, which is not possible in a single-body WEC. 
+Thus, the importance of balancing cost, power, and probability at the grid scale becomes evident through both parameter sensitivities and the power-matrix breakdown and explains the mixed results between the PTO and hull design variables.
+
 \paragraph{Structures and Geometry are Important at Small Scale}
 \ifdefined\DISSERTATION
-    On the right side, the sensitivities are higher overall:
+    Returning to \Cref{remdo:fig:param-sens-J-star-tornado}, the right side shows the sensitivities of the minimum design cost, which are higher overall:
     minimum LCOE has 5 parameters with normalized magnitude above 0.5, whereas minimum design cost has sixteen.
     The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $h_{\text{stiff},d}/h_{1,\text{stiff},d}$,
     suggesting it be added as a design variable.
@@ -538,10 +553,10 @@ normalized so that a value of 1 means a given percent increase in the parameter 
     because--with thicknesses already at their lower bounds--the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
 \fi
 
-This insight for min-LCOE confirms what we already knew, that power and financing are important for grid scale.
+\hl{This insight for min-LCOE confirms what we already knew, that power and financing are important for grid scale.
 This doesn't really shift our R\&D priorities here, but it maybe can help us set targets and tradeoffs more systematically and quantitatively.
 But the insight for smaller systems is new: there are a lot more areas for R\&D that could be helpful, and those areas are not necessarily the same as for grid scale, they are more focused on structures and geometry.
-So maybe this will lead to new R\&D programs for small scale systems that focus on geometric and structural optimization.
+So maybe this will lead to new R\&D programs for small scale systems that focus on geometric and structural optimization.}
 
 % page 8-9
 \begin{landscape}
@@ -665,12 +680,12 @@ A previous study compares structural mass per unit hull volume for marine struct
 \fi
 
 \subsubsection{Assessing Design Paradigms}
-Based on the above, is reactive control best?
+\hl{Based on the above, is reactive control best?
 Survivability and dynamics constraints and the level at which you choose to constrain being the thing to focus on, not an argument about full reactive versus pure damping.
 Should structural sizing inform control design, like PTO sizing does, not the other way around?
 Is drag a big deal? The presence of it is, but the exact value isn't, because the dynamic constraints are more important.
 Reason: the dynamic constraints are what medaite the multidisciplinary interactions and coupling, so this supports the importance of coupling, and dynamic constraints are a good way to frame that conversation because they are both concrete and important.
-Do you always want $N_{WEC}$ low when you have a target power?
+Do you always want $N_{WEC}$ low when you have a target power?}
 
 % 550 - 579
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -716,7 +731,7 @@ This subsection evaluates how realistic the optimization formulation choices are
     Dynamic parameters (blue), including the float and spar drag coefficients and PTO efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
     Some structural thicknesses ($t_{fb}$ and $t_d$ in both, $t_{sr}$ in cost minimization) are insensitive to all parameters because the optimum sits consistently at the lower bound, reinforcing the need to improve the structures model for thin-skinned stiffened shells.
     
-    Examining geometric parameters for promotion to design variables:
+    \hl{Examining geometric parameters for promotion to design variables:}
     $D_d/D_s$ strongly affects four design variables ($D_s$, $t_{sr}$, $h_s$, $h_{\text{stiff},f}$), indicating $D_d$ should be a design variable;
     $T_{f,1}/T_{f,2}$ strongly affects the overall draft $T_{f,2}$, indicating $T_{f,1}$ should be one too;
     $T_s/D_s$ affects $h_s$ and $h_{fs,\text{clear}}$, indicating $T_s$ should be added alongside $h_s$;
@@ -839,10 +854,10 @@ The damping control front is a bit more non-convex, with cusps at around 85, 90,
 \fi
 
 % 628 - 654
-\subsection{Future Work}
+% \subsection{Future Work}
 \ifdefined\DISSERTATION
-    Future improvements span two axes: enhancements to the model and enhancements to the optimization formulation, each applicable to either the existing setup or a new one.
-    \Cref{remdo:tab:future-studies} organizes the most promising directions along these axes.
+    % Future improvements span two axes: enhancements to the model and enhancements to the optimization formulation, each applicable to either the existing setup or a new one.
+    % \Cref{remdo:tab:future-studies} organizes the most promising directions along these axes.
 
 % 	\paragraph{Not including powertrain impedance/generator model/real control co-design
 % 	\paragraph{Grid scale does not include PBE}
