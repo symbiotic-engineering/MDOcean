@@ -69,7 +69,7 @@ The hydrodynamic coefficients $\vec{\gamma}$, $\mathbf{A}_h$, $\mathbf{B}_h$, an
 
 The displacement vector $\vec{\hat{\xi}}$ contains a state for each degree of freedom.
 We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
-A two-body heaving point absorber that rigidly locks the bodies in a storm following \cite{RM3} has vectors:
+A two-body heaving point absorber that rigidly locks the bodies in a storm following \citet{RM3} has vectors:
 \begin{equation}\label{eq:define-vectors}
     \vec{\hat{\xi}}_{op} = \begin{bmatrix}
         \hat{\xi}_f \\ \hat{\xi}_s
@@ -172,7 +172,7 @@ To ensure physicality, the added mass and damping matrices are required to remai
 Any violations are corrected by adjusting the coupling terms $A_c$ and $B_c$.
 
 %  \subsubsection{Spar Dynamics}
-% The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \cite{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
+% The RM3 is a two-body system where the relative motion of the float and spar produces power. However, capturing these underactuated multibody dynamics would require more complicated modeling and control \citep{faedo_principle_2022}, especially in the context of force saturation%, as well as implementation of the excitation force phase in MEEM.
 % While updating these models is important future work, a fixed spar is assumed for this study. Thus the results can be considered more dynamically representative of a single-body point absorber or a two-body point absorber with bottom-mounted spar, as might be encountered in shallow water. Nonetheless, calculations still utilize the 45 m water depth of Humboldt Bay, and the results provide relevant preliminary design insights about a floating spar device, especially because the spar structures and economics are still considered. To ensure that the fixed spar assumption is reasonably accurate, the spar amplitude is required to remain small.
 
 % Rather than checking this requirement by calculating the spar amplitude exactly, as this would require the exact modeling complications which the fixed-spar assumption intends to circumvent, the characteristics of second-order linear systems are used to develop a simple sufficient criteria for low spar motion. The peak response amplitude of a system with equation of motion $m\ddot{x}+b\dot{x}+kx=F$ is:
@@ -183,7 +183,7 @@ Any violations are corrected by adjusting the coupling terms $A_c$ and $B_c$.
 % \end{equation}
 % where damping ratio is $\zeta=\frac{b}{2\sqrt{mk}}$ and natural frequency is $\omega_n=\sqrt{\frac{k}{m}}$. To keep the peak spar amplitude $|X|_{pk}$ low, both $\zeta$ and $m\omega_n^2/F=k/F$ should be kept high. A sufficient criteria for maintaining $|X|_{pk}$ below some nominal threshold $|X|_{pk,nom}$ is therefore to constrain $\zeta=\zeta_{nom}$ and $k/F > (k/F)_{nom}$. While this is not a necessary condition (other designs could also maintain low spar amplitude), a sufficient condition is adequate for preliminary optimization purposes. 
 
-% Expressing these conditions in terms of the uncontrolled spar dynamic coefficients \cite{tao_low_2003}:
+% Expressing these conditions in terms of the uncontrolled spar dynamic coefficients \citep{tao_low_2003}:
 % \begin{equation}\label{eq:spar}
 % \begin{aligned}
 % b &= b_{s,rad}+b_{s,drag} \\
@@ -215,7 +215,7 @@ This subsection introduces the dynamics and control modeling assumptions before 
 
 \ifdefined\DISSERTATION
     Methods for WEC dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), quasi-linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
-    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest, with studies \cite{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} and studies \cite{abdulkadir_optimal_2024,lin_fast_2025} serving as illustrative examples of each case.
+    In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest. \citet{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} study the former and \citet{abdulkadir_optimal_2024,lin_fast_2025} illustrate the latter.
     This section describes both the technical concept and the practical rationale for the choice of a quasi-linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
@@ -224,7 +224,7 @@ This subsection introduces the dynamics and control modeling assumptions before 
     Dynamic constraints on amplitude, force, and peak power significantly influence the trade-off of power and cost, and amplitude limits are required to obtain a physically meaningful result.
     Besides nonlinearities, MDOcean also requires a low computation cost, since the dynamics will be evaluated many thousands of times during optimization.
     Of the methods mentioned, Pontryagin's maximum principle (PMP) and quasi-linearized pseudo-spectral techniques meet these requirements.
-    PMP requires an analytically difficult derivation unique to the specific nonlinearities in question because wave energy dynamics have a particular form requiring so-called singular control \cite{zou_optimal_2017}.
+    PMP requires an analytically difficult derivation unique to the specific nonlinearities in question because wave energy dynamics have a particular form requiring so-called singular control \citep{zou_optimal_2017}.
     On the other hand, quasi-linearized pseudo-spectral techniques are simple and intuitive.
     Therefore, MDOcean pursues a semi-analytical quasi-linearized pseudo-spectral method.
 \else
@@ -256,15 +256,15 @@ Avoiding iterative numerical optimization substantially reduces computational co
     \Cref{fig:venn-diagram} shows a Venn diagram comparing different methods for optimal control synthesis in greater detail.
     Typical frequency domain methods for control design, such as loop shaping, PID tuning, and $H_\infty$/$H_2$ control for general applications, along with complex-conjugate impedance matching for power-maximizing applications such as wave energy, cannot take into account constraints and nonlinearities.
     Meanwhile, typical methods for nonlinear control design, such as feedback linearization, sliding mode control, backstepping, and Lyapunov-based control, are performed in the time domain and do not incorporate constraints.
-    Latching and declutching control are wave-energy-specific passive nonlinear bang-bang control methods that utilize the frequency-domain concept of phase-matching the fundamental harmonic of the response to the wave excitation, but they are still primarily time-domain methods and do not incorporate constraints \cite{hals_comparison_2011}.
+    Latching and declutching control are wave-energy-specific passive nonlinear bang-bang control methods that utilize the frequency-domain concept of phase-matching the fundamental harmonic of the response to the wave excitation, but they are still primarily time-domain methods and do not incorporate constraints \citep{hals_comparison_2011}.
     Methods for constrained optimal control, meanwhile, such as model predictive control (MPC), constrained linear-quadratic regulation (LQR), and trajectory optimization are likewise time-domain and were originally derived for linear control problems, although nonlinear extensions exist including nonlinear MPC (NMPC), constrained iterative LQR (iLQR), and differential dynamic programming (DP).
     Other methods for nonlinear constrained optimal control in the time domain include the already-discussed PMP and the control barrier function method.
-    Methods to incorporate nonlinearities in the frequency domain include harmonic balance synthesis, which retains full nonlinearity in a sinusoidal-steady state analysis so technically falls in the spectral domain rather than the frequency domain; its linearized counterpart, describing function (DF)-based synthesis \cite{atherton_nonlinear_1982,gelb_multiple-input_1968}; and the extension of the latter to broadband inputs, spectral linearization (also called stochastic linearization, Gaussian closure, and quasi-linear control) \cite{roberts_random_2003,ching_quasilinear_2010}.
+    Methods to incorporate nonlinearities in the frequency domain include harmonic balance synthesis, which retains full nonlinearity in a sinusoidal-steady state analysis so technically falls in the spectral domain rather than the frequency domain; its linearized counterpart, describing function (DF)-based synthesis \citep{atherton_nonlinear_1982,gelb_multiple-input_1968}; and the extension of the latter to broadband inputs, spectral linearization (also called stochastic linearization, Gaussian closure, and quasi-linear control) \citep{roberts_random_2003,ching_quasilinear_2010}.
     These methods are not optimal control methods and do not incorporate constraints, although it is possible to sub-optimally enforce constraints by applying a saturation nonlinearity to the constrained quantity.
-    Finally, methods which combine frequency domain synthesis with constrained optimal control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (OC), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (IM), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (LMIs), typically in the context of robust control \cite{vanantwerp_tutorial_2000}.
+    Finally, methods which combine frequency domain synthesis with constrained optimal control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (OC), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (IM), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (LMIs), typically in the context of robust control \citep{vanantwerp_tutorial_2000}.
 
     At the intersection of all three categories lies nonlinear spectral OC, pseudo-spectral OC, and the method used in MDOcean, which we call ``quasi-linearized pseudo-spectral OC.''
-    The pseudospectral method uses the same global basis function representation as spectral OC, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \cite{elnagar_pseudospectral_1995}.
+    The pseudospectral method uses the same global basis function representation as spectral OC, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \citep{elnagar_pseudospectral_1995}.
     Pseudo-spectral methods often employ Legendre or Chebyshev polynomial bases, although in wave energy Fourier bases are more typical.
     In this case, the method is equivalent to a nonlinear trajectory optimization problem that enforces both spectral-domain harmonic balance and time-domain constraints.
     The quasi-linearized pseudo-spectral method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
@@ -331,7 +331,7 @@ The modified frequency-domain approach with the highest accuracy and optimality 
 This synthesis can occur in a number of ways.
 If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via the Pontryagin Maximum Principle (PMP)) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of QLPS in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
 \ifdefined\DISSERTATION
-    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \cite{zou_optimal_2017}) or analytical time-integration (as in the method of \cite{lin_fast_2025}).
+    This differs from the standard PMP method in that the evaluation of the response and power corresponding to the time-domain PMP controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \citet{zou_optimal_2017}) or analytical time-integration (as in the method of \citet{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
 \fi
 For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
@@ -350,7 +350,7 @@ MDOcean pursues this approach for amplitude limits in the operational design loa
 \ifdefined\DISSERTATION
     The constrained optimization to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain and will be discussed in detail in \Cref{sec:optimal-control}.
     The current MDOcean software uses the numerical approach, which requires more computation time but is simpler to implement and equally accurate.
-    The analytical approach is nonetheless derived in \Cref{sec:optimal-control} (with further details and graphical visualization of the constraints in \Cref{sec:appendix-qp-solution} and reference \cite{mccabe_force-limited_2024}) and recommended for future implementation.
+    \Cref{sec:optimal-control} derives the analytical approach, while \citet{mccabe_force-limited_2024} and \Cref{sec:appendix-qp-solution} provide details and visualizations.
 \else
     The constrained optimization used to identify the controller in (M1.2) and (M2) can be performed numerically or analytically by analyzing an impedance-mismatched linear system in the frequency domain;
     the analytical derivation is provided in \Cref{sec:optimal-control}, with additional details in \Cref{sec:appendix-qp-solution}.
@@ -362,7 +362,7 @@ If neither a numerical nor an analytical implementation is available to identify
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous WEC optimization studies for various constraints \cite{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
+    It has been used in several previous WEC optimization studies for various constraints \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
 \else
     This simple approach has been used in several previous WEC optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
     and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
@@ -370,7 +370,7 @@ This approach neglects the corresponding effect of the saturation/zeroing on oth
 It is utilized here for the power limit.
 
 As a last resort, the energy in that sea state can be zeroed (M4),
-essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which reference~\cite{mccabe_constrained_2013} pursues for a radiation limit constraint.
+essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which \citet{mccabe_constrained_2013} pursues for a radiation limit constraint.
 These approaches do not attempt to find dynamic solutions which satisfy the limits, and essentially deal with violations by penalizing the optimization through either the objective or constraints.
 The latter approach (M5) is actually the only option for evaluation of slamming amplitude limits in the storm design load case.
 \ifdefined\DISSERTATION
@@ -423,16 +423,16 @@ The former encodes the describing function formula directly into the simulation 
     Because the same describing function is applied in both synthesis and evaluation, the inverse and forward describing functions cancel; the time-domain nonlinear controller need not be reconstructed for power evaluation, only for hardware implementation.
 \fi
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
-The RAFT open-source Python package for offshore wind turbines uses the drag describing function with iteration but does not include describing functions for saturation \cite{hall_open-source_2022}.
+\citet{hall_open-source_2022} documents the RAFT open-source Python package for offshore wind turbines, which uses the drag describing function with iteration but does not include describing functions for saturation.
 MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabling efficient simulation while retaining model fidelity.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Equation of Motion}\label{sec:eom}
 \ifdefined\DISSERTATION
     Before applying the quasi-linearized pseudo-spectral method described above, we first present the equations of motion for a standard linear WEC model, starting in the time domain and quickly moving to the frequency domain.
-    Specifically, we combine the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
-    The MDOcean dynamic model combines the bi-conjugate network model of \cite{coe_co-design_2025} with the underactuated multi-degree of freedom model of \cite{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    The MDOcean dynamic model combines the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to express the equations of motion for a multibody WEC subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \fi
 
 The float and spar are each modeled as a floating rigid body, and the two bodies are kinematically coupled to transmit force between them.
@@ -495,7 +495,7 @@ Three matrix forms describe the port relationships:
 impedance ($\mathbf{Z}$) groups all ports together;
 cascade ($\mathbf{a}$/ABCD) transmits efforts and flows sequentially between port groups and is used for the PTO dynamics (\Cref{sec:appendix-pto-model});
 hybrid ($\mathbf{h}$) mixes the two and is used for the PTO kinematics.
-Full conventions, conversion formulas, and the cascade inversion rule are given in \Cref{sec:appendix-multiport}, following \cite{reveyrand_multiport_2018}.
+Full conventions, conversion formulas, and the cascade inversion rule are given in \Cref{sec:appendix-multiport}, following \citet{reveyrand_multiport_2018}.
 
 \begin{figure}[htbp]
 \centering
@@ -551,7 +551,7 @@ To capture non-dynamic power losses such as those in an electrical drive, a cons
     Note that this is not strictly equivalent to assuming the generator has constant efficiency, since controllers with reactive terms ($K_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
     The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
 \fi
-Validation in \Cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \cite{RM3}.
+Validation in \Cref{sec:validation-benchmarking} sets $\eta=80\%$ to match the RM3 design assumption of \citet{RM3}.
 
 The full expansion of $p_{\text{avg},\text{elec}}$ and $p_{pk,\text{elec}}$ in terms of the optimal-control variables $B_l$, $K_l$, and the electrical-port current phasor $\hat{I}$ is given in \Cref{sec:appendix-power-elec}.
 
@@ -762,7 +762,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
     higher-order nonlinear potential flow effects, and
     steady and unsteady viscous separation phenomena are all neglected.
     In this section, we model the form drag due to viscous flow separation, including steady wake losses, turbulence, and cycle-averaged vortex shedding.
-    These effects have been found to be the dominant drag force for heaving WECs \cite{quartier_influence_2021} and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
+    \citet{quartier_influence_2021} finds that these effects are the dominant drag force for heaving WECs and are important to avoid unrealistically high resonant peaks in the response amplitude which would lead to overestimates of power production.
 \else
     The linear, inviscid hydrodynamics model of \Cref{sec:hydro} omits viscous flow separation, which is the dominant drag mechanism for heaving WECs \citep{quartier_influence_2021}.
     Without modeling drag, the predicted resonant amplitude is unrealistically high and power is overestimated.
@@ -771,7 +771,7 @@ The result is updated effective values for control gains $B_l$ and $K_l$ that re
 % Maha question: should we just jump to the result instead of deriving p_d approximation? (5/18/26)
 Drag force $\vec{F}_d$ is proportional to the product of the relative velocity of the WEC and incident wave, $\vec{v}_{\text{rel}}(y,t)=\vec{\dot{\xi}}(t)-\vec{v}_{\text{wave}}(y,t)$, with its absolute value.
 The resulting quadratic form $|\vec{F}_d|\sim|\vec{v}_{\text{rel}}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
-To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \cite{quartier_influence_2021}.
+To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \citet{quartier_influence_2021}.
 The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ is modeled with empirical drag coefficient vector $\vec{C}_d$:
 \begin{equation}\label{eq:drag-pressure}
     \vec{p}_{d}(y,t) = \frac{1}{2}\rho_w \vec{C}_d ~\vec{v}_{rel}(y,t) |\vec{v}_{rel}(y,t)|
@@ -798,7 +798,7 @@ Integrating the drag pressure over the wetted surface via strip theory (\Cref{se
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
 Explicit expressions for $\mathbf{B}_d$ and $\vec{\gamma}_d$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
@@ -831,7 +831,7 @@ We now combine the results across sea states to find the long-term energy statis
 
 To find the long-term average power production $\overline{P}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{P}^{H,T}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in \Cref{fig:JPD-multiply}.
-The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \cite{janzou_system_2020}.
+The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \citet{janzou_system_2020}.
 
 \begin{figure}[b!]
 \centering
@@ -997,7 +997,7 @@ The values of $\Delta z$ used for float and spar in operational and storm cases 
 
 \ifdefined\DISSERTATION
     The values $h_{fs,\text{clear}}$, $h_{fs,\text{up}}$, $h_{fs,\text{down}}$, $\xi_{f,\text{linear}}$, and $\xi_{s,\text{linear}}$ are all upper limits and are independent of sea state, while $\xi_{\text{slam}}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \Cref{sec:appendix-slam}.
-    In early design studies that do not directly compute the hydrodynamic coefficients and associated power production, the amplitude limits proposed here could be plugged into Budal's upper bound, a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity to yield an upper bound on power production \cite{zou_practical_2023}.
+    In early design studies that do not directly compute the hydrodynamic coefficients and associated power production, the amplitude limits proposed here could be plugged into Budal's upper bound, a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity to yield an upper bound on power production \citep{zou_practical_2023}.
 
     Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
     This is a questionable assumption, but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
@@ -1068,7 +1068,7 @@ The factors of safety represent the multiplicative increase in force before stre
     The structures module therefore runs significantly faster than traditional finite element method (FEM) simulations, though it lacks the ability to easily generalize to other geometries, boundary conditions, and load cases as a FEM model could.
 
     More specifically, the peak limits analyzed include yield, global buckling, local buckling, and ultimate where appropriate, while the endurance limit assesses high-cycle fatigue.
-    The latter is potentially conservative, and future work could implement Miner's law to better represent infrequent operational loads (low-cycle fatigue) \cite{ove_arup__partners_ltd_structural_2016}.
+    The latter is potentially conservative, and future work could implement Miner's law to better represent infrequent operational loads (low-cycle fatigue) \citep{ove_arup__partners_ltd_structural_2016}.
 \else
     Peak-limit checks include yield, global buckling, local buckling, and ultimate where appropriate;
     the endurance limit assesses high-cycle fatigue.
@@ -1160,7 +1160,7 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
 \ifdefined\DISSERTATION
     The MDOcean economics model aims not to predict the precise cost breakdown of a given design but to accurately reflect the scaling of cost with design variables to facilitate design optimization and tradeoff analysis.
     With this in mind, the model lumps costs into categories that are either constant or scale with design, and the constant costs and scale factors are tuned to match more detailed cost breakdowns.
-    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS) \cite{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
+    The cost data chosen for tuning is the RM3 Cost Breakdown Structure (CBS), first published by \citet{neary_reference_2014} and reproduced in \Cref{tab:CBS} of \Cref{sec:appendix-econ}.
 \else
     The MDOcean economics model prioritizes capturing the scaling of cost with design variables over predicting absolute cost.
     Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).

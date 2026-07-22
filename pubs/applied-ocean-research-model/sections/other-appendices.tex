@@ -4,7 +4,7 @@
 \label{sec:appendix-additional-hydro}
 \subsection{Spar Coefficients}
 As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides MEEM.
-We approximate the spar added mass coefficient $A_s$ as a frequency-independent quantity using a formula proposed by \cite{philip_damping_2012} based on the displaced water volume in the spherical projection of the damping plate:
+We approximate the spar added mass coefficient $A_s$ as a frequency-independent quantity using a formula that \citet{philip_damping_2012} proposes based on the displaced water volume in the spherical projection of the damping plate:
 \begin{equation}\label{eq:As}
  A_s =\frac{1}{3}\rho_w D_d^3\left(1 - \frac{3}{4}r^2\sqrt{1-r^2} - \frac{1}{4}(1-\sqrt{1-r^2})^2(2+\sqrt{1-r^2})\right),
 \end{equation}
@@ -12,7 +12,7 @@ where $r = D_s/D_d$.
 This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\rho_w D_d^3$ at $r=0$) to a pure column limit ($\frac{1}{6}\rho_w D_d^3$ at $r=1$).
 
 The other spar coefficients are calculated by fitting and interpolating data from WAMIT for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
-To derive the dimensional scalings, we use the numerical results that \cite{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
+To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
 By plotting the data for a variety of geometries on a single plot and scaling the axes by dimensionless geometric ratios until the points begin to overlap as a single trend,
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
@@ -55,8 +55,8 @@ This section provides supplementary derivations and implementation details for t
 We next turn our attention to the PTO kinematics and dynamics, to specify the generic impedance matrix $\mathbf{Z}_p$ in \Cref{eq:eom-freq-domain}.
 A PTO model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
-Reference \cite{penalba_review_2016} reviews WEC PTO models and reference~\cite{coe_co-design_2025} synthesizes these into a multiport impedance matching network framework to facilitate control co-design.
-Reference \cite{coe_co-design_2025} presents a PTO model in cascade matrix form for a single degree of freedom system. 
+\citet{penalba_review_2016} review WEC PTO models and \citet{coe_co-design_2025} synthesize these into a multiport impedance matching network framework to facilitate control co-design.
+\citet{coe_co-design_2025} present a PTO model in cascade matrix form for a single degree of freedom system. 
 This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common PTO structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 
@@ -65,7 +65,7 @@ This section provides a general structure in effort-flow form applicable across 
 \label{sec:appendix-multiport}
 
 The intrinsic, powertrain, and Th\'evenin-equivalent representations used throughout \Cref{sec:dynamics} are all instances of multiport circuit models, with effort variables $\vec{e}$ and flow variables $\vec{q}$ at each port.
-Following \cite{reveyrand_multiport_2018}, three matrix forms describe the relationships between port variables: impedance ($\mathbf{Z}$), cascade ($\mathbf{a}$, also called ABCD), and hybrid ($\mathbf{h}$):
+Following \citet{reveyrand_multiport_2018}, three matrix forms describe the relationships between port variables: impedance ($\mathbf{Z}$), cascade ($\mathbf{a}$, also called ABCD), and hybrid ($\mathbf{h}$):
 \begin{equation}\label{eq:multiport-matrix-definitions}
 \vec{e} = \mathbf{Z}\,\vec{q},
 \qquad
@@ -94,12 +94,12 @@ This form is used for the PTO dynamics (drivetrain followed by generator).
 This form is used for the PTO kinematics, where it naturally accommodates underactuation.
 \end{itemize}
 
-Conversion between the three forms is accomplished using the formulas in reference \cite{reveyrand_multiport_2018}.
+Conversion between the three forms is accomplished using the formulas proposed by \citet{reveyrand_multiport_2018}.
 Some port relationships are physically well-defined in one convention but degenerate in another (for example, an ideal current source has no impedance representation but a well-defined hybrid representation) so the convention is chosen to match the physics of each subsystem.
 
-% Verify against \cite{coe_co-design_2025} before submission and edit
+% Verify against \citet{coe_co-design_2025} before submission and edit
 % if the convention differs.
-The sign convention adopted here treats both flows as positive when entering the multiport, matching \cite{coe_co-design_2025}.
+The sign convention adopted here treats both flows as positive when entering the multiport, matching the suggestion of \citet{coe_co-design_2025}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{PTO Kinematics and Underactuation}
@@ -625,7 +625,7 @@ where $d_{\mu\nu} = |\Gamma_{c,\nu} - \Gamma_{c,\mu}|$ is the distance between t
 $a_{\mu\nu} = \frac{1}{2}(r_{\mu}^2-r_{\nu}^2+d_{\mu\nu}^2)/d_{\mu\nu}$ is the distance from 
 the center of the $\mu$th circle to the midpoint of the two intersection points, 
 and $1i$ is the imaginary unit.
-The closest-point candidates $\mathcal{C}_{cl}$ match \equationautorefname~4 of \cite{mccabe_force-limited_2024},
+The closest-point candidates $\mathcal{C}_{cl}$ match the solution that \citet[\equationautorefname~4]{mccabe_force-limited_2024} derive.
 which provides the solution for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\mathcal{F}$, only compute $\mathcal{C}$ and then check whether each candidate point is feasible.
@@ -702,7 +702,7 @@ It is expected that the optimal design will have low reactivity because reactivi
 Notably, $\Gamma$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
 \citet{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
 
-Similar graphical interpretations of constraints for wave energy converters are presented in the studies \cite{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
+Similar graphical interpretations of constraints for wave energy converters are presented by \citet{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 \citet{mccabe_force-limited_2024} focus on force/current limits but discuss amplitude, phase voltage, and apparent power constraints as well.
 \citet{merigaud_geometrical_2023} consider exclusively amplitude limits while \citet{bacelli_geometric_2013} cover amplitude and force limits.
 \citet{mccabe_force-limited_2024} use Smith charts to show constraints directly in $\Gamma$ space as we do here, while \citet{merigaud_geometrical_2023} work in the complex plane of the hydrodynamic transmission coefficient and \citet{bacelli_geometric_2013} in that of the PTO force.
@@ -1047,9 +1047,9 @@ and would unlock a fully semi-analytical differentiation workflow.
 \Cref{sec:dynamics} introduces the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
 
 The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\pi}$ above the force limit.
-This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \cite{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \cite{coe_initial_2020} finds as numerically optimal).
+This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \citet{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \citet{coe_initial_2020} finds as numerically optimal).
 In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}. 
+For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \citep{mccabe_force-limited_2024}. 
 
 The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \Cref{sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case. 
 
@@ -1057,14 +1057,14 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 %\begin{equation}
 %    f_{sat} = \min\left( \alpha\frac{\tau_{max}}{\tau}, 1\right),
 %\end{equation}
-%where $\tau_{\text{max}}$ is the maximum permissible generator torque and $\alpha$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\tau_{\text{max}}$, using the describing function derived in \cite{mccabe_force-limited_2024},
+%where $\tau_{\text{max}}$ is the maximum permissible generator torque and $\alpha$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\tau_{\text{max}}$, using the describing function derived in \citep{mccabe_force-limited_2024},
 %\begin{equation}
 %    \alpha = \frac{2}{\pi} \left( \frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left(\frac{\tau_{max}}{F_p}\right)^2} \right).
 %\end{equation}
     
 %When $\frac{F_p}{\tau_{\text{max}}}$ = 1 (no saturation), then $\alpha= 1$; when $\frac{F_p}{\tau_{\text{max}}} \rightarrow \infty$ (full saturation), then $\alpha= \frac{4}{\pi}$. This makes sense because $\frac{4}{\pi}$ is the harmonic amplitude of a unit square wave, and in full saturation the saturated signal approaches a square wave. $\alpha$ is plotted in \Cref{fig:alpha-fit}.
 
-%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \cite{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
+%The factor $f_{sat}$ describes the ratio of the saturated and unsaturated torque signal. Previous work \citet{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $m_{sat}$, but this is not the case because the WEC response also changes with saturation. 
 
 % %Substituting $f_{sat}$ back into the equation of motion reveals that the control gain saturation multiplier $m_{sat}$ is the solution to a quadratic equation $a_q m_{sat}^2 + b_q m_{sat} + c_q = 0$. If the uncontrolled dynamics have a natural frequency $\omega_{n,u}$ and damping ratio $\zeta_u$, and the controlled unsaturated dynamics have natural frequency $\omega_n$ and damping ratio $\zeta$, then the quadratic coefficients can be expressed as:
 
@@ -1106,7 +1106,7 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 
 % The no saturation case ($f_{sat} = 1$) for \eqref{abc-matrix} yields $m_{sat}=1$. This confirms the expected behavior that when no force reduction is required, the powertrain coefficients can remain unchanged.
 
-% Equations \eqref{eq:abc-matrix} and \eqref{eq:theta-basis} are an equivalent reformulation of \cite{mccabe_force-limited_2024}, which uses expressions for the complex reflection coefficient $\Gamma$ common in electrical engineering, rather than the damping ratio and natural frequency more common in mechanical engineering. The equivalence is:
+% Equations \eqref{eq:abc-matrix} and \eqref{eq:theta-basis} are an equivalent reformulation of \citet{mccabe_force-limited_2024}, which uses expressions for the complex reflection coefficient $\Gamma$ common in electrical engineering, rather than the damping ratio and natural frequency more common in mechanical engineering. The equivalence is:
 % \begin{equation}
 %     \Gamma = \frac{z-1}{z+1}, \quad z = \frac{2\theta_1 + i~ \theta_4}{-2(\theta_1+\theta_2) + i~(\theta_3+\theta_4)}
 % \end{equation}
@@ -1150,7 +1150,7 @@ Plugging the describing function \Cref{eq:drag-pressure} into the drag force int
     + \vec{\gamma}_{d} \hat{\zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
-The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \cite{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
 The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
@@ -1262,19 +1262,19 @@ The relevant limits are then:
 %%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
 \label{subsec:appendix-drag-others}
-The WEC drag model in the study \cite{quartier_influence_2021} also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+\citet{quartier_influence_2021} propose a WEC drag model that also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
 While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
-Furthermore, the drag ``damping'' term in the grouping of \cite{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
+Furthermore, the drag ``damping'' term in the grouping of \citet{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
 This creates the confusing possibility for negative apparent damping coefficients, leading to false concerns about violating energy conservation if erroneously interpreted as a true damping coefficient.
 The damping-excitation grouping chosen in \Cref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
 
-Another improvement over \cite{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
-Reference \cite{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
-This means that Ref.~\cite{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
-Early MDOcean simulations that used the formulation of \cite{quartier_influence_2021} found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
+Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
+\citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+This means that \citet{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+Early MDOcean simulations that used the \citet{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \Cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \cite{quartier_influence_2021}.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \citep{quartier_influence_2021}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
@@ -1283,7 +1283,7 @@ The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
 The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \Cref{eq:eom-freq-domain} and $k$ is the iteration index.
-It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria:
+It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \citet{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
     \frac{\partial}
@@ -1467,7 +1467,7 @@ Meanwhile, the error is extremely low in the 2-DOF system enforcing the same hyd
 This indicates that the larger error in the 2-DOF-drag-MEEM case is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF.
 The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
 
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \cite{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
 For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
@@ -1629,7 +1629,7 @@ The current decomposition preserves multiplicativity, which is the key advantage
 \subsection{RM3 Cost Breakdown Structure}
 \label{sec:appendix-econ-cbs}
 
-The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \cite{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
+The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
 Percentages are shown for both single-device ($N_{WEC}=1$) and array ($N_{WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \Cref{eq:cost-power-law}.
 
 \begin{table}[htbp]
@@ -1706,7 +1706,7 @@ The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Economic Validation}
 \label{sec:appendix-econ-validation}
-\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \cite{RM3} reference values.
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \citet{RM3} reference values.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/cost_vs_N_WEC.pdf}]{figs/from-matlab/cost_vs_N_WEC.pdf}
@@ -1723,7 +1723,7 @@ It outputs a factor of safety for each limit case.
 First, it obtains equivalent section properties based on the plate and stiffener dimensions.
 Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \citep{young_roarks_2001} and the references therein.
 Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit-state expressions for each possible failure mode of each major structural element under each design load case.
-For consistency with the reference model report \cite{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
+For consistency with the reference model report \citep{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Equivalent Section Properties for Stiffened Plates}
@@ -1802,7 +1802,7 @@ The top and bottom plates are the only ones with external heave loads, arising f
 
 The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \Cref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
-For example, reference~\cite{young_roarks_2001} contains models for rectangular plates under perpendicular loading.
+For example, \citet{young_roarks_2001} compile models for rectangular plates under perpendicular loading.
 They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
 This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{\text{min}}^2$.
 For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{\text{min}}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{\text{min}}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{\text{min}}=b_1$, and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
@@ -1836,7 +1836,7 @@ Under a distributed pressure $q$, the bottom plate maximum moment per unit lengt
 \begin{equation}\label{eq:bottom-plate-moment}
 M_{bot}=\beta q x_{\text{min}}^2
 \end{equation}
-for $\beta$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \cite{timoshenko_theory_1959}, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+for $\beta$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
 While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
 
 \subsubsection{Float Top Plate}
@@ -1849,9 +1849,9 @@ Under these conditions, either the stress at the center $\sigma_{\text{cent}}$ o
         \sigma_{\text{cent}}&=-\beta_2 W/t_{f,\text{top},eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ in reference \cite{young_roarks_2001}.
+using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
-However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design in references \cite{RM3,previsic_reference_2011}.
+However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
 
@@ -1864,7 +1864,7 @@ This prevents the need for a separate structural analysis of the side plates.
 \subsection{Damping Plate}
 For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{\text{plate}}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
-Formulas for the concentrated loading are given in reference \cite{boedo_corrected_1998}, and formulas for distributed loading are given as case 2L of table 11.2 in reference \cite{young_roarks_2001}.
+Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
 The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
@@ -1874,7 +1874,7 @@ This results in the following expression for the radial plate bending stress $\s
     \right)
 \end{equation}
 
-The critical buckling stress $\sigma_{\text{buckle}}$ is found according to \cite{american_bureau_of_shipping_requirements_2022}.
+The critical buckling stress $\sigma_{\text{buckle}}$ is found with the \citet{american_bureau_of_shipping_requirements_2022} methodology.
 The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
 The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
@@ -1969,11 +1969,11 @@ These equations assume that the spar is compact, meaning that local buckling of 
 $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
 $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
 $h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \cite{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \cite{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
-$H_{s,\text{struct}}$ & 100 year wave height \cite{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \cite{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
-$T_{\text{struct}}$ & 100 year wave peak period \cite{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
+JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
+$H_s$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
+$T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
 $\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
 $E$& Material Young's modulus& 200 & GPa  \\ 
