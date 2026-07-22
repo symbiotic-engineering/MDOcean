@@ -159,15 +159,13 @@ The encoding of a physical design space into optimization design variables is no
     Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
     Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
-<<<<<<< HEAD
-    For example, the float and spar drafts may be encoded directly as dimensions or nondimensionally as a dimension and a ratio.
-    An encoding may be chosen to control the objective directly, induce convexity, or maintain feasibility; the last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
-    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint; early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
-=======
-    For example, bulk dimensions hvm may be encoded directly as dimensions or as nondimensional ratios.
-    An encoding may be chosen to control the objective directly, induce convexity in the obj or constraints, or maintain feasibility. The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints, and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
-    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint. Early results with nondimensional encodings \cite{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
->>>>>>> origin/post-submit-edits-old
+    For example, bulk dimensions may be encoded directly as dimensions or as nondimensional ratios.
+    An encoding may be chosen to control the objective directly, induce convexity in the objective or constraints, or maintain feasibility.
+    The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty,
+    via parameters, bounds, linear constraints, or nonlinear constraints,
+    and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
+    Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint.
+    Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.
 \fi
 
 This logic repeats for the remaining design variables and requirements.
@@ -258,13 +256,10 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
     While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else
-<<<<<<< HEAD
-    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed, a choice that adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
-    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
-=======
-    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed. This choice adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
-    Recent papers have demonstrated the value of full PTO co-design \cite{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
->>>>>>> origin/post-submit-edits-old
+    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed.
+    This choice adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
+    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023};
+    pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
 \fi
 
 %\subsubsection{Model Checking}
@@ -272,7 +267,6 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 %It was initially speculated that the structural constraints would always be active, 
 
 \subsection{Interpretation}
-\label{remdo:sec:formulation}
 Translating raw optimization outputs into meaningful engineering insights is nontrivial and rarely made explicit.
 Consistent with MDO as part of the design process, this section outlines the methodology for interpreting optimation and sensitivity results for wave energy, focusing on which design questions can and cannot be addressed by which results.
 % maybe instroduce this distinction when discussing choice of DVs vs parameters originally? think of PTO size, structures, and h_fs_clear as dynamic limit setters. maybe cite Pat's book on how parameter sensitivities can be used for factor screening and other things.

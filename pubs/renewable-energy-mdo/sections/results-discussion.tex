@@ -22,7 +22,7 @@ Above water, the nominal design's long float-spar connection tubes give way to a
 This results from the fixed submersion fraction $T_{f,2}/h_f$, which forces float height $h_f$ to grow when draft $T_{f,2}$ increases.
 This is reasonable given the symmetry of the slamming and submersion constraints
 \ifdefined\DISSERTATION
-    (see \Cref{aor:sec:appendix-slamming})
+    (see \Cref{sec:appendix-slam})
     %though a different $h_f$ could potentially obtain better performance by capitalizing on the slight asymmetry.
 \fi
 .
@@ -304,10 +304,16 @@ If the WEC is infeasible, the gap determines the reduction to the base cost of s
 \ifdefined\DISSERTATION
     \Cref{remdo:fig:constraint-activity} shows which constraints are active along the front.
     Three structural design variables ($t_d$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) reach their lower bound and none their upper bound.
-    The only active linear constraint is the spar natural frequency constraint; since it is priority 2 (required for modeling accuracy under the assumptions), its activity is significant and discussed further in \Cref{remdo:sec:discussion}.
-    Aside from the maximum force constraint (always active by design), the active nonlinear constraints are the float, column, and damping plate factors of safety and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing float slamming.
+    %The only active linear constraint is the spar natural frequency constraint;
+    %since it is priority 2 (required for modeling accuracy under the assumptions),
+    %its activity is significant and discussed further in \Cref{remdo:sec:discussion}.
+    Aside from the maximum force constraint (always active by design), the active nonlinear constraints are the float, column, and damping plate factors of safety
+    and the amplitude constraints preventing the float from rising above the spar, maintaining linear wave theory, and preventing float slamming.
 \else
-    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front: three structural variables at their lower bound, the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \Cref{remdo:sec:discussion}), and the structural factor-of-safety and float-amplitude constraints.
+    \Cref{remdo:fig:constraint-activity} shows the active constraints along the front:
+    three structural variables at their lower bound,
+    %the spar natural frequency constraint (a priority 2 modeling-accuracy constraint whose activity is discussed in \Cref{remdo:sec:discussion}),
+    and the structural factor-of-safety and float-amplitude constraints.
 \fi
 \begin{figure*}[htbp]
     \centering
@@ -339,7 +345,7 @@ People should start designing with a nominal reactive power, not as much or as l
 \paragraph{Assessing the Appeal of Fatigue-Minimizing Control}
 Notably, the base cost of survival differs substantially between damping and reactive control.
 This implies that the base cost of survival does not depend entirely on the storm DLC as might be expected, since the model assumes that the PTO locks and the control scheme is irrelevant in a storm.
-An examination of Lagrange multipliers (see \Cref{fig:re:constraint-activity}) confirms that operational fatigue constraints are active while storm constraints are inactive.
+An examination of Lagrange multipliers (see \Cref{remdo:fig:constraint-activity}) confirms that operational fatigue constraints are active while storm constraints are inactive.
 Essentially, damping control reduces fatigue loads compared to a reactive controller of the same power capability.
 This suggests that an R\&D program targeting reductions in the base cost of survival
 (or more generally enhancing the economic viability of WECs with power requirements under 100~kW,
@@ -489,7 +495,7 @@ normalized so that a value of 1 means a given percent increase in the parameter 
 \ifdefined\DISSERTATION
     Because sensitivities show that the optimal LCOE is particularly sensitive to efficiencies and site characteristcs that drive energy generation,
     \Cref{remdo:fig:power-matrix-opt} shows a multiplicative breakdown of the power matrix for the minimum-LCOE design to reveal which factors most limit energy production.
-    See \Cref{aor:sec:power-matrix-mult} for the definitions of each quantity.
+    See \Cref{sec:discussion-multidisciplinary,sec:appendix-power-decomposition} for the definitions of each quantity.
     The radiation efficiency (closely related to the intrinsic impedance frequency response) has an unexpected bimodal shape, exhibiting both a gradual peak at low periods and a sharp resonant peak around 11~s.
     We observe a reduction in drag efficiency near the resonant period, where the oscillation amplitude and thus the relative WEC-water velocity is particularly high.
     The force limit factor departs from unity only at high wave heights and periods, and there it drops precipitously to less than 10\% at the highest period.
@@ -826,7 +832,6 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
 % 490 - 509
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Assessing Utility of Gradients for Multi-Objective Optimization}
-\label{remdo:sec:discussion-optimization}
 \ifdefined\DISSERTATION
     Recalling the prior WEC optimization studies of \Cref{remdo:sec:lit}, all prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm, a population-based heuristic.
     Based on the stated generation counts and population sizes \citep{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}, these require roughly 12{,}000, 2{,}200, 6{,}100, and 2{,}400 function evaluations to converge.
