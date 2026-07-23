@@ -1,5 +1,3 @@
-\clearpage
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Literature Review Column Legends}
@@ -13,7 +11,9 @@ The following tables define column-abbreviation legends for the optimization-stu
 \begin{table}[htbp]
     \centering
     \caption{Legend keys for the dynamics and controls columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}|P{0.04\linewidth}L{0.14\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-8}}
+    }
          \multicolumn{2}{c|}{Device}&  \multicolumn{2}{c|}{Hydro}&  \multicolumn{2}{c|}{Drag} &\multicolumn{2}{c|}{Domain} & \multicolumn{2}{c}{Controls} \\ \hline
          N-PA&  N-body floating point absorber&  MEEM&  Matched eigenfunction expansion method or similar &  DF& Describing function & F&Frequency domain & P&Proportional (pure damping) \\
          ATN&  Attenuator&  BEM&  Boundary element method&  LD& Linear damping & F+&Frequency domain, with extension to incorporate constraints or nonlinearities & PI&Proportional integral (damping and stiffness, aka reactive) \\
@@ -21,7 +21,7 @@ The following tables define column-abbreviation legends for the optimization-stu
          OSW&  Oscillating surge WEC&  FIT&  Fit of model to numerical or experimental data&  CFD& Computational fluid dynamics & PS&Pseudo-spectral& NL&Nonlinear structured \\
          OTP&  Overtopping&  ALG&  Algebraic approximation&  &  & & & UNS&Nonlinear unstructured \\
         OWC& Oscillating water column& & & & & & & & \\
-    \end{tabular}
+    \endtabular
     \end{table}
 \endgroup
 \end{landscape}
@@ -31,20 +31,24 @@ The following tables define column-abbreviation legends for the optimization-stu
 \setlength{\tabcolsep}{2pt}
 \begin{table}[htbp]
     \caption{Legend keys for other modeling columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-9}}
+    }
          \multicolumn{2}{c|}{Mooring}& \multicolumn{2}{c|}{Structures} &  \multicolumn{2}{c|}{Economics}&  \multicolumn{2}{c}{Sea state}\\ \hline
          DYN&  Model incorporates mooring dynamics &  AN&  Models stress analytically as a function of dimensions&  STR&  Models structural cost &  REG& Regular waves\\
          DES&  Study considers mooring physical design &  LO&  Models load without dimension-dependent stress &  PTO&  Models power take-off cost &  IRR& Irregular wave spectrum\\
          &  &  FEA&  Models stress using finite element analysis &  GEO&  Geometric cost proxy (i.e.\ hull volume, surface area)&  REG+, IRR+& Joint probabilities of wave heights and periods for multiple sea states\\
          &  &  &  &  FULL&  Full cost model &  STO& Storm condition\\
-    \end{tabular}
+    \endtabular
     \end{table}
 
 \bigskip
 
 \begin{table}[htbp]
     \caption{Legend keys for the optimization columns of \Cref{remdo:tab:lit}}
-\begin{tabular}{P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}|P{0.04\linewidth}L{0.18\linewidth}}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{re:table-10}}
+    }
          \multicolumn{2}{c|}{Optimization} &  \multicolumn{2}{c|}{Objective} &  \multicolumn{2}{c|}{Constraints} & \multicolumn{2}{c}{Design variables}\\  \hline
          LOC&  Local optimizer (gradient-based, derivative-free)&  ECON&  Economic metrics or proxies, including power/size ratios&  GEO&  Geometric (volume, inertial, layout)& DIM&Bulk dimensions\\
          GA&  Genetic algorithm&  PWR&  Power production&  AMP&  Amplitude, stroke& STR&Structural thickness\\
@@ -52,7 +56,7 @@ The following tables define column-abbreviation legends for the optimization-stu
          IT&  Iterated by hand&  ARRY&  Array spacing&  STA&  Stability& CTL&Control parameters\\
          ALT& Altair Inspire (commercial tool)& LO& Loads (force, force per size)& STR& Structural failure& SHP&Hull shape\\
          BF& Brute force sweep& BW& Bandwidth& PWR& Minimum power& &\\
-    \end{tabular}
+    \endtabular
     \end{table}
 \endgroup
 \end{landscape}
@@ -61,7 +65,7 @@ The following tables define column-abbreviation legends for the optimization-stu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Optimization Process Details}
-This section provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
+This appendix provides additional details on constraint definitions, scaling, and numerical settings used by the optimization workflow.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,10 +101,27 @@ The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert f
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Hessian Scaling Procedure}
-\label{remdo:sec:appendix-scaling}
+\subsection{Optimization Scaling Procedure}
+Problem scaling is critical for good results in practice.
+All constraints are normalized, transforming inequalities $f_{\text{min}} \leq f(x) \leq f_{\text{max}}$ to:
+\begin{equation}
+\begin{aligned}
+    \frac{f(x)}{f_{min}}-1 &\geq 0 \\
+    -\frac{f(x)}{f_{max}}+1 &\geq 0 \\
+\end{aligned}
+\end{equation}
+When $f_{\text{min}}$ or $f_{\text{max}}$ is zero --- as for $g_{NL,5}$ and $g_{NL,14}$, which constrain $GM$ and $P_{\text{avg}}$ to be positive --- the constraint is instead normalized by a constant of suitable order of magnitude.
+\ifdefined\DISSERTATION
+    Design variables are implemented in the engineering-notation SI unit that places the nominal value between 1 and 1000: meters for bulk dimensions, millimeters for structural dimensions, MN for force, and kilowatts for power.
+    The objectives are scaled to magnitude near one, using megawatts for power, millions of dollars for cost, and \$/kWh for LCOE.
+\else
+    Scaled design variables use the engineering-notation SI unit that places each nominal value between 1 and 1000, and the objectives are scaled to magnitude near one.
+\fi
+
+\paragraph{Hessian Scaling}
+For SQP, Hessian scaling further equalizes each variable's effect magnitude on the objective.
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
-Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as recommended in section 8.3 of reference text \cite{papalambros_principles_2017}:
+Then a scale vector $\textbf{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as \citet[section 8.3]{papalambros_principles_2017} recommend:
 \begin{equation}
     s_i = \frac{1}{\sqrt{H_{ii}}}
 \end{equation}
@@ -125,21 +146,21 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
     \centering
     \caption{Hyper-parameters used to control numerics}
     \label{remdo:tab:hyperparams}
-\begin{tabular}{lccc} \hline 
-          &Variable&  Value& Unit\\ \hline 
-          Simulation&$X_{tol}$&  0.01 & m \\ \hline 
-          &$\angle X_{tol}$& 3 & degrees\\ \hline 
-          &Maximum drag iterations& 100 & -\\ \hline 
-          &$N_{\text{harmonics}}$& 10 & - \\ \hline
-          &$b_{\text{max}}$ & 700.5 & - \\ \hline
-          SQP Optimization&Constraint tolerance& 1e-5 & - \\ \hline
-          &Iterations before Hessian scaling& 8 & - \\ \hline
-  &Maximum iterations after Hessian scaling& 150&-\\\hline
-  &Maximum function evaluations& 2000&-\\\hline
- Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\\hline
- & Minimum poll fraction& 1&\\\hline
- & Pareto set change tolerance& 1.6e-8&\\\hline
- & Maximum pattern search iterations& 100&\\\hline
+\begin{tabular}{lccc} \toprule 
+          &Variable&  Value& Unit\\ \midrule 
+          Simulation&$\xi_{tol}$&  0.01 & m \\
+          &$\angle \xi_{tol}$& 3 & degrees\\
+          &Maximum drag iterations& 100 & -\\
+          &$N_{\text{harmonics}}$& 10 & - \\
+          &$b_{\text{max}}$ & 700.5 & - \\ \midrule
+          SQP Optimization&Constraint tolerance& 1e-5 & - \\
+          &Iterations before Hessian scaling& 8 & - \\
+  &Maximum iterations after Hessian scaling& 150&-\\
+  &Maximum function evaluations& 2000&-\\ \midrule
+ Multi-objective optimization& Number of epsilon-constraint seeds& 8&-\\
+ & Minimum poll fraction& 1&-\\
+ & Pareto set change tolerance& 1.6e-8&-\\
+ & Maximum pattern search iterations& 100&-\\\bottomrule
     \end{tabular}
     \end{table}
 
@@ -147,6 +168,24 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Supplementary Results}
 \label{remdo:sec:appendix-supplemental-results}
+\subsection{Pre-Optimization Sweep}
+\Cref{remdo:fig:experiments} depicts a variable sweep using the one-at-a-time design-of-experiments method.
+Many designs are infeasible: those that violate nonlinear constraints are marked with an X,
+and those that violate linear constraints are not simulated to avoid errors as described in \cref{remdo:sec:requirements}.
+Most violations are due to structural failure of the damping plate, in both fatigue and ultimate load cases.
+A few designs violate hydrostatic pitch stability ($g_{NL,5}$) or geometrically incompatible damping plate thickness ($g_{L,7}$).
+Of particular note, the most significant LCOE decrease is obtained by increasing the float diameter.
+The LCOE attains a local minimum at a float diameter around 1.5 times the nominal design, but the plate fails structurally there.
+The PTO power and force ratings also attain local minima, as expected from the tradeoff of power generation and cost.
+The structural variables, meanwhile, increase with cost and do not affect power, so no direct LCOE tradeoff is expected; these variables exist solely to satisfy constraints.
+\begin{figure}[htbp]
+\centering
+\includegraphics[\FigureOptions{re:figs/from-matlab/experiments_ratios.pdf}]{figs/from-matlab/experiments_ratios.pdf}
+\caption{Exploratory one at a time sweep of design variables to understand tradeoffs prior to optimization. Feasible and infeasible designs are indicated with an O and X respectively.}
+\label{remdo:fig:experiments}
+\end{figure}
+%\hl{Maybe add a 2D sweep of $D_f$ and $T_{f,2}$ if I have time}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Single Objective Optimization Results}
@@ -155,10 +194,62 @@ where $\odot$ indicates element-wise matrix multiplication and $\varoslash$ elem
 The optimization converges in \resultsRE[singleObjIters]~iterations, not including the 8 initial iterations used to perform Hessian scaling.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/single_obj_convergence.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/single_obj_convergence.pdf}]{figs/from-matlab/single_obj_convergence.pdf}
 \caption{Single objective convergence plots}\label{remdo:fig:single-objective-convergence}
 \end{figure}
 
+\begin{table*}[htbp]
+    \centering
+    \input{tables/from-matlab/optimal_design_vars.tex}
+    \caption{Optimal design variables}\label{remdo:tab:opt-dv-values}
+\end{table*}
+\begin{table*}[htbp]
+    \centering
+    \input{tables/from-matlab/optimal_outputs.tex}
+    \caption{Optimal outputs}\label{remdo:tab:opt-output}
+\end{table*}
+
+\ifdefined\DISSERTATION
+    Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
+    and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
+    whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
+    Local parameter sensitivity is treated in \Cref{remdo:sec:appendix-sensitivities-local}; design-variable perturbation is examined here.
+    \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
+    $\Delta J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
+\else
+    The optimization also returns the objective gradient $\vec{\nabla} J$ and the Hessian of the Lagrangian, enabling further local sensitivities.
+    \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \Cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
+\fi
+% change plot so it represents magnitude, accuracy, and curvature
+
+
+\begin{equation}\label{remdo:eq:delta-J}
+    \Delta J \approx \vec{\nabla} J^T \Delta \vec{x}% + \frac{1}{2} \Delta \vec{x}^T H \Delta \vec{x}
+\end{equation}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[\FigureOptions{re:figs/from-matlab/delta_x.pdf}]{figs/from-matlab/delta_x.pdf}
+\caption{Change in objective for perturbation of design variables from the minimum LCOE design}\label{remdo:fig:delta-J}
+\end{figure}
+
+\ifdefined\DISSERTATION
+    The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\Delta J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
+    Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
+    The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
+    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
+    More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
+\else
+    The gradient estimate $\Delta J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
+    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
+    Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
+\fi
+Inaccuracies here, due to the nonlinear curvature of the true objective,
+motivates the choice to use reoptimization rather than post-optimality derivatives for the local parameter sensitivity analysis in \Cref{remdo:sec:appendix-sensitivities-local}.
+This makes gradient-based sensitivity analysis unappealing, but does not detract from the gradient's utility in the optimization itself.
+
+\subsection{Multistart}
 \Cref{remdo:fig:multistart-parallel-axis} shows the effect of starting point $x_0$ (leftmost column in each subplot) on the optimal design value $x^*$ (middle two columns) and optimal objective value $J^*$ (rightmost two columns).
 The meaning of $x$ in each subplot is indicated by the subplot title.
 The two starting points that achieve global optima, denoted in green and orange, both have low initial values of $T_{f,2}$ and medium initial values of $t_{f,b}$.
@@ -176,7 +267,7 @@ Future multistart procedures could therefore fix deterministic starts for the un
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/multistart_parallel_coordinates.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/multistart_parallel_coordinates.pdf}]{figs/from-matlab/multistart_parallel_coordinates.pdf}
 \caption{Parallel axis plot for effect of starting point on convergence}\label{remdo:fig:multistart-parallel-axis}
 \fillandplacepagenumber
 \end{figure}
@@ -184,12 +275,29 @@ Future multistart procedures could therefore fix deterministic starts for the un
 \endgroup
 \end{landscape}
 
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=\linewidth]{example-image-a}  % TODO (scrutineering): replace placeholder with real multistart bar chart
+% \caption{Bar chart showing impact of starting point on convergence behavior}\label{remdo:fig:multistart-bar}
+% \end{figure}
+
+% \begin{table}[htbp]
+% \begin{tabular}{c|c|c}
+%    Objective & Cost & Power \\ \hline
+%    Converged to any solution & XX & XX \\
+%    Converged to same optimum & XX & XX \\
+%    Converged to better optimum & 0 & 0 \\
+% \end{tabular}
+% \caption{Sensitivity to starting point}
+% \end{table}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Local Sensitivities}
-\label{remdo:sec:appendix-sensitivties}
+\label{remdo:sec:appendix-sensitivities-local}
 \Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters. 
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_re_optim_objective_grid.pdf}]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
 \caption{Local parameter sensitivity analysis to optimal objective $J^*$}
 \label{remdo:fig:param-sens-local-global-J-star}
 \end{figure}
@@ -207,7 +315,7 @@ This method involves setting up a simple linear system for each parameter $p_i$ 
 \begin{equation}
     A_{sens} \vec{x}_{sens}(p_i) = \vec{b}_{sens}(p_i)
 \end{equation}
-The forms of the parameter-agnostic $A_{\text{sens}}$ matrix and the parameter-specific $b_{\text{sens}}$ vector are given in reference \cite{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
+The forms of the parameter-agnostic $A_{\text{sens}}$ matrix and the parameter-specific $b_{\text{sens}}$ vector are given by \citet{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
 They are computed from solver outputs like the Lagrange multipliers $\vec{\lambda}$, Hessian $\mathbf{H}$, and gradient $\vec{\nabla} J$, as well as other derivatives %\hl{(specify which)} 
 obtained here via finite difference simulation evaluations % \hl{(specify how many)} 
 without re-optimizing.
@@ -219,7 +327,7 @@ The sensitivity vector $\vec{x}_{\text{sens}}$ is then used to solve for a numbe
     %\Delta p_{ij} &= \frac{d_{sens,j}}{\vec{e}_{sens,j}^{~T}\vec{x}_{sens}(p_i)}
 \end{aligned}
 \end{equation}
-where additional sensitivity quantities introduced are matrix $C_{\text{sens}}$, scalar $d_{\text{sens},j}$, and vector $\vec{e}_{\text{sens},j}$ assembled from the same inputs as $A_{\text{sens}}$ and $b_{\text{sens}}$ \cite{sobieszczanski-sobieski_sensitivity_1982}.
+where additional sensitivity quantities introduced are matrix $C_{\text{sens}}$, scalar $d_{\text{sens},j}$, and vector $\vec{e}_{\text{sens},j}$ assembled from the same inputs as $A_{\text{sens}}$ and $b_{\text{sens}}$ \citep{sobieszczanski-sobieski_sensitivity_1982}.
 
 %\hl{This formula could be cleaned up by making it vectorized.}
 
@@ -228,13 +336,14 @@ This method is the ``ground truth'' local sensitivity against which the other me
 While the first three methods take \resultsRE[gradientSensRuntime]~to run, the fourth method takes \resultsRE[reoptimSensRuntime], since \resultsRE[numReoptims]~separate optimizations are performed.
 
 While the sensitivities computed with post-optimality derivatives enjoy a significant advantage in computational speed over the re-optimization sensitivity, their accuracy is unfortunately low.
-The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
-For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
-For others, %some such as \hl{XX}, 
-the values are opposite signs.
+% The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
+% For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
+% For others, %some such as \hl{XX}, 
+% the values are opposite signs.
 This could indicate the presence of discontinuities, strong nonlinearities, or the interference of finite precision effects when computing the partial derivatives.
 
-On the bright side, for the majority (\resultsRE[percentParamsRightSign]) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
+On the bright side, for the majority %(\resultsRE[percentParamsRightSign]) 
+of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
 For example, this occurs for $h$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, $D_{d,tu}$, $FOS_{\text{mult},d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
@@ -243,18 +352,40 @@ All in all, the quadratic post-optimality sensitivities are useful for rapidly e
 Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
 This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/post_optim_design_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_design_grid.pdf}]{figs/from-matlab/post_optim_design_grid.pdf}
 \caption{Quadratic parameter sensitivity analysis to optimal design $x^*$}
 \label{remdo:fig:param-sens-local-x-star}
 \end{figure}
 
 \begin{figure}[htbp]
-\includegraphics[width=\linewidth]{figs/from-matlab/re_optim_design_grid.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/re_optim_design_grid.pdf}]{figs/from-matlab/re_optim_design_grid.pdf}
 \caption{Re-optimization parameter sensitivity analysis to optimal design $x^*$}
 \label{remdo:fig:param-sens-global-x-star}
 \end{figure}
 
 Finally, the authors note that while the re-optimization method is valid even when the parameters are far from their nominal values and can be considered a global sensitivity analysis method, it has here only been performed for parameters perturbed in a OAT fashion very close to the nominal and is therefore used as a local sensitivity analysis method.
 The global sensitivities of \Cref{remdo:sec:sensitivities} only investigate a few select parameters.
-Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \cite{reed_addressing_2022}.
+Future work could obtain fuller global sensitivities through re-optimization or a variety of other methods such as Sobol variance decomposition or Method of Morris \citep{reed_addressing_2022}.
 This would reveal higher order effects like interactions between parameters and dependence of the sensitivity derivative on the parameter value.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization Runtime}
+%\Cref{remdo:fig:optim-runtimes} shows the runtime of each routine, run in parallel on a 14-core server; the optimization also runs, more slowly, on a commodity laptop.
+The timings in this section are performed on an Ubuntu 20.04 LTS server with a 14-core Intel Core i9-10940X CPU (3.3~GHz base clock) and 256~GB of DDR4 RAM at 3200~MHz, running MATLAB R2024b.
+The optimization also runs, more slowly, on a commodity laptop.
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/from-matlab/runtime_bar_chart.pdf}
+%     \caption{Bar chart of optimization and analysis runtimes}
+%     \label{remdo:fig:optim-runtimes}
+% \end{figure}
+
+\ifdefined\DISSERTATION
+    Each single-objective optimization takes just \resultsRE[singleObjRuntime], converging in \resultsRE[singleObjIters]~iterations and \resultsRE[singleObjFcnEvals]~function evaluations (objective and gradient combined).
+    Generating the Pareto front takes \resultsRE[paretoRuntime], of which \resultsRE[paretoPctTimeSeeds]~is spent on epsilon-constraint seeding and \resultsRE[paretoPctTimePatternSearch]~on the pattern search.
+    Gradient-based post-optimality sensitivities run in just \resultsRE[gradientSensRuntime], while re-optimization-based sensitivities take \resultsRE[reoptimSensRuntime].
+\else
+    Each single-objective optimization takes \resultsRE[singleObjRuntime] (\resultsRE[singleObjIters]~iterations, \resultsRE[singleObjFcnEvals]~function evaluations); the Pareto front takes \resultsRE[paretoRuntime]; gradient-based sensitivities run in \resultsRE[gradientSensRuntime] versus \resultsRE[reoptimSensRuntime]~for re-optimization-based ones.
+\fi

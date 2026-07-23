@@ -62,6 +62,11 @@ function [X_opt,obj_opt,flag,output,lambda,grad,hess,problem] = run_solver(prob,
                 total_iterations = total_iterations + output.iterations;
                 total_funcCount = total_funcCount + output.funcCount;
             end
+            if flag == -2 && ~isempty(output.bestfeasible)
+                X_opt = output.bestfeasible.x;
+                obj_opt = output.bestfeasible.fval;
+                warning('Converged to infeasible point, so using best feasible solution.')
+            end
         end
         output.total_iterations = total_iterations;
         output.total_funcCount = total_funcCount;

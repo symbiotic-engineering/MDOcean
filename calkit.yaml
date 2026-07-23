@@ -4404,7 +4404,9 @@ pipeline:
       outputs:
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
-        - path: results/Validation/validation.tex
+        - path: results/Validation/validation_smaller.tex
+          storage: git
+        - path: results/Validation/validation_larger.tex
           storage: git
         - results/Validation/end.mat
         - path: results/Validation/end.json
@@ -5317,7 +5319,10 @@ pipeline:
           storage: git
         - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
     move-re-results:
-      kind: matlab-command
+      kind: shell-command
+      command: |
+        cp results/**/*.pdf pubs/renewable-energy-mdo/figs/from-matlab/
+        cp results/**/*.tex pubs/renewable-energy-mdo/tables/from-matlab/
       environment: _system
       inputs:
         - results/ReadNonMatlabFigs/
@@ -5339,9 +5344,12 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('RE');
+      #command: add_mdocean_path(); move_results_to_pubs('RE');
     move-aor-results:
-      kind: matlab-command
+      kind: shell-command
+      command: |
+        cp results/**/*.pdf pubs/applied-ocean-research-model/figs/from-matlab/
+        cp results/**/*.tex pubs/applied-ocean-research-model/tables/from-matlab/
       environment: _system
       inputs:
         - results/DragIntegral/
@@ -5370,7 +5378,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('AOR');
+      #command: add_mdocean_path(); move_results_to_pubs('AOR');
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
@@ -5523,6 +5531,12 @@ pipeline:
         # pareto timing percentages
         paretoPctTimeSeeds: "{paretoPctTimeSeeds*100:.0f}%"
         paretoPctTimePatternSearch: "{paretoPctTimePatternSearch*100:.0f}%"
+    copy-dissertation-only-figs:
+      kind: map-paths
+      paths:
+        - src: results/SparHydro/spar_added_mass.pdf
+          dest: pubs/dissertation/figs/from-matlab/spar_added_mass.pdf
+          kind: file-to-file
     copy-shared-latex:
       kind: map-paths
       paths:
@@ -5578,6 +5592,9 @@ pipeline:
         - src: pubs/shared/els-cas/cas-dc.cls
           dest: pubs/renewable-energy-mdo/cas-dc.cls
           kind: file-to-file
+        - src: pubs/shared/els-cas/cas-sc.cls
+          dest: pubs/renewable-energy-mdo/cas-sc.cls
+          kind: file-to-file
         #
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/applied-ocean-research-model/cas-common.sty
@@ -5629,6 +5646,9 @@ pipeline:
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/renewable-energy-mdo/shared-pkg.tex
+        - pubs/renewable-energy-mdo/cas-dc.cls
+        - pubs/renewable-energy-mdo/cas-sc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
@@ -5654,6 +5674,8 @@ pipeline:
         - pubs/applied-ocean-research-model/zotero-meem-refs.bib
         - pubs/applied-ocean-research-model/commands-aor.tex
         - pubs/applied-ocean-research-model/shared-pkg.tex
+        - pubs/applied-ocean-research-model/cas-dc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/main.synctex.gz
@@ -5699,7 +5721,11 @@ pipeline:
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/references.bib
+        - pubs/dissertation/dissertation-conclusion.tex
+        - pubs/dissertation/dynamic-toc-depth.tex
         - pubs/shared/shared-pkg.tex
+        - pubs/shared/table-column-specs.tex
+        - pubs/shared/figure-widths.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
@@ -5802,16 +5828,16 @@ pipeline:
       outputs:
         - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
           delete_before_run: false
-          storage: null
+          storage: dvc
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg

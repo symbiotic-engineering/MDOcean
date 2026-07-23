@@ -315,7 +315,7 @@
 \newcommand{\makecopyright}{%
   \begin{copyrightpage}
   \copyright\ \@copyrightyear{} \@copyrightholder \\
-  ALL RIGHTS RESERVED
+  CC BY-NC-ND 4.0 License
   \end{copyrightpage}%
 }
 \newcommand{\@copyrightholder}{\@author}
@@ -366,7 +366,7 @@
   \typeout{Vita}
   \pagestyle{plain}
   \pagenumbering{roman}
-  \setcounter{page}{3}
+  \setcounter{page}{8}
   \prelim@contents{Biographical Sketch}
   \chapter*{Biographical Sketch}
 }{%

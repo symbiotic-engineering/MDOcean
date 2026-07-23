@@ -1,47 +1,76 @@
 \begin{abstract}
     Wave energy converters (WECs) can advance the global energy transition by harnessing ocean waves to produce clean power for utility grids and offshore activities.
-    This dissertation describes (1) the development of a fast and accurate computational model to simulate the WEC
+    This dissertation describes (1) the development of a fast and accurate computational model to simulate the WEC's coupled subsystems
     including hydrodynamics, constrained optimal control, and structural survival;
-    (2) the application of the model in a systems optimization framework to understand how WEC shape and size mediate the tradeoff between cost and power;
-    and (3) the extension of this framework to holistically incorporate techno-economic viability and environmental impacts at the grid level.
-
+    (2) a detailed theoretical and computational evaluation of the hydrodynamics model considering the link between its mathematical structure and numerical properties such as accuracy, convergence, and computational efficiency;
+    \ifdefined\DECIDER
+    \else
+    and
+    \fi
+    (3) the application of the model in a systems optimization framework to understand how WEC shape and size mediate the tradeoff between cost and
+    \ifdefined\DECIDER
+        power; and 
+        (4) the extension of this framework to holistically incorporate techno-economic viability and environmental impacts at the grid level.
+    \else
+        power.
+    \fi
     Guided by a first-principles understanding of frequency-domain dynamics and a geometric interpretation of the constrained optimal control problem,
     we quasi-linearize the drag and force saturation nonlinearities and solve the resulting low-order quadratic program analytically.
     The simplified dynamics model achieves runtimes 10-1000x faster than prior state-of-the-art with acceptable accuracy (errors of 1-10\%).
     We combine this quasi-linearized dynamics model with mathematical models for 
     concentric-cylinder hydrodynamics, stiffened-plate structural stress, hydrostatic stability, allowable oscillation amplitude, and material and component cost
     to form a multidisciplinary WEC simulation.
-    We release the software and corresponding numerical benchmarks open source as MDOcean and OpenFLASH.
+    We release the software and corresponding numerical benchmarks open source as \texttt{MDOcean} and \texttt{OpenFLASH}.
 
     The subsequent design study leverages the model's efficiency and structure to enable a more comprehensive and thoughtful search of the design space.
     We synthesize aspects of multidisciplinary design optimization, control co-design, techno-economic analysis, and systems engineering
     to create an integrated methodology for WEC design optimization that incorporates necessary coupling while remaining computationally efficient and robust to uncertainty.
-    We demonstrate ~50\% reduction in the levelized cost of energy, outline the dominant role of powertrain constraints in the power-cost balance,
+    We demonstrate \resultsRE[pctImproveLCOEMinLCOE] reduction in the levelized cost of energy, outline the dominant role of powertrain constraints in the power-cost balance,
     derive sensitivities, and discuss implications for WEC design and future model development.
-    Finally, we revise the framework by integrating life cycle analysis and capacity expansion modeling
-    to maximize more meaningful net value metrics including profitability and avoided carbon emissions.
-    Preliminary results suggest that while seasonal grid variation complicates the power-cost tradeoff, carbon emissions can be considered more simply.
+    \ifdefined\DECIDER
+        Finally, we revise the framework by integrating life cycle analysis and capacity expansion modeling
+        to maximize more meaningful net value metrics including profitability and avoided carbon emissions.
+        Preliminary results suggest that while seasonal grid variation complicates the power-cost tradeoff, carbon emissions can be considered more simply.
+    \fi
     The system design process articulated here can generalize to other emerging energy technologies,
     ultimately advancing the decarbonization of the electricity sector.
-\end{abstract}
 
-\chapter*{Plain Language Summary}
+    \clearpage
+
+\begin{center}
+    \LARGE\textbf{Plain Language Summary}
+\end{center}
+
 Wave energy converters (WECs) are machines that collect the energy in ocean waves.
 WECs can send the energy to the grid or use it to power activities in the ocean without a grid connection.
 WECs produce power that is clean: WECs do not burn fossil fuels or create carbon dioxide.
 This means WECs can help fight climate change by providing a sustainable source of electricity.
-This dissertation describes three research projects that aim to improve WECs and make them more useful for society.
-The first project creates a computer model that predicts certain information about a WEC based on its shape and size.
+This dissertation describes 
+\ifdefined\DECIDER
+    four 
+\else
+    three
+\fi
+research projects that aim to improve WECs and make them more useful for society.
+\begin{enumerate}[leftmargin=*]
+\item The first project creates a computer model that predicts information about a WEC based on its shape and size.
 The model predicts how a WEC will move in the ocean and whether it will break.
-It also calculates how the WEC can generate as much power as possible by reacting differently to waves of different sizes.
-This model is much faster than previous models, and its predictions are close enough to reality to be useful for WEC design.
-The second project uses the model to find the best shape and size for a WEC.
-It finds the shape and size that will produce the most power for the least cost.
+It also finds how the WEC can generate as much power as possible by reacting differently to waves of different sizes.
+This model runs much faster than other models, and its predictions are accurate enough to be useful for WEC design.
+\item The second project looks at one part of the model from the first project in more detail: the part that calculates how much force the waves put on the WEC.
+It extends the model to include WECs of more complicated shapes.
+It also performs computer experiments to measure how accurate the model is and how long it takes to run. 
+\item The third project uses the model to find the best shape and size for a WEC.
+It finds the WEC that will produce the most power for the least cost.
 The best shape and size depends on how much power is needed and how much money is available to spend.
-The third project adds information about the power grid to the model so it can predict more things.
-It predicts how much money a WEC will make by selling its power to the grid, and whether this money will be enough to pay for the WEC.
-It also predicts how other generators on the grid will change their power output when a WEC is added to the grid.
-This tells us how much carbon dioxide emissions will be avoided as a result of the WEC generating renewable energy.
+\ifdefined\DECIDER
+    \item The fourth project adds information about the power grid to the model.
+    This lets it predict how much money a WEC will make by selling its power to the grid, and whether this money will be enough to pay for the WEC.
+    It also predicts what happens when a WEC is added to the grid: how generators already on the grid will change their power output,
+    and how the best combination of new generators to build will change.
+    This tells us how much carbon dioxide emissions will be avoided as a result of the WEC.
+\fi
+\end{enumerate}
 
 The philosophy of the project is that it is better to use a simple model based on physics that engineers work with often
 than to use a complex model that is difficult to understand.
@@ -50,20 +79,24 @@ and that the best way the WEC should react to the waves can be thought about usi
 Some more complicated physics, like drag and hitting the limit of the generator, are included in a simplified way.
 This lets us derive an exact equation for the best way to react to the waves.
 The simple model runs 10 to 1000 times faster than previous models, and it has errors of only 1 to 10 percent.
-The model also calculates information about the water around the WEC by assuming the WEC is shaped like a set of concentric cylinders,
+The model also calculates how much force the waves put on the WEC by assuming the WEC is shaped like a set of concentric cylinders,
 and it calculates whether the WEC will break by assuming the WEC is made of thin plates with reinforcements.
 It calculates whether the WEC will tip over, whether it is moving an appropriate amount in the water, and how much it will cost.
 The software that does the calculations, and the results of the calculations, are available free for anyone to use.
-The software is called MDOcean and OpenFLASH.
+The software is called \texttt{MDOcean} (which models the entire WEC) and \texttt{OpenFLASH} (which just models the wave forces).
 
 Since the model runs so fast, we can use it to compare all the possible shapes and sizes of WECs to find the best one. 
 We combine ideas from different areas of engineering to create a method for finding the best shape and size of a WEC.
-Our methods makes sure to consider how the different parts of the WEC affect each other, and how we can be more confident in our predictions even if we aren't sure about some of the inputs to the model.
-We find that we can reduce the cost of energy from a WEC by about 50 percent.
+Our methods consider how the different parts of the WEC affect each other,
+and how to be more sure about our predictions even if we aren't sure about some of the inputs to the model.
+We find that we can reduce the cost of energy from a WEC by \resultsRE[pctImproveLCOEMinLCOE].
 We also find that when you change how much power is needed and how much money is available to spend, the part of the WEC that changes most drastically is the generator size.
 We calculate how much the predictions change if we change other inputs to the model, and we discuss what this means for designing WECs and improving the model in the future.
-Finally, we add information about the environmental impact of building the WEC and about how the WEC will affect the rest of the power grid.
-This lets us predict whether the WEC will make enough money to pay for itself, and how much carbon dioxide emissions will be avoided by using the WEC instead of a fossil fuel generator.
-The initial results suggest that the answer depends on how the power grid changes throughout the year.
-The system design process that we propose can also be used for other types of new energy technologies,
+\ifdefined\DECIDER
+    Finally, we add information about the environmental impact of building the WEC and about how the WEC will affect the rest of the power grid.
+    This lets us predict whether the WEC will make enough money to pay for itself, and how much carbon dioxide emissions will be avoided by using the WEC instead of a fossil fuel generator.
+    The initial results suggest that the answer depends on how the power grid changes across the year.
+\fi
+The system design process that we propose can be used for other types of new energy technologies,
 which will help make the grid more sustainable.
+\end{abstract}
