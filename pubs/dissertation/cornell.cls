@@ -315,7 +315,7 @@
 \newcommand{\makecopyright}{%
   \begin{copyrightpage}
   \copyright\ \@copyrightyear{} \@copyrightholder \\
-  ALL RIGHTS RESERVED
+  CC BY-NC-ND 4.0 License
   \end{copyrightpage}%
 }
 \newcommand{\@copyrightholder}{\@author}

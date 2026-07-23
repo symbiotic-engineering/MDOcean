@@ -336,13 +336,14 @@ This method is the ``ground truth'' local sensitivity against which the other me
 While the first three methods take \resultsRE[gradientSensRuntime]~to run, the fourth method takes \resultsRE[reoptimSensRuntime], since \resultsRE[numReoptims]~separate optimizations are performed.
 
 While the sensitivities computed with post-optimality derivatives enjoy a significant advantage in computational speed over the re-optimization sensitivity, their accuracy is unfortunately low.
-The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
-For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
-For others, %some such as \hl{XX}, 
-the values are opposite signs.
+% The mean absolute error from quadratic to re-optimization-based normalized sensitivities across all parameters is \resultsRE[percentMeanAbsErrorParamSens].
+% For some parameters such as $t_{f,r}/t_{f,b}$, $\$/N$, and $C_{d,\text{spar}}$, a large re-optimization sensitivity exists that the other methods miss entirely, predicting as near-zero.
+% For others, %some such as \hl{XX}, 
+% the values are opposite signs.
 This could indicate the presence of discontinuities, strong nonlinearities, or the interference of finite precision effects when computing the partial derivatives.
 
-On the bright side, for the majority (\resultsRE[percentParamsRightSign]) of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
+On the bright side, for the majority %(\resultsRE[percentParamsRightSign]) 
+of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
 For example, this occurs for $h$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, $D_{d,tu}$, $FOS_{\text{mult},d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance. 
