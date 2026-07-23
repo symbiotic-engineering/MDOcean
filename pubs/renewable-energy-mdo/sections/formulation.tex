@@ -79,7 +79,7 @@ Constraints are the most common but not the only enforcement mechanism.
   \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,\text{min}}$&  Float seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,5}$\\
   \requirement{spar_seafloor_overflow}&$h-T_{f,2}>\Delta z_{f,\text{min}}$&  Spar seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,6}$\\
-  \hline
+  \hline 
   \requirement{float_base_diameter}& $D_{f,in} <D_{f,b} < D_f$& Float base diameter& 2&Parameter $D_{f,b}/D_f$ \\
   \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Parameter $T_{f,1}/T_{f,2}$ \\
   \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2&Parameter $T_{f,2}/h_f$\\
@@ -112,12 +112,13 @@ Constraints are the most common but not the only enforcement mechanism.
 \ifdefined\DISSERTATION
     Priority 1 requirements are model requirements that must never be violated during the optimization, because doing so causes the simulation to error or return an invalid result such as \texttt{Inf}, \texttt{NaN}, or imaginary numbers.
     Some algorithms fail outright at such points, and even robust algorithms struggle to converge without a valid objective to guide the next step.
-    Violating a priority 2 requirement yields an inaccurate but computationally valid objective; this is still undesirable during optimization (especially for gradient-based methods, where it can mislead the search), and an active priority 2 constraint in the final solution suggests the optimum lies in a region the model cannot accurately represent.
-    Priority 3 requirements return an accurate objective even when violated, marking a design as undesirable for practical or functional reasons rather than model validity; active priority 3 constraints in the final design are acceptable and even expected.
+    Violating a priority 2 requirement yields an inaccurate but computationally valid objective and constraints; this is still undesirable during optimization (especially for gradient-based methods, where it can mislead the search), and an active priority 2 constraint in the final solution suggests the optimum lies in a region the model cannot accurately represent.
+    Priority 3 requirements return an accurate objective and constraints even when violated, marking a design as undesirable for practical or functional reasons rather than model validity; active priority 3 constraints in the final design are acceptable and even expected.
     This three-level prioritization ultimately informs the selection of design variables and parameters.
 \else
     Priority 1 requirements must never be violated during optimization, as they cause the simulation to error or return invalid results (\texttt{Inf}, \texttt{NaN}, imaginary numbers) that can stall or derail the algorithm.
-    Priority 2 violations yield an inaccurate but valid objective, and constraints undesirable during the search and a sign, if active at the solution, that the optimum lies outside the model's accurate range.
+    Priority 2 violations yield an inaccurate but valid objective and constraints.
+    This is undesirable during the search and a sign, if active at the solution, that the optimum lies outside the model's accurate range.
     Priority 3 requirements return an accurate objective and constraints even when violated; active priority 3 constraints in the final design are acceptable and expected.
     This three-level prioritization informs the selection of design variables and parameters.
 \fi
@@ -145,13 +146,13 @@ Constraints are the most common but not the only enforcement mechanism.
 \fi
 In summary, the requirements table clearly articulates and prioritizes the necessary items based on both design needs and model assumptions,
 and will inform the optimization problem formulation.
-
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Design Variables, Parameters, and Constraints}
 The encoding of a physical design space into optimization design variables is non-unique.
 \ifdefined\DISSERTATION
-    For example, the float and spar drafts could be encoded directly as dimensions $T_{f,2}$ and $T_s$, or nondimensionally as dimension $T_s$ and ratio $T_{f,2}/T_s$.
-    An encoding may be chosen because it more directly controls the objective, makes the problem convex, or helps maintain feasibility and convergence during optimization; the last is pursued here.
+    For example, the float spar and drafts could be encoded directly as dimensions $T_{f,2}$ and $T_s$, or nondimensionally as dimension $T_s$ and ratio $T_{f,2}/T_s$.
+    An encoding may be chosen because it more directly controls the objective, makes the problem convex in the objective or constraints, or helps maintain feasibility and convergence during optimization.
+    The last is pursued here.
     Depending on the encoding, each requirement can be enforced via parameters, design variable bounds, linear inequality or equality constraints, or nonlinear inequality or equality constraints, listed from least to most difficult for the optimizer.
     It is therefore desirable to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements, ensuring they hold even at intermediate points.
     
@@ -159,10 +160,9 @@ The encoding of a physical design space into optimization design variables is no
     Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
     Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
-    For example, bulk dimensions may be encoded directly as dimensions or as nondimensional ratios.
+    For example, the float and spar drafts may be encoded directly as dimensions or as a dimension and a ratio.
     An encoding may be chosen to control the objective directly, induce convexity in the objective or constraints, or maintain feasibility.
-    The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty,
-    via parameters, bounds, linear constraints, or nonlinear constraints,
+    The last is pursued here, since each requirement can be enforced, in increasing order of optimizer difficulty, via parameters, bounds, linear constraints, or nonlinear constraints,
     and it is desirable to keep all five priority 1 requirements free of nonlinear constraints so they hold even at intermediate points.
     Applied to the draft example, the dimensional encoding renders the relevant priority 1 requirements achievable by linear constraint whereas the nondimensional encoding forces a nonlinear constraint.
     Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed frequent constraint violation and simulation failure, motivating the dimensional choice.

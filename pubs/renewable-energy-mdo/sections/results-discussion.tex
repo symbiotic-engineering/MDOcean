@@ -610,12 +610,11 @@ So maybe this will lead to new R\&D programs for small scale systems that focus 
 We observed the impact of modeled effects, especially effects that this model incorporates that others often lack, to judge whether they are worth including.
 \ifdefined\DISSERTATION
     Several areas of model complexity, force saturation, slamming amplitude limits, and 2-DOF dynamics, stand out as contributing significantly to the results, evident in the constraint activity and in the differences from using 1-DOF (stationary-spar) dynamics; \Cref{remdo:sec:sensitivity-model-assumptions} analyzed these in detail.
-    MDOcean's 2-DOF dynamics run roughly an order of magnitude slower than its 1-DOF dynamics \citep{mccabe_development_2026}, suggesting that code improvements to narrow this gap may be worthwhile given the dynamic importance of the second degree of freedom.
     Force saturation is especially relevant: it directly reduces powertrain cost and indirectly reduces structural cost by lowering operational heave loading, which permits a thinner spar given the active column fatigue factor-of-safety constraint.
     The observed impact of these effects justifies the corresponding model complexity and suggests other optimization frameworks should include them for realistic results.
 \else
     Force saturation, slamming amplitude limits, and 2-DOF dynamics all contribute significantly to the results.% (\Cref{remdo:sec:sensitivity-model-assumptions}).
-    The 2-DOF dynamics run roughly an order of magnitude slower than 1-DOF \citep{mccabe_development_2026}, suggesting worthwhile code improvements, while force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
+    Force saturation reduces both powertrain cost and, via lower heave loading, structural cost.
     The impact of these effects justifies their model complexity and argues for their inclusion in other frameworks.
 \fi
 
@@ -686,7 +685,7 @@ A previous study compares structural mass per unit hull volume for marine struct
     Incremental improvements include more structurally and hydrodynamically performant detail designs that obey these constraints while reducing material and sustaining energy production, for example, performing FEA or adding stiffeners to justify removing more material, replacing welded connections with pins to reduce moment transfer, or modifying the float--spar attachment geometry to allow more travel at the same bulk dimensions.
     Transformative improvements include creative concepts that avoid these constraints altogether, storm-survival strategies such as submerging the WEC, changing shape with control surfaces, or altering the PTO control strategy to reduce force and amplitude, whose viability can be readily estimated by weighing the additional costs (e.g.\ actuator and control hardware and software) against the performance gains, again using the Lagrange multipliers of \Cref{remdo:fig:lagrange-multiplier}.
 \else
-    Although survivability is a critical but rarely optimized WEC requirement, this study quantifies its effect:
+    Although survivability is a critical but rarely-optimized WEC requirement, this study quantifies its effect:
     the Lagrange multipliers (\Cref{remdo:fig:lagrange-multiplier}) indicate that improving the damping plate is worth about 5 and 10 times more than improving the column and float respectively,
     motivating both incremental detail-design improvements and transformative storm-survival concepts (submersion, control surfaces, or amplitude-reducing control), whose viability can be screened using the same multipliers.
 \fi
@@ -850,8 +849,8 @@ More complete multistart results appear in \Cref{remdo:sec:appendix-supplemental
     Even with the higher evaluation count, the gradient-based algorithm retains the advantage of certifying convergence to a local optimum, and with systematic multistart, reasonable confidence of a global optimum, which a heuristic optimization cannot provide.
 \else
     All prior large-scale ($\geq 8$ design variables) WEC optimizations use the genetic algorithm (\Cref{remdo:sec:lit}), requiring roughly 2{,}000--12{,}000 function evaluations to converge \citep{khanal_multi-objective_2024,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,abdulkadir_control_2024}.
-    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations exceed the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
-    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
+    This study is the first to use a gradient-based algorithm at this scale; surprisingly, finite-difference gradients over 12 design variables make its estimated $\resultsRE[paretoFcnEvals]$ evaluations on par with the heuristic counts, though MDOcean's semi-analytical model likely still runs faster in wall-clock time.
+    Automatic differentiation or the adjoint method would make the count independent of the design-variable dimension and less than heurisitcs, and the gradient-based approach retains the key advantage of certifying local optimality, with global confidence via multistart, that heuristics cannot.
 \fi
 
 

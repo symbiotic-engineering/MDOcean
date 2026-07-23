@@ -59,7 +59,7 @@ As a gradient-based optimizer, SQP requires derivatives of the objective and con
     Most similar to the present approach, \citet{gambarini_gradient_2024} uses semi-analytical hydrodynamics and analytically differentiates the linear system with respect to control and array-layout variables, but does not provide the body-dimension derivatives required here.
     For the MEEM hydrodynamics used in this study, symbolic differentiation of the linear system was attempted but exhausts memory at any reasonable matrix size; obtaining MEEM gradients via adjoints or algorithmic differentiation remains future work.
     This study therefore uses finite difference, with step size set automatically by the MATLAB Optimization Toolbox --- a viable choice given the simulation's low cost.
-    Initial concerns that the oscillatory hydrodynamics would degrade the gradients \citep{mccabe_open-source_2024} proved unfounded, likely because the overall hydrodynamic coefficients are far less oscillatory than their individual subfunctions, keeping gradients accurate even at larger step sizes.
+    Initial concerns that the oscillatory hydrodynamics would degrade the gradients \citep{mccabe_open-source_2024} proved unfounded, likely because the overall hydrodynamic coefficients are far smoother than their individual subfunctions, keeping gradients accurate even at larger step sizes.
 \else
     Obtaining gradients for WEC simulations is difficult:
     existing automatic and analytical differentiation methods cover pseudo-spectral dynamics \citep{bradbury_jax_2018}
@@ -100,12 +100,13 @@ After optimization, sensitivity analysis is performed, first local then OAT glob
 %%%
 Single-objective algorithms typically require adaptation for multiple objectives, and gradient-based multi-objective optimization is particularly challenging.
 \ifdefined\DISSERTATION
-    While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012}, solvers that use such multi-objective gradient information are rare, partly because building a Pareto front requires the exploration that gradient-based optimizers --- which excel at exploitation --- do not naturally provide.
+    While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012}, solvers that use such multi-objective gradient information are rare, partly because Pareto front generation requires the exploration that gradient-based optimizers --- which excel at exploitation --- do not naturally provide.
     Two more common approaches exist: reformulating the multi-objective problem as repeated single-objective optimization to permit a gradient-based algorithm, or using a multi-objective derivative-free or heuristic method that extends readily from its single-objective counterpart.
     This work pursues both: the epsilon-constraint method first creates an ensemble of single-objective problems solved by the familiar SQP algorithm, and these solutions then seed a derivative-free pattern search.
     In the epsilon-constraint method, one objective is repeatedly optimized while a constraint on the second objective is swept, tracing out the Pareto front.
     Here the single-objective optima of each objective set the constraint values: the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ becomes the center of a circle, and twenty constraint values are taken at equal angular spacing on that circle.
     The MATLAB \texttt{paretosearch} function then executes a constrained multi-objective pattern search \citep{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
+    This retains the benefit of gradient based optimization: guarantee of local optimality and faster convergence.
 \else
     While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012},
     solvers using them are rare, since Pareto front generation demands exploration rather than the pure exploitation that gradient methods excel at.
