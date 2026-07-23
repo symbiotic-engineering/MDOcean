@@ -1,22 +1,35 @@
 \section{Motivation}
-The fundamental question of this dissertation is how energy from ocean waves can be most effectively harnessed to contribute to global decarbonization efforts.
+Climate change is one of the most pressing challenges of our time,
+and the energy sector is a major contributor to global greenhouse gas emissions.
+Renewable resources like wind and solar have been widely adopted, but another renewable resource, the ocean, remains largely untapped.
+There exist a wide variety of devices that harness energy from ocean waves, known as wave energy converters (WECs).
+However, it remains unknown what size, shape, operation, and design tradeoffs of a WEC will most effectively contribute to global decarbonization efforts.
+This requires the examination and strategic improvement of both the technical and economic performance of wave energy devices.
+Several attempts have been made to optimize WECs, but they have been limited in scope, rigor, and relevance.
 
-This work is motivated by two complementary gaps in the literature.
-First, within the wave energy converter (WEC) community, there remains an incomplete understanding of the fundamental barriers that prevent WEC technologies from achieving large-scale viability.
-Second, within the broader climate and energy systems literature, there is a lack of clarity regarding how WECs can be meaningfully integrated as a solution to climate change.
-This dissertation seeks to address both gaps simultaneously.
-
-The overarching goal is to perform a design optimization study that is not only methodologically rigorous, but also meaningful in its outcomes.
-In this context, ``meaningful'' is defined by three criteria.
+This thesis aims to perform a wave energy design optimization study that is genuinely meaningful in its outcomes.
+In this context, ``meaningful'' is defined by 
+\ifdefined\DECIDER
+four
+\else
+three
+\fi
+criteria.
 First, the analysis must be \textbf{comprehensive}, meaning that it spans a sufficiently expansive design space and captures the relevant multidisciplinary couplings inherent in wave energy systems.
-Second, it must be \textbf{decision-relevant}, in the sense that it yields actionable insights that inform design direction, rather than merely demonstrating a sophisticated numerical method or producing isolated computational results.
-Third, it must be \textbf{aligned with climate objectives}, such that the optimization targets metrics that are directly relevant to economic feasibility and environmental impact.
+Second, it must be \textbf{methodologically rigorous}, meaning that we understand the mathematical structure and numerical behavior of the models sufficiently well to ensure that the optimization results are accurate, convergent, and reproducible.
+Third, it must be \textbf{decision-relevant}, in the sense that it yields actionable insights that inform design direction, rather than merely demonstrating a sophisticated numerical method or producing isolated computational results.
+\ifdefined\DECIDER
+  Fourth, it must be \textbf{aligned with climate objectives}, such that the optimization targets metrics that are directly relevant to economic feasibility and environmental impact.
+\fi
 
 Achieving comprehensiveness requires the development of a modeling and optimization framework that is both highly \textbf{integrated} and computationally \textbf{efficient}.
-Accordingly, the first part of this dissertation focuses on the development, validation, and benchmarking of such a framework, which is referred to as MDOcean. 
-To obtain decision-relevant insights, this framework is then applied in a design optimization study, which constitutes the second part of the dissertation. 
-Finally, to ensure relevance to climate goals, the framework is extended to incorporate performance metrics that better reflect economic and environmental viability.
-
+Accordingly, \Cref{ch:modeling} of this dissertation focuses on the development, validation, and benchmarking of such a framework, which is referred to as MDOcean. 
+\Cref{ch:hydrodynamic} then provides a detailed theoretical and computational evaluation of the hydrodynamics model, increasing its rigor and extending its capabilities.
+The resulting model is packaged in a software called OpenFLASH.
+To obtain decision-relevant insights, the MDOcean framework is then applied in a design optimization study, which constitutes \Cref{ch:optimization} of the dissertation. 
+\ifdefined\DECIDER
+  Finally, to ensure relevance to climate goals, in \Cref{ch:grid} the framework is extended to incorporate performance metrics that better reflect economic and environmental viability.
+\fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Contributions}
@@ -49,29 +62,31 @@ Key message: Multidisciplinary design optimization exploits careful problem form
 \subimport{../renewable-energy-mdo/sections}{re-contributions}
 \end{itemize}
 %
-\noindent 
-Contribution 4: Grid Impact Synthesis (see \cref{ch:grid-value})
+\ifdefined\DECIDER
+  \noindent 
+  Contribution 4: Grid Impact Synthesis (see \cref{ch:grid-value})
 
-Key message: Coupling design optimization with capacity expansion modeling and life cycle assessment can guide early-stage technologies to fulfill system decarbonization goals.
-\begin{itemize}
-\item Identifies features that matter versus don't matter for the integration of grid value and climate change objectives into design optimization: avoided capital cost matters, avoided operational cost matters a bit but less, seasonal variation is more important than hourly variation
+  Key message: Coupling design optimization with capacity expansion modeling and life cycle assessment can guide early-stage technologies to fulfill system decarbonization goals.
+  \begin{itemize}
+  \item Identifies features that matter versus don't matter for the integration of grid value and climate change objectives into design optimization: avoided capital cost matters, avoided operational cost matters a bit but less, seasonal variation is more important than hourly variation
 
-\item Argues that wave energy can provide grid planners/operators with substantial value and that designing for grid value can bring WECs closer to economic viability, though this can only occur if the energy market design appropriately monetizes and incentivizes this
+  \item Argues that wave energy can provide grid planners/operators with substantial value and that designing for grid value can bring WECs closer to economic viability, though this can only occur if the energy market design appropriately monetizes and incentivizes this
 
-\item Articulates the connection between energy grid planning optimization (capacity expansion, economic dispatch, and unit commitment problems) and technology specific design optimization and control co-design
+  \item Articulates the connection between energy grid planning optimization (capacity expansion, economic dispatch, and unit commitment problems) and technology specific design optimization and control co-design
 
-\item Proposes three methods to structure the above optimization (CEM in the loop, CEM sweep with reduced-order WEC design, and price-taker assumption with value matrix) and compares their relevance, fidelity, and limitations
+  \item Proposes three methods to structure the above optimization (CEM in the loop, CEM sweep with reduced-order WEC design, and price-taker assumption with value matrix) and compares their relevance, fidelity, and limitations
 
-\item Expands on the implementation of CEM sweep with reduced-order WEC design, shows that a second-order WEC model is insufficient for the above purposes, and proposes other reduced-order models to be explored in future work
+  \item Expands on the implementation of CEM sweep with reduced-order WEC design, shows that a second-order WEC model is insufficient for the above purposes, and proposes other reduced-order models to be explored in future work
 
-\item Expands on the implementation of the price-taker assumption with value matrix methodology: derive how capacity expansion model outputs can be used to obtain a value matrix which intuitively shows the variation of grid effects with sea state
+  \item Expands on the implementation of the price-taker assumption with value matrix methodology: derive how capacity expansion model outputs can be used to obtain a value matrix which intuitively shows the variation of grid effects with sea state
 
-\item Shows that under the price taker assumption, the convexity and structure of the net value of energy problem is identical to that of the levelized cost of energy problem, just the weight of power in each sea state changes
+  \item Shows that under the price taker assumption, the convexity and structure of the net value of energy problem is identical to that of the levelized cost of energy problem, just the weight of power in each sea state changes
 
-\item Identifies steel, fiberglass, and maintenance fuel as the environmental drivers that can be optimized at the early design stage.
-Shows that the environmental objectives have the same structure as the economic ones, just again with different weights
+  \item Identifies steel, fiberglass, and maintenance fuel as the environmental drivers that can be optimized at the early design stage.
+  Shows that the environmental objectives have the same structure as the economic ones, just again with different weights
 
-\end{itemize}
+  \end{itemize}
+\fi
 
 \section{List of Research Outputs}\label{sec:research-outputs}
 The following publications, presentations, and software have resulted from the work in this dissertation.
@@ -143,15 +158,27 @@ Contribution 3: Design Optimization
     \titem{c} McCabe, Murphy, and Haji, 2022, ``Multidisciplinary Optimization to Reduce Cost and Power Variation of a Wave Energy Converter,'' ASME IDETC-CIE: Design Automation Conference. \url{https://doi.org/10.1115/DETC2022-90227}.
 \end{typedlist}
 %
-\noindent
-Contribution 4: Grid Impact Synthesis
+\newcommand{\contributionsDecider}{%
 \begin{typedlist}
     \titem{c} McCabe, Dietrich, Yang, Long, Kuan, Buccino, Liu, and Haji, 2025. ``WEC Optimization to Maximize Grid Economic Value and Avoided Emissions,'' University Marine Energy Research Community Conference. \url{https://doi.org/10.5281/zenodo.20546181}.
     \titem{c} McCabe, Dietrich, Liu, and Haji, 2023. ``System Level Techno-Economic and Environmental Design Optimization for Ocean Wave Energy.'' ASME IDETC-CIE: Design Automation Conference. \url{https://doi.org/10.1115/DETC2023-114607}.
     \titem{p} McCabe and Haji, ``Value Metrics and Global Impact Potential of Wave Energy,'' University Marine Energy Research Community Conference, September 2022.
 \end{typedlist}
+}
+\ifdefined\DECIDER
+  \noindent
+  Contribution 4: Grid Impact Synthesis
+  \contributionsDecider
+\fi
 
 The author has also contributed to the following collaborative publications and projects that are not included in the core contributions of the dissertation.
+
+\ifdefined\DECIDER
+\else
+  \noindent
+  Grid and Environmental Impact Synthesis:
+  \contributionsDecider
+\fi
 
 \noindent
 Wave-Powered Offshore Aquaculture:
