@@ -7637,6 +7637,18 @@ stages:
           persist: false
     desc: Automatically generated from the 're-results-to-latex' stage
       in calkit.yaml. Changes made here will be overwritten.
+  copy-dissertation-only-figs:
+    cmd: calkit map-paths --file-to-file 
+      'results/SparHydro/spar_added_mass.pdf->pubs/dissertation/figs/from-matlab/spar_added_mass.pdf'
+    deps:
+      - results/SparHydro/spar_added_mass.pdf
+    outs:
+      - pubs/dissertation/figs/from-matlab/spar_added_mass.pdf:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 
+      'copy-dissertation-only-figs' stage in calkit.yaml. Changes made
+      here will be overwritten.
   copy-shared-latex:
     cmd: calkit map-paths --file-to-file 
       'pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib'
@@ -7881,6 +7893,8 @@ stages:
       - pubs/renewable-energy-mdo/content-re.tex
       - pubs/UMERC-2025-grid-value/
       - pubs/dissertation/references.bib
+      - pubs/dissertation/dissertation-conclusion.tex
+      - pubs/dissertation/dynamic-toc-depth.tex
       - pubs/shared/shared-pkg.tex
       - pubs/shared/table-column-specs.tex
       - pubs/shared/figure-widths.tex
