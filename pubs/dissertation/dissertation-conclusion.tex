@@ -1,0 +1,142 @@
+To address climate change, the world must transition to clean energy,
+and ocean wave energy is a unique solution to renewably power coastal communities and offshore activities.
+Wave energy is currently too expensize to be practical, and system-level optimization can be used to increase its economic viability.
+The interdisciplinary nature of wave energy converters requires careful consideration of the optimization formulation and model complexity
+to adequately trade off scope, coupling, accuracy, and computation time.
+This thesis focuses on the two-body point absorber WEC, inspired by the Reference Model 3 design \cite{RM3}.
+
+% ======================================================================
+\section{Summary of Project Scope}
+\Cref{ch:modeling} considers the system modeling, and develops a novel framework called \texttt{MDOcean} for simulating the hydrodynamics, dynamics, control, structures, and economics of a two-body point absorber WEC.
+It uses semi-analytical models to leverage physical and mathematical insight to reduce the computational cost of the simulation,
+and validates and benchmarks the code against other models.
+Of particular note is the dynamics and controls module, which introduces a method called quasi-linear pseudo-spectral (QLPS) control to efficiently handle constraints and nonlinearities while retaining the effective simplicity of a linear frequency-domain model. 
+
+\Cref{ch:hydrodynamic} elaborates on and extends the hydrodynamics portion of the \texttt{MDOcean} framework, using the matched eigenfunction expansion method to solve the linear potential flow radiation problem for a class of axisymmetric bodies.
+It performs numerical experiments to understand the relationship between spatial discretization, series truncation order, nondimensional geometry, accuracy, and runtime.
+It further analyzes the block matrix structure for all cases of radially-monotonic geometries,
+systematically documents geometry-dependent convergence,
+and quantifies accuracy for slanted bodies.
+
+\Cref{ch:optimization} applies the multidisciplinary design optimization technique to formulate, solve, and interpret a WEC optimization.
+It develops a set of requirements based on the model and simulation capabilities and design requirements; 
+systematically decides the appropriate set of design variables, constraints, parameters, and objectives;
+performs single- and multi-objective optimizations and sensitivity analyses;
+and interprets the results to yield insight into the design space and the trade-offs between objectives.
+
+\Cref{ch:grid-value} integrates considerations for the grid and the environment into the optimization framework.
+Economic and environmental costs and benefits are first explored through literature review and synthesis of existing data,
+and are then quantified using capacity expansion modeling and life cycle assessment.
+Viability is assessed using a levelized net value metric.
+Three different approaches to coupling the grid and design optimization are compared,
+discussing the tradeoffs between accuracy, computational cost, and development time.
+Case studies are presented to illustrate each approach using fictitious inputs,
+and preliminary conclusions are drawn about the effectiveness of each approach.
+
+All chapters directly feed into each other:
+the multidisciplinarity, semi-analytical structure, and computational speed of the models in \cref{ch:modeling,ch:hydrodynamic} expose the 
+coupling structure, convexity, and smoothness of the design space.
+These characteristics in turn inform the optimization formulation decisions of \cref{ch:optimization} and are precisely what enables the optimization to explore the design space so comprehensively and yield improved designs and insight.
+
+A unifying thread throughout all chapters is that one should approach simulation and optimization as a part of the engineering design process,
+where decisions are strategically made to fulfill requirements and answer actionable design questions, rather than as a siloed academic pursuit.
+
+Another theme of the work is that one should not simply direct vigorous computation power at an opaque numerical scheme to obtain a ``solution.''
+Rather, it is preferable to spend upfront time both creatively exploring and systematically interrogating the system assumptions, physical and mathematical structure, limit cases, nondimensional forms, bounds, and trends to build a mental model--and simplified analytical or semi-analytical computational model.
+This provides understanding not just of the system's behavior under one set of inputs but also intuition for how and why this behavior would change for other inputs, knowledge of different possible regimes of paradigmatic behavior, and even answers to questions the designer would otherwise have not thought to ask.
+While these simple models and methods do not replace more costly numerical tools, they provide necessary yet overlooked insight that is particularly valuable early in the design cycle and can blend symbiotically with the results of more detailed methods.
+
+\section{Key Findings}
+\Cref{ch:modeling} shows that for the nominal RM3 design, the \texttt{MDOcean} simulation achieves a runtime of \resultsAOR[simRuntime] across all disciplinary modules and sea states.
+The runtime of its dynamics and control module represents a 1000x speedup over the dynamics-only WEC-Sim time-domain simulation.
+Furthermore, its MEEM hydrodynamics module achieves a runtime of \resultsAOR[meemRuntime] for each frequency.
+\Cref{ch:hydrodynamic}'s deep dive into the numerics of the MEEM model uncovers the polynomial dependence of this runtime on the number of terms retained in the infinite series,
+and derives a prediction scheme for the number of terms required to achieve a desired accuracy for various geometries. 
+Using the prediction scheme to target 1\% convergence yields results that obtain 2\% convergence and avoids using 30+ more terms than necessary for over 95\% of geometries.
+For slanted geometries with potential sampled at the radial midpoint of each fluid region, errors in sampled potential are shown to be less than 3\% for a representative geometry,
+and error in the damping coefficient is less than 5\% using 30 subdivisions for slant angles as steep as 15 degrees from vertical.
+Direct comparisons with a boundary element method solver demonstrate that MEEM achieves comparable hydrodynamic coefficients while converging faster with substantially smaller matrices.
+This establishes the method's practical computational advantage and strengthens understanding of the link between its mathematical structure and numerical properties.
+\hl{need to add key findings of RE and DECIDER}
+% ======================================================================
+\section{Limitations and Future Work}
+\subsection{Enhancing the Present Scope}
+Opportunities for future work were discussed at the end of each chapter.
+The system model of \Cref{ch:modeling} could be improved by incorporating surge force, mooring cost, generator magnetics and core losses, nonlinear storm wave forces, irregular waves and corresponding spectral outputs, structures for a regime with even thinner stiffener-dominated profiles, additional powertrain nonlinearities, more flexible survivability operations, structural materials besides steel, and hydrodynamic architectures beyond point absorbers.
+A number of runtime improvements could be made to the simulation, including further model simplifications and code optimizations to avoid unnecessary computations while preserving fidelity.
+
+Validation could be improved on the structures module especially.
+The hydrodynamics module could be extended to incorporate more of the insights gained from the convergence study, geometry generalizations, and numerical improvements of \Cref{ch:hydrodynamic}.
+The analysis of \Cref{ch:hydrodynamic} itself could be extended by repeating the matrix structure and convergence study for fluid regions with boundary conditions that represent damping plates, non-cylindrical geometries, second-order forces.
+The optimization could be improved by promoting several geometric parameters to be design variables in accordance with the findings of \Cref{ch:optimization},
+exploring creative concepts for surviviability and amplitude constraints,
+more fully comparing the effect of different model assumptions and objective formulations,
+incorporating adjoint or analytical derivatives including post-optimality sensitivities of the analytical QCQP at each iteration of the outer optimization,
+and assessing additional locations to better understand the dependence of the optimal on the wave environment.
+
+Improved software integration, documentation, dissemination, and maturity is a final opportunity for future work that spans all chapters of the dissertation.
+Both \texttt{MDOcean} and \texttt{OpenFLASH} are open-source with basic web documentation for installation, usage, and API reference;
+computational pipelines to reproduce published results;
+and a continuous integration setup for automated testing, build, and deployment.
+However, at the time of writing, only a handful of external users appear to have engaged with the software,
+and the author is not aware of any outside projects that have used the software to produce new research results or design insights.
+Integrating the software with other open-source marine energy simulation and optimization tools,
+such as \texttt{WEC-Sim}, \texttt{WecOptTool}, \texttt{RAFT}, \texttt{WEIS}, and \texttt{Capytaine},
+could increase its visibility and adoption.
+A modular framework that integrates these tools and more with the ability to mix-and-match disciplinary fidelities remains a long-term goal requiring significant development effort on the software engineering side.
+\texttt{OpenMDAO} is an open-source MDO framework that could facilitate this integration and provide state-of-the-art MDO visualizations, algorithms, and automated sensitivities.
+While two old versions of \texttt{MDOcean} (v0.1.5 and v0.3.0) were ported to Python and implemented in \texttt{OpenMDAO} in the \texttt{WEC-DECIDER} repository,
+more recent versions have not been, and this represents a useful avenue for future work.
+
+% future work should compare different optim formulations head to head. I compared different sims but only one optim.
+% the big question: what design is best? we've only answered that under these very specific assumptions, and so few people have considered all the disciplines like I did that there isn't really consensus especially on the structural front. We are supporting the growing consensus of the importance of control co-design and PTO dynamics and that you can undersize your PTO.
+% second big question: what simulation and optimization fidelity/strcture is most appropriate for answering the above question?
+% i've shown one way of structuring the sim/optim and that it's better than the status quo but it still has some issues, and we need to keep iterating on it to find what is actually best.
+% big question 3: how can we make wecs economically viable? 
+% I showed a way to get a lot closer and some pathways for further LCOE reduction, but it's still pretty far from being viable so we also need structured innovation / new concepts / markets in addition to optimization of current concepts.
+
+\subsection{Vision for Future WEC Design and Optimization}
+The same engineering principles and methods used in this thesis can be applied to further improve the design and optimization of WEC systems.
+While this work exploits the QCQP structure of the optimal control problem for fixed design,
+future work should exploit the fractional-QP structure of the PTO and structural sizing that \cref{sec:appendix-qp-convexity} identifies.
+This would leave only the hull and structural sizing as a nonconvex design optimization problem, with further structure that can perhaps be exploited even further.
+For example, the hull and structural optimizations can be further split up into separate nonconvex subproblems with only linear and quadratic inequality constraints respectively.
+Separation reduces the dimension of each problem 
+and could potentially mitigate the number of multistart runs required to find a global optimum.
+Finally, wrapping the entire optimization in an integer programming framework would allow for the inclusion of discrete design variables, such as the hydrodynamic architecture, number of degrees of freedom, type of PTO, and structural material.
+\Cref{fig:nested_future_optim} conceptually demonstrates such an optimization, though a number of practical details remain to be studied.
+
+\begin{figure}
+\centering
+\label{fig:nested_future_optim}
+\includegraphics[width=\textwidth]{figs/nested_future_optim.pdf}
+\caption{Conceptual illustration of a nested optimization framework for future WEC design and optimization.}
+\end{figure}
+
+The ultimate nesting structure that minimizes the overall solution time may differ from the one proposed in \Cref{fig:nested_future_optim} 
+and should be determined based on the relative computational cost of each module and expected number of iterations required for each subproblem (which lowers considerably for convex or analytically solvable subproblems).
+These tradeoffs can be systematically explored using MDO, as the optimization architecture remains an  ``asymmetric subspace optimization'' as \citet[Sec. J]{martins_multidisciplinary_2013} describes.
+Combination with a multifidelity framework that refines the model complexity as the optimization progresses could enhance the accuracy of the final optimization \cite{wu_gradient-based_2022}.
+This could ultimately lead to an optimization framework that chooses the appropriate model fidelity, subproblem structure, and convergence hyperparameters based on dynamically-identified computational cost scalings
+that depend on the number of sea states, bodies, controlled degrees of freedom, and hull spatial discretization. 
+Such a framework should be created in partnership with WEC developers, energy planners, and coastal communities
+to ensure that the process accurately represents real-world design and operation constraints and maximizes the benefits for those ultimately affected.
+
+\section{More Meaningful Optimization Metrics}
+In this spirit, adjusting the optimization objectives to better align with practical climate-relevant metrics is essential moving forward.
+A substantial portion of my PhD research focused on this task, although it is omitted from this dissertation writeup because trustworthy results could not ultimately be obtained in the timeframe available.
+A whitepaper will be released describing the work done and the challenges encountered,
+and I hope that future researchers will continue to pursue this important task.
+
+% ======================================================================
+\section{Closing Remarks}
+In summary, this dissertation develops a novel framework for simulating and optimizing two-body point absorber WECs.
+Novel aspects of the model are the quasi-linear pseudo-spectral control method, the unification and numerical analysis of the matched eigenfunction expansion method, and the inclusion of realistic constraints including structural survivability and slamming/submersion amplitude limits.
+The model is validated and benchmarked against other models, and the optimization is formulated, solved, and interpreted to yield insight into the design space and the trade-offs between objectives.
+The work lays the groundwork for continued improvement of WEC modeling, design, and optimization, and the methods can be applied to other problems involving coupled dynamic interactions or renewable energy systems.
+
+Even for problems that are not directly related, the methods and principles emphasized in this dissertation can be applied to other interdisciplinary problems.
+My plea for engineers of all fields is to take the concepts that underlie this work and apply them to their own problems: 
+do the hard work to understand the system and generate engineering insight rather than blindly seeking a numerical solution, especially at the early design stages as is common in academic research;
+think hard about what you're optimizing and why, adjust your stated goals until they align with your actual intentions, and refine your methodologies until they dutifully reflect the ideal pathway to achieve the stated goals.
+In this way, engineers can come closer to the ideal of using technology and innovation to make a meaningful positive impact on the world.

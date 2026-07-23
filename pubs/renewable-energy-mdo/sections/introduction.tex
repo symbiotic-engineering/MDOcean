@@ -33,7 +33,7 @@
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/RM3_image.pdf}
+\includegraphics[\FigureOptions{re:figs/from-matlab/RM3_image.pdf}]{figs/from-matlab/RM3_image.pdf}
 \caption{RM3 geometry visualized}
 \label{remdo:fig:rm3-parts}
 \end{figure}
@@ -88,7 +88,9 @@ Column-abbreviation legends are provided in \Cref{remdo:sec:appendix-lit-legend}
 %\begin{tabular}
 \singleColMacro{
 \setlength{\tabcolsep}{1pt}
-\begin{longtable}{P{0.04\linewidth}?P{0.05\linewidth}|P{0.06\linewidth}|P{0.040\linewidth}|P{0.02\linewidth}|P{0.025\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.045\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}?P{0.045\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}|P{0.055\linewidth}|P{0.02\linewidth}}
+\expanded{
+    \noexpand\longtable{\TableColumnSpecs{re:lit-review}}
+}
 \rot{\textbf{Ref}} & \rot{\textbf{Device}} & \rot{\textbf{Hydro}}& \rot{\textbf{Drag}} & \rot{\textbf{\# DOF}} & \rot{\textbf{Domain}} & \rot{\textbf{Controls}} & \rot{\textbf{Mooring}} & \rot{\textbf{Powertrain}} & \rot{\textbf{Structures}} & \rot{\textbf{Economics}} & \rot{\textbf{Sea state}}
 & \rot{\textbf{Optimizer}}& \rot{\textbf{Objective}} & \rot{\textbf{Constraints}} & \rot{\textbf{\shortstack{Design \\ Variables}}}& \rot{\textbf{\# DVs}} \\
 \hline\hline
@@ -177,7 +179,7 @@ This work & 2-PA & MEEM & DF & 1 & F+ & PI+ & - & DYN & AN & STR, PTO & REG+, ST
 See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
 \label{remdo:tab:lit}
 %\fillandplacepagenumber
-\end{longtable}
+\endlongtable
 }
 \endgroup
 %\end{landscape}
@@ -207,7 +209,8 @@ See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
     \citet{lin_fast_2025} introduces a CCD formulation faster than PS by leveraging Pontryagin's maximum principle analytically; \citet{abdulkadir_optimal_2024} use PMP for PTO-constrained array dynamics; \citet{herber_dynamic_2014} performs direct-transcription co-optimization of cylinder draft and radius with control.
 
     Several studies have independently concluded that significantly undersizing the PTO and accepting force saturation is favorable.
-    \citet{mcgilton_optimal_2024} reports only 3\% energy loss from a 70\% force-rating reduction across multiple device archetypes (RM3, RM5), sites, and scales, supporting analytical predictions \citep{coe_maybe_2021,devin_high-dimensional_2024}.
+    \citet{mcgilton_optimal_2024} reports only 3\% energy loss from a 70\% force-rating reduction across multiple device archetypes (RM3, RM5), sites, and scales, supporting analytical predictions \citep{devin_high-dimensional_2024}.
+    \citet{coe_maybe_2021} argues both for a smaller PTO and a smaller physical device, reasoning that ``due first to the high variability and strong positive skew of ocean wave power and second to the filtering behavior of a WEC, a smaller WEC may actually have better economics in terms of average annual energy, capacity factor, and costs.''
     None of these studies perform full economic analysis to confirm that the cost savings outweigh the power decrease --- a gap this paper addresses.
     \else
     Of the multi-discipline studies in \Cref{remdo:tab:lit}, the largest in scope are those of \citet{khanal_multi-objective_2024,gaudin_single_2021,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022}, spanning four-WEC array layout, hydrodynamics, controls, economics, high-dimensional site/layout/mooring, shape with stability constraints, and power-versus-structure trade-offs.
@@ -216,6 +219,7 @@ See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
     manual iteration \citep{RM3,mi_multi-scale_2025}, commercial decoupled tools \citep{an_optimal_2024}, brute-force sweeps over analytical stress \citep{ambuhl_reliability-based_2014}, or load-magnitude proxies \citep{nguyen_theoretical_2024,ferri_balancing_2014}.
     The control co-design literature \citep{garcia-sanz_control_2019,coe_useful_2023} has produced joint PTO-and-controller optimizations
     \citep{rosati_control_2023,son_performance_2016,anderson_re-imagining_2024,devin_high-dimensional_2024,grasberger_control_2024,gaebele_tpl_2025} often leveraging the pseudo-spectral method;
+    
     \citet{gaebele_tpl_2025} directly optimizes RM3 and finds a 0.55 dimensional scaling factor optimal.
     Several studies independently conclude that undersizing the PTO and accepting force saturation is favorable:
     \citet{mcgilton_optimal_2024} reports only 3\% energy loss from a 70\% force-rating reduction across archetypes, sites, and scales,
@@ -282,8 +286,8 @@ See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
     \Cref{remdo:sec:optim-methods} describes the optimization methodology including the underlying model topology, although modeling details are published separately \citep{mccabe_development_2026}; specifically,
     \Cref{remdo:sec:formulation} develops the optimization problem formulation.
     \Cref{remdo:sec:optim-process} details the solution procedure.
-    \Cref{remdo:sec:results} presents single-objective optimization, sensitivity analysis, and multi-objective optimization results.
-    \Cref{remdo:sec:discussion} interprets the trends, presents three representative optimal designs, and outlines future work.
+    \Cref{remdo:sec:results} presents single-objective optimization, sensitivity analysis, and multi-objective optimization results,
+    then interprets the trends, presents design takeaways, and outlines future work.
 \else
     This paper applies the MDOcean framework \citep{mccabe_development_2026}, which integrates semi-analytical models across hydrodynamics, dynamics and control, structures, and economics, to what is believed to be the most comprehensive WEC techno-economic design optimization to date.
     The contributions are: a multidisciplinary problem formulation simultaneously varying 12 design variables across bulk dimensions, structural thicknesses, and powertrain ratings subject to static, dynamic, structural, and operational constraints;
@@ -293,5 +297,5 @@ See \Cref{remdo:sec:appendix-lit-legend} for legend definitions.}
     The remainder of the paper is organized as follows.
     \Cref{remdo:sec:optim-methods} describes the optimization methodology and references \citet{mccabe_development_2026} for the underlying simulation model; specifically,
     \Cref{remdo:sec:formulation} develops the problem formulation and \Cref{remdo:sec:optim-process} the solution procedure.
-    \Cref{remdo:sec:results} presents results; \Cref{remdo:sec:discussion} interprets them and outlines future work.
+    \Cref{remdo:sec:results} presents and interprets results and outlines future work.
 \fi

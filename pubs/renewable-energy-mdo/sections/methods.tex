@@ -7,13 +7,21 @@
     (2) implementing and verifying models for each simulation module,
     (3) formally defining the optimization problem, and 
     (4) outlining a process for solving the problem and analyzing the results.
-    \Cref{remdo:fig:overview-methods} depicts the overall flow, with the simulation and modeling components covered in this section and the formulation and solution-process components developed in \Cref{remdo:sec:formulation,remdo:sec:optim-process}.
+    \Cref{remdo:fig:overview-methods} depicts the overall flow,
+    with the simulation and modeling components covered in \Cref{ch:modeling,ch:hydrodynamic}
+    and the formulation and solution-process components developed in \Cref{remdo:sec:formulation,remdo:sec:optim-process}.
 \else
-    \Cref{remdo:fig:overview-methods} summarizes the four iterative components that comprise the methodologies: selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process. \Cref{remdo:sec:model} addresses the first two while \Cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
+    \Cref{remdo:fig:overview-methods} summarizes the four iterative components that comprise the methodologies:
+    selecting the simulation structure, implementing and verifying models for each module, formally defining the optimization problem, and outlining a solution and analysis process.
+    \Cref{remdo:sec:model} addresses the first two while \Cref{remdo:sec:formulation,remdo:sec:optim-process} develops the last two.
 \fi
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=1\linewidth]{figs/from-matlab/methodology_flowchart.pdf}
+    \ifdefined\DISSERTATION
+        \includegraphics[\FigureOptions{re:figs/from-matlab/methodology_flowchart.pdf}]{figs/methodology_flowchart_dissertation.pdf}
+    \else
+        \includegraphics[\FigureOptions{re:figs/from-matlab/methodology_flowchart.pdf}]{figs/from-matlab/methodology_flowchart.pdf}
+    \fi
     \caption{Methodology overview}
     \label{remdo:fig:overview-methods}
 \end{figure}
@@ -39,7 +47,7 @@ These together compute the system-level quantities the optimization acts on: ann
 
 \begin{figure*}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
+    \includegraphics[\FigureOptions{re:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
     \caption{Simplified extended design structure matrix (XDSM) diagram of the MDOcean modules, adapted from \citet{mccabe_development_2026}.
 Inputs enter at the top, data passes forward between modules left to right along the diagonal, and outputs of the optimization exit at the left; the orange block denotes iteration in the dynamics module.}
     \label{remdo:fig:n2}
@@ -57,4 +65,4 @@ Inputs enter at the top, data passes forward between modules left to right along
 \fi
 
 MDOcean adopts an implicit multiple-discipline-feasible (MDF) analysis architecture, in which an analytically-derived optimal controller is solved explicitly inside the dynamics iteration rather than introducing control variables into the outer optimization.
-The reader is referred to \citet{mccabe_development_2026} for the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime (the property that makes the present optimization computationally feasible).
+\citet{mccabe_development_2026} provides the full module-level assumptions, the control-architecture taxonomy and rationale, the constrained optimal control derivation, and the validation and benchmarking results that establish MDOcean's accuracy and \resultsRE[simRuntime] per-evaluation runtime (the property that makes the present optimization computationally feasible).

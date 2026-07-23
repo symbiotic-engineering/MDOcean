@@ -4434,7 +4434,10 @@ stages:
     outs:
       - results/Validation/cost_vs_N_WEC.pdf
       - results/Validation/cost_vs_N_WEC.fig
-      - results/Validation/validation.tex:
+      - results/Validation/validation_smaller.tex:
+          cache: false
+          persist: false
+      - results/Validation/validation_larger.tex:
           cache: false
           persist: false
       - results/Validation/end.mat
@@ -5055,7 +5058,8 @@ stages:
       - results/Parameters/end.json
       - results/Validation/cost_vs_N_WEC.pdf
       - results/Validation/cost_vs_N_WEC.fig
-      - results/Validation/validation.tex
+      - results/Validation/validation_smaller.tex
+      - results/Validation/validation_larger.tex
       - results/Validation/end.mat
       - results/Validation/end.json
       - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf
@@ -5842,7 +5846,8 @@ stages:
       - results/SweepGeoms/end.json
       - results/Validation/cost_vs_N_WEC.pdf
       - results/Validation/cost_vs_N_WEC.fig
-      - results/Validation/validation.tex
+      - results/Validation/validation_smaller.tex
+      - results/Validation/validation_larger.tex
       - results/Validation/end.mat
       - results/Validation/end.json
       - results/Wecsim/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf
@@ -7046,7 +7051,8 @@ stages:
       - .calkit/env-locks/pubs
       - results/Validation/cost_vs_N_WEC.pdf
       - results/Validation/cost_vs_N_WEC.fig
-      - results/Validation/validation.tex
+      - results/Validation/validation_smaller.tex
+      - results/Validation/validation_larger.tex
       - results/Validation/end.mat
       - results/Validation/end.json
     outs:
@@ -7457,8 +7463,9 @@ stages:
     desc: Automatically generated from the 'pyxdsm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-re-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      move_results_to_pubs('RE');"
+    cmd: "bash --noprofile --norc -c \"cp results/**/*.pdf pubs/renewable-energy-mdo/figs/from-matlab/\n\
+      cp results/**/*.tex pubs/renewable-energy-mdo/tables/from-matlab/\n\
+      \""
     deps:
       - results/ReadNonMatlabFigs/
       - results/DesignSpaceExploration/
@@ -7482,8 +7489,9 @@ stages:
     desc: Automatically generated from the 'move-re-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-aor-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      move_results_to_pubs('AOR');"
+    cmd: "bash --noprofile --norc -c \"cp results/**/*.pdf pubs/applied-ocean-research-model/figs/from-matlab/\n\
+      cp results/**/*.tex pubs/applied-ocean-research-model/tables/from-matlab/\n\
+      \""
     deps:
       - results/DragIntegral/
       - results/FitOlaya/
@@ -7629,6 +7637,18 @@ stages:
           persist: false
     desc: Automatically generated from the 're-results-to-latex' stage
       in calkit.yaml. Changes made here will be overwritten.
+  copy-dissertation-only-figs:
+    cmd: calkit map-paths --file-to-file 
+      'results/SparHydro/spar_added_mass.pdf->pubs/dissertation/figs/from-matlab/spar_added_mass.pdf'
+    deps:
+      - results/SparHydro/spar_added_mass.pdf
+    outs:
+      - pubs/dissertation/figs/from-matlab/spar_added_mass.pdf:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 
+      'copy-dissertation-only-figs' stage in calkit.yaml. Changes made
+      here will be overwritten.
   copy-shared-latex:
     cmd: calkit map-paths --file-to-file 
       'pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib'
@@ -7873,7 +7893,11 @@ stages:
       - pubs/renewable-energy-mdo/content-re.tex
       - pubs/UMERC-2025-grid-value/
       - pubs/dissertation/references.bib
+      - pubs/dissertation/dissertation-conclusion.tex
+      - pubs/dissertation/dynamic-toc-depth.tex
       - pubs/shared/shared-pkg.tex
+      - pubs/shared/table-column-specs.tex
+      - pubs/shared/figure-widths.tex
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib

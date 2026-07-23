@@ -9,6 +9,8 @@ function [J, P_matrix_elec, g_vec, val] = simulation(X, p)
 % :returns: g_vec
 % :returns: Simulation result values struct
 
+val = [];
+
 X = max(X,1e-3); % sometimes optimizer will choose inputs that violate bounds, this is to prevent errors from negative numbers
 
 %% Assemble inputs
@@ -74,7 +76,7 @@ m_f_tot = max(m_f_tot,1e-3); % zero out negative mass produced by infeasible inp
 [F_heave_storm, F_surge_storm, ...
  F_heave_op, F_surge_op, F_ptrain_max, ...
  P_var, P_avg_elec, P_matrix_elec, ...
- X_constraints]                         = dynamics(in, m_f_tot, m_s_tot);
+ X_constraints]                         = dynamics(in, m_f_tot, m_s_tot, false);
 
 [FOS_float,FOS_spar,FOS_damping_plate,...
     FOS_spar_local] = structures(...
@@ -194,7 +196,7 @@ if nargout > 3 % if returning extra struct output for validation
      phase_X_f,phase_X_s,phase_X_u,...
      F_drag_f,F_drag_s,...
      phase_F_drag_f,phase_F_drag_s,...
-     qcqp_debug] = dynamics(in, m_f_tot, m_s_tot);
+     qcqp_debug] = dynamics(in, m_f_tot, m_s_tot, true);
 
     val.mass_f  = mass(1);
     val.mass_vc = mass(2);

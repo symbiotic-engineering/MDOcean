@@ -4,7 +4,7 @@ classdef Validation < GenericAnalysis
 
     properties
         fig_names = {'cost_vs_N_WEC'};
-        tab_names = {'validation'};
+        tab_names = {'validation_smaller', 'validation_larger'};
     end
 
     methods

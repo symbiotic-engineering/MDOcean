@@ -9,6 +9,10 @@
 % This sample document was originally provided by Blake Jacquot, and
 % fixed up by Andrew Myers.
 %
+% For bibliography
+\usepackage[numbers,square]{natbib}
+\usepackage{bibentry} % for inline full citations
+
 % Shared packages
 \usepackage{import}
 \subimport{../shared}{shared-pkg}
@@ -24,9 +28,6 @@
 \usepackage{hangcaption}
 \usepackage{txfonts}
 \usepackage{palatino}
-
-% For bibliography
-\usepackage[numbers,square]{natbib}
 
 % for grid paper
 \usepackage{framed}
@@ -49,6 +50,12 @@
 \usepackage{moresize}
 \usepackage[skip=0.5ex]{subcaption}
 
+% for changing table of contents depth dynamically
+\usepackage{tocvsec2}
+\usepackage[user,abspage]{zref}
+\usepackage{etoolbox}
+\input{dynamic-toc-depth.tex}
+
 % appendices after each chapter
 \newcommand{\appendixchapter}[1]{%
   \chapter*{#1}
@@ -60,6 +67,18 @@
 \titleformat{\chapter}[display]
 {\normalfont\bfseries}{\Large\centering\MakeUppercase{\@chapapp\space \thechapter}}{0pt}{\LARGE\center}
 \titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+% epigraph (quote at beginning of each chapter)
+\newcommand{\epigraph}[2]{%
+  \begin{center}
+  \begin{minipage}{0.5\linewidth}
+    \textit{#1}\\[-4ex]
+    \begin{flushright}
+    ---#2
+    \end{flushright}
+  \end{minipage}
+\end{center}
+}
 
 \graphicspath{
   {../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}
@@ -79,7 +98,6 @@
 %the tolerance to 9999
 \tolerance=9999
 
-\bibliographystyle{plainnat}
 %\bibliographystyle{IEEEbib}
 
 \newcommand{\DISSERTATION}{} % used for dissertation-specific formatting in shared files
@@ -98,6 +116,14 @@
 \copyrightyear{2026}
 
 \begin{document}
+\bibliographystyle{plainnat}
+\nobibliography{references,jfm,zotero-meem-refs}
+
+\makeatletter
+\def\bibliography#1{%
+  \@input@{\jobname.bbl}%
+}
+\makeatother
 
 \maketitle
 \makecopyright
@@ -127,7 +153,7 @@ Let's make sure the world knows it.
 \input{acknowledgements.tex}
 \end{acknowledgements}
 
-\setcounter{tocdepth}{1}
+\settocdepth{section}
 \contentspage
 \tablelistpage
 \figurelistpage
@@ -144,12 +170,17 @@ Let's make sure the world knows it.
 Multidisciplinary Semi-Analytical Model for Wave Energy Converters}
 \label{ch:modeling}
 
-\emph{All models are wrong, but some are useful.}
+\epigraph{Essentially, all models are wrong, but some are useful.}
+{George Box, 1987 \cite[Chapter 13.1]{box_empirical_1987}}
 
-- George Box, 1987
+This chapter is adapted from \citet{mccabe_development_2026}.
+It was submitted to the journal \textit{Applied Ocean Research} on June 22, 2026 (submission number APOR-D-26-00768), and is currently under review.
+The full citation is:
 
-This chapter is adapted from \citet{mccabe_development_2026}, currently under review for publication in Applied Ocean Research.
+\bibentry{mccabe_development_2026}.
+
 See \cref{sec:research-outputs} for other research outputs associated with this work.
+\clearpage
 \subimport{../applied-ocean-research-model/}{content}
 
 \appendixchapter{System Modeling Appendices}
@@ -163,13 +194,18 @@ See \cref{sec:research-outputs} for other research outputs associated with this 
 Matched Eigenfunction Method for Generalized Concentric Bodies}
 \label{ch:hydrodynamic}
 
-\emph{The purpose of computing is insight, not numbers.}
+\epigraph{The purpose of computing is insight, not numbers.}
+{Richard Hamming, 1962 \cite{hamming_numerical_1962}}
 
-- Richard Hamming, 1962
+This chapter is adapted from \citet{bimali_matrix_2026}.
+It was submitted to the \textit{Journal of Fluid Mechanics} on May 31, 2026 (submission number JFM-2026-1453) and will be resubmitted to a journal with a more numerical focus, 
+such as \textit{Journal of Computational Physics} or \textit{International Journal for Numerical Methods in Fluids}, upon recommendation of the editor.
+The full citation is:
 
-This chapter is adapted from \citet{bimali_matrix_2026}, currently under review for publication in the Journal of Fluid Mechanics (submission number JFM-2026-1453).
+\bibentry{bimali_matrix_2026}.
+
 See \cref{sec:research-outputs} for other research outputs associated with this work.
-
+\clearpage
 \subimport{../../mdocean/simulation/modules/OpenFLASH/pubs/JFM/}{FLMguide}
 
 \appendixchapter{Hydrodynamic Modeling Appendices}
@@ -184,18 +220,24 @@ Advance Wave Energy Converter Viability
 }
 \label{ch:optimization}
 
-\emph{The performance of a system doesn't depend on how the parts perform taken separately, it depends on how they perform together.
+\epigraph{The performance of a system doesn't depend on how the parts perform taken separately, it depends on how they perform together.
 [...] When you improve the performance of a part of a system taken separately, you can destroy the system.}
+{Russell Ackoff, 2003 \citep{ackoff_video_2003}}
 
-- Russell Ackoff, 2003 \citep{ackoff_video_2003}
+This chapter is adapted from \citet{mccabe_leveraging_2026}.
+It was submitted to \textit{Renewable Energy} (RENE-D-26-08510) on June 22, 2026,
+and will be resubmitted with some formatting changes as recommended by the editor.
+The full citation is:
 
-This chapter is adapted from \citet{mccabe_leveraging_2026}, \hl{(pending submission)} [currently under review] for publication in Renewable Energy.
+\bibentry{mccabe_leveraging_2026}.
+
 See \cref{sec:research-outputs} for other research outputs associated with this work.
+\clearpage
 \subimport{../renewable-energy-mdo/}{content-re}
 
 \appendixchapter{Design Optimization Appendices}
 \begin{subappendices}
-  \subimport{../renewable-energy-mdo/sections}{other-appendices}
+  \subimport{../renewable-energy-mdo/}{sections/other-appendices}
 \end{subappendices}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -205,26 +247,25 @@ A Paradigm for Grid-Informed Design Optimization\\[-4ex]
 to Maximize System Economic and Environmental Value}
 \label{ch:grid-value}
 
-\emph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
-
-- Greta Thunberg, 2019 \citep{thunberg_speech_2019}
+\epigraph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
+{Greta Thunberg, 2019 \citep{thunberg_speech_2019}}
 
 This chapter is currently unpublished.
 See \cref{sec:research-outputs} for research outputs associated with this work.
+
+\clearpage
 \subimport{../UMERC-2025-grid-value/}{content-grid}
+%\input{grid.tex}
 
 \appendixchapter{Grid Impact Synthesis Appendices}
 \begin{subappendices}
-  \section{Reduced order model details}
+  \section{Reduced Order Model Details}
   \subimport{../UMERC-2025-grid-value/}{appendix-grid}
 \end{subappendices}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
-\hl{A conclusion will be written here}.
-% \chapter{Vision for the Future of Wave Energy Optimization}
-% - extend to other architectures and more complex models (already written in modeling paper)
-% - integrate with wecopttool and wecsim
+\input{dissertation-conclusion.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -30,8 +30,12 @@ For the single-objective formulation, the optimization minimizes the levelized c
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations: it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \citep{akdemir_opportunities_2023,mccabe_system_2023}; it has high early-stage uncertainty, since costs other than structural and PTO costs are difficult to predict early on and thus modeled as fixed with respect to design \citep{mccabe_development_2026}; and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citep{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
-    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$. This removes the influence of the fixed charge rate and inaccurately-scaled costs and exposes the minimum-capital design for a given power requirement.
+    LCOE is adopted for its simplicity, though it carries three limitations:
+    it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \citep{akdemir_opportunities_2023,mccabe_system_2023};
+    it has high early-stage uncertainty, since costs other than structural and PTO costs are difficult to predict early on and thus modeled as fixed with respect to design \citep{mccabe_development_2026};
+    and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citep{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
+    This removes the influence of the fixed charge rate and inaccurately-scaled costs and exposes the minimum-capital design for a given power requirement.
 \fi
 
 The objective function is expressed:
@@ -254,7 +258,8 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 \else
     While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed.
     This choice adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
-    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023}; pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
+    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023};
+    pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
 \fi
 
 %\subsubsection{Model Checking}
@@ -262,11 +267,10 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 %It was initially speculated that the structural constraints would always be active, 
 
 \subsection{Interpretation}
-\label{remdo:sec:formulation}
 Translating raw optimization outputs into meaningful engineering insights is nontrivial and rarely made explicit.
 Consistent with MDO as part of the design process, this section outlines the methodology for interpreting optimation and sensitivity results for wave energy, focusing on which design questions can and cannot be addressed by which results.
 % maybe instroduce this distinction when discussing choice of DVs vs parameters originally? think of PTO size, structures, and h_fs_clear as dynamic limit setters. maybe cite Pat's book on how parameter sensitivities can be used for factor screening and other things.
 We separate parameters by the amount of control the designer has over them and the degree to which their values may vary due to both flexibility and uncertainty.
-``States of the world'', such as location and use case, have low control and high variation, whereas physical constants, such as gravitational acceleration and water density, have low control and low variation.
+``States of the world,'' such as location and use case, have low control and high variation, whereas physical constants, such as gravitational acceleration and water density, have low control and low variation.
 Performance-based characteristics are characterized by moderate control (through subsystem R\&D or market development) and can have high (i.e. cost uncertainty of unmodeled subsystems) or low variation (i.e. drag coefficient of a floating body).
 Finally, parameters that could have been design variables but were instead fixed for simplicity, such as the damping plate diameter and spar draft, have high control and low variation.
