@@ -3,9 +3,41 @@
 ### Fixed
 - Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
 
-## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-17
+## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-7-23
+### Added
+- Paper: macro to swap between figure widths and table specs depending on dissertation vs journal and 1 vs 2 columns
+- Model: `check_max_CW.m` incorporates slamming-based Budal Upper Bound into maximum capture width calculation (note that this may break `SweepGeoms`, which still only uses radiation-based max capture width) and uses amplitude saturation to compute the drag ratio
+- AOR paper: discussion about how to further improve runtime
+- Dissertation: conditionally remove DECIDER chapter
+- Figures: create `nested_future_optim` and `methodology_flowchart_dissertation` as dissertation-specific dvc figures
+- Dissertation: create macro for epigraphs
+- Dissertation: dynamic table of contents depth based on page length of section
+- Paper: single column Elsevier cas template
+
 ### Changed
-- Dev: merge `main` into `post-submit-edits-old` and prepare branch for merge.
+- Plots: fill markers on PTO sweep
+- Optimization: if converge to infeasible point, use best feasible point
+- Speedup: vectorize and remove unneeded transposes and debug struct creation from analytical QCQP
+- Speedup: reduce complex operations by adding parentheses in `get_response_drag.m` and grouping terms in `multibody_response.m`
+- Speedup: only compute analytical drag integrals for sea states where they apply in `make_drag_LUT.m`
+- AOR paper: break up dynamics appendix into separate files
+- Dynamics: pass solved `control_mult` directly out of solver
+- Paper: change all citations to use `citet` or `citep` (natbib)
+- Paper: various word choice and table formatting improvements
+- Paper: numeric results now throws warning if undetected (will be overwritten by pipeline though)
+- Dissertation: remove Moana quote since it's copyrighted
+- Dissertation: change thesis writeup's license to CC BY-NC-ND
+- Dissertation: proper inline full citations with `bibentry` package
+- RE paper: delete unused old tables
+- RE paper: substantial rewrite of results and discussion sections
+
+### Fixed
+- Plots: avoid error in `plot_nominal_constraint_circles` if all sea states are unconstrained
+- Paper: add `\` before `%` and `#` in bib file urls to avoid errors with `\bibentry` package
+
+## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
+### Changed
+- Dev: expand `.github/copilot-instructions.md` with cloud-agent onboarding guidance, targeted Calkit commands, and known error/workaround notes.
 
 ## [v1.3.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.2) - 2026-7-12
 ### Added
