@@ -17,6 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  inkscape:
+    kind: docker
+    image: minidocks/inkscape:latest
+    description: Inkscape via Docker.
+    wdir: /app
   # pdf2svg:
   #   kind: docker
   #   path: pubs/defense/latex-standalone/Dockerfile
@@ -40,6 +45,7 @@ dependencies:
   - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
+  HOME: /tmp # for inkscape container, to avoid permission issues
 parameters:
   mermaid_name:
     - taxonomy
@@ -56,6 +62,14 @@ parameters:
 #   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
   stages:
+    svg2pdf:
+      kind: command
+      environment: inkscape
+      command: inkscape {name}.svg --export-type=pdf --export-filename={name}.pdf
+      iterate_over:
+        - arg_name: name
+          values:
+            - pubs/dissertation/images/neurodiversity_image
     mermaid-make-pdfs:
       kind: command
       environment: mermaid

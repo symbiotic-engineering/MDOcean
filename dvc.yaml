@@ -1,4 +1,16 @@
 stages:
+  svg2pdf:
+    cmd: calkit xenv -n inkscape --no-check -- inkscape 
+      ${item.name}.svg --export-type=pdf 
+      --export-filename=${item.name}.pdf
+    deps:
+      - .calkit/env-locks/inkscape
+    outs: []
+    matrix:
+      name:
+        - pubs/dissertation/images/neurodiversity_image
+    desc: Automatically generated from the 'svg2pdf' stage in 
+      calkit.yaml. Changes made here will be overwritten.
   mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
       mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
