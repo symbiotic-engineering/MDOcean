@@ -73,8 +73,8 @@ function [hydro_ratio, P_wave, ...
     % compare to maximum capture width
     CW_max_radiation = p.g * T.^2 / (4*pi^2);
     H = Hs / sqrt(2);
-    draft = X(strcmp(b.var_names, 'D_f'));
-    D_f = X(strcmp(b.var_names, 'T_f_2'));
+    D_f = X(strcmp(b.var_names, 'D_f'));
+    draft = X(strcmp(b.var_names, 'T_f_2'));
     max_amp = draft + H/2; % slamming upper bound when theta = 0 (applies for both small and large wave regimes)
     waterplane_area = pi/4 * D_f^2;
     P_max_budal = H/4 * p.rho_w * p.g .* (2*pi./T) .* waterplane_area .* max_amp;
