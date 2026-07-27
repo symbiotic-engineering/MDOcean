@@ -115,6 +115,7 @@ As exceptions, the following files have been adapted from other code and have di
 - `pubs/shared/els-cas/` (including `cas-sc.cls` and `cas-dc.cls`): LaTeX Project Public License v1.3c
 - `pubs/applied-ocean-research-model/stars-cc-by-sa.tex`: CC BY-SA 4.0
 - `pubs/dissertation/wave_images/wave_image.png`: CC BY-NC 4.0
+- `pubs/dissertation/sampleDissertation.pdf`: CC BY-NC-ND 4.0
 
 ## Dependencies
 
