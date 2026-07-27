@@ -85,7 +85,7 @@ pipeline:
     make-drag-integral:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); make_drag_integral
+      command: mip project run 'add_mdocean_path(); make_drag_integral'
       inputs:
         - ./mdocean/inputs/make_drag_integral.m
         - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
@@ -95,8 +95,7 @@ pipeline:
     make-var-bounds:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); b = var_bounds(); 
-        save('./mdocean/inputs/var_bounds.mat','b');
+      command: mip project run 'add_mdocean_path(); b = var_bounds(); save(''./mdocean/inputs/var_bounds.mat'',''b'');'
       inputs:
         - ./mdocean/inputs/var_bounds.m
         - ./mdocean/inputs/parameters.m
@@ -108,8 +107,9 @@ pipeline:
     make-calkit-stages:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); analysis_to_calkit;
+      command: mip project run 'add_mdocean_path(); analysis_to_calkit;'
       inputs:
+        - ./mip.lock
         - mdocean/analysis/
         - mdocean/inputs/
         - mdocean/optimization/multiobjective/
@@ -4986,8 +4986,9 @@ pipeline:
     test-aor:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); addpath('tests'); run_tests('AOR')
+      command: mip project run 'add_mdocean_path(); addpath(''tests''); run_tests(''AOR'')'
       inputs:
+        - ./mip.lock
         - from_stage_outputs: analysis-Comparison
         - from_stage_outputs: analysis-Cost
         - from_stage_outputs: analysis-DampingPlateStructures
@@ -5014,8 +5015,9 @@ pipeline:
     test-re:
       kind: matlab-command
       environment: _system
-      command: add_mdocean_path(); addpath('tests'); run_tests('RE')
+      command: mip project run 'add_mdocean_path(); addpath(''tests''); run_tests(''RE'')'
       inputs:
+        - ./mip.lock
         - from_stage_outputs: analysis-AllFigCompare
         - from_stage_outputs: analysis-Comparison
         - from_stage_outputs: analysis-Constraints
@@ -5339,7 +5341,7 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('RE');
+      command: mip project run 'add_mdocean_path(); move_results_to_pubs(''RE'');'
     move-aor-results:
       kind: matlab-command
       environment: _system
@@ -5370,7 +5372,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: add_mdocean_path(); move_results_to_pubs('AOR');
+      command: mip project run 'add_mdocean_path(); move_results_to_pubs(''AOR'');'
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
@@ -5539,21 +5541,18 @@ pipeline:
         - src: pubs/shared/references.bib
           dest: pubs/UMERC-2025-grid-value/references.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        # zotero-meem-refs.bib is vendored from OpenFLASH pubs/JFM
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
           kind: file-to-file
                 #
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
         # bib style file
