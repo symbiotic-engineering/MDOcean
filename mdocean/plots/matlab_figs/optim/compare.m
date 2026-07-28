@@ -108,11 +108,13 @@ text(-30,5,'Wave Height Hs (m)','FontWeight','bold','FontSize',16,'Rotation',90)
 
 %% hydro coeff comparison plot
 h_hydro = hydro_compare(vals,color);
+h_hydro_imp = hydro_impedance_compare(vals,color,p,X);
 
 %% stacked cost breakdown + power histogram (nominal vs min LCOE)
 h_cost_power = figure;
 t_cost = tiledlayout(1,3);
 t_cost.TileSpacing = 'compact';
+h_cost_power.Position(3:4) = [1200 600];
 
 idx_compare = [1 2]; % nominal and min LCOE
 labels_compare = titles(idx_compare);
@@ -121,9 +123,9 @@ labels_compare = titles(idx_compare);
 idx_F_max = strcmp(b.var_names,'F_max');
 idx_P_max = strcmp(b.var_names,'P_max');
 N_WEC = p.N_WEC;
-alpha_pto = 0.206;
-pto_power_mult = (0.4454 + 0.9099*N_WEC^(-alpha_pto)) * p.cost_perW_mult;
-pto_force_mult = (0.0086 + 0.0118*N_WEC^(-alpha_pto)) * p.cost_perN_mult;
+alpha_pto = p.econ_alpha_pto;
+pto_power_mult = (p.econ_pto_power_coeff_base + p.econ_pto_power_coeff_scale*N_WEC^(-alpha_pto)) * p.cost_perW_mult;
+pto_force_mult = (p.econ_pto_force_coeff_base + p.econ_pto_force_coeff_scale*N_WEC^(-alpha_pto)) * p.cost_perN_mult;
 P_max_W = X(idx_compare,idx_P_max) * 1e5;
 F_max_N = X(idx_compare,idx_F_max) * 1e6;
 pto_power = pto_power_mult * P_max_W;
@@ -137,8 +139,8 @@ legend({'Power','Force'},'Location','best')
 improvePlot
 
 % Structural cost stack (float, column, reaction plate, other)
-alpha_struct = 0.481;
-cost_per_kg = (1.64e6 + 1.31e6 * N_WEC^(-alpha_struct)) / 687000;
+alpha_struct = p.econ_alpha_struct;
+cost_per_kg = (p.econ_struct_capex_base + p.econ_struct_capex_scale * N_WEC^(-alpha_struct)) / p.econ_struct_mass_ref;
 struct_stack = zeros(length(idx_compare),4);
 for i = 1:length(idx_compare)
     j = idx_compare(i);
@@ -199,9 +201,9 @@ stacked_number_line(X(:,1:end-1).', b.X_mins, b.X_maxs, color, markers, titles, 
 
 h_stacked_out = figure;
 stacked_number_line(out_table{:,:}, [], [], color, markers, titles, out_table.Properties.RowNames);
-h_stacked_out.Position(3:4) = [1000  400]; % make taller
+h_stacked_out.Position(3:4) = [1000 1200]; % make taller so all row labels are visible
 
-figs = [h_geom, h_hydro, h_prob, h_power_matrix, h_cost_power, h_stacked_dv, h_stacked_out];
+figs = [h_geom, h_hydro, h_hydro_imp, h_prob, h_power_matrix, h_cost_power, h_stacked_dv, h_stacked_out];
 
 end
 
@@ -224,7 +226,7 @@ function f = hydro_compare(vals,colors)
 f = figure;
 
 % first subplot: excitation
-t = tiledlayout(1,3);
+t = tiledlayout(1,2);
 t.TileSpacing = 'compact';
 nexttile
 hold on
@@ -285,30 +287,6 @@ for j = 1:length(h)
     %h(j).LineWidth = 1;
 end
 
-% third subplot: impedance (magnitude and phase)
-nexttile
-hold on
-for i=1:length(vals)
-    val = vals(i);
-    col = colors{i};
-    w=unique(val.w(~isnan(val.w)),'stable');
-    A_f_over_rho = unique(val.A_f_over_rho(~isnan(val.A_f_over_rho)),'stable');
-    B_f_over_rho_w = unique(val.B_f_over_rho_w(~isnan(val.B_f_over_rho_w)),'stable');
-    Z_h = B_f_over_rho_w + 1i * A_f_over_rho;
-    yyaxis left
-    plot(w(:,1), abs(Z_h(:,1)), [col '-*'])
-    ylabel('|Z_h| (m^3)')
-    yyaxis right
-    plot(w(:,1), angle(Z_h(:,1)), [col '-.'])
-    ylabel('\angle Z_h (rad)')
-end
-title('Hydrodynamic Impedance')
-xlabel('Wave Frequency (\omega)')
-xlim([0.3,1.45])
-legend({'|Z_h|','\angle Z_h'})
-hold off
-improvePlot
-
 % figure legend for design colors
 axLegend = axes('Position',[0.91 0.1 0.08 0.8]);
 hold(axLegend,'on')
@@ -316,8 +294,141 @@ dummy_style = {'k-','b-','r-','g-','m-'};
 for i = 1:length(dummy_style)
     plot(axLegend,NaN,NaN,dummy_style{i})
 end
-legend(axLegend,{'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'},'Location','northwest');
+leg = legend(axLegend,{'Nominal','Min LCOE','Min CAPEX','Max Power','Balanced'});
 axLegend.Visible = 'off';
+try
+    leg.Layout.Tile = 'east';
+catch
+    leg.Location = 'eastoutside';
+end
 
 f.Position(3) = 1530;
+end
+
+function f = hydro_impedance_compare(vals,colors,p,X)
+f = figure;
+t = tiledlayout(2,1);
+t.TileSpacing = 'compact';
+t.Padding = 'compact';
+ax_mag = nexttile;
+hold(ax_mag,'on')
+ax_phase = nexttile;
+hold(ax_phase,'on')
+
+Hs_sorted = sort(p.Hs(:));
+n_hs = length(Hs_sorted);
+alpha_min = 0.2;
+alpha_max = 1.0;
+if n_hs > 1
+    alpha_vals = linspace(alpha_min, alpha_max, n_hs).';
+else
+    alpha_vals = alpha_max;
+end
+cmap = jet(max(n_hs,2));
+if n_hs == 1
+    cmap = cmap(1,:);
+else
+    cmap = cmap(1:n_hs,:);
+end
+line_styles = {'-','--',':','-.'};
+
+for i=1:length(vals)
+    val = vals(i);
+    style_i = line_styles{mod(i-1,length(line_styles))+1};
+    w = val.w;
+    if isempty(w)
+        continue
+    end
+    [B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s] = linear_coeffs_for_impedance(X(i,:), p, val, w);
+    for j=1:size(w,1)
+        if j <= length(p.Hs)
+            hs_j = p.Hs(j);
+        else
+            hs_j = Hs_sorted(min(j,n_hs));
+        end
+        idx_hs = find(abs(Hs_sorted - hs_j) < 1e-12, 1, 'first');
+        if isempty(idx_hs)
+            [~,idx_hs] = min(abs(Hs_sorted - hs_j));
+        end
+        alpha_j = alpha_vals(idx_hs);
+        col_j = cmap(idx_hs,:);
+        w_j = w(j,:).';
+        idx_valid = ~isnan(w_j);
+        if ~any(idx_valid)
+            continue
+        end
+        w_j = w_j(idx_valid);
+        B_c_j = B_c(j,idx_valid).';
+        B_f_j = B_f(j,idx_valid).';
+        B_s_j = B_s(j,idx_valid).';
+        K_f_j = K_f(j,idx_valid).';
+        K_s_j = K_s(j,idx_valid).';
+        m_c_j = m_c(j,idx_valid).';
+        m_f_j = m_f(j,idx_valid).';
+        m_s_j = m_s(j,idx_valid).';
+        if p.use_multibody
+            [real_G_u,imag_G_u] = multibody_impedance(B_c_j,B_f_j,B_s_j,K_f_j,K_s_j,m_c_j,m_f_j,m_s_j,w_j);
+        else
+            resistance = B_f_j;
+            reactance = m_f_j.*w_j - K_f_j./w_j;
+            mag_G_u_squared = 1 ./ (resistance.^2 + reactance.^2);
+            real_G_u = resistance .* mag_G_u_squared;
+            imag_G_u = -reactance .* mag_G_u_squared;
+        end
+        G_u = real_G_u + 1i * imag_G_u;
+        Z_th = 1./G_u;
+        plot(ax_mag, w_j, abs(Z_th), style_i, 'Color', [col_j alpha_j], 'LineWidth', 1.2, ...
+            'HandleVisibility', 'off')
+        plot(ax_phase, w_j, angle(Z_th), style_i, 'Color', [col_j alpha_j], 'LineWidth', 1.2, ...
+            'HandleVisibility', 'off')
+    end
+end
+
+dummy_min = plot(ax_mag, NaN, NaN, '-', 'Color', [0 0 0 alpha_vals(1)], ...
+    'LineWidth', 2, 'DisplayName', sprintf('Low H_s = %.2f m', Hs_sorted(1)));
+dummy_max = plot(ax_mag, NaN, NaN, '-', 'Color', [0 0 0 alpha_vals(end)], ...
+    'LineWidth', 2, 'DisplayName', sprintf('High H_s = %.2f m', Hs_sorted(end)));
+legend(ax_mag, [dummy_min, dummy_max], 'Location', 'best')
+
+colormap(f,cmap)
+cb = colorbar(ax_phase);
+cb.Layout.Tile = 'east';
+cb.Label.String = 'H_s (m)';
+cb.Ticks = linspace(0,1,n_hs);
+cb.TickLabels = compose('%.2f', Hs_sorted);
+clim(ax_phase,[0 1])
+
+title(ax_mag, 'Controlled DOF Thevenin Impedance')
+ylabel(ax_mag, '|Z_{th}| (N s/m)')
+ylabel(ax_phase, '\angle Z_{th} (rad)')
+xlabel(ax_phase, 'Wave Frequency (\omega)')
+xlim(ax_mag,[0.3,1.45])
+xlim(ax_phase,[0.3,1.45])
+grid(ax_mag,'on')
+grid(ax_phase,'on')
+improvePlot
+end
+
+function [B_c,B_f,B_s,K_f,K_s,m_c,m_f,m_s] = linear_coeffs_for_impedance(x, p, val, w)
+D_s = x(1);
+D_f = x(2);
+T_f_2 = x(3);
+D_d = p.D_d_over_D_s * D_s;
+T_s = p.T_s_over_D_s * D_s;
+T = 2*pi./w;
+if size(T,1) == numel(p.Hs)
+    Hs = repmat(p.Hs(:), 1, size(T,2));
+else
+    Hs = ones(size(T));
+end
+m_float = val.mass_f;
+m_spar = val.mass_vc + val.mass_rp;
+[m_f,B_f,K_f,~,~,...
+ m_s,B_s,K_s,~,~,...
+ m_c,B_c] = get_dynamic_coeffs(Hs, T, ...
+                               D_f, T_f_2, D_s, D_d, T_s, p.h, ...
+                               m_float, m_spar, p.spar_excitation_coeffs,...
+                               p.C_d_float, p.C_d_spar, ...
+                               p.rho_w, p.g, p.use_MEEM, p.harmonics, ...
+                               p.hydro, p.m_k_h_precomputed_op);
 end
