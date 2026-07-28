@@ -5,7 +5,7 @@ import os
 
 
 def usage():
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--symbol-glossary-seed <seed-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
     sys.exit(1)
 
 if len(sys.argv) < 2:
@@ -17,6 +17,7 @@ ignored_files = []
 settings_files = []
 output_file = None
 symbol_glossary_file = None
+symbol_glossary_seed_file = None
 output_handle = sys.stdout
 use_color = True
 
@@ -982,8 +983,9 @@ def build_symbol_glossary_lines(symbols, descriptions):
     return lines
 
 
-def write_symbol_glossary(path, symbols):
-    descriptions = read_existing_symbol_descriptions(path)
+def write_symbol_glossary(path, symbols, seed_path=None):
+    source_path = seed_path if seed_path else path
+    descriptions = read_existing_symbol_descriptions(source_path)
     lines = build_symbol_glossary_lines(symbols, descriptions)
     with open(path, "w") as handle:
         for line in lines:
@@ -2278,6 +2280,14 @@ def main():
             else:
                 print("Missing file after --symbol-glossary-output")
                 usage()
+
+        if arg == "--symbol-glossary-seed":
+            if idx + 1 < len(sys.argv):
+                symbol_glossary_seed_file = sys.argv[idx + 1]
+                idx += 1
+            else:
+                print("Missing file after --symbol-glossary-seed")
+                usage()
         
         if arg == "--error":
             exit_code = True
@@ -2327,7 +2337,7 @@ def main():
             for text_string in sorted(math_text_mix_strings):
                 write_output("- %s" % text_string)
         if symbol_glossary_file is not None:
-            write_symbol_glossary(symbol_glossary_file, all_equation_symbols)
+            write_symbol_glossary(symbol_glossary_file, all_equation_symbols, symbol_glossary_seed_file)
             write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), symbol_glossary_file))
     finally:
         if output_handle is not sys.stdout:
