@@ -1,0 +1,59 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events for any branch
+  push:
+    branches:
+      - main
+
+  # Triggers the workflow on pull request events
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    timeout-minutes: 1440 # 24 hours
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          path: MDOcean
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+        if: always()
+        with:
+            products: >
+                Parallel_Computing_Toolbox
+                Global_Optimization_Toolbox
+                Optimization_Toolbox
+                Statistics_and_Machine_Learning_Toolbox
+                MATLAB_Report_Generator
+                Simulink
+                Simscape
+                Simscape_Multibody
+
+    #   - name: Add MATLAB to path on self-hosted runner
+    #     if: runner.os == 'Linux' && runner.environment == 'self-hosted'
+    #     run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+
+      - name: Run tests and generate artifacts
+        uses: matlab-actions/run-command@v2
+        if: always()
+        with:
+          command: disp("Hello world")
+
+      - name: Attempt to manually run matlab command
+        run: |
+            ls ../_tool/
+            run-matlab-command disp("Hello world")
