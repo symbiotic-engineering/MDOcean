@@ -125,6 +125,8 @@ The following packages are used in this code:
 | [OpenFLASH](https://github.com/symbiotic-engineering/OpenFLASH) | Required for simulation |
 | Optimization Toolbox | Required for optimization |
 | Global Optimization Toolbox | Required for optimization |
+| Curve Fitting Toolbox | Optional for post-processing |
+| Image Processing Toolbox | Optional for post-processing |
 | Symbolic Math Toolbox | Optional for simulation code generation |
 | Parallel Computing Toolbox | Optional for speedup |
 | MATLAB Report Generator | Optional for WEC-Sim validation |
