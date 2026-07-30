@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+# if running on github actions, use the auto-licensed matlab
+    exec ../../_actions/matlab-actions/run-command/v2/dist/bin/glnxa64/run-matlab-command "$1"
+else
+# if running locally, use the local matlab installation (requires its own license)
+    exec matlab -batch "$1"
+fi
