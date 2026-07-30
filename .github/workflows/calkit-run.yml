@@ -107,6 +107,10 @@ jobs:
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
+      - name: manually dvc pull subproject
+        run: |
+          cd mdocean/simulation/modules/OpenFLASH
+          calkit dvc pull
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
