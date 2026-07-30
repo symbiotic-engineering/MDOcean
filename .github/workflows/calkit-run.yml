@@ -107,17 +107,13 @@ jobs:
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
-      - name: manually dvc pull subproject
-        run: |
-          cd mdocean/simulation/modules/OpenFLASH
-          calkit dvc pull
       - name: Run Calkit
         id: run_calkit
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
+          run_args: --keep-going --log --pull build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
           # test-aor test-re 
           pull_dvc: false
           save: false
