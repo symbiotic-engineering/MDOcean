@@ -5,6 +5,9 @@
 ### Changed
 - CI: use auto-licensed MATLAB binary from `matlab-actions` workflow steps
 - Docs: add image processing, report generation, and curve fitting toolboxes to readme and `dep_check.m`
+- Pipeline: track test-results and code-coverage outputs as a dvc-zip
+- Pipeline: matlab stages use `shell_command: ./mymatlab` instead of `matlab-command` for actions-conditional behavior
+
 
 ## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
 ### Changed
