@@ -98,6 +98,17 @@ def get_git_tracked_outputs(calkit_path=CALKIT_YAML):
             and stage_data.get("executed_ipynb_storage") == "git"
         ):
             paths.append(_norm_path(f".calkit/notebooks/executed/{notebook_path}"))
+        if (
+            isinstance(notebook_path, str)
+            and stage_data.get("html_storage") == "git"
+        ):
+            html_path = notebook_path.replace('.ipynb','.html')
+            paths.append(_norm_path(f".calkit/notebooks/html/{html_path}"))
+        if (
+            isinstance(notebook_path, str)
+            and stage_data.get("cleaned_ipynb_storage") == "git"
+        ):
+            paths.append(_norm_path(f".calkit/notebooks/cleaned/{notebook_path}"))
     return list(dict.fromkeys(paths))
 
 
