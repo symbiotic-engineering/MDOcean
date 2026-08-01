@@ -1,8 +1,9 @@
 # Changelog
 ## Unreleased
 
+## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed
-- Pipeline: include git-stored executed notebook outputs under `.calkit/notebooks/executed/` in `dev/dvc_lock_merge.py` merge-driver checkout/add guidance.
+- Pipeline: include git-stored notebook outputs under `.calkit/notebooks/` in `dev/dvc_lock_merge.py` merge-driver checkout/add guidance.
 
 ## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-30
 ### Changed
