@@ -6,7 +6,7 @@ function intermed_result_struct = analysis_fcn(p,b)
 % :param b: Design variable bounds struct
 % :returns: Intermediate results struct (cached heavy analyses)
     % Run design space exploration experiments
-    [X_ins,ratios,LCOE,cost,power,failed] = experiments(p,b);
+    [X_ins,ratios,LCOE,cost,power,failed,failed_mat] = experiments(p,b);
 
 %     cd('..')
 %     pareto = ParetoFigFunc(p,b);
@@ -22,5 +22,6 @@ function intermed_result_struct = analysis_fcn(p,b)
     intermed_result_struct.cost = cost;
     intermed_result_struct.power = power;
     intermed_result_struct.failed = failed;
+    intermed_result_struct.failed_mat = failed_mat;
 %     intermed_result_struct.pareto_results_struct = pareto_results_struct;
 end

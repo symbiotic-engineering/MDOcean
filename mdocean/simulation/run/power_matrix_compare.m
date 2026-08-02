@@ -115,7 +115,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
             contour_plot(T,H,sim(i).(var_name), ['Sim: ',sim_str{i}] );
             clim(clims)
             % error
-            error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name));
+            is_phase = contains(var_name,'phase');
+            error = compute_percent_error_matrix(actual.(var_name), sim(i).(var_name), is_phase);
             nexttile
 
             % set contour lines to make plot more readable
@@ -152,7 +153,15 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
                 end
             end
             
-            error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+            is_wecsim_geom = p.T_s_over_D_s == 29/6;
+            if p.C_d_float==0 && p.C_d_spar==0 && is_wecsim_geom && p.use_multibody && any(isfinite(error),'all')
+                cb = signed_log(error, [], [], T, H, true);
+                cb.TickLabels = strcat(cb.TickLabels, '%');
+            else
+                cb = error_plot(T,H,error,['Percent Error ' sim_str{i}],error_levels);
+                cb.Ruler.TickLabelFormat = '%.0f%%';
+            end
+            
         end
 
         xlabel(t,'Wave Period T (s)','FontSize',20)
@@ -160,8 +169,8 @@ function figs = comparison_plot(T, H, actual, sim, vars_to_plot, actual_str, sim
     end
 end
 
-function error_plot(T, H, error, error_title, error_values)
-    [c,h_fig] = contour_plot(T, H, error, error_title, error_values);
+function cb = error_plot(T, H, error, error_title, error_values)
+    [c,h_fig,cb] = contour_plot(T, H, error, error_title, error_values);
     if ~isempty(c)
         clabel(c,h_fig);
     end
@@ -170,7 +179,7 @@ function error_plot(T, H, error, error_title, error_values)
     end
 end
 
-function [c,h_fig] = contour_plot(T, H, Z, Z_title, Z_levels)
+function [c,h_fig,cb] = contour_plot(T, H, Z, Z_title, Z_levels)
     if nargin<5
         Z_levels = [];
     end
@@ -360,8 +369,14 @@ function results = assemble_results_struct(sz,varargin)
 
 end
 
-function pct_error = compute_percent_error_matrix(actual, sim)
-    pct_error = 100 * (sim - actual) ./ actual;
-    pct_error(pct_error==0) = NaN;
-
+function pct_error = compute_percent_error_matrix(actual, sim, wrap_phase)
+    if nargin<3
+        wrap_phase = false;
+    end
+    error = (sim - actual) ./ actual;
+    error(error==0) = NaN;
+    if wrap_phase
+        error = wrapToPi(error);
+    end
+    pct_error = error * 100;
 end

@@ -28,7 +28,7 @@ function [fig_array,...
             tab_firstrows = {[]};
             tab_colspecs = {[]};
             
-            end_result_struct.forceScaleFactor = tab.value(strcmp(tab.name, 'F_heave_mult'));
-            end_result_struct.powerScaleFactor = tab.value(strcmp(tab.name, 'power_scale_multibody'));
-            end_result_struct.massScaleFactor  = tab.value(strcmp(tab.name, 'm_scale'));
+            end_result_struct.forceScaleFactor = tab.value{strcmp(tab.name, 'F_heave_mult')};
+            end_result_struct.powerScaleFactor = tab.value{strcmp(tab.name, 'power_scale_multibody')};
+            end_result_struct.massScaleFactor  = tab.value{strcmp(tab.name, 'm_scale')};
 end

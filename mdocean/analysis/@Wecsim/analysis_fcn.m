@@ -17,7 +17,6 @@ function intermed_result_struct = analysis_fcn(~,~)
     intermed_result_struct.case_cell = case_cell;
     intermed_result_struct.filename_cell = filename_cell;
     intermed_result_struct.runOnlyFewSeaStates = runOnlyFewSeaStates;
-
 end
 
 function out_cell = run_wecsim_all_cases(case_cell)

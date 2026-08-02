@@ -1,0 +1,24 @@
+%%{init: {'flowchart': { 'padding': 5 , 'diagramPadding': 5 , 'useMaxWidth': false} }}%%
+flowchart LR
+
+    Ns[ ] --> |Time-<br />Domain <br />Constraints|Ms
+    Ms[Linearization via Constraint DFs] --> |Freq.-<br />Domain <br />Constraints|Cs
+    As[ ] --> |Time-<br />Domain <br />Nonlin. <br />Plant|Bs[Linearization <br />via Plant DFs]
+    Bs -->|Freq.-<br />Domain <br />Lin. Plant| Cs[Freq.-Domain<br />Lin. Constr. <br />Opt. Control]
+    Cs -->|Freq.-<br />Domain <br />Lin. Opt. <br />Controller| Ce[Freq.-Domain <br />Lin. Simulation]
+
+    Bs -->|Freq.-<br />Domain <br />Lin. Plant| Ce
+    Ce -->|Freq.-<br />Domain <br />Lin. <br />Response| Ee[Nonlin. Signal Reconstruction via <br />Inv. Response DF]
+    Ee -->|Time-<br />Domain <br />Nonlin. <br />Response| Fe[" "]
+
+    classDef hidden fill:transparent,stroke:transparent,color:transparent;
+    class As,Ns,Fs,Ne,Fe hidden;
+    classDef bigFont font-size:20px
+    class Ms,Cs,Bs,Ce,Ee bigFont
+
+    classDef plant fill:#9ff
+    class Bs plant
+    classDef response fill:#ff9
+    class Ms,Ee response
+
+ 

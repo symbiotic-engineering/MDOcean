@@ -29,7 +29,7 @@ function [ P_matrix, idxs] = paretoFront( P_matrix )
 idxs = [1 : i]';
 while i >= 1
     old_size = size(P_matrix,1);
-    indices = sum( bsxfun( @ge, P_matrix(i,:), P_matrix ), 2 ) == dim;
+    indices = sum(P_matrix(i,:) >= P_matrix, 2) == dim;
     indices(i) = false;
     P_matrix(indices,:) = [];
     idxs(indices) = [];

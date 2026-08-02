@@ -54,7 +54,7 @@ function [fig_array, ...
 
     for k = 1:3
         ax(k) = nexttile;
-        contourf(F_max_vec, P_max_kW, data{k});
+        contourf(F_max_vec, P_max_kW, data{k}, 'HandleVisibility', 'off');
         colorbar;
         xlabel('F_{max} (MN)');
         if k == 1
@@ -67,9 +67,9 @@ function [fig_array, ...
     improvePlot;
 
     % --- Hatching and markers (after improvePlot) ---
-    marker_props_mp = {'ko', 'MarkerSize', 8, 'LineWidth', 2, ...
+    marker_props_mp = {'mo', 'MarkerSize', 8, 'LineWidth', 2, ...
                        'DisplayName', 'Max Power'};
-    marker_props_ml = {'kd', 'MarkerSize', 8, 'LineWidth', 2, ...
+    marker_props_ml = {'cd', 'MarkerSize', 8, 'LineWidth', 2, ...
                        'DisplayName', 'Min LCOE'};
 
     for k = 1:3
@@ -77,12 +77,15 @@ function [fig_array, ...
         hold on;
 
         % Hatched infeasibility region
-        if any(viol_plot(:))
+        hatch_on = false;
+        if hatch_on && any(viol_plot(:))
             tmp_clim = clim;
             [~, h_hatch] = contourf(ax(k), F_max_vec, P_max_kW, ...
                                     double(viol_plot), [1 1], 'Fill', 'off');
             hh = hatchfill2(h_hatch, 'cross');
             hh.Color = [0 0 0 0.5];
+            h_hatch.HandleVisibility = 'off';
+            hh.HandleVisibility = 'off';
             clim(tmp_clim);
         end
 
@@ -99,6 +102,7 @@ function [fig_array, ...
     end
 
     legend(ax(1), 'Location', 'best');
+    fig.Position(3:4) = [800 400];
 
     % --- Figure 2: per-sea-state constraint activity counts ---
     n_force_only = intermed_result_struct.n_force_only;
@@ -120,7 +124,7 @@ function [fig_array, ...
     ax2 = gobjects(1, 4);
     for k = 1:4
         ax2(k) = nexttile;
-        contourf(F_max_vec, P_max_kW, cnt_data{k});
+        contourf(F_max_vec, P_max_kW, cnt_data{k}, 'HandleVisibility', 'off');
         colorbar;
         xlabel('F_{max} (MN)');
         if mod(k, 2) == 1

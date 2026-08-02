@@ -22,10 +22,11 @@ function [fig_array,...
             cost = intermed_result_struct.cost;
             power = intermed_result_struct.power;
             failed = intermed_result_struct.failed;
+            failed_mat = intermed_result_struct.failed_mat;
             %pareto_results_struct = intermed_result_struct.pareto_results_struct;
 
             [fig_array,results_tab] = experiments_plot(b,X_ins,ratios,LCOE,...
-                                                        cost,power,failed);
+                                                        cost,power,failed,failed_mat); %pareto_results_struct);
                                                         %pareto_results_struct);
             fig_array = fig_array(2);                                            
             

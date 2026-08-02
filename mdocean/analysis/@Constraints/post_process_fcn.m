@@ -26,4 +26,6 @@ function [fig_array,...
             tab_colspecs = {[]};
             
             end_result_struct.constraints_table = tab;
+            end_result_struct.numLinConstraints = height(intermed_result_struct.linear_constraint_names);
+            end_result_struct.numNonlinConstraints = height(tab);
 end

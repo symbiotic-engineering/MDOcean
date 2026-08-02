@@ -67,4 +67,5 @@ function [fig_array,...
             end_result_struct.sensitivity_analysis_complete = true;
             end_result_struct.runtime_post_optim = intermed_result_struct.runtime_post_optim;
             end_result_struct.runtime_re_optim = intermed_result_struct.runtime_re_optim;
+            end_result_struct.numReoptims = intermed_result_struct.num_reoptims;
 end

@@ -22,6 +22,17 @@ function [fig_array,...
     
     tab_firstrows = {};
     tab_colspecs = {};
-    
+
+    val_sat   = intermed_result_struct.val_sat;
+    val_nosat = intermed_result_struct.val_nosat;
+
+    % Re-optimized comparison: no-sat vs sat optimized designs
+    % "power gain" when running without force saturation (more power, but higher cost)
+    end_result_struct.pctPowerGainForceSatOptMinLCOE  = (val_nosat.power_avg - val_sat.power_avg) / val_sat.power_avg * 100;
+    end_result_struct.pctPTOCostIncreaseForceSatOptMinLCOE = (val_nosat.capex_PTO - val_sat.capex_PTO) / val_sat.capex_PTO * 100;
+    end_result_struct.pctStructCostIncreaseForceSatOptMinLCOE = (val_nosat.capex_struct - val_sat.capex_struct) / val_sat.capex_struct * 100;
+    LCOE_sat   = intermed_result_struct.objs_sat(1);
+    LCOE_nosat = intermed_result_struct.objs_nosat(1);
+    end_result_struct.pctLCOEIncreaseForceSatOptMinLCOE = (LCOE_nosat - LCOE_sat) / LCOE_sat * 100;
     end_result_struct.force_saturation_analysis_complete = true;
 end

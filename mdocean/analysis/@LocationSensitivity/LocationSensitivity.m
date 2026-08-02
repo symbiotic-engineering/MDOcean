@@ -10,7 +10,16 @@ classdef LocationSensitivity < GenericAnalysis
                      'location_probability_PDF'};
         tab_names = {'location_sensitivity'};
     end
-
+    methods
+        function obj = LocationSensitivity(varargin)
+            obj = obj@GenericAnalysis(varargin{:});
+            obj.extra_analysis_outputs = {'results/LocationSensitivity/intermed_h_power_matrix_1.fig',...
+                                          'results/LocationSensitivity/intermed_h_power_matrix_2.fig',...
+                                          'results/LocationSensitivity/intermed_h_power_matrix_3.fig',...
+                                          'results/LocationSensitivity/intermed_h_power_matrix_4.fig',...
+                                          'results/LocationSensitivity/intermed_h_probability_PDF_1.fig' };
+        end
+    end
     methods (Static)
         intermed_result_struct = analysis_fcn(p,b)
 

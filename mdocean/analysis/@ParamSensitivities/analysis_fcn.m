@@ -17,7 +17,7 @@ function intermed_result_struct = analysis_fcn(~,b)
      par_x_star_par_p_global, ...
      delta_p_change_activity_local, ...
      delta_p_change_activity_global,...
-     runtime_post_optim, runtime_re_optim] = param_sweep(b.filename_uuid);
+     runtime_post_optim, runtime_re_optim, num_reoptims] = param_sweep(b.filename_uuid);
     
     % Store results for post-processing
     intermed_result_struct.ratios = ratios;
@@ -49,5 +49,6 @@ function intermed_result_struct = analysis_fcn(~,b)
 
     intermed_result_struct.runtime_post_optim = runtime_post_optim;
     intermed_result_struct.runtime_re_optim = runtime_re_optim;
+    intermed_result_struct.num_reoptims = num_reoptims;
     intermed_result_struct.b = b;
 end

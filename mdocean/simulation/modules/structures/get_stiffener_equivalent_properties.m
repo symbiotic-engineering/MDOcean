@@ -33,7 +33,7 @@ function [h_eq,y_max,S_eq] = get_stiffener_equivalent_properties(t_plate, h_stif
     end
 
     if any(h_eq_over_h_3 < 1) % if equivalent stiffened height is less than unstiffened height
-        warning('stiffener equivalence broke')
+        warning('MDOcean:GetStiffenerEquiv:StiffenerEquivBroke', 'stiffener equivalence broke')
         h_eq_over_h_3(h_eq_over_h_3 < 1) = 1;
     end
     h = t_plate;

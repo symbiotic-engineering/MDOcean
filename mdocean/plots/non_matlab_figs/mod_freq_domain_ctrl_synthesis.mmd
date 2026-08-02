@@ -1,10 +1,20 @@
+%%{init: {'flowchart': { 'padding': 5 , 'diagramPadding': 5 , 'useMaxWidth': false} }}%%
 flowchart LR
-    N[ ] --> |Time-Domain <br />Constraints|M
-    M[Linearization with Constraint DFs] --> |Frequency-Domain Constraints|C
-    A[ ] --> |Time-Domain <br />Nonlinear Plant|B[Linearization <br />with Plant DFs]
-    B -->|Frequency-Domain <br />Linear Plant| C[Numerical or Analytical<br />Linear Frequency-Domain Constrained Optimal Control]
-    C -->|Frequency-Domain Linear Optimal Controller| E[Nonlinear Signal Reconstruction with <br />Inverse Control DF]
-    E -->|Time-Domain Nonlinear Optimal Controller| F[" "]
+    N[ ] --> |Time-<br />Domain <br />Constraints|M
+    M[Linearization via Constraint DFs] --> |Freq.-<br />Domain <br />Constraints|C
+    A[ ] --> |Time-<br />Domain <br />Nonlin. <br />Plant|B[Linearization <br />via Plant DFs]
+    B -->|Freq.-<br />Domain <br />Lin. Plant| C[Freq.-Domain<br />Lin. Constr. <br />Opt. Control]
+    C -->|Freq.-<br />Domain <br />Lin. Opt. <br />Controller| E[Nonlin. Signal Reconstruction via <br />Inv. Control DF]
+    E -->|Time-<br />Domain <br />Nonlin. Opt. <br />Controller| F[" "]
 
     classDef hidden fill:transparent,stroke:transparent,color:transparent;
     class A,N,F hidden;
+    classDef bigFont font-size:20px
+    class M,C,B,E bigFont
+
+    classDef controller fill:#f9f
+    class E controller
+    classDef plant fill:#9ff
+    class B plant
+    classDef response fill:#ff9
+    class M response

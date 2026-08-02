@@ -16,7 +16,7 @@ function [fig_array,...
 % :returns: tab_colspecs
             
             tab = array2table([intermed_result_struct.X_mins intermed_result_struct.X_noms intermed_result_struct.X_maxs], ...
-                    'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', intermed_result_struct.var_names(1:end-1));
+                    'VariableNames',{'Mins','Noms','Maxs'}, 'RowNames', intermed_result_struct.var_names_pretty(1:end-1));
             
             fig_array = [];
             

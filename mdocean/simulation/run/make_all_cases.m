@@ -12,9 +12,9 @@ function [case_cell,case_desc_cell] = make_all_cases(runOnlyFewSeaStates)
                 report_X, report_mb_p_array};
 
     case_group_desc = {'drag_off_meem_off','drag_on_meem_off','drag_off_meem_on','drag_on_meem_on'};
-    case_desc_cell  = {strcat('wecsim_geom_wecsim_multibody_true_', case_group_desc),...
-                       strcat('wecsim_geom_wecsim_multibody_false_', case_group_desc),...
-                       strcat('wecsim_geom_report_multibody_true_', case_group_desc),...
+    case_desc_cell  = {strcat('wecsim_wcsm_multi_', case_group_desc),...
+                       strcat('wecsim_wcsm_single_', case_group_desc),...
+                       strcat('wecsim_rpt_multi_', case_group_desc),...
                       };
 
 end
@@ -22,7 +22,11 @@ end
 function p_array = make_case_group(geometry, multibody, runOnlyFewSeaStates)
     p = parameters(geometry);
     p.use_force_sat = false;
-    p.use_amp_sat = false;
+    if multibody
+        p.use_amp_sat = true;
+    else
+        p.use_amp_sat = false;
+    end
     p.use_power_sat = false;
     p.use_multibody = multibody;
 
