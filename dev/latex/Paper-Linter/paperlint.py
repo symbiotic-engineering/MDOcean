@@ -3,6 +3,12 @@ import re
 import sys
 import os
 
+LATEX_DEV_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+if LATEX_DEV_DIR not in sys.path:
+    sys.path.append(LATEX_DEV_DIR)
+
+from math_symbol_parser import extract_math_symbols as shared_extract_math_symbols
+
 
 def usage():
     print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--symbol-glossary-seed <seed-file>] [--replace-glossary-refs] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
@@ -895,86 +901,7 @@ def _group_contains_gls_command(group):
 
 
 def extract_math_symbols(content):
-    cleaned = strip_explicit_math_text(content)
-    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
-    cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
-    cleaned = re.sub(r"\\(?:left|right)(?![A-Za-z@])|\\(?:,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
-    symbols = set()
-    idx = 0
-    while idx < len(cleaned):
-        base = None
-        next_idx = idx + 1
-        char = cleaned[idx]
-
-        if char.isalpha():
-            prev_alpha = idx > 0 and cleaned[idx - 1].isalpha()
-            next_alpha = idx + 1 < len(cleaned) and cleaned[idx + 1].isalpha()
-            if prev_alpha or next_alpha:
-                idx += 1
-                continue
-            base = char
-            next_idx = idx + 1
-        elif char == "\\":
-            command, command_end = _read_command(cleaned, idx)
-            if command is None:
-                idx += 1
-                continue
-            name = command[1:]
-            if name in GREEK_MATH_SYMBOLS:
-                base = command
-                next_idx = command_end
-            elif name in SYMBOL_DECORATOR_COMMANDS:
-                arg_start = _skip_ws(cleaned, command_end)
-                if arg_start < len(cleaned) and cleaned[arg_start] == "{":
-                    group, group_end = _read_braced_group(cleaned, arg_start)
-                    if group is not None and _normalize_symbol(_unwrap_braces(group)) and not _group_contains_gls_command(group):
-                        base = command + group
-                        next_idx = group_end
-                if base is None:
-                    idx = command_end
-                    continue
-            else:
-                idx = command_end
-                continue
-        else:
-            idx += 1
-            continue
-
-        symbol = base
-        script_idx = next_idx
-        while True:
-            script_idx = _skip_ws(cleaned, script_idx)
-            if script_idx >= len(cleaned) or cleaned[script_idx] not in "_^":
-                break
-            script_op = cleaned[script_idx]
-            script_val, script_end = _read_script_value(cleaned, script_idx + 1)
-            if script_val is None:
-                break
-            if base == "e" and script_op == "^":
-                idx = next_idx
-                break
-            canonical_script = _canonicalize_script(script_op, script_val)
-            if canonical_script is not None:
-                symbol += canonical_script
-            script_idx = script_end
-
-        if base == "e" and idx == next_idx:
-            continue
-
-        normalized = _canonicalize_symbol(symbol.strip())
-        normalized_key = _symbol_key(normalized)
-        if normalized_key.startswith("\\"):
-            base_name = normalized_key[1:].split("{", 1)[0]
-            if base_name in MATH_SYMBOL_STOPWORDS:
-                idx = script_idx
-                continue
-        elif normalized_key in MATH_SYMBOL_STOPWORDS:
-            idx = script_idx
-            continue
-
-        symbols.add(normalized)
-        idx = script_idx
-    return symbols
+    return shared_extract_math_symbols(content)
 
 
 def split_sentences(text):
@@ -1275,6 +1202,30 @@ def check_equation_symbols_defined():
             symbol_text = "$%s$" % symbol
         warns.append((first_line, "Symbol %s is used in an equation but is not mentioned inline in the surrounding 3 sentences" % symbol_text, (0, 0)))
     return warns
+
+
+def _count_gls_commands(text):
+    return len(re.findall(r"\\gls\{[^{}]+\}", text))
+
+
+def check_math_glossary_reference_coverage():
+    warns = []
+
+    for start, end in envs.get("equation", []):
+        equation_text = "\n".join(strip_comment_from_line(tex_lines_clean[i]) for i in range(start, end + 1))
+        if _count_gls_commands(equation_text) < 2:
+            warns.append((start, "Equation environment should include at least two \\gls references", (0, 0)))
+
+    for i, line in enumerate(tex_lines_clean):
+        for match in re.finditer(r"(?<!\\)\$\$(.+?)(?<!\\)\$\$", line):
+            if _count_gls_commands(match.group(1)) < 1:
+                warns.append((i, "Display math $$...$$ should include at least one \\gls reference", match.span()))
+        for _, _, content in get_math_spans(line):
+            if _count_gls_commands(content) < 1:
+                warns.append((i, "Inline math should include at least one \\gls reference", (0, 0)))
+
+    return warns
+
 
 def check_space_before_cite():
     warns = []
@@ -2357,6 +2308,7 @@ checks = [
     (check_required_sections,           CATEGORY_GENERAL,    "required-sections"),
     (check_math_numbers,                CATEGORY_TYPOGRAPHY, "math-numbers"),
     (check_equation_symbols_defined,    CATEGORY_REFERENCE,  "symbol-mention"),
+    (check_math_glossary_reference_coverage, CATEGORY_REFERENCE, "math-gls-coverage"),
     (check_large_numbers_without_si,    CATEGORY_TYPOGRAPHY, "si"),
     (check_listing_in_correct_float,    CATEGORY_REFERENCE,  "listing-float"),
     (check_tabular_in_correct_float,    CATEGORY_REFERENCE,  "tabular-float"),
