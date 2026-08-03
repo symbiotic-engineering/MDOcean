@@ -130,6 +130,19 @@ pipeline:
       outputs:
         - path: calkit_stages.yaml
           storage: git
+    build-symbol-glossary-shared:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/merge_symbol_glossaries.py
+      inputs:
+        - pubs/shared/symbol-glossary-aor.tex
+        - pubs/shared/symbol-glossary-re.tex
+        - pubs/shared/symbol-glossary-jfm.tex
+        - pubs/shared/symbol-glossary-umerc.tex
+        - dev/latex/merge_symbol_glossaries.py
+      outputs:
+        - path: pubs/shared/symbol-glossary-shared.tex
+          storage: git
     analysis-AllFigCompare:
       kind: shell-command
       environment: _system
