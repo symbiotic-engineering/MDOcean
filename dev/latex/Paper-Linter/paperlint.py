@@ -2,6 +2,19 @@
 import re
 import sys
 import os
+import pathlib
+
+LATEX_DEV_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+if LATEX_DEV_DIR not in sys.path:
+    sys.path.append(LATEX_DEV_DIR)
+
+from math_symbol_parser import (
+    canonicalize_symbol as shared_canonicalize_symbol,
+    extract_math_symbols as shared_extract_math_symbols,
+    find_math_symbol_matches as shared_find_math_symbol_matches,
+    parse_glossary_entries,
+    symbol_key as shared_symbol_key,
+)
 
 
 def usage():
@@ -320,26 +333,11 @@ def preprocess():
 
 
 def read_glossary_replacements(path):
-    replacements = []
+    replacements = {}
     if not os.path.exists(path):
         return replacements
-
-    try:
-        with open(path) as handle:
-            lines = handle.readlines()
-    except Exception:
-        return replacements
-
-    for line in lines:
-        stripped = line.strip()
-        if not stripped.startswith(r"\glsxtrnewsymbol["):
-            continue
-        match = GLOSSARY_ENTRY_RE.fullmatch(stripped)
-        if not match:
-            continue
-        replacements.append((match.group("label"), match.group("body")))
-
-    replacements.sort(key=lambda item: len(item[1]), reverse=True)
+    for label, symbol, _ in parse_glossary_entries(pathlib.Path(path)):
+        replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
     return replacements
 
 
@@ -351,29 +349,20 @@ def mask_command_spans(text, commands):
 
 
 def replace_glossary_refs_in_span(span_text, replacements):
-    pieces = []
-    index = 0
-    total = 0
+    updates = []
+    for start, end, symbol in shared_find_math_symbol_matches(span_text):
+        label = replacements.get(shared_symbol_key(shared_canonicalize_symbol(symbol)))
+        if label is None:
+            continue
+        updates.append((start, end, label))
 
-    while index < len(span_text):
-        if span_text.startswith(r"\gls{", index):
-            match = GLS_COMMAND_RE.match(span_text, index)
-            if match:
-                pieces.append(match.group(0))
-                index = match.end()
-                continue
+    if not updates:
+        return span_text, 0
 
-        for label, body in replacements:
-            if span_text.startswith(body, index) and glossary_body_matches_boundaries(span_text, index, body):
-                pieces.append(r"\gls{%s}" % label)
-                index += len(body)
-                total += 1
-                break
-        else:
-            pieces.append(span_text[index])
-            index += 1
-
-    return "".join(pieces), total
+    updated = span_text
+    for start, end, label in sorted(updates, key=lambda item: item[0], reverse=True):
+        updated = updated[:start] + r"\gls{%s}" % label + updated[end:]
+    return updated, len(updates)
 
 
 def glossary_body_matches_boundaries(span_text, index, body):
@@ -401,7 +390,6 @@ def replace_glossary_refs_in_line(line, replacements, equation_line=False):
 
     total = 0
     if equation_line:
-        content = mask_command_spans(content, REPLACEMENT_MATH_TEXT_COMMANDS + ["begin", "end", "label", "tag", "nonumber", "notag"])
         updated, count = replace_glossary_refs_in_span(content, replacements)
         total += count
         return updated + comment, total
@@ -414,8 +402,7 @@ def replace_glossary_refs_in_line(line, replacements, equation_line=False):
     last_index = 0
     for start, end, _ in spans:
         pieces.append(content[last_index:start])
-        span_text = mask_command_spans(content[start:end], REPLACEMENT_MATH_TEXT_COMMANDS)
-        updated, count = replace_glossary_refs_in_span(span_text, replacements)
+        updated, count = replace_glossary_refs_in_span(content[start:end], replacements)
         pieces.append(updated)
         total += count
         last_index = end
@@ -808,6 +795,11 @@ def _read_script_value(text, idx):
             if group is not None:
                 return command + group, group_end
         return command, command_end
+    if text[idx].isalnum():
+        end = idx + 1
+        while end < len(text) and text[end].isalnum():
+            end += 1
+        return text[idx:end], end
     return text[idx], idx + 1
 
 
@@ -895,86 +887,7 @@ def _group_contains_gls_command(group):
 
 
 def extract_math_symbols(content):
-    cleaned = strip_explicit_math_text(content)
-    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
-    cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
-    cleaned = re.sub(r"\\(?:left|right)(?![A-Za-z@])|\\(?:,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
-    symbols = set()
-    idx = 0
-    while idx < len(cleaned):
-        base = None
-        next_idx = idx + 1
-        char = cleaned[idx]
-
-        if char.isalpha():
-            prev_alpha = idx > 0 and cleaned[idx - 1].isalpha()
-            next_alpha = idx + 1 < len(cleaned) and cleaned[idx + 1].isalpha()
-            if prev_alpha or next_alpha:
-                idx += 1
-                continue
-            base = char
-            next_idx = idx + 1
-        elif char == "\\":
-            command, command_end = _read_command(cleaned, idx)
-            if command is None:
-                idx += 1
-                continue
-            name = command[1:]
-            if name in GREEK_MATH_SYMBOLS:
-                base = command
-                next_idx = command_end
-            elif name in SYMBOL_DECORATOR_COMMANDS:
-                arg_start = _skip_ws(cleaned, command_end)
-                if arg_start < len(cleaned) and cleaned[arg_start] == "{":
-                    group, group_end = _read_braced_group(cleaned, arg_start)
-                    if group is not None and _normalize_symbol(_unwrap_braces(group)) and not _group_contains_gls_command(group):
-                        base = command + group
-                        next_idx = group_end
-                if base is None:
-                    idx = command_end
-                    continue
-            else:
-                idx = command_end
-                continue
-        else:
-            idx += 1
-            continue
-
-        symbol = base
-        script_idx = next_idx
-        while True:
-            script_idx = _skip_ws(cleaned, script_idx)
-            if script_idx >= len(cleaned) or cleaned[script_idx] not in "_^":
-                break
-            script_op = cleaned[script_idx]
-            script_val, script_end = _read_script_value(cleaned, script_idx + 1)
-            if script_val is None:
-                break
-            if base == "e" and script_op == "^":
-                idx = next_idx
-                break
-            canonical_script = _canonicalize_script(script_op, script_val)
-            if canonical_script is not None:
-                symbol += canonical_script
-            script_idx = script_end
-
-        if base == "e" and idx == next_idx:
-            continue
-
-        normalized = _canonicalize_symbol(symbol.strip())
-        normalized_key = _symbol_key(normalized)
-        if normalized_key.startswith("\\"):
-            base_name = normalized_key[1:].split("{", 1)[0]
-            if base_name in MATH_SYMBOL_STOPWORDS:
-                idx = script_idx
-                continue
-        elif normalized_key in MATH_SYMBOL_STOPWORDS:
-            idx = script_idx
-            continue
-
-        symbols.add(normalized)
-        idx = script_idx
-    return symbols
+    return shared_extract_math_symbols(content)
 
 
 def split_sentences(text):
@@ -1206,6 +1119,23 @@ def read_existing_symbol_metadata(path):
     return metadata_by_symbol
 
 
+def read_existing_symbols(path):
+    symbols = set()
+    if not os.path.exists(path):
+        return symbols
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return symbols
+    for line in lines:
+        symbol, _ = _parse_glsxtrnewsymbol_line(line)
+        if symbol is None:
+            continue
+        symbols.add(_canonicalize_symbol(symbol.strip()))
+    return symbols
+
+
 def build_symbol_glossary_lines(symbols, metadata_by_symbol):
     lines = []
     used_labels = set()
@@ -1236,6 +1166,7 @@ def build_symbol_glossary_lines(symbols, metadata_by_symbol):
 
 def write_symbol_glossary(path, symbols, seed_path=None):
     source_path = seed_path if seed_path else path
+    symbols = set(symbols) | read_existing_symbols(source_path)
     metadata_by_symbol = read_existing_symbol_metadata(source_path)
     lines = build_symbol_glossary_lines(symbols, metadata_by_symbol)
     with open(path, "w") as handle:
@@ -1275,6 +1206,31 @@ def check_equation_symbols_defined():
             symbol_text = "$%s$" % symbol
         warns.append((first_line, "Symbol %s is used in an equation but is not mentioned inline in the surrounding 3 sentences" % symbol_text, (0, 0)))
     return warns
+
+
+def _count_gls_commands(text):
+    return len(re.findall(r"\\gls\{[^{}]+\}", text))
+
+
+def check_math_glossary_reference_coverage():
+    warns = []
+
+    for start, end in envs.get("equation", []):
+        equation_text = "\n".join(strip_comment_from_line(tex_lines_clean[i]) for i in range(start, end + 1))
+        symbol_count = len(extract_math_symbols(equation_text))
+        if symbol_count >= 2 and _count_gls_commands(equation_text) < 2:
+            warns.append((start, "Equation environment should include at least two \\gls references", (0, 0)))
+        elif symbol_count == 1 and _count_gls_commands(equation_text) < 1:
+            warns.append((start, "Equation environment should include at least one \\gls reference", (0, 0)))
+
+    for i, line in enumerate(tex_lines_clean):
+        for match in re.finditer(r"(?<!\\)\$\$(.+?)(?<!\\)\$\$", line):
+            content = match.group(1)
+            if extract_math_symbols(content) and _count_gls_commands(content) < 1:
+                warns.append((i, "Display math $$...$$ should include at least one \\gls reference", match.span()))
+
+    return warns
+
 
 def check_space_before_cite():
     warns = []
@@ -2357,6 +2313,7 @@ checks = [
     (check_required_sections,           CATEGORY_GENERAL,    "required-sections"),
     (check_math_numbers,                CATEGORY_TYPOGRAPHY, "math-numbers"),
     (check_equation_symbols_defined,    CATEGORY_REFERENCE,  "symbol-mention"),
+    (check_math_glossary_reference_coverage, CATEGORY_REFERENCE, "math-gls-coverage"),
     (check_large_numbers_without_si,    CATEGORY_TYPOGRAPHY, "si"),
     (check_listing_in_correct_float,    CATEGORY_REFERENCE,  "listing-float"),
     (check_tabular_in_correct_float,    CATEGORY_REFERENCE,  "tabular-float"),

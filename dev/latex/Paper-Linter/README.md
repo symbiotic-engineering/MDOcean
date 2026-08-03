@@ -335,3 +335,7 @@ This category includes warnings for everything related to (cross-)references (sw
 #### Equation Symbols Mentioned in Text
 * **Description**: Warns if a symbol first used in an equation is not mentioned inline in the surrounding text
 * **Switch**: `symbol-mention`
+
+#### Math Glossary Reference Coverage
+* **Description**: Warns if an equation has fewer than two `\gls{...}` references or an inline/display math span has none
+* **Switch**: `math-gls-coverage`
