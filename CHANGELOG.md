@@ -1,9 +1,7 @@
 # Changelog
 ## Unreleased
-### Fixed
-- Paper: fix shared figure option expansion in `\includegraphics` and replace AOR conditional `\TableColumnSpecs` preambles with explicit one/two-column tabular specs.
 
-## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-7-23
+## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-3
 ### Added
 - Paper: macro to swap between figure widths and table specs depending on dissertation vs journal and 1 vs 2 columns
 - Model: `check_max_CW.m` incorporates slamming-based Budal Upper Bound into maximum capture width calculation (note that this may break `SweepGeoms`, which still only uses radiation-based max capture width) and uses amplitude saturation to compute the drag ratio
@@ -12,6 +10,7 @@
 - Figures: create `nested_future_optim` and `methodology_flowchart_dissertation` as dissertation-specific dvc figures
 - Dissertation: create macro for epigraphs
 - Dissertation: dynamic table of contents depth based on page length of section
+- Dissertation: add images of defense, neurodiversity loop, wave
 - Paper: single column Elsevier cas template
 
 ### Changed
@@ -30,8 +29,12 @@
 - Dissertation: proper inline full citations with `bibentry` package
 - RE paper: delete unused old tables
 - RE paper: substantial rewrite of results and discussion sections
+- Location sensitivity: add try-catch to prevent drag negative damping
+- Pipeline: start tracking `pubs/dissertation/aux/` on dvc
+- Pipeline: uncomment subproject so dissertation runs on CI
 
 ### Fixed
+- Analysis: fix meem runtime issue which zeroed the time spent unpacking the struct
 - Plots: avoid error in `plot_nominal_constraint_circles` if all sea states are unconstrained
 - Paper: add `\` before `%` and `#` in bib file urls to avoid errors with `\bibentry` package
 
