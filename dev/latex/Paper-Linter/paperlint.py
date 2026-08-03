@@ -5,7 +5,7 @@ import os
 
 
 def usage():
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--symbol-glossary-seed <seed-file>] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--symbol-glossary-seed <seed-file>] [--replace-glossary-refs] [-i/x <switch n, evaluated in order of specification>] [--error]" % sys.argv[0])
     sys.exit(1)
 
 if len(sys.argv) < 2:
@@ -18,8 +18,37 @@ settings_files = []
 output_file = None
 symbol_glossary_file = None
 symbol_glossary_seed_file = None
+replace_glossary_refs = False
 output_handle = sys.stdout
 use_color = True
+GLOSSARY_FILE = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs", "shared", "symbol-glossary-shared.tex"))
+GLOSSARY_ENTRY_RE = re.compile(
+    r"\\glsxtrnewsymbol\[(?P<attrs>[^\]]*)\]\{(?P<label>[^}]+)\}\{\\ensuremath\{(?P<body>.*)\}\}"
+)
+GLS_COMMAND_RE = re.compile(r"\\gls\{[^{}]*\}")
+EXPLICIT_MATH_TEXT_COMMANDS = [
+    "text",
+    "textrm",
+    "textit",
+    "textbf",
+    "textsf",
+    "texttt",
+    "textsc",
+    "mbox",
+    "operatorname",
+    "gls",
+]
+REPLACEMENT_MATH_TEXT_COMMANDS = [
+    "text",
+    "textrm",
+    "textit",
+    "textbf",
+    "textsf",
+    "texttt",
+    "textsc",
+    "mbox",
+    "operatorname",
+]
 
 
 def write_output(text="", end="\n"):
@@ -150,6 +179,13 @@ def strip_comment_from_line(line):
     return line
 
 
+def split_comment_from_line(line):
+    match = re.search(r"(?<!\\)%", line)
+    if match:
+        return line[:match.start()], line[match.start():]
+    return line, ""
+
+
 def apply_settings_file(settings_file, used_categories):
     try:
         with open(settings_file) as handle:
@@ -270,6 +306,131 @@ def preprocess():
         mask_spans(line, get_command_brace_spans(line, "texttt"))
         for line in tex_lines_math_masked
     ]
+
+
+def read_glossary_replacements(path):
+    replacements = []
+    if not os.path.exists(path):
+        return replacements
+
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return replacements
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped.startswith(r"\glsxtrnewsymbol["):
+            continue
+        match = GLOSSARY_ENTRY_RE.fullmatch(stripped)
+        if not match:
+            continue
+        replacements.append((match.group("label"), match.group("body")))
+
+    replacements.sort(key=lambda item: len(item[1]), reverse=True)
+    return replacements
+
+
+def mask_command_spans(text, commands):
+    spans = []
+    for command in commands:
+        spans.extend(get_command_brace_spans(text, command))
+    return mask_spans(text, spans)
+
+
+def replace_glossary_refs_in_span(span_text, replacements):
+    pieces = []
+    index = 0
+    total = 0
+
+    while index < len(span_text):
+        if span_text.startswith(r"\gls{", index):
+            match = GLS_COMMAND_RE.match(span_text, index)
+            if match:
+                pieces.append(match.group(0))
+                index = match.end()
+                continue
+
+        for label, body in replacements:
+            if span_text.startswith(body, index) and glossary_body_matches_boundaries(span_text, index, body):
+                pieces.append(r"\gls{%s}" % label)
+                index += len(body)
+                total += 1
+                break
+        else:
+            pieces.append(span_text[index])
+            index += 1
+
+    return "".join(pieces), total
+
+
+def glossary_body_matches_boundaries(span_text, index, body):
+    if body.startswith("\\"):
+        return True
+
+    previous_char = span_text[index - 1] if index > 0 else ""
+    next_index = index + len(body)
+    next_char = span_text[next_index] if next_index < len(span_text) else ""
+    if previous_char and (previous_char.isalnum() or previous_char == "\\"):
+        return False
+    if next_char and (next_char.isalnum() or next_char == "\\"):
+        return False
+    return True
+
+
+def replace_glossary_refs_in_line(line, replacements, equation_line=False):
+    content, comment = split_comment_from_line(line)
+    if not content:
+        return line, 0
+
+    stripped = content.strip()
+    if equation_line and stripped.startswith((r"\begin", r"\end", r"\label", r"\tag", r"\nonumber", r"\notag")):
+        return line, 0
+
+    total = 0
+    if equation_line:
+        content = mask_command_spans(content, REPLACEMENT_MATH_TEXT_COMMANDS + ["begin", "end", "label", "tag", "nonumber", "notag"])
+        updated, count = replace_glossary_refs_in_span(content, replacements)
+        total += count
+        return updated + comment, total
+
+    spans = get_math_spans(content)
+    if not spans:
+        return line, 0
+
+    pieces = []
+    last_index = 0
+    for start, end, _ in spans:
+        pieces.append(content[last_index:start])
+        span_text = mask_command_spans(content[start:end], REPLACEMENT_MATH_TEXT_COMMANDS)
+        updated, count = replace_glossary_refs_in_span(span_text, replacements)
+        pieces.append(updated)
+        total += count
+        last_index = end
+
+    pieces.append(content[last_index:])
+    return "".join(pieces) + comment, total
+
+
+def replace_glossary_refs_in_file(path, replacements):
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return 0
+
+    updated_lines = []
+    total = 0
+    for i, line in enumerate(lines):
+        updated_line, count = replace_glossary_refs_in_line(line, replacements, equation_line=in_equation(i))
+        updated_lines.append(updated_line)
+        total += count
+
+    if total > 0:
+        with open(path, "w") as handle:
+            handle.writelines(updated_lines)
+    return total
 
 
 def in_any_env(line):
@@ -557,18 +718,7 @@ def mask_inline_math_and_texttt(line):
 
 def strip_explicit_math_text(content):
     stripped = content
-    explicit_text_commands = [
-        "text",
-        "textrm",
-        "textit",
-        "textbf",
-        "textsf",
-        "texttt",
-        "textsc",
-        "mbox",
-        "operatorname",
-    ]
-    pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(explicit_text_commands))
+    pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(EXPLICIT_MATH_TEXT_COMMANDS))
     while True:
         updated = pattern.sub(" ", stripped)
         if updated == stripped:
@@ -2204,7 +2354,7 @@ def remove_categories(cat, rem_cat):
 
 def main():
 
-    global output_file, symbol_glossary_file, output_handle, use_color, math_text_mix_strings
+    global output_file, symbol_glossary_file, output_handle, use_color, math_text_mix_strings, replace_glossary_refs
 
     nr_warnings = 0
     nr_suppressed = 0
@@ -2288,6 +2438,9 @@ def main():
             else:
                 print("Missing file after --symbol-glossary-seed")
                 usage()
+
+        if arg == "--replace-glossary-refs":
+            replace_glossary_refs = True
         
         if arg == "--error":
             exit_code = True
@@ -2339,6 +2492,21 @@ def main():
         if symbol_glossary_file is not None:
             write_symbol_glossary(symbol_glossary_file, all_equation_symbols, symbol_glossary_seed_file)
             write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), symbol_glossary_file))
+        if replace_glossary_refs:
+            glossary_replacements = read_glossary_replacements(GLOSSARY_FILE)
+            if len(glossary_replacements) == 0:
+                write_output("No glossary replacements found in '%s'" % GLOSSARY_FILE)
+            else:
+                changed_files = 0
+                total_replacements = 0
+                for file in tex_files:
+                    count = replace_glossary_refs_in_file(file, glossary_replacements)
+                    if count > 0:
+                        changed_files += 1
+                        total_replacements += count
+                        write_output("Updated %d glossary reference%s in '%s'" % (count, "" if count == 1 else "s", file))
+                write_output("Updated %d files" % changed_files)
+                write_output("Total glossary replacements: %d" % total_replacements)
     finally:
         if output_handle is not sys.stdout:
             output_handle.close()

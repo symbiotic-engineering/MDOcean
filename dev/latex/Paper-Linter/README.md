@@ -4,7 +4,7 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--replace-glossary-refs] [--error]
 
 Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
@@ -16,6 +16,7 @@ If `--settings` is provided, switches are loaded from a settings file with lines
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
 If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows. If the file already exists, matching symbols keep their existing `description={...}` values and only new symbols receive a blank description.
+If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies to `\gls{...}` references in place using `pubs/shared/symbol-glossary-shared.tex` as the source of glossary labels.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings
