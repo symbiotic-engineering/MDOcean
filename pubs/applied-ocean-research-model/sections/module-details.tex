@@ -19,7 +19,7 @@
 %TC:break Geometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Geometry}\label{sec:geom}
-The geometry module computes submerged volume $\gls{sym-V}_{\text{sub}}$, structural volume $\gls{sym-V}_{\text{struct}}$, and associated hydrostatic properties from bulk dimensions.
+The geometry module computes submerged volume $\gls{sym-V-sub}$, structural volume $\gls{sym-V-struct}$, and associated hydrostatic properties from bulk dimensions.
 \Cref{fig:dims} defines the principal geometric variables, where $\gls{sym-T}$ denotes drafts, $\gls{sym-h}$ heights, and $\gls{sym-D}$ diameters.
 Subscripts $\gls{sym-f}$, $\gls{sym-s}$, and $d$ refer to the float, spar, and damping plate, respectively.
 Key points include the center of buoyancy $\gls{sym-B}$, center of gravity $\gls{sym-G}$, the keel $\gls{sym-K}$, and metacenter $\gls{sym-M}$ for the combined system.
@@ -47,7 +47,7 @@ Assuming seawater ballast, this imposes a volume constraint:
 \begin{equation}\label{eq:vol-constraint}
 V_{struct} \le V_{sub} + V_{surf} - V_{pto},
 \end{equation}
-where $\gls{sym-V}_{\text{surf}}$ (design-dependent) and $\gls{sym-V-pto}$ (fixed) are volumes of the above-water structures and PTO respectively.
+where $\gls{sym-V-surf}$ (design-dependent) and $\gls{sym-V-pto}$ (fixed) are volumes of the above-water structures and PTO respectively.
 
 %TC:break Hydrodynamic Coefficients
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -941,11 +941,11 @@ This approximation can either under- or overestimate the true peak depending on 
         &N/A\\  \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Maximum allowable float amplitude, $|\gls{sym-xi-f}|_{\text{max}}$ \vspace{8pt} }
-        & $\min(\gls{sym-xi}_{\gls{sym-f},\text{linear}}, \gls{sym-xi}_{\gls{sym-f},\text{slam}})$
+        & $\min(\gls{sym-xi-f-lin}, \gls{sym-xi-f-slam})$
         & N/A \\ \hline %$\gls{sym-X}_{\text{slam}}$\\
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Maximum allowable spar amplitude, $|\gls{sym-xi-s}|_{\text{max}}$ }
-        & $\min(\gls{sym-xi}_{\gls{sym-s},\text{linear}}, \gls{sym-xi}_{\gls{sym-s},\text{slam}})$
+        & $\min(\gls{sym-xi-s-lin}, \gls{sym-xi-s-slam})$
         & N/A %$\gls{sym-X}_{\text{slam}}$\\
 \end{tabular}
 \end{table}
@@ -972,10 +972,10 @@ The permissible heights for upward and downward motion of the float relative to 
     h_{fs,\text{down}} &= T_s - T_{f,2} - h_d
 \end{aligned}
 \end{equation}
-Additionally, a limit of $\gls{sym-h}_{fs,\text{clear}}$ (see definition in \Cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
+Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
 
 The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
-This maximum amplitude $\gls{sym-xi}_{\text{linear}}$ for the float and spar respectively is
+This maximum amplitude $\gls{sym-xi-lin}$ for the float and spar respectively is
 \begin{equation}
     \xi_{f,\text{linear}} = \frac{1}{10}(h-T_{f,2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10}(h-T_s)
 \end{equation}
@@ -996,7 +996,7 @@ for relevant vertical body dimension $\gls{sym-Delta} \gls{sym-z}$ and horizonta
 The values of $\gls{sym-Delta} \gls{sym-z}$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \Cref{sec:appendix-slam}.
 
 \ifdefined\DISSERTATION
-    The values $\gls{sym-h}_{fs,\text{clear}}$, $\gls{sym-h}_{fs,\text{up}}$, $\gls{sym-h}_{fs,\text{down}}$, $\gls{sym-xi}_{\gls{sym-f},\text{linear}}$, and $\gls{sym-xi}_{\gls{sym-s},\text{linear}}$ are all upper limits and are independent of sea state, while $\gls{sym-xi}_{\text{slam}}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \Cref{sec:appendix-slam}.
+    The values $\gls{sym-h-fs-clear}$, $\gls{sym-h-fs-up}$, $\gls{sym-h-fs-down}$, $\gls{sym-xi-f-lin}$, and $\gls{sym-xi-s-lin}$ are all upper limits and are independent of sea state, while $\gls{sym-xi-slam}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \Cref{sec:appendix-slam}.
     In early design studies that do not directly compute the hydrodynamic coefficients and associated power production, the amplitude limits proposed here could be plugged into Budal's upper bound, a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity to yield an upper bound on power production \cite{zou_practical_2023}.
 
     Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
@@ -1136,12 +1136,12 @@ For illustrative purposes only, assuming a fixed maximum stress and considering 
 \end{equation}
 
 \ifdefined\DISSERTATION
-    Since structural material scales linearly with both the thickness $\gls{sym-t}$ and the stiffener height $\gls{sym-h}_{\text{stiff}}$, the squaring of stiffener heights in \Cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
-    We therefore expect that an optimization would potentially drive the thicknesses to their minimum values, and thus it is also required to model the minimum value of $\gls{sym-t}/\gls{sym-h}_{\text{stiff}}$ for which the stiffened plate assumptions hold.
+    Since structural material scales linearly with both the thickness $\gls{sym-t}$ and the stiffener height $\gls{sym-h-stiff}$, the squaring of stiffener heights in \Cref{eq:struct-scaling} means that increasing the stiffener height is generally more structurally efficient than increasing the thickness.
+    We therefore expect that an optimization would potentially drive the thicknesses to their minimum values, and thus it is also required to model the minimum value of $\gls{sym-t}/\gls{sym-h-stiff}$ for which the stiffened plate assumptions hold.
     These limits are also derived in \Cref{sec:appendix-structures}.
 \else
-    Because structural material volume scales linearly in both $\gls{sym-t}$ and $\gls{sym-h}_{\text{stiff}}$, the squared dependence on stiffener height in \Cref{eq:struct-scaling} implies that taller stiffeners are more material-efficient than thicker plates.
-    Optimization therefore tends to drive thicknesses toward the minimum value of $\gls{sym-t}/\gls{sym-h}_{\text{stiff}}$ for which the stiffened-plate assumptions hold;
+    Because structural material volume scales linearly in both $\gls{sym-t}$ and $\gls{sym-h-stiff}$, the squared dependence on stiffener height in \Cref{eq:struct-scaling} implies that taller stiffeners are more material-efficient than thicker plates.
+    Optimization therefore tends to drive thicknesses toward the minimum value of $\gls{sym-t}/\gls{sym-h-stiff}$ for which the stiffened-plate assumptions hold;
     these limits are derived in \Cref{sec:appendix-structures}.
 \fi
 
