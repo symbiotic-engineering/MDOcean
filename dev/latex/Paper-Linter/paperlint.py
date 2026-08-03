@@ -890,6 +890,10 @@ def _canonicalize_symbol(symbol):
     return _normalize_scripts_in_expression(symbol)
 
 
+def _group_contains_gls_command(group):
+    return re.search(r"\\gls\s*\{", group) is not None
+
+
 def extract_math_symbols(content):
     cleaned = strip_explicit_math_text(content)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
@@ -923,7 +927,7 @@ def extract_math_symbols(content):
                 arg_start = _skip_ws(cleaned, command_end)
                 if arg_start < len(cleaned) and cleaned[arg_start] == "{":
                     group, group_end = _read_braced_group(cleaned, arg_start)
-                    if group is not None:
+                    if group is not None and _normalize_symbol(_unwrap_braces(group)) and not _group_contains_gls_command(group):
                         base = command + group
                         next_idx = group_end
                 if base is None:
@@ -946,10 +950,16 @@ def extract_math_symbols(content):
             script_val, script_end = _read_script_value(cleaned, script_idx + 1)
             if script_val is None:
                 break
+            if base == "e" and script_op == "^":
+                idx = next_idx
+                break
             canonical_script = _canonicalize_script(script_op, script_val)
             if canonical_script is not None:
                 symbol += canonical_script
             script_idx = script_end
+
+        if base == "e" and idx == next_idx:
+            continue
 
         normalized = _canonicalize_symbol(symbol.strip())
         normalized_key = _symbol_key(normalized)
