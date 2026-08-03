@@ -5,11 +5,11 @@
 \label{sec:modules}
 \ifdefined\DISSERTATION
     The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
-    For notation, unbolded unarrowed variables refer to scalars (e.g. $\gls{sym-x}$ or $\gls{sym-X}$), arrowed variables refer to vectors ($\gls{sym-vec-x}$ or $\gls{sym-vec-X}$), and bold variables refer to matrices ($\gls{sym-mathbf-x}$ or $\gls{sym-mathbf-X}$).
+    For notation, unbolded unarrowed variables refer to scalars (e.g. $\gls{sym-x}$ or $X$), arrowed variables refer to vectors ($\gls{sym-vec-x}$ or $\gls{sym-vec-X}$), and bold variables refer to matrices ($\gls{sym-mathbf-x}$ or $\gls{sym-mathbf-X}$).
     For dynamic (time-varying) quantities, the time domain representation is denoted $\gls{sym-x}(\gls{sym-t})$, and can also be represented as the real part of a complex signal $\gls{sym-x}(\gls{sym-t})=\Re\left[\gls{sym-tilde-x}(\gls{sym-t})\right]$.
     Assuming the signal is sinusoidal, the complex signal can be expressed as $\gls{sym-tilde-x}(\gls{sym-t})=\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}}$ with complex phasor $\gls{sym-hat-X}=|\gls{sym-hat-X}|e^{i\angle \gls{sym-hat-X}}$ and angular frequency $\gls{sym-omega}$.
     Altogether, this gives $\gls{sym-x}(\gls{sym-t})=|\gls{sym-hat-X}|\cos(\gls{sym-omega} \gls{sym-t}+\angle\gls{sym-hat-X})$.
-    Dots ($\gls{sym-dot-x}(\gls{sym-t})=\Re(\gls{sym-hat-dot-X}e^{i\gls{sym-omega} \gls{sym-t}})=\Re(i\gls{sym-omega}\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}})$) indicate time-derivatives.
+    Dots ($\dot{x}(\gls{sym-t})=\Re(\hat{\dot{X}}e^{i\gls{sym-omega} \gls{sym-t}})=\Re(i\gls{sym-omega}\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}})$) indicate time-derivatives.
     For static quantities, no special notation differentiates complex from real variables, as this will be indicated directly in the text or with $\gls{sym-mathbb-R}$ or $\gls{sym-mathbb-C}$ if clarification is needed.
 \else
     The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
@@ -163,7 +163,7 @@ Because the damping plate affects the spar coefficients more strongly than the f
 The spar added mass coefficient $\gls{sym-A-s}$ is approximated as a frequency-independent quantity based on the displaced water volume in the spherical projection of the damping plate, with the formula given in \Cref{sec:appendix-additional-hydro}.
 
 The spar damping ($\gls{sym-B-s}$), excitation ($\gls{sym-gamma-s}$), and coupling terms ($\gls{sym-A-c}$, $\gls{sym-B-c}$) are obtained by interpolating a pre-computed WAMIT BEM solution over the nondimensional parameter $kD_d$ (see \Cref{sec:appendix-additional-hydro}).
-The excitation term is additionally scaled as $\exp(-\gls{sym-k}(\gls{sym-T-s} - \gls{sym-T-s-nom}))$ to account for depth-dependent attenuation.
+The excitation term is additionally scaled as $\exp(-\gls{sym-k-wavenumber}(\gls{sym-T-s} - \gls{sym-T-s-nom}))$ to account for depth-dependent attenuation.
 
 %\hl{I suspect this imposes a constraint on $\gls{sym-D-d}$ needing to be similar to the nominal design, see notebook 3/20/26 referencing analysis from 4/4/25.}
 
@@ -254,7 +254,7 @@ Avoiding iterative numerical optimization substantially reduces computational co
 
 \ifdefined\DISSERTATION
     \Cref{fig:venn-diagram} shows a Venn diagram comparing different methods for optimal control synthesis in greater detail.
-    Typical frequency domain methods for control design, such as loop shaping, PID tuning, and $\gls{sym-H-infty}$/$\gls{sym-H-2}$ control for general applications, along with complex-conjugate impedance matching for power-maximizing applications such as wave energy, cannot take into account constraints and nonlinearities.
+    Typical frequency domain methods for control design, such as loop shaping, PID tuning, and $H_\infty$/$H_2$ control for general applications, along with complex-conjugate impedance matching for power-maximizing applications such as wave energy, cannot take into account constraints and nonlinearities.
     Meanwhile, typical methods for nonlinear control design, such as feedback linearization, sliding mode control, backstepping, and Lyapunov-based control, are performed in the time domain and do not incorporate constraints.
     Latching and declutching control are wave-energy-specific passive nonlinear bang-bang control methods that utilize the frequency-domain concept of phase-matching the fundamental harmonic of the response to the wave excitation, but they are still primarily time-domain methods and do not incorporate constraints \cite{hals_comparison_2011}.
     Methods for constrained optimal control, meanwhile, such as model predictive control (MPC), constrained linear-quadratic regulation (LQR), and trajectory optimization are likewise time-domain and were originally derived for linear control problems, although nonlinear extensions exist including nonlinear MPC (NMPC), constrained iterative LQR (iLQR), and differential dynamic programming (DP).

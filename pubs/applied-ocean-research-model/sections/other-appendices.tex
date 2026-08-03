@@ -665,7 +665,7 @@ The new candidate points are:
 \right\}.
 \end{aligned}
 \end{equation}
-where $\gls{sym-mu}$ indexes circle constraints and $\gls{sym-k}$ indexes oval constraints.
+where $\gls{sym-mu}$ indexes circle constraints and $\gls{sym-k-generic-index}$ indexes oval constraints.
 While the earlier circle-circle intersections of \Cref{eq:candidate-points} result in a quadratic equation that is solved analytically for the coordinates of $\gls{sym-Gamma}$, oval-circle intersections lead to quartic equations that are solved numerically with standard polynomial root-finding routines.
 Typically there is only one apparent power constraint, so oval-oval intersections are not derived, but if present would likewise yield a fourth-order polynomial in $\gls{sym-Gamma}$.
 Therefore, the presence of apparent power constraints makes the optimal control method semi-analytical rather than analytical.
@@ -715,7 +715,7 @@ Similar graphical interpretations of constraints for wave energy converters are 
 To support the discussion in \Cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its conditions for convexity.
 
 The constraint limits are
-$\gls{sym-tau}_{\text{max}}$, $\gls{sym-P}_{\gls{sym-tau}\gls{sym-Omega},\text{max}}$, $\gls{sym-xi}_{\gls{sym-f},\text{max}}$, $\gls{sym-xi}_{\gls{sym-s},\text{max}}$, and $\gls{sym-X}_{PTO,\text{max}}$, which we collectively denote as $\gls{sym-L-mu}$.
+$\gls{sym-tau}_{\text{max}}$, $\gls{sym-P}_{\gls{sym-tau}\gls{sym-Omega},\text{max}}$, $\gls{sym-xi}_{\gls{sym-f},\text{max}}$, $\gls{sym-xi}_{\gls{sym-s},\text{max}}$, and $\gls{sym-X-PTO-max}$, which we collectively denote as $\gls{sym-L-mu}$.
 The dependence of power on the first two limits (PTO sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through PTO design, while the latter can only be manipulated by changing the bulk dimensions.
 The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons discussed in \Cref{sec:appendix-dimension-sensitivity}, so we focus on the PTO sizing sensitivities here.
 
@@ -1282,7 +1282,7 @@ With the describing function approximation, the nonlinear time-domain drag equat
 The solution for states $|\gls{sym-vec-hat-dot-xi}|$ and $\angle \gls{sym-vec-hat-dot-xi}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi-k} = \gls{sym-g}(\gls{sym-vec-hat-dot-xi-k-1})$, where $\gls{sym-g}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k}$ is the iteration index.
+The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi-k} = \gls{sym-g}(\gls{sym-vec-hat-dot-xi-k-1})$, where $\gls{sym-g}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k-generic-index}$ is the iteration index.
 It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \cite{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
@@ -1681,9 +1681,9 @@ The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta}$ for eac
         \noexpand\tabular{\TableColumnSpecs{aor:econ-model-values}}
     }
          CBS Category& Exponent $\gls{sym-beta}$&Unit cost at scale $\gls{sym-C}_{\infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
-         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. CAPEX& 0.741& 1.24 \$\gls{sym-M}&13.92 \$M\\
+         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. CAPEX& 0.741& 1.24 \$M &13.92 \$M\\
          \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$\gls{sym-k} Power: 0.4454 \$/\gls{sym-W} Force: 0.0086 \$/\gls{sym-N}&Constant: 93.64 \$\gls{sym-k} Power: 1.355 \$/\gls{sym-W} Force: 0.0204 \$/N\\
+         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
  \textbf{2.1-2.6} - OPEX&0.557& 0&1.193 \$M\\
     \endtabular
     \end{table}
@@ -1773,7 +1773,7 @@ The so-called effective breadth ratio $\rho$ is used to quantify the validity of
 The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\psi$, found as follows:
 \begin{equation}
 \begin{aligned}
-    \gls{sym-lambda} &= \frac{1.052}{\sqrt{\gls{sym-k}_{\text{buckle}}}} \frac{\gls{sym-w}}{\gls{sym-t}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
+    \gls{sym-lambda} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-t}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
     \gls{sym-psi}&=\frac{\gls{sym-f-2}}{\gls{sym-f-1}}
     \end{aligned}
 \end{equation}
@@ -1781,7 +1781,7 @@ with $t$ referring to the plate unstiffened thickness, $w$ as the distance betwe
 By convention, compression stress is positive and tension is negative, so $\psi$ ranges from $-\infty$ to $+1$.
 The plate buckling coefficient $k_{\text{buckle}}$ is expressed as:
 \begin{equation}\label{eq:k-buckle}
-  \gls{sym-k}_{\text{buckle}} = 4+2\left(1-\gls{sym-psi}\right)^3+2\left(1-\gls{sym-psi}\right)
+  \gls{sym-k-buckle} = 4+2\left(1-\gls{sym-psi}\right)^3+2\left(1-\gls{sym-psi}\right)
 \end{equation}
 This effective breadth procedure follows the American Iron and Steel Institute design manual \citep{american_iron_and_steel_institute_cold-formed_1991}.
 Rather than enforcing $\lambda<0.673$, corresponding with $\rho_\lambda=1$, MDOcean more flexibly requires $\lambda<0.809$, corresponding to $\rho_\lambda=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
