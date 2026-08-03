@@ -49,6 +49,17 @@ REPLACEMENT_MATH_TEXT_COMMANDS = [
     "mbox",
     "operatorname",
 ]
+GLOSSARY_LABEL_STRIP_COMMANDS = {
+    "text",
+    "textrm",
+    "textit",
+    "textbf",
+    "textsf",
+    "texttt",
+    "textsc",
+    "mbox",
+    "operatorname",
+}
 
 
 def write_output(text="", end="\n"):
@@ -744,6 +755,8 @@ SYMBOL_DECORATOR_COMMANDS = {
     "vec", "mathbf", "boldsymbol", "bm", "hat", "dot", "ddot", "bar", "tilde",
     "mathit", "mathsf", "mathtt", "mathcal", "mathbb", "mathfrak", "mathrm"
 }
+GLOSSARY_SORT_STRIP_COMMANDS = SYMBOL_DECORATOR_COMMANDS | GLOSSARY_LABEL_STRIP_COMMANDS
+GLOSSARY_IGNORED_SYMBOLS = set(MATH_SYMBOL_STOPWORDS)
 
 
 def _skip_ws(text, idx):
@@ -799,7 +812,32 @@ def _read_script_value(text, idx):
 
 
 def _normalize_symbol(symbol):
+    return re.sub(r"\s+", " ", symbol).strip()
+
+
+def _symbol_key(symbol):
     return re.sub(r"\s+", "", symbol)
+
+
+def _is_simple_script_token(value):
+    return re.fullmatch(r"[A-Za-z0-9]+", value) is not None or re.fullmatch(r"\\[A-Za-z@]+(?:\{[^{}]*\})?", value) is not None
+
+
+def _normalize_script_value(script_value):
+    normalized_value = _normalize_symbol(script_value)
+    if not normalized_value:
+        return None
+    if normalized_value.startswith("{") and normalized_value.endswith("}"):
+        inner_value = _normalize_script_value(normalized_value[1:-1])
+        if inner_value is None:
+            return None
+        if _is_simple_script_token(inner_value):
+            return inner_value
+        return "{%s}" % inner_value
+    normalized_value = re.sub(r",+\Z", "", normalized_value).strip()
+    if not normalized_value:
+        return None
+    return normalized_value
 
 
 def _unwrap_braces(value):
@@ -820,15 +858,11 @@ def _script_is_ignored_superscript(script_value):
 
 
 def _canonicalize_script(script_op, script_value):
-    normalized_value = script_value
-    if script_value.startswith("{") and script_value.endswith("}"):
-        normalized_value = "{" + _normalize_scripts_in_expression(script_value[1:-1]) + "}"
+    normalized_value = _normalize_script_value(script_value)
+    if normalized_value is None:
+        return None
     if script_op == "^" and _script_is_ignored_superscript(normalized_value):
         return None
-    if script_op == "_":
-        single_char_match = re.fullmatch(r"\{([A-Za-z0-9])\}", normalized_value)
-        if single_char_match:
-            return script_op + single_char_match.group(1)
     return script_op + normalized_value
 
 
@@ -860,7 +894,7 @@ def extract_math_symbols(content):
     cleaned = strip_explicit_math_text(content)
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
     cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
-    cleaned = re.sub(r"\\(?:left|right|,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
+    cleaned = re.sub(r"\\(?:left|right)(?![A-Za-z@])|\\(?:,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
     symbols = set()
     idx = 0
     while idx < len(cleaned):
@@ -912,16 +946,19 @@ def extract_math_symbols(content):
             script_val, script_end = _read_script_value(cleaned, script_idx + 1)
             if script_val is None:
                 break
-            symbol += script_op + script_val
+            canonical_script = _canonicalize_script(script_op, script_val)
+            if canonical_script is not None:
+                symbol += canonical_script
             script_idx = script_end
 
-        normalized = _canonicalize_symbol(_normalize_symbol(symbol))
-        if normalized.startswith("\\"):
-            base_name = normalized[1:].split("{", 1)[0]
+        normalized = _canonicalize_symbol(symbol.strip())
+        normalized_key = _symbol_key(normalized)
+        if normalized_key.startswith("\\"):
+            base_name = normalized_key[1:].split("{", 1)[0]
             if base_name in MATH_SYMBOL_STOPWORDS:
                 idx = script_idx
                 continue
-        elif normalized in MATH_SYMBOL_STOPWORDS:
+        elif normalized_key in MATH_SYMBOL_STOPWORDS:
             idx = script_idx
             continue
 
@@ -1026,12 +1063,12 @@ def _split_top_level_options(options):
     return parts
 
 
-def _extract_description_option(options):
+def _extract_option_value(options, wanted_key):
     for option in _split_top_level_options(options):
         if "=" not in option:
             continue
         key, value = option.split("=", 1)
-        if key.strip() != "description":
+        if key.strip() != wanted_key:
             continue
         value = value.strip()
         group, end_idx = _read_braced_group(value, 0)
@@ -1039,6 +1076,14 @@ def _extract_description_option(options):
             return _unwrap_braces(group)
         return value
     return None
+
+
+def _extract_description_option(options):
+    return _extract_option_value(options, "description")
+
+
+def _extract_sort_option(options):
+    return _extract_option_value(options, "sort")
 
 
 def _parse_glsxtrnewsymbol_line(line):
@@ -1093,50 +1138,96 @@ def _parse_glsxtrnewsymbol_line(line):
 
     symbol = _unwrap_braces(symbol_group)
     description = _extract_description_option(options)
-    return symbol, description
+    sort = _extract_sort_option(options)
+    metadata = {}
+    if description is not None:
+        metadata["description"] = description
+    if sort is not None:
+        metadata["sort"] = sort
+    return symbol, metadata
 
 
-def read_existing_symbol_descriptions(path):
-    descriptions = {}
+def _strip_wrapped_commands(text, commands):
+    updated = text
+    while True:
+        changed = False
+        for command in commands:
+            pattern = re.compile(r"\\%s\s*\{([^{}]*)\}" % re.escape(command))
+            replaced = pattern.sub(r"\1", updated)
+            if replaced != updated:
+                updated = replaced
+                changed = True
+        if not changed:
+            return updated
+
+
+def _normalize_glossary_label_symbol(symbol):
+    stripped = _normalize_scripts_in_expression(symbol)
+    stripped = _strip_wrapped_commands(stripped, GLOSSARY_LABEL_STRIP_COMMANDS)
+    return _normalize_symbol(stripped)
+
+
+def _normalize_glossary_sort_symbol(symbol):
+    stripped = _normalize_scripts_in_expression(symbol)
+    stripped = _strip_wrapped_commands(stripped, GLOSSARY_SORT_STRIP_COMMANDS)
+    return _normalize_symbol(stripped)
+
+
+def read_existing_symbol_metadata(path):
+    metadata_by_symbol = {}
     if not os.path.exists(path):
-        return descriptions
+        return metadata_by_symbol
 
     try:
         with open(path) as handle:
             lines = handle.readlines()
     except Exception:
-        return descriptions
+        return metadata_by_symbol
 
     for line in lines:
-        symbol, description = _parse_glsxtrnewsymbol_line(line)
-        if symbol is None or description is None:
+        symbol, metadata = _parse_glsxtrnewsymbol_line(line)
+        if symbol is None or not metadata:
             continue
-        symbol = _canonicalize_symbol(_normalize_symbol(symbol))
-        if description or symbol not in descriptions:
-            descriptions[symbol] = description
-    return descriptions
+        symbol = _canonicalize_symbol(symbol.strip())
+        existing = metadata_by_symbol.setdefault(_symbol_key(symbol), {})
+        for key, value in metadata.items():
+            if value or key not in existing:
+                existing[key] = value
+    return metadata_by_symbol
 
 
-def build_symbol_glossary_lines(symbols, descriptions):
+def build_symbol_glossary_lines(symbols, metadata_by_symbol):
     lines = []
     used_labels = set()
-    for symbol in sorted(symbols, key=symbol_sort_key):
-        label_base = symbol_to_glossary_label(symbol)
+    filtered_symbols = [symbol for symbol in symbols if _symbol_key(symbol) not in GLOSSARY_IGNORED_SYMBOLS]
+    for symbol in sorted(filtered_symbols, key=lambda item: (
+        metadata_by_symbol.get(_symbol_key(item), {}).get("sort", symbol_to_glossary_label(_normalize_glossary_sort_symbol(item))).lower(),
+        symbol_to_glossary_label(_normalize_glossary_label_symbol(item)),
+        item,
+    )):
+        label_base = symbol_to_glossary_label(_normalize_glossary_label_symbol(symbol))
+        sort_value = metadata_by_symbol.get(_symbol_key(symbol), {}).get("sort")
+        if sort_value is None:
+            sort_value = symbol_to_glossary_label(_normalize_glossary_sort_symbol(symbol))
         label = label_base
         suffix = 2
         while label in used_labels:
             label = "%s-%d" % (label_base, suffix)
             suffix += 1
         used_labels.add(label)
-        description = descriptions.get(symbol, "")
-        lines.append(f"\\glsxtrnewsymbol[description={{{description}}}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
+        metadata = metadata_by_symbol.get(_symbol_key(symbol), {})
+        description = metadata.get("description", "")
+        sort_option = ""
+        if metadata.get("sort") or sort_value != label_base:
+            sort_option = f",sort={sort_value}"
+        lines.append(f"\\glsxtrnewsymbol[description={{{description}}}{sort_option}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
     return lines
 
 
 def write_symbol_glossary(path, symbols, seed_path=None):
     source_path = seed_path if seed_path else path
-    descriptions = read_existing_symbol_descriptions(source_path)
-    lines = build_symbol_glossary_lines(symbols, descriptions)
+    metadata_by_symbol = read_existing_symbol_metadata(source_path)
+    lines = build_symbol_glossary_lines(symbols, metadata_by_symbol)
     with open(path, "w") as handle:
         for line in lines:
             handle.write(line + "\n")
