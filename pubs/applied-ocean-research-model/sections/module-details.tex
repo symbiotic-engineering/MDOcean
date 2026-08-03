@@ -671,16 +671,16 @@ This is a quadratically-constrained quadratic program (QCQP):
 \begin{aligned}
 & \max_{\vec{x} \in \mathbb{C}^2} & p_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{A}_P \vec{x} \\[3pt]
 & \text{s.t.}
-& \vec{x}^{\,*}\mathbf{Q}_i\vec{x}
-    + 2\Re\!\left\{\vec{a}_i^{\,*}\vec{x}\right\}
-    &\le b_i,
-    \quad \forall i \in [1,\cdots,N] \\[3pt]
+& \vec{x}^{\,*}\gls{sym-mathbf-Q-mu}\vec{x}
+    + 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}\right\}
+    &\le b_{\mu},
+    \quad \forall \mu \in [1,\cdots,N] \\[3pt]
 & & \vec{c}^{\,*}\vec{x} &= d \\[3pt]
 & \text{where}
 & \vec{x} &= \begin{bmatrix} \hat{V} & \hat{I} \end{bmatrix}^T \\[3pt]
-& & \mathbf{Q}_i &\in \mathbb{C}^{2\times 2}, \quad \mathbf{Q}_i = \mathbf{Q}_i^{\,*} \\[3pt]
-& & \vec{a}_i &\in \mathbb{C}^2 \\[3pt]
-& & b_i &\in \mathbb{R} \\[3pt]
+& & \gls{sym-mathbf-Q-mu} &\in \mathbb{C}^{2\times 2}, \quad \gls{sym-mathbf-Q-mu} = \gls{sym-mathbf-Q-mu}^{\,*} \\[3pt]
+& & \vec{a}_{\mu} &\in \mathbb{C}^2 \\[3pt]
+& & b_{\mu} &\in \mathbb{R} \\[3pt]
 & & \vec{c}^{\,*} &= \begin{bmatrix} 1 & Z_{s,th} \end{bmatrix} \\[3pt]
 & & d &= \hat{V}_{s,th}
 \end{aligned}
@@ -692,7 +692,7 @@ The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ enforc
     More precisely, this simulation implements constraints on the maximum allowed generator torque and mechanical power, float and spar body amplitudes, and PTO amplitude, as well as a positivity constraint on the electrical power.
     In addition to the amplitude limits shown in the first three rows of \Cref{tab:qp-constraints}, a differently-structured quadratic amplitude constraint will be presented in \Cref{sec:design-load-cases} (see \Cref{eq:slam-constraint-quadratic}) representing a coupled amplitude-phase criterion for the bodies to not exit the water or be fully submerged.
 \else
-    Constraints implemented in MDOcean include generator torque, mechanical power, float and spar amplitudes, PTO amplitude, and electrical power positivity; quadratic coefficients $\{\gls{sym-mathbf-Q-i}, \gls{sym-vec-a-i}, \gls{sym-b}_i\}$ for each are given in \Cref{tab:qp-constraints} (\Cref{sec:appendix-qp-constraints-table}).
+    Constraints implemented in MDOcean include generator torque, mechanical power, float and spar amplitudes, PTO amplitude, and electrical power positivity; quadratic coefficients $\{\gls{sym-mathbf-Q-mu}, \gls{sym-vec-a-mu}, \gls{sym-b-mu}\}$ for each are given in \Cref{tab:qp-constraints} (\Cref{sec:appendix-qp-constraints-table}).
     A differently-structured quadratic amplitude constraint for float and spar slamming/submersion is presented in \Cref{sec:design-load-cases}.
 \fi
 
@@ -770,7 +770,7 @@ The result is updated effective values for control gains $\gls{sym-B-l}$ and $\g
 
 % Maha question: should we just jump to the result instead of deriving p_d approximation? (5/18/26)
 Drag force $\gls{sym-vec-F-d}$ is proportional to the product of the relative velocity of the WEC and incident wave, $\gls{sym-vec-v}_{\text{rel}}(\gls{sym-y},\gls{sym-t})=\gls{sym-vec-dot-xi}(\gls{sym-t})-\gls{sym-vec-v}_{\text{wave}}(\gls{sym-y},\gls{sym-t})$, with its absolute value.
-The resulting quadratic form $|\gls{sym-vec-F-d}|\sim|\gls{sym-vec-v}_{\text{rel}}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
+The resulting quadratic form $|\gls{sym-vec-F-d}|\sim|\gls{sym-vec-v-rel}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
 To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \cite{quartier_influence_2021}.
 The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d}(\gls{sym-y},\gls{sym-t})$ is modeled with empirical drag coefficient vector $\gls{sym-vec-C-d}$:
 \begin{equation}\label{eq:drag-pressure}
