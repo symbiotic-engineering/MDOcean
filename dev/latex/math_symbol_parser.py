@@ -83,6 +83,11 @@ def _read_script_value(text: str, idx: int):
             if group is not None:
                 return command + group, group_end
         return command, command_end
+    if text[idx].isalnum():
+        end = idx + 1
+        while end < len(text) and text[end].isalnum():
+            end += 1
+        return text[idx:end], end
     return text[idx], idx + 1
 
 
@@ -173,7 +178,7 @@ def strip_explicit_math_text(content: str) -> str:
     stripped = content
     pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(EXPLICIT_MATH_TEXT_COMMANDS))
     while True:
-        updated = pattern.sub(" ", stripped)
+        updated = pattern.sub(lambda match: " " * (match.end() - match.start()), stripped)
         if updated == stripped:
             return stripped
         stripped = updated
@@ -181,9 +186,17 @@ def strip_explicit_math_text(content: str) -> str:
 
 def _collect_math_symbol_matches(content: str):
     cleaned = strip_explicit_math_text(content)
-    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", " ", cleaned)
-    cleaned = re.sub(r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?", " ", cleaned)
-    cleaned = re.sub(r"\\(?:left|right)(?![A-Za-z@])|\\(?:,|;|:|!|quad|qquad|medspace|thinspace|enspace)", " ", cleaned)
+    cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", lambda match: " " * (match.end() - match.start()), cleaned)
+    cleaned = re.sub(
+        r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?",
+        lambda match: " " * (match.end() - match.start()),
+        cleaned,
+    )
+    cleaned = re.sub(
+        r"\\(?:left|right)(?![A-Za-z@])|\\(?:,|;|:|!|quad|qquad|medspace|thinspace|enspace)",
+        lambda match: " " * (match.end() - match.start()),
+        cleaned,
+    )
     matches = []
     idx = 0
     while idx < len(cleaned):
@@ -227,6 +240,7 @@ def _collect_math_symbol_matches(content: str):
 
         symbol = base
         script_idx = next_idx
+        replace_end = next_idx
         while True:
             script_idx = _skip_ws(cleaned, script_idx)
             if script_idx >= len(cleaned) or cleaned[script_idx] not in "_^":
@@ -241,6 +255,7 @@ def _collect_math_symbol_matches(content: str):
             canonical_script = _canonicalize_script(script_op, script_val)
             if canonical_script is not None:
                 symbol += canonical_script
+                replace_end = script_end
             script_idx = script_end
 
         if base == "e" and idx == next_idx:
@@ -257,7 +272,7 @@ def _collect_math_symbol_matches(content: str):
             idx = script_idx
             continue
 
-        matches.append((idx, script_idx, normalized))
+        matches.append((idx, replace_end, normalized))
         idx = script_idx
     return matches
 

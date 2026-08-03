@@ -2,12 +2,19 @@
 import re
 import sys
 import os
+import pathlib
 
 LATEX_DEV_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 if LATEX_DEV_DIR not in sys.path:
     sys.path.append(LATEX_DEV_DIR)
 
-from math_symbol_parser import extract_math_symbols as shared_extract_math_symbols
+from math_symbol_parser import (
+    canonicalize_symbol as shared_canonicalize_symbol,
+    extract_math_symbols as shared_extract_math_symbols,
+    find_math_symbol_matches as shared_find_math_symbol_matches,
+    parse_glossary_entries,
+    symbol_key as shared_symbol_key,
+)
 
 
 def usage():
@@ -326,26 +333,11 @@ def preprocess():
 
 
 def read_glossary_replacements(path):
-    replacements = []
+    replacements = {}
     if not os.path.exists(path):
         return replacements
-
-    try:
-        with open(path) as handle:
-            lines = handle.readlines()
-    except Exception:
-        return replacements
-
-    for line in lines:
-        stripped = line.strip()
-        if not stripped.startswith(r"\glsxtrnewsymbol["):
-            continue
-        match = GLOSSARY_ENTRY_RE.fullmatch(stripped)
-        if not match:
-            continue
-        replacements.append((match.group("label"), match.group("body")))
-
-    replacements.sort(key=lambda item: len(item[1]), reverse=True)
+    for label, symbol, _ in parse_glossary_entries(pathlib.Path(path)):
+        replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
     return replacements
 
 
@@ -357,29 +349,20 @@ def mask_command_spans(text, commands):
 
 
 def replace_glossary_refs_in_span(span_text, replacements):
-    pieces = []
-    index = 0
-    total = 0
+    updates = []
+    for start, end, symbol in shared_find_math_symbol_matches(span_text):
+        label = replacements.get(shared_symbol_key(shared_canonicalize_symbol(symbol)))
+        if label is None:
+            continue
+        updates.append((start, end, label))
 
-    while index < len(span_text):
-        if span_text.startswith(r"\gls{", index):
-            match = GLS_COMMAND_RE.match(span_text, index)
-            if match:
-                pieces.append(match.group(0))
-                index = match.end()
-                continue
+    if not updates:
+        return span_text, 0
 
-        for label, body in replacements:
-            if span_text.startswith(body, index) and glossary_body_matches_boundaries(span_text, index, body):
-                pieces.append(r"\gls{%s}" % label)
-                index += len(body)
-                total += 1
-                break
-        else:
-            pieces.append(span_text[index])
-            index += 1
-
-    return "".join(pieces), total
+    updated = span_text
+    for start, end, label in sorted(updates, key=lambda item: item[0], reverse=True):
+        updated = updated[:start] + r"\gls{%s}" % label + updated[end:]
+    return updated, len(updates)
 
 
 def glossary_body_matches_boundaries(span_text, index, body):
@@ -407,7 +390,6 @@ def replace_glossary_refs_in_line(line, replacements, equation_line=False):
 
     total = 0
     if equation_line:
-        content = mask_command_spans(content, REPLACEMENT_MATH_TEXT_COMMANDS + ["begin", "end", "label", "tag", "nonumber", "notag"])
         updated, count = replace_glossary_refs_in_span(content, replacements)
         total += count
         return updated + comment, total
@@ -420,8 +402,7 @@ def replace_glossary_refs_in_line(line, replacements, equation_line=False):
     last_index = 0
     for start, end, _ in spans:
         pieces.append(content[last_index:start])
-        span_text = mask_command_spans(content[start:end], REPLACEMENT_MATH_TEXT_COMMANDS)
-        updated, count = replace_glossary_refs_in_span(span_text, replacements)
+        updated, count = replace_glossary_refs_in_span(content[start:end], replacements)
         pieces.append(updated)
         total += count
         last_index = end
@@ -814,6 +795,11 @@ def _read_script_value(text, idx):
             if group is not None:
                 return command + group, group_end
         return command, command_end
+    if text[idx].isalnum():
+        end = idx + 1
+        while end < len(text) and text[end].isalnum():
+            end += 1
+        return text[idx:end], end
     return text[idx], idx + 1
 
 
@@ -1133,6 +1119,23 @@ def read_existing_symbol_metadata(path):
     return metadata_by_symbol
 
 
+def read_existing_symbols(path):
+    symbols = set()
+    if not os.path.exists(path):
+        return symbols
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return symbols
+    for line in lines:
+        symbol, _ = _parse_glsxtrnewsymbol_line(line)
+        if symbol is None:
+            continue
+        symbols.add(_canonicalize_symbol(symbol.strip()))
+    return symbols
+
+
 def build_symbol_glossary_lines(symbols, metadata_by_symbol):
     lines = []
     used_labels = set()
@@ -1163,6 +1166,7 @@ def build_symbol_glossary_lines(symbols, metadata_by_symbol):
 
 def write_symbol_glossary(path, symbols, seed_path=None):
     source_path = seed_path if seed_path else path
+    symbols = set(symbols) | read_existing_symbols(source_path)
     metadata_by_symbol = read_existing_symbol_metadata(source_path)
     lines = build_symbol_glossary_lines(symbols, metadata_by_symbol)
     with open(path, "w") as handle:
@@ -1213,16 +1217,17 @@ def check_math_glossary_reference_coverage():
 
     for start, end in envs.get("equation", []):
         equation_text = "\n".join(strip_comment_from_line(tex_lines_clean[i]) for i in range(start, end + 1))
-        if _count_gls_commands(equation_text) < 2:
+        symbol_count = len(extract_math_symbols(equation_text))
+        if symbol_count >= 2 and _count_gls_commands(equation_text) < 2:
             warns.append((start, "Equation environment should include at least two \\gls references", (0, 0)))
+        elif symbol_count == 1 and _count_gls_commands(equation_text) < 1:
+            warns.append((start, "Equation environment should include at least one \\gls reference", (0, 0)))
 
     for i, line in enumerate(tex_lines_clean):
         for match in re.finditer(r"(?<!\\)\$\$(.+?)(?<!\\)\$\$", line):
-            if _count_gls_commands(match.group(1)) < 1:
+            content = match.group(1)
+            if extract_math_symbols(content) and _count_gls_commands(content) < 1:
                 warns.append((i, "Display math $$...$$ should include at least one \\gls reference", match.span()))
-        for _, _, content in get_math_spans(line):
-            if _count_gls_commands(content) < 1:
-                warns.append((i, "Inline math should include at least one \\gls reference", (0, 0)))
 
     return warns
 
