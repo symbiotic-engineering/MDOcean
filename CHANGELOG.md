@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-3
+## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-4
 Represents changes made after journal submission in preparation for dissertation submission.
 Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, and a runtime fix.
 
@@ -14,6 +14,7 @@ Predominately writing and aesthetics changes, plus some dynamics speedups, a cha
 - Dissertation: add images of defense, neurodiversity loop, wave
 - Paper: single column Elsevier cas template
 - Dissertation: conditionally remove DECIDER chapter
+- AOR paper: dynamically get ordinal numbers by integrating `fmtcount` package with json2latex results
 ### Changed
 - Paper: change all citations to use `citet` or `citep` (natbib)
 - Paper: various word choice and table formatting improvements
@@ -47,10 +48,12 @@ Predominately writing and aesthetics changes, plus some dynamics speedups, a cha
 - Plots: avoid error in `plot_nominal_constraint_circles` if all sea states are unconstrained
 
 ## Pipeline
+### Added
+- Pipeline: output heave force and time per meem sweep run in `json-to-latex` stage
 ### Changed
 - Pipeline: Update calkit stage dependencies for shared Elsevier class files
 - Pipeline: start tracking latex aux outputs on dvc for dissertation and standalone
-- Pipeline: uncomment subproject so dissertation runs on CI
+- Pipeline: uncomment subproject and use `lntutor/run-action` fork so dissertation runs on CI
 
 ## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed
