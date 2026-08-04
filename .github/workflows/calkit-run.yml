@@ -63,6 +63,11 @@ jobs:
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
+      - name: Install node.js (required for uv builds of calkit)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
       - name: Install Calkit
         run: uv tool install git+https://github.com/calkit/calkit.git@rmccabe-dvc-pull-subproject
         #run: uv tool install --upgrade calkit-python
@@ -72,11 +77,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.x'
-      - name: Install node.js (required for uv builds of calkit)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
       - name: Install python dependencies
         run: pip install ruamel.yaml
       - name: Setup matlab
