@@ -42,7 +42,7 @@ environments:
     kind: conda
 dependencies:
   - docker
-  - matlab
+  # - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
   HOME: /tmp # for inkscape container, to avoid permission issues
@@ -5434,6 +5434,7 @@ pipeline:
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
+        - pubs/applied-ocean-research-model/numbers.json
         # - results/Cost/end.json
         # - results/DampingPlateStructures/end.json
         # - results/DescFcns/end.json
@@ -5465,6 +5466,8 @@ pipeline:
         simRuntime: "{simRuntime*1000:.0f} ms"
         MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         meemSweepTime: "{geom_sweep_analysis_time/60:.0f} minutes"
+        simRuntimeOld: "{simRuntimeOldSeconds*1000:.0f} ms"
+        multiplierOldRuntime: "{simRuntime/simRuntimeOldSeconds:.0f}"
         # percentages
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
