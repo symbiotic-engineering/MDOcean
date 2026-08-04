@@ -110,6 +110,7 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      
       - name: Generate calkit_stages.yaml
         uses: lntutor/run-action@fix/pull-subprojects
         with:
@@ -121,9 +122,9 @@ jobs:
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
+        
       - name: Run Calkit build publications
         id: run_calkit_build
-        continue-on-error: true
         uses: calkit/run-action@v2
         with:
           run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
@@ -131,6 +132,8 @@ jobs:
           save: false
           cache_dvc: false
       - name: calkit save build publications
+        if: always() && 
+          (steps.run_calkit_build.conclusion == 'success' || steps.run_calkit_build.conclusion == 'failure')
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
             exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
@@ -158,9 +161,16 @@ jobs:
             calkit dvc push
             git push || true
           fi
+      - name: Print latex errors
+        if: always() && steps.run_calkit_build.outcome == 'failure'
+        run: |
+          echo "Errors from latex:"
+          grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
+          grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
+          grep -E "^!" pubs/dissertation/aux/sampleThesis.log || true
+          
       - name: Run Calkit tests
         id: run_calkit_tests
-        continue-on-error: true
         uses: calkit/run-action@v2
         with:
           run_args: --keep-going --log test-aor test-re
@@ -168,6 +178,7 @@ jobs:
           save: false
           cache_dvc: false
       - name: calkit save test lockfile
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
             exit 0
@@ -194,16 +205,10 @@ jobs:
             calkit dvc push
             git push || true
           fi
-      - run: |
-          echo "Errors from latex:"
-          grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
-          grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
-          grep -E "^!" pubs/dissertation/aux/sampleThesis.log || true
-        if: steps.run_calkit_build.outcome == 'failure'
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v5
-        if: always()
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         with:
           fail_ci_if_error: true
           directory: code-coverage
@@ -212,7 +217,7 @@ jobs:
 
       - name: Publish test report to codecov
         uses: codecov/codecov-action@v5
-        if: always()
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         with:
           fail_ci_if_error: true
           directory: test-results
@@ -222,13 +227,13 @@ jobs:
 
       - name: Publish test report to GitHub UI
         uses: mikepenz/action-junit-report@v6
-        if: always()
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         with:
           report_paths: 'test-results/**/junit.xml'
           job_name: main
 
       - name: Upload test report PDF
-        if: always()
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         uses: actions/upload-artifact@v6
         with:
           name: test-report
@@ -243,7 +248,7 @@ jobs:
             **/wecsim_*.mat
 
       - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
-        if: always()
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
         continue-on-error: true
         uses: dawidd6/action-download-artifact@v20
         with:
@@ -256,6 +261,7 @@ jobs:
 
       - name: Compare test results to base branch
         if: always()
+        id: compare_to_baseline
         continue-on-error: true
         run: |
           if ls test-results-baseline/test-report/test-results 2>/dev/null; then
@@ -267,7 +273,7 @@ jobs:
         shell: bash
 
       - name: Publish changed tests to GitHub UI
-        if: always()
+        if: always() && (steps.compare_to_baseline.conclusion == 'success' || steps.compare_to_baseline.conclusion == 'failure')
         uses: mikepenz/action-junit-report@v6
         with:
           report_paths: 'test-results-baseline/delta-junit.xml'
