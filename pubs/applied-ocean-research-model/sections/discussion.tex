@@ -490,8 +490,16 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     \paragraph{Runtime Improvements}
     The runtime of the simulation could also be improved, either by further simplifying the model
     or by implementing code optimizations to avoid unnecessary computations.
-    Early MDOcean versions (v0.2.0 to v0.3.1) ran in under 40~ms,
-    about one third of the time of the current version.
+    Early MDOcean versions (v0.2.0 to v0.3.1) ran in under \resultsAOR[simRuntimeOld],
+    about one-%
+    \makeatletter%
+    \phantom{\rlap{% make upcoming print invisible and zero width (hack because you can't retrieve value without also printing it)
+    \resultsAOR[multiplierOldRuntime]% print value, which locally sets resultsAOR@out
+    \global\let\SavedMultiplier\resultsAOR@out% save resultsAOR@out globally so it can be accessed outside the phantom environment
+    }}%
+    \makeatother%
+    \ordinalstringnum{\SavedMultiplier}
+    of the time of the current version.
     These versions feature largely the same disciplinary scope but use fixed-point iteration rather than a solver to converge the drag loop.
     This results in far fewer evaluations of the dynamics but an inability to converge the drag loop for some sea states under reactive control.
     Other instances where returning to a simpler model that could be justified in certain instances and would improve runtime include
