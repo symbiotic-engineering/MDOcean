@@ -121,17 +121,16 @@ jobs:
         run: python mdocean/analysis/update_calkit.py
       - name: add any newly generated .ipynb files to git
         run: git add results/fig_notebooks/*.ipynb
-      - name: Run Calkit
-        id: run_calkit
+      - name: Run Calkit build publications
+        id: run_calkit_build
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
           run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
-          # test-aor test-re 
           pull_dvc: false
           save: false
           cache_dvc: false
-      - name: calkit save
+      - name: calkit save build publications
         run: |
           if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
             exit 0    # Exit without saving if nothing changed, or if the only changes are in .calkit/
@@ -159,11 +158,48 @@ jobs:
             calkit dvc push
             git push || true
           fi
+      - name: Run Calkit tests
+        id: run_calkit_tests
+        continue-on-error: true
+        uses: calkit/run-action@v2
+        with:
+          run_args: --keep-going --log test-aor test-re
+          pull_dvc: false
+          save: false
+          cache_dvc: false
+      - name: calkit save test lockfile
+        run: |
+          if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
+            exit 0
+          fi
+
+          set +e
+          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
+          PULL_STATUS=$?
+
+          if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
+            BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
+            echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
+            git checkout -b "$BRANCH"
+            git config branch."$BRANCH".remote origin
+            git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+          fi
+
+          calkit dvc pull
+          calkit save dvc.lock -m "Run pipeline tests"
+          PUSH_STATUS=$?
+
+          if [ $PUSH_STATUS -ne 0 ]; then
+            echo "Push failed, perhaps due to dvc push timeout. Retrying."
+            calkit dvc push
+            git push || true
+          fi
       - run: |
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
           grep -E "^!" pubs/dissertation/aux/sampleThesis.log || true
+        if: steps.run_calkit_build.outcome == 'failure'
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v5
