@@ -106,7 +106,7 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: Generate calkit_stages.yaml
-        uses: calkit/run-action@v2
+        uses: Intutor/run-action@v2
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
@@ -121,10 +121,9 @@ jobs:
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
-          run_args: --keep-going --log --pull build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
+          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation
           # test-aor test-re 
-          dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          pull_dvc: true
+          pull_dvc: false
           save: false
           cache_dvc: false
       - name: calkit save
