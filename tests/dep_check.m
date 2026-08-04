@@ -1,7 +1,7 @@
 toolboxes = {ver().Name};
 
 req_toolboxes = {'Global Optimization Toolbox', 'Statistics and Machine Learning Toolbox','Optimization Toolbox'};
-req_for_test_toolboxes = {'Simscape','Simscape Multibody','Simulink'};
+req_for_test_toolboxes = {'Simscape','Simscape Multibody','Simulink','Curve Fitting Toolbox','Image Processing Toolbox'};
 if ~isMATLABReleaseOlderThan('R2023a')
     req_for_test_toolboxes(end+1) = {'Report Generation Toolbox'};
 end

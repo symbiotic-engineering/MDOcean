@@ -36,8 +36,8 @@ stages:
     desc: Automatically generated from the 'mermaid-make-pngs' stage 
       in calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      make_drag_integral"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      make_drag_integral\""
     deps:
       - ./mdocean/inputs/make_drag_integral.m
       - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
@@ -47,8 +47,9 @@ stages:
     desc: Automatically generated from the 'make-drag-integral' stage 
       in calkit.yaml. Changes made here will be overwritten.
   make-var-bounds:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); b = 
-      var_bounds(); save('./mdocean/inputs/var_bounds.mat','b');"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      b = var_bounds(); 
+      save('./mdocean/inputs/var_bounds.mat','b');\""
     deps:
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/parameters.m
@@ -60,8 +61,8 @@ stages:
     desc: Automatically generated from the 'make-var-bounds' stage in 
       calkit.yaml. Changes made here will be overwritten.
   make-calkit-stages:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      analysis_to_calkit;"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      analysis_to_calkit;\""
     deps:
       - mdocean/analysis/
       - mdocean/inputs/
@@ -87,8 +88,8 @@ stages:
     desc: Automatically generated from the 'make-calkit-stages' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=AllFigCompare; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=AllFigCompare; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -149,8 +150,8 @@ stages:
     desc: Automatically generated from the 'analysis-AllFigCompare' 
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-AllFigCompare:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=AllFigCompare; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=AllFigCompare; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -217,8 +218,8 @@ stages:
     desc: Automatically generated from the 'postpro-AllFigCompare' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Comparison:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Comparison; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Comparison; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Comparison/Comparison.m
@@ -289,8 +290,8 @@ stages:
     desc: Automatically generated from the 'analysis-Comparison' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-Comparison:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Comparison; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Comparison; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Comparison/Comparison.m
@@ -377,8 +378,8 @@ stages:
     desc: Automatically generated from the 'postpro-Comparison' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Constraints:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Constraints; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Constraints; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Constraints/Constraints.m
@@ -439,8 +440,8 @@ stages:
     desc: Automatically generated from the 'analysis-Constraints' 
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-Constraints:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Constraints; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Constraints; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Constraints/Constraints.m
@@ -508,8 +509,8 @@ stages:
     desc: Automatically generated from the 'postpro-Constraints' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Cost:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
-      obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Cost; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Cost/Cost.m
@@ -570,8 +571,8 @@ stages:
     desc: Automatically generated from the 'analysis-Cost' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-Cost:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
-      obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Cost; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Cost/Cost.m
@@ -639,8 +640,8 @@ stages:
     desc: Automatically generated from the 'postpro-Cost' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-DampingPlateStructures:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DampingPlateStructures; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DampingPlateStructures; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
@@ -707,8 +708,8 @@ stages:
       'analysis-DampingPlateStructures' stage in calkit.yaml. Changes 
       made here will be overwritten.
   postpro-DampingPlateStructures:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DampingPlateStructures; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DampingPlateStructures; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
@@ -783,8 +784,8 @@ stages:
       'postpro-DampingPlateStructures' stage in calkit.yaml. Changes 
       made here will be overwritten.
   analysis-DescFcns:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DescFcns; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DescFcns; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -849,8 +850,8 @@ stages:
     desc: Automatically generated from the 'analysis-DescFcns' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-DescFcns:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DescFcns; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DescFcns; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -924,8 +925,8 @@ stages:
     desc: Automatically generated from the 'postpro-DescFcns' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-DesignSpaceExploration:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignSpaceExploration; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DesignSpaceExploration; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
@@ -990,8 +991,8 @@ stages:
       'analysis-DesignSpaceExploration' stage in calkit.yaml. Changes 
       made here will be overwritten.
   postpro-DesignSpaceExploration:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignSpaceExploration; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DesignSpaceExploration; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
@@ -1069,8 +1070,8 @@ stages:
       'postpro-DesignSpaceExploration' stage in calkit.yaml. Changes 
       made here will be overwritten.
   analysis-DesignVars:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignVars; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DesignVars; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -1131,8 +1132,8 @@ stages:
     desc: Automatically generated from the 'analysis-DesignVars' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-DesignVars:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignVars; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DesignVars; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -1200,8 +1201,8 @@ stages:
     desc: Automatically generated from the 'postpro-DesignVars' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-DragIntegral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DragIntegral; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DragIntegral; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1263,8 +1264,8 @@ stages:
     desc: Automatically generated from the 'analysis-DragIntegral' 
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-DragIntegral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DragIntegral; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=DragIntegral; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1339,8 +1340,8 @@ stages:
     desc: Automatically generated from the 'postpro-DragIntegral' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=FitOlaya; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=FitOlaya; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./dev/hydro_coeffs/damping_plate/3b_black.csv
@@ -1419,8 +1420,8 @@ stages:
     desc: Automatically generated from the 'analysis-FitOlaya' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=FitOlaya; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=FitOlaya; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@FitOlaya/FitOlaya.m
@@ -1589,8 +1590,8 @@ stages:
     desc: Automatically generated from the 'postpro-FitOlaya' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ForceSaturationFigFunc; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ForceSaturationFigFunc; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
@@ -1663,8 +1664,8 @@ stages:
       'analysis-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
   postpro-ForceSaturationFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ForceSaturationFigFunc; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ForceSaturationFigFunc; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
@@ -1736,8 +1737,8 @@ stages:
       'postpro-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
   analysis-GradientOptimFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=GradientOptimFigFunc; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=GradientOptimFigFunc; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
@@ -1808,8 +1809,8 @@ stages:
       'analysis-GradientOptimFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
   postpro-GradientOptimFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=GradientOptimFigFunc; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=GradientOptimFigFunc; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
@@ -1903,8 +1904,8 @@ stages:
       'postpro-GradientOptimFigFunc' stage in calkit.yaml. Changes 
       made here will be overwritten.
   analysis-HydroCoeffFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=HydroCoeffFigFunc; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=HydroCoeffFigFunc; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
@@ -1968,8 +1969,8 @@ stages:
       'analysis-HydroCoeffFigFunc' stage in calkit.yaml. Changes made 
       here will be overwritten.
   postpro-HydroCoeffFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=HydroCoeffFigFunc; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=HydroCoeffFigFunc; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
@@ -2037,8 +2038,8 @@ stages:
     desc: Automatically generated from the 'postpro-HydroCoeffFigFunc'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-LocationSensitivity:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=LocationSensitivity; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=LocationSensitivity; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
@@ -2118,8 +2119,8 @@ stages:
       'analysis-LocationSensitivity' stage in calkit.yaml. Changes 
       made here will be overwritten.
   postpro-LocationSensitivity:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=LocationSensitivity; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=LocationSensitivity; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
@@ -2204,8 +2205,8 @@ stages:
       'postpro-LocationSensitivity' stage in calkit.yaml. Changes made
       here will be overwritten.
   analysis-Meem:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
-      obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Meem; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Meem/Meem.m
@@ -2277,8 +2278,8 @@ stages:
     desc: Automatically generated from the 'analysis-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-Meem:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
-      obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Meem; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Meem/Meem.m
@@ -2362,8 +2363,8 @@ stages:
     desc: Automatically generated from the 'postpro-Meem' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Multistart:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Multistart; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Multistart; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Multistart/Multistart.m
@@ -2435,8 +2436,8 @@ stages:
     desc: Automatically generated from the 'analysis-Multistart' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-Multistart:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Multistart; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Multistart; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/SAFE/PAWN/pawn_cdfs.m
@@ -2519,8 +2520,8 @@ stages:
     desc: Automatically generated from the 'postpro-Multistart' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParamSensitivities:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParamSensitivities; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParamSensitivities; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
@@ -2593,8 +2594,8 @@ stages:
       'analysis-ParamSensitivities' stage in calkit.yaml. Changes made
       here will be overwritten.
   postpro-ParamSensitivities:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParamSensitivities; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParamSensitivities; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
@@ -2711,8 +2712,8 @@ stages:
       'postpro-ParamSensitivities' stage in calkit.yaml. Changes made 
       here will be overwritten.
   analysis-Parameters:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Parameters; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Parameters; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Parameters/Parameters.m
@@ -2773,8 +2774,8 @@ stages:
     desc: Automatically generated from the 'analysis-Parameters' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-Parameters:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Parameters; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Parameters; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Parameters/Parameters.m
@@ -2842,8 +2843,8 @@ stages:
     desc: Automatically generated from the 'postpro-Parameters' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoFigFunc; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParetoFigFunc; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -2916,8 +2917,8 @@ stages:
     desc: Automatically generated from the 'analysis-ParetoFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-ParetoFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoFigFunc; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParetoFigFunc; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -2998,8 +2999,8 @@ stages:
     desc: Automatically generated from the 'postpro-ParetoFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoSweep; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParetoSweep; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3060,8 +3061,8 @@ stages:
     desc: Automatically generated from the 'analysis-ParetoSweep' 
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-ParetoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoSweep; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ParetoSweep; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3128,8 +3129,8 @@ stages:
     desc: Automatically generated from the 'postpro-ParetoSweep' stage
       in calkit.yaml. Changes made here will be overwritten.
   analysis-PtoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=PtoSweep; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=PtoSweep; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@PtoSweep/PtoSweep.m
@@ -3190,8 +3191,8 @@ stages:
     desc: Automatically generated from the 'analysis-PtoSweep' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-PtoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=PtoSweep; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=PtoSweep; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@PtoSweep/PtoSweep.m
@@ -3260,8 +3261,8 @@ stages:
     desc: Automatically generated from the 'postpro-PtoSweep' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-ReadNonMatlabFigs:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ReadNonMatlabFigs; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ReadNonMatlabFigs; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
@@ -3323,8 +3324,8 @@ stages:
       'analysis-ReadNonMatlabFigs' stage in calkit.yaml. Changes made 
       here will be overwritten.
   postpro-ReadNonMatlabFigs:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ReadNonMatlabFigs; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=ReadNonMatlabFigs; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - mdocean/plots/non_matlab_figs/img/
@@ -3415,8 +3416,8 @@ stages:
     desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-QPCircles:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=QPCircles; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=QPCircles; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@QPCircles/QPCircles.m
@@ -3479,8 +3480,8 @@ stages:
     desc: Automatically generated from the 'analysis-QPCircles' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-QPCircles:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=QPCircles; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=QPCircles; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@QPCircles/QPCircles.m
@@ -3548,8 +3549,8 @@ stages:
     desc: Automatically generated from the 'postpro-QPCircles' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-RunSingleFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=RunSingleFigFunc; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=RunSingleFigFunc; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
@@ -3632,8 +3633,8 @@ stages:
     desc: Automatically generated from the 'analysis-RunSingleFigFunc'
       stage in calkit.yaml. Changes made here will be overwritten.
   postpro-RunSingleFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=RunSingleFigFunc; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=RunSingleFigFunc; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
@@ -3727,8 +3728,8 @@ stages:
     desc: Automatically generated from the 'postpro-RunSingleFigFunc' 
       stage in calkit.yaml. Changes made here will be overwritten.
   analysis-Runtime:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Runtime; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Runtime; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Runtime/Runtime.m
@@ -3793,8 +3794,8 @@ stages:
     desc: Automatically generated from the 'analysis-Runtime' stage in
       calkit.yaml. Changes made here will be overwritten.
   postpro-Runtime:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Runtime; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Runtime; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Runtime/Runtime.m
@@ -3868,8 +3869,8 @@ stages:
     desc: Automatically generated from the 'postpro-Runtime' stage in 
       calkit.yaml. Changes made here will be overwritten.
   analysis-Slamming:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Slamming; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Slamming; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Slamming/Slamming.m
@@ -3933,8 +3934,8 @@ stages:
     desc: Automatically generated from the 'analysis-Slamming' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-Slamming:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Slamming; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Slamming; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Slamming/Slamming.m
@@ -4002,8 +4003,8 @@ stages:
     desc: Automatically generated from the 'postpro-Slamming' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-SparHydro:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SparHydro; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=SparHydro; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -4066,8 +4067,8 @@ stages:
     desc: Automatically generated from the 'analysis-SparHydro' stage 
       in calkit.yaml. Changes made here will be overwritten.
   postpro-SparHydro:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SparHydro; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=SparHydro; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -4135,8 +4136,8 @@ stages:
     desc: Automatically generated from the 'postpro-SparHydro' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-SweepGeoms:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SweepGeoms; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=SweepGeoms; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
@@ -4207,8 +4208,8 @@ stages:
     desc: Automatically generated from the 'analysis-SweepGeoms' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-SweepGeoms:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SweepGeoms; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=SweepGeoms; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
@@ -4302,8 +4303,8 @@ stages:
     desc: Automatically generated from the 'postpro-SweepGeoms' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Validation; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Validation; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Validation/Validation.m
@@ -4370,8 +4371,8 @@ stages:
     desc: Automatically generated from the 'analysis-Validation' stage
       in calkit.yaml. Changes made here will be overwritten.
   postpro-Validation:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Validation; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Validation; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Validation/Validation.m
@@ -4444,8 +4445,8 @@ stages:
     desc: Automatically generated from the 'postpro-Validation' stage 
       in calkit.yaml. Changes made here will be overwritten.
   analysis-Wecsim:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Wecsim; obj.run_analysis();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Wecsim; obj.run_analysis();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
@@ -4525,8 +4526,8 @@ stages:
     desc: Automatically generated from the 'analysis-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-Wecsim:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Wecsim; obj.run_all_from_load();"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      obj=Wecsim; obj.run_all_from_load();\""
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Wecsim/Wecsim.m
@@ -6224,8 +6225,8 @@ stages:
     desc: Automatically generated from the 'all-postpro' stage in 
       calkit.yaml. Changes made here will be overwritten.
   test-aor:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      addpath('tests'); run_tests('AOR')"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      addpath('tests'); run_tests('AOR')\""
     deps:
       - tests/
       - mdocean/
@@ -6294,8 +6295,8 @@ stages:
     desc: Automatically generated from the 'test-aor' stage in 
       calkit.yaml. Changes made here will be overwritten.
   test-re:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      addpath('tests'); run_tests('RE')"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      addpath('tests'); run_tests('RE')\""
     deps:
       - tests/
       - mdocean/
@@ -7457,8 +7458,8 @@ stages:
     desc: Automatically generated from the 'pyxdsm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-re-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      move_results_to_pubs('RE');"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      move_results_to_pubs('RE');\""
     deps:
       - results/ReadNonMatlabFigs/
       - results/DesignSpaceExploration/
@@ -7482,8 +7483,8 @@ stages:
     desc: Automatically generated from the 'move-re-results' stage in 
       calkit.yaml. Changes made here will be overwritten.
   move-aor-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      move_results_to_pubs('AOR');"
+    cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
+      move_results_to_pubs('AOR');\""
     deps:
       - results/DragIntegral/
       - results/FitOlaya/

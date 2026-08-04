@@ -3,6 +3,18 @@
 ### Changed
 - Dev: manage external MATLAB dependencies (OpenFLASH, WEC-Sim, SAFE) with the [mip](https://mip.sh) package manager instead of git submodules: dependencies are declared in `mip.yaml`, pinned in `mip.lock`, and installed into a project-local `./.mip` environment by `setup_mip` / `mip project sync`
 
+## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
+### Fixed
+- Pipeline: include git-stored notebook outputs under `.calkit/notebooks/` in `dev/dvc_lock_merge.py` merge-driver checkout/add guidance.
+
+## [v1.3.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.4) - 2026-7-30
+### Changed
+- CI: use auto-licensed MATLAB binary from `matlab-actions` workflow steps
+- Docs: add image processing, report generation, and curve fitting toolboxes to readme and `dep_check.m`
+- Pipeline: track test-results and code-coverage outputs as a dvc-zip
+- Pipeline: matlab stages use `shell_command: ./mymatlab` instead of `matlab-command` for actions-conditional behavior
+
+
 ## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
 ### Changed
 - Dev: expand `.github/copilot-instructions.md` with cloud-agent onboarding guidance, targeted Calkit commands, and known error/workaround notes.
