@@ -1,5 +1,7 @@
 # Changelog
 ## Unreleased
+### Changed
+- Dev: manage external MATLAB dependencies (OpenFLASH, WEC-Sim, SAFE) with the [mip](https://mip.sh) package manager instead of git submodules: dependencies are declared in `mip.yaml`, pinned in `mip.lock`, and installed into a project-local `./.mip` environment by `setup_mip` / `mip project sync`
 
 ## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed

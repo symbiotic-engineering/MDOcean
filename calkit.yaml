@@ -85,7 +85,7 @@ pipeline:
     make-drag-integral:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); make_drag_integral"
+      command: mip project run 'add_mdocean_path(); make_drag_integral'
       inputs:
         - ./mdocean/inputs/make_drag_integral.m
         - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
@@ -95,8 +95,7 @@ pipeline:
     make-var-bounds:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); b = var_bounds(); 
-        save('./mdocean/inputs/var_bounds.mat','b');"
+      command: mip project run 'add_mdocean_path(); b = var_bounds(); save(''./mdocean/inputs/var_bounds.mat'',''b'');'
       inputs:
         - ./mdocean/inputs/var_bounds.m
         - ./mdocean/inputs/parameters.m
@@ -108,8 +107,9 @@ pipeline:
     make-calkit-stages:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); analysis_to_calkit;"
+      command: mip project run 'add_mdocean_path(); analysis_to_calkit;'
       inputs:
+        - ./mip.lock
         - mdocean/analysis/
         - mdocean/inputs/
         - mdocean/optimization/multiobjective/
@@ -133,8 +133,8 @@ pipeline:
     analysis-AllFigCompare:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -195,8 +195,8 @@ pipeline:
     postpro-AllFigCompare:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=AllFigCompare; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -263,8 +263,8 @@ pipeline:
     analysis-Comparison:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Comparison; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Comparison; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Comparison/Comparison.m
@@ -335,8 +335,8 @@ pipeline:
     postpro-Comparison:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Comparison; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Comparison; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Comparison
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -421,8 +421,8 @@ pipeline:
     analysis-Constraints:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Constraints; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Constraints; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
@@ -483,8 +483,8 @@ pipeline:
     postpro-Constraints:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Constraints; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Constraints; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Constraints
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -551,8 +551,8 @@ pipeline:
     analysis-Cost:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Cost; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Cost; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Cost/Cost.m
@@ -613,8 +613,8 @@ pipeline:
     postpro-Cost:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Cost; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Cost; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Cost
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -681,8 +681,8 @@ pipeline:
     analysis-DampingPlateStructures:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=DampingPlateStructures; obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=DampingPlateStructures; obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
@@ -748,8 +748,8 @@ pipeline:
     postpro-DampingPlateStructures:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=DampingPlateStructures; obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=DampingPlateStructures; obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-DampingPlateStructures
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -820,8 +820,8 @@ pipeline:
     analysis-DescFcns:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DescFcns; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=DescFcns; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -886,8 +886,8 @@ pipeline:
     postpro-DescFcns:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DescFcns; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=DescFcns; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-DescFcns
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -958,8 +958,8 @@ pipeline:
     analysis-DesignSpaceExploration:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=DesignSpaceExploration; obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=DesignSpaceExploration; obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
@@ -1023,8 +1023,8 @@ pipeline:
     postpro-DesignSpaceExploration:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=DesignSpaceExploration; obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=DesignSpaceExploration; obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-DesignSpaceExploration
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1101,8 +1101,8 @@ pipeline:
     analysis-DesignVars:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DesignVars; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=DesignVars; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -1163,8 +1163,8 @@ pipeline:
     postpro-DesignVars:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DesignVars; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=DesignVars; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-DesignVars
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1231,8 +1231,8 @@ pipeline:
     analysis-DragIntegral:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=DragIntegral; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1294,8 +1294,8 @@ pipeline:
     postpro-DragIntegral:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=DragIntegral; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-DragIntegral
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1370,8 +1370,8 @@ pipeline:
     analysis-FitOlaya:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=FitOlaya; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./dev/hydro_coeffs/damping_plate/3b_black.csv
@@ -1450,8 +1450,8 @@ pipeline:
     postpro-FitOlaya:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=FitOlaya; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-FitOlaya
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1620,8 +1620,8 @@ pipeline:
     analysis-ForceSaturationFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=ForceSaturationFigFunc; obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=ForceSaturationFigFunc; obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
@@ -1693,8 +1693,8 @@ pipeline:
     postpro-ForceSaturationFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
-        obj=ForceSaturationFigFunc; obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); 
+        obj=ForceSaturationFigFunc; obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-ForceSaturationFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1763,8 +1763,8 @@ pipeline:
     analysis-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=GradientOptimFigFunc;
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
@@ -1834,8 +1834,8 @@ pipeline:
     postpro-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=GradientOptimFigFunc;
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1927,8 +1927,8 @@ pipeline:
     analysis-HydroCoeffFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
@@ -1991,8 +1991,8 @@ pipeline:
     postpro-HydroCoeffFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=HydroCoeffFigFunc; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-HydroCoeffFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2059,8 +2059,8 @@ pipeline:
     analysis-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
@@ -2139,8 +2139,8 @@ pipeline:
     postpro-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=LocationSensitivity; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2218,8 +2218,8 @@ pipeline:
     analysis-Meem:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Meem; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Meem; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Meem/Meem.m
@@ -2291,8 +2291,8 @@ pipeline:
     postpro-Meem:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Meem; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Meem; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Meem
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2369,8 +2369,8 @@ pipeline:
     analysis-Multistart:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Multistart; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Multistart; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Multistart/Multistart.m
@@ -2442,8 +2442,8 @@ pipeline:
     postpro-Multistart:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Multistart; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Multistart; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Multistart
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2525,8 +2525,8 @@ pipeline:
     analysis-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
@@ -2598,8 +2598,8 @@ pipeline:
     postpro-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=ParamSensitivities; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2715,8 +2715,8 @@ pipeline:
     analysis-Parameters:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Parameters; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Parameters; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Parameters/Parameters.m
@@ -2777,8 +2777,8 @@ pipeline:
     postpro-Parameters:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Parameters; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Parameters; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Parameters
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2845,8 +2845,8 @@ pipeline:
     analysis-ParetoFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -2919,8 +2919,8 @@ pipeline:
     postpro-ParetoFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=ParetoFigFunc; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-ParetoFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3001,8 +3001,8 @@ pipeline:
     analysis-ParetoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3063,8 +3063,8 @@ pipeline:
     postpro-ParetoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=ParetoSweep; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-ParetoSweep
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3131,8 +3131,8 @@ pipeline:
     analysis-PtoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=PtoSweep; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@PtoSweep/PtoSweep.m
@@ -3193,8 +3193,8 @@ pipeline:
     postpro-PtoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=PtoSweep; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-PtoSweep
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3263,8 +3263,8 @@ pipeline:
     analysis-ReadNonMatlabFigs:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
@@ -3325,8 +3325,8 @@ pipeline:
     postpro-ReadNonMatlabFigs:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=ReadNonMatlabFigs; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3417,8 +3417,8 @@ pipeline:
     analysis-QPCircles:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=QPCircles; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=QPCircles; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@QPCircles/QPCircles.m
@@ -3481,8 +3481,8 @@ pipeline:
     postpro-QPCircles:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=QPCircles; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=QPCircles; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-QPCircles
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3549,8 +3549,8 @@ pipeline:
     analysis-RunSingleFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
@@ -3633,8 +3633,8 @@ pipeline:
     postpro-RunSingleFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=RunSingleFigFunc; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-RunSingleFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3720,8 +3720,8 @@ pipeline:
     analysis-Runtime:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Runtime; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Runtime; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Runtime/Runtime.m
@@ -3786,8 +3786,8 @@ pipeline:
     postpro-Runtime:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Runtime; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Runtime; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Runtime
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3861,8 +3861,8 @@ pipeline:
     analysis-Slamming:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Slamming; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Slamming; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Slamming/Slamming.m
@@ -3926,8 +3926,8 @@ pipeline:
     postpro-Slamming:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Slamming; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Slamming; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Slamming
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3994,8 +3994,8 @@ pipeline:
     analysis-SparHydro:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SparHydro; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=SparHydro; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -4058,8 +4058,8 @@ pipeline:
     postpro-SparHydro:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SparHydro; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=SparHydro; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-SparHydro
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4126,8 +4126,8 @@ pipeline:
     analysis-SweepGeoms:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=SweepGeoms; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
@@ -4198,8 +4198,8 @@ pipeline:
     postpro-SweepGeoms:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=SweepGeoms; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-SweepGeoms
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4293,8 +4293,8 @@ pipeline:
     analysis-Validation:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Validation; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Validation; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Validation/Validation.m
@@ -4361,8 +4361,8 @@ pipeline:
     postpro-Validation:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Validation; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Validation; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Validation
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4433,8 +4433,8 @@ pipeline:
     analysis-Wecsim:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Wecsim; 
-        obj.run_analysis();"
+      command: mip project run 'add_mdocean_path(); obj=Wecsim; 
+        obj.run_analysis();'
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
@@ -4514,8 +4514,8 @@ pipeline:
     postpro-Wecsim:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Wecsim; 
-        obj.run_all_from_load();"
+      command: mip project run 'add_mdocean_path(); obj=Wecsim; 
+        obj.run_all_from_load();'
       inputs:
         - from_stage_outputs: analysis-Wecsim
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -5009,9 +5009,9 @@ pipeline:
     test-aor:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
-        run_tests('AOR')"
+      command: mip project run 'add_mdocean_path(); addpath(''tests''); run_tests(''AOR'')'
       inputs:
+        - ./mip.lock
         - from_stage_outputs: analysis-Comparison
         - from_stage_outputs: analysis-Cost
         - from_stage_outputs: analysis-DampingPlateStructures
@@ -5038,9 +5038,9 @@ pipeline:
     test-re:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
-        run_tests('RE')"
+      command: mip project run 'add_mdocean_path(); addpath(''tests''); run_tests(''RE'')'
       inputs:
+        - ./mip.lock
         - from_stage_outputs: analysis-AllFigCompare
         - from_stage_outputs: analysis-Comparison
         - from_stage_outputs: analysis-Constraints
@@ -5364,8 +5364,7 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); 
-        move_results_to_pubs('RE');"
+      command: mip project run 'add_mdocean_path(); move_results_to_pubs(''RE'');'
     move-aor-results:
       kind: shell-command
       environment: _system
@@ -5396,8 +5395,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); 
-        move_results_to_pubs('AOR');"
+      command: mip project run 'add_mdocean_path(); move_results_to_pubs(''AOR'');'
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
@@ -5566,21 +5564,18 @@ pipeline:
         - src: pubs/shared/references.bib
           dest: pubs/UMERC-2025-grid-value/references.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        # zotero-meem-refs.bib is vendored from OpenFLASH pubs/JFM
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
           kind: file-to-file
                 #
-        - src: 
-            mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - src: pubs/shared/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
         # bib style file
