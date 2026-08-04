@@ -64,7 +64,8 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
       - name: Install Calkit
-        run: uv tool install --upgrade calkit-python
+        run: uv tool install git+https://github.com/calkit/calkit.git@rmccabe-dvc-pull-subproject
+        #run: uv tool install --upgrade calkit-python
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
       - name: Set up Python
@@ -105,6 +106,10 @@ jobs:
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
+      - Run calkit subproject
+        uses: calkit/run-action@v2
+        with:
+
       - name: Generate calkit_stages.yaml
         uses: lntutor/run-action@fix/pull-subprojects
         with:
