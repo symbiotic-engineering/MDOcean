@@ -1,4 +1,143 @@
 stages:
+  OpenFLASH:
+    cmd: calkit dvc repro
+    wdir: mdocean/simulation/modules/OpenFLASH
+    always_changed: true
+    deps:
+      - .calkit/env-locks/openflash-on-branch
+      - .calkit/env-locks/openflash-on-main
+      - .calkit/env-locks/tex
+      - .calkit/notebooks/cleaned/analysis/convergence-results.ipynb
+      - .calkit/notebooks/cleaned/analysis/low_m0_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/slant_data_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/sparsity_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/timing_plots.ipynb
+      - .calkit/notebooks/cleaned/analysis/validation_with_capytaine_plots.ipynb
+      - analysis/data/potential-slants.pkl
+      - analysis/data/slants.pkl
+      - analysis/data/slope-slants.pkl
+      - analysis/data/timing.pkl
+      - analysis/sea-lab-utils
+      - calkit.yaml
+      - dev/python/limiting-cases/low_m0.py
+      - package/src
+      - pubs/JFM/FLMguide.tex
+      - pubs/JFM/JFM-FLM_Au.cls
+      - pubs/JFM/becca-zotero-refs.bib
+      - pubs/JFM/figs/graph_abstract.tex
+      - pubs/JFM/jfm-appendix.tex
+      - pubs/JFM/jfm.bib
+      - pubs/JFM/jfm.bst
+      - pubs/JFM/lineno-FLM.sty
+      - pubs/JFM/zotero-meem-refs.bib
+    outs:
+      - .calkit/notebooks/executed/analysis/convergence-results.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/low_m0_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/slant_data_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/sparsity_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/timing_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/executed/analysis/validation_with_capytaine_plots.ipynb:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/convergence-results.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/low_m0_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/slant_data_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/sparsity_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/timing_plots.html:
+          cache: false
+          persist: true
+      - .calkit/notebooks/html/analysis/validation_with_capytaine_plots.html:
+          cache: false
+          persist: true
+      - pubs/JFM/FLMguide.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/A_sparsity_plot.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Along-Outline.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/B_sparsity_plot.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/C_sparsity_plot.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Cross-Section-Potential-Slant.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Slant-Freq.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Speed-Comparison.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-CPT-Time-Matrix-Comparison.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-Comp-Distribution.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM-Low-Freq.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/MEEM_vs_Capytaine_Nonslant_Validation.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/Vary-Slopes.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/alpha-beta-explanation.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/alpha-beta-to-trend.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/convergence-fit-assessment.pdf:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/graph_abstract.log:
+          cache: false
+          persist: true
+      - pubs/JFM/figs/graph_abstract.pdf:
+          cache: false
+          persist: true
+    desc: Automatically generated wrapper for subproject 
+      'mdocean/simulation/modules/OpenFLASH'. Changes made here will 
+      be overwritten.
+  svg2pdf:
+    cmd: calkit xenv -n inkscape --no-check -- inkscape 
+      ${item.name}.svg --export-type=pdf 
+      --export-filename=${item.name}.pdf
+    deps:
+      - ./${item.name}.svg
+      - .calkit/env-locks/inkscape
+    outs:
+      - ./${item.name}.pdf
+    matrix:
+      name:
+        - pubs/dissertation/images/neurodiversity_image
+    desc: Automatically generated from the 'svg2pdf' stage in 
+      calkit.yaml. Changes made here will be overwritten.
   mermaid-make-pdfs:
     cmd: calkit xenv -n mermaid --no-check -- -i 
       mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
@@ -80,7 +219,17 @@ stages:
       - mdocean/plots/fig_tab_pub_mapping.m
       - mdocean/plots/get_fig_tab_names.m
       - mdocean/plots/move_results_to_pubs.m
-      - mdocean/simulation/
+      - mdocean/simulation/modules/dynamics/
+      - mdocean/simulation/modules/econ/
+      - mdocean/simulation/modules/enviro.m
+      - mdocean/simulation/modules/geometry.m
+      - mdocean/simulation/modules/grid_CEM.m
+      - mdocean/simulation/modules/hydro/
+      - mdocean/simulation/modules/lin_ineq_constraints.m
+      - mdocean/simulation/modules/structures/
+      - mdocean/simulation/run/
+      - mdocean/simulation/sim_catch_warning.m
+      - mdocean/simulation/simulation.m
     outs:
       - calkit_stages.yaml:
           cache: false
@@ -5001,6 +5150,18 @@ stages:
       - results/Wecsim/end.json:
           cache: false
           persist: false
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     desc: Automatically generated from the 'postpro-Wecsim' stage in 
       calkit.yaml. Changes made here will be overwritten.
   postpro-WithTables:
@@ -5456,6 +5617,18 @@ stages:
       - results/Wecsim/WECSim_errors.tex
       - results/Wecsim/end.mat
       - results/Wecsim/end.json
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     outs: []
     desc: Automatically generated from the 'postpro-WithTables' stage 
       in calkit.yaml. Changes made here will be overwritten.
@@ -6244,6 +6417,18 @@ stages:
       - results/Wecsim/WECSim_errors.tex
       - results/Wecsim/end.mat
       - results/Wecsim/end.json
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     outs: []
     desc: Automatically generated from the 'all-postpro' stage in 
       calkit.yaml. Changes made here will be overwritten.
@@ -6252,7 +6437,23 @@ stages:
       addpath('tests'); run_tests('AOR')\""
     deps:
       - tests/
-      - mdocean/
+      - mdocean/SAFE/
+      - mdocean/__version__.py
+      - mdocean/analysis/
+      - mdocean/inputs/
+      - mdocean/optimization/
+      - mdocean/plots/
+      - mdocean/simulation/modules/dynamics/
+      - mdocean/simulation/modules/econ/
+      - mdocean/simulation/modules/enviro.m
+      - mdocean/simulation/modules/geometry.m
+      - mdocean/simulation/modules/grid_CEM.m
+      - mdocean/simulation/modules/hydro/
+      - mdocean/simulation/modules/lin_ineq_constraints.m
+      - mdocean/simulation/modules/structures/
+      - mdocean/simulation/run/
+      - mdocean/simulation/sim_catch_warning.m
+      - mdocean/simulation/simulation.m
       - results/Comparison/intermed.mat
       - results/Cost/intermed.mat
       - results/DampingPlateStructures/intermed.mat
@@ -6322,7 +6523,23 @@ stages:
       addpath('tests'); run_tests('RE')\""
     deps:
       - tests/
-      - mdocean/
+      - mdocean/SAFE/
+      - mdocean/__version__.py
+      - mdocean/analysis/
+      - mdocean/inputs/
+      - mdocean/optimization/
+      - mdocean/plots/
+      - mdocean/simulation/modules/dynamics/
+      - mdocean/simulation/modules/econ/
+      - mdocean/simulation/modules/enviro.m
+      - mdocean/simulation/modules/geometry.m
+      - mdocean/simulation/modules/grid_CEM.m
+      - mdocean/simulation/modules/hydro/
+      - mdocean/simulation/modules/lin_ineq_constraints.m
+      - mdocean/simulation/modules/structures/
+      - mdocean/simulation/run/
+      - mdocean/simulation/sim_catch_warning.m
+      - mdocean/simulation/simulation.m
       - results/AllFigCompare/intermed.mat
       - results/Comparison/intermed.mat
       - results/Constraints/intermed.mat
@@ -7460,6 +7677,18 @@ stages:
       - results/Wecsim/WECSim_errors.tex
       - results/Wecsim/end.mat
       - results/Wecsim/end.json
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+      - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Wecsim.ipynb:
           cache: false
@@ -7538,28 +7767,33 @@ stages:
     desc: Automatically generated from the 'move-aor-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   aor-results-to-latex:
-    cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
+    cmd: "calkit latex from-json 'pubs/applied-ocean-research-model/numbers.json'
+      'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
       'results/Runtime/end.json' 'results/SweepGeoms/end.json' 'results/PtoSweep/end.json'
       'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
       --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
       $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
       MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
-      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
-      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\"\
-      : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
-      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
-      : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
-      : \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"powerScaleFactor\": \"\
-      {powerScaleFactor:.2f}\", \"forceScaleFactor\": \"{forceScaleFactor:.2f}\"\
-      , \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"ptoSweepMinLCOE_F_max\"\
-      : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
-      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
-      : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
-      : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
-      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"\
-      }'"
+      MN\", \"heaveForceNominal\": \"{heaveForceNominal/1e6:.0f} MN\", \"\
+      simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
+      ms\", \"meemSweepTime\": \"{geom_sweep_analysis_time/60:.0f} minutes\"\
+      , \"meemSweepTimePerCombo\": \"{geom_sweep_analysis_time/n_combos*1000:.0f}
+      ms\", \"simRuntimeOld\": \"{simRuntimeOldSeconds*1000:.0f} ms\", \"\
+      multiplierOldRuntime\": \"{simRuntime/simRuntimeOldSeconds:.0f}\"\
+      , \"pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\"\
+      : \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\"\
+      , \"wecsimAvgPowerErrorBestCase\": \"{wecsimAvgPowerErrorBestCase:.2f}%\"\
+      , \"wecsimAvgPowerErrorWorstCase\": \"{wecsimAvgPowerErrorWorstCase:.2f}%\"\
+      , \"powerScaleFactor\": \"{powerScaleFactor:.2f}\", \"forceScaleFactor\"\
+      : \"{forceScaleFactor:.2f}\", \"massScaleFactor\": \"{massScaleFactor:.2f}\"\
+      , \"ptoSweepMinLCOE_F_max\": \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\"\
+      , \"ptoSweepMinLCOE_P_max\": \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\"\
+      , \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f} kW\"\
+      , \"ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\"\
+      , \"ptoSweepMinLCOE_LCOE\": \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\",
+      \"meemSweepSize\": \"{n_combos}\"}'"
     deps:
+      - pubs/applied-ocean-research-model/numbers.json
       - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
       - results/Runtime/end.json
@@ -7654,6 +7888,18 @@ stages:
           persist: false
     desc: Automatically generated from the 're-results-to-latex' stage
       in calkit.yaml. Changes made here will be overwritten.
+  copy-dissertation-only-figs:
+    cmd: calkit map-paths --file-to-file 
+      'results/SparHydro/spar_added_mass.pdf->pubs/dissertation/figs/from-matlab/spar_added_mass.pdf'
+    deps:
+      - results/SparHydro/spar_added_mass.pdf
+    outs:
+      - pubs/dissertation/figs/from-matlab/spar_added_mass.pdf:
+          cache: false
+          persist: true
+    desc: Automatically generated from the 
+      'copy-dissertation-only-figs' stage in calkit.yaml. Changes made
+      here will be overwritten.
   copy-shared-latex:
     cmd: calkit map-paths --file-to-file 
       'pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib'
@@ -7968,9 +8214,11 @@ stages:
       - pubs/renewable-energy-mdo/commands-re.tex
       - pubs/renewable-energy-mdo/content-re.tex
       - pubs/UMERC-2025-grid-value/
-      - pubs/shared/references.bib
-      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
-      - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+      - pubs/dissertation/figs/
+      - pubs/dissertation/images/
+      - pubs/dissertation/references.bib
+      - pubs/dissertation/dissertation-conclusion.tex
+      - pubs/dissertation/dynamic-toc-depth.tex
       - pubs/shared/shared-pkg.tex
       - pubs/shared/table-column-specs.tex
       - pubs/shared/figure-widths.tex
@@ -7987,7 +8235,7 @@ stages:
           cache: false
           persist: false
       - pubs/dissertation/aux/:
-          cache: false
+          cache: true
           persist: true
     desc: Automatically generated from the 'build-dissertation' stage 
       in calkit.yaml. Changes made here will be overwritten.

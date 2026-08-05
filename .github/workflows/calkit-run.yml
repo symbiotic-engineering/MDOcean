@@ -63,8 +63,13 @@ jobs:
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
+      - name: Install node.js (required for uv builds of calkit)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Install Calkit
-        run: uv tool install --upgrade calkit-python
+        run: uv tool install git+https://github.com/calkit/calkit.git@rmccabe-dvc-pull-warn
+        #run: uv tool install --upgrade calkit-python
       - name: Setup jq
         uses: dcarbone/install-jq-action@v3
       - name: Set up Python
@@ -106,7 +111,7 @@ jobs:
       #     curl -v --max-time 5 telnet://${{ env.MLM_LICENSE_FILE }}
       #   if: always()
       - name: Generate calkit_stages.yaml
-        uses: calkit/run-action@v2
+        uses: lntutor/run-action@fix/pull-subprojects
         with:
           dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
           run_args: make-calkit-stages
@@ -121,9 +126,7 @@ jobs:
         continue-on-error: true
         uses: calkit/run-action@v2
         with:
-          dvc_token: ${{ secrets.CALKIT_DVC_TOKEN }}
-          # render-quarto-pdf
-          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz test-aor test-re check-dup-json-keys
+          run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation test-aor test-re 
           pull_dvc: false
           save: false
           cache_dvc: false
@@ -159,6 +162,7 @@ jobs:
           echo "Errors from latex:"
           grep -E "^!" pubs/applied-ocean-research-model/aux/main.log || true
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
+          grep -E "^!" pubs/dissertation/aux/sampleThesis.log || true
 
       - name: Publish code coverage to codecov
         uses: codecov/codecov-action@v5

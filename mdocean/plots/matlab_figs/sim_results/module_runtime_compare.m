@@ -79,7 +79,7 @@ function [figs, ...
     % determine line numbers
     meem_filename = 'A_b_c_matrix_N10_M10_K10_heaving_outer';
     bessel_lines     = findStringInFile(meem_filename, 'bessel');
-    unpack_lines     = findStringInFile(meem_filename, 'ct{:}');
+    unpack_lines     = findStringInFile(meem_filename, 'ct{');
     dispersion_lines = findStringInFile('run_MEEM','m_k_h_deg = fzero(eqn, bounds)');
     lin_solve_lines  = findStringInFile('run_MEEM','A_num\b_num');
 

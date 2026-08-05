@@ -56,6 +56,12 @@
 \input{glossary-acronyms.tex}
 \makeglossaries
 
+% for changing table of contents depth dynamically
+\usepackage{tocvsec2}
+\usepackage[user,abspage]{zref}
+\usepackage{etoolbox}
+\input{dynamic-toc-depth.tex}
+
 % appendices after each chapter
 \newcommand{\appendixchapter}[1]{%
   \chapter*{#1}
@@ -119,6 +125,7 @@
 %\bibliographystyle{IEEEbib}
 
 \newcommand{\DISSERTATION}{} % used for dissertation-specific formatting in shared files
+%\newcommand{\DECIDER}{} % comment out to remove decider
 
 \renewcommand{\caption}[1]{\singlespacing\hangcaption{#1}\normalspacing}
 \renewcommand{\topfraction}{0.85}
@@ -135,7 +142,7 @@
 
 \begin{document}
 \bibliographystyle{plainnat}
-\nobibliography{references,jfm,zotero-meem-refs}
+\nobibliography{references,jfm,zotero-meem-refs} % required to use bibentry inline full citation
 
 \makeatletter
 \def\bibliography#1{%
@@ -149,7 +156,7 @@
 \input{abstract.tex}
 
 \begin{biosketch}
-Becca is a 5th-year Ph.D. candidate in Mechanical Engineering interested in the design of renewable energy systems.
+Becca is a Ph.D. candidate in Mechanical Engineering interested in the design of complex systems.
 She enjoys solving integrated mechanical, electromagnetic, fluid, and controls problems through simulation, systems design, and prototyping.
 Her PhD research at Cornell's Symbiotic Engineering and Analysis Lab with Prof. Maha Haji involves 
 optimizing ocean wave energy toward economic viability and reduced carbon emissions. 
@@ -158,6 +165,20 @@ During her PhD, she completed three half-marathons and founded and led two stude
 GAIA (Global Action Impact Association) and SNAC (Student Neurodiversity Alliance at Cornell).
 Becca graduated from MIT in 2021 with a B.S. in Mechanical Engineering. 
 At MIT, she focused on electric vehicles, writing her bachelor's thesis on electric motor optimization for Formula SAE cars. 
+\begin{figure}[hb]
+  \centering
+  \hfill
+\begin{subfigure}[r]{0.465\textwidth}
+  \centering
+  \includegraphics[width=\textwidth,angle=-90]{images/grad_pic.jpeg}
+\end{subfigure}
+\hfill
+\begin{subfigure}[r]{0.525\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{images/defense_photo_edited.jpg}
+\end{subfigure}
+\hfill
+\end{figure}
 \end{biosketch}
 
 \begin{dedication}
@@ -165,13 +186,19 @@ This dissertation is dedicated to my neurokin:
 all neurodivergent people across space, time, and context.
 Thinking differently is a gift.
 Let's make sure the world knows it.
+\vspace{1.5in}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.35\columnwidth]{images/neurodiversity_image.pdf}
+\caption*{\footnotesize{Image in the Public Domain, CC0}}
+\end{figure}
 \end{dedication}
 
 \begin{acknowledgements}
 \input{acknowledgements.tex}
 \end{acknowledgements}
 
-\setcounter{tocdepth}{1}
+\settocdepth{section}
 \contentspage
 \tablelistpage
 \figurelistpage
@@ -285,37 +312,43 @@ See \cref{sec:research-outputs} for other research outputs associated with this 
 
 \appendixchapter{Design Optimization Appendices}
 \begin{subappendices}
-  \subimport{../renewable-energy-mdo/sections}{other-appendices}
+  \subimport{../renewable-energy-mdo/}{sections/other-appendices}
 \end{subappendices}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
-\large
-A Paradigm for Grid-Informed Design Optimization\\[-4ex] 
-to Maximize System Economic and Environmental Value}
-\label{ch:grid-value}
+\ifdefined\DECIDER
+  \chapter[Grid Impact Synthesis]{Grid Impact Synthesis\\
+  \large
+  A Paradigm for Grid-Informed Design Optimization\\[-4ex] 
+  to Maximize System Economic and Environmental Value}
+  \label{ch:grid-value}
 
-\epigraph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
-{Greta Thunberg, 2019 \citep{thunberg_speech_2019}}
+  \epigraph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
+  {Greta Thunberg, 2019 \citep{thunberg_speech_2019}}
 
-This chapter is currently unpublished.
-See \cref{sec:research-outputs} for research outputs associated with this work.
+  This chapter is currently unpublished.
+  See \cref{sec:research-outputs} for research outputs associated with this work.
 
-\clearpage
-\subimport{../UMERC-2025-grid-value/}{content-grid}
+  \clearpage
+  \subimport{../UMERC-2025-grid-value/}{content-grid}
+  %\input{grid.tex}
 
-\appendixchapter{Grid Impact Synthesis Appendices}
-\begin{subappendices}
-  \section{Reduced order model details}
-  \subimport{../UMERC-2025-grid-value/}{appendix-grid}
-\end{subappendices}
+  \appendixchapter{Grid Impact Synthesis Appendices}
+  \begin{subappendices}
+    \section{Reduced Order Model Details}
+    \subimport{../UMERC-2025-grid-value/}{appendix-grid}
+  \end{subappendices}
+\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
-\hl{A conclusion will be written here}.
-% \chapter{Vision for the Future of Wave Energy Optimization}
-% - extend to other architectures and more complex models (already written in modeling paper)
-% - integrate with wecopttool and wecsim
+\ifdefined\DECIDER
+\else
+  \epigraph{We should no longer measure our wealth and success in the graph that shows economic growth, but in the curve that shows the emissions of greenhouse gases.}
+  {Greta Thunberg, 2019 \citep{thunberg_speech_2019}}
+  \clearpage
+\fi
+\input{dissertation-conclusion.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

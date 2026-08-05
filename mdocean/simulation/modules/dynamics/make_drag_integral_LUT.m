@@ -56,33 +56,43 @@ function [B,G_real,G_imag] = drag_LUT_or_analytical_or_compute(R,TH,K,LUT_fcn)
 
     % r -> Inf
     idx_r_inf = isinf(R) & K ~= 0;
-    B(idx_r_inf) = 0;
-    G_r_inf = pi * besselj(1,K(idx_r_inf)*(1i-1)) ./ (K(idx_r_inf)*(1i-1));
-    G_imag(idx_r_inf) = imag(G_r_inf);
-    G_real(idx_r_inf) = real(G_r_inf);
+    if any(idx_r_inf(:))
+        B(idx_r_inf) = 0;
+        G_r_inf = pi * besselj(1,K(idx_r_inf)*(1i-1)) ./ (K(idx_r_inf)*(1i-1));
+        G_imag(idx_r_inf) = imag(G_r_inf);
+        G_real(idx_r_inf) = real(G_r_inf);
+    end
 
     idx_r_inf_k_zero = isinf(R) & K == 0;
-    B(idx_r_inf_k_zero) = 0;
-    G_imag(idx_r_inf_k_zero) = 0;
-    G_real(idx_r_inf_k_zero) = pi/2;
+    if any(idx_r_inf_k_zero(:))
+        B(idx_r_inf_k_zero) = 0;
+        G_imag(idx_r_inf_k_zero) = 0;
+        G_real(idx_r_inf_k_zero) = pi/2;
+    end
 
     % r -> 0
     idx_r_zero = R == 0 & K ~= 0;
-    B(idx_r_zero) = pi/2;
-    G_imag(idx_r_zero) = 0;
-    G_real(idx_r_zero) = pi * besselj(1,K(idx_r_zero)) ./ (K(idx_r_zero));
+    if any(idx_r_zero(:))
+        B(idx_r_zero) = pi/2;
+        G_imag(idx_r_zero) = 0;
+        G_real(idx_r_zero) = pi * besselj(1,K(idx_r_zero)) ./ (K(idx_r_zero));
+    end
 
     idx_r_zero_k_zero = R == 0 & K == 0;
-    B(idx_r_zero_k_zero) = pi/2;
-    G_imag(idx_r_zero_k_zero) = 0;
-    G_real(idx_r_zero_k_zero) = pi/2;
+    if any(idx_r_zero_k_zero(:))
+        B(idx_r_zero_k_zero) = pi/2;
+        G_imag(idx_r_zero_k_zero) = 0;
+        G_real(idx_r_zero_k_zero) = pi/2;
+    end
 
     % k -> 0
     idx_k_zero = K == 0 & ~isinf(R) & R ~= 0;
-    k_zero_const_term = pi/2 * sqrt(1 + R(idx_k_zero).^2 - 2*R(idx_k_zero).*sin(TH(idx_k_zero)));
-    B(idx_k_zero) = k_zero_const_term;
-    G_imag(idx_k_zero) = 0;
-    G_real(idx_k_zero) = k_zero_const_term;
+    if any(idx_k_zero(:))
+        k_zero_const_term = pi/2 * sqrt(1 + R(idx_k_zero).^2 - 2*R(idx_k_zero).*sin(TH(idx_k_zero)));
+        B(idx_k_zero) = k_zero_const_term;
+        G_imag(idx_k_zero) = 0;
+        G_real(idx_k_zero) = k_zero_const_term;
+    end
 
 
     % then use LUT everywhere else (queries outside the LUT will return NaN)
@@ -109,7 +119,8 @@ end
 function out = wrapToPiOver2(angle)
 
     wrapped = wrapToPi(angle);
-    out = sign(wrapped) .* min( abs(wrapped), pi - abs(wrapped));
+    abs_w = abs(wrapped);
+    out = sign(wrapped) .* min(abs_w, pi - abs_w);
 end
 
 function F = myinterpFcn(X,Y,Z,V)

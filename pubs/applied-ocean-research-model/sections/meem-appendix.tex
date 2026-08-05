@@ -34,45 +34,240 @@ Boundary conditions dictate $\gls{sym-phi-p}$ and the eigenfunctions for $\gls{s
 By construction, this potential obeys all boundary conditions except for zero radial velocity on radial body surfaces.
 The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of \Cref{sec:appendix-meem-matching}.
 
+\newcommand{\dispersion}{
+    \begin{cases}
+        \gls{sym-m-0}\tanh(\gls{sym-m-0}\gls{sym-h})
+            =\gls{sym-omega}^{2}/\gls{sym-g},
+            & \gls{sym-k-index}=0,\\
+        \gls{sym-m-k}\tan(\gls{sym-m-k}\gls{sym-h})
+            =-\gls{sym-omega}^{2}/\gls{sym-g},
+            & \gls{sym-k-index}\geq 1
+    \end{cases}
+}
+
 \begin{table}[htbp]
     \centering
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:meem-eigenfunctions}}
     }
-         Region&  $i1$&  $i2$& $e$\\ \hline
-         Homog. potential $\gls{sym-phi-h}(\gls{sym-r},\gls{sym-z})$&  $\displaystyle\sum_{\gls{sym-n}} \gls{sym-C-1n-i1} \gls{sym-R-1n-i1}(\gls{sym-r}) \gls{sym-Z-n-i1}(\gls{sym-z})$&  $\displaystyle\sum_{\gls{sym-m}} \left(\gls{sym-C-1m-i2} \gls{sym-R-1m-i2}(\gls{sym-r}) + \gls{sym-C-2m-i2} \gls{sym-R-2m-i2}(\gls{sym-r}) \right) \gls{sym-Z-m-i2}(\gls{sym-z})$& $\displaystyle\sum_{\gls{sym-k-index}} \gls{sym-B-k-e} \gls{sym-Lambda-k}(\gls{sym-r}) \gls{sym-Z-k-e}(\gls{sym-z})$\\ \hline
-         Partic. potential $\gls{sym-phi-p}(\gls{sym-r},\gls{sym-z})$&  $\displaystyle\frac{1}{2(\gls{sym-h}-\gls{sym-d-1})}\left[ (\gls{sym-z}+\gls{sym-h})^2 - \frac{\gls{sym-r}^2}{2}\right] $&  $\displaystyle\frac{1}{2(\gls{sym-h}-\gls{sym-d-2})}\left[ (\gls{sym-z}+\gls{sym-h})^2 - \frac{\gls{sym-r}^2}{2}\right]$& $0$\\ \hline
-         Radial eigen-function $\gls{sym-R}(\gls{sym-r})$&  $\gls{sym-R-1n-i1}(\gls{sym-r}) = \begin{cases}
-            \frac{1}{2} &  \gls{sym-n}=0 \\[1em]   %%% <--- here
-            \frac{\gls{sym-mathrm-I-0}(\gls{sym-lambda}_{\gls{sym-n}}^{i1}\gls{sym-r})}{\gls{sym-mathrm-I-0}(\gls{sym-lambda}_{\gls{sym-n}}^{i1}\gls{sym-a}_{2})} & \gls{sym-n} \ge 1
-        \end{cases} $&  \shortstack{$\gls{sym-R-1m-i2}(\gls{sym-r}) = \begin{cases}
-            \frac{1}{2} &  \gls{sym-m}=0 \\[1em]   %%% <--- here
-            \frac{\gls{sym-mathrm-I-0}(\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-r})}{\gls{sym-mathrm-I-0}(\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-a}_{2})} & \gls{sym-m} \ge 1
-        \end{cases}$   \\ $\gls{sym-R-2m-i2}(\gls{sym-r}) = \begin{cases}
-           \frac{1}{2}\ln(\frac{\gls{sym-r}}{\gls{sym-a-2}}) &  \gls{sym-m} = 0 \\
-        \frac{\gls{sym-mathrm-K-0}(\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-r})}{\gls{sym-mathrm-K-0}(\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-a}_{2})} & \gls{sym-m} \ge 1
-        \end{cases}$}& $\gls{sym-Lambda-k}(\gls{sym-r}) = \begin{cases}
-           \frac{\mathrm{\gls{sym-H}}_0^{1}(\gls{sym-m}_0r)}{\mathrm{\gls{sym-H}}_0^{1}(\gls{sym-m}_0a_2)} & \gls{sym-k-index} = 0 \\[1em]
-          \frac{\gls{sym-mathrm-K-0}(\gls{sym-m}_kr)}{\gls{sym-mathrm-K-0}(\gls{sym-m}_ka_2)} &  \gls{sym-k-index} \ge 1
-        \end{cases}$\\ \hline
- Vertical eigen-function $\gls{sym-Z}(\gls{sym-z})$& $\gls{sym-Z-n-i1}(\gls{sym-z}) = \begin{cases}
-           1 & \gls{sym-n}=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\gls{sym-lambda}_{\gls{sym-n}}^{i1}(\gls{sym-z}+\gls{sym-h})) & \gls{sym-n} \ge 1
-        \end{cases}$& $\gls{sym-Z-m-i2}(\gls{sym-z}) = \begin{cases}
-           1 & \gls{sym-m}=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\gls{sym-lambda}_{\gls{sym-m}}^{i2}(\gls{sym-z}+\gls{sym-h})) & \gls{sym-m} \ge 1
-        \end{cases}$&$    \gls{sym-Z}^{e}_{\gls{sym-k-index}}(\gls{sym-z}) = \begin{cases}
-           \gls{sym-N-0}^{-\frac{1}{2}}\cosh( \gls{sym-m-0}(\gls{sym-z}+\gls{sym-h})) &  \gls{sym-k-index}=0 \\[1em]   %%% <--- here
-           \gls{sym-N-k}^{-\frac{1}{2}}\cos( \gls{sym-m-k}(\gls{sym-z}+\gls{sym-h})) &  \gls{sym-k-index} \ge 1
-        \end{cases}$\\ \hline
- Eigen-value& $\displaystyle \gls{sym-lambda-n-i1} = \frac{n\gls{sym-pi}}{\gls{sym-h}-d_{1}},  \gls{sym-n} \geq 1$& $\displaystyle \gls{sym-lambda-m-i2} = \frac{m\gls{sym-pi}}{\gls{sym-h}-d_{2}}, \gls{sym-m} \geq 1$&
- $\displaystyle \begin{cases} \gls{sym-m-0} \tanh(\gls{sym-m}_0h)= \gls{sym-omega}^2/\gls{sym-g}, & \gls{sym-k-index}=0 \\ \gls{sym-m-k} \tan(\gls{sym-m}_kh) = -\gls{sym-omega}^2/\gls{sym-g}, & \gls{sym-k-index} \geq 1\\ \end{cases} $\\\hline
+    \hline 
+    Region
+        &
+        $i1$
+        &
+        $i2$
+        &
+        $e$
+        \\
+        \hline 
+    Homog. potential $\gls{sym-phi-h}(\gls{sym-r},\gls{sym-z})$
+        &
+        $\displaystyle\sum_{\gls{sym-n}}
+            \gls{sym-C-1n-i1}
+            \gls{sym-R-1n-i1}(\gls{sym-r})
+            \gls{sym-Z-n-i1}(\gls{sym-z})$
+        &
+        $\displaystyle\sum_{\gls{sym-m}}\left(
+            \gls{sym-C-1m-i2}\,
+            \gls{sym-R-1m-i2}(\gls{sym-r})
+            +
+            \gls{sym-C-2m-i2}\,
+            \gls{sym-R-2m-i2}(\gls{sym-r})
+        \right)
+        \times~
+        \gls{sym-Z-m-i2}(\gls{sym-z})$
+        &
+        $\displaystyle\sum_{\gls{sym-k-index}}
+            \gls{sym-B-k-e}
+            \gls{sym-Lambda-k}(\gls{sym-r})
+            \gls{sym-Z-k-e}(\gls{sym-z})$
+    Partic. potential $\gls{sym-phi-p}(\gls{sym-r},\gls{sym-z})$
+        &
+        $\displaystyle
+        \frac{1}{2(\gls{sym-h}-\gls{sym-d-1})}
+        \left[
+            (\gls{sym-z}+\gls{sym-h})^2
+            -
+            \frac{\gls{sym-r}^2}{2}
+        \right]$
+        &
+        $\displaystyle
+        \frac{1}{2(\gls{sym-h}-\gls{sym-d-2})}
+        \left[
+            (\gls{sym-z}+\gls{sym-h})^2
+            -
+            \frac{\gls{sym-r}^2}{2}
+        \right]$
+        &
+        $0$
+        \\
+        \hline 
+    Radial eigen-function $R(r)$
+        &  $\gls{sym-R-1n-i1}(\gls{sym-r})
+            =
+            \begin{cases}
+                \frac12
+                    & \gls{sym-n}=0\\[1em]
+                \displaystyle
+                \frac{
+                    \gls{sym-mathrm-I-0}
+                    (\gls{sym-lambda}_{\gls{sym-n}}^{i1}\gls{sym-r})
+                }{
+                    \gls{sym-mathrm-I-0}
+                    (\gls{sym-lambda}_{\gls{sym-n}}^{i1}\gls{sym-a}_{2})
+                }
+                    & \gls{sym-n}\ge1
+            \end{cases}$
+        &  \shortstack{
+            $
+            \gls{sym-R-1m-i2}(\gls{sym-r})
+            =
+            \begin{cases}
+                \frac12
+                    & \gls{sym-m}=0\\[1em]
+                \displaystyle
+                \frac{
+                    \gls{sym-mathrm-I-0}
+                    (\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-r})
+                }{
+                    \gls{sym-mathrm-I-0}
+                    (\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-a}_{2})
+                }
+                    & \gls{sym-m}\ge1
+            \end{cases}
+            $
+            \\
+            $
+            \gls{sym-R-2m-i2}(\gls{sym-r})
+            =
+            \begin{cases}
+                \frac12
+                \ln\!\left(
+                    \frac{\gls{sym-r}}
+                        {\gls{sym-a-2}}
+                \right)
+                    & \gls{sym-m}=0\\
+                \displaystyle
+                \frac{
+                    \gls{sym-mathrm-K-0}
+                    (\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-r})
+                }{
+                    \gls{sym-mathrm-K-0}
+                    (\gls{sym-lambda}_{\gls{sym-m}}^{i2}\gls{sym-a}_{2})
+                }
+                    & \gls{sym-m}\ge1
+            \end{cases}
+            $
+            }
+        &
+        $\gls{sym-Lambda-k}(\gls{sym-r})
+            =
+            \begin{cases}
+                \displaystyle
+                \frac{
+                    \gls{sym-mathrm-H-0-1}
+                    (\gls{sym-m-0}\gls{sym-r})
+                }{
+                    \gls{sym-mathrm-H-0-1}
+                    (\gls{sym-m-0}\gls{sym-a-2})
+                }
+                    & \gls{sym-k-index}=0\\[1em]
+                \displaystyle
+                \frac{
+                    \gls{sym-mathrm-K-0}
+                    (\gls{sym-m-k}\gls{sym-r})
+                }{
+                    \gls{sym-mathrm-K-0}
+                    (\gls{sym-m-k}\gls{sym-a-2})
+                }
+                    & \gls{sym-k-index}\ge1
+            \end{cases}$
+            \\
+            \hline 
+    Vertical eigen-function $\gls{sym-Z}(\gls{sym-z})$
+        &
+        $\gls{sym-Z-n-i1}(\gls{sym-z})
+        =
+        \sqrt{2}\times
+        \begin{cases}
+            1/\sqrt{2}
+                & \gls{sym-n}=0\\[1em]
+            \cos\!\left(
+                \gls{sym-lambda}_{\gls{sym-n}}^{i1}
+                (\gls{sym-z}+\gls{sym-h})
+            \right)
+                & \gls{sym-n}\ge1
+        \end{cases}$
+        &
+        $\gls{sym-Z-m-i2}(\gls{sym-z})
+        =
+        \sqrt{2}\times
+        \begin{cases}
+            1/\sqrt{2}
+                & \gls{sym-m}=0\\[1em]
+            \cos\!\left(
+                \gls{sym-lambda}_{\gls{sym-m}}^{i2}
+                (\gls{sym-z}+\gls{sym-h})
+            \right)
+                & \gls{sym-m}\ge1
+        \end{cases}$
+        &
+        $\gls{sym-Z-k-e}(\gls{sym-z})
+        =
+        \gls{sym-N-k}^{-\frac12}
+        \times
+        \begin{cases}
+            \cosh\!\left(
+                \gls{sym-m-0}
+                (\gls{sym-z}+\gls{sym-h})
+            \right)
+                & \gls{sym-k-index}=0\\[1em]
+            \cos\!\left(
+                \gls{sym-m-k}
+                (\gls{sym-z}+\gls{sym-h})
+            \right)
+                & \gls{sym-k-index}\ge1
+        \end{cases}$
+        \\
+        \hline
+    Eigen-value& 
+        $\displaystyle
+        \gls{sym-lambda-n-i1}
+        =
+        \frac{\gls{sym-n}\gls{sym-pi}}
+            {\gls{sym-h}-\gls{sym-d-1}},
+        \quad
+        \gls{sym-n}\ge1$
+        &
+        $\displaystyle
+        \gls{sym-lambda-m-i2}
+        =
+        \frac{\gls{sym-m}\gls{sym-pi}}
+            {\gls{sym-h}-\gls{sym-d-2}},
+        \quad
+        \gls{sym-m}\ge1$
+        &
+        \ifdefined\DISSERTATION
+            $\gls{sym-m-k}$ (see \Cref{aor:eq:dispersion})
+        \else
+            $\displaystyle
+            \dispersion
+            $
+        \fi
+    \\
+    \hline
     \endtabular
     \caption{Equations for potential (homogeneous and particular) and eigenfunctions (radial and vertical) for each region.}
     \label{tab:MEEM-eigenfunctions}
 \end{table}
-
-In \Cref{tab:MEEM-eigenfunctions},  $\textrm{\gls{sym-I}}_0$,  $\textrm{\gls{sym-K}}_0$, and $\textrm{\gls{sym-H}}_0^1$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $\gls{sym-N-k}$ expression is defined as:
+\ifdefined\DISSERTATION
+    The dispersion relation is a nonlinear equation that implicitly gives the exterior-region eigenvalues $m_k$:
+    \begin{equation}
+        \label{aor:eq:dispersion}
+    \dispersion
+    \end{equation}
+\fi
+In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-I-0}$,  $\gls{sym-K-0}$, and $\gls{sym-H-0-1}$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $\gls{sym-N-k}$ expression is defined as:
 
 \begin{equation}
     N_k = \frac{1}{2}\left(1+\frac{f_k}{2m_kh}  \right)~
