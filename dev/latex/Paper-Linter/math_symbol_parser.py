@@ -257,7 +257,6 @@ def _collect_math_symbol_matches(content: str):
                 symbol += canonical_script
                 replace_end = script_end
             script_idx = script_end
-
         if base == "e" and idx == next_idx:
             continue
 

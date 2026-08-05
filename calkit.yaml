@@ -5677,14 +5677,11 @@ pipeline:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-aor.txt
-        - --symbol-glossary-output pubs/shared/symbol-glossary-aor.tex
-        - --symbol-glossary-seed 
-          pubs/shared/symbol-glossary-aor-seed.tex
+        - --params dev/latex/Paper-Linter/params-aor.txt
       inputs:
         - pubs/applied-ocean-research-model/commands-aor.tex
         - pubs/applied-ocean-research-model/content.tex
@@ -5695,6 +5692,7 @@ pipeline:
         - pubs/applied-ocean-research-model/references.bib
         - pubs/applied-ocean-research-model/zotero-meem-refs.bib
         - pubs/applied-ocean-research-model/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-aor.txt
         - pubs/shared/symbol-glossary-aor-seed.tex
       outputs:
         - path: dev/latex/Paper-Linter/lint-aor.txt
@@ -5705,13 +5703,11 @@ pipeline:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/renewable-energy-mdo/mdocean.tex
-        - --ignore pubs/renewable-energy-mdo/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-re.txt
-        - --symbol-glossary-output pubs/shared/symbol-glossary-re.tex
-        - --symbol-glossary-seed pubs/shared/symbol-glossary-re-seed.tex
+        - --params dev/latex/Paper-Linter/params-re.txt
       inputs:
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
@@ -5722,6 +5718,7 @@ pipeline:
         - pubs/renewable-energy-mdo/references.bib
         - pubs/renewable-energy-mdo/zotero-meem-refs.bib
         - pubs/renewable-energy-mdo/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-re.txt
         - pubs/shared/symbol-glossary-re-seed.tex
       outputs:
         - path: dev/latex/Paper-Linter/lint-re.txt
@@ -5732,6 +5729,7 @@ pipeline:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
         - --settings dev/latex/Paper-Linter/settings.txt
@@ -5751,18 +5749,17 @@ pipeline:
     paperlint-jfm:
       kind: python-script
       environment: pubs
+      always_run: true
       script_path: dev/latex/Paper-Linter/paperlint.py
       args:
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-jfm.txt
-        - --symbol-glossary-output pubs/shared/symbol-glossary-jfm.tex
-        - --symbol-glossary-seed 
-          pubs/shared/symbol-glossary-jfm-seed.tex
+        - --params dev/latex/Paper-Linter/params-jfm.txt
       inputs:
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - dev/latex/Paper-Linter/params-jfm.txt
         - pubs/shared/symbol-glossary-jfm-seed.tex
       outputs:
         - path: dev/latex/Paper-Linter/lint-jfm.txt

@@ -4,7 +4,7 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--replace-glossary-refs] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--replace-glossary-refs] [--error]
 
 Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
@@ -12,7 +12,8 @@ The switches can be configured with the `-x` and `-i` parameters to exclude and 
 The include/exclude switches are evaluated in the order they are specified. 
 For example, `-i typography` only activates the typography rules, whereas `-i all -x typography -i cite-space` enables all rules without the typography rules, but enables the `cite-space` rule from the typography category. 
 
-If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1 <switch>` (`1` enables, `0` disables).
+If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1|2 <switch>` (`2` enables a check and runs its fix action when available).
+If `--params` is provided, paper-specific parameters are loaded from a parameter file as `key=value` pairs.
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
 If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows. If the file already exists, matching symbols keep their existing `description={...}` values and only new symbols receive a blank description.
@@ -79,6 +80,10 @@ This category includes typography-related issues, such as wrong punctuation (swi
 #### Math/Text Mode Mixing
 * **Description**: Warns if text-like content is used inside math mode without explicit text markup
 * **Switch**: `math-text-mix`
+
+#### Mathmode Subscripts
+* **Description**: Warns if prose words in math subscripts should be wrapped in `\text{...}`
+* **Switch**: `mathmode-subscripts`
 
 #### Large Numbers without siunit
 * **Description**: Warns if large numbers are not formatted with the `sinuit` package
@@ -336,6 +341,14 @@ This category includes warnings for everything related to (cross-)references (sw
 * **Description**: Warns if a symbol first used in an equation is not mentioned inline in the surrounding text
 * **Switch**: `symbol-mention`
 
+#### Glossary References
+* **Description**: Warns if math symbols should be replaced with glossary references where available
+* **Switch**: `glossary-refs`
+
 #### Math Glossary Reference Coverage
 * **Description**: Warns if an equation has fewer than two `\gls{...}` references or an inline/display math span has none
 * **Switch**: `math-gls-coverage`
+
+#### Prefix
+* **Description**: Warns if labels and references should be prefixed according to the paper-specific parameters file
+* **Switch**: `prefix`
