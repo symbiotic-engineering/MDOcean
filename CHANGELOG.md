@@ -3,7 +3,7 @@
 
 ## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-4
 Represents changes made after journal submission in preparation for dissertation submission.
-Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, and a runtime fix.
+Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, a runtime measurement fix, and some pipeline cleanup.
 
 ## Paper
 ### Added
@@ -47,13 +47,19 @@ Predominately writing and aesthetics changes, plus some dynamics speedups, a cha
 - Analysis: fix meem runtime issue which zeroed the time spent unpacking the struct
 - Plots: avoid error in `plot_nominal_constraint_circles` if all sea states are unconstrained
 
-## Pipeline
+## Pipeline/CI
 ### Added
 - Pipeline: output heave force and time per meem sweep run in `json-to-latex` stage
 ### Changed
+- CI: change conditional logic so tests only run if publication builds pass
+- CI: change workflow success criterion to be building all pubs and running (not passing) all tests
 - Pipeline: Update calkit stage dependencies for shared Elsevier class files
 - Pipeline: start tracking latex aux outputs on dvc for dissertation and standalone
-- Pipeline: uncomment subproject and use `lntutor/run-action` fork so dissertation runs on CI
+- CI: make OpenFLASH + dissertation run on CI: uncomment subproject, use `lntutor/run-action` fork, use calkit branch that changes dvc pull errors to warnings
+### Fixed
+- CI: split publication build and testing into separate actions steps. This prevents later unnecessary reruns of postpro stages that have tables, since their new `end.json` outputs are no longer saved.
+- Pipeline: prevent stale latex stages by dvc-ignoring `synctex.gz`
+- Pipeline: fix `.gitignore` that was messing with dvc-tracking of `pubs/defense/ppt` files
 
 ## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed
