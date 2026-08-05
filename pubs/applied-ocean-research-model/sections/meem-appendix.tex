@@ -23,7 +23,7 @@ Extension to many regions is discussed in section 3.4.
 
 \begin{figure}[htb]
 \centering
-\includegraphics{figs/from-matlab/meem_dims.pdf}
+\includegraphics[\FigureOptions{aor:figs/from-matlab/meem_dims.pdf}]{figs/from-matlab/meem_dims.pdf}
 \caption{Fluid regions and dimensions used in the dual concentric cylinder MEEM}
 \label{fig:meem-regions}
 \end{figure}
@@ -34,47 +34,132 @@ Boundary conditions dictate $\phi_p$ and the eigenfunctions for $\phi_h$ in each
 By construction, this potential obeys all boundary conditions except for zero radial velocity on radial body surfaces.
 The unknown coefficients must be computed to enforce this final condition as well as continuity across regions, which will be the subject of \Cref{sec:appendix-meem-matching}.
 
+\newcommand{\dispersion}{
+    \begin{cases}
+        m_0 \tanh(m_0h)=  \omega^2/g, & k=0     \\
+        m_k \tan(m_kh) = -\omega^2/g, & k \geq 1\\
+    \end{cases}
+}
+
 \begin{table}[htbp]
     \centering
-    \begin{tabular}{|
-    M{0.069\linewidth}|
-    M{0.29\linewidth}|
-    M{0.29\linewidth}|
-    M{0.25\linewidth}|
-    } \hline 
-         Region&  $i1$&  $i2$& $e$\\ \hline 
-         Homog. potential $\phi_h(r,z)$&  $\displaystyle\sum_n C_{1n}^{i1} R_{1n}^{i1}(r) Z_n^{i1}(z)$&  $\displaystyle\sum_m \left(C_{1m}^{i2} R_{1m}^{i2}(r) + C_{2m}^{i2} R_{2m}^{i2}(r) \right) Z_m^{i2}(z)$& $\displaystyle\sum_k B_k^e \Lambda_k(r) Z_k^e(z)$\\ \hline 
-         Partic. potential $\phi_p(r,z)$&  $\displaystyle\frac{1}{2(h-d_1)}\left[ (z+h)^2 - \frac{r^2}{2}\right] $&  $\displaystyle\frac{1}{2(h-d_2)}\left[ (z+h)^2 - \frac{r^2}{2}\right]$& $0$\\ \hline 
-         Radial eigen-function $R(r)$&  $R_{1n}^{i1}(r) = \begin{cases}
-            \frac{1}{2} &  n=0 \\[1em]   %%% <--- here
-            \frac{\mathrm{I}_0(\lambda_{n}^{i1}r)}{\mathrm{I}_0(\lambda_{n}^{i1}a_{2})} & n \ge 1
-        \end{cases} $&  \shortstack{$R_{1m}^{i2}(r) = \begin{cases}
-            \frac{1}{2} &  m=0 \\[1em]   %%% <--- here
-            \frac{\mathrm{I}_0(\lambda_{m}^{i2}r)}{\mathrm{I}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
-        \end{cases}$   \\ $R_{2m}^{i2}(r) = \begin{cases}
-           \frac{1}{2}\ln(\frac{r}{a_2}) &  m = 0 \\
-        \frac{\mathrm{K}_0(\lambda_{m}^{i2}r)}{\mathrm{K}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
-        \end{cases}$}& $\Lambda_k(r) = \begin{cases}
-           \frac{\mathrm{H}_0^{1}(m_0r)}{\mathrm{H}_0^{1}(m_0a_2)} & k = 0 \\[1em] 
-          \frac{\mathrm{K}_0(m_kr)}{\mathrm{K}_0(m_ka_2)} &  k \ge 1
-        \end{cases}$\\ \hline 
- Vertical eigen-function $Z(z)$& $Z_n^{i1}(z) = \begin{cases}
-           1 & n=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\lambda_{n}^{i1}(z+h)) & n \ge 1
-        \end{cases}$& $Z_m^{i2}(z) = \begin{cases}
-           1 & m=0 \\[1em]   %%% <--- here
-           \sqrt{2}\cos(\lambda_{m}^{i2}(z+h)) & m \ge 1
-        \end{cases}$&$    Z^{e}_{k}(z) = \begin{cases}
-           N_0^{-\frac{1}{2}}\cosh( m_0(z+h)) &  k=0 \\[1em]   %%% <--- here
-           N_k^{-\frac{1}{2}}\cos( m_k(z+h)) &  k \ge 1
-        \end{cases}$\\ \hline
- Eigen-value& $\displaystyle \lambda_{n}^{i1} = \frac{n\pi}{h-d_{1}},  n \geq 1$& $\displaystyle \lambda_{m}^{i2} = \frac{m\pi}{h-d_{2}}, m \geq 1$&
- $\displaystyle \begin{cases} m_0 \tanh(m_0h)= \omega^2/g, & k=0 \\ m_k \tan(m_kh) = -\omega^2/g, & k \geq 1\\ \end{cases} $\\\hline
-    \end{tabular}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{aor:meem-eigenfunctions}}
+    }
+    \hline 
+    Region
+        &
+        $i1$
+        &
+        $i2$
+        &
+        $e$
+        \\
+        \hline 
+    Homog. potential $\phi_h(r,z)$
+        & 
+        $\displaystyle\sum_n
+            C_{1n}^{i1} R_{1n}^{i1}(r) Z_n^{i1}(z)$
+        &
+        $\displaystyle\sum_m \left(
+            C_{1m}^{i2} R_{1m}^{i2}(r) + 
+            C_{2m}^{i2} R_{2m}^{i2}(r)
+        \right)$
+        $\times~Z_m^{i2}(z)$
+        & 
+        $\displaystyle\sum_k
+            B_k^e \Lambda_k(r) Z_k^e(z)$
+        \\
+        \hline
+    Partic. potential $\phi_p(r,z)$
+        &
+        $\displaystyle\frac{1}{2(h-d_1)}\left[ (z+h)^2 - \frac{r^2}{2}\right] $
+        &
+        $\displaystyle\frac{1}{2(h-d_2)}\left[ (z+h)^2 - \frac{r^2}{2}\right]$
+        &
+        $0$
+        \\
+        \hline 
+    Radial eigen-function $R(r)$
+        &  $R_{1n}^{i1}(r) =
+            \begin{cases}
+                \frac{1}{2} &  n=0 \\[1em]   %%% <--- here
+                \displaystyle\frac{\mathrm{I}_0(\lambda_{n}^{i1}r)}{\mathrm{I}_0(\lambda_{n}^{i1}a_{2})} & n \ge 1
+            \end{cases} $
+        &  \shortstack{
+            $R_{1m}^{i2}(r) =
+                \begin{cases}
+                    \frac{1}{2} &  m=0 \\[1em]   %%% <--- here
+                    \displaystyle\frac{\mathrm{I}_0(\lambda_{m}^{i2}r)}{\mathrm{I}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
+                \end{cases}$
+            \\
+            $R_{2m}^{i2}(r) =
+                \begin{cases}
+                    \frac{1}{2}\ln(\frac{r}{a_2})              &  m = 0 \\
+                    \displaystyle\frac{\mathrm{K}_0(\lambda_{m}^{i2}r)}
+                         {\mathrm{K}_0(\lambda_{m}^{i2}a_{2})} & m \ge 1
+                \end{cases}$
+            }
+        &
+        $\Lambda_k(r) = 
+            \begin{cases}
+                \displaystyle
+                \frac{\mathrm{H}_0^{1}(m_0r)}
+                     {\mathrm{H}_0^{1}(m_0a_2)} & k = 0
+                     \\[1em] 
+                \displaystyle
+                \frac{\mathrm{K}_0(m_kr)}
+                     {\mathrm{K}_0(m_ka_2)}     & k \ge 1
+            \end{cases}$
+            \\
+            \hline 
+    Vertical eigen-function $Z(z)$
+        &
+        $Z_n^{i1}(z) = \sqrt{2} \times
+            \begin{cases}
+                1/\sqrt{2} & n=0 \\[1em]   %%% <--- here
+                \cos(\lambda_{n}^{i1}(z+h)) & n \ge 1
+            \end{cases}$
+        &
+        $Z_m^{i2}(z) =~\sqrt{2}~\times
+            \begin{cases}
+                1/\sqrt{2} & m=0 \\[1em]   %%% <--- here
+                \cos(\lambda_{m}^{i2}(z+h)) & m \ge 1
+            \end{cases}$
+        &
+        $Z^{e}_{k}(z) = N_k^{-\frac{1}{2}} \times
+            \begin{cases}
+                \cosh( m_0(z+h)) &  k=0 \\[1em]   %%% <--- here
+                \cos( m_k(z+h)) &  k \ge 1
+            \end{cases}$
+        \\
+        \hline
+    Eigen-value& 
+        $\displaystyle \lambda_{n}^{i1} = \frac{n\pi}{h-d_{1}},~ n \geq 1$
+        & 
+        $\displaystyle \lambda_{m}^{i2} = \frac{m\pi}{h-d_{2}},~ m \geq 1$
+        &
+        \ifdefined\DISSERTATION
+            $m_k$ (see \Cref{aor:eq:dispersion})
+        \else
+            $\displaystyle
+            \dispersion
+            $
+        \fi
+    \\
+    \hline
+    \endtabular
     \caption{Equations for potential (homogeneous and particular) and eigenfunctions (radial and vertical) for each region.}
     \label{tab:MEEM-eigenfunctions}
 \end{table}
-
+%
+\ifdefined\DISSERTATION
+    The dispersion relation is a nonlinear equation that implicitly gives the exterior-region eigenvalues $m_k$:
+    \begin{equation}
+        \label{aor:eq:dispersion}
+    \dispersion
+    \end{equation}
+\fi
 In \Cref{tab:MEEM-eigenfunctions},  $\textrm{I}_0$,  $\textrm{K}_0$, and $\textrm{H}_0^1$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $N_k$ expression is defined as:
 
 \begin{equation}
@@ -373,7 +458,7 @@ Of the sixteen blocks that make up the matrix, six are diagonal, four are zero, 
 An even sparser matrix could be obtained with the alternate eigenfunction scaling for the second region described in \citet{chau_inertia_2012}. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.45\linewidth]{figs/from-matlab/meem_sparsity.pdf}
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_sparsity.pdf}]{figs/from-matlab/meem_sparsity.pdf}
     \caption{A-matrix sparsity pattern, shown for $N=M=K=4$}
     \label{fig:sparsity}
 \end{figure}
@@ -496,7 +581,7 @@ Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to W
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/meem_validation.pdf}
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_validation.pdf}]{figs/from-matlab/meem_validation.pdf}
     \caption{Nondimensional added mass and damping coefficient validation against \citep{chau_inertia_2012}}
     \label{fig:meem-yeung-validation}
 \end{figure}
@@ -509,7 +594,7 @@ We observe that potential matching converges faster than velocity matching.
 \Cref{fig:meem-matching} shows the matching behavior for $N=M=K=11$, where potential matches well but velocity still has noticeable mismatch. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/meem_matching.pdf}
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_matching.pdf}]{figs/from-matlab/meem_matching.pdf}
     \caption{Matching for $N=M=K=11$ for benchmark geometry}
     \label{fig:meem-matching}
 \end{figure}
@@ -518,7 +603,7 @@ Hydro coefficient convergence depends on the geometry: the benchmark shallow-wat
 There, damping converges well at low frequencies but requires more harmonics at higher frequencies, while added mass has similar convergence across frequencies. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\linewidth]{figs/from-matlab/meem_convergence_vs_omega.pdf}
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_convergence_vs_omega.pdf}]{figs/from-matlab/meem_convergence_vs_omega.pdf}
     \caption{Convergence for $N=M=K=(5,10,20,30)$ for RM3}
     \label{fig:meem-convergence}
 \end{figure}
@@ -547,7 +632,7 @@ Plugging this into the first element of the bottom block of the b-vector (positi
 \end{equation}
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=.5\linewidth]{figs/from-matlab/asymptotic_b_vector.pdf}
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/asymptotic_b_vector.pdf}]{figs/from-matlab/asymptotic_b_vector.pdf}
     \caption{Asymptotic b-vector for large $m_0h$}
     \label{fig:meem-b-limit}
 \end{figure}

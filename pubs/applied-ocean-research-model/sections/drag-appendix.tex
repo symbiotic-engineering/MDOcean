@@ -1,0 +1,193 @@
+
+As described in \Cref{sec:drag}, a describing function approximation is used to model the form drag.
+The relative-velocity computation in \Cref{eq:drag-pressure} uses the standard finite-depth linear-wave velocity phasor evaluated at body draft,
+with $\vec{T} = [T_{f,2}, T_s]$ collecting the bottom drafts of the float and spar:
+\begin{equation}
+    \label{eq:wave-velocity-phasor}
+    \vec{\hat{V}}_{wave}(y) = \frac{H}{2}\,\frac{gk}{\omega}\, \exp\{-k\vec{T}-iky\}.
+\end{equation}
+
+Strip theory integrates the spatially-dependent infinitesimal drag force vector $d\vec{F}_d$ over the wetted surface area $A_{wet}$.
+For a hollow cylinder of outer radius $\vec{R}$ and inner radius $\vec{R}_{in}$,
+% derived p156-159 notebook 3/10/25
+% simplified p169-173 notebook 3/12/25
+\begin{equation}\label{eq:drag-force-integral}
+    \vec{\hat{F}}_d = \int_{A_{wet}} d\vec{\hat{F}}_d(y) = -\int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y)\, \vec{\hat{p}}_d(y)\, dy,
+\end{equation}
+where $\vec{w}(y)$ is the local body width perpendicular to wave propagation:
+\begin{equation}\label{eq:drag-width}
+    \vec{w}(y) = \begin{cases}
+        2\sqrt{\vec{R}^2-y^2}, & \vec{R}_{in}<|y|<\vec{R} \\
+        2\sqrt{\vec{R}^2-y^2} - 2\sqrt{\vec{R}_{in}^2-y^2}, & 0<|y|<\vec{R}_{in}.
+    \end{cases}
+\end{equation}
+
+Plugging the describing function \Cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
+\begin{equation}\label{eq:drag-damping-excitation-2}
+    \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
+    + \vec{\gamma}_{d} \hat{\zeta}
+\end{equation}
+The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force. 
+The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $y$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
+The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\mathbf{B}_d$ and complex drag excitation vector $\vec{\gamma}_{d}$ defined as follows:
+\begin{equation}\label{eq:drag-coeffs}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi}\frac{1}{2} \rho_w \, \textrm{diag}\left(\vec{C}_d |\vec{\hat{\dot{\xi}}}| \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) dy \right) \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \frac{1}{2} \rho_w \vec{C}_d \, |\vec{\hat{\dot{\xi}}}| \frac{gke^{-k\vec{T}}}{\omega} \int_{y=-\vec{R}}^{\vec{R}} \vec{w}(y) \vec{\alpha}_v(y) e^{-iky} dy 
+\end{aligned}
+\end{equation}
+where we use radii vectors $\vec{R}=[D_f/2,D_d/2]$ and $\vec{R}_{in}=[D_{f,in},0]$ to represent the float and spar.
+$\vec{\alpha}_v(y)$ is the amplitude ratio of the relative velocity and WEC velocity:
+\begin{equation}\label{eq:drag-alpha-definitions}
+    \vec{\alpha}_v(y) = \frac{\vec{|\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} \exp\{-2ky\} - 2 \vec{r} \exp\{-ky\}  \sin\angle \vec{\hat{\dot{\xi}}}}
+\end{equation}
+and $\vec{r} = |\hat{V}_{\text{wave}}|/ |\vec{\dot{\xi}}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Nondimensional Drag Integrals $I_B$ and $I_G$}
+The drag coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ are expressed in \Cref{eq:drag-coeffs} as dimensional integrals over the width of the WEC.
+Here we present an alternative form of the coefficients in terms of nondimensionalized integral functions, which we refer to as $I_B(r,\theta,\kappa)$ and $I_G(r,\theta,\kappa)$:
+\begin{equation}\label{eq:drag-integrals-IB-IG}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}|
+    \left[ 
+        I_B(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B(r,\angle\hat{\dot{\xi}},\alpha k R)
+    \right]
+    \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}| \frac{g k}{\omega} e^{-k\vec{T}}
+    \left[ 
+        I_G(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_G(r,\angle\hat{\dot{\xi}},\alpha kR)
+    \right]
+\end{aligned}
+\end{equation}
+where the nondimensional integral functions $I_B$ (real) and $I_G$ (complex) are defined as:
+\begin{equation}\label{eq:definition-IB-IG}
+\begin{aligned}
+    I_B(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} dx
+    \\
+    I_G(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} e^{-i\kappa x} dx
+\end{aligned}
+\end{equation}
+
+The integrals must be evaluated numerically, except for special limit cases for which analytical results are available.
+\Cref{fig:drag-integrals} shows the results of numerical integration for $I_B$ and $I_G$ across a range of inputs.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_integral_B.pdf}]{figs/from-matlab/drag_integral_B.pdf}
+        \caption{Drag damping integral $I_B$, scaled by $\frac{2}{\pi}$.}
+        \label{fig:drag-damping-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_integral_G_m.pdf}]{figs/from-matlab/drag_integral_G_m.pdf}
+        \caption{Magnitude of drag excitation integral $|I_G|$, scaled by $\frac{2}{\pi}$.}
+        \label{fig:drag-excitation-magnitude-integral}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.32\textwidth}
+        \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_integral_G_p.pdf}]{figs/from-matlab/drag_integral_G_p.pdf}
+        \caption{Phase of drag excitation integral $\angle I_G$, scaled by $\frac{1}{\pi}$.}
+        \label{fig:drag-excitation-phase-integral}
+    \end{subfigure}
+    \caption{Nondimensional drag integrals shown in polar coordinates for various values of $\kappa$, where the polar radius represents $1/r$ and the polar angle represents $\theta$.}
+    \label{fig:drag-integrals}
+\end{figure}
+
+The limit cases in question include $r \rightarrow 0$ (the body velocity dominates the incident wave velocity) and $\kappa \rightarrow 0$ (the body diameter is small with respect to the wavelength), with the following expressions:
+\begin{equation}
+\begin{aligned}
+    \lim_{r\rightarrow 0} I_B(r,\theta,\kappa) = \frac{\pi}{2},
+    \qquad
+    \lim_{r\rightarrow 0} I_G(r,\theta,\kappa) =
+    \begin{cases}
+    \frac{\pi J_1(\kappa)}{\kappa} & \textrm{if } \kappa \neq 0 \\
+    \frac{\pi}{2} & \textrm{if } \kappa = 0
+    \end{cases} \\
+    \lim_{\kappa \rightarrow 0} I_B(r,\theta,\kappa) =  \lim_{\kappa \rightarrow 0} I_G(r,\theta,\kappa) = \frac{\pi}{2}\sqrt{1+r^2-2r\sin\theta},
+\end{aligned}
+\end{equation}
+where $J_1$ is the Bessel function of the first kind of order 1.
+An important edge case occurs at the origin of the polar plots in \Cref{fig:drag-integrals}, when $r \rightarrow \infty$ (the incident wave velocity dominates the body velocity, so $|\hat{\dot{\xi}}|\rightarrow 0$).
+Here, the integrals as defined in \Cref{eq:definition-IB-IG} diverge, and the form of \Cref{eq:drag-integrals-IB-IG} does not apply.
+Instead, when $r\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $I' = I/r$:
+\begin{equation}
+\begin{aligned}
+    \mathbf{B}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{V}_{wave}|
+    \left[ 
+        I_B'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha k R)
+    \right]
+    \\
+    \vec{\gamma}_{d} &= \frac{8}{3\pi} \rho_w R^2 C_d  |\hat{V}_{wave}| \frac{gk}{\omega} e^{-k\vec{T}}
+    \left[ 
+        I_G'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_G'(r,\angle\hat{\dot{\xi}},\alpha kR)
+    \right]
+\end{aligned}
+\end{equation}
+The relevant limits are then:
+\begin{equation}
+\begin{aligned}
+    \lim_{r\rightarrow \infty} I_B'(r,\theta,\kappa) = 0,
+    \qquad
+    \lim_{r\rightarrow \infty} I_G'(r,\theta,\kappa) = 
+    \begin{cases}
+    \frac{\pi J_1((1i-1)\kappa)}{(1i-1)\kappa} & \textrm{if } \kappa \neq 0 \\
+    \frac{\pi}{2} & \textrm{if } \kappa = 0
+    \end{cases}
+\end{aligned}
+\end{equation}
+
+%%%%%%%%%%%%%%%
+\subsubsection{Comparison to Other Drag Formulations}
+\label{subsec:appendix-drag-others}
+\citet{quartier_influence_2021} propose a WEC drag model that also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
+In other words, it fails to account for the edge case of $r \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
+Furthermore, the drag ``damping'' term in the grouping of \citet{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
+This creates the confusing possibility for negative apparent damping coefficients, leading to false concerns about violating energy conservation if erroneously interpreted as a true damping coefficient.
+The damping-excitation grouping chosen in \Cref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\mathbf{B}_d$.
+
+Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $y$.
+\citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+This means that \citet{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
+Early MDOcean simulations that used the \citet{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
+The strip-theory approach presented in \Cref{sec:drag} avoids this issue.
+Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \citep{quartier_influence_2021}.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Iterative Solution}
+With the describing function approximation, the nonlinear time-domain drag equation is now a quasi-linear frequency-domain equation, since the state-dependence of the coefficients $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ prevents true linearity.
+The solution for states $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
+Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
+MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
+The latter is a form of fixed point iteration where $\vec{\hat{\dot{\xi}}}_k = g(\vec{\hat{\dot{\xi}}}_{k-1})$, where $g(\vec{\hat{\dot{\xi}}})$ is the equation of motion \Cref{eq:eom-freq-domain} and $k$ is the iteration index.
+It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \citet{chicone_contraction_2006} shows has the following criteria:
+\begin{equation}
+ \left|
+    \frac{\partial}
+    {\partial \vec{\hat{\dot{\xi}}}}~\left[
+    g\left(
+        \vec{\hat{\dot{\xi}}}~
+    \right)\right]
+\right| < 1
+\end{equation}
+
+Five to eight iterations on $|\vec{\hat{\dot{\xi}}}|$ and $\angle \vec{\hat{\dot{\xi}}}$ are typically required to converge all sea states to within 0.01~m and 3 degrees. % from summer research slide 44 5/30/24
+%In high-frequency sea states where there is substantial phase difference between $\dot{X}_{\text{rel}}$ and $\dot{X}$, $B_d$ occasionally becomes negative.
+At present (since MDOcean v1.0.0), the solver used for drag iteration can be simultaneously used for the numerical optimal control procedure described in \Cref{sec:optimal-control}, although since v1.2.0 by default the solver is used only for drag convergence and optimal control is done analytically.
+Compared to numerical optimal control nested inside the drag solve, combining the solvers in this way has the advantages of code simplicity and reducing the number of dynamics evaluations required for a given simulation, provided that the number of iterations required to converge the coupled drag-control solve is less than the product of the number of iterations required to converge each solve individually.
+However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
+
+%%%%%%%%%%%%%%%
+\subsubsection{Optimal Control Condition}
+Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
+The optimal load damping $B_l$ is derived by setting
+\begin{equation}
+\begin{aligned}
+0 &= \frac{\partial }{\partial B_l} \left[p_{avg,VI}\right]
+= \frac{\partial}{\partial B_l} \left[\frac{1}{2} B_l |\hat{I}|^2\right]
+= \frac{\partial }{\partial B_l} \left[\frac{1}{2} B_l \left|\frac{\hat{V}_{s,th}}{Z_{s,th}+B_l+K_l/s}\right|^2 \right]
+\end{aligned}
+\end{equation}
+and the typical simplification $\frac{\partial \hat{V}_{s,th}}{\partial B_l}=\frac{\partial Z_{s,th}}{\partial B_l}=0$ must be replaced with the implicit dependence of the Th\'{e}venin equivalent parameters on $B_l$ because $B_l$ affects $\hat{\dot\xi}$ and therefore $\mathbf{B}_{d}$ and $\vec{\gamma}_{d}$ via \eqref{eq:drag-coeffs}.
+In practice, however, the standard complex conjugate controller was observed to produce nearly identical power as the one incorporating the more complicated dependence, so the standard is used for simplicity.

@@ -17,6 +17,11 @@ environments:
     description: Mermaid CLI via Docker.
     wdir: /data
     command_mode: entrypoint
+  inkscape:
+    kind: docker
+    image: minidocks/inkscape:latest
+    description: Inkscape via Docker.
+    wdir: /app
   # pdf2svg:
   #   kind: docker
   #   path: pubs/defense/latex-standalone/Dockerfile
@@ -37,9 +42,10 @@ environments:
     kind: conda
 dependencies:
   - docker
-  - matlab
+  # - matlab
 env_vars:
   QT_QPA_PLATFORM: offscreen
+  HOME: /tmp # for inkscape container, to avoid permission issues
 parameters:
   mermaid_name:
     - taxonomy
@@ -52,10 +58,23 @@ parameters:
     - circuit_kinematics
     - control_method_venn_diagram
     - meem_dims
-# subprojects:
-#   - path: mdocean/simulation/modules/OpenFLASH
+subprojects:
+  - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
   stages:
+    svg2pdf:
+      kind: command
+      environment: inkscape
+      command: inkscape {name}.svg --export-type=pdf 
+        --export-filename={name}.pdf
+      iterate_over:
+        - arg_name: name
+          values:
+            - pubs/dissertation/images/neurodiversity_image
+      inputs:
+        - ./{name}.svg
+      outputs:
+        - ./{name}.pdf
     mermaid-make-pdfs:
       kind: command
       environment: mermaid
@@ -4425,7 +4444,9 @@ pipeline:
       outputs:
         - results/Validation/cost_vs_N_WEC.pdf
         - results/Validation/cost_vs_N_WEC.fig
-        - path: results/Validation/validation.tex
+        - path: results/Validation/validation_smaller.tex
+          storage: git
+        - path: results/Validation/validation_larger.tex
           storage: git
         - results/Validation/end.mat
         - path: results/Validation/end.json
@@ -4955,6 +4976,18 @@ pipeline:
         - results/Wecsim/end.mat
         - path: results/Wecsim/end.json
           storage: git
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_0_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_off_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_0_meem_10_geom_wecsim.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_off_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.pdf
+        - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.pdf
     postpro-WithTables:
       kind: shell-command
       environment: _system
@@ -5401,6 +5434,7 @@ pipeline:
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
+        - pubs/applied-ocean-research-model/numbers.json
         # - results/Cost/end.json
         # - results/DampingPlateStructures/end.json
         # - results/DescFcns/end.json
@@ -5428,10 +5462,15 @@ pipeline:
         # forces
         surgeForceFloatNominal: "{surgeForceFloatNominal/1e6:.0f} MN"
         surgeForceSparNominal: "{surgeForceSparNominal/1e6:.0f} MN"
+        heaveForceNominal: "{heaveForceNominal/1e6:.0f} MN"
         # runtimes
         simRuntime: "{simRuntime*1000:.0f} ms"
         MEEMRuntime: "{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms"
         meemSweepTime: "{geom_sweep_analysis_time/60:.0f} minutes"
+        meemSweepTimePerCombo: "{geom_sweep_analysis_time/n_combos*1000:.0f}
+          ms"
+        simRuntimeOld: "{simRuntimeOldSeconds*1000:.0f} ms"
+        multiplierOldRuntime: "{simRuntime/simRuntimeOldSeconds:.0f}"
         # percentages
         pctRuntimeMEEM: "{pctRuntimeMEEM:.0f}%"
         pctRuntimeDynamics: "{pctRuntimeDynamics:.0f}%"
@@ -5550,6 +5589,12 @@ pipeline:
         # pareto timing percentages
         paretoPctTimeSeeds: "{paretoPctTimeSeeds*100:.0f}%"
         paretoPctTimePatternSearch: "{paretoPctTimePatternSearch*100:.0f}%"
+    copy-dissertation-only-figs:
+      kind: map-paths
+      paths:
+        - src: results/SparHydro/spar_added_mass.pdf
+          dest: pubs/dissertation/figs/from-matlab/spar_added_mass.pdf
+          kind: file-to-file
     copy-shared-latex:
       kind: map-paths
       paths:
@@ -5605,6 +5650,9 @@ pipeline:
         - src: pubs/shared/els-cas/cas-dc.cls
           dest: pubs/renewable-energy-mdo/cas-dc.cls
           kind: file-to-file
+        - src: pubs/shared/els-cas/cas-sc.cls
+          dest: pubs/renewable-energy-mdo/cas-sc.cls
+          kind: file-to-file
         #
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/applied-ocean-research-model/cas-common.sty
@@ -5656,10 +5704,11 @@ pipeline:
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/renewable-energy-mdo/shared-pkg.tex
+        - pubs/renewable-energy-mdo/cas-dc.cls
+        - pubs/renewable-energy-mdo/cas-sc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
-        - path: pubs/renewable-energy-mdo/mdocean.synctex.gz
-          storage: null
         - path: pubs/renewable-energy-mdo/aux/
           storage: null
           delete_before_run: false
@@ -5681,10 +5730,10 @@ pipeline:
         - pubs/applied-ocean-research-model/zotero-meem-refs.bib
         - pubs/applied-ocean-research-model/commands-aor.tex
         - pubs/applied-ocean-research-model/shared-pkg.tex
+        - pubs/applied-ocean-research-model/cas-dc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
-        - path: pubs/applied-ocean-research-model/main.synctex.gz
-          storage: null
         - path: pubs/applied-ocean-research-model/aux/
           storage: null
           delete_before_run: false
@@ -5725,18 +5774,22 @@ pipeline:
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
         - pubs/UMERC-2025-grid-value/
+        - pubs/dissertation/figs/
+        - pubs/dissertation/images/
         - pubs/dissertation/references.bib
+        - pubs/dissertation/dissertation-conclusion.tex
+        - pubs/dissertation/dynamic-toc-depth.tex
         - pubs/shared/shared-pkg.tex
+        - pubs/shared/table-column-specs.tex
+        - pubs/shared/figure-widths.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       outputs:
         - pubs/dissertation/sampleThesis.pdf
-        - path: pubs/dissertation/sampleThesis.synctex.gz
-          storage: null
         - path: pubs/dissertation/aux/
-          storage: null
+          storage: dvc
           delete_before_run: false
     # all-writing:
     #   kind: shell-command
@@ -5829,16 +5882,16 @@ pipeline:
       outputs:
         - path: mdocean/plots/non_matlab_figs/aux/{name}.log
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.aux
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fdb_latexmk
           delete_before_run: false
-          storage: null
+          storage: dvc
         - path: mdocean/plots/non_matlab_figs/aux/{name}.fls
           delete_before_run: false
-          storage: null
+          storage: dvc
     # make-standalone-tex-svg:
     #   kind: shell-command
     #   environment: pdf2svg

@@ -21,12 +21,25 @@ if nargin>1
     hold on
 end
 
-if ~isfield(val, 'qcqp_debug') || isempty(val.qcqp_debug.centers)
+if ~isfield(val, 'qcqp_debug') || isempty(val.qcqp_debug)
     title('No constrained sea state found');
     return
 end
 
 d = val.qcqp_debug;
+if numel(d) > 1
+    has_centers = arrayfun(@(s) isfield(s, 'centers') && ~isempty(s.centers), d);
+    if any(has_centers)
+        d = d(find(has_centers, 1, 'first'));
+    else
+        title('No constrained sea state found');
+        return
+    end
+end
+if ~isfield(d, 'centers') || isempty(d.centers)
+    title('No constrained sea state found');
+    return
+end
 centers = d.centers;        % N×2 array of [Re Im] circle centers
 radii   = d.radii;          % N×1 vector of radii
 labels  = d.labels;         % N×1 cell of constraint names
@@ -34,6 +47,29 @@ Gamma_opt = d.Gamma_opt;    % complex optimal Gamma
 w_i     = d.w;              % angular frequency of this sea state
 
 N = size(centers, 1);
+if ~isfield(d, 'radii') || isempty(radii) || N ~= numel(radii)
+    title('No constrained sea state found');
+    return
+end
+radii = radii(:);
+
+if ~isfield(d, 'labels') || isempty(labels)
+    labels = arrayfun(@(k) sprintf('Constraint %d', k), 1:N, 'UniformOutput', false);
+elseif ~iscell(labels)
+    if isstring(labels)
+        labels = cellstr(labels);
+    elseif ischar(labels)
+        labels = cellstr(labels);
+    else
+        labels = arrayfun(@(k) sprintf('Constraint %d', k), 1:N, 'UniformOutput', false);
+    end
+end
+labels = labels(:);
+if numel(labels) < N
+    labels(end+1:N) = arrayfun(@(k) sprintf('Constraint %d', k), numel(labels)+1:N, 'UniformOutput', false);
+elseif numel(labels) > N
+    labels = labels(1:N);
+end
 
 hold on;
 

@@ -1,6 +1,66 @@
 # Changelog
 ## Unreleased
 
+## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-4
+Represents changes made after journal submission in preparation for dissertation submission.
+Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, a runtime measurement fix, and some pipeline cleanup.
+
+## Paper
+### Added
+- Paper: macro to swap between figure widths and table specs depending on dissertation vs journal and 1 vs 2 columns
+- AOR paper: discussion about how to further improve runtime
+- Dissertation: create macro for epigraphs
+- Dissertation: dynamic table of contents depth based on page length of section
+- Dissertation: add images of defense, neurodiversity loop, wave
+- Paper: single column Elsevier cas template
+- Dissertation: conditionally remove DECIDER chapter
+- AOR paper: dynamically get ordinal numbers by integrating `fmtcount` package with json2latex results
+### Changed
+- Paper: change all citations to use `citet` or `citep` (natbib)
+- Paper: various word choice and table formatting improvements
+- Paper: numeric results now throws warning if undetected (will be overwritten by pipeline though)
+- Paper: merge latest `overleaf-sync` updates into this journal-edit branch.
+- Dissertation: remove Moana quote since it's copyrighted
+- Dissertation: change thesis writeup's license to CC BY-NC-ND
+- Dissertation: proper inline full citations with `bibentry` package
+- AOR paper: break up dynamics appendix into separate files
+- AOR paper: revise abstract wording
+- RE paper: delete unused old tables
+- RE paper: switch manuscript from `cas-dc` to `cas-sc` (single column)
+- RE paper: substantial rewrite of results and discussion sections
+### Fixed
+- Paper: add `\` before `%` and `#` in bib file urls to avoid errors with `\bibentry` package
+
+## Model/Optimization/Analysis
+### Added
+- Model: `check_max_CW.m` incorporates slamming-based Budal Upper Bound into maximum capture width calculation (note that this may break `SweepGeoms`, which still only uses radiation-based max capture width) and uses amplitude saturation to compute the drag ratio
+- Figures: create `nested_future_optim` and `methodology_flowchart_dissertation` as dissertation-specific dvc figures
+### Changed
+- Plots: fill markers on PTO sweep
+- Dynamics: pass solved `control_mult` directly out of solver
+- Location sensitivity: add try-catch to prevent drag negative damping
+- Optimization: if converge to infeasible point, use best feasible point
+- Speedup: vectorize and remove unneeded transposes and debug struct creation from analytical QCQP
+- Speedup: reduce complex operations by adding parentheses in `get_response_drag.m` and grouping terms in `multibody_response.m`
+- Speedup: only compute analytical drag integrals for sea states where they apply in `make_drag_LUT.m`
+### Fixed
+- Analysis: fix meem runtime issue which zeroed the time spent unpacking the struct
+- Plots: avoid error in `plot_nominal_constraint_circles` if all sea states are unconstrained
+
+## Pipeline/CI
+### Added
+- Pipeline: output heave force and time per meem sweep run in `json-to-latex` stage
+### Changed
+- CI: change conditional logic so tests only run if publication builds pass
+- CI: change workflow success criterion to be building all pubs and running (not passing) all tests
+- Pipeline: Update calkit stage dependencies for shared Elsevier class files
+- Pipeline: start tracking latex aux outputs on dvc for dissertation and standalone
+- CI: make OpenFLASH + dissertation run on CI: uncomment subproject, use `lntutor/run-action` fork, use calkit branch that changes dvc pull errors to warnings
+### Fixed
+- CI: split publication build and testing into separate actions steps. This prevents later unnecessary reruns of postpro stages that have tables, since their new `end.json` outputs are no longer saved.
+- Pipeline: prevent stale latex stages by dvc-ignoring `synctex.gz`
+- Pipeline: fix `.gitignore` that was messing with dvc-tracking of `pubs/defense/ppt` files
+
 ## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed
 - Pipeline: include git-stored notebook outputs under `.calkit/notebooks/` in `dev/dvc_lock_merge.py` merge-driver checkout/add guidance.
@@ -11,7 +71,6 @@
 - Docs: add image processing, report generation, and curve fitting toolboxes to readme and `dep_check.m`
 - Pipeline: track test-results and code-coverage outputs as a dvc-zip
 - Pipeline: matlab stages use `shell_command: ./mymatlab` instead of `matlab-command` for actions-conditional behavior
-
 
 ## [v1.3.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.3) - 2026-7-14
 ### Changed

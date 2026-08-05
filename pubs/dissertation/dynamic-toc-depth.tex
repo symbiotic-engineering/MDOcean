@@ -1,0 +1,49 @@
+% generated with Google Gemini 1.5 on 7/22/26
+
+% 1. Turn on internal letter scanning OUTSIDE of all macros
+\makeatletter
+
+% 2. Create safe placeholders with non-restricted names
+\providecommand{\finishSectionPageCount}{}
+\providecommand{\initSectionPageCount}{}
+
+% 3. Define the structural counter
+\newcounter{secpcount}
+
+% 4. Provide the clean operational definitions (No internal \makeatletter)
+\renewcommand{\initSectionPageCount}{%
+  \stepcounter{secpcount}%
+  \zlabel{secstart-\thesecpcount}%
+  \zifrefundefined{secend-\thesecpcount}{}{%
+    % Safely parse the zref data matching internal layout strings
+    \edef\secpages{\numexpr\zref@extract{secend-\thesecpcount}{abspage}-\zref@extract{secstart-\thesecpcount}{abspage}+1\relax}%
+    % Apply depth adjustments
+    \ifnum\secpages>23\relax
+      \settocdepth{subsection}%
+    \else
+      \settocdepth{section}%
+    \fi
+  }%
+}
+
+\renewcommand{\finishSectionPageCount}{%
+  \ifnum\value{secpcount}>0\relax
+    \zlabel{secend-\thesecpcount}%
+  \fi
+}
+
+% 5. Inject automation hooks safely
+\AtBeginDocument{%
+  \pretocmd{\section}{%
+    \finishSectionPageCount
+    \initSectionPageCount
+  }{}{}%
+}
+
+% 6. Restore standard text character constraints
+\makeatother
+
+% 7. Final hook at the absolute end of the file
+\AtEndDocument{%
+  \finishSectionPageCount
+}
