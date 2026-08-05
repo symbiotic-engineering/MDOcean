@@ -32,8 +32,10 @@ function [fig_array,...
     
     end_result_struct.nominalLCOE = intermed_result_struct.LCOE;
     surgeForce = intermed_result_struct.val.force_surge;
+    heaveForce = intermed_result_struct.val.force_heave;
     end_result_struct.surgeForceFloatNominal = surgeForce(1);
     end_result_struct.surgeForceSparNominal  = surgeForce(2);
+    end_result_struct.heaveForceNominal = heaveForce(1);
     end_result_struct.capexDesignNominal = intermed_result_struct.val.capex_design;
     end_result_struct.powerAvgNominal = intermed_result_struct.val.power_avg;
 end

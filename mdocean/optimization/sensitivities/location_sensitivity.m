@@ -58,7 +58,12 @@ parfor i=1:length(files)
     if dry_run
         [X_opts(:,i), obj_opts(i), flags(i)] = deal([new_b.X_noms; 1], 1, 1); 
     else
-        [X_opts(:,i), obj_opts(i), flags(i)] = gradient_optim(X,new_p,new_b,which_obj);
+        try
+            [X_opts(:,i), obj_opts(i), flags(i)] = gradient_optim(X,new_p,new_b,which_obj);
+        catch ME
+            warning('Location sensitivity optimization failed for %s: %s', files{i}, ME.message);
+            X_opts(:,i) = [new_b.X_noms; 1];
+        end
     end
     
     new_ps(i) = new_p;

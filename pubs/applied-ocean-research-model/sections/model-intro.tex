@@ -18,9 +18,9 @@ Thus, a design process that emphasizes techno-economic viability from an early s
 \ifdefined\DISSERTATION
     However, the presence of strong interdisciplinary coupling complicates the application of typical design and optimization techniques to WECs.
     The powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses must be selected to balance the complex tradeoff between power production and cost while ensuring survivability and practical feasibility.
-    Concentrating and automating the design decision-making efforts of structural, control, hydrodynamics, and electrical engineers while accurately capturing all major relationships and requirements is challenging, not to mention computationally prohibitive.
+    Accurately capturing all major relationships and requirements that drive structural, control, hydrodynamic, and electrical design is technically challenging and computationally prohibitive.
     Nonetheless, leveraging the coupling between subsystems and across technical domains can produce large gains in techno-economic viability.
-    Automating this process through optimization allows WEC designers to more quickly and systematically explore tradeoffs of major design decisions, and could eventually allow standardized comparisons between different WEC architectures.
+    Automating this process through optimization allows WEC designers to more quickly and systematically explore tradeoffs of major design decisions, and could eventually standardize comparisons between different WEC architectures.
     Thus, performing a system-level WEC optimization that simultaneously considers the coupled techno-economic goals, design decisions, and requirements is highly advantageous.
 \else
     The strong interdisciplinary coupling of between powertrain, controller, bulk dimensions, hydrodynamic shape, and structural thicknesses complicates conventional WEC design techniques.
@@ -30,23 +30,20 @@ Thus, a design process that emphasizes techno-economic viability from an early s
 
 % what is RM3
 \ifdefined\DISSERTATION
-    An initial attempt to consolidate a multidisciplinary WEC design process, though without optimization, was the Reference Model Project.
-    From 2010 to 2014, the U.S.\ Department of Energy funded the creation of six benchmark designs for marine energy devices, published a report \citep{RM3} describing the design considerations and performance calculations, and released design artifacts and other documentation on its website.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} Three designs are for tidal and current energy turbines, and three are WECs.
+    The U.S.\ Department of Energy's 2010-2014 Reference Model Project \citep{RM3} represents an early attempt to consolidate a multidisciplinary WEC design process, though without optimization.
+    The project's report \citep{RM3} introduces six benchmark marine energy device designs (three WECs and three tidal/current turbines) and describes their design considerations and performance calculations.
+    Its website releases further design artifacts.\footnote{\url{https://openei.org/wiki/PRIMRE/Signature_Projects/Reference_Model}} 
     The third reference model, known as RM3, is a two-body point absorber WEC designed for a reference site located in Humboldt Bay, California.
-    The major structural components of the device are a surface float and a spar consisting of a vertical column and a subsurface damping plate, with labeled dimensions shown in \Cref{fig:dims}.
-    The float oscillates up and down with oncoming incident waves while the spar stays mostly stationary, and electrical power is produced from this relative heave motion.
-    RM3 has received considerable research attention in the decade since the original report was published.
-    The present study builds on that work and presents a multidisciplinary techno-economic simulation of the RM3.
+    The device consists of a surface float and a spar comprising a vertical column and a subsurface damping plate.
+    \Cref{fig:dims} pictures components and dimensions.
+    The float oscillates vertically with incident waves while the spar stays mostly stationary, and this relative heave motion produces electrical power.
+    The present study builds on considerable scholarship surrounding RM3 and presents a multidisciplinary techno-economic simulation for RM3-like WECs.
 \else
     This paper builds on the U.S.\ Department of Energy's Reference Model Project, specifically the third reference model (RM3) \citep{RM3}: a two-body point-absorber WEC designed for Humboldt Bay, California, comprising a surface float and a spar with a subsurface damping plate (\Cref{fig:dims}).
     Electrical power is produced from the relative heave motion of the float against the spar.
 \fi
 
-\ifdefined\DISSERTATION
-    The remainder of the introduction will review WEC system modeling literature, articulate the appeal of semi-analytical modeling to address gaps in the field, and identify the paper's key contributions and structure.
-\else
-    The remainder of this introduction reviews WEC modeling literature, identifies the gap motivating MDOcean, and summarizes the paper's contributions.
-\fi
+The remainder of this introduction reviews WEC modeling literature, identifies the gap motivating semi-analytical system models, and summarizes the paper's contributions.
 
 \subsection{WEC System Modeling: State of the Art and Gaps}
 \label{sec:lit}
@@ -174,29 +171,25 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
 \begingroup
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1.05\linewidth]{figs/from-matlab/taxonomy.pdf}
+\includegraphics[\FigureOptions{aor:figs/from-matlab/taxonomy.pdf}]{figs/from-matlab/taxonomy.pdf}
 \caption{WEC system modeling approaches, with MDOcean's capabilities outlined in black.}\label{fig:model-taxonomy}
 \fillandplacepagenumber
 \end{figure}
 \endgroup
 \end{landscape}
 %Need to copy sources over from slide 27 and 35 of F24 reseach slides with original charts (with color)
+{\renewcommand{\arraystretch}{0.98}
 \singleColMacro{
-\begin{longtable}{
-    P{0.13\linewidth}| % Ref
-    P{0.055\linewidth}| % Type
-    P{0.08\linewidth}| % hydro
-    P{0.04\linewidth}| % drag
-    P{0.025\linewidth}| % dynam
-    P{0.05\linewidth}| % controls
-    P{0.04\linewidth}| % mooring
-    P{0.035\linewidth}| % PTO
-    P{0.05\linewidth}| % struct
-    P{0.06\linewidth}| % econ
-    P{0.065\linewidth}} % waves
+\setlength{\tabcolsep}{1pt}
+\expanded{
+    \noexpand\longtable{\TableColumnSpecs{aor:lit-review}}
+}
 \rot{\textbf{Ref}} & \rot{\textbf{Type}} & \rot{\textbf{Hydro}}& \rot{\textbf{Drag}} & \rot{\textbf{Dyn}} & \rot{\textbf{Ctrl}} & \rot{\textbf{Moor}} & \rot{\textbf{PTO}} & \rot{\textbf{Struct}} & \rot{\textbf{Econ}} & \rot{\textbf{Waves}} \\
 \hline
-This work & 2-PA & MEEM, ALG, FIT & DF, M & F+ & PI+ & - & DY & AN & STR, PTO & REG+, STO \\
+{\setlength{\baselineskip}{0.5\baselineskip} This work\par}
+ & 2-PA &
+{\setlength{\baselineskip}{0.5\baselineskip} MEEM, ALG, FIT\par}
+ & DF, M & F+ & PI+ & - & DY & AN & STR, PTO & REG+, STO \\
 
 \cite{mccabe_multidisciplinary_2022} & 2-PA & ALG & - & F+ & PI+ & - & EF & AN & STR & REG+, STO \\
 
@@ -220,7 +213,7 @@ This work & 2-PA & MEEM, ALG, FIT & DF, M & F+ & PI+ & - & DY & AN & STR, PTO & 
 
 \cite{RM3} & 2-PA & BEM & Q & T & P & DE & - & FEA & FULL & IRR+, STO \\
 
-\cite{mi_multi-scale_2025} & OSW & BEM & \small{Various} & T & PI & DE & DY & FEA & FULL & IRR+, STO \\
+\cite{mi_multi-scale_2025} & OSW & BEM & \footnotesize{Various} & T & PI & DE & DY & FEA & FULL & IRR+, STO \\
 
 \cite{an_optimal_2024} & OTP & CFD & CFD & T & - & - & - & FEA & - & STO \\
 
@@ -228,7 +221,7 @@ This work & 2-PA & MEEM, ALG, FIT & DF, M & F+ & PI+ & - & DY & AN & STR, PTO & 
 
 \cite{nguyen_theoretical_2024} & OSW & MEEM & LD & F & PI & - & - & LD & - & IRR \\
 
-\cite{ferri_balancing_2014} & 1-PA & BEM & LD & T & P,PI+, US & - & DY & LD & STR & IRR+ \\
+\cite{ferri_balancing_2014} & 1-PA & BEM & LD & T & P, PI+, US & - & DY & LD & STR & IRR+ \\
 
 \cite{rosati_control_2023} & OWC & BEM & - & T & NL P+ & - & EF & - & PTO & IRR+ \\
 
@@ -258,8 +251,9 @@ See \Cref{fig:model-taxonomy} for abbreviations.
 An asterisk * in type column means array effects from multiple interacting devices are modeled.}
 \label{tab:lit}
 %\fillandplacepagenumber
-\end{longtable}
-}
+\endlongtable
+} % end single col macro
+} % end array stretch
 
 \subsection{Relevance of Semi-Analytical Modeling}   
 An optimization study can use any kind of simulation model to assess the design's performance, including simple algebraic models, theory-intensive semi-analytical models, and standard numerical models.
