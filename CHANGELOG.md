@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-4
+## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-5
 Represents changes made after journal submission in preparation for dissertation submission.
 Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, a runtime measurement fix, and some pipeline cleanup.
 
