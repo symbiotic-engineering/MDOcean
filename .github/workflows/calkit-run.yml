@@ -152,8 +152,14 @@ jobs:
             git config branch."$BRANCH".merge refs/heads/"$BRANCH"
           fi
 
+          # first save subproject
+          cd mdocean/simulation/modules/OpenFLASH
+          calkit save dvc.lock dvc.yaml .calkit/ -m "Run pipeline from MDOcean superproject"
+          cd ../../../..
+
+          # then save superproject
           calkit dvc pull
-          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+          calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex mdocean/simulation/modules/OpenFLASH/ -m "Run pipeline"
           PUSH_STATUS=$?
 
           if [ $PUSH_STATUS -ne 0 ]; then
