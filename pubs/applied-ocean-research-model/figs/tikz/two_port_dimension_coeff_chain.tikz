@@ -1,0 +1,58 @@
+\begin{tikzpicture}[
+    wire/.style={line width=0.9pt},
+    infoarrow/.style={->, line width=0.9pt, color=blue!70!black},
+    lowerblock/.style={draw, minimum width=1.45cm, minimum height=1.2cm, align=center},
+    upperblock/.style={draw, minimum width=1.45cm, minimum height=0.75cm}
+]
+    % Global dimensions for easy editing
+    \def\xsep{2.0}
+    \def\uppery{1.9}
+    \def\ytop{0.6}
+    \def\ybot{-0.6}
+    \def\dimtexty{2.7}
+    \def\coeftexty{1.2}
+
+    % Five lower two-port blocks and five upper blocks
+    \foreach \i/\label in {
+        1/{\mathbf{Z}_i},
+        2/{\mathbf{h}_{\mathrm{kin}}},
+        3/{\mathbf{a}_{\mathrm{drive}}},
+        4/{\mathbf{a}_{\mathrm{gen}}},
+        5/{\boldsymbol{\eta}_{\mathrm{inv}}}
+    } {
+        \pgfmathsetmacro{\x}{(\i-1)*\xsep}
+        \node[lowerblock] (L\i) at (\x,0) {$\label$};
+        \node[upperblock] (U\i) at (\x,\uppery) {};
+
+        \node[font=\small] (Dim\i) at (\x,\dimtexty) {dimensions};
+        \draw[infoarrow] (Dim\i.south) -- (U\i.north);
+
+        \node[font=\small] (Coef\i) at (\x,\coeftexty) {coefficients};
+        \draw[infoarrow] (Coef\i.south) -- (L\i.north);
+    }
+
+    % Left and right sinusoidal voltage sources
+    \draw[wire] (-2,\ybot) to[sinusoidal voltage source] (-2,\ytop);
+    \draw[wire] (10,\ybot) to[sinusoidal voltage source] (10,\ytop);
+
+    % Connections up to block 4
+    \draw[wire] (-2,\ytop) -- (L1.north west);
+    \draw[wire] (-2,\ybot) -- (L1.south west);
+    \draw[wire] (L1.north east) -- (L2.north west);
+    \draw[wire] (L2.north east) -- (L3.north west);
+    \draw[wire] (L3.north east) -- (L4.north west);
+    \draw[wire] (L1.south east) -- (L2.south west);
+    \draw[wire] (L2.south east) -- (L3.south west);
+    \draw[wire] (L3.south east) -- (L4.south west);
+
+    % Vertical impedance between blocks 4 and 5
+    \node[draw, minimum width=0.28cm, minimum height=1.55cm, align=center] (Zlink) at (7,0) {$Z$};
+    \draw[wire] (L4.north east) -- (Zlink.north west);
+    \draw[wire] (Zlink.north east) -- (L5.north west);
+    \draw[wire] (L4.south east) -- (Zlink.south west);
+    \draw[wire] (Zlink.south east) -- (L5.south west);
+
+    % Connections from block 5 to right source
+    \draw[wire] (L5.north east) -- (10,\ytop);
+    \draw[wire] (L5.south east) -- (10,\ybot);
+\end{tikzpicture}
