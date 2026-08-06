@@ -237,7 +237,7 @@ This multiplicative decomposition allows isolation of the effect of each design 
 \hline
  & $x_{\text{shape}}$ & $C_{d,f}$ & $C_{d,s}$ & $F_{\text{max}}$ & $P_{\text{max}}$ & $\eta$ \\
 \hline
-$\mathbf{\eta}^{H,T}_{rad}$   & $\checkmark$ &  &  &  &  &  \\
+$\mathbf{\eta}^{H,T}_{\text{rad}}$   & $\checkmark$ &  &  &  &  &  \\
 $\mathbf{\eta}^{H,T}_{\text{drag}}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
 $\mathbf{\eta}^{H,T}_{\text{limits}}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  \\
 $\mathbf{\eta}^{H,T}_{\text{elec}}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
@@ -278,7 +278,7 @@ The effect of drag is most significant in the 11-12 second range, corresponding 
 
 \paragraph{Constraint Sensitivities}
 The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\eta^{H,T}_{\text{limits}}$.
-From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,opt}|^2)$ that captures the effect of active dynamic constraints:
+From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,\text{opt}}|^2)$ that captures the effect of active dynamic constraints:
 \begin{equation}\label{eq:power-elec-sum}
 \begin{aligned}
     \overline{P}_{elec} &= \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
@@ -292,8 +292,8 @@ From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 \end{aligned}
 \end{equation}
 
-Power is maximized when $|\Gamma_{\beta,opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
-When constraints are active, the optimal $|\Gamma_{\beta,opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,opt}|$.
+Power is maximized when $|\Gamma_{\beta,\text{opt}}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
+When constraints are active, the optimal $|\Gamma_{\beta,\text{opt}}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,\text{opt}}|$.
 
 \Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\overline{P}_{\text{elec}}$ as a function of the constraint coefficients $b_\mu$ (which are affine or square functions of the constraint limits $\tau_{\text{max}}$, $P_{\tau\Omega,\text{max}}$, $\xi_{f,\text{max}}$, $\xi_{s,\text{max}}$, and $X_{PTO,\text{max}}$ defined in \Cref{tab:qp-constraints}).
 

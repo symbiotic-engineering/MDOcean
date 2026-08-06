@@ -576,13 +576,13 @@ This subsection presents the unconstrained and constrained optimal-control solut
 \paragraph{Unconstrained}
 In the absence of constraints, maximizing power at a given port requires impedance matching at that port due to the maximum power transfer theorem.
 We apply matching at the generator electrical port, so the electrical load impedance $\gls{sym-Z-l}$ must be the complex conjugate of the Th\'{e}venin equivalent source impedance $\gls{sym-Z-s-th}$ seen from that port.
-This is called reactive control, with subscript $reac$:
+This is called reactive control, with subscript $\text{reac}$:
 \begin{equation}\label{eq:matched-load}
     Z_{l,reac} = Z_{s,th}^*
 \end{equation}
 
 However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
-Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $damp$, and requires $\gls{sym-K}_{l,\text{damp}}=0$.
+Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{l,\text{damp}}=0$.
 The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
 \begin{equation}\label{eq:damping-control}
     B_{l,damp} = \sqrt{ (B_{l,reac})^2 + (K_{l,reac}/\omega)^2}
@@ -818,14 +818,14 @@ We now combine the results across sea states to find the long-term energy statis
     While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\gls{sym-vec-hat-xi}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\gls{sym-hat-xi-f}$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
     These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-mathbf-hat-xi-H-T-f}$) indexed by sea state rather than by degree of freedom, indicated by the $\gls{sym-H},\gls{sym-T}$ superscript.
     Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
-    To distinguish from the average and maximum signal values over a wave period denoted with $avg$ and $pk$ subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $max$.
-    This intentionally matches the $max$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
+    To distinguish from the average and maximum signal values over a wave period denoted with $\text{avg}$ and $pk$ subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $\text{max}$.
+    This intentionally matches the $\text{max}$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
     An exception is the slamming and submergence constraints, which will be discussed separately in \Cref{sec:design-load-cases}.
 \else
     Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{\gls{sym-H},\gls{sym-T}}$ (e.g.\ $\mathbf{\gls{sym-P}}_{\text{elec}}^{\gls{sym-H},\gls{sym-T}}$),
     with operations interpreted elementwise across sea states rather than as matrix multiplication.
-    Long-term averages across sea states are denoted with an overbar $\overline{(\cdot)}$ and long-term maxima with subscript $max$,
-    distinguishing them from the within-period averages and peaks ($avg$, $pk$) introduced in \Cref{sec:power}.
+    Long-term averages across sea states are denoted with an overbar $\overline{(\cdot)}$ and long-term maxima with subscript $\text{max}$,
+    distinguishing them from the within-period averages and peaks ($\text{avg}$, $pk$) introduced in \Cref{sec:power}.
     A separate quadratic amplitude limit for slamming and submergence, which varies across sea states, is treated in \Cref{sec:design-load-cases}.
 \fi
 
@@ -977,7 +977,7 @@ Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dim
 The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
 This maximum amplitude $\gls{sym-xi-lin}$ for the float and spar respectively is
 \begin{equation}
-    \xi_{f,\text{linear}} = \frac{1}{10}(h-T_{f,2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10}(h-T_s)
+    \xi_{f,\text{linear}} = \frac{1}{10} (h-T_{f,2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10} (h-T_s)
 \end{equation}
 \ifdefined\DISSERTATION
     which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
@@ -1014,7 +1014,7 @@ The values of $\gls{sym-Delta} \gls{sym-z}$ used for float and spar in operation
 % \hline
 % \textbf{Value} & \textbf{Sea state to use} & \textbf{Saturation to meet it?} \\
 % \hline
-% $\gls{sym-F}_{\text{heave},storm}$& Storm sea state & Not relevant (controller is off during storm) \\
+% $\gls{sym-F}_{\text{heave},\text{storm}}$& Storm sea state & Not relevant (controller is off during storm) \\
 % \hline
 % $\gls{sym-F}_{\text{heave},op}$& Operating sea states with nonzero JPD & Ideally, but requires more work \\
 % \hline
