@@ -1089,11 +1089,11 @@ def check_inconsistent_word_style():
 
 def check_missing_word_style():
     warns = []
-    style_for_word, style_counts, styled_word_pattern = actions.collect_word_style_data(ts.tex)
+    prose_style_for_word, styled_word_pattern = actions.collect_word_style_data(ts.tex)
     for i, l in enumerate(ts.tex_lines_clean):
         if ts.in_code(i):
             continue
-        updated, span = actions.missing_word_style_line(l, style_for_word, style_counts, styled_word_pattern)
+        updated, span = actions.missing_word_style_line(l, prose_style_for_word, styled_word_pattern)
         if span is not None:
             warns.append((i, "Word used without a style", span))
     return warns
@@ -1116,11 +1116,12 @@ def print_warnings(warn, writer, use_color=True, output=True):
     sorted_warn = sorted(warn, key=lambda tup: tup[0][0])
     for cw in sorted_warn:
         w = cw[0]
-        if w[0] != -1 and ts.tex_lines[w[0]].strip().startswith("%"):
+        has_line = 0 <= w[0] < len(ts.tex_lines)
+        if has_line and ts.tex_lines[w[0]].strip().startswith("%"):
             continue
-        if w[0] != -1 and ts.in_comment(w[0]):
+        if has_line and ts.in_comment(w[0]):
             continue
-        if w[0] != -1 and ts.in_code(w[0]) and cw[1] not in CODE_WARNING_EXCEPTIONS:
+        if has_line and ts.in_code(w[0]) and cw[1] not in CODE_WARNING_EXCEPTIONS:
             continue
 
         if output:
@@ -1144,7 +1145,7 @@ def print_warnings(warn, writer, use_color=True, output=True):
             writer("")
 
         if len(w) > 2:
-            if output:
+            if output and has_line:
                 writer("    %s" % ts.tex_lines[w[0]].replace("\t", " "))
             if output:
                 if use_color:

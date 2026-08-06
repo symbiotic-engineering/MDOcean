@@ -90,6 +90,8 @@ def fix_mathmode_subscripts_in_file(path):
 
 
 def space_before_cite_line(line):
+    if re.match(r'^\s*%', line):
+        return line, None
     match = re.search(r'[^ ~]\\cite(?![A-Za-z])', line)
     if not match or '\\etal\\cite' in line:
         return line, None
@@ -291,7 +293,13 @@ def fix_cite_duplicate_in_file(path):
 
 
 def brackets_space_line(line):
-    updated = line
+    placeholders = []
+
+    def mask_math(match):
+        placeholders.append(match.group(0))
+        return f'__PAPERLINT_MATH_{len(placeholders) - 1}__'
+
+    updated = math_pat.sub(mask_math, line)
     changed = False
     new_updated = re.sub(r'(?<![\\\s\{\[~])\((?=[A-Za-z\\])', ' (', updated)
     changed |= new_updated != updated
@@ -302,8 +310,12 @@ def brackets_space_line(line):
     new_updated = re.sub(r'\s+\)', ')', updated)
     changed |= new_updated != updated
     updated = new_updated
+
     if not changed:
         return line, None
+
+    for index, original in enumerate(placeholders):
+        updated = updated.replace(f'__PAPERLINT_MATH_{index}__', original)
     return updated, (0, len(line))
 
 
@@ -342,59 +354,109 @@ def fix_numerals_in_file(path):
 def collect_word_style_data(text):
     text = text + ("\n" + WORD_STYLE_REFERENCE_TEXT if WORD_STYLE_REFERENCE_TEXT else "")
     styled_word_pattern = re.compile(r'\\text([^\{]*)\{([^{}]+)\}')
-    style_for_word = {}
-    style_counts_by_word = {}
-    style_counts = {}
-    for styled in styled_word_pattern.finditer(text):
+    prose_style_counts_by_word = {}
+    styled_counts_by_word = {}
+
+    masked_text = math_pat.sub(lambda match: " " * len(match.group(0)), text)
+    for styled in styled_word_pattern.finditer(masked_text):
         style = styled.group(1)
+        if not style:
+            continue
         word = styled.group(2)
-        style_counts[word] = style_counts.get(word, 0) + 1
-        if word not in style_counts_by_word:
-            style_counts_by_word[word] = {}
-        style_counts_by_word[word][style] = style_counts_by_word[word].get(style, 0) + 1
+        if not re.fullmatch(r"[a-z]+", word):
+            continue
+        if word not in prose_style_counts_by_word:
+            prose_style_counts_by_word[word] = {}
+        prose_style_counts_by_word[word][style] = prose_style_counts_by_word[word].get(style, 0) + 1
+        styled_counts_by_word[word] = styled_counts_by_word.get(word, 0) + 1
 
-    for word, counts in style_counts_by_word.items():
-        # Prefer the most common style seen for this word.
-        style_for_word[word] = max(counts.items(), key=lambda item: item[1])[0]
-    return style_for_word, style_counts, styled_word_pattern
+    total_counts_by_word = {}
+    if prose_style_counts_by_word:
+        word_pattern = re.compile(r'(?<!\\)\b(' + '|'.join(map(re.escape, prose_style_counts_by_word.keys())) + r')\b')
+        for match in word_pattern.finditer(masked_text):
+            word = match.group(1)
+            total_counts_by_word[word] = total_counts_by_word.get(word, 0) + 1
+
+    prose_style_for_word = {}
+    for word, counts in prose_style_counts_by_word.items():
+        total_count = total_counts_by_word.get(word, 0)
+        styled_count = styled_counts_by_word.get(word, 0)
+        if total_count > 0 and styled_count / total_count > 0.3:
+            # Prefer the most common style seen for this word.
+            prose_style_for_word[word] = max(counts.items(), key=lambda item: item[1])[0]
+    return prose_style_for_word, styled_word_pattern
 
 
-def missing_word_style_line(line, style_for_word, style_counts, styled_word_pattern):
-    placeholders = []
+def missing_word_style_line(line, prose_style_for_word, styled_word_pattern):
+    def rewrite_segment(segment, wrap_word, pattern):
+        placeholders = []
 
-    def mask_gls(match):
-        placeholders.append(match.group(0))
-        return f'__PAPERLINT_GLS_{len(placeholders) - 1}__'
+        def mask_gls(match):
+            placeholders.append(match.group(0))
+            return f'__PAPERLINT_GLS_{len(placeholders) - 1}__'
 
-    def mask_styled(match):
-        placeholders.append(match.group(0))
-        return f'__PAPERLINT_STYLE_{len(placeholders) - 1}__'
+        def mask_styled(match):
+            placeholders.append(match.group(0))
+            return f'__PAPERLINT_STYLE_{len(placeholders) - 1}__'
 
-    updated = re.sub(r'\\gls[a-zA-Z]*\*?\{[^{}]*\}', mask_gls, line)
-    updated = styled_word_pattern.sub(mask_styled, updated)
-    changed = updated != line
-    for word, style in style_for_word.items():
-        new_updated = re.sub(
-            r'(?<!\\)\b%s\b' % re.escape(word),
-            lambda _match, style=style, word=word: f'\\text{style}{{{word}}}',
-            updated,
-        )
-        changed |= new_updated != updated
+        updated = re.sub(r'\\gls[a-zA-Z]*\*?\{[^{}]*\}', mask_gls, segment)
+        updated = styled_word_pattern.sub(mask_styled, updated)
+        if pattern is None:
+            return segment
+
+        new_updated = pattern.sub(lambda match: wrap_word(match.group(1)), updated)
+        if new_updated == segment:
+            return segment
         updated = new_updated
-    for index, original in enumerate(placeholders):
-        updated = updated.replace(f'__PAPERLINT_STYLE_{index}__', original)
+        for index, original in enumerate(placeholders):
+            updated = updated.replace(f'__PAPERLINT_STYLE_{index}__', original)
+            updated = updated.replace(f'__PAPERLINT_GLS_{index}__', original)
+        return updated
+
+    def wrap_math(word):
+        return f'\\text{{{word}}}'
+
+    def wrap_prose(word, style):
+        return f'\\text{style}{{{word}}}'
+
+    prose_pattern = None
+    if prose_style_for_word:
+        prose_pattern = re.compile(r'(?<!\\)\b(' + '|'.join(map(re.escape, prose_style_for_word.keys())) + r')\b')
+
+    updated_parts = []
+    last = 0
+    changed = False
+
+    for match in math_pat.finditer(line):
+        if last < match.start():
+            prose_segment = line[last:match.start()]
+            rewritten_prose = rewrite_segment(prose_segment, lambda word: wrap_prose(word, prose_style_for_word[word]), prose_pattern)
+            updated_parts.append(rewritten_prose)
+            changed |= rewritten_prose != prose_segment
+
+        math_segment = match.group(0)
+        rewritten_math = rewrite_segment(math_segment, wrap_math, word_pat)
+        updated_parts.append(rewritten_math)
+        changed |= rewritten_math != math_segment
+        last = match.end()
+
+    tail = line[last:]
+    rewritten_tail = rewrite_segment(tail, lambda word: wrap_prose(word, prose_style_for_word[word]), prose_pattern)
+    updated_parts.append(rewritten_tail)
+    changed |= rewritten_tail != tail
+
     if not changed:
         return line, None
-    return updated, (0, len(line))
+    return "".join(updated_parts), (0, len(line))
 
 
 def fix_missing_word_style_in_file(path):
     path = Path(path)
     old = _read_text(path)
-    style_for_word, style_counts, styled_word_pattern = collect_word_style_data(old)
-    if not style_for_word:
+    prose_style_for_word, styled_word_pattern = collect_word_style_data(old)
+    if not prose_style_for_word:
         return 0
-    return _rewrite_lines(path, lambda line: missing_word_style_line(line, style_for_word, style_counts, styled_word_pattern)[0])
+    return _rewrite_lines(path, lambda line: missing_word_style_line(line, prose_style_for_word, styled_word_pattern)[0])
 
 
 def fix_glossary_refs_in_file(path, glossary_file):
