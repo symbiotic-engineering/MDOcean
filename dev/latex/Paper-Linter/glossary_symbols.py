@@ -45,6 +45,7 @@ GLOSSARY_LABEL_STRIP_COMMANDS = {
 
 GLOSSARY_SORT_STRIP_COMMANDS = SYMBOL_DECORATOR_COMMANDS | GLOSSARY_LABEL_STRIP_COMMANDS
 GLOSSARY_IGNORED_SYMBOLS = set(MATH_SYMBOL_STOPWORDS)
+GLS_COMMAND_RE = re.compile(r"\\gls[a-zA-Z]*\{([^{}]+)\}")
 
 _skip_ws = shared_skip_ws
 _read_braced_group = shared_read_braced_group
@@ -53,6 +54,29 @@ _normalize_scripts_in_expression = shared_normalize_scripts_in_expression
 _unwrap_braces = shared_unwrap_braces
 _canonicalize_symbol = shared_canonicalize_symbol
 _symbol_key = shared_symbol_key
+
+
+def _collapse_simple_script_braces(text):
+    return re.sub(r"([_^])\{([A-Za-z0-9]+)\}", r"\1\2", text)
+
+
+def _normalize_glossary_equivalence_symbol(symbol):
+    stripped = _normalize_scripts_in_expression(symbol)
+    stripped = _strip_wrapped_commands(stripped, GLOSSARY_SORT_STRIP_COMMANDS)
+    stripped = _collapse_simple_script_braces(stripped)
+    return _normalize_symbol(stripped)
+
+
+def _prefer_glossary_symbol(existing_symbol, candidate_symbol):
+    existing_has_text = "\\text{" in existing_symbol
+    candidate_has_text = "\\text{" in candidate_symbol
+    if candidate_has_text and not existing_has_text:
+        return candidate_symbol
+    if existing_has_text and not candidate_has_text:
+        return existing_symbol
+    if len(candidate_symbol) < len(existing_symbol):
+        return candidate_symbol
+    return existing_symbol
 
 
 def read_glossary_replacements(path):
@@ -149,6 +173,9 @@ def extract_math_symbols(content):
 
 def symbol_to_glossary_label(symbol):
     stripped = symbol[1:] if symbol.startswith("\\") else symbol
+    stripped = stripped.replace(r"\prime", "prime")
+    stripped = stripped.replace("'", "prime")
+    stripped = stripped.replace("*", "star")
     safe = re.sub(r"[^A-Za-z0-9]+", "-", stripped).strip("-")
     if not safe:
         safe = "symbol"
@@ -302,7 +329,7 @@ def read_existing_symbol_metadata(path):
         if symbol is None or not metadata:
             continue
         symbol = _canonicalize_symbol(symbol.strip())
-        existing = metadata_by_symbol.setdefault(_symbol_key(symbol), {})
+        existing = metadata_by_symbol.setdefault(_symbol_key(_normalize_glossary_equivalence_symbol(symbol)), {})
         for key, value in metadata.items():
             if value or key not in existing:
                 existing[key] = value
@@ -322,21 +349,37 @@ def read_existing_symbols(path):
         symbol, _ = _parse_glsxtrnewsymbol_line(line)
         if symbol is None:
             continue
-        symbols.add(_canonicalize_symbol(symbol.strip()))
+        symbols.add(_normalize_glossary_equivalence_symbol(_canonicalize_symbol(symbol.strip())))
     return symbols
+
+
+def collect_glossary_labels_from_files(paths):
+    labels = set()
+    for path in paths:
+        try:
+            with open(path) as handle:
+                content = ts.strip_tex_comments(handle.read())
+        except Exception:
+            continue
+        for match in GLS_COMMAND_RE.finditer(content):
+            label = match.group(1).strip()
+            if label:
+                labels.add(label)
+    return labels
 
 
 def build_symbol_glossary_lines(symbols, metadata_by_symbol):
     lines = []
     used_labels = set()
-    filtered_symbols = [symbol for symbol in symbols if _symbol_key(symbol) not in GLOSSARY_IGNORED_SYMBOLS]
+    filtered_symbols = [symbol for symbol in symbols if _symbol_key(_normalize_glossary_equivalence_symbol(symbol)) not in GLOSSARY_IGNORED_SYMBOLS]
     for symbol in sorted(filtered_symbols, key=lambda item: (
-        metadata_by_symbol.get(_symbol_key(item), {}).get("sort", symbol_to_glossary_label(_normalize_glossary_sort_symbol(item))).lower(),
+        metadata_by_symbol.get(_symbol_key(_normalize_glossary_equivalence_symbol(item)), {}).get("sort", symbol_to_glossary_label(_normalize_glossary_sort_symbol(item))).lower(),
         symbol_to_glossary_label(_normalize_glossary_label_symbol(item)),
         item,
     )):
         label_base = symbol_to_glossary_label(_normalize_glossary_label_symbol(symbol))
-        sort_value = metadata_by_symbol.get(_symbol_key(symbol), {}).get("sort")
+        lookup_key = _symbol_key(_normalize_glossary_equivalence_symbol(symbol))
+        sort_value = metadata_by_symbol.get(lookup_key, {}).get("sort")
         if sort_value is None:
             sort_value = symbol_to_glossary_label(_normalize_glossary_sort_symbol(symbol))
         label = label_base
@@ -345,7 +388,7 @@ def build_symbol_glossary_lines(symbols, metadata_by_symbol):
             label = "%s-%d" % (label_base, suffix)
             suffix += 1
         used_labels.add(label)
-        metadata = metadata_by_symbol.get(_symbol_key(symbol), {})
+        metadata = metadata_by_symbol.get(lookup_key, {})
         description = metadata.get("description", "")
         sort_option = ""
         if metadata.get("sort") or sort_value != label_base:
@@ -354,11 +397,31 @@ def build_symbol_glossary_lines(symbols, metadata_by_symbol):
     return lines
 
 
-def write_symbol_glossary(path, symbols, seed_path=None):
+def write_symbol_glossary(path, symbols, seed_path=None, used_labels=None):
     source_path = seed_path if seed_path else path
-    symbols = set(symbols) | read_existing_symbols(source_path)
+    grouped_symbols = {}
+    for symbol in set(symbols):
+        normalized_key = _symbol_key(_normalize_glossary_equivalence_symbol(symbol))
+        existing_symbol = grouped_symbols.get(normalized_key)
+        if existing_symbol is None:
+            grouped_symbols[normalized_key] = symbol
+        else:
+            grouped_symbols[normalized_key] = _prefer_glossary_symbol(existing_symbol, symbol)
+
+    used_labels = set(used_labels or [])
+    if os.path.exists(source_path):
+        for label, symbol, _ in parse_glossary_entries(pathlib.Path(source_path)):
+            canonical_symbol = _canonicalize_symbol(symbol)
+            normalized_key = _symbol_key(_normalize_glossary_equivalence_symbol(canonical_symbol))
+            if canonical_symbol in grouped_symbols.values() or label in used_labels:
+                existing_symbol = grouped_symbols.get(normalized_key)
+                if existing_symbol is None:
+                    grouped_symbols[normalized_key] = canonical_symbol
+                else:
+                    grouped_symbols[normalized_key] = _prefer_glossary_symbol(existing_symbol, canonical_symbol)
     metadata_by_symbol = read_existing_symbol_metadata(source_path)
-    lines = build_symbol_glossary_lines(symbols, metadata_by_symbol)
+    lines = build_symbol_glossary_lines(set(grouped_symbols.values()), metadata_by_symbol)
+
     with open(path, "w") as handle:
         for line in lines:
             handle.write(line + "\n")

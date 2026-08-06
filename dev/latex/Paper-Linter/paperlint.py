@@ -43,6 +43,13 @@ def main():
     if options["replace_glossary_refs"]:
         options["check_states"]["glossary-refs"] = 2
 
+    if options["symbol_glossary_seed_file"] is not None:
+        try:
+            with open(options["symbol_glossary_seed_file"]) as handle:
+                checks.actions.WORD_STYLE_REFERENCE_TEXT = handle.read()
+        except Exception:
+            checks.actions.WORD_STYLE_REFERENCE_TEXT = ""
+
     if options["output_file"] is not None:
         output_handle = open(options["output_file"], "w")
         use_color = False
@@ -51,6 +58,14 @@ def main():
         use_color = output_handle.isatty()
 
     tex_files = ts.collect_tex_files(options["root_path"], options["ignored_files"])
+
+    missing_word_style_check = None
+    missing_word_style_prepass = options["check_states"].get("missing-textstyle", 1) == 2
+    if missing_word_style_prepass:
+        for c in checks.checks:
+            if c[2] == "missing-textstyle":
+                missing_word_style_check = c
+                break
 
     try:
         for file in tex_files:
@@ -67,6 +82,15 @@ def main():
 
             ts.preprocess()
 
+            if missing_word_style_prepass and missing_word_style_check is not None and len(missing_word_style_check) > 3 and missing_word_style_check[3] is not None:
+                missing_word_style_check[3](file)
+                try:
+                    ts.next_file(file)
+                except RuntimeError:
+                    print("Could not open '%s'" % sys.argv[1])
+                    sys.exit(1)
+                ts.preprocess()
+
             warnings = []
             suppressed = []
             for c in checks.checks:
@@ -77,7 +101,9 @@ def main():
                 else:
                     add_warn = c[0]()
                     pre_fix_warning_count = len(add_warn)
-                    if state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
+                    if c[2] == "missing-textstyle" and missing_word_style_prepass:
+                        pass
+                    elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                         if c[2] == "glossary-refs":
                             c[3](file, GLOSSARY_FILE)
                         elif c[2] == "prefix":
@@ -122,7 +148,13 @@ def main():
             for text_string in sorted(checks.math_text_mix_strings):
                 write_output("- %s" % text_string)
         if options["symbol_glossary_file"] is not None:
-            gs.write_symbol_glossary(options["symbol_glossary_file"], all_equation_symbols, options["symbol_glossary_seed_file"])
+            used_glossary_labels = gs.collect_glossary_labels_from_files(tex_files)
+            gs.write_symbol_glossary(
+                options["symbol_glossary_file"],
+                all_equation_symbols,
+                options["symbol_glossary_seed_file"],
+                used_labels=used_glossary_labels,
+            )
             write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), options["symbol_glossary_file"]))
     finally:
         if output_handle is not sys.stdout:

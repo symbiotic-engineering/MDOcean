@@ -11,9 +11,9 @@ WORDS = [
     "cost", "struct", "crit", "tube", "plate", "top", "edge", "cent",
     "fixed", "constant", "max", "min", "elec", "drag", "up", "down",
     "linear", "slam", "wave", "oval", "unconstrained", "shaft",
-    "harmonics", "limits", "shape", "stiff", "rel", "damp",
+    "harmonics", "limits", "shape", "stiff", "rel", "damp", "opt",
     "avg", "surf", "sub", "guess", "mech", "reac", "storm",
-    "design", "sens", "spar", "unsat",
+    "design", "sens", "spar", "unsat", "in", "rad"
 ]
 
 word_pat = re.compile(r'(?<!\\text\{)\b(' + '|'.join(map(re.escape, WORDS)) + r')\b')
@@ -27,6 +27,14 @@ math_pat = re.compile(
     ''',
     re.DOTALL | re.VERBOSE,
 )
+
+WORD_STYLE_REFERENCE_TEXT = ""
+
+TERMINOLOGY_REPLACEMENTS = [
+    (re.compile(r"\bexternal region(s)?\b", re.IGNORECASE), "exterior region"),
+    (re.compile(r"\binternal region(s)?\b", re.IGNORECASE), "interior region"),
+    (re.compile(r"\breaction plate(s)?\b", re.IGNORECASE), "damping plate"),
+]
 
 
 def _read_text(path):
@@ -91,6 +99,31 @@ def space_before_cite_line(line):
 
 def fix_space_before_cite_in_file(path):
     return _rewrite_lines(path, lambda line: space_before_cite_line(line)[0])
+
+
+def preferred_terminology_line(line):
+    updated = line
+    changed = False
+
+    for pattern, replacement in TERMINOLOGY_REPLACEMENTS:
+        def replace(match, replacement=replacement):
+            plural_suffix = match.group(1) or ""
+            term = replacement + plural_suffix
+            if match.group(0) and match.group(0)[0].isupper():
+                term = term[0].upper() + term[1:]
+            return term
+
+        new_updated = pattern.sub(replace, updated)
+        changed |= new_updated != updated
+        updated = new_updated
+
+    if not changed:
+        return line, None
+    return updated, (0, len(line))
+
+
+def fix_preferred_terminology_in_file(path):
+    return _rewrite_lines(path, lambda line: preferred_terminology_line(line)[0])
 
 
 def collect_unused_macro_definitions(text):
@@ -307,15 +340,14 @@ def fix_numerals_in_file(path):
 
 
 def collect_word_style_data(text):
-    styled_word_pattern = re.compile(r'\\text([^\{]+)\{([^{}]+)\}')
+    text = text + ("\n" + WORD_STYLE_REFERENCE_TEXT if WORD_STYLE_REFERENCE_TEXT else "")
+    styled_word_pattern = re.compile(r'\\text([^\{]*)\{([^{}]+)\}')
     style_for_word = {}
     style_counts_by_word = {}
     style_counts = {}
     for styled in styled_word_pattern.finditer(text):
         style = styled.group(1)
         word = styled.group(2)
-        if len(word) <= 3:
-            continue
         style_counts[word] = style_counts.get(word, 0) + 1
         if word not in style_counts_by_word:
             style_counts_by_word[word] = {}
@@ -330,15 +362,18 @@ def collect_word_style_data(text):
 def missing_word_style_line(line, style_for_word, style_counts, styled_word_pattern):
     placeholders = []
 
+    def mask_gls(match):
+        placeholders.append(match.group(0))
+        return f'__PAPERLINT_GLS_{len(placeholders) - 1}__'
+
     def mask_styled(match):
         placeholders.append(match.group(0))
         return f'__PAPERLINT_STYLE_{len(placeholders) - 1}__'
 
-    updated = styled_word_pattern.sub(mask_styled, line)
+    updated = re.sub(r'\\gls[a-zA-Z]*\*?\{[^{}]*\}', mask_gls, line)
+    updated = styled_word_pattern.sub(mask_styled, updated)
     changed = updated != line
     for word, style in style_for_word.items():
-        if style_counts.get(word, 0) <= 1:
-            continue
         new_updated = re.sub(
             r'(?<!\\)\b%s\b' % re.escape(word),
             lambda _match, style=style, word=word: f'\\text{style}{{{word}}}',

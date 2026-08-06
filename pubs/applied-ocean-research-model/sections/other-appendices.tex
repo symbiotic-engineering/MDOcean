@@ -375,7 +375,7 @@ Specifically, the equivalent thickness of the plate $t_{eq}$ is derived by equat
 \end{equation}
 Next, deflection of the stiffened plate is equal to the deflection of the equivalent unstiffened plate with flexural rigidity $D_{eq}$:
 \begin{equation}
-    \gls{sym-D-eq} = \frac{\gls{sym-E}~  \gls{sym-t-eq}^3}{12(1-\gls{sym-nu}^2)}
+    \gls{sym-D-eq} = \frac{\gls{sym-E}~  \gls{sym-t-eq}^3}{12(1-\gls{sym-nu-poisson}^2)}
 \end{equation}
 
 The maximum stress $\sigma$ of the stiffened plate is then:
@@ -400,10 +400,10 @@ The so-called effective breadth ratio $\rho$ is used to quantify the validity of
         \frac{1}{2}+\frac{1}{3-\gls{sym-psi}}, & \gls{sym-psi} \leq -0.236
     \end{cases}
 \end{equation}
-The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\psi$, found as follows:
+The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\gls{sym-psi}$, found as follows:
 \begin{equation}
 \begin{aligned}
-    \gls{sym-lambda} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-t}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
+    \gls{sym-lambda} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-thick}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
     \gls{sym-psi}&=\frac{\gls{sym-f-2}}{\gls{sym-f-1}}
     \end{aligned}
 \end{equation}
@@ -472,14 +472,14 @@ While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for 
 \subsubsection{Float Top Plate}
 The top float plate has equivalent thickness $t_{f,\text{top},eq}$ and the same dimensions and edge fixity as the bottom plate.
 Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $r_0$, where $r_0$ is assumed to be at least half the thickness.
-Under these conditions, either the stress at the center $\sigma_{\text{cent}}$ or along the longer edge $\sigma_{\text{edge}}$ may dominate:
+Under these conditions, either the stress at the center $\gls{sym-sigma-cent}$ or along the longer edge $\gls{sym-sigma-edge}$ may dominate:
 \begin{equation}\label{eq:top-plate-stress}
     \begin{aligned}
-    \gls{sym-sigma}_{\text{edge}}&= \frac{3W}{2\gls{sym-pi} \gls{sym-t}_{\gls{sym-f},\text{top},eq}^2}\left( (1+\gls{sym-nu})\ln\frac{2x_{\text{min}}}{\gls{sym-pi} \gls{sym-r-0}}+\gls{sym-beta-1}\right)\\
-        \gls{sym-sigma}_{\text{cent}}&=-\gls{sym-beta-2} \gls{sym-W}/\gls{sym-t}_{\gls{sym-f},\text{top},eq}^2
+    \gls{sym-sigma-edge}&= \frac{3\gls{sym-W}}{2\gls{sym-pi} \gls{sym-t-f-top-eq}^2}\left( (1+\gls{sym-nu-poisson})\ln\frac{2x_{\text{min}}}{\gls{sym-pi} \gls{sym-r-0}}+\gls{sym-beta-1}\right)\\
+        \gls{sym-sigma-cent}&=-\gls{sym-beta-2} \gls{sym-W}/\gls{sym-t-f-top-eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
+using $\gls{sym-beta-1}$ and $\gls{sym-beta-2}$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
 However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
@@ -548,20 +548,20 @@ The Euler critical buckling force $F_{\text{crit}}$ is:
 where $E$ is the Young'\gls{sym-s} modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface), and $L$ is the beam length, set to $h_s$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
-    FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}} = \frac{\gls{sym-sigma-Y} \frac{\gls{sym-zeta} + \sqrt{\gls{sym-zeta}^2+4\gls{sym-omega}}}{2}}{\frac{\gls{sym-F}}{\gls{sym-A}} + \gls{sym-q}}
+    FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}} = \frac{\gls{sym-sigma-Y} \frac{\gls{sym-zeta-2} + \sqrt{\gls{sym-zeta-2}^2+4\gls{sym-omega-2}}}{2}}{\frac{\gls{sym-F}}{\gls{sym-A}} + \gls{sym-q}}
 \end{equation}
 where $\zeta$ and $\omega$ are defined as follows:
 \begin{equation}
 \begin{aligned}
-     \gls{sym-zeta} &= 1 - \gls{sym-P-r}(1 - \gls{sym-P-r})~\frac{\gls{sym-sigma-Y}}{\gls{sym-F}_{\text{crit}}/\gls{sym-A}} - \frac{\gls{sym-sigma-theta}}{\gls{sym-sigma-Y}}, \qquad
-    \gls{sym-omega} = \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}}  \left(1 - \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}}\right)
+     \gls{sym-zeta-2} &= 1 - \gls{sym-P-r}(1 - \gls{sym-P-r})~\frac{\gls{sym-sigma-Y}}{\gls{sym-F}_{\text{crit}}/\gls{sym-A}} - \frac{\gls{sym-sigma-theta}}{\gls{sym-sigma-Y}}, \qquad
+    \gls{sym-omega-2} = \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}}  \left(1 - \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}}\right)
 \end{aligned}
 \end{equation}
 and the hoop stress $\sigma_\theta$ is
 \begin{equation}
      \gls{sym-sigma-theta} = \frac{q\gls{sym-D-s}}{2~\gls{sym-t-s-r}}
 \end{equation}
-$P_r$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
+$\gls{sym-P-r}$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
 These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}.
 % \begin{equation}
@@ -574,7 +574,7 @@ These equations assume that the spar is compact, meaning that local buckling of 
 % Three yield factors of safety $FOS_y$ (for the float, vertical column, and damping plate) and one buckling factor of safety $FOS_b$ (for the vertical column) are computed for each of two forces (the powertrain force $F_p$ and the hydrodynamic excitation force $F_h$). This gives a total of eight FOS:
 % \begin{equation}
 % \begin{aligned}
-%     FOS_{\gls{sym-y}~{i,\gls{sym-j}}} = \frac{\gls{sym-sigma-y}}{\gls{sym-sigma}_{vm,ij}} ~~&~~
+%     FOS_{\gls{sym-y}~{i,\gls{sym-j}}} = \frac{\gls{sym-sigma-Y}}{\gls{sym-sigma}_{vm,ij}} ~~&~~
 %     FOS_{\gls{sym-b},\gls{sym-j}} = \frac{\gls{sym-F}_{\text{crit}}}{\gls{sym-F}_{\gls{sym-j}}}} \\
 %     i = 1..3, ~& \gls{sym-j} = 1..2
 % \end{aligned}
@@ -605,7 +605,7 @@ $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 1
 $T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
-$\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
+$\rho_M$ & Material density& 7850 & kg/$m^3$  \\ 
 $E$& Material Young's modulus& 200 & GPa  \\ 
 $\text{cost}_m$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 

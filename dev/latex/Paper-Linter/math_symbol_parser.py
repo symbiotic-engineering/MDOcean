@@ -84,10 +84,8 @@ def _read_script_value(text: str, idx: int):
                 return command + group, group_end
         return command, command_end
     if text[idx].isalnum():
-        end = idx + 1
-        while end < len(text) and text[end].isalnum():
-            end += 1
-        return text[idx:end], end
+        # TeX takes a single token for unbraced scripts, not an alnum run.
+        return text[idx], idx + 1
     return text[idx], idx + 1
 
 
@@ -138,11 +136,17 @@ def _script_is_ignored_superscript(script_value: str) -> bool:
 
 
 def _canonicalize_script(script_op: str, script_value: str):
+    original_value = _normalize_symbol(script_value)
+    had_outer_braces = original_value.startswith("{") and original_value.endswith("}")
     normalized_value = _normalize_script_value(script_value)
     if normalized_value is None:
         return None
     if script_op == "^" and _script_is_ignored_superscript(normalized_value):
         return None
+    # Preserve braces when they were explicitly present around a multi-character
+    # simple script value (e.g., a_{in}, x^{ij}).
+    if had_outer_braces and re.fullmatch(r"[A-Za-z0-9]{2,}", normalized_value):
+        normalized_value = "{%s}" % normalized_value
     return script_op + normalized_value
 
 
@@ -174,6 +178,11 @@ def _group_contains_gls_command(group: str) -> bool:
     return re.search(r"\\gls\s*\{", group) is not None
 
 
+def _decorator_group_has_symbol(group: str) -> bool:
+    inner = _unwrap_braces(group)
+    return len(extract_math_symbols(inner)) > 0
+
+
 def strip_explicit_math_text(content: str) -> str:
     stripped = content
     pattern = re.compile(r"\\(?:%s)\*?\{[^{}]*\}" % "|".join(EXPLICIT_MATH_TEXT_COMMANDS))
@@ -185,7 +194,7 @@ def strip_explicit_math_text(content: str) -> str:
 
 
 def _collect_math_symbol_matches(content: str):
-    cleaned = strip_explicit_math_text(content)
+    cleaned = content
     cleaned = re.sub(r"\\(?:begin|end)\{[^{}]+\}", lambda match: " " * (match.end() - match.start()), cleaned)
     cleaned = re.sub(
         r"\\(?:label|tag|nonumber|notag)\*?(?:\{[^{}]*\})?",
@@ -221,11 +230,27 @@ def _collect_math_symbol_matches(content: str):
             if name in GREEK_MATH_SYMBOLS:
                 base = command
                 next_idx = command_end
+            elif name == "gls":
+                skip_idx = _skip_ws(cleaned, command_end)
+                if skip_idx < len(cleaned) and cleaned[skip_idx] == "{":
+                    _, skip_end = _read_braced_group(cleaned, skip_idx)
+                    if skip_end > skip_idx:
+                        idx = skip_end
+                    else:
+                        idx = command_end
+                else:
+                    idx = command_end
+                continue
             elif name in SYMBOL_DECORATOR_COMMANDS:
                 arg_start = _skip_ws(cleaned, command_end)
                 if arg_start < len(cleaned) and cleaned[arg_start] == "{":
                     group, group_end = _read_braced_group(cleaned, arg_start)
-                    if group is not None and _normalize_symbol(_unwrap_braces(group)) and not _group_contains_gls_command(group):
+                    if (
+                        group is not None
+                        and _normalize_symbol(_unwrap_braces(group))
+                        and not _group_contains_gls_command(group)
+                        and _decorator_group_has_symbol(group)
+                    ):
                         base = command + group
                         next_idx = group_end
                 if base is None:
@@ -260,7 +285,7 @@ def _collect_math_symbol_matches(content: str):
         if base == "e" and idx == next_idx:
             continue
 
-        normalized = canonicalize_symbol(symbol.strip())
+        normalized = _normalize_symbol(canonicalize_symbol(symbol.strip()))
         normalized_key = symbol_key(normalized)
         if normalized_key.startswith("\\"):
             base_name = normalized_key[1:].split("{", 1)[0]

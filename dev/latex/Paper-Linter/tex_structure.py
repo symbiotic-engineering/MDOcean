@@ -37,7 +37,7 @@ def strip_tex_comments(text):
     return "\n".join(lines)
 
 
-def resolve_included_file(base_file, target):
+def resolve_included_file(base_file, target, root_dir=None):
     target = target.strip().strip('"').strip("'")
     if not target:
         return None
@@ -49,6 +49,8 @@ def resolve_included_file(base_file, target):
         candidates.append(target)
     else:
         candidates.append(os.path.join(base_dir, target))
+        if root_dir is not None:
+            candidates.append(os.path.join(root_dir, target))
 
     if not os.path.splitext(target)[1]:
         extensions = [".tex", ".tikz", ".ltx"]
@@ -81,6 +83,8 @@ def should_ignore_file(file_path, ignore_specs):
 def collect_tex_files(root_path, ignore_specs=None):
     if ignore_specs is None:
         ignore_specs = []
+
+    root_dir = root_path if not root_path.endswith(".tex") else os.path.dirname(os.path.normpath(root_path))
 
     if root_path.endswith(".tex"):
         initial_files = [os.path.normpath(root_path)]
@@ -120,7 +124,7 @@ def collect_tex_files(root_path, ignore_specs=None):
 
         content = strip_tex_comments(content)
         for match in included_pattern.finditer(content):
-            included_file = resolve_included_file(file_path, match.group(1))
+            included_file = resolve_included_file(file_path, match.group(1), root_dir=root_dir)
             if included_file is not None:
                 visit(included_file)
 

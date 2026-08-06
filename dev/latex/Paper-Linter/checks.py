@@ -1099,6 +1099,18 @@ def check_missing_word_style():
     return warns
 
 
+def check_preferred_terminology():
+    warns = []
+    for i, l in enumerate(ts.tex_lines_clean):
+        if ts.in_code(i):
+            continue
+        updated, span = actions.preferred_terminology_line(l)
+        if span is not None:
+            warns.append((i, "Use preferred terminology", span))
+            break
+    return warns
+
+
 def print_warnings(warn, writer, use_color=True, output=True):
     warnings = 0
     sorted_warn = sorted(warn, key=lambda tup: tup[0][0])
@@ -1190,6 +1202,7 @@ checks = [
     (check_hline_in_table,              CATEGORY_VISUAL,     "hline"),
     (check_duplicate_word,              CATEGORY_TYPOGRAPHY, "duplicate-word", actions.fix_duplicate_words_in_file),
     (check_space_before_punctuation,    CATEGORY_TYPOGRAPHY, "punctuation-space", actions.fix_space_before_punctuation_in_file),
+    (check_preferred_terminology,       CATEGORY_STYLE,      "preferred-terminology", actions.fix_preferred_terminology_in_file),
     (check_headers_without_text,        CATEGORY_VISUAL,     "two-header"),
     (check_one_sentence_paragraphs,     CATEGORY_VISUAL,     "single-sentence"),
     (check_paragraph_length,            CATEGORY_VISUAL,     "paragraph-length"),
