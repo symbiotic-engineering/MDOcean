@@ -7,7 +7,7 @@
     In the most straightforward case where simply one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint.
     For example, if only a maximum force constraint exists, the constrained solution has a force $\gls{sym-hat-F-p-constr}$ that is the minimum of the unconstrained force $\gls{sym-hat-F-p-unconstrained}$ and the maximum allowed force fundamental $\gls{sym-F-max}$:
     \begin{equation}
-    \hat{F}_{p,constr} = \min\left(\hat{F}_{p,unconstrained}, F_{max}\right)
+    \gls{sym-hat-F-p-constr} = \min\left(\gls{sym-hat-F-p-unconstrained}, \gls{sym-F-max}\right)
     \end{equation}
     The solver guesses a value of $\gls{sym-Gamma}$, calculates the resulting force $\gls{sym-hat-F-p-guess}$, and then uses $\gls{sym-hat-F-p-guess}-\gls{sym-hat-F-p-constr}$ as an error signal to adjust its next guess of $\gls{sym-Gamma}$, iterating until the error converges to zero.
     This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\gls{sym-hat-F-p-unconstrained}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\gls{sym-hat-F-p-unconstrained}$ and the system linearization are updated each control iteration).
@@ -76,12 +76,12 @@ The quadratic coefficients $\{\gls{sym-mathbf-Q-mu}, \gls{sym-vec-a-mu}, \gls{sy
 The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ reduces the optimization problem dimension from $\gls{sym-vec-x} \in \gls{sym-mathbb-C}^2$ to $\gls{sym-mathbb-C}^1$.
 Specifically, the equality constraint requires that the solution be a particular solution plus a scalar multiple of $\gls{sym-vec-n}$, the null space vector of $\gls{sym-vec-c}^{\,*}$:
 \begin{equation}\label{eq:x-p-plus-nullspace}
-    \vec{x} = \underbrace{
-        \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
+    \gls{sym-vec-x} = \underbrace{
+        \frac{\gls{sym-hat-V-s-th}}{2\Re( \gls{sym-Z-s-th})}
         \begin{bmatrix} \ Z_{s,th}^* \\ 1 \end{bmatrix}
     }_{
-        \textrm{particular solution } \vec{x}_p}
-    -~ \Gamma \cdot \frac{\hat{V}_{s,th}}{2\Re( Z_{s,th})}
+        \textrm{particular solution } \gls{sym-vec-x-p}}
+    -~ \gls{sym-Gamma} \cdot \frac{\gls{sym-hat-V-s-th}}{2\Re( \gls{sym-Z-s-th})}
     \underbrace{
         \begin{bmatrix} -\ Z_{s,th}^* \\ 1 \end{bmatrix}
     }_{
@@ -90,12 +90,12 @@ Specifically, the equality constraint requires that the solution be a particular
 where $\gls{sym-Gamma}$ is a nondimensional complex scalar representing the remaining degree of freedom in the optimization after enforcing the equality constraint.
 For the particular solution, we have chosen to use the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \Cref{eq:matched-load} and can be derived from the quadratic program as follows:
 \begin{equation}\label{eq:x-p}
-    \vec{x}_{p} = \frac{d \mathbf{A}_P\vec{c}}{\vec{c}^{\,*}\mathbf{A}_P\vec{c}}
+    \gls{sym-vec-x-p} = \frac{d \gls{sym-mathbf-A-P}\gls{sym-vec-c}}{\gls{sym-vec-c}^{\,*}\gls{sym-mathbf-A-P}\gls{sym-vec-c}}
 \end{equation}
 This selection for $\gls{sym-vec-x-p}$ means that the degree of freedom $\gls{sym-Gamma}$ represents the deviation of the solution from the impedance-matched solution.
 Using $\gls{sym-hat-I-p}$ for brevity to denote the current in the particular solution, \Cref{eq:x-p-plus-nullspace} can be rewritten as:
 \begin{equation}\label{eq:x-p-plus-nullspace-simplified}
-\vec{x} = \gls{sym-vec-x-p} - \Gamma \hat{I}_p \vec{n}
+\gls{sym-vec-x} = \gls{sym-vec-x-p} - \gls{sym-Gamma} \gls{sym-hat-I-p} \gls{sym-vec-n}
     %&= \begin{bmatrix}
     %    1+\Gamma &  0 \\
     %    0 & 1-\Gamma
@@ -112,7 +112,7 @@ While constrained quadratic programs like \Cref{eq:opt-problem} generally requir
 First, we rewrite the objective and inequality constraints in terms of $\gls{sym-Gamma}$ by plugging \Cref{eq:x-p-plus-nullspace-simplified} into \Cref{eq:opt-problem}:
 \begin{subequations}
 \begin{align}
-P_{avg,VI}
+\gls{sym-P-avg-VI}
 &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re(\gls{sym-Z-s-th})}~ (1 - |\gls{sym-Gamma}|^2)
 \label{eq:obj-gamma}
 \\[6pt]
@@ -122,22 +122,22 @@ P_{avg,VI}
 \right\}+\gls{sym-C-q-mu}
 \le
 0
-\quad \forall \mu
+\quad \forall \gls{sym-mu}
 \label{eq:ineq-gamma}
 \end{align}
 \end{subequations}
 where quadratic coefficients $\gls{sym-A-q-mu}$, $\gls{sym-B-q-mu}$, and $\gls{sym-C-q-mu}$ from \Cref{eq:ineq-gamma} are defined as:
 \begin{equation}
 \begin{aligned}
-    \gls{sym-A-q-mu} &= |\hat{I}_p|^{2},
-    \gls{sym-vec-n}^{\,*}\mathbf{Q}_{\mu}\gls{sym-vec-n}& &\in \mathbb{R} \\
-    \gls{sym-B-q-mu} &= -\hat{I}_p,
-    \left(\gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu} + \vec{a}_{\mu}^{\,*}\right)\gls{sym-vec-n}& &\in \gls{sym-mathbb-C} \\
+    \gls{sym-A-q-mu} &= |\gls{sym-hat-I-p}|^{2},
+    \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}& &\in \gls{sym-mathbb-R} \\
+    \gls{sym-B-q-mu} &= -\gls{sym-hat-I-p},
+    \left(\gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu} + \gls{sym-vec-a-mu}^{\,*}\right)\gls{sym-vec-n}& &\in \gls{sym-mathbb-C} \\
     \gls{sym-C-q-mu} &=
         \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p}
         +
-        2\Re\!\left\{\vec{a}_{\mu}^{\,*}\gls{sym-vec-x-p}\right\}
-        -b_{\mu}&
+        2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x-p}\right\}
+        -\gls{sym-b-mu}&
     &\in \gls{sym-mathbb-R}
 \end{aligned}
 \end{equation}
@@ -160,36 +160,36 @@ The constraint requires that $\gls{sym-Gamma}$ lie within this circle when $\gls
 Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu-2}$, and $\gls{sym-S}_{\gls{sym-mu}}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
-\Gamma_{c,\mu}
+\gls{sym-Gamma-c-mu-2}
 &= \frac{-\gls{sym-B-q-mu}^{\,*}}{\gls{sym-A-q-mu}} =
 \frac{
-    \hat{I}_p^{\,*}\,
+    \gls{sym-hat-I-p}^{\,*}\,
     \gls{sym-vec-n}^{\,*}
-    \left(\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p} + \vec{a}_{\mu}\right)
+    \left(\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p} + \gls{sym-vec-a-mu}\right)
 }{
-    |\hat{I}_p|^{2}\,
+    |\gls{sym-hat-I-p}|^{2}\,
     \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}
 }
 \label{eq:gamma-disc-center}
 \\[6pt]
-r_{\mu}^2
+\gls{sym-r-mu}^2
 &=
 \frac{|\gls{sym-B-q-mu}|^2-\gls{sym-A-q-mu}\gls{sym-C-q-mu}}{\gls{sym-A-q-mu}^2} =
 \frac{
-b_{\mu}
+\gls{sym-b-mu}
 -
 \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p}
 -
-2\Re\!\left\{\vec{a}_{\mu}^{\,*}\gls{sym-vec-x-p}\right\}
+2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x-p}\right\}
 }{
-|\hat{I}_p|^{2}\,
+|\gls{sym-hat-I-p}|^{2}\,
 \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}
 }
 +
-|\Gamma_{c,\mu}|^2
+|\gls{sym-Gamma-c-mu-2}|^2
 \label{eq:gamma-disc-radius}
 \\
-S_{\mu} &= \textrm{sign}(\gls{sym-A-q-mu}) = \textrm{sign}\left(\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}\right)
+\gls{sym-S-mu} &= \textrm{sign}(\gls{sym-A-q-mu}) = \textrm{sign}\left(\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}\right)
 \label{eq:gamma-disc-sign}
 \end{align}
 \end{subequations}
@@ -203,10 +203,10 @@ We analytically compute all such candidate points and select the one with the lo
 For $\gls{sym-N}$ constraints, there are up to $\gls{sym-N}^2$ candidate points ($\gls{sym-N}^2-\gls{sym-N}$ at intersections and $\gls{sym-N}$ at closest points).
 This leads to the following expression for the constrained optimal solution (valid when $\gls{sym-A-q-mu} \neq 0 ~\forall \gls{sym-mu}$):
 \begin{equation}\label{eq:gamma-opt-quadratic}
-\Gamma_{opt} =
+\gls{sym-Gamma-opt} =
 \begin{cases}
- 0 & \textrm{if } S_{\mu} \gls{sym-C-q-mu} \leq 0 \quad \forall \mu \\[3pt]
- \arg\min\limits_{\gls{sym-Gamma} \in \mathcal{F} \bigcap \gls{sym-mathcal-C}} |\gls{sym-Gamma}|
+ 0 & \textrm{if } \gls{sym-S-mu} \gls{sym-C-q-mu} \leq 0 \quad \forall \gls{sym-mu} \\[3pt]
+ \arg\min\limits_{\gls{sym-Gamma} \in \gls{sym-mathcal-F} \bigcap \gls{sym-mathcal-C}} |\gls{sym-Gamma}|
  & \textrm{otherwise} \\[3pt]
  \textrm{infeasible} & \textrm{if } \gls{sym-mathcal-F} \bigcap \gls{sym-mathcal-C} = \emptyset
 \end{cases}
@@ -215,22 +215,22 @@ where $\gls{sym-mathcal-F} = \bigcap_{\gls{sym-mu}} \left\{\gls{sym-Gamma} : \gl
 \begin{equation}\label{eq:candidate-points}
 \begin{aligned}
 \gls{sym-mathcal-C-int} &= \left\{
-    \Gamma_{\mu,\nu}, \quad \forall \mu \neq \nu
+    \gls{sym-Gamma-mu-nu}, \quad \forall \gls{sym-mu} \neq \gls{sym-nu}
 \right\}.
 \\
 \gls{sym-mathcal-C-cl} &= \left\{
-    (|\Gamma_{c,\mu}| - r_{\mu})e^{i\angle\,\Gamma_{c,\mu}}, \quad \forall \mu
+    (|\gls{sym-Gamma-c-mu-2}| - \gls{sym-r-mu})e^{i\angle\,\gls{sym-Gamma-c-mu-2}}, \quad \forall \gls{sym-mu}
 \right\}.
 \end{aligned}
 \end{equation}
 The intersection points of the $\gls{sym-mu}$th and $\gls{sym-nu}$th circles are given by:
 \begin{equation}\label{eq:circle-intersection}
-    \Gamma_{\mu,\nu} =
-    \Gamma_{c,\mu} + \frac{\Gamma_{c,\nu} - \Gamma_{c,\mu}}{d_{\mu\nu}}
+    \gls{sym-Gamma-mu-nu} =
+    \gls{sym-Gamma-c-mu-2} + \frac{\gls{sym-Gamma-c-nu-2} - \gls{sym-Gamma-c-mu-2}}{\gls{sym-d-mu-nu}}
     \left(
-        a_{\mu\nu}
+        \gls{sym-a-mu-nu}
         \pm
-        1i \sqrt{r_{\mu}^2-a_{\mu\nu}^2}
+        1i \sqrt{\gls{sym-r-mu}^2-\gls{sym-a-mu-nu}^2}
     \right)
 \end{equation}
 where $\gls{sym-d-mu-nu-star} = |\gls{sym-Gamma-c-nu} - \gls{sym-Gamma-c-mu}|$ is the distance between the circle centers,
@@ -262,16 +262,16 @@ Though the optimization is no longer a quadratically constrained quadratic progr
 The new candidate points are:
 \begin{equation}
 \begin{aligned}
-\mathcal{C}_{int,oval-circ} &= \left\{
-    \Gamma :
-    |\Gamma - \Gamma_{c,\mu}| = r_{\mu}, ~(1-|\Gamma|^2)^2 + 4\Im(\Gamma) = \frac{|S_{max,k}|}{|S_0|}, \quad \forall \mu,k
+\gls{sym-mathcal-C-int-oval-circ} &= \left\{
+    \gls{sym-Gamma} :
+    |\gls{sym-Gamma} - \gls{sym-Gamma-c-mu-2}| = \gls{sym-r-mu}, ~(1-|\gls{sym-Gamma}|^2)^2 + 4\Im(\gls{sym-Gamma}) = \frac{|\gls{sym-S-max-k}|}{|\gls{sym-S-0}|}, \quad \forall \gls{sym-mu},\gls{sym-k-generic-index}
 \right\}.
 \\
-\mathcal{C}_{cl,oval} &= \left\{
-    \Gamma :
-    \Gamma = \begin{cases}
-        \pm \sqrt{1-\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|<|S_0| \\
-        \pm \sqrt{1+\frac{|S_{max,k}|}{|S_0|}}, \quad \forall k~ |S_{max,k}|>|S_0|
+\gls{sym-mathcal-C-cl-oval} &= \left\{
+    \gls{sym-Gamma} :
+    \gls{sym-Gamma} = \begin{cases}
+        \pm \sqrt{1-\frac{|\gls{sym-S-max-k}|}{|\gls{sym-S-0}|}}, \quad \forall \gls{sym-k-generic-index}~ |\gls{sym-S-max-k}|<|\gls{sym-S-0}| \\
+        \pm \sqrt{1+\frac{|\gls{sym-S-max-k}|}{|\gls{sym-S-0}|}}, \quad \forall \gls{sym-k-generic-index}~ |\gls{sym-S-max-k}|>|\gls{sym-S-0}|
     \end{cases}
 \right\}.
 \end{aligned}
@@ -344,7 +344,7 @@ $\frac{\partial \gls{sym-g-mu}}{\partial \gls{sym-L-mu}} = -\frac{\partial \gls{
 This derivative can be trivially computed for all constraints in \Cref{tab:qp-constraints}.
 The power sensitivity simplifies to:
 \begin{equation}
-    \frac{\partial p_{avg,VI,opt}}{\partial L_\mu} = -\lambda_\mu \frac{\partial b_\mu}{\partial L_\mu}
+    \frac{\partial \gls{sym-p-avg-VI-opt}}{\partial \gls{sym-L-mu}} = -\gls{sym-lambda-mu} \frac{\partial \gls{sym-b-mu}}{\partial \gls{sym-L-mu}}
 \end{equation}
 If the optimization problem were solved with a numerical solver,
 the Lagrange multipliers would be directly available as part of the solution.
@@ -353,24 +353,24 @@ $\gls{sym-Gamma-opt}(\gls{sym-r-mu-2}, \gls{sym-Gamma-c-mu})$,
 so we can compute the Lagrange multipliers as follows:
 \begin{equation}\label{eq:lagrange}
 \begin{aligned}
-   \lambda_\mu
+   \gls{sym-lambda-mu}
     &\equiv
-    \frac{\partial p_{avg,VI,opt}}{\partial g_\mu}
+    \frac{\partial \gls{sym-p-avg-VI-opt}}{\partial \gls{sym-g-mu}}
     \\
-    &= - \frac{\partial p_{avg,VI,opt}}{\partial b_\mu}
-    \\
-    &= -
-    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
-    \frac{\partial |\Gamma_{opt}|}{\partial b_\mu}
+    &= - \frac{\partial \gls{sym-p-avg-VI-opt}}{\partial \gls{sym-b-mu}}
     \\
     &= -
-    \frac{\partial p_{avg,VI,opt}}{\partial |\Gamma_{opt}|}
+    \frac{\partial \gls{sym-p-avg-VI-opt}}{\partial |\gls{sym-Gamma-opt}|}
+    \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-b-mu}}
+    \\
+    &= -
+    \frac{\partial \gls{sym-p-avg-VI-opt}}{\partial |\gls{sym-Gamma-opt}|}
     \left(
-        \frac{\partial |\Gamma_{opt}|}{\partial r_{\mu}}
-        \frac{\partial r_{\mu}}{\partial b_\mu}
+        \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-r-mu}}
+        \frac{\partial \gls{sym-r-mu}}{\partial \gls{sym-b-mu}}
         +
-        \frac{\partial |\Gamma_{opt}|}{\partial \Gamma_{c,\mu}}
-        \frac{\partial \Gamma_{c,\mu}}{\partial b_\mu}
+        \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-Gamma-c-mu-2}}
+        \frac{\partial \gls{sym-Gamma-c-mu-2}}{\partial \gls{sym-b-mu}}
     \right)
 \end{aligned}
 \end{equation}
@@ -381,11 +381,11 @@ The computation of each of the five partials in the final expression of \Cref{eq
 Recall from \Cref{eq:gamma-disc-radius} that each inequality constraint maps to a circle in the complex $\gls{sym-Gamma}$ plane
 with center $\gls{sym-Gamma-c-mu}$ and radius $\gls{sym-r-mu}$ given by:
 \begin{equation}\label{eq:radius-full}
-    r_\mu^2
-    = \frac{b_{\mu} - \vec{x}_p^{\,*}\mathbf{Q}_{\mu}\vec{x}_p
-            - 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}_p\right\}}
-           {|\hat{I}_p|^{2}\,\vec{n}^{\,*}\mathbf{Q}_{\mu}\vec{n}}
-    + |\Gamma_{c,\mu}|^2
+    \gls{sym-r-mu}^2
+    = \frac{\gls{sym-b-mu} - \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p}
+            - 2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x-p}\right\}}
+           {|\gls{sym-hat-I-p}|^{2}\,\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}}
+    + |\gls{sym-Gamma-c-mu-2}|^2
 \end{equation}
 The constraint limit $\gls{sym-L-mu}$ enters $\gls{sym-r-mu}$ only through $\gls{sym-b-mu}$
 (the right-hand side of the quadratic inequality in \Cref{tab:qp-constraints}),
@@ -395,9 +395,9 @@ Defining $\gls{sym-d-mu} = |\gls{sym-hat-I-p}|^{2}\,\gls{sym-vec-n}^{\,*}\gls{sy
 and $\gls{sym-c-mu} = \gls{sym-d-mu}|\gls{sym-Gamma-c-mu}|^2 - \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q}_{\gls{sym-mu}}\gls{sym-vec-x-p} - 2\Re\!\left\{\gls{sym-vec-a-mu-2}^{\,*}\gls{sym-vec-x-p}\right\}$,
 both independent of the constraint limits, \Cref{eq:radius-full} and its derivative simplify to:
 \begin{equation}\label{eq:radius-simplified}
-    r_\mu^2 = \frac{b_\mu + c_\mu}{d_\mu}
+    \gls{sym-r-mu}^2 = \frac{\gls{sym-b-mu} + \gls{sym-c-mu}}{\gls{sym-d-mu}}
     , \quad
-    \frac{\partial r_\mu}{\partial b_\mu} = \frac{1}{2\sqrt{d_\mu(b_\mu + c_\mu)}}
+    \frac{\partial \gls{sym-r-mu}}{\partial \gls{sym-b-mu}} = \frac{1}{2\sqrt{\gls{sym-d-mu}(\gls{sym-b-mu} + \gls{sym-c-mu})}}
 \end{equation}
 Since $\gls{sym-r-mu}\in\gls{sym-mathbb-R}$ (circle radii cannot have an imaginary part), then $\gls{sym-b-mu} + \gls{sym-c-mu}$ and $\gls{sym-d-mu}$ must have the same sign, so $\frac{\partial \gls{sym-r-mu}}{\partial \gls{sym-b-mu}}$ is always positive.
 In other words, increasing $\gls{sym-b-mu}$ always enlarges the circle radius, regardless of whether the constraint represents the interior or exterior of the circle.
@@ -411,20 +411,20 @@ to obtain a relationship between reflection coefficient magnitude and constraint
 Substituting \Cref{eq:radius-simplified} into \Cref{eq:candidate-points} shows that
 the squared optimal reflection coefficient magnitude in each sea state takes one of the following values depending on the number of active constraints:
 \begin{equation}\label{eq:gamma-opt-summary}
-    |\Gamma_{opt}|^2 =
+    |\gls{sym-Gamma-opt}|^2 =
     \begin{cases}
         0
     & \text{none active} \\
-        |\Gamma_{c,\mu^*}|^2
-        - 2|\Gamma_{c,\mu^*}|\sqrt{\frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}}}
-        + \frac{b_{\mu^*}+c_{\mu^*}}{d_{\mu^*}}
+        |\gls{sym-Gamma-c-mu}|^2
+        - 2|\gls{sym-Gamma-c-mu}|\sqrt{\frac{\gls{sym-b-mu-2}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}}
+        + \frac{\gls{sym-b-mu-2}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
             \Gamma_{c,\mu^*} + \frac{\Gamma_{c,\nu^*} - \Gamma_{c,\mu^*}}{d_{\mu^*\nu^*}}
             \left(
-                a_{\mu^*\nu^*}
+                \gls{sym-a-mu-nu-star}
                 \pm
-                1i \sqrt{\frac{b_{\mu^*} + c_{\mu^*}}{d_{\mu^*}}-a_{\mu^*\nu^*}^2}
+                1i \sqrt{\frac{\gls{sym-b-mu-2} + \gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}-\gls{sym-a-mu-nu-star}^2}
             \right)
         \right|^2
     & \text{$\gls{sym-mu}^*$ \& $\gls{sym-nu}^*$ active}
@@ -435,21 +435,21 @@ and $\gls{sym-a}_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ and $d_{\gls{sym-mu}^*,\gls{sy
 $d_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is independent of the constraint limits, while $\gls{sym-a}_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is affine in $\gls{sym-b}_{\gls{sym-mu}^*}$ and $\gls{sym-b}_{\gls{sym-nu}^*}$.
 Thus, using \textrm{aff}() and \textrm{quad}() to denote affine and quadratic functions of the arguments, we have the following scale behavior:
 \begin{equation}\label{eq:gamma-opt-scale}
-    |\Gamma_{opt}|^2 =
+    |\gls{sym-Gamma-opt}|^2 =
     \begin{cases}
         0
     & \text{none active} \\
-        \textrm{aff}(b_{\mu^*}) + \sqrt{\textrm{aff}(b_{\mu^*})}
+        \textrm{aff}(\gls{sym-b-mu-2}) + \sqrt{\textrm{aff}(\gls{sym-b-mu-2})}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
-            \textrm{aff}(b_{\mu^*})+\textrm{aff}(b_{\nu^*})
+            \textrm{aff}(\gls{sym-b-mu-2})+\textrm{aff}(\gls{sym-b-nu-2})
             \pm
-            1i \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})}
+            1i \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}
         \right|^2
     & \text{$\gls{sym-mu}^*$ \& $\gls{sym-nu}^*$ active} \\
-    = \textrm{quad}(b_{\mu^*}, b_{\nu^*}) +
-    (\textrm{aff}(b_{\mu^*}) + \textrm{aff}(b_{\nu^*}))
-    \sqrt{\textrm{quad}(b_{\mu^*}, b_{\nu^*})} &
+    = \textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2}) +
+    (\textrm{aff}(\gls{sym-b-mu-2}) + \textrm{aff}(\gls{sym-b-nu-2}))
+    \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})} &
     \end{cases}
 \end{equation}
 Constraint activity indices $\gls{sym-mu}^*,\gls{sym-nu}^*$ depend on the constraint limits,
@@ -461,9 +461,9 @@ The penalty function is convex in $\gls{sym-Gamma}$ if and only if all constrain
 Then, the optimal reflection coefficient of each candidate type can be written as the minimum of the candidate points passed through the penalty function.
 \begin{equation}\label{eq:gamma-opt-min-per-candidate}
 \begin{aligned}
-   |\Gamma_{cl,\mu^*}| &=
-    \min_\mu \left\{
-        | f\left(\Gamma_{cl,\mu}(b_\mu)\right) |
+   |\gls{sym-Gamma-cl-mu}| &=
+    \min_\gls{sym-mu} \left\{
+        | \gls{sym-f}\left(\gls{sym-Gamma-cl-mu-2}(\gls{sym-b-mu})\right) |
     \right\}, \quad
     |\Gamma_{int,\mu^*,\nu^*}| =
     \min_{\mu,\nu} \left\{
@@ -474,7 +474,7 @@ Then, the optimal reflection coefficient of each candidate type can be written a
 Finally, the overall optimal reflection coefficient $|\gls{sym-Gamma-opt}|$ is the minimum of all the per-candidate-type minima:
 \begin{equation}\label{eq:gamma-opt-min}
 \begin{aligned}
-    |\Gamma_{opt}| &=
+    |\gls{sym-Gamma-opt}| &=
     \min \left\{
         |\Gamma_{cl,\mu^*}(b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*}(b_\mu, b_\nu)|
     \right\}
@@ -514,22 +514,22 @@ it can be written as a sum over all constraint pairs $(\gls{sym-mu},\gls{sym-nu}
 \begin{equation}
 \label{eq:gamma-opt-scale-sum}
 \begin{aligned}
-    |\Gamma_{opt}|^2
-    = &\sum_\mu \sum_{\nu > \mu}
+    |\gls{sym-Gamma-opt}|^2
+    = &\sum_\gls{sym-mu} \sum_{\gls{sym-nu} > \gls{sym-mu}}
     \left[
         \delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})
         \left(
-            \textrm{aff}(b_{\mu})
-            + \sqrt{\textrm{aff}(b_{\mu})}
+            \textrm{aff}(\gls{sym-b-mu})
+            + \sqrt{\textrm{aff}(\gls{sym-b-mu})}
         \right)
      + \delta_{\mu,\mu^*}\delta_{\nu,\nu^*}
     \right.
 \\
     &\left.
         \left(
-            \textrm{quad}(b_{\mu}, b_{\nu}) +
-            \left(\textrm{aff}(b_{\mu}) + \textrm{aff}(b_{\nu})\right)
-            \sqrt{\textrm{quad}(b_{\mu}, b_{\nu})}
+            \textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu}) +
+            \left(\textrm{aff}(\gls{sym-b-mu}) + \textrm{aff}(\gls{sym-b-nu})\right)
+            \sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}
         \right)
     \right]
 \end{aligned}
@@ -551,9 +551,9 @@ Since the PTO sizing limits are of primary relevance, the following derivation a
 
 From \Cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be written as:
 \begin{equation}\label{eq:power-elec-sensitivity}
-    \overline{P}_{elec} = \overline{P}_{elec,0}
-    - \eta \sum_{\beta=1}^{N_{sea}} w_\beta
-    \cdot |\Gamma_{\beta,opt}|^2
+    \overline{\gls{sym-P}}_{elec} = \overline{\gls{sym-P}}_{elec,0}
+    - \gls{sym-eta} \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-w-beta}
+    \cdot |\gls{sym-Gamma-beta-opt}|^2
 \end{equation}
 where $\overline{\gls{sym-P}}_{\text{elec},0}$ is the power available if all sea states were unconstrained (impedance-matched) and
 $\gls{sym-w-beta}=JPD_{\gls{sym-beta}} \cdot

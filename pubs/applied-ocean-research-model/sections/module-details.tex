@@ -39,13 +39,13 @@ Static pitch stability is enforced by requiring:
 
 Hydrostatic equilibrium is enforced by matching displaced water mass to total system mass, with any mismatch compensated using ballast with mass $\gls{sym-m-bal}$:
 \begin{equation}
-    m_{bal} = \rho_w V_{sub} - \rho_M V_{struct},
+    \gls{sym-m-bal} = \gls{sym-rho-w} \gls{sym-V-sub} - \gls{sym-rho-M} \gls{sym-V-struct},
 \end{equation}
 where $\gls{sym-rho-w}$ and $\gls{sym-rho-M}$ are water and structural material densities.
 To ensure feasible buoyancy, $\gls{sym-m-bal}$ must be non-negative and physically storable within the hull.
 Assuming seawater ballast, this imposes a volume constraint:
 \begin{equation}\label{eq:vol-constraint}
-V_{struct} \le V_{sub} + V_{surf} - V_{pto},
+\gls{sym-V-struct} \le \gls{sym-V-sub} + \gls{sym-V-surf} - \gls{sym-V-pto},
 \end{equation}
 where $\gls{sym-V-surf}$ (design-dependent) and $\gls{sym-V-pto}$ (fixed) are volumes of the above-water structures and PTO respectively.
 
@@ -54,14 +54,14 @@ where $\gls{sym-V-surf}$ (design-dependent) and $\gls{sym-V-pto}$ (fixed) are vo
 \subsection{Hydrodynamic Coefficients}\label{sec:hydro}
 The first-order hydrodynamic force phasors $\gls{sym-vec-hat-F}$ for interacting floating bodies are expressed in the frequency domain as the sum of wave excitation $\gls{sym-vec-hat-F}_{e}$, hydrodynamic radiation $\gls{sym-vec-hat-F-rad}$, and hydrostatic restoring $\gls{sym-vec-hat-F-res}$ contributions:
 \begin{equation}\label{eq:hydro-forces}
-    \vec{\hat{F}} = \vec{\hat{F}}_{e} + \vec{\hat{F}}_{rad} + \vec{\hat{F}}_{res}
+    \gls{sym-vec-hat-F} = \gls{sym-vec-hat-F-e} + \gls{sym-vec-hat-F-rad} + \gls{sym-vec-hat-F-res}
 \end{equation}
 where, under monochromatic forcing,
 \begin{equation}\label{eq:hydro-forces-expanded}
 \begin{aligned}
-    \vec{\hat{F}}_{e} &= \gls{sym-vec-gamma}\,\hat{\zeta},&~~
-    \vec{\hat{F}}_{rad} &= -\mathbf{A}_h\vec{\hat{\ddot{\xi}}} - \mathbf{B}_h\vec{\hat{\dot{\xi}}},&~~
-    \vec{\hat{F}}_{res} &= -\mathbf{K}_h\vec{\hat{\xi}}.
+    \gls{sym-vec-hat-F-e} &= \gls{sym-vec-gamma}\,\gls{sym-hat-zeta},&~~
+    \gls{sym-vec-hat-F-rad} &= -\gls{sym-mathbf-A-h}\gls{sym-vec-hat-ddot-xi} - \gls{sym-mathbf-B-h}\gls{sym-vec-hat-dot-xi},&~~
+    \gls{sym-vec-hat-F-res} &= -\gls{sym-mathbf-K-h}\gls{sym-vec-hat-xi}.
 \end{aligned}
 \end{equation}
 Here $\gls{sym-vec-hat-xi}$ is the body displacement phasor vector from the origin at the center of the float at the still waterline.
@@ -71,40 +71,40 @@ The displacement vector $\gls{sym-vec-hat-xi}$ contains a state for each degree 
 We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
 A two-body heaving point absorber that rigidly locks the bodies in a storm following \citet{RM3} has vectors:
 \begin{equation}\label{eq:define-vectors}
-    \vec{\hat{\xi}}_{op} = \begin{bmatrix}
-        \hat{\xi}_f \\ \hat{\xi}_s
+    \gls{sym-vec-hat-xi-op} = \begin{bmatrix}
+        \gls{sym-hat-xi-f} \\ \gls{sym-hat-xi-s}
     \end{bmatrix}, ~~
-    \vec{\hat{\xi}}_{st}=\begin{bmatrix}\hat{\xi}_m
+    \gls{sym-vec-hat-xi-st}=\begin{bmatrix}\gls{sym-hat-xi-m}
     \end{bmatrix}, ~~
      \gls{sym-vec-gamma}_{op} = \begin{bmatrix}
-        \gamma_f \\ \gamma_s
+        \gls{sym-gamma-f} \\ \gls{sym-gamma-s}
     \end{bmatrix},~~
      \gls{sym-vec-gamma}_{st} = \begin{bmatrix}
-        \gamma_m
+        \gls{sym-gamma-m}
     \end{bmatrix}.
 \end{equation}
 with subscripts for the float ($\gls{sym-f}$), spar ($\gls{sym-s}$), their coupling ($\gls{sym-c}$), and the merged float-spar ($\gls{sym-m}$).
 Operational hydrodynamic matrices are symmetric $2\times 2$:
 \begin{equation}\label{eq:op-hydro-coeffs}
 \begin{aligned}
-    \mathbf{A}_{h,op} = \begin{bmatrix}
-        A_f & A_c \\ A_c & A_s
+    \gls{sym-mathbf-A-h-op} = \begin{bmatrix}
+        \gls{sym-A-f} & \gls{sym-A-c} \\ \gls{sym-A-c} & \gls{sym-A-s}
     \end{bmatrix},~
-    \mathbf{B}_{h,op} &= \begin{bmatrix}
-        B_f & B_c \\ B_c & B_s
+    \gls{sym-mathbf-B-h-op} &= \begin{bmatrix}
+        \gls{sym-B-f} & \gls{sym-B-c} \\ \gls{sym-B-c} & \gls{sym-B-s}
     \end{bmatrix},\\
-    \mathbf{K}_{h,op} &= \begin{bmatrix}
-        K_f & 0\\ 0 & K_s
+    \gls{sym-mathbf-K-h-op} &= \begin{bmatrix}
+        \gls{sym-K-f} & 0\\ 0 & \gls{sym-K-s}
     \end{bmatrix}
 \end{aligned}
 \end{equation}
 while storm (merged-body) coefficients are scalar:
 \begin{equation}\label{eq:st-hydro-coeffs}
 \begin{aligned}
-\gls{sym-vec-gamma}_{st}&=\gamma_{m}=\Sigma~\gls{sym-vec-gamma}_{op},&
-~\mathbf{A}_{h,st}&=A_m=\Sigma~\mathbf{A}_{h,op}, \\
-~\mathbf{B}_{h,st}&=B_m=\Sigma~\mathbf{B}_{h,op},&
-~\mathbf{K}_{h,st}&=K_m=\Sigma~\mathbf{K}_{h,op}.
+\gls{sym-vec-gamma}_{st}&=\gls{sym-gamma-m}=\gls{sym-Sigma}~\gls{sym-vec-gamma}_{op},&
+~\gls{sym-mathbf-A-h-st}&=\gls{sym-A-m}=\gls{sym-Sigma}~\gls{sym-mathbf-A-h-op}, \\
+~\gls{sym-mathbf-B-h-st}&=\gls{sym-B-m}=\gls{sym-Sigma}~\gls{sym-mathbf-B-h-op},&
+~\gls{sym-mathbf-K-h-st}&=\gls{sym-K-m}=\gls{sym-Sigma}~\gls{sym-mathbf-K-h-op}.
 \end{aligned}
 \end{equation}
 with $\gls{sym-Sigma}$ denoting the sum of all elements in the matrix or vector (``grand sum'').
@@ -450,23 +450,23 @@ Forces include wave excitation $\gls{sym-vec-F-e}$, hydrodynamic radiation $\gls
 
 % todo: this is time domain so gamma is not allowed to be complex
 \begin{equation}\label{eq:eom}
-    \mathbf{M}\ddot{\vec\xi}(t)
-    = \vec{F}_{e}(t) + \vec{F}_{rad}(t) + \vec{F}_{res}(t) + \vec{F}_{d}(t) + \vec{F}_{p}(t)
+    \gls{sym-mathbf-M}\ddot{\vec\xi}(\gls{sym-t})
+    = \gls{sym-vec-F-e}(\gls{sym-t}) + \gls{sym-vec-F-rad}(\gls{sym-t}) + \gls{sym-vec-F-res}(\gls{sym-t}) + \gls{sym-vec-F-d}(\gls{sym-t}) + \gls{sym-vec-F-p}(\gls{sym-t})
 \end{equation}
 where, in the frequency domain under monochromatic forcing,
 \begin{equation}\label{eq:eom-forces}
 \begin{aligned}
-    \vec{F}_{e}(t)   &= \Re\!\left(\gls{sym-vec-gamma}\,\tilde{\zeta}(t)\right),
-    & \vec{F}_{rad}(t) &= -\mathbf{A}_h\ddot{\vec{\xi}}(t) - \mathbf{B}_h\dot{\vec{\xi}}(t), \\
-    \vec{F}_{res}(t) &= -\mathbf{K}_h\vec{\xi}(t),
-    & \vec{F}_{d}(t)   &= -\mathbf{B}_d\dot{\vec{\xi}}(t) + \Re\!\left(\gls{sym-vec-gamma-d}\,\tilde{\zeta}(t)\right), \\
-    \vec{F}_{p}(t)   &= -\mathbf{B}_p\dot{\vec{\xi}}(t) - \mathbf{K}_p\vec{\xi}(t).
+    \gls{sym-vec-F-e}(\gls{sym-t})   &= \Re\!\left(\gls{sym-vec-gamma}\,\gls{sym-tilde-zeta}(\gls{sym-t})\right),
+    & \gls{sym-vec-F-rad}(\gls{sym-t}) &= -\gls{sym-mathbf-A-h}\gls{sym-ddot-vec-xi}(\gls{sym-t}) - \gls{sym-mathbf-B-h}\gls{sym-dot-vec-xi}(\gls{sym-t}), \\
+    \gls{sym-vec-F-res}(\gls{sym-t}) &= -\gls{sym-mathbf-K-h}\gls{sym-vec-xi}(\gls{sym-t}),
+    & \gls{sym-vec-F-d}(\gls{sym-t})   &= -\gls{sym-mathbf-B-d}\gls{sym-dot-vec-xi}(\gls{sym-t}) + \Re\!\left(\gls{sym-vec-gamma-d}\,\gls{sym-tilde-zeta}(\gls{sym-t})\right), \\
+    \gls{sym-vec-F-p}(\gls{sym-t})   &= -\gls{sym-mathbf-B-p}\gls{sym-dot-vec-xi}(\gls{sym-t}) - \gls{sym-mathbf-K-p}\gls{sym-vec-xi}(\gls{sym-t}).
 \end{aligned}
 \end{equation}
 for both operational and storm conditions, where $\gls{sym-vec-xi}(\gls{sym-t})$ (body position) and $\gls{sym-zeta}(\gls{sym-t})$ (wave elevation) were defined in \Cref{sec:hydro}.
 The mass matrix is:
 \begin{equation}
-\gls{sym-M-op}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \gls{sym-M-storm}=\begin{bmatrix}m_f + m_s \end{bmatrix}
+\gls{sym-M-op}=\begin{bmatrix}\gls{sym-m-f} & 0 \\ 0 & \gls{sym-m-s}\end{bmatrix}, \quad  \gls{sym-M-storm}=\begin{bmatrix}\gls{sym-m-f} + \gls{sym-m-s} \end{bmatrix}
 \end{equation}
 
 \ifdefined\DISSERTATION
@@ -482,11 +482,11 @@ The mass matrix is:
 
 In the frequency domain, the complex transfer function from real regular wave height $\gls{sym-H}$ to the vector of complex body velocity phasors $\gls{sym-vec-hat-dot-xi}$ is then:
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\vec{\hat{\dot{\xi}}}}{H} = \frac{1}{2}\left[\mathbf{Z}_i+\mathbf{Z}_p\right]^{-1}(\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
+    \frac{\gls{sym-vec-hat-dot-xi}}{\gls{sym-H}} = \frac{1}{2}\left[\gls{sym-mathbf-Z-i}+\gls{sym-mathbf-Z-p}\right]^{-1}(\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
 \end{equation}
 where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\gls{sym-mathbf-Z}_{i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
-\mathbf{Z}_i = -i\omega(\mathbf{M}+\mathbf{A}_h)+(\mathbf{B}_h+\mathbf{B}_d)+\frac{1}{i\omega}(\mathbf{K}_h)
+\gls{sym-mathbf-Z-i} = -i\gls{sym-omega}(\gls{sym-mathbf-M}+\gls{sym-mathbf-A-h})+(\gls{sym-mathbf-B-h}+\gls{sym-mathbf-B-d})+\frac{1}{i\gls{sym-omega}}(\gls{sym-mathbf-K-h})
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\gls{sym-mathbf-Z-p} = \gls{sym-mathbf-B-p}+\frac{\gls{sym-mathbf-K-p}}{i\gls{sym-omega}}$.
 
@@ -525,23 +525,23 @@ The instantaneous time-domain power at any port is simply the product of the por
     $\{e,q\}=\{\gls{sym-tau},\gls{sym-Omega}\}$ yields the generator mechanical power,
     and $\{e,q\}=\{\gls{sym-V},I\}$ yields the generator electrical power.
 \else
-    The same expression is evaluated at the floating body, PTO, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,q\}$.
+    The same expression is evaluated at the floating body, PTO, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,\gls{sym-q}\}$.
 \fi
 
 In the frequency domain assuming sinusoidal waveforms, the active power $\gls{sym-P}$, reactive power $\gls{sym-Q}$, complex power $\gls{sym-S}$, and apparent power $|\gls{sym-S}|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    P &= \tfrac{1}{2}\Re(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Re(Z)|\hat{q}|^2,\\
-    Q &= \tfrac{1}{2}\Im(\hat{e}\hat{q}^*) = \tfrac{1}{2}\Im(Z)|\hat{q}|^2, \\
-    S &= P + iQ = \tfrac{1}{2}\hat{e}\hat{q}^* = \tfrac{1}{2}Z|\hat{q}|^2, \\
-    |S| &= \tfrac{1}{2}|Z||\hat{q}|^2,
+    \gls{sym-P} &= \tfrac{1}{2}\Re(\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re(\gls{sym-Z})|\gls{sym-hat-q}|^2,\\
+    \gls{sym-Q} &= \tfrac{1}{2}\Im(\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im(\gls{sym-Z})|\gls{sym-hat-q}|^2, \\
+    \gls{sym-S} &= \gls{sym-P} + iQ = \tfrac{1}{2}\hat{e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z}|\gls{sym-hat-q}|^2, \\
+    |\gls{sym-S}| &= \tfrac{1}{2}|\gls{sym-Z}||\gls{sym-hat-q}|^2,
 \end{aligned}
 \end{equation}
 where the port is terminated with complex impedance $\gls{sym-Z}$ and $(\,)^*$ denotes the conjugate transpose.
 
 The average and peak powers over a wave period, derived in \Cref{sec:appendix-power-time}, are
 \begin{equation}\label{eq:power-avg-peak}
-    p_{avg} = P, \qquad p_{pk} = P + |S|.
+    \gls{sym-p-avg} = \gls{sym-P}, \qquad p_{pk} = \gls{sym-P} + |\gls{sym-S}|.
 \end{equation}
 The corresponding minimum power is $\gls{sym-p}_{\text{min}} = \gls{sym-P} - |\gls{sym-S}|$, negative when $|\gls{sym-S}|>\gls{sym-P}$ (i.e., reactive control).
 
@@ -578,14 +578,14 @@ In the absence of constraints, maximizing power at a given port requires impedan
 We apply matching at the generator electrical port, so the electrical load impedance $\gls{sym-Z-l}$ must be the complex conjugate of the Th\'{e}venin equivalent source impedance $\gls{sym-Z-s-th}$ seen from that port.
 This is called reactive control, with subscript $\text{reac}$:
 \begin{equation}\label{eq:matched-load}
-    Z_{l,reac} = Z_{s,th}^*
+    \gls{sym-Z-l-reac} = \gls{sym-Z-s-th}^*
 \end{equation}
 
 However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
 Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{l,\text{damp}}=0$.
 The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
 \begin{equation}\label{eq:damping-control}
-    B_{l,damp} = \sqrt{ (B_{l,reac})^2 + (K_{l,reac}/\omega)^2}
+    \gls{sym-B-l-damp} = \sqrt{ (\gls{sym-B-l-reac})^2 + (\gls{sym-K-l-reac}/\gls{sym-omega})^2}
 \end{equation}
 \ifdefined\DISSERTATION
     When a port other than the electrical port must avoid reactive power, the constrained solution detailed later in this section can be used to enforce $\gls{sym-Q}=0$ at that port.
@@ -607,12 +607,12 @@ We first compile expressions for all metrics $\gls{sym-M}$ which must be constra
     Each metric is written as a quadratic product of the port variable vector with a matrix $\gls{sym-mathbf-A-M}$:
 \fi
 \begin{equation}\label{eq:metrics}
-    M = \frac{1}{4} \begin{bmatrix}
-    \hat{e} \\ \hat{q}
+    \gls{sym-M} = \frac{1}{4} \begin{bmatrix}
+    \hat{e} \\ \gls{sym-hat-q}
     \end{bmatrix}^*
-    \mathbf{A}_M
+    \gls{sym-mathbf-A-M}
     \begin{bmatrix}
-    \hat{e} \\ \hat{q}
+    \hat{e} \\ \gls{sym-hat-q}
     \end{bmatrix}
 \end{equation}
 The matrices for various metrics are given in \Cref{tab:power-metrics}.
@@ -653,11 +653,11 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 
 Note that the apparent power $|\gls{sym-S}|$, and therefore the peak power from \Cref{eq:power-avg-peak}, cannot be written in the quadratic form of \Cref{eq:metrics} and is instead fourth-order:
 \begin{equation}
-    |S|^2 = S S^* = \frac{1}{16} \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}^*
-    \mathbf{A}_S
+    |\gls{sym-S}|^2 = \gls{sym-S} \gls{sym-S}^* = \frac{1}{16} \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
+    \gls{sym-mathbf-A-S}
     \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}
     \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}^*
-    \mathbf{A}_S^T
+    \gls{sym-mathbf-A-S}^T
     \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}
 \end{equation}
 Peak power constraints use a more complicated approach discussed in \Cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
@@ -699,10 +699,10 @@ The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ enforc
 \Cref{eq:opt-problem} has the following solution:
 \begin{equation}\label{eq:constrained-qp-solution}
 \begin{aligned}
-    \vec{x}_{opt} &=
-    \frac{\hat{V}_{s,th}}{2\Re(Z_{s,th})}
+    \gls{sym-vec-x-opt} &=
+    \frac{\gls{sym-hat-V-s-th}}{2\Re(\gls{sym-Z-s-th})}
         \begin{bmatrix} Z_{s,th}^* (1+\Gamma_{\text{opt}}) \\ 1-\Gamma_{\text{opt}} \end{bmatrix} \\
-    p_{avg,VI,opt} &= \frac{|\hat{V}_{s,th}|^2}{8\Re(Z_{s,th})}~ (1 - |\Gamma_{\text{opt}}|^2)
+    \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re(\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
 where $\gls{sym-Gamma}_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
@@ -781,9 +781,9 @@ The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d
 \begin{aligned}
     \left(      \gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t}) ~\cdot \right. \\
     \left.\left|\gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t}) \right|\right)
-    &= |\vec{\hat{V}}_{rel}(y)|^2 \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
-    \left| \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\right|\\
-    &\approx~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
+    &= |\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|^2 \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))
+    \left| \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))\right|\\
+    &\approx~|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|^2\frac{8}{3\gls{sym-pi}} \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))
 \end{aligned}
 \end{equation}
 where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
@@ -794,8 +794,8 @@ The amplitude of the sinusoidal approximation equals $\frac{8}{3\gls{sym-pi}}\ap
 
 Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
 \begin{equation}\label{eq:drag-damping-excitation}
-    \vec{\hat{F}}_d = -\mathbf{B}_{d} \vec{\hat{\dot{\xi}}}
-    + \gls{sym-vec-gamma}_{d} \hat{\zeta}
+    \gls{sym-vec-hat-F-d} = -\gls{sym-mathbf-B-d} \gls{sym-vec-hat-dot-xi}
+    + \gls{sym-vec-gamma}_{d} \gls{sym-hat-zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $\gls{sym-y}$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
@@ -871,8 +871,8 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
 \fi
 \begin{equation}\label{eq:heave-force-decomp}
 \begin{aligned}
-    F_{heave,f}(t) &=\max\!\left(|F_p(t)|,~ |m_f\ddot{\xi}_f(t)-F_p(t)|\right) \\
-    F_{heave,s}(t) &=\max\!\left(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|\right)
+    \gls{sym-F-heave-f}(\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p}(\gls{sym-t})|,~ |\gls{sym-m-f}\gls{sym-ddot-xi-f}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|\right) \\
+    \gls{sym-F-heave-s}(\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p}(\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|\right)
 \end{aligned}
 \end{equation}
 In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_p\gls{sym-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
@@ -886,7 +886,7 @@ In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its 
     Assuming constructive interference with the shaft torque,
 \fi
 \begin{equation}\label{eq:peak-pto-force}
-\max_t |F_{p,op}(t)| \approx \frac{1}{R} \left(\left| Z_{shaft} \hat{\Omega} \right| + \tau_{max} \right).
+\max_\gls{sym-t} |\gls{sym-F-p-op}(\gls{sym-t})| \approx \frac{1}{\gls{sym-R}} \left(\left| \gls{sym-Z-shaft} \gls{sym-hat-Omega} \right| + \gls{sym-tau-max} \right).
 \end{equation}
 The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\gls{sym-hat-F-p-st}$ directly.
 
@@ -968,8 +968,8 @@ In operational sea states, the geometric clearance between the float and spar is
 The permissible heights for upward and downward motion of the float relative to the spar are:
 \begin{equation}\label{eq:h-fs-up-down}
 \begin{aligned}
-    h_{fs,\text{up}} &= h_s - T_s - (h_f- T_{f,2}) \\
-    h_{fs,\text{down}} &= T_s - T_{f,2} - h_d
+    \gls{sym-h-fs-up} &= \gls{sym-h-s} - \gls{sym-T-s} - (\gls{sym-h-f}- \gls{sym-T-f-2}) \\
+    \gls{sym-h-fs-down} &= \gls{sym-T-s} - \gls{sym-T-f-2} - \gls{sym-h-d}
 \end{aligned}
 \end{equation}
 Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
@@ -977,7 +977,7 @@ Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dim
 The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
 This maximum amplitude $\gls{sym-xi-lin}$ for the float and spar respectively is
 \begin{equation}
-    \xi_{f,\text{linear}} = \frac{1}{10} (h-T_{f,2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10} (h-T_s)
+    \xi_{f,\text{linear}} = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-f-2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-s})
 \end{equation}
 \ifdefined\DISSERTATION
     which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in MEEM) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
@@ -1038,7 +1038,7 @@ MDOcean uses a JPD (joint probability density matrix) to capture the long-term v
 Additionally, it represents each irregular wave condition within the JPD as an equivalent sinusoidal regular wave.
 Regular wave height $\gls{sym-H}$ and period $\gls{sym-T}$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}\label{eq:regular-wave-equiv}
-    H = \frac{H_s}{\sqrt{2}}, \qquad T = T_e \approx 0.857 ~T_p,
+    \gls{sym-H} = \frac{\gls{sym-H-s}}{\sqrt{2}}, \qquad \gls{sym-T} = \gls{sym-T-e} \approx 0.857 ~\gls{sym-T-p},
 \end{equation}
 where the irregular sea state has significant wave height $\gls{sym-H-s}$, energy period $\gls{sym-T-e}$, and (for a Pierson-Moskowitz spectrum) peak period $\gls{sym-T-p}$.
 This regular wave assumption avoids the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
@@ -1188,9 +1188,9 @@ The chosen scalings are a power law for the number of devices to reflect economi
 This yields:
 \begin{equation}\label{eq:unit-cost}
 \begin{aligned}
-    C_{unit} &=  C_{pto} + C_{\text{struct}} + C_{\text{fixed}} \\
-    C_{pto} &= C_{pto,\text{constant}} + p_{P} P_{pk,\text{elec}} +p_{F} F_{\text{max}} \\
-    C_{\text{struct}} &= p_{s} V_{\text{struct}}
+    \gls{sym-C-unit} &=  \gls{sym-C-pto} + C_{\text{struct}} + C_{\text{fixed}} \\
+    \gls{sym-C-pto} &= C_{pto,\text{constant}} + \gls{sym-p-P-2} P_{pk,\text{elec}} +\gls{sym-p-F-2} F_{\text{max}} \\
+    C_{\text{struct}} &= \gls{sym-p-s-2} V_{\text{struct}}
 \end{aligned}
 \end{equation}
 where $\gls{sym-p-P}$, $\gls{sym-p-F}$, and $\gls{sym-p-s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
@@ -1198,5 +1198,5 @@ See \Cref{sec:appendix-econ-power-laws} for more details.
 
 The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via \gls{sym-a} power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 
-The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $N_{WEC}$.
+The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $\gls{sym-N-WEC}$.
 For consistency with prior references \citep{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.

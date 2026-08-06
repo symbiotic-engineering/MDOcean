@@ -10,14 +10,14 @@ This section provides a general structure in effort-flow form applicable across 
 The intrinsic, powertrain, and Th\'evenin-equivalent representations used throughout \Cref{sec:dynamics} are all instances of multiport circuit models, with effort variables $\gls{sym-vec-e}$ and flow variables $\gls{sym-vec-q}$ at each port.
 Following \citet{reveyrand_multiport_2018}, three matrix forms describe the relationships between port variables: impedance ($\gls{sym-mathbf-Z}$), cascade ($\gls{sym-mathbf-a}$, also called ABCD), and hybrid ($\gls{sym-mathbf-h}$):
 \begin{equation}\label{eq:multiport-matrix-definitions}
-\vec{e} = \mathbf{Z}\,\vec{q},
+\vec{e} = \gls{sym-mathbf-Z}\,\gls{sym-vec-q},
 \qquad
 \begin{bmatrix} \vec{e}_2 \\ \vec{q}_2 \end{bmatrix}
-= [\mathbf{a}]_{2\leftarrow 1}
+= [\gls{sym-mathbf-a}]_{2\leftarrow 1}
 \begin{bmatrix} \vec{e}_1 \\ \vec{q}_1 \end{bmatrix},
 \qquad
 \begin{bmatrix} \vec{e}_1 \\ \vec{q}_2 \end{bmatrix}
-= [\mathbf{h}]_{1,2}
+= [\gls{sym-mathbf-h}]_{1,2}
 \begin{bmatrix} \vec{q}_1 \\ \vec{e}_2 \end{bmatrix}.
 \end{equation}
 These equations apply to both time-domain and phasor representations of each port.
@@ -29,7 +29,7 @@ The intrinsic dynamics matrix $\gls{sym-mathbf-Z-i}$ and the PTO impedance $\gls
 The arrow subscript indicates direction: $[\gls{sym-mathbf-a}]_{2\leftarrow 1}$ maps port group 1 to port group 2.
 Reversing direction inverts the matrix,
     \begin{equation}\label{eq:cascade-inverse}
-        [\mathbf{a}]_{1\leftarrow 2} = [\mathbf{a}]_{2\leftarrow 1}^{-1},
+        [\gls{sym-mathbf-a}]_{1\leftarrow 2} = [\gls{sym-mathbf-a}]_{2\leftarrow 1}^{-1},
     \end{equation}
     and sequential multiplication represents serial composition of two-port elements.
 This form is used for the PTO dynamics (drivetrain followed by generator).
@@ -54,7 +54,7 @@ Relevant dynamics include the inertia, stiffness, static friction, mechanical ad
 The PTO kinematics describe the relationship between WEC body displacements $\gls{sym-vec-hat-xi}$ to PTO displacements $\gls{sym-vec-hat-X-PTO}$, determined by linkages or similar mechanisms and not including subsequent PTO elements such as a mechanical drivetrain or generator.
 In general form, the PTO kinematics can be expressed as:
 \begin{equation}\label{eq:pto-kinematics-motion}
-\vec{\hat{X}}_{PTO} = \mathbf{T}_{kin}~ \vec{\hat{\xi}}
+\gls{sym-vec-hat-X-PTO} = \gls{sym-mathbf-T-kin}~ \gls{sym-vec-hat-xi}
 \end{equation}
 with kinematic transformation matrix $\gls{sym-mathbf-T-kin}$ that may depend on the body displacements $\gls{sym-vec-hat-xi}$ if the linkages are nonlinear, but hereafter is assumed constant for simplicity.
 This assumption means that \Cref{eq:pto-kinematics-motion} can be differentiated trivially to yield the same matrix relationship for velocities.
@@ -72,8 +72,8 @@ Non-square impedance matrices may be used to capture unbalanced port relations i
 Instead, the kinematics can be packaged into a square hybrid matrix $\gls{sym-mathbf-h-kin}$ which accurately represents the underactuated system:
 \begin{equation}\label{eq:h-matrix-kinematics}
     \begin{bmatrix}
-        \vec{\hat{F}}_p \\
-        \vec{\hat{\dot{X}}}_{PTO}
+        \gls{sym-vec-hat-F-p} \\
+        \gls{sym-vec-hat-dot-X-PTO}
     \end{bmatrix}
     = \underbrace{
         \begin{bmatrix}
@@ -82,7 +82,7 @@ Instead, the kinematics can be packaged into a square hybrid matrix $\gls{sym-ma
         \end{bmatrix}}
         _{\gls{sym-mathbf-h-kin}}
     \begin{bmatrix}
-        \vec{\hat{\dot{\xi}}} \\ \vec{\hat{F}}_{PTO}
+        \gls{sym-vec-hat-dot-xi} \\ \gls{sym-vec-hat-F-PTO}
     \end{bmatrix}
 \end{equation}
 
@@ -125,14 +125,14 @@ Instead, we can use cascade-like matrices to solve for a modified variable $\gls
 \begin{equation}\label{eq:modified-body-velocity}
     \gls{sym-vec-dot-xi-Delta} = \gls{sym-vec-dot-xi} - \gls{sym-vec-dot-xi-0}
     \quad \textrm{ where } \quad
-    \gls{sym-vec-dot-xi-0} = \mathbf{Z}_i^{-1}~\vec{\gamma}~\frac{H}{2}
+    \gls{sym-vec-dot-xi-0} = \gls{sym-mathbf-Z-i}^{-1}~\gls{sym-vec-gamma}~\frac{\gls{sym-H}}{2}
 \end{equation}
 The cascade-like matrix from the PTO port $\{\gls{sym-F-PTO}, \gls{sym-dot-X-PTO}\}$ to the modified body port $\{\gls{sym-F-p}, \gls{sym-dot-xi-Delta}\}$ is then:
 \begin{equation}\label{eq:body-transmission-matrix}
-[\mathbf{a}]_{F_p\xi_\Delta\leftarrow F\dot{X}} =
+[\gls{sym-mathbf-a}]_{\gls{sym-F-p}\gls{sym-xi-Delta}\leftarrow \gls{sym-F}\gls{sym-dot-X}} =
 \begin{bmatrix}
-\mathbf{I}_2 \\
--\mathbf{Z}_i^{-1}
+\gls{sym-mathbf-I-2} \\
+-\gls{sym-mathbf-Z-i}^{-1}
 \end{bmatrix}
 \gls{sym-mathbf-T-kin}^T
 \begin{bmatrix}
@@ -146,17 +146,17 @@ noting that this matrix is non-square ($\in \gls{sym-mathbb-C}^{4\times2}$) sinc
 \subsubsection{PTO Dynamics}
 \label{sec:appendix-pto-dynamics}
 In addition to the PTO port already discussed, we define two additional ports of relevance: the generator mechanical port (torque $\gls{sym-tau}$ and rotation speed $\gls{sym-Omega}$) and the generator electrical port (voltage $\gls{sym-V}$ and current $\gls{sym-I}$).
-Assuming a drivetrain consisting of a linear to rotational gear ratio with equivalent radius $\gls{sym-R-gear}$ followed by a driveshaft with impedance $\gls{sym-Z-shaft}$, the PTO mechanical dynamics are expressed with cascade matrix $[\gls{sym-mathbf-a}]_{F\gls{sym-dot-X}\leftarrow \gls{sym-tau} \gls{sym-Omega}}$:
+Assuming a drivetrain consisting of a linear to rotational gear ratio with equivalent radius $\gls{sym-R-gear}$ followed by a driveshaft with impedance $\gls{sym-Z-shaft}$, the PTO mechanical dynamics are expressed with cascade matrix $[\gls{sym-mathbf-a}]_{\gls{sym-F}\gls{sym-dot-X}\leftarrow \gls{sym-tau} \gls{sym-Omega}}$:
 \begin{equation}\label{eq:mech-transmission-matrix}
 \begin{bmatrix}
-F_{PTO} \\ \dot{X}_{PTO}
+\gls{sym-F-PTO} \\ \gls{sym-dot-X-PTO}
 \end{bmatrix}
 =
 \underbrace{\begin{bmatrix}
 \gls{sym-Z-shaft}/\gls{sym-R-gear} & 1/\gls{sym-R-gear} \\
 \gls{sym-R-gear} & 0
 \end{bmatrix}}
-_{[\gls{sym-mathbf-a}]_{F\dot{X}\leftarrow \gls{sym-tau} \gls{sym-Omega}}}
+_{[\gls{sym-mathbf-a}]_{\gls{sym-F}\gls{sym-dot-X}\leftarrow \gls{sym-tau} \gls{sym-Omega}}}
 \begin{bmatrix}
  \gls{sym-tau}\\ \gls{sym-Omega}
 \end{bmatrix}
@@ -185,9 +185,9 @@ The former is more convenient for hardware implementation, because modern drives
 %Here we formulate both as linear impedances with damping and stiffness terms, where
 The mechanical control impedance $\gls{sym-Z-u}$ and electrical load impedance $\gls{sym-Z-l}$ are defined as follows:
 \begin{equation}\label{eq:controller-impedances}
-    Z_l = \frac{V}{I} = B_l + \frac{K_l}{i\omega}
+    \gls{sym-Z-l} = \frac{\gls{sym-V}}{\gls{sym-I}} = \gls{sym-B-l} + \frac{\gls{sym-K-l}}{i\gls{sym-omega}}
     ,  \qquad
-    Z_u = \frac{\tau}{\Omega}% = B_u + \frac{K_u}{s}
+    \gls{sym-Z-u} = \frac{\gls{sym-tau}}{\gls{sym-Omega}}% = B_u + \frac{K_u}{s}
 \end{equation}
 Combining \Cref{eq:controller-impedances,eq:elec-transmission-matrix} gives the following expression for $\gls{sym-Z-u}$ as a function of $\gls{sym-Z-l}$:
 \begin{equation}\label{eq:control-impedance}
@@ -247,10 +247,10 @@ The intrinsic dynamics, PTO kinematics, and PTO dynamics can be combined into a 
 \begin{equation}\label{eq:thevenin-electrical}
     \gls{sym-Z-s-th} = \frac{
     \begin{bmatrix}1 & 0\end{bmatrix}
-    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \gls{sym-mathbf-a-VI-leftarrow-F-dot-X}
     \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}}
     {\begin{bmatrix}0 & 1\end{bmatrix}
-    \mathbf{a}_{VI \leftarrow F\dot{X}}
+    \gls{sym-mathbf-a-VI-leftarrow-F-dot-X}
     \begin{bmatrix}-Z_{i,th} \\ 1\end{bmatrix}
     } = \frac{B-AZ_{i,th}}{D-CZ_{i,th}}
     \qquad \gls{sym-hat-V-s-th} = \hat{F}_{th}(A-C\gls{sym-Z-s-th})
@@ -259,7 +259,7 @@ where $\gls{sym-A},\gls{sym-B},\gls{sym-C},\gls{sym-D}$ are the elements of $\gl
 This is shown in the bottom portion of \Cref{fig:multiport-circuit-pto}.
 The load voltage and current can then be found as:
 \begin{equation}\label{eq:voltage-current}
-    \hat{V} = \hat{V}_{s,th}\frac{Z_l}{Z_{s,th}+Z_l}, \qquad \hat{I} = \frac{\hat{V}_{s,th}}{Z_{s,th}+Z_l}
+    \gls{sym-hat-V} = \gls{sym-hat-V-s-th}\frac{\gls{sym-Z-l}}{\gls{sym-Z-s-th}+\gls{sym-Z-l}}, \qquad \gls{sym-hat-I} = \frac{\gls{sym-hat-V-s-th}}{\gls{sym-Z-s-th}+\gls{sym-Z-l}}
 \end{equation}
 
 %%%%%%%%%%%%%%%
@@ -269,7 +269,7 @@ The load voltage and current can then be found as:
 
 Equation~\eqref{eq:power-PQS} can be used to rewrite the instantaneous power $\gls{sym-p-t}$ at any port as \citep{saadat_power_1999}
 \begin{equation}\label{eq:power-time-PQS}
-    p(t) = P + |S|\cos\!\left(2(\omega t + \angle\hat{e}) - \tan^{-1}\!\left(\frac{Q}{P}\right)\right),
+    \gls{sym-p}(\gls{sym-t}) = \gls{sym-P} + |\gls{sym-S}|\cos\!\left(2(\gls{sym-omega} \gls{sym-t} + \angle\hat{e}) - \tan^{-1}\!\left(\frac{\gls{sym-Q}}{\gls{sym-P}}\right)\right),
 \end{equation}
 a DC offset of $\gls{sym-P}$ plus an oscillation at $2\gls{sym-omega}$ with amplitude $|\gls{sym-S}|$.
 The average and peak powers in \Cref{eq:power-avg-peak} follow directly: $\gls{sym-p-avg} = \gls{sym-P}$ since the oscillation averages to zero, and $\gls{sym-p-pk-2} = \gls{sym-P} + |\gls{sym-S}|$ at the cosine maximum.
@@ -282,17 +282,17 @@ The minimum $\gls{sym-p-min} = \gls{sym-P} - |\gls{sym-S}|$ is negative when $|\
 Expressing the average and peak powers at the electrical port in terms of the constrained-control parameters introduced in \Cref{sec:optimal-control} (control damping $\gls{sym-B-l}$, control stiffness $\gls{sym-K-l}$, and current phasor $\gls{sym-hat-I}$), and applying the constant electrical efficiency $\gls{sym-eta}$,
 \begin{equation}\label{eq:power-elec}
 \begin{bmatrix}
-p_{avg,elec} \\
-p_{pk,elec}
+\gls{sym-p-avg-elec} \\
+\gls{sym-p-pk-elec}
 \end{bmatrix}
 =
-\eta
+\gls{sym-eta}
 \begin{bmatrix}
-p_{avg,VI} \\
-p_{pk,VI}
+\gls{sym-p-avg-VI} \\
+\gls{sym-p-pk-VI}
 \end{bmatrix}
 =
-\gls{sym-eta} \tfrac{1}{2} \gls{sym-B-l} |\hat{I}|^2
+\gls{sym-eta} \tfrac{1}{2} \gls{sym-B-l} |\gls{sym-hat-I}|^2
 \begin{bmatrix}
 1 \\
 1 + \sqrt{1 + \left(\tfrac{\gls{sym-K-l}}{\gls{sym-B-l}\gls{sym-omega}}\right)^2}

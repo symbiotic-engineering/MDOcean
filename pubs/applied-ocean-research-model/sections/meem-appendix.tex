@@ -261,7 +261,7 @@ The unknown coefficients must be computed to enforce this final condition as wel
     \label{tab:MEEM-eigenfunctions}
 \end{table}
 \ifdefined\DISSERTATION
-    The dispersion relation is a nonlinear equation that implicitly gives the exterior-region eigenvalues $m_k$:
+    The dispersion relation is a nonlinear equation that implicitly gives the exterior-region eigenvalues $\gls{sym-m-k}$:
     \begin{equation}
         \label{aor:eq:dispersion}
     \dispersion
@@ -501,10 +501,10 @@ The eigencoefficients must be selected to enforce the radial velocity body bound
 The radiation problem was first solved this way for a floating cylinder in 1980 \citep{yeung_added_1981}.
 
 First, the infinite sums in $\gls{sym-phi-h}$ must be truncated.
-Assuming truncation to $\gls{sym-N}$ terms in \textit{i1}, $\gls{sym-M}$ terms in \textit{i2}, and $\gls{sym-K}$ terms in \textit{e}, the total number of eigencoefficients to solve for is $\gls{sym-N}+2M+\gls{sym-K}$.
+Assuming truncation to $\gls{sym-N}$ terms in \textit{i1}, $\gls{sym-M}$ terms in \textit{i2}, and $\gls{sym-K}$ terms in \textit{e}, the total number of eigencoefficients to solve for is $\gls{sym-N}+2\gls{sym-M}+\gls{sym-K}$.
 For a 3-region problem, there are 2 boundaries.
 Thus there are four matching equations: (1) potential at $\gls{sym-a-1}$, (2) potential at $\gls{sym-a-2}$, (3) velocity at $\gls{sym-a-1}$, and (4) velocity at $\gls{sym-a-2}$.
-As-is, this is not enough equations ($4 < \gls{sym-N}+2M+\gls{sym-K}$).
+As-is, this is not enough equations ($4 < \gls{sym-N}+2\gls{sym-M}+\gls{sym-K}$).
 We must leverage eigenfunction orthogonality to get enough equations.
 The first equation will turn into $\gls{sym-N}$ equations; the second and third each give $\gls{sym-M}$; the fourth $\gls{sym-K}$.
 The transformation uses the following property of orthogonality.
@@ -534,7 +534,7 @@ Other combinations of eigenfunction multiplication or integration besides those 
 
 \subsection{Block Matrix Structure}
 
-Once orthogonality is applied, the matching equations create a linear system $A\gls{sym-vec-x}=\gls{sym-vec-b}$ where $\gls{sym-A}$ is a complex sparse $(\gls{sym-N}+2M+\gls{sym-K})$x$(\gls{sym-N}+2M+\gls{sym-K})$ square matrix corresponding to the homogeneous case, $\gls{sym-vec-x}=[\gls{sym-vec-C-1n-i1}, \gls{sym-vec-C-1m-i2}, \gls{sym-vec-C-2m-i2}, \vec{\gls{sym-B}_{\gls{sym-k-index}}^{e}}]$ is the complex eigencoefficient vector, and $\gls{sym-vec-b}$ is the real boundary condition vector corresponding to the particular case.
+Once orthogonality is applied, the matching equations create a linear system $\gls{sym-A}\gls{sym-vec-x}=\gls{sym-vec-b}$ where $\gls{sym-A}$ is a complex sparse $(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$x$(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$ square matrix corresponding to the homogeneous case, $\gls{sym-vec-x}=[\gls{sym-vec-C-1n-i1}, \gls{sym-vec-C-1m-i2}, \gls{sym-vec-C-2m-i2}, \vec{\gls{sym-B}_{\gls{sym-k-index}}^{e}}]$ is the complex eigencoefficient vector, and $\gls{sym-vec-b}$ is the real boundary condition vector corresponding to the particular case.
 We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of MEEM overlooks.
 The A-matrix and b-vector block structures are shown in \Cref{tab:MEEM-A-matrix,tab:MEEM-b-vector} respectively.
 They are written in compact notation using row vectors of basis functions, so $\gls{sym-vec-R-1n-i1}=[\gls{sym-R-10-i1}, \gls{sym-R-11-i1}, ..., \gls{sym-R-1-N-1-i1}]$ and so on.
@@ -659,25 +659,25 @@ with output constant $\gls{sym-c-0}$ and output row vector $\gls{sym-vec-c}$ def
     \label{tab:MEEM-c-vector}
 \begin{tabular}{|l|c|c|c|c|} \hline
           Body&N&  M&  M& K\\ \hline
-          Float&$0_{1N}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1m}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-2m}$& $0_{1K}$\\ \hline
-          Spar& $\gls{sym-vec-Z-n}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1n}$& $0_{1M}$& $0_{1M}$&$0_{1K}$\\\hline
+          Float&$0_{1\gls{sym-N}}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1m}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-2m}$& $0_{1\gls{sym-K}}$\\ \hline
+          Spar& $\gls{sym-vec-Z-n}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1n}$& $0_{1\gls{sym-M}}$& $0_{1\gls{sym-M}}$&$0_{1\gls{sym-K}}$\\\hline
     \end{tabular}
     \end{table}
 The appropriate dimensions are
 \begin{equation}
-    a_{out} = \begin{cases}
-        a_2, & \text{float} \\
-        a_1, & \text{spar}
+    \gls{sym-a-out} = \begin{cases}
+        \gls{sym-a-2}, & \text{float} \\
+        \gls{sym-a-1}, & \text{spar}
     \end{cases}
     \qquad
-    a_{in} = \begin{cases}
-        a_1, & \text{float} \\
+    \gls{sym-a-in} = \begin{cases}
+        \gls{sym-a-1}, & \text{float} \\
         0, & \text{spar}
     \end{cases}
     \qquad
    d = \begin{cases}
-        -d_2, & \text{float} \\
-        -d_1, & \text{spar}
+        -\gls{sym-d-2}, & \text{float} \\
+        -\gls{sym-d-1}, & \text{spar}
     \end{cases}
 \end{equation}
 to obtain the hydrodynamic coefficients of the float or the spar respectively.
@@ -685,10 +685,10 @@ to obtain the hydrodynamic coefficients of the float or the spar respectively.
 Using the A-matrix and b- and c-vectors, the MEEM solution directly calculates radiation coefficients $\gls{sym-B-h}$ and $\gls{sym-A-h}$.
 The hydrostatic stiffness $\gls{sym-K-h}$ and the excitation coefficient $\gls{sym-gamma}$ are calculated as follows:
 \begin{equation}\label{eq:gamma-K}
-    |\gamma|  = \sqrt{\frac{ 4 \rho_w g V_g  B_h} {m_0}}, \quad % excitation
-   \angle \gamma = -\frac{\pi}{2} + \angle\frac{ B_{k=0}^e}{\textrm{H}_0^{1}(m_0 a_2)},\quad
-    K_h       = \rho_w g \underbrace{\frac{\pi}{4} (D_f^2 - D_s^2)}_{A_{w,f}},\quad  % hydrostatic stiffness
-    K_s = \rho_w g \underbrace{\frac{\pi}{4} D_s^2}_{A_{w,s}}
+    |\gls{sym-gamma}|  = \sqrt{\frac{ 4 \gls{sym-rho-w} \gls{sym-g} \gls{sym-V-g}  \gls{sym-B-h}} {\gls{sym-m-0}}}, \quad % excitation
+   \angle \gls{sym-gamma} = -\frac{\gls{sym-pi}}{2} + \angle\frac{ \gls{sym-B-k-0-e}}{\textrm{\gls{sym-H}}_0^{1}(\gls{sym-m-0} \gls{sym-a-2})},\quad
+    \gls{sym-K-h}       = \gls{sym-rho-w} \gls{sym-g} \underbrace{\frac{\gls{sym-pi}}{4} (\gls{sym-D-f}^2 - \gls{sym-D-s}^2)}_{\gls{sym-A-w-f}},\quad  % hydrostatic stiffness
+    \gls{sym-K-s} = \gls{sym-rho-w} \gls{sym-g} \underbrace{\frac{\gls{sym-pi}}{4} \gls{sym-D-s}^2}_{\gls{sym-A-w-s}}
 \end{equation}
 where $\gls{sym-g}$ is the acceleration due to gravity, $\gls{sym-rho-w}$ is the density of water, $\gls{sym-m-0}$ is the wavenumber, $\gls{sym-V-g}$ is the finite depth group velocity, $\textrm{\gls{sym-H}}_0^1$ is the zeroth-order Hankel function of the first kind, and $\gls{sym-A-w}$ is the waterplane area \citep{newman}.
 This method of calculating excitation from damping is the well-known Haskind relation.
@@ -710,7 +710,7 @@ Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to W
 
 \subsection{Convergence}
 
-As $\gls{sym-N},\gls{sym-M},K\rightarrow\infty$, matching quality improves, and hydro coefficients converge toward their true values.
+As $\gls{sym-N},\gls{sym-M},\gls{sym-K}\rightarrow\infty$, matching quality improves, and hydro coefficients converge toward their true values.
 Previous MEEM papers use $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \citep{chau_inertia_2012}.
 We observe that potential matching converges faster than velocity matching.
 \Cref{fig:meem-matching} shows the matching behavior for $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=11$, where potential matches well but velocity still has noticeable mismatch.
@@ -748,9 +748,9 @@ Therefore, the limit is derived analytically. %\hl{This formula hasn't been nume
 \begin{equation}
     \lim_{m_0h\rightarrow\infty} Z_0^e(z)= \frac{\cosh^2(m_0h)}{\sqrt{2m_0h}}\exp\left(1+\frac{z}{h}\right)
 \end{equation}
-Plugging this into the first element of the bottom block of the b-vector (position $\gls{sym-N}+2M+1$) results in
+Plugging this into the first element of the bottom block of the b-vector (position $\gls{sym-N}+2\gls{sym-M}+1$) results in
 \begin{equation}
-    \lim_{m_0h\rightarrow\infty}b_{N+2M+1}=\frac{-a_2}{h-d_2} \sqrt{\frac{h}{2m_0}}\exp(-d_2m_0)
+    \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty}\gls{sym-b-N-2M-1}=\frac{-\gls{sym-a-2}}{\gls{sym-h}-\gls{sym-d-2}} \sqrt{\frac{\gls{sym-h}}{2\gls{sym-m-0}}}\exp(-\gls{sym-d-2}\gls{sym-m-0})
 \end{equation}
 \begin{figure}[htbp]
     \centering
@@ -770,12 +770,12 @@ The asymptotic approximation is accurate for values of $\gls{sym-m}_0h/\textrm{a
 The corresponding limit for the vertical coupling integral is:
 \begin{equation}
 \begin{aligned}
-    \lim_{m_0h\rightarrow\infty}\boldsymbol{\mathcal{Z}}_{m,k=0} &
+    \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty}\gls{sym-boldsymbol-mathcal-Z-m-k-0} &
     %= \int_{-h}^{-d_2} \vec{Z}_m^{i2 ~T}\vec{Z}_0^{e} dz
-    = h~\frac{\cosh^2(m_0h)}{\sqrt{2m_0h}}\cdot \frac{-1+(-1)^m\exp(1-\frac{d_2}{h})}{f_{m}} \\
-    \text{where}~~f_m&= \begin{cases}
-        1, & m=0 \\
-        h^2\lambda_m^2+1, & m \geq 1
+    = \gls{sym-h}~\frac{\cosh^2(\gls{sym-m-0}\gls{sym-h})}{\sqrt{2\gls{sym-m-0}\gls{sym-h}}}\cdot \frac{-1+(-1)^\gls{sym-m}\exp(1-\frac{\gls{sym-d-2}}{\gls{sym-h}})}{\gls{sym-f-m}} \\
+    \text{where}~~\gls{sym-f-m}&= \begin{cases}
+        1, & \gls{sym-m}=0 \\
+        \gls{sym-h}^2\gls{sym-lambda-m}^2+1, & \gls{sym-m} \geq 1
     \end{cases}
     \end{aligned}
 \end{equation}
@@ -790,11 +790,11 @@ Degrees are used instead of radians so asymptotes occur at rational values.
 
 The runtime of the MEEM method is the time required to find the eigencoefficients, then obtain the hydrodynamic coefficients from eigencoefficients.
 First, a nonlinear root-finding algorithm runs $\gls{sym-K}-1$ times to generate the $\gls{sym-m-k}$ inputs used in the A-matrix and b-vector.
-Then $3N+8M+2K-11$ Bessel functions must be evaluated for the radial terms of the A-matrix.
-(Note that this would reduce to $2N+8M+2K-10$ evaluations if the definition of the $\gls{sym-R-i1-1n}(\gls{sym-r})$ eigenfunction were modified to use a scale factor based on $\gls{sym-a-1}$ rather than $\gls{sym-a-2}$, although this enhancement is not pursued here to maintain consistency with previous work).
+Then $3\gls{sym-N}+8\gls{sym-M}+2\gls{sym-K}-11$ Bessel functions must be evaluated for the radial terms of the A-matrix.
+(Note that this would reduce to $2\gls{sym-N}+8\gls{sym-M}+2\gls{sym-K}-10$ evaluations if the definition of the $\gls{sym-R-i1-1n}(\gls{sym-r})$ eigenfunction were modified to use a scale factor based on $\gls{sym-a-1}$ rather than $\gls{sym-a-2}$, although this enhancement is not pursued here to maintain consistency with previous work).
 % if I change scaling of i2 from a2 to (a1+a2)/2, it increases by 2*(M-1). So total would be 2N+10M+2K-12. see notebook p51.
 The cost of evaluating vertical coupling integrals (\Cref{tab:meem-integrals}) is negligible since they are trigonometric.
-Linear solves scale almost cubically with matrix size, so this step scales with $(\gls{sym-N}+2M+\gls{sym-K})^3$.
+Linear solves scale almost cubically with matrix size, so this step scales with $(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})^3$.
 The radial integrals for the c-vector do not require evaluating Bessel functions with any arguments that were not already evaluated for the A-matrix.
 For $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=10$, the simulation of a single frequency averages \resultsAOR[MEEMRuntime] on the hardware described in \Cref{sec:sim-runtime}.
 \Cref{fig:runtime-hydro} shows the time breakdown.

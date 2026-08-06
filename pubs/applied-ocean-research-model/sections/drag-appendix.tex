@@ -11,20 +11,20 @@ For a hollow cylinder of outer radius $\gls{sym-vec-R}$ and inner radius $\gls{s
 % derived p156-159 notebook 3/10/25
 % simplified p169-173 notebook 3/12/25
 \begin{equation}\label{eq:drag-force-integral}
-    \gls{sym-vec-hat-F-d} = \int_{\gls{sym-A-wet}} d\vec{\hat{F}}_d(y) = -\int_{y=-\gls{sym-vec-R}}^{\gls{sym-vec-R}} \gls{sym-vec-w-y}\, \vec{\hat{p}}_d(y)\, dy,
+    \gls{sym-vec-hat-F-d} = \int_{\gls{sym-A-wet}} d\gls{sym-vec-hat-F-d}(\gls{sym-y}) = -\int_{\gls{sym-y}=-\gls{sym-vec-R}}^{\gls{sym-vec-R}} \gls{sym-vec-w-y}\, \gls{sym-vec-hat-p-d}(\gls{sym-y})\, dy,
 \end{equation}
 where $\gls{sym-vec-w-y}$ is the local body width perpendicular to wave propagation:
 \begin{equation}\label{eq:drag-width}
     \gls{sym-vec-w-y} = \begin{cases}
-        2\sqrt{\gls{sym-vec-R}^2-y^2}, & \gls{sym-vec-R-in}<|y|<\gls{sym-vec-R} \\
-        2\sqrt{\gls{sym-vec-R}^2-y^2} - 2\sqrt{\gls{sym-vec-R-in}^2-y^2}, & 0<|y|<\gls{sym-vec-R-in}.
+        2\sqrt{\gls{sym-vec-R}^2-\gls{sym-y}^2}, & \gls{sym-vec-R-in}<|\gls{sym-y}|<\gls{sym-vec-R} \\
+        2\sqrt{\gls{sym-vec-R}^2-\gls{sym-y}^2} - 2\sqrt{\gls{sym-vec-R-in}^2-\gls{sym-y}^2}, & 0<|\gls{sym-y}|<\gls{sym-vec-R-in}.
     \end{cases}
 \end{equation}
 
 Plugging the describing function \Cref{eq:drag-pressure} into the drag force integral \eqref{eq:drag-force-integral} reveals the quasi-linearized drag force to be the sum of a damping term in phase with the body motion and an excitation term potentially out of phase with the body motion:
 \begin{equation}\label{eq:drag-damping-excitation-2}
-    \gls{sym-vec-F-d} = -\gls{sym-mathbf-B-d} \vec{\hat{\dot{\xi}}}
-    + \gls{sym-vec-gamma-d} \hat{\zeta}
+    \gls{sym-vec-F-d} = -\gls{sym-mathbf-B-d} \gls{sym-vec-hat-dot-xi}
+    + \gls{sym-vec-gamma-d} \gls{sym-hat-zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $\gls{sym-y}$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
@@ -38,7 +38,7 @@ The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag
 where we use radii vectors $\gls{sym-vec-R}=[\gls{sym-D-f}/2,\gls{sym-D-d}/2]$ and $\gls{sym-vec-R-in}=[\gls{sym-D-f-in},0]$ to represent the float and spar.
 $\gls{sym-vec-alpha-v-y}$ is the amplitude ratio of the relative velocity and WEC velocity:
 \begin{equation}\label{eq:drag-alpha-definitions}
-    \gls{sym-vec-alpha-v-y} = \frac{|\vec{\hat{V}}_{rel}(y)|}{|\vec{\dot{\xi}}|} = \sqrt{1 + \vec{r}^{\, 2} \exp\{-2ky\} - 2 \vec{r} \exp\{-ky\}  \sin\angle \vec{\hat{\dot{\xi}}}}
+    \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|}{|\gls{sym-vec-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp\{-2ky\} - 2 \gls{sym-vec-r} \exp\{-ky\}  \sin\angle \gls{sym-vec-hat-dot-xi}}
 \end{equation}
 and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
 
@@ -100,8 +100,8 @@ The limit cases in question include $\gls{sym-r} \rightarrow 0$ (the body veloci
     \qquad
     \lim_{r\rightarrow 0} \gls{sym-I-G}(r,\theta,\kappa) =
     \begin{cases}
-    \frac{\pi \gls{sym-J-1}(\kappa)}{\kappa} & \textrm{if } \kappa \neq 0 \\
-    \frac{\pi}{2} & \textrm{if } \kappa = 0
+    \frac{\gls{sym-pi} \gls{sym-J-1}(\gls{sym-kappa})}{\gls{sym-kappa}} & \textrm{if } \gls{sym-kappa} \neq 0 \\
+    \frac{\gls{sym-pi}}{2} & \textrm{if } \gls{sym-kappa} = 0
     \end{cases} \\
     \lim_{\kappa \rightarrow 0} \gls{sym-I-B}(r,\theta,\kappa) =  \lim_{\kappa \rightarrow 0} \gls{sym-I-G}(r,\theta,\kappa) = \frac{\pi}{2}\sqrt{1+r^2-2r\sin\theta},
 \end{aligned}
@@ -112,7 +112,7 @@ Here, the integrals as defined in \Cref{eq:definition-IB-IG} diverge, and the fo
 Instead, when $r\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $\gls{sym-I}' = \gls{sym-I}/\gls{sym-r}$:
 \begin{equation}
 \begin{aligned}
-    \gls{sym-mathbf-B-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{V}_{wave}|
+    \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-V-wave}|
     \left[
         I_B'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha k R)
     \right]
@@ -130,8 +130,8 @@ The relevant limits are then:
     \qquad
     \lim_{r\rightarrow \infty} I_G'(r,\theta,\kappa) =
     \begin{cases}
-    \frac{\pi \gls{sym-J-1}((1i-1)\kappa)}{(1i-1)\kappa} & \textrm{if } \kappa \neq 0 \\
-    \frac{\pi}{2} & \textrm{if } \kappa = 0
+    \frac{\gls{sym-pi} \gls{sym-J-1}((1i-1)\gls{sym-kappa})}{(1i-1)\gls{sym-kappa}} & \textrm{if } \gls{sym-kappa} \neq 0 \\
+    \frac{\gls{sym-pi}}{2} & \textrm{if } \gls{sym-kappa} = 0
     \end{cases}
 \end{aligned}
 \end{equation}
@@ -164,9 +164,9 @@ It is therefore guaranteed to converge as long as the dynamics are contracting a
 \begin{equation}
  \left|
     \frac{\partial}
-    {\partial \vec{\hat{\dot{\xi}}}}~\left[
-    g\left(
-        \vec{\hat{\dot{\xi}}}~
+    {\partial \gls{sym-vec-hat-dot-xi}}~\left[
+    \gls{sym-g}\left(
+        \gls{sym-vec-hat-dot-xi}~
     \right)\right]
 \right| < 1
 \end{equation}
@@ -183,9 +183,9 @@ Note that in the quasi-linear formulation, the lack of complete linearity means 
 The optimal load damping $\gls{sym-B-l}$ is derived by setting
 \begin{equation}
 \begin{aligned}
-0 &= \frac{\partial }{\partial B_l} \left[p_{avg,VI}\right]
-= \frac{\partial}{\partial B_l} \left[\frac{1}{2} B_l |\hat{I}|^2\right]
-= \frac{\partial }{\partial B_l} \left[\frac{1}{2} B_l \left|\frac{\hat{V}_{s,th}}{Z_{s,th}+B_l+K_l/s}\right|^2 \right]
+0 &= \frac{\partial }{\partial \gls{sym-B-l}} \left[\gls{sym-p-avg-VI}\right]
+= \frac{\partial}{\partial \gls{sym-B-l}} \left[\frac{1}{2} \gls{sym-B-l} |\gls{sym-hat-I}|^2\right]
+= \frac{\partial }{\partial \gls{sym-B-l}} \left[\frac{1}{2} \gls{sym-B-l} \left|\frac{\gls{sym-hat-V-s-th}}{\gls{sym-Z-s-th}+\gls{sym-B-l}+\gls{sym-K-l}/\gls{sym-s}}\right|^2 \right]
 \end{aligned}
 \end{equation}
 and the typical simplification $\frac{\partial \gls{sym-hat-V-s-th}}{\partial \gls{sym-B-l}}=\frac{\partial \gls{sym-Z-s-th}}{\partial \gls{sym-B-l}}=0$ must be replaced with the implicit dependence of the Th\'{e}venin equivalent parameters on $\gls{sym-B-l}$ because $\gls{sym-B-l}$ affects $\gls{sym-hat-dot-xi}$ and therefore $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ via \eqref{eq:drag-coeffs}.
