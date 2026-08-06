@@ -72,28 +72,28 @@ This appendix provides additional details on constraint definitions, scaling, an
 \subsection{Linear Inequality Constraints}
 \label{remdo:sec:appendix-linear-constraints}
 
-The eight linear inequality constraints of the optimization formulation (\Cref{remdo:sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $g_{L,*}$ given in parentheses:
+The eight linear inequality constraints of the optimization formulation (\Cref{remdo:sec:formulation}) are expressed in matrix form below, where each row corresponds to the constraint identifier $\gls{sym-g-L}$ given in parentheses:
 % notebook p137 11/16/25
 % TODO: verify row 2 ($g_{L,2}$) coefficient — should the leading entry use D_{f,in}/D_s or D_{f,in} directly? See formulation note, unresolved against MATLAB source.
 \begin{equation}
     \begin{bmatrix}
-    -\frac{D_d}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
-    \frac{D_{f,in}}{D_s} & -1 & 0 & ~~~0& 0  & 0\\
-    \frac{h_d}{D_s}-\frac{T_s}{D_s} & 0 & 1 & ~~~0& 0  & 0\\
-    \frac{T_s}{D_s} & 0 & ~-1+\frac{1}{T_{f,2}/h_f} & ~~-1 & 0 & 0\\
-    0 & \frac{N}{2\cdot223} & 1 & ~~~0& 0  & 0\\
-    \frac{N}{2\cdot223}  + \frac{T_s}{D_s} & 0 & 0 & ~~~0 & 0 & 0\\
-    -\frac{h_d}{D_s} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
-    0 & 0 & \frac{-.5}{T_{f,2}/h_f} & ~~~0 & 0 & 1 \\
+    -\frac{\gls{sym-D-d}}{\gls{sym-D-s}} & 0 & 0 & ~~~0 & 0 & 0\\
+    \frac{\gls{sym-D-f-in}}{\gls{sym-D-s}} & -1 & 0 & ~~~0& 0  & 0\\
+    \frac{\gls{sym-h-d}}{\gls{sym-D-s}}-\frac{\gls{sym-T-s}}{\gls{sym-D-s}} & 0 & 1 & ~~~0& 0  & 0\\
+    \frac{\gls{sym-T-s}}{\gls{sym-D-s}} & 0 & ~-1+\frac{1}{\gls{sym-T-f-2}/\gls{sym-h-f}} & ~~-1 & 0 & 0\\
+    0 & \frac{\gls{sym-N}}{2\cdot223} & 1 & ~~~0& 0  & 0\\
+    \frac{\gls{sym-N}}{2\cdot223}  + \frac{\gls{sym-T-s}}{\gls{sym-D-s}} & 0 & 0 & ~~~0 & 0 & 0\\
+    -\frac{\gls{sym-h-d}}{\gls{sym-D-s}} & 0 & 0 & ~~~0 & 10^{-3} & 0\\
+    0 & 0 & \frac{-.5}{\gls{sym-T-f-2}/\gls{sym-h-f}} & ~~~0 & 0 & 1 \\
     \end{bmatrix}
-    \begin{bmatrix} D_s \\ D_f \\ T_{f,2} \\ h_s \\ t_d \\ h_{stiff,f}
+    \begin{bmatrix} \gls{sym-D-s} \\ \gls{sym-D-f} \\ \gls{sym-T-f-2} \\ \gls{sym-h-s} \\ \gls{sym-t-d} \\ \gls{sym-h-stiff-f}
     \end{bmatrix}
     \leq
     \begin{bmatrix}
-    -D_{d,min} \\ -0.01 \\ -0.01 \\ -0.01 \\ h \\ h \\ -0.01 \\ -0.01
+    -\gls{sym-D-d-min} \\ -0.01 \\ -0.01 \\ -0.01 \\ \gls{sym-h} \\ \gls{sym-h} \\ -0.01 \\ -0.01
     \end{bmatrix}~
     \begin{pmatrix}
-    g_{L,1} \\ g_{L,2} \\ g_{L,3} \\g_{L,4} \\ g_{L,5} \\ g_{L,6} \\ g_{L,7} \\ g_{L,8}
+    \gls{sym-g-L-1} \\ \gls{sym-g-L-2} \\ \gls{sym-g-L-3} \\ \gls{sym-g-L-4} \\ \gls{sym-g-L-5} \\ \gls{sym-g-L-6} \\ \gls{sym-g-L-7} \\ \gls{sym-g-L-8}
     \end{pmatrix}
 \end{equation}
 The $-0.01$ values on the right-hand side provide a small numerical buffer against the constraints to avoid model limits.
