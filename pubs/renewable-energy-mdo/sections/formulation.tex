@@ -4,14 +4,14 @@ The standard optimization problem is expressed \citep{martins_engineering_2022,p
 \begin{equation}
 \label{remdo:eq:standard-opt-prob}
 \begin{aligned}
-    \text{min}~~& \gls{sym-vec-J}(\gls{sym-vec-x},~\gls{sym-vec-p}) \\
+    \text{min}~~& \gls{sym-vec-J} (\gls{sym-vec-x},~\gls{sym-vec-p}) \\
     \text{by varying}~~&\gls{sym-vec-x} \\
     \text{subject to}~~ &\gls{sym-vec-x-LB} \leq \gls{sym-vec-x} \leq \gls{sym-vec-x-UB} \\
-    &\gls{sym-vec-g}(\gls{sym-vec-x},~\gls{sym-vec-p}) \geq 0\\
-    &\gls{sym-vec-h}(\gls{sym-vec-x},~\gls{sym-vec-p})= 0\\
+    &\gls{sym-vec-g} (\gls{sym-vec-x},~\gls{sym-vec-p}) \geq 0\\
+    &\gls{sym-vec-h} (\gls{sym-vec-x},~\gls{sym-vec-p})= 0\\
 \end{aligned}
 \end{equation}
-An optimization algorithm adjusts the design variable vector $\gls{sym-vec-x}$ within lower and upper bounds $\gls{sym-vec-x-LB}$, $\gls{sym-vec-x-UB}$ to minimize the objective(s) $\gls{sym-vec-J}$, subject to inequality and equality constraints $\gls{sym-vec-g}$ and $\gls{sym-vec-h}$.
+An optimization algorithm adjusts the design variable vector $\gls{sym-vec-x}$ within lower and upper bounds $\gls{sym-vec-x-LB}$, $\gls{sym-vec-x-UB}$ to minimize the objective (s) $\gls{sym-vec-J}$, subject to inequality and equality constraints $\gls{sym-vec-g}$ and $\gls{sym-vec-h}$.
 Parameters $\gls{sym-vec-p}$ are constant inputs required to compute the objective or constraints.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,27 +27,27 @@ For the single-objective formulation, the optimization minimizes the levelized c
     Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \citep{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \citep{jenne_powering_2021}.
     
-    In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
+    In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $\gls{sym-overline-P-elec}$ and design-dependent capital cost $\gls{sym-C-design}$.
     This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
     LCOE is adopted for its simplicity, though it carries three limitations:
     it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \citep{akdemir_opportunities_2023,mccabe_system_2023};
     it has high early-stage uncertainty, since costs other than structural and PTO costs are difficult to predict early on and thus modeled as fixed with respect to design \citep{mccabe_development_2026};
     and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citep{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
-    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $P_{\text{avg,elec}}$ and design-dependent capital cost $C_{\text{design}}$.
+    The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $\gls{sym-overline-P-elec}$ and design-dependent capital cost $\gls{sym-C-design}$.
     This removes the influence of the fixed charge rate and inaccurately-scaled costs and exposes the minimum-capital design for a given power requirement.
 \fi
 
 The objective function is expressed:
 \begin{equation}
 \label{remdo:eq:obj-fcn}
-\gls{sym-vec-J}(\gls{sym-vec-x}, \gls{sym-vec-p}) = \begin{cases} LCOE\ (\gls{sym-vec-x}, \gls{sym-vec-p}), & \text{Single objective} \\
-[C_{\text{design}} (\gls{sym-vec-x}, \gls{sym-vec-p}),\ P_{\text{avg,elec}} (\gls{sym-vec-x}, \gls{sym-vec-p})]^\top, & \text{Multi-objective}
+\gls{sym-vec-J} (\gls{sym-vec-x}, \gls{sym-vec-p}) = \begin{cases} LCOE\ (\gls{sym-vec-x}, \gls{sym-vec-p}), & \text{Single objective} \\
+[\gls{sym-C-design} (\gls{sym-vec-x}, \gls{sym-vec-p}),\ \gls{sym-overline-P-elec} (\gls{sym-vec-x}, \gls{sym-vec-p})]^\top, & \text{Multi-objective}
 \end{cases}
 \end{equation}
 %The objectives of this optimization problem are to minimize the LCOE and the power coefficient of variation of the RM3 WEC. LCOE, the cost per unit energy over the lifetime of the device, was chosen as an objective function because it is often the metric used to assess and compare energy production methods. A low LCOE indicates the project is competitive with conventional energy production processes and better able to generate affordable energy for consumers. The second objective, power coefficient of variation, is a measure of the fluctuation in power output. Minimizing power variation provides more consistent output and reduces the amount of energy storage required.
 
-%The coefficient of variation of power $c_v$ normalizes the the standard deviation of power across different sea states $\sigma$ by the average power across those sea states $\mu$:
+%The coefficient of variation of power $c_v$ normalizes the standard deviation of power across different sea states $\sigma$ by the average power across those sea states $\mu$:
 % \begin{equation}
 %     c_v = \frac{\sigma}{\mu}.
 %     \label{remdo:cv}

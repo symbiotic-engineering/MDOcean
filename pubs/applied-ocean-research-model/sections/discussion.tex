@@ -281,7 +281,7 @@ The structure of the constrained optimal control problem allows for quantificati
 From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,\text{opt}}|^2)$ that captures the effect of active dynamic constraints:
 \begin{equation}\label{eq:power-elec-sum}
 \begin{aligned}
-    \gls{sym-p-avg-elec} &= \gls{sym-eta} \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-w-beta} \cdot
+    \gls{sym-overline-P-elec} &= \gls{sym-eta} \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-w-beta} \cdot
     \frac{|\gls{sym-hat-V-s-th-beta}|^2}{8\Re(\gls{sym-Z-s-th-beta})}~ (1 - |\gls{sym-Gamma-beta-opt}|^2)
     \\ \text{s.t.}
 \quad
@@ -295,7 +295,7 @@ From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 Power is maximized when $|\gls{sym-Gamma-beta-opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
 When constraints are active, the optimal $|\gls{sym-Gamma-beta-opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\gls{sym-Gamma-beta-opt}|$.
 
-\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\gls{sym-p-avg-elec}$ as a function of the constraint coefficients $\gls{sym-b-mu}$ (which are affine or square functions of the constraint limits $\gls{sym-tau-max}$, $\gls{sym-P-max-elec}$, $\gls{sym-X-f-max}$, $\gls{sym-X-s-max}$, and $\gls{sym-X-PTO-max}$ defined in \Cref{tab:qp-constraints}).
+\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\gls{sym-overline-P-elec}$ as a function of the constraint coefficients $\gls{sym-b-mu}$ (which are affine or square functions of the constraint limits $\gls{sym-tau-max}$, $\gls{sym-P-tau-Omega-max}$, $\gls{sym-xi-f-max}$, $\gls{sym-xi-s-max}$, and $\gls{sym-X-PTO-max}$ defined in \Cref{tab:qp-constraints}).
 
 The result is:
 \begin{equation}\label{eq:power-double-sum-main}
@@ -494,8 +494,8 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     about one-%
     \makeatletter%
     \phantom{\rlap{% make upcoming print invisible and zero width (hack because you can't retrieve value without also printing it)
-    \resultsAOR[multiplierOldRuntime]% print value, which locally sets resultsAOR@out
-    \global\let\SavedMultiplier\resultsAOR@out% save resultsAOR@out globally so it can be accessed outside the phantom environment
+    \resultsAOR[multiplierOldRuntime] % print value, which locally sets resultsAOR@out
+    \global\let\SavedMultiplier\resultsAOR@out % save resultsAOR@out globally so it can be accessed outside the phantom environment
     }}%
     \makeatother%
     \ordinalstringnum{\SavedMultiplier}
