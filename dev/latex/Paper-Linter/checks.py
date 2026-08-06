@@ -475,8 +475,11 @@ def check_duplicate_word():
             continue
         updated, span = actions.duplicate_word_line(l)
         if span is not None:
-            match = re.search(r"\\b(\\w+)\\s+\\1\\b", l, re.IGNORECASE)
-            warns.append((i, "Duplicated adjacent word '%s'" % match.group(1), span))
+            match = re.search(r"\b(\w+)\s+\1\b", l, re.IGNORECASE)
+            if match is not None:
+                warns.append((i, "Duplicated adjacent word '%s'" % match.group(1), span))
+            else:
+                warns.append((i, "Duplicated adjacent word", span))
     return warns
 
 
