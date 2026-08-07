@@ -3,7 +3,7 @@ The relative-velocity computation in \Cref{eq:drag-pressure} uses the standard f
 with $\gls{sym-vec-T} = [\gls{sym-T-f-2}, \gls{sym-T-s}]$ collecting the bottom drafts of the float and spar:
 \begin{equation}
     \label{eq:wave-velocity-phasor}
-    \vec{\hat{V}}_{wave}(y) = \frac{H}{2}\,\frac{gk}{\omega}\, \exp\{-k\vec{T}-iky\}.
+    \gls{sym-vec-hat-V-wave}(\gls{sym-y}) = \frac{\gls{sym-H}}{2}\,\frac{\gls{sym-g}\gls{sym-k-wavenumber}}{\gls{sym-omega}}\, \exp\{-\gls{sym-k-wavenumber}\gls{sym-vec-T}-i\gls{sym-k-wavenumber}\gls{sym-y}\}.
 \end{equation}
 
 Strip theory integrates the spatially-dependent infinitesimal drag force vector $d\gls{sym-vec-F-d}$ over the wetted surface area $\gls{sym-A-wet}$.
@@ -31,16 +31,16 @@ The damping-excitation grouping of the drag terms, as well as the dependence of 
 The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\gls{sym-mathbf-B-d}$ and complex drag excitation vector $\gls{sym-vec-gamma-d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
 \begin{aligned}
-    \gls{sym-mathbf-B-d} &= \frac{8}{3\pi}\frac{1}{2} \rho_w \, \textrm{diag}\left(\vec{C}_d |\vec{\hat{\dot{\xi}}}| \int_{y=-\vec{R}}^{\vec{R}} \gls{sym-vec-w-y} \vec{\alpha}_v(y) dy \right) \\
-    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \frac{1}{2} \rho_w \vec{C}_d \, |\vec{\hat{\dot{\xi}}}| \frac{gke^{-k\vec{T}}}{\omega} \int_{y=-\vec{R}}^{\vec{R}} \gls{sym-vec-w-y} \gls{sym-vec-alpha-v-y} e^{-iky} dy
+    \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}}\frac{1}{2} \gls{sym-rho-w} \, \textrm{diag}\left(\gls{sym-vec-C-d} |\gls{sym-vec-hat-dot-xi}| \int_{\gls{sym-y}=-\gls{sym-vec-R}}^{\gls{sym-vec-R}} \gls{sym-vec-w-y} \gls{sym-vec-alpha-v}(\gls{sym-y}) d\gls{sym-y} \right) \\
+    \gls{sym-vec-gamma-d} &= \frac{8}{3\gls{sym-pi}} \frac{1}{2} \gls{sym-rho-w} \gls{sym-vec-C-d} \, |\gls{sym-vec-hat-dot-xi}| \frac{\gls{sym-g}\gls{sym-k-wavenumber}\exp(-\gls{sym-k-wavenumber}\gls{sym-vec-T})}{\gls{sym-omega}} \int_{\gls{sym-y}=-\gls{sym-vec-R}}^{\gls{sym-vec-R}} \gls{sym-vec-w-y} \gls{sym-vec-alpha-v-y} \exp(-i\gls{sym-k-wavenumber}\gls{sym-y}) d\gls{sym-y}
 \end{aligned}
 \end{equation}
 where we use radii vectors $\gls{sym-vec-R}=[\gls{sym-D-f}/2,\gls{sym-D-d}/2]$ and $\gls{sym-vec-R-in}=[\gls{sym-D-f-in},0]$ to represent the float and spar.
 $\gls{sym-vec-alpha-v-y}$ is the amplitude ratio of the relative velocity and WEC velocity:
 \begin{equation}\label{eq:drag-alpha-definitions}
-    \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|}{|\gls{sym-vec-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp\{-2ky\} - 2 \gls{sym-vec-r} \exp\{-ky\}  \sin\angle \gls{sym-vec-hat-dot-xi}}
+    \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|}{|\gls{sym-vec-hat-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp(-2\gls{sym-k-wavenumber}\gls{sym-y}) - 2 \gls{sym-vec-r} \exp(-\gls{sym-k-wavenumber}\gls{sym-y})  \sin\angle \gls{sym-vec-hat-dot-xi}}
 \end{equation}
-and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-hat-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Nondimensional Drag Integrals $\gls{sym-I-B}$ and $\gls{sym-I-G}$}
@@ -50,21 +50,21 @@ Here we present an alternative form of the coefficients in terms of nondimension
 \begin{aligned}
     \gls{sym-mathbf-B-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}|
     \left[
-        I_B(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B(r,\angle\hat{\dot{\xi}},\alpha k R)
+        I_B(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_B(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber} R)
     \right]
     \\
-    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}| \frac{g k}{\omega} e^{-k\vec{T}}
+    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}| \frac{g \gls{sym-k-wavenumber}}{\omega} \exp(-\gls{sym-k-wavenumber}\vec{T})
     \left[
-        \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},\alpha kR)
+        \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber}R)
     \right]
 \end{aligned}
 \end{equation}
 where the nondimensional integral functions $\gls{sym-I-B}$ (real) and $\gls{sym-I-G}$ (complex) are defined as:
 \begin{equation}\label{eq:definition-IB-IG}
 \begin{aligned}
-    \gls{sym-I-B}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} dx
+    \gls{sym-I-B}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2\exp(-2\kappa x)-2r\sin\theta \exp(-\kappa x)} dx
     \\
-    \gls{sym-I-G}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2e^{-2\kappa x}-2r\sin\theta e^{-\kappa x}} e^{-i\kappa x} dx
+    \gls{sym-I-G}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2\exp(-2\kappa x)-2r\sin\theta \exp(-\kappa x)} \exp(-i\kappa x) dx
 \end{aligned}
 \end{equation}
 
@@ -114,12 +114,12 @@ Instead, when $r\rightarrow \infty$, we apply an alternative convention that rep
 \begin{aligned}
     \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-V-wave}|
     \left[
-        I_B'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha k R)
+        I_B'(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber} R)
     \right]
     \\
-    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d  |\hat{V}_{wave}| \frac{gk}{\omega} e^{-k\vec{T}}
+    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d  |\hat{V}_{wave}| \frac{g\gls{sym-k-wavenumber}}{\omega} \exp(-\gls{sym-k-wavenumber}\vec{T})
     \left[
-        I_G'(r,\angle\hat{\dot{\xi}},kR) - \alpha^2 I_G'(r,\angle\hat{\dot{\xi}},\alpha kR)
+        I_G'(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_G'(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber}R)
     \right]
 \end{aligned}
 \end{equation}

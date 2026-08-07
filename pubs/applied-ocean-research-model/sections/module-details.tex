@@ -1,4 +1,4 @@
-%!TeX root = ../main.tex
+%!TeX root =../main.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Module Details}
@@ -7,14 +7,14 @@
     The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
     For notation, unbolded unarrowed variables refer to scalars (e.g. $\gls{sym-x}$ or $X$), arrowed variables refer to vectors ($\gls{sym-vec-x}$ or $\gls{sym-vec-X}$), and bold variables refer to matrices ($\gls{sym-mathbf-x}$ or $\gls{sym-mathbf-X}$).
     For dynamic (time-varying) quantities, the time domain representation is denoted $\gls{sym-x}(\gls{sym-t})$, and can also be represented as the real part of a complex signal $\gls{sym-x}(\gls{sym-t})=\Re\left[\gls{sym-tilde-x}(\gls{sym-t})\right]$.
-    Assuming the signal is sinusoidal, the complex signal can be expressed as $\gls{sym-tilde-x}(\gls{sym-t})=\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}}$ with complex phasor $\gls{sym-hat-X}=|\gls{sym-hat-X}|e^{i\angle \gls{sym-hat-X}}$ and angular frequency $\gls{sym-omega}$.
+    Assuming the signal is sinusoidal, the complex signal can be expressed as $\gls{sym-tilde-x}(\gls{sym-t})=\gls{sym-hat-X}\exp(i\gls{sym-omega} \gls{sym-t})$ with complex phasor $\gls{sym-hat-X}=|\gls{sym-hat-X}|\exp(i\angle \gls{sym-hat-X})$ and angular frequency $\gls{sym-omega}$.
     Altogether, this gives $\gls{sym-x}(\gls{sym-t})=|\gls{sym-hat-X}|\cos(\gls{sym-omega} \gls{sym-t}+\angle\gls{sym-hat-X})$.
-    Dots ($\dot{x}(\gls{sym-t})=\Re(\hat{\dot{X}}e^{i\gls{sym-omega} \gls{sym-t}})=\Re(i\gls{sym-omega}\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}})$) indicate time-derivatives.
+    Dots ($\dot{x}(\gls{sym-t})=\Re(\hat{\dot{X}}\exp(i\gls{sym-omega} \gls{sym-t}))=\Re(i\gls{sym-omega}\gls{sym-hat-X}\exp(i\gls{sym-omega} \gls{sym-t})))$ indicate time-derivatives.
     For static quantities, no special notation differentiates complex from real variables, as this will be indicated directly in the text or with $\gls{sym-mathbb-R}$ or $\gls{sym-mathbb-C}$ if clarification is needed.
 \else
     The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
     For notation, unbolded unarrowed variables refer to scalars, arrowed variables refer to vectors, and bold variables refer to matrices.
-    Time-varying quantities $\gls{sym-x}(\gls{sym-t})$ are represented by complex phasor $\gls{sym-hat-X}$ such that $\gls{sym-x}(\gls{sym-t})=\Re[\gls{sym-hat-X}e^{i\gls{sym-omega} \gls{sym-t}}]$.
+    Time-varying quantities $\gls{sym-x}(\gls{sym-t})$ are represented by complex phasor $\gls{sym-hat-X}$ such that $\gls{sym-x}(\gls{sym-t})=\Re[\gls{sym-hat-X}\exp(i\gls{sym-omega} \gls{sym-t})]$.
 \fi
 %TC:break Geometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,7 +189,7 @@ Any violations are corrected by adjusting the coupling terms $\gls{sym-A-c}$ and
 % b &= b_{s,rad}+b_{s,drag} \\
 % k &= \frac{\pi}{4} \rho_w g  D_s^2 \\
 % m &= \rho_w V_{sub,s}C_m\\
-%     \omega_n^2 &= \frac{g}{C_m D_d} \frac{1}{\frac{T_s}{D_d} + \frac{h_d}{D_d}\left(\frac{D_d}{D_s}\right)^2} \leq \omega_{n,nom}^2 \\
+%     \omega_n^2 &= \frac{g}{C_m D_d} \frac{1}{\frac{T_s}{D_d} + \frac{h_d}{D_d}\left (\frac{D_d}{D_s}\right)^2} \leq \omega_{n,nom}^2 \\
 %     \zeta &= abcd \geq \zeta_{nom}
 % \end{aligned}
 % \end{equation}
@@ -315,7 +315,7 @@ However, in the special case where the only time-domain constraint is on the con
 \centering
 \caption{Constraint satisfaction approaches for modified frequency domain methods. Filled stars indicate better performance.}
 \label{tab:constraint-approaches}
-\begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l l}
+\begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l}
 &\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \toprule
 M1 & Nonlinear optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
 M2 & Linear optimal controller& \Stars{3} & \Stars{2} \\ \hline
@@ -335,9 +335,9 @@ If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical PMP evaluation methods, respectively, are of concern.
 \fi
 For situations without an explicit PMP control law (M1.2), a nonlinear near-optimal controller can be constructed by first deriving the optimal linear controller via constrained optimization
-(M2) and then adjusting it to be nonlinear using insights from signal saturation and filtering.
+ (M2) and then adjusting it to be nonlinear using insights from signal saturation and filtering.
 This is the approach pursued here for the force limit.
-M1.2 should be considered the primary formulation of QLPS, and the other modified frequency-domain methods (M2)--(M5) in \Cref{tab:constraint-approaches} act as approximations of QLPS with varying levels of accuracy and optimality.
+M1.2 should be considered the primary formulation of QLPS, and the other modified frequency-domain methods (M2)-- (M5) in \Cref{tab:constraint-approaches} act as approximations of QLPS with varying levels of accuracy and optimality.
 M1.1 and M1.2 both linearize the nonlinear controller via the describing function method.
 In addition to the control nonlinearity, a describing function is also utilized to linearize the plant drag nonlinearity.
 
@@ -450,17 +450,17 @@ Forces include wave excitation $\gls{sym-vec-F-e}$, hydrodynamic radiation $\gls
 
 % todo: this is time domain so gamma is not allowed to be complex
 \begin{equation}\label{eq:eom}
-    \gls{sym-mathbf-M}\ddot{\vec\xi}(\gls{sym-t})
-    = \gls{sym-vec-F-e}(\gls{sym-t}) + \gls{sym-vec-F-rad}(\gls{sym-t}) + \gls{sym-vec-F-res}(\gls{sym-t}) + \gls{sym-vec-F-d}(\gls{sym-t}) + \gls{sym-vec-F-p}(\gls{sym-t})
+    \gls{sym-mathbf-M}\ddot{\vec\xi} (\gls{sym-t})
+    = \gls{sym-vec-F-e} (\gls{sym-t}) + \gls{sym-vec-F-rad} (\gls{sym-t}) + \gls{sym-vec-F-res} (\gls{sym-t}) + \gls{sym-vec-F-d} (\gls{sym-t}) + \gls{sym-vec-F-p} (\gls{sym-t})
 \end{equation}
 where, in the frequency domain under monochromatic forcing,
 \begin{equation}\label{eq:eom-forces}
 \begin{aligned}
-    \gls{sym-vec-F-e}(\gls{sym-t})   &= \Re\!\left(\gls{sym-vec-gamma}\,\gls{sym-tilde-zeta}(\gls{sym-t})\right),
-    & \gls{sym-vec-F-rad}(\gls{sym-t}) &= -\gls{sym-mathbf-A-h}\gls{sym-ddot-vec-xi}(\gls{sym-t}) - \gls{sym-mathbf-B-h}\gls{sym-dot-vec-xi}(\gls{sym-t}), \\
-    \gls{sym-vec-F-res}(\gls{sym-t}) &= -\gls{sym-mathbf-K-h}\gls{sym-vec-xi}(\gls{sym-t}),
-    & \gls{sym-vec-F-d}(\gls{sym-t})   &= -\gls{sym-mathbf-B-d}\gls{sym-dot-vec-xi}(\gls{sym-t}) + \Re\!\left(\gls{sym-vec-gamma-d}\,\gls{sym-tilde-zeta}(\gls{sym-t})\right), \\
-    \gls{sym-vec-F-p}(\gls{sym-t})   &= -\gls{sym-mathbf-B-p}\gls{sym-dot-vec-xi}(\gls{sym-t}) - \gls{sym-mathbf-K-p}\gls{sym-vec-xi}(\gls{sym-t}).
+    \gls{sym-vec-F-e} (\gls{sym-t})   &= \Re\!\left (\gls{sym-vec-gamma}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right),
+    & \gls{sym-vec-F-rad} (\gls{sym-t}) &= -\gls{sym-mathbf-A-h}\gls{sym-ddot-vec-xi} (\gls{sym-t}) - \gls{sym-mathbf-B-h}\gls{sym-dot-vec-xi} (\gls{sym-t}), \\
+    \gls{sym-vec-F-res} (\gls{sym-t}) &= -\gls{sym-mathbf-K-h}\gls{sym-vec-xi} (\gls{sym-t}),
+    & \gls{sym-vec-F-d} (\gls{sym-t})   &= -\gls{sym-mathbf-B-d}\gls{sym-dot-vec-xi} (\gls{sym-t}) + \Re\!\left (\gls{sym-vec-gamma-d}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right), \\
+    \gls{sym-vec-F-p} (\gls{sym-t})   &= -\gls{sym-mathbf-B-p}\gls{sym-dot-vec-xi} (\gls{sym-t}) - \gls{sym-mathbf-K-p}\gls{sym-vec-xi} (\gls{sym-t}).
 \end{aligned}
 \end{equation}
 for both operational and storm conditions, where $\gls{sym-vec-xi}(\gls{sym-t})$ (body position) and $\gls{sym-zeta}(\gls{sym-t})$ (wave elevation) were defined in \Cref{sec:hydro}.
@@ -482,11 +482,11 @@ The mass matrix is:
 
 In the frequency domain, the complex transfer function from real regular wave height $\gls{sym-H}$ to the vector of complex body velocity phasors $\gls{sym-vec-hat-dot-xi}$ is then:
 \begin{equation}\label{eq:eom-freq-domain}
-    \frac{\gls{sym-vec-hat-dot-xi}}{\gls{sym-H}} = \frac{1}{2}\left[\gls{sym-mathbf-Z-i}+\gls{sym-mathbf-Z-p}\right]^{-1}(\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
+    \frac{\gls{sym-vec-hat-dot-xi}}{\gls{sym-H}} = \frac{1}{2}\left[\gls{sym-mathbf-Z-i}+\gls{sym-mathbf-Z-p}\right]^{-1} (\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
 \end{equation}
 where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\gls{sym-mathbf-Z}_{i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
-\gls{sym-mathbf-Z-i} = -i\gls{sym-omega}(\gls{sym-mathbf-M}+\gls{sym-mathbf-A-h})+(\gls{sym-mathbf-B-h}+\gls{sym-mathbf-B-d})+\frac{1}{i\gls{sym-omega}}(\gls{sym-mathbf-K-h})
+\gls{sym-mathbf-Z-i} = -i\gls{sym-omega} (\gls{sym-mathbf-M}+\gls{sym-mathbf-A-h})+ (\gls{sym-mathbf-B-h}+\gls{sym-mathbf-B-d})+\frac{1}{i\gls{sym-omega}} (\gls{sym-mathbf-K-h})
 \end{equation}
 The PTO kinematics and dynamics are yet to be specified, currently represented by generic impedance matrix $\gls{sym-mathbf-Z-p} = \gls{sym-mathbf-B-p}+\frac{\gls{sym-mathbf-K-p}}{i\gls{sym-omega}}$.
 
@@ -518,12 +518,12 @@ Details and circuit diagrams are provided in \Cref{sec:appendix-pto-dynamics}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Power Production}\label{sec:power}
-The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $\gls{sym-p}(\gls{sym-t}) = e(\gls{sym-t})~\gls{sym-q}(\gls{sym-t})$.
+The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $\gls{sym-p-t} = \gls{sym-e-t}~\gls{sym-q-t}$.
 \ifdefined\DISSERTATION
-    Substituting $\{e,q\}=\{\gls{sym-F}_{\gls{sym-p}},\gls{sym-dot-xi}\}$ yields the floating body mechanical power,
-    $\{e,q\}=\{\gls{sym-F-PTO},\gls{sym-dot-X-PTO}\}$ yields the mechanical power at the PTO port,
-    $\{e,q\}=\{\gls{sym-tau},\gls{sym-Omega}\}$ yields the generator mechanical power,
-    and $\{e,q\}=\{\gls{sym-V},I\}$ yields the generator electrical power.
+    Substituting $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-F-p},\gls{sym-dot-xi}\}$ yields the floating body mechanical power,
+    $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-F-PTO},\gls{sym-dot-X-PTO}\}$ yields the mechanical power at the PTO port,
+    $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-tau},\gls{sym-Omega}\}$ yields the generator mechanical power,
+    and $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-V},\gls{sym-I}\}$ yields the generator electrical power.
 \else
     The same expression is evaluated at the floating body, PTO, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,\gls{sym-q}\}$.
 \fi
@@ -531,8 +531,8 @@ The instantaneous time-domain power at any port is simply the product of the por
 In the frequency domain assuming sinusoidal waveforms, the active power $\gls{sym-P}$, reactive power $\gls{sym-Q}$, complex power $\gls{sym-S}$, and apparent power $|\gls{sym-S}|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    \gls{sym-P} &= \tfrac{1}{2}\Re(\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re(\gls{sym-Z})|\gls{sym-hat-q}|^2,\\
-    \gls{sym-Q} &= \tfrac{1}{2}\Im(\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im(\gls{sym-Z})|\gls{sym-hat-q}|^2, \\
+    \gls{sym-P} &= \tfrac{1}{2}\Re (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re (\gls{sym-Z})|\gls{sym-hat-q}|^2,\\
+    \gls{sym-Q} &= \tfrac{1}{2}\Im (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im (\gls{sym-Z})|\gls{sym-hat-q}|^2, \\
     \gls{sym-S} &= \gls{sym-P} + iQ = \tfrac{1}{2}\hat{e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z}|\gls{sym-hat-q}|^2, \\
     |\gls{sym-S}| &= \tfrac{1}{2}|\gls{sym-Z}||\gls{sym-hat-q}|^2,
 \end{aligned}
@@ -548,7 +548,7 @@ The corresponding minimum power is $\gls{sym-p}_{\text{min}} = \gls{sym-P} - |\g
 To capture non-dynamic power losses such as those in an electrical drive, a constant efficiency $\gls{sym-eta}$ describes the gain between average generator electrical power and average absorbed electrical power.
 \ifdefined\DISSERTATION
     If the generator cascade matrix is not used (i.e.\ $[\gls{sym-mathbf-a}]_{\gls{sym-tau}\gls{sym-Omega}\leftarrow VI} = \gls{sym-mathbf-I}$), this efficiency can also approximate losses in the generator itself.
-    Note that this is not strictly equivalent to assuming the generator has constant efficiency, since controllers with reactive terms ($\gls{sym-K}_l\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
+    Note that this is not strictly equivalent to assuming the generator has constant efficiency, since controllers with reactive terms ($\gls{sym-K-l}\neq 0$) spend some time expending energy, which reverses the direction of the generator efficiency.
     The average efficiency is assumed to also apply to the peak powers, though this is not guaranteed in general for the same reason.
 \fi
 Validation in \Cref{sec:validation-benchmarking} sets $\gls{sym-eta}=80\%$ to match the RM3 design assumption of \citet{RM3}.
@@ -700,9 +700,9 @@ The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ enforc
 \begin{equation}\label{eq:constrained-qp-solution}
 \begin{aligned}
     \gls{sym-vec-x-opt} &=
-    \frac{\gls{sym-hat-V-s-th}}{2\Re(\gls{sym-Z-s-th})}
+    \frac{\gls{sym-hat-V-s-th}}{2\Re (\gls{sym-Z-s-th})}
         \begin{bmatrix} Z_{s,th}^* (1+\Gamma_{\text{opt}}) \\ 1-\Gamma_{\text{opt}} \end{bmatrix} \\
-    \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re(\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
+    \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re (\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
 where $\gls{sym-Gamma}_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
@@ -731,7 +731,7 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     As is, this nonlinear signal could not be handled with a frequency-domain transfer function and would require time-domain simulation.
     Conveniently, through the describing function method, the saturated signal can be represented with Fourier analysis as a superposition of harmonics.
     Furthermore, because the plant is a second order oscillator and filters out high frequency inputs, harmonics other than the fundamental contain very little energy and can be safely neglected.
-    \Cref{fig:desc-fcns}(a) shows this approximation graphically for a saturated-sine force signal.
+    \Cref{fig:desc-fcns} (a) shows this approximation graphically for a saturated-sine force signal.
 \else
     The maximum generator torque constraint is handled separately.
     Saturation makes the optimal torque non-sinusoidal (approaching a square wave for low torque limits), which would normally require time-domain simulation.
@@ -774,22 +774,22 @@ The resulting quadratic form $|\gls{sym-vec-F-d}|\sim|\gls{sym-vec-v-rel}|^2$ im
 To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \citet{quartier_influence_2021}.
 The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d}(\gls{sym-y},\gls{sym-t})$ is modeled with empirical drag coefficient vector $\gls{sym-vec-C-d}$:
 \begin{equation}\label{eq:drag-pressure}
-    \gls{sym-vec-p-d}(\gls{sym-y},\gls{sym-t}) = \frac{1}{2}\gls{sym-rho-w} \gls{sym-vec-C-d} ~\gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t}) |\gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t})|
+    \gls{sym-vec-p-d} (\gls{sym-y},\gls{sym-t}) = \frac{1}{2}\gls{sym-rho-w} \gls{sym-vec-C-d} ~\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t}) |\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t})|
 \end{equation}
 \Cref{eq:drag-pressure-approx} expands the velocity term then applies the describing function approximation:
 \begin{equation}\label{eq:drag-pressure-approx}
 \begin{aligned}
-    \left(      \gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t}) ~\cdot \right. \\
-    \left.\left|\gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t}) \right|\right)
-    &= |\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|^2 \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))
-    \left| \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))\right|\\
-    &\approx~|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|^2\frac{8}{3\gls{sym-pi}} \cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2}(\gls{sym-y}))
+    \left(\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t}) ~\cdot \right. \\
+    \left.\left|\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t}) \right|\right)
+    &= |\gls{sym-vec-hat-V-rel-2} (\gls{sym-y})|^2 \cos (\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2} (\gls{sym-y}))
+    \left| \cos (\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2} (\gls{sym-y}))\right|\\
+    &\approx~|\gls{sym-vec-hat-V-rel-2} (\gls{sym-y})|^2\frac{8}{3\gls{sym-pi}} \cos (\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel-2} (\gls{sym-y}))
 \end{aligned}
 \end{equation}
 where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
 The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \Cref{sec:appendix-drag} (\Cref{eq:wave-velocity-phasor}).
 
-The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in \Cref{fig:desc-fcns}(b).
+The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in \Cref{fig:desc-fcns} (b).
 The amplitude of the sinusoidal approximation equals $\frac{8}{3\gls{sym-pi}}\approx0.85$ times the peak of the nonlinear waveform.
 
 Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
@@ -871,8 +871,8 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
 \fi
 \begin{equation}\label{eq:heave-force-decomp}
 \begin{aligned}
-    \gls{sym-F-heave-f}(\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p}(\gls{sym-t})|,~ |\gls{sym-m-f}\gls{sym-ddot-xi-f}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|\right) \\
-    \gls{sym-F-heave-s}(\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p}(\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|\right)
+    \gls{sym-F-heave-f} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-f}\gls{sym-ddot-xi-f} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right) \\
+    \gls{sym-F-heave-s} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right)
 \end{aligned}
 \end{equation}
 In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_p\gls{sym-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
@@ -886,14 +886,14 @@ In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its 
     Assuming constructive interference with the shaft torque,
 \fi
 \begin{equation}\label{eq:peak-pto-force}
-\max_\gls{sym-t} |\gls{sym-F-p-op}(\gls{sym-t})| \approx \frac{1}{\gls{sym-R}} \left(\left| \gls{sym-Z-shaft} \gls{sym-hat-Omega} \right| + \gls{sym-tau-max} \right).
+\max_\gls{sym-t} |\gls{sym-F-p-op} (\gls{sym-t})| \approx \frac{1}{\gls{sym-R}} \left (\left| \gls{sym-Z-shaft} \gls{sym-hat-Omega} \right| + \gls{sym-tau-max} \right).
 \end{equation}
 The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\gls{sym-hat-F-p-st}$ directly.
 
 The fluid force nonlinearities $|m\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
 MDOcean currently uses the fundamental amplitude for both load cases:
 \begin{equation}\label{eq:peak-fluid-force}
-\max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
+\max_t \left|m\ddot{\xi} (t)-F_p (t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
 \end{equation}
 This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
 \ifdefined\DISSERTATION
@@ -952,7 +952,7 @@ This approximation can either under- or overestimate the true peak depending on 
 
 The surge force for each component is calculated as \citep{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
-   F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (e^{-kz_{\text{top}}}-e^{-kT})
+   F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (\exp(-kz_{\text{top}})-\exp(-kT))
 \end{equation}
 using the respective waterplane areas $\gls{sym-A-w}$  and drafts $\gls{sym-T}$ for the float and spar.
 The top vertical height $\gls{sym-z}_{\text{top}}$ is set to zero for the float and $\gls{sym-T-f-2}$ for the spar.
@@ -990,7 +990,7 @@ This includes slamming (the bottom surface rises out of the water and impacts on
 The condition to prevent slamming and submersion in regular waves of height $\gls{sym-H}$ is derived in \Cref{sec:appendix-slam}.
 These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \Cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \Cref{eq:opt-problem}:
 \begin{equation}\label{eq:slam-constraint-quadratic}
-    \hat{\xi}^*\hat{\xi} - H\Re(e^{iky}\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
+    \hat{\xi}^*\hat{\xi} - H\Re (\exp (iky)\hat{\xi}) < \Delta z^2-\left (\frac{H}{2}\right)^2
 \end{equation}
 for relevant vertical body dimension $\gls{sym-Delta} \gls{sym-z}$ and horizontal coordinate $\gls{sym-y}$.
 The values of $\gls{sym-Delta} \gls{sym-z}$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \Cref{sec:appendix-slam}.
@@ -1129,7 +1129,7 @@ Further details of all structural calculations performed in the simulation are p
 For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
 \begin{equation}\label{eq:struct-scaling}
 \begin{aligned}
-    t_{f} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} D_f}{\left(\frac{D_f}{D_s}-1\right)^2} \\
+    t_{f} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} D_f}{\left (\frac{D_f}{D_s}-1\right)^2} \\
     t_{s}^4 &\sim F_{\text{heave}} h_s^2 \\
     t_{d} h_{\text{stiff},d}^2 &\sim \frac{F_{\text{heave}}D_d^2}{D_s} \\
 \end{aligned}
