@@ -38,9 +38,9 @@ The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag
 where we use radii vectors $\gls{sym-vec-R}=[\gls{sym-D-f}/2,\gls{sym-D-d}/2]$ and $\gls{sym-vec-R-in}=[\gls{sym-D-f-in},0]$ to represent the float and spar.
 $\gls{sym-vec-alpha-v-y}$ is the amplitude ratio of the relative velocity and WEC velocity:
 \begin{equation}\label{eq:drag-alpha-definitions}
-    \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel-2}(\gls{sym-y})|}{|\gls{sym-vec-hat-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp(-2\gls{sym-k-wavenumber}\gls{sym-y}) - 2 \gls{sym-vec-r} \exp(-\gls{sym-k-wavenumber}\gls{sym-y})  \sin\angle \gls{sym-vec-hat-dot-xi}}
+    \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel}(\gls{sym-y})|}{|\gls{sym-vec-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp(-2\gls{sym-k-wavenumber}\gls{sym-y}) - 2 \gls{sym-vec-r} \exp(-\gls{sym-k-wavenumber}\gls{sym-y})  \sin\angle \gls{sym-vec-dot-xi}}
 \end{equation}
-and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-hat-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Nondimensional Drag Integrals $\gls{sym-I-B}$ and $\gls{sym-I-G}$}
@@ -48,23 +48,23 @@ The drag coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ are exp
 Here we present an alternative form of the coefficients in terms of nondimensionalized integral functions, which we refer to as $\gls{sym-I-B}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa})$ and $\gls{sym-I-G}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa})$:
 \begin{equation}\label{eq:drag-integrals-IB-IG}
 \begin{aligned}
-    \gls{sym-mathbf-B-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}|
+    \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-dot-xi}|
     \left[
-        I_B(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_B(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber} R)
+        \gls{sym-I-B}(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-k-wavenumber}\gls{sym-R}) - \gls{sym-alpha}^2 \gls{sym-I-B}(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-alpha} \gls{sym-k-wavenumber} \gls{sym-R})
     \right]
     \\
-    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d |\hat{\dot{\xi}}| \frac{g \gls{sym-k-wavenumber}}{\omega} \exp(-\gls{sym-k-wavenumber}\vec{T})
+    \gls{sym-vec-gamma-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-dot-xi}| \frac{\gls{sym-g} \gls{sym-k-wavenumber}}{\gls{sym-omega}} \exp(-\gls{sym-k-wavenumber}\gls{sym-vec-T})
     \left[
-        \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 \gls{sym-I-G}(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber}R)
+        \gls{sym-I-G}(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-k-wavenumber}\gls{sym-R}) - \gls{sym-alpha}^2 \gls{sym-I-G}(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-alpha} \gls{sym-k-wavenumber}\gls{sym-R})
     \right]
 \end{aligned}
 \end{equation}
 where the nondimensional integral functions $\gls{sym-I-B}$ (real) and $\gls{sym-I-G}$ (complex) are defined as:
 \begin{equation}\label{eq:definition-IB-IG}
 \begin{aligned}
-    \gls{sym-I-B}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2\exp(-2\kappa x)-2r\sin\theta \exp(-\kappa x)} dx
+    \gls{sym-I-B}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} x)-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} x)} d\gls{sym-x}
     \\
-    \gls{sym-I-G}(r,\theta,\kappa) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+r^2\exp(-2\kappa x)-2r\sin\theta \exp(-\kappa x)} \exp(-i\kappa x) dx
+    \gls{sym-I-G}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} x)-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} x)} \exp(-i\gls{sym-kappa}\gls{sym-x}) d\gls{sym-x}
 \end{aligned}
 \end{equation}
 
@@ -107,19 +107,19 @@ The limit cases in question include $\gls{sym-r} \rightarrow 0$ (the body veloci
 \end{aligned}
 \end{equation}
 where $\gls{sym-J-1}$ is the Bessel function of the first kind of order 1.
-An important edge case occurs at the origin of the polar plots in \Cref{fig:drag-integrals}, when $\gls{sym-r} \rightarrow \infty$ (the incident wave velocity dominates the body velocity, so $|\hat{\gls{sym-dot-xi}}|\rightarrow 0$).
+An important edge case occurs at the origin of the polar plots in \Cref{fig:drag-integrals}, when $\gls{sym-r} \rightarrow \infty$ (the incident wave velocity dominates the body velocity, so $|\gls{sym-hat-dot-xi}|\rightarrow 0$).
 Here, the integrals as defined in \Cref{eq:definition-IB-IG} diverge, and the form of \Cref{eq:drag-integrals-IB-IG} does not apply.
-Instead, when $r\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $\gls{sym-I}' = \gls{sym-I}/\gls{sym-r}$:
+Instead, when $\gls{sym-r}\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $\gls{sym-I-prime} = \gls{sym-I}/\gls{sym-r}$:
 \begin{equation}
 \begin{aligned}
     \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-V-wave}|
     \left[
-        I_B'(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_B'(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber} R)
+        \gls{sym-I-B}'(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-k-wavenumber}\gls{sym-R}) - \gls{sym-alpha}^2 \gls{sym-I-B}'(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-alpha} \gls{sym-k-wavenumber} \gls{sym-R})
     \right]
     \\
-    \gls{sym-vec-gamma-d} &= \frac{8}{3\pi} \rho_w R^2 C_d  |\hat{V}_{wave}| \frac{g\gls{sym-k-wavenumber}}{\omega} \exp(-\gls{sym-k-wavenumber}\vec{T})
+    \gls{sym-vec-gamma-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-V-wave}| \frac{\gls{sym-g}\gls{sym-k-wavenumber}}{\gls{sym-omega}} \exp(-\gls{sym-k-wavenumber}\gls{sym-vec-T})
     \left[
-        I_G'(r,\angle\hat{\dot{\xi}},\gls{sym-k-wavenumber}R) - \alpha^2 I_G'(r,\angle\hat{\dot{\xi}},\alpha \gls{sym-k-wavenumber}R)
+        \gls{sym-I-G}'(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-k-wavenumber}\gls{sym-R}) - \gls{sym-alpha}^2 \gls{sym-I-G}'(\gls{sym-r},\angle\gls{sym-hat-dot-xi},\gls{sym-alpha} \gls{sym-k-wavenumber}\gls{sym-R})
     \right]
 \end{aligned}
 \end{equation}
@@ -159,7 +159,7 @@ With the describing function approximation, the nonlinear time-domain drag equat
 The solution for states $|\gls{sym-vec-hat-dot-xi}|$ and $\angle \gls{sym-vec-hat-dot-xi}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi-k} = \gls{sym-g}(\gls{sym-vec-hat-dot-xi-k-1})$, where $\gls{sym-g}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k-generic-index}$ is the iteration index.
+The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}} = \gls{sym-g}(\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}-1})$, where $\gls{sym-g}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k-generic-index}$ is the iteration index.
 It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \citet{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
