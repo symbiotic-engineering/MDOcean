@@ -5,12 +5,14 @@
     upperblock/.style={draw, minimum width=1.45cm, minimum height=0.75cm}
 ]
     % Global dimensions for easy editing
+    \def\blockh{1.2}
     \def\xsep{2.0}
     \def\uppery{1.9}
-    \def\ytop{0.6}
-    \def\ybot{-0.6}
-    \def\dimtexty{2.7}
+    \pgfmathsetmacro{\wireoffset}{0.25*\blockh}
+    \def\dimtexty{3.0}
     \def\coeftexty{1.2}
+    \pgfmathsetmacro{\ztall}{0.5*\blockh}
+    \pgfmathsetmacro{\zwide}{0.2*\ztall}
 
     % Five lower two-port blocks and five upper blocks
     \foreach \i/\label in {
@@ -18,7 +20,7 @@
         2/{\mathbf{h}_{\mathrm{kin}}},
         3/{\mathbf{a}_{\mathrm{drive}}},
         4/{\mathbf{a}_{\mathrm{gen}}},
-        5/{\boldsymbol{\eta}_{\mathrm{inv}}}
+        5/{\pmb{\eta}_{\mathrm{inv}}}
     } {
         \pgfmathsetmacro{\x}{(\i-1)*\xsep}
         \node[lowerblock] (L\i) at (\x,0) {$\label$};
@@ -32,27 +34,27 @@
     }
 
     % Left and right sinusoidal voltage sources
-    \draw[wire] (-2,\ybot) to[sinusoidal voltage source] (-2,\ytop);
-    \draw[wire] (10,\ybot) to[sinusoidal voltage source] (10,\ytop);
+    \draw[wire] (-2,-\wireoffset) to[sinusoidal voltage source] (-2,\wireoffset);
+    \draw[wire] (10,-\wireoffset) to[sinusoidal voltage source] (10,\wireoffset);
 
     % Connections up to block 4
-    \draw[wire] (-2,\ytop) -- (L1.north west);
-    \draw[wire] (-2,\ybot) -- (L1.south west);
-    \draw[wire] (L1.north east) -- (L2.north west);
-    \draw[wire] (L2.north east) -- (L3.north west);
-    \draw[wire] (L3.north east) -- (L4.north west);
-    \draw[wire] (L1.south east) -- (L2.south west);
-    \draw[wire] (L2.south east) -- (L3.south west);
-    \draw[wire] (L3.south east) -- (L4.south west);
+    \draw[wire] (-2,\wireoffset) -- ([yshift=\wireoffset cm]L1.west);
+    \draw[wire] (-2,-\wireoffset) -- ([yshift=-\wireoffset cm]L1.west);
+    \draw[wire] ([yshift=\wireoffset cm]L1.east) -- ([yshift=\wireoffset cm]L2.west);
+    \draw[wire] ([yshift=\wireoffset cm]L2.east) -- ([yshift=\wireoffset cm]L3.west);
+    \draw[wire] ([yshift=\wireoffset cm]L3.east) -- ([yshift=\wireoffset cm]L4.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L1.east) -- ([yshift=-\wireoffset cm]L2.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L2.east) -- ([yshift=-\wireoffset cm]L3.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- ([yshift=-\wireoffset cm]L4.west);
 
     % Vertical impedance between blocks 4 and 5
-    \node[draw, minimum width=0.28cm, minimum height=1.55cm, align=center] (Zlink) at (7,0) {$Z$};
-    \draw[wire] (L4.north east) -- (Zlink.north west);
-    \draw[wire] (Zlink.north east) -- (L5.north west);
-    \draw[wire] (L4.south east) -- (Zlink.south west);
-    \draw[wire] (Zlink.south east) -- (L5.south west);
+    \node[draw, minimum width=\zwide cm, minimum height=\ztall cm, align=center] (Zlink) at (7,0) {$Z$};
+    \draw[wire] ([yshift=\wireoffset cm]L4.east) -- ([yshift=\wireoffset cm]Zlink.west);
+    \draw[wire] ([yshift=\wireoffset cm]Zlink.east) -- ([yshift=\wireoffset cm]L5.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- ([yshift=-\wireoffset cm]Zlink.west);
+    \draw[wire] ([yshift=-\wireoffset cm]Zlink.east) -- ([yshift=-\wireoffset cm]L5.west);
 
     % Connections from block 5 to right source
-    \draw[wire] (L5.north east) -- (10,\ytop);
-    \draw[wire] (L5.south east) -- (10,\ybot);
+    \draw[wire] ([yshift=\wireoffset cm]L5.east) -- (10,\wireoffset);
+    \draw[wire] ([yshift=-\wireoffset cm]L5.east) -- (10,-\wireoffset);
 \end{tikzpicture}
