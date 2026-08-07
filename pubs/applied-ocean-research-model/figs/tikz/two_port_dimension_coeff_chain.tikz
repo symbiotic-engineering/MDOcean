@@ -1,18 +1,18 @@
 \begin{tikzpicture}[
     wire/.style={line width=0.9pt},
     infoarrow/.style={->, line width=0.9pt, color=blue!70!black},
-    lowerblock/.style={draw, minimum width=1.45cm, minimum height=1.2cm, align=center},
+    lowerblock/.style={draw, minimum width=1.45cm, minimum height=1.5cm, align=center},
     upperblock/.style={draw, minimum width=1.45cm, minimum height=0.75cm}
 ]
     % Global dimensions for easy editing
-    \def\blockh{1.2}
+    \def\blockh{2}
     \def\xsep{2.0}
     \def\uppery{1.9}
     \pgfmathsetmacro{\wireoffset}{0.25*\blockh}
     \def\dimtexty{3.0}
     \def\coeftexty{1.2}
-    \pgfmathsetmacro{\ztall}{0.5*\blockh}
-    \pgfmathsetmacro{\zwide}{0.2*\ztall}
+    \pgfmathsetmacro{\ztall}{0.3*\blockh}
+    \pgfmathsetmacro{\zwide}{0.05*\ztall}
 
     % Five lower two-port blocks and five upper blocks
     \foreach \i/\label in {
@@ -20,7 +20,7 @@
         2/{\mathbf{h}_{\mathrm{kin}}},
         3/{\mathbf{a}_{\mathrm{drive}}},
         4/{\mathbf{a}_{\mathrm{gen}}},
-        5/{\pmb{\eta}_{\mathrm{inv}}}
+        5/{\boldsymbol{\eta}_{\mathrm{inv}}}
     } {
         \pgfmathsetmacro{\x}{(\i-1)*\xsep}
         \node[lowerblock] (L\i) at (\x,0) {$\label$};
@@ -34,8 +34,8 @@
     }
 
     % Left and right sinusoidal voltage sources
-    \draw[wire] (-2,-\wireoffset) to[sinusoidal voltage source] (-2,\wireoffset);
-    \draw[wire] (10,-\wireoffset) to[sinusoidal voltage source] (10,\wireoffset);
+    \draw[wire] (-2,-\wireoffset) to[sinusoidal voltage source, bipole/length=0.8cm] (-2,\wireoffset);
+    \draw[wire] (10,-\wireoffset) to[sinusoidal voltage source, bipole/length=0.8cm] (10,\wireoffset);
 
     % Connections up to block 4
     \draw[wire] (-2,\wireoffset) -- ([yshift=\wireoffset cm]L1.west);
@@ -48,7 +48,7 @@
     \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- ([yshift=-\wireoffset cm]L4.west);
 
     % Vertical impedance between blocks 4 and 5
-    \node[draw, minimum width=\zwide cm, minimum height=\ztall cm, align=center] (Zlink) at (7,0) {$Z$};
+    \draw (0, 2) to[european resistor, l={$Z_l$}] (Zlink);
     \draw[wire] ([yshift=\wireoffset cm]L4.east) -- ([yshift=\wireoffset cm]Zlink.west);
     \draw[wire] ([yshift=\wireoffset cm]Zlink.east) -- ([yshift=\wireoffset cm]L5.west);
     \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- ([yshift=-\wireoffset cm]Zlink.west);
