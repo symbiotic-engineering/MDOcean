@@ -1,8 +1,9 @@
 # Changelog
 ## Unreleased
 
+## [v1.4.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.2) - 2026-8-8
 ### Added
-- Figures: add an editable TikZ five-stage two-port block diagram with dimension/coefficient annotation arrows, source connections, and an interstage impedance in AOR figure assets.
+- Figures: add a TikZ block diagram showing static analyses and dynamics including five two-ports
 
 ## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-5
 Represents changes made after journal submission in preparation for dissertation submission.
