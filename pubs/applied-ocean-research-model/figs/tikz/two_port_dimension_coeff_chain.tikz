@@ -1,3 +1,6 @@
+% Load TikZ libraries needed for brace decorations and node fitting
+\usetikzlibrary{decorations.pathreplacing,fit}
+
 \begin{tikzpicture}[
     wire/.style={line width=0.9pt},
     infoarrow/.style={->, line width=0.9pt, color=blue!70!black},
@@ -36,7 +39,7 @@
             \ifnum\i=2 kinematic analysis\fi
             \ifnum\i=3 drivetrain analysis\fi
             \ifnum\i=4 generator analysis\fi
-            \ifnum\i=5 pwr. electronic analysis\fi
+            \ifnum\i=5 electrical analysis\fi
             \ifnum\i=6 control analysis\fi
         };
 
@@ -99,8 +102,26 @@
     \node[opaqueuppertext] (Env) at (-\xsep,\coeftexty) {wave params.};
 
     % power (right source output)
-    \node[font=\small, text=blue!70!black, anchor=west] at ([xshift=1.5cm,yshift=0.8cm]rightsource) {generated power};
-    \draw[infoarrow] ([xshift=9pt,yshift=10pt]rightsource) -- ([xshift=1.5cm,yshift=0.8cm]rightsource);
+    % power (right source output)
+    \node[uppertext] (GeneratedPower) at ([xshift=1cm,yshift=0.8cm]rightsource) {generated power};
+    \draw[infoarrow] ([xshift=9pt,yshift=10pt]rightsource) -- (GeneratedPower);
+
+    % Right-side brace covering controller structure down to control analysis
+    \draw[decorate,decoration={brace,amplitude=6pt}] ($(Type6.north)+(0.6,0)$) -- ($(U6.north)+(0.6,0)$);
+
+    % Cost analysis and value analysis blocks
+    \pgfmathsetmacro{\xcost}{6*\xsep}
+    \pgfmathsetmacro{\xvalue}{7*\xsep}
+    \node[upperblock] (Ucost) at (\xcost,\uppery) {cost analysis};
+    \node[upperblock] (Uvalue) at (\xvalue,\uppery) {value analysis};
+
+    % cost output point and arrow labelled 'cost'
+    \coordinate (CostPoint) at ($ (Ucost.east) + (0.9,0)$);
+    \draw[infoarrow] (Ucost.east) -- node[midway, above] {cost} (CostPoint);
+
+    % Blue arrows into value analysis from cost and generated power
+    \draw[infoarrow] (CostPoint) -- (Uvalue.west);
+    \draw[infoarrow] (GeneratedPower.east) -- (Uvalue.west);
 
     % Horizontal wire connections
     \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift=\wireoffset cm]leftsource) -- ([yshift=\wireoffset cm]L1.west);
@@ -119,4 +140,17 @@
         to[european resistor, l^={$Z_{grid}$}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$);
     \draw[wire,postaction={decorate},decoration={markings, mark=at position \rightarrowpos with {\arrow{stealth}}}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$) -- node[right, xshift=4pt, above=-1pt] {$I_{\mathrm{grid}}$} ([yshift=\wireoffset cm]rightsource);
     \draw[wire] ([yshift=-\wireoffset cm]L6.east) -- ([yshift=-\wireoffset cm]rightsource);
+    
+    % Enclosing polygon around requested elements (axis-aligned only)
+    % Compute numeric positions using existing layout macros
+    \pgfmathsetmacro{\upperwidth}{1.45}
+    \pgfmathsetmacro{\xleft}{-1*\xsep-\upperwidth-0.3}
+    \pgfmathsetmacro{\xafterone}{.5*\xsep}
+    \pgfmathsetmacro{\xmidright}{4.5*\xsep}
+    \pgfmathsetmacro{\xright}{7*\xsep+\upperwidth+0.4}
+    \pgfmathsetmacro{\yhigh}{\typetexty+0.4}
+    \pgfmathsetmacro{\ymid}{\uppery-0.5}
+    \pgfmathsetmacro{\ybot}{-1.1}
+    \draw[red, thick, dashed, fill=none] (\xleft,\yhigh) -- (\xafterone,\yhigh) -- (\xafterone,\ymid) -- (\xmidright,\ymid) -- (\xmidright,\yhigh) -- (\xright,\yhigh) -- (\xright,\ybot) -- (\xleft,\ybot) -- cycle;
+
 \end{tikzpicture}
