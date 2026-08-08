@@ -5,12 +5,16 @@
     upperblock/.style={draw, minimum width=1.45cm, minimum height=0.75cm}
 ]
     % Global dimensions for easy editing
-    \def\blockh{2.8}
-    \def\xsep{2.0}
-    \def\uppery{2.4}
-    \pgfmathsetmacro{\wireoffset}{0.25*\blockh}
-    \def\dimtexty{3.5}
-    \def\coeftexty{1.6}
+    \def\blockh{2.8}         % vertical block height
+    \def\xsep{2.3}           % horizontal spacing between blocks
+    \def\rightshift{1.4}     % horizontal spacing around grid impedance
+    \def\sourcegap{0.8}      % horizontal spacing from sources to block edges
+    \def\arrowpos{0.58}      % horizontal spacing of arrowhead on main wires
+    \def\rightarrowpos{0.68} % horizontal spacing of arrowhead on rightmost wire
+    \def\uppery{2.4}         % vertical position of upper blocks
+    \pgfmathsetmacro{\wireoffset}{0.25*\blockh} % vertical offset of wires from top/bottom of lower blocks
+    \def\dimtexty{3.5}       % vertical position of dimension design variable text
+    \def\coeftexty{1.7}      % vertical position of coefficient intermed variable text
 
     % Five lower two-port blocks and five upper blocks
     \foreach \i/\label in {
@@ -18,7 +22,7 @@
         2/{\mathbf{h}_{\mathrm{kin}}},
         3/{\mathbf{a}_{\mathrm{drive}}},
         4/{\mathbf{a}_{\mathrm{gen}}},
-        5/{\boldsymbol{\eta}_{\mathrm{inv}}}
+        5/{\mathbf{a}_{\mathrm{elec}}}
     } {
         \pgfmathsetmacro{\x}{(\i-1)*\xsep}
         \node[lowerblock] (L\i) at (\x,0) {$\label$};
@@ -27,30 +31,37 @@
         \node[font=\small] (Dim\i) at (\x,\dimtexty) {dimensions};
         \draw[infoarrow] (Dim\i.south) -- (U\i.north);
 
-        \node[font=\small] (Coef\i) at (\x,\coeftexty) {coefficients};
         \draw[infoarrow] (U\i.south) -- (L\i.north);
+        \node[font=\small, fill=white, fill opacity=0.5, text opacity=1, inner sep=1pt] (Coef\i) at (\x,\coeftexty) {coefficients};
     }
 
     % Left and right sinusoidal voltage sources
-    \draw[wire] (-2,-\wireoffset) to[sinusoidal voltage source] (-2,\wireoffset);
-    \draw[wire] (10,-\wireoffset) to[sinusoidal voltage source] (10,\wireoffset);
+    \path (L1.west) ++(-\sourcegap,0) coordinate (leftsource);
+    \path (L5.east) ++(\sourcegap+\rightshift,0) coordinate (rightsource);
+    \draw[wire] ([yshift=-\wireoffset cm]leftsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]leftsource);
+    \draw[wire] ([yshift=-\wireoffset cm]rightsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]rightsource);
+    \node[font=\small] at ([yshift=8pt,xshift=-18pt]leftsource) {$+$};
+    \node[font=\small] at ([yshift=-8pt,xshift=-18pt]leftsource) {$-$};
+    \node[font=\small] at ([yshift=8pt,xshift=18pt]rightsource) {$+$};
+    \node[font=\small] at ([yshift=-8pt,xshift=18pt]rightsource) {$-$};
+    \node[font=\small, anchor=east] at ([xshift=-12pt]leftsource) {$\zeta$};
+    \node[font=\small, anchor=west] at ([xshift= 12pt]rightsource) {$V_{\mathrm{grid}}$};
 
     % Horizontal wire connections
-    \draw[wire] (-2,\wireoffset) -- ([yshift=\wireoffset cm]L1.west);
-    \draw[wire] (-2,-\wireoffset) -- ([yshift=-\wireoffset cm]L1.west);
-    \draw[wire] ([yshift= \wireoffset cm]L1.east) -- ([yshift= \wireoffset cm]L2.west);
-    \draw[wire] ([yshift= \wireoffset cm]L2.east) -- ([yshift= \wireoffset cm]L3.west);
-    \draw[wire] ([yshift= \wireoffset cm]L3.east) -- ([yshift= \wireoffset cm]L4.west);
-    \draw[wire] ([yshift= \wireoffset cm]L4.east) -- ([yshift= \wireoffset cm]L5.west);
-    \draw[wire] ([yshift=-\wireoffset cm]L1.east) -- ([yshift=-\wireoffset cm]L2.west);
-    \draw[wire] ([yshift=-\wireoffset cm]L2.east) -- ([yshift=-\wireoffset cm]L3.west);
-    \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- ([yshift=-\wireoffset cm]L4.west);
-    \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- ([yshift=-\wireoffset cm]L5.west);
-
-    % Vertical impedance between blocks 4 and 5
-    \draw (7, -\wireoffset) to[european resistor, l={$Z_{i,th}$}] (7, \wireoffset);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift=\wireoffset cm]leftsource) -- ([yshift=\wireoffset cm]L1.west);
+    \draw[wire] ([yshift=-\wireoffset cm]leftsource) -- ([yshift=-\wireoffset cm]L1.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L1.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\dot{\xi}$} ([yshift= \wireoffset cm]L2.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L2.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\dot{X}_{\mathrm{pto}}$} ([yshift= \wireoffset cm]L3.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L3.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\Omega$} ([yshift= \wireoffset cm]L4.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L4.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$I$} ([yshift= \wireoffset cm]L5.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L1.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$F_p$} ([yshift=-\wireoffset cm]L2.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L2.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$F_{\mathrm{pto}}$} ([yshift=-\wireoffset cm]L3.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$\tau$} ([yshift=-\wireoffset cm]L4.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$V$} ([yshift=-\wireoffset cm]L5.west);
 
     % Connections from block 5 to right source
-    \draw[wire] ([yshift=\wireoffset cm]L5.east) -- (10,\wireoffset);
-    \draw[wire] ([yshift=-\wireoffset cm]L5.east) -- (10,-\wireoffset);
+    \draw[wire] ([yshift=\wireoffset cm]L5.east) -- ($([yshift=\wireoffset cm]L5.east)+(0.5,0)$)
+        to[european resistor, l^={$Z_{grid}$}] ($([yshift=\wireoffset cm]L5.east)+(1.6,0)$);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \rightarrowpos with {\arrow{stealth}}}] ($([yshift=\wireoffset cm]L5.east)+(1.6,0)$) -- node[right, xshift=4pt, above=-1pt] {$I_{\mathrm{grid}}$} ([yshift=\wireoffset cm]rightsource);
+    \draw[wire] ([yshift=-\wireoffset cm]L5.east) -- ([yshift=-\wireoffset cm]rightsource);
 \end{tikzpicture}
