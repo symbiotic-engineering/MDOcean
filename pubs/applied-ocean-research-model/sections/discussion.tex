@@ -212,7 +212,7 @@ Similar to \Cref{fig:JPD-multiply} showing the multiplication of the power matri
 \Cref{fig:power-matrix-decomposition} further decomposes the power matrix into component matrices
 showing the impact of shape, drag, maximum force, and PTO losses, with the following breakdown:
 \begin{equation}\label{eq:power-matrix-decomposition}
-\gls{sym-mathbf-P-H-T-elec} = \mathbf{J}^{H,T}_{wave} ~\mathbf{CW}^{\gls{sym-H},\gls{sym-T}}_{max} ~\gls{sym-mathbf-eta-H-T-rad} ~\gls{sym-mathbf-eta-H-T-drag} ~\gls{sym-mathbf-eta-H-T-limits} ~\gls{sym-mathbf-eta-H-T-elec}
+\gls{sym-mathbf-P-H-T-elec} = \gls{sym-mathbf-J-H-T-wave} ~\gls{sym-mathbf-CW-H-T-max} ~\gls{sym-mathbf-eta-H-T-rad} ~\gls{sym-mathbf-eta-H-T-drag} ~\gls{sym-mathbf-eta-H-T-limits} ~\gls{sym-mathbf-eta-H-T-elec}
 \end{equation}
 
 Here $\mathbf{J}^{H,T}_{\text{wave}}$ is the wave power density (design-independent) and $\mathbf{CW}^{\gls{sym-H},\gls{sym-T}}_{\text{max}}$ is the radiation-limit capture width (depends only on the mode of motion).
@@ -235,12 +235,12 @@ This multiplicative decomposition allows isolation of the effect of each design 
 \caption{Dependence of efficiencies on inputs}\label{tab:power-matrix-dependence}
 \begin{tabular}{lcccccc}
 \hline
- & $x_{\text{shape}}$ & $\gls{sym-C-d-f}$ & $\gls{sym-C-d-s}$ & $F_{\text{max}}$ & $P_{\text{max}}$ & $\gls{sym-eta}$ \\
+ & $x_{\text{shape}}$ & $\gls{sym-C-d-f}$ & $\gls{sym-C-d-s}$ & $\gls{sym-F-max}$ & $\gls{sym-P-max}$ & $\gls{sym-eta}$ \\
 \hline
-$\mathbf{\eta}^{H,T}_{\text{rad}}$   & $\checkmark$ &  &  &  &  &  \\
-$\mathbf{\eta}^{H,T}_{\text{drag}}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
-$\mathbf{\eta}^{H,T}_{\text{limits}}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  \\
-$\mathbf{\eta}^{H,T}_{\text{elec}}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+$\gls{sym-mathbf-eta-H-T-rad}$   & $\checkmark$ &  &  &  &  &  \\
+$\gls{sym-mathbf-eta-H-T-drag}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
+$\gls{sym-mathbf-eta-H-T-limits}$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  \\
+$\gls{sym-mathbf-eta-H-T-elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -277,25 +277,25 @@ The effect of drag is most significant in the 11-12 second range, corresponding 
 \fi
 
 \paragraph{Constraint Sensitivities}
-The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\eta^{H,T}_{\text{limits}}$.
+The structure of the constrained optimal control problem allows for quantification of the sensitivity of optimal power to each constraint limit, formalizing the intuition behind $\gls{sym-mathbf-eta-H-T-limits}$.
 From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical power (the LCOE denominator) is a sea-state-weighted sum of the impedance-matched power in each sea state, each scaled down by the factor $(1-|\Gamma_{\beta,\text{opt}}|^2)$ that captures the effect of active dynamic constraints:
 \begin{equation}\label{eq:power-elec-sum}
 \begin{aligned}
-    \overline{P}_{elec} &= \eta \sum_{\beta=1}^{N_{sea}} JPD_\beta \cdot
-    \frac{|\hat{V}_{s,th,\beta}|^2}{8\Re(Z_{s,th,\beta})}~ (1 - |\Gamma_{\beta,opt}|^2)
-    \\ s.t.
+    \gls{sym-overline-P-elec} &= \gls{sym-eta} \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-w-beta} \cdot
+    \frac{|\gls{sym-hat-V-s-th-beta}|^2}{8\Re(\gls{sym-Z-s-th-beta})}~ (1 - |\gls{sym-Gamma-beta-opt}|^2)
+    \\ \text{s.t.}
 \quad
-    |\hat{F}_{p,\beta}| &\leq F_{max},\quad
-    |p_{pk,elec,\beta}| \leq P_{max,elec},\\
-    |\hat{\xi}_{f,\beta}| &\leq X_{f,max},\quad
-    |\hat{\xi}_{s,\beta}| \leq X_{s,max}\\
+    |\gls{sym-hat-F-p-beta}| &\leq \gls{sym-F-max},\quad
+    |\gls{sym-p-pk-elec-beta}| \leq \gls{sym-P-max-elec},\\
+    |\gls{sym-hat-xi-f-beta}| &\leq \gls{sym-X-f-max},\quad
+    |\gls{sym-hat-xi-s-beta}| \leq \gls{sym-X-s-max}\\
 \end{aligned}
 \end{equation}
 
-Power is maximized when $|\Gamma_{\beta,\text{opt}}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
-When constraints are active, the optimal $|\Gamma_{\beta,\text{opt}}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\Gamma_{\beta,\text{opt}}|$.
+Power is maximized when $|\gls{sym-Gamma-beta-opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
+When constraints are active, the optimal $|\gls{sym-Gamma-beta-opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\gls{sym-Gamma-beta-opt}|$.
 
-\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\overline{P}_{\text{elec}}$ as a function of the constraint coefficients $b_\mu$ (which are affine or square functions of the constraint limits $\tau_{\text{max}}$, $P_{\tau\Omega,\text{max}}$, $\xi_{f,\text{max}}$, $\xi_{s,\text{max}}$, and $X_{PTO,\text{max}}$ defined in \Cref{tab:qp-constraints}).
+\Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\gls{sym-overline-P-elec}$ as a function of the constraint coefficients $\gls{sym-b-mu}$ (which are affine or square functions of the constraint limits $\gls{sym-tau-max}$, $\gls{sym-P-tau-Omega-max}$, $\gls{sym-xi-f-max}$, $\gls{sym-xi-s-max}$, and $\gls{sym-X-PTO-max}$ defined in \Cref{tab:qp-constraints}).
 
 The result is:
 \begin{equation}\label{eq:power-double-sum-main}
@@ -494,8 +494,8 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     about one-%
     \makeatletter%
     \phantom{\rlap{% make upcoming print invisible and zero width (hack because you can't retrieve value without also printing it)
-    \resultsAOR[multiplierOldRuntime]% print value, which locally sets resultsAOR@out
-    \global\let\SavedMultiplier\resultsAOR@out% save resultsAOR@out globally so it can be accessed outside the phantom environment
+    \resultsAOR[multiplierOldRuntime] % print value, which locally sets resultsAOR@out
+    \global\let\SavedMultiplier\resultsAOR@out % save resultsAOR@out globally so it can be accessed outside the phantom environment
     }}%
     \makeatother%
     \ordinalstringnum{\SavedMultiplier}
