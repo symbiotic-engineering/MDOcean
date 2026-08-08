@@ -6,12 +6,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_FILES = [
-    ROOT / "pubs" / "shared" / "symbol-glossary-aor.tex",
-    ROOT / "pubs" / "shared" / "symbol-glossary-re.tex",
-    ROOT / "pubs" / "shared" / "symbol-glossary-jfm.tex",
-    ROOT / "pubs" / "shared" / "symbol-glossary-umerc.tex",
+    ROOT / "pubs" / "applied-ocean-research-model" / "symbol-glossary-aor.tex",
+    ROOT / "pubs" / "renewable-energy-mdo" / "symbol-glossary-re.tex",
+    ROOT / "mdocean" / "simulation" / "modules" / "OpenFLASH" / "pubs" / "JFM" / "symbol-glossary-jfm.tex",
+    # ROOT / "pubs" / "UMERC-2025-grid-value" / "symbol-glossary-umerc.tex",
 ]
-OUTPUT_FILE = ROOT / "pubs" / "shared" / "symbol-glossary-shared.tex"
+OUTPUT_FILE = ROOT / "pubs" / "dissertation" / "symbol-glossary-dissertation.tex"
 
 
 def is_content_line(line: str) -> bool:
