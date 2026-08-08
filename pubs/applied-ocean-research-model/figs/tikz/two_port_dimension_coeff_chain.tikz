@@ -2,7 +2,9 @@
     wire/.style={line width=0.9pt},
     infoarrow/.style={->, line width=0.9pt, color=blue!70!black},
     lowerblock/.style={draw, minimum width=1.45cm, minimum height=2cm, align=center},
-    upperblock/.style={draw, minimum width=1.45cm, minimum height=0.75cm}
+    upperblock/.style={draw=blue!70!black, fill=blue!12, text=blue!70!black, minimum width=1.45cm, minimum height=0.75cm, align=center, text width=2cm, font=\footnotesize},
+    uppertext/.style={text width=2cm, align=center, font=\footnotesize},
+    opaqueuppertext/.style={text width=2cm, align=center, font=\footnotesize, fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt}
 ]
     % Global dimensions for easy editing
     \def\blockh{2.8}         % vertical block height
@@ -11,33 +13,76 @@
     \def\sourcegap{0.8}      % horizontal spacing from sources to block edges
     \def\arrowpos{0.58}      % horizontal spacing of arrowhead on main wires
     \def\rightarrowpos{0.68} % horizontal spacing of arrowhead on rightmost wire
-    \def\uppery{2.4}         % vertical position of upper blocks
+    \def\uppery{2.5}         % vertical position of upper blocks
     \pgfmathsetmacro{\wireoffset}{0.25*\blockh} % vertical offset of wires from top/bottom of lower blocks
-    \def\dimtexty{3.5}       % vertical position of dimension design variable text
-    \def\coeftexty{1.7}      % vertical position of coefficient intermed variable text
+    \def\dimtexty{3.6}       % vertical position of dimension design variable text
+    \def\typetexty{4.6}     % vertical position of the type labels
+    \def\coeftexty{1.6}      % vertical position of coefficient intermed variable text
 
     % Five lower two-port blocks and five upper blocks
+    \node[upperblock] (Uleft) at (-\xsep,\uppery) {wave statistical analysis};
     \foreach \i/\label in {
         1/{\mathbf{Z}_i},
         2/{\mathbf{h}_{\mathrm{kin}}},
         3/{\mathbf{a}_{\mathrm{drive}}},
         4/{\mathbf{a}_{\mathrm{gen}}},
-        5/{\mathbf{a}_{\mathrm{elec}}}
+        5/{},
+        6/{}
     } {
         \pgfmathsetmacro{\x}{(\i-1)*\xsep}
         \node[lowerblock] (L\i) at (\x,0) {$\label$};
-        \node[upperblock] (U\i) at (\x,\uppery) {};
+        \node[upperblock] (U\i) at (\x,\uppery) {\strut
+            \ifnum\i=1 floating body analysis\fi
+            \ifnum\i=2 kinematic analysis\fi
+            \ifnum\i=3 drivetrain analysis\fi
+            \ifnum\i=4 generator analysis\fi
+            \ifnum\i=5 pwr. electronic analysis\fi
+            \ifnum\i=6 control analysis\fi
+        };
 
-        \node[font=\small] (Dim\i) at (\x,\dimtexty) {dimensions};
-        \draw[infoarrow] (Dim\i.south) -- (U\i.north);
+        \node[uppertext] (Type\i) at (\x,\typetexty) {\strut
+            \ifnum\i=1 floating body type\fi
+            \ifnum\i=2 degrees of freedom\fi
+            \ifnum\i=3 drivetrain type\fi
+            \ifnum\i=4 generator type\fi
+            \ifnum\i=5 converter type\fi
+            \ifnum\i=6 controller structure\fi
+        };
 
+        \node[uppertext] (Dim\i) at (\x,\dimtexty) {\strut
+            \ifnum\i=1 floating body dimensions\fi
+            \ifnum\i=2 linkage geometry\fi
+            \ifnum\i=3 drivetrain dimensions\fi
+            \ifnum\i=4 generator dimensions\fi
+            \ifnum\i=5 pwr. electronic components\fi
+            \ifnum\i=6 constraint limits\fi
+        };
+
+        %\ifnum\i=2
+        %    \draw[infoarrow] (Type\i.south) -- (U\i.north);
+        %\else
+            \draw[infoarrow] (Type\i.south) -- (Dim\i.north);
+            \draw[infoarrow] (Dim\i.south) -- (U\i.north);
+        %\fi
         \draw[infoarrow] (U\i.south) -- (L\i.north);
-        \node[font=\small, fill=white, fill opacity=0.5, text opacity=1, inner sep=1pt] (Coef\i) at (\x,\coeftexty) {coefficients};
+        \node[opaqueuppertext] (Coef\i) at (\x,\coeftexty) {\strut
+            \ifnum\i=1 hydro. coefficients \fi
+            \ifnum\i=2 kinematic coefficients \fi
+            \ifnum\i=3 drivetrain coefficients \fi
+            \ifnum\i=4 generator coefficients \fi
+            \ifnum\i=5 pwr. electronic coefficients \fi
+            \ifnum\i=6 control coefficients \fi
+        };
     }
+    
+    % Merged lower block covering blocks 5 and 6
+    \pgfmathsetmacro{\xmerge}{4.5*\xsep}
+    \pgfmathsetmacro{\mergewidth}{\xsep+1.45}
+    \node[lowerblock, minimum width=\mergewidth cm, fill=white] (L56) at (\xmerge,0) {$\mathbf{a}_{\mathrm{elec}}$};
 
     % Left and right sinusoidal voltage sources
     \path (L1.west) ++(-\sourcegap,0) coordinate (leftsource);
-    \path (L5.east) ++(\sourcegap+\rightshift,0) coordinate (rightsource);
+    \path (L6.east) ++(\sourcegap+\rightshift,0) coordinate (rightsource);
     \draw[wire] ([yshift=-\wireoffset cm]leftsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]leftsource);
     \draw[wire] ([yshift=-\wireoffset cm]rightsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]rightsource);
     \node[font=\small] at ([yshift=8pt,xshift=-18pt]leftsource) {$+$};
@@ -46,6 +91,16 @@
     \node[font=\small] at ([yshift=-8pt,xshift=18pt]rightsource) {$-$};
     \node[font=\small, anchor=east] at ([xshift=-12pt]leftsource) {$\zeta$};
     \node[font=\small, anchor=west] at ([xshift= 12pt]rightsource) {$V_{\mathrm{grid}}$};
+
+    % location and wave environment (left source inputs)
+    \node[uppertext] (Loc) at (-\xsep,\typetexty) {location};
+    \draw[infoarrow] (Loc.south) -- (Uleft.north);
+    \draw[infoarrow] (Uleft.south) -- ([xshift=-.3cm, yshift=.3cm]leftsource);
+    \node[opaqueuppertext] (Env) at (-\xsep,\coeftexty) {wave params.};
+
+    % power (right source output)
+    \node[font=\small, text=blue!70!black, anchor=west] at ([xshift=1.5cm,yshift=0.8cm]rightsource) {generated power};
+    \draw[infoarrow] ([xshift=9pt,yshift=10pt]rightsource) -- ([xshift=1.5cm,yshift=0.8cm]rightsource);
 
     % Horizontal wire connections
     \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift=\wireoffset cm]leftsource) -- ([yshift=\wireoffset cm]L1.west);
@@ -59,9 +114,9 @@
     \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$\tau$} ([yshift=-\wireoffset cm]L4.west);
     \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$V$} ([yshift=-\wireoffset cm]L5.west);
 
-    % Connections from block 5 to right source
-    \draw[wire] ([yshift=\wireoffset cm]L5.east) -- ($([yshift=\wireoffset cm]L5.east)+(0.5,0)$)
-        to[european resistor, l^={$Z_{grid}$}] ($([yshift=\wireoffset cm]L5.east)+(1.6,0)$);
-    \draw[wire,postaction={decorate},decoration={markings, mark=at position \rightarrowpos with {\arrow{stealth}}}] ($([yshift=\wireoffset cm]L5.east)+(1.6,0)$) -- node[right, xshift=4pt, above=-1pt] {$I_{\mathrm{grid}}$} ([yshift=\wireoffset cm]rightsource);
-    \draw[wire] ([yshift=-\wireoffset cm]L5.east) -- ([yshift=-\wireoffset cm]rightsource);
+    % Connections from block 6 to right source
+    \draw[wire] ([yshift=\wireoffset cm]L6.east) -- ($([yshift=\wireoffset cm]L6.east)+(0.5,0)$)
+        to[european resistor, l^={$Z_{grid}$}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \rightarrowpos with {\arrow{stealth}}}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$) -- node[right, xshift=4pt, above=-1pt] {$I_{\mathrm{grid}}$} ([yshift=\wireoffset cm]rightsource);
+    \draw[wire] ([yshift=-\wireoffset cm]L6.east) -- ([yshift=-\wireoffset cm]rightsource);
 \end{tikzpicture}
