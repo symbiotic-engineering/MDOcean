@@ -146,10 +146,10 @@ Since \Cref{eq:obj-gamma} shows that power decreases with increasing $|\gls{sym-
 \begin{alignat}{2}
 & \min_{\gls{sym-Gamma} \in \gls{sym-mathbb-C}} &  |\gls{sym-Gamma}|^2& \\[3pt]
 & \text{s.t.} &
-\gls{sym-S-mu}|\gls{sym-Gamma} - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
+\gls{sym-S-mu}|\gls{sym-Gamma} - \gls{sym-Gamma-c-mu}|^2 &\le S_{\mu} r_{\mu}^2,
 \quad \forall \mu \label{eq:disc-constraint}\\
 & \text{where} &
-\Gamma_{c,\mu}  &\in \gls{sym-mathbb-C} \nonumber\\
+\gls{sym-Gamma-c-mu}  &\in \gls{sym-mathbb-C} \nonumber\\
 & & r_{\mu}^2 &\in \gls{sym-mathbb-R} \nonumber \\
 & & \gls{sym-S-mu} &\in \left\{-1,1\right\} \nonumber
 \end{alignat}
@@ -160,7 +160,7 @@ The constraint requires that $\gls{sym-Gamma}$ lie within this circle when $\gls
 Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu}$, and $\gls{sym-S-mu}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
-\gls{sym-Gamma-c-mu-2}
+\gls{sym-Gamma-c-mu}
 &= \frac{-\gls{sym-B-q-mu}^{\,*}}{\gls{sym-A-q-mu}} =
 \frac{
     \gls{sym-hat-I-p}^{\,*}\,
@@ -186,7 +186,7 @@ Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu}$, and $\gls{sym-S-mu}$ are de
 \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}
 }
 +
-|\gls{sym-Gamma-c-mu-2}|^2
+|\gls{sym-Gamma-c-mu}|^2
 \label{eq:gamma-disc-radius}
 \\
 \gls{sym-S-mu} &= \textrm{sign} (\gls{sym-A-q-mu}) = \textrm{sign}\left(\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}\right)
@@ -219,14 +219,14 @@ where $\gls{sym-mathcal-F} = \bigcap_{\gls{sym-mu}} \left\{\gls{sym-Gamma}: \gls
 \right\}.
 \\
 \gls{sym-mathcal-C-cl} &= \left\{
-    (|\gls{sym-Gamma-c-mu-2}| - \gls{sym-r-mu})\exp (i\angle\,\gls{sym-Gamma-c-mu-2}), \quad \forall \gls{sym-mu}
+    (|\gls{sym-Gamma-c-mu}| - \gls{sym-r-mu})\exp (i\angle\,\gls{sym-Gamma-c-mu}), \quad \forall \gls{sym-mu}
 \right\}.
 \end{aligned}
 \end{equation}
 The intersection points of the $\gls{sym-mu}$th and $\gls{sym-nu}$th circles are given by:
 \begin{equation}\label{eq:circle-intersection}
     \gls{sym-Gamma-mu-nu} =
-    \gls{sym-Gamma-c-mu-2} + \frac{\gls{sym-Gamma-c-nu-2} - \gls{sym-Gamma-c-mu-2}}{\gls{sym-d-mu-nu}}
+    \gls{sym-Gamma-c-mu} + \frac{\gls{sym-Gamma-c-nu-2} - \gls{sym-Gamma-c-mu}}{\gls{sym-d-mu-nu}}
     \left(        \gls{sym-a-mu-nu}
         \pm
         1i \sqrt{\gls{sym-r-mu}^2-\gls{sym-a-mu-nu}^2}
@@ -263,7 +263,7 @@ The new candidate points are:
 \begin{aligned}
 \gls{sym-mathcal-C-int-oval-circ} &= \left\{
     \gls{sym-Gamma}:
-    |\gls{sym-Gamma} - \gls{sym-Gamma-c-mu-2}| = \gls{sym-r-mu}, ~(1-|\gls{sym-Gamma}|^2)^2 + 4\Im (\gls{sym-Gamma}) = \frac{|\gls{sym-S-max-k}|}{|\gls{sym-S-0}|}, \quad \forall \gls{sym-mu},\gls{sym-k-generic-index}
+    |\gls{sym-Gamma} - \gls{sym-Gamma-c-mu}| = \gls{sym-r-mu}, ~(1-|\gls{sym-Gamma}|^2)^2 + 4\Im (\gls{sym-Gamma}) = \frac{|\gls{sym-S-max-k}|}{|\gls{sym-S-0}|}, \quad \forall \gls{sym-mu},\gls{sym-k-generic-index}
 \right\}.
 \\
 \gls{sym-mathcal-C-cl-oval} &= \left\{
@@ -367,8 +367,8 @@ so we can compute the Lagrange multipliers as follows:
     \left(        \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-r-mu}}
         \frac{\partial \gls{sym-r-mu}}{\partial \gls{sym-b-mu}}
         +
-        \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-Gamma-c-mu-2}}
-        \frac{\partial \gls{sym-Gamma-c-mu-2}}{\partial \gls{sym-b-mu}}
+        \frac{\partial |\gls{sym-Gamma-opt}|}{\partial \gls{sym-Gamma-c-mu}}
+        \frac{\partial \gls{sym-Gamma-c-mu}}{\partial \gls{sym-b-mu}}
     \right)
 \end{aligned}
 \end{equation}
@@ -383,7 +383,7 @@ with center $\gls{sym-Gamma-c-mu}$ and radius $\gls{sym-r-mu}$ given by:
     = \frac{\gls{sym-b-mu} - \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p}
             - 2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x-p}\right\}}
            {|\gls{sym-hat-I-p}|^{2}\,\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}}
-    + |\gls{sym-Gamma-c-mu-2}|^2
+    + |\gls{sym-Gamma-c-mu}|^2
 \end{equation}
 The constraint limit $\gls{sym-L-mu}$ enters $\gls{sym-r-mu}$ only through $\gls{sym-b-mu}$
  (the right-hand side of the quadratic inequality in \Cref{tab:qp-constraints}),
@@ -413,15 +413,19 @@ the squared optimal reflection coefficient magnitude in each sea state takes one
     \begin{cases}
         0
     & \text{none active} \\
-        |\gls{sym-Gamma-c-mu}|^2
-        - 2|\gls{sym-Gamma-c-mu}|\sqrt{\frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}}
+        |\gls{sym-Gamma-c-mu-star}|^2
+        - 2|\gls{sym-Gamma-c-mu-star}|\sqrt{\frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}}
         + \frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
-            \Gamma_{c,\mu^*} + \frac{\Gamma_{c,\nu^*} - \Gamma_{c,\mu^*}}{d_{\mu^*\nu^*}}
-            \left(                \gls{sym-a-mu-nu-star}
+            \gls{sym-Gamma-c-mu-star} + \frac{\gls{sym-Gamma-c-nu-star} - \gls{sym-Gamma-c-mu-star}}{d_{\mu^*\nu^*}}
+            \left( \gls{sym-a-mu-nu-star}
                 \pm
-                1i \sqrt{\frac{\gls{sym-b-mu-star} + \gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}-\gls{sym-a-mu-nu-star}^2}
+                1i \sqrt{
+                    \frac{\gls{sym-b-mu-star}
+                    + \gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}
+                    -\gls{sym-a-mu-nu-star}^2
+                    }
             \right)
         \right|^2
     & \text{$\gls{sym-mu}^*$ \& $\gls{sym-nu}^*$ active}
