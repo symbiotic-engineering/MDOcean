@@ -78,7 +78,7 @@ The unknown coefficients must be computed to enforce this final condition as wel
         &
         $\displaystyle\sum_{\gls{sym-k-index}}
             \gls{sym-B-k-e}
-            \gls{sym-Lambda-k} (\gls{sym-r})
+            \gls{sym-Lambda-k-e} (\gls{sym-r})
             \gls{sym-Z-k-e} (\gls{sym-z})$
     Partic. potential $\gls{sym-phi-p}(\gls{sym-r},\gls{sym-z})$
         &
@@ -158,7 +158,7 @@ The unknown coefficients must be computed to enforce this final condition as wel
             $
             }
         &
-        $\gls{sym-Lambda-k} (\gls{sym-r})
+        $\gls{sym-Lambda-k-e} (\gls{sym-r})
             =
             \begin{cases}
                 \displaystyle
@@ -286,7 +286,7 @@ In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-mathrm-I-0}$,  $\gls{sym-mathrm-K-
 }
 
 \newcommand{\RintTwoDefn}{
-    $\displaystyle \gls{sym-boldsymbol-mathcal-R-2m} = \int\limits_{\gls{sym-a-in}}^{\gls{sym-a-out}} \gls{sym-vec-R}_{2m}(\gls{sym-r})rdr$
+    $\displaystyle \gls{sym-boldsymbol-mathcal-R}_{2m} = \int\limits_{\gls{sym-a-in}}^{\gls{sym-a-out}} \gls{sym-vec-R}_{2m}(\gls{sym-r})rdr$
 }
 
 \newcommand{\ZmnDefn}{
@@ -534,7 +534,7 @@ Each basis function is evaluated at the radius described to the left of its row 
           \shortstack{$\gls{sym-phi-i1}=\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&N&  $(\gls{sym-h}-\gls{sym-d-1})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1n-i1})$&  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-2m-i2}$& $0_{NK}$\\ \hline
           \shortstack{$\gls{sym-phi-i2}=\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&M&  $0_{MN}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-2m-i2})$& $-\gls{sym-boldsymbol-mathcal-Z}_{mk}\odot 1_{M1}\vec{\Lambda}_{\gls{sym-k-index}}$\\ \hline
           \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i1}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&M&  $- \gls{sym-boldsymbol-mathcal-Z}_{mn} \odot 1_{M1} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1n-i1}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2})$& $0_{MK}$\\ \hline
-          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&K&  $0_{KN}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km}\odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$& $\gls{sym-h}~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-Lambda-k})$\\ \hline
+          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&K&  $0_{KN}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km}\odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$& $\gls{sym-h}~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-Lambda-k-e})$\\ \hline
     \end{tabular}
 \end{table}
 
@@ -643,8 +643,8 @@ with output constant $\gls{sym-c-0}$ and output row vector $\gls{sym-vec-c}$ def
     \label{tab:MEEM-c-vector}
 \begin{tabular}{|l|c|c|c|c|} \hline
           Body&N&  M&  M& K\\ \hline
-          Float&$0_{1\gls{sym-N}}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1m}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-2m}$& $0_{1\gls{sym-K}}$\\ \hline
-          Spar& $\gls{sym-vec-Z-n}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R-1n}$& $0_{1\gls{sym-M}}$& $0_{1\gls{sym-M}}$&$0_{1\gls{sym-K}}$\\\hline
+          Float&$0_{1\gls{sym-N}}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1m}$&  $\gls{sym-vec-Z-m}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{2m}$& $0_{1\gls{sym-K}}$\\ \hline
+          Spar& $\gls{sym-vec-Z-n}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1n}$& $0_{1\gls{sym-M}}$& $0_{1\gls{sym-M}}$&$0_{1\gls{sym-K}}$\\\hline
     \end{tabular}
     \end{table}
 The appropriate dimensions are
