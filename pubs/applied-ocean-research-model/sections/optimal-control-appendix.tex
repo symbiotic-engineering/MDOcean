@@ -7,7 +7,7 @@
     In the most straightforward case where simply one constraint exists, the constraint is active if and only if the unconstrained solution violates that constraint.
     For example, if only a maximum force constraint exists, the constrained solution has a force $\gls{sym-hat-F-p-constr}$ that is the minimum of the unconstrained force $\gls{sym-hat-F-p-unconstrained}$ and the maximum allowed force fundamental $\gls{sym-F-max}$:
     \begin{equation}
-    \gls{sym-hat-F-p-constr} = \min\left (\gls{sym-hat-F-p-unconstrained}, \gls{sym-F-max}\right)
+    \gls{sym-hat-F-p-constr} = \min\left(\gls{sym-hat-F-p-unconstrained}, \gls{sym-F-max}\right)
     \end{equation}
     The solver guesses a value of $\gls{sym-Gamma}$, calculates the resulting force $\gls{sym-hat-F-p-guess}$, and then uses $\gls{sym-hat-F-p-guess}-\gls{sym-hat-F-p-constr}$ as an error signal to adjust its next guess of $\gls{sym-Gamma}$, iterating until the error converges to zero.
     This solver-based optimal control performs numerical root-finding, not numerical optimization, and can happen in an inner loop of the drag-linearization solver iteration (where $\gls{sym-hat-F-p-unconstrained}$ stays constant each control iteration) or simultaneously with the drag-linearization iteration (where $\gls{sym-hat-F-p-unconstrained}$ and the system linearization are updated each control iteration).
@@ -132,7 +132,7 @@ where quadratic coefficients $\gls{sym-A-q-mu}$, $\gls{sym-B-q-mu}$, and $\gls{s
     \gls{sym-A-q-mu} &= |\gls{sym-hat-I-p}|^{2},
     \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}& &\in \gls{sym-mathbb-R} \\
     \gls{sym-B-q-mu} &= -\gls{sym-hat-I-p},
-    \left (\gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu} + \gls{sym-vec-a-mu}^{\,*}\right)\gls{sym-vec-n}& &\in \gls{sym-mathbb-C} \\
+    \left(\gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu} + \gls{sym-vec-a-mu}^{\,*}\right)\gls{sym-vec-n}& &\in \gls{sym-mathbb-C} \\
     \gls{sym-C-q-mu} &=
         \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p}
         +
@@ -146,18 +146,18 @@ Since \Cref{eq:obj-gamma} shows that power decreases with increasing $|\gls{sym-
 \begin{alignat}{2}
 & \min_{\gls{sym-Gamma} \in \gls{sym-mathbb-C}} &  |\gls{sym-Gamma}|^2& \\[3pt]
 & \text{s.t.} &
-S_{\mu}|\gls{sym-Gamma} - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
+\gls{sym-S-mu}|\gls{sym-Gamma} - \Gamma_{c,\mu}|^2 &\le S_{\mu} r_{\mu}^2,
 \quad \forall \mu \label{eq:disc-constraint}\\
 & \text{where} &
 \Gamma_{c,\mu}  &\in \gls{sym-mathbb-C} \nonumber\\
 & & r_{\mu}^2 &\in \gls{sym-mathbb-R} \nonumber \\
-& & S_{\mu} &\in \left\{-1,1\right\} \nonumber
+& & \gls{sym-S-mu} &\in \left\{-1,1\right\} \nonumber
 \end{alignat}
 \end{subequations}
 where the constraint \Cref{eq:disc-constraint} is derived from \Cref{eq:ineq-gamma} by completing the square.
-More precisely, when $\gls{sym-A-q-mu} \neq 0$, the $\gls{sym-mu}$th inequality constraint defines a circle in the complex plane of $\gls{sym-Gamma}$ centered at $\gls{sym-Gamma-c-mu}$ with radius $\gls{sym-r-mu-2}$.
+More precisely, when $\gls{sym-A-q-mu} \neq 0$, the $\gls{sym-mu}$th inequality constraint defines a circle in the complex plane of $\gls{sym-Gamma}$ centered at $\gls{sym-Gamma-c-mu}$ with radius $\gls{sym-r-mu}$.
 The constraint requires that $\gls{sym-Gamma}$ lie within this circle when $\gls{sym-A-q-mu} > 0$ ($\gls{sym-S}_{\gls{sym-mu}}=1$) or outside this circle when $\gls{sym-A-q-mu} < 0$ ($\gls{sym-S}_{\gls{sym-mu}}=-1$).
-Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu-2}$, and $\gls{sym-S}_{\gls{sym-mu}}$ are defined as:
+Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu}$, and $\gls{sym-S-mu}$ are defined as:
 \begin{subequations}\label{eq:gamma-disc-params}
 \begin{align}
 \gls{sym-Gamma-c-mu-2}
@@ -165,7 +165,7 @@ Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu-2}$, and $\gls{sym-S}_{\gls{sy
 \frac{
     \gls{sym-hat-I-p}^{\,*}\,
     \gls{sym-vec-n}^{\,*}
-    \left (\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p} + \gls{sym-vec-a-mu}\right)
+    \left(\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p} + \gls{sym-vec-a-mu}\right)
 }{
     |\gls{sym-hat-I-p}|^{2}\,
     \gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}
@@ -189,7 +189,7 @@ Parameters $\gls{sym-Gamma-c-mu}$, $\gls{sym-r-mu-2}$, and $\gls{sym-S}_{\gls{sy
 |\gls{sym-Gamma-c-mu-2}|^2
 \label{eq:gamma-disc-radius}
 \\
-\gls{sym-S-mu} &= \textrm{sign} (\gls{sym-A-q-mu}) = \textrm{sign}\left (\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}\right)
+\gls{sym-S-mu} &= \textrm{sign} (\gls{sym-A-q-mu}) = \textrm{sign}\left(\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}\right)
 \label{eq:gamma-disc-sign}
 \end{align}
 \end{subequations}
@@ -211,7 +211,7 @@ This leads to the following expression for the constrained optimal solution (val
  \textrm{infeasible} & \textrm{if } \gls{sym-mathcal-F} \bigcap \gls{sym-mathcal-C} = \emptyset
 \end{cases}
 \end{equation}
-where $\gls{sym-mathcal-F} = \bigcap_{\gls{sym-mu}} \left\{\gls{sym-Gamma}: \gls{sym-S}_{\gls{sym-mu}}|\gls{sym-Gamma} - \gls{sym-Gamma-c-mu}| \le \gls{sym-S}_{\gls{sym-mu}} \gls{sym-r-mu-2} \right\}$ is the set of all feasible points and $\gls{sym-mathcal-C}$ is the set of candidate points. $\gls{sym-mathcal-C}$ is the union of $\gls{sym-mathcal-C-int}$, the candidates at circle intersections, and $\gls{sym-mathcal-C-cl}$, the candidates at the closest point on each circle to the origin:
+where $\gls{sym-mathcal-F} = \bigcap_{\gls{sym-mu}} \left\{\gls{sym-Gamma}: \gls{sym-S}_{\gls{sym-mu}}|\gls{sym-Gamma} - \gls{sym-Gamma-c-mu}| \le \gls{sym-S}_{\gls{sym-mu}} \gls{sym-r-mu} \right\}$ is the set of all feasible points and $\gls{sym-mathcal-C}$ is the set of candidate points. $\gls{sym-mathcal-C}$ is the union of $\gls{sym-mathcal-C-int}$, the candidates at circle intersections, and $\gls{sym-mathcal-C-cl}$, the candidates at the closest point on each circle to the origin:
 \begin{equation}\label{eq:candidate-points}
 \begin{aligned}
 \gls{sym-mathcal-C-int} &= \left\{
@@ -233,18 +233,18 @@ The intersection points of the $\gls{sym-mu}$th and $\gls{sym-nu}$th circles are
     \right)
 \end{equation}
 where $\gls{sym-d-mu-nu-star} = |\gls{sym-Gamma-c-nu} - \gls{sym-Gamma-c-mu}|$ is the distance between the circle centers,
-$\gls{sym-a-mu-nu-star} = \frac{1}{2}(\gls{sym-r-mu-2}^2-\gls{sym-r-nu}^2+\gls{sym-d-mu-nu-star}^2)/\gls{sym-d-mu-nu-star}$ is the distance from
+$\gls{sym-a-mu-nu-star} = \frac{1}{2}(\gls{sym-r-mu}^2-\gls{sym-r-nu}^2+\gls{sym-d-mu-nu-star}^2)/\gls{sym-d-mu-nu-star}$ is the distance from
 the center of the $\gls{sym-mu}$th circle to the midpoint of the two intersection points,
 and $1i$ is the imaginary unit.
 The closest-point candidates $\gls{sym-mathcal-C-cl}$ match the solution that \citet[\equationautorefname~4]{mccabe_force-limited_2024} derive for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\gls{sym-mathcal-F}$, only compute $\gls{sym-mathcal-C}$ and then check whether each candidate point is feasible.
-\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu-2}=4$, $\gls{sym-S}_{\gls{sym-mu}}=1$, and various $\gls{sym-Gamma-c-mu}$.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu}=4$, $\gls{sym-S}_{\gls{sym-mu}}=1$, and various $\gls{sym-Gamma-c-mu}$.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/qp_circles.pdf}]{figs/from-matlab/qp_circles.pdf}
     \caption{Visualization of the optimization problem \Cref{eq:opt-problem-gamma} in the complex plane of $\gls{sym-Gamma}$.
-Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu-2}=4$ and $\gls{sym-S}_{\gls{sym-mu}}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
+Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu}=4$ and $\gls{sym-S}_{\gls{sym-mu}}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
@@ -348,7 +348,7 @@ The power sensitivity simplifies to:
 If the optimization problem were solved with a numerical solver,
 the Lagrange multipliers would be directly available as part of the solution.
 In our case, we have a semi-analytical solution for the optimal reflection coefficient at each sea state in terms of the constraint centers and radii at that sea state,
-$\gls{sym-Gamma-opt}(\gls{sym-r-mu-2}, \gls{sym-Gamma-c-mu})$,
+$\gls{sym-Gamma-opt}(\gls{sym-r-mu}, \gls{sym-Gamma-c-mu})$,
 so we can compute the Lagrange multipliers as follows:
 \begin{equation}\label{eq:lagrange}
 \begin{aligned}
@@ -429,7 +429,7 @@ the squared optimal reflection coefficient magnitude in each sea state takes one
 \end{equation}
 where $\gls{sym-mu}^*,\gls{sym-nu}^*$ refer to the indices of the active constraint (s) for a given sea state,
 and $\gls{sym-a}_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ and $d_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ are real numbers defined in the discussion following \Cref{eq:circle-intersection}.
-$d_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is independent of the constraint limits, while $\gls{sym-a}_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is affine in $\gls{sym-b}_{\gls{sym-mu}^*}$ and $\gls{sym-b}_{\gls{sym-nu}^*}$.
+$d_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is independent of the constraint limits, while $\gls{sym-a}_{\gls{sym-mu}^*,\gls{sym-nu}^*}$ is affine in $\gls{sym-b-mu-star}$ and $\gls{sym-b-nu-star}$.
 Thus, using \textrm{aff}() and \textrm{quad}() to denote affine and quadratic functions of the arguments, we have the following scale behavior:
 \begin{equation}\label{eq:gamma-opt-scale}
     |\gls{sym-Gamma-opt}|^2 =
@@ -458,13 +458,13 @@ The penalty function is convex in $\gls{sym-Gamma}$ if and only if all constrain
 Then, the optimal reflection coefficient of each candidate type can be written as the minimum of the candidate points passed through the penalty function.
 \begin{equation}\label{eq:gamma-opt-min-per-candidate}
 \begin{aligned}
-   |\gls{sym-Gamma-cl-mu}| &=
+   |\gls{sym-Gamma-cl-mu-star}| &=
     \min_\gls{sym-mu} \left\{
-        | \gls{sym-f}\left (\gls{sym-Gamma-cl-mu-2} (\gls{sym-b-mu})\right) |
+        | \gls{sym-f}\left(\gls{sym-Gamma-cl-mu} (\gls{sym-b-mu})\right) |
     \right\}, \quad
     |\Gamma_{int,\mu^*,\nu^*}| =
     \min_{\mu,\nu} \left\{
-        | f\left (\Gamma_{\mu,\nu} (b_\mu, b_\nu)\right) |
+        | f\left(\Gamma_{\mu,\nu} (b_\mu, b_\nu)\right) |
     \right\}
 \end{aligned}
 \end{equation}
@@ -473,7 +473,7 @@ Finally, the overall optimal reflection coefficient $|\gls{sym-Gamma-opt}|$ is t
 \begin{aligned}
     |\gls{sym-Gamma-opt}| &=
     \min \left\{
-        |\Gamma_{cl,\mu^*} (b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*} (b_\mu, b_\nu)|
+        |\gls{sym-Gamma-cl-mu-star} (b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*} (b_\mu, b_\nu)|
     \right\}
 \end{aligned}
 \end{equation}
@@ -481,9 +481,9 @@ Finally, the overall optimal reflection coefficient $|\gls{sym-Gamma-opt}|$ is t
 Working from the inside out, we now analyze the convexity of $|\gls{sym-Gamma-opt}|^2$ with respect to $\gls{sym-b-mu}$.
 Starting with the candidates at closest points, the square root is a concave increasing function,
 and a concave increasing function of an affine function is concave,
-so $\sqrt{\textrm{aff}(\gls{sym-b-mu-2})}$ is concave.
+so $\sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The sum of a concave function and an affine function is concave,
-so $|\gls{sym-Gamma-cl}|=\textrm{aff}(\gls{sym-b-mu-2}) + \sqrt{\textrm{aff}(\gls{sym-b-mu-2})}$ is concave.
+so $|\gls{sym-Gamma-cl}|=\textrm{aff}(\gls{sym-b-mu}) + \sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The penalty function is convex if and only if all constraints are convex,
 so $-|\gls{sym-f}(\gls{sym-Gamma-cl})|$ is concave if and only if $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 The minimum of a set of concave functions is a concave increasing function,
@@ -491,18 +491,18 @@ The minimum of a set of concave functions is a concave increasing function,
 and $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$ is the minimum of a set of concave functions if and only if all constraints are concave,
 so $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$ is concave if and only if $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 
-Moving onto the candidates at intersection points, a quadratic function is concave if its leading order term is negative, and the leading order term of $\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})$ is negative (arising from the subtraction of squared-affine term $\gls{sym-a-mu-nu-star}^2$).
-%Square root is a concave function, and a concave function of a concave function is concave, so $\sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}$ is concave.
+Moving onto the candidates at intersection points, a quadratic function is concave if its leading order term is negative, and the leading order term of $\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})$ is negative (arising from the subtraction of squared-affine term $\gls{sym-a-mu-nu-star}^2$).
+%Square root is a concave function, and a concave function of a concave function is concave, so $\sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$ is concave.
 The geometric mean of two positive values is a concave function, so the geometric mean of two positive concave functions is concave.
-The term $\left(\textrm{aff}(\gls{sym-b-mu-2}) + \textrm{aff}(\gls{sym-b-nu-2})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}$
-is the geometric mean of $(\textrm{aff}(\gls{sym-b-mu-2})+\textrm{aff}(\gls{sym-b-nu-2}))^2$ and $\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})$.
-The $(\textrm{aff}(\gls{sym-b-mu-2})+\textrm{aff}(\gls{sym-b-nu-2}))^2$ is positive but is convex rather than concave.
-This means the curvature of $\left(\textrm{aff}(\gls{sym-b-mu-2}) + \textrm{aff}(\gls{sym-b-nu-2})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}$ cannot be established with the present analysis.
-If the curvature of $\left(\textrm{aff}(\gls{sym-b-mu-2}) + \textrm{aff}(\gls{sym-b-nu-2})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}$ could be established as concave,
+The term $\left(\textrm{aff}(\gls{sym-b-mu}) + \textrm{aff}(\gls{sym-b-nu})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$
+is the geometric mean of $(\textrm{aff}(\gls{sym-b-mu})+\textrm{aff}(\gls{sym-b-nu}))^2$ and $\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})$.
+The $(\textrm{aff}(\gls{sym-b-mu})+\textrm{aff}(\gls{sym-b-nu}))^2$ is positive but is convex rather than concave.
+This means the curvature of $\left(\textrm{aff}(\gls{sym-b-mu}) + \textrm{aff}(\gls{sym-b-nu})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$ cannot be established with the present analysis.
+If the curvature of $\left(\textrm{aff}(\gls{sym-b-mu}) + \textrm{aff}(\gls{sym-b-nu})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$ could be established as concave,
 then the sum of two concave functions is concave, so the candidate points $|\gls{sym-Gamma-int}|$ would be concave.
 If that were the case, then by the same argument as for the closest points, the minimum of feasible $|\gls{sym-Gamma-int}|$ would be concave if and only if all constraints are concave.
 The optimum $|\gls{sym-Gamma-opt}|$ is the minimum of the feasible $|\gls{sym-Gamma-cl}|$ and $|\gls{sym-Gamma-int}|$, so if both of those are concave, then it is also concave.
-Therefore, the criteria for the concavity of $|\gls{sym-Gamma-opt}|$ with respect to $\gls{sym-b-mu}$ is that all constraints are convex (interior of circles), and the curvature of $\left(\textrm{aff}(\gls{sym-b-mu-2}) + \textrm{aff}(\gls{sym-b-nu-2})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}$ is concave.
+Therefore, the criteria for the concavity of $|\gls{sym-Gamma-opt}|$ with respect to $\gls{sym-b-mu}$ is that all constraints are convex (interior of circles), and the curvature of $\left(\textrm{aff}(\gls{sym-b-mu}) + \textrm{aff}(\gls{sym-b-nu})\right) \sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$ is concave.
 As future work, the above curvature analysis should be verified with a disciplined convex programming package such as CVXPY.
 
 To facilitate the analysis of the next section, we observe that although the squared optimal reflection coefficient magnitude, $|\gls{sym-Gamma-opt}|^2$,
@@ -523,7 +523,7 @@ it can be written as a sum over all constraint pairs $(\gls{sym-mu},\gls{sym-nu}
 \\
     &\left.
         \left(            \textrm{quad} (\gls{sym-b-mu}, \gls{sym-b-nu}) +
-            \left (\textrm{aff} (\gls{sym-b-mu}) + \textrm{aff} (\gls{sym-b-nu})\right)
+            \left(\textrm{aff} (\gls{sym-b-mu}) + \textrm{aff} (\gls{sym-b-nu})\right)
             \sqrt{\textrm{quad} (\gls{sym-b-mu}, \gls{sym-b-nu})}
         \right)
     \right]
@@ -572,7 +572,7 @@ Substituting \Cref{eq:gamma-opt-scale-sum} into \Cref{eq:power-elec-sensitivity}
     &\left.
         + \delta_{\mu,\mu^*_\beta}\delta_{\nu,\nu^*_\beta}
         \left(            \textrm{quad}_\beta (b_{\mu}, b_{\nu}) +
-            \left (\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
+            \left(\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
             \sqrt{\textrm{quad}_\beta (b_{\mu}, b_{\nu})}
         \right)
     \right]
@@ -594,7 +594,7 @@ The two Kronecker delta terms are combined with the weighting term $\gls{sym-w-b
     &\left.
      \sum_{\beta=1}^{N_{sea}} \tilde{w}_{2\mu\nu\beta}
         \left(            \textrm{quad}_\beta (b_{\mu}, b_{\nu}) +
-            \left (\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
+            \left(\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
             \sqrt{\textrm{quad}_\beta (b_{\mu}, b_{\nu})}
         \right)
     \right]
@@ -610,7 +610,7 @@ Recognizing that the sea state sum in \eqref{eq:power-triple-sum} essentially ju
         \sqrt{\textrm{aff}_{\mu\nu\beta} (b_{\mu})}
         + \textrm{quad}_{\mu\nu\beta} (b_{\mu}, b_{\nu})
     +
-        \left (\textrm{aff}_{\mu\nu\beta} (b_{\mu}) + \textrm{aff}_{\mu\nu\beta} (b_{\nu})\right)
+        \left(\textrm{aff}_{\mu\nu\beta} (b_{\mu}) + \textrm{aff}_{\mu\nu\beta} (b_{\nu})\right)
         \sqrt{\textrm{quad}_{\mu\nu\beta} (b_{\mu}, b_{\nu})}
     \right]
 \end{aligned}\end{equation}
@@ -662,7 +662,7 @@ The appropriate complex scale factor from the optimal unsaturated controller (da
 %\end{equation}
 %where $\gls{sym-tau}_{\text{max}}$ is the maximum permissible generator torque and $\gls{sym-alpha}$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\gls{sym-tau}_{\text{max}}$, using the describing function derived in \citep{mccabe_force-limited_2024},
 %\begin{equation}
-%    \alpha = \frac{2}{\pi} \left(\frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left (\frac{\tau_{max}}{F_p}\right)^2} \right).
+%    \alpha = \frac{2}{\pi} \left(\frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left(\frac{\tau_{max}}{F_p}\right)^2} \right).
 %\end{equation}
 
 %When $\frac{\gls{sym-F-p}}{\gls{sym-tau}_{\text{max}}}$ = 1 (no saturation), then $\gls{sym-alpha}= 1$;
