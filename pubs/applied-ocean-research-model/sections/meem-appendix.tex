@@ -261,7 +261,7 @@ The unknown coefficients must be computed to enforce this final condition as wel
     \dispersion
     \end{equation}
 \fi
-In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-I-0}$,  $\gls{sym-K-0}$, and $\gls{sym-H-0-1}$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $\gls{sym-N-k}$ expression is defined as:
+In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-mathrm-I-0}$,  $\gls{sym-mathrm-K-0}$, and $\gls{sym-mathrm-H-0-1}$ are different Bessel functions of order zero; 1M and 2M mean body 1 and 2 (spar and float) are moving respectively, while 1S and 2S mean each is stationary; and the $\gls{sym-N-k}$ expression is defined as:
 
 \begin{equation}
     \gls{sym-N-k} = \frac{1}{2}\left(1+\frac{\gls{sym-f-k}}{2\gls{sym-m-k}\gls{sym-h}}  \right)~
@@ -291,14 +291,14 @@ In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-I-0}$,  $\gls{sym-K-0}$, and $\gls
 
 \newcommand{\ZmnDefn}{
     \shortstack{
-        $\displaystyle \gls{sym-boldsymbol-mathcal-Z-nm} = \gls{sym-boldsymbol-mathcal-Z-mn}^T =$
+        $\displaystyle \gls{sym-boldsymbol-mathcal-Z}_{nm} = \gls{sym-boldsymbol-mathcal-Z}_{mn}^\top =$
         \\
         $\displaystyle \int_{-\gls{sym-h}}^{-\gls{sym-d-1}} \gls{sym-vec-Z-n}^{i1 ~\gls{sym-T}}\gls{sym-vec-Z-m}^{i2} dz$
     }
 }
 \newcommand{\ZmkDefn}{
     \shortstack{
-        $\displaystyle \gls{sym-boldsymbol-mathcal-Z-mk} = \gls{sym-boldsymbol-mathcal-Z-km}^{\\text{top}} = $
+        $\displaystyle \gls{sym-boldsymbol-mathcal-Z}_{mk} = \gls{sym-boldsymbol-mathcal-Z}_{km}^\top = $
         \\
         $\displaystyle \int_{-\gls{sym-h}}^{-\gls{sym-d-2}} \gls{sym-vec-Z-m}^{i2 ~\gls{sym-T}}\vec{\gls{sym-Z}}_{\gls{sym-k-index}}^{e} dz $
     }
@@ -501,10 +501,10 @@ If $\gls{sym-e-j}(\gls{sym-x})$ is orthogonal to $\gls{sym-e-i}(\gls{sym-x})$ fr
 \end{aligned}
 \end{equation}
 
-where $<\cdot,\cdot>$ is the inner product and $\gls{sym-delta-ij}$ is Kronecker’s delta.
+where $<\cdot,\cdot>$ is the inner product and $\gls{sym-delta-ij}$ is Kronecker's delta.
 In the current hydrodynamics problem, the basis functions are the vertical eigenfunctions $\gls{sym-Z-n-i1}$, $\gls{sym-Z-m-i2}$, and $\gls{sym-Z}_{\gls{sym-k-index}}^{e}$.
 Orthogonality of each eigenfunction can be verified with the inner product.
-In the first region, for example, $<\gls{sym-Z-n-1-i1},\gls{sym-Z-n-2-i1}>=\gls{sym-delta-n-1n-2}$.
+In the first region, for example, $<Z_{n_1}^{i_1},Z_{n_2}^{i_1}>=\delta_{n_1 n_2}$.
 Note that eigenfunctions of different domains are not orthogonal, and their inner products will be expressed as coupling integrals in \Cref{tab:meem-integrals}.
 
 For each of the four matching equations, the property of orthogonality applies only after multiplying by the appropriate eigenfunction and integrating over appropriate bounds.
@@ -531,10 +531,10 @@ Each basis function is evaluated at the radius described to the left of its row 
     \begin{tabular}{|M{0.12\linewidth}|c||c|c|c|c|}\hline
  & & $\gls{sym-vec-C-1n-i1-2}$& $\gls{sym-vec-C-1m-i2-2}$& $\gls{sym-vec-C-2m-i2-2}$&$\gls{sym-vec-B-k-e}$\\\hline
           &size&  N&  M&  M& K\\ \hline \hline
-          \shortstack{$\gls{sym-phi-i1}=\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&N&  $(\gls{sym-h}-\gls{sym-d-1})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1n-i1})$&  $-\gls{sym-boldsymbol-mathcal-Z-nm}\odot 1_{N1}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z-nm}\odot 1_{N1}\gls{sym-vec-R-2m-i2}$& $0_{NK}$\\ \hline
-          \shortstack{$\gls{sym-phi-i2}=\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&M&  $0_{MN}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-2m-i2})$& $-\gls{sym-boldsymbol-mathcal-Z-mk}\odot 1_{M1}\vec{\Lambda}_{\gls{sym-k-index}}$\\ \hline
-          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i1}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&M&  $- \gls{sym-boldsymbol-mathcal-Z-mn} \odot 1_{M1} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1n-i1}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2})$& $0_{MK}$\\ \hline
-          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&K&  $0_{KN}$&  $-\gls{sym-boldsymbol-mathcal-Z-km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z-km}\odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$& $\gls{sym-h}~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-Lambda-k})$\\ \hline
+          \shortstack{$\gls{sym-phi-i1}=\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&N&  $(\gls{sym-h}-\gls{sym-d-1})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1n-i1})$&  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-2m-i2}$& $0_{NK}$\\ \hline
+          \shortstack{$\gls{sym-phi-i2}=\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&M&  $0_{MN}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-2m-i2})$& $-\gls{sym-boldsymbol-mathcal-Z}_{mk}\odot 1_{M1}\vec{\Lambda}_{\gls{sym-k-index}}$\\ \hline
+          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i1}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}$ \\ at $\gls{sym-r}=\gls{sym-a-1}$}&M&  $- \gls{sym-boldsymbol-mathcal-Z}_{mn} \odot 1_{M1} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1n-i1}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2})$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2})$& $0_{MK}$\\ \hline
+          \shortstack{$\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-i2}=\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-e}$ \\ at $\gls{sym-r}=\gls{sym-a-2}$}&K&  $0_{KN}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$&  $-\gls{sym-boldsymbol-mathcal-Z}_{km}\odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$& $\gls{sym-h}~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-Lambda-k})$\\ \hline
     \end{tabular}
 \end{table}
 
@@ -619,7 +619,7 @@ Once the eigencoefficients have been calculated by solving the linear system for
         R_{j_1} (r)R_{j_2} (r)rdr
     \right] \nonumber
 \end{alignat}
-where the generic indices $\gls{sym-j-1}$ and $\gls{sym-j-2}$ are used to represent $\gls{sym-n}$ or $\gls{sym-m}$ depending on the region.
+where the generic indices $j_1$ and $j_2$ are used to represent $\gls{sym-n}$ or $\gls{sym-m}$ depending on the region.
 For regions with multiple radial eigenfunctions or surfaces covering multiple fluid regions, summation over each eigenfunction and region respectively is implied.
 After substituting the eigenfunctions from \Cref{tab:MEEM-eigenfunctions} into \Cref{eq:meem-c-derivation}, all $\gls{sym-z}$-dependent quantities are evaluated at the body draft on the integration surface, $\gls{sym-z}=-d$.
 This means $\frac{\partial \gls{sym-phi-p}}{\partial \gls{sym-z}}=1$, and $\gls{sym-Z-j}(\gls{sym-z})$ simplifies to
@@ -670,11 +670,11 @@ Using the A-matrix and b- and c-vectors, the MEEM solution directly calculates r
 The hydrostatic stiffness $\gls{sym-K-h}$ and the excitation coefficient $\gls{sym-gamma}$ are calculated as follows:
 \begin{equation}\label{eq:gamma-K}
     |\gls{sym-gamma}|  = \sqrt{\frac{ 4 \gls{sym-rho-w} \gls{sym-g} \gls{sym-V-g}  \gls{sym-B-h}} {\gls{sym-m-0}}}, \quad % excitation
-   \angle \gls{sym-gamma} = -\frac{\gls{sym-pi}}{2} + \angle\frac{ \gls{sym-B-k-0-e}}{\gls{sym-textrm-H-0-1} (\gls{sym-m-0} \gls{sym-a-2})},\quad
+   \angle \gls{sym-gamma} = -\frac{\gls{sym-pi}}{2} + \angle\frac{ \gls{sym-B-k-0-e}}{\gls{sym-mathrm-H-0-1} (\gls{sym-m-0} \gls{sym-a-2})},\quad
     \gls{sym-K-h}       = \gls{sym-rho-w} \gls{sym-g} \underbrace{\frac{\gls{sym-pi}}{4} (\gls{sym-D-f}^2 - \gls{sym-D-s}^2)}_{\gls{sym-A-w-f}},\quad  % hydrostatic stiffness
     \gls{sym-K-s} = \gls{sym-rho-w} \gls{sym-g} \underbrace{\frac{\gls{sym-pi}}{4} \gls{sym-D-s}^2}_{\gls{sym-A-w-s}}
 \end{equation}
-where $\gls{sym-g}$ is the acceleration due to gravity, $\gls{sym-rho-w}$ is the density of water, $\gls{sym-m-0}$ is the wavenumber, $\gls{sym-V-g}$ is the finite depth group velocity, $\gls{sym-textrm-H-0-1}$ is the zeroth-order Hankel function of the first kind, and $\gls{sym-A-w}$ is the waterplane area \citep{newman}.
+where $\gls{sym-g}$ is the acceleration due to gravity, $\gls{sym-rho-w}$ is the density of water, $\gls{sym-m-0}$ is the wavenumber, $\gls{sym-V-g}$ is the finite depth group velocity, $\gls{sym-mathrm-H-0-1}$ is the zeroth-order Hankel function of the first kind, and $\gls{sym-A-w}$ is the waterplane area \citep{newman}.
 This method of calculating excitation from damping is the well-known Haskind relation.
 Note that while the excitation magnitude $|\gls{sym-gamma}|$ depends on the radiation damping $\gls{sym-B-h}$ which in turn depends on all the inner region eigencoefficients ($\vec{\gls{sym-C}}_{\gls{sym-m}}^{i2}$ for float excitation and $\gls{sym-vec-C-1n-i1-2}$ for the spar excitation), the excitation phase $\angle\gls{sym-gamma}$ depends only on the first exterior eigencoefficient, $\gls{sym-B-k-0-e}$.
 
@@ -754,7 +754,7 @@ The asymptotic approximation is accurate for values of $\gls{sym-m-0}\gls{sym-h}
 The corresponding limit for the vertical coupling integral is:
 \begin{equation}
 \begin{aligned}
-    \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty}\gls{sym-boldsymbol-mathcal-Z-m-k-0} &
+    \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty}\gls{sym-boldsymbol-mathcal-Z}_{m,k=0} &
     %= \int_{-h}^{-d_2} \vec{Z}_m^{i2 ~T}\vec{Z}_0^{\textit{e}} dz
     = \gls{sym-h}~\frac{\cosh^2 (\gls{sym-m-0}\gls{sym-h})}{\sqrt{2\gls{sym-m-0}\gls{sym-h}}}\cdot \frac{-1+(-1)^\gls{sym-m}\exp(1-\frac{\gls{sym-d-2}}{\gls{sym-h}})}{\gls{sym-f-m}} \\
     \text{where}~~\gls{sym-f-m}&= \begin{cases}

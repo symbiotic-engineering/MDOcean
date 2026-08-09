@@ -25,7 +25,7 @@ To derive the dimensional scalings, we use the numerical results that \citet{ola
 By plotting the data for a variety of geometries on a single plot and scaling the axes by dimensionless geometric ratios until the points begin to overlap as a single trend,
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
-|\gls{sym-gamma-s}| = \gls{sym-rho-w} \gls{sym-g} \gls{sym-pi} \gls{sym-D-s}^2/4 |\gls{sym-H-0}(\gls{sym-k-wavenumber}\gls{sym-R-x})| \exp(-\gls{sym-k-wavenumber} \gls{sym-e-1}) \gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-alpha} \max(1,\gls{sym-alpha})
+|\gls{sym-gamma-s}| = \gls{sym-rho-w} \gls{sym-g} \gls{sym-pi} \gls{sym-D-s}^2/4 |\gls{sym-mathrm-H-0-1}(\gls{sym-k-wavenumber}\gls{sym-R-x})| \exp(-\gls{sym-k-wavenumber} \gls{sym-e-1}) \gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-alpha} \max(1,\gls{sym-alpha})
 \sqrt{\frac{\gls{sym-Upsilon}\left(\frac{\gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-R-x} \gls{sym-alpha}^3}{\gls{sym-beta} \gls{sym-R-p}}\right)}
            {\gls{sym-beta}\left(1+\frac{\gls{sym-beta}}{\gls{sym-alpha}}\right)}}
 \end{equation}
@@ -183,7 +183,9 @@ We also validate the describing function approximation for the drag force.
 The general application of the describing function technique requires that the fundamental frequency $\gls{sym-omega}$ contains the vast majority of the energy, resulting in body displacements of the form $\gls{sym-xi}(\gls{sym-t}) \sim \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
 \Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $\gls{sym-C-d}=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
 This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
-The particular describing function relation used for drag assumes that the drag force has the form $\gls{sym-F-d}(\gls{sym-t}) \sim |\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})|\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
+The particular describing function relation used for drag assumes that the drag force has the form
+$\gls{sym-F-d-t} \sim |\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})|
+                       \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
 \Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the JPD.
 The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
 
@@ -234,8 +236,8 @@ The radiation and drag efficiencies are defined relative to a drag-free simulati
 \mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}}, \qquad
 \mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
 \end{equation}
-$\gls{sym-mathbf-eta-H-T}_{\text{drag}}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{\gls{sym-P}}_{F\gls{sym-dot-X},\text{no drag}}$ (the denominator) rather than raising the numerator.
-In cases where the unconstrained controller is stable, $\gls{sym-mathbf-eta-H-T}_{\text{drag}} \leq 1$ is guaranteed.
+$\gls{sym-boldsymbol-eta-H-T}_{\text{drag}}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{\gls{sym-P}}_{F\gls{sym-dot-X},\text{no drag}}$ (the denominator) rather than raising the numerator.
+In cases where the unconstrained controller is stable, $\gls{sym-boldsymbol-eta-H-T}_{\text{drag}} \leq 1$ is guaranteed.
 
 The product of the first four matrices is the theoretical ideal mechanical power:
 \begin{equation}
@@ -247,7 +249,7 @@ The remaining two efficiency matrices capture the loss to dynamic constraints an
     \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}.
 \end{equation}
 
-Although it would be possible to formulate alternative variants such as $\gls{sym-mathbf-eta-H-T}_{\text{drag},\text{var}} = \gls{sym-mathbf-P-IV}/\mathbf{\gls{sym-P}}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
+Although it would be possible to formulate alternative variants such as $\gls{sym-boldsymbol-eta-H-T}_{\text{drag},\text{var}} = \gls{sym-mathbf-P-IV}/\mathbf{\gls{sym-P}}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
 The current decomposition preserves multiplicativity, which is the key advantage of the formulation in \Cref{eq:power-matrix-decomposition}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

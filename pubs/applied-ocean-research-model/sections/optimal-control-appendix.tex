@@ -40,24 +40,24 @@ The quadratic coefficients $\{\gls{sym-mathbf-Q-mu}, \gls{sym-vec-a-mu}, \gls{sy
     $|\gls{sym-hat-xi-f}| \leq \gls{sym-xi-f-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-p-dot-xi-f-leftarrow-VI}]^*
-        \gls{sym-mathbf-A}_{|\gls{sym-hat-q}|^2}
+        \gls{sym-mathbf-A-hat-q-2}
         [\gls{sym-mathbf-a-F-p-dot-xi-f-leftarrow-VI}]$ &
         $[0,~ \gls{sym-hat-xi-f-0}]^\\text{top}$ & $\gls{sym-xi-f-max} - |\gls{sym-hat-xi-f-0}|$ \\
     $|\gls{sym-hat-xi-s}| \leq \gls{sym-xi-s-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-p-dot-xi-s-leftarrow-VI}]^*
-        \gls{sym-mathbf-A}_{|\gls{sym-hat-q}|^2}
+        \gls{sym-mathbf-A-hat-q-2}
         [\gls{sym-mathbf-a-F-p-dot-xi-s-leftarrow-VI}]$ &
         $[0,~ \gls{sym-hat-xi-s-0}]^\\text{top}$ & $\gls{sym-xi-s-max} - |\gls{sym-hat-xi-s-0}|$ \\
     $|\gls{sym-hat-X-PTO}| \leq \gls{sym-X-PTO-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-dot-X-leftarrow-VI}]^*
-        \gls{sym-mathbf-A}_{|\gls{sym-hat-q}|^2}
+        \gls{sym-mathbf-A-hat-q-2}
         [\gls{sym-mathbf-a-F-dot-X-leftarrow-VI}]$ &
         $\gls{sym-vec-0}$ & $\gls{sym-X-PTO-max}^2$ \\
     $|\gls{sym-hat-tau}| \leq \gls{sym-tau-max}$ &
         $[\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]^*
-        \gls{sym-mathbf-A}_{|\gls{sym-hat-e}|^2}
+        \gls{sym-mathbf-A-hat-e-2}
         [\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]$ &
         $\gls{sym-vec-0}$ & $\gls{sym-tau-max}^2$ \\
     $\gls{sym-P-tau-Omega} \leq \gls{sym-P-tau-Omega-max}$ &
@@ -249,7 +249,7 @@ Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all 
 \end{figure}
 
 If $\gls{sym-A-q-mu} = 0$ for any $\gls{sym-mu}$, the $\gls{sym-mu}$th inequality constraint defines a line in the complex plane of $\gls{sym-Gamma}$ rather than a circle.
-This can occur when $\gls{sym-mathbf-Q}_{\gls{sym-mu}} = 0$ (the constraint on $\gls{sym-vec-x}$ is linear rather than quadratic, which is not the case for any of the constraints in \Cref{tab:qp-constraints}) or when $\gls{sym-vec-n}^{\, *}\gls{sym-mathbf-Q}_{\gls{sym-mu}}\gls{sym-vec-n} = 0$ ($\gls{sym-mathbf-Q}_{\gls{sym-mu}}$ is rank-deficient and $\gls{sym-vec-n}$ is in its nullspace).
+This can occur when $\gls{sym-mathbf-Q-mu} = 0$ (the constraint on $\gls{sym-vec-x}$ is linear rather than quadratic, which is not the case for any of the constraints in \Cref{tab:qp-constraints}) or when $\gls{sym-vec-n}^{\, *}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n} = 0$ ($\gls{sym-mathbf-Q-mu}$ is rank-deficient and $\gls{sym-vec-n}$ is in its nullspace).
 The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $\gls{sym-A-q-mu}$ with a small positive $\gls{sym-epsilon}$ in this case and use the quadratic implementation.
 
 %%%%%%%%%%%%%%%
@@ -302,7 +302,7 @@ In the $\gls{sym-Gamma}$ plane, a convex constraint corresponds to a circle whos
 Constraints on the effort and flow magnitude (e.g., force limits $|\gls{sym-hat-F}|\leq \gls{sym-F}_{\text{max}}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
 \citet{mccabe_force-limited_2024} visualize the feasible regions for families of such constraints on the complex $\gls{sym-Gamma}$ plane.
 They show that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
-The quadratic matrices $\gls{sym-mathbf-Q}$ in \Cref{tab:qp-constraints} confirm this: $\gls{sym-mathbf-A}_{|\gls{sym-hat-q}|^2}$ and $\gls{sym-mathbf-A}_{|\gls{sym-hat-e}|^2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
+The quadratic matrices $\gls{sym-mathbf-Q-mu}$ in \Cref{tab:qp-constraints} confirm this: $\gls{sym-mathbf-A-hat-q-2}$ and $\gls{sym-mathbf-A-hat-e-2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
 For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \Cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
 Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \citep{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
 It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
@@ -389,8 +389,8 @@ The constraint limit $\gls{sym-L-mu}$ enters $\gls{sym-r-mu}$ only through $\gls
  (the right-hand side of the quadratic inequality in \Cref{tab:qp-constraints}),
 while $\gls{sym-vec-x-p}$, $\gls{sym-vec-n}$, $\gls{sym-hat-I-p}$, $\gls{sym-mathbf-Q-mu}$, $\gls{sym-vec-a-mu}$, and $\gls{sym-Gamma-c-mu}$ depend only on the Th\'{e}venin impedance $\gls{sym-Z-s-th}$ and excitation $\gls{sym-hat-V-s-th}$ for the sea state,
 which are independent of the constraint limits.
-Defining $\gls{sym-d-mu} = |\gls{sym-hat-I-p}|^{2}\,\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q}_{\gls{sym-mu}}\gls{sym-vec-n}$
-and $\gls{sym-c-mu} = \gls{sym-d-mu}|\gls{sym-Gamma-c-mu}|^2 - \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q}_{\gls{sym-mu}}\gls{sym-vec-x-p} - 2\Re\!\left\{\gls{sym-vec-a-mu-2}^{\,*}\gls{sym-vec-x-p}\right\}$,
+Defining $\gls{sym-d-mu} = |\gls{sym-hat-I-p}|^{2}\,\gls{sym-vec-n}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-n}$
+and $\gls{sym-c-mu} = \gls{sym-d-mu}|\gls{sym-Gamma-c-mu}|^2 - \gls{sym-vec-x-p}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x-p} - 2\Re\!\left\{\gls{sym-vec-a-mu-2}^{\,*}\gls{sym-vec-x-p}\right\}$,
 both independent of the constraint limits, \Cref{eq:radius-full} and its derivative simplify to:
 \begin{equation}\label{eq:radius-simplified}
     \gls{sym-r-mu}^2 = \frac{\gls{sym-b-mu} + \gls{sym-c-mu}}{\gls{sym-d-mu}}
@@ -414,14 +414,14 @@ the squared optimal reflection coefficient magnitude in each sea state takes one
         0
     & \text{none active} \\
         |\gls{sym-Gamma-c-mu}|^2
-        - 2|\gls{sym-Gamma-c-mu}|\sqrt{\frac{\gls{sym-b-mu-2}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}}
-        + \frac{\gls{sym-b-mu-2}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}
+        - 2|\gls{sym-Gamma-c-mu}|\sqrt{\frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}}
+        + \frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
             \Gamma_{c,\mu^*} + \frac{\Gamma_{c,\nu^*} - \Gamma_{c,\mu^*}}{d_{\mu^*\nu^*}}
             \left(                \gls{sym-a-mu-nu-star}
                 \pm
-                1i \sqrt{\frac{\gls{sym-b-mu-2} + \gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}-\gls{sym-a-mu-nu-star}^2}
+                1i \sqrt{\frac{\gls{sym-b-mu-star} + \gls{sym-c-mu-2}}{\gls{sym-d-mu-2}}-\gls{sym-a-mu-nu-star}^2}
             \right)
         \right|^2
     & \text{$\gls{sym-mu}^*$ \& $\gls{sym-nu}^*$ active}
@@ -436,17 +436,17 @@ Thus, using \textrm{aff}() and \textrm{quad}() to denote affine and quadratic fu
     \begin{cases}
         0
     & \text{none active} \\
-        \textrm{aff} (\gls{sym-b-mu-2}) + \sqrt{\textrm{aff} (\gls{sym-b-mu-2})}
+        \textrm{aff} (\gls{sym-b-mu-star}) + \sqrt{\textrm{aff} (\gls{sym-b-mu-star})}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
-            \textrm{aff} (\gls{sym-b-mu-2})+\textrm{aff} (\gls{sym-b-nu-2})
+            \textrm{aff} (\gls{sym-b-mu-star})+\textrm{aff} (\gls{sym-b-nu-star})
             \pm
-            1i \sqrt{\textrm{quad} (\gls{sym-b-mu-2}, \gls{sym-b-nu-2})}
+            1i \sqrt{\textrm{quad} (\gls{sym-b-mu-star}, \gls{sym-b-nu-star})}
         \right|^2
     & \text{$\gls{sym-mu}^*$ \& $\gls{sym-nu}^*$ active} \\
-    = \textrm{quad} (\gls{sym-b-mu-2}, \gls{sym-b-nu-2}) +
-    (\textrm{aff} (\gls{sym-b-mu-2}) + \textrm{aff} (\gls{sym-b-nu-2}))
-    \sqrt{\textrm{quad} (\gls{sym-b-mu-2}, \gls{sym-b-nu-2})} &
+    = \textrm{quad} (\gls{sym-b-mu-star}, \gls{sym-b-nu-star}) +
+    (\textrm{aff} (\gls{sym-b-mu-star}) + \textrm{aff} (\gls{sym-b-nu-star}))
+    \sqrt{\textrm{quad} (\gls{sym-b-mu-star}, \gls{sym-b-nu-star})} &
     \end{cases}
 \end{equation}
 Constraint activity indices $\gls{sym-mu}^*,\gls{sym-nu}^*$ depend on the constraint limits,
